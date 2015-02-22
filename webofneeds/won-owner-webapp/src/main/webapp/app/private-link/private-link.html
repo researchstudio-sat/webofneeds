@@ -18,8 +18,9 @@
      xmlns="http://www.w3.org/1999/html">
     <div >
         <div style="font-size: 1.8em; text-align: center ;">
-            <img ng-show="!postClosed" src="{{img_path}}" alt="Generic placeholder thumbnail" style="z-index: 0">
-            <!--TODO put here second layer on the first layer picture--><img ng-show="postClosed" src="/owner/images/closed.PNG" alt="Generic placeholder thumbnail">
+            <img ng-show="!postClosed" ng-src="{{img_path}}" alt="Generic placeholder thumbnail" style="z-index: 0">
+            <!--TODO put here second layer on the first layer picture--><img ng-show="postClosed"
+                                                                             src="/owner/images/closed.PNG" alt="Generic placeholder thumbnail">
             <strong>{{currentNeed.title}}</strong>
         </div>
         <div style="text-align: center ;">
@@ -415,7 +416,7 @@
             </div>
         </div>
         <div id="settingsArea" ng-show="!settingsCollapsed" class="div-table col-lg-12">
-            <div class="div-table-row col-lg-12">
+            <div ng-show="showPrivateUser()" class="div-table-row col-lg-12">
                 <div class="div-table-cell col-lg-6">
                     <div class="row col-lg-12">
                         <div class="col-lg-11 pull-left">
@@ -423,7 +424,8 @@
                             Bookmark or otherwise save this link. Access it to chat or browse matches to your post. You shouldn’t give it away.
                         </div>
                         <div class="col-lg-1 pull-right">
-                            <img src="/owner/images/messageWasSent.PNG"/>
+                            <!--<img src="/owner/images/messageWasSent.PNG"/>-->
+                            <span style="font-size:200px"class="fa fa-exclamation"></span>
                         </div>
                     </div>
                     <div class="row col-lg-12">
@@ -432,7 +434,12 @@
                         </div>
                         <div class="col-lg-1">
                             <!--<span class="glyphicon glyphicon-floppy-disk" style="font-size: 2.8em;" data-toggle="copy link to clipboard"></span>-->
-                            <i class="fa fa-file-text-o fa-lg" style="font-size: 2.8em;"></i>
+                            <!--<i class="fa fa-file-text-o fa-lg" style="font-size: 2.8em;"></i>-->
+                            <button class="btn btn-primary" type="button" clip-copy="privateLink"
+                                    clip-click="logClipCopied()" clip-click-fallback="fallbackForClipCopy(copy)">
+                                <!--<span class="glyphicon glyphicon-floppy-disk"></span>-->
+                                <i class="fa fa-file-text-o fa-lg"></i>&nbsp;Copy link
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -508,7 +515,13 @@
                         </div>
                         <div class="col-lg-1">
                             <!--<span class="glyphicon glyphicon-floppy-disk" style="font-size: 2.8em;" data-toggle="copy link to clipboard"></span>-->
-                            <i class="fa fa-file-text-o fa-lg" style="font-size: 2.8em;"></i>
+                            <!--<i class="fa fa-file-text-o fa-lg" style="font-size: 2.8em;"></i>-->
+                            <button class="btn btn-primary" type="button" clip-copy="publicLink" clip-click-fallback="fallbackForClipCopy(copy)"
+                                    clip-click="logClipCopied()">
+                                <!--<span class="glyphicon glyphicon-floppy-disk"></span>-->
+                                <i class="fa fa-file-text-o fa-lg"></i>&nbsp;Copy link
+                            </button>
+
                         </div>
                     </div>
                     <div class="row col-lg-12">
@@ -531,6 +544,7 @@
                 </div>
             </div>
         </div>
+
 
         <!--Post Options Area-->
         <div id="postOptionsAreaCollapse" class="well div-table col-lg-12">

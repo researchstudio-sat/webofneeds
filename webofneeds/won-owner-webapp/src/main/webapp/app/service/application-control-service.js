@@ -79,6 +79,14 @@ angular.module('won.owner').factory('applicationControlService', function (appli
                 return ""
         }
     };
+    applicationControlService.getMachineReadableNeedState = function(needState){
+        switch (needState){
+            case 'Active':
+                return won.WON.Active;
+            case 'Inactive':
+                return won.WON.Inactive;
+        }
+    }
     applicationControlService.getMenuPositionForNeedType = function(needType){
         switch (needType){
             case won.WON.BasicNeedTypeDemand:

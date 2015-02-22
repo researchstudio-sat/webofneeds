@@ -23,6 +23,12 @@ public class WONMSG
 
   private static Model m = ModelFactory.createDefaultModel();
 
+  public static final Resource TYPE_NODE2OWNER = m.createResource(BASE_URI+"NodeToOwnerEnvelope");
+  public static final Resource TYPE_OWNER2NODE = m.createResource(BASE_URI+"OwnerToNodeEnvelope");
+  public static final Resource TYPE_SYSTEMMSG = m.createResource(BASE_URI+"SystemMessageEnvelope");
+  public static final Resource TYPE_NODE2NODE = m.createResource(BASE_URI+"NodeToNodeEnvelope");
+  public static final Resource TYPE_NODE2MATCHER = m.createResource(BASE_URI+"NodeToMatcherEnvelope");
+  public static final Resource TYPE_MATCHER2NODE = m.createResource(BASE_URI+"MatcherToNodeEnvelope");
 
   // main types
   public static final Resource TYPE_CREATE = m.createResource(BASE_URI + "CreateMessage");

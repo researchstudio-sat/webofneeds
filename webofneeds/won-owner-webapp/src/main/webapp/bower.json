@@ -22,7 +22,7 @@
     "angular-bootstrap": "~0.6.0",
     "angular-mocks": "1.0.8",
     "angular-route": "~1.2.23",
-    "angular-ui-map": "~0.0.2",
+    "angular-ui-map": "~0.0.3",
     "angular-ui-utils": "~0.2.1",
     "angular": "~1.2.23",
     "jquery": "~2.0.3",
@@ -31,9 +31,11 @@
     "ng-scrollbar": "~0.0.6",
     "sockjs": "0.3.4",
     "ng-tags-input": "2.1.1",
+    "ng-clip": "0.2.6",
     "bootsketch": "~1.0.0"
   },
   "resolutions": {
-    "angular": ">=1.2.1"
+     "angular": "~1.2.28"
   }
+
 }

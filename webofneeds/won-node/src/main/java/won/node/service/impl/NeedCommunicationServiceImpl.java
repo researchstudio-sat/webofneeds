@@ -145,7 +145,7 @@ public class NeedCommunicationServiceImpl implements
       URI wrappedMessageURI = this.wonNodeInformationService.generateEventURI();
     //TODO; hint messages are strictly said, not an inbound message since it doesn't have a remote counterpart. should be refactored
       WonMessage wrappedMessage  =  WonMessageBuilder
-      .copyInboundWonMessageForLocalStorage(wrappedMessageURI, con.getConnectionURI(), wonMessage);
+      .copyInboundNodeToNodeMessageAsNodeToOwnerMessage(wrappedMessageURI, con.getConnectionURI(), wonMessage);
 
       rdfStorageService.storeDataset(wrappedMessageURI, wrappedMessage.getCompleteDataset());
 
@@ -153,7 +153,7 @@ public class NeedCommunicationServiceImpl implements
       con.getConnectionURI(), wrappedMessage));
       reg.get(con).hint(con, wmScore, wmOriginator, facetModel, wrappedMessage);
              /*
-      WonMessage newWonMessage = WonMessageBuilder.wrapOutboundWonMessageForLocalStorage(con.getConnectionURI(),
+      WonMessage newWonMessage = WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(con.getConnectionURI(),
                                                                                        wonMessage);
 
       messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(), newWonMessage));
@@ -187,7 +187,8 @@ public class NeedCommunicationServiceImpl implements
                                                      ConnectionEventType.OWNER_OPEN);
 
       // add the connectionID to the wonMessage
-      final WonMessage newWonMessage = WonMessageBuilder.wrapOutboundWonMessageForLocalStorage(con.getConnectionURI(),
+      final WonMessage newWonMessage = WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(
+        con.getConnectionURI(),
         wonMessage);
 
       messageEventRepository.save(
@@ -237,7 +238,7 @@ public class NeedCommunicationServiceImpl implements
       // to the message and pass it on to the owner.
       URI wrappedMessageURI = this.wonNodeInformationService.generateEventURI();
       WonMessage wrappedMessage  =  WonMessageBuilder
-        .copyInboundWonMessageForLocalStorage(wrappedMessageURI, con.getConnectionURI(), wonMessage);
+        .copyInboundNodeToNodeMessageAsNodeToOwnerMessage(wrappedMessageURI, con.getConnectionURI(), wonMessage);
 
 
       rdfStorageService.storeDataset(wrappedMessageURI, wrappedMessage.getCompleteDataset());

@@ -51,7 +51,8 @@ public class GroupFacetImpl extends AbstractFacet
                 URI forwardedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
                 URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(con.getRemoteConnectionURI(),
                   linkedDataSource);
-                WonMessage newWonMessage = WonMessageBuilder.forwardReceivedWonMessage(forwardedMessageURI, wonMessage,
+                WonMessage newWonMessage = WonMessageBuilder.forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(
+                  forwardedMessageURI, wonMessage,
                   con.getConnectionURI(), con.getNeedURI(), wonMessage.getReceiverNodeURI(),
                   con.getRemoteConnectionURI(), con.getRemoteNeedURI(), remoteWonNodeUri);
                 needFacingConnectionClient.sendMessage(c, message, newWonMessage);

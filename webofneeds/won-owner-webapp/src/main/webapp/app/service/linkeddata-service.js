@@ -488,12 +488,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
                                "prefix " + "dc" + ":<" + "http://purl.org/dc/elements/1.1/>\n" +
                                "prefix " + "geo" + ":<" + "http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
-                               "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime where { " +
+                               "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime ?state where { " +
                                //TODO: add as soon as named graphs are handled by the rdf store
                                //
                                //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
                                //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
-                               //                "GRAPH ?coreURI {"+
+                               //                "GRAPH ?coreURI {"+,
+                               "<" + uri + ">" + won.WON.isInStateCompacted + " ?state ." +
                                "<" + uri + ">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ." +
                                "<" + uri + ">" + won.WON.hasContentCompacted + " ?content ." +
                                "?content dc:title ?title ." +
@@ -530,6 +531,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                resultObject.tags = getSafeValue(result.tags);
                                resultObject.textDescription = getSafeValue(result.textDescription);
                                resultObject.creationDate = getSafeValue(result.creationDate);
+                               resultObject.state = getSafeValue(result.state);
                            });
                            return resultObject;
                        } catch (e) {
@@ -628,6 +630,33 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 function(reason) { return $q.reject("could not get remote need uri of connection " + connectionUri + ". Reason: " + reason)});
     }
 
+    linkedDataService.getEnvelopeDataForNeed=function(needUri){
+        if(typeof needUri === 'undefined'||needUri == null){
+            throw {message: "getEnvelopeDataForNeed: needUri must not be null"};
+
+        }
+        return linkedDataService.getWonNodeUriOfNeed(needUri)
+            .then(function(wonNodeUri){
+                var ret = {};
+                ret[won.WONMSG.hasSender] = needUri;
+                ret[won.WONMSG.hasSenderNeed] = needUri;
+                ret[won.WONMSG.hasSenderNode] = wonNodeUri;
+                ret[won.WONMSG.hasReceiverNeed] = needUri;
+                ret[won.WONMSG.hasReceiverNode] = wonNodeUri;
+                return ret;
+
+            },function(reason) {
+                //no connection found
+                var deferred = $q.defer();
+                var ret = {};
+                ret[won.WONMSG.hasSender] = needUri;
+                ret[won.WONMSG.hasSenderNeed] = needUri;
+                ret[won.WONMSG.hasReceiverNeed] = needUri;
+                return ret;
+                deferred.resolve(ret);
+                return deferred.promise;}
+        )
+    }
     /**
      * Fetches a structure that can be used directly (in a JSON-LD node) as the envelope data
      * to send a message via the specified connectionUri (that is interpreted as a local connection.

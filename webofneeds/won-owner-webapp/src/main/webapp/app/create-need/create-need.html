@@ -55,7 +55,7 @@
 
                                         <div class="row">
                                             <div class="col-lg-8 col-lg-offset-2" ng-show="!showChangeType">
-                                                <img src="{{currentTypeIcon()}}"/> {{getCurrentTypeOfOffer()}}
+                                                <img ng-src="{{currentTypeIcon()}}"/> {{getCurrentTypeOfOffer()}}
                                                 <a ng-click="clickOnChangeTypeOfNeed()">(change)</a>
                                             </div>
                                         </div>
@@ -379,7 +379,7 @@
 
                                     <p class="text-justify">
                                         <!-- TODO shorten the text description -->
-                                        {{need.textDescription}} (<a href="#/post-detail/">go to full description</a>).
+                                        {{need.textDescription}} (<a href="" ng-click="goToDetailPostPreview()">go to full description</a>).
                                         <!-- TODO link needs to be extended by parameters -->
                                     </p>
                                 </div>
@@ -390,9 +390,9 @@
                             And this is how it will look if they view it in greater detail:
                         </div>
 
-                        <div class="col-md-12 well">
+                        <div id="detail-preview" class="col-md-12 well">
                             <!--TODO controller should be specified in the directive-->
-                            <won-Post-Detail need="need"></won-Post-Detail>
+                            <won-Post-Detail need="previewNeed"></won-Post-Detail>
                             <!--deactivate conatct, map and calendar-->
                         </div>
                     </div>
@@ -421,7 +421,7 @@
                         ng-disabled="goToPreviewButtonDisabled()" ng-click="jumpToStep(3)">
                     <i class="fa fa-chevron-right fa-lg"></i><i class="fa fa-chevron-right fa-lg"></i>&nbsp;{{gotoPreviewButtonText()}}
                 </button>
-                <button ng-show="publishButton" type="button" class="btn btn-success" ng-click="publish()">
+                <button ng-show="publishButton" type="button" class="btn btn-success" ng-click="publishClicked()">
                     <i class="fa fa-check fa-lg"></i>&nbsp;Publish
                 </button>
 

@@ -41,6 +41,7 @@ public class WonMessageBuilder
   private URI receiverNodeURI;
 
   private WonMessageType wonMessageType;
+  private WonEnvelopeType wonEnvelopeType;
   private Resource responseMessageState;
 
   private Set<URI> refersToURIs = new HashSet<>();
@@ -132,9 +133,15 @@ public class WonMessageBuilder
     defaultModel.createResource(envelopeGraphURI, WONMSG.ENVELOPE_GRAPH);
     dataset.addNamedModel(envelopeGraphURI, envelopeGraph);
 
+    //make sure the envelope type has been set
+    if (this.wonEnvelopeType == null) {
+      throw new IllegalStateException("envelopeType must be set!");
+    }
+
     // message URI
-    Resource messageEventResource = envelopeGraph.createResource(messageURI.toString());
-    if (wonMessageType != null){
+    Resource messageEventResource = envelopeGraph
+      .createResource(messageURI.toString(), this.wonEnvelopeType.getResource());
+    if (wonMessageType != null) {
       messageEventResource.addProperty(WONMSG.HAS_MESSAGE_TYPE_PROPERTY, wonMessageType.getResource());
     }
 
@@ -523,6 +530,10 @@ public class WonMessageBuilder
     this.wonMessageType = wonMessageType;
     return this;
   }
+  public WonMessageBuilder setWonEnvelopeType(WonEnvelopeType wonEnvelopeType){
+    this.wonEnvelopeType = wonEnvelopeType;
+    return this;
+  }
 
   /**
    * Adds the specified content graph, and the specified signature graph, using the specified
@@ -575,7 +586,7 @@ public class WonMessageBuilder
    * @param wonMessage
    * @return
    */
-  public WonMessageBuilder copyEnvelopeFromWonMessage(final WonMessage wonMessage) {
+  WonMessageBuilder copyEnvelopeFromWonMessage(final WonMessage wonMessage) {
     return this
       .setWonMessageType(wonMessage.getMessageType())
       .setReceiverURI(wonMessage.getReceiverURI())
@@ -592,7 +603,7 @@ public class WonMessageBuilder
    * @param wonMessage
    * @return
    */
-  public WonMessageBuilder copyContentFromMessageReplacingMessageURI(final WonMessage wonMessage) {
+  WonMessageBuilder copyContentFromMessageReplacingMessageURI(final WonMessage wonMessage) {
     return copyContentFromMessage(wonMessage, true);
   }
 
@@ -602,7 +613,7 @@ public class WonMessageBuilder
    * @param wonMessage
    * @return
    */
-  public WonMessageBuilder copyContentFromMessage(final WonMessage wonMessage) {
+  WonMessageBuilder copyContentFromMessage(final WonMessage wonMessage) {
     return copyContentFromMessage(wonMessage, false);
   }
 
@@ -616,7 +627,7 @@ public class WonMessageBuilder
    * @param wonMessage
    * @return
    */
-  public WonMessageBuilder copyContentFromMessage(final WonMessage wonMessage, boolean replaceMessageUri) {
+   WonMessageBuilder copyContentFromMessage(final WonMessage wonMessage, boolean replaceMessageUri) {
     Dataset messageContent = wonMessage.getMessageContent();
     for (Iterator<String> nameIt = messageContent.listNames(); nameIt.hasNext(); ){
       String modelUri = nameIt.next();
@@ -651,8 +662,8 @@ public class WonMessageBuilder
    * @param inboundWonMessage
    * @return
    */
-  public static WonMessage copyInboundWonMessageForLocalStorage(final URI newMessageUri,
-    final URI localConnectionUri, final WonMessage inboundWonMessage) {
+  public static WonMessage copyInboundNodeToNodeMessageAsNodeToOwnerMessage(final URI newMessageUri,
+                                                                            final URI localConnectionUri, final WonMessage inboundWonMessage) {
     URI inboundReceiverURI = inboundWonMessage.getReceiverURI();
     if (inboundReceiverURI != null){
       assert inboundReceiverURI.equals(localConnectionUri) : "inbound wonMessage's receiverURI is not the expected " +
@@ -665,10 +676,11 @@ public class WonMessageBuilder
       .setReceiverURI(localConnectionUri)
       .setTimestamp(new Date().getTime())
       .addRefersToURI(inboundWonMessage.getMessageURI())
+      .setWonEnvelopeType(WonEnvelopeType.NodeToOwner)
       .build();
   }
 
-  public static WonMessage wrapOutboundWonMessageForLocalStorage(final URI localConnectionUri, final WonMessage
+  public static WonMessage wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(final URI localConnectionUri, final WonMessage
     outboundWonMessage){
     WonMessageBuilder builder = new WonMessageBuilder()
       .wrap(outboundWonMessage)
@@ -676,21 +688,23 @@ public class WonMessageBuilder
     if (localConnectionUri != null) {
       builder.setSenderURI(localConnectionUri);
     }
+    builder.setWonEnvelopeType(WonEnvelopeType.NodeToNode);
     return builder.build();
   }
 
 
-  public static WonMessage wrapOwnerToNeedWonMessageForLocalStorage(final WonMessage
-    ownerToNeedWonMessage){
+  public static WonMessage wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(final WonMessage
+                                                                                       ownerToNeedWonMessage){
     WonMessageBuilder builder = new WonMessageBuilder()
       .wrap(ownerToNeedWonMessage)
       .setTimestamp(new Date().getTime());
+    builder.setWonEnvelopeType(WonEnvelopeType.NodeToNode);
     return builder.build();
   }
 
-  public static WonMessage forwardReceivedWonMessage(final URI newMessageUri, final WonMessage wonMessage,
-    final URI connectionURI, final URI needURI, final URI wonNodeUri,
-    final URI remoteConnectionURI, final URI remoteNeedURI, final URI remoteWonNodeUri) {
+  public static WonMessage forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(final URI newMessageUri, final WonMessage wonMessage,
+                                                                               final URI connectionURI, final URI needURI, final URI wonNodeUri,
+                                                                               final URI remoteConnectionURI, final URI remoteNeedURI, final URI remoteWonNodeUri) {
     WonMessageBuilder builder = new WonMessageBuilder()
       .setMessageURI(newMessageUri)
       .setWonMessageType(wonMessage.getMessageType())
@@ -699,7 +713,8 @@ public class WonMessageBuilder
       .setTimestamp(System.currentTimeMillis())
       .setReceiverURI(remoteConnectionURI)
       .setReceiverNeedURI(remoteNeedURI)
-      .setReceiverNodeURI(remoteWonNodeUri);
+      .setReceiverNodeURI(remoteWonNodeUri)
+      .setWonEnvelopeType(WonEnvelopeType.NodeToNode);
     return builder.build();
   }
 

@@ -65,6 +65,9 @@
         <script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
         <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
         <script type="text/javascript" src="bower_components/ng-scrollbar/src/ng-scrollbar.js"></script>
+        <script type="text/javascript" src="bower_components/zeroclipboard/dist/ZeroClipboard.js"></script>
+        <script type="text/javascript" src="bower_components/ng-clip/src/ngClip.js"></script>
+
         <script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
         <script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
         <script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
@@ -181,25 +184,25 @@
 
 
 
-				<li ng-show="!showPublic()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
+				<li ng-show="showAccountUser()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
 					<i class="fa fa-clipboard fa-lg"></i>&nbsp;Post box</a>
 				</li>
 
-                <li ng-show="!showPublic()" ng-cloak notif-dropdown
+                <li ng-show="showAccountUser()" ng-cloak notif-dropdown
                     event-type = "message"
                     unread-events-by-type-by-need="unreadEventsByTypeByNeed"
                     unread-events-by-need-by-type="unreadEventsByNeedByType"
                     on-click="openNeedDetailView(needURI)"
                     get-type-pic-uri = "getTypePicURI(type)">
                 </li>
-                <li ng-show="!showPublic()" ng-cloak notif-dropdown
+                <li ng-show="showAccountUser()" ng-cloak notif-dropdown
                     event-type = "connect"
                     unread-events-by-type-by-need="unreadEventsByTypeByNeed"
                     unread-events-by-need-by-type="unreadEventsByNeedByType"
                     on-click="openNeedDetailView(needURI)"
                     get-type-pic-uri = "getTypePicURI(type)">
                 </li>
-                <li ng-show="!showPublic()" ng-cloak notif-dropdown
+                <li ng-show="showAccountUser()" ng-cloak notif-dropdown
                     event-type = "hint"
                     unread-events-by-type-by-need="unreadEventsByTypeByNeed"
                     unread-events-by-need-by-type="unreadEventsByNeedByType"
@@ -250,6 +253,7 @@
             window.user = {
                 <sec:authorize access="isAuthenticated()">
                 username : '<sec:authentication property="principal.username" />',
+                authorities : '<sec:authentication property="principal.authorities" />',
                 isAuth : true
                 </sec:authorize>
                 <sec:authorize access="!isAuthenticated()">

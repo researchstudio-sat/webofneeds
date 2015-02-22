@@ -12,10 +12,7 @@ import won.cryptography.service.SecureRandomNumberServiceImpl;
 import won.owner.service.OwnerApplicationServiceCallback;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.protocol.exception.WonMessageBuilderException;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDecoder;
-import won.protocol.message.WonMessageType;
+import won.protocol.message.*;
 import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -84,18 +81,6 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         Model content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next());
         RdfUtils.replaceBaseURI(content, wonMessage.getMessageURI().toString());
 
-        // ToDo (FS): this should be encapsulated in an own subclass of WonMessage
-        // get the active status
-        boolean active = false;
-        switch (WonRdfUtils.NeedUtils.queryActiveStatus(
-          messageContent, wonMessage.getSenderNeedURI())) {
-          case ACTIVE:
-            active = true;
-            break;
-          case INACTIVE:
-            active = false;
-            break;
-        }
 
 
         // get the wonNodeURI
@@ -105,7 +90,8 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         final ListenableFuture<URI> newNeedURI;
         try {
           wonMessageMap.put(wonMessage.getSenderNeedURI(), wonMessage);
-          newNeedURI = ownerProtocolService.createNeed(content, active, wonNodeURI,wonMessage);
+
+          newNeedURI = ownerProtocolService.createNeed(content, true, wonNodeURI,wonMessage);
 
           newNeedURI.addListener(new Runnable()
           {
@@ -243,6 +229,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         .setReceiverNeedURI(wonMessage.getSenderNeedURI())
         .setResponseMessageState(responseType)
         .addRefersToURI(wonMessage.getMessageURI())
+        .setWonEnvelopeType(WonEnvelopeType.NodeToOwner)
         .build();
 
       ownerApplicationServiceCallbackToClient.onMessage(responseWonMessage);

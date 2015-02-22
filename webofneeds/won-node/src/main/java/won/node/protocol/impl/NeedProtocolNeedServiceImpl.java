@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.node.service.impl.URIService;
 import won.protocol.exception.*;
+import won.protocol.message.WonEnvelopeType;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.Connection;
@@ -155,6 +156,7 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
       connection.getRemoteConnectionURI(),
       connection.getRemoteNeedURI(),
       remoteNeed.getWonNodeURI())
+      .setWonEnvelopeType(WonEnvelopeType.NodeToOwner)
       .build();
 
   }

@@ -36,6 +36,7 @@ import won.owner.model.User;
 import won.owner.pojo.UserPojo;
 import won.owner.service.impl.WONUserDetailService;
 import won.owner.web.validator.UserRegisterValidator;
+import won.protocol.util.CheapInsecureRandomString;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -106,6 +107,47 @@ public class RestUserController
   }
 
   /**
+   * registers user
+   *
+   * @param user   registration data of a user
+   * @param errors
+   * @return ResponseEntity with Http Status Code
+   */
+  @ResponseBody
+  @RequestMapping(
+    value = "/private",
+    method = RequestMethod.POST
+  )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity registerPrivateLinkAsUser(@RequestBody UserPojo user, Errors errors) {
+    String privateLink = null;
+    try {
+      System.out.println(user.getUsername() + "  " + user.getPassword() + " " +  user.getPasswordAgain());
+      privateLink = (new CheapInsecureRandomString()).nextString(32); // TODO more secure random alphanum string
+      user.setUsername(privateLink);
+      userRegisterValidator.validate(user, errors);
+      if (errors.hasErrors()) {
+        if (errors.getFieldErrorCount() > 0) {
+          // someone trying to go around js validation
+          return new ResponseEntity(errors.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
+        } else {
+          // username is already in database
+          return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
+        }
+      } else {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        User userDetails = new User(user.getUsername(), passwordEncoder.encode(user.getPassword()), "ROLE_PRIVATE");
+        wonUserDetailService.save(userDetails);
+      }
+    } catch (DataIntegrityViolationException e) {
+      // username is already in database
+      return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
+    }
+    return new ResponseEntity(privateLink, HttpStatus.CREATED);
+  }
+
+  /**
    * check authentication and returrn ResponseEntity with HTTP status code
    *
    * @param user     user object
@@ -159,6 +201,27 @@ public class RestUserController
       return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
     } else {
       return new ResponseEntity("Current session is still valid. asdf", HttpStatus.OK);
+    }
+  }
+
+  @RequestMapping(
+    value = "/isSignedInRole",
+    method = RequestMethod.GET
+  )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  //public ResponseEntity isSignedIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
+  public ResponseEntity isSignedInRole() {
+    // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
+    // code by itself if the session isn't valid any more
+    SecurityContext context = SecurityContextHolder.getContext();
+    //if(context.getAuthentication() )
+    if (context == null || context.getAuthentication() == null) {
+      return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
+    } else if ("anonymousUser".equals(context.getAuthentication().getPrincipal())) {
+      return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
+    } else {
+      return new ResponseEntity(SecurityContextHolder.getContext().getAuthentication().getAuthorities(), HttpStatus.OK);
     }
   }
 

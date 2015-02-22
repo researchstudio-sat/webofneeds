@@ -7,7 +7,16 @@
  */
 
 angular.module('won.owner')
-    .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope, $log,applicationStateService, applicationControlService, linkedDataService, wonService) {
+    .controller('PrivateLinkCtrl', function ($scope
+        , $location
+        , userService
+        , $rootScope
+        , $log
+        , $routeParams
+        , applicationStateService
+        , applicationControlService
+        , linkedDataService
+        , wonService) {
 
     // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
@@ -47,17 +56,47 @@ angular.module('won.owner')
      won.WONMSG.hintMessage,
      won.WONMSG.closeMessage];
 
-
+    $rootScope.postClosed=false;
     //$scope.title = 'New Flat, Need Furniture';
+        $scope.need = applicationStateService.getCurrentNeed().then(function(need){
+            $rootScope.postClosed =  applicationStateService.checkIfNeedIsInactive(need);
+        });
+
     $scope.img_path = '/owner/images/thumbnail_demo.jpg';
-    $rootScope.postClosed = false;
+
+
+
+
     $rootScope.postShouldBeClosed = false;
     $rootScope.postShouldBeReopened = false;
 
 
     //settings
-    $scope.privateLink = applicationStateService.getPrivateLink($scope.currentNeed.uri);
-    $scope.publicLink = applicationStateService.getPublicLink($scope.currentNeed.uri);
+
+    if ($routeParams.id != null) {
+
+        userService.setUpRegistrationForUserWithPrivateLink($routeParams.id).then(
+            function success() {
+                // calling replace() removes it from the browser history when clicking back button,
+                // i.e. if I enter a private link A and then change the session (time-out, log-in with
+                // other user account or create a new private link B) clicking 'back' in the browser won't
+                // display my private link A. This is a big plus, but still needs some work: at least in
+                // Chrome, I can still see my private link in the browser history page.
+                // TODO bug: sometimes, when entering the private link page (try 4-10 times in a raw)
+                // connections are not loaded...
+                $location.url('/private-link').replace();
+            }
+            //TODO error
+        );
+        return;
+    }
+
+    if (userService.isPrivateUser()) {
+        $scope.privateLink = applicationStateService.getPrivateLink(userService.getUserName());
+    }
+
+    $scope.publicLink = applicationStateService.getPublicLink(applicationStateService.getCurrentNeedURI());
+
     $scope.notificationEmail = '';
     $scope.notificationEmailValide = false;
     $scope.notificationChecks = {
@@ -85,10 +124,9 @@ angular.module('won.owner')
         return userService.isAuth();
     };
 
-    $scope.copyLinkToClipboard = function() {
-        //todo maybe we can use http://zeroclipboard.org/
+    $scope.showPrivateUser = function() {
+        return userService.isPrivateUser();
     };
-
 
     $scope.settingsCollapseClick= function() {
         $scope.settingsCollapsed = !$scope.settingsCollapsed;
@@ -465,7 +503,7 @@ angular.module('won.owner')
 
 })
 
-angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scope,$route,$window,$location,userService, $rootScope) {
+angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scope,$route,$window,$location,userService,applicationStateService, $rootScope,wonService) {
 
     $scope.close = false;
     $scope.reopen = false;
@@ -482,6 +520,19 @@ angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scop
         }
     }     */
 
+    $scope.$on(won.EVENT.CLOSE_NEED_SENT, function(ngEvent, eventData) {
+        linkedDataService.getNeed(eventData.hasSenderNeed).then(function(need){
+            $rootScope.postClosed = applicationStateService.checkIfNeedIsInactive(need);
+        });
+
+    });
+    $scope.$on(won.EVENT.ACTIVATE_NEED_SENT, function(ngEvent, eventData) {
+        linkedDataService.getNeed(eventData.hasSenderNeed).then(function(need){
+            $rootScope.postClosed = applicationStateService.checkIfNeedIsInactive(need);
+        });
+
+    });
+
     $scope.onClickYes = function () {
         $scope.error = '';
 
@@ -490,14 +541,14 @@ angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scop
             //TODO logic
             $scope.close = true;
             $rootScope.postShouldBeClosed = false;
-            $rootScope.postClosed = true;
+            wonService.closeNeed($scope.currentNeed.uri);
         }
 
         //TODO logic
         if($rootScope.postShouldBeReopened){
             $scope.reopen = true;
             $rootScope.postShouldBeReopened = false;
-            $rootScope.postClosed = false;
+            wonService.activateNeed($scope.currentNeed.uri);
         }
     }
 
