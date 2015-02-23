@@ -416,6 +416,25 @@ angular.module('won.owner').factory('userService', function ($window
         }
     }
 
+    userService.sendEmail = function(emailType, emailTo) {
+        var email = {};
+        email.type = emailType;
+        email.to = emailTo;
+        return $http.post(
+            '/owner/rest/users/email',
+            email
+        ).then(
+            function success(data, status) {
+                $log.debug("Successfully send email");
+                return {status: "OK"};
+            },
+            function error(data, status) {
+                $log.error("ERROR: failed to send email");
+                return {status: "FATAL_ERROR"};
+            }
+        );
+    }
+
     var verified = userService.verifyAuth(); //checking login status
     verified.then(function reloadWhileLoggedIn(loggedIn){
         if(loggedIn) {

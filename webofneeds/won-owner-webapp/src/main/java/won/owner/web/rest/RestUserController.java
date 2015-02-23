@@ -5,6 +5,7 @@
 
 package won.owner.web.rest;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +35,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import won.owner.model.User;
 import won.owner.pojo.UserPojo;
+import won.owner.service.impl.URIService;
 import won.owner.service.impl.WONUserDetailService;
 import won.owner.web.validator.UserRegisterValidator;
 import won.protocol.util.CheapInsecureRandomString;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
@@ -61,13 +64,25 @@ public class RestUserController
 
   private UserRegisterValidator userRegisterValidator;
 
+  private TempSpringEmail emailSender;
+
+  private URIService uriService;
+
+  @Autowired
+  ServletContext context;
+
   @Autowired
   public RestUserController(final WONUserDetailService wonUserDetailService, final AuthenticationManager authenticationManager,
-                            final SecurityContextRepository securityContextRepository, final UserRegisterValidator userRegisterValidator) {
+                            final SecurityContextRepository securityContextRepository,
+                            final UserRegisterValidator userRegisterValidator,
+                            final TempSpringEmail emailSender,
+                            final URIService uriService) {
     this.wonUserDetailService = wonUserDetailService;
     this.authenticationManager = authenticationManager;
     this.securityContextRepository = securityContextRepository;
     this.userRegisterValidator = userRegisterValidator;
+    this.emailSender = emailSender;
+    this.uriService = uriService;
   }
 
   /**
@@ -106,6 +121,40 @@ public class RestUserController
     return new ResponseEntity("New user was created", HttpStatus.CREATED);
   }
 
+
+  @ResponseBody
+  @RequestMapping(
+    value = "/email",
+    method = RequestMethod.POST
+  )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity sendEmail(@RequestBody JsonNode input) {
+
+    String type = input.get("type").asText();
+    String to = input.get("to").asText();
+    User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    if ("PRIVATE_LINK".equals(type)) {
+      if ("ROLE_PRIVATE".equals(user.getRole())) {
+        String privateLink =  uriService.getOwnerProtocolOwnerURI() + "/#/private-link?id=" + user.getUsername();
+        try{
+          emailSender.sendPrivateLink(to, privateLink);
+        }
+        catch (Exception ex) { // org.springframework.mail.MailException
+          logger.warn("Email could not be sent", ex);
+          return new ResponseEntity("Email could not be sent", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+      } else {
+        return new ResponseEntity("Cannot send private link to not private user", HttpStatus.BAD_REQUEST);
+      }
+    } else {
+      return new ResponseEntity("Mail type " + type + " not supported", HttpStatus.BAD_REQUEST);
+    }
+
+    return new ResponseEntity("Email sent", HttpStatus.OK);
+  }
+
   /**
    * registers user
    *
@@ -123,7 +172,6 @@ public class RestUserController
   public ResponseEntity registerPrivateLinkAsUser(@RequestBody UserPojo user, Errors errors) {
     String privateLink = null;
     try {
-      System.out.println(user.getUsername() + "  " + user.getPassword() + " " +  user.getPasswordAgain());
       privateLink = (new CheapInsecureRandomString()).nextString(32); // TODO more secure random alphanum string
       user.setUsername(privateLink);
       userRegisterValidator.validate(user, errors);
