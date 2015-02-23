@@ -25,20 +25,16 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-    <!--
-         Load properties but ignore unresolvable properties so that
-         they are searched in other property configurers defined in the context
-    -->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/owner.properties" ignore-unresolvable="true"/>
 
     <!-- configuration with gmail smtp server, uses unsafe access and requires
-    that https://www.google.com/settings/security/lesssecureapps is turned on.
-    Change this confuguration if another mail server should be used -->
-    <bean id="springMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+     that https://www.google.com/settings/security/lesssecureapps is turned on.
+     Change this confuguration if another mail server should be used -->
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
         <property name="host" value="smtp.gmail.com"/>
+
         <property name="port" value="587" />
-        <property name="username" value="${email.from.won.user}" />
-        <property name="password" value="${email.from.won.password}" />
+        <property name="username" value="***@googlemail.com" />
+        <property name="password" value="***"  />
 
         <property name="javaMailProperties">
             <props>
@@ -46,20 +42,17 @@
                 <prop key="mail.smtp.starttls.enable">true</prop>
             </props>
         </property>
-
     </bean>
 
-    <bean id="springTemplateMessage" class="org.springframework.mail.SimpleMailMessage">
-        <property name="from" value="${email.from.won.user}"/>
-    </bean>
-
-    <bean id="ownerNoReplayMailSender" class="won.owner.web.WonOwnerMailSender">
-        <property name="wonMailSender" ref="wonMailSender"/>
+    <!-- this is a template message that we can pre-load with default state -->
+    <bean id="templateMessage" class="org.springframework.mail.SimpleMailMessage">
+        <property name="from" value="***@googlemail.com"/>
     </bean>
 
     <bean id="wonMailSender" class="won.utils.mail.WonMailSender">
-        <property name="mailSender" ref="springMailSender"/>
-        <property name="templateMessage" ref="springTemplateMessage"/>
+        <property name="mailSender" ref="mailSender"/>
+        <property name="templateMessage" ref="templateMessage"/>
     </bean>
+
 
 </beans>

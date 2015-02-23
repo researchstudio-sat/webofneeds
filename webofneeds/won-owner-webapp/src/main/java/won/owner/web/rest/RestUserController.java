@@ -37,6 +37,7 @@ import won.owner.model.User;
 import won.owner.pojo.UserPojo;
 import won.owner.service.impl.URIService;
 import won.owner.service.impl.WONUserDetailService;
+import won.owner.web.WonOwnerMailSender;
 import won.owner.web.validator.UserRegisterValidator;
 import won.protocol.util.CheapInsecureRandomString;
 
@@ -64,7 +65,7 @@ public class RestUserController
 
   private UserRegisterValidator userRegisterValidator;
 
-  private TempSpringEmail emailSender;
+  private WonOwnerMailSender emailSender;
 
   private URIService uriService;
 
@@ -75,7 +76,7 @@ public class RestUserController
   public RestUserController(final WONUserDetailService wonUserDetailService, final AuthenticationManager authenticationManager,
                             final SecurityContextRepository securityContextRepository,
                             final UserRegisterValidator userRegisterValidator,
-                            final TempSpringEmail emailSender,
+                            final WonOwnerMailSender emailSender,
                             final URIService uriService) {
     this.wonUserDetailService = wonUserDetailService;
     this.authenticationManager = authenticationManager;
