@@ -142,7 +142,7 @@ public class RestUserController
           emailSender.sendPrivateLink(to, privateLink);
         }
         catch (Exception ex) { // org.springframework.mail.MailException
-          logger.warn("Email could not be sent", ex);
+          logger.error("Email could not be sent", ex);
           return new ResponseEntity("Email could not be sent", HttpStatus.INTERNAL_SERVER_ERROR);
         }
       } else {

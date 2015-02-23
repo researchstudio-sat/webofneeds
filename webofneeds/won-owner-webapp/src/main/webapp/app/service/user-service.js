@@ -430,6 +430,7 @@ angular.module('won.owner').factory('userService', function ($window
             },
             function error(data, status) {
                 $log.error("ERROR: failed to send email");
+                // TODO: notify the user that email sending failed and ask him to copy the link instead
                 return {status: "FATAL_ERROR"};
             }
         );
