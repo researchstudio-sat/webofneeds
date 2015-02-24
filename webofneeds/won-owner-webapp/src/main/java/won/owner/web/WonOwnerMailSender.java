@@ -16,7 +16,7 @@ public class WonOwnerMailSender {
 
   public void sendPrivateLink(String toEmail, String privateLink) {
 
-    String subject = "Your need tracking";
+    String subject = "Your request posting";
     String ownerAppLink = privateLink.substring(0, privateLink.indexOf("private-link"));
     String text = "Dear user," +
       "\n\n" +

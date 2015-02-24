@@ -436,6 +436,39 @@ angular.module('won.owner').factory('userService', function ($window
         );
     }
 
+    userService.getSettingsForNeed = function(needUri) {
+        var deferred = $q.defer();
+        $http.get(
+                '/owner/rest/users/settings/?uri=' + encodeURIComponent(needUri)
+        ).then(
+            function success(response) {
+                deferred.resolve(response.data);
+            },
+            function error(response) {
+                deferred.reject(response);
+                // TODO broadcast error notification or handle it in calling method?
+            }
+        )
+        return deferred.promise;
+    }
+
+    userService.setSettingsForNeed = function(settings) {
+        var deferred = $q.defer();
+        $http.post(
+                '/owner/rest/users/settings/',
+            settings
+        ).then(
+            function success(response) {
+                deferred.resolve(response.data);
+            },
+            function error(response) {
+                deferred.reject(response);
+                // TODO broadcast error notification or handle it in calling method?
+            }
+        )
+        return deferred.promise;
+    }
+
     var verified = userService.verifyAuth(); //checking login status
     verified.then(function reloadWhileLoggedIn(loggedIn){
         if(loggedIn) {

@@ -459,7 +459,8 @@
                     </div>
                     <div class="row col-lg-12">
                         <div class="col-lg-1">
-                            <input type="checkbox" id='emailNotif1'>
+                            <input type="checkbox" id='emailNotif1' ng-model="notificationChecks.val1"
+                                   ng-change="notificationChecksChanged()" />
                         </div>
                         <div class="col-lg-11">
                             new conversation messages
@@ -467,7 +468,8 @@
                     </div>
                     <div class="row col-lg-12">
                         <div class="col-lg-1">
-                            <input type="checkbox" id='emailNotif2'>
+                            <input type="checkbox" id='emailNotif2' ng-model="notificationChecks.val2"
+                                   ng-change="notificationChecksChanged()" />
                         </div>
                         <div class="col-lg-11">
                             new conversation requests
@@ -475,15 +477,17 @@
                     </div>
                     <div class="row col-lg-12">
                         <div class="col-lg-1">
-                            <input type="checkbox" id='emailNotif3'>
+                            <input type="checkbox" id='emailNotif3' ng-model="notificationChecks.val3"
+                                   ng-change="notificationChecksChanged()" />
                         </div>
                         <div class="col-lg-11">
                             new matches (~ search results)
                         </div>
                     </div>
-                    <form ng-show="!notificationEmailValide" class="form-horizontal container col-lg-12" novalidate name="validateEmail" ng-submit="notifyMe()">
+                    <form class="form-horizontal container col-lg-12" novalidate
+                          name="validateEmail" ng-submit="notifyMe()">
                         <fieldset>
-                            <div class="row col-lg-12">
+                            <div class="row col-lg-12" ng-show="emailChange">
                                 <div class="col-lg-1 pull-left">to: </div>
                                 <div class="col-lg-11 pull-right">
                                     <input type="email" class="form-control col-lg-8" name="notificationInput" id="notificationInput" ng-model="notificationEmail" required>
@@ -492,14 +496,19 @@
                             </div>
                             <div class="row col-lg-12">
                                 <div class="col-lg-12">
-                                    <button ng-disabled="validateEmail.$invalid" type="submit" class="btn btn-primary pull-right">Notify me!</button>
+                                    <button
+                                            ng-disabled="validateEmail.$invalid || !(notificationChecks.changed || emailChange)"
+                                            type="submit"
+                                            class="btn btn-primary pull-right">Set notifications!</button>
                                 </div>
                             </div>
                         </fieldset>
                     </form>
-                    <div ng-show="notificationEmailValide" class="row col-lg-12">
+                    <div ng-show="!emailChange" class="row col-lg-12">
                         <div class="col-lg-12">
-                            to: {{notificationEmail}} <a href="" ng-click="changeEmailAddress()">change email address</a>
+                            to: <input type="email" disabled="true" ng-model="notificationEmail" /> <a href=""
+                                                                           ng-click="changeEmailAddress()">change email
+                            address</a>
                         </div>
                     </div>
                 </div>

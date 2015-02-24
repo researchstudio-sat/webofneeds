@@ -28,6 +28,8 @@
 
     <!-- configuration with gmail smtp server, uses unsafe access and requires
      that https://www.google.com/settings/security/lesssecureapps is turned on.
+     It is also possible to configure more secure acces with token instead of password,
+     see https://java.net/projects/javamail/pages/OAuth2.
      Change this confuguration if another mail server should be used -->
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
         <property name="host" value="smtp.gmail.com"/>
