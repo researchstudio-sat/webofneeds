@@ -189,7 +189,7 @@ public class WonWebSocketHandler
 
   private void notifyPerEmail(final User user, final URI needUri, final WonMessage wonMessage) {
 
-    if (user != null) {
+    if (user == null) {
       return;
     }
 

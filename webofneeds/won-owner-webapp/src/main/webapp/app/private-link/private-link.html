@@ -506,11 +506,13 @@
                     </form>
                     <div ng-show="!emailChange" class="row col-lg-12">
                         <div class="col-lg-12">
-                            to: <input type="email" disabled="true" ng-model="notificationEmail" /> <a href=""
+                            to: <input type="text" readonly  class="form-control" ng-model="notificationEmail" /> <a
+                                href=""
                                                                            ng-click="changeEmailAddress()">change email
                             address</a>
                         </div>
                     </div>
+
                 </div>
                 <div class="div-table-cell col-lg-6">
                     <div class="row col-lg-12">
