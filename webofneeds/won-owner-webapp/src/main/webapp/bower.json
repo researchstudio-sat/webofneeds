@@ -25,6 +25,7 @@
     "angular-ui-map": "~0.0.3",
     "angular-ui-utils": "~0.2.1",
     "angular": "~1.2.23",
+    "bootstrap": "~3.0.0",
     "jquery": "~2.0.3",
     "js-md5": "~1.1.0",
     "jsonld.js": "https://github.com/digitalbazaar/jsonld.js.git#~0.3.1",
