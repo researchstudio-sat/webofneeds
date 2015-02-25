@@ -21,12 +21,16 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import won.protocol.model.BasicNeedType;
+import won.protocol.model.NeedState;
+import won.protocol.util.NeedBuilderBase;
 import won.protocol.util.NeedModelBuilder;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.StringWriter;
+import java.net.URI;
 
 /**
  * User: fkleedorfer
@@ -46,6 +50,34 @@ public class NeedModelBuilderTests
   {
     Model model = readTTL("won-core/src/test/resources/docs/test_intervals.ttl", "http://www.example.com/resource/need/12");
     testRoundTrip(model);
+  }
+
+  /**
+   * Tests if conversion between NeedState enum and the corresponding URI works.
+   * @throws Exception
+   */
+  @Test
+  void testNeedStateURIandEnum() throws Exception {
+    TestNeedBuilder builder = new TestNeedBuilder();
+    builder.setState(NeedState.ACTIVE);
+    Assert.assertEquals(NeedState.ACTIVE.getURI(), builder.testGetTheNeedStateURI());
+    builder = new TestNeedBuilder();
+    builder.setState(NeedState.ACTIVE.getURI());
+    Assert.assertEquals(NeedState.ACTIVE, builder.testGetTheNeedStateNS());
+  }
+
+  /**
+   * Tests if conversion between NeedState enum and the corresponding URI works.
+   * @throws Exception
+   */
+  @Test
+  void testBasicNeedTypeURIandEnum() throws Exception {
+    TestNeedBuilder builder = new TestNeedBuilder();
+    builder.setBasicNeedType(BasicNeedType.CRITIQUE);
+    Assert.assertEquals(BasicNeedType.CRITIQUE.getURI(), builder.testGetBasicNeedTypeURI());
+    builder = new TestNeedBuilder();
+    builder.setBasicNeedType(BasicNeedType.DEMAND.getURI());
+    Assert.assertEquals(BasicNeedType.DEMAND, builder.testGetBasicNeedTypeBNT());
   }
 
   public void testRoundTrip(Model model) throws FileNotFoundException
@@ -87,5 +119,37 @@ public class NeedModelBuilderTests
     StringWriter writer = new StringWriter();
     model.write(writer, FileUtils.langNTriple, baseURI);
     return writer.toString();
+  }
+
+  /**
+   * Need builder used for testing protected methods of the base builder.
+   */
+  private class TestNeedBuilder extends NeedBuilderBase<String>
+  {
+    @Override
+    public String build() {
+      return null;
+    }
+
+    @Override
+    public void copyValuesFromProduct(String product) {
+      //do nothing
+    }
+
+    public NeedState testGetTheNeedStateNS(){
+      return getStateNS();
+    }
+
+    public URI testGetTheNeedStateURI(){
+      return getStateURI();
+    }
+
+    public BasicNeedType testGetBasicNeedTypeBNT(){
+      return getBasicNeedTypeBNT();
+    }
+
+    public URI testGetBasicNeedTypeURI(){
+      return getBasicNeedTypeURI();
+    }
   }
 }
