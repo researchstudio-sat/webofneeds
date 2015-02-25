@@ -72,10 +72,19 @@ angular.module('won.owner')
         },//,
         controller: function($scope,applicationStateService){
             $scope.contactFormActiv = false;
+            $scope.$watch('need', function (newVal, oldVal) {
+                if (newVal == null || (oldVal != null && newVal.uri != oldVal.uri)) {
+                    $scope.contactFormActiv = false;
+                }
+            });
             $scope.showPublic = function(){
                 return userService.isAuth();
             }
             $scope.canBeContacted = function(){
+
+                if ($scope.need == null) { // can happen when e.g. a server with that need is down and its linked data cannot be loaded
+                    return false;
+                }
 
                 // if it is own need, cannot be contacted
                 if (applicationStateService.getAllNeeds()[$scope.need.uri]) {
@@ -279,7 +288,21 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
             $scope.dummyUri = '';
             $scope.post = null;//the post that is selected to connect with the current post. if no post is selected, a dummy post will be created
             $scope.allNeeds = applicationStateService.getAllNeeds();
-            $scope.dropdownText = 'Select your post'
+            $scope.dropdownText = 'Select your post';
+
+            $scope.$watch('need', function (newVal, oldVal) {
+                if (newVal == null || (oldVal != null && newVal.uri != oldVal.uri)) {
+                    // TODO move into separate init function
+                    $scope.message = '';
+                    $scope.sendStatus = false;
+                    $scope.email = '';
+                    $scope.postTitle = '';
+                    $scope.privateLink = '';
+                    $scope.dummyUri = '';
+                    $scope.post = null;//the post that is selected to connect with the current post. if no post is selected, a dummy post will be created
+                }
+            });
+
             $scope.clickOnPost = function(post){
                 $scope.dropdownText = post.title;
                 $scope.post = $scope.allNeeds[post.uri];
