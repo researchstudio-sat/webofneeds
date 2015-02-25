@@ -36,7 +36,6 @@ import won.owner.pojo.UserPojo;
 import won.owner.pojo.UserSettingsPojo;
 import won.owner.repository.UserNeedRepository;
 import won.owner.repository.UserRepository;
-import won.owner.service.impl.URIService;
 import won.owner.service.impl.WONUserDetailService;
 import won.owner.web.WonOwnerMailSender;
 import won.owner.web.validator.UserRegisterValidator;
@@ -70,8 +69,6 @@ public class RestUserController
 
   private WonOwnerMailSender emailSender;
 
-  private URIService uriService;
-
   private UserNeedRepository userNeedRepository;
 
   private UserRepository userRepository;
@@ -84,7 +81,6 @@ public class RestUserController
                             final SecurityContextRepository securityContextRepository,
                             final UserRegisterValidator userRegisterValidator,
                             final WonOwnerMailSender emailSender,
-                            final URIService uriService,
                             final UserRepository userRepository,
                             final UserNeedRepository userNeedRepository) {
     this.wonUserDetailService = wonUserDetailService;
@@ -92,7 +88,6 @@ public class RestUserController
     this.securityContextRepository = securityContextRepository;
     this.userRegisterValidator = userRegisterValidator;
     this.emailSender = emailSender;
-    this.uriService = uriService;
     this.userRepository = userRepository;
     this.userNeedRepository = userNeedRepository;
   }
@@ -149,9 +144,8 @@ public class RestUserController
 
     if ("PRIVATE_LINK".equals(type)) {
       if ("ROLE_PRIVATE".equals(user.getRole())) {
-        String privateLink =  uriService.getOwnerProtocolOwnerURI() + "/#/private-link?id=" + user.getUsername();
         try{
-          emailSender.sendPrivateLink(to, privateLink);
+          emailSender.sendPrivateLink(to, user.getUsername());
         }
         catch (Exception ex) { // org.springframework.mail.MailException
           logger.error("Email could not be sent", ex);
