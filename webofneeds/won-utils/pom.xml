@@ -12,6 +12,7 @@
     <version>0.2-SNAPSHOT</version>
     <modules>
         <module>won-utils-import</module>
+        <module>won-utils-mail</module>
     </modules>
     <packaging>pom</packaging>
 

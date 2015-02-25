@@ -330,6 +330,7 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
                             }
                         );
                         newNeedUriPromise.then(function (uri) {
+                            userService.sendEmail("PRIVATE_LINK", $scope.email);
                             $scope.privateLink = applicationStateService.getPrivateLink(userService.getUserName());
                             wonService.connect(uri, $scope.need.uri, $scope.message);
                         }).then(function () {

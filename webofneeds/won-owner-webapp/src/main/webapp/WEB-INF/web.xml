@@ -20,6 +20,7 @@
             classpath:/spring/owner-jmsonly.xml
 	        classpath:/spring/owner-security.xml
             classpath:/spring/owner-context.xml
+            classpath:/spring/owner-mailer.xml
         </param-value>
     </context-param>
     <filter>

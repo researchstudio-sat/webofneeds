@@ -41,6 +41,12 @@
             <version>${project.version}</version>
             <scope>${dependencies.scope}</scope>
         </dependency>
+        <dependency>
+            <groupId>webofneeds</groupId>
+            <artifactId>won-utils-mail</artifactId>
+            <version>${project.version}</version>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
 
         <!-- JSTL/Servlet-->
 		<dependency>
@@ -146,6 +152,16 @@
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session</artifactId>
             <version>1.0.0.RC1</version>
+        </dependency>
+
+        <!-- TESTING -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
         </dependency>
 
     </dependencies>
