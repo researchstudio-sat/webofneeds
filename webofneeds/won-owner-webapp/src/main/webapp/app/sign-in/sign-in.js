@@ -8,8 +8,8 @@ angular.module('won.owner')
             console.log("In SignInDirective init");
             return {
                 restrict: 'AE',
-                //template: 'hello sign-in',
-                templateUrl : 'app/sign-in/sign-in.html',
+                template: 'hello sign-in',
+                //templateUrl : 'app/sign-in/sign-in.html',
                 //scope : {
                     /*chosenMessage: '=',
                      clickOnPostLink: '&'*/
