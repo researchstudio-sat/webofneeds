@@ -55,7 +55,8 @@ angular.module('won.owner')
             templateUrl : 'app/conversation/conversation.html',
             scope : {
                 chosenMessage: '=',
-                clickOnPostLink: '&'
+                clickOnPostLink: '&',
+                sortedField: '='
             },
 
             controller : function($scope, $location, $log,$anchorScroll, $rootScope, wonService){
