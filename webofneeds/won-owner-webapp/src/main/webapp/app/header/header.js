@@ -22,8 +22,9 @@ angular.module('won.owner').controller("HeaderCtrl",
              , applicationStateService
              , $filter
              , $interval
-             , $log,
-               $window
+             , $log
+             , $window
+             , $modal //TODO testing
              ) {
 
 
@@ -52,6 +53,15 @@ angular.module('won.owner').controller("HeaderCtrl",
     $scope.goLandingPage = function() {
         $location.url("/");
     }
+
+    $scope.loginModal = function() {
+        $modal.open({
+            //template: ' <div class="modal-dialog"><div class="modal-content"><div class="modal-header">blah</div><div class="modal-body">blah</div><div class="modal-footer">blah</div></div></div>',
+            templateUrl: 'app/sign-in/sign-in-modal-content.html',
+            size: 'sm'
+        });
+
+    };
 
 	$scope.showPublic = function() {
         return !userService.isAuth();
