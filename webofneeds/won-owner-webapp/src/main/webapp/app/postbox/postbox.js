@@ -133,7 +133,8 @@ angular.module('won.owner').directive('inboxTable',function factory(){
             clickOnRemove:'&',
             controlData:'=',
             sortedField:'=',
-            templateUrl:'@'
+            templateUrl:'@',
+            search: '='
         },
         template:'<div ng-attr-id="id" class="row col-lg-12" ng-include="templateUrl"></div>',
         controller: function($scope,$log){
