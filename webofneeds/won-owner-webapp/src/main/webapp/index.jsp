@@ -19,7 +19,7 @@
 <!DOCTYPE HTML>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
-<html>
+<html ng-app="won.owner" ng-strict-di>
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- see http://getbootstrap.com/css/#overview-mobile -->
@@ -128,7 +128,6 @@
 	</head>
 	<body ng-controller="MainCtrl">
 		<span ng-init=""></span>
-		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&callback=onGoogleReady"></script>
 		<nav class="navbar navbar-default" role="navigation" ng-controller="HeaderCtrl">
 			<div class="container" style="padding:0">
 
@@ -261,9 +260,7 @@
                 </sec:authorize>
             };
 
-            function onGoogleReady() {
-                angular.bootstrap(document.getElementsByTagName("html")[0], ['won.owner']);
-            }
+
         </script>
 	</body>
 </html>
