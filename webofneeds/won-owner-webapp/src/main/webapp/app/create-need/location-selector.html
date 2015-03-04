@@ -4,12 +4,12 @@
 <form class="input-group" id="locationForm">
     <input type="text" class="form-control" id="addressTextField"
            ng-model="addressText"
-           placeholder="e.g. Thurngasse 8, Vienna, Austria"
+           placeholder="e.g. Street 11, Town, Country"
            ui-keypress="{ArrowDown:'onArrowDownInSearchField()', ArrowUp: 'onArrowUpInSearchField()'}"
            autocomplete="off"/> <!--@a.c.=off: we'll use our own dropdown/auto-complete-->
 
     <ul id="location-suggestions" class="dropdown-menu" role="menu" tabindex="0">
-        <li ng-hide="addressSearchResults && addressSearchResults.length > 0" tabindex="0">Loading address results...  [REPLACE WITH SPINNER]</li>
+        <li ng-hide="addressSearchResults && addressSearchResults.length > 0" tabindex="0"> <i class="fa fa-circle-o-notch fa-spin"></i> Loading address results...</li>
         <li ng-click="selectAddress(adr)" ng-repeat="adr in addressSearchResults" tabindex="0"><a href="javascript:void(0)">{{adr.display_name}}</a></li>
     </ul>
 
@@ -20,6 +20,7 @@
     <!-- TODO add a 'x' button to clear input (replace search-button?)-->
     </span>
 </form><!-- /input-group -->
+
 
 <!--<hr>-->
 <!--<p>angular.ui.bootstrap:</p>-->
