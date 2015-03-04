@@ -6,31 +6,33 @@
     <!--<h2>{{ our_value_proposition }}</h2>-->
     <!--<p>testvar: {{testvar}}</p>-->
 
-    <div class="form-group">
-        <label for="signUsername">Email address</label>
-        <input type="email" class="form-control" name="signUsername" id="signUsername" ng-model="user.username"
-               placeholder="Email address" required>
-        <!--TODO put in reg form in login form crosses in input fields from http://getbootstrap.com/css/-->
-        <span class="label label-warning" ng-show="signInForm.signUsername.$invalid && !signInForm.signUsername.$pristine">Please write valid email address</span>
-        <span class="label label-warning" ng-show="error.length > 0">{{error}}</span>
-    </div>
+    <form class="form-horizontal container" novalidate name="signInForm">
+        <div class="form-group">
+            <label for="signUsername">Email address</label>
+            <input type="email" class="form-control" name="signUsername" id="signUsername" ng-model="username"
+                   placeholder="Email address" required>
+            <!--TODO put in reg form in login form crosses in input fields from http://getbootstrap.com/css/-->
+            <span class="label label-warning" ng-show="signInForm.signUsername.$invalid && !signInForm.signUsername.$pristine">Please write valid email address</span>
+            <span class="label label-warning" ng-show="error.length > 0">{{error}}</span>
+        </div>
 
 
-    <div class="form-group">
-        <label for="signPassword">Password</label>
-        <input type="password" class="form-control" name="signPassword" id="signPassword" ng-model="user.password"
-               placeholder="Password" required>
-    </div>
+        <div class="form-group">
+            <label for="signPassword">Password</label>
+            <input type="password" class="form-control" name="signPassword" id="signPassword" ng-model="password"
+                   placeholder="Password" required>
+        </div>
 
-    <label class="checkbox-inline">
-        <input type="checkbox" id="rememberMeCheckBox" value="">Remember me
-    </label>
+        <label class="checkbox-inline">
+            <input type="checkbox" id="rememberMeCheckBox" value="">Remember me
+        </label>
 
-    <a class="show" href="#/forgot-pwd">Forgot your password?</a>
+        <a class="show" href="#/forgot-pwd">Forgot your password?</a>
+    </form>
 
 </div>
 <div class="modal-footer">
 
-    <button ng-disabled="signInForm.$invalid" type="submit" class="btn btn-primary" ng-click="ok()">Sign in</button>
+    <button ng-disabled="signInForm.$invalid" type="submit" class="btn btn-primary" ng-click="signin(username, password)">Sign in</button>
     <!-- do ng-click and submit conflict here? submit probably won't work as it's in the footer -->
 </div>
