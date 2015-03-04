@@ -1,42 +1,54 @@
 <div class="modal-header">
     <button class="close" ng-click="cancel()">&times;</button>
-    <h1 class="modal-title" style="font-size: 1.8em;">Free Sign Up</h1>
+    <h1 class="modal-title" style="font-size: 1.8em;">Sign Up</h1>
 </div>
 <div class="modal-body">
     <!--<h2>{{ our_value_proposition }}</h2>-->
-    <!--<p>testvar: {{testvar}}</p>-->
+    <form novalidate name="signUpForm">
+        <div class="form-group">
+            <label for="registerUsername">Email address</label>
+            <input type="email" class="form-control" name="registerUsername"
+                   id="registerUsername" ng-model="username"
+                   required>
+            <span class="label label-warning"
+                  ng-show="signUpForm.registerUsername.$invalid && !signUpForm.registerUsername.$pristine">
+                Email should look similar to name@example.com
+            </span>
+        </div>
 
-    <div class="form-group">
-        <label for="registerUsername">Email address</label>
-        <input type="email" class="form-control" name="registerUsername" id="registerUsername" ng-model="registerUser.username"
-               placeholder="Email address"
-               required>
-        <span class="label label-warning" ng-show="registerForm.registerUsername.$invalid && !registerForm.registerUsername.$pristine">Please write valid email address</span>
-        <span class="label label-warning" ng-show="error.length > 0">{{error}}</span>
-    </div>
+        <div class="form-group">
+            <label for="registerPassword">Password</label>
+            <input type="password" class="form-control" name="registerPassword"
+                   id="registerPassword" ng-model="password"
+                   required>
+            <span class="label label-warning"
+                  ng-show="password.length > 0 && password.length < 8">
+                Password must have at least eight characters.
+            </span>
+        </div>
 
 
-    <div class="form-group">
-        <label for="registerPassword">Password</label>
-        <input type="password" class="form-control" name="registerPassword" id="registerPassword" ng-model="registerUser.password"
-               placeholder="Password"
-               required>
-        <span class="label label-warning" ng-show="registerUser.password.length > 0 && registerUser.password.length < 6">Password must be at least 6 characters</span>
-    </div>
+        <div class="form-group">
+            <label for="registerPasswordAgain">Repeat password</label>
+            <input type="password" class="form-control" name="registerPasswordAgain"
+                   id="registerPasswordAgain" ng-model="passwordAgain"
+                   required>
+            <span class="label label-warning"
+                  ng-show="signUpForm.registerPasswordAgain.$invalid && password.length > 0">
+                Please repeat password.
+            </span>
+            <span class="label label-warning"
+                  ng-show="password !== passwordAgain && passwordAgain.length > 0">
+                Passwords are not equal.
+            </span>
+        </div>
+    </form>
 
-
-    <div class="form-group">
-        <label for="registerPasswordAgain">Repeat password</label>
-        <input type="password" class="form-control" name="registerPasswordAgain" id="registerPasswordAgain" ng-model="registerUser.passwordAgain"
-               placeholder="Repeat password"
-               required>
-        <span class="label label-warning" ng-show="registerForm.registerPasswordAgain.$invalid && registerUser.password.length > 0">Please repeat password</span>
-        <span class="label label-warning" ng-show="!registerUser.isSamePassword() && registerUser.passwordAgain.length > 0">Passwords are not equal</span>
-    </div>
+    <span class="label label-warning" ng-show="error.length > 0">{{error}}</span>
 
 </div>
 <div class="modal-footer">
 
-    <button ng-disabled="registerForm.$invalid" type="submit" class="btn btn-primary" ng-click="ok()">Sign up</button>
+    <button ng-disabled="signUpForm.$invalid" type="submit" class="btn btn-primary" ng-click="signUp(username, password, passwordAgain)">Sign Up</button>
     <!-- do ng-click and submit conflict here? submit probably won't work as it's in the footer -->
 </div>

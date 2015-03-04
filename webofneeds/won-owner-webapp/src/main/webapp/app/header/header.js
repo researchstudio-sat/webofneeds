@@ -54,14 +54,19 @@ angular.module('won.owner').controller("HeaderCtrl",
         $location.url("/");
     }
 
-    $scope.loginModal = function() {
+    $scope.displaySignIn = function() {
         $modal.open({
-            //template: ' <div class="modal-dialog"><div class="modal-content"><div class="modal-header">blah</div><div class="modal-body">blah</div><div class="modal-footer">blah</div></div></div>',
             controller: 'SignInModalInstanceCtrl',
             templateUrl: 'app/sign-in/sign-in-modal-content.html',
             size: 'sm'
         });
-
+    };
+    $scope.displaySignUp = function() {
+        $modal.open({
+            controller: 'SignUpModalInstanceCtrl',
+            templateUrl: 'app/sign-in/sign-up-modal-content.html',
+            size: 'sm'
+        });
     };
 
 	$scope.showPublic = function() {
