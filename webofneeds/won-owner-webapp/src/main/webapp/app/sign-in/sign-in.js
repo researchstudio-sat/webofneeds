@@ -22,9 +22,7 @@ angular.module('won.owner').controller('SignInModalInstanceCtrl',
                 services) should be kept in application-control-service? */
                 userService.logInAndSetUpApplicationState({username: name, password: pw}).then(function(response) {
                     if (response.status == "OK") {
-                        //$location.url('/postbox');
-                        //TODO trigger refresh so nav changes to signed-in state?
-                        $modalInstance.close();
+                        $modalInstance.close(); //close() could also take params that would be returned
                     } else if (response.status == "ERROR") {
                         $scope.error = response.message;
                     } else {
