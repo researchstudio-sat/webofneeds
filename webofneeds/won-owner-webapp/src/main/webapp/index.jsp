@@ -106,6 +106,7 @@
         <script type="text/javascript" src="<c:url value="/app/service/linkeddata-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/message-factory-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/sign-in/sign-in.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/sign-in/sign-up.js"/>"></script>
 
 
         <script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
@@ -217,9 +218,14 @@
 			</ul>
 					<ul class="nav navbar-nav navbar-right" ng-cloak>
                         <li><span ng-show="checkRegistered()"></span></li>
-				<li ng-show="showPublic()" ng-class="isActive('register')"><a href="#/register">Sign up&nbsp;<span class="caret"/></a></li>
+
+                        <li ng-show="showPublic()" ng-class="isActive('register')">
+                            <a ng-click="displaySignUp()">
+                                Sign Up&nbsp;<span class="caret"/>
+                            </a>
+                        </li>
                         <li ng-show="showPublic()" ng-class="isActive('signin')">
-                            <a ng-click="loginModal()">
+                            <a ng-click="displaySignIn()">
                                 Sign In&nbsp;<span class="caret"/>
                             </a>
                         </li>
