@@ -20,23 +20,17 @@ angular.module('won.owner').controller('SignInModalInstanceCtrl',
             if($scope.signInForm.$valid) {
                 /* TODO probably such functions as logInAndSetUpApplicationState() (that combine then->then of several
                 services) should be kept in application-control-service? */
-                userService.logInAndSetUpApplicationState({username: name, password: pw}).then(onLoginResponse);
-            }
-
-        }
-        onLoginResponse = function(response) {
-            if (response.status == "OK") {
-                //$location.url('/postbox');
-                //TODO trigger refresh so nav changes to signed-in state?
-                $modalInstance.close();
-            } else if (response.status == "ERROR") {
-                $scope.error = response.message;
-            } else {
-                $log.debug(response.messsage);
+                userService.logInAndSetUpApplicationState({username: name, password: pw}).then(function(response) {
+                    if (response.status == "OK") {
+                        //$location.url('/postbox');
+                        //TODO trigger refresh so nav changes to signed-in state?
+                        $modalInstance.close();
+                    } else if (response.status == "ERROR") {
+                        $scope.error = response.message;
+                    } else {
+                        $log.debug(response.messsage);
+                    }
+                });
             }
         }
-
-        // stuff below fold possibly needs (more) refactoring  -------
-
 });
-
