@@ -28,31 +28,21 @@ angular.module('won.owner').controller('SignUpModalInstanceCtrl',
                     passwordAgain : pwRepeated
                 }
 
-                //TODO spinning wheel
                 $scope.processing = true;
-                userService.registerUser(credentials).then(function onRegisterResponse(response) {
-                        if (response.status == "OK") {
-                            $scope.error = '';
-
-                            //angular.resetForm($scope, "registerForm"); //<-- would force retyping == bad ux
-                            userService.logInAndSetUpApplicationState(credentials).then(
-                                function success(){
-                                    $scope.processing = false;
-                                    $modalInstance.close(); //close() could also take params that would be returned
-                                },
-                                function failure(){
-                                    $scope.processing = false;
-                                    $scope.error = response.message;
-                                });
-                        } else if (response.status == "ERROR") {
-                            $scope.processing = false;
-                            $scope.error = response.message;
-                        } else {
-                            $scope.processing = false;
-                            $log.debug(response.message);
-                        }
+                userService.registerUser(credentials).then(function (response) {
+                    if (response.status === "OK") {
+                        $scope.error = '';
+                        return userService.logInAndSetUpApplicationState(credentials)
+                    } else {
+                        throw new Error(response.message); //TODO do i need to wrap this somehow?
                     }
-                );
+                }).then( function(){
+                    $modalInstance.close(); //close() could also take params that would be returned
+                }).catch (function(response) {
+                    $scope.error = response.message;
+                }).finally(function(){
+                    $scope.processing = false;
+                });
             }
         }
     });
