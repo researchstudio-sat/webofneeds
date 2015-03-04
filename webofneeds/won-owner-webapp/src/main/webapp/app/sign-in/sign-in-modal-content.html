@@ -1,47 +1,36 @@
-<!--<div class="modal-dialog"> <!-- ui-bs 0.6 doesn't fully support bs 3.0. This div is a dirty fix. Remove after updating -->
-    <!--<div class="modal-content"> <!-- ui-bs 0.6 doesn't fully support bs 3.0. This div is a dirty fix. Remove after updating -->
-        <div class="modal-header">
-            <!--<button class="btn btn-warning" ng-click="cancel()">Cancel</button>-->
-            <!--<button class="btn pull-right" type="button" ng-click="cancelRegister()">X</button>-->
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h1 class="modal-title" style="font-size: 2em;">Sign Up</h1>
-        </div>
-        <div class="modal-body">
-            <!--<h2>{{ our_value_proposition }}</h2>-->
+<div class="modal-header">
+    <button class="close" ng-click="cancel()">&times;</button>
+    <h1 class="modal-title" style="font-size: 1.8em;">Sign In</h1>
+</div>
+<div class="modal-body">
+    <!--<h2>{{ our_value_proposition }}</h2>-->
+    <!--<p>testvar: {{testvar}}</p>-->
 
-            <div class="form-group">
-                <label for="registerUsername">Email address</label>
-                <input type="email" class="form-control" name="registerUsername" id="registerUsername" ng-model="registerUser.username"
-                       placeholder="Email address"
-                       required>
-                <span class="label label-warning" ng-show="registerForm.registerUsername.$invalid && !registerForm.registerUsername.$pristine">Please write valid email address</span>
-                <span class="label label-warning" ng-show="error.length > 0">{{error}}</span>
-            </div>
+    <div class="form-group">
+        <label for="signUsername">Email address</label>
+        <input type="email" class="form-control" name="signUsername" id="signUsername" ng-model="user.username"
+               placeholder="Email address" required>
+        <!--TODO put in reg form in login form crosses in input fields from http://getbootstrap.com/css/-->
+        <span class="label label-warning" ng-show="signInForm.signUsername.$invalid && !signInForm.signUsername.$pristine">Please write valid email address</span>
+        <span class="label label-warning" ng-show="error.length > 0">{{error}}</span>
+    </div>
 
 
-            <div class="form-group">
-                <label for="registerPassword">Password</label>
-                <input type="password" class="form-control" name="registerPassword" id="registerPassword" ng-model="registerUser.password"
-                       placeholder="Password"
-                       required>
-                <span class="label label-warning" ng-show="registerUser.password.length > 0 && registerUser.password.length < 6">Password must be at least 6 characters</span>
-            </div>
+    <div class="form-group">
+        <label for="signPassword">Password</label>
+        <input type="password" class="form-control" name="signPassword" id="signPassword" ng-model="user.password"
+               placeholder="Password" required>
+    </div>
 
+    <label class="checkbox-inline">
+        <input type="checkbox" id="rememberMeCheckBox" value="">Remember me
+    </label>
 
-            <div class="form-group">
-                <label for="registerPasswordAgain">Repeat password</label>
-                <input type="password" class="form-control" name="registerPasswordAgain" id="registerPasswordAgain" ng-model="registerUser.passwordAgain"
-                       placeholder="Repeat password"
-                       required>
-                <span class="label label-warning" ng-show="registerForm.registerPasswordAgain.$invalid && registerUser.password.length > 0">Please repeat password</span>
-                <span class="label label-warning" ng-show="!registerUser.isSamePassword() && registerUser.passwordAgain.length > 0">Passwords are not equal</span>
-            </div>
+    <a class="show" href="#/forgot-pwd">Forgot your password?</a>
 
-        </div>
-        <div class="modal-footer">
+</div>
+<div class="modal-footer">
 
-            <button ng-disabled="registerForm.$invalid" type="submit" class="btn btn-primary" ng-click="ok()">Sign up</button>
-            <!-- do ng-click and submit conflict here? submit probably won't work as it's in the footer -->
-        </div>
-    <!--</div>-->
-<!--</div>-->
+    <button ng-disabled="signInForm.$invalid" type="submit" class="btn btn-primary" ng-click="ok()">Sign in</button>
+    <!-- do ng-click and submit conflict here? submit probably won't work as it's in the footer -->
+</div>

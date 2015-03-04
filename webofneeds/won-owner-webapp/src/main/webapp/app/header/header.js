@@ -57,6 +57,7 @@ angular.module('won.owner').controller("HeaderCtrl",
     $scope.loginModal = function() {
         $modal.open({
             //template: ' <div class="modal-dialog"><div class="modal-content"><div class="modal-header">blah</div><div class="modal-body">blah</div><div class="modal-footer">blah</div></div></div>',
+            controller: 'SignInModalInstanceCtrl',
             templateUrl: 'app/sign-in/sign-in-modal-content.html',
             size: 'sm'
         });
