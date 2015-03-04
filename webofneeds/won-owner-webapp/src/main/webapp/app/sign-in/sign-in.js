@@ -6,7 +6,6 @@
 angular.module('won.owner').controller('SignInModalInstanceCtrl',
     function ($scope, $route, $window, $location, $http,
               $modalInstance, applicationStateService, userService) {
-        $scope.testvar = "42";
 
         $scope.username = '';
         $scope.password = '';
