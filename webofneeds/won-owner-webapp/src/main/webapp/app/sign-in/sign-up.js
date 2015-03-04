@@ -34,7 +34,7 @@ angular.module('won.owner').controller('SignUpModalInstanceCtrl',
                         $scope.error = '';
                         return userService.logInAndSetUpApplicationState(credentials)
                     } else {
-                        throw new Error(response.message); //TODO do i need to wrap this somehow?
+                        throw new Error(response.message);
                     }
                 }).then( function(){
                     $modalInstance.close(); //close() could also take params that would be returned
