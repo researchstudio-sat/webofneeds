@@ -33,7 +33,7 @@
 
 	    <link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
 	    <link rel="stylesheet" href="style/datepicker.css"/>
-	    <link rel="stylesheet" href="font-awesome-4.1.0/css/font-awesome.min.css">
+	    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
 	    <link rel="stylesheet" href="style/lightbox.css"/>
 	    <link rel="stylesheet" href="style/bootstrap-tagsinput.css"/>
         <link rel="stylesheet" href="style/star-rating.css"/>
