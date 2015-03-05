@@ -10,6 +10,7 @@ angular.module('won.owner').controller('SignInModalInstanceCtrl',
         $scope.username = '';
         $scope.password = '';
         $scope.error = '';
+        $scope.processing = false;
 
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
@@ -21,8 +22,11 @@ angular.module('won.owner').controller('SignInModalInstanceCtrl',
                 /* TODO probably such functions as logInAndSetUpApplicationState()
                 (that combine then->then of several
                 services) should be kept in application-control-service? */
+
+                $scope.processing = true;
                 userService.logInAndSetUpApplicationState({username: name, password: pw})
                     .then(function(response) {
+                        $scope.processing = false;
                         if (response.status == "OK") {
                             $modalInstance.close(); //close() could also take params that would be returned
                         } else if (response.status == "ERROR") {

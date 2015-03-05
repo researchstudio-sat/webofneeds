@@ -32,6 +32,12 @@
 </div>
 <div class="modal-footer">
 
-    <button ng-disabled="signInForm.$invalid" type="submit" class="btn btn-primary" ng-click="signin(username, password)">Sign in</button>
+    <button ng-disabled="signInForm.$invalid"
+            type="submit"
+            class="btn btn-primary"
+            ng-click="signin(username, password)">
+        <i class="fa fa-circle-o-notch fa-spin" ng-show="processing"></i>
+        Sign in
+    </button>
     <!-- do ng-click and submit conflict here? submit probably won't work as it's in the footer -->
 </div>
