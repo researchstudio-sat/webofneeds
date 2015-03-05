@@ -18,16 +18,18 @@ angular.module('won.owner').controller('SignInModalInstanceCtrl',
         $scope.signin = function(name, pw) {
             $scope.error = '';
             if($scope.signInForm.$valid) {
-                /* TODO probably such functions as logInAndSetUpApplicationState() (that combine then->then of several
+                /* TODO probably such functions as logInAndSetUpApplicationState()
+                (that combine then->then of several
                 services) should be kept in application-control-service? */
-                userService.logInAndSetUpApplicationState({username: name, password: pw}).then(function(response) {
-                    if (response.status == "OK") {
-                        $modalInstance.close(); //close() could also take params that would be returned
-                    } else if (response.status == "ERROR") {
-                        $scope.error = response.message;
-                    } else {
-                        $log.debug(response.messsage);
-                    }
+                userService.logInAndSetUpApplicationState({username: name, password: pw})
+                    .then(function(response) {
+                        if (response.status == "OK") {
+                            $modalInstance.close(); //close() could also take params that would be returned
+                        } else if (response.status == "ERROR") {
+                            $scope.error = response.message;
+                        } else {
+                            $log.debug(response.messsage);
+                        }
                 });
             }
         }
