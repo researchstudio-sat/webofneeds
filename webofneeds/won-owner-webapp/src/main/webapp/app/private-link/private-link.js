@@ -97,13 +97,32 @@ angular.module('won.owner')
 
     $scope.publicLink = applicationStateService.getPublicLink(applicationStateService.getCurrentNeedURI());
 
+        // default settings for all users
     $scope.notificationEmail = '';
-    $scope.notificationEmailValide = false;
+    $scope.emailChange = false;
     $scope.notificationChecks = {
         val1: false,
         val2: false,
-        val3: false
+        val3: false,
+        changed: false
     };
+    // ask back-end for current need of the user settings
+        //TODO or load need settings in main when loading current need?
+    userService.getSettingsForNeed(applicationStateService.getCurrentNeedURI()).then(
+        function success(settingsData) {
+            $scope.notificationEmail = settingsData.email;
+            if ($scope.notificationEmail == null) {
+                $scope.emailChange = true;
+            } else {
+                $scope.emailChange = false;
+            }
+            $scope.notificationChecks.val1 = settingsData.notifyConversations;
+            $scope.notificationChecks.val2 = settingsData.notifyRequests;
+            $scope.notificationChecks.val3 = settingsData.notifyMatches;
+            $scope.notificationChecks.changed = false;
+        }
+        //TODO error
+    );
 
     $scope.prevMessageId = null;
 
@@ -133,12 +152,39 @@ angular.module('won.owner')
     };
 
     $scope.notifyMe = function() {
-        $scope.notificationEmailValide = !$scope.notificationEmailValide;
-        //todo send ro backend
+        $scope.emailChange = false;
+        $scope.notificationChecks.changed = false;
+
+        //send to backend:
+
+        var setting = {
+            email: $scope.notificationEmail,
+            notifyConversations: $scope.notificationChecks.val1,
+            notifyRequests: $scope.notificationChecks.val2,
+            notifyMatches : $scope.notificationChecks.val3,
+            needUri: applicationStateService.getCurrentNeedURI(),
+            username: userService.getUnescapeUserName()
+        };
+
+        userService.setSettingsForNeed(setting).then(
+            function success(settingsData) {
+                // this is expected, do nothing
+            },
+            function error(settingsData) {
+                $scope.emailChange = true;
+                $scope.notificationChecks.changed = true;
+                //TODO error notification
+            }
+        );
+
     };
     $scope.changeEmailAddress = function() {
-        $scope.notificationEmailValide = !$scope.notificationEmailValide;
+        $scope.emailChange = true;
     };
+
+    $scope.notificationChecksChanged = function() {
+        $scope.notificationChecks.changed = true;
+    }
 
     //Post Options
     $scope.newMessage = '';

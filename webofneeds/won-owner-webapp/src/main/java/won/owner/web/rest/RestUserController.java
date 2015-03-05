@@ -5,6 +5,7 @@
 
 package won.owner.web.rest;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,19 +29,24 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import won.owner.model.User;
+import won.owner.model.UserNeed;
 import won.owner.pojo.UserPojo;
+import won.owner.pojo.UserSettingsPojo;
+import won.owner.repository.UserNeedRepository;
+import won.owner.repository.UserRepository;
 import won.owner.service.impl.WONUserDetailService;
+import won.owner.web.WonOwnerMailSender;
 import won.owner.web.validator.UserRegisterValidator;
 import won.protocol.util.CheapInsecureRandomString;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * User: t.kozel
@@ -61,13 +67,29 @@ public class RestUserController
 
   private UserRegisterValidator userRegisterValidator;
 
+  private WonOwnerMailSender emailSender;
+
+  private UserNeedRepository userNeedRepository;
+
+  private UserRepository userRepository;
+
+  @Autowired
+  ServletContext context;
+
   @Autowired
   public RestUserController(final WONUserDetailService wonUserDetailService, final AuthenticationManager authenticationManager,
-                            final SecurityContextRepository securityContextRepository, final UserRegisterValidator userRegisterValidator) {
+                            final SecurityContextRepository securityContextRepository,
+                            final UserRegisterValidator userRegisterValidator,
+                            final WonOwnerMailSender emailSender,
+                            final UserRepository userRepository,
+                            final UserNeedRepository userNeedRepository) {
     this.wonUserDetailService = wonUserDetailService;
     this.authenticationManager = authenticationManager;
     this.securityContextRepository = securityContextRepository;
     this.userRegisterValidator = userRegisterValidator;
+    this.emailSender = emailSender;
+    this.userRepository = userRepository;
+    this.userNeedRepository = userNeedRepository;
   }
 
   /**
@@ -106,6 +128,126 @@ public class RestUserController
     return new ResponseEntity("New user was created", HttpStatus.CREATED);
   }
 
+
+  @ResponseBody
+  @RequestMapping(
+    value = "/email",
+    method = RequestMethod.POST
+  )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity sendEmail(@RequestBody JsonNode input) {
+
+    String type = input.get("type").asText();
+    String to = input.get("to").asText();
+    User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    if ("PRIVATE_LINK".equals(type)) {
+      if ("ROLE_PRIVATE".equals(user.getRole())) {
+        try{
+          emailSender.sendPrivateLink(to, user.getUsername());
+        }
+        catch (Exception ex) { // org.springframework.mail.MailException
+          logger.error("Email could not be sent", ex);
+          return new ResponseEntity("Email could not be sent", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+      } else {
+        return new ResponseEntity("Cannot send private link to not private user", HttpStatus.BAD_REQUEST);
+      }
+    } else {
+      return new ResponseEntity("Mail type " + type + " not supported", HttpStatus.BAD_REQUEST);
+    }
+
+    return new ResponseEntity("Email sent", HttpStatus.OK);
+  }
+
+  @ResponseBody
+  @RequestMapping(
+    value = "/settings",
+    produces = MediaType.APPLICATION_JSON,
+    method = RequestMethod.GET
+  )
+
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public UserSettingsPojo getUserSettings(@RequestParam("uri") String uri) {
+
+    String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    // cannot use user object from context since hw doesn't know about created in this session need,
+    // therefore, we have to retrieve the user object from the user repository
+    User user = userRepository.findByUsername(username);
+    UserSettingsPojo userSettingsPojo = new UserSettingsPojo(user.getUsername(), user.getEmail());
+    URI needUri = null;
+    try {
+      needUri = new URI(uri);
+      userSettingsPojo.setNeedUri(uri);
+      for (UserNeed userNeed : user.getUserNeeds()) {
+        if (userNeed.getUri().equals(needUri)) {
+          userSettingsPojo.setNotify(userNeed.isMatches(), userNeed.isRequests(), userNeed.isConversations());
+          //userSettingsPojo.setEmail(user.getEmail());
+          break;
+        }
+      }
+    } catch (URISyntaxException e) {
+      // TODO error response
+      logger.warn(uri + " need uri problem", e);
+    }
+    return userSettingsPojo;
+  }
+
+  @ResponseBody
+  @RequestMapping(
+    value = "/settings",
+    produces = MediaType.APPLICATION_JSON,
+    method = RequestMethod.POST
+  )
+
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity setUserSettings(@RequestBody UserSettingsPojo userSettingsPojo) {
+
+    String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    // cannot use user object from context since hw doesn't know about created in this session need,
+    // therefore, we have to retrieve the user object from the user repository
+    User user = userRepository.findByUsername(username);
+    if (!user.getUsername().equals(userSettingsPojo.getUsername())) {
+      logger.warn("user name wrong");
+      return new ResponseEntity("user name problem", HttpStatus.BAD_REQUEST);
+    }
+
+    if (user.getEmail() == null) {
+      //TODO validate email server-side?
+      // set email:
+      user.setEmail(userSettingsPojo.getEmail());
+      userRepository.save(user);
+    } else if (!user.getEmail().equals(userSettingsPojo.getEmail())) {
+      //TODO validate email server-side?
+      // change email:
+      user.setEmail(userSettingsPojo.getEmail());
+      userRepository.save(user);
+      logger.info("change email requested - email changed");
+    }
+
+    // retrieve UserNeed
+    URI needUri = null;
+    try {
+      needUri = new URI(userSettingsPojo.getNeedUri());
+      for (UserNeed userNeed : user.getUserNeeds()) {
+        if (userNeed.getUri().equals(needUri)) {
+          userNeed.setMatches(userSettingsPojo.isNotifyMatches());
+          userNeed.setRequests(userSettingsPojo.isNotifyRequests());
+          userNeed.setConversations(userSettingsPojo.isNotifyConversations());
+          userNeedRepository.save(userNeed);
+          break;
+        }
+      }
+    } catch (URISyntaxException e) {
+      logger.warn(userSettingsPojo.getNeedUri() + " need uri problem.", e);
+      return new ResponseEntity(userSettingsPojo.getNeedUri() + " need uri problem.", HttpStatus.BAD_REQUEST);
+    }
+   return new ResponseEntity("Settings created", HttpStatus.CREATED);
+  }
+
   /**
    * registers user
    *
@@ -123,7 +265,6 @@ public class RestUserController
   public ResponseEntity registerPrivateLinkAsUser(@RequestBody UserPojo user, Errors errors) {
     String privateLink = null;
     try {
-      System.out.println(user.getUsername() + "  " + user.getPassword() + " " +  user.getPasswordAgain());
       privateLink = (new CheapInsecureRandomString()).nextString(32); // TODO more secure random alphanum string
       user.setUsername(privateLink);
       userRegisterValidator.validate(user, errors);

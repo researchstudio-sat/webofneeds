@@ -416,6 +416,59 @@ angular.module('won.owner').factory('userService', function ($window
         }
     }
 
+    userService.sendEmail = function(emailType, emailTo) {
+        var email = {};
+        email.type = emailType;
+        email.to = emailTo;
+        return $http.post(
+            '/owner/rest/users/email',
+            email
+        ).then(
+            function success(data, status) {
+                $log.debug("Successfully send email");
+                return {status: "OK"};
+            },
+            function error(data, status) {
+                $log.error("ERROR: failed to send email");
+                // TODO: notify the user that email sending failed and ask him to copy the link instead
+                return {status: "FATAL_ERROR"};
+            }
+        );
+    }
+
+    userService.getSettingsForNeed = function(needUri) {
+        var deferred = $q.defer();
+        $http.get(
+                '/owner/rest/users/settings/?uri=' + encodeURIComponent(needUri)
+        ).then(
+            function success(response) {
+                deferred.resolve(response.data);
+            },
+            function error(response) {
+                deferred.reject(response);
+                // TODO broadcast error notification or handle it in calling method?
+            }
+        )
+        return deferred.promise;
+    }
+
+    userService.setSettingsForNeed = function(settings) {
+        var deferred = $q.defer();
+        $http.post(
+                '/owner/rest/users/settings/',
+            settings
+        ).then(
+            function success(response) {
+                deferred.resolve(response.data);
+            },
+            function error(response) {
+                deferred.reject(response);
+                // TODO broadcast error notification or handle it in calling method?
+            }
+        )
+        return deferred.promise;
+    }
+
     var verified = userService.verifyAuth(); //checking login status
     verified.then(function reloadWhileLoggedIn(loggedIn){
         if(loggedIn) {

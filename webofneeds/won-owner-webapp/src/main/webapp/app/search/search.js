@@ -158,11 +158,15 @@ app.directive(('searchResult'), function searchResultFct($log, applicationStateS
                     applicationStateService.setCurrentNeedURI($scope.results[selectedResult][won.WON.searchResultURI]['@id']);
 
 
-                    linkedDataService.getNeed($scope.results[selectedResult][won.WON.searchResultURI]['@id']).then(function(need){
+                    linkedDataService.getNeed($scope.results[selectedResult][won.WON.searchResultURI]['@id']).then(
+                    function success(need) {
                         $scope.selectedNeed = need;
-
+                    },
+                    function error(response) {
+                        $scope.selectedNeed = null;
+                        $log.debug("failed to select search result, probably the need doesn't exist any more")
                     })
-                }catch (e){
+                } catch (e){
                     $log.debug("failed to set current need uri. probably there's no search result")
                 }
             }

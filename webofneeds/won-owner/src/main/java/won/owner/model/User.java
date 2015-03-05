@@ -11,9 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -46,6 +46,9 @@ public class User implements UserDetails{
   @Column(name = "role")
   private String role;
 
+  @Column(name = "email")
+  private String email;
+
   //TODO: eager is dangerous here, but we need it as the User object is kept in the http session which outlives the
   //hibernate session. However, this wastes space and may lead to memory issues during high usage. Fix it.
   @ElementCollection( fetch = FetchType.EAGER)
@@ -61,6 +64,7 @@ public class User implements UserDetails{
 		this.username = username;
 		this.password = password;
     this.role ="ROLE_ACCOUNT";
+    this.email = this.username;
 	}
 
   public User(final String username, final String password, String role) {
@@ -149,6 +153,14 @@ public class User implements UserDetails{
     this.userNeeds = userNeeds;
   }
 
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(final String email) {
+    this.email = email;
+  }
+
   public String getRole() {
     return role;
   }
@@ -179,6 +191,7 @@ public class User implements UserDetails{
 		if (password != null ? !password.equals(user.password) : user.password != null) return false;
 		if (username != null ? !username.equals(user.username) : user.username != null) return false;
     if (role != null ? !role.equals(user.role) : user.role != null) return false;
+    if (email != null ? !email.equals(user.email) : user.email != null) return false;
 
 		return true;
 	}
@@ -190,6 +203,7 @@ public class User implements UserDetails{
 		result = 31 * result + (password != null ? password.hashCode() : 0);
 		result = 31 * result + (userNeeds != null ? userNeeds.hashCode() : 0);
     result = 31 * result + (role != null ? role.hashCode() : 0);
+    result = 31 * result + (email != null ? email.hashCode() : 0);
 		return result;
 	}
 }

@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
 import org.springframework.transaction.annotation.Propagation;
@@ -35,6 +36,7 @@ import won.owner.repository.UserNeedRepository;
 import won.owner.repository.UserRepository;
 import won.owner.service.OwnerApplicationServiceCallback;
 import won.owner.service.impl.OwnerApplicationService;
+import won.owner.web.WonOwnerMailSender;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageEncoder;
@@ -72,6 +74,8 @@ public class WonWebSocketHandler
   @Autowired
   SessionRepository sessionRepository;
 
+  @Autowired
+  private WonOwnerMailSender emailSender;
 
   @Override
   public void afterPropertiesSet() throws Exception {
@@ -167,6 +171,7 @@ public class WonWebSocketHandler
     WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
     URI needUri = wonMessage.getReceiverNeedURI();
     User user = getUserForWonMessage(wonMessage);
+
     Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForWonMessage(wonMessage, needUri, user);
     if (webSocketSessions.size() == 0) {
       logger.info("cannot deliver message of type {} for need {}, receiver {}: no websocket session found",
@@ -176,6 +181,57 @@ public class WonWebSocketHandler
     }
     for (WebSocketSession session : webSocketSessions) {
       sendMessageForSession(wonMessage, webSocketMessage, session, needUri, user);
+    }
+    // send per email notifications if it applies:
+    notifyPerEmail(user, needUri, wonMessage);
+
+  }
+
+  private void notifyPerEmail(final User user, final URI needUri, final WonMessage wonMessage) {
+
+    if (user == null) {
+      return;
+    }
+
+    UserNeed userNeed = getNeedOfUser(user, needUri);
+    if (userNeed == null) {
+      return;
+    }
+
+    try {
+      switch (wonMessage.getMessageType()) {
+        case OPEN:
+          if (userNeed.isConversations()) {
+            emailSender.sendNotificationMessage(user.getEmail(), "Conversation Message",
+                                                wonMessage.getReceiverNeedURI().toString());
+          }
+          return;
+        case CONNECTION_MESSAGE:
+          if (userNeed.isConversations()) {
+            emailSender.sendNotificationMessage(user.getEmail(), "Conversation Message",
+                                                wonMessage.getReceiverNeedURI().toString());
+          }
+          return;
+        case CONNECT:
+          if (userNeed.isRequests()) {
+            emailSender.sendNotificationMessage(user.getEmail(), "Conversation Request",
+                                                wonMessage.getReceiverNeedURI().toString());
+          }
+          return;
+        case HINT_MESSAGE:
+          if (userNeed.isRequests()) {
+            emailSender.sendNotificationMessage(user.getEmail(), "Match", wonMessage.getReceiverNeedURI().toString());
+          }
+          return;
+        //TODO close message can be of either type depending of state of the connection...
+        case CLOSE:
+          //TODO
+          return;
+        default:
+          return;
+      }
+    } catch (MailException ex) { // org.springframework.mail.MailException
+      logger.error("Email could not be sent", ex);
     }
   }
 
@@ -224,6 +280,16 @@ public class WonWebSocketHandler
   private User getUserForWonMessage(final WonMessage wonMessage) {
     URI needUri = wonMessage.getReceiverNeedURI();
     return userRepository.findByNeedUri(needUri);
+  }
+
+  private UserNeed getNeedOfUser(final User user, final URI needUri) {
+
+    for (UserNeed userNeed : user.getUserNeeds()) {
+      if (userNeed.getUri().equals(needUri)) {
+        return userNeed;
+      }
+    }
+    return null;
   }
 
   private synchronized void sendMessageForSession(final WonMessage wonMessage, final WebSocketMessage<String>

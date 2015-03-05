@@ -163,6 +163,11 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
         //a feedback message is not forwarded to the remote connection, and facets cannot react to it.
         //invoke facet implementation
         //TODO: this may be much more responsive if done asynchronously. We dont return anything here anyway.
+        //TODO: before sending, we should actually create a new URI located on the target WoN node
+        //      and copy all the message content to a new message with that URI,
+        //      additionally point to the message we just received from the owner ,
+        //      sign it and send it. This way, the remote WoN node can just store it the way it is
+        //      note: this step may be left out if the message is to be delivered locally.
         reg.get(con).sendMessageFromOwner(con, message, newWonMessage);
       }
       //todo: the method shall return an object that debugrms the owner that processing the message on the node side was done successfully.
