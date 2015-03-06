@@ -1,6 +1,7 @@
 package won.owner.web.rest;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ public class WonOwnerMailSenderTest {
 
   // a test fails if mail account data were not specified in the owner.properties
   @Test
+  @Ignore //we don't want to require setting WON_CONFIG_DIR during the build
   public void emailSenderAccountPropertiesTest() {
     Assert.assertTrue(baseEmailSender.getUsername() != null && baseEmailSender.getUsername().length() > 1);
     Assert.assertNotNull(baseEmailSender.getPassword() != null && baseEmailSender.getPassword().length() > 1);

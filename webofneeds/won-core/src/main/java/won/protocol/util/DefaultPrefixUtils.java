@@ -35,7 +35,7 @@ public class DefaultPrefixUtils
    * @param model
    */
   public static void setDefaultPrefixes(Model model) {
-    setDefaultPrefixes(model.getGraph().getPrefixMapping());         
+    setDefaultPrefixes(model.getGraph().getPrefixMapping());
   }
 
   /**
