@@ -1,0 +1,43 @@
+<div class="modal-header">
+    <button class="close" ng-click="cancel()">&times;</button>
+    <h1 class="modal-title" style="font-size: 1.8em;">Sign In</h1>
+</div>
+<div class="modal-body">
+    <!--<h2>{{ our_value_proposition }}</h2>-->
+
+    <form novalidate name="signInForm">
+        <div class="form-group">
+            <label for="signUsername">Email address</label>
+            <input type="email" class="form-control" name="signUsername" id="signUsername" ng-model="username"
+                   placeholder="Email address" required>
+            <!--TODO put in reg form in login form crosses in input fields from http://getbootstrap.com/css/-->
+            <span class="label label-warning" ng-show="signInForm.signUsername.$invalid && !signInForm.signUsername.$pristine">Please write valid email address</span>
+            <span class="label label-warning" ng-show="error.length > 0">{{error}}</span>
+        </div>
+
+
+        <div class="form-group">
+            <label for="signPassword">Password</label>
+            <input type="password" class="form-control" name="signPassword" id="signPassword" ng-model="password"
+                   placeholder="Password" required>
+        </div>
+
+        <label class="checkbox-inline">
+            <input type="checkbox" id="rememberMeCheckBox" value="">Remember me
+        </label>
+
+        <a class="show" href="#/forgot-pwd">Forgot your password?</a>
+    </form>
+
+</div>
+<div class="modal-footer">
+
+    <button ng-disabled="signInForm.$invalid"
+            type="submit"
+            class="btn btn-primary"
+            ng-click="signin(username, password)">
+        <i class="fa fa-circle-o-notch fa-spin" ng-show="processing"></i>
+        Sign in
+    </button>
+    <!-- do ng-click and submit conflict here? submit probably won't work as it's in the footer -->
+</div>

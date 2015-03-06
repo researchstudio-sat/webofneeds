@@ -33,7 +33,7 @@
 
 	    <link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
 	    <link rel="stylesheet" href="style/datepicker.css"/>
-	    <link rel="stylesheet" href="font-awesome-4.1.0/css/font-awesome.min.css">
+	    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
 	    <link rel="stylesheet" href="style/lightbox.css"/>
 	    <link rel="stylesheet" href="style/bootstrap-tagsinput.css"/>
         <link rel="stylesheet" href="style/star-rating.css"/>
@@ -56,9 +56,13 @@
         <script src="scripts/jquery.10.2.js"></script>
         <script src="scripts/jquery.fs.scroller.min.js"></script>
         <script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
         <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="bower_components/angular-mocks/angular-mocks.js"></script>
+
         <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+        <link rel="stylesheet" href="style/ui-bootstrap-patches.css"/> <!-- disable after updating ui-bootstrap -->
+
 
         <script type="text/javascript" src="bower_components/angular-ui-utils/ui-utils.js"></script> <!-- to include all ui-utils TODO deleteme-->
         <script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
@@ -101,6 +105,8 @@
         <script type="text/javascript" src="<c:url value="/app/service/won-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/linkeddata-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/message-factory-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/sign-in/sign-in.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/sign-in/sign-up.js"/>"></script>
 
 
         <script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
@@ -209,12 +215,20 @@
                     on-click="openNeedDetailView(needURI)"
                     get-type-pic-uri = "getTypePicURI(type)">
                 </li>
-
 			</ul>
 					<ul class="nav navbar-nav navbar-right" ng-cloak>
                         <li><span ng-show="checkRegistered()"></span></li>
-				<li ng-show="showPublic()" ng-class="isActive('register')"><a href="#/register">Sign up&nbsp;<span class="caret"/></a></li>
-				<li ng-show="showPublic()" ng-class="isActive('signin')"><a href="#/signin">Sign in&nbsp;<span class="caret"/></a></li>
+
+                        <li ng-show="showPublic()" ng-class="isActive('register')">
+                            <a ng-click="displaySignUp()">
+                                Sign Up&nbsp;<span class="caret"/>
+                            </a>
+                        </li>
+                        <li ng-show="showPublic()" ng-class="isActive('signin')">
+                            <a ng-click="displaySignIn()">
+                                Sign In&nbsp;<span class="caret"/>
+                            </a>
+                        </li>
 				<!--<li ng-show="!showPublic()"><a href="#/need-list">{{userdata.username}}</a></li>
 										<li ng-show="!showPublic()"><a href="" ng-click="onClickSignOut()">Sign out</a></li>     -->
 

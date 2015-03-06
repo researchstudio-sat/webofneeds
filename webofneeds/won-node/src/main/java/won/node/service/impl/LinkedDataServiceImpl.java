@@ -37,13 +37,14 @@ import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
-import won.protocol.util.*;
+import won.protocol.util.ConnectionModelMapper;
+import won.protocol.util.DefaultPrefixUtils;
+import won.protocol.util.NeedModelMapper;
 import won.protocol.vocabulary.LDP;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -112,10 +113,23 @@ public class LinkedDataServiceImpl implements LinkedDataService
     } else {
       needListPageResource = model.createResource(this.needResourceURIPrefix);
     }
+
     for (URI needURI : uris) {
       model.add(model.createStatement(needListPageResource, RDFS.member, model.createResource(needURI.toString())));
     }
-    return DatasetFactory.create(model);
+    Dataset ret = newDatasetWithNamedModel(createDataGraphUri(needListPageResource), model);
+    addBaseUriAndDefaultPrefixes(ret);
+    return ret;
+  }
+
+  private String createDataGraphUri(Resource needListPageResource) {
+    return needListPageResource.getURI()+"#data";
+  }
+
+  private Dataset newDatasetWithNamedModel(String graphUri, Model model) {
+    Dataset dataset = DatasetFactory.createMem();
+    dataset.addNamedModel(graphUri, model);
+    return dataset;
   }
 
   public Dataset listConnectionURIs(final int page)
@@ -139,7 +153,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
                                                                                      WON.CONNECTION) ));
 
     }
-    return DatasetFactory.create(model);
+    return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUri(connections), model));
   }
 
   public Dataset getNeedDataset(final URI needUri) throws NoSuchNeedException {
@@ -148,7 +162,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
     // load the dataset from storage
     Dataset dataset = rdfStorage.loadDataset(need.getNeedURI());
     Model metaModel = needModelMapper.toModel(need);
-    Model defaultModel = ModelFactory.createDefaultModel();
 
     Resource needResource = metaModel.getResource(needUri.toString());
 
@@ -174,17 +187,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     // add meta model to dataset
     String needMetaInformationURI = uriService.createNeedMetaInformationURI(needUri).toString();
     dataset.addNamedModel(needMetaInformationURI, metaModel);
-
-    // add the won:hasGraph properties
-    Iterator<String> it = dataset.listNames();
-    while (it.hasNext()) {
-      defaultModel.add(needResource, WON.HAS_GRAPH, defaultModel.createResource(it.next()));
-    }
-
-    setNsPrefixes(defaultModel);
-
-    dataset.setDefaultModel(defaultModel);
-
+    addBaseUriAndDefaultPrefixes(dataset);
     return dataset;
   }
 
@@ -195,7 +198,9 @@ public class LinkedDataServiceImpl implements LinkedDataService
       Resource showNodePageResource = null;
       showNodePageResource = model.createResource(this.resourceURIPrefix);
       addProtocolEndpoints(model, showNodePageResource);
-      return DatasetFactory.create(model);
+      Dataset ret = newDatasetWithNamedModel(createDataGraphUri(showNodePageResource), model);
+      addBaseUriAndDefaultPrefixes(ret);
+      return ret;
     }
 
   //TODO: protocol endpoint specification in RDF model needs refactoring!
@@ -266,7 +271,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
       }
     }
 
-    return DatasetFactory.create(model);
+    return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUri(connectionResource), model));
   }
 
 
@@ -274,6 +279,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   public Dataset getEventDataset(URI eventURI) {
     Dataset result = rdfStorage.loadDataset(eventURI);
     DefaultPrefixUtils.setDefaultPrefixes(result.getDefaultModel());
+    addBaseUriAndDefaultPrefixes(result);
     return result;
   }
 
@@ -308,7 +314,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     for (URI connURI : uris)
       model.add(model.createStatement(connections, RDFS.member, model.createResource(connURI.toString())));
-    return DatasetFactory.create(model);
+    return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUri(connections), model));
   }
 
   private String addPageQueryString(String uri, int page)
@@ -339,6 +345,31 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private void setNsPrefixes(final Model model)
   {
     DefaultPrefixUtils.setDefaultPrefixes(model);
+  }
+
+  /**
+   * Adds the specified URI as the default prefix for each model in the dataset and
+   * return the dataset.
+   * @param dataset
+   * @return
+   */
+  private Dataset addBaseUriAndDefaultPrefixes(Dataset dataset){
+    setNsPrefixes(dataset.getDefaultModel());
+    addPrefixForSpecialResources(dataset, "local", this.resourceURIPrefix);
+    addPrefixForSpecialResources(dataset, "need", this.needResourceURIPrefix);
+    addPrefixForSpecialResources(dataset, "event", this.eventResourceURIPrefix);
+    addPrefixForSpecialResources(dataset, "conn", this.connectionResourceURIPrefix);
+    return dataset;
+  }
+
+  private void addPrefixForSpecialResources(Dataset dataset, String prefix, String uri) {
+    if (uri == null) return; //ignore if no uri specified
+    //the prefix (prefix of all local URIs must end with a slash or a hash, otherwise,
+    //it will never be used by RDF serializations. Force that.
+    if (!uri.endsWith("/") && !uri.endsWith("#")) {
+      uri += "/";
+    }
+    dataset.getDefaultModel().getGraph().getPrefixMapping().setNsPrefix(prefix, uri);
   }
 
   public void setNeedResourceURIPrefix(final String needResourceURIPrefix)

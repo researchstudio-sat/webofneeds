@@ -514,17 +514,15 @@ public class WonRdfUtils
      */
     public static Model getNeedModelFromNeedDataset(Dataset dataset){
       assert dataset != null : "dataset must not be null";
-      Model result = ModelFactory.createDefaultModel();
-      Model defaultModel = dataset.getDefaultModel();
-      //find the hasGraph triples that should reference graphs in the dataset.
-      // Get their data and copy it to the result graph.
-      NodeIterator it = defaultModel.listObjectsOfProperty(WON.HAS_GRAPH);
-      while(it.hasNext()){
-        Model namedModel = dataset.getNamedModel(it.next().toString());
-        if (namedModel != null){
-          result.add(namedModel);
+      final Model result = ModelFactory.createDefaultModel();
+
+      RdfUtils.visit(dataset,new RdfUtils.ModelVisitor<Object>() {
+        @Override
+        public Object visit(Model model) {
+          result.add(model);
+          return null;
         }
-      }
+      });
       return result;
     }
 
