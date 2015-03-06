@@ -16,8 +16,7 @@
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>WEB-INF/spring-ws-servlet.xml
-            classpath:/spring/owner-jmsonly.xml
+        <param-value>classpath:/spring/owner-jmsonly.xml
 	        classpath:/spring/owner-security.xml
             classpath:/spring/owner-context.xml
             classpath:/spring/owner-mailer.xml
@@ -52,24 +51,7 @@
 
 
 
-	<!-- WEB SERVICES  -->
-
-    <listener>
-        <listener-class>
-            com.sun.xml.ws.transport.http.servlet.WSServletContextListener
-        </listener-class>
-    </listener>
-    <servlet>
-        <servlet-name>ownerProtocolJaxWSServlet</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>2</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ownerProtocolJaxWSServlet</servlet-name>
-        <url-pattern>/protocol</url-pattern>
-    </servlet-mapping>
-
-	<!-- SPRING WEB MVC config -->
+		<!-- SPRING WEB MVC config -->
 
 	<servlet>
 		<servlet-name>dispatcher</servlet-name>

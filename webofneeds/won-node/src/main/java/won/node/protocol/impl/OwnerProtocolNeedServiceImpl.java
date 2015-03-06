@@ -91,19 +91,19 @@ public class OwnerProtocolNeedServiceImpl implements OwnerProtocolNeedService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    public Collection<URI> listConnectionURIs(int page) {
+    public Page<URI> listConnectionURIs(int page) {
         return needInformationService.listConnectionURIs(page);
     }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    public Collection<URI> listNeedURIs(int page) {
+    public Page<URI> listNeedURIs(int page) {
         return needInformationService.listNeedURIs(page);
     }
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    public Collection<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException {
+    public Page<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException {
         return needInformationService.listConnectionURIs(needURI, page);
     }
 

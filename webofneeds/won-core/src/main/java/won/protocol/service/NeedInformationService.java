@@ -45,7 +45,7 @@ public interface NeedInformationService {
      * @param page the page number
      * @return a collection of all need URIs.
      */
-    public Collection<URI> listNeedURIs(int page);
+    public Page<URI> listNeedURIs(int page);
 
     /**
      * Retrieves all connection URIs (regardless of state) for the specified local need URI.
@@ -69,7 +69,7 @@ public interface NeedInformationService {
      *
      * @return a collection of connection URIs.
      */
-    public Collection<URI> listConnectionURIs(int page);
+    public Page<URI> listConnectionURIs(int page);
 
     /**
      * Retrieves a page of the list of connection URIs (regardless of state) for the specified local need URI.
@@ -80,7 +80,7 @@ public interface NeedInformationService {
      * @throws won.protocol.exception.NoSuchNeedException
      *          if needURI is not a known need URI
      */
-    public Collection<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException;
+    public Page<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException;
 
     /**
      * Read general information about the need.
@@ -133,4 +133,22 @@ public interface NeedInformationService {
     public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
 
   ConnectionEvent readEvent(URI eventURI);
+
+  public static class Page<T>{
+    private Collection<T> content;
+    private boolean hasNext;
+
+    public Page(final Collection<T> content, final boolean hasNext) {
+      this.content = content;
+      this.hasNext = hasNext;
+    }
+
+    public Collection<T> getContent() {
+      return content;
+    }
+
+    public boolean hasNext() {
+      return hasNext;
+    }
+  }
 }

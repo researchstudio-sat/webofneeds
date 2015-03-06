@@ -59,18 +59,7 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
-        <!-- JAX-WS (webservices)-->
-        <dependency>
-            <groupId>com.sun.xml.ws</groupId>
-            <artifactId>jaxws-rt</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.ws</groupId>
-            <artifactId>jaxws-tools</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-
+        <!-- Spring -->
 	    <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
@@ -124,28 +113,10 @@
 		</dependency>
 
 		<dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-            <scope>${dependencies.scope}</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
             <scope>${dependencies.scope}</scope>
 		</dependency>
-
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
 
         <!-- spring-session -->
         <dependency>

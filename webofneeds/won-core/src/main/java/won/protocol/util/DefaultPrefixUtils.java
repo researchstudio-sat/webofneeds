@@ -49,7 +49,6 @@ public class DefaultPrefixUtils
     prefixMapping.setNsPrefix("ldp", LDP.getURI());
     prefixMapping.setNsPrefix("rdfs", RDFS.getURI());
     prefixMapping.setNsPrefix("geo", GEO.getURI());
-    prefixMapping.setNsPrefix("gr", GR.getURI());
     prefixMapping.setNsPrefix("xsd", XSD.getURI());
     prefixMapping.setNsPrefix("dc", DC.getURI());    
   }

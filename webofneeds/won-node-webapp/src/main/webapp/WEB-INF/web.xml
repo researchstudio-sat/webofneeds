@@ -21,19 +21,7 @@
     </context-param>
 
 
-    <!-- WEB SERVICES -->
 
-
-
-    <servlet>
-        <servlet-name>wonProtocolJaxWSServlet</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>3</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>wonProtocolJaxWSServlet</servlet-name>
-        <url-pattern>/protocol/*</url-pattern>
-    </servlet-mapping>
 
     <!-- SPRING WEB MVC config -->
     <servlet>
@@ -53,11 +41,5 @@
         <welcome-file>index.html</welcome-file>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
-
-    <listener>
-        <listener-class>
-            com.sun.xml.ws.transport.http.servlet.WSServletContextListener
-        </listener-class>
-    </listener>
 
 </web-app>

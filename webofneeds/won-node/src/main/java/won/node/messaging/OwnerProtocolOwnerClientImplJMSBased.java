@@ -17,12 +17,10 @@
 package won.node.messaging;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.node.protocol.impl.OwnerProtocolOwnerClientFactory;
 import won.protocol.exception.*;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
@@ -47,9 +45,6 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
 
-
-  @Autowired
-  private OwnerProtocolOwnerClientFactory clientFactory;
 
   private MessagingService messagingService;
 
@@ -181,10 +176,6 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
         headerMap.put("methodName", "sendMessage");
         messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
     }
-  public void setClientFactory(final OwnerProtocolOwnerClientFactory clientFactory)
-  {
-    this.clientFactory = clientFactory;
-  }
 
     public void setNeedRepository(NeedRepository needRepository) {
         this.needRepository = needRepository;

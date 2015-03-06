@@ -44,6 +44,7 @@ import won.protocol.vocabulary.LDP;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.List;
 
@@ -97,21 +98,19 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private String activeMqMatcherProtocolTopicNameNeedActivated;
   private String activeMqMatcherProtocolTopicNameNeedDeactivated;
 
-    public Dataset listNeedURIs(final int page)
+    public Dataset listNeedURIs(final int pageNum)
   {
-    Collection<URI> uris = null;
-    if (page >= 0) {
-      uris = needInformationService.listNeedURIs(page);
-    } else {
-      uris = needInformationService.listNeedURIs();
-    }
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
     Resource needListPageResource = null;
-    if (page >= 0) {
-      needListPageResource = createPage(model, this.needResourceURIPrefix, page, uris.size());
+    Collection<URI> uris = null;
+    if (pageNum >= 0) {
+      NeedInformationService.Page page = needInformationService.listNeedURIs(pageNum);
+      needListPageResource = createPage(model, this.needResourceURIPrefix+"/", pageNum, page);
+      uris = page.getContent();
     } else {
-      needListPageResource = model.createResource(this.needResourceURIPrefix);
+      uris = needInformationService.listNeedURIs();
+      needListPageResource = model.createResource(this.needResourceURIPrefix+"/");
     }
 
     for (URI needURI : uris) {
@@ -123,7 +122,13 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   private String createDataGraphUri(Resource needListPageResource) {
-    return needListPageResource.getURI()+"#data";
+    URI uri = URI.create(needListPageResource.getURI());
+    try {
+      URI ret = new URI(uri.getScheme(), uri.getHost(), uri.getPath(), uri.getQuery(), "data");
+      return ret.toString();
+    } catch (URISyntaxException e) {
+      return uri.toString() + "#data";
+    }
   }
 
   private Dataset newDatasetWithNamedModel(String graphUri, Model model) {
@@ -132,25 +137,22 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return dataset;
   }
 
-  public Dataset listConnectionURIs(final int page)
+  public Dataset listConnectionURIs(final int pageNum)
   {
     Collection<URI> uris = null;
-    if (page >= 0) {
-      uris = needInformationService.listConnectionURIs(page);
-    } else {
-      uris = needInformationService.listConnectionURIs();
-    }
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
     Resource connections = null;
-    if (page >= 0) {
-      connections = createPage(model, this.connectionResourceURIPrefix, page, uris.size());
+    if (pageNum >= 0) {
+      NeedInformationService.Page page = needInformationService.listConnectionURIs(pageNum);
+      connections = createPage(model, this.connectionResourceURIPrefix+"/", pageNum, page);
+      uris = page.getContent();
     } else {
-      connections = model.createResource(this.connectionResourceURIPrefix,LDP.CONTAINER);
+      connections = model.createResource(this.connectionResourceURIPrefix+"/",LDP.CONTAINER);
+      uris = needInformationService.listConnectionURIs();
     }
     for (URI connectionURI : uris) {
-      model.add(model.createStatement(connections, RDFS.member, model.createResource(connectionURI.toString(),
-                                                                                     WON.CONNECTION) ));
+      model.add(model.createStatement(connections, RDFS.member, model.createResource(connectionURI.toString())));
 
     }
     return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUri(connections), model));
@@ -294,24 +296,22 @@ public class LinkedDataServiceImpl implements LinkedDataService
     }
   }
 
-  public Dataset listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException
+  public Dataset listConnectionURIs(final int pageNum, final URI needURI) throws NoSuchNeedException
   {
     Collection<URI> uris = null;
-    if (page >= 0)
-      uris = needInformationService.listConnectionURIs(needURI, page);
-    else
-      uris = needInformationService.listConnectionURIs(needURI);
-
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
     //model.setNsPrefix("", needURI.toString());
 
     Resource connections = null;
-    if (page >= 0)
-      connections = createPage(model, needURI.toString() + "/connections/", page, uris.size());
-    else
+    if (pageNum >= 0) {
+      NeedInformationService.Page<URI> page = needInformationService.listConnectionURIs(needURI, pageNum);
+      connections = createPage(model, needURI.toString() + "/connections/", pageNum, page);
+      uris = page.getContent();
+    } else {
       connections = model.createResource(needURI.toString() + "/connections/");
-
+      uris = needInformationService.listConnectionURIs(needURI);
+    }
     for (URI connURI : uris)
       model.add(model.createStatement(connections, RDFS.member, model.createResource(connURI.toString())));
     return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUri(connections), model));
@@ -323,9 +323,9 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return uri + "?page=" + page;
   }
 
-  private Resource createPage(final Model model, final String containerURI, final int page, final int numberOfMembers)
+  private Resource createPage(final Model model, final String containerURI, final int pageNum, NeedInformationService.Page page)
   {
-    String containerPageURI = addPageQueryString(containerURI, page);
+    String containerPageURI = addPageQueryString(containerURI, pageNum);
     Resource containerPageResource = model.createResource(containerPageURI);
     Resource containerResource = model.createResource(containerURI);
     model.add(model.createStatement(containerPageResource, RDF.type, LDP.PAGE));
@@ -333,12 +333,11 @@ public class LinkedDataServiceImpl implements LinkedDataService
     model.add(model.createStatement(containerPageResource, RDF.type, LDP.CONTAINER));
     Resource containerNextPageResource = null;
     //assume last page if we didn't fetch pageSize uris
-    if (numberOfMembers < pageSize) {
-      containerNextPageResource = RDF.nil;
-    } else {
-      containerNextPageResource = model.createResource(addPageQueryString(containerURI, page + 1));
+    if (page.hasNext()) {
+      containerNextPageResource = model.createResource(addPageQueryString(containerURI, pageNum + 1));
+      model.add(model.createStatement(containerPageResource, LDP.NEXT_PAGE, containerNextPageResource));
     }
-    model.add(model.createStatement(containerPageResource, LDP.NEXT_PAGE, containerNextPageResource));
+
     return containerPageResource;
   }
 
