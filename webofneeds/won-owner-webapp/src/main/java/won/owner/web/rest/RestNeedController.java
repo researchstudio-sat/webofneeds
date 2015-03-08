@@ -20,7 +20,6 @@ package won.owner.web.rest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -34,16 +33,8 @@ import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.pojo.CreateDraftPojo;
 import won.owner.repository.DraftRepository;
-import won.owner.service.impl.DataReloadService;
 import won.owner.service.impl.URIService;
 import won.owner.service.impl.WONUserDetailService;
-import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
-import won.protocol.repository.ChatMessageRepository;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.MatchRepository;
-import won.protocol.repository.NeedRepository;
-import won.protocol.repository.rdfstorage.RDFStorageService;
-import won.protocol.util.linkeddata.LinkedDataSource;
 
 import javax.ws.rs.core.MediaType;
 import java.net.URI;
@@ -61,27 +52,7 @@ public class RestNeedController {
   final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  @Qualifier("default")
-  private OwnerProtocolNeedServiceClientSide ownerService;
-
-  @Autowired
-  private NeedRepository needRepository;
-
-
-  @Autowired
   private DraftRepository draftRepository;
-
-  @Autowired
-  private MatchRepository matchRepository;
-
-  @Autowired
-  private RDFStorageService rdfStorage;
-
-  @Autowired
-  private ChatMessageRepository chatMessageRepository;
-
-  @Autowired
-  private ConnectionRepository connectionRepository;
 
   @Autowired
   private URIService uriService;
@@ -89,41 +60,6 @@ public class RestNeedController {
   @Autowired
   private WONUserDetailService wonUserDetailService;
 
-  @Autowired
-  private DataReloadService dataReloadService;
-
-
-  @Autowired
-  private LinkedDataSource linkedDataSource;
-
-
-  public void setDataReloadService(DataReloadService dataReloadService) {
-    this.dataReloadService = dataReloadService;
-  }
-
-  public URIService getUriService() {
-    return uriService;
-  }
-
-  public void setUriService(final URIService uriService) {
-    this.uriService = uriService;
-  }
-
-  public void setOwnerService(OwnerProtocolNeedServiceClientSide ownerService) {
-    this.ownerService = ownerService;
-  }
-
-  public void setConnectionRepository(ConnectionRepository connectionRepository) {
-    this.connectionRepository = connectionRepository;
-  }
-
-  public void setMatchRepository(MatchRepository matchRepository) {
-    this.matchRepository = matchRepository;
-  }
-
-  public void setNeedRepository(NeedRepository needRepository) {
-    this.needRepository = needRepository;
-  }
 
   /**
    * returns a List containing needs belonging to the user
