@@ -879,7 +879,12 @@
                         <executions>
                             <execution>
                                 <id>copy-module-dependencies</id>
-                                <phase>verify</phase>
+                                <!--
+                                    technically, 'validate' is not the correct phase, but when put here, copying the
+                                    dependencies can be executed isolated from all other tasks an thus runs faster.
+                                    For only copying the dependencies run 'mvn validate -Pcopy-module-dependencies'
+                                 -->
+                                <phase>validate</phase>
                                 <goals>
                                     <goal>copy-dependencies</goal>
                                 </goals>
@@ -922,7 +927,13 @@
                             <execution>
                                 <!-- don't use this same id in module pom.xmls, say won-owner-webapp -->
                                 <id>copy-project-dependencies</id>
-                                <phase>verify</phase>
+                                <!--
+                                    technically, 'validate' is not the correct phase, but when put here, copying the
+                                    dependencies can be executed isolated from all other tasks an thus runs faster.
+                                    For only copying the dependencies run 'mvn validate -Pcopy-project-dependencies'
+                                 -->
+                                <phase>validate</phase>
+
                                 <goals>
                                     <goal>copy-dependencies</goal>
                                 </goals>
@@ -936,6 +947,7 @@
                                     -->
                                     <excludeGroupIds>webofneeds,org.sindice.siren, org.apache.lucene</excludeGroupIds>
                                     <excludeArtifactIds>servlet-api</excludeArtifactIds>
+                                    <excludeTypes>war</excludeTypes>
                                 </configuration>
                             </execution>
                         </executions>
