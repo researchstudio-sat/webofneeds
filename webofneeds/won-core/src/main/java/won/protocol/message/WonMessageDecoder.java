@@ -8,9 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * User: ypanchenko
@@ -34,24 +31,7 @@ public class WonMessageDecoder
     Dataset dataset = DatasetFactory.createMem();
     StringReader sr = new StringReader(message);
     RDFDataMgr.read(dataset, sr, null, lang);
-    return decodeFromDataset(dataset);
-  }
-
-  // ToDo (FS): build the WonMessage and MessageEvent with the Builder in order to avoid redundant code
-  public static WonMessage decodeFromDataset(Dataset message) {
-
-    return new WonMessage(message);
-  }
-
-  // TODO move to a GateUtils...
-  private static List<String> getModelNames(final Dataset dataset) {
-
-    List<String> modelNames = new ArrayList<String>();
-    Iterator<String> names = dataset.listNames();
-    while (names.hasNext()) {
-      modelNames.add(names.next());
-    }
-    return modelNames;
+    return new WonMessage(dataset);
   }
 
 }
