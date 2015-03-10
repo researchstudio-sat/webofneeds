@@ -179,14 +179,15 @@ public class WonMessageBuilderTest
   }
 
   public void check_get_content_in_message_with_content(final WonMessage msg) {
-    Dataset content = msg.getMessageContent();
+    Dataset actualContentDataset = msg.getMessageContent();
     Assert.assertTrue("messageContent dataset of message with content has non-empty default graph",
-      content.getDefaultModel().isEmpty());
+      actualContentDataset.getDefaultModel().isEmpty());
     Assert.assertTrue("messageContent dataset of message with content has no named graphs",
-      content.listNames().hasNext());
+      actualContentDataset.listNames().hasNext());
     Set<String> names = new HashSet<String>();
-    Iterators.addAll(names, content.listNames());
+    Iterators.addAll(names, actualContentDataset.listNames());
     Assert.assertEquals("incorrect number of named graphs", names.size(), 1);
+    Assert.assertTrue("content different from the expected content", findContentGraphInMessage(msg, createContent()));
   }
 
   @Test
@@ -218,13 +219,27 @@ public class WonMessageBuilderTest
   }
 
   public void check_get_content_in_message_with_two_content_graphs(final WonMessage msg) {
-    Dataset content = msg.getMessageContent();
+    Dataset actualContentDataset = msg.getMessageContent();
     Assert.assertTrue("messageContent dataset of message with content has non-empty default graph",
-      content.getDefaultModel().isEmpty());
+      actualContentDataset.getDefaultModel().isEmpty());
     Set<String> names = new HashSet<String>();
-    Iterators.addAll(names, content.listNames());
-
+    Iterators.addAll(names, actualContentDataset.listNames());
     Assert.assertEquals("incorrect number of named graphs", names.size(), 2);
+    Assert.assertTrue("content different from the expected content", findContentGraphInMessage(msg, createContent()));
+    Assert.assertTrue("content different from the expected 'different' content", findContentGraphInMessage(msg,
+      createDifferentContent()));
+
+  }
+
+  public boolean findContentGraphInMessage(final WonMessage msg, final Model expectedContent) {
+    Dataset actualContentDataset = msg.getMessageContent();
+    boolean foundIt = false;
+    for (Iterator<String> nameit = actualContentDataset.listNames(); nameit.hasNext();) {
+      foundIt = expectedContent.isIsomorphicWith(
+        actualContentDataset.getNamedModel(nameit.next()));
+      if (foundIt) break;
+    }
+    return foundIt;
   }
 
   private WonMessageBuilder createMessageWithEnvelopeType(){

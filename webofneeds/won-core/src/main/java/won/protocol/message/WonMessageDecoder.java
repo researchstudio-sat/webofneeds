@@ -31,7 +31,12 @@ public class WonMessageDecoder
     Dataset dataset = DatasetFactory.createMem();
     StringReader sr = new StringReader(message);
     RDFDataMgr.read(dataset, sr, null, lang);
-    return new WonMessage(dataset);
+    return decodeFromDataset(dataset);
   }
+
+  public static WonMessage decodeFromDataset(Dataset message) {
+    return new WonMessage(message);
+  }
+
 
 }
