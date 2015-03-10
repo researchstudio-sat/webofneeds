@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Facet;
 import won.protocol.model.NeedState;
 import won.protocol.service.WonNodeInfo;
@@ -140,103 +141,32 @@ public class WonRdfUtils
 
   public static class FacetUtils {
 
-    /**
-     * Returns the first facet found in the model, attached to the null relative URI '<>'.
-     * Returns null if there is no such facet.
-     * @param content
-     * @return
-     */
-    public static URI getFacet(URI subject, Model content) {
-      logger.debug("getFacet(model) called");
-      Resource baseRes = content.getResource(subject.toString());
-      StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
-      if (!stmtIterator.hasNext()) {
-        logger.debug("no facet found in model");
-        return null;
-      }
-      URI facetURI = URI.create(stmtIterator.next().getObject().asResource().getURI());
-      if (logger.isDebugEnabled()){
-        if (stmtIterator.hasNext()){
-          logger.debug("returning facet {}, but model has more facets than just this one.");
-        }
-      }
-      return facetURI;
+
+
+    public static URI getFacet(WonMessage message){
+      return getObjectOfMessageProperty(message, WON.HAS_FACET);
+    }
+
+    public static URI getRemoteFacet(WonMessage message) {
+      return getObjectOfMessageProperty(message, WON.HAS_REMOTE_FACET);
     }
 
     /**
-     * Returns the first RemoteFacet found in the model, attached to the specified subject.
-     * Returns null if there is no such facet.
-     * @param content
-     * @return
+     * Returns a property of the message (i.e. the object of the first triple ( [message-uri] [property] X )
+     * found in one of the content graphs of the specified message.
      */
-    public static URI getRemoteFacet(URI subject, Model content) {
-      logger.debug("getFacet(model) called");
-      Resource baseRes = content.getResource(subject.toString());
-      StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_REMOTE_FACET);
-      if (!stmtIterator.hasNext()) {
-        logger.debug("no RemoteFacet found in model");
-        return null;
-      }
-      URI remoteFacetURI = URI.create(stmtIterator.next().getObject().asResource().getURI());
-      if (logger.isDebugEnabled()){
-        if (stmtIterator.hasNext()){
-          logger.debug("returning RemoteFacet {}, but model has more RemoteFacets than just this one.");
+    private static URI getObjectOfMessageProperty(final WonMessage message, final Property property) {
+      List<String> contentGraphUris = message.getContentGraphURIs();
+      Dataset contentGraphs = message.getMessageContent();
+      URI messageURI = message.getMessageURI();
+      for (String graphUri: contentGraphUris) {
+        Model contentGraph = contentGraphs.getNamedModel(graphUri);
+        StmtIterator smtIter = contentGraph.getResource(messageURI.toString()).listProperties(property);
+        if (smtIter.hasNext()) {
+          return URI.create(smtIter.nextStatement().getObject().asResource().getURI());
         }
       }
-      return remoteFacetURI;
-    }
-
-    public static URI getFacet(final URI subject, Dataset content){
-      return RdfUtils.findFirst(content, new RdfUtils.ModelVisitor<URI>()
-      {
-        @Override
-        public URI visit(final Model model) {
-          return getFacet(subject, model);
-        }
-      });
-    }
-
-    public static URI getRemoteFacet(final URI subject, Dataset content){
-      return RdfUtils.findFirst(content, new RdfUtils.ModelVisitor<URI>()
-      {
-        @Override
-        public URI visit(final Model model) {
-          return getRemoteFacet(subject, model);
-        }
-      });
-    }
-
-    /**
-     * Returns the first facet found in the model, attached to the null relative URI '<>'.
-     * Returns null if there is no such facet.
-     * @param content
-     * @return
-     */
-    public static URI getFacet(Model content) {
-      logger.debug("getFacet(model) called");
-      Resource baseRes = RdfUtils.getBaseResource(content);
-      StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
-      if (!stmtIterator.hasNext()) {
-        logger.debug("no facet found in model");
-        return null;
-      }
-      URI facetURI = URI.create(stmtIterator.next().getObject().asResource().getURI());
-      if (logger.isDebugEnabled()){
-        if (stmtIterator.hasNext()){
-          logger.debug("returning facet {}, but model has more facets than just this one.");
-        }
-      }
-      return facetURI;
-    }
-
-    public static URI getFacet(Dataset content){
-      return RdfUtils.findFirst(content, new RdfUtils.ModelVisitor<URI>()
-      {
-        @Override
-        public URI visit(final Model model) {
-          return getFacet(model);
-        }
-      });
+      return null;
     }
 
     /**
@@ -257,6 +187,8 @@ public class WonRdfUtils
       }
       return ret;
     }
+
+
 
     /**
      * Adds a triple to the model of the form <> won:hasFacet [facetURI].

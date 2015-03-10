@@ -86,7 +86,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
         //TODO: facet code to be refactored!
         Connection con = findOrCreateConnection(ownNeedUriConvert, otherNeedUriConvert,
-          wonMessage.getReceiverURI(), WonRdfUtils.FacetUtils.getFacet(contentConvert), ConnectionState.SUGGESTED);
+          wonMessage.getReceiverURI(), WonRdfUtils.FacetUtils.getFacet(wonMessage), ConnectionState.SUGGESTED);
 
         Match match = new Match();
         match.setFromNeed(ownNeedUriConvert);

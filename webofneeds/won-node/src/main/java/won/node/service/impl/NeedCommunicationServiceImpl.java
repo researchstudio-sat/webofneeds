@@ -125,7 +125,7 @@ public class NeedCommunicationServiceImpl implements
       Model facetModel = ModelFactory.createDefaultModel();
 
       try {
-        URI facet = dataService.getFacet(content);
+        URI facet = WonRdfUtils.FacetUtils.getFacet(wonMessage);
         // ToDo (FS): adapt this part to the new message format (dont use content)
         if (facet == null) {
           //get the first one of the need's supported facets. TODO: implement some sort of strategy for choosing a facet here (and in the matcher)
@@ -179,7 +179,7 @@ public class NeedCommunicationServiceImpl implements
       URI receiverNeedURI = wonMessage.getReceiverNeedURI();
 
       //TODO: when we introduce dedicated URIs for individual facets, this will be how
-      URI facetURI = WonRdfUtils.FacetUtils.getFacet(content);
+      URI facetURI = WonRdfUtils.FacetUtils.getFacet(wonMessage);
 
       //create Connection in Database
       final Connection con =  dataService.createConnection(senderNeedURI, receiverNeedURI, null, facetURI,
@@ -217,8 +217,7 @@ public class NeedCommunicationServiceImpl implements
       URI needURIFromWonMessage = wonMessage.getReceiverNeedURI();
       URI otherNeedURIFromWonMessage = wonMessage.getSenderNeedURI();
       URI otherConnectionURIFromWonMessage = wonMessage.getSenderURI();
-      URI facetURI = WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage.getMessageURI(),
-        wonMessage.getMessageContent());
+      URI facetURI = WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage);
 
 
       logger.debug("CONNECT received for need {} referring to need {} (connection {})",

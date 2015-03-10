@@ -1,7 +1,6 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.graph.TripleBoundary;
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,6 @@ import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -120,31 +118,6 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     return ret;
   }
 
-  /**
-   * Returns the first facet found in the model, attached to the null relative URI '<>'.
-   * Returns null if there is no such facet.
-   * @param content
-   * @return
-   */
-  @Override
-  public URI getFacet(Model content) {
-    return WonRdfUtils.FacetUtils.getFacet(content);
-  }
-
-  public URI getFacet(Dataset content) {
-    return WonRdfUtils.FacetUtils.getFacet(content);
-  }
-
-  /**
-   * Adds a triple to the model of the form <> won:hasFacet [facetURI].
-   * @param content
-   * @param facetURI
-   */
-  @Override
-  public void addFacet(final Model content, final URI facetURI)
-  {
-    WonRdfUtils.FacetUtils.addFacet(content, facetURI);
-  }
 
   @Override
   public Connection getConnection(List<Connection> connections, URI facetURI, ConnectionEventType eventType)
