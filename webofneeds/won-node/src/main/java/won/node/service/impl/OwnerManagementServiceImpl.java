@@ -1,5 +1,6 @@
 package won.node.service.impl;
 
+import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class OwnerManagementServiceImpl implements ApplicationManagementService 
     private QueueManagementServiceImpl queueManagementService;
 
     @Override
-    public String  registerOwnerApplication() {
+    public String  registerOwnerApplication(Exchange exchange) {
         UUID ownerApplicationId = UUID.randomUUID();  //TODO: owner application id generation shall be reviewed.
         logger.debug("ownerApplicationId: "+ownerApplicationId.toString() );
         OwnerApplication ownerApplication = new OwnerApplication();

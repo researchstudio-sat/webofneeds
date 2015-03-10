@@ -82,7 +82,7 @@ public class HintSender implements MatchProcessor
         FacetType.OwnerFacet.getURI(),
         originator,
         score)
-      .setWonEnvelopeType(WonEnvelopeType.MatcherToNode)
+      .setWonEnvelopeType(WonEnvelopeType.FROM_EXTERNAL)
       .build();
   }
 }

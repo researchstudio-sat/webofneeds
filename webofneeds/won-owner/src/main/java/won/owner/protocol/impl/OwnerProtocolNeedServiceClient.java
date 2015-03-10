@@ -95,9 +95,6 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
         connectionRepository.save(con);
       }
     }
-
-
-
   }
 
   @Override

@@ -96,7 +96,7 @@ public class MatcherCLI implements CommandLineRunner
         FacetType.OwnerFacet.getURI(),
         originator,
         score)
-      .setWonEnvelopeType(WonEnvelopeType.MatcherToNode)
+      .setWonEnvelopeType(WonEnvelopeType.FROM_EXTERNAL)
       .build();
   }
 }

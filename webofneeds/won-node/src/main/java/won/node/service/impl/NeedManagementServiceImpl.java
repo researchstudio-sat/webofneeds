@@ -159,7 +159,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
           new WonMessageBuilder()
             .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateEventURI(),
                                                             need.getNeedURI(), need.getWonNodeURI())
-            .setWonEnvelopeType(WonEnvelopeType.NodeToNode)
+            .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
             .build(needDataset);
         matcherProtocolMatcherClient.needCreated(needURI, ModelFactory.createDefaultModel(), newNeedNotificationMessage);
       } catch (Exception e) {
@@ -352,7 +352,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
           connection.getConnectionURI(),
           connection.getNeedURI(),
           localWonNodeUri)
-          .setWonEnvelopeType(WonEnvelopeType.SystemMsg)
+          .setWonEnvelopeType(WonEnvelopeType.FROM_SYSTEM)
           .build();
 
       }else{
@@ -367,7 +367,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
           connection.getRemoteConnectionURI(),
           connection.getRemoteNeedURI(),
           remoteWonNodeUri)
-          .setWonEnvelopeType(WonEnvelopeType.NodeToNode)
+          .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
                       .build();
       }
 

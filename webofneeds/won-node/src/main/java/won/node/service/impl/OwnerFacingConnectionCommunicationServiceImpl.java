@@ -76,7 +76,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
         .setSenderURI(con.getConnectionURI())
         .setReceiverURI(con.getRemoteConnectionURI())
         .setReceiverNeedURI(con.getRemoteNeedURI())
-        .setWonEnvelopeType(WonEnvelopeType.NodeToNode)
+        .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
         .build();
 
       rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
@@ -102,7 +102,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       WonMessage newWonMessage = new WonMessageBuilder()
         .wrap(wonMessage)
         .setTimestamp(System.currentTimeMillis())
-        .setWonEnvelopeType(WonEnvelopeType.NodeToNode)
+        .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
         .build();
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
@@ -128,7 +128,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       WonMessage newWonMessage = new WonMessageBuilder()
         .wrap(wonMessage)
         .setTimestamp(System.currentTimeMillis())
-        .setWonEnvelopeType(WonEnvelopeType.NodeToNode)
+        .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
         .build();
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorageService.storeDataset(newWonMessage.getMessageURI(),

@@ -66,6 +66,7 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     private String defaultNodeURI;
 
     protected OwnerProtocolCamelConfiguratorImpl() {
+
     }
 
     @Override

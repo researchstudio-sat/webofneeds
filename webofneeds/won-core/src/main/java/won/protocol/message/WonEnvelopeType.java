@@ -11,12 +11,11 @@ import java.net.URI;
  */
 public enum WonEnvelopeType
 {
-  NodeToOwner(WONMSG.TYPE_NODE2OWNER),
-  OwnerToNode(WONMSG.TYPE_OWNER2NODE),
-  SystemMsg(WONMSG.TYPE_SYSTEMMSG),
-  NodeToNode(WONMSG.TYPE_NODE2NODE),
-  MatcherToNode(WONMSG.TYPE_MATCHER2NODE),
-  NodeToMatcher(WONMSG.TYPE_NODE2MATCHER);
+
+  FROM_NODE(WONMSG.TYPE_FROM_NODE),
+  FROM_OWNER(WONMSG.TYPE_FROM_OWNER),
+  FROM_SYSTEM(WONMSG.TYPE_FROM_SYSTEM),
+  FROM_EXTERNAL(WONMSG.TYPE_FROM_EXTERNAL);
 
   private Resource resource;
 
@@ -37,18 +36,14 @@ public enum WonEnvelopeType
 
   public static WonEnvelopeType getWonEnvelopeType(Resource resource) {
 
-    if (WONMSG.TYPE_OWNER2NODE.equals(resource))
-      return OwnerToNode;
-    if (WONMSG.TYPE_NODE2OWNER.equals(resource))
-      return NodeToOwner;
-    if (WONMSG.TYPE_NODE2NODE.equals(resource))
-      return NodeToNode;
-    if (WONMSG.TYPE_SYSTEMMSG.equals(resource))
-      return SystemMsg;
-    if (WONMSG.TYPE_MATCHER2NODE.equals(resource))
-      return SystemMsg;
-    if (WONMSG.TYPE_NODE2MATCHER.equals(resource))
-      return SystemMsg;
+    if (WONMSG.TYPE_FROM_OWNER.equals(resource))
+      return FROM_OWNER;
+    if (WONMSG.TYPE_FROM_NODE.equals(resource))
+      return FROM_NODE;
+    if (WONMSG.TYPE_FROM_SYSTEM.equals(resource))
+      return FROM_SYSTEM;
+    if (WONMSG.TYPE_FROM_EXTERNAL.equals(resource))
+      return FROM_EXTERNAL;
 
     return null;
   }

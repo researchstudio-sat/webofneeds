@@ -676,7 +676,7 @@ public class WonMessageBuilder
       .setReceiverURI(localConnectionUri)
       .setTimestamp(new Date().getTime())
       .addRefersToURI(inboundWonMessage.getMessageURI())
-      .setWonEnvelopeType(WonEnvelopeType.NodeToOwner)
+      .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
       .build();
   }
 
@@ -688,7 +688,7 @@ public class WonMessageBuilder
     if (localConnectionUri != null) {
       builder.setSenderURI(localConnectionUri);
     }
-    builder.setWonEnvelopeType(WonEnvelopeType.NodeToNode);
+    builder.setWonEnvelopeType(WonEnvelopeType.FROM_NODE);
     return builder.build();
   }
 
@@ -698,7 +698,7 @@ public class WonMessageBuilder
     WonMessageBuilder builder = new WonMessageBuilder()
       .wrap(ownerToNeedWonMessage)
       .setTimestamp(new Date().getTime());
-    builder.setWonEnvelopeType(WonEnvelopeType.NodeToNode);
+    builder.setWonEnvelopeType(WonEnvelopeType.FROM_NODE);
     return builder.build();
   }
 
@@ -714,7 +714,7 @@ public class WonMessageBuilder
       .setReceiverURI(remoteConnectionURI)
       .setReceiverNeedURI(remoteNeedURI)
       .setReceiverNodeURI(remoteWonNodeUri)
-      .setWonEnvelopeType(WonEnvelopeType.NodeToNode);
+      .setWonEnvelopeType(WonEnvelopeType.FROM_NODE);
     return builder.build();
   }
 

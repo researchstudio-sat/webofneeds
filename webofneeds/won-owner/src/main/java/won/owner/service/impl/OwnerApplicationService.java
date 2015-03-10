@@ -229,7 +229,7 @@ public class OwnerApplicationService implements OwnerProtocolOwnerServiceCallbac
         .setReceiverNeedURI(wonMessage.getSenderNeedURI())
         .setResponseMessageState(responseType)
         .addRefersToURI(wonMessage.getMessageURI())
-        .setWonEnvelopeType(WonEnvelopeType.NodeToOwner)
+        .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
         .build();
 
       ownerApplicationServiceCallbackToClient.onMessage(responseWonMessage);

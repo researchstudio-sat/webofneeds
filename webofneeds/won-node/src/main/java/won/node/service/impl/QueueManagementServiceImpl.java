@@ -16,6 +16,8 @@
 
 package won.node.service.impl;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +93,7 @@ public class QueueManagementServiceImpl implements QueueManagementService {
     }
 
     @Override
-    public List<String> getEndpointsForOwnerApplication(String ownerApplicationID) {
+    public List<String> getEndpointsForOwnerApplication(@Header("ownerApplicationID") String ownerApplicationID, Exchange exchange) {
         //TODO: must implement special handling of the case where the id is unknown
         List<OwnerApplication> ownerApplications = ownerApplicationRepository.findByOwnerApplicationId(ownerApplicationID);
         List<String> endpoints = new ArrayList<>();

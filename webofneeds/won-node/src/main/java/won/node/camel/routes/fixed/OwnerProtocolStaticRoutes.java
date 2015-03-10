@@ -29,10 +29,10 @@ public class OwnerProtocolStaticRoutes extends RouteBuilder {
             .wireTap("bean:messagingService?method=inspectMessage")
             .choice()
             .when(header("methodName").isEqualTo("register"))
-            .to("bean:ownerProtocolNeedJMSService?method=registerOwnerApplication")
+            .to("bean:ownerManagementService?method=registerOwnerApplication")
             .when(header("methodName").isEqualTo("getEndpoints"))
-            .to("bean:ownerProtocolNeedJMSService?method=getEndpointsForOwnerApplication")
-            .when(header("methodName").isEqualTo("createNeed"))
+            .to("bean:queueManagementService?method=getEndpointsForOwnerApplication");
+           /* .when(header("methodName").isEqualTo("createNeed"))
             .to("bean:ownerProtocolNeedJMSService?method=createNeed")
             .when(header("methodName").isEqualTo("connect"))
             .to("bean:ownerProtocolNeedJMSService?method=connect")
@@ -51,6 +51,6 @@ public class OwnerProtocolStaticRoutes extends RouteBuilder {
             .when(header("methodName").isEqualTo("getEndpointsForOwnerApplication"))
             .to("bean:ownerProtocolNeedJMSService?method=getEndpointsForOwnerApplication")
             .otherwise()
-            .to("bean:ownerProtocolNeedJMSService?method=close");
+            .to("bean:ownerProtocolNeedJMSService?method=close");*/
     }
 }

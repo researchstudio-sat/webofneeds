@@ -92,6 +92,7 @@ public class NeedFacingConnectionCommunicationServiceImpl implements ConnectionC
         connectionURIFromWonMessage, newWonMessage));
       //invoke facet implementation
       reg.get(con).openFromNeed(con, content, newWonMessage);
+
   }
 
   @Override

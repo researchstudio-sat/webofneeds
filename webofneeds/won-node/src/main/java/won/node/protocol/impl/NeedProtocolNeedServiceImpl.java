@@ -156,7 +156,7 @@ public class NeedProtocolNeedServiceImpl implements NeedProtocolNeedService
       connection.getRemoteConnectionURI(),
       connection.getRemoteNeedURI(),
       remoteNeed.getWonNodeURI())
-      .setWonEnvelopeType(WonEnvelopeType.NodeToOwner)
+      .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
       .build();
 
   }

@@ -424,7 +424,7 @@ public abstract class AbstractFacet implements Facet
           .setReceiverURI(wonMessage.getSenderURI())
           .setReceiverNeedURI(wonMessage.getSenderNeedURI())
           .setReceiverNodeURI(wonMessage.getSenderNodeURI())
-          .setWonEnvelopeType(WonEnvelopeType.NodeToOwner)
+          .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
           .build();
 
         needFacingConnectionCommunicationService.close(
