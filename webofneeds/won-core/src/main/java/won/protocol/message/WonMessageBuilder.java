@@ -11,6 +11,7 @@ import won.protocol.util.CheapInsecureRandomString;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
@@ -69,19 +70,9 @@ public class WonMessageBuilder
 
     checkProperties();
 
-    Model defaultModel = null;
 
     if (dataset == null) {
-      // create the default model, containing a triple that denotes the message graph as
-      // envelope graph
       dataset = DatasetFactory.createMem();
-      defaultModel = dataset.getDefaultModel();
-    } else {
-      defaultModel = dataset.getDefaultModel();
-      if (defaultModel == null) {
-        defaultModel = ModelFactory.createDefaultModel();
-        dataset.setDefaultModel(defaultModel);
-      }
     }
     if (messageURI == null){
       throw new WonMessageBuilderException("No messageURI specified");
@@ -93,54 +84,23 @@ public class WonMessageBuilder
 
     Model envelopeGraph = ModelFactory.createDefaultModel();
     DefaultPrefixUtils.setDefaultPrefixes(envelopeGraph);
-
-    //add wrapped message first, including all its named graphs.
-    //This way, we can later avoid clashed when generating new graph URIs
-    if (this.wrappedMessage != null){
-        if (this.forwardedMessage != null) throw new IllegalStateException("cannot wrap and forward with the same " +
-          "builder");
-        //the [wrappedMessage.envelopeGraphURI] rdf:type msg:EnvelopeGraph triple in the default graph is required to
-        // find the wrapped envelope graph.
-        envelopeGraph.createResource(this.wrappedMessage.getOuterEnvelopeGraphURI().toString(),
-          WONMSG.ENVELOPE_GRAPH);
-      //copy all named graphs to the new message dataset
-      for (Iterator<String> names = this.wrappedMessage.getCompleteDataset().listNames(); names.hasNext(); ){
-        String graphUri = names.next();
-        dataset.addNamedModel(graphUri, this.wrappedMessage.getCompleteDataset().getNamedModel(graphUri));
-      }
-    }
-    
-    //add forwarded message next, including all its named graphs.
-    //This way, we can later avoid clashed when generating new graph URIs
-    if (this.forwardedMessage != null){
-      if (this.wrappedMessage != null) throw new IllegalStateException("cannot wrap and forward with the same " +
-        "builder");
-      //the [forwardedMessage.envelopeGraphURI] rdf:type msg:EnvelopeGraph triple in the default graph is required to
-      // find the forwarded envelope graph.
-      envelopeGraph.createResource(this.forwardedMessage.getOuterEnvelopeGraphURI().toString(),
-        WONMSG.FORWARDED_ENVELOPE_GRAPH);
-      //copy all named graphs to the new message dataset
-      for (Iterator<String> names = this.forwardedMessage.getCompleteDataset().listNames(); names.hasNext(); ){
-        String graphUri = names.next();
-        dataset.addNamedModel(graphUri, this.forwardedMessage.getCompleteDataset().getNamedModel(graphUri));
-      }
-    }
     //create a new envelope graph uri and add the envelope graph to the dataset
     String envelopeGraphURI = RdfUtils.createNewGraphURI(messageURI.toString(), ENVELOPE_URI_SUFFIX,4,dataset).toString();
-
-    //the [envelopeGraphURI] rdf:type msg:EnvelopeGraph triple in the default graph is required to find the
-    //envelope graph.
-    defaultModel.createResource(envelopeGraphURI, WONMSG.ENVELOPE_GRAPH);
     dataset.addNamedModel(envelopeGraphURI, envelopeGraph);
+    // message URI
+    Resource messageEventResource = envelopeGraph.createResource(messageURI.toString(),
+      this.wonEnvelopeType.getResource());
+    //the [envelopeGraphURI] rdf:type msg:EnvelopeGraph makes it easy to select graphs by type
+    Resource envelopeGraphResource = envelopeGraph.createResource(envelopeGraphURI, WONMSG.ENVELOPE_GRAPH);
+    envelopeGraphResource.addProperty(RDFG.SUBGRAPH_OF, messageEventResource);
+
+    addWrappedOrForwardedMessage(dataset, envelopeGraph, envelopeGraphResource, messageURI);
 
     //make sure the envelope type has been set
     if (this.wonEnvelopeType == null) {
       throw new IllegalStateException("envelopeType must be set!");
     }
 
-    // message URI
-    Resource messageEventResource = envelopeGraph
-      .createResource(messageURI.toString(), this.wonEnvelopeType.getResource());
     if (wonMessageType != null) {
       messageEventResource.addProperty(WONMSG.HAS_MESSAGE_TYPE_PROPERTY, wonMessageType.getResource());
     }
@@ -206,6 +166,10 @@ public class WonMessageBuilder
       messageEventResource.addProperty(
         WONMSG.HAS_CONTENT_PROPERTY, messageEventResource
           .getModel().createResource(uniqueContentUri));
+      //add the [content-graph] rdfg:subGraphOf [message-uri] triple to the envelope
+      envelopeGraph.createStatement(envelopeGraph.getResource(contentURI.toString()), RDFG.SUBGRAPH_OF,
+        messageEventResource);
+
       Model signatureGraph = signatureMap.get(contentURI);
       if (signatureGraph != null) {
         throw new UnsupportedOperationException("signatures are not supported yet");
@@ -228,6 +192,50 @@ public class WonMessageBuilder
 
     return new WonMessage(dataset);
 
+  }
+
+  public void addWrappedOrForwardedMessage(final Dataset dataset, final Model envelopeGraph,
+    final Resource envelopeGraphResource, URI messageURI) {
+    //add wrapped message first, including all its named graphs.
+    //This way, we can later avoid clashed when generating new graph URIs
+    if (this.wrappedMessage != null){
+      if (this.forwardedMessage != null) throw new IllegalStateException("cannot wrap and forward with the same " +
+        "builder");
+      addAsContainedEnvelope(dataset, envelopeGraph, envelopeGraphResource, wrappedMessage, messageURI);
+    }
+
+    //add forwarded message next, including all its named graphs.
+    //This way, we can later avoid clashed when generating new graph URIs
+    if (this.forwardedMessage != null){
+      if (this.wrappedMessage != null) throw new IllegalStateException("cannot wrap and forward with the same " +
+        "builder");
+      addAsContainedEnvelope(dataset, envelopeGraph, envelopeGraphResource, wrappedMessage, messageURI);
+    }
+  }
+
+  public void addAsContainedEnvelope(final Dataset dataset, final Model envelopeGraph,
+    final Resource envelopeGraphResource, WonMessage messageToAdd, URI messageURI) {
+    String messageUriString = messageURI.toString();
+    //the [wrappedMessage.envelopeGraphURI] rdf:type msg:EnvelopeGraph triple in the default graph is required to
+    // find the wrapped envelope graph.
+    envelopeGraphResource.addProperty(WONMSG.CONTAINS_ENVELOPE, envelopeGraph.getResource(messageToAdd
+      .getOuterEnvelopeGraphURI().toString()));
+    //copy all named graphs to the new message dataset
+    for (Iterator<String> names = messageToAdd.getCompleteDataset().listNames(); names.hasNext(); ){
+      String graphUri = names.next();
+      Model modelToAdd = this.wrappedMessage.getCompleteDataset().getNamedModel(graphUri);
+      dataset.addNamedModel(graphUri, modelToAdd);
+      //define that the added graph is a subgraph of the message if that is not yet
+      //expressed in the graph itself
+      if (!modelToAdd
+            .contains(
+              modelToAdd.getResource(graphUri),
+              RDFG.SUBGRAPH_OF,
+              modelToAdd.getResource(messageUriString))){
+        envelopeGraph.createStatement(envelopeGraph.getResource(graphUri), RDFG.SUBGRAPH_OF,
+          envelopeGraph.getResource(messageUriString));
+      }
+    }
   }
 
   /**
@@ -268,6 +276,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
       .setWonMessageType(WonMessageType.OPEN)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -291,6 +300,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
       .setWonMessageType(WonMessageType.CLOSE)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -312,6 +322,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.SystemMsg)
       .setWonMessageType(WonMessageType.CLOSE)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -332,6 +343,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
       .setWonMessageType(WonMessageType.DEACTIVATE)
       .setSenderNeedURI(localNeed)
       .setReceiverNeedURI(localNeed)
@@ -357,6 +369,7 @@ public class WonMessageBuilder
     RdfUtils.replaceBaseResource(facetModel, facetModel.createResource(messageURI.toString()));
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
       .setWonMessageType(WonMessageType.CONNECT)
       .setSenderNeedURI(localNeed)
       .setSenderNodeURI(localWonNode)
@@ -377,6 +390,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
       .setWonMessageType(WonMessageType.CREATE_NEED)
       .setSenderNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
@@ -405,6 +419,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.MatcherToNode)
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setSenderNodeURI(matcherURI)
       .setReceiverURI(needFacetURI)
@@ -438,6 +453,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.NodeToOwner)
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setSenderNodeURI(matcherURI)
       .setReceiverURI(needConnectionURI)
@@ -462,6 +478,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
       .setWonMessageType(WonMessageType.CONNECTION_MESSAGE)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -482,6 +499,7 @@ public class WonMessageBuilder
     URI localWonNode) {
 
     this.setWonMessageType(WonMessageType.NEED_CREATED_NOTIFICATION)
+        .setWonEnvelopeType(WonEnvelopeType.NodeToMatcher)
         .setMessageURI(messageURI)
         .setSenderNeedURI(localNeed)
         .setSenderNodeURI(localWonNode)

@@ -410,7 +410,8 @@
         won.minimalContext = {
             "msg": "http://purl.org/webofneeds/message#",
             "won": "http://purl.org/webofneeds/model#",
-            "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+            "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+            "rdfg": "http://www.w3.org/2004/03/trix/rdfg-1/"
         }
 
         won.defaultContext = {
@@ -424,6 +425,7 @@
                 "won": "http://purl.org/webofneeds/model#",
                 "gr": "http://purl.org/goodrelations/v1#",
                 "ldp": "http://www.w3.org/ns/ldp#",
+                "rdfg": "http://www.w3.org/2004/03/trix/rdfg-1/",
                 "won:hasContent":{
                     "@id":"http://purl.org/webofneeds/model#hasContent",
                     "@type":"@id"
@@ -564,18 +566,7 @@
          */
         won.addMessageGraph = function (builder, graphURIs, messageType) {
             graphs = builder.data['@graph'];
-            //add the default graph to the graphs of the builder
-            var defaultGraph = won.JsonLdHelper.getDefaultGraph(builder.data);
-            if (defaultGraph == null) {
-                defaultGraph =
-                    {
-                        "@graph": [],
-                        "@id": "@default"
-                    };
-                graphs.push(defaultGraph);
-            }
-            defaultGraph["@graph"].push({"@id": UNSET_URI + "#data", "@type": "msg:EnvelopeGraph" });
-
+            unsetMessageGraphUri = UNSET_URI+"#data";
             //create the message graph, containing the message type
             var messageGraph = {
                 "@graph": [
@@ -583,9 +574,13 @@
                         "@id":UNSET_URI,
                         "@type":won.WONMSG.OwnerToNodeEnvelope,
                         "msg:hasMessageType": {'@id':messageType}
+                    },
+                    {   "@id": unsetMessageGraphUri,
+                        "@type": "msg:EnvelopeGraph",
+                        "rdfg:subGraphOf" : {"@id":UNSET_URI}
                     }
                 ],
-                "@id": UNSET_URI + "#data"
+                "@id": unsetMessageGraphUri
             };
             won.addContentGraphReferencesToMessageGraph(messageGraph, graphURIs);
             //add the message graph to the graphs of the builder

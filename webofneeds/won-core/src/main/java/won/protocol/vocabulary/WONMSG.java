@@ -21,6 +21,7 @@ public class WONMSG
   public static final String DEFAULT_PREFIX = "msg";
 
 
+
   private static Model m = ModelFactory.createDefaultModel();
 
   public static final String GROUP_FACET_STRING = BASE_URI+"GroupFacet";
@@ -111,6 +112,10 @@ public class WONMSG
 
   public static final Resource ENVELOPE_GRAPH = m.createResource(BASE_URI+ "EnvelopeGraph");
   public static final Resource FORWARDED_ENVELOPE_GRAPH = m.createResource(BASE_URI+ "ForwardedEnvelopeGraph");
+
+  //used to wrap an envelope inside another for forwarding and adding the server-side envelope to a
+  // client-generated message
+  public static final Property CONTAINS_ENVELOPE = m.createProperty(BASE_URI, "containsEnvelope");
 
   public static final Property RECEIVER_PROPERTY = m.createProperty(BASE_URI, "hasReceiver");
   public static final Property RECEIVER_NEED_PROPERTY = m.createProperty(BASE_URI, "hasReceiverNeed");

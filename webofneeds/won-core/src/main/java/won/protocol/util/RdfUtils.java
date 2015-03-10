@@ -862,10 +862,15 @@ public class RdfUtils
    * @return <code>URI</code> of the resource
    */
   public static RDFNode findOnePropertyFromResource(Model model, URI resourceURI, Property property) {
+    Resource resource = model.getResource(resourceURI.toString());
 
+    return findOnePropertyFromResource(model, resource, property);
+  }
+
+  public static RDFNode findOnePropertyFromResource(final Model model, final Resource resource, final Property property) {
     List<RDFNode> foundNodes = new ArrayList<RDFNode>();
 
-    NodeIterator iterator = model.listObjectsOfProperty(model.createResource(resourceURI.toString()), property);
+    NodeIterator iterator = model.listObjectsOfProperty(resource, property);
     while (iterator.hasNext()) {
       foundNodes.add(iterator.next());
     }

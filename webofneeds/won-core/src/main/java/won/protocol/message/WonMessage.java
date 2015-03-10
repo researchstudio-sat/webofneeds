@@ -1,5 +1,6 @@
 package won.protocol.message;
 
+import com.google.common.collect.Sets;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.*;
@@ -8,19 +9,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WONMSG;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 
 /**
- * User: ypanchenko
- * Date: 04.08.2014
+ * Wraps an RDF dataset representing a WoN message.
+ *
+ * Note: this implementation is not thread-safe.
  */
 public class WonMessage implements Serializable
 {
@@ -111,59 +111,94 @@ public class WonMessage implements Serializable
 
   public URI getOuterEnvelopeGraphURI(){
     if (this.outerEnvelopeGraphURI != null) {
-      return this.outerEnvelopeGraphURI;
+      getEnvelopeGraphs(); //also sets the outerEnvelopeUri
     }
-    Model model = this.completeDataset.getDefaultModel();
-    if (model == null) throw new IllegalStateException("default model must not be null");
-    Resource envelopeGraphResource = getEnvelopeGraphReference(model, true);
-    this.outerEnvelopeGraphURI =  URI.create(envelopeGraphResource.getURI().toString());
     return this.outerEnvelopeGraphURI;
   }
 
-  public List<Model> getEnvelopeGraphs(){
-    if (envelopeGraphs != null) return envelopeGraphs;
+  /**
+   * Returns all envelope graphs found in the message.
+   *
+   * Not that this method has side effects: all intermediate results are cached for re-use. This
+   * concerns the envelopeGraphNames, contentGraphNames and messageURI members.
+   * @return
+   */
+  public List<Model> getEnvelopeGraphs() {
+    //return cached instance if we have it
+    if (this.envelopeGraphs != null) return this.envelopeGraphs;
+    //initialize
+    List<Model> allEnvelopes = new ArrayList<Model>();
     this.envelopeGraphNames = new ArrayList<String>();
     this.contentGraphNames = new ArrayList<String>();
-    Model model = this.completeDataset.getDefaultModel();
-    if (model == null) throw new IllegalStateException("default model must not be null");
-    boolean mustContainEnvelopeGraphRef = true;
-    List<Model> ret = new ArrayList<Model>();
-    do {
-      //find the reference to the envelope graph in the current model (the default model in the first iteration)
-      Resource envelopeGraphResource = getEnvelopeGraphReference(model, mustContainEnvelopeGraphRef);
-      model = null;
-      if (envelopeGraphResource != null) {
-        //look at the envelope graph (model):
-        this.envelopeGraphNames.add(envelopeGraphResource.toString());
-        mustContainEnvelopeGraphRef = false; //only needed for default model
-        model = this.completeDataset.getNamedModel(envelopeGraphResource.toString());
-        if (model == null) throw new IllegalStateException("envelope graph referenced in model" +
-          envelopeGraphResource + " but not found as named graph in dataset!");
-        //find all content graphs referenced in it
+    this.messageURI = null;
+    this.outerEnvelopeGraph = null;
+    Set<String> envelopesContainedInOthers = new HashSet<String>();
+    Set<String> allEnvelopeGraphNames = new HashSet<String>();
+    //iterate over named graphs
+    Iterator<String> modelUriIterator = this.completeDataset.listNames();
+    while (modelUriIterator.hasNext()) {
+      String envelopeGraphUri = modelUriIterator.next();
+      Model envelopeGraph = this.completeDataset.getNamedModel(envelopeGraphUri);
+      //check if the current named graph is an envelope graph (G rdf:type wonmsg:EnvelopeGraph)
+      if (isEnvelopeGraph(envelopeGraphUri, envelopeGraph)) {
+        this.envelopeGraphNames.add(envelopeGraphUri);
+        allEnvelopeGraphNames.add(envelopeGraphUri);
+        allEnvelopes.add(envelopeGraph);
+        //find out the message's URI (if we haven't yet)
         if (this.messageURI == null) {
-          //this can only happen when this method is called before getMessageURI.
-          //we will search for the msg:hasMessageType triple.
-          this.messageURI = RdfUtils.findFirstObjectUri(model, WONMSG.HAS_MESSAGE_TYPE_PROPERTY, null, false, true);
+          findMessageUri(envelopeGraph, envelopeGraphUri);
         }
-        if (this.messageURI == null) {
-          //this can only happen when this method is called before getMessageURI.
-          //we will search for the msg:hasContent triple (because we need it for the code below
-          this.messageURI = RdfUtils.findFirstObjectUri(model, WONMSG.HAS_CONTENT_PROPERTY, null, true, true);
-        }
+        //check if the envelope contains references to 'contained' envelopes and remember their names
+        List<String> containedEnvelopes = findContainedEnvelopeUris(envelopeGraph, envelopeGraphUri);
+        envelopesContainedInOthers.addAll(containedEnvelopes);
         if (this.messageURI != null) {
-          for (NodeIterator it = getContentGraphReferences(model, model.getResource(getMessageURI().toString())); it
+          for (NodeIterator it = getContentGraphReferences(envelopeGraph, envelopeGraph.getResource(getMessageURI().toString())); it
             .hasNext(); ) {
             RDFNode node = it.next();
             this.contentGraphNames.add(node.asResource().toString());
           }
         }
-        //add it to the list of envelope graph models
-        ret.add(model);
       }
-    } while (model != null);
-    this.envelopeGraphs = ret;
-    return Collections.unmodifiableList(ret);
+    }
+    Set<String> candidatesForOuterEnvelope = Sets.symmetricDifference(allEnvelopeGraphNames,
+      envelopesContainedInOthers);
+    //we've now visited all named graphs. We should now have exactly one candidate for the outer envelope
+    if (candidatesForOuterEnvelope.size() != 1){
+      throw new IllegalStateException(String.format("Message dataset must contain exactly one envelope graph that is " +
+        "not included " +
+        "in another one, but found %d", candidatesForOuterEnvelope.size()));
+    }
+    String outerEnvelopeUri = candidatesForOuterEnvelope.iterator().next();
+    this.outerEnvelopeGraphURI = URI.create(outerEnvelopeUri);
+    this.outerEnvelopeGraph = this.completeDataset.getNamedModel(outerEnvelopeUri);
+    this.envelopeGraphs = allEnvelopes;
+    return Collections.unmodifiableList(allEnvelopes);
   }
+
+
+  private void findMessageUri(final Model model, final String modelUri) {
+    RDFNode messageUriNode = RdfUtils.findOnePropertyFromResource(model, model.getResource(modelUri), RDFG.SUBGRAPH_OF);
+    this.messageURI = URI.create(messageUriNode.asResource().getURI());
+  }
+
+  private List<String> findContainedEnvelopeUris(final Model envelopeGraph, final String envelopeGraphUri) {
+    Resource envelopeGraphResource = envelopeGraph.getResource(envelopeGraphUri);
+    StmtIterator it = envelopeGraphResource.listProperties(WONMSG.CONTAINS_ENVELOPE);
+    if (it.hasNext()) {
+      List ret = new ArrayList<String>();
+      while (it.hasNext()) {
+        ret.add(it.nextStatement().getObject().asResource().getURI());
+      }
+      return ret;
+    }
+    return Collections.emptyList();
+  }
+
+  public boolean isEnvelopeGraph(final String modelUri, final Model model) {
+    return model.contains(model.getResource(modelUri), RDF.type, WONMSG.ENVELOPE_GRAPH);
+  }
+
+
 
   public List<String> getEnvelopeGraphURIs(){
     if (this.envelopeGraphs == null) {
@@ -182,26 +217,9 @@ public class WonMessage implements Serializable
     return Collections.unmodifiableList(this.contentGraphNames);
   }
 
-  private Resource getEnvelopeGraphReference(Model model, boolean mustContainEnvelopeGraphRef){
-    StmtIterator it = model.listStatements(null, RDF.type, WONMSG.ENVELOPE_GRAPH);
-    if (!it.hasNext()){
-      if (mustContainEnvelopeGraphRef) {
-        throw new IllegalStateException("no envelope graph found");
-      } else {
-        return null;
-      }
-    }
-    Resource envelopeGraphResource = it.nextStatement().getSubject();
-    if (it.hasNext()) throw new IllegalStateException("more than one envelope graphs " +
-      "referenced in model!");
-    return envelopeGraphResource;
-  }
-
-  private NodeIterator getContentGraphReferences(Model model, Resource envelopeGraphResource){
+   private NodeIterator getContentGraphReferences(Model model, Resource envelopeGraphResource){
     return model.listObjectsOfProperty(envelopeGraphResource, WONMSG.HAS_CONTENT_PROPERTY);
   }
-
-
 
   public URI getMessageURI() {
     if (this.messageURI == null) {
