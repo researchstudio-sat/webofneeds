@@ -22,7 +22,7 @@
     <import resource="classpath:spring/component/needproducer/needproducer-mails.xml"/>
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-roundrobin.xml"/>
 
-    <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.MatcherProtocolTestBot">
+    <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.ConversationBot">
         <property name="taskScheduler" ref="taskScheduler" />
         <property name="needProducer" ref="needProducerFromMails" />
         <property name="nodeURISource" ref="nodeUriSourceRoundRobin" />

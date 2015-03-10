@@ -276,6 +276,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
       .setWonMessageType(WonMessageType.OPEN)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -299,6 +300,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
       .setWonMessageType(WonMessageType.CLOSE)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -320,6 +322,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.SystemMsg)
       .setWonMessageType(WonMessageType.CLOSE)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -340,6 +343,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
       .setWonMessageType(WonMessageType.DEACTIVATE)
       .setSenderNeedURI(localNeed)
       .setReceiverNeedURI(localNeed)
@@ -365,6 +369,7 @@ public class WonMessageBuilder
     RdfUtils.replaceBaseResource(facetModel, facetModel.createResource(messageURI.toString()));
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
       .setWonMessageType(WonMessageType.CONNECT)
       .setSenderNeedURI(localNeed)
       .setSenderNodeURI(localWonNode)
@@ -385,6 +390,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
       .setWonMessageType(WonMessageType.CREATE_NEED)
       .setSenderNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
@@ -413,6 +419,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.MatcherToNode)
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setSenderNodeURI(matcherURI)
       .setReceiverURI(needFacetURI)
@@ -446,6 +453,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.NodeToOwner)
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setSenderNodeURI(matcherURI)
       .setReceiverURI(needConnectionURI)
@@ -470,6 +478,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
+      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
       .setWonMessageType(WonMessageType.CONNECTION_MESSAGE)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -490,6 +499,7 @@ public class WonMessageBuilder
     URI localWonNode) {
 
     this.setWonMessageType(WonMessageType.NEED_CREATED_NOTIFICATION)
+        .setWonEnvelopeType(WonEnvelopeType.NodeToMatcher)
         .setMessageURI(messageURI)
         .setSenderNeedURI(localNeed)
         .setSenderNodeURI(localWonNode)
