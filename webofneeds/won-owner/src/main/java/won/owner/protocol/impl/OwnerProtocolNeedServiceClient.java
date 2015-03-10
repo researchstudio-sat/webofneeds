@@ -214,7 +214,7 @@ public class OwnerProtocolNeedServiceClient implements OwnerProtocolNeedServiceC
       @Override
       public void run() {
         //find out the facet to connect with
-        final URI facetURI = WonRdfUtils.FacetUtils.getFacet(content);
+        final URI facetURI = WonRdfUtils.FacetUtils.getFacet(wonMessage);
         //save the connection object in the database
         Connection con = null;
         URI connectionURI = null;

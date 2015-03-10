@@ -39,7 +39,6 @@ import won.matcher.query.*;
 import won.matcher.query.rdf.TriplesQueryFactory;
 import won.matcher.service.ScoreTransformer;
 import won.protocol.solr.SolrFields;
-import won.protocol.util.WonRdfUtils;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -235,11 +234,12 @@ public class Matcher
   }
 
   public void processMatch(final URI fromDocUri, final URI toDocUri, final Model fromDocModel, final Model toDocModel, final double normalizedScore) {
-    Model facetModel = determineFacetsForHint(fromDocUri, toDocUri, fromDocModel, toDocModel);
+    Model explanation = ModelFactory.createDefaultModel(); //if there is something interesting to say about the
+    // match, this is where it should be said
     logger.debug("calling MatchProcessors for match {} -> {} :: {}", new Object[]{fromDocUri, toDocUri, normalizedScore});
     for (MatchProcessor proc: matchProcessors){
       //we're sending the hint to both objects.
-      proc.process(fromDocUri,toDocUri,normalizedScore,originatorURI,facetModel);
+      proc.process(fromDocUri,toDocUri,normalizedScore,originatorURI,explanation);
     }
   }
 
@@ -252,36 +252,7 @@ public class Matcher
   }
 
 
-  /**
-   * Just takes the first facet from both needs. TODO: Needs refinement once we get more clever with multiple facets.
-   * @param fromDocUri
-   * @param toDocUri
-   * @param fromModel
-   * @param toModel
-   * @return
-   */
-  private Model determineFacetsForHint(URI fromDocUri, URI toDocUri, Model fromModel, Model toModel) {
-    logger.debug("determining facets for use in hint.");
-    if (logger.isDebugEnabled()){
-      logger.debug("fromModel:");
-      RDFDataMgr.write(System.out, fromModel, Lang.TURTLE);
-      logger.debug("[end fromModel]\n\n\n");
-    }
-    URI fromFacetURI = WonRdfUtils.FacetUtils.getFacet(fromModel);
-    logger.debug("'from' need {} has facet {}", fromDocUri, fromFacetURI);
-    if (fromFacetURI == null ) return null;
-    if (logger.isDebugEnabled()){
-      logger.debug("toModel:");
-      RDFDataMgr.write(System.out, toModel, Lang.TURTLE);
-      logger.debug("[end toModel]\n\n\n");
-    }
-    URI toFacetURI = WonRdfUtils.FacetUtils.getFacet(toModel);
-    logger.debug("'to' need {} has facet {}", toDocUri, toFacetURI);
-    if (toFacetURI == null ) return null;
-    //for now, just use the first facets for matching. TODO: implement a clever strategy here
-    Model facetModel = WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacetURI, toFacetURI);
-    return facetModel;
-  }
+
 
 
   /**

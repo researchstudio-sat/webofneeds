@@ -16,7 +16,6 @@
 
 package won.node.service;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import won.node.service.impl.URIService;
@@ -39,21 +38,6 @@ public interface DataAccessService
 {
   Collection<URI> getSupportedFacets(URI needUri) throws NoSuchNeedException;
 
-  /**
-   * Returns the first facet found in the model, attached to the null relative URI '<>'.
-   * Returns null if there is no such facet.
-   * @param content
-   * @return
-   */
-  URI getFacet(Model content);
-  URI getFacet(Dataset content);
-
-  /**
-   * Adds a triple to the model of the form <> won:hasFacet [facetURI].
-   * @param content
-   * @param facetURI
-   */
-  void addFacet(Model content, URI facetURI);
 
   Connection getConnection(List<Connection> connections, URI facetURI, ConnectionEventType eventType)
       throws ConnectionAlreadyExistsException;
