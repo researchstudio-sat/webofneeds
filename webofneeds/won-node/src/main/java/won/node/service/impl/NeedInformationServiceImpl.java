@@ -19,8 +19,8 @@ package won.node.service.impl;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
@@ -30,6 +30,7 @@ import won.protocol.model.NeedState;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.EventRepository;
 import won.protocol.repository.NeedRepository;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.util.DataAccessUtils;
 
@@ -67,9 +68,10 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
-  public Collection<URI> listNeedURIs(int page)
+  public Page<URI> listNeedURIs(int page)
   {
-    return needRepository.getAllNeedURIs(new PageRequest(page, this.pageSize));
+    Slice slice = needRepository.getAllNeedURIs(new PageRequest(page, this.pageSize));
+    return new Page(slice.getContent(), slice.hasNext());
   }
 
   @Override
@@ -85,15 +87,18 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
-  public Collection<URI> listConnectionURIs(int page)
+  public Page<URI> listConnectionURIs(int page)
   {
-    return connectionRepository.getAllConnectionURIs(new PageRequest(page, this.pageSize));
+    Slice slice = connectionRepository.getAllConnectionURIs(new PageRequest(page, this.pageSize));
+    return new Page(slice.getContent(), slice.hasNext());
   }
 
   @Override
-  public Collection<URI> listConnectionURIs(final URI needURI, int page) throws NoSuchNeedException
+  public Page<URI> listConnectionURIs(final URI needURI, int page) throws NoSuchNeedException
   {
-    return connectionRepository.getAllConnectionURIsForNeedURI(needURI, new PageRequest(page, this.pageSize));
+    Slice slice = connectionRepository.getAllConnectionURIsForNeedURI(needURI, new PageRequest(page,
+      this.pageSize));
+    return new Page(slice.getContent(), slice.hasNext());
   }
 
 

@@ -66,6 +66,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             results = angular.isArray(promises) ? [] : {},
             handler = typeof errorHandler === 'function' ? errorHandler : function(x,y){};
 
+        if (promises.length == 0) {
+            deferred.reject(results);
+        }
+
         angular.forEach(promises, function(promise, key) {
             promise.then(function(value) {
                 successes++;

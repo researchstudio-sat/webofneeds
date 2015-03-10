@@ -19,3 +19,5 @@ in bootsketch.css) */
 
 /* fixes search bar in "home >> I mode" for now: */
 .form-inline .form-control { width: 100% }
+
+.modal-dialog { position: static }

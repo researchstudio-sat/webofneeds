@@ -20,7 +20,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.need.NeedProtocolNeedClientSide;
@@ -35,9 +34,6 @@ import java.net.URI;
 public class NeedProtocolNeedClient implements NeedProtocolNeedClientSide
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
-
-  @Autowired
-  private NeedProtocolNeedClientFactory clientFactory;
 
   private NeedProtocolNeedClientSide delegate;
 
@@ -71,11 +67,6 @@ public class NeedProtocolNeedClient implements NeedProtocolNeedClientSide
     logger.debug("need to need: SEND_TEXT_MESSAGE called for connection {} with message {}", connection, message);
     delegate.sendMessage(connection, message, wonMessage);
 
-  }
-
-  public void setClientFactory(final NeedProtocolNeedClientFactory clientFactory)
-  {
-    this.clientFactory = clientFactory;
   }
 
 

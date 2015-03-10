@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.sindice.siren</groupId>
             <artifactId>siren-solr</artifactId>
-            <scope>${dependencies.scope}</scope>
+            <scope>compile</scope>
         </dependency>
 
         <!-- spring dependencies -->
@@ -76,11 +76,7 @@
             <artifactId>spring-web</artifactId>
             <scope>${dependencies.scope}</scope>
         </dependency>
-        <dependency>
-            <groupId>org.sindice.siren</groupId>
-            <artifactId>siren-solr</artifactId>
-            <scope>compile</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>

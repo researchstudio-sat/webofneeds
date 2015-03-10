@@ -18,6 +18,7 @@ package won.protocol.repository;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Query;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
@@ -40,7 +41,7 @@ public interface ConnectionRepository extends WonRepository<Connection>
 
   List<Connection> findByNeedURI(URI URI);
 
-  List<Connection> findByNeedURI(URI URI, Pageable pageable);
+  Slice<Connection> findByNeedURI(URI URI, Pageable pageable);
 
   List<Connection> findByNeedURIAndRemoteNeedURI(URI needURI, URI remoteNeedURI);
 
@@ -52,13 +53,13 @@ public interface ConnectionRepository extends WonRepository<Connection>
   List<URI> getAllConnectionURIs();
 
   @Query("select connectionURI from Connection")
-  List<URI> getAllConnectionURIs(PageRequest pageRequest);
+  Slice<URI> getAllConnectionURIs(Pageable pageable);
 
   @Query("select connectionURI from Connection where needURI = ?1")
   List<URI> getAllConnectionURIsForNeedURI(URI needURI);
 
   @Query("select connectionURI from Connection where needURI = ?1")
-  List<URI> getAllConnectionURIsForNeedURI(URI needURI, PageRequest pageRequest);
+  Slice<URI> getAllConnectionURIsForNeedURI(URI needURI, Pageable pageable);
 
   @Query("select connectionURI from Connection where needURI = ?1 and state != ?2")
   List<URI> getConnectionURIsByNeedURIAndNotInState(URI needURI, ConnectionState connectionState);

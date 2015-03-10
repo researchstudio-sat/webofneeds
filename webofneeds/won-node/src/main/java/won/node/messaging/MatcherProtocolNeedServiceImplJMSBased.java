@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.message.WonMessageDecoder;
-import won.protocol.message.WonMessageEncoder;
 import won.protocol.util.RdfUtils;
 
 import java.net.URI;

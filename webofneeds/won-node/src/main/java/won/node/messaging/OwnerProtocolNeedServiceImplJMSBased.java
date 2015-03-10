@@ -128,7 +128,7 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
 
     //@Override
     public Collection<URI> listNeedURIs(int page) {
-        return delegate.listNeedURIs(page);
+        return delegate.listNeedURIs(page).getContent();
     }
 
     //@Override
@@ -143,12 +143,12 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
 
    // @Override
     public Collection<URI> listConnectionURIs(int page) {
-        return delegate.listConnectionURIs(page);
+        return delegate.listConnectionURIs(page).getContent();
     }
 
    // @Override
     public Collection<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException {
-        return delegate.listConnectionURIs(needURI, page);
+        return delegate.listConnectionURIs(needURI, page).getContent();
     }
 
    // @Override

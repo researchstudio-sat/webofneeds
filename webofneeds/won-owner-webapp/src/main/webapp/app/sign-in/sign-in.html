@@ -1,0 +1,73 @@
+
+<!-- ui.bootstrap doesn't allow html-popovers yet (it's on their todo-list) -->
+<!--<button popover-placement="bottom"
+        popover-title="Create a Free Account"
+        popover-animation="true"
+        popover-html="true"
+        popover="<strong> Testing html </strong> asdf"
+        class="btn btn-default">Sign Up</button> -->
+
+
+<!--<button type="button"
+        class="btn btn-default"
+        data-container="body"
+        data-toggle="popover"
+        data-placement="bottom"
+        data-html="true"
+        data-content='
+        <form>
+            <label for="registerUsername">Email address</label>
+            <input type="email" class="form-control" name="registerUsername" id="registerUsername" ng-model="registerUser.username"
+                   placeholder="Email address"
+                   required>
+        </form>
+
+
+        '>
+  Sign Up
+</button> -->
+
+
+    <a ng-click="open('sm')">Directive Sign-in</a>
+    <!--<div ng-show="selected">Selection from a modal: {{ selected }}</div>-->
+
+
+        <!--
+<div class="col-md-12">
+    <label for="registerUsername">Email address</label>
+    <input type="email" class="form-control" name="registerUsername" id="registerUsername" ng-model="registerUser.username"
+           placeholder="Email address"
+           required>
+
+    <span class="label label-warning" ng-show="registerForm.registerUsername.$invalid && !registerForm.registerUsername.$pristine">Please write valid email address</span>
+    <span class="label label-warning" ng-show="error.length > 0">{{error}}</span>
+</div>
+</div>
+<div class="form-group">
+
+    <div class="col-md-12">
+        <label for="registerPassword">Password</label>
+        <input type="password" class="form-control" name="registerPassword" id="registerPassword" ng-model="registerUser.password"
+               placeholder="Password"
+               required>
+        <span class="label label-warning" ng-show="registerUser.password.length > 0 && registerUser.password.length < 6">Password must be at least 6 characters</span>
+    </div>
+</div>
+<div class="form-group">
+
+    <div class="col-md-12">
+        <label for="registerPasswordAgain">Repeat password</label>
+        <input type="password" class="form-control" name="registerPasswordAgain" id="registerPasswordAgain" ng-model="registerUser.passwordAgain"
+               placeholder="Repeat password"
+               required>
+        <span class="label label-warning" ng-show="registerForm.registerPasswordAgain.$invalid && registerUser.password.length > 0">Please repeat password</span>
+        <span class="label label-warning" ng-show="!registerUser.isSamePassword() && registerUser.passwordAgain.length > 0">Passwords are not equal</span>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-md-12">
+        <button ng-disabled="registerForm.$invalid" type="submit" class="btn btn-primary col-md-12">Sign up</button>
+    </div>
+</div>
+
+        -->
