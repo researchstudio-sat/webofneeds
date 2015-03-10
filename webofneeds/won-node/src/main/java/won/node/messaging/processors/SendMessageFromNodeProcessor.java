@@ -11,7 +11,6 @@ import won.node.service.impl.URIService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
-import won.protocol.message.WonMessageProcessor;
 import won.protocol.model.Connection;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.repository.*;
@@ -26,7 +25,7 @@ import java.util.concurrent.ExecutorService;
  * User: syim
  * Date: 02.03.2015
  */
-public class SendMessageFromNodeProcessor implements WonMessageProcessor
+public class SendMessageFromNodeProcessor extends AbstractInOnlyMessageProcessor
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private FacetRegistry reg;

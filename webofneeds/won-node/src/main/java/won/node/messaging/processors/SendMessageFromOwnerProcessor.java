@@ -27,7 +27,7 @@ import java.util.List;
  * User: syim
  * Date: 02.03.2015
  */
-public class SendMessageFromOwnerProcessor implements WonMessageProcessor
+public class SendMessageFromOwnerProcessor extends AbstractInOnlyMessageProcessor
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private FacetRegistry reg;

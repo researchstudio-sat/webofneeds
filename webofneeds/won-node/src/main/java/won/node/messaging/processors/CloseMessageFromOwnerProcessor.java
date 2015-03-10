@@ -2,36 +2,20 @@ package won.node.messaging.processors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import won.node.facet.impl.FacetRegistry;
-import won.node.service.DataAccessService;
-import won.protocol.message.*;
+import won.protocol.message.WonEnvelopeType;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 
 /**
  * User: syim
  * Date: 02.03.2015
  */
-public class CloseMessageFromOwnerProcessor implements WonMessageProcessor
+public class CloseMessageFromOwnerProcessor extends AbstractInOnlyMessageProcessor
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-  private FacetRegistry reg;
-  private DataAccessService dataService;
-  @Autowired
-  private ConnectionRepository connectionRepository;
-  @Autowired
-  private won.node.service.impl.URIService URIService;
-  @Autowired
-  private RDFStorageService rdfStorageService;
-  @Autowired
-  private MessageEventRepository messageEventRepository;
 
 
 
@@ -45,7 +29,7 @@ public class CloseMessageFromOwnerProcessor implements WonMessageProcessor
       .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
       .build();
     logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
-    rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+    rdfStorage.storeDataset(newWonMessage.getMessageURI(),
                                    WonMessageEncoder.encodeAsDataset(newWonMessage));
 
     logger.debug("CLOSE received from the owner side for connection {}", wonMessage.getSenderURI());
@@ -53,7 +37,7 @@ public class CloseMessageFromOwnerProcessor implements WonMessageProcessor
     Connection con = dataService.nextConnectionState(wonMessage.getSenderURI(), ConnectionEventType.OWNER_CLOSE);
 
     // store newWonMessage and messageEventPlaceholder
-    rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+    rdfStorage.storeDataset(newWonMessage.getMessageURI(),
                                    WonMessageEncoder.encodeAsDataset(newWonMessage));
     messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(),
                                                             newWonMessage));

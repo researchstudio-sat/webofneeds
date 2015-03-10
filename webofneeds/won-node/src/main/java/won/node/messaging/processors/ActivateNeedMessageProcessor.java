@@ -2,20 +2,12 @@ package won.node.messaging.processors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
-import won.protocol.message.WonMessageProcessor;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.NeedRepository;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
@@ -24,20 +16,9 @@ import java.net.URI;
  * User: syim
  * Date: 02.03.2015
  */
-public class ActivateNeedMessageProcessor implements WonMessageProcessor
+public class ActivateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
 {
-  Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  private MatcherProtocolMatcherServiceClientSide matcherProtocolMatcherClient;
-  //used to close connections when a need is deactivated
-
-  private RDFStorageService rdfStorage;
-
-  @Autowired
-  private NeedRepository needRepository;
-
-  @Autowired
-  private MessageEventRepository messageEventRepository;
 
   public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();

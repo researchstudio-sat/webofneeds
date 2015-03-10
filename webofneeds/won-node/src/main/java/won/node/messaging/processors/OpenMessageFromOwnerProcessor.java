@@ -2,18 +2,13 @@ package won.node.messaging.processors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import won.node.facet.impl.FacetRegistry;
-import won.node.service.DataAccessService;
-import won.protocol.message.*;
+import won.protocol.message.WonEnvelopeType;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 
 import java.net.URI;
 
@@ -21,19 +16,9 @@ import java.net.URI;
  * User: syim
  * Date: 02.03.2015
  */
-public class OpenMessageFromOwnerProcessor implements WonMessageProcessor
+public class OpenMessageFromOwnerProcessor extends AbstractInOnlyMessageProcessor
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-  private FacetRegistry reg;
-  private DataAccessService dataService;
-  @Autowired
-  private ConnectionRepository connectionRepository;
-  @Autowired
-  private won.node.service.impl.URIService URIService;
-  @Autowired
-  private RDFStorageService rdfStorageService;
-  @Autowired
-  private MessageEventRepository messageEventRepository;
+
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
@@ -51,7 +36,7 @@ public class OpenMessageFromOwnerProcessor implements WonMessageProcessor
       .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
       .build();
 
-    rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+    rdfStorage.storeDataset(newWonMessage.getMessageURI(),
                                    WonMessageEncoder.encodeAsDataset(newWonMessage));
 
     URI connectionURIFromWonMessage = newWonMessage.getSenderURI();
