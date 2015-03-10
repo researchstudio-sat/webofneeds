@@ -32,6 +32,7 @@ public class SimpleMaildirToSysoutBot implements CommandLineRunner
     SpringApplication app = new SpringApplication(
         new Object[]{"classpath:/spring/app/readMailsFromFolder-writeToSysout-testBot.xml"}
     );
+    app.setWebEnvironment(false);
     app.run(args);
   }
 
