@@ -64,13 +64,8 @@ public class OwnerProtocolNeedServiceClientJMSBased
     private URI defaultNodeURI;
     private ApplicationContext ownerApplicationContext;
 
-
-
-
     //todo: make this configurable
     private String startingEndpoint ;
-
-
 
     //private OwnerProtocolActiveMQServiceImpl ownerProtocolActiveMQService;
     @Autowired
