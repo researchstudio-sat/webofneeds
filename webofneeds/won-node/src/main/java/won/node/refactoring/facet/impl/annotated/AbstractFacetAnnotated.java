@@ -45,7 +45,7 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
   //string to be appended to the need uri, and prepended to a facet-specific identifier
   // so as to form a unique graph name used for storing data that is managed by the facet
   private static final String FACET_GRAPH_PATH = "facetgraph";
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  protected final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
   protected WonNodeInformationService wonNodeInformationService;

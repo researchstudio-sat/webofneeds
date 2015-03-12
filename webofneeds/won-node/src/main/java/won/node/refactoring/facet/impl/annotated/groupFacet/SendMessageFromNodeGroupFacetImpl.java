@@ -30,7 +30,7 @@ import java.util.List;
   facetType = WONMSG.GROUP_FACET_STRING,
   direction = WONMSG.TYPE_FROM_NODE_STRING,
   messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
-public class GroupFacetImplAnnotated extends AbstractFacetAnnotated
+public class SendMessageFromNodeGroupFacetImpl extends AbstractFacetAnnotated
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
