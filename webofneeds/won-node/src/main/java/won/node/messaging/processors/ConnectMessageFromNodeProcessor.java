@@ -5,6 +5,8 @@ import org.apache.camel.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import won.node.annotation.FixedMessageProcessor;
 import won.node.facet.impl.FacetRegistry;
 import won.node.service.DataAccessService;
 import won.node.service.impl.NeedCommunicationServiceImpl;
@@ -26,6 +28,7 @@ import won.protocol.repository.NeedRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
@@ -34,6 +37,8 @@ import java.util.concurrent.ExecutorService;
  * User: syim
  * Date: 02.03.2015
  */
+@Component
+@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_NODE_STRING,messageType = WONMSG.TYPE_CONNECT_STRING)
 public class ConnectMessageFromNodeProcessor implements WonMessageProcessor
 {
   final Logger logger = LoggerFactory.getLogger(NeedCommunicationServiceImpl.class);
@@ -84,8 +89,7 @@ public class ConnectMessageFromNodeProcessor implements WonMessageProcessor
     URI needURIFromWonMessage = wonMessage.getReceiverNeedURI();
     URI otherNeedURIFromWonMessage = wonMessage.getSenderNeedURI();
     URI otherConnectionURIFromWonMessage = wonMessage.getSenderURI();
-    URI facetURI = WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage.getMessageURI(),
-                                                         wonMessage.getMessageContent());
+    URI facetURI = WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage);
 
 
     logger.debug("CONNECT received for need {} referring to need {} (connection {})",

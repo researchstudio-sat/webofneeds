@@ -27,32 +27,26 @@
          Load properties but ignore unresolvable properties so that
          they are searched in other property configurers defined in the context
     -->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
+
+    <!-- find all message processors -->
+    <context:annotation-config />
+    <context:component-scan base-package="won.protocol.exception" />
+    <context:component-scan base-package="won.protocol.matcher" />
+    <context:component-scan base-package="won.protocol.model" />
+    <context:component-scan base-package="won.protocol.need" />
+    <context:component-scan base-package="won.protocol.owner" />
+    <context:component-scan base-package="won.protocol.repository" />
+    <context:component-scan base-package="won.protocol.service" />
+    <context:component-scan base-package="won.protocol.util" />
+    <context:component-scan base-package="won.node.refactoring"/>
+    <context:component-scan base-package="won.node.messaging.processors"/>
+    <!-- find add-ons -->
+    <context:component-scan base-package="won.node.contrib"/>
+
+
 
     <bean name="wonMessageCamelProcessor" class="won.node.camel.processor.WonMessageCamelProcessor"></bean>
-    <bean name="activateNeedMessageProcessor" class="won.node.messaging.processors.ActivateNeedMessageProcessor"></bean>
-    <bean name="deactivateNeedMessageProcessor"
-          class="won.node.messaging.processors.DeactivateNeedMessageProcessor"></bean>
-    <bean name="closeMessageFromOwnerMessageProcessor"
-          class="won.node.messaging.processors.CloseMessageFromOwnerProcessor"></bean>
-    <bean name="closeMessageFromNodeMessageProcessor"
-          class="won.node.messaging.processors.CloseMessageFromNodeProcessor"></bean>
-    <bean name="connectMessageFromNodeMessageProcessor"
-          class="won.node.messaging.processors.ConnectMessageFromNodeProcessor"></bean>
-    <bean name="connectMessageFromOwnerMessageProcessor"
-          class="won.node.messaging.processors.ConnectMessageFromOwnerProcessor"></bean>
-    <bean name="createNeedMessageProcessor"
-          class="won.node.messaging.processors.CreateNeedMessageProcessor"></bean>
-    <bean name="openMessageFromNodeMessageProcessor"
-          class="won.node.messaging.processors.OpenMessageFromNodeProcessor"></bean>
-    <bean name="openMessageFromOwnerMessageProcessor"
-          class="won.node.messaging.processors.OpenMessageFromOwnerProcessor"></bean>
-    <bean name="sendMessageFromNodeMessageProcessor"
-          class="won.node.messaging.processors.SendMessageFromNodeProcessor"></bean>
-    <bean name="sendMessageFromOwnerMessageProcessor"
-          class="won.node.messaging.processors.SendMessageFromOwnerProcessor"></bean>
-    <bean name ="hintMessageProcessor"
-          class="won.node.messaging.processors.HintMessageProcessor"></bean>
+    <bean name="wonMessageSlipComputer" class="won.node.camel.processor.WonMessageSlipComputer"/>
 
 
 </beans>

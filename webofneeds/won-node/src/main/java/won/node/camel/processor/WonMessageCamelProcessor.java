@@ -7,7 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
+import won.protocol.util.WonRdfUtils;
 
+import java.net.URI;
 import java.util.Map;
 
 /**
@@ -24,7 +26,9 @@ public class WonMessageCamelProcessor implements Processor
     Map headers = exchange.getIn().getHeaders();
     if(headers.get("wonMessage")!=null){
       WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG,headers.get("wonMessage").toString());
-      exchange.getIn().setHeader("messageType",wonMessage.getMessageType().getResource());
+      exchange.getIn().setHeader("messageType",URI.create(wonMessage.getMessageType().getResource().getURI()));
+      exchange.getIn().setHeader("direction", URI.create(wonMessage.getEnvelopeType().getResource().getURI()));
+      exchange.getIn().setHeader("facetType",WonRdfUtils.FacetUtils.getFacet(wonMessage));
       exchange.getIn().setHeader("wonMessage",wonMessage);
       exchange.getIn().setBody(wonMessage);
     }

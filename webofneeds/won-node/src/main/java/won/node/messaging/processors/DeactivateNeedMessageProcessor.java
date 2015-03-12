@@ -4,6 +4,8 @@ import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import won.node.annotation.FixedMessageProcessor;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.*;
@@ -17,6 +19,7 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.util.Collection;
@@ -26,6 +29,8 @@ import java.util.List;
  * User: syim
  * Date: 02.03.2015
  */
+@Component
+@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_DEACTIVATE_STRING)
 public class DeactivateNeedMessageProcessor implements WonMessageProcessor
 {
   Logger logger = LoggerFactory.getLogger(this.getClass());

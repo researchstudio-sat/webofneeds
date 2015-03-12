@@ -4,6 +4,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.springframework.stereotype.Component;
+import won.node.annotation.FixedMessageProcessor;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -12,7 +14,9 @@ import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.util.Collection;
@@ -21,6 +25,8 @@ import java.util.Collection;
  * User: syim
  * Date: 02.03.2015
  */
+@Component
+@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType = WONMSG.TYPE_HINT_STRING)
 public class HintMessageProcessor extends AbstractInOnlyMessageProcessor
 {
 
@@ -47,7 +53,7 @@ public class HintMessageProcessor extends AbstractInOnlyMessageProcessor
     Model facetModel = ModelFactory.createDefaultModel();
 
     try {
-      URI facet = dataService.getFacet(wonMessage.getMessageContent());
+      URI facet = WonRdfUtils.FacetUtils.getFacet(wonMessage);
       // ToDo (FS): adapt this part to the new message format (dont use content)
       if (facet == null) {
         //get the first one of the need's supported facets. TODO: implement some sort of strategy for choosing a facet here (and in the matcher)

@@ -4,9 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import won.node.annotation.Facet;
-import won.node.annotation.MessageDirection;
-import won.node.annotation.MessageType;
+import won.node.annotation.FacetMessageProcessor;
 import won.node.refactoring.facet.impl.annotated.AbstractFacetAnnotated;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -28,9 +26,10 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-@MessageType(messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
-@MessageDirection(direction = WONMSG.TYPE_FROM_NODE_STRING)
-@Facet(facetType = WONMSG.GROUP_FACET_STRING)
+@FacetMessageProcessor(
+  facetType = WONMSG.GROUP_FACET_STRING,
+  direction = WONMSG.TYPE_FROM_NODE_STRING,
+  messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
 public class GroupFacetImplAnnotated extends AbstractFacetAnnotated
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());

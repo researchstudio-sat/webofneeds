@@ -4,6 +4,8 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.springframework.stereotype.Component;
+import won.node.annotation.FixedMessageProcessor;
 import won.protocol.message.WonEnvelopeType;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -13,6 +15,7 @@ import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.util.List;
@@ -21,10 +24,10 @@ import java.util.List;
  * User: syim
  * Date: 02.03.2015
  */
+@Component
+@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CREATE_STRING)
 public class CreateNeedMessageProcessor extends AbstractInOutMessageProcessor
 {
-
-
 
   @Override
   public Object process(final Exchange exchange) throws Exception {

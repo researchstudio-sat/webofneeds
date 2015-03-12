@@ -3,6 +3,7 @@ package won.node.messaging.processors;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.node.service.DataAccessService;
 import won.protocol.message.WonMessageProcessor;
@@ -17,6 +18,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  * User: syim
  * Date: 02.03.2015
  */
+@Component
 public abstract class AbstractInOutMessageProcessor implements WonMessageProcessor
 {
   protected Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());

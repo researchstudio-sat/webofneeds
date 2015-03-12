@@ -5,6 +5,8 @@ import org.apache.camel.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import won.node.annotation.FixedMessageProcessor;
 import won.node.facet.impl.FacetRegistry;
 import won.node.service.DataAccessService;
 import won.node.service.impl.URIService;
@@ -17,6 +19,7 @@ import won.protocol.repository.*;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
+import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
@@ -25,6 +28,8 @@ import java.util.concurrent.ExecutorService;
  * User: syim
  * Date: 02.03.2015
  */
+@Component
+@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_NODE_STRING,messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
 public class SendMessageFromNodeProcessor extends AbstractInOnlyMessageProcessor
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());

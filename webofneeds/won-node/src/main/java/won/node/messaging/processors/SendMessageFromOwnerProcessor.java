@@ -7,9 +7,14 @@ import org.apache.camel.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import won.node.annotation.FixedMessageProcessor;
 import won.node.facet.impl.FacetRegistry;
 import won.node.service.DataAccessService;
-import won.protocol.message.*;
+import won.protocol.message.WonEnvelopeType;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.repository.ConnectionRepository;
@@ -18,6 +23,7 @@ import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.util.LinkedList;
@@ -27,6 +33,8 @@ import java.util.List;
  * User: syim
  * Date: 02.03.2015
  */
+@Component
+@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
 public class SendMessageFromOwnerProcessor extends AbstractInOnlyMessageProcessor
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());

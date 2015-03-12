@@ -621,6 +621,10 @@ public class RdfUtils
     );
   }
 
+  public static URI toUriOrNull(final Object uriStringOrNull) {
+    if (uriStringOrNull == null) return null;
+    return URI.create(uriStringOrNull.toString());
+  }
 
 
   /**
