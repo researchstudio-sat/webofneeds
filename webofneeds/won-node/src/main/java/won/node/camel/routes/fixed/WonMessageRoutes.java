@@ -16,7 +16,6 @@ public class WonMessageRoutes  extends RouteBuilder
   public void configure() throws Exception {
     from("activemq:queue:WonMessageOwnerProtocol.in?concurrentConsumers=5")
       .routeId("WonMessageOwnerRoute")
-      .to("bean:ownerProtocolIncomingMessageCamelProcessor")
       .to("bean:wonMessageCamelProcessor")
       .routingSlip(method("wonMessageSlipComputer"))
       .choice()
@@ -25,9 +24,8 @@ public class WonMessageRoutes  extends RouteBuilder
       .when(header("methodName").isEqualTo("getEndpoints"))
       .to("bean:queueManagementService?method=getEndpointsForOwnerApplication")
       .wireTap("bean:messagingService?method=inspectMessage");
-    from("activemq:queue:WonMessageOwnerProtoco11l.in?concurrentConsumers=5")
+    from("activemq:queue:WonMessageOwnerProtocol2.in?concurrentConsumers=5")
       .routeId("WonMessageOwnerRoute2")
-      .to("bean:ownerProtocolIncomingMessageCamelProcessor")
       .to("bean:wonMessageCamelProcessor")
       .wireTap("bean:messagingService?method=inspectMessage")
       .choice()

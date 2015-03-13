@@ -7,22 +7,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.annotation.FixedMessageProcessor;
-import won.node.facet.impl.FacetRegistry;
 import won.node.service.DataAccessService;
-import won.node.service.impl.URIService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.Connection;
 import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.repository.*;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
-import java.util.concurrent.ExecutorService;
 
 /**
  * User: syim
@@ -33,27 +31,22 @@ import java.util.concurrent.ExecutorService;
 public class SendMessageFromNodeProcessor extends AbstractInOnlyMessageProcessor
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
-  private FacetRegistry reg;
-  private DataAccessService dataService;
 
-  private ExecutorService executorService;
 
   @Autowired
-  private ConnectionRepository connectionRepository;
+  ConnectionRepository connectionRepository;
+
   @Autowired
-  private EventRepository eventRepository;
+  WonNodeInformationService wonNodeInformationService;
+
   @Autowired
-  private RDFStorageService rdfStorageService;
+  RDFStorageService rdfStorage;
+
   @Autowired
-  private OwnerApplicationRepository ownerApplicationRepository;
+  DataAccessService dataService;
+
   @Autowired
-  private NeedRepository needRepository;
-  @Autowired
-  private URIService uriService;
-  @Autowired
-  private MessageEventRepository messageEventRepository;
-  @Autowired
-  private WonNodeInformationService wonNodeInformationService;
+  MessageEventRepository messageEventRepository;
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
@@ -62,7 +55,7 @@ public class SendMessageFromNodeProcessor extends AbstractInOnlyMessageProcessor
     WonMessage newWonMessage = WonMessageBuilder.copyInboundNodeToNodeMessageAsNodeToOwnerMessage(
       newMessageURI, wonMessage.getReceiverURI(), wonMessage);
     logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
-    rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
+    rdfStorage.storeDataset(newWonMessage.getMessageURI(),
                                    WonMessageEncoder.encodeAsDataset(newWonMessage));
 
     URI connectionURIFromWonMessage = newWonMessage.getReceiverURI();
@@ -75,5 +68,25 @@ public class SendMessageFromNodeProcessor extends AbstractInOnlyMessageProcessor
 
     //invoke facet implementation
     // reg.get(con).sendMessageFromNeed(con, message, newWonMessage);
+  }
+
+  public void setConnectionRepository(final ConnectionRepository connectionRepository) {
+    this.connectionRepository = connectionRepository;
+  }
+
+  public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
+    this.wonNodeInformationService = wonNodeInformationService;
+  }
+
+  public void setRdfStorage(final RDFStorageService rdfStorage) {
+    this.rdfStorage = rdfStorage;
+  }
+
+  public void setDataService(final DataAccessService dataService) {
+    this.dataService = dataService;
+  }
+
+  public void setMessageEventRepository(final MessageEventRepository messageEventRepository) {
+    this.messageEventRepository = messageEventRepository;
   }
 }

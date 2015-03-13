@@ -30,14 +30,6 @@
 
     <!-- find all message processors -->
     <context:annotation-config />
-    <context:component-scan base-package="won.protocol.exception" />
-    <context:component-scan base-package="won.protocol.matcher" />
-    <context:component-scan base-package="won.protocol.model" />
-    <context:component-scan base-package="won.protocol.need" />
-    <context:component-scan base-package="won.protocol.owner" />
-    <context:component-scan base-package="won.protocol.repository" />
-    <context:component-scan base-package="won.protocol.service" />
-    <context:component-scan base-package="won.protocol.util" />
     <context:component-scan base-package="won.node.refactoring"/>
     <context:component-scan base-package="won.node.messaging.processors"/>
     <!-- find add-ons -->

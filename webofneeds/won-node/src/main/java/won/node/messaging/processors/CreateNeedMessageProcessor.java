@@ -4,8 +4,10 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.annotation.FixedMessageProcessor;
+import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.message.WonEnvelopeType;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -14,6 +16,13 @@ import won.protocol.model.Facet;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
+import won.protocol.repository.FacetRepository;
+import won.protocol.repository.MessageEventRepository;
+import won.protocol.repository.NeedRepository;
+import won.protocol.repository.rdfstorage.RDFStorageService;
+import won.protocol.service.LinkedDataService;
+import won.protocol.service.NeedManagementService;
+import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -28,6 +37,24 @@ import java.util.List;
 @FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CREATE_STRING)
 public class CreateNeedMessageProcessor extends AbstractInOutMessageProcessor
 {
+
+  @Autowired
+  RDFStorageService rdfStorage;
+
+  @Autowired
+  protected NeedManagementService needManagementService;
+  @Autowired
+  protected NeedRepository needRepository;
+  @Autowired
+  protected FacetRepository facetRepository;
+  @Autowired
+  protected MessageEventRepository messageEventRepository;
+  @Autowired
+  protected LinkedDataService linkedDataService;
+  @Autowired
+  protected WonNodeInformationService wonNodeInformationService;
+  @Autowired
+  protected MatcherProtocolMatcherServiceClientSide matcherProtocolMatcherClient;
 
   @Override
   public Object process(final Exchange exchange) throws Exception {
@@ -111,5 +138,37 @@ public class CreateNeedMessageProcessor extends AbstractInOutMessageProcessor
       throw new IllegalArgumentException("at least one RDF node must be of type won:Need");
     }
     return needURI;
+  }
+
+  public void setRdfStorage(final RDFStorageService rdfStorage) {
+    this.rdfStorage = rdfStorage;
+  }
+
+  public void setNeedManagementService(final NeedManagementService needManagementService) {
+    this.needManagementService = needManagementService;
+  }
+
+  public void setNeedRepository(final NeedRepository needRepository) {
+    this.needRepository = needRepository;
+  }
+
+  public void setFacetRepository(final FacetRepository facetRepository) {
+    this.facetRepository = facetRepository;
+  }
+
+  public void setMessageEventRepository(final MessageEventRepository messageEventRepository) {
+    this.messageEventRepository = messageEventRepository;
+  }
+
+  public void setLinkedDataService(final LinkedDataService linkedDataService) {
+    this.linkedDataService = linkedDataService;
+  }
+
+  public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
+    this.wonNodeInformationService = wonNodeInformationService;
+  }
+
+  public void setMatcherProtocolMatcherClient(final MatcherProtocolMatcherServiceClientSide matcherProtocolMatcherClient) {
+    this.matcherProtocolMatcherClient = matcherProtocolMatcherClient;
   }
 }

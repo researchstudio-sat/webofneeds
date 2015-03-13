@@ -2,14 +2,19 @@ package won.node.messaging.processors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.annotation.FixedMessageProcessor;
+import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
+import won.protocol.repository.MessageEventRepository;
+import won.protocol.repository.NeedRepository;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -23,6 +28,18 @@ import java.net.URI;
 @FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_ACTIVATE_STRING)
 public class ActivateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
 {
+
+  @Autowired
+  RDFStorageService rdfStorage;
+
+  @Autowired
+  NeedRepository needRepository;
+
+  @Autowired
+  MessageEventRepository messageEventRepository;
+
+  @Autowired
+  MatcherProtocolMatcherServiceClientSide matcherProtocolMatcherClient;
 
 
   public void process(Exchange exchange) throws Exception {
@@ -45,4 +62,20 @@ public class ActivateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
 
     matcherProtocolMatcherClient.needActivated(need.getNeedURI(), newWonMessage);
   }
+  public void setRdfStorage(final RDFStorageService rdfStorage) {
+    this.rdfStorage = rdfStorage;
+  }
+
+  public void setNeedRepository(final NeedRepository needRepository) {
+    this.needRepository = needRepository;
+  }
+
+  public void setMessageEventRepository(final MessageEventRepository messageEventRepository) {
+    this.messageEventRepository = messageEventRepository;
+  }
+
+  public void setMatcherProtocolMatcherClient(final MatcherProtocolMatcherServiceClientSide matcherProtocolMatcherClient) {
+    this.matcherProtocolMatcherClient = matcherProtocolMatcherClient;
+  }
+
 }

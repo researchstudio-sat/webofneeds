@@ -2,14 +2,18 @@ package won.node.messaging.processors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.annotation.FixedMessageProcessor;
+import won.node.service.DataAccessService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.MessageEventPlaceholder;
+import won.protocol.repository.MessageEventRepository;
+import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -24,6 +28,15 @@ import java.net.URI;
 public class ConnectMessageFromOwnerProcessor extends AbstractInOnlyMessageProcessor
 {
 
+
+  @Autowired
+  RDFStorageService rdfStorage;
+
+  @Autowired
+  DataAccessService dataService;
+
+  @Autowired
+  MessageEventRepository messageEventRepository;
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
@@ -52,5 +65,17 @@ public class ConnectMessageFromOwnerProcessor extends AbstractInOnlyMessageProce
 
 
 
+  }
+
+  public void setRdfStorage(final RDFStorageService rdfStorage) {
+    this.rdfStorage = rdfStorage;
+  }
+
+  public void setDataService(final DataAccessService dataService) {
+    this.dataService = dataService;
+  }
+
+  public void setMessageEventRepository(final MessageEventRepository messageEventRepository) {
+    this.messageEventRepository = messageEventRepository;
   }
 }

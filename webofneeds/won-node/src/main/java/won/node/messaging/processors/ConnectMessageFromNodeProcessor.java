@@ -124,4 +124,60 @@ public class ConnectMessageFromNodeProcessor implements WonMessageProcessor
 
     //return con.getConnectionURI();
   }
+
+  public void setReg(final FacetRegistry reg) {
+    this.reg = reg;
+  }
+
+  public void setDataService(final DataAccessService dataService) {
+    this.dataService = dataService;
+  }
+
+  public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerService ownerProtocolOwnerService) {
+    this.ownerProtocolOwnerService = ownerProtocolOwnerService;
+  }
+
+  public void setNeedProtocolNeedService(final NeedProtocolNeedService needProtocolNeedService) {
+    this.needProtocolNeedService = needProtocolNeedService;
+  }
+
+  public void setNeedFacingConnectionCommunicationService(final NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService) {
+    this.needFacingConnectionCommunicationService = needFacingConnectionCommunicationService;
+  }
+
+  public void setOwnerFacingConnectionCommunicationService(final OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService) {
+    this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
+  }
+
+  public void setURIService(final won.node.service.impl.URIService URIService) {
+    this.URIService = URIService;
+  }
+
+  public void setExecutorService(final ExecutorService executorService) {
+    this.executorService = executorService;
+  }
+
+  public void setNeedRepository(final NeedRepository needRepository) {
+    this.needRepository = needRepository;
+  }
+
+  public void setConnectionRepository(final ConnectionRepository connectionRepository) {
+    this.connectionRepository = connectionRepository;
+  }
+
+  public void setEventRepository(final EventRepository eventRepository) {
+    this.eventRepository = eventRepository;
+  }
+
+  public void setRdfStorageService(final RDFStorageService rdfStorageService) {
+    this.rdfStorageService = rdfStorageService;
+  }
+
+  public void setMessageEventRepository(final MessageEventRepository messageEventRepository) {
+    this.messageEventRepository = messageEventRepository;
+  }
+
+  public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
+    this.wonNodeInformationService = wonNodeInformationService;
+  }
 }
