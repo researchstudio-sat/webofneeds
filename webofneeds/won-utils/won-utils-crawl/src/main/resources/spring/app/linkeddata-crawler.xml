@@ -24,9 +24,11 @@
     <!--
        context that combines components to provide an environment for running bots
     -->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/crawler.properties" ignore-unresolvable="true"/>
+    <!-- <context:property-placeholder location="file:${WON_CONFIG_DIR}/crawler.properties" ignore-unresolvable="true"/> -->
 
-
-    <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml" />
     <import resource="classpath:/spring/component/ehcache/spring-owner-ehcache.xml" />
+    <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml" />
+    <bean id="clRunnerBean" class="won.utils.crawl.app.CLRunnerBean" >
+        <property name="linkedDataSource" ref="linkedDataSource"/>
+    </bean>
 </beans>
