@@ -3,14 +3,14 @@ package won.protocol.util;
 import com.google.common.collect.Iterators;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
+import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.eval.PathEval;
 import com.hp.hpl.jena.sparql.util.Context;
+import com.hp.hpl.jena.tdb.TDB;
 import com.hp.hpl.jena.util.FileUtils;
 import com.hp.hpl.jena.util.ResourceUtils;
 import org.apache.jena.riot.Lang;
@@ -22,6 +22,7 @@ import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEvent;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.sparql.WonQueries;
 
 import java.io.*;
 import java.net.URI;
@@ -490,6 +491,95 @@ public class RdfUtils
     };
   }
 
+    /**
+     * Evaluates the property path by executing a sparql query.
+     * @param dataset
+     * @param resourceURI
+     * @param propertyPath
+     * @return
+     */
+    public static Iterator<RDFNode> getNodesForPropertyPathByQuery(final Dataset dataset, final URI resourceURI, Path propertyPath)
+    {
+        String queryString = "select ?obj where { ?resource " + propertyPath.toString() +" ?obj}";
+        Query query = QueryFactory.create(queryString);
+        QuerySolutionMap initialBinding = new QuerySolutionMap();
+        initialBinding.add("?resource",dataset.getDefaultModel().createResource(resourceURI.toString()));
+        QueryExecution qExec = QueryExecutionFactory.create(query, dataset,initialBinding);
+        qExec.getContext().set(TDB.symUnionDefaultGraph, true) ;
+        try {
+            final ResultSet results = qExec.execSelect();
+            LinkedList<RDFNode> resultNodes = new LinkedList<>();
+
+            while (results.hasNext()) {
+                QuerySolution soln = results.next();
+                RDFNode result = soln.get("obj");
+                resultNodes.add(result);
+            }
+            return resultNodes.iterator();
+        } finally {
+            if (!qExec.isClosed()){
+                qExec.close();
+            }
+        }
+    }
+
+    /**
+     * Sets the vars of a given sparql query
+     * Replaces every instance of ::var:: with the given object (this can only be an URI or a List of URIS at the moment)
+     * @param stmt
+     * @param var that will be replaced
+     * @param obj object that is replacing the variable
+     * @return replaced statement
+     */
+    public static String setSparqlVars(String stmt, String var, Object obj){
+        StringBuilder replacement = new StringBuilder();
+
+        if(obj instanceof URI){
+            replacement.append("<").append(obj.toString()).append(">");
+        }else if(obj instanceof List){
+            for(Object itm : (List)obj){
+                if(itm instanceof URI){
+                    replacement.append("<").append(itm.toString()).append(">,");
+                }
+            }
+            replacement.deleteCharAt(replacement.length()-1);
+        }
+
+        return stmt.replaceAll("::"+var+"::",replacement.toString());
+    }
+
+    /**
+     * Sets the vars of a given sparql query
+     * Replaces every instance of ::var:: with the given object (this can only be an URI or a List of URIS at the moment)
+     * @param stmt
+     * @param varMap replaces the key with the object within the given statement
+     * @return replaced statement
+     */
+    public static String setSparqlVars(String stmt, Map<String, Object> varMap) {
+        for(Map.Entry<String, Object> entry : varMap.entrySet()){
+            stmt = setSparqlVars(stmt, entry.getKey(), entry.getValue());
+        }
+        return stmt;
+    }
+
+    /**
+     * Evaluates a property path on the specified dataset by executing a sparql query and returns an iterator of URIs.
+     * @param dataset
+     * @param resourceURI
+     * @param propertyPath
+     * @return
+     */
+    public static Iterator<URI> getURIsForPropertyPathByQuery(final Dataset dataset, final URI resourceURI, Path propertyPath)
+    {
+        Iterator<RDFNode> nodeIterator = getNodesForPropertyPathByQuery(dataset, resourceURI, propertyPath);
+        return new ProjectingIterator<RDFNode, URI>(nodeIterator) {
+            @Override
+            public URI next() {
+                return toURI(this.baseIterator.next());
+            }
+        };
+    }
+
 
 
   /**
@@ -553,6 +643,16 @@ public class RdfUtils
     return URI.create(node.getURI());
   }
 
+    /**
+     * Returns the URI of the specified RDFNode or null if the node is null. If the node does not
+     * represent a resource, a ResourceRequiredException is thrown.
+     * @param node
+     * @return
+     */
+    public static URI toURI(RDFNode node){
+        if (node == null) return null;
+        return URI.create(node.asResource().getURI());
+    }
 
   /**
    * Returns the first RDF node found in the specified model for the specified property path.
