@@ -5,7 +5,6 @@ import org.apache.camel.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import won.node.annotation.DefaultFacetMessageProcessor;
@@ -42,13 +41,14 @@ public class WonMessageSlipComputer implements BeanFactoryPostProcessor,Expressi
                                                                                               .class);
     facetMessageProcessorsMap =  (HashMap)configurableListableBeanFactory.getBeansWithAnnotation(FacetMessageProcessor
                                                                                               .class);
+/*
     for(Object bean: facetMessageProcessorsMap.values()){
       configurableListableBeanFactory.autowireBeanProperties(bean, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
     }
     for(Object bean: fixedMessageProcessorsMap.values()){
       configurableListableBeanFactory.autowireBeanProperties(bean, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
     }
-
+*/
   }
 
   @Override

@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import won.node.messaging.processors.CreateNeedMessageProcessor;
 import won.protocol.message.WonEnvelopeType;
 import won.protocol.message.WonMessage;
 import won.protocol.vocabulary.WONMSG;
@@ -22,6 +23,13 @@ public class WonMessageSlipComputerTests
 {
   @Autowired
   WonMessageSlipComputer wonMessageSlipComputer;
+
+  @Autowired
+  CreateNeedMessageProcessor test;
+
+  public void setTest(final CreateNeedMessageProcessor test) {
+    this.test = test;
+  }
 
   @Test
   public void testCreateFromOwner() throws Exception {

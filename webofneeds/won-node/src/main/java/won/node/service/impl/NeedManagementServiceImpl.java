@@ -30,7 +30,6 @@ import org.javasimon.Stopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.exception.*;
 import won.protocol.message.WonEnvelopeType;
@@ -61,7 +60,6 @@ import java.util.List;
  */
 /* TODO: The logic of the methods of this class has nothing to do with JMS. should be merged with NeedManagementServiceImpl class. The only change was made in createNeed method, where the concept of authorizedApplications for each need was introduced.
  */
-@Component
 public class NeedManagementServiceImpl implements NeedManagementService
 {
   final Logger logger = LoggerFactory.getLogger(getClass());

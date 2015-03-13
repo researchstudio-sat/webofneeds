@@ -116,7 +116,4 @@
 
     <bean id="ownerManagementService" class="won.node.service.impl.OwnerManagementServiceImpl"/>
 
-
-    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor">
-    </bean>
 </beans>

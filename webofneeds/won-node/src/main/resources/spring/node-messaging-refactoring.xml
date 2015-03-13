@@ -8,17 +8,19 @@
 
     <!--
          Load properties but ignore unresolvable properties so that
-         they are searched in other property configurers defined in the context
+         they are searched in other property configurers defined in th e context
     -->
-    <context:annotation-config />
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
 
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
+    <context:component-scan base-package="won.*" />
+    <import resource="classpath:/spring/refactoring/message-processors.xml"/>
     <import resource="classpath:/spring/refactoring/node-core.xml" />
     <import resource="classpath:/spring/component/storage/jdbc-storage.xml" />
     <import resource="classpath:/spring/component/storage/jpabased-rdf-storage.xml" />
     <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml"/>
     <import resource="classpath:/spring/refactoring/camel/node-camel.xml" />
-    <import resource="classpath:/spring/refactoring/message-processors.xml"/>
+
+
     <!--import resource="classpath:/spring/component/needProtocolNeedService/needProtocolNeedService-jms.xml" /-->
     <import
     resource="classpath:/spring/component/needProtocolNeedServiceClient/needProtocolNeedServiceClient-jms.xml" />

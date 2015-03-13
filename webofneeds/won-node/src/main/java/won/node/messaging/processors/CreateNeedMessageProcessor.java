@@ -5,7 +5,8 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Service;
 import won.node.annotation.FixedMessageProcessor;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.message.WonEnvelopeType;
@@ -33,14 +34,14 @@ import java.util.List;
  * User: syim
  * Date: 02.03.2015
  */
-@Component
+@Service
+@DependsOn(value="autoWiredAnnotationBeanPostProcessor")
 @FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CREATE_STRING)
 public class CreateNeedMessageProcessor extends AbstractInOutMessageProcessor
 {
 
   @Autowired
   RDFStorageService rdfStorage;
-
   @Autowired
   protected NeedManagementService needManagementService;
   @Autowired
@@ -170,5 +171,37 @@ public class CreateNeedMessageProcessor extends AbstractInOutMessageProcessor
 
   public void setMatcherProtocolMatcherClient(final MatcherProtocolMatcherServiceClientSide matcherProtocolMatcherClient) {
     this.matcherProtocolMatcherClient = matcherProtocolMatcherClient;
+  }
+
+  public RDFStorageService getRdfStorage() {
+    return rdfStorage;
+  }
+
+  public NeedManagementService getNeedManagementService() {
+    return needManagementService;
+  }
+
+  public NeedRepository getNeedRepository() {
+    return needRepository;
+  }
+
+  public FacetRepository getFacetRepository() {
+    return facetRepository;
+  }
+
+  public MessageEventRepository getMessageEventRepository() {
+    return messageEventRepository;
+  }
+
+  public LinkedDataService getLinkedDataService() {
+    return linkedDataService;
+  }
+
+  public WonNodeInformationService getWonNodeInformationService() {
+    return wonNodeInformationService;
+  }
+
+  public MatcherProtocolMatcherServiceClientSide getMatcherProtocolMatcherClient() {
+    return matcherProtocolMatcherClient;
   }
 }
