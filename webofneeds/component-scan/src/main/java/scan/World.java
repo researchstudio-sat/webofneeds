@@ -6,4 +6,7 @@ package scan;
  */
 public class World
 {
+  public String getWorld(){
+    return "world";
+  }
 }

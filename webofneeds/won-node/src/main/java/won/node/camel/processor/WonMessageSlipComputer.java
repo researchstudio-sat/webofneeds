@@ -4,9 +4,9 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import won.node.annotation.DefaultFacetMessageProcessor;
 import won.node.annotation.FacetMessageProcessor;
 import won.node.annotation.FixedMessageProcessor;
@@ -26,21 +26,24 @@ import java.util.Map;
  * User: syim
  * Date: 11.03.2015
  */
-public class WonMessageSlipComputer implements BeanFactoryPostProcessor,Expression
+public class WonMessageSlipComputer implements InitializingBean, ApplicationContextAware, Expression
 {
   Logger logger = LoggerFactory.getLogger(this.getClass());
   HashMap<String, Object> fixedMessageProcessorsMap;
   HashMap<String, Object> facetMessageProcessorsMap;
+  private ApplicationContext applicationContext;
+
+  public void setApplicationContext(ApplicationContext applicationContext) {
+    this.applicationContext = applicationContext;
+  }
 
 
   @Override
-  public void postProcessBeanFactory(final ConfigurableListableBeanFactory configurableListableBeanFactory)
-    throws BeansException {
-
-    fixedMessageProcessorsMap = (HashMap)configurableListableBeanFactory.getBeansWithAnnotation(FixedMessageProcessor
-                                                                                              .class);
-    facetMessageProcessorsMap =  (HashMap)configurableListableBeanFactory.getBeansWithAnnotation(FacetMessageProcessor
-                                                                                              .class);
+  public void afterPropertiesSet() throws Exception {
+    fixedMessageProcessorsMap = (HashMap)applicationContext.getBeansWithAnnotation(FixedMessageProcessor
+            .class);
+    facetMessageProcessorsMap =  (HashMap)applicationContext.getBeansWithAnnotation(FacetMessageProcessor
+            .class);
 /*
     for(Object bean: facetMessageProcessorsMap.values()){
       configurableListableBeanFactory.autowireBeanProperties(bean, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
@@ -50,6 +53,7 @@ public class WonMessageSlipComputer implements BeanFactoryPostProcessor,Expressi
     }
 */
   }
+
 
   @Override
   public <T> T evaluate(final Exchange exchange, final Class<T> type) {

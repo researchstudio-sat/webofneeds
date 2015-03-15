@@ -52,8 +52,6 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
 
   @Autowired
   protected LinkedDataSource linkedDataSource;
-  @Autowired
-  WonMessageDynamicRouter wonMessageDynamicRouter;
 
   /**
    * Client talking another need via the need protocol

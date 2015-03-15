@@ -20,4 +20,8 @@ public class Person
 
   @Autowired
   SAT sat;
+
+  public void sayHello(){
+    System.out.println("Hello, " + world.getWorld() + "!");
+  }
 }

@@ -21,7 +21,7 @@ public class ComponentScanTest
 
   @Test
   public void testCreateFromOwner() throws Exception {
-    System.out.println("hi");
+    person.sayHello();
   }
 
 }
