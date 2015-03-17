@@ -33,7 +33,6 @@ import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.message.WonMessage;
-import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.model.Match;
@@ -95,10 +94,10 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onMessageFromOtherNeed(final Connection con, final ChatMessage message, final WonMessage wonMessage) throws Exception
+  public void onMessageFromOtherNeed(final Connection con, final WonMessage wonMessage) throws Exception
   {
     if (getLifecyclePhase().isActive()){
-      eventBus.publish(new MessageFromOtherNeedEvent(con, message, wonMessage));
+      eventBus.publish(new MessageFromOtherNeedEvent(con,  wonMessage));
     } else {
       logger.info("not publishing event for call to onMessageFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }

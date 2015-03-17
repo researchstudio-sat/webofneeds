@@ -1,14 +1,11 @@
 package won.bot.framework.events.action.impl;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.action.EventBotActionUtils;
 import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.NeedCreationFailedEvent;
-import won.bot.framework.events.event.impl.NeedCreatedEvent;
 import won.bot.framework.events.event.impl.NeedProducerExhaustedEvent;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
@@ -75,42 +72,24 @@ public class CreateNeedWithFacetsAction extends BaseEventBotAction
         }
         final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
         logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
-        final ListenableFuture<URI> futureNeedUri = getEventListenerContext().getOwnerService().createNeed(
-          needModel, true, wonNodeUri, createWonMessage(wonNodeUri, needModel));
-        //add a listener that adds the need URI to the botContext
-        futureNeedUri.addListener(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                if (futureNeedUri.isDone()){
-                    try {
-                        URI uri = futureNeedUri.get();
-                        logger.debug("need creation finished, new need URI is: {}", uri);
-                        EventBotActionUtils.rememberInListIfNamePresent(getEventListenerContext(), uri, uriListName);
-                        getEventListenerContext().getEventBus().publish(new NeedCreatedEvent(uri, wonNodeUri, needModel,null));
-                    } catch (Exception e){
-                        logger.warn("createNeed failed", e);
-                    }
-                } else if (futureNeedUri.isCancelled()){
-                  try {
-                    logger.debug("need creation canceled");
-                    getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
-                  } catch (Exception e){
-                    logger.warn("createNeed failed", e);
-                  }
-                }
-            }
-        }, getEventListenerContext().getExecutor());
+        WonNodeInformationService wonNodeInformationService =
+          getEventListenerContext().getWonNodeInformationService();
+        URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
+        getEventListenerContext().getOwnerService().sendWonMessage(createWonMessage(wonNodeInformationService,
+                                                                                    needURI, wonNodeUri, needModel));
+        logger.debug("need creation finished, new need URI is: {}", needURI);
+        EventBotActionUtils.rememberInListIfNamePresent(getEventListenerContext(), needURI, uriListName);
+        //TODO: register a listener for the CreateResponse and then publish the NCE
+        //getEventListenerContext().getEventBus().publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel,null));
+        //TODO: publish a NeedCreationFailedEvent when an error is received from the server
+        //getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
     }
 
-  private WonMessage createWonMessage(URI wonNodeURI, Model needModel)
+  private WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI,
+                                      Model needModel)
     throws WonMessageBuilderException {
 
-    WonNodeInformationService wonNodeInformationService =
-      getEventListenerContext().getWonNodeInformationService();
 
-    URI needURI = wonNodeInformationService.generateNeedURI(wonNodeURI);
 
     RdfUtils.replaceBaseURI(needModel,needURI.toString());
 

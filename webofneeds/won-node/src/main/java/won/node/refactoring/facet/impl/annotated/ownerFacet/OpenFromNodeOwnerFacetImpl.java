@@ -6,11 +6,9 @@ import won.node.annotation.DefaultFacetMessageProcessor;
 import won.node.annotation.FacetMessageProcessor;
 import won.node.refactoring.FacetCamel;
 import won.node.refactoring.facet.impl.annotated.AbstractFacetAnnotated;
-import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
-import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
+import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -18,8 +16,8 @@ import won.protocol.vocabulary.WONMSG;
  * Date: 05.03.2015
  */
 @Component
-@DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_NODE_STRING,messageType = WONMSG.TYPE_OPEN_STRING)
-@FacetMessageProcessor(facetType = WONMSG.OWNER_FACET_STRING,direction=WONMSG.TYPE_FROM_NODE_STRING,messageType =
+@DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType = WONMSG.TYPE_OPEN_STRING)
+@FacetMessageProcessor(facetType = WON.OWNER_FACET_STRING,direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType =
   WONMSG.TYPE_OPEN_STRING)
 public class OpenFromNodeOwnerFacetImpl extends AbstractFacetAnnotated implements FacetCamel
 {
@@ -31,11 +29,12 @@ public class OpenFromNodeOwnerFacetImpl extends AbstractFacetAnnotated implement
     return facetType;
   }
 
-  @Override
-  public void openFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
-    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-    //inform the need side
 
+  @Override
+  public void process(final WonMessage wonMessage) {
+    //TODO: only for old messaging protocol. remove it when transition is finished.
+    final Model content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next
+      ());
     executorService.execute(new Runnable()
     {
       @Override
@@ -49,13 +48,5 @@ public class OpenFromNodeOwnerFacetImpl extends AbstractFacetAnnotated implement
         }
       }
     });
-
-  }
-
-
-
-  @Override
-  public void process(WonMessage wonMessage) {
-
   }
 }

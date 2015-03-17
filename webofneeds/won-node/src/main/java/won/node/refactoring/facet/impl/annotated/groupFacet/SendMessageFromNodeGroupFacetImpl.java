@@ -13,6 +13,7 @@ import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
@@ -27,8 +28,8 @@ import java.util.List;
  */
 @Component
 @FacetMessageProcessor(
-  facetType = WONMSG.GROUP_FACET_STRING,
-  direction = WONMSG.TYPE_FROM_NODE_STRING,
+  facetType = WON.GROUP_FACET_STRING,
+  direction = WONMSG.TYPE_FROM_EXTERNAL_STRING,
   messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
 public class SendMessageFromNodeGroupFacetImpl extends AbstractFacetAnnotated
 {

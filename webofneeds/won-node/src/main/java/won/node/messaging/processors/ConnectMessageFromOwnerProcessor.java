@@ -2,6 +2,7 @@ package won.node.messaging.processors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.apache.jena.riot.Lang;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.annotation.FixedMessageProcessor;
@@ -14,6 +15,7 @@ import won.protocol.model.ConnectionState;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -37,10 +39,10 @@ public class ConnectMessageFromOwnerProcessor extends AbstractInOnlyMessageProce
 
   @Autowired
   MessageEventRepository messageEventRepository;
-
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = message.getBody(WonMessage.class);
+    //WonMessage wonMessage = message.getHeader("wonMessage");
     URI senderNeedURI = wonMessage.getSenderNeedURI();
     URI receiverNeedURI = wonMessage.getReceiverNeedURI();
 
@@ -62,9 +64,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractInOnlyMessageProce
     logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
     rdfStorage.storeDataset(newWonMessage.getMessageURI(),
                             newWonMessage.getCompleteDataset());
-
-
-
+    exchange.getIn().setBody(RdfUtils.writeDatasetToString(newWonMessage.getCompleteDataset(), Lang.JSONLD));
   }
 
   public void setRdfStorage(final RDFStorageService rdfStorage) {

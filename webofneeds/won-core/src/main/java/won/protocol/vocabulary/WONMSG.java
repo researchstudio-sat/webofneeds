@@ -24,15 +24,12 @@ public class WONMSG
 
   private static Model m = ModelFactory.createDefaultModel();
 
-  public static final String GROUP_FACET_STRING = BASE_URI+"GroupFacet";
-  public static final String OWNER_FACET_STRING = BASE_URI+"OwnerFacet";
 
-  public static final String TYPE_FROM_NODE_STRING = BASE_URI+"FromNode";
+
   public static final String TYPE_FROM_OWNER_STRING = BASE_URI+"FromOwner";
   public static final String TYPE_FROM_SYSTEM_STRING = BASE_URI+"FromSystem";
   public static final String TYPE_FROM_EXTERNAL_STRING = BASE_URI+"FromExternal";
 
-  public static final Resource TYPE_FROM_NODE = m.createResource(BASE_URI+"FromNode");
   public static final Resource TYPE_FROM_OWNER = m.createResource(BASE_URI+"FromOwner");
   public static final Resource TYPE_FROM_SYSTEM = m.createResource(BASE_URI+"FromSystem");
   public static final Resource TYPE_FROM_EXTERNAL = m.createResource(BASE_URI+"FromExternal");

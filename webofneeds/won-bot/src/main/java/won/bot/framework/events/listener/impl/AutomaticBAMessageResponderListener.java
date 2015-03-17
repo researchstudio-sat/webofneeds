@@ -124,8 +124,9 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener
             public void run()
             {
                 try {
-                    getEventListenerContext().getOwnerService().sendConnectionMessage(senderURI, myContent, null);
-                    logger.info("State of the sender before sending: {} ", action.getStateOfSenderBeforeSending());
+                  logger.info("State of the sender before sending: {} ", action.getStateOfSenderBeforeSending());
+                    throw new UnsupportedOperationException("Not yet adapted to new message format!");
+                    //getEventListenerContext().getOwnerService().sendWonMessage(senderURI, myContent, null);
                 } catch (Exception e) {
                     logger.warn("could not send message via connection {}", senderURI, e);
                 }

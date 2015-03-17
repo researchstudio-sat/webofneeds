@@ -27,7 +27,7 @@ import java.net.URI;
  * Date: 02.03.2015
  */
 @Component
-@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_NODE_STRING,messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
+@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
 public class SendMessageFromNodeProcessor extends AbstractInOnlyMessageProcessor
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -66,6 +66,7 @@ public class SendMessageFromNodeProcessor extends AbstractInOnlyMessageProcessor
     messageEventRepository.save(new MessageEventPlaceholder(
       connectionURIFromWonMessage, newWonMessage));
 
+    exchange.getIn().setHeader("wonMessage",newWonMessage);
     //invoke facet implementation
     // reg.get(con).sendMessageFromNeed(con, message, newWonMessage);
   }

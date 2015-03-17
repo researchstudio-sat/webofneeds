@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.annotation.FixedMessageProcessor;
 import won.node.service.DataAccessService;
-import won.protocol.message.WonEnvelopeType;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
@@ -53,7 +53,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractInOnlyMessageProcesso
       .setSenderURI(con.getConnectionURI())
       .setReceiverURI(con.getRemoteConnectionURI())
       .setReceiverNeedURI(con.getRemoteNeedURI())
-      .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
       .build();
 
     rdfStorage.storeDataset(newWonMessage.getMessageURI(),
@@ -68,6 +68,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractInOnlyMessageProcesso
     messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonMessage,
                                                             newWonMessage));
 
+    exchange.getIn().setHeader("wonMessage",newWonMessage);
     //invoke facet implementation
     //reg.get(con).openFromOwner(con, content, newWonMessage);
   }

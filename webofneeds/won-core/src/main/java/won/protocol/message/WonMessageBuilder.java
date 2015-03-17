@@ -6,7 +6,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import won.protocol.exception.WonMessageBuilderException;
-import won.protocol.model.NeedState;
 import won.protocol.util.CheapInsecureRandomString;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
@@ -42,7 +41,7 @@ public class WonMessageBuilder
   private URI receiverNodeURI;
 
   private WonMessageType wonMessageType;
-  private WonEnvelopeType wonEnvelopeType;
+  private WonMessageDirection wonMessageDirection;
   private Resource responseMessageState;
 
   private Set<URI> refersToURIs = new HashSet<>();
@@ -89,7 +88,7 @@ public class WonMessageBuilder
     dataset.addNamedModel(envelopeGraphURI, envelopeGraph);
     // message URI
     Resource messageEventResource = envelopeGraph.createResource(messageURI.toString(),
-      this.wonEnvelopeType.getResource());
+      this.wonMessageDirection.getResource());
     //the [envelopeGraphURI] rdf:type msg:EnvelopeGraph makes it easy to select graphs by type
     Resource envelopeGraphResource = envelopeGraph.createResource(envelopeGraphURI, WONMSG.ENVELOPE_GRAPH);
     envelopeGraphResource.addProperty(RDFG.SUBGRAPH_OF, messageEventResource);
@@ -97,7 +96,7 @@ public class WonMessageBuilder
     addWrappedOrForwardedMessage(dataset, envelopeGraph, envelopeGraphResource, messageURI);
 
     //make sure the envelope type has been set
-    if (this.wonEnvelopeType == null) {
+    if (this.wonMessageDirection == null) {
       throw new IllegalStateException("envelopeType must be set!");
     }
 
@@ -276,7 +275,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.FROM_OWNER)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.OPEN)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -300,7 +299,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.FROM_OWNER)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.CLOSE)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -322,7 +321,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.FROM_SYSTEM)
+      .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM)
       .setWonMessageType(WonMessageType.CLOSE)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -331,25 +330,17 @@ public class WonMessageBuilder
     return this;
   }
 
-  public WonMessageBuilder setMessagePropertiesForNeedState(
+  public WonMessageBuilder setMessagePropertiesForDeactivate(
     URI messageURI,
-    NeedState needState,
     URI localNeed,
     URI localWonNode) {
-
-    // create need state RDF (message event content)
-    Model contentModel = ModelFactory.createDefaultModel();
-    contentModel.add(contentModel.createResource(localNeed.toString()), WON.IS_IN_STATE, needState.getURI().toString());
-
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.FROM_OWNER)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.DEACTIVATE)
       .setSenderNeedURI(localNeed)
       .setReceiverNeedURI(localNeed)
       .setReceiverNodeURI(localWonNode)
-        // ToDo (FS): remove the hardcoded part of the URI
-      .addContent(URI.create(messageURI.toString() + "/content"), contentModel, null)
       .setTimestampToNow();
 
     return this;
@@ -369,7 +360,7 @@ public class WonMessageBuilder
     RdfUtils.replaceBaseResource(facetModel, facetModel.createResource(messageURI.toString()));
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.FROM_OWNER)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.CONNECT)
       .setSenderNeedURI(localNeed)
       .setSenderNodeURI(localWonNode)
@@ -390,7 +381,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.FROM_OWNER)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.CREATE_NEED)
       .setSenderNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
@@ -419,7 +410,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.FROM_EXTERNAL)
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setSenderNodeURI(matcherURI)
       .setReceiverURI(needFacetURI)
@@ -453,7 +444,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setSenderNodeURI(matcherURI)
       .setReceiverURI(needConnectionURI)
@@ -478,7 +469,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.FROM_OWNER)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.CONNECTION_MESSAGE)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -499,7 +490,7 @@ public class WonMessageBuilder
     URI localWonNode) {
 
     this.setWonMessageType(WonMessageType.NEED_CREATED_NOTIFICATION)
-        .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
+        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
         .setMessageURI(messageURI)
         .setSenderNeedURI(localNeed)
         .setSenderNodeURI(localWonNode)
@@ -548,8 +539,8 @@ public class WonMessageBuilder
     this.wonMessageType = wonMessageType;
     return this;
   }
-  public WonMessageBuilder setWonEnvelopeType(WonEnvelopeType wonEnvelopeType){
-    this.wonEnvelopeType = wonEnvelopeType;
+  public WonMessageBuilder setWonMessageDirection(WonMessageDirection wonMessageDirection){
+    this.wonMessageDirection = wonMessageDirection;
     return this;
   }
 
@@ -694,7 +685,7 @@ public class WonMessageBuilder
       .setReceiverURI(localConnectionUri)
       .setTimestamp(new Date().getTime())
       .addRefersToURI(inboundWonMessage.getMessageURI())
-      .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
       .build();
   }
 
@@ -706,17 +697,25 @@ public class WonMessageBuilder
     if (localConnectionUri != null) {
       builder.setSenderURI(localConnectionUri);
     }
-    builder.setWonEnvelopeType(WonEnvelopeType.FROM_NODE);
+    builder.setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
     return builder.build();
   }
 
-
+  @Deprecated
   public static WonMessage wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(final WonMessage
                                                                                        ownerToNeedWonMessage){
     WonMessageBuilder builder = new WonMessageBuilder()
       .wrap(ownerToNeedWonMessage)
       .setTimestamp(new Date().getTime());
-    builder.setWonEnvelopeType(WonEnvelopeType.FROM_NODE);
+    builder.setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
+    return builder.build();
+  }
+
+  public static WonMessage wrapMessageReceivedByNode(final WonMessage wonMessage, WonMessageDirection direction){
+    WonMessageBuilder builder = new WonMessageBuilder()
+      .wrap(wonMessage)
+      .setWonMessageDirection(direction)
+      .setTimestamp(new Date().getTime());
     return builder.build();
   }
 
@@ -732,7 +731,7 @@ public class WonMessageBuilder
       .setReceiverURI(remoteConnectionURI)
       .setReceiverNeedURI(remoteNeedURI)
       .setReceiverNodeURI(remoteWonNodeUri)
-      .setWonEnvelopeType(WonEnvelopeType.FROM_NODE);
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
     return builder.build();
   }
 

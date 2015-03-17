@@ -11,18 +11,23 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import won.node.refactoring.FacetCamel;
 import won.node.service.DataAccessService;
 import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
-import won.protocol.message.*;
+import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.need.NeedProtocolNeedClientSide;
 import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
+import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -48,6 +53,8 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
   protected final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
+  protected ConnectionRepository connectionRepository;
+  @Autowired
   protected WonNodeInformationService wonNodeInformationService;
 
   @Autowired
@@ -56,6 +63,8 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
   /**
    * Client talking another need via the need protocol
    */
+  @Autowired
+  @Qualifier("needProtocolNeedClient")
   protected NeedProtocolNeedClientSide needProtocolNeedService;
   /**
    * Client talking to the owner side via the owner protocol
@@ -74,6 +83,7 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
 
   protected won.node.service.impl.URIService URIService;
 
+  @Autowired
   protected ExecutorService executorService;
 
   protected DataAccessService dataService;
@@ -287,7 +297,7 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
 
     Model remoteFacetModelCandidate = content;
     if (wonMessage == null)
-      remoteFacetModelCandidate = changeHasRemoteFacetToHasFacet(content);
+      remoteFacetModelCandidate = changeHasRemoteFacetToHasFacet(content, wonMessage.getMessageURI());
     final Model remoteFacetModel = remoteFacetModelCandidate;
     try {
       executorService.execute(new Runnable()
@@ -367,7 +377,7 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
   public void connectFromOwner(final Connection con, final Model content, WonMessage wonMessage)
           throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
-    Model remoteFacetModel = null;  remoteFacetModel = changeHasRemoteFacetToHasFacet(content);
+    Model remoteFacetModel = null;  remoteFacetModel = changeHasRemoteFacetToHasFacet(content, wonMessage.getMessageURI());
 
     final Connection connectionForRunnable = con;
     //send to need
@@ -411,7 +421,7 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
           .setReceiverURI(wonMessage.getSenderURI())
           .setReceiverNeedURI(wonMessage.getSenderNeedURI())
           .setReceiverNodeURI(wonMessage.getSenderNodeURI())
-          .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
+          .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
           .build();
 
        // needFacingConnectionCommunicationService.close(
@@ -461,10 +471,11 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
   /**
    * Creates a copy of the specified model, replacing won:hasRemoteFacet by won:hasFacet and vice versa.
    * @param model
+   * @param messageURI
    * @return
    */
-  private Model changeHasRemoteFacetToHasFacet(Model model) {
-    Resource baseRes = model.getResource(model.getNsPrefixURI(""));
+  private Model changeHasRemoteFacetToHasFacet(Model model, final URI messageURI) {
+    Resource baseRes = model.getResource(messageURI.toString());
 
     StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_REMOTE_FACET);
     if (!stmtIterator.hasNext())
@@ -472,11 +483,11 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
 
 
     final Model newModel = ModelFactory.createDefaultModel();
-    newModel.setNsPrefix("", model.getNsPrefixURI(""));
+   // newModel.setNsPrefix("", model.getNsPrefixURI(""));
     newModel.add(model);
     newModel.removeAll(null, WON.HAS_REMOTE_FACET, null);
     newModel.removeAll(null, WON.HAS_FACET, null);
-    Resource newBaseRes = newModel.createResource(newModel.getNsPrefixURI(""));
+    Resource newBaseRes = newModel.createResource(messageURI.toString());
     //replace won:hasFacet
     while (stmtIterator.hasNext()) {
       Resource facet = stmtIterator.nextStatement().getObject().asResource();
@@ -545,4 +556,7 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
     this.rdfStorageService = rdfStorageService;
   }
 
+  public void setConnectionRepository(final ConnectionRepository connectionRepository) {
+    this.connectionRepository = connectionRepository;
+  }
 }

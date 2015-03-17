@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import won.node.annotation.FixedMessageProcessor;
 import won.node.facet.impl.FacetRegistry;
 import won.node.service.DataAccessService;
-import won.protocol.message.WonEnvelopeType;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
@@ -57,7 +57,7 @@ public class SendMessageFromOwnerProcessor extends AbstractInOnlyMessageProcesso
     WonMessage newWonMessage = new WonMessageBuilder()
       .wrap(wonMessage)
       .setTimestamp(System.currentTimeMillis())
-      .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
       .build();
     logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
     rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
@@ -71,6 +71,7 @@ public class SendMessageFromOwnerProcessor extends AbstractInOnlyMessageProcesso
     messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonMessage,
                                                             newWonMessage));
 
+    exchange.getIn().setHeader("wonMessage",newWonMessage);
     final Connection connection = con;
     boolean feedbackWasPresent = RdfUtils.applyMethod(newWonMessage.getMessageContent(),
                                                       new RdfUtils.ModelVisitor<Boolean>()

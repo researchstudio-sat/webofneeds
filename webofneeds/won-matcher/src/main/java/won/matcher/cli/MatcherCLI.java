@@ -8,7 +8,7 @@ import won.matcher.protocol.impl.MatcherProtocolNeedServiceClient;
 import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonMessageBuilderException;
-import won.protocol.message.WonEnvelopeType;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.FacetType;
@@ -96,7 +96,7 @@ public class MatcherCLI implements CommandLineRunner
         FacetType.OwnerFacet.getURI(),
         originator,
         score)
-      .setWonEnvelopeType(WonEnvelopeType.FROM_EXTERNAL)
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
       .build();
   }
 }

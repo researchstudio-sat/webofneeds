@@ -44,20 +44,20 @@ public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
         logger.debug("processing messages for dynamic recipients generation");
         Map headers = exchange.getIn().getHeaders();
         Map properties = exchange.getProperties();
-        List<OwnerApplication> ownerApplications = (List<OwnerApplication>)headers.get("ownerApplications");
-        String methodName =headers.get("methodName").toString();
-        logger.debug(ownerApplications.get(0).getOwnerApplicationId());
-        List<String> queueNames = convertToQueueName(ownerApplications,methodName,exchange);
+        List<String> ownerApplications = (List<String>)headers.get("ownerApplications");
+ //       String methodName =headers.get("methodName").toString();
+        logger.debug(ownerApplications.get(0));
+        List<String> queueNames = convertToQueueName(ownerApplications,"wonMessage",exchange);
         exchange.getIn().setHeader("ownerApplicationIDs",queueNames);
     }
-    private List<String> convertToQueueName(List<OwnerApplication> ownerApplications,String methodName,Exchange
+    private List<String> convertToQueueName(List<String> ownerApplications,String methodName,Exchange
       exchange){
         List<String> ownerApplicationQueueNames = new ArrayList<>();
 
         for (int i =0;i<ownerApplications.size();i++){
-             OwnerApplication ownerApplication = ownerApplicationRepository.findByOwnerApplicationId(ownerApplications.get(i).getOwnerApplicationId()).get(i);
+             OwnerApplication ownerApplication = ownerApplicationRepository.findByOwnerApplicationId(ownerApplications.get(i)).get(i);
              logger.debug(queueManagementService.getEndpointsForOwnerApplication(ownerApplication.getOwnerApplicationId(),exchange).get(0));
-             logger.debug("ownerApplicationID: "+ownerApplications.get(i).getOwnerApplicationId());
+             logger.debug("ownerApplicationID: "+ownerApplications.get(i));
              ownerApplicationQueueNames.add(i, queueManagementService.getEndpointForMessage(methodName,ownerApplication.getOwnerApplicationId()));
 
         }

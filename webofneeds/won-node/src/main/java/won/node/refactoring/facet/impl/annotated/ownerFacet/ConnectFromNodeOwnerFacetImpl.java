@@ -1,6 +1,7 @@
 package won.node.refactoring.facet.impl.annotated.ownerFacet;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.camel.Header;
 import org.springframework.stereotype.Component;
 import won.node.annotation.DefaultFacetMessageProcessor;
 import won.node.annotation.FacetMessageProcessor;
@@ -12,6 +13,7 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
+import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -19,8 +21,8 @@ import won.protocol.vocabulary.WONMSG;
  * Date: 05.03.2015
  */
 @Component
-@DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_NODE_STRING,messageType = WONMSG.TYPE_CONNECT_STRING)
-@FacetMessageProcessor(facetType = WONMSG.OWNER_FACET_STRING,direction=WONMSG.TYPE_FROM_NODE_STRING,messageType =
+@DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType = WONMSG.TYPE_CONNECT_STRING)
+@FacetMessageProcessor(facetType = WON.OWNER_FACET_STRING,direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType =
   WONMSG.TYPE_CONNECT_STRING)
 public class ConnectFromNodeOwnerFacetImpl extends AbstractFacetAnnotated implements FacetCamel
 {
@@ -32,20 +34,17 @@ public class ConnectFromNodeOwnerFacetImpl extends AbstractFacetAnnotated implem
     return facetType;
   }
 
-  @Override
-  public void connectFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
-    throws NoSuchNeedException,
-    IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
+  @Override
+  public void process(@Header("wonMessage") WonMessage wonMessage)
+    throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
+    //TODO: only for old messaging protocol. remove it when transition is finished.
+    final Model content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next
+      ());
+    Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getReceiverURI());
     super.connectFromNeed(con, content, wonMessage);
     /* when connected change linked data*/
 
-  }
-
-
-
-  @Override
-  public void process(WonMessage wonMessage) {
 
   }
 }

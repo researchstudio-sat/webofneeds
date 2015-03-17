@@ -25,7 +25,7 @@ import won.node.facet.impl.FacetRegistry;
 import won.node.service.DataAccessService;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.message.WonEnvelopeType;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
@@ -76,7 +76,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
         .setSenderURI(con.getConnectionURI())
         .setReceiverURI(con.getRemoteConnectionURI())
         .setReceiverNeedURI(con.getRemoteNeedURI())
-        .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
+        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
         .build();
 
       rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
@@ -102,7 +102,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       WonMessage newWonMessage = new WonMessageBuilder()
         .wrap(wonMessage)
         .setTimestamp(System.currentTimeMillis())
-        .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
+        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
         .build();
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
@@ -128,7 +128,7 @@ public class OwnerFacingConnectionCommunicationServiceImpl implements Connection
       WonMessage newWonMessage = new WonMessageBuilder()
         .wrap(wonMessage)
         .setTimestamp(System.currentTimeMillis())
-        .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
+        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
         .build();
       logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
       rdfStorageService.storeDataset(newWonMessage.getMessageURI(),

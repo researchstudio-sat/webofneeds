@@ -98,6 +98,7 @@ public class HintMessageProcessor extends AbstractInOnlyMessageProcessor
     messageEventRepository.save(new MessageEventPlaceholder(
       con.getConnectionURI(), wrappedMessage));
 
+    exchange.getIn().setHeader("wonMessage",wrappedMessage);
     //reg.get(con).hint(con, wmScore, wmOriginator, facetModel, wrappedMessage);
              /*
       WonMessage newWonMessage = WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(con.getConnectionURI(),

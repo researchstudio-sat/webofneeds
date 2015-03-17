@@ -52,6 +52,7 @@
         <property name="sessionCacheSize" value="10"></property>
 
     </bean>
+    <bean name="wonMessageCamelProcessor" class="won.owner.camel.processor.OwnerWonMessageCamelProcessor"></bean>
 
     <!-- Camels AMQP component doesn't seem to support AMQP 1.0 yet -->
     <!--bean id ="amqpComponent" class="org.apache.camel.component.amqp.AMQPComponent">

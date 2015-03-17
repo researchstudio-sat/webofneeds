@@ -11,7 +11,6 @@ import won.node.facet.impl.WON_TX;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.model.NeedState;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -50,8 +49,7 @@ public class TwoPhaseCommitDeactivateOnCloseAction extends BaseEventBotAction
       String coordinationMessageUri = ni.toList().get(0).asResource().getURI().toString();
       assert coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_COMMIT.getURI().toString()) : "expected a " +
         "Commmit message";
-      getEventListenerContext().getOwnerService().deactivate(
-        needURI, createWonMessage(needURI));
+      getEventListenerContext().getOwnerService().sendWonMessage(createWonMessage(needURI));
       getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(needURI));
     }
   }
@@ -66,10 +64,9 @@ public class TwoPhaseCommitDeactivateOnCloseAction extends BaseEventBotAction
 
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder
-      .setMessagePropertiesForNeedState(
+      .setMessagePropertiesForDeactivate(
         wonNodeInformationService.generateEventURI(
           localWonNode),
-        NeedState.INACTIVE,
         needURI,
         localWonNode)
       .build();

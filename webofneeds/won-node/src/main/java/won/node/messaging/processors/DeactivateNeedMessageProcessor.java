@@ -121,7 +121,7 @@ public class DeactivateNeedMessageProcessor implements WonMessageProcessor
           connection.getConnectionURI(),
           connection.getNeedURI(),
           localWonNodeUri)
-                      .setWonEnvelopeType(WonEnvelopeType.FROM_SYSTEM)
+                      .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM)
                       .build();
 
       }else{
@@ -136,7 +136,7 @@ public class DeactivateNeedMessageProcessor implements WonMessageProcessor
           connection.getRemoteConnectionURI(),
           connection.getRemoteNeedURI(),
           remoteWonNodeUri)
-                      .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
+                      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
                       .build();
       }
 

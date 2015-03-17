@@ -16,11 +16,7 @@
 
 package won.owner.service;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.message.WonMessage;
-import won.protocol.model.ChatMessage;
-import won.protocol.model.Connection;
-import won.protocol.model.Match;
 
 /**
  * User: fkleedorfer
@@ -28,13 +24,6 @@ import won.protocol.model.Match;
  */
 public interface OwnerProtocolOwnerServiceCallback
 {
-  void onHint(Match match, final Model content, final WonMessage wonMessage);
 
-  void onConnect(Connection con, final Model content, final WonMessage wonMessage);
-
-  void onOpen(Connection con, final Model content, final WonMessage wonMessage);
-
-  void onClose(Connection con, final Model content, final WonMessage wonMessage);
-
-  void onTextMessage(Connection con, ChatMessage message, final Model content, final WonMessage wonMessage);
+  void onWonMessage(final WonMessage wonMessage);
 }

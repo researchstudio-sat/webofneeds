@@ -31,7 +31,11 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node-uri-source.properties" ignore-unresolvable="true"/>
     <!-- expects a botManager and a taskScheduler bean -->
     <bean id="ownerProtocolOwnerServiceHandler" class="won.bot.integration.BotOwnerProtocolOwnerServiceCallback" >
+    </bean>
+    <bean id="botOwnerProtocolAdapter" class="won.bot.integration.BotOwnerProtocolAdapterCallback" >
         <property name="botManager" ref="botManager" />
         <property name="taskScheduler" ref="taskScheduler" />
     </bean>
+
+
 </beans>

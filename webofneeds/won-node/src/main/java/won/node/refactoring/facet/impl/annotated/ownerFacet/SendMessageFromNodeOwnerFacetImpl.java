@@ -11,6 +11,7 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
+import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -18,8 +19,8 @@ import won.protocol.vocabulary.WONMSG;
  * Date: 05.03.2015
  */
 @Component
-@DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_NODE_STRING,messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
-@FacetMessageProcessor(facetType = WONMSG.OWNER_FACET_STRING,direction=WONMSG.TYPE_FROM_NODE_STRING,messageType =
+@DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
+@FacetMessageProcessor(facetType = WON.OWNER_FACET_STRING,direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType =
   WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
 public class SendMessageFromNodeOwnerFacetImpl extends AbstractFacetAnnotated implements FacetCamel
 {
@@ -37,30 +38,26 @@ public class SendMessageFromNodeOwnerFacetImpl extends AbstractFacetAnnotated im
    * to the remote partner.
    *
    *
-   * @param con the connection object
-   * @param message  the chat message
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
+
   @Override
-  public void sendMessageFromNeed(final Connection con, final Model message, final WonMessage wonMessage)
-    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void process(final WonMessage wonMessage) {
     //send to the need side
+    final Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getReceiverURI());
+    //TODO: only for old messaging protocol. remove it when transition is finished.
+    final Model content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next
+      ());
     executorService.execute(new Runnable() {
       @Override
       public void run() {
         try {
-          ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, wonMessage);
+          ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception in textMessageFromNeed:", e);
         }
       }
     });
-  }
-
-
-  @Override
-  public void process(WonMessage wonMessage) {
-
   }
 }

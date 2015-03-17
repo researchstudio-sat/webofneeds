@@ -11,7 +11,6 @@ import won.node.facet.impl.WON_TX;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.model.NeedState;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -57,7 +56,7 @@ public class TwoPhaseCommitNoVoteDeactivateAllNeedsAction extends BaseEventBotAc
     }
     List<URI> toDeactivate = getEventListenerContext().getBotContext().listNeedUris();
     for (URI uri: toDeactivate){
-      getEventListenerContext().getOwnerService().deactivate(uri, createWonMessage(uri));
+      getEventListenerContext().getOwnerService().sendWonMessage(createWonMessage(uri));
       getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
     }
   }
@@ -72,10 +71,9 @@ public class TwoPhaseCommitNoVoteDeactivateAllNeedsAction extends BaseEventBotAc
 
     WonMessageBuilder builder = new WonMessageBuilder();
     return builder
-      .setMessagePropertiesForNeedState(
+      .setMessagePropertiesForDeactivate(
         wonNodeInformationService.generateEventURI(
           localWonNode),
-        NeedState.INACTIVE,
         needURI,
         localWonNode)
       .build();

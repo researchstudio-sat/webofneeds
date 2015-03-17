@@ -9,17 +9,16 @@ import java.net.URI;
  * User: syim
  * Date: 17.02.2015
  */
-public enum WonEnvelopeType
+public enum WonMessageDirection
 {
 
-  FROM_NODE(WONMSG.TYPE_FROM_NODE),
   FROM_OWNER(WONMSG.TYPE_FROM_OWNER),
   FROM_SYSTEM(WONMSG.TYPE_FROM_SYSTEM),
   FROM_EXTERNAL(WONMSG.TYPE_FROM_EXTERNAL);
 
   private Resource resource;
 
-  private WonEnvelopeType(Resource resource)
+  private WonMessageDirection(Resource resource)
   {
     this.resource = resource;
   }
@@ -29,17 +28,15 @@ public enum WonEnvelopeType
     return resource;
   }
 
-  public static WonEnvelopeType getWonEnvelopeType(URI uri){
-    return getWonEnvelopeType(WONMSG.toResource(uri));
+  public static WonMessageDirection getWonMessageDirection(URI uri){
+    return getWonMessageDirection(WONMSG.toResource(uri));
   }
 
 
-  public static WonEnvelopeType getWonEnvelopeType(Resource resource) {
+  public static WonMessageDirection getWonMessageDirection(Resource resource) {
 
     if (WONMSG.TYPE_FROM_OWNER.equals(resource))
       return FROM_OWNER;
-    if (WONMSG.TYPE_FROM_NODE.equals(resource))
-      return FROM_NODE;
     if (WONMSG.TYPE_FROM_SYSTEM.equals(resource))
       return FROM_SYSTEM;
     if (WONMSG.TYPE_FROM_EXTERNAL.equals(resource))

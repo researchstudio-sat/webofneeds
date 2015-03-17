@@ -9,14 +9,12 @@ import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
 import won.protocol.model.*;
-import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -31,7 +29,7 @@ import java.util.List;
  * Time: 14:12
  */
     //TODO: refactor service interfaces.
-public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
+public class OwnerProtocolOwnerServiceImpl {//implements OwnerProtocolOwnerService{
 
     final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -56,7 +54,6 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
     //TODO: refactor this to use DataAccessService
 
-    @Override
     public void hint(final String ownNeedURI, final String otherNeedURI,
                      final String score, final String originatorURI,
                      final String content, final WonMessage wonMessage)
@@ -84,10 +81,6 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
 
         if (scoreConvert < 0 || scoreConvert > 1) throw new IllegalArgumentException("score is not in [0,1]");
 
-        //TODO: facet code to be refactored!
-        Connection con = findOrCreateConnection(ownNeedUriConvert, otherNeedUriConvert,
-          wonMessage.getReceiverURI(), WonRdfUtils.FacetUtils.getFacet(wonMessage), ConnectionState.SUGGESTED);
-
         Match match = new Match();
         match.setFromNeed(ownNeedUriConvert);
         match.setToNeed(otherNeedUriConvert);
@@ -95,16 +88,13 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         match.setScore(scoreConvert);
         //TODO: save new connection or find existing one!
 
-        ownerServiceCallback.onHint(match, contentConvert, wonMessage);
-        //ownerService.handleHintMessageEventFromWonNode(match, contentConvert);
-
+        //ownerServiceCallback.onHint(match, contentConvert, wonMessage);
     }
 
     private boolean isNeedActive(final Need need) {
         return NeedState.ACTIVE == need.getState();
     }
 
-    @Override
     public void connect(final String ownNeedURI, final String otherNeedURI, final String ownConnectionURI,
                         final String content, final WonMessage wonMessage)
             throws NoSuchNeedException, ConnectionAlreadyExistsException, IllegalMessageForNeedStateException
@@ -114,7 +104,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
       URI otherNeedURIConvert;
       URI ownConnectionURIConvert;
       URI facetURI;
-      Model contentConvert = RdfUtils.toModel(content);
+     // Model contentConvert = wonMessage.getMessageContent();
 
       ownNeedURIConvert = wonMessage.getReceiverNeedURI();
       otherNeedURIConvert = wonMessage.getSenderNeedURI();
@@ -140,7 +130,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         facetURI, ConnectionState.REQUEST_RECEIVED);
 
 
-      ownerServiceCallback.onConnect(con, contentConvert, wonMessage);
+     // ownerServiceCallback.onConnect(con, contentConvert, wonMessage);
       //ownerService.handleConnectMessageEventFromWonNode(con, contentConvert);
     }
 
@@ -185,7 +175,6 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
     return con;
   }
 
-  @Override
     public void open(URI connectionURI, Model content, final WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
         URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
@@ -199,12 +188,11 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
         //save in the db
         connectionRepository.save(con);
-        ownerServiceCallback.onOpen(con, content, wonMessage);
+    //    ownerServiceCallback.onOpen(con, content, wonMessage);
         //ownerService.handleOpenMessageEventFromWonNode(con, content);
 
     }
 
-    @Override
     public void close(final URI connectionURI, Model content, final WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
@@ -221,11 +209,10 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         con.setState(con.getState().transit(ConnectionEventType.PARTNER_CLOSE));
         //save in the db
         connectionRepository.save(con);
-        ownerServiceCallback.onClose(con, content, wonMessage);
+     //   ownerServiceCallback.onClose(con, content, wonMessage);
         //ownerService.handleCloseMessageEventFromWonNode(con, content);
     }
 
-    @Override
     public void sendMessage(final URI connectionURI, final Model message, final WonMessage wonMessage)
             throws NoSuchConnectionException, IllegalMessageForConnectionStateException
     {
@@ -283,7 +270,7 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         chatMessage.setOriginatorURI(con.getRemoteNeedURI());
         //save in the db
         chatMessageRepository.save(chatMessage);
-        ownerServiceCallback.onTextMessage(con, chatMessage, messageFromWonMessage, wonMessage);
+       // ownerServiceCallback.onTextMessage(con, chatMessage, messageFromWonMessage, wonMessage);
         //ownerService.handleTextMessageEventFromWonNode(con, chatMessage, message);
 
     }
@@ -296,5 +283,8 @@ public class OwnerProtocolOwnerServiceImpl implements OwnerProtocolOwnerService{
         msg = msg.toUpperCase();
         msg = msg.substring(0,7)+"_"+msg.substring(7);
         return msg;
+    }
+    public void processIncomingWonMessage(){
+
     }
 }

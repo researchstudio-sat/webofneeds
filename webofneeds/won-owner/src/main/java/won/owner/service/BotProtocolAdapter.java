@@ -14,27 +14,27 @@
  *    limitations under the License.
  */
 
-package won.protocol.owner;
+package won.owner.service;
 
-import org.springframework.context.ApplicationContextAware;
+import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.message.WonMessage;
-
-import java.net.URI;
+import won.protocol.model.Connection;
+import won.protocol.model.Match;
 
 /**
- * User: LEIH-NB
- * Date: 17.10.13
+ * User: fkleedorfer
+ * Date: 21.01.14
  */
-public interface OwnerProtocolNeedServiceClientSide extends ApplicationContextAware{
+public interface BotProtocolAdapter
+{
+  void onHint(Match match, final Model content, final WonMessage wonMessage);
 
-    /**
-     * registers the owner application on WON Node and receive client ID
-     *
-     * @param endpointURI
-     * */
-    // ToDo (FS): this one shouldn't be here, right?
-     public String register(URI endpointURI) throws Exception;
+  void onConnect(Connection con, final Model content, final WonMessage wonMessage);
 
-    public void sendWonMessage(WonMessage wonMessage) throws Exception;
+  void onOpen(Connection con, final Model content, final WonMessage wonMessage);
+
+  void onClose(Connection con, final Model content, final WonMessage wonMessage);
+
+  void onTextMessage(Connection con, final Model content, final WonMessage wonMessage);
 
 }

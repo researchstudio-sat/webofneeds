@@ -44,14 +44,7 @@ public class WonMessageSlipComputer implements InitializingBean, ApplicationCont
             .class);
     facetMessageProcessorsMap =  (HashMap)applicationContext.getBeansWithAnnotation(FacetMessageProcessor
             .class);
-/*
-    for(Object bean: facetMessageProcessorsMap.values()){
-      configurableListableBeanFactory.autowireBeanProperties(bean, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
-    }
-    for(Object bean: fixedMessageProcessorsMap.values()){
-      configurableListableBeanFactory.autowireBeanProperties(bean, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
-    }
-*/
+
   }
 
 
@@ -89,13 +82,13 @@ public class WonMessageSlipComputer implements InitializingBean, ApplicationCont
       if (facetType != null) {
         Annotation annotation = facet.getClass().getAnnotation(FacetMessageProcessor.class);
         if(matches(annotation, messageType, direction, facetType)){
-          slip += ","+pair.getKey().toString();
+          slip += ",bean:"+pair.getKey().toString()+"?method=process";
           break;
         }
       } else {
         Annotation annotation = facet.getClass().getAnnotation(DefaultFacetMessageProcessor.class);
         if(matches(annotation, messageType, direction, facetType)){
-          slip += ","+pair.getKey().toString();
+          slip += ",bean:"+pair.getKey().toString()+"?method=process";
           break;
         }
       }

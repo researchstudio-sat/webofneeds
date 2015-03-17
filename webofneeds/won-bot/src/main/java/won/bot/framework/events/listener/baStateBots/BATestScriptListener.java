@@ -17,6 +17,7 @@
 package won.bot.framework.events.listener.baStateBots;
 
 import com.hp.hpl.jena.query.*;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import won.bot.framework.events.EventListenerContext;
@@ -28,7 +29,12 @@ import won.bot.framework.events.event.impl.ConnectFromOtherNeedEvent;
 import won.bot.framework.events.filter.EventFilter;
 import won.bot.framework.events.filter.impl.*;
 import won.bot.framework.events.listener.AbstractFinishingListener;
+import won.protocol.exception.WonMessageBuilderException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
@@ -161,9 +167,14 @@ public class BATestScriptListener extends AbstractFinishingListener
         }
       } else {
         URI fromCon = getConnectionToSendFrom(action.isSenderIsCoordinator());
+        URI fromNeed = getNeedToSendFrom(action.isSenderIsCoordinator());
+        URI toCon = getConnectionToSendFrom(!action.isSenderIsCoordinator());
+        URI toNeed = getNeedToSendFrom(!action.isSenderIsCoordinator());
+
         logger.debug("sending message for action {} on connection {}", action, fromCon);
         assertCorrectConnectionState(fromCon, action);
-        sendMessage(action, fromCon, new Date(System.currentTimeMillis() + millisBetweenMessages));
+        sendMessage(action, fromCon, fromNeed, toCon, toNeed, new Date(System.currentTimeMillis() +
+                                                                      millisBetweenMessages));
         synchronized (countMonitor){
           this.messagesInFlight++;
         }
@@ -240,7 +251,9 @@ public class BATestScriptListener extends AbstractFinishingListener
     return this.participantSideConnectionURI != null && this.coordinatorSideConnectionURI != null;
   }
 
-  private void sendMessage(final BATestScriptAction action, final URI fromCon, Date when) throws Exception {
+  private void sendMessage(final BATestScriptAction action, final URI fromCon, final URI fromNeed, final URI toCon,
+                           final URI toNeed, Date when) throws
+    Exception {
     assert action != null : "action must not be null";
     assert fromCon != null : "fromCon must not be null";
     assert when != null : "when must not be null";
@@ -250,13 +263,73 @@ public class BATestScriptListener extends AbstractFinishingListener
     {
       public void run() {
         try {
-          getEventListenerContext().getOwnerService().sendConnectionMessage(fromCon, action.getMessageToBeSent(), null);
+          getEventListenerContext().getOwnerService().sendWonMessage(createWonMessageForConnectionMessage(
+            fromCon, fromNeed, toCon, toNeed,
+            action.getMessageToBeSent()));
         } catch (Exception e) {
           logger.warn("could not send message from {} ", fromCon);
           logger.warn("caught exception", e);
         }
       }
     }, when);
+  }
+
+  private WonMessage createWonMessageForConnectionMessage(URI fromConUri, URI fromNeedUri, URI toConUri, URI toNeedUri,
+                                                          Model content)
+    throws WonMessageBuilderException {
+
+    WonNodeInformationService wonNodeInformationService =
+      getEventListenerContext().getWonNodeInformationService();
+
+    Dataset localNeedRDF =
+      getEventListenerContext().getLinkedDataSource().getDataForResource(fromNeedUri);
+    Dataset remoteNeedRDF =
+      getEventListenerContext().getLinkedDataSource().getDataForResource(toNeedUri);
+
+    URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(localNeedRDF, fromNeedUri);
+    URI remoteWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, toNeedUri);
+
+    WonMessageBuilder builder = new WonMessageBuilder();
+    return  builder
+      .setMessagePropertiesForConnectionMessage(
+        wonNodeInformationService.generateEventURI(
+          localWonNode),
+        fromConUri,
+        fromNeedUri,
+        localWonNode,
+        toConUri,
+        toNeedUri,
+        remoteWonNode,
+        content)
+      .build();
+  }
+
+  private WonMessage createWonMessageForOpen(URI fromConUri, URI fromNeedUri, URI toConUri, URI toNeedUri)
+    throws WonMessageBuilderException {
+
+    WonNodeInformationService wonNodeInformationService =
+      getEventListenerContext().getWonNodeInformationService();
+
+    Dataset localNeedRDF =
+      getEventListenerContext().getLinkedDataSource().getDataForResource(fromNeedUri);
+    Dataset remoteNeedRDF =
+      getEventListenerContext().getLinkedDataSource().getDataForResource(toNeedUri);
+
+    URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(localNeedRDF, fromNeedUri);
+    URI remoteWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, toNeedUri);
+
+    WonMessageBuilder builder = new WonMessageBuilder();
+    return  builder
+      .setMessagePropertiesForOpen(
+        wonNodeInformationService.generateEventURI(
+          localWonNode),
+        fromConUri,
+        fromNeedUri,
+        localWonNode,
+        toConUri,
+        toNeedUri,
+        remoteWonNode)
+      .build();
   }
 
   private void sendOpen(final URI connectionURI, Date when) throws Exception {
@@ -268,7 +341,9 @@ public class BATestScriptListener extends AbstractFinishingListener
       public void run()
       {
         try {
-          getEventListenerContext().getOwnerService().open(connectionURI, null, null);
+          //TODO: THIS STILL HAS TO BE ADAPTED TO NEW MESSAGE FORMAT!
+          //getEventListenerContext().getOwnerService().sendWonMessage(connectionURI, null, null);
+          throw new UnsupportedOperationException("Not yet adapted to new message format!");
         } catch (Exception e) {
           logger.warn("could not send open from {} ", connectionURI);
           logger.warn("caught exception", e);
@@ -279,6 +354,10 @@ public class BATestScriptListener extends AbstractFinishingListener
 
   private URI getConnectionToSendFrom(final boolean senderIsCoordinator) {
     return senderIsCoordinator ? coordinatorSideConnectionURI : participantSideConnectionURI;
+  }
+
+  private URI getNeedToSendFrom(final boolean senderIsCoordinator) {
+    return senderIsCoordinator ? coordinatorURI : participantURI;
   }
 
   /**

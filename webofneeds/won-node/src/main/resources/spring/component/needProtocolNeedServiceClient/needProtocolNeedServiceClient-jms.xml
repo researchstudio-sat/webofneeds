@@ -25,6 +25,7 @@
         <property name="openStartingEndpoint" value="seda:NeedProtocol.Out.open"/>
         <property name="closeStartingEndpoint" value="seda:NeedProtocol.Out.close"/>
         <property name="sendMessageStartingEndpoint" value="seda:NeedProtocol.Out.sendMessage"/>
+        <qualifier value="needProtocolNeedClient"/>
         <!--property name="protocolCommunicationService" ref="protocolCommunicationService"/-->
     </bean>
 </beans>

@@ -1,6 +1,7 @@
 package won.node.refactoring.facet.impl.annotated.ownerFacet;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.annotation.DefaultFacetMessageProcessor;
 import won.node.annotation.FacetMessageProcessor;
@@ -11,6 +12,8 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
+import won.protocol.repository.ConnectionRepository;
+import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -20,11 +23,13 @@ import won.protocol.vocabulary.WONMSG;
 @Component
 @DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG
   .TYPE_CONNECTION_MESSAGE_STRING)
-@FacetMessageProcessor(facetType = WONMSG.OWNER_FACET_STRING,direction=WONMSG.TYPE_FROM_OWNER_STRING,messageType =
+@FacetMessageProcessor(facetType = WON.OWNER_FACET_STRING,direction=WONMSG.TYPE_FROM_OWNER_STRING,messageType =
   WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
 public class SendMessageFromOwnerOwnerFacetImpl extends AbstractFacetAnnotated implements FacetCamel
 {
 
+  @Autowired
+  ConnectionRepository connectionRepository;
   final FacetType facetType = FacetType.OwnerFacet;
 
 
@@ -38,30 +43,28 @@ public class SendMessageFromOwnerOwnerFacetImpl extends AbstractFacetAnnotated i
    * to the remote partner.
    *
    *
-   * @param con the connection object
-   * @param message  the chat message
    * @throws NoSuchConnectionException if connectionURI does not refer to an existing connection
    * @throws IllegalMessageForConnectionStateException if the message is not allowed in the current state of the connection
    */
+
   @Override
-  public void sendMessageFromOwner(final Connection con, final Model message, final WonMessage wonMessage)
-    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void process(final WonMessage wonMessage) {
     //inform the other side
+    final Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getSenderURI());
+    //TODO: only for old messaging protocol. remove it when transition is finished.
+    final Model content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next
+      ());
+
     executorService.execute(new Runnable() {
       @Override
       public void run() {
         try {
-          needFacingConnectionClient.sendMessage(con, message, wonMessage);
+
+          needFacingConnectionClient.sendMessage(con, content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception in textMessageFromOwner: ",e);
         }
       }
     });
-  }
-
-
-  @Override
-  public void process(WonMessage wonMessage) {
-
   }
 }

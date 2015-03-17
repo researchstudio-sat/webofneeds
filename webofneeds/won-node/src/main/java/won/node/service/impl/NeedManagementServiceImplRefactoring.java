@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.exception.WonMessageBuilderException;
-import won.protocol.message.WonEnvelopeType;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.Connection;
@@ -188,7 +188,7 @@ public class NeedManagementServiceImplRefactoring implements NeedManagementServi
           connection.getConnectionURI(),
           connection.getNeedURI(),
           localWonNodeUri)
-          .setWonEnvelopeType(WonEnvelopeType.FROM_SYSTEM)
+          .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM)
           .build();
 
       }else{
@@ -203,7 +203,7 @@ public class NeedManagementServiceImplRefactoring implements NeedManagementServi
           connection.getRemoteConnectionURI(),
           connection.getRemoteNeedURI(),
           remoteWonNodeUri)
-          .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
+          .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
                       .build();
       }
 

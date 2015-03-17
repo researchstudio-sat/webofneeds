@@ -38,8 +38,8 @@ import java.util.concurrent.ExecutorService;
  * Date: 02.03.2015
  */
 @Component
-@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_NODE_STRING,messageType = WONMSG.TYPE_CONNECT_STRING)
-public class ConnectMessageFromNodeProcessor implements WonMessageProcessor
+@FixedMessageProcessor(direction= WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType = WONMSG.TYPE_CONNECT_STRING)
+public class ConnectMessageFromNodeProcessor  implements WonMessageProcessor
 {
   final Logger logger = LoggerFactory.getLogger(NeedCommunicationServiceImpl.class);
   private FacetRegistry reg;
@@ -117,12 +117,15 @@ public class ConnectMessageFromNodeProcessor implements WonMessageProcessor
     messageEventRepository.save(new MessageEventPlaceholder(
       con.getConnectionURI(), wrappedMessage));
 
+    exchange.getIn().setHeader("wonMessage",wrappedMessage);
     //invoke facet implementation
     //Facet facet = reg.get(con);
     // send an empty model until we remove this parameter
     //facet.connectFromNeed(con, content, wrappedMessage);
 
     //return con.getConnectionURI();
+    exchange.getIn().setBody(con.getConnectionURI().toString());
+
   }
 
   public void setReg(final FacetRegistry reg) {

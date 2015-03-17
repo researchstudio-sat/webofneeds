@@ -4,15 +4,15 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import won.node.annotation.FixedMessageProcessor;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
-import won.protocol.message.WonEnvelopeType;
+import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
 import won.protocol.model.Facet;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
@@ -37,50 +37,34 @@ import java.util.List;
 @Service
 @DependsOn(value="autoWiredAnnotationBeanPostProcessor")
 @FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CREATE_STRING)
-public class CreateNeedMessageProcessor extends AbstractInOutMessageProcessor
+public class CreateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
 {
 
-  @Autowired
-  RDFStorageService rdfStorage;
-  @Autowired
-  protected NeedManagementService needManagementService;
-  @Autowired
-  protected NeedRepository needRepository;
-  @Autowired
-  protected FacetRepository facetRepository;
-  @Autowired
-  protected MessageEventRepository messageEventRepository;
-  @Autowired
-  protected LinkedDataService linkedDataService;
-  @Autowired
-  protected WonNodeInformationService wonNodeInformationService;
-  @Autowired
-  protected MatcherProtocolMatcherServiceClientSide matcherProtocolMatcherClient;
 
   @Override
-  public Object process(final Exchange exchange) throws Exception {
+  public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    String ownerApplicationID = message.getHeader("ownerApplicationId").toString();
     WonMessage wonMessage = message.getBody(WonMessage.class);
-    WonMessage newWonMessage = WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage
-      (wonMessage);
-    // store the newWonMessage as it is
-    logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
-    rdfStorage.storeDataset(newWonMessage.getMessageURI(),
-                            WonMessageEncoder.encodeAsDataset(newWonMessage));
+    Need need = storeNeed(wonMessage);
+    authorizeOwnerApplicationForNeed(message, need);
+    try {
+      WonMessage newNeedNotificationMessage = makeNeedCreatedMessageForMatcher(need);
+      //TODO: remove mPMC here, use method from base class
+      Dataset needContent = wonMessage.getMessageContent();
+      URI needURI = getNeedURIFromWonMessage(needContent);
+      matcherProtocolMatcherClient.needCreated(needURI, ModelFactory.createDefaultModel(),
+      newNeedNotificationMessage);
+      WonMessage responseWonMessage = makeCreateResponseMessage(wonMessage);
+      sendMessageToOwner(responseWonMessage, toStringIds(need.getAuthorizedApplications()));
+    } catch (Exception e) {
+      logger.warn("could not create NeedCreatedNotification", e);
+    }
+  }
 
-
-    // the model where all the information created by the WON node is stored
-    // Update: the meta data model is not needed at the moment since the meta data
-    // are generated on each request from the LinkedDataService
-    // Model needMeta = ModelFactory.createDefaultModel();
-
-    // the dataset which contains the need model graphs from the owner application
-    Dataset needContent = newWonMessage.getMessageContent();
-
+  private Need storeNeed(final WonMessage wonMessage) {
+    Dataset needContent = wonMessage.getMessageContent();
     URI needURI = getNeedURIFromWonMessage(needContent);
-
-    if (!needURI.equals(newWonMessage.getSenderNeedURI()))
+    if (!needURI.equals(wonMessage.getSenderNeedURI()))
       throw new IllegalArgumentException("receiverNeedURI and NeedURI of the content are not equal");
 
     Need need = new Need();
@@ -89,12 +73,12 @@ public class CreateNeedMessageProcessor extends AbstractInOutMessageProcessor
     need.setNeedURI(needURI);
 
     // ToDo (FS) check if the WON node URI corresponds with the WON node (maybe earlier in the message layer)
-    need.setWonNodeURI(newWonMessage.getReceiverNodeURI());
+    need.setWonNodeURI(wonMessage.getReceiverNodeURI());
 
     need = needRepository.save(need);
 
     // store the message event placeholder to keep the connection between need and message event
-    messageEventRepository.save(new MessageEventPlaceholder(needURI, newWonMessage));
+    messageEventRepository.save(new MessageEventPlaceholder(needURI, wonMessage));
 
     List<Facet> facets = WonRdfUtils.NeedUtils.getFacets(needURI, needContent);
     if (facets.size() == 0)
@@ -108,27 +92,39 @@ public class CreateNeedMessageProcessor extends AbstractInOutMessageProcessor
     WonRdfUtils.NeedUtils.removeConnectionContainer(needContent, needURI);
 
     rdfStorage.storeDataset(needURI, needContent);
+    return need;
+  }
+
+  private void authorizeOwnerApplicationForNeed(final Message message, final Need need) {
+    String ownerApplicationID = message.getHeader("ownerApplicationId").toString();
     needManagementService.authorizeOwnerApplicationForNeed(ownerApplicationID, need);
+  }
 
-    // ToDo (FS): send the same newWonMessage or create a new one (with new type)?
+  private WonMessage makeNeedCreatedMessageForMatcher(final Need need) throws NoSuchNeedException {
+    Dataset needDataset = linkedDataService.getNeedDataset(need.getNeedURI());
+    return new WonMessageBuilder()
+      .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateEventURI(),
+                                                      need.getNeedURI(), need.getWonNodeURI())
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
+      .build(needDataset);
+  }
 
+  private WonMessage makeCreateResponseMessage(final WonMessage wonMessage) {
+    URI responseMessageURI = URI.create(wonMessage.getSenderNeedURI().toString() +
+                                          "/event/" +
+                                          randomNumberService
+                                            .generateRandomString(9));
 
-    try {
-      Dataset needDataset = linkedDataService.getNeedDataset(need.getNeedURI());
-      WonMessage newNeedNotificationMessage =
-        new WonMessageBuilder()
-          .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateEventURI(),
-                                                          need.getNeedURI(), need.getWonNodeURI())
-          .setWonEnvelopeType(WonEnvelopeType.FROM_NODE)
-          .build(needDataset);
-      matcherProtocolMatcherClient.needCreated(needURI, ModelFactory.createDefaultModel(),
-      newNeedNotificationMessage);
-    } catch (Exception e) {
-      logger.warn("could not create NeedCreatedNotification", e);
-    }
-    //TODO: send needCreated Message with needURI?
-    exchange.getOut().setBody(needURI);
-    return needURI;
+    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+    return wonMessageBuilder
+      .setWonMessageType(WonMessageType.CREATE_RESPONSE)
+      .setMessageURI(responseMessageURI)
+      .setSenderNodeURI(wonMessage.getReceiverNodeURI())
+      .setReceiverNeedURI(wonMessage.getSenderNeedURI())
+      .setResponseMessageState(WONMSG.TYPE_RESPONSE_STATE_SUCCESS)
+      .addRefersToURI(wonMessage.getMessageURI())
+      .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM)
+      .build();
   }
 
 

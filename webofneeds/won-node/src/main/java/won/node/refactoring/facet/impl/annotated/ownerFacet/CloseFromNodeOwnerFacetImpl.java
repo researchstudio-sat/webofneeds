@@ -6,11 +6,10 @@ import won.node.annotation.DefaultFacetMessageProcessor;
 import won.node.annotation.FacetMessageProcessor;
 import won.node.refactoring.FacetCamel;
 import won.node.refactoring.facet.impl.annotated.AbstractFacetAnnotated;
-import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
+import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -18,12 +17,11 @@ import won.protocol.vocabulary.WONMSG;
  * Date: 05.03.2015
  */
 @Component
-@DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_NODE_STRING,messageType = WONMSG.TYPE_CLOSE_STRING)
-@FacetMessageProcessor(facetType = WONMSG.OWNER_FACET_STRING,direction=WONMSG.TYPE_FROM_NODE_STRING,messageType =
+@DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType = WONMSG.TYPE_CLOSE_STRING)
+@FacetMessageProcessor(facetType = WON.OWNER_FACET_STRING,direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType =
   WONMSG.TYPE_CLOSE_STRING)
 public class CloseFromNodeOwnerFacetImpl extends AbstractFacetAnnotated implements FacetCamel
 {
-
   final FacetType facetType = FacetType.OwnerFacet;
 
 
@@ -31,9 +29,15 @@ public class CloseFromNodeOwnerFacetImpl extends AbstractFacetAnnotated implemen
     return facetType;
   }
 
+
+
+
   @Override
-  public void closeFromNeed(final Connection con, final Model content, final WonMessage wonMessage)
-    throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
+  public void process(final WonMessage wonMessage) {
+    final Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getReceiverURI());
+    //TODO: only for old messaging protocol. remove it when transition is finished.
+    final Model content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next
+      ());
     //inform the need side
     executorService.execute(new Runnable()
     {
@@ -46,12 +50,5 @@ public class CloseFromNodeOwnerFacetImpl extends AbstractFacetAnnotated implemen
         }
       }
     });
-  }
-
-
-
-  @Override
-  public void process(WonMessage wonMessage) {
-
   }
 }
