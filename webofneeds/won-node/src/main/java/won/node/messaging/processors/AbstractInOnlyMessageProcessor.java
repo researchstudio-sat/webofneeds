@@ -1,6 +1,7 @@
 package won.node.messaging.processors;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MessagingService;
 import won.protocol.jms.NeedProtocolCommunicationService;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageProcessor;
 import won.protocol.model.Need;
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.*;
@@ -29,10 +29,12 @@ import java.util.*;
  * User: syim
  * Date: 02.03.2015
  */
-public abstract class AbstractInOnlyMessageProcessor implements WonMessageProcessor
+public abstract class AbstractInOnlyMessageProcessor implements Processor
 {
 
   protected Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+  public static Lang RDF_LANGUAGE_FOR_MESSAGE = Lang.TRIG;
 
   @Autowired
   protected MessagingService messagingService;
@@ -73,7 +75,8 @@ public abstract class AbstractInOnlyMessageProcessor implements WonMessageProces
     List<OwnerApplication> ownerApplications = need.getAuthorizedApplications();
     Map headerMap = new HashMap<String, Object>();
     headerMap.put("ownerApplications", toStringIds(ownerApplications));
-    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),Lang.JSONLD),
+    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),
+        RDF_LANGUAGE_FOR_MESSAGE),
                                        "outgoingMessages");
   }
 
@@ -81,14 +84,14 @@ public abstract class AbstractInOnlyMessageProcessor implements WonMessageProces
     Map headerMap = new HashMap<String, Object>();
     headerMap.put("protocol","OwnerProtocol");
     headerMap.put("ownerApplications", ownerApplicationIds);
-    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),Lang.JSONLD),
+    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),RDF_LANGUAGE_FOR_MESSAGE),
                                        "outgoingMessages");
   }
 
   protected void sendMessageToOwner(WonMessage message, String... ownerApplicationIds){
     Map headerMap = new HashMap<String, Object>();
     headerMap.put("ownerApplications", Arrays.asList(ownerApplicationIds));
-    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),Lang.JSONLD),
+    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),RDF_LANGUAGE_FOR_MESSAGE),
                                        "outgoingMessages");
   }
 
@@ -104,7 +107,7 @@ public abstract class AbstractInOnlyMessageProcessor implements WonMessageProces
     }
     Map headerMap = new HashMap<String, Object>();
     headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
-    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),Lang.JSONLD),
+    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),RDF_LANGUAGE_FOR_MESSAGE),
                                        "outgoingMessages");
     throw new UnsupportedOperationException("not implemented!");
   }

@@ -2,6 +2,7 @@ package won.node.camel.processor;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
+import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -12,7 +13,6 @@ import won.node.annotation.FacetMessageProcessor;
 import won.node.annotation.FixedMessageProcessor;
 import won.node.refactoring.FacetCamel;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageProcessor;
 import won.protocol.util.RdfUtils;
 
 import java.lang.annotation.Annotation;
@@ -101,7 +101,7 @@ public class WonMessageSlipComputer implements InitializingBean, ApplicationCont
     Iterator iter = fixedMessageProcessorsMap.entrySet().iterator();
     while (iter.hasNext()) {
       Map.Entry pair = (Map.Entry)iter.next();
-      WonMessageProcessor wonMessageProcessor = (WonMessageProcessor)pair.getValue();
+      Processor wonMessageProcessor = (Processor)pair.getValue();
       Annotation annotation = wonMessageProcessor.getClass().getAnnotation(FixedMessageProcessor.class);
 
       if(matches(annotation, messageType, direction, null)){

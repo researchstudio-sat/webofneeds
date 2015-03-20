@@ -21,6 +21,8 @@ import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
 
+import java.net.URI;
+
 /**
  * User: fkleedorfer
  * Date: 21.01.14
@@ -36,5 +38,9 @@ public interface BotProtocolAdapter
   void onClose(Connection con, final Model content, final WonMessage wonMessage);
 
   void onTextMessage(Connection con, final Model content, final WonMessage wonMessage);
+
+  void onSuccessMessage(URI successfulMessageUri, WonMessage wonMessage);
+
+  void onFailureMessage(URI failedMessageUri, WonMessage wonMessage);
 
 }

@@ -46,6 +46,21 @@ public interface Bot
   public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
 
   /**
+   * Called when a message is received that indicates some error during processing of
+   * a message previously sent by the bot.
+   * @param failedMessageUri
+   * @param wonMessage
+   */
+  public void onFailureMessage(URI failedMessageUri, WonMessage wonMessage);
+  /**
+   * Called when a message is received that indicates successful processing of
+   * a message previously sent by the bot.
+   * @param successfulMessageUri
+   * @param wonMessage
+   */
+  public void onSuccessMessage(URI successfulMessageUri, WonMessage wonMessage);
+
+  /**
    * Override this to be informed whenever the bot has created a new need successfully.
    * @param needUri
    * @param needModel
@@ -82,4 +97,5 @@ public interface Bot
    * @return
    */
   public boolean isWorkDone();
+
 }

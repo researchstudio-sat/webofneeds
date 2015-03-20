@@ -6,8 +6,7 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
 
 /**
- * User: syim
- * Date: 05.03.2015
+ * TODO [msg-refactoring]: not needed. We can implement WonMessageProcessor
  */
 public interface FacetCamel
 {

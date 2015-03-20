@@ -77,7 +77,6 @@ public class NodeWonMessageCamelProcessor implements WonMessageCamelProcessor
   private void populateExchangeHeadersFromMessage(final Exchange exchange, final WonMessage wonMessage) {
     exchange.getIn().setHeader("messageType", URI.create(wonMessage.getMessageType().getResource().getURI()));
     exchange.getIn().setHeader("facetType", WonRdfUtils.FacetUtils.getFacet(wonMessage));
-    exchange.getIn().setHeader("wonMessage",wonMessage);
     exchange.getIn().setBody(wonMessage);
   }
 

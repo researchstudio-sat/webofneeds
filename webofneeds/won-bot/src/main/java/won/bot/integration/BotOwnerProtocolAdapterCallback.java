@@ -96,6 +96,37 @@ public class BotOwnerProtocolAdapterCallback implements BotProtocolAdapter
     }, new Date());
   }
 
+  @Override
+  public void onSuccessMessage(final URI successfulMessageUri, final WonMessage wonMessage) {
+    taskScheduler.schedule(new Runnable(){
+      public void run(){
+        try {
+          logger.debug("onSuccessMessage for message {} ",successfulMessageUri);
+          URI needUri = wonMessage.getSenderNeedURI();
+          getBotForNeedUri(needUri).onSuccessMessage(successfulMessageUri, wonMessage);
+        } catch (Exception e) {
+          logger.warn("error while handling onSuccessMessage()",e);
+        }
+      }
+    }, new Date());
+  }
+
+  @Override
+  public void onFailureMessage(final URI failedMessageUri, final WonMessage wonMessage) {
+    taskScheduler.schedule(new Runnable(){
+      public void run(){
+        try {
+          logger.debug("onFailureMessage for message {} ",failedMessageUri);
+          URI needUri = wonMessage.getSenderNeedURI();
+          getBotForNeedUri(needUri).onFailureMessage(failedMessageUri, wonMessage);
+        } catch (Exception e) {
+          logger.warn("error while handling onFailureMessage()",e);
+        }
+      }
+    }, new Date());
+  }
+
+
   public void setBotManager(BotManager botManager) {
     this.botManager = botManager;
   }

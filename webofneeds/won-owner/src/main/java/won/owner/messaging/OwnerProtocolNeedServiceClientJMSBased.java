@@ -214,7 +214,6 @@ public class OwnerProtocolNeedServiceClientJMSBased
     Map<String, Object> headerMap = new HashMap<>();
     headerMap.put("ownerApplicationID", ownerApplicationId);
     headerMap.put("remoteBrokerEndpoint",camelConfiguration.getEndpoint());
-    headerMap.put("wonMessage",WonMessageEncoder.encode(wonMessage, Lang.TRIG));
     messagingService
       .sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG), startingEndpoint);
 
