@@ -6,7 +6,15 @@ import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.action.EventBotActionUtils;
 import won.bot.framework.events.event.Event;
+import won.bot.framework.events.event.NeedCreationFailedEvent;
+import won.bot.framework.events.event.impl.FailureResponseEvent;
+import won.bot.framework.events.event.impl.NeedCreatedEvent;
 import won.bot.framework.events.event.impl.NeedProducerExhaustedEvent;
+import won.bot.framework.events.event.impl.SuccessResponseEvent;
+import won.bot.framework.events.filter.impl.AcceptOnceFilter;
+import won.bot.framework.events.filter.impl.OriginalMessageUriResponseEventFilter;
+import won.bot.framework.events.listener.EventListener;
+import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -74,15 +82,35 @@ public class CreateNeedWithFacetsAction extends BaseEventBotAction
         logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
         WonNodeInformationService wonNodeInformationService =
           getEventListenerContext().getWonNodeInformationService();
-        URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
-        getEventListenerContext().getOwnerService().sendWonMessage(createWonMessage(wonNodeInformationService,
-                                                                                    needURI, wonNodeUri, needModel));
-        logger.debug("need creation finished, new need URI is: {}", needURI);
-        EventBotActionUtils.rememberInListIfNamePresent(getEventListenerContext(), needURI, uriListName);
-        //TODO: register a listener for the CreateResponse and then publish the NCE
-        //getEventListenerContext().getEventBus().publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel,null));
-        //TODO: publish a NeedCreationFailedEvent when an error is received from the server
-        //getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
+        final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
+        WonMessage createNeedMessage = createWonMessage(wonNodeInformationService,
+          needURI, wonNodeUri, needModel);
+
+
+        //create an event listener that processes the response to the wonMessage we're about to send
+        EventListener createResponseListener = new ActionOnEventListener(getEventListenerContext(),
+          new AcceptOnceFilter(OriginalMessageUriResponseEventFilter.forWonMessage(createNeedMessage)),
+          new BaseEventBotAction(getEventListenerContext())
+          {
+            @Override
+            protected void doRun(final Event event) throws Exception {
+              if (event instanceof SuccessResponseEvent) {
+                logger.debug("need creation successful, new need URI is {}", needURI);
+                EventBotActionUtils.rememberInListIfNamePresent(getEventListenerContext(), needURI, uriListName);
+                getEventListenerContext().getEventBus()
+                                         .publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
+              } else  if (event instanceof FailureResponseEvent){
+                logger.debug("need creation failed for need URI {}, original message URI {}", needURI, ((FailureResponseEvent) event).getOriginalMessageURI());
+                getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
+              }
+            }
+          });
+
+      getEventListenerContext().getEventBus().subscribe(SuccessResponseEvent.class, createResponseListener);
+      getEventListenerContext().getEventBus().subscribe(FailureResponseEvent.class, createResponseListener);
+      logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
+      getEventListenerContext().getOwnerService().sendWonMessage(createNeedMessage);
+      logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
     }
 
   private WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI,

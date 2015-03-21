@@ -9,6 +9,7 @@ import won.node.annotation.FixedMessageProcessor;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.*;
+import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.model.*;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.FacetRepository;

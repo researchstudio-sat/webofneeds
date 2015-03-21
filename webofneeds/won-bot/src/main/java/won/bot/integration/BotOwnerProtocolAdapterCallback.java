@@ -101,11 +101,11 @@ public class BotOwnerProtocolAdapterCallback implements BotProtocolAdapter
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
-          logger.debug("onSuccessMessage for message {} ",successfulMessageUri);
+          logger.debug("onSuccessResponse for message {} ",successfulMessageUri);
           URI needUri = wonMessage.getSenderNeedURI();
-          getBotForNeedUri(needUri).onSuccessMessage(successfulMessageUri, wonMessage);
+          getBotForNeedUri(needUri).onSuccessResponse(successfulMessageUri, wonMessage);
         } catch (Exception e) {
-          logger.warn("error while handling onSuccessMessage()",e);
+          logger.warn("error while handling onSuccessResponse()",e);
         }
       }
     }, new Date());
@@ -116,11 +116,11 @@ public class BotOwnerProtocolAdapterCallback implements BotProtocolAdapter
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
-          logger.debug("onFailureMessage for message {} ",failedMessageUri);
+          logger.debug("onFailureResponse for message {} ",failedMessageUri);
           URI needUri = wonMessage.getSenderNeedURI();
-          getBotForNeedUri(needUri).onFailureMessage(failedMessageUri, wonMessage);
+          getBotForNeedUri(needUri).onFailureResponse(failedMessageUri, wonMessage);
         } catch (Exception e) {
-          logger.warn("error while handling onFailureMessage()",e);
+          logger.warn("error while handling onFailureResponse()",e);
         }
       }
     }, new Date());

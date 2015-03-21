@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.service.OwnerProtocolOwnerServiceCallback;
 import won.owner.service.impl.NopOwnerProtocolOwnerServiceCallback;
-import won.protocol.message.WonMessageProcessor;
+import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.repository.ChatMessageRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MatchRepository;

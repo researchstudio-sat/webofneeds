@@ -18,9 +18,7 @@ package won.bot.framework.bot;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.message.WonMessage;
-import won.protocol.model.Connection;
-import won.protocol.model.Match;
+import won.owner.protocol.message.WonEventCallback;
 
 import java.net.URI;
 
@@ -29,43 +27,19 @@ import java.net.URI;
  *
  * Note: Methods may throw runtime exceptions, which will be handled by the execution framework.
  */
-public interface Bot
+public interface Bot extends WonEventCallback
 {
   public boolean knowsNeedURI(URI needURI);
 
   public boolean knowsNodeURI(URI wonNodeURI);
 
-  public void onConnectFromOtherNeed(Connection con, final WonMessage wonMessage) throws Exception;
-  public void onOpenFromOtherNeed(Connection con, final WonMessage wonMessage) throws Exception;
-  public void onCloseFromOtherNeed(Connection con, final WonMessage wonMessage) throws Exception;
-  public void onHintFromMatcher(Match match, final WonMessage wonMessage) throws Exception;
-  public void onMessageFromOtherNeed(Connection con, final WonMessage wonMessage) throws Exception;
+
+  public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception;
+
   public void onMatcherRegistered(URI wonNodeUri);
   public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Dataset needModel);
   public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
   public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
-
-  /**
-   * Called when a message is received that indicates some error during processing of
-   * a message previously sent by the bot.
-   * @param failedMessageUri
-   * @param wonMessage
-   */
-  public void onFailureMessage(URI failedMessageUri, WonMessage wonMessage);
-  /**
-   * Called when a message is received that indicates successful processing of
-   * a message previously sent by the bot.
-   * @param successfulMessageUri
-   * @param wonMessage
-   */
-  public void onSuccessMessage(URI successfulMessageUri, WonMessage wonMessage);
-
-  /**
-   * Override this to be informed whenever the bot has created a new need successfully.
-   * @param needUri
-   * @param needModel
-   */
-  public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception;
 
   /**
    * Init method, called exactly once by the framework before any other method is invoked.

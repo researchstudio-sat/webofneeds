@@ -46,8 +46,8 @@ public class WonMessage implements Serializable
   private URI receiverNeedURI;
   private URI receiverNodeURI;
   private List<URI> refersTo = new ArrayList<>();
-  private URI responseState;
-  private List<String> contentGraphNames;
+  private URI isResponseToMessageURI;
+    private List<String> contentGraphNames;
 
 
   //private Resource msgBnode;
@@ -299,12 +299,11 @@ public class WonMessage implements Serializable
 
   }
 
-
-  public URI getResponseState() {
-    if (this.responseState == null) {
-      this.responseState = getEnvelopePropertyURIValue(WONMSG.HAS_RESPONSE_STATE_PROPERTY);
+  public URI getIsResponseToMessageURI() {
+    if (this.isResponseToMessageURI == null) {
+      this.isResponseToMessageURI = getEnvelopePropertyURIValue(WONMSG.IS_RESPONSE_TO);
     }
-    return this.responseState;
+    return this.isResponseToMessageURI;
   }
 
   private URI getEnvelopePropertyURIValue(Property property){

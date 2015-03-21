@@ -42,15 +42,18 @@ public class WonMessageBuilder
 
   private WonMessageType wonMessageType;
   private WonMessageDirection wonMessageDirection;
-  private Resource responseMessageState;
 
+  //a message may refer to a number of other messages (e.g. previously sent messages)
   private Set<URI> refersToURIs = new HashSet<>();
+  //if the message is a response message, it MUST have exactly one isResponseToMessageURI set.
+  private URI isResponseToMessageURI;
 
   private Map<URI, Model> contentMap = new HashMap<>();
   private Map<URI, Model> signatureMap = new HashMap<>();
   private WonMessage wrappedMessage;
   private WonMessage forwardedMessage;
   private Long timestamp;
+
 
   public WonMessage build() throws WonMessageBuilderException {
     return build(null);
@@ -139,17 +142,14 @@ public class WonMessageBuilder
         envelopeGraph.createResource(refersToURI.toString()));
     }
 
-    // add responseMessageState
-    if (responseMessageState != null) {
-      messageEventResource.addProperty(
-        WONMSG.HAS_RESPONSE_STATE_PROPERTY,
-        envelopeGraph.createResource(responseMessageState.toString()));
-    } else {
-      if (wonMessageType != null && WONMSG.isResponseMessageType(wonMessageType.getResource())) {
-        throw new WonMessageBuilderException(
-          "Message type is " + wonMessageType.getResource().toString() +
-            " but no response message state has been provided.");
+    if (isResponseToMessageURI != null) {
+      if (wonMessageType != WonMessageType.SUCCESS_RESPONSE && wonMessageType != WonMessageType.FAILURE_RESPONSE ){
+        throw new IllegalArgumentException("isResponseToMessageURI can only be used for SUCCESS_RESPONSE and " +
+          "FAILURE_RESPONSE types");
       }
+      messageEventResource.addProperty(
+        WONMSG.IS_RESPONSE_TO,
+        envelopeGraph.createResource(isResponseToMessageURI.toString()));
     }
 
     if (timestamp != null) {
@@ -571,8 +571,8 @@ public class WonMessageBuilder
     return this;
   }
 
-  public WonMessageBuilder setResponseMessageState(Resource responseMessageState) {
-    this.responseMessageState = responseMessageState;
+  public WonMessageBuilder setIsResponseToMessageURI(URI isResponseToMessageURI){
+    this.isResponseToMessageURI = isResponseToMessageURI;
     return this;
   }
 

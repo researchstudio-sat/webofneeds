@@ -21,7 +21,7 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
 
     <!-- Camel configuration -->
-    <camel:camelContext id="wonNodeCamel">
+    <camel:camelContext id="wonNodeCamel" trace="true">
         <camel:packageScan>
             <camel:package>won.node.camel.routes.fixed</camel:package>
         </camel:packageScan>

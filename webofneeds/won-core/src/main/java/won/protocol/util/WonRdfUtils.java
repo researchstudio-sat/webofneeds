@@ -12,6 +12,7 @@ import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Facet;
+import won.protocol.model.Match;
 import won.protocol.model.NeedState;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.vocabulary.WON;
@@ -137,6 +138,31 @@ public class WonRdfUtils
     }
 
 
+    /**
+     * Converts the specified hint message into a Match object.
+     * @param wonMessage
+     * @return a match object or null if the message is not a hint message.
+     */
+    public static Match toMatch(final WonMessage wonMessage) {
+      if (!WONMSG.TYPE_HINT.equals(wonMessage.getMessageType())){
+        return null;
+      }
+      Match match = new Match();
+      match.setFromNeed(wonMessage.getReceiverNeedURI());
+      match.setToNeed(wonMessage.getSenderURI());
+      Dataset messageContent = wonMessage.getMessageContent();
+
+      RDFNode score = RdfUtils.findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
+        WON.HAS_MATCH_SCORE);
+      if (!score.isLiteral()) return null;
+      match.setScore(score.asLiteral().getDouble());
+
+      RDFNode counterpart = RdfUtils.findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
+        WON.HAS_MATCH_COUNTERPART);
+      if (!counterpart.isResource()) return null;
+      match.setToNeed(URI.create(score.asResource().getURI()));
+      return match;
+    }
   }
 
   public static class FacetUtils {

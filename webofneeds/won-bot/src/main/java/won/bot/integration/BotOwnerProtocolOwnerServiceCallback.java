@@ -53,9 +53,7 @@ public class BotOwnerProtocolOwnerServiceCallback implements OwnerProtocolOwnerS
 
   @Override
   public void onWonMessage(final WonMessage wonMessage) {
-    //TODO check Message types and call appropriate methods of BotOwnerProtocolAdapterCallback
-    System.out.println("received WonMessage: ");
-    System.out.println(RdfUtils.writeDatasetToString(wonMessage.getCompleteDataset(), Lang.TRIG));
+
   }
 
 

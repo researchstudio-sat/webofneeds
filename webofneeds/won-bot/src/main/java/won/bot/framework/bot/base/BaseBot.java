@@ -124,6 +124,12 @@ public class BaseBot implements Bot
   @Override public void onMessageFromOtherNeed(Connection con, final WonMessage wonMessage) throws Exception {}
 
   @Override
+  public void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {}
+
+  @Override
+  public void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {}
+
+  @Override
   public void onMatcherRegistered(final URI wonNodeUri) {}
 
   @Override

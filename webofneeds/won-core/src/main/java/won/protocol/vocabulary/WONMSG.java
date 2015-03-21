@@ -52,6 +52,9 @@ public class WONMSG
   public static final Resource TYPE_CONNECTION_MESSAGE = m.createResource(TYPE_CONNECTION_MESSAGE_STRING);
   public static final Resource TYPE_HINT = m.createResource(TYPE_HINT_STRING);
 
+  public static final Resource TYPE_SUCCESS_RESPONSE = m.createResource(BASE_URI + "SuccessResponse");
+  public static final Resource TYPE_FAILURE_RESPONSE = m.createResource(BASE_URI + "FailureResponse");
+
   // notification types
   //TODO: delete if not needed
   public static final Resource TYPE_HINT_NOTIFICATION = m.createResource(BASE_URI + "HintNotificationMessage");
@@ -60,6 +63,7 @@ public class WONMSG
     "NeedCreatedNotificationMessage");
 
   // response types
+
   //TODO: delete if not needed
   public static final Resource TYPE_CREATE_RESPONSE = m.createResource(BASE_URI + "CreateResponseMessage");
   //TODO: delete if not needed
@@ -124,6 +128,7 @@ public class WONMSG
   public static final Property HAS_MESSAGE_TYPE_PROPERTY = m.createProperty(BASE_URI, "hasMessageType");
   public static final Property HAS_CONTENT_PROPERTY = m.createProperty(BASE_URI, "hasContent");
   public static final Property REFERS_TO_PROPERTY = m.createProperty(BASE_URI, "refersTo");
+  public static final Property IS_RESPONSE_TO = m.createProperty(BASE_URI, "isResponseTo");
   public static final Property NEW_NEED_STATE_PROPERTY = m.createProperty(BASE_URI, "newNeedState");
   public static final Property HAS_TIMESTAMP = m.createProperty(BASE_URI, "hasTimestamp");
   //public static final String MESSAGE_HAS_CONTENT_PROPERTY = "hasContent";

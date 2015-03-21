@@ -188,10 +188,30 @@ public class EventBot extends TriggeredBot
     }
   }
 
+  @Override
+  public void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
+    if (getLifecyclePhase().isActive()){
+      eventBus.publish(new FailureResponseEvent(failedMessageUri, wonMessage));
+    } else {
+      logger.info("not publishing event for call to onFailureResponse() as the bot is not in state {} but {}",
+        BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+    }
+  }
+
+  @Override
+  public void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
+    if (getLifecyclePhase().isActive()){
+      eventBus.publish(new SuccessResponseEvent(successfulMessageUri, wonMessage));
+    } else {
+      logger.info("not publishing event for call to onSuccessResponse() as the bot is not in state {} but {}",
+        BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+    }
+  }
+
   /*
-   * Override this method to initialize your event listeners. Will be called before
-   * the first event is published.
-   */
+     * Override this method to initialize your event listeners. Will be called before
+     * the first event is published.
+     */
   protected void initializeEventListeners(){
 
   }
