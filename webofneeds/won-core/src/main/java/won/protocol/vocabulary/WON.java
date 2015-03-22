@@ -161,6 +161,8 @@ public class WON
   public static final Property SEARCH_RESULT_URI = m.createProperty(BASE_URI,"uri");
   public static final Property SEARCH_RESULT_PREVIEW = m.createProperty(BASE_URI, "preview");
 
+  public static final String PRIVATE_DATA_GRAPH_URI= BASE_URI + "privateDataGraph";
+
 
   public static final String GROUP_FACET_STRING = BASE_URI+"GroupFacet";
   public static final String OWNER_FACET_STRING = BASE_URI+"OwnerFacet";

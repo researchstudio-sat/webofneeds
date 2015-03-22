@@ -16,17 +16,26 @@
 
 package won.protocol.util.linkeddata;
 
+import com.hp.hpl.jena.assembler.exceptions.AssemblerException;
+import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.NodeIterator;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.sparql.core.DatasetGraph;
+import com.hp.hpl.jena.sparql.expr.NodeValue;
+import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueBoolean;
 import com.hp.hpl.jena.sparql.path.Path;
+import com.hp.hpl.jena.sparql.util.graph.GraphUtils;
+import com.hp.hpl.jena.tdb.TDB;
+import com.hp.hpl.jena.tdb.TDBFactory;
+import com.hp.hpl.jena.tdb.assembler.VocabTDB;
+import com.hp.hpl.jena.tdb.base.file.Location;
+import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
 import net.sf.ehcache.constructs.blocking.SelfPopulatingCache;
+import org.apache.jena.atlas.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -75,7 +84,15 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
   public Dataset getDataForResource(URI resource){
 
     assert resource != null : "resource must not be null";
-    Element element = cache.get(resource);
+    Element element = null;
+
+    try {
+        element = cache.get(resource);
+    }catch(CacheException e){
+        logger.debug(String.format("Couldn't fetch resource %s",resource.toString()),e);
+        return DatasetFactory.createMem();
+    }
+
     Object dataset = element.getObjectValue();
     if (dataset instanceof Dataset) return (Dataset) dataset;
     throw new IllegalStateException(
@@ -93,9 +110,7 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
     int depth = 0;
     int requests = 0;
 
-    Dataset dataset = getDataForResource(resourceURI);
-
-
+    Dataset dataset = makeDataset();
     OUTER: while (newlyDiscoveredURIs.size() > 0 && depth < maxDepth && requests < maxRequest){
       urisToCrawl = newlyDiscoveredURIs;
       newlyDiscoveredURIs = new HashSet<URI>();
@@ -127,7 +142,7 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
     int depth = 0;
     int requests = 0;
 
-    Dataset resultDataset = DatasetFactory.createMem();
+    Dataset resultDataset = makeDataset();
 
     OUTER: while (newlyDiscoveredURIs.size() > 0 && depth < maxDepth && requests < maxRequest){
       urisToCrawl = newlyDiscoveredURIs;
@@ -169,7 +184,7 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
                                                   List<Path> properties){
     Set<URI> toCrawl = new HashSet<URI>();
     for (int i = 0; i<properties.size();i++){
-      Iterator<URI> newURIs = RdfUtils.getURIsForPropertyPath(dataset,
+      Iterator<URI> newURIs = RdfUtils.getURIsForPropertyPathByQuery(dataset,
         resourceURI,
         properties.get(i));
       while (newURIs.hasNext()){
@@ -237,18 +252,26 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
     this.linkedDataRestClient = linkedDataRestClient;
   }
 
-  private class LinkedDataCacheEntryFactory implements CacheEntryFactory {
-    private LinkedDataCacheEntryFactory(){}
-
-    @Override
-    public Object createEntry(final Object key) throws Exception
-    {
-      if (key instanceof URI) {
-        logger.debug("fetching linked data for URI {}", key);
-        return linkedDataRestClient.readResourceData((URI) key);
-      } else {
-        throw new IllegalArgumentException("this cache only resolves URIs to Models");
-      }
+    public static Dataset makeDataset() {
+        DatasetGraph dsg = TDBFactory.createDatasetGraph();
+        dsg.getContext().set(TDB.symUnionDefaultGraph, new NodeValueBoolean(true));
+        return DatasetFactory.create(dsg);
     }
+
+  private class LinkedDataCacheEntryFactory implements CacheEntryFactory {
+      private LinkedDataCacheEntryFactory() {
+      }
+
+      @Override
+      public Object createEntry(final Object key) throws Exception {
+          if (key instanceof URI) {
+              logger.debug("fetching linked data for URI {}", key);
+              return linkedDataRestClient.readResourceData((URI) key);
+          } else {
+              throw new IllegalArgumentException("this cache only resolves URIs to Models");
+          }
+      }
   }
+
+
 }

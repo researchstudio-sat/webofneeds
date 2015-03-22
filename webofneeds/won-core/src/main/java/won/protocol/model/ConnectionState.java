@@ -139,4 +139,18 @@ public enum ConnectionState
     logger.warn("No enum could be matched for: {}", fragment);
     return null;
   }
+
+    /**
+     * Tries to match the given URI against all enum values.
+     *
+     * @param uri URI to match
+     * @return matched enum, null otherwise
+     */
+    public static ConnectionState fromURI(final URI uri)
+    {
+        for (ConnectionState state : values())
+            if (state.getURI().equals(uri))
+                return state;
+        return null;
+    }
 }
