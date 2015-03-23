@@ -45,7 +45,7 @@ public class WonMessageIntoCamelProcessor implements Processor
     WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, exchange.getIn().getBody().toString());
     exchange.getIn().setHeader("messageType", URI.create(wonMessage.getMessageType().getResource().getURI()));
     exchange.getIn().setHeader("facetType", WonRdfUtils.FacetUtils.getFacet(wonMessage));
-    exchange.getIn().setHeader("wonMessage", wonMessage);
+    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER, wonMessage);
   }
 
 }

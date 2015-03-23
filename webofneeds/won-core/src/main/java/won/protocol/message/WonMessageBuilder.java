@@ -47,6 +47,9 @@ public class WonMessageBuilder
   private Set<URI> refersToURIs = new HashSet<>();
   //if the message is a response message, it MUST have exactly one isResponseToMessageURI set.
   private URI isResponseToMessageURI;
+  //some message exist twice: once on the receiver's won node and once on the sender's.
+  //this property allows to link to the corresponding remote message
+  private URI correspondingRemoteMessageURI;
 
   private Map<URI, Model> contentMap = new HashMap<>();
   private Map<URI, Model> signatureMap = new HashMap<>();
@@ -150,6 +153,12 @@ public class WonMessageBuilder
       messageEventResource.addProperty(
         WONMSG.IS_RESPONSE_TO,
         envelopeGraph.createResource(isResponseToMessageURI.toString()));
+    }
+
+    if (correspondingRemoteMessageURI != null) {
+      messageEventResource.addProperty(
+              WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE,
+              envelopeGraph.createResource(correspondingRemoteMessageURI.toString()));
     }
 
     if (timestamp != null) {
@@ -502,7 +511,8 @@ public class WonMessageBuilder
             this.setMessageURI(newMessageUri)
             .setTimestamp(new Date().getTime())
             .copyContentFromMessageReplacingMessageURI(ownerOrSystemMsg)
-            .addRefersToURI(ownerOrSystemMsg.getMessageURI())
+            .copyEnvelopeFromWonMessage(ownerOrSystemMsg)
+            .setCorrespondingRemoteMessageURI(ownerOrSystemMsg.getMessageURI())
             .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
     return this;
   }
@@ -606,6 +616,11 @@ public class WonMessageBuilder
 
   public WonMessageBuilder setIsResponseToMessageURI(URI isResponseToMessageURI){
     this.isResponseToMessageURI = isResponseToMessageURI;
+    return this;
+  }
+
+  public WonMessageBuilder setCorrespondingRemoteMessageURI(URI correspondingRemoteMessageURI){
+    this.correspondingRemoteMessageURI = correspondingRemoteMessageURI;
     return this;
   }
 

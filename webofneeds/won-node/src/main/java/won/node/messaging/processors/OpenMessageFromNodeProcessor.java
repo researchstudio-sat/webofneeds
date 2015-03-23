@@ -8,6 +8,7 @@ import won.node.service.DataAccessService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.MessageEventPlaceholder;
@@ -41,7 +42,7 @@ public class OpenMessageFromNodeProcessor extends AbstractInOnlyMessageProcessor
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader("wonMessage");
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
     URI newMessageURI = this.wonNodeInformationService.generateEventURI();
     WonMessage newWonMessage = WonMessageBuilder.copyInboundNodeToNodeMessageAsNodeToOwnerMessage(
       newMessageURI, wonMessage.getReceiverURI(), wonMessage);
@@ -57,7 +58,7 @@ public class OpenMessageFromNodeProcessor extends AbstractInOnlyMessageProcessor
     messageEventRepository.save(new MessageEventPlaceholder(
       connectionURIFromWonMessage, newWonMessage));
 
-    exchange.getIn().setHeader("wonMessage",newWonMessage);
+    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER,newWonMessage);
     //invoke facet implementation
     //reg.get(con).openFromNeed(con, wonMessage.getMessageContent(), newWonMessage);
   }

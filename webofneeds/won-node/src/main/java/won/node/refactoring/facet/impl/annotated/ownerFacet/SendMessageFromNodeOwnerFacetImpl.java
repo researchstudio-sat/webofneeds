@@ -1,15 +1,14 @@
 package won.node.refactoring.facet.impl.annotated.ownerFacet;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
+import won.node.messaging.processors.AbstractInOnlyMessageProcessor;
 import won.node.messaging.processors.DefaultFacetMessageProcessor;
 import won.node.messaging.processors.FacetMessageProcessor;
-import won.node.refactoring.FacetCamel;
-import won.node.refactoring.facet.impl.annotated.AbstractFacetAnnotated;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
-import won.protocol.model.Connection;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.FacetType;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
@@ -22,7 +21,7 @@ import won.protocol.vocabulary.WONMSG;
 @DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
 @FacetMessageProcessor(facetType = WON.OWNER_FACET_STRING,direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType =
   WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
-public class SendMessageFromNodeOwnerFacetImpl extends AbstractFacetAnnotated implements FacetCamel
+public class SendMessageFromNodeOwnerFacetImpl extends AbstractInOnlyMessageProcessor
 {
 
   final FacetType facetType = FacetType.OwnerFacet;
@@ -43,21 +42,9 @@ public class SendMessageFromNodeOwnerFacetImpl extends AbstractFacetAnnotated im
    */
 
   @Override
-  public void process(final WonMessage wonMessage) {
-    //send to the need side
-    final Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getReceiverURI());
-    //TODO: only for old messaging protocol. remove it when transition is finished.
-    final Model content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next
-      ());
-    executorService.execute(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), content, wonMessage);
-        } catch (Exception e) {
-          logger.warn("caught Exception in textMessageFromNeed:", e);
-        }
-      }
-    });
+  public void process(final Exchange exchange) {
+    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
+    //just send the message
+    this.sendMessageToOwner(wonMessage, wonMessage.getReceiverNeedURI());
   }
 }

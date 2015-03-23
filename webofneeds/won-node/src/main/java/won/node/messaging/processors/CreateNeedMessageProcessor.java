@@ -10,6 +10,7 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Facet;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
@@ -40,7 +41,7 @@ public class CreateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
   @Override
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader("wonMessage");
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
     Need need = storeNeed(wonMessage);
     authorizeOwnerApplicationForNeed(message, need);
     try {

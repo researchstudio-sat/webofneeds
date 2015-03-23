@@ -11,6 +11,7 @@ import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
@@ -76,7 +77,7 @@ public class ConnectMessageFromNodeProcessor extends AbstractInOnlyMessageProces
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader("wonMessage");
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
     // a need wants to connect.
     // get the required data from the message and create a connection
     URI needURIFromWonMessage = wonMessage.getReceiverNeedURI();
@@ -98,7 +99,7 @@ public class ConnectMessageFromNodeProcessor extends AbstractInOnlyMessageProces
                                                   facetURI,
                                                   ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
 
-    exchange.getIn().setHeader("wonMessage", wonMessage);
+    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER, wonMessage);
     //send response
     WonMessage successResponseMessage = makeSuccessResponseMessage(wonMessage, con);
     sendMessageToNode(successResponseMessage, wonMessage.getReceiverNeedURI(), wonMessage.getSenderNeedURI());

@@ -5,10 +5,11 @@ import org.apache.camel.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.service.DataAccessService;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.MessageEventPlaceholder;
@@ -41,7 +42,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractInOnlyMessageProcesso
   MessageEventRepository messageEventRepository;
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader("wonMessage");
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
     Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getSenderURI());
 
     logger.debug("STORING message with id {}", wonMessage.getMessageURI());
@@ -67,7 +68,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractInOnlyMessageProcesso
     messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonMessage,
                                                             newWonMessage));
 
-    exchange.getIn().setHeader("wonMessage",newWonMessage);
+    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER,newWonMessage);
     //invoke facet implementation
     //reg.get(con).openFromOwner(con, content, newWonMessage);
   }

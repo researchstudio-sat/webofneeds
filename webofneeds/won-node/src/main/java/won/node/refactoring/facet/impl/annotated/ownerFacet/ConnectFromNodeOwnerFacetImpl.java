@@ -1,17 +1,12 @@
 package won.node.refactoring.facet.impl.annotated.ownerFacet;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import org.apache.camel.Header;
+import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
+import won.node.messaging.processors.AbstractInOnlyMessageProcessor;
 import won.node.messaging.processors.DefaultFacetMessageProcessor;
 import won.node.messaging.processors.FacetMessageProcessor;
-import won.node.refactoring.FacetCamel;
-import won.node.refactoring.facet.impl.annotated.AbstractFacetAnnotated;
-import won.protocol.exception.ConnectionAlreadyExistsException;
-import won.protocol.exception.IllegalMessageForNeedStateException;
-import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
-import won.protocol.model.Connection;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.FacetType;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
@@ -24,7 +19,7 @@ import won.protocol.vocabulary.WONMSG;
 @DefaultFacetMessageProcessor(direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType = WONMSG.TYPE_CONNECT_STRING)
 @FacetMessageProcessor(facetType = WON.OWNER_FACET_STRING,direction=WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType =
   WONMSG.TYPE_CONNECT_STRING)
-public class ConnectFromNodeOwnerFacetImpl extends AbstractFacetAnnotated implements FacetCamel
+public class ConnectFromNodeOwnerFacetImpl extends AbstractInOnlyMessageProcessor
 {
 
   final FacetType facetType = FacetType.OwnerFacet;
@@ -36,15 +31,9 @@ public class ConnectFromNodeOwnerFacetImpl extends AbstractFacetAnnotated implem
 
 
   @Override
-  public void process(@Header("wonMessage") WonMessage wonMessage)
-    throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
-    //TODO: only for old messaging protocol. remove it when transition is finished.
-    final Model content = wonMessage.getMessageContent().getNamedModel(wonMessage.getMessageContent().listNames().next
-      ());
-    Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getReceiverURI());
-    super.connectFromNeed(con, content, wonMessage);
-    /* when connected change linked data*/
-
-
+  public void process(final Exchange exchange) {
+    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
+    //just send the message
+    this.sendMessageToOwner(wonMessage, wonMessage.getReceiverNeedURI());
   }
 }

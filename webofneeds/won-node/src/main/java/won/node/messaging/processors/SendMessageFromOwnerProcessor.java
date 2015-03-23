@@ -10,10 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.facet.impl.FacetRegistry;
 import won.node.service.DataAccessService;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.repository.ConnectionRepository;
@@ -52,7 +53,7 @@ public class SendMessageFromOwnerProcessor extends AbstractInOnlyMessageProcesso
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader("wonMessage");
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
     WonMessage newWonMessage = new WonMessageBuilder()
       .wrap(wonMessage)
       .setTimestamp(System.currentTimeMillis())
@@ -70,7 +71,7 @@ public class SendMessageFromOwnerProcessor extends AbstractInOnlyMessageProcesso
     messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonMessage,
                                                             newWonMessage));
 
-    exchange.getIn().setHeader("wonMessage",newWonMessage);
+    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER,newWonMessage);
     final Connection connection = con;
     boolean feedbackWasPresent = RdfUtils.applyMethod(newWonMessage.getMessageContent(),
                                                       new RdfUtils.ModelVisitor<Boolean>()

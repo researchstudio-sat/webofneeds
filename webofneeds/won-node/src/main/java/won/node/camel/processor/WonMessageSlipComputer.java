@@ -12,6 +12,7 @@ import won.node.messaging.processors.DefaultFacetMessageProcessor;
 import won.node.messaging.processors.FacetMessageProcessor;
 import won.node.messaging.processors.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.util.RdfUtils;
 
 import java.lang.annotation.Annotation;
@@ -49,7 +50,7 @@ public class WonMessageSlipComputer implements InitializingBean, ApplicationCont
 
   @Override
   public <T> T evaluate(final Exchange exchange, final Class<T> type) {
-    WonMessage message = (WonMessage) exchange.getIn().getHeader("wonMessage");
+    WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
     assert message != null : "wonMessage header must not be null";
     String slip ="";
     // exchange.getIn().setHeader();

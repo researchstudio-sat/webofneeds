@@ -14,19 +14,15 @@
  *    limitations under the License.
  */
 
-package won.node.camel.routes.fixed;
-
-import org.apache.camel.builder.RouteBuilder;
+package won.protocol.message.processor.camel;
 
 /**
- * User: LEIH-NB
- * Date: 19.11.13
+ * Constants used for camel.
  */
-public class OwnerProtocoDynamicRoutes extends RouteBuilder {
-    @Override
-    public void configure() throws Exception {
-        from("seda:OwnerProtocolOut?concurrentConsumers=5").routeId("Node2OwnerRoute")
-          .to("bean:ownerProtocolOutgoingMessagesProcessor")
-          .recipientList(header("ownerApplicationIDs"));
-    }
+public class WonCamelConstants {
+  public static final String WON_MESSAGE_EXCHANGE_HEADER = "wonMessage";
+  public static final String DIRECTION_EXCHANGE_HEADER = "wonDirection";
+  public static final String FACET_TYPE_EXCHANGE_HEADER = "wonFacetType";
+  public static final String MESSAGE_TYPE_EXCHANGE_HEADER = "wonMessageType";
+
 }

@@ -5,6 +5,7 @@ import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
@@ -24,7 +25,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractInOnlyMessageProce
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader("wonMessage");
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
     URI senderNeedURI = wonMessage.getSenderNeedURI();
     URI receiverNeedURI = wonMessage.getReceiverNeedURI();
     URI facetURI = WonRdfUtils.FacetUtils.getFacet(wonMessage);
@@ -35,7 +36,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractInOnlyMessageProce
 
     final WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage, con);
 
-    exchange.getIn().setHeader("wonMessage", newWonMessage);
+    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER, newWonMessage);
 
     WonMessage successResponse = makeSuccessResponseMessage(wonMessage, con);
     sendMessageToOwner(successResponse, senderNeedURI);

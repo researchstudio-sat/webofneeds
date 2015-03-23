@@ -40,7 +40,7 @@ public class NeedProtocolCommunicationServiceImpl implements NeedProtocolCommuni
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public synchronized CamelConfiguration configureCamelEndpoint(URI needUri,URI otherNeedUri,String startingEndpoint) throws Exception {
+    public synchronized CamelConfiguration configureCamelEndpoint(URI needUri,URI otherNeedUri) throws Exception {
         String needProtocolQueueName;
         CamelConfiguration camelConfiguration = new CamelConfiguration();
         logger.debug("ensuring camel is configured for local need {}, remote need {} and starting endpoint {}",new Object[]{needUri, otherNeedUri, startingEndpoint});

@@ -38,6 +38,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 /**
  * User: syim
@@ -80,6 +81,9 @@ public abstract class ProcessorBase
   protected RandomNumberService randomNumberService;
   @Autowired
   protected NeedProtocolCommunicationService needProtocolCommunicationService;
+  @Autowired
+  protected ExecutorService executorService;
+
 
 
   protected void sendMessageToOwner(WonMessage message, URI needURI){
@@ -121,7 +125,6 @@ public abstract class ProcessorBase
     headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
     messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),RDF_LANGUAGE_FOR_MESSAGE),
                                        "outgoingMessages");
-    throw new UnsupportedOperationException("not implemented!");
   }
 
   protected List<String> toStringIds(final List<OwnerApplication> ownerApplications) {
@@ -131,4 +134,5 @@ public abstract class ProcessorBase
     }
     return ownerApplicationIds;
   }
+
 }

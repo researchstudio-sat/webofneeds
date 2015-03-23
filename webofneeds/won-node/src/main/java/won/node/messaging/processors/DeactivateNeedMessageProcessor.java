@@ -11,6 +11,7 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.*;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.FacetRepository;
@@ -57,7 +58,7 @@ public class DeactivateNeedMessageProcessor extends AbstractInOnlyMessageProcess
 
 
   public void process(final Exchange exchange) throws Exception {
-    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader("wonMessage");
+    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
     WonMessage newWonMessage = WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(wonMessage);
     logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
     rdfStorage.storeDataset(newWonMessage.getMessageURI(),

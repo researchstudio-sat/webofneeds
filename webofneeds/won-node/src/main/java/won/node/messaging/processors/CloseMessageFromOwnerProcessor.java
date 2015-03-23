@@ -5,10 +5,11 @@ import org.apache.camel.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.service.DataAccessService;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.MessageEventPlaceholder;
@@ -36,7 +37,7 @@ public class CloseMessageFromOwnerProcessor extends AbstractInOnlyMessageProcess
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader("wonMessage");
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
 
     WonMessage newWonMessage = new WonMessageBuilder()
       .wrap(wonMessage)
@@ -57,7 +58,7 @@ public class CloseMessageFromOwnerProcessor extends AbstractInOnlyMessageProcess
     messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(),
                                                             newWonMessage));
 
-    exchange.getIn().setHeader("wonMessage",newWonMessage);
+    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER,newWonMessage);
 
 
     //invoke facet implementation

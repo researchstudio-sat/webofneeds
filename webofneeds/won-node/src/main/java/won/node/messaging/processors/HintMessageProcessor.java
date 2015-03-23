@@ -10,6 +10,7 @@ import won.node.service.DataAccessService;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
@@ -49,7 +50,7 @@ public class HintMessageProcessor extends AbstractInOnlyMessageProcessor
 
   public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader("wonMessage");
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
 
     logger.debug("STORING message with id {}", wonMessage.getMessageURI());
 
@@ -97,7 +98,7 @@ public class HintMessageProcessor extends AbstractInOnlyMessageProcessor
     messageEventRepository.save(new MessageEventPlaceholder(
       con.getConnectionURI(), wrappedMessage));
 
-    exchange.getIn().setHeader("wonMessage",wrappedMessage);
+    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER,wrappedMessage);
     //reg.get(con).hint(con, wmScore, wmOriginator, facetModel, wrappedMessage);
              /*
       WonMessage newWonMessage = WonMessageBuilder.wrapAndSetTimestamp(con.getConnectionURI(),

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import won.node.messaging.processors.AbstractInOnlyMessageProcessor;
 import won.node.messaging.processors.FacetMessageProcessor;
 import won.protocol.message.WonMessage;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.FacetType;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
@@ -26,7 +27,7 @@ public class ConnectFromOwnerOwnerFacetImpl extends AbstractInOnlyMessageProcess
   }
 
   public void process(Exchange exchange) {
-    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader("wonMessage");
+    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
     //just send the message
     this.sendMessageToNode(wonMessage, wonMessage.getSenderNeedURI(), wonMessage.getReceiverNeedURI());
   }

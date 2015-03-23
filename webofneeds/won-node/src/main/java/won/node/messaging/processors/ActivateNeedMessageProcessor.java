@@ -8,6 +8,7 @@ import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
@@ -43,7 +44,7 @@ public class ActivateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
 
   public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader("wonMessage");
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
     WonMessage newWonMessage =  WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(
       wonMessage);
     logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
