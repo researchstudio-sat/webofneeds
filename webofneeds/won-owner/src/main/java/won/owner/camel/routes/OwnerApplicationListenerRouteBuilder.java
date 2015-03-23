@@ -51,7 +51,10 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
                for (int i = 0; i<endpoints.size();i++){
                    from(endpoints.get(i)+"?concurrentConsumers=5").routeId("Node2OwnerRoute"+brokerUri)
                            .wireTap("bean:messagingService?method=inspectMessage")
-                           .to("bean:wonMessageCamelProcessor");
+                            .to("bean:wonMessageIntoCamelProcessor")
+                            .to("bean:wellformednessChecker")
+                            .to("bean:signatureChecker")
+                            .to("bean:ownerCallbackAdapter");
        }
     }
 

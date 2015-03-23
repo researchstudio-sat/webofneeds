@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import won.node.annotation.FixedMessageProcessor;
 import won.node.facet.impl.FacetRegistry;
 import won.node.service.DataAccessService;
 import won.protocol.message.WonMessageDirection;
@@ -53,7 +52,7 @@ public class SendMessageFromOwnerProcessor extends AbstractInOnlyMessageProcesso
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = message.getBody(WonMessage.class);
+    WonMessage wonMessage = (WonMessage) message.getHeader("wonMessage");
     WonMessage newWonMessage = new WonMessageBuilder()
       .wrap(wonMessage)
       .setTimestamp(System.currentTimeMillis())

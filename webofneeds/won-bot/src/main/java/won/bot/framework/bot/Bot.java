@@ -18,7 +18,7 @@ package won.bot.framework.bot;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
-import won.owner.protocol.message.WonEventCallback;
+import won.owner.protocol.message.OwnerCallback;
 
 import java.net.URI;
 
@@ -27,7 +27,7 @@ import java.net.URI;
  *
  * Note: Methods may throw runtime exceptions, which will be handled by the execution framework.
  */
-public interface Bot extends WonEventCallback
+public interface Bot extends OwnerCallback
 {
   public boolean knowsNeedURI(URI needURI);
 

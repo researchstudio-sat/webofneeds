@@ -6,7 +6,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import won.node.annotation.FixedMessageProcessor;
 import won.node.service.DataAccessService;
 import won.protocol.exception.ConnectionAlreadyExistsException;
 import won.protocol.message.WonMessage;
@@ -50,7 +49,7 @@ public class HintMessageProcessor extends AbstractInOnlyMessageProcessor
 
   public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = message.getBody(WonMessage.class);
+    WonMessage wonMessage = (WonMessage) message.getHeader("wonMessage");
 
     logger.debug("STORING message with id {}", wonMessage.getMessageURI());
 
@@ -101,7 +100,7 @@ public class HintMessageProcessor extends AbstractInOnlyMessageProcessor
     exchange.getIn().setHeader("wonMessage",wrappedMessage);
     //reg.get(con).hint(con, wmScore, wmOriginator, facetModel, wrappedMessage);
              /*
-      WonMessage newWonMessage = WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(con.getConnectionURI(),
+      WonMessage newWonMessage = WonMessageBuilder.wrapAndSetTimestamp(con.getConnectionURI(),
                                                                                        wonMessage);
 
       messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(), newWonMessage));

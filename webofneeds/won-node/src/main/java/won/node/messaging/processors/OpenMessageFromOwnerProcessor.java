@@ -4,7 +4,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import won.node.annotation.FixedMessageProcessor;
 import won.node.service.DataAccessService;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessage;
@@ -42,7 +41,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractInOnlyMessageProcesso
   MessageEventRepository messageEventRepository;
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = message.getBody(WonMessage.class);
+    WonMessage wonMessage = (WonMessage) message.getHeader("wonMessage");
     Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getSenderURI());
 
     logger.debug("STORING message with id {}", wonMessage.getMessageURI());

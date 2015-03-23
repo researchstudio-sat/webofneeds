@@ -16,6 +16,8 @@
 
 package won.protocol.message.processor.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
@@ -33,8 +35,12 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
  */
 public class WellformednessCheckingWonMessageProcessor implements WonMessageProcessor
 {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+
   @Override
-  public void process(final WonMessage message) throws WonMessageProcessingException {
-    throw new UnsupportedOperationException("not yet implemented");
+  public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
+    logger.warn("well-formedness check not yet implemented!");
+    return message;
   }
+
 }

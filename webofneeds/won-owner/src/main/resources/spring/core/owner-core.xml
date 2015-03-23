@@ -36,20 +36,11 @@
         <property name="ownerProtocolOwnerURI" value="${uri.prefix.owner}"/>
     </bean>
 
-    <bean id="dataReloadService" class="won.owner.service.impl.DataReloadService">
-        <property name="ownerService" ref="ownerProtocolNeedReadService" />
-    </bean>
-
     <!-- Model Mapper for RDF -->
     <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"/>
     <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"/>
 
-    <bean id="ownerProtocolOwnerService" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" />
-
     <bean id="executor" class="org.springframework.scheduling.concurrent.ConcurrentTaskExecutor" />
-
-    <bean id="ownerProtocolNeedReadService" class="won.owner.protocol.impl.OwnerProtocolNeedReadServiceImpl">
-    </bean>
 
 	<bean id="wonUserDetailService" class="won.owner.service.impl.WONUserDetailService" />
 </beans>

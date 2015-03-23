@@ -24,5 +24,5 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
  */
 public interface WonMessageProcessor
 {
-  public void process(WonMessage message) throws WonMessageProcessingException;
+  public WonMessage process(WonMessage message) throws WonMessageProcessingException;
 }

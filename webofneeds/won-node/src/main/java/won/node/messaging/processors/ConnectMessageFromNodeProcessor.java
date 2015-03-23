@@ -6,19 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import won.node.annotation.FixedMessageProcessor;
-import won.node.facet.impl.FacetRegistry;
-import won.node.service.DataAccessService;
 import won.node.service.impl.NeedCommunicationServiceImpl;
 import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.need.NeedProtocolNeedService;
 import won.protocol.owner.OwnerProtocolOwnerService;
 import won.protocol.repository.ConnectionRepository;
@@ -39,11 +34,9 @@ import java.util.concurrent.ExecutorService;
  */
 @Component
 @FixedMessageProcessor(direction= WONMSG.TYPE_FROM_EXTERNAL_STRING,messageType = WONMSG.TYPE_CONNECT_STRING)
-public class ConnectMessageFromNodeProcessor  implements WonMessageProcessor
+public class ConnectMessageFromNodeProcessor extends AbstractInOnlyMessageProcessor
 {
   final Logger logger = LoggerFactory.getLogger(NeedCommunicationServiceImpl.class);
-  private FacetRegistry reg;
-  private DataAccessService dataService;
 
   /**
    * Client talking to the owner side via the owner protocol
@@ -83,7 +76,7 @@ public class ConnectMessageFromNodeProcessor  implements WonMessageProcessor
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = message.getBody(WonMessage.class);
+    WonMessage wonMessage = (WonMessage) message.getHeader("wonMessage");
     // a need wants to connect.
     // get the required data from the message and create a connection
     URI needURIFromWonMessage = wonMessage.getReceiverNeedURI();
@@ -104,83 +97,23 @@ public class ConnectMessageFromNodeProcessor  implements WonMessageProcessor
                                                   otherConnectionURIFromWonMessage,
                                                   facetURI,
                                                   ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
-    // copy the message envelope
-    // information about the newly created connection
-    // to the message and pass it on to the owner.
-    URI wrappedMessageURI = this.wonNodeInformationService.generateEventURI();
-    WonMessage wrappedMessage  =  WonMessageBuilder
-      .copyInboundNodeToNodeMessageAsNodeToOwnerMessage(wrappedMessageURI, con.getConnectionURI(), wonMessage);
 
-
-    rdfStorageService.storeDataset(wrappedMessageURI, wrappedMessage.getCompleteDataset());
-
-    messageEventRepository.save(new MessageEventPlaceholder(
-      con.getConnectionURI(), wrappedMessage));
-
-    exchange.getIn().setHeader("wonMessage",wrappedMessage);
-    //invoke facet implementation
-    //Facet facet = reg.get(con);
-    // send an empty model until we remove this parameter
-    //facet.connectFromNeed(con, content, wrappedMessage);
-
-    //return con.getConnectionURI();
-    exchange.getIn().setBody(con.getConnectionURI().toString());
-
+    exchange.getIn().setHeader("wonMessage", wonMessage);
+    //send response
+    WonMessage successResponseMessage = makeSuccessResponseMessage(wonMessage, con);
+    sendMessageToNode(successResponseMessage, wonMessage.getReceiverNeedURI(), wonMessage.getSenderNeedURI());
   }
 
-  public void setReg(final FacetRegistry reg) {
-    this.reg = reg;
+  private WonMessage makeSuccessResponseMessage(WonMessage originalMessage, Connection con) {
+    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
+    wonMessageBuilder.setPropertiesForNodeResponse(
+            originalMessage,
+            true,
+            this.wonNodeInformationService.generateEventURI());
+    //hack(?): set sender to the new connection uri to communicate it to the original sender.
+    // alternative: use a dedicated property (msg:newConnectionUri [uri]) in the message
+    wonMessageBuilder.setSenderURI(con.getConnectionURI());
+    return wonMessageBuilder.build();
   }
 
-  public void setDataService(final DataAccessService dataService) {
-    this.dataService = dataService;
-  }
-
-  public void setOwnerProtocolOwnerService(final OwnerProtocolOwnerService ownerProtocolOwnerService) {
-    this.ownerProtocolOwnerService = ownerProtocolOwnerService;
-  }
-
-  public void setNeedProtocolNeedService(final NeedProtocolNeedService needProtocolNeedService) {
-    this.needProtocolNeedService = needProtocolNeedService;
-  }
-
-  public void setNeedFacingConnectionCommunicationService(final NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService) {
-    this.needFacingConnectionCommunicationService = needFacingConnectionCommunicationService;
-  }
-
-  public void setOwnerFacingConnectionCommunicationService(final OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService) {
-    this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
-  }
-
-  public void setURIService(final won.node.service.impl.URIService URIService) {
-    this.URIService = URIService;
-  }
-
-  public void setExecutorService(final ExecutorService executorService) {
-    this.executorService = executorService;
-  }
-
-  public void setNeedRepository(final NeedRepository needRepository) {
-    this.needRepository = needRepository;
-  }
-
-  public void setConnectionRepository(final ConnectionRepository connectionRepository) {
-    this.connectionRepository = connectionRepository;
-  }
-
-  public void setEventRepository(final EventRepository eventRepository) {
-    this.eventRepository = eventRepository;
-  }
-
-  public void setRdfStorageService(final RDFStorageService rdfStorageService) {
-    this.rdfStorageService = rdfStorageService;
-  }
-
-  public void setMessageEventRepository(final MessageEventRepository messageEventRepository) {
-    this.messageEventRepository = messageEventRepository;
-  }
-
-  public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
-    this.wonNodeInformationService = wonNodeInformationService;
-  }
 }

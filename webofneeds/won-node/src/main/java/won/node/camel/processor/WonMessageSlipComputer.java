@@ -8,10 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import won.node.annotation.DefaultFacetMessageProcessor;
-import won.node.annotation.FacetMessageProcessor;
-import won.node.annotation.FixedMessageProcessor;
-import won.node.refactoring.FacetCamel;
+import won.node.messaging.processors.DefaultFacetMessageProcessor;
+import won.node.messaging.processors.FacetMessageProcessor;
+import won.node.messaging.processors.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.util.RdfUtils;
 
@@ -78,7 +77,7 @@ public class WonMessageSlipComputer implements InitializingBean, ApplicationCont
     Iterator iter = facetMessageProcessorsMap.entrySet().iterator();
     while(iter.hasNext()){
       Map.Entry pair = (Map.Entry)iter.next();
-      FacetCamel facet = (FacetCamel) pair.getValue();
+      Object facet =  pair.getValue();
       if (facetType != null) {
         Annotation annotation = facet.getClass().getAnnotation(FacetMessageProcessor.class);
         if(matches(annotation, messageType, direction, facetType)){

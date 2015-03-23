@@ -85,7 +85,7 @@ public class AutomaticMessageResponderListener extends AbstractHandleFirstNEvent
         URI connectionUri = messageEvent.getConnectionURI();
         logger.debug("sending message " + message);
         try {
-          getEventListenerContext().getOwnerService().sendWonMessage(createWonMessage(connectionUri, messageContent));
+          getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionUri, messageContent));
         } catch (Exception e) {
           logger.warn("could not send message via connection {}", connectionUri, e);
         }

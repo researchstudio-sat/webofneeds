@@ -26,7 +26,7 @@ import java.net.URI;
  * Interface for owner implementations providing methods for receiving specific messages and sending
  * generic messages.
  */
-public interface WonEventCallback
+public interface OwnerCallback
 {
   public void onConnectFromOtherNeed(Connection con, final WonMessage wonMessage);
   public void onOpenFromOtherNeed(Connection con, final WonMessage wonMessage);

@@ -50,7 +50,7 @@ public class ConnectTwoNeedsAction extends BaseEventBotAction
   {
     List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();
     try {
-      getEventListenerContext().getOwnerService().sendWonMessage(
+      getEventListenerContext().getWonMessageSender().sendWonMessage(
         createWonMessage(needs.get(0), needs.get(1)));
     } catch (Exception e) {
       logger.warn("could not connect {} and {}", new Object[]{needs.get(0), needs.get(1)}, e);

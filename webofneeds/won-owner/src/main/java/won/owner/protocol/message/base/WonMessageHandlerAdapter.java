@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-package won.owner.protocol.message.impl;
+package won.owner.protocol.message.base;
 
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.owner.protocol.message.WonEventCallback;
+import won.owner.protocol.message.OwnerCallback;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -35,9 +35,12 @@ import won.protocol.util.RdfUtils;
 public abstract class WonMessageHandlerAdapter implements WonMessageProcessor
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
-  private WonEventCallback adaptee;
+  private OwnerCallback adaptee;
 
-  public WonMessageHandlerAdapter(final WonEventCallback adaptee) {
+  protected WonMessageHandlerAdapter() {
+  }
+
+  public WonMessageHandlerAdapter(final OwnerCallback adaptee) {
     this.adaptee = adaptee;
   }
 
@@ -59,7 +62,7 @@ public abstract class WonMessageHandlerAdapter implements WonMessageProcessor
   protected abstract Match makeMatch(final WonMessage wonMessage);
 
   @Override
-  public void process(final WonMessage message) throws WonMessageProcessingException {
+  public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
     logger.debug("processing message {} and calling appropriate method on adaptee", message.getMessageURI() );
     WonMessageType messageType = message.getMessageType();
     switch(messageType){
@@ -90,5 +93,11 @@ public abstract class WonMessageHandlerAdapter implements WonMessageProcessor
           logger.debug("message: {}", RdfUtils.writeDatasetToString(message.getCompleteDataset(), Lang.TRIG));
         }
     }
+    //return the message for further processing
+    return message;
+  }
+
+  public void setAdaptee(OwnerCallback adaptee) {
+    this.adaptee = adaptee;
   }
 }

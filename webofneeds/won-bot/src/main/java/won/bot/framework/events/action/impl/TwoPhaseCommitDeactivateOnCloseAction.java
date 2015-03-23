@@ -49,7 +49,7 @@ public class TwoPhaseCommitDeactivateOnCloseAction extends BaseEventBotAction
       String coordinationMessageUri = ni.toList().get(0).asResource().getURI().toString();
       assert coordinationMessageUri.equals(WON_TX.COORDINATION_MESSAGE_COMMIT.getURI().toString()) : "expected a " +
         "Commmit message";
-      getEventListenerContext().getOwnerService().sendWonMessage(createWonMessage(needURI));
+      getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(needURI));
       getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(needURI));
     }
   }

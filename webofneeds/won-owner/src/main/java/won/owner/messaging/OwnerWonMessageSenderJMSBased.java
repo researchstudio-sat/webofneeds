@@ -31,8 +31,8 @@ import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.sender.WonMessageSender;
 import won.protocol.model.WonNode;
-import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.DataAccessUtils;
 
@@ -48,10 +48,10 @@ import java.util.concurrent.Future;
  * Date: 17.10.13
  */
 
-public class OwnerProtocolNeedServiceClientJMSBased
+public class OwnerWonMessageSenderJMSBased
   implements ApplicationContextAware,
   ApplicationListener<ContextRefreshedEvent>,
-  OwnerProtocolNeedServiceClientSide
+        WonMessageSender
 {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -71,6 +71,48 @@ public class OwnerProtocolNeedServiceClientJMSBased
 
   @Autowired
   private WonNodeRepository wonNodeRepository;
+
+  public void sendWonMessage(WonMessage wonMessage) {
+    try {
+      // ToDo (FS): change it to won node URI and create method in the MessageEvent class
+      URI wonNodeUri = wonMessage.getSenderURI();
+
+      if (wonNodeUri == null)
+        wonNodeUri = defaultNodeURI;
+
+      List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
+      String ownerApplicationId;
+      /**
+       * if owner application is not connected to any won node, register owner application to the node with wonNodeURI.
+       */
+      CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
+      if (wonNodeList.size() == 0) {
+        //todo: methods of ownerProtocolActiveMQService might have some concurrency issues. this problem will be resolved in the future, and this code here shall be revisited then.
+        ownerApplicationId = register(wonNodeUri);
+        configureRemoteEndpointsForOwnerApplication(ownerApplicationId,
+                ownerProtocolCommunicationServiceImpl.getProtocolCamelConfigurator()
+                        .getEndpoint(wonNodeUri));
+        logger.debug("registered ownerappID: " + ownerApplicationId);
+        wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
+      } else {
+        //todo refactor with register()
+        //TODO what happens with persistent WonNodeRepository? shouldn't camel configured again?
+        //camelContext.getComponent()
+        ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
+      }
+
+      Map<String, Object> headerMap = new HashMap<>();
+      headerMap.put("ownerApplicationID", ownerApplicationId);
+      headerMap.put("remoteBrokerEndpoint",camelConfiguration.getEndpoint());
+      messagingService
+              .sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG), startingEndpoint);
+
+      //camelContext.getShutdownStrategy().setSuppressLoggingOnTimeout(true);
+    } catch (Exception e){
+      throw new RuntimeException("could not send message", e);
+    }
+  }
+
 
   /**
    * The owner application calls the register() method node upon initalization to connect to the default won node
@@ -183,48 +225,6 @@ public class OwnerProtocolNeedServiceClientJMSBased
   }
 
 
-  public void sendWonMessage(WonMessage wonMessage) throws Exception {
-    // ToDo (FS): change it to won node URI and create method in the MessageEvent class
-    URI wonNodeUri = wonMessage.getSenderURI();
-
-    if (wonNodeUri == null)
-      wonNodeUri = defaultNodeURI;
-
-    List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
-    String ownerApplicationId;
-    /**
-     * if owner application is not connected to any won node, register owner application to the node with wonNodeURI.
-     */
-     CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
-    if (wonNodeList.size() == 0) {
-      //todo: methods of ownerProtocolActiveMQService might have some concurrency issues. this problem will be resolved in the future, and this code here shall be revisited then.
-      ownerApplicationId = register(wonNodeUri);
-      configureRemoteEndpointsForOwnerApplication(ownerApplicationId,
-                                                  ownerProtocolCommunicationServiceImpl.getProtocolCamelConfigurator()
-                                                                                       .getEndpoint(wonNodeUri));
-      logger.debug("registered ownerappID: " + ownerApplicationId);
-      wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
-    } else {
-      //todo refactor with register()
-      //TODO what happens with persistent WonNodeRepository? shouldn't camel configured again?
-      //camelContext.getComponent()
-      ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
-    }
-
-    Map<String, Object> headerMap = new HashMap<>();
-    headerMap.put("ownerApplicationID", ownerApplicationId);
-    headerMap.put("remoteBrokerEndpoint",camelConfiguration.getEndpoint());
-    messagingService
-      .sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG), startingEndpoint);
-
-    //camelContext.getShutdownStrategy().setSuppressLoggingOnTimeout(true);
-
-
-
-
-
-
-  }
 
 
   public void setMessagingService(MessagingService messagingService) {

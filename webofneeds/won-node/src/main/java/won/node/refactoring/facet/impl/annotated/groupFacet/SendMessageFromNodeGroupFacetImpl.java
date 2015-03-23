@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import won.node.annotation.FacetMessageProcessor;
+import won.node.messaging.processors.FacetMessageProcessor;
 import won.node.refactoring.facet.impl.annotated.AbstractFacetAnnotated;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;

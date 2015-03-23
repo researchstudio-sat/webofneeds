@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageType;
+import won.protocol.model.Connection;
 import won.protocol.model.Facet;
 import won.protocol.model.Match;
 import won.protocol.model.NeedState;
@@ -163,6 +165,8 @@ public class WonRdfUtils
       match.setToNeed(URI.create(score.asResource().getURI()));
       return match;
     }
+
+
   }
 
   public static class FacetUtils {

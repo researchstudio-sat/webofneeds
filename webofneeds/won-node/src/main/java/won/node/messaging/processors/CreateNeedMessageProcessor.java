@@ -4,15 +4,12 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
-import won.node.annotation.FixedMessageProcessor;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageType;
 import won.protocol.model.Facet;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
@@ -35,7 +32,6 @@ import java.util.List;
  * Date: 02.03.2015
  */
 @Service
-@DependsOn(value="autoWiredAnnotationBeanPostProcessor")
 @FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CREATE_STRING)
 public class CreateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
 {
@@ -44,7 +40,7 @@ public class CreateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
   @Override
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = message.getBody(WonMessage.class);
+    WonMessage wonMessage = (WonMessage) message.getHeader("wonMessage");
     Need need = storeNeed(wonMessage);
     authorizeOwnerApplicationForNeed(message, need);
     try {
@@ -88,9 +84,6 @@ public class CreateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
       facetRepository.save(f);
     }
 
-    // remove connection container if the create message contains already one (or some)
-    WonRdfUtils.NeedUtils.removeConnectionContainer(needContent, needURI);
-
     rdfStorage.storeDataset(needURI, needContent);
     return need;
   }
@@ -110,21 +103,10 @@ public class CreateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
   }
 
   private WonMessage makeCreateResponseMessage(final WonMessage wonMessage) {
-    URI responseMessageURI = URI.create(wonMessage.getSenderNeedURI().toString() +
-                                          "/event/" +
-                                          randomNumberService
-                                            .generateRandomString(9));
-
-    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-    return wonMessageBuilder
-      .setWonMessageType(WonMessageType.CREATE_RESPONSE)
-      .setMessageURI(responseMessageURI)
-      .setSenderNodeURI(wonMessage.getReceiverNodeURI())
-      .setReceiverNeedURI(wonMessage.getSenderNeedURI())
-      .setResponseMessageState(WONMSG.TYPE_RESPONSE_STATE_SUCCESS)
-      .addRefersToURI(wonMessage.getMessageURI())
-      .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM)
-      .build();
+    return new WonMessageBuilder().setPropertiesForNodeResponse(
+            wonMessage,
+            true,
+            this.wonNodeInformationService.generateEventURI()).build();
   }
 
 

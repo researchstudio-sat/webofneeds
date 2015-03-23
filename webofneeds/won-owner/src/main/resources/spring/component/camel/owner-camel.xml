@@ -21,7 +21,7 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/owner.properties" ignore-unresolvable="true"/>
 
     <!-- messaging beans -->
-    <camel:camelContext id="wonOwnerCamel">
+    <camel:camelContext id="wonOwnerCamel" trace="true">
         <camel:packageScan>
             <camel:package>won.owner.camel.routes.fixed</camel:package>
         </camel:packageScan>
@@ -52,31 +52,7 @@
         <property name="sessionCacheSize" value="10"></property>
 
     </bean>
-    <bean name="wonMessageCamelProcessor" class="won.owner.camel.processor.OwnerWonMessageCamelProcessor"></bean>
 
-    <!-- Camels AMQP component doesn't seem to support AMQP 1.0 yet -->
-    <!--bean id ="amqpComponent" class="org.apache.camel.component.amqp.AMQPComponent">
-        <property name="configuration" ref="jmsConfig"></property>
-    </bean-->
-    <!--bean id="amqpConnectionFactory" class="org.apache.qpid.client.AMQConnectionFactory">
-    <property name="brokerURL" value="tcp://localhost:61616"/>
-    <constructor-arg index="0" type="java.lang.String" value="amqp://localhost:5672"/>
-    </bean-->
-
-    <!--bean id="destination" class="org.apache.activemq.command.ActiveMQQueue">
-        <constructor-arg value="WON.MSG"></constructor-arg>
-    </bean>
-    <bean id="producerJMSTemplate" class="org.springframework.jms.core.JmsTemplate">
-        <property name="connectionFactory" ref="cachedConnectionFactory"></property>
-        <property name="defaultDestination" ref="destination"></property>
-    </bean-->
-
-    <!-- bean for consuming messages -->
-
-    <!--jms:listener-container container-type="default" connection-factory="cachedConnectionFactory" acknowledge="auto">
-        <jms:listener destination="WON.CREATENEED" ref="ownerProtocolOwnerServiceImpl" method="onMessage"></jms:listener>
-    </jms:listener-container-->
-    <!--bean id="needMessageCreator" class="won.owner.protocol.impl.NeedMessageCreatorImpl"></bean-->
     <!-- Activate Annotation based configuration -->
     <context:annotation-config />
 
@@ -90,7 +66,27 @@
     <context:component-scan base-package="won.protocol.service" />
     <context:component-scan base-package="won.protocol.util" />
 
+  <!-- won-specific processors -->
+  <!-- start of the pipeline -->
+  <bean name="wonMessageIntoCamelProcessor" class="won.protocol.message.processor.camel.WonMessageIntoCamelProcessor" />
+  <!-- processor for checking well-formedness of messages -->
+  <bean name="wellformednessChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.protocol.message.processor.impl.WellformednessCheckingWonMessageProcessor" />
+    </constructor-arg>
+  </bean>
+  <!-- processor for checking signatures -->
+  <bean name="signatureChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor" />
+    </constructor-arg>
+  </bean>
 
-
+  <bean id="ownerCallbackAdapter" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <!-- adapts an OwnerCallback to incoming messages. The callback is autowired -->
+      <bean class="won.owner.protocol.message.base.MessageExtractingWonMessageHandlerAdapter"/>
+    </constructor-arg>
+  </bean>
 
 </beans>

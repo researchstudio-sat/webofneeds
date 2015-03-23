@@ -5,11 +5,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import won.node.annotation.FixedMessageProcessor;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.exception.WonMessageBuilderException;
-import won.protocol.message.*;
-import won.protocol.message.processor.WonMessageProcessor;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.*;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.FacetRepository;
@@ -32,7 +33,7 @@ import java.util.List;
  */
 @Component
 @FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_DEACTIVATE_STRING)
-public class DeactivateNeedMessageProcessor implements WonMessageProcessor
+public class DeactivateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
 {
   Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -56,7 +57,7 @@ public class DeactivateNeedMessageProcessor implements WonMessageProcessor
 
 
   public void process(final Exchange exchange) throws Exception {
-    WonMessage wonMessage = exchange.getIn().getBody(WonMessage.class);
+    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader("wonMessage");
     WonMessage newWonMessage = WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(wonMessage);
     logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
     rdfStorage.storeDataset(newWonMessage.getMessageURI(),

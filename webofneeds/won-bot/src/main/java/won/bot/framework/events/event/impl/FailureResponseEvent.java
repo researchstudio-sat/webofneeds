@@ -29,8 +29,10 @@ public class FailureResponseEvent extends BaseEvent implements ResponseEvent
 {
   private URI originalMessageURI;
   private WonMessage failureMessage;
-  public FailureResponseEvent(final URI failedMessageUri, final WonMessage wonMessage) {
-    this.originalMessageURI = failedMessageUri;
+
+  public FailureResponseEvent(URI originalMessageURI, WonMessage failureMessage) {
+    this.originalMessageURI = originalMessageURI;
+    this.failureMessage = failureMessage;
   }
 
   public URI getOriginalMessageURI() {

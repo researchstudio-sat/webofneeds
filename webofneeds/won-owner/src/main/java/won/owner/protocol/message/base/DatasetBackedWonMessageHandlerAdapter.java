@@ -14,14 +14,14 @@
  *    limitations under the License.
  */
 
-package won.owner.protocol.message.impl;
+package won.owner.protocol.message.base;
 
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.tdb.TDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.owner.protocol.message.WonEventCallback;
+import won.owner.protocol.message.OwnerCallback;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
@@ -64,14 +64,14 @@ public class DatasetBackedWonMessageHandlerAdapter extends WonMessageHandlerAdap
   private LinkedDataSource linkedDataSource;
 
 
-  public DatasetBackedWonMessageHandlerAdapter(final WonEventCallback adaptee) {
+  public DatasetBackedWonMessageHandlerAdapter(final OwnerCallback adaptee) {
     super(adaptee);
   }
 
   @Override
-  public void process(final WonMessage message) throws WonMessageProcessingException {
+  public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
     RdfUtils.addDatasetToDataset(dataset, message.getCompleteDataset());
-    super.process(message);
+    return super.process(message);
   }
 
   public void setLinkedDataSource(final LinkedDataSource linkedDataSource) {

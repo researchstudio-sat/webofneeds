@@ -263,7 +263,7 @@ public class BATestScriptListener extends AbstractFinishingListener
     {
       public void run() {
         try {
-          getEventListenerContext().getOwnerService().sendWonMessage(createWonMessageForConnectionMessage(
+          getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessageForConnectionMessage(
             fromCon, fromNeed, toCon, toNeed,
             action.getMessageToBeSent()));
         } catch (Exception e) {
@@ -342,7 +342,7 @@ public class BATestScriptListener extends AbstractFinishingListener
       {
         try {
           //TODO: THIS STILL HAS TO BE ADAPTED TO NEW MESSAGE FORMAT!
-          //getEventListenerContext().getOwnerService().sendWonMessage(connectionURI, null, null);
+          //getEventListenerContext().getWonMessageSender().sendWonMessage(connectionURI, null, null);
           throw new UnsupportedOperationException("Not yet adapted to new message format!");
         } catch (Exception e) {
           logger.warn("could not send open from {} ", connectionURI);

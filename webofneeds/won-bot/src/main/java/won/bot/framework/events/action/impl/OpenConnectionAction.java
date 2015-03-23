@@ -51,14 +51,14 @@ public class OpenConnectionAction extends BaseEventBotAction
     if (event instanceof ConnectFromOtherNeedEvent) {
       ConnectionSpecificEvent connectEvent = (ConnectionSpecificEvent) event;
       logger.debug("auto-replying to connect for connection {}", connectEvent.getConnectionURI() );
-      getEventListenerContext().getOwnerService().sendWonMessage(createOpenWonMessage(connectEvent.getConnectionURI()));
+      getEventListenerContext().getWonMessageSender().sendWonMessage(createOpenWonMessage(connectEvent.getConnectionURI()));
       return;
     } else if (event instanceof OpenFromOtherNeedEvent){
       ConnectionSpecificEvent connectEvent = (ConnectionSpecificEvent) event;
       if (((OpenFromOtherNeedEvent) event).getCon().getState() == ConnectionState.REQUEST_RECEIVED) {
         logger.debug("auto-replying to open(REQUEST_RECEIVED) with open for connection {}",
           connectEvent.getConnectionURI());
-        getEventListenerContext().getOwnerService().sendWonMessage(createOpenWonMessage(connectEvent.getConnectionURI()));
+        getEventListenerContext().getWonMessageSender().sendWonMessage(createOpenWonMessage(connectEvent.getConnectionURI()));
       }
       return;
     } else if (event instanceof HintFromMatcherEvent) {
@@ -66,7 +66,7 @@ public class OpenConnectionAction extends BaseEventBotAction
       // use connection object instead
       HintFromMatcherEvent hintEvent = (HintFromMatcherEvent) event;
       logger.debug("opening connection based on hint {}", event);
-      getEventListenerContext().getOwnerService().sendWonMessage(
+      getEventListenerContext().getWonMessageSender().sendWonMessage(
         createConnectWonMessage(
           hintEvent.getMatch().getFromNeed(), hintEvent.getMatch().getToNeed(),
           FacetType.OwnerFacet.getURI(), FacetType.OwnerFacet.getURI()));

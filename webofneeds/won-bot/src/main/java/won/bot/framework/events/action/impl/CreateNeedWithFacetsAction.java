@@ -85,7 +85,8 @@ public class CreateNeedWithFacetsAction extends BaseEventBotAction
         final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
         WonMessage createNeedMessage = createWonMessage(wonNodeInformationService,
           needURI, wonNodeUri, needModel);
-
+        //remember the need URI so we can react to success/failure responses
+        EventBotActionUtils.rememberInListIfNamePresent(getEventListenerContext(), needURI, uriListName);
 
         //create an event listener that processes the response to the wonMessage we're about to send
         EventListener createResponseListener = new ActionOnEventListener(getEventListenerContext(),
@@ -96,11 +97,11 @@ public class CreateNeedWithFacetsAction extends BaseEventBotAction
             protected void doRun(final Event event) throws Exception {
               if (event instanceof SuccessResponseEvent) {
                 logger.debug("need creation successful, new need URI is {}", needURI);
-                EventBotActionUtils.rememberInListIfNamePresent(getEventListenerContext(), needURI, uriListName);
                 getEventListenerContext().getEventBus()
                                          .publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
               } else  if (event instanceof FailureResponseEvent){
                 logger.debug("need creation failed for need URI {}, original message URI {}", needURI, ((FailureResponseEvent) event).getOriginalMessageURI());
+                EventBotActionUtils.removeFromListIfNamePresent(getEventListenerContext(), needURI, uriListName);
                 getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
               }
             }
@@ -109,7 +110,7 @@ public class CreateNeedWithFacetsAction extends BaseEventBotAction
       getEventListenerContext().getEventBus().subscribe(SuccessResponseEvent.class, createResponseListener);
       getEventListenerContext().getEventBus().subscribe(FailureResponseEvent.class, createResponseListener);
       logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
-      getEventListenerContext().getOwnerService().sendWonMessage(createNeedMessage);
+      getEventListenerContext().getWonMessageSender().sendWonMessage(createNeedMessage);
       logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
     }
 

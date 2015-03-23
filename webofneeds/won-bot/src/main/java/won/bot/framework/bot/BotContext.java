@@ -16,6 +16,8 @@
 
 package won.bot.framework.bot;
 
+import com.sun.jndi.toolkit.url.Uri;
+
 import java.net.URI;
 import java.util.List;
 
@@ -61,12 +63,14 @@ public interface BotContext
    * @param uri
    */
   public void rememberNeedUri(URI uri);
-
   public void rememberNodeUri(URI uri);
-
   public void rememberNamedNeedUriList(List<URI> uris, String name);
   public void appendToNamedNeedUriList(URI uri, String name);
   public List<URI> getNamedNeedUriList(String name);
+
+  public void removeNeedUri(URI uri);
+  public void removeNamedNeedUri(String name);
+  public void removeNeedUriFromNamedNeedUriList(URI uri, String name);
 
   /**
    * Fetch a need URI by its name. The URI must have been given a name previously.

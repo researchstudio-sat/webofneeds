@@ -33,10 +33,10 @@ import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.message.WonMessage;
+import won.protocol.message.sender.WonMessageSender;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.model.Match;
-import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
@@ -94,7 +94,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onMessageFromOtherNeed(final Connection con, final WonMessage wonMessage) throws Exception
+  public void onMessageFromOtherNeed(final Connection con, final WonMessage wonMessage)
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new MessageFromOtherNeedEvent(con,  wonMessage));
@@ -104,7 +104,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onHintFromMatcher(final Match match, final WonMessage wonMessage) throws Exception
+  public void onHintFromMatcher(final Match match, final WonMessage wonMessage)
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new HintFromMatcherEvent(match, wonMessage));
@@ -114,7 +114,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage) throws Exception
+  public void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage)
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new CloseFromOtherNeedEvent(con, wonMessage));
@@ -124,7 +124,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage) throws Exception
+  public void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage)
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new OpenFromOtherNeedEvent(con, wonMessage));
@@ -134,7 +134,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onConnectFromOtherNeed(final Connection con, final WonMessage wonMessage) throws Exception
+  public void onConnectFromOtherNeed(final Connection con, final WonMessage wonMessage)
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new ConnectFromOtherNeedEvent(con, wonMessage));
@@ -285,9 +285,9 @@ public class EventBot extends TriggeredBot
       return EventBot.this.getMatcheNodeURISource();
     }
 
-    public OwnerProtocolNeedServiceClientSide getOwnerService()
+    public WonMessageSender getWonMessageSender()
     {
-      return EventBot.this.getOwnerService();
+      return EventBot.this.getWonMessageSender();
     }
 
     public MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient(){
@@ -298,7 +298,6 @@ public class EventBot extends TriggeredBot
     public MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService() {
       return EventBot.this.getMatcherProtocolMatcherService();
     }
-
 
     public NeedProducer getNeedProducer()
     {

@@ -1,4 +1,4 @@
-package won.node.annotation;
+package won.node.messaging.processors;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -39,8 +39,10 @@ public class WonMessageRoutes extends RouteBuilder
           .when(header("methodName").isEqualTo("getEndpoints"))
             .to("bean:queueManagementService?method=getEndpointsForOwnerApplication")
           .otherwise()
-            .to("bean:wonMessageCamelProcessor")
-            .routingSlip(method("wonMessageSlipComputer"));
+            .to("bean:wonMessageIntoCamelProcessor")
+            .to("bean:wellformednessChecker")
+            .to("bean:signatureChecker")
+            .to("bean:ownerCallbackAdapter");
   }
 
   private class ConstantStringExpression implements Expression

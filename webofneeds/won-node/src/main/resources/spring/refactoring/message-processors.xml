@@ -38,10 +38,6 @@
     <!-- find add-ons -->
     <context:component-scan base-package="won.node.contrib"/>
     <context:annotation-config />
-    <bean name="autoWiredAnnotationBeanPostProcessor"
-          class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
-    <bean name="wonMessageCamelProcessor" class="won.node.camel.processor.NodeWonMessageCamelProcessor"></bean>
-    <bean name="wonMessageSlipComputer" class="won.node.camel.processor.WonMessageSlipComputer"/>
 
 
 </beans>

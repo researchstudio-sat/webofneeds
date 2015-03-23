@@ -153,7 +153,7 @@ public class NeedCommunicationServiceImpl implements
       con.getConnectionURI(), wrappedMessage));
       reg.get(con).hint(con, wmScore, wmOriginator, facetModel, wrappedMessage);
              /*
-      WonMessage newWonMessage = WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(con.getConnectionURI(),
+      WonMessage newWonMessage = WonMessageBuilder.wrapAndSetTimestamp(con.getConnectionURI(),
                                                                                        wonMessage);
 
       messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(), newWonMessage));
@@ -185,11 +185,9 @@ public class NeedCommunicationServiceImpl implements
       final Connection con =  dataService.createConnection(senderNeedURI, receiverNeedURI, null, facetURI,
                                                      ConnectionState.REQUEST_SENT,
                                                      ConnectionEventType.OWNER_OPEN);
-
+       //---
       // add the connectionID to the wonMessage
-      final WonMessage newWonMessage = WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(
-        con.getConnectionURI(),
-        wonMessage);
+     final WonMessage newWonMessage = null; //BROKEN - we already refactored this!
 
       messageEventRepository.save(
         new MessageEventPlaceholder(con.getConnectionURI(), newWonMessage));

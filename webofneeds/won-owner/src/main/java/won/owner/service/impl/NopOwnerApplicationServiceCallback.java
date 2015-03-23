@@ -16,19 +16,19 @@
 
 package won.owner.service.impl;
 
-import won.owner.service.OwnerApplicationServiceCallback;
 import won.protocol.message.WonMessage;
+import won.protocol.message.processor.WonMessageProcessor;
+import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 /**
  * Handler implementation that does nothing. Useful for extending as well as pull-only cases
  * such as a simple Web application.
  */
-public class NopOwnerApplicationServiceCallback implements OwnerApplicationServiceCallback
+public class NopOwnerApplicationServiceCallback implements WonMessageProcessor
 {
 
-
   @Override
-  public void onMessage(final WonMessage wonMessage) {
-
+  public WonMessage process(WonMessage message) throws WonMessageProcessingException {
+    return message;
   }
 }

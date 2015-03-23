@@ -66,6 +66,53 @@
     <bean name="needProtocolCamelConfigurator" class="won.node.messaging.NeedProtocolCamelConfiguratorImpl">
         <property name="componentName" value="activemq"/>
     </bean>
-    <bean name="messageDynamicRouter" class="won.node.refactoring.messaging.NodeMessageDynamicRouter"/>
+
+
+  <!-- won-specific processors -->
+  <!-- start of the pipeline -->
+  <bean name="wonMessageIntoCamelProcessor" class="won.protocol.message.processor.camel.WonMessageIntoCamelProcessor" />
+  <!-- wrapping the messages for storage on node -->
+  <bean name="wrapperFromOwner" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.node.protocol.message.processor.impl.MessageWrappingWonMessageProcessor">
+        <constructor-arg name="direction" value="FROM_OWNER" />
+      </bean>
+    </constructor-arg>
+  </bean>
+  <bean name="wrapperFromExternal" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.node.protocol.message.processor.impl.MessageWrappingWonMessageProcessor">
+        <constructor-arg name="direction" value="FROM_EXTERNAL" />
+      </bean>
+    </constructor-arg>
+  </bean>
+  <!-- wrapping the messages for storage on node -->
+  <bean name="wrapperFromSystem" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.node.protocol.message.processor.impl.MessageWrappingWonMessageProcessor">
+        <constructor-arg name="direction" value="FROM_SYSTEM" />
+      </bean>
+    </constructor-arg>
+  </bean>
+  <!-- processor for checking well-formedness of messages -->
+  <bean name="wellformednessChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.protocol.message.processor.impl.WellformednessCheckingWonMessageProcessor" />
+    </constructor-arg>
+  </bean>
+  <!-- processor for checking signatures -->
+  <bean name="signatureChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor" />
+    </constructor-arg>
+  </bean>
+  <!-- persisting messages -->
+  <bean name="persister" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.node.protocol.message.processor.impl.PersistingWonMessageProcessor" />
+    </constructor-arg>
+  </bean>
+  <!-- routing logic for wonMessages, computing which static and facet code to execute -->
+  <bean name="wonMessageSlipComputer" class="won.node.camel.processor.WonMessageSlipComputer"/>
 
 </beans>

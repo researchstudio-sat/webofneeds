@@ -1,12 +1,12 @@
 package won.bot.integration;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.Bot;
 import won.bot.framework.manager.BotManager;
-import won.owner.service.BotProtocolAdapter;
+import won.owner.protocol.message.OwnerCallback;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -17,7 +17,8 @@ import java.util.Date;
 /**
  * OwnerProtocolOwnerServiceCallback that dispatches the calls to the bots.
  */
-public class BotOwnerProtocolAdapterCallback implements BotProtocolAdapter
+@Qualifier("default")
+public class BotOwnerCallback implements OwnerCallback
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   BotManager botManager;
@@ -27,7 +28,7 @@ public class BotOwnerProtocolAdapterCallback implements BotProtocolAdapter
 
 
   @Override
-  public void onClose(final Connection con, final Model content, final WonMessage wonMessage) {
+  public void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
@@ -42,7 +43,7 @@ public class BotOwnerProtocolAdapterCallback implements BotProtocolAdapter
 
 
   @Override
-  public void onHint(final Match match, final Model content, final WonMessage wonMessage) {
+  public void onHintFromMatcher(final Match match, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
@@ -55,7 +56,7 @@ public class BotOwnerProtocolAdapterCallback implements BotProtocolAdapter
   }
 
   @Override
-  public void onConnect(final Connection con, final Model content, final WonMessage wonMessage) {
+  public void onConnectFromOtherNeed(final Connection con, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
@@ -69,7 +70,7 @@ public class BotOwnerProtocolAdapterCallback implements BotProtocolAdapter
   }
 
   @Override
-  public void onOpen(final Connection con, final Model content, final WonMessage wonMessage) {
+  public void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
@@ -82,8 +83,7 @@ public class BotOwnerProtocolAdapterCallback implements BotProtocolAdapter
   }
 
   @Override
-  public void onTextMessage(final Connection con,
-                            final Model content, final WonMessage wonMessage) {
+  public void onMessageFromOtherNeed(final Connection con, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
@@ -97,12 +97,12 @@ public class BotOwnerProtocolAdapterCallback implements BotProtocolAdapter
   }
 
   @Override
-  public void onSuccessMessage(final URI successfulMessageUri, final WonMessage wonMessage) {
+  public void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
           logger.debug("onSuccessResponse for message {} ",successfulMessageUri);
-          URI needUri = wonMessage.getSenderNeedURI();
+          URI needUri = wonMessage.getReceiverNeedURI();
           getBotForNeedUri(needUri).onSuccessResponse(successfulMessageUri, wonMessage);
         } catch (Exception e) {
           logger.warn("error while handling onSuccessResponse()",e);
@@ -112,12 +112,12 @@ public class BotOwnerProtocolAdapterCallback implements BotProtocolAdapter
   }
 
   @Override
-  public void onFailureMessage(final URI failedMessageUri, final WonMessage wonMessage) {
+  public void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
     taskScheduler.schedule(new Runnable(){
       public void run(){
         try {
           logger.debug("onFailureResponse for message {} ",failedMessageUri);
-          URI needUri = wonMessage.getSenderNeedURI();
+          URI needUri = wonMessage.getReceiverNeedURI();
           getBotForNeedUri(needUri).onFailureResponse(failedMessageUri, wonMessage);
         } catch (Exception e) {
           logger.warn("error while handling onFailureResponse()",e);

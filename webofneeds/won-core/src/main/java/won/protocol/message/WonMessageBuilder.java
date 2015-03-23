@@ -366,7 +366,7 @@ public class WonMessageBuilder
       .setSenderNodeURI(localWonNode)
       .setReceiverURI(remoteFacet)
       .setReceiverNeedURI(remoteNeed)
-      .setReceiverNodeURI(receiverNodeURI)
+      .setReceiverNodeURI(remoteWonNode)
         // ToDo (FS): remove the hardcoded part of the URI
       .addContent(URI.create(messageURI.toString() + "/content"), facetModel, null)
       .setTimestampToNow();
@@ -495,6 +495,39 @@ public class WonMessageBuilder
         .setSenderNeedURI(localNeed)
         .setSenderNodeURI(localWonNode)
         .setTimestampToNow();
+    return this;
+  }
+
+  public WonMessageBuilder setPropertiesForPassingMessageToRemoteNode(final WonMessage ownerOrSystemMsg, URI newMessageUri){
+            this.setMessageURI(newMessageUri)
+            .setTimestamp(new Date().getTime())
+            .copyContentFromMessageReplacingMessageURI(ownerOrSystemMsg)
+            .addRefersToURI(ownerOrSystemMsg.getMessageURI())
+            .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
+    return this;
+  }
+
+  public WonMessageBuilder setPropertiesForNodeResponse(WonMessage originalMessage, boolean isSuccess, URI messageURI){
+    this.setWonMessageType(isSuccess? WonMessageType.SUCCESS_RESPONSE : WonMessageType.FAILURE_RESPONSE)
+        .setMessageURI(messageURI);
+    WonMessageDirection origDirection = originalMessage.getEnvelopeType();
+    if (WonMessageDirection.FROM_EXTERNAL == origDirection){
+      //if the message is an external message, the original receiver becomes
+      //the sender of the response.
+      this.setSenderNodeURI(originalMessage.getReceiverNodeURI());
+      this.setSenderNeedURI(originalMessage.getReceiverNeedURI());
+      this.setSenderURI(originalMessage.getReceiverURI());
+    } else if (WonMessageDirection.FROM_OWNER == origDirection|| WonMessageDirection.FROM_SYSTEM == origDirection ){
+      //if the message comes from the owner, the original sender is also
+      //the sender of the response
+      this.setSenderNodeURI( originalMessage.getSenderNodeURI());
+      this.setSenderNeedURI(originalMessage.getSenderNeedURI());
+      this.setSenderURI(originalMessage.getSenderURI());
+    }
+      this.setReceiverNeedURI(originalMessage.getSenderNeedURI())
+        .setReceiverURI(originalMessage.getSenderURI())
+        .setIsResponseToMessageURI(originalMessage.getMessageURI())
+        .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM);
     return this;
   }
 
@@ -689,17 +722,7 @@ public class WonMessageBuilder
       .build();
   }
 
-  public static WonMessage wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(final URI localConnectionUri, final WonMessage
-    outboundWonMessage){
-    WonMessageBuilder builder = new WonMessageBuilder()
-      .wrap(outboundWonMessage)
-      .setTimestamp(new Date().getTime());
-    if (localConnectionUri != null) {
-      builder.setSenderURI(localConnectionUri);
-    }
-    builder.setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
-    return builder.build();
-  }
+
 
   @Deprecated
   public static WonMessage wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(final WonMessage

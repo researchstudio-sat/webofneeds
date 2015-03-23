@@ -2,8 +2,8 @@ package won.node.refactoring.facet.impl.annotated.ownerFacet;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.stereotype.Component;
-import won.node.annotation.DefaultFacetMessageProcessor;
-import won.node.annotation.FacetMessageProcessor;
+import won.node.messaging.processors.DefaultFacetMessageProcessor;
+import won.node.messaging.processors.FacetMessageProcessor;
 import won.node.refactoring.FacetCamel;
 import won.node.refactoring.facet.impl.annotated.AbstractFacetAnnotated;
 import won.protocol.exception.IllegalMessageForConnectionStateException;

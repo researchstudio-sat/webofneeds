@@ -115,14 +115,6 @@ public enum ConnectionState
     return URI.create(WON.BASE_URI + name);
   }
 
-  public static ConnectionState fromURI(URI uri){
-    if (SUGGESTED.getURI().equals(uri)) return SUGGESTED;
-    if (CLOSED.getURI().equals(uri)) return CLOSED;
-    if (REQUEST_SENT.getURI().equals(uri)) return REQUEST_SENT;
-    if (REQUEST_RECEIVED.getURI().equals(uri)) return REQUEST_RECEIVED;
-    if (CONNECTED.getURI().equals(uri)) return CONNECTED;
-    return null;
-  }
 
   /**
    * Tries to match the given string against all enum values.

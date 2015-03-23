@@ -31,7 +31,7 @@
         <property name="needProducer" ref="needProducerMixed" />
         <property name="nodeURISource" ref="nodeUriSourceRandom" />
         <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->
-        <property name="ownerService" ref="ownerProtocolNeedServiceClientJMSBased" />
+        <property name="wonMessageSender" ref="ownerProtocolNeedServiceClientJMSBased" />
         <property name="trigger">
             <bean class="org.springframework.scheduling.support.PeriodicTrigger">
                 <constructor-arg name="period" value="20" />

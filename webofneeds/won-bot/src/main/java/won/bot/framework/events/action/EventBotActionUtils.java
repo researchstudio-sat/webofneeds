@@ -37,9 +37,19 @@ public class EventBotActionUtils
           ctx.getBotContext().rememberNeedUri(uri);
         logger.debug("remembering need in List {} ", uri);
       }
-
   }
+
   public static void rememberInNodeListIfNamePresent(EventListenerContext ctx, URI uri){
     ctx.getBotContext().rememberNodeUri(uri);
+  }
+
+  public static void removeFromListIfNamePresent(EventListenerContext ctx ,URI uri, String uriListName) {
+    if (uriListName != null && uriListName.trim().length() > 0){
+      ctx.getBotContext().removeNeedUriFromNamedNeedUriList(uri, uriListName);
+      logger.debug("removing need from NamedNeedList {} ", uri);
+    } else {
+      ctx.getBotContext().removeNeedUri(uri);
+      logger.debug("removed need from bot context {} ", uri);
+    }
   }
 }
