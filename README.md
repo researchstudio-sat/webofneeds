@@ -19,6 +19,8 @@ Requirements for getting started:
 - maven 2 or later
 - tomcat 6 or later as application-server
 
+For Build instructions and more detailed information, [please consult the wiki](https://github.com/researchstudio-sat/webofneeds/wiki).
+
 To prevent reinventing the wheel every single day, 
 we come back to existing (old) technology for the matching services:
 - siren                   -> http://siren.sindice.com/ 
