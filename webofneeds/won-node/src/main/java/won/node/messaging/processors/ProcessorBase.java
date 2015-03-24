@@ -115,8 +115,7 @@ public abstract class ProcessorBase
 
     CamelConfiguration camelConfiguration = null;
     try {
-      camelConfiguration = needProtocolCommunicationService.configureCamelEndpoint(remoteNeedUri,needUri,
-                                                                                                      "seda:NeedProtocol.Out");
+      camelConfiguration = needProtocolCommunicationService.configureCamelEndpoint(message.getReceiverNodeURI());
     } catch (Exception e) {
       logger.info("error sending message to node", e);
       throw new RuntimeException("error sending message to node: could not configure camel endpoint", e);

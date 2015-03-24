@@ -1,6 +1,5 @@
 package won.node.refactoring.facet.impl.annotated;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -11,17 +10,13 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import won.node.refactoring.FacetCamel;
 import won.node.service.DataAccessService;
 import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
@@ -63,9 +58,9 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
   /**
    * Client talking another need via the need protocol
    */
-  @Autowired
+ /* @Autowired
   @Qualifier("needProtocolNeedClient")
-  protected NeedProtocolNeedClientSide needProtocolNeedService;
+  protected NeedProtocolNeedClientSide needProtocolNeedService;*/
   /**
    * Client talking to the owner side via the owner protocol
    */
@@ -382,9 +377,9 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
     final Connection connectionForRunnable = con;
     //send to need
 
-    try {
-      final ListenableFuture<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(),
-        con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel, wonMessage);
+    //try {
+      /*final ListenableFuture<URI> remoteConnectionURI = needProtocolNeedService.connect(con.getRemoteNeedURI(),
+        con.getNeedURI(), connectionForRunnable.getConnectionURI(), remoteFacetModel, wonMessage);*/
       this.executorService.execute(new Runnable(){
         @Override
         public void run() {
@@ -392,7 +387,7 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
             if (logger.isDebugEnabled()) {
               logger.debug("saving remote connection URI");
             }
-            dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
+           // dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
           } catch (Exception e) {
             logger.warn("Error saving connection {}. Stacktrace follows", con);
             logger.warn("Error saving connection ", e);
@@ -400,7 +395,7 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
         }
       });
 
-    } catch (WonProtocolException e) {
+    /*} catch (WonProtocolException e) {
       // we can't connect the connection. we send a close back to the owner
       // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
       // For now, we call the close method as if it had been called from the remote side
@@ -431,7 +426,7 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
       }
     } catch (Exception e) {
         logger.warn("caught Exception in connectFromOwner: ",e);
-    }
+    }*/
   }
 
   /**
@@ -532,9 +527,7 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
     this.URIService = URIService;
   }
 
-  public void setNeedFacingConnectionClient(NeedProtocolNeedClientSide needFacingConnectionClient) {
-    this.needFacingConnectionClient = needFacingConnectionClient;
-  }
+
 
   public void setOwnerFacingConnectionCommunicationService(OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService) {
  //   this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
@@ -544,9 +537,9 @@ public abstract class AbstractFacetAnnotated implements FacetCamel
   //  this.needFacingConnectionCommunicationService = needFacingConnectionCommunicationService;
   }
 
-  public void setNeedProtocolNeedService(NeedProtocolNeedClientSide needProtocolNeedServiceClient) {
+  /*public void setNeedProtocolNeedService(NeedProtocolNeedClientSide needProtocolNeedServiceClient) {
     this.needProtocolNeedService = needProtocolNeedServiceClient;
-  }
+  }*/
 
   public void setOwnerProtocolOwnerService(OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService) {
     this.ownerProtocolOwnerService = ownerProtocolOwnerService;

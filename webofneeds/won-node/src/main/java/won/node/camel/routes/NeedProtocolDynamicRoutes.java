@@ -16,13 +16,11 @@
 
 package won.node.camel.routes;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.builder.RouteBuilder;
-
 /**
  * User: LEIH-NB
  * Date: 25.11.13
  */
+/*
 public class NeedProtocolDynamicRoutes extends RouteBuilder {
 
 
@@ -40,3 +38,4 @@ public class NeedProtocolDynamicRoutes extends RouteBuilder {
                 .recipientList(header("remoteBrokerEndpoint"));
     }
 }
+*/

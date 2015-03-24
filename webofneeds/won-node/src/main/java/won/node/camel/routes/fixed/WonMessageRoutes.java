@@ -42,11 +42,6 @@ public class WonMessageRoutes  extends RouteBuilder
      * Need protocol, incoming
      */
     from("activemq:queue:NeedProtocol.in?concurrentConsumers=5")
-      .to("seda:NeedProtocolIn");
-    /**
-     * Need protocol, incoming from local
-     */
-    from("seda:NeedProtocolIn")
        .routeId("WonMessageNodeRoute")
        .setHeader("direction", new ConstantStringExpression(WONMSG.TYPE_FROM_EXTERNAL_STRING))
        .choice()
@@ -84,7 +79,7 @@ public class WonMessageRoutes  extends RouteBuilder
     /**
      * Outgoing messages - routing by 'protocol' header
      */
-    from("seda:OUTMSG").routeId("ProtocolSelectorRoute")
+    from("seda:OUTMSG")
             .wireTap("bean:messagingService?method=inspectMessage")
             .choice()
             .when(header("protocol").isEqualTo("OwnerProtocol"))
