@@ -16,16 +16,15 @@
 
 package won.node.messaging.processors;
 
-import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.cryptography.service.RandomNumberService;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.node.service.DataAccessService;
-import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MessagingService;
 import won.protocol.jms.NeedProtocolCommunicationService;
 import won.protocol.message.WonMessage;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Need;
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.*;
@@ -49,7 +48,6 @@ public abstract class ProcessorBase
 
   protected Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-  public static Lang RDF_LANGUAGE_FOR_MESSAGE = Lang.TRIG;
 
   @Autowired
   protected MessagingService messagingService;
@@ -92,38 +90,31 @@ public abstract class ProcessorBase
     Map headerMap = new HashMap<String, Object>();
     headerMap.put("ownerApplications", toStringIds(ownerApplications));
     messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),
-        RDF_LANGUAGE_FOR_MESSAGE),
-                                       "outgoingMessages");
+        WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
+                                       "seda:OwnerProtocolOut");
   }
 
   protected void sendMessageToOwner(WonMessage message, List<String> ownerApplicationIds){
     Map headerMap = new HashMap<String, Object>();
     headerMap.put("protocol","OwnerProtocol");
     headerMap.put("ownerApplications", ownerApplicationIds);
-    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),RDF_LANGUAGE_FOR_MESSAGE),
-                                       "outgoingMessages");
+    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),
+        WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
+                                       "seda:OwnerProtocolOut");
   }
 
   protected void sendMessageToOwner(WonMessage message, String... ownerApplicationIds){
     Map headerMap = new HashMap<String, Object>();
     headerMap.put("ownerApplications", Arrays.asList(ownerApplicationIds));
-    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),RDF_LANGUAGE_FOR_MESSAGE),
-                                       "outgoingMessages");
+    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
+                                       "seda:OwnerProtocolOut");
   }
 
-  protected void sendMessageToNode(WonMessage message, URI needUri, URI remoteNeedUri){
-
-    CamelConfiguration camelConfiguration = null;
-    try {
-      camelConfiguration = needProtocolCommunicationService.configureCamelEndpoint(message.getReceiverNodeURI());
-    } catch (Exception e) {
-      logger.info("error sending message to node", e);
-      throw new RuntimeException("error sending message to node: could not configure camel endpoint", e);
-    }
+  protected void sendMessageToNode(WonMessage message){
     Map headerMap = new HashMap<String, Object>();
-    headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
-    messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),RDF_LANGUAGE_FOR_MESSAGE),
-                                       "outgoingMessages");
+    headerMap.put(WonCamelConstants.WON_MESSAGE_HEADER, message);
+    messagingService.sendInOnlyMessage(null, headerMap, null,
+                                       "seda:NeedProtocolOut");
   }
 
   protected List<String> toStringIds(final List<OwnerApplication> ownerApplications) {

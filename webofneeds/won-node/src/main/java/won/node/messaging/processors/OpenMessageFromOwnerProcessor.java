@@ -42,7 +42,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractInOnlyMessageProcesso
   MessageEventRepository messageEventRepository;
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
     Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getSenderURI());
 
     logger.debug("STORING message with id {}", wonMessage.getMessageURI());
@@ -68,7 +68,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractInOnlyMessageProcesso
     messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonMessage,
                                                             newWonMessage));
 
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER,newWonMessage);
+    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER,newWonMessage);
     //invoke facet implementation
     //reg.get(con).openFromOwner(con, content, newWonMessage);
   }

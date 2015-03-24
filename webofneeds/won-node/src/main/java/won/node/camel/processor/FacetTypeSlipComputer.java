@@ -1,8 +1,23 @@
+/*
+ * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package won.node.camel.processor;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
-import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -10,9 +25,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import won.node.messaging.processors.DefaultFacetMessageProcessor;
 import won.node.messaging.processors.FacetMessageProcessor;
-import won.node.messaging.processors.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.util.RdfUtils;
 
 import java.lang.annotation.Annotation;
@@ -26,10 +41,9 @@ import java.util.Map;
  * User: syim
  * Date: 11.03.2015
  */
-public class WonMessageSlipComputer implements InitializingBean, ApplicationContextAware, Expression
+public class FacetTypeSlipComputer implements InitializingBean, ApplicationContextAware, Expression
 {
   Logger logger = LoggerFactory.getLogger(this.getClass());
-  HashMap<String, Object> fixedMessageProcessorsMap;
   HashMap<String, Object> facetMessageProcessorsMap;
   private ApplicationContext applicationContext;
 
@@ -40,8 +54,6 @@ public class WonMessageSlipComputer implements InitializingBean, ApplicationCont
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    fixedMessageProcessorsMap = (HashMap)applicationContext.getBeansWithAnnotation(FixedMessageProcessor
-            .class);
     facetMessageProcessorsMap =  (HashMap)applicationContext.getBeansWithAnnotation(FacetMessageProcessor
             .class);
 
@@ -50,7 +62,7 @@ public class WonMessageSlipComputer implements InitializingBean, ApplicationCont
 
   @Override
   public <T> T evaluate(final Exchange exchange, final Class<T> type) {
-    WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
+    WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
     assert message != null : "wonMessage header must not be null";
     String slip ="";
     // exchange.getIn().setHeader();
@@ -60,8 +72,7 @@ public class WonMessageSlipComputer implements InitializingBean, ApplicationCont
     assert direction != null : "direction header must not be null";
     URI facetType = RdfUtils.toUriOrNull(exchange.getIn().getHeader("facetType"));
     try {
-      slip = computeMessageTypeSlip(slip,messageType,direction);
-      slip = computeFacetSlip(slip,messageType, facetType, direction);
+      slip = computeFacetSlip(messageType, facetType, direction);
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
     } catch (InvocationTargetException e) {
@@ -73,7 +84,7 @@ public class WonMessageSlipComputer implements InitializingBean, ApplicationCont
     return type.cast(slip);
   }
 
-  private String computeFacetSlip(String slip, URI messageType, URI facetType,URI direction)
+  private String computeFacetSlip(URI messageType, URI facetType, URI direction)
     throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     Iterator iter = facetMessageProcessorsMap.entrySet().iterator();
     while(iter.hasNext()){
@@ -82,43 +93,17 @@ public class WonMessageSlipComputer implements InitializingBean, ApplicationCont
       if (facetType != null) {
         Annotation annotation = facet.getClass().getAnnotation(FacetMessageProcessor.class);
         if(matches(annotation, messageType, direction, facetType)){
-          slip += ",bean:"+pair.getKey().toString()+"?method=process";
-          break;
+          return "bean:"+pair.getKey().toString();
         }
       } else {
         Annotation annotation = facet.getClass().getAnnotation(DefaultFacetMessageProcessor.class);
         if(matches(annotation, messageType, direction, facetType)){
-          slip += ",bean:"+pair.getKey().toString()+"?method=process";
-          break;
+          return "bean:"+pair.getKey().toString();
         }
       }
     }
-    return slip;
-  }
-
-  private String computeMessageTypeSlip(String slip, URI messageType,URI direction)
-    throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    Iterator iter = fixedMessageProcessorsMap.entrySet().iterator();
-    while (iter.hasNext()) {
-      Map.Entry pair = (Map.Entry)iter.next();
-      Processor wonMessageProcessor = (Processor)pair.getValue();
-      Annotation annotation = wonMessageProcessor.getClass().getAnnotation(FixedMessageProcessor.class);
-
-      if(matches(annotation, messageType, direction, null)){
-        slip = pair.getKey().toString();
-        break;
-      }
-    }
-    return slip;
-  }
-
-  private String addToSlip(String slip, Object key){
-    if(slip.length()==0){
-      slip += key;
-    }else{
-      slip += ","+key;
-    }
-    return slip;
+    throw new WonMessageProcessingException(String.format("unexpected combination of messageType, " +
+      "facetType and direction encountered:  %s, %s, %s", messageType, facetType, direction));
   }
 
   private boolean matches(Annotation annotation, URI messageType, URI direction, URI facetType)

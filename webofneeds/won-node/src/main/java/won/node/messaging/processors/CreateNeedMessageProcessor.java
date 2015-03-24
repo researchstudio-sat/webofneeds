@@ -41,7 +41,7 @@ public class CreateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
   @Override
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
     Need need = storeNeed(wonMessage);
     authorizeOwnerApplicationForNeed(message, need);
     try {

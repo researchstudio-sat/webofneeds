@@ -43,7 +43,7 @@ public class SendMessageFromNodeOwnerFacetImpl extends AbstractInOnlyMessageProc
 
   @Override
   public void process(final Exchange exchange) {
-    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
+    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
     //just send the message
     this.sendMessageToOwner(wonMessage, wonMessage.getReceiverNeedURI());
   }

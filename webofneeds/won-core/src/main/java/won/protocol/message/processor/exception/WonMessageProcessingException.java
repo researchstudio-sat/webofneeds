@@ -19,7 +19,7 @@ package won.protocol.message.processor.exception;
 /**
  * Base class for exceptions thrown during message processing
  */
-public abstract class WonMessageProcessingException extends RuntimeException
+public class WonMessageProcessingException extends RuntimeException
 {
   public WonMessageProcessingException() {
   }

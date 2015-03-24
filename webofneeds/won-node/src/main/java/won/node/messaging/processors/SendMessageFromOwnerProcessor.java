@@ -53,7 +53,7 @@ public class SendMessageFromOwnerProcessor extends AbstractInOnlyMessageProcesso
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
     WonMessage newWonMessage = new WonMessageBuilder()
       .wrap(wonMessage)
       .setTimestamp(System.currentTimeMillis())
@@ -71,7 +71,7 @@ public class SendMessageFromOwnerProcessor extends AbstractInOnlyMessageProcesso
     messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonMessage,
                                                             newWonMessage));
 
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER,newWonMessage);
+    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER,newWonMessage);
     final Connection connection = con;
     boolean feedbackWasPresent = RdfUtils.applyMethod(newWonMessage.getMessageContent(),
                                                       new RdfUtils.ModelVisitor<Boolean>()

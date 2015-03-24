@@ -58,7 +58,7 @@ public class DeactivateNeedMessageProcessor extends AbstractInOnlyMessageProcess
 
 
   public void process(final Exchange exchange) throws Exception {
-    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
+    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
     WonMessage newWonMessage = WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(wonMessage);
     logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
     rdfStorage.storeDataset(newWonMessage.getMessageURI(),

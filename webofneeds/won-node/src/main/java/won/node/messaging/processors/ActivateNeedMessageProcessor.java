@@ -44,7 +44,7 @@ public class ActivateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
 
   public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
     WonMessage newWonMessage =  WonMessageBuilder.wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(
       wonMessage);
     logger.debug("STORING message with id {}", newWonMessage.getMessageURI());

@@ -67,6 +67,11 @@
         <property name="componentName" value="activemq"/>
     </bean>
 
+    <bean id="needProtocolOutgoingMessagesProcessor"
+          class="won.node.camel.processor.NeedProtocolOutgoingMessagesProcessor" />
+
+    <bean id="successResponder"
+          class="won.node.messaging.processors.SuccessResponder" />
 
   <!-- won-specific processors -->
   <!-- start of the pipeline -->
@@ -112,7 +117,8 @@
       <bean class="won.node.protocol.message.processor.impl.PersistingWonMessageProcessor" />
     </constructor-arg>
   </bean>
-  <!-- routing logic for wonMessages, computing which static and facet code to execute -->
-  <bean name="wonMessageSlipComputer" class="won.node.camel.processor.WonMessageSlipComputer"/>
-
+  <!-- routing logic for wonMessages, computing which message-type specific processor -->
+  <bean name="messageTypeSlip" class="won.node.camel.processor.MessageTypeSlipComputer"/>
+  <!-- routing logic for wonMessages, computing which facet-specific processor to use -->
+  <bean name="facetTypeSlip" class="won.node.camel.processor.FacetTypeSlipComputer"/>
 </beans>

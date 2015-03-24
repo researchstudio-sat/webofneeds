@@ -19,6 +19,14 @@ package won.bot.framework.events.action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.event.impl.FailureResponseEvent;
+import won.bot.framework.events.event.impl.SuccessResponseEvent;
+import won.bot.framework.events.filter.impl.AcceptOnceFilter;
+import won.bot.framework.events.filter.impl.OriginalMessageUriResponseEventFilter;
+import won.bot.framework.events.listener.EventListener;
+import won.bot.framework.events.listener.impl.ActionOnEventListener;
+import won.protocol.message.WonMessage;
 
 import java.net.URI;
 
@@ -52,4 +60,37 @@ public class EventBotActionUtils
       logger.debug("removed need from bot context {} ", uri);
     }
   }
+
+  /**
+   * Creates a listener that waits for the response to the specified message. If a SuccessResponse is received,
+   * the successCallbck is executed, if a FailureResponse is received, the failureCallback is executed.
+   * @param needURI
+   * @param createNeedMessage
+   * @param successCallback
+   * @param failureCallback
+   * @param context
+   * @return
+   */
+ public static EventListener makeAndSubscribeResponseListener(final URI needURI, final WonMessage createNeedMessage,
+   final EventListener successCallback, final EventListener failureCallback, EventListenerContext context) {
+
+    //create an event listener that processes the response to the wonMessage we're about to send
+    EventListener listener = new ActionOnEventListener(context,
+      new AcceptOnceFilter(OriginalMessageUriResponseEventFilter.forWonMessage(createNeedMessage)),
+      new BaseEventBotAction(context)
+      {
+        @Override
+        protected void doRun(final Event event) throws Exception {
+          if (event instanceof SuccessResponseEvent) {
+            successCallback.onEvent(event);
+          } else  if (event instanceof FailureResponseEvent){
+            failureCallback.onEvent(event);
+          }
+        }
+      });
+   context.getEventBus().subscribe(SuccessResponseEvent.class, listener);
+   context.getEventBus().subscribe(FailureResponseEvent.class, listener);
+   return listener;
+  }
+
 }

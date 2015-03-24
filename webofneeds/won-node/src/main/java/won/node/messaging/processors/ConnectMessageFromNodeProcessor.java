@@ -77,7 +77,7 @@ public class ConnectMessageFromNodeProcessor extends AbstractInOnlyMessageProces
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
     // a need wants to connect.
     // get the required data from the message and create a connection
     URI needURIFromWonMessage = wonMessage.getReceiverNeedURI();
@@ -99,22 +99,18 @@ public class ConnectMessageFromNodeProcessor extends AbstractInOnlyMessageProces
                                                   facetURI,
                                                   ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
 
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER, wonMessage);
-    //send response
-    WonMessage successResponseMessage = makeSuccessResponseMessage(wonMessage, con);
-    sendMessageToNode(successResponseMessage, wonMessage.getReceiverNeedURI(), wonMessage.getSenderNeedURI());
+    //build message to send to owner, put in header
+    final WonMessage newWonMessage = createMessageToSendToOwner(wonMessage, con);
+    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, newWonMessage);
   }
 
-  private WonMessage makeSuccessResponseMessage(WonMessage originalMessage, Connection con) {
-    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-    wonMessageBuilder.setPropertiesForNodeResponse(
-            originalMessage,
-            true,
-            this.wonNodeInformationService.generateEventURI());
-    //hack(?): set sender to the new connection uri to communicate it to the original sender.
-    // alternative: use a dedicated property (msg:newConnectionUri [uri]) in the message
-    wonMessageBuilder.setSenderURI(con.getConnectionURI());
-    return wonMessageBuilder.build();
+  private WonMessage createMessageToSendToOwner(WonMessage wonMessage, Connection con) {
+    //create the message to send to the owner
+    return new WonMessageBuilder()
+      .setPropertiesForPassingMessageToOwner(wonMessage)
+      .setReceiverURI(con.getConnectionURI())
+      .build();
   }
+
 
 }

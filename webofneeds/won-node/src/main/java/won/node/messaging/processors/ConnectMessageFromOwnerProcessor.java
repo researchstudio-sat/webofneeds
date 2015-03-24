@@ -25,7 +25,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractInOnlyMessageProce
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
     URI senderNeedURI = wonMessage.getSenderNeedURI();
     URI receiverNeedURI = wonMessage.getReceiverNeedURI();
     URI facetURI = WonRdfUtils.FacetUtils.getFacet(wonMessage);
@@ -34,12 +34,14 @@ public class ConnectMessageFromOwnerProcessor extends AbstractInOnlyMessageProce
                                                         ConnectionState.REQUEST_SENT,
                                                         ConnectionEventType.OWNER_OPEN);
 
+    //add the information about the new local connection to the original message
+    wonMessage = new WonMessageBuilder().wrap(wonMessage).setSenderURI(con.getConnectionURI()).build();
+    //put it into the header so the persister will pick it up later
+    message.setHeader(WonCamelConstants.WON_MESSAGE_HEADER,wonMessage);
+    //prepare the message to pass to the remote node
     final WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage, con);
-
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER, newWonMessage);
-
-    WonMessage successResponse = makeSuccessResponseMessage(wonMessage, con);
-    sendMessageToOwner(successResponse, senderNeedURI);
+    //put it into the 'modified message' header (so the persister doesn't pick up the wrong one).
+    exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
   }
 
   private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage, Connection con) {
@@ -51,19 +53,6 @@ public class ConnectMessageFromOwnerProcessor extends AbstractInOnlyMessageProce
                             .generateEventURI(wonMessage.getReceiverNodeURI()))
             .setSenderURI(con.getConnectionURI())
             .build();
-  }
-
-  private WonMessage makeSuccessResponseMessage(WonMessage originalMessage, Connection con) {
-    WonMessageBuilder wonMessageBuilder = new WonMessageBuilder();
-    wonMessageBuilder.setPropertiesForNodeResponse(
-            originalMessage,
-            true,
-            this.wonNodeInformationService.generateEventURI());
-    //hack(?): set sender and receiver to the new connection uri to communicate it to the owner.
-    // alternative: use a dedicated property (msg:newConnectionUri [uri]) in the message
-    wonMessageBuilder.setSenderURI(con.getConnectionURI());
-    wonMessageBuilder.setReceiverURI(con.getConnectionURI());
-    return wonMessageBuilder.build();
   }
 
 }

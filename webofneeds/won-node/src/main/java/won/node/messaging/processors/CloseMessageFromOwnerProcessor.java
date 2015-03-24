@@ -37,7 +37,7 @@ public class CloseMessageFromOwnerProcessor extends AbstractInOnlyMessageProcess
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
 
     WonMessage newWonMessage = new WonMessageBuilder()
       .wrap(wonMessage)
@@ -58,7 +58,7 @@ public class CloseMessageFromOwnerProcessor extends AbstractInOnlyMessageProcess
     messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(),
                                                             newWonMessage));
 
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER,newWonMessage);
+    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER,newWonMessage);
 
 
     //invoke facet implementation

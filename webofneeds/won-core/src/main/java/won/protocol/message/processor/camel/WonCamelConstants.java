@@ -16,13 +16,18 @@
 
 package won.protocol.message.processor.camel;
 
+import org.apache.jena.riot.Lang;
+
 /**
  * Constants used for camel.
  */
 public class WonCamelConstants {
-  public static final String WON_MESSAGE_EXCHANGE_HEADER = "wonMessage";
-  public static final String DIRECTION_EXCHANGE_HEADER = "wonDirection";
-  public static final String FACET_TYPE_EXCHANGE_HEADER = "wonFacetType";
-  public static final String MESSAGE_TYPE_EXCHANGE_HEADER = "wonMessageType";
+  public static final String WON_MESSAGE_HEADER = "wonMessage";
+  public static final String DIRECTION_HEADER = "wonDirection";
+  public static final String FACET_TYPE_HEADER = "wonFacetType";
+  public static final String MESSAGE_TYPE_HEADER = "wonMessageType";
 
+  public static final Lang RDF_LANGUAGE_FOR_MESSAGE = Lang.TRIG;
+  public static final String ORIGINAL_WON_MESSAGE_HEADER = "wonOriginalMessage";
+  public static final String OUTBOUND_MESSAGE_HEADER = "wonModifiedMessage";
 }

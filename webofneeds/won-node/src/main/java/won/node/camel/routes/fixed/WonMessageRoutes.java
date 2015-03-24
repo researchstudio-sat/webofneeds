@@ -4,6 +4,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -31,7 +32,11 @@ public class WonMessageRoutes  extends RouteBuilder
             .to("bean:wellformednessChecker")
             .to("bean:signatureChecker")
             .to("bean:wrapperFromOwner")
-            .routingSlip(method("wonMessageSlipComputer"));
+            .routingSlip(method("messageTypeSlip"))
+            .to("bean:persister")
+            .setHeader(WonCamelConstants.WON_MESSAGE_HEADER, header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER))
+            .routingSlip(method("facetTypeSlip"))
+            .to("bean:successResponder");
     /**
      * Owner protocol, outgoing
      */
@@ -55,7 +60,10 @@ public class WonMessageRoutes  extends RouteBuilder
             .to("bean:wellformednessChecker")
             .to("bean:signatureChecker")
             .to("bean:wrapperFromExternal")
-            .routingSlip(method("wonMessageSlipComputer"));
+            .routingSlip(method("messageTypeSlip"))
+            .to("bean:persister")
+            .routingSlip(method("facetTypeSlip"))
+            .to("bean:successResponder");
     /**
      * Need protocol, outgoing
      */
@@ -76,18 +84,7 @@ public class WonMessageRoutes  extends RouteBuilder
           .to("bean:persister")
         .otherwise()
           .log(LoggingLevel.INFO, "could not route message");
-    /**
-     * Outgoing messages - routing by 'protocol' header
-     */
-    from("seda:OUTMSG")
-            .wireTap("bean:messagingService?method=inspectMessage")
-            .choice()
-            .when(header("protocol").isEqualTo("OwnerProtocol"))
-            .to("seda:OwnerProtocolOut")
-            .when(header("protocol").isEqualTo("MatcherProtocol"))
-            .to("seda:MatcherProtocolOut")
-            .otherwise()
-            .to("log:No protocol defined in header");
+
 
   }
 

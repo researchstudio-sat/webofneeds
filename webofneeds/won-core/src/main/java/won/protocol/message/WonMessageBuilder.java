@@ -256,6 +256,7 @@ public class WonMessageBuilder
    */
   public WonMessageBuilder wrap(WonMessage toWrap){
     this.setMessageURI(toWrap.getMessageURI());
+    this.setWonMessageDirection(toWrap.getEnvelopeType());
     this.wrappedMessage = toWrap;
     return this;
   }
@@ -373,7 +374,6 @@ public class WonMessageBuilder
       .setWonMessageType(WonMessageType.CONNECT)
       .setSenderNeedURI(localNeed)
       .setSenderNodeURI(localWonNode)
-      .setReceiverURI(remoteFacet)
       .setReceiverNeedURI(remoteNeed)
       .setReceiverNodeURI(remoteWonNode)
         // ToDo (FS): remove the hardcoded part of the URI
@@ -517,6 +517,16 @@ public class WonMessageBuilder
     return this;
   }
 
+  public WonMessageBuilder setPropertiesForPassingMessageToOwner(final WonMessage externalMsg){
+    this.setMessageURI(externalMsg.getMessageURI())
+        .setTimestamp(new Date().getTime())
+        .copyContentFromMessageReplacingMessageURI(externalMsg)
+        .copyEnvelopeFromWonMessage(externalMsg)
+        .setCorrespondingRemoteMessageURI(externalMsg.getMessageURI())
+        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
+    return this;
+  }
+
   public WonMessageBuilder setPropertiesForNodeResponse(WonMessage originalMessage, boolean isSuccess, URI messageURI){
     this.setWonMessageType(isSuccess? WonMessageType.SUCCESS_RESPONSE : WonMessageType.FAILURE_RESPONSE)
         .setMessageURI(messageURI);
@@ -524,20 +534,24 @@ public class WonMessageBuilder
     if (WonMessageDirection.FROM_EXTERNAL == origDirection){
       //if the message is an external message, the original receiver becomes
       //the sender of the response.
-      this.setSenderNodeURI(originalMessage.getReceiverNodeURI());
-      this.setSenderNeedURI(originalMessage.getReceiverNeedURI());
-      this.setSenderURI(originalMessage.getReceiverURI());
+      this
+        .setSenderNodeURI(originalMessage.getReceiverNodeURI())
+        .setSenderNeedURI(originalMessage.getReceiverNeedURI())
+        .setSenderURI(originalMessage.getReceiverURI());
     } else if (WonMessageDirection.FROM_OWNER == origDirection|| WonMessageDirection.FROM_SYSTEM == origDirection ){
       //if the message comes from the owner, the original sender is also
       //the sender of the response
-      this.setSenderNodeURI( originalMessage.getSenderNodeURI());
-      this.setSenderNeedURI(originalMessage.getSenderNeedURI());
-      this.setSenderURI(originalMessage.getSenderURI());
+      this
+        .setSenderNodeURI(originalMessage.getSenderNodeURI())
+        .setSenderNeedURI(originalMessage.getSenderNeedURI())
+        .setSenderURI(originalMessage.getSenderURI());
     }
-      this.setReceiverNeedURI(originalMessage.getSenderNeedURI())
-        .setReceiverURI(originalMessage.getSenderURI())
-        .setIsResponseToMessageURI(originalMessage.getMessageURI())
-        .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM);
+    this
+      .setReceiverNeedURI(originalMessage.getSenderNeedURI())
+      .setReceiverNodeURI(originalMessage.getSenderNodeURI())
+      .setReceiverURI(originalMessage.getSenderURI())
+      .setIsResponseToMessageURI(originalMessage.getMessageURI())
+      .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM);
     return this;
   }
 

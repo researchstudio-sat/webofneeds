@@ -50,7 +50,7 @@ public class HintMessageProcessor extends AbstractInOnlyMessageProcessor
 
   public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
 
     logger.debug("STORING message with id {}", wonMessage.getMessageURI());
 
@@ -98,7 +98,7 @@ public class HintMessageProcessor extends AbstractInOnlyMessageProcessor
     messageEventRepository.save(new MessageEventPlaceholder(
       con.getConnectionURI(), wrappedMessage));
 
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER,wrappedMessage);
+    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER,wrappedMessage);
     //reg.get(con).hint(con, wmScore, wmOriginator, facetModel, wrappedMessage);
              /*
       WonMessage newWonMessage = WonMessageBuilder.wrapAndSetTimestamp(con.getConnectionURI(),

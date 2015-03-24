@@ -24,17 +24,10 @@ import won.protocol.jms.MessagingService;
 import won.protocol.jms.NeedProtocolCommunicationService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.model.OwnerApplication;
-import won.protocol.repository.OwnerApplicationRepository;
-import won.protocol.service.QueueManagementService;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import won.protocol.util.RdfUtils;
 
 /**
- * User: sbyim
- * Date: 13.11.13
+ * Processor responsible for routing messages to
  */
 public class NeedProtocolOutgoingMessagesProcessor implements Processor {
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
@@ -48,13 +41,18 @@ public class NeedProtocolOutgoingMessagesProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         logger.debug("processing message for sending to remote node");
-      WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_EXCHANGE_HEADER);
-      if (wonMessage.getSenderNodeURI().equals(wonMessage.getReceiverNodeURI())){
+      WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+      if (wonMessage.getSenderNeedURI() != null && wonMessage.getSenderNodeURI().equals(wonMessage.getReceiverNodeURI
+        ())){
         //sending locally, directly put message into the incoming need protocol
-        messageService.sendInOnlyMessage(null, null, wonMessage, "seda:NeedProtocolIn");
+        messageService.sendInOnlyMessage(null, null, RdfUtils
+          .writeDatasetToString(wonMessage.getCompleteDataset(), WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
+          "activemq:queue:NeedProtocol.in");
         return;
       }
+      //add a camel endpoint for the remote won node
       needProtocolCommunicationService.configureCamelEndpoint(wonMessage.getReceiverNodeURI());
+      //send the message to that endpoint
       messageService.sendInOnlyMessage(null, null, wonMessage, wonMessage.getReceiverNodeURI().toString());
     }
 
