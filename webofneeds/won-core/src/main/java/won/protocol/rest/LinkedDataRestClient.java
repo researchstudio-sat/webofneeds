@@ -20,6 +20,7 @@ import com.hp.hpl.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
@@ -41,6 +42,9 @@ public class LinkedDataRestClient
 
   public LinkedDataRestClient() {
       HttpMessageConverter datasetConverter = new RdfDatasetConverter();
+
+      ((HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(3000);
+      ((HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory()).setConnectTimeout(3000);
 
       restTemplate = new RestTemplate();
       restTemplate.getMessageConverters().add(datasetConverter);
