@@ -20,7 +20,9 @@ import com.hp.hpl.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
@@ -41,12 +43,23 @@ public class LinkedDataRestClient
   private HttpEntity entity;
 
   public LinkedDataRestClient() {
+      this(10000,10000); //DEF. TIMEOUT IS 10sec
+  }
+
+  public LinkedDataRestClient(int connectTimeout, int readTimeout) {
       HttpMessageConverter datasetConverter = new RdfDatasetConverter();
 
-      ((HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(3000);
-      ((HttpComponentsClientHttpRequestFactory) restTemplate.getRequestFactory()).setConnectTimeout(3000);
-
       restTemplate = new RestTemplate();
+      ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
+
+      if (requestFactory instanceof SimpleClientHttpRequestFactory) {
+          if(connectTimeout>0){((SimpleClientHttpRequestFactory) requestFactory).setConnectTimeout(connectTimeout);}
+          if(readTimeout>0){((SimpleClientHttpRequestFactory) requestFactory).setReadTimeout(readTimeout);}
+      } else if (requestFactory instanceof HttpComponentsClientHttpRequestFactory) {
+          if(connectTimeout>0){((HttpComponentsClientHttpRequestFactory) requestFactory).setConnectTimeout(connectTimeout);}
+          if(readTimeout>0){((HttpComponentsClientHttpRequestFactory) requestFactory).setReadTimeout(readTimeout);}
+      }
+
       restTemplate.getMessageConverters().add(datasetConverter);
 
       HttpHeaders headers = new HttpHeaders();

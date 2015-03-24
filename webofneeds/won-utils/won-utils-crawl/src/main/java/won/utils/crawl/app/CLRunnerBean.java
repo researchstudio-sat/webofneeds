@@ -44,7 +44,7 @@ public class CLRunnerBean implements CommandLineRunner {
         for(String arg : args) {
             URI uri = URI.create(arg);
             logger.info("Getting Data from uri: " + uri);
-            RdfUtils.addDatasetToDataset(needDataset, linkedDataSource.getDataForResourceWithPropertyPath(uri, configurePropertyPaths(), 10000, 4, false),true);
+            RdfUtils.addDatasetToDataset(needDataset, linkedDataSource.getDataForResourceWithPropertyPath(uri, configurePropertyPaths(), 10000, 4, false), true);
         }
         //RDFDataMgr.write(System.err, needDataset, Lang.TRIG); //THIS IS TO PRINT THE WHOLE RDF
 
