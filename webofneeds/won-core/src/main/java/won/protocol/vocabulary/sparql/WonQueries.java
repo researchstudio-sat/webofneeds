@@ -12,7 +12,8 @@ public class WonQueries {
             "PREFIX gr:    <http://purl.org/goodrelations/v1#>"+
             "PREFIX sioc:  <http://rdfs.org/sioc/ns#>"+
             "PREFIX ldp:   <http://www.w3.org/ns/ldp#>"+
-            "PREFIX dc:    <http://purl.org/dc/elements/1.1/>";
+            "PREFIX dc:    <http://purl.org/dc/elements/1.1/>"+
+            "PREFIX msg:   <http://purl.org/webofneeds/message#>";
 
     public static final String SPARQL_ALL_TRIPLES = SPARQL_PREFIX + "SELECT * WHERE { graph ?g {?s ?p ?o} . }";
 

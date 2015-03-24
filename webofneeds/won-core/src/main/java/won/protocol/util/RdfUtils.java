@@ -1134,20 +1134,35 @@ public class RdfUtils
    * Adds the second dataset to the first one, merging default models and models with identical name.
    * @param baseDataset
    * @param toBeAddedtoBase
+   * @param replaceNamedModel if true, named graphs are not merged but replaced
    */
-  public static void addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase) {
+  public static void addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase, boolean replaceNamedModel) {
     assert baseDataset != null : "baseDataset must not be null";
     assert toBeAddedtoBase != null : "toBeAddedToBase must not be null";
     baseDataset.getDefaultModel().add(toBeAddedtoBase.getDefaultModel());
     for ( Iterator<String> nameIt = toBeAddedtoBase.listNames(); nameIt.hasNext();){
       String modelName = nameIt.next();
-      if (baseDataset.containsNamedModel(modelName)) {
-        baseDataset.getNamedModel(modelName).add(toBeAddedtoBase.getNamedModel(modelName));
+      if (baseDataset.containsNamedModel(modelName)){
+          if (replaceNamedModel) {
+              baseDataset.removeNamedModel(modelName);
+              baseDataset.addNamedModel(modelName, toBeAddedtoBase.getNamedModel(modelName));
+          } else {
+              baseDataset.getNamedModel(modelName).add(toBeAddedtoBase.getNamedModel(modelName));
+          }
       } else {
         baseDataset.addNamedModel(modelName, toBeAddedtoBase.getNamedModel(modelName));
       }
     }
   }
+
+    /**
+     * Adds the second dataset to the first one, merging default models and models with identical name.
+     * @param baseDataset
+     * @param toBeAddedtoBase
+     */
+    public static void addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase) {
+        addDatasetToDataset(baseDataset, toBeAddedtoBase, false);
+    }
 
   /**
    * Adds all triples of the dataset to the model.

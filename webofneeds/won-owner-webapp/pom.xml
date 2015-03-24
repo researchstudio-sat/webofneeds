@@ -242,7 +242,7 @@
                         </deployable>
                     </deployables>
                 </configuration>
-                <executions>
+                <!--<executions>
                     <execution>
                         <id>deploy-owner-tomcat</id>
                         <phase>deploy</phase>
@@ -250,7 +250,7 @@
                             <goal>deployer-redeploy</goal>
                         </goals>
                     </execution>
-                </executions>
+                </executions>-->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
