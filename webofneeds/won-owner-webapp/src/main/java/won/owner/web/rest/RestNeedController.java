@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,7 +37,6 @@ import won.owner.repository.DraftRepository;
 import won.owner.service.impl.URIService;
 import won.owner.service.impl.WONUserDetailService;
 
-import javax.ws.rs.core.MediaType;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -68,7 +68,7 @@ public class RestNeedController {
   @ResponseBody
   @RequestMapping(
     value = "/",
-    produces = MediaType.APPLICATION_JSON,
+    produces = MediaType.APPLICATION_JSON_VALUE,
     method = RequestMethod.GET
   )
   public List<URI> getAllNeedsOfUser() {
@@ -96,7 +96,7 @@ public class RestNeedController {
   @ResponseBody
   @RequestMapping(
     value = "/drafts",
-    produces = MediaType.APPLICATION_JSON,
+    produces = MediaType.APPLICATION_JSON_VALUE,
     method = RequestMethod.GET
   )
   //TODO: move transactionality annotation into the service layer
@@ -124,8 +124,8 @@ public class RestNeedController {
   @ResponseBody
   @RequestMapping(
     value = "/drafts",
-    consumes = MediaType.APPLICATION_JSON,
-    produces = MediaType.APPLICATION_JSON,
+    consumes = MediaType.APPLICATION_JSON_VALUE,
+    produces = MediaType.APPLICATION_JSON_VALUE,
     method = RequestMethod.POST
   )
   //TODO: move transactionality annotation into the service layer
@@ -173,7 +173,7 @@ public class RestNeedController {
   @ResponseBody
   @RequestMapping(
     value ="/drafts/draft",
-    produces = MediaType.APPLICATION_JSON,
+    produces = MediaType.APPLICATION_JSON_VALUE,
     method = RequestMethod.GET
   )
   public CreateDraftPojo getDraft(@RequestParam("uri") String uri) {

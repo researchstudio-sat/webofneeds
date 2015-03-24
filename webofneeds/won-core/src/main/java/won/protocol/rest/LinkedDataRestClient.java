@@ -17,7 +17,6 @@
 package won.protocol.rest;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.sun.jersey.api.client.ClientHandlerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -25,7 +24,6 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import sun.security.provider.certpath.OCSPResponse;
 
 import java.net.URI;
 import java.text.MessageFormat;
