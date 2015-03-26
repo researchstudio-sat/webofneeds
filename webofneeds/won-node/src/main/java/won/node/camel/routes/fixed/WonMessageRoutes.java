@@ -5,6 +5,7 @@ import org.apache.camel.Expression;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -16,6 +17,14 @@ public class WonMessageRoutes  extends RouteBuilder
 
   @Override
   public void configure() throws Exception {
+
+    onException(WonMessageProcessingException.class)
+      .handled(true)
+      .to("bean:failResponder")
+      .wireTap("bean:messagingService?method=inspectMessage");
+
+
+
     /**
      * owner protocol, incoming
      */

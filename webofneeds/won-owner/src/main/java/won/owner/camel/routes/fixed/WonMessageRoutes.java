@@ -31,6 +31,7 @@ public class WonMessageRoutes extends RouteBuilder
   @Override
   public void configure() throws Exception {
     from("activemq:queue:OwnerProtocol.in?concurrentConsumers=5")
+      .wireTap("bean:messagingService?method=inspectMessage")
       .routeId("WonMessageOwnerRoute")
       .setHeader("direction", new ConstantStringExpression(WONMSG.TYPE_FROM_OWNER_STRING))
         .choice()
@@ -40,7 +41,7 @@ public class WonMessageRoutes extends RouteBuilder
             .to("bean:queueManagementService?method=getEndpointsForOwnerApplication")
           .otherwise()
             .to("bean:wonMessageIntoCamelProcessor")
-            .to("bean:wellformednessChecker")
+      .to("bean:wellformednessChecker")
             .to("bean:signatureChecker")
             .to("bean:ownerCallbackAdapter");
   }
