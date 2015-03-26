@@ -119,6 +119,15 @@ public class WONMSG
   //public static final String MESSAGE_REFERS_TO_PROPERTY = "refersTo";
   //public static final String MESSAGE_NEW_NEED_STATE_PROPERTY = "newNeedState";
 
+
+  // added to support referencing signatures from the envelope
+  public static final Property REFERENCES_SIGNATURE_PROPERTY = m.createProperty(BASE_URI, "referencesSignature");
+  // TODO maybe the three properties below could better belong to a separate ontology
+  public static final Property HAS_SIGNED_GRAPH_PROPERTY = m.createProperty(BASE_URI, "hasSignedGraph");
+  public static final Property HAS_SIGNATURE_VALUE_PROPERTY = m.createProperty(BASE_URI, "hasSignatureValue");
+  public static final Property HAS_SIGNATURE_GRAPH_PROPERTY = m.createProperty(BASE_URI, "hasSignatureGraph");
+
+
   public static final String GRAPH_URI_FRAGMENT = "data";
 
   /**
