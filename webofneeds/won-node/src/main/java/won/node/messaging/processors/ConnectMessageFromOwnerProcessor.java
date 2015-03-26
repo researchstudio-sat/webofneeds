@@ -9,6 +9,7 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
+import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -20,7 +21,7 @@ import java.net.URI;
  */
 @Component
 @FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CONNECT_STRING)
-public class ConnectMessageFromOwnerProcessor extends AbstractInOnlyMessageProcessor
+public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor
 {
 
   public void process(final Exchange exchange) throws Exception {
@@ -34,14 +35,20 @@ public class ConnectMessageFromOwnerProcessor extends AbstractInOnlyMessageProce
                                                         ConnectionState.REQUEST_SENT,
                                                         ConnectionEventType.OWNER_OPEN);
 
-    //add the information about the new local connection to the original message
-    wonMessage = new WonMessageBuilder().wrap(wonMessage).setSenderURI(con.getConnectionURI()).build();
-    //put it into the header so the persister will pick it up later
-    message.setHeader(WonCamelConstants.WON_MESSAGE_HEADER,wonMessage);
     //prepare the message to pass to the remote node
     final WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage, con);
+    //add the information about the new local connection to the original message
+    wonMessage = new WonMessageBuilder()
+      .wrap(wonMessage)
+      .setSenderURI(con.getConnectionURI())
+      .setCorrespondingRemoteMessageURI(newWonMessage.getMessageURI())
+      .build();
+
+    //put it into the header so the persister will pick it up later
+    message.setHeader(WonCamelConstants.WON_MESSAGE_HEADER,wonMessage);
+
     //put it into the 'modified message' header (so the persister doesn't pick up the wrong one).
-    exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
+    message.setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
   }
 
   private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage, Connection con) {
@@ -55,4 +62,23 @@ public class ConnectMessageFromOwnerProcessor extends AbstractInOnlyMessageProce
             .build();
   }
 
+  @Override
+  public void onSuccessResponse(final Exchange exchange) throws Exception {
+    WonMessage responseMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    MessageEventPlaceholder mep = this.messageEventRepository.findOneByCorrespondingRemoteMessageURI(
+      responseMessage
+        .getIsResponseToMessageURI());
+    //update the connection database: set the remote connection URI just obtained from the response
+    Connection con = this.connectionRepository.findOneByConnectionURI(mep.getSenderURI());
+    con.setRemoteConnectionURI(responseMessage.getSenderURI());
+    this.connectionRepository.save(con);
+  }
+
+  @Override
+  public void onFailureResponse(final Exchange exchange) throws Exception {
+    //TODO: define what to do if the connect fails remotely option: create a system message of type CLOSE,
+    // and forward it only to the owner. Add an explanation (a reference to the failure response and some
+    // expplanation text.
+    logger.warn("The remote end responded with a failure message. Our behaviour is now undefined.");
+  }
 }

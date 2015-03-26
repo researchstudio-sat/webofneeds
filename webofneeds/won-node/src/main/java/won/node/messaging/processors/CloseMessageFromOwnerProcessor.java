@@ -2,19 +2,12 @@ package won.node.messaging.processors;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import won.node.service.DataAccessService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
-import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -23,57 +16,32 @@ import won.protocol.vocabulary.WONMSG;
  */
 @Component
 @FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CLOSE_STRING)
-public class CloseMessageFromOwnerProcessor extends AbstractInOnlyMessageProcessor
+public class CloseMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor
 {
 
-  @Autowired
-  RDFStorageService rdfStorage;
-
-  @Autowired
-  DataAccessService dataService;
-
-  @Autowired
-  MessageEventRepository messageEventRepository;
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
 
-    WonMessage newWonMessage = new WonMessageBuilder()
-      .wrap(wonMessage)
-      .setTimestamp(System.currentTimeMillis())
-      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
-      .build();
-    logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
-    rdfStorage.storeDataset(newWonMessage.getMessageURI(),
-                                   WonMessageEncoder.encodeAsDataset(newWonMessage));
-
     logger.debug("CLOSE received from the owner side for connection {}", wonMessage.getSenderURI());
 
     Connection con = dataService.nextConnectionState(wonMessage.getSenderURI(), ConnectionEventType.OWNER_CLOSE);
-
-    // store newWonMessage and messageEventPlaceholder
-    rdfStorage.storeDataset(newWonMessage.getMessageURI(),
-                                   WonMessageEncoder.encodeAsDataset(newWonMessage));
-    messageEventRepository.save(new MessageEventPlaceholder(con.getConnectionURI(),
-                                                            newWonMessage));
-
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER,newWonMessage);
-
-
-    //invoke facet implementation
-    //  reg.get(con).closeFromOwner(newWonMessage);
+    //prepare the message to pass to the remote node
+    final WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage);
+    //put it into the 'outbound message' header (so the persister doesn't pick up the wrong one).
+    message.setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
   }
 
-  public void setRdfStorage(final RDFStorageService rdfStorage) {
-    this.rdfStorage = rdfStorage;
+  private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage) {
+    //create the message to send to the remote node
+    return new WonMessageBuilder()
+      .setPropertiesForPassingMessageToRemoteNode(
+        wonMessage,
+        wonNodeInformationService
+          .generateEventURI(wonMessage.getReceiverNodeURI()))
+      .build();
   }
 
-  public void setDataService(final DataAccessService dataService) {
-    this.dataService = dataService;
-  }
 
-  public void setMessageEventRepository(final MessageEventRepository messageEventRepository) {
-    this.messageEventRepository = messageEventRepository;
-  }
 }

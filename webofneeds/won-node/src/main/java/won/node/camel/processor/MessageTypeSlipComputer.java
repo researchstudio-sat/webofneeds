@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import won.node.messaging.processors.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.util.RdfUtils;
@@ -54,8 +55,16 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
     assert messageType != null : "messageType header must not be null";
     URI direction = RdfUtils.toUriOrNull(exchange.getIn().getHeader("direction"));
     assert direction != null : "direction header must not be null";
+    String method = "process";
+    if (WonMessageType.SUCCESS_RESPONSE.getResource().getURI().toString().equals(messageType)){
+      method = "onSuccessResponse";
+      messageType = URI.create(message.getIsResponseToMessageType().getResource().toString());
+    } else if (WonMessageType.FAILURE_RESPONSE.getResource().getURI().toString().equals(messageType)){
+      method ="onFailureResponse";
+      messageType = URI.create(message.getIsResponseToMessageType().getResource().toString());
+    }
     try {
-      slip = computeMessageTypeSlip(messageType,direction);
+      slip = "bean:"+computeMessageTypeSlip(messageType,direction) + "?method=" + method;
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
     } catch (InvocationTargetException e) {

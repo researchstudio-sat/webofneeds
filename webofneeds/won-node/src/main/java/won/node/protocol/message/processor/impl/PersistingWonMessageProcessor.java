@@ -21,9 +21,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
+import won.protocol.model.MessageEventPlaceholder;
+import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
+
+import java.net.URI;
 
 /**
  * Persists the specified WonMessage.
@@ -33,17 +38,22 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
 
   @Autowired
   RDFStorageService rdfStorage;
+  @Autowired
+  protected MessageEventRepository messageEventRepository;
 
   @Override
   public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-    saveMessage(message);
+    URI parentURI = WonMessageUtils.getParentEntityUri(message);
+    saveMessage(message, parentURI);
     return message;
   }
 
-  private void saveMessage(final WonMessage wrappedWonMessage) {
-    logger.debug("STORING message with id {}", wrappedWonMessage.getMessageURI());
-    rdfStorage.storeDataset(wrappedWonMessage.getMessageURI(),
-            WonMessageEncoder.encodeAsDataset(wrappedWonMessage));
+  private void saveMessage(final WonMessage wonMessage, URI parent) {
+    logger.debug("STORING message with id {}", wonMessage.getMessageURI());
+    rdfStorage.storeDataset(wonMessage.getMessageURI(),
+            WonMessageEncoder.encodeAsDataset(wonMessage));
+    messageEventRepository.save(new MessageEventPlaceholder(parent,
+      wonMessage));
   }
 
 }

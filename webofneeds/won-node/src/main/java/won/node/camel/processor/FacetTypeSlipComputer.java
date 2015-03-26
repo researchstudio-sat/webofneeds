@@ -26,6 +26,7 @@ import org.springframework.context.ApplicationContextAware;
 import won.node.messaging.processors.DefaultFacetMessageProcessor;
 import won.node.messaging.processors.FacetMessageProcessor;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.util.RdfUtils;
@@ -71,8 +72,18 @@ public class FacetTypeSlipComputer implements InitializingBean, ApplicationConte
     URI direction = RdfUtils.toUriOrNull(exchange.getIn().getHeader("direction"));
     assert direction != null : "direction header must not be null";
     URI facetType = RdfUtils.toUriOrNull(exchange.getIn().getHeader("facetType"));
+    //for ordinary messages, the process method is called
+    //for responses, the on[Failure|Success]Response is called.
+    String method = "process";
+    if (WonMessageType.SUCCESS_RESPONSE.getResource().getURI().toString().equals(messageType)){
+      method = "onSuccessResponse";
+      messageType = URI.create(message.getIsResponseToMessageType().getResource().toString());
+    } else if (WonMessageType.FAILURE_RESPONSE.getResource().getURI().toString().equals(messageType)){
+      method ="onFailureResponse";
+      messageType = URI.create(message.getIsResponseToMessageType().getResource().toString());
+    }
     try {
-      slip = computeFacetSlip(messageType, facetType, direction);
+      slip = "bean:"+computeFacetSlip(messageType, facetType, direction) + "?method=" + method;
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
     } catch (InvocationTargetException e) {
@@ -93,12 +104,12 @@ public class FacetTypeSlipComputer implements InitializingBean, ApplicationConte
       if (facetType != null) {
         Annotation annotation = facet.getClass().getAnnotation(FacetMessageProcessor.class);
         if(matches(annotation, messageType, direction, facetType)){
-          return "bean:"+pair.getKey().toString();
+          return pair.getKey().toString();
         }
       } else {
         Annotation annotation = facet.getClass().getAnnotation(DefaultFacetMessageProcessor.class);
         if(matches(annotation, messageType, direction, facetType)){
-          return "bean:"+pair.getKey().toString();
+          return pair.getKey().toString();
         }
       }
     }

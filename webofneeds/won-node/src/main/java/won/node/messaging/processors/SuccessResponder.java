@@ -29,7 +29,7 @@ import java.net.URI;
  * Sends a success response message back to the sender of the original message, if that message was sent on
  * behalf of a specified need (i.e. its senderNeedURI is set).
  */
-public class SuccessResponder extends AbstractInOnlyMessageProcessor
+public class SuccessResponder extends AbstractCamelProcessor
 {
   @Override
   public void process(final Exchange exchange) throws Exception {

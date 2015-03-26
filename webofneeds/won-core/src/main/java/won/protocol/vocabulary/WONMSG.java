@@ -21,7 +21,6 @@ public class WONMSG
   public static final String DEFAULT_PREFIX = "msg";
 
 
-
   private static Model m = ModelFactory.createDefaultModel();
 
 
@@ -42,6 +41,8 @@ public class WONMSG
   public static final String TYPE_CLOSE_STRING =BASE_URI + "CloseMessage";
   public static final String TYPE_CONNECTION_MESSAGE_STRING =BASE_URI + "ConnectionMessage";
   public static final String TYPE_HINT_STRING =BASE_URI + "HintMessage";
+  public static final String TYPE_FAILURE_RESPONSE_STRING = BASE_URI+"FailureResponse";
+  public static final String TYPE_SUCCESS_RESPONSE_STRING = BASE_URI+"SuccessResponse";
   // main types
   public static final Resource TYPE_CREATE = m.createResource(TYPE_CREATE_STRING);
   public static final Resource TYPE_CONNECT = m.createResource(TYPE_CONNECT_STRING);
@@ -52,8 +53,8 @@ public class WONMSG
   public static final Resource TYPE_CONNECTION_MESSAGE = m.createResource(TYPE_CONNECTION_MESSAGE_STRING);
   public static final Resource TYPE_HINT = m.createResource(TYPE_HINT_STRING);
 
-  public static final Resource TYPE_SUCCESS_RESPONSE = m.createResource(BASE_URI + "SuccessResponse");
-  public static final Resource TYPE_FAILURE_RESPONSE = m.createResource(BASE_URI + "FailureResponse");
+  public static final Resource TYPE_SUCCESS_RESPONSE = m.createResource(TYPE_SUCCESS_RESPONSE_STRING);
+  public static final Resource TYPE_FAILURE_RESPONSE = m.createResource(TYPE_FAILURE_RESPONSE_STRING);
 
   // notification types
   //TODO: delete if not needed
@@ -129,6 +130,7 @@ public class WONMSG
   public static final Property HAS_CONTENT_PROPERTY = m.createProperty(BASE_URI, "hasContent");
   public static final Property REFERS_TO_PROPERTY = m.createProperty(BASE_URI, "refersTo");
   public static final Property IS_RESPONSE_TO = m.createProperty(BASE_URI, "isResponseTo");
+  public static final Property IS_RESPONSE_TO_MESSAGE_TYPE = m.createProperty(BASE_URI, "isResponseToMessagType");;
   public static final Property HAS_CORRESPONDING_REMOTE_MESSAGE = m.createProperty(BASE_URI, "hasCorrespondingRemoteMessage");
   public static final Property NEW_NEED_STATE_PROPERTY = m.createProperty(BASE_URI, "newNeedState");
   public static final Property HAS_TIMESTAMP = m.createProperty(BASE_URI, "hasTimestamp");

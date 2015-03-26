@@ -73,7 +73,13 @@
     <bean id="successResponder"
           class="won.node.messaging.processors.SuccessResponder" />
 
-  <!-- won-specific processors -->
+    <bean id="toNodeSender"
+          class="won.node.messaging.processors.ToNodeSender" />
+    <bean id="toOwnerSender"
+          class="won.node.messaging.processors.ToOwnerSender" />
+
+
+    <!-- won-specific processors -->
   <!-- start of the pipeline -->
   <bean name="wonMessageIntoCamelProcessor" class="won.protocol.message.processor.camel.WonMessageIntoCamelProcessor" />
   <!-- wrapping the messages for storage on node -->

@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
+import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
@@ -30,8 +31,9 @@ import java.util.Map;
 
 /**
  * First processor for incoming messages. It expects a serialized WonMessage
- * in TriG format in the exchange's in, in the body.
- * The WonMessage is deserialized and put into the in header 'wonMessage'.
+ * in TriG format in the exchange's in, in the body or a WonMessage object in the
+ * in header 'wonMessgage'. If that header is empty, the WonMessage found in the
+ * body is deserialized and put into the in header 'wonMessage'.
  * Moreover, the headers 'facetType' and 'messageType' are set.
  */
 public class WonMessageIntoCamelProcessor implements Processor
@@ -42,7 +44,15 @@ public class WonMessageIntoCamelProcessor implements Processor
   public void process(final Exchange exchange) throws Exception {
     logger.debug("processing won message");
     Map headers = exchange.getIn().getHeaders();
-    WonMessage wonMessage = WonMessageDecoder.decode(Lang.TRIG, exchange.getIn().getBody().toString());
+    //if the wonMessage header is there, don't change it - that way we can re-route internal messages
+    WonMessage wonMessage = (WonMessage) headers.get(WonCamelConstants.WON_MESSAGE_HEADER);
+    if (wonMessage == null) {
+      wonMessage = WonMessageDecoder.decode(Lang.TRIG, exchange.getIn().getBody().toString());
+    }
+    if (wonMessage == null) {
+      throw new WonMessageProcessingException("No WonMessage found in header '" +
+        WonCamelConstants.WON_MESSAGE_HEADER+"' or in the body");
+    }
     exchange.getIn().setHeader("messageType", URI.create(wonMessage.getMessageType().getResource().getURI()));
     exchange.getIn().setHeader("facetType", WonRdfUtils.FacetUtils.getFacet(wonMessage));
     exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, wonMessage);

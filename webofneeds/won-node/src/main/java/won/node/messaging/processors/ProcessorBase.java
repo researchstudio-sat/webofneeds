@@ -84,6 +84,7 @@ public abstract class ProcessorBase
 
 
 
+
   protected void sendMessageToOwner(WonMessage message, URI needURI){
     Need need = needRepository.findOneByNeedURI(needURI);
     List<OwnerApplication> ownerApplications = need.getAuthorizedApplications();
@@ -115,6 +116,13 @@ public abstract class ProcessorBase
     headerMap.put(WonCamelConstants.WON_MESSAGE_HEADER, message);
     messagingService.sendInOnlyMessage(null, headerMap, null,
                                        "seda:NeedProtocolOut");
+  }
+
+  protected void sendSystemMessage(WonMessage message){
+    Map headerMap = new HashMap<String, Object>();
+    headerMap.put(WonCamelConstants.WON_MESSAGE_HEADER, message);
+    messagingService.sendInOnlyMessage(null, headerMap, null,
+      "seda:SystemProtocolIntoOwnerProtocol");
   }
 
   protected List<String> toStringIds(final List<OwnerApplication> ownerApplications) {

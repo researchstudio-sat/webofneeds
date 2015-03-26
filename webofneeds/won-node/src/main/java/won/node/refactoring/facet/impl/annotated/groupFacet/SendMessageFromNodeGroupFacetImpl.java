@@ -1,13 +1,15 @@
 package won.node.refactoring.facet.impl.annotated.groupFacet;
 
+import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import won.node.messaging.processors.AbstractFromOwnerCamelProcessor;
 import won.node.messaging.processors.FacetMessageProcessor;
-import won.node.refactoring.facet.impl.annotated.AbstractFacetAnnotated;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.FacetType;
@@ -31,7 +33,7 @@ import java.util.List;
   facetType = WON.GROUP_FACET_STRING,
   direction = WONMSG.TYPE_FROM_EXTERNAL_STRING,
   messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
-public class SendMessageFromNodeGroupFacetImpl extends AbstractFacetAnnotated
+public class SendMessageFromNodeGroupFacetImpl extends AbstractFromOwnerCamelProcessor
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -40,32 +42,28 @@ public class SendMessageFromNodeGroupFacetImpl extends AbstractFacetAnnotated
 
 
   @Override
-  public void process(final WonMessage wonMessage) {
+  public void process(final Exchange exchange) throws Exception {
+    final WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
     final Connection con = connectionRepository.findByConnectionURI(wonMessage.getReceiverURI()).get(0);
     final List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
-                                                                                       ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
-    //inform the other side
-    executorService.execute(new Runnable() {
-      @Override
-      public void run() {
-        for (final Connection c : cons) {
-          try {
-            if(! c.equals(con)) {
-              URI forwardedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
-              URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(con.getRemoteConnectionURI(),
-                                                                                            linkedDataSource);
-              WonMessage newWonMessage = WonMessageBuilder.forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(
-                forwardedMessageURI, wonMessage,
-                con.getConnectionURI(), con.getNeedURI(), wonMessage.getReceiverNodeURI(),
-                con.getRemoteConnectionURI(), con.getRemoteNeedURI(), remoteWonNodeUri);
-             // needFacingConnectionClient.sendMessage(newWonMessage);
-            }
-          } catch (Exception e) {
-            logger.warn("caught Exception:", e);
-          }
+      ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
+
+    for (final Connection c : cons) {
+      try {
+        if (!c.equals(con)) {
+          URI forwardedMessageURI = wonNodeInformationService.generateEventURI(wonMessage.getReceiverNodeURI());
+          URI remoteWonNodeUri = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(con.getRemoteConnectionURI(),
+            linkedDataSource);
+          WonMessage newWonMessage = WonMessageBuilder.forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(
+            forwardedMessageURI, wonMessage,
+            con.getConnectionURI(), con.getNeedURI(), wonMessage.getReceiverNodeURI(),
+            con.getRemoteConnectionURI(), con.getRemoteNeedURI(), remoteWonNodeUri);
+          sendSystemMessage(newWonMessage);
         }
+      } catch (Exception e) {
+        logger.warn("caught Exception:", e);
       }
-    });
+    }
   }
 
   public FacetType getFacetType() {
