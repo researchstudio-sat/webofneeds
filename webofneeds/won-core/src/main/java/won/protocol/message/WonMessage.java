@@ -111,8 +111,9 @@ public class WonMessage implements Serializable
 
   public URI getOuterEnvelopeGraphURI(){
     if (this.outerEnvelopeGraphURI != null) {
-      getEnvelopeGraphs(); //also sets the outerEnvelopeUri
+      return this.outerEnvelopeGraphURI;
     }
+    getEnvelopeGraphs(); //also sets the outerEnvelopeUri
     return this.outerEnvelopeGraphURI;
   }
 

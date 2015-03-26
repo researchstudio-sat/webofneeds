@@ -2,6 +2,7 @@ package won.protocol.message;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
+import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -49,6 +50,7 @@ public class WonMessageBuilder
 
   private Map<URI, Model> contentMap = new HashMap<>();
   private Map<URI, Model> signatureMap = new HashMap<>();
+  List<SignatureReference> sigReferences = new ArrayList<>();
   private WonMessage wrappedMessage;
   private WonMessage forwardedMessage;
   private Long timestamp;
@@ -159,6 +161,20 @@ public class WonMessageBuilder
         envelopeGraph.createTypedLiteral(this.timestamp));
     }
 
+
+    for (SignatureReference sigRef : sigReferences) {
+      Resource bnode = envelopeGraph.createResource(AnonId.create());
+      messageEventResource.addProperty(
+        WONMSG.REFERENCES_SIGNATURE_PROPERTY,
+        bnode);
+      bnode.addProperty(WONMSG.HAS_SIGNATURE_GRAPH_PROPERTY,
+                        envelopeGraph.createResource(sigRef.getSignatureGraphUri()));
+      bnode.addProperty(WONMSG.HAS_SIGNED_GRAPH_PROPERTY,
+                        envelopeGraph.createResource(sigRef.getSignedGraphUri()));
+      bnode.addProperty(WONMSG.HAS_SIGNATURE_VALUE_PROPERTY,
+                        envelopeGraph.createLiteral(sigRef.getSignatureValue()));
+    }
+
     for (URI contentURI : contentMap.keySet()) {
       String uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), CONTENT_URI_SUFFIX, 5,
         dataset).toString();
@@ -188,7 +204,7 @@ public class WonMessageBuilder
       //now replace the content URIs
     }
 
-    // ToDo (FS): add signature of the whole message
+
 
     return new WonMessage(dataset);
 
@@ -572,6 +588,16 @@ public class WonMessageBuilder
     contentMap.put(contentURI, content);
     if (signature != null)
       signatureMap.put(contentURI, signature);
+    return this;
+  }
+
+  // TODO
+  // For now the simplest solution is to consider the signature graphs themselves as content graphs,
+  // in future we have to see what is better, to parse/understand the signatures inside the won message
+  // or to keep signature processing outside the won message (the the current solution is adopted, and
+  // then e.g. the above method should not have a signature parameter)
+  public WonMessageBuilder setSignatureReferences(List<SignatureReference> sigReferences) {
+    this.sigReferences = sigReferences;
     return this;
   }
 
