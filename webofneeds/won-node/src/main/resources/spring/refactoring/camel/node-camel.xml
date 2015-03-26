@@ -72,6 +72,14 @@
 
     <bean id="successResponder"
           class="won.node.messaging.processors.SuccessResponder" />
+
+    <bean id="toNodeSender"
+          class="won.node.messaging.processors.ToNodeSender" />
+    <bean id="toOwnerSender"
+          class="won.node.messaging.processors.ToOwnerSender" />
+
+
+    <!-- won-specific processors -->
     <bean id="failResponder"
           class="won.node.messaging.processors.FailResponder" />
   <!-- won-specific processors -->

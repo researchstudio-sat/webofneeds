@@ -4,23 +4,11 @@ import com.hp.hpl.jena.graph.TripleBoundary;
 import com.hp.hpl.jena.rdf.model.*;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import won.node.facet.impl.FacetRegistry;
-import won.node.service.DataAccessService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
-import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.rdfstorage.RDFStorageService;
-import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
@@ -35,74 +23,28 @@ import java.util.List;
  */
 @Component
 @FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CONNECTION_MESSAGE_STRING)
-public class SendMessageFromOwnerProcessor extends AbstractInOnlyMessageProcessor
+public class SendMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor
 {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-  private FacetRegistry reg;
-  private DataAccessService dataService;
-  @Autowired
-  private ConnectionRepository connectionRepository;
-  @Autowired
-  private won.node.service.impl.URIService URIService;
-  @Autowired
-  private RDFStorageService rdfStorageService;
-  @Autowired
-  private MessageEventRepository messageEventRepository;
-
-
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
-    WonMessage newWonMessage = new WonMessageBuilder()
-      .wrap(wonMessage)
-      .setTimestamp(System.currentTimeMillis())
-      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
-      .build();
-    logger.debug("STORING message with id {}", newWonMessage.getMessageURI());
-    rdfStorageService.storeDataset(newWonMessage.getMessageURI(),
-                                   WonMessageEncoder.encodeAsDataset(newWonMessage));
-
-    URI connectionURIFromWonMessage = newWonMessage.getSenderURI();
-
-    final Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURIFromWonMessage);
-
-
-    messageEventRepository.save(new MessageEventPlaceholder(connectionURIFromWonMessage,
-                                                            newWonMessage));
-
+    WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage);
     exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER,newWonMessage);
-    final Connection connection = con;
-    boolean feedbackWasPresent = RdfUtils.applyMethod(newWonMessage.getMessageContent(),
-                                                      new RdfUtils.ModelVisitor<Boolean>()
-                                                      {
-                                                        @Override
-                                                        public Boolean visit(final Model model) {
-                                                          return processFeedbackMessage(connection, model);
-                                                        }
-                                                      },
-                                                      new RdfUtils.ResultCombiner<Boolean>()
-                                                      {
-                                                        @Override
-                                                        public Boolean combine(final Boolean first, final Boolean second) {
-                                                          return first || second;
-                                                        }
-                                                      });
-
-    if (!feedbackWasPresent) {
-      //a feedback message is not forwarded to the remote connection, and facets cannot react to it.
-      //invoke facet implementation
-      //TODO: this may be much more responsive if done asynchronously. We dont return anything here anyway.
-      //TODO: before sending, we should actually create a new URI located on the target WoN node
-      //      and copy all the message content to a new message with that URI,
-      //      additionally point to the message we just received from the owner ,
-      //      sign it and send it. This way, the remote WoN node can just store it the way it is
-      //      note: this step may be left out if the message is to be delivered locally.
-      //reg.get(con).sendMessageFromOwner(con, message, newWonMessage);
-    }
-    //todo: the method shall return an object that debugrms the owner that processing the message on the node side was done successfully.
-    //return con.getConnectionURI();
   }
+
+  private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage) {
+    //create the message to send to the remote node
+    return new WonMessageBuilder()
+      .setPropertiesForPassingMessageToRemoteNode(
+        wonMessage,
+        wonNodeInformationService
+          .generateEventURI(wonMessage.getReceiverNodeURI()))
+      .build();
+  }
+
+  /////// TODO: move code below to the implementation of a FEEDBACK message
+
 
   /**
    * Finds feedback in the message, processes it and removes it from the message.

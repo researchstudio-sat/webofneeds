@@ -75,7 +75,7 @@ public class OwnerWonMessageSenderJMSBased
   public void sendWonMessage(WonMessage wonMessage) {
     try {
       // ToDo (FS): change it to won node URI and create method in the MessageEvent class
-      URI wonNodeUri = wonMessage.getSenderURI();
+      URI wonNodeUri = wonMessage.getSenderNodeURI();
 
       if (wonNodeUri == null)
         wonNodeUri = defaultNodeURI;

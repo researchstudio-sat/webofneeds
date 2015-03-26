@@ -8,4 +8,5 @@ import org.apache.camel.Processor;
  */
 public abstract class AbstractInOnlyMessageProcessor extends ProcessorBase implements Processor
 {
+
 }

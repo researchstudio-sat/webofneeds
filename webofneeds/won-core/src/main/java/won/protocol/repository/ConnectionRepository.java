@@ -64,4 +64,7 @@ public interface ConnectionRepository extends WonRepository<Connection>
   @Query("select connectionURI from Connection where needURI = ?1 and state != ?2")
   List<URI> getConnectionURIsByNeedURIAndNotInState(URI needURI, ConnectionState connectionState);
 
+  @Query("select c from Connection c where c.needURI = ?1 and c.state != ?2")
+  List<Connection> getConnectionsByNeedURIAndNotInState(URI needURI, ConnectionState connectionState);
+
 }

@@ -5,7 +5,6 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Service;
-import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -15,13 +14,6 @@ import won.protocol.model.Facet;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.repository.FacetRepository;
-import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.NeedRepository;
-import won.protocol.repository.rdfstorage.RDFStorageService;
-import won.protocol.service.LinkedDataService;
-import won.protocol.service.NeedManagementService;
-import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -34,7 +26,7 @@ import java.util.List;
  */
 @Service
 @FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CREATE_STRING)
-public class CreateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
+public class CreateNeedMessageProcessor extends AbstractCamelProcessor
 {
 
 
@@ -120,67 +112,5 @@ public class CreateNeedMessageProcessor extends AbstractInOnlyMessageProcessor
     return needURI;
   }
 
-  public void setRdfStorage(final RDFStorageService rdfStorage) {
-    this.rdfStorage = rdfStorage;
-  }
 
-  public void setNeedManagementService(final NeedManagementService needManagementService) {
-    this.needManagementService = needManagementService;
-  }
-
-  public void setNeedRepository(final NeedRepository needRepository) {
-    this.needRepository = needRepository;
-  }
-
-  public void setFacetRepository(final FacetRepository facetRepository) {
-    this.facetRepository = facetRepository;
-  }
-
-  public void setMessageEventRepository(final MessageEventRepository messageEventRepository) {
-    this.messageEventRepository = messageEventRepository;
-  }
-
-  public void setLinkedDataService(final LinkedDataService linkedDataService) {
-    this.linkedDataService = linkedDataService;
-  }
-
-  public void setWonNodeInformationService(final WonNodeInformationService wonNodeInformationService) {
-    this.wonNodeInformationService = wonNodeInformationService;
-  }
-
-  public void setMatcherProtocolMatcherClient(final MatcherProtocolMatcherServiceClientSide matcherProtocolMatcherClient) {
-    this.matcherProtocolMatcherClient = matcherProtocolMatcherClient;
-  }
-
-  public RDFStorageService getRdfStorage() {
-    return rdfStorage;
-  }
-
-  public NeedManagementService getNeedManagementService() {
-    return needManagementService;
-  }
-
-  public NeedRepository getNeedRepository() {
-    return needRepository;
-  }
-
-  public FacetRepository getFacetRepository() {
-    return facetRepository;
-  }
-
-  public MessageEventRepository getMessageEventRepository() {
-    return messageEventRepository;
-  }
-
-  public LinkedDataService getLinkedDataService() {
-    return linkedDataService;
-  }
-
-  public WonNodeInformationService getWonNodeInformationService() {
-    return wonNodeInformationService;
-  }
-
-  public MatcherProtocolMatcherServiceClientSide getMatcherProtocolMatcherClient() {
-    return matcherProtocolMatcherClient;
-  }
 }
