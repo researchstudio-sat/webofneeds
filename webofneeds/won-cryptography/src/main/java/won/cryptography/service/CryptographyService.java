@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.net.URI;
 import java.security.Key;
 import java.security.KeyPair;
@@ -30,8 +31,8 @@ public class CryptographyService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final String PRIVATE_KEY_STORE_PREFIX = "PR-";
-    private final String PUBLIC_KEY_STORE_PREFIX = "PU-";
+    //private final String PRIVATE_KEY_STORE_PREFIX = "PR-";
+    //private final String PUBLIC_KEY_STORE_PREFIX = "PU-";
 
     private KeyPairService keyPairService;
 
@@ -49,21 +50,20 @@ public class CryptographyService {
     }
 
 
-    public KeyPair createNewNeedKeyPair(URI needURI) {
+    public KeyPair createNewNeedKeyPair(BigInteger certNumber, URI needURI) {
 
 
         KeyPair newKeyPair = keyPairService.generateNewKeyPair();
-        X509Certificate newCertificate = certificateService.createSelfSignedCertificate(newKeyPair);
-        keyStoreService.putKey(PRIVATE_KEY_STORE_PREFIX + needURI.toString(),
+        X509Certificate newCertificate = certificateService.createSelfSignedCertificate(certNumber, newKeyPair,
+                                                                                        needURI.toString());
+        keyStoreService.putKey(needURI.toString(),
                 newKeyPair.getPrivate(), new Certificate[] {newCertificate});
-        keyStoreService.putKey(PUBLIC_KEY_STORE_PREFIX + needURI.toString(),
-                newKeyPair.getPublic(), new Certificate[] {newCertificate});
 
         return newKeyPair;
 
     }
 
-    public Key getNeedPrivateKey (URI needURI) {
+    public Key getNeedPrivateKey(URI needURI) {
 
         return keyStoreService.getKey(needURI.toString());
 

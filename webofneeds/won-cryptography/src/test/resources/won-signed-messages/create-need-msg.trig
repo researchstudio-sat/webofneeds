@@ -1,0 +1,152 @@
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix need:  <http://localhost:8080/won/resource/need/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix conn:  <http://localhost:8080/won/resource/connection/> .
+@prefix event: <http://localhost:8080/won/resource/event/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix local: <http://localhost:8080/won/resource/> .
+@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix cert: <http://www.w3.org/ns/auth/cert#> .
+
+
+
+# NEED DATA GRAPH
+<http://localhost:8080/won/resource/need/3144709509622353000/core/#data>
+{
+    need:3144709509622353000
+            a                     won:Need ;
+            won:hasBasicNeedType  won:Supply ;
+            won:hasContent        [ a                          won:NeedContent ;
+                                    dc:title                   "salat offer a" ;
+                                    won:hasContentDescription  [ a                             won:NeedModality ;
+                                                                 won:hasLocationSpecification  [ a               geo:Point ;
+                                                                                                 won:hasAddress  "" ;
+                                                                                                 geo:latitude    "0.000000"^^xsd:float ;
+                                                                                                 geo:longitude   "0.000000"
+                                                                                               ]
+                                                               ] ;
+                                    won:hasTag                 "aaa" ;
+                                    won:hasTextDescription     "a"
+                                  ] ;
+            won:hasFacet          won:OwnerFacet .
+}
+
+#  NEED DATA GRAPH SIGNATURE
+<http://localhost:8080/won/resource/need/3144709509622353000/core/#data-sig>
+{
+<http://localhost:8080/won/resource/need/3144709509622353000/core/#data-sig>
+          a                            signature:Signature ;
+          msg:hasSignedGraph <http://localhost:8080/won/resource/need/3144709509622353000/core/#data> ;
+          signature:hasGraphSigningMethod
+                  [ a                               signature:GraphSigningMethod ;
+                    signature:hasDigestMethod       signature:dm-sha-256 ;
+                    signature:hasGraphCanonicalizationMethod
+                            signature:gcm-fisteus-2010 ;
+                    signature:hasGraphDigestMethod  signature:gdm-fisteus-2010 ;
+                    signature:hasGraphSerializationMethod
+                            signature:gsm-trig ;
+                    signature:hasSignatureMethod    signature:sm-ecdsa
+                  ] ;
+          signature:hasSignatureValue
+                  "MGQCMD48hjJRNr3gthb7eIi0RnMzgfK1DjSwYjm3I7Wnaz0OGMS8SgB+VurkERD0OpXmrwIwX/8U\r\n1j7hkLlGIPXV540mmPAoRqah6y3Ir9H2JxMmI92eVHPCZ1FBZH4zpf0nC6hT" ;
+          signature:hasVerificationCertificate
+                  <http://localhost:8080/won/resource/need/3144709509622353000/#certificate>  .
+}
+
+
+
+
+# 1st ENVELOPE GRAPH
+<http://localhost:8080/won/resource/event/7719577021233193000#data>
+{
+    <http://localhost:8080/won/resource/event/7719577021233193000#data>
+            a       msg:EnvelopeGraph ;
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    event:7719577021233193000 .
+
+    event:7719577021233193000
+            a                    msg:OwnerToNodeEnvelope ;
+            msg:hasContent       <http://localhost:8080/won/resource/need/3144709509622353000/core/#data> ;
+
+            msg:referencesSignature     [
+                msg:hasSignedGraph <http://localhost:8080/won/resource/need/3144709509622353000/core/#data> ;
+                msg:hasSignatureValue "MGQCMD48hjJRNr3gthb7eIi0RnMzgfK1DjSwYjm3I7Wnaz0OGMS8SgB+VurkERD0OpXmrwIwX/8U\r\n1j7hkLlGIPXV540mmPAoRqah6y3Ir9H2JxMmI92eVHPCZ1FBZH4zpf0nC6hT" ;
+                msg:hasSignatureGraph <http://localhost:8080/won/resource/need/3144709509622353000/core/#data-sig>
+            ] ;
+
+            msg:hasMessageType   msg:CreateMessage ;
+            msg:hasReceiverNode  <http://localhost:8080/won/resource> ;
+            msg:hasSenderNeed    need:3144709509622353000 .
+}
+
+# 1st ENVELOPE GRAPH SIGNATURE
+<http://localhost:8080/won/resource/event/7719577021233193000#data-sig>
+{
+    <http://localhost:8080/won/resource/event/7719577021233193000#data-sig>
+              a                            signature:Signature ;
+              msg:hasSignedGraph <http://localhost:8080/won/resource/event/7719577021233193000#data> ;
+              signature:hasGraphSigningMethod
+                      [ a                               signature:GraphSigningMethod ;
+                        signature:hasDigestMethod       signature:dm-sha-256 ;
+                        signature:hasGraphCanonicalizationMethod
+                                signature:gcm-fisteus-2010 ;
+                        signature:hasGraphDigestMethod  signature:gdm-fisteus-2010 ;
+                        signature:hasGraphSerializationMethod
+                                signature:gsm-trig ;
+                        signature:hasSignatureMethod    signature:sm-ecdsa
+                      ] ;
+              signature:hasSignatureValue  "MGQCMG6lq0ryorsJlzU4CPfE/7oYgN80tw5AQ+VnshSMXbjA9bimRpfJ7wiqYwtK0WOLvQIwBW0Z\r\nkhH9JMHaF/uTklwaNsw1kApqiZhQswtg1eXJpKAQ+5nzzqY3Vds6c9sjrH1R" ;
+              signature:hasVerificationCertificate
+                      <http://localhost:8080/won/resource/need/3144709509622353000/#certificate> .
+}
+
+
+
+
+# 2nd ENVELOPE GRAPH
+<http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl>
+{
+    <http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl>
+            a                     msg:EnvelopeGraph ;
+            msg:containsEnvelope  <http://localhost:8080/won/resource/event/7719577021233193000#data> ;
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    event:7719577021233193000 .
+    
+    event:7719577021233193000
+            a                 msg:NodeToNodeEnvelope ;
+
+            msg:referencesSignature     [
+                            msg:hasSignedGraph <http://localhost:8080/won/resource/event/7719577021233193000#data> ;
+                            msg:hasSignatureValue "MGQCMG6lq0ryorsJlzU4CPfE/7oYgN80tw5AQ+VnshSMXbjA9bimRpfJ7wiqYwtK0WOLvQIwBW0Z\r\nkhH9JMHaF/uTklwaNsw1kApqiZhQswtg1eXJpKAQ+5nzzqY3Vds6c9sjrH1R" ;
+                            msg:hasSignatureGraph <http://localhost:8080/won/resource/event/7719577021233193000#data-sig>
+                        ] ;
+
+            msg:hasTimestamp  "1426858925851"^^xsd:long .
+
+}
+
+# 2nd ENVELOPE GRAPH SIGNATURE
+<http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl-sig>
+{
+    <http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl-sig>
+              a                            signature:Signature ;
+              msg:hasSignedGraph <http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl> ;
+              signature:hasGraphSigningMethod
+                      [ a                               signature:GraphSigningMethod ;
+                        signature:hasDigestMethod       signature:dm-sha-256 ;
+                        signature:hasGraphCanonicalizationMethod
+                                signature:gcm-fisteus-2010 ;
+                        signature:hasGraphDigestMethod  signature:gdm-fisteus-2010 ;
+                        signature:hasGraphSerializationMethod
+                                signature:gsm-trig ;
+                        signature:hasSignatureMethod    signature:sm-ecdsa
+                      ] ;
+              signature:hasSignatureValue  "MGQCMF6rblKX5jdsUSUx6hvFHSeMFz0mYhn4Cj9MRHCFNh3rSmykwwIBSe1GBOxCUjYXRAIwYGWW\r\n0KuTlGvAu8M0bAGDqnSFLLhpxmZH5Zv0t1qpZSc15VkVx+tUyTb9CYtr5Oi1" ;
+              signature:hasVerificationCertificate
+                      <http://localhost:8080/node/certificate> .
+}

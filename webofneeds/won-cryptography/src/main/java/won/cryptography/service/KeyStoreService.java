@@ -59,12 +59,26 @@ public class KeyStoreService {
         Key retrieved = null;
 
         try {
-            retrieved = store.getKey("key1", storePW);
+            retrieved = store.getKey(alias, storePW);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return retrieved;
+
+    }
+
+    public Certificate getCertificate(String alias) {
+
+      Certificate retrieved = null;
+
+      try {
+        retrieved = store.getCertificate(alias);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      return retrieved;
 
     }
 
