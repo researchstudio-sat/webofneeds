@@ -2,6 +2,7 @@ package won.protocol.model;
 
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.processor.camel.WonCamelConstants;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlTransient;
@@ -25,9 +26,8 @@ public class MessageEventPlaceholder
     this.receiverURI = wonMessage.getReceiverURI();
     this.receiverNeedURI = wonMessage.getReceiverNeedURI();
     this.receiverNodeURI = wonMessage.getReceiverNodeURI();
-
-
     this.creationDate = new Date();
+    this.correspondingRemoteMessageURI = wonMessage.getCorrespondingRemoteMessageURI();
   }
 
   @Id

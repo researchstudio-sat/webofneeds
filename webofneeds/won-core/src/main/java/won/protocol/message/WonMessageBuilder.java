@@ -518,22 +518,18 @@ public class WonMessageBuilder
   }
 
   public WonMessageBuilder setPropertiesForPassingMessageToRemoteNode(final WonMessage ownerOrSystemMsg, URI newMessageUri){
-            this.setMessageURI(newMessageUri)
-            .setTimestamp(new Date().getTime())
-            .copyContentFromMessageReplacingMessageURI(ownerOrSystemMsg)
-            .copyEnvelopeFromWonMessage(ownerOrSystemMsg)
-            .setCorrespondingRemoteMessageURI(ownerOrSystemMsg.getMessageURI())
-            .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
+    this.setMessageURI(newMessageUri)
+      .setTimestamp(new Date().getTime())
+      .copyContentFromMessageReplacingMessageURI(ownerOrSystemMsg)
+      .copyEnvelopeFromWonMessage(ownerOrSystemMsg)
+      .setCorrespondingRemoteMessageURI(ownerOrSystemMsg.getMessageURI())
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
     return this;
   }
 
   public WonMessageBuilder setPropertiesForPassingMessageToOwner(final WonMessage externalMsg){
-    this.setMessageURI(externalMsg.getMessageURI())
-        .setTimestamp(new Date().getTime())
-        .copyContentFromMessageReplacingMessageURI(externalMsg)
-        .copyEnvelopeFromWonMessage(externalMsg)
-        .setCorrespondingRemoteMessageURI(externalMsg.getMessageURI())
-        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
+    this.wrap(externalMsg)
+      .setTimestamp(new Date().getTime());
     return this;
   }
 

@@ -10,10 +10,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import won.node.messaging.processors.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.util.RdfUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -47,20 +47,26 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
 
   @Override
   public <T> T evaluate(final Exchange exchange, final Class<T> type) {
-    WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     assert message != null : "wonMessage header must not be null";
     String slip ="";
     // exchange.getIn().setHeader();
-    URI messageType = RdfUtils.toUriOrNull(exchange.getIn().getHeader("messageType"));
+    URI messageType = (URI) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_TYPE_HEADER);
     assert messageType != null : "messageType header must not be null";
-    URI direction = RdfUtils.toUriOrNull(exchange.getIn().getHeader("direction"));
+    URI direction = (URI) exchange.getIn().getHeader(WonCamelConstants.DIRECTION_HEADER);
     assert direction != null : "direction header must not be null";
     String method = "process";
-    if (WonMessageType.SUCCESS_RESPONSE.getResource().getURI().toString().equals(messageType)){
+    if (WonMessageType.SUCCESS_RESPONSE.getResource().getURI().toString().equals(messageType.toString())){
       method = "onSuccessResponse";
+      //the response comes from the remote node (always!), but the handler we need is the
+      //one that sent the original message, so we have to switch direction
+      direction = URI.create(WonMessageDirection.FROM_OWNER.getResource().toString());
       messageType = URI.create(message.getIsResponseToMessageType().getResource().toString());
-    } else if (WonMessageType.FAILURE_RESPONSE.getResource().getURI().toString().equals(messageType)){
+    } else if (WonMessageType.FAILURE_RESPONSE.getResource().getURI().toString().equals(messageType.toString())){
       method ="onFailureResponse";
+      //the response comes from the remote node (always!), but the handler we need is the
+      //one that sent the original message, so we have to switch direction
+      direction = URI.create(WonMessageDirection.FROM_OWNER.getResource().toString());
       messageType = URI.create(message.getIsResponseToMessageType().getResource().toString());
     }
     try {
@@ -72,7 +78,6 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
     } catch (IllegalAccessException e) {
       e.printStackTrace();
     }
-    exchange.getIn().setHeader("wonSlip",slip);
     return type.cast(slip);
   }
 
@@ -89,8 +94,8 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
         return pair.getKey().toString();
       }
     }
-    throw new WonMessageProcessingException(String.format("unexpected combination of messageType " +
-      "and direction encountered:  %s, %s", messageType, direction));
+    throw new WonMessageProcessingException(String.format("unexpected combination of messageType %s " +
+      "and direction %s encountered", messageType, direction));
   }
 
 

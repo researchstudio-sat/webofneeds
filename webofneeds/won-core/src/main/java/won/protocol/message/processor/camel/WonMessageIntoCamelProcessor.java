@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 import java.util.Map;
@@ -34,7 +33,7 @@ import java.util.Map;
  * in TriG format in the exchange's in, in the body or a WonMessage object in the
  * in header 'wonMessgage'. If that header is empty, the WonMessage found in the
  * body is deserialized and put into the in header 'wonMessage'.
- * Moreover, the headers 'facetType' and 'messageType' are set.
+ * Moreover, the 'messageType' header is set.
  */
 public class WonMessageIntoCamelProcessor implements Processor
 {
@@ -45,17 +44,16 @@ public class WonMessageIntoCamelProcessor implements Processor
     logger.debug("processing won message");
     Map headers = exchange.getIn().getHeaders();
     //if the wonMessage header is there, don't change it - that way we can re-route internal messages
-    WonMessage wonMessage = (WonMessage) headers.get(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage wonMessage = (WonMessage) headers.get(WonCamelConstants.MESSAGE_HEADER);
     if (wonMessage == null) {
       wonMessage = WonMessageDecoder.decode(Lang.TRIG, exchange.getIn().getBody().toString());
     }
     if (wonMessage == null) {
       throw new WonMessageProcessingException("No WonMessage found in header '" +
-        WonCamelConstants.WON_MESSAGE_HEADER+"' or in the body");
+        WonCamelConstants.MESSAGE_HEADER +"' or in the body");
     }
-    exchange.getIn().setHeader("messageType", URI.create(wonMessage.getMessageType().getResource().getURI()));
-    exchange.getIn().setHeader("facetType", WonRdfUtils.FacetUtils.getFacet(wonMessage));
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, wonMessage);
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(wonMessage.getMessageType().getResource().getURI()));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, wonMessage);
   }
 
 }

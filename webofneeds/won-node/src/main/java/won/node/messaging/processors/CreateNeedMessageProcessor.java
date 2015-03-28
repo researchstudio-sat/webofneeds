@@ -11,7 +11,6 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Facet;
-import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.util.WonRdfUtils;
@@ -33,7 +32,7 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
   @Override
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     Need need = storeNeed(wonMessage);
     authorizeOwnerApplicationForNeed(message, need);
     try {
@@ -65,9 +64,6 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     need.setWonNodeURI(wonMessage.getReceiverNodeURI());
 
     need = needRepository.save(need);
-
-    // store the message event placeholder to keep the connection between need and message event
-    messageEventRepository.save(new MessageEventPlaceholder(needURI, wonMessage));
 
     List<Facet> facets = WonRdfUtils.NeedUtils.getFacets(needURI, needContent);
     if (facets.size() == 0)

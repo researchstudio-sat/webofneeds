@@ -26,10 +26,10 @@ import org.springframework.context.ApplicationContextAware;
 import won.node.messaging.processors.DefaultFacetMessageProcessor;
 import won.node.messaging.processors.FacetMessageProcessor;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.util.RdfUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -63,23 +63,29 @@ public class FacetTypeSlipComputer implements InitializingBean, ApplicationConte
 
   @Override
   public <T> T evaluate(final Exchange exchange, final Class<T> type) {
-    WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     assert message != null : "wonMessage header must not be null";
     String slip ="";
     // exchange.getIn().setHeader();
-    URI messageType = RdfUtils.toUriOrNull(exchange.getIn().getHeader("messageType"));
+    URI messageType = (URI) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_TYPE_HEADER);
     assert messageType != null : "messageType header must not be null";
-    URI direction = RdfUtils.toUriOrNull(exchange.getIn().getHeader("direction"));
+    URI direction = (URI) exchange.getIn().getHeader(WonCamelConstants.DIRECTION_HEADER);
     assert direction != null : "direction header must not be null";
-    URI facetType = RdfUtils.toUriOrNull(exchange.getIn().getHeader("facetType"));
+    URI facetType = (URI) exchange.getIn().getHeader(WonCamelConstants.FACET_TYPE_HEADER);
     //for ordinary messages, the process method is called
     //for responses, the on[Failure|Success]Response is called.
     String method = "process";
-    if (WonMessageType.SUCCESS_RESPONSE.getResource().getURI().toString().equals(messageType)){
+    if (WonMessageType.SUCCESS_RESPONSE.getResource().getURI().toString().equals(messageType.toString())){
       method = "onSuccessResponse";
+      //the response comes from the remote node (always!), but the handler we need is the
+      //one that sent the original message, so we have to switch direction
+      direction = URI.create(WonMessageDirection.FROM_OWNER.getResource().toString());
       messageType = URI.create(message.getIsResponseToMessageType().getResource().toString());
-    } else if (WonMessageType.FAILURE_RESPONSE.getResource().getURI().toString().equals(messageType)){
+    } else if (WonMessageType.FAILURE_RESPONSE.getResource().getURI().toString().equals(messageType.toString())){
       method ="onFailureResponse";
+      //the response comes from the remote node (always!), but the handler we need is the
+      //one that sent the original message, so we have to switch direction
+      direction = URI.create(WonMessageDirection.FROM_OWNER.getResource().toString());
       messageType = URI.create(message.getIsResponseToMessageType().getResource().toString());
     }
     try {
@@ -91,7 +97,6 @@ public class FacetTypeSlipComputer implements InitializingBean, ApplicationConte
     } catch (IllegalAccessException e) {
       e.printStackTrace();
     }
-    exchange.getIn().setHeader("wonSlip",slip);
     return type.cast(slip);
   }
 
@@ -113,8 +118,8 @@ public class FacetTypeSlipComputer implements InitializingBean, ApplicationConte
         }
       }
     }
-    throw new WonMessageProcessingException(String.format("unexpected combination of messageType, " +
-      "facetType and direction encountered:  %s, %s, %s", messageType, facetType, direction));
+    throw new WonMessageProcessingException(String.format("unexpected combination of messageType %s, " +
+      "facetType %s and direction %s encountered", messageType, facetType, direction));
   }
 
   private boolean matches(Annotation annotation, URI messageType, URI direction, URI facetType)

@@ -7,8 +7,11 @@ import org.apache.camel.builder.PredicateBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import won.node.messaging.predicates.IsMessageForConnectionPredicate;
 import won.node.messaging.predicates.IsResponseMessagePredicate;
+import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
+
+import java.net.URI;
 
 /**
  * User: syim
@@ -24,7 +27,7 @@ public class WonMessageRoutes  extends RouteBuilder
      */
     from("activemq:queue:OwnerProtocol.in?concurrentConsumers=5")
       .routeId("WonMessageOwnerRoute")
-      .setHeader("direction", new ConstantStringExpression(WONMSG.TYPE_FROM_OWNER_STRING))
+      .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_OWNER_STRING)))
         .choice()
           .when(header("methodName").isEqualTo("register"))
             .to("bean:ownerManagementService?method=registerOwnerApplication")
@@ -48,7 +51,7 @@ public class WonMessageRoutes  extends RouteBuilder
      */
     from("seda:SystemProtocolIntoOwnerProtocol?concurrentConsumers=5")
       .routeId("WonMessageSystemRoute")
-      .setHeader("direction", new ConstantStringExpression(WONMSG.TYPE_FROM_SYSTEM_STRING))
+      .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
       .to("bean:wonMessageIntoCamelProcessor")
       .to("bean:wellformednessChecker")
       .to("bean:signatureChecker")
@@ -64,21 +67,35 @@ public class WonMessageRoutes  extends RouteBuilder
         // Also, it puts any outbound message in the respective header
       .routingSlip(method("messageTypeSlip"))
       .to("bean:persister")
-      .setHeader(WonCamelConstants.WON_MESSAGE_HEADER, header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER))
+      .setHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER, header(WonCamelConstants.MESSAGE_HEADER))
+      .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER))
         //now if the outbound message is one that facet implementations can
         //process, let them do that, then send the resulting message to the remote end.
-      .filter(new IsMessageForConnectionPredicate())
-      .routingSlip(method("facetTypeSlip"))
-      .to("bean:toNodeSender")
-        //if we didn't raise an exception so far, send a success response
-      .to("bean:successResponder");
+      .choice()
+        .when(PredicateBuilder.and(
+                header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
+                new IsMessageForConnectionPredicate()))
+            //put the local connection URI into the header
+            .setHeader(WonCamelConstants.CONNECTION_URI_HEADER,
+                    new GetEnvelopePropertyExpression(WonCamelConstants.ORIGINAL_MESSAGE_HEADER,
+                            URI.create(WONMSG.SENDER_PROPERTY.getURI().toString())))
+            //look into the db to find the facet we are using
+            .to("bean:facetExtractor")
+            .routingSlip(method("facetTypeSlip"))
+            .to("bean:toNodeSender")
+            .end() //end choice
+                    //if we didn't raise an exception so far, send a success response
+                    //for that, we have to re-instate the original (not the outbound) messagge, so we reply to the right one
+            .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER))
+            .to("bean:successResponder");
+
 
     /**
      * Need protocol, incoming
      */
     from("activemq:queue:NeedProtocol.in?concurrentConsumers=5")
        .routeId("WonMessageNodeRoute")
-       .setHeader("direction", new ConstantStringExpression(WONMSG.TYPE_FROM_EXTERNAL_STRING))
+       .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_EXTERNAL.getURI())))
        .choice()
             // (won nodes register the same way as owner applications do)
          .when(header("methodName").isEqualTo("register"))
@@ -93,12 +110,21 @@ public class WonMessageRoutes  extends RouteBuilder
             //call the default implementation, which may alter the message.
             .routingSlip(method("messageTypeSlip"))
             .to("bean:persister")
-            //inbound messages are always passed to facet implementations
+             //put the local connection URI into the header
+            .setHeader(WonCamelConstants.CONNECTION_URI_HEADER,
+                    new GetEnvelopePropertyExpression(WonCamelConstants.MESSAGE_HEADER,
+                            URI.create(WONMSG.RECEIVER_PROPERTY.getURI().toString())))
+             //look into the db to find the facet we are using
+            .to("bean:facetExtractor")
+            //inbound messages are always passed to facet implementations as they
+            //are always directed at connections
             .routingSlip(method("facetTypeSlip"))
             //now, we have the message we want to pass on to the owner in the exchange's in header.
             //do we want to send a response back? only if we're not currently processing a response!
             .to("bean:toOwnerSender")
-            .filter(PredicateBuilder.not(new IsResponseMessagePredicate()))
+            .filter(PredicateBuilder.and(
+                    header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
+                    PredicateBuilder.not(new IsResponseMessagePredicate())))
                 .to("bean:successResponder");
 
     /**
@@ -115,7 +141,7 @@ public class WonMessageRoutes  extends RouteBuilder
       .to("bean:wonMessageIntoCamelProcessor")
       .choice()
         //we only handle hint messages
-        .when(header("messageType").isEqualTo(WONMSG.TYPE_HINT))
+        .when(header(WonCamelConstants.MESSAGE_TYPE_HEADER).isEqualTo(WONMSG.TYPE_HINT))
           .to("bean:wellformednessChecker")
           .to("bean:signatureChecker")
           .to("bean:wrapperFromExternal")
@@ -128,17 +154,34 @@ public class WonMessageRoutes  extends RouteBuilder
 
   }
 
-  private class ConstantStringExpression implements Expression
+  private class ConstantURIExpression implements Expression
   {
-    private String constantString;
+    private URI uri;
 
-    public ConstantStringExpression(final String constantString) {
-      this.constantString = constantString;
+    public ConstantURIExpression(final URI uri) {
+      this.uri = uri;
     }
 
     @Override
     public <T> T evaluate(final Exchange exchange, final Class<T> type) {
-      return type.cast(constantString);
+      return type.cast(uri);
     }
   }
+
+  private class GetEnvelopePropertyExpression implements Expression
+  {
+    String header;
+    URI property;
+    private GetEnvelopePropertyExpression(String header, URI property) {
+      this.property = property;
+      this.header = header;
+    }
+
+    @Override
+    public <T> T evaluate(Exchange exchange, Class<T> type) {
+      WonMessage message = (WonMessage) exchange.getIn().getHeader(header);
+      return type.cast(message.getEnvelopePropertyURIValue(property));
+    }
+  }
+
 }

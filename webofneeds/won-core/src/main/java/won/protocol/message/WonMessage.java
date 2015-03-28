@@ -325,6 +325,17 @@ public class WonMessage implements Serializable
     return isResponseToMessageType;
   }
 
+  public URI getEnvelopePropertyURIValue(URI property){
+    for (Model envelopeGraph: getEnvelopeGraphs()){
+      StmtIterator it = envelopeGraph.listStatements(envelopeGraph.getResource(getMessageURI().toString()), envelopeGraph.getProperty(property.toString()),
+              (RDFNode) null);
+      if (it.hasNext()){
+        return URI.create(it.nextStatement().getObject().asResource().toString());
+      }
+    }
+    return null;
+  }
+
   private URI getEnvelopePropertyURIValue(Property property){
     for (Model envelopeGraph: getEnvelopeGraphs()){
       StmtIterator it = envelopeGraph.listStatements(envelopeGraph.getResource(getMessageURI().toString()), property,

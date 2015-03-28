@@ -77,6 +77,8 @@
           class="won.node.messaging.processors.ToNodeSender" />
     <bean id="toOwnerSender"
           class="won.node.messaging.processors.ToOwnerSender" />
+    <bean id="facetExtractor"
+          class="won.protocol.message.processor.camel.FacetExtractingCamelProcessor" />
 
 
     <!-- won-specific processors -->
