@@ -23,12 +23,12 @@ public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     WonMessage newWonMessage = createMessageToSendToOwner(wonMessage);
     URI connectionURIFromWonMessage = newWonMessage.getReceiverURI();
     Connection con = dataService.nextConnectionState(connectionURIFromWonMessage,
                                                      ConnectionEventType.PARTNER_OPEN);
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER,newWonMessage);
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER,newWonMessage);
   }
 
   private WonMessage createMessageToSendToOwner(WonMessage wonMessage) {

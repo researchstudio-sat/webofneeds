@@ -19,6 +19,7 @@ package won.owner.camel.routes.fixed;
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 import org.apache.camel.builder.RouteBuilder;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
 
 /**
@@ -32,7 +33,7 @@ public class WonMessageRoutes extends RouteBuilder
   public void configure() throws Exception {
     from("activemq:queue:OwnerProtocol.in?concurrentConsumers=5")
       .routeId("WonMessageOwnerRoute")
-      .setHeader("direction", new ConstantStringExpression(WONMSG.TYPE_FROM_OWNER_STRING))
+      .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantStringExpression(WONMSG.TYPE_FROM_OWNER_STRING))
         .choice()
           .when(header("methodName").isEqualTo("register"))
             .to("bean:ownerManagementService?method=registerOwnerApplication")

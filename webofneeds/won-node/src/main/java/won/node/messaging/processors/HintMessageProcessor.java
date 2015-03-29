@@ -31,7 +31,7 @@ public class HintMessageProcessor extends AbstractCamelProcessor
 
   public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
 
     logger.debug("STORING message with id {}", wonMessage.getMessageURI());
 
@@ -68,7 +68,7 @@ public class HintMessageProcessor extends AbstractCamelProcessor
     URI wrappedMessageURI = this.wonNodeInformationService.generateEventURI();
     //build message to send to owner, put in header
     final WonMessage newWonMessage = createMessageToSendToOwner(wonMessage, con);
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, newWonMessage);
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, newWonMessage);
   }
 
   private WonMessage createMessageToSendToOwner(WonMessage wonMessage, Connection con) {

@@ -5,10 +5,13 @@ import com.hp.hpl.jena.rdf.model.*;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.model.Connection;
+import won.protocol.model.ConnectionState;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
@@ -28,9 +31,25 @@ public class SendMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
+    URI connectionUri = wonMessage.getSenderURI();
+    if (connectionUri == null){
+      throw new MissingMessagePropertyException(URI.create(WONMSG.SENDER_PROPERTY.toString()));
+    }
+    Connection con = connectionRepository.findOneByConnectionURI(connectionUri);
+    if (con.getState() != ConnectionState.CONNECTED) {
+      throw new IllegalMessageForConnectionStateException(connectionUri, "CONNECTION_MESSAGE", con.getState());
+    }
     WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage);
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER,newWonMessage);
+    //add the information about the remote message to the locally stored one
+    wonMessage = new WonMessageBuilder()
+            .wrap(wonMessage)
+            .setCorrespondingRemoteMessageURI(newWonMessage.getMessageURI())
+            .build();
+    //put it into the header so the persister will pick it up later
+    message.setHeader(WonCamelConstants.MESSAGE_HEADER,wonMessage);
+
+    exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER,newWonMessage);
   }
 
   private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage) {

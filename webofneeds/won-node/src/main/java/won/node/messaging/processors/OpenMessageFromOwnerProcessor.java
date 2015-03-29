@@ -24,7 +24,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getSenderURI());
 
     //prepare the message to pass to the remote node
@@ -38,7 +38,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
 
     con = dataService.nextConnectionState(connectionURIFromWonMessage, ConnectionEventType.OWNER_OPEN);
 
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER,newWonMessage);
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER,newWonMessage);
   }
 
   private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage, Connection con) {

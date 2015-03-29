@@ -3,6 +3,7 @@ package won.node.messaging.processors;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -26,15 +27,24 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     URI senderNeedURI = wonMessage.getSenderNeedURI();
     URI receiverNeedURI = wonMessage.getReceiverNeedURI();
     URI facetURI = WonRdfUtils.FacetUtils.getFacet(wonMessage);
-    //create Connection in Database
-    final Connection con = dataService.createConnection(senderNeedURI, receiverNeedURI, null, facetURI,
-                                                        ConnectionState.REQUEST_SENT,
-                                                        ConnectionEventType.OWNER_OPEN);
-
+    URI connectionURI = wonMessage.getSenderURI(); //if the uri is known already, we can load the connection!
+    Connection con = null;
+    if (connectionURI != null) {
+      con = connectionRepository.findOneByConnectionURI(connectionURI);
+      if (con == null) throw new NoSuchConnectionException(connectionURI);
+    } else {
+      con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndTypeURI(senderNeedURI, receiverNeedURI, facetURI);
+    }
+    if (con == null){
+      //create Connection in Database
+      con = dataService.createConnection(senderNeedURI, receiverNeedURI, null, facetURI,
+                                                          ConnectionState.REQUEST_SENT,
+                                                          ConnectionEventType.OWNER_OPEN);
+    }
     //prepare the message to pass to the remote node
     final WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage, con);
     //add the information about the new local connection to the original message
@@ -45,7 +55,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
       .build();
 
     //put it into the header so the persister will pick it up later
-    message.setHeader(WonCamelConstants.WON_MESSAGE_HEADER,wonMessage);
+    message.setHeader(WonCamelConstants.MESSAGE_HEADER,wonMessage);
 
     //put it into the 'modified message' header (so the persister doesn't pick up the wrong one).
     message.setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
@@ -64,7 +74,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
 
   @Override
   public void onSuccessResponse(final Exchange exchange) throws Exception {
-    WonMessage responseMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage responseMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     MessageEventPlaceholder mep = this.messageEventRepository.findOneByCorrespondingRemoteMessageURI(
       responseMessage
         .getIsResponseToMessageURI());

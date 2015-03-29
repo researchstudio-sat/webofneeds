@@ -22,7 +22,7 @@ public class CloseMessageFromOwnerProcessor extends AbstractFromOwnerCamelProces
 
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
 
     logger.debug("CLOSE received from the owner side for connection {}", wonMessage.getSenderURI());
 

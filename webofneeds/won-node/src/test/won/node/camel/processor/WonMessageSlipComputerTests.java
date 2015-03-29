@@ -24,7 +24,7 @@ import java.net.URI;
 public class WonMessageSlipComputerTests
 {
   @Autowired
-  WonMessageFixedSlipComputer wonMessageFixedSlipComputer;
+  MessageTypeSlipComputer wonMessageSlipComputer;
 
   @Autowired
   CreateNeedMessageProcessor test;
@@ -36,150 +36,138 @@ public class WonMessageSlipComputerTests
   @Test
   public void testCreateFromOwner() throws Exception {
     Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
-    exchange.getIn().setHeader("messageType", URI.create(WONMSG.TYPE_CREATE_STRING));
-    exchange.getIn().setHeader("direction", URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
-    wonMessageSlipComputer.evaluate(exchange,String.class);
-    Assert.assertEquals("createNeedMessageProcessor", exchange.getIn().getHeader("wonSlip"));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.TYPE_CREATE_STRING));
+    exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER, URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
+    String slip = wonMessageSlipComputer.evaluate(exchange,String.class);
+    Assert.assertEquals("createNeedMessageProcessor", slip);
   }
   @Test
   public void testActivateNeedMessage() throws Exception {
     Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
-    exchange.getIn().setHeader("messageType", URI.create(WONMSG.TYPE_ACTIVATE_STRING));
-    exchange.getIn().setHeader("direction", URI.create(WONMSG.TYPE_FROM_OWNER.getURI().toString()));
-    exchange.getIn().setHeader("facetType",URI.create(WON.OWNER_FACET_STRING));
-    wonMessageSlipComputer.evaluate(exchange,String.class);
-    Assert.assertEquals("activateNeedMessageProcessor", exchange.getIn().getHeader
-      ("wonSlip"));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.TYPE_ACTIVATE_STRING));
+    exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER, URI.create(WONMSG.TYPE_FROM_OWNER.getURI().toString()));
+    exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER,URI.create(WON.OWNER_FACET_STRING));
+    String slip = wonMessageSlipComputer.evaluate(exchange,String.class);
+    Assert.assertEquals("activateNeedMessageProcessor", slip);
   }
 
   @Test
   public void testCloseMessageFromNode() throws Exception{
     Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
-    exchange.getIn().setHeader("messageType", URI.create(WONMSG.TYPE_CLOSE_STRING));
-    exchange.getIn().setHeader("direction", URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
-    exchange.getIn().setHeader("facetType",URI.create(WON.OWNER_FACET_STRING));
-    wonMessageSlipComputer.evaluate(exchange,String.class);
-    Assert.assertEquals("closeMessageFromNodeProcessor,closeFromNodeOwnerFacetImpl", exchange.getIn().getHeader
-      ("wonSlip"));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.TYPE_CLOSE_STRING));
+    exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER, URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
+    exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER,URI.create(WON.OWNER_FACET_STRING));
+    String slip = wonMessageSlipComputer.evaluate(exchange,String.class);
+    Assert.assertEquals("closeMessageFromNodeProcessor,closeFromNodeOwnerFacetImpl",slip);
   }
   @Test
   public void testCloseMessageFromOwner() throws Exception{
     Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
-    exchange.getIn().setHeader("messageType", URI.create(WONMSG.TYPE_CLOSE_STRING));
-    exchange.getIn().setHeader("direction", URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
-    exchange.getIn().setHeader("facetType",URI.create(WON.OWNER_FACET_STRING));
-    wonMessageSlipComputer.evaluate(exchange,String.class);
-    Assert.assertEquals("closeMessageFromOwnerProcessor,closeFromOwnerOwnerFacetImpl", exchange.getIn().getHeader
-      ("wonSlip"));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.TYPE_CLOSE_STRING));
+    exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER, URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
+    exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER,URI.create(WON.OWNER_FACET_STRING));
+    String slip = wonMessageSlipComputer.evaluate(exchange,String.class);
+    Assert.assertEquals("closeMessageFromOwnerProcessor,closeFromOwnerOwnerFacetImpl", slip);
   }
 
   @Test
   public void testConnectMessageFromNode() throws Exception{
     Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
-    exchange.getIn().setHeader("messageType", URI.create(WONMSG.TYPE_CONNECT_STRING));
-    exchange.getIn().setHeader("direction", URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.TYPE_CONNECT_STRING));
+    exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER, URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString
       ()));
-    exchange.getIn().setHeader("facetType",URI.create(WON.OWNER_FACET_STRING));
-    wonMessageSlipComputer.evaluate(exchange,String.class);
-    Assert.assertEquals("connectMessageFromNodeProcessor,connectFromNodeOwnerFacetImpl", exchange.getIn().getHeader
-      ("wonSlip"));
+    exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER,URI.create(WON.OWNER_FACET_STRING));
+    String slip = wonMessageSlipComputer.evaluate(exchange,String.class);
+    Assert.assertEquals("connectMessageFromNodeProcessor,connectFromNodeOwnerFacetImpl", slip);
   }
 
   @Test
   public void testConnectMessageFromOwner() throws Exception{
     Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
-    exchange.getIn().setHeader("messageType", URI.create(WONMSG.TYPE_CONNECT_STRING));
-    exchange.getIn().setHeader("direction", URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
-    exchange.getIn().setHeader("facetType",URI.create(WON.OWNER_FACET_STRING));
-    wonMessageSlipComputer.evaluate(exchange,String.class);
-    Assert.assertEquals("connectMessageFromOwnerProcessor,connectFromOwnerOwnerFacetImpl", exchange.getIn().getHeader
-      ("wonSlip"));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.TYPE_CONNECT_STRING));
+    exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER, URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
+    exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER,URI.create(WON.OWNER_FACET_STRING));
+    String slip = wonMessageSlipComputer.evaluate(exchange,String.class);
+    Assert.assertEquals("connectMessageFromOwnerProcessor,connectFromOwnerOwnerFacetImpl", slip);
   }
   @Test
   public void testDeactivateNeedMessageFromOwner() throws Exception{
     Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
-    exchange.getIn().setHeader("messageType", URI.create(WONMSG.TYPE_DEACTIVATE_STRING));
-    exchange.getIn().setHeader("direction", URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
-    exchange.getIn().setHeader("facetType",URI.create(WON.OWNER_FACET_STRING));
-    wonMessageSlipComputer.evaluate(exchange,String.class);
-    Assert.assertEquals("deactivateNeedMessageProcessor", exchange.getIn().getHeader
-      ("wonSlip"));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.TYPE_DEACTIVATE_STRING));
+    exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER, URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
+    exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER,URI.create(WON.OWNER_FACET_STRING));
+    String slip = wonMessageSlipComputer.evaluate(exchange,String.class);
+    Assert.assertEquals("deactivateNeedMessageProcessor", slip);
   }
   @Test
   public void testHintMessageProcessor() throws Exception{
     Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
-    exchange.getIn().setHeader("messageType", URI.create(WONMSG.TYPE_HINT_STRING));
-    exchange.getIn().setHeader("direction", URI.create(
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.TYPE_HINT_STRING));
+    exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER, URI.create(
       WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
-    exchange.getIn().setHeader("facetType",URI.create(WON.OWNER_FACET_STRING));
-    wonMessageSlipComputer.evaluate(exchange,String.class);
-    Assert.assertEquals("hintMessageProcessor", exchange.getIn().getHeader
-      ("wonSlip"));
+    exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER,URI.create(WON.OWNER_FACET_STRING));
+    String slip = wonMessageSlipComputer.evaluate(exchange,String.class);
+    Assert.assertEquals("hintMessageProcessor", slip);
   }
   @Test
   public void testOpenMessageFromNode() throws Exception{
     Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
-    exchange.getIn().setHeader("messageType", URI.create(WONMSG.TYPE_OPEN_STRING));
-    exchange.getIn().setHeader("direction", URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
-    exchange.getIn().setHeader("facetType",URI.create(WON.OWNER_FACET_STRING));
-    wonMessageSlipComputer.evaluate(exchange,String.class);
-    Assert.assertEquals("openMessageFromNodeProcessor,openFromNodeOwnerFacetImpl", exchange.getIn().getHeader
-      ("wonSlip"));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.TYPE_OPEN_STRING));
+    exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER, URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
+    exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER,URI.create(WON.OWNER_FACET_STRING));
+    String slip = wonMessageSlipComputer.evaluate(exchange,String.class);
+    Assert.assertEquals("openMessageFromNodeProcessor,openFromNodeOwnerFacetImpl", slip);
   }
   @Test
   public void testOpenMessageFromOwner() throws Exception{
     Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
-    exchange.getIn().setHeader("messageType", URI.create(WONMSG.TYPE_OPEN_STRING));
-    exchange.getIn().setHeader("direction", URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
-    exchange.getIn().setHeader("facetType",URI.create(WON.OWNER_FACET_STRING));
-    wonMessageSlipComputer.evaluate(exchange,String.class);
-    Assert.assertEquals("openMessageFromOwnerProcessor,openFromOwnerOwnerFacetImpl", exchange.getIn().getHeader
-      ("wonSlip"));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.TYPE_OPEN_STRING));
+    exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER, URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
+    exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER,URI.create(WON.OWNER_FACET_STRING));
+    String slip = wonMessageSlipComputer.evaluate(exchange,String.class);
+    Assert.assertEquals("openMessageFromOwnerProcessor,openFromOwnerOwnerFacetImpl", slip);
   }
   @Test
   public void testSendMessageFromNode() throws Exception{
     Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
-    exchange.getIn().setHeader("messageType", URI.create(WONMSG.TYPE_CONNECTION_MESSAGE_STRING));
-    exchange.getIn().setHeader("direction", URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
-    exchange.getIn().setHeader("facetType",URI.create(WON.OWNER_FACET_STRING));
-    wonMessageSlipComputer.evaluate(exchange,String.class);
-    Assert.assertEquals("sendMessageFromNodeProcessor,sendMessageFromNodeOwnerFacetImpl", exchange.getIn().getHeader
-      ("wonSlip"));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.TYPE_CONNECTION_MESSAGE_STRING));
+    exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER, URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
+    exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER,URI.create(WON.OWNER_FACET_STRING));
+    String slip = wonMessageSlipComputer.evaluate(exchange,String.class);
+    Assert.assertEquals("sendMessageFromNodeProcessor,sendMessageFromNodeOwnerFacetImpl", slip);
   }
   @Test
   public void testSendMessageFromOwner() throws Exception{
     Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
-    exchange.getIn().setHeader("messageType", URI.create(WONMSG.TYPE_CONNECTION_MESSAGE_STRING));
-    exchange.getIn().setHeader("direction", URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
-    exchange.getIn().setHeader("facetType",URI.create(WON.OWNER_FACET_STRING));
-    wonMessageSlipComputer.evaluate(exchange,String.class);
-    Assert.assertEquals("sendMessageFromOwnerProcessor,sendMessageFromOwnerOwnerFacetImpl", exchange.getIn().getHeader
-      ("wonSlip"));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.TYPE_CONNECTION_MESSAGE_STRING));
+    exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER, URI.create(WonMessageDirection.FROM_OWNER.getResource().getURI().toString()));
+    exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER,URI.create(WON.OWNER_FACET_STRING));
+    String slip = wonMessageSlipComputer.evaluate(exchange,String.class);
+    Assert.assertEquals("sendMessageFromOwnerProcessor,sendMessageFromOwnerOwnerFacetImpl",slip);
   }
   @Test
   public void testSendMessageFromNodeGroupFacet() throws Exception{
     Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-    exchange.getIn().setHeader(WonCamelConstants.WON_MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
-    exchange.getIn().setHeader("messageType", URI.create(WONMSG.TYPE_CONNECTION_MESSAGE_STRING));
-    exchange.getIn().setHeader("direction", URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
-    exchange.getIn().setHeader("facetType",URI.create(WON.GROUP_FACET_STRING));
-    wonMessageSlipComputer.evaluate(exchange,String.class);
-    Assert.assertEquals("sendMessageFromNodeProcessor,sendMessageFromNodeGroupFacetImpl", exchange.getIn().getHeader
-      ("wonSlip"));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, new WonMessage(DatasetFactory.createMem()));
+    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(WONMSG.TYPE_CONNECTION_MESSAGE_STRING));
+    exchange.getIn().setHeader(WonCamelConstants.DIRECTION_HEADER, URI.create(WonMessageDirection.FROM_EXTERNAL.getResource().getURI().toString()));
+    exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER,URI.create(WON.GROUP_FACET_STRING));
+    String slip = wonMessageSlipComputer.evaluate(exchange,String.class);
+    Assert.assertEquals("sendMessageFromNodeProcessor,sendMessageFromNodeGroupFacetImpl", slip);
   }
-  public void setWonMessageFixedSlipComputer(final WonMessageFixedSlipComputer wonMessageFixedSlipComputer) {
+  public void setWonMessageFixedSlipComputer(final MessageTypeSlipComputer wonMessageFixedSlipComputer) {
     this.wonMessageSlipComputer = wonMessageFixedSlipComputer;
   }
 }

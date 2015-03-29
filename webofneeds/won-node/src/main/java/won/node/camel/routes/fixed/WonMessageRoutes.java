@@ -47,10 +47,10 @@ public class WonMessageRoutes  extends RouteBuilder
             .to("bean:ownerProtocolOutgoingMessagesProcessor")
             .recipientList(header("ownerApplicationIDs"));
     /**
-     * System messages: treated almost as incoming from owner.
+     * System-to-remote messages: treated almost as incoming from owner.
      */
-    from("seda:SystemProtocolIntoOwnerProtocol?concurrentConsumers=5")
-      .routeId("WonMessageSystemRoute")
+    from("seda:SystemMessageToRemoteNode?concurrentConsumers=5")
+      .routeId("SystemMessageToRemoteNode")
       .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
       .to("bean:wonMessageIntoCamelProcessor")
       .to("bean:wellformednessChecker")
@@ -58,6 +58,21 @@ public class WonMessageRoutes  extends RouteBuilder
       .to("bean:wrapperFromSystem")
       //route to message processing logic
       .to("seda:OwnerProtocolLogic");
+
+    /**
+     * System-to-owner messages: treated almost as incoming from remote node.
+     */
+    from("seda:SystemMessageToOwner?concurrentConsumers=5")
+            .routeId("SystemMessageToOwner")
+            .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
+            .to("bean:wonMessageIntoCamelProcessor")
+            .to("bean:wellformednessChecker")
+            .to("bean:signatureChecker")
+            .to("bean:wrapperFromSystem")
+                    //route to message processing logic
+            .to("bean:persister")
+            .to("bean:toOwnerSender");
+
 
     /**
      * Owner protocol logic: expects messages from OwnerProtocolIn and SystemIntoOwnerProtocol routes.
@@ -126,6 +141,8 @@ public class WonMessageRoutes  extends RouteBuilder
                     header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
                     PredicateBuilder.not(new IsResponseMessagePredicate())))
                 .to("bean:successResponder");
+
+
 
     /**
      * Need protocol, outgoing

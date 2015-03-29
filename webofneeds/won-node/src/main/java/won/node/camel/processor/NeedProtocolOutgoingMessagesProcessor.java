@@ -41,7 +41,7 @@ public class NeedProtocolOutgoingMessagesProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         logger.debug("processing message for sending to remote node");
-      WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+      WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
       if (wonMessage.getSenderNeedURI() != null && wonMessage.getSenderNodeURI().equals(wonMessage.getReceiverNodeURI
         ())){
         //sending locally, directly put message into the incoming need protocol

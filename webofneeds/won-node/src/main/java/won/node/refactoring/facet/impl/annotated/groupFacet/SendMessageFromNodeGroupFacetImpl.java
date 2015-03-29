@@ -43,7 +43,7 @@ public class SendMessageFromNodeGroupFacetImpl extends AbstractFromOwnerCamelPro
 
   @Override
   public void process(final Exchange exchange) throws Exception {
-    final WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    final WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     final Connection con = connectionRepository.findByConnectionURI(wonMessage.getReceiverURI()).get(0);
     final List<Connection> cons = connectionRepository.findByNeedURIAndStateAndTypeURI(con.getNeedURI(),
       ConnectionState.CONNECTED, FacetType.GroupFacet.getURI());
@@ -58,7 +58,7 @@ public class SendMessageFromNodeGroupFacetImpl extends AbstractFromOwnerCamelPro
             forwardedMessageURI, wonMessage,
             con.getConnectionURI(), con.getNeedURI(), wonMessage.getReceiverNodeURI(),
             con.getRemoteConnectionURI(), con.getRemoteNeedURI(), remoteWonNodeUri);
-          sendSystemMessage(newWonMessage);
+          sendSystemMessageToRemoteNode(newWonMessage);
         }
       } catch (Exception e) {
         logger.warn("caught Exception:", e);

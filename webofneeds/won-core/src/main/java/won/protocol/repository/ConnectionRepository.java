@@ -16,7 +16,6 @@
 
 package won.protocol.repository;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Query;
@@ -38,6 +37,8 @@ public interface ConnectionRepository extends WonRepository<Connection>
   List<Connection> findByConnectionURI(URI URI);
 
   Connection findOneByConnectionURI(URI URI);
+
+  Connection findOneByNeedURIAndRemoteNeedURIAndTypeURI(URI needURI, URI remoteNeedURI, URI typeUri);
 
   List<Connection> findByNeedURI(URI URI);
 

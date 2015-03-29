@@ -32,7 +32,7 @@ public class DeactivateNeedMessageProcessor extends AbstractCamelProcessor
 
 
   public void process(final Exchange exchange) throws Exception {
-    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     URI receiverNeedURI = wonMessage.getReceiverNeedURI();
     logger.debug("DEACTIVATING need. needURI:{}", receiverNeedURI);
     if (receiverNeedURI == null) throw new WonMessageProcessingException("receiverNeedURI is not set");
@@ -57,7 +57,7 @@ public class DeactivateNeedMessageProcessor extends AbstractCamelProcessor
     WonMessage message = new WonMessageBuilder().setMessagePropertiesForClose(messageURI,
       con.getConnectionURI(), con.getNeedURI(), need.getWonNodeURI(), con.getRemoteConnectionURI(),
       con.getRemoteNeedURI(), remoteWonNode).build();
-    sendSystemMessage(message);
+    sendSystemMessageToRemoteNode(message);
   }
 
 }

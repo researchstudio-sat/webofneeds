@@ -29,7 +29,7 @@ public class IsResponseMessagePredicate implements Predicate
 {
   @Override
   public boolean matches(final Exchange exchange) {
-    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     WonMessageType messageType = wonMessage.getMessageType();
     switch (messageType){
       case SUCCESS_RESPONSE: return true;

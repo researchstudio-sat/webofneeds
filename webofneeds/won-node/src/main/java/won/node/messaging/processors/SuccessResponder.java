@@ -33,9 +33,9 @@ public class SuccessResponder extends AbstractCamelProcessor
 {
   @Override
   public void process(final Exchange exchange) throws Exception {
-    WonMessage originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     if (originalMessage == null) throw new WonMessageProcessingException("did not find the original message in the " +
-      "exchange header '" + WonCamelConstants.WON_MESSAGE_HEADER +"'");
+      "exchange header '" + WonCamelConstants.MESSAGE_HEADER +"'");
     //only send success message if the original message was sent on behalf of a need (otherwise we have to find out
     // with other means which ownerapplications to send the response to.
     if (originalMessage.getSenderNeedURI() == null) return;
@@ -43,9 +43,9 @@ public class SuccessResponder extends AbstractCamelProcessor
     WonMessage responseMessage = new WonMessageBuilder().setPropertiesForNodeResponse(originalMessage, true,
       newMessageURI).build();
     if (WonMessageDirection.FROM_OWNER == originalMessage.getEnvelopeType()){
-      sendMessageToOwner(responseMessage, originalMessage.getSenderNeedURI());
+      sendSystemMessageToOwner(responseMessage);
     } else if (WonMessageDirection.FROM_EXTERNAL == originalMessage.getEnvelopeType()){
-      sendMessageToNode(responseMessage);
+      sendSystemMessageToRemoteNode(responseMessage);
     }
   }
 }

@@ -24,7 +24,7 @@ public class ActivateNeedMessageProcessor extends AbstractCamelProcessor
 
   public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();
-    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     URI receiverNeedURI = wonMessage.getReceiverNeedURI();
     logger.debug("ACTIVATING need. needURI:{}", receiverNeedURI);
     if (receiverNeedURI == null) throw new IllegalArgumentException("receiverNeedURI is not set");

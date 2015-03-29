@@ -24,12 +24,36 @@ import java.net.URI;
 public class WonMessageUtils
 {
   public static URI getParentEntityUri(final WonMessage message) {
-    URI parentURI = message.getSenderURI();
+    URI parentURI = null;
+    WonMessageDirection direction = message.getEnvelopeType();
+    if (direction == WonMessageDirection.FROM_EXTERNAL ){
+      parentURI = getParentUriFromReceiverProperties(message);
+    } else if (direction == WonMessageDirection.FROM_OWNER || direction == WonMessageDirection.FROM_SYSTEM){
+      parentURI = getParentUriFromSenderProperties(message);
+    }
+    return parentURI;
+  }
+
+  private static URI getParentUriFromSenderProperties(WonMessage message) {
+    URI parentURI;
+    parentURI = message.getSenderURI();
     if (parentURI == null) {
       parentURI = message.getSenderNeedURI();
     }
     if (parentURI == null) {
       parentURI = message.getSenderNodeURI();
+    }
+    return parentURI;
+  }
+
+  private static URI getParentUriFromReceiverProperties(WonMessage message) {
+    URI parentURI;
+    parentURI = message.getReceiverURI();
+    if (parentURI == null) {
+      parentURI = message.getReceiverNeedURI();
+    }
+    if (parentURI == null) {
+      parentURI = message.getReceiverNodeURI();
     }
     return parentURI;
   }

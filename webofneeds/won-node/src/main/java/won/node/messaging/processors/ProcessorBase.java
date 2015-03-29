@@ -113,16 +113,23 @@ public abstract class ProcessorBase
 
   protected void sendMessageToNode(WonMessage message){
     Map headerMap = new HashMap<String, Object>();
-    headerMap.put(WonCamelConstants.WON_MESSAGE_HEADER, message);
+    headerMap.put(WonCamelConstants.MESSAGE_HEADER, message);
     messagingService.sendInOnlyMessage(null, headerMap, null,
                                        "seda:NeedProtocolOut");
   }
 
-  protected void sendSystemMessage(WonMessage message){
+  protected void sendSystemMessageToRemoteNode(WonMessage message){
     Map headerMap = new HashMap<String, Object>();
-    headerMap.put(WonCamelConstants.WON_MESSAGE_HEADER, message);
+    headerMap.put(WonCamelConstants.MESSAGE_HEADER, message);
     messagingService.sendInOnlyMessage(null, headerMap, null,
-      "seda:SystemProtocolIntoOwnerProtocol");
+      "seda:SystemMessageToRemoteNode");
+  }
+
+  protected void sendSystemMessageToOwner(WonMessage message){
+    Map headerMap = new HashMap<String, Object>();
+    headerMap.put(WonCamelConstants.MESSAGE_HEADER, message);
+    messagingService.sendInOnlyMessage(null, headerMap, null,
+            "seda:SystemMessageToOwner");
   }
 
   protected List<String> toStringIds(final List<OwnerApplication> ownerApplications) {
