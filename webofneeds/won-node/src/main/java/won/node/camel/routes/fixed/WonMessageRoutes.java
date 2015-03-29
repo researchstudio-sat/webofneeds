@@ -9,6 +9,7 @@ import won.node.messaging.predicates.IsMessageForConnectionPredicate;
 import won.node.messaging.predicates.IsResponseMessagePredicate;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
@@ -22,6 +23,14 @@ public class WonMessageRoutes  extends RouteBuilder
 
   @Override
   public void configure() throws Exception {
+
+    onException(WonMessageProcessingException.class)
+      .handled(true)
+      .to("bean:failResponder")
+      .wireTap("bean:messagingService?method=inspectMessage");
+
+
+
     /**
      * owner protocol, incoming
      */

@@ -82,6 +82,9 @@
 
 
     <!-- won-specific processors -->
+    <bean id="failResponder"
+          class="won.node.messaging.processors.FailResponder" />
+  <!-- won-specific processors -->
   <!-- start of the pipeline -->
   <bean name="wonMessageIntoCamelProcessor" class="won.protocol.message.processor.camel.WonMessageIntoCamelProcessor" />
   <!-- wrapping the messages for storage on node -->
