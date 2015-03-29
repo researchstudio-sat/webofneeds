@@ -3,6 +3,7 @@ package won.node.messaging.processors;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import won.node.messaging.processors.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -38,7 +39,14 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
 
     con = dataService.nextConnectionState(connectionURIFromWonMessage, ConnectionEventType.OWNER_OPEN);
 
-    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER,newWonMessage);
+    //add the information about the corresponding message to the local one
+    wonMessage = new WonMessageBuilder()
+            .wrap(wonMessage)
+            .setCorrespondingRemoteMessageURI(newWonMessage.getMessageURI())
+            .build();
+
+    //put it into the header so the persister will pick it up later
+    message.setHeader(WonCamelConstants.MESSAGE_HEADER, wonMessage);
   }
 
   private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage, Connection con) {

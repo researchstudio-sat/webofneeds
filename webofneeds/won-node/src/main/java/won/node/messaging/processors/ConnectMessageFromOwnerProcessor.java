@@ -3,6 +3,7 @@ package won.node.messaging.processors;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import won.node.messaging.processors.annotation.FixedMessageProcessor;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;

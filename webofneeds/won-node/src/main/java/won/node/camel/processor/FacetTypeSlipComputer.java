@@ -23,13 +23,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import won.node.messaging.processors.DefaultFacetMessageProcessor;
-import won.node.messaging.processors.FacetMessageProcessor;
+import won.node.messaging.processors.annotation.DefaultFacetMessageProcessor;
+import won.node.messaging.processors.annotation.FacetMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
+import won.protocol.vocabulary.WONMSG;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -75,19 +77,31 @@ public class FacetTypeSlipComputer implements InitializingBean, ApplicationConte
     //for ordinary messages, the process method is called
     //for responses, the on[Failure|Success]Response is called.
     String method = "process";
-    if (WonMessageType.SUCCESS_RESPONSE.getResource().getURI().toString().equals(messageType.toString())){
-      method = "onSuccessResponse";
-      //the response comes from the remote node (always!), but the handler we need is the
+    if (WonMessageDirection.FROM_EXTERNAL.isIdentifiedBy(direction)){
+      //check if we're handling a response. If so, do special routing
+      //the response comes from the remote node, but the handler we need is the
       //one that sent the original message, so we have to switch direction
-      direction = URI.create(WonMessageDirection.FROM_OWNER.getResource().toString());
-      messageType = URI.create(message.getIsResponseToMessageType().getResource().toString());
-    } else if (WonMessageType.FAILURE_RESPONSE.getResource().getURI().toString().equals(messageType.toString())){
-      method ="onFailureResponse";
-      //the response comes from the remote node (always!), but the handler we need is the
-      //one that sent the original message, so we have to switch direction
-      direction = URI.create(WonMessageDirection.FROM_OWNER.getResource().toString());
-      messageType = URI.create(message.getIsResponseToMessageType().getResource().toString());
+      //and we have to set the type to the type of the original message that
+      //we are now handling the response to
+      if (WonMessageType.SUCCESS_RESPONSE.isIdentifiedBy(messageType)){
+        method = "onSuccessResponse";
+        direction = URI.create(WonMessageDirection.FROM_OWNER.getResource().toString());
+        WonMessageType origType = message.getIsResponseToMessageType();
+        if (origType == null) {
+          throw new MissingMessagePropertyException(URI.create(WONMSG.IS_RESPONSE_TO_MESSAGE_TYPE.getURI().toString()));
+        }
+        messageType = origType.getURI();
+      } else if (WonMessageType.FAILURE_RESPONSE.isIdentifiedBy(messageType)){
+        method ="onFailureResponse";
+        direction = URI.create(WonMessageDirection.FROM_OWNER.getResource().toString());
+        WonMessageType origType = message.getIsResponseToMessageType();
+        if (origType == null) {
+          throw new MissingMessagePropertyException(URI.create(WONMSG.IS_RESPONSE_TO_MESSAGE_TYPE.getURI().toString()));
+        }
+        messageType = origType.getURI();
+      }
     }
+
     try {
       slip = "bean:"+computeFacetSlip(messageType, facetType, direction) + "?method=" + method;
     } catch (NoSuchMethodException e) {

@@ -3,7 +3,7 @@ package won.node.refactoring.facet.impl.annotated.ownerFacet;
 import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
 import won.node.messaging.processors.AbstractFromOwnerCamelProcessor;
-import won.node.messaging.processors.FacetMessageProcessor;
+import won.node.messaging.processors.annotation.FacetMessageProcessor;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 

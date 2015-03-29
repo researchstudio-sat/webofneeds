@@ -243,7 +243,9 @@ public class WonMessage implements Serializable
   public WonMessageDirection getEnvelopeType() {
     if (this.envelopeType == null){
       URI type = getEnvelopePropertyURIValue(RDF.type);
-      this.envelopeType = WonMessageDirection.getWonMessageDirection(type);
+      if (type != null){
+        this.envelopeType = WonMessageDirection.getWonMessageDirection(type);
+      }
     }
     return this.envelopeType;
   }
@@ -320,7 +322,9 @@ public class WonMessage implements Serializable
   public WonMessageType getIsResponseToMessageType() {
     if (this.isResponseToMessageType == null){
        URI typeURI = getEnvelopePropertyURIValue(WONMSG.IS_RESPONSE_TO_MESSAGE_TYPE);
-      this.isResponseToMessageType = WonMessageType.getWonMessageType(typeURI);
+      if (typeURI != null) {
+        this.isResponseToMessageType = WonMessageType.getWonMessageType(typeURI);
+      }
     }
     return isResponseToMessageType;
   }

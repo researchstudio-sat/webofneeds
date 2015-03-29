@@ -672,7 +672,7 @@ public class WonMessageBuilder
    * @return
    */
   WonMessageBuilder copyEnvelopeFromWonMessage(final WonMessage wonMessage) {
-    return this
+    this
       .setWonMessageType(wonMessage.getMessageType())
       .setReceiverURI(wonMessage.getReceiverURI())
       .setReceiverNeedURI(wonMessage.getReceiverNeedURI())
@@ -680,6 +680,13 @@ public class WonMessageBuilder
       .setSenderURI(wonMessage.getSenderURI())
       .setSenderNeedURI(wonMessage.getSenderNeedURI())
       .setSenderNodeURI(wonMessage.getSenderNodeURI());
+    if (wonMessage.getIsResponseToMessageType() != null){
+      this.setIsResponseToMessageType(wonMessage.getIsResponseToMessageType());
+    }
+    if (wonMessage.getIsResponseToMessageURI() != null){
+      this.setIsResponseToMessageURI(wonMessage.getIsResponseToMessageURI());
+    }
+    return this;
   }
 
   /**

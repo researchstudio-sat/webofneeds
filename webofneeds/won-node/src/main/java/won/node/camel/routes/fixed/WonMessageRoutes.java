@@ -5,11 +5,10 @@ import org.apache.camel.Expression;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.PredicateBuilder;
 import org.apache.camel.builder.RouteBuilder;
-import won.node.messaging.predicates.IsMessageForConnectionPredicate;
+import won.node.messaging.predicates.ShouldCallFacetImplForMessagePredicate;
 import won.node.messaging.predicates.IsResponseMessagePredicate;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
@@ -24,9 +23,9 @@ public class WonMessageRoutes  extends RouteBuilder
   @Override
   public void configure() throws Exception {
 
-    onException(WonMessageProcessingException.class)
-      .handled(true)
+    onException(Exception.class)
       .to("bean:failResponder")
+      .handled(true)
       .wireTap("bean:messagingService?method=inspectMessage");
 
 
@@ -98,7 +97,7 @@ public class WonMessageRoutes  extends RouteBuilder
       .choice()
         .when(PredicateBuilder.and(
                 header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
-                new IsMessageForConnectionPredicate()))
+                new ShouldCallFacetImplForMessagePredicate()))
             //put the local connection URI into the header
             .setHeader(WonCamelConstants.CONNECTION_URI_HEADER,
                     new GetEnvelopePropertyExpression(WonCamelConstants.ORIGINAL_MESSAGE_HEADER,
@@ -106,15 +105,25 @@ public class WonMessageRoutes  extends RouteBuilder
             //look into the db to find the facet we are using
             .to("bean:facetExtractor")
             .routingSlip(method("facetTypeSlip"))
+            .endChoice() //end choice
+      .end()
+      .choice()
+          .when(
+                  //check if the outbound message header is set, otherwise we don't have anything to
+                  //send to the remote node
+                  //(CAUTION: the actual message is in the default message header).
+                  header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER).isNotNull())
             .to("bean:toNodeSender")
-            .end() //end choice
-                    //if we didn't raise an exception so far, send a success response
-                    //for that, we have to re-instate the original (not the outbound) messagge, so we reply to the right one
-            .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER))
+      .end()
+      //if we didn't raise an exception so far, send a success response
+      //for that, we have to re-instate the original (not the outbound) messagge, so we reply to the right one
+      .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER))
+      .filter(PredicateBuilder.and(
+              header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
+              PredicateBuilder.not(new IsResponseMessagePredicate())))
             .to("bean:successResponder");
 
-
-    /**
+    /** .to("bean:toNodeSender")
      * Need protocol, incoming
      */
     from("activemq:queue:NeedProtocol.in?concurrentConsumers=5")
@@ -144,14 +153,14 @@ public class WonMessageRoutes  extends RouteBuilder
             //are always directed at connections
             .routingSlip(method("facetTypeSlip"))
             //now, we have the message we want to pass on to the owner in the exchange's in header.
-            //do we want to send a response back? only if we're not currently processing a response!
+            //do we want to send a response back? only if we're not currently processing a respon    
             .to("bean:toOwnerSender")
-            .filter(PredicateBuilder.and(
-                    header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
-                    PredicateBuilder.not(new IsResponseMessagePredicate())))
-                .to("bean:successResponder");
-
-
+            .choice()
+              .when(PredicateBuilder.and(
+                      header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
+                      PredicateBuilder.not(new IsResponseMessagePredicate())))
+                .to("bean:successResponder")
+            .end();
 
     /**
      * Need protocol, outgoing

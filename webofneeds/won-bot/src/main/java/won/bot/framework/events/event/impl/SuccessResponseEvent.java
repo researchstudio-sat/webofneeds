@@ -31,6 +31,8 @@ public class SuccessResponseEvent extends BaseEvent implements ResponseEvent
   private WonMessage successMessage;
 
   public SuccessResponseEvent(URI originalMessageURI, WonMessage successMessage) {
+    assert originalMessageURI != null : "originalMessageURI must not be null!";
+    assert successMessage != null : "successMessage must not be null!";
     this.originalMessageURI = originalMessageURI;
     this.successMessage = successMessage;
   }
@@ -41,5 +43,20 @@ public class SuccessResponseEvent extends BaseEvent implements ResponseEvent
 
   public WonMessage getSuccessMessage() {
     return successMessage;
+  }
+
+  @Override
+  public URI getConnectionURI() {
+    return successMessage.getReceiverURI();
+  }
+
+  @Override
+  public URI getRemoteNeedURI() {
+    return successMessage.getSenderNeedURI();
+  }
+
+  @Override
+  public URI getNeedURI() {
+    return successMessage.getReceiverNeedURI();
   }
 }

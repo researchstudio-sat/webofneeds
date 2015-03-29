@@ -3,6 +3,7 @@ package won.node.messaging.processors;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import won.node.messaging.processors.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Need;
@@ -17,7 +18,9 @@ import java.net.URI;
  * Date: 02.03.2015
  */
 @Component
-@FixedMessageProcessor(direction = WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_ACTIVATE_STRING)
+@FixedMessageProcessor(
+        direction = WONMSG.TYPE_FROM_OWNER_STRING,
+        messageType = WONMSG.TYPE_ACTIVATE_STRING)
 public class ActivateNeedMessageProcessor extends AbstractCamelProcessor
 {
 

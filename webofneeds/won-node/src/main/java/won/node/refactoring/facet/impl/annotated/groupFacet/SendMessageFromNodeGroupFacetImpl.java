@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.messaging.processors.AbstractFromOwnerCamelProcessor;
-import won.node.messaging.processors.FacetMessageProcessor;
+import won.node.messaging.processors.annotation.FacetMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;

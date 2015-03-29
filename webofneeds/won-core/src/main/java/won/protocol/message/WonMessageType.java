@@ -48,8 +48,17 @@ public enum WonMessageType
     return resource;
   }
 
+  public URI getURI(){
+    return URI.create(getResource().getURI().toString());
+  }
+
   public static WonMessageType getWonMessageType(URI uri){
     return getWonMessageType(WONMSG.toResource(uri));
+  }
+
+  public boolean isIdentifiedBy(URI uri){
+    if (uri == null) return false;
+    return getResource().getURI().toString().equals(uri.toString());
   }
 
 

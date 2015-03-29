@@ -31,6 +31,8 @@ public class FailureResponseEvent extends BaseEvent implements ResponseEvent
   private WonMessage failureMessage;
 
   public FailureResponseEvent(URI originalMessageURI, WonMessage failureMessage) {
+    assert originalMessageURI != null : "originalMessageURI must not be null!";
+    assert failureMessage != null : "failureMessage must not be null!";
     this.originalMessageURI = originalMessageURI;
     this.failureMessage = failureMessage;
   }
@@ -41,5 +43,20 @@ public class FailureResponseEvent extends BaseEvent implements ResponseEvent
 
   public WonMessage getFailureMessage() {
     return failureMessage;
+  }
+
+  @Override
+  public URI getConnectionURI() {
+    return failureMessage.getReceiverURI();
+  }
+
+  @Override
+  public URI getRemoteNeedURI() {
+    return failureMessage.getSenderNeedURI();
+  }
+
+  @Override
+  public URI getNeedURI() {
+    return failureMessage.getReceiverNeedURI();
   }
 }

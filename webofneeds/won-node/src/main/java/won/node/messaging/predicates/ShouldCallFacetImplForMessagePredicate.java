@@ -28,7 +28,7 @@ import won.protocol.message.processor.camel.WonCamelConstants;
  * If yes, facet implementations are executed and the message is
  * passed to the remote won node.
  */
-public class IsMessageForConnectionPredicate implements Predicate
+public class ShouldCallFacetImplForMessagePredicate implements Predicate
 {
   @Override
   public boolean matches(final Exchange exchange) {
@@ -38,6 +38,8 @@ public class IsMessageForConnectionPredicate implements Predicate
       case DEACTIVATE: return false;
       case ACTIVATE: return false;
       case CREATE_NEED: return false;
+      case SUCCESS_RESPONSE: return false;
+      case FAILURE_RESPONSE: return false;
     }
     return true;
   }

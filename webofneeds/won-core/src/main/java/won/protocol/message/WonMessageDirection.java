@@ -32,6 +32,11 @@ public enum WonMessageDirection
     return getWonMessageDirection(WONMSG.toResource(uri));
   }
 
+  public boolean isIdentifiedBy(URI uri){
+    if (uri == null) return false;
+    return getResource().getURI().toString().equals(uri.toString());
+  }
+
 
   public static WonMessageDirection getWonMessageDirection(Resource resource) {
 

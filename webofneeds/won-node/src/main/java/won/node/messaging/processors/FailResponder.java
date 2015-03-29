@@ -16,11 +16,14 @@
 
 package won.node.messaging.processors;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.Exchange;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 
@@ -32,8 +35,19 @@ public class FailResponder extends AbstractInOnlyMessageProcessor
 {
   @Override
   public void process(final Exchange exchange) throws Exception {
-    WonMessage originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.WON_MESSAGE_HEADER);
+    WonMessage originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);
+    if (originalMessage == null){
+      originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+    }
+
     logger.error("an error occurred while processing WON message");
+    Exception e = (Exception) exchange.getProperty(Exchange.EXCEPTION_CAUGHT);
+    String errormessage = null;
+    if (e != null){
+      errormessage = e.getMessage();
+    } else {
+      errormessage = String.format("An error occurred while processing message %s", originalMessage.getMessageURI());
+    }
     if (originalMessage == null) return;
     //if (originalMessage == null) throw new WonMessageProcessingException("did not find the original message in the " +
     //  "exchange header '" + WonCamelConstants.WON_MESSAGE_HEADER +"'");
@@ -42,12 +56,20 @@ public class FailResponder extends AbstractInOnlyMessageProcessor
     //originalMessage.getCompleteDataset();
     //if (originalMessage.getSenderURI() == null) return;
     URI newMessageURI = this.wonNodeInformationService.generateEventURI();
-    WonMessage responseMessage = new WonMessageBuilder().setPropertiesForNodeResponse(originalMessage, false,
-      newMessageURI).build();
+    Model errorMessageContent = WonRdfUtils.MessageUtils.textMessage(errormessage);
+    RdfUtils.replaceBaseURI(errorMessageContent, newMessageURI.toString());
+    WonMessage responseMessage = new WonMessageBuilder()
+            .setPropertiesForNodeResponse(originalMessage, false,newMessageURI)
+            .addContent(
+                    URI.create(newMessageURI.toString() + "/content"),
+                    errorMessageContent,
+                    null)
+            .build();
+
     if (WonMessageDirection.FROM_OWNER == originalMessage.getEnvelopeType()){
-      sendMessageToOwner(responseMessage, originalMessage.getSenderURI());
+      sendSystemMessageToOwner(responseMessage);
     } else if (WonMessageDirection.FROM_EXTERNAL == originalMessage.getEnvelopeType()){
-      sendMessageToNode(responseMessage);
+      sendSystemMessageToRemoteNode(responseMessage);
     }
   }
 }
