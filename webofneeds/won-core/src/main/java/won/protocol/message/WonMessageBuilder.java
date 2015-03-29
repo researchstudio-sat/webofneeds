@@ -6,7 +6,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import won.protocol.exception.WonMessageBuilderException;
-import won.protocol.model.NeedState;
 import won.protocol.util.CheapInsecureRandomString;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
@@ -42,16 +41,26 @@ public class WonMessageBuilder
   private URI receiverNodeURI;
 
   private WonMessageType wonMessageType;
-  private WonEnvelopeType wonEnvelopeType;
-  private Resource responseMessageState;
+  private WonMessageDirection wonMessageDirection;
 
+  //a message may refer to a number of other messages (e.g. previously sent messages)
   private Set<URI> refersToURIs = new HashSet<>();
+  //if the message is a response message, it MUST have exactly one isResponseToMessageURI set.
+  private URI isResponseToMessageURI;
+
+
+  private WonMessageType isResponseToMessageType;
+  //some message exist twice: once on the receiver's won node and once on the sender's.
+  //this property allows to link to the corresponding remote message
+  private URI correspondingRemoteMessageURI;
 
   private Map<URI, Model> contentMap = new HashMap<>();
   private Map<URI, Model> signatureMap = new HashMap<>();
   private WonMessage wrappedMessage;
   private WonMessage forwardedMessage;
   private Long timestamp;
+
+
 
   public WonMessage build() throws WonMessageBuilderException {
     return build(null);
@@ -89,7 +98,7 @@ public class WonMessageBuilder
     dataset.addNamedModel(envelopeGraphURI, envelopeGraph);
     // message URI
     Resource messageEventResource = envelopeGraph.createResource(messageURI.toString(),
-      this.wonEnvelopeType.getResource());
+      this.wonMessageDirection.getResource());
     //the [envelopeGraphURI] rdf:type msg:EnvelopeGraph makes it easy to select graphs by type
     Resource envelopeGraphResource = envelopeGraph.createResource(envelopeGraphURI, WONMSG.ENVELOPE_GRAPH);
     envelopeGraphResource.addProperty(RDFG.SUBGRAPH_OF, messageEventResource);
@@ -97,7 +106,7 @@ public class WonMessageBuilder
     addWrappedOrForwardedMessage(dataset, envelopeGraph, envelopeGraphResource, messageURI);
 
     //make sure the envelope type has been set
-    if (this.wonEnvelopeType == null) {
+    if (this.wonMessageDirection == null) {
       throw new IllegalStateException("envelopeType must be set!");
     }
 
@@ -140,17 +149,26 @@ public class WonMessageBuilder
         envelopeGraph.createResource(refersToURI.toString()));
     }
 
-    // add responseMessageState
-    if (responseMessageState != null) {
-      messageEventResource.addProperty(
-        WONMSG.HAS_RESPONSE_STATE_PROPERTY,
-        envelopeGraph.createResource(responseMessageState.toString()));
-    } else {
-      if (wonMessageType != null && WONMSG.isResponseMessageType(wonMessageType.getResource())) {
-        throw new WonMessageBuilderException(
-          "Message type is " + wonMessageType.getResource().toString() +
-            " but no response message state has been provided.");
+    if (isResponseToMessageURI != null) {
+      if (wonMessageType != WonMessageType.SUCCESS_RESPONSE && wonMessageType != WonMessageType.FAILURE_RESPONSE ){
+        throw new IllegalArgumentException("isResponseToMessageURI can only be used for SUCCESS_RESPONSE and " +
+          "FAILURE_RESPONSE types");
       }
+      if (isResponseToMessageType == null){
+        throw new IllegalArgumentException("response messages must specify the type of message they are a response to" +
+          ". Use setIsResponseToMessageType(type)");
+      }
+      messageEventResource.addProperty(
+        WONMSG.IS_RESPONSE_TO,
+        envelopeGraph.createResource(isResponseToMessageURI.toString()));
+      messageEventResource.addProperty(
+        WONMSG.IS_RESPONSE_TO_MESSAGE_TYPE, this.isResponseToMessageType.getResource());
+    }
+
+    if (correspondingRemoteMessageURI != null) {
+      messageEventResource.addProperty(
+              WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE,
+              envelopeGraph.createResource(correspondingRemoteMessageURI.toString()));
     }
 
     if (timestamp != null) {
@@ -248,6 +266,7 @@ public class WonMessageBuilder
    */
   public WonMessageBuilder wrap(WonMessage toWrap){
     this.setMessageURI(toWrap.getMessageURI());
+    this.setWonMessageDirection(toWrap.getEnvelopeType());
     this.wrappedMessage = toWrap;
     return this;
   }
@@ -276,7 +295,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.OPEN)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -300,7 +319,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.CLOSE)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -322,7 +341,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.SystemMsg)
+      .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM)
       .setWonMessageType(WonMessageType.CLOSE)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -331,25 +350,17 @@ public class WonMessageBuilder
     return this;
   }
 
-  public WonMessageBuilder setMessagePropertiesForNeedState(
+  public WonMessageBuilder setMessagePropertiesForDeactivate(
     URI messageURI,
-    NeedState needState,
     URI localNeed,
     URI localWonNode) {
-
-    // create need state RDF (message event content)
-    Model contentModel = ModelFactory.createDefaultModel();
-    contentModel.add(contentModel.createResource(localNeed.toString()), WON.IS_IN_STATE, needState.getURI().toString());
-
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.DEACTIVATE)
       .setSenderNeedURI(localNeed)
       .setReceiverNeedURI(localNeed)
       .setReceiverNodeURI(localWonNode)
-        // ToDo (FS): remove the hardcoded part of the URI
-      .addContent(URI.create(messageURI.toString() + "/content"), contentModel, null)
       .setTimestampToNow();
 
     return this;
@@ -369,13 +380,12 @@ public class WonMessageBuilder
     RdfUtils.replaceBaseResource(facetModel, facetModel.createResource(messageURI.toString()));
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.CONNECT)
       .setSenderNeedURI(localNeed)
       .setSenderNodeURI(localWonNode)
-      .setReceiverURI(remoteFacet)
       .setReceiverNeedURI(remoteNeed)
-      .setReceiverNodeURI(receiverNodeURI)
+      .setReceiverNodeURI(remoteWonNode)
         // ToDo (FS): remove the hardcoded part of the URI
       .addContent(URI.create(messageURI.toString() + "/content"), facetModel, null)
       .setTimestampToNow();
@@ -390,7 +400,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.CREATE_NEED)
       .setSenderNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
@@ -419,7 +429,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.MatcherToNode)
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setSenderNodeURI(matcherURI)
       .setReceiverURI(needFacetURI)
@@ -453,7 +463,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.NodeToOwner)
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setSenderNodeURI(matcherURI)
       .setReceiverURI(needConnectionURI)
@@ -478,7 +488,7 @@ public class WonMessageBuilder
 
     this
       .setMessageURI(messageURI)
-      .setWonEnvelopeType(WonEnvelopeType.OwnerToNode)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.CONNECTION_MESSAGE)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
@@ -499,11 +509,57 @@ public class WonMessageBuilder
     URI localWonNode) {
 
     this.setWonMessageType(WonMessageType.NEED_CREATED_NOTIFICATION)
-        .setWonEnvelopeType(WonEnvelopeType.NodeToMatcher)
+        .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
         .setMessageURI(messageURI)
         .setSenderNeedURI(localNeed)
         .setSenderNodeURI(localWonNode)
         .setTimestampToNow();
+    return this;
+  }
+
+  public WonMessageBuilder setPropertiesForPassingMessageToRemoteNode(final WonMessage ownerOrSystemMsg, URI newMessageUri){
+    this.setMessageURI(newMessageUri)
+      .setTimestamp(new Date().getTime())
+      .copyContentFromMessageReplacingMessageURI(ownerOrSystemMsg)
+      .copyEnvelopeFromWonMessage(ownerOrSystemMsg)
+      .setCorrespondingRemoteMessageURI(ownerOrSystemMsg.getMessageURI())
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
+    return this;
+  }
+
+  public WonMessageBuilder setPropertiesForPassingMessageToOwner(final WonMessage externalMsg){
+    this.wrap(externalMsg)
+      .setTimestamp(new Date().getTime());
+    return this;
+  }
+
+  public WonMessageBuilder setPropertiesForNodeResponse(WonMessage originalMessage, boolean isSuccess, URI messageURI){
+    this.setWonMessageType(isSuccess? WonMessageType.SUCCESS_RESPONSE : WonMessageType.FAILURE_RESPONSE)
+        .setMessageURI(messageURI);
+
+    WonMessageDirection origDirection = originalMessage.getEnvelopeType();
+    if (WonMessageDirection.FROM_EXTERNAL == origDirection){
+      //if the message is an external message, the original receiver becomes
+      //the sender of the response.
+      this
+        .setSenderNodeURI(originalMessage.getReceiverNodeURI())
+        .setSenderNeedURI(originalMessage.getReceiverNeedURI())
+        .setSenderURI(originalMessage.getReceiverURI());
+    } else if (WonMessageDirection.FROM_OWNER == origDirection|| WonMessageDirection.FROM_SYSTEM == origDirection ){
+      //if the message comes from the owner, the original sender is also
+      //the sender of the response
+      this
+        .setSenderNodeURI(originalMessage.getSenderNodeURI())
+        .setSenderNeedURI(originalMessage.getSenderNeedURI())
+        .setSenderURI(originalMessage.getSenderURI());
+    }
+    this
+      .setReceiverNeedURI(originalMessage.getSenderNeedURI())
+      .setReceiverNodeURI(originalMessage.getSenderNodeURI())
+      .setReceiverURI(originalMessage.getSenderURI())
+      .setIsResponseToMessageURI(originalMessage.getMessageURI())
+      .setIsResponseToMessageType(originalMessage.getMessageType())
+      .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM);
     return this;
   }
 
@@ -548,8 +604,8 @@ public class WonMessageBuilder
     this.wonMessageType = wonMessageType;
     return this;
   }
-  public WonMessageBuilder setWonEnvelopeType(WonEnvelopeType wonEnvelopeType){
-    this.wonEnvelopeType = wonEnvelopeType;
+  public WonMessageBuilder setWonMessageDirection(WonMessageDirection wonMessageDirection){
+    this.wonMessageDirection = wonMessageDirection;
     return this;
   }
 
@@ -580,8 +636,19 @@ public class WonMessageBuilder
     return this;
   }
 
-  public WonMessageBuilder setResponseMessageState(Resource responseMessageState) {
-    this.responseMessageState = responseMessageState;
+  public WonMessageBuilder setIsResponseToMessageURI(URI isResponseToMessageURI){
+    this.isResponseToMessageURI = isResponseToMessageURI;
+    return this;
+  }
+
+  public WonMessageBuilder setIsResponseToMessageType(final WonMessageType isResponseToMessageType) {
+    this.isResponseToMessageType = isResponseToMessageType;
+    return this;
+  }
+
+
+  public WonMessageBuilder setCorrespondingRemoteMessageURI(URI correspondingRemoteMessageURI){
+    this.correspondingRemoteMessageURI = correspondingRemoteMessageURI;
     return this;
   }
 
@@ -605,7 +672,7 @@ public class WonMessageBuilder
    * @return
    */
   WonMessageBuilder copyEnvelopeFromWonMessage(final WonMessage wonMessage) {
-    return this
+    this
       .setWonMessageType(wonMessage.getMessageType())
       .setReceiverURI(wonMessage.getReceiverURI())
       .setReceiverNeedURI(wonMessage.getReceiverNeedURI())
@@ -613,6 +680,13 @@ public class WonMessageBuilder
       .setSenderURI(wonMessage.getSenderURI())
       .setSenderNeedURI(wonMessage.getSenderNeedURI())
       .setSenderNodeURI(wonMessage.getSenderNodeURI());
+    if (wonMessage.getIsResponseToMessageType() != null){
+      this.setIsResponseToMessageType(wonMessage.getIsResponseToMessageType());
+    }
+    if (wonMessage.getIsResponseToMessageURI() != null){
+      this.setIsResponseToMessageURI(wonMessage.getIsResponseToMessageURI());
+    }
+    return this;
   }
 
   /**
@@ -694,29 +768,27 @@ public class WonMessageBuilder
       .setReceiverURI(localConnectionUri)
       .setTimestamp(new Date().getTime())
       .addRefersToURI(inboundWonMessage.getMessageURI())
-      .setWonEnvelopeType(WonEnvelopeType.NodeToOwner)
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
       .build();
   }
 
-  public static WonMessage wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(final URI localConnectionUri, final WonMessage
-    outboundWonMessage){
-    WonMessageBuilder builder = new WonMessageBuilder()
-      .wrap(outboundWonMessage)
-      .setTimestamp(new Date().getTime());
-    if (localConnectionUri != null) {
-      builder.setSenderURI(localConnectionUri);
-    }
-    builder.setWonEnvelopeType(WonEnvelopeType.NodeToNode);
-    return builder.build();
-  }
 
 
+  @Deprecated
   public static WonMessage wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(final WonMessage
                                                                                        ownerToNeedWonMessage){
     WonMessageBuilder builder = new WonMessageBuilder()
       .wrap(ownerToNeedWonMessage)
       .setTimestamp(new Date().getTime());
-    builder.setWonEnvelopeType(WonEnvelopeType.NodeToNode);
+    builder.setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
+    return builder.build();
+  }
+
+  public static WonMessage wrapMessageReceivedByNode(final WonMessage wonMessage, WonMessageDirection direction){
+    WonMessageBuilder builder = new WonMessageBuilder()
+      .wrap(wonMessage)
+      .setWonMessageDirection(direction)
+      .setTimestamp(new Date().getTime());
     return builder.build();
   }
 
@@ -732,7 +804,7 @@ public class WonMessageBuilder
       .setReceiverURI(remoteConnectionURI)
       .setReceiverNeedURI(remoteNeedURI)
       .setReceiverNodeURI(remoteWonNodeUri)
-      .setWonEnvelopeType(WonEnvelopeType.NodeToNode);
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
     return builder.build();
   }
 

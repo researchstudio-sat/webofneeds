@@ -23,7 +23,7 @@ import won.protocol.exception.IllegalMessageForNeedStateException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
-import won.protocol.message.WonEnvelopeType;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.FacetType;
@@ -82,7 +82,7 @@ public class HintSender implements MatchProcessor
         FacetType.OwnerFacet.getURI(),
         originator,
         score)
-      .setWonEnvelopeType(WonEnvelopeType.MatcherToNode)
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
       .build();
   }
 }

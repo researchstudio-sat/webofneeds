@@ -38,7 +38,7 @@ public class WonMessage implements Serializable
 
   private URI messageURI;
   private WonMessageType messageType; // ConnectMessage, CreateMessage, NeedStateMessage
-  private WonEnvelopeType envelopeType;
+  private WonMessageDirection envelopeType;
   private URI senderURI;
   private URI senderNeedURI;
   private URI senderNodeURI;
@@ -46,8 +46,10 @@ public class WonMessage implements Serializable
   private URI receiverNeedURI;
   private URI receiverNodeURI;
   private List<URI> refersTo = new ArrayList<>();
-  private URI responseState;
-  private List<String> contentGraphNames;
+  private URI isResponseToMessageURI;
+    private List<String> contentGraphNames;
+  private WonMessageType isResponseToMessageType;
+  private URI correspondingRemoteMessageURI;
 
 
   //private Resource msgBnode;
@@ -176,6 +178,8 @@ public class WonMessage implements Serializable
   }
 
 
+
+
   private void findMessageUri(final Model model, final String modelUri) {
     RDFNode messageUriNode = RdfUtils.findOnePropertyFromResource(model, model.getResource(modelUri), RDFG.SUBGRAPH_OF);
     this.messageURI = URI.create(messageUriNode.asResource().getURI());
@@ -236,10 +240,12 @@ public class WonMessage implements Serializable
     return this.messageType;
   }
 
-  public WonEnvelopeType getEnvelopeType() {
+  public WonMessageDirection getEnvelopeType() {
     if (this.envelopeType == null){
       URI type = getEnvelopePropertyURIValue(RDF.type);
-      this.envelopeType = WonEnvelopeType.getWonEnvelopeType(type);
+      if (type != null){
+        this.envelopeType = WonMessageDirection.getWonMessageDirection(type);
+      }
     }
     return this.envelopeType;
   }
@@ -299,12 +305,39 @@ public class WonMessage implements Serializable
 
   }
 
-
-  public URI getResponseState() {
-    if (this.responseState == null) {
-      this.responseState = getEnvelopePropertyURIValue(WONMSG.HAS_RESPONSE_STATE_PROPERTY);
+  public URI getIsResponseToMessageURI() {
+    if (this.isResponseToMessageURI == null) {
+      this.isResponseToMessageURI = getEnvelopePropertyURIValue(WONMSG.IS_RESPONSE_TO);
     }
-    return this.responseState;
+    return this.isResponseToMessageURI;
+  }
+
+  public URI getCorrespondingRemoteMessageURI() {
+    if (this.correspondingRemoteMessageURI == null) {
+      this.correspondingRemoteMessageURI = getEnvelopePropertyURIValue(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE);
+    }
+    return this.correspondingRemoteMessageURI;
+  }
+
+  public WonMessageType getIsResponseToMessageType() {
+    if (this.isResponseToMessageType == null){
+       URI typeURI = getEnvelopePropertyURIValue(WONMSG.IS_RESPONSE_TO_MESSAGE_TYPE);
+      if (typeURI != null) {
+        this.isResponseToMessageType = WonMessageType.getWonMessageType(typeURI);
+      }
+    }
+    return isResponseToMessageType;
+  }
+
+  public URI getEnvelopePropertyURIValue(URI property){
+    for (Model envelopeGraph: getEnvelopeGraphs()){
+      StmtIterator it = envelopeGraph.listStatements(envelopeGraph.getResource(getMessageURI().toString()), envelopeGraph.getProperty(property.toString()),
+              (RDFNode) null);
+      if (it.hasNext()){
+        return URI.create(it.nextStatement().getObject().asResource().toString());
+      }
+    }
+    return null;
   }
 
   private URI getEnvelopePropertyURIValue(Property property){

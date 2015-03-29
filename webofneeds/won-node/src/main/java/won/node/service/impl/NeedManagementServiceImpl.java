@@ -30,10 +30,9 @@ import org.javasimon.Stopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
 import won.protocol.exception.*;
-import won.protocol.message.WonEnvelopeType;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
@@ -61,7 +60,6 @@ import java.util.List;
  */
 /* TODO: The logic of the methods of this class has nothing to do with JMS. should be merged with NeedManagementServiceImpl class. The only change was made in createNeed method, where the concept of authorizedApplications for each need was introduced.
  */
-@Component
 public class NeedManagementServiceImpl implements NeedManagementService
 {
   final Logger logger = LoggerFactory.getLogger(getClass());
@@ -159,7 +157,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
           new WonMessageBuilder()
             .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateEventURI(),
                                                             need.getNeedURI(), need.getWonNodeURI())
-            .setWonEnvelopeType(WonEnvelopeType.NodeToNode)
+            .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
             .build(needDataset);
         matcherProtocolMatcherClient.needCreated(needURI, ModelFactory.createDefaultModel(), newNeedNotificationMessage);
       } catch (Exception e) {
@@ -352,7 +350,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
           connection.getConnectionURI(),
           connection.getNeedURI(),
           localWonNodeUri)
-          .setWonEnvelopeType(WonEnvelopeType.SystemMsg)
+          .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM)
           .build();
 
       }else{
@@ -367,7 +365,7 @@ public class NeedManagementServiceImpl implements NeedManagementService
           connection.getRemoteConnectionURI(),
           connection.getRemoteNeedURI(),
           remoteWonNodeUri)
-          .setWonEnvelopeType(WonEnvelopeType.NodeToNode)
+          .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
                       .build();
       }
 

@@ -51,19 +51,10 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
                for (int i = 0; i<endpoints.size();i++){
                    from(endpoints.get(i)+"?concurrentConsumers=5").routeId("Node2OwnerRoute"+brokerUri)
                            .wireTap("bean:messagingService?method=inspectMessage")
-                           .choice()
-                           .when(header("methodName").isEqualTo("connect"))
-                           .to("bean:ownerProtocolOwnerServiceJMSBased?method=connect")
-                           .when(header("methodName").isEqualTo("hint"))
-                           .to("bean:ownerProtocolOwnerServiceJMSBased?method=hint")
-                           .when(header("methodName").isEqualTo("sendMessage"))
-                           .to("bean:ownerProtocolOwnerServiceJMSBased?method=sendMessage")
-                           .when(header("methodName").isEqualTo("open"))
-                           .to("bean:ownerProtocolOwnerServiceJMSBased?method=open")
-                           .when(header("methodName").isEqualTo("close"))
-                           .to("bean:ownerProtocolOwnerServiceJMSBased?method=close")
-                           .otherwise()
-                           .to("log:Message Type Not Supported");
+                            .to("bean:wonMessageIntoCamelProcessor")
+                            .to("bean:wellformednessChecker")
+                            .to("bean:signatureChecker")
+                            .to("bean:ownerCallbackAdapter");
        }
     }
 

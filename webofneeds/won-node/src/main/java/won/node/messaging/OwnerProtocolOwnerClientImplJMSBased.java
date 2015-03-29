@@ -37,6 +37,7 @@ import won.protocol.util.RdfUtils;
 import java.io.StringWriter;
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +69,7 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
       Need need = DataAccessUtils.loadNeed(needRepository, ownNeedUri);
       List<OwnerApplication> ownerApplications = need.getAuthorizedApplications();
 
+
       Map headerMap = new HashMap<String, String>();
       headerMap.put("ownNeedUri", ownNeedUri.toString());
       headerMap.put("otherNeedUri",otherNeedUri.toString());
@@ -75,14 +77,22 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
       headerMap.put("originatorUri",originatorUri.toString());
       headerMap.put("content",RdfUtils.toString(content));
       headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
-      headerMap.put("ownerApplications", ownerApplications);
+      headerMap.put("ownerApplications", toIds(ownerApplications));
       headerMap.put("protocol","OwnerProtocol");
       headerMap.put("methodName", "hint");
       messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
 
   }
 
-    @Override
+  private List<String> toIds(final List<OwnerApplication> ownerApplications) {
+    List<String> ownerApplicationIds = new ArrayList<String>(ownerApplications.size());
+    for(OwnerApplication app: ownerApplications){
+      ownerApplicationIds.add(app.getOwnerApplicationId());
+    }
+    return ownerApplicationIds;
+  }
+
+  @Override
     public void connect(final URI ownNeedURI, final URI otherNeedURI,
                         final URI ownConnectionURI, final Model content,
                         final WonMessage wonMessage)
@@ -101,7 +111,7 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
         headerMap.put("ownConnectionURI", ownConnectionURI.toString()) ;
         headerMap.put("content",RdfUtils.toString(content));
         headerMap.put("wonMessage",WonMessageEncoder.encode(wonMessage, Lang.TRIG));
-        headerMap.put("ownerApplications", ownerApplications);
+        headerMap.put("ownerApplications", toIds(ownerApplications));
 
         headerMap.put("protocol","OwnerProtocol");
         headerMap.put("methodName", "connect");
@@ -116,12 +126,12 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
       URI needURI = con.getNeedURI();
       Need need = null;
       need = getNeedOrThrowISE(connectionURI, needURI);
-      List<OwnerApplication> ownerApplicationList = need.getAuthorizedApplications();
+      List<OwnerApplication> ownerApplications = need.getAuthorizedApplications();
       Map headerMap = new HashMap<String, String>();
       headerMap.put("connectionURI", connectionURI.toString()) ;
       headerMap.put("content",RdfUtils.toString(content));
       headerMap.put("wonMessage",WonMessageEncoder.encode(wonMessage, Lang.TRIG));
-      headerMap.put("ownerApplications", ownerApplicationList);
+      headerMap.put("ownerApplications", toIds(ownerApplications));
       headerMap.put("protocol","OwnerProtocol");
       headerMap.put("methodName", "open");
       messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
@@ -135,16 +145,17 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
       URI needURI = con.getNeedURI();
       Need need = null;
       need = getNeedOrThrowISE(connectionURI, needURI);
-      List<OwnerApplication> ownerApplicationList = need.getAuthorizedApplications();
+      List<OwnerApplication> ownerApplications = need.getAuthorizedApplications();
       Map headerMap = new HashMap<String, String>();
       headerMap.put("connectionURI", connectionURI.toString()) ;
       headerMap.put("content",RdfUtils.toString(content));
       headerMap.put("wonMessage",WonMessageEncoder.encode(wonMessage, Lang.TRIG));
-      headerMap.put("ownerApplications", ownerApplicationList);
+      headerMap.put("ownerApplications", toIds(ownerApplications));
       headerMap.put("protocol","OwnerProtocol");
       headerMap.put("methodName", "close");
       messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
     }
+
 
   public Need getNeedOrThrowISE(final URI connectionURI, final URI needURI) {
     final Need need;
@@ -166,12 +177,12 @@ public class OwnerProtocolOwnerClientImplJMSBased implements OwnerProtocolOwnerS
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         URI needURI = con.getNeedURI();
         Need need = getNeedOrThrowISE(connectionURI, needURI);
-        List<OwnerApplication> ownerApplicationList = need.getAuthorizedApplications();
+        List<OwnerApplication> ownerApplications = need.getAuthorizedApplications();
         Map headerMap = new HashMap<String, String>();
         headerMap.put("connectionURI", connectionURI.toString()) ;
         headerMap.put("message",messageConvert);
         headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
-        headerMap.put("ownerApplications", ownerApplicationList);
+        headerMap.put("ownerApplications", toIds(ownerApplications));
         headerMap.put("protocol","OwnerProtocol");
         headerMap.put("methodName", "sendMessage");
         messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");

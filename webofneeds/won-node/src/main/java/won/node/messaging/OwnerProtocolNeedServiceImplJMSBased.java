@@ -48,14 +48,14 @@ public class OwnerProtocolNeedServiceImplJMSBased{// implements //ownerProtocolN
     public List<String> getEndpointsForOwnerApplication(
             @Header("ownerApplicationID") String ownerApplicationID, Exchange exchange){
         logger.debug("get endpoints: message received");
-        List<String> endpoints = queueManagementService.getEndpointsForOwnerApplication(ownerApplicationID);
+        List<String> endpoints = queueManagementService.getEndpointsForOwnerApplication(ownerApplicationID,exchange);
         return endpoints;
     }
 
     public String registerOwnerApplication(
             Exchange exchange) throws IllegalNeedContentException, JMSException {
         logger.debug("register: message received");
-        String ownerApplicationId = ownerManagementService.registerOwnerApplication();
+        String ownerApplicationId = ownerManagementService.registerOwnerApplication(exchange);
 
         return ownerApplicationId;
     }

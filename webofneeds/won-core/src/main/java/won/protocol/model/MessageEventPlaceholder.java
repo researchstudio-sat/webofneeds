@@ -2,6 +2,7 @@ package won.protocol.model;
 
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.processor.camel.WonCamelConstants;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlTransient;
@@ -25,8 +26,8 @@ public class MessageEventPlaceholder
     this.receiverURI = wonMessage.getReceiverURI();
     this.receiverNeedURI = wonMessage.getReceiverNeedURI();
     this.receiverNodeURI = wonMessage.getReceiverNodeURI();
-
     this.creationDate = new Date();
+    this.correspondingRemoteMessageURI = wonMessage.getCorrespondingRemoteMessageURI();
   }
 
   @Id
@@ -56,9 +57,10 @@ public class MessageEventPlaceholder
   private URI receiverNeedURI;
   @Column(name = "receiverNodeURI")
   private URI receiverNodeURI;
-
   @Column(name = "creationDate")
   private Date creationDate;
+  @Column(name = "correspondingRemoteMessageURI")
+  private URI correspondingRemoteMessageURI;
 
 
   @XmlTransient
@@ -148,6 +150,14 @@ public class MessageEventPlaceholder
 
   public void setCreationDate(final Date creationDate) {
     this.creationDate = creationDate;
+  }
+
+  public URI getCorrespondingRemoteMessageURI() {
+    return correspondingRemoteMessageURI;
+  }
+
+  public void setCorrespondingRemoteMessageURI(final URI correspondingRemoteMessageURI) {
+    this.correspondingRemoteMessageURI = correspondingRemoteMessageURI;
   }
 
   @Override

@@ -71,7 +71,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q,$log, 
                 "won":"http://purl.org/webofneeds/model#",
                 "msg":"http://purl.org/webofneeds/message#"
             },
-            "@type": "msg:NodeToOwnerEnvelope"
+            "@type": "msg:FromNode"
 
 
         }

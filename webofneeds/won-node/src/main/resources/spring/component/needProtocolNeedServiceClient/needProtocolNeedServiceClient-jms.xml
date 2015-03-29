@@ -19,12 +19,5 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean name="needProtocolNeedClientJMSBased" class="won.node.messaging.NeedProtocolNeedClientImplJMSBased">
-        <property name="messagingService" ref="messagingService"/>
-        <property name="connectStartingEndpoint" value="seda:NeedProtocol.Out.connect"/>
-        <property name="openStartingEndpoint" value="seda:NeedProtocol.Out.open"/>
-        <property name="closeStartingEndpoint" value="seda:NeedProtocol.Out.close"/>
-        <property name="sendMessageStartingEndpoint" value="seda:NeedProtocol.Out.sendMessage"/>
-        <!--property name="protocolCommunicationService" ref="protocolCommunicationService"/-->
-    </bean>
+
 </beans>

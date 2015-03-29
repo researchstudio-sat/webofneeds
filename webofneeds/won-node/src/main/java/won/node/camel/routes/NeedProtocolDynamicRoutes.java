@@ -19,17 +19,15 @@ package won.node.camel.routes;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 
-import java.util.List;
-
 /**
  * User: LEIH-NB
  * Date: 25.11.13
  */
-public class NeedProtocolDynamicRoutes extends RouteBuilder {
+
+public class NeedProtocolDynamicRoutes extends RouteBuilder
+{
 
 
-    private List<String> endpoints;
-    private String routeID;
     private String from;
 
     public NeedProtocolDynamicRoutes(CamelContext camelContext, String from){

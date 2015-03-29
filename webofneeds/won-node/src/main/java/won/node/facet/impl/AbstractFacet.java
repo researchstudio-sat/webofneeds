@@ -15,7 +15,7 @@ import won.node.service.DataAccessService;
 import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
 import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
-import won.protocol.message.WonEnvelopeType;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageType;
@@ -424,7 +424,7 @@ public abstract class AbstractFacet implements Facet
           .setReceiverURI(wonMessage.getSenderURI())
           .setReceiverNeedURI(wonMessage.getSenderNeedURI())
           .setReceiverNodeURI(wonMessage.getSenderNodeURI())
-          .setWonEnvelopeType(WonEnvelopeType.NodeToOwner)
+          .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
           .build();
 
         needFacingConnectionCommunicationService.close(

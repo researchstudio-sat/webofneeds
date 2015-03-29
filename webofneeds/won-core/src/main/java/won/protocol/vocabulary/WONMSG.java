@@ -21,25 +21,40 @@ public class WONMSG
   public static final String DEFAULT_PREFIX = "msg";
 
 
-
   private static Model m = ModelFactory.createDefaultModel();
 
-  public static final Resource TYPE_NODE2OWNER = m.createResource(BASE_URI+"NodeToOwnerEnvelope");
-  public static final Resource TYPE_OWNER2NODE = m.createResource(BASE_URI+"OwnerToNodeEnvelope");
-  public static final Resource TYPE_SYSTEMMSG = m.createResource(BASE_URI+"SystemMessageEnvelope");
-  public static final Resource TYPE_NODE2NODE = m.createResource(BASE_URI+"NodeToNodeEnvelope");
-  public static final Resource TYPE_NODE2MATCHER = m.createResource(BASE_URI+"NodeToMatcherEnvelope");
-  public static final Resource TYPE_MATCHER2NODE = m.createResource(BASE_URI+"MatcherToNodeEnvelope");
 
+
+  public static final String TYPE_FROM_OWNER_STRING = BASE_URI+"FromOwner";
+  public static final String TYPE_FROM_SYSTEM_STRING = BASE_URI+"FromSystem";
+  public static final String TYPE_FROM_EXTERNAL_STRING = BASE_URI+"FromExternal";
+
+  public static final Resource TYPE_FROM_OWNER = m.createResource(BASE_URI+"FromOwner");
+  public static final Resource TYPE_FROM_SYSTEM = m.createResource(BASE_URI+"FromSystem");
+  public static final Resource TYPE_FROM_EXTERNAL = m.createResource(BASE_URI+"FromExternal");
+
+  public static final String TYPE_CREATE_STRING = BASE_URI+"CreateMessage";
+  public static final String TYPE_CONNECT_STRING = BASE_URI + "ConnectMessage";
+  public static final String TYPE_DEACTIVATE_STRING= BASE_URI + "DeactivateMessage";
+  public static final String TYPE_ACTIVATE_STRING = BASE_URI + "ActivateMessage";
+  public static final String TYPE_OPEN_STRING = BASE_URI + "OpenMessage";
+  public static final String TYPE_CLOSE_STRING =BASE_URI + "CloseMessage";
+  public static final String TYPE_CONNECTION_MESSAGE_STRING =BASE_URI + "ConnectionMessage";
+  public static final String TYPE_HINT_STRING =BASE_URI + "HintMessage";
+  public static final String TYPE_FAILURE_RESPONSE_STRING = BASE_URI+"FailureResponse";
+  public static final String TYPE_SUCCESS_RESPONSE_STRING = BASE_URI+"SuccessResponse";
   // main types
-  public static final Resource TYPE_CREATE = m.createResource(BASE_URI + "CreateMessage");
-  public static final Resource TYPE_CONNECT = m.createResource(BASE_URI + "ConnectMessage");
-  public static final Resource TYPE_DEACTIVATE = m.createResource(BASE_URI + "DeactivateMessage");
-  public static final Resource TYPE_ACTIVATE = m.createResource(BASE_URI + "ActivateMessage");
-  public static final Resource TYPE_OPEN = m.createResource(BASE_URI + "OpenMessage");
-  public static final Resource TYPE_CLOSE = m.createResource(BASE_URI + "CloseMessage");
-  public static final Resource TYPE_CONNECTION_MESSAGE = m.createResource(BASE_URI + "ConnectionMessage");
-  public static final Resource TYPE_HINT = m.createResource(BASE_URI + "HintMessage");
+  public static final Resource TYPE_CREATE = m.createResource(TYPE_CREATE_STRING);
+  public static final Resource TYPE_CONNECT = m.createResource(TYPE_CONNECT_STRING);
+  public static final Resource TYPE_DEACTIVATE = m.createResource(TYPE_DEACTIVATE_STRING);
+  public static final Resource TYPE_ACTIVATE = m.createResource(TYPE_ACTIVATE_STRING);
+  public static final Resource TYPE_OPEN = m.createResource(TYPE_OPEN_STRING);
+  public static final Resource TYPE_CLOSE = m.createResource(TYPE_CLOSE_STRING);
+  public static final Resource TYPE_CONNECTION_MESSAGE = m.createResource(TYPE_CONNECTION_MESSAGE_STRING);
+  public static final Resource TYPE_HINT = m.createResource(TYPE_HINT_STRING);
+
+  public static final Resource TYPE_SUCCESS_RESPONSE = m.createResource(TYPE_SUCCESS_RESPONSE_STRING);
+  public static final Resource TYPE_FAILURE_RESPONSE = m.createResource(TYPE_FAILURE_RESPONSE_STRING);
 
   // notification types
   //TODO: delete if not needed
@@ -49,6 +64,7 @@ public class WONMSG
     "NeedCreatedNotificationMessage");
 
   // response types
+
   //TODO: delete if not needed
   public static final Resource TYPE_CREATE_RESPONSE = m.createResource(BASE_URI + "CreateResponseMessage");
   //TODO: delete if not needed
@@ -113,6 +129,9 @@ public class WONMSG
   public static final Property HAS_MESSAGE_TYPE_PROPERTY = m.createProperty(BASE_URI, "hasMessageType");
   public static final Property HAS_CONTENT_PROPERTY = m.createProperty(BASE_URI, "hasContent");
   public static final Property REFERS_TO_PROPERTY = m.createProperty(BASE_URI, "refersTo");
+  public static final Property IS_RESPONSE_TO = m.createProperty(BASE_URI, "isResponseTo");
+  public static final Property IS_RESPONSE_TO_MESSAGE_TYPE = m.createProperty(BASE_URI, "isResponseToMessageType");;
+  public static final Property HAS_CORRESPONDING_REMOTE_MESSAGE = m.createProperty(BASE_URI, "hasCorrespondingRemoteMessage");
   public static final Property NEW_NEED_STATE_PROPERTY = m.createProperty(BASE_URI, "newNeedState");
   public static final Property HAS_TIMESTAMP = m.createProperty(BASE_URI, "hasTimestamp");
   //public static final String MESSAGE_HAS_CONTENT_PROPERTY = "hasContent";

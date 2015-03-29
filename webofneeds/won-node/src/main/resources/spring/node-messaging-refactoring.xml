@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation=
+               "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <!--
+         Load properties but ignore unresolvable properties so that
+         they are searched in other property configurers defined in th e context
+    -->
+
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
+    <context:component-scan base-package="won.*" />
+    <import resource="classpath:/spring/refactoring/message-processors.xml"/>
+    <import resource="classpath:/spring/refactoring/node-core.xml" />
+    <import resource="classpath:/spring/component/storage/jdbc-storage.xml" />
+    <import resource="classpath:/spring/component/storage/jpabased-rdf-storage.xml" />
+    <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml"/>
+    <import resource="classpath:/spring/refactoring/camel/node-camel.xml" />
+
+
+    <!--import resource="classpath:/spring/component/needProtocolNeedService/needProtocolNeedService-jms.xml" /-->
+    <import
+    resource="classpath:/spring/component/needProtocolNeedServiceClient/needProtocolNeedServiceClient-jms.xml" />
+    <!--import resource="classpath:/spring/component/ownerProtocolNeedService/ownerProtocolNeedService-jms.xml" /-->
+    <import
+    resource="classpath:/spring/component/ownerProtocolOwnerServiceClient/ownerProtocolOwnerServiceClient-jms.xml" />
+    <import
+            resource="classpath:/spring/component/matcherProtocolMatcherServiceClient/matcherProtocolMatcherServiceClient-jms.xml"/>
+    <import resource="classpath:/spring/component/scheduling/node-scheduling.xml" />
+    <!-- monitoring -->
+    <!--
+    <import resource="classpath:/spring/component/monitoring/node-monitoring-jmx.xml" />
+    <import resource="classpath:/spring/component/monitoring/node-monitoring.xml" />
+    <import resource="classpath:/spring/component/monitoring/monitoring-recorder.xml" />
+    -->
+    <import resource="classpath:/spring/component/ehcache/spring-node-ehcache.xml" />
+
+    <import resource="classpath:/spring/component/cryptographyServices.xml" />
+    <import resource="classpath:/spring/component/wonNodeInformationService.xml" />
+
+
+</beans>
