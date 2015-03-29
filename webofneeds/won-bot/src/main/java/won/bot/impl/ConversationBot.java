@@ -78,7 +78,7 @@ public class ConversationBot extends EventBot
     // * connect events - so it responds with open
     // * open events - so it responds with open (if the open received was the first open, and we still need to accept the connection)
     this.autoOpener = new ActionOnEventListener(ctx, new OpenConnectionAction(ctx));
-    //bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
+    bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
     //add a listener that auto-responds to messages by a message
     //after 10 messages, it unsubscribes from all events
@@ -86,7 +86,6 @@ public class ConversationBot extends EventBot
     // * message events - so it responds
     // * open events - so it initiates the chain reaction of responses
     this.autoResponder = new AutomaticMessageResponderListener(ctx, NO_OF_MESSAGES, MILLIS_BETWEEN_MESSAGES);
-    bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoResponder);
     bus.subscribe(OpenFromOtherNeedEvent.class, this.autoResponder);
     bus.subscribe(MessageFromOtherNeedEvent.class, this.autoResponder);
 
