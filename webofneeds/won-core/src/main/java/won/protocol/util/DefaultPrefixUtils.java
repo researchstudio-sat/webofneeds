@@ -45,6 +45,7 @@ public class DefaultPrefixUtils
   public static void setDefaultPrefixes(PrefixMapping prefixMapping) {
     prefixMapping.setNsPrefix("won", WON.getURI());
     prefixMapping.setNsPrefix(WONMSG.DEFAULT_PREFIX, WONMSG.getURI());
+    prefixMapping.setNsPrefix(WONCRYPT.DEFAULT_PREFIX, WONCRYPT.getURI());
     prefixMapping.setNsPrefix("rdf", RDF.getURI());
     prefixMapping.setNsPrefix("ldp", LDP.getURI());
     prefixMapping.setNsPrefix("rdfs", RDFS.getURI());

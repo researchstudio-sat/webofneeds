@@ -51,7 +51,7 @@ public class WonVerifierTest
     KeyStoreService storeService = new KeyStoreService(keysFile);
 
     // TODO load public keys from certificate referenced from signatures
-    String needCertUri = "http://localhost:8080/won/resource/need/3144709509622353000/#certificate";
+    String needCertUri = "http://localhost:8080/won/resource/need/3144709509622353000";
     String ownerCertUri = "http://localhost:8080/owner/certificate";
     String nodeCertUri = "http://localhost:8080/node/certificate";
 

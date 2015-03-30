@@ -8,12 +8,15 @@ import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Triple;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.ontology.Ontology;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import sun.misc.BASE64Decoder;
 import won.protocol.message.SignatureReference;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
+import java.security.Provider;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.Signature;
 import java.util.LinkedList;
 import java.util.Map;
@@ -30,6 +33,8 @@ public class WonVerifier
   private SignatureVerificationResult result = new SignatureVerificationResult();
 
   public WonVerifier(Dataset dataset) {
+    Provider provider = new BouncyCastleProvider();
+    Security.addProvider(provider);
     this.dataset = dataset;
     prepareForVerifying();
   }

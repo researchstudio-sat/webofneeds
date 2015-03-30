@@ -83,6 +83,16 @@ public class TestSigningUtils {
     return testDataset;
   }
 
+  public static Dataset prepareTestDataset(String resourceFile) throws
+    IOException {
+    // read dataset with created need
+    InputStream is = TestSigningUtils.class.getResourceAsStream(resourceFile);
+    Dataset dataset = DatasetFactory.createMem();
+    RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
+    is.close();
+    return dataset;
+  }
+
   public static Set<String> getSubjects(Model model) {
     Set<String> subjs = new HashSet<String>();
     StmtIterator sti = model.listStatements();

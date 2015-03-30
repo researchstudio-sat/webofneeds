@@ -6,10 +6,11 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import won.cryptography.utils.TestSigningUtils;
+import won.cryptography.rdfsign.WonKeysExtractor;
 import won.cryptography.rdfsign.WonSigner;
 import won.cryptography.rdfsign.WonVerifier;
 import won.cryptography.service.KeyStoreService;
+import won.cryptography.utils.TestSigningUtils;
 import won.protocol.message.*;
 import won.protocol.util.RdfUtils;
 
@@ -62,10 +63,10 @@ public class VerifyAndSignExamples
     this.nodeKey = (ECPrivateKey) storeService.getKey(TestSigningUtils.NODE_KEY_NAME);
 
     // TODO load public keys from certificate referenced from signatures
-    needCertUri = "http://localhost:8080/won/resource/need/3144709509622353000/#certificate";
+    needCertUri = "http://localhost:8080/won/resource/need/3144709509622353000";
     nodeCertUri = "http://localhost:8080/node/certificate";
 
-    pubKeysMap.put(needCertUri, storeService.getCertificate(TestSigningUtils.NEED_KEY_NAME).getPublicKey());
+    //pubKeysMap.put(needCertUri, storeService.getCertificate(TestSigningUtils.NEED_KEY_NAME).getPublicKey());
     pubKeysMap.put(nodeCertUri, storeService.getCertificate(TestSigningUtils.NODE_KEY_NAME).getPublicKey());
   }
 
@@ -84,6 +85,12 @@ public class VerifyAndSignExamples
                                                                                           NEED_CORE_DATA_SIG_URI,
                                                                                           EVENT_ENV1_URI,
                                                                                           EVENT_ENV1_SIG_URI,});
+
+    // node extracts need's public keys
+    Map<String,PublicKey> extractedKeys = WonKeysExtractor.getPublicKeys(inputDataset);
+    for (String key : extractedKeys.keySet()) {
+      pubKeysMap.put(key, extractedKeys.get(key));
+    }
 
     // node then verifies the data it receives
     // TODO maybe it should store the public key of the created need to use it for

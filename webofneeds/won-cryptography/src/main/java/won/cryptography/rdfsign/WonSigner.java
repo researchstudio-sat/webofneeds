@@ -6,12 +6,15 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterface;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import sun.misc.BASE64Encoder;
 import won.protocol.message.SignatureReference;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
 import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.Security;
 import java.security.Signature;
 import java.util.*;
 
@@ -37,9 +40,8 @@ public class WonSigner
     this.dataset = dataset;
     this.algorithm = algorithm;
 
-    //TODO check maybe it's not needed here
-    //provider = new BouncyCastleProvider();
-    //Security.addProvider(provider);
+    Provider provider = new BouncyCastleProvider();
+    Security.addProvider(provider);
   }
 
 

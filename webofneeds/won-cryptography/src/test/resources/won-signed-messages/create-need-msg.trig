@@ -12,6 +12,7 @@
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
 @prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
 @prefix cert: <http://www.w3.org/ns/auth/cert#> .
+@prefix woncrypt:   <http://purl.org/webofneeds/woncrypt#> .
 
 
 
@@ -33,7 +34,16 @@
                                     won:hasTag                 "aaa" ;
                                     won:hasTextDescription     "a"
                                   ] ;
-            won:hasFacet          won:OwnerFacet .
+            won:hasFacet          won:OwnerFacet ;
+            cert:key [ cert:PublicKey
+                                [
+                                    a woncrypt:ECCPublicKey ;
+                                    woncrypt:ecc_curveId "brainpoolp384r1" ;
+                                    woncrypt:ecc_algorithm "EC" ;
+                                    woncrypt:ecc_qx "26de01d3bc95b7de3f50f813f0e25fc7e3334802d76594350d024f3b78d682eab6422b4285ddfa69b65deac5b063c058" ;
+                                    woncrypt:ecc_qy "5871bd0f6065bf6786dccc4f658b1aad83e3b22ac4dd65d480322fec2b94f8b175eeb02bd34a6c0a1526c29371164dd6" ;
+                                ]
+            ] .
 }
 
 #  NEED DATA GRAPH SIGNATURE
@@ -53,9 +63,9 @@
                     signature:hasSignatureMethod    signature:sm-ecdsa
                   ] ;
           signature:hasSignatureValue
-                  "MGQCMD48hjJRNr3gthb7eIi0RnMzgfK1DjSwYjm3I7Wnaz0OGMS8SgB+VurkERD0OpXmrwIwX/8U\r\n1j7hkLlGIPXV540mmPAoRqah6y3Ir9H2JxMmI92eVHPCZ1FBZH4zpf0nC6hT" ;
+                  "MGQCMGyNqqqX51QXHlUYMmVDNs83veBQvwBO7W3BlYn5CVbStS9v/WfQJRvf4aCmZHDvgAIwM78j\r\nRg5x0Vu42Odi3U4R0AYBKmnzO0Db537Cc6uFWoNeBleqw259xxwOlpozMHfr" ;
           signature:hasVerificationCertificate
-                  <http://localhost:8080/won/resource/need/3144709509622353000/#certificate>  .
+                  <http://localhost:8080/won/resource/need/3144709509622353000>  .
 }
 
 
@@ -75,7 +85,7 @@
 
             msg:referencesSignature     [
                 msg:hasSignedGraph <http://localhost:8080/won/resource/need/3144709509622353000/core/#data> ;
-                msg:hasSignatureValue "MGQCMD48hjJRNr3gthb7eIi0RnMzgfK1DjSwYjm3I7Wnaz0OGMS8SgB+VurkERD0OpXmrwIwX/8U\r\n1j7hkLlGIPXV540mmPAoRqah6y3Ir9H2JxMmI92eVHPCZ1FBZH4zpf0nC6hT" ;
+                msg:hasSignatureValue "MGQCMGyNqqqX51QXHlUYMmVDNs83veBQvwBO7W3BlYn5CVbStS9v/WfQJRvf4aCmZHDvgAIwM78j\r\nRg5x0Vu42Odi3U4R0AYBKmnzO0Db537Cc6uFWoNeBleqw259xxwOlpozMHfr" ;
                 msg:hasSignatureGraph <http://localhost:8080/won/resource/need/3144709509622353000/core/#data-sig>
             ] ;
 
@@ -100,9 +110,9 @@
                                 signature:gsm-trig ;
                         signature:hasSignatureMethod    signature:sm-ecdsa
                       ] ;
-              signature:hasSignatureValue  "MGQCMG6lq0ryorsJlzU4CPfE/7oYgN80tw5AQ+VnshSMXbjA9bimRpfJ7wiqYwtK0WOLvQIwBW0Z\r\nkhH9JMHaF/uTklwaNsw1kApqiZhQswtg1eXJpKAQ+5nzzqY3Vds6c9sjrH1R" ;
+              signature:hasSignatureValue  "MGQCME+PugatzrSYuM++Se06b32fNvuilsHP/+7M4wbyzE3RVIzGDzVUmCLijp3ahayCHAIwGikN\r\nAXqoz8+5K2WfQq7kvBX/thMEzYmtiGwUfhUg5VwXUjLHkyww95YMtpaqQ6DG" ;
               signature:hasVerificationCertificate
-                      <http://localhost:8080/won/resource/need/3144709509622353000/#certificate> .
+                      <http://localhost:8080/won/resource/need/3144709509622353000> .
 }
 
 
@@ -122,7 +132,7 @@
 
             msg:referencesSignature     [
                             msg:hasSignedGraph <http://localhost:8080/won/resource/event/7719577021233193000#data> ;
-                            msg:hasSignatureValue "MGQCMG6lq0ryorsJlzU4CPfE/7oYgN80tw5AQ+VnshSMXbjA9bimRpfJ7wiqYwtK0WOLvQIwBW0Z\r\nkhH9JMHaF/uTklwaNsw1kApqiZhQswtg1eXJpKAQ+5nzzqY3Vds6c9sjrH1R" ;
+                            msg:hasSignatureValue "MGQCME+PugatzrSYuM++Se06b32fNvuilsHP/+7M4wbyzE3RVIzGDzVUmCLijp3ahayCHAIwGikN\r\nAXqoz8+5K2WfQq7kvBX/thMEzYmtiGwUfhUg5VwXUjLHkyww95YMtpaqQ6DG" ;
                             msg:hasSignatureGraph <http://localhost:8080/won/resource/event/7719577021233193000#data-sig>
                         ] ;
 
@@ -146,7 +156,7 @@
                                 signature:gsm-trig ;
                         signature:hasSignatureMethod    signature:sm-ecdsa
                       ] ;
-              signature:hasSignatureValue  "MGQCMF6rblKX5jdsUSUx6hvFHSeMFz0mYhn4Cj9MRHCFNh3rSmykwwIBSe1GBOxCUjYXRAIwYGWW\r\n0KuTlGvAu8M0bAGDqnSFLLhpxmZH5Zv0t1qpZSc15VkVx+tUyTb9CYtr5Oi1" ;
+              signature:hasSignatureValue  "MGQCMBQeADC8WyHtdJje9r8z2ihLCiadO//8nM+gwIEUWEpdrRKN97VXo7vEVMjbKBDvWgIwb+qO\r\n+xAnDq1TToTBY5yOy1rjhJjYW0lIVrCNyY1Txem/2z+DrWRExDsFSN7EpnXu" ;
               signature:hasVerificationCertificate
                       <http://localhost:8080/node/certificate> .
 }
