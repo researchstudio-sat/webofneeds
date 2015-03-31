@@ -33,8 +33,8 @@
     <import resource="classpath:/spring/component/ehcache/spring-node-ehcache.xml" />
 
     <!-- find all message processors -->
-    <context:component-scan base-package="won.node.message.processor.fixed"/>
-    <context:component-scan base-package="won.node.message.processor.facet"/>
+    <context:component-scan base-package="won.node.camel.processor.fixed"/>
+    <context:component-scan base-package="won.node.camel.processor.facet"/>
     <!-- find add-ons -->
     <context:component-scan base-package="won.node.contrib"/>
     <context:annotation-config />
