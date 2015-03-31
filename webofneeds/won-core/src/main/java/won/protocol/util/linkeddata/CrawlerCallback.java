@@ -14,13 +14,16 @@
  *    limitations under the License.
  */
 
-package won.protocol.util.linkeddata.cache;
+package won.protocol.util.linkeddata;
+
+import com.hp.hpl.jena.query.Dataset;
+
+import java.net.URI;
 
 /**
- * User: fkleedorfer
- * Date: 31.03.14
+ * Callback that is informed of each Dataset downloaded.
  */
-public class EvictionStrategy
+public interface CrawlerCallback
 {
-
+  public void onDatasetCrawled(URI uri, Dataset dataset);
 }
