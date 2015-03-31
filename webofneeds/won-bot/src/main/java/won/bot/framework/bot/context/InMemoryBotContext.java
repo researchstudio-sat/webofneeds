@@ -83,6 +83,25 @@ public class InMemoryBotContext implements BotContext
     nodeUris.add(uri);
   }
 
+  @Override
+  public synchronized void removeNeedUri(URI uri) {
+    needUris.remove(uri);
+  }
+
+  @Override
+  public synchronized void removeNamedNeedUri(String name) {
+    URI uri = namedNeedUris.remove(name);
+    if (uri != null) {
+      needUris.remove(uri);
+    }
+  }
+
+  @Override
+  public synchronized void removeNeedUriFromNamedNeedUriList(URI uri, String name) {
+    List<URI> uris = namedNeedUriLists.get(name);
+    uris.remove(uri);
+    needUris.remove(uri);
+  }
 
   @Override
   public synchronized URI getNeedByName(final String name) {

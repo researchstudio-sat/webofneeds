@@ -164,6 +164,8 @@ public class WON
   public static final String PRIVATE_DATA_GRAPH_URI= BASE_URI + "privateDataGraph";
 
 
+  public static final String GROUP_FACET_STRING = BASE_URI+"GroupFacet";
+  public static final String OWNER_FACET_STRING = BASE_URI+"OwnerFacet";
   /**
    * Returns the base URI for this schema.
    *

@@ -89,7 +89,7 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
     try {
         element = cache.get(resource);
     }catch(CacheException e){
-        logger.debug(String.format("Couldn't fetch resource %s",resource.toString()),e);
+        logger.debug(String.format("Couldn't fetch resource %s",resource),e);
         return DatasetFactory.createMem();
     }
 

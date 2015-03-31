@@ -151,7 +151,7 @@
                         </deployable>
                     </deployables>
                 </configuration>
-                <executions>
+                <!--<executions>
                     <execution>
                         <id>deploy-matcher-tomcat</id>
                         <phase>deploy</phase>
@@ -159,7 +159,7 @@
                             <goal>deployer-redeploy</goal>
                         </goals>
                     </execution>
-                </executions>
+                </executions>-->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

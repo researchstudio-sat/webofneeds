@@ -29,7 +29,6 @@
          they are searched in other property configurers defined in the context
     -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
-    <context:annotation-config />
 
     <!--- RDF Storage -->
     <bean id="rdfStorageRef" class="won.protocol.repository.rdfstorage.impl.JpaRepositoryBasedRdfStorageServiceImpl" />

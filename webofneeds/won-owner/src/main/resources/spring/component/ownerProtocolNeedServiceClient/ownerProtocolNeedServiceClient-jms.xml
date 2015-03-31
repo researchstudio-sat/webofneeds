@@ -49,11 +49,12 @@
 
     </bean>
 
-    <bean id="ownerProtocolNeedServiceClientJMSBased" class="won.owner.messaging.OwnerProtocolNeedServiceClientJMSBased">
+    <bean id="ownerProtocolNeedServiceClientJMSBased" class="won.owner.messaging.OwnerWonMessageSenderJMSBased">
         <property name="messagingService" ref="messagingService"/>
         <property name="defaultNodeURI" value="${uri.node.default}"/>
         <property name="startingEndpoint" value="seda:outgoingMessages"/>
         <!--property name="ownerProtocolActiveMQService" ref="activeMQService"/-->
+        <qualifier value="default" />
     </bean>
 
 

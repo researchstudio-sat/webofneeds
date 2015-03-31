@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -44,7 +45,6 @@ import won.protocol.util.CheapInsecureRandomString;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -164,7 +164,7 @@ public class RestUserController
   @ResponseBody
   @RequestMapping(
     value = "/settings",
-    produces = MediaType.APPLICATION_JSON,
+    produces = MediaType.APPLICATION_JSON_VALUE,
     method = RequestMethod.GET
   )
 
@@ -198,7 +198,7 @@ public class RestUserController
   @ResponseBody
   @RequestMapping(
     value = "/settings",
-    produces = MediaType.APPLICATION_JSON,
+    produces = MediaType.APPLICATION_JSON_VALUE,
     method = RequestMethod.POST
   )
 
@@ -423,7 +423,7 @@ public class RestUserController
   @ResponseBody
   @RequestMapping(
     value = "/ping",
-    produces = MediaType.APPLICATION_JSON,
+    produces = MediaType.APPLICATION_JSON_VALUE,
     method = RequestMethod.GET
   )
   public String doPing() {

@@ -115,6 +115,7 @@ public enum ConnectionState
     return URI.create(WON.BASE_URI + name);
   }
 
+
   /**
    * Tries to match the given string against all enum values.
    *

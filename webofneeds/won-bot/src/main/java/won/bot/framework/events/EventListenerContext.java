@@ -24,9 +24,10 @@ import won.bot.framework.events.bus.EventBus;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
-import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+import won.protocol.message.sender.WonMessageSender;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
+
 import java.net.URI;
 import java.util.concurrent.Executor;
 
@@ -51,9 +52,9 @@ public interface EventListenerContext
 
   public MatcherNodeURISource getMatcherNodeURISource();
   /**
-   * Returns the bot's owner service. Used to connect to WON_BA nodes.
+   * Returns the bot's wonMessageSender.
    */
-  public OwnerProtocolNeedServiceClientSide getOwnerService();
+  public WonMessageSender getWonMessageSender();
 
   /**
    * Returns the bot's matcher service

@@ -1,6 +1,5 @@
 package won.bot.framework.events.action.impl;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import won.bot.framework.events.EventListenerContext;
@@ -8,8 +7,10 @@ import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.action.EventBotActionUtils;
 import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.NeedCreationFailedEvent;
+import won.bot.framework.events.event.impl.FailureResponseEvent;
 import won.bot.framework.events.event.impl.NeedCreatedEvent;
 import won.bot.framework.events.event.impl.NeedProducerExhaustedEvent;
+import won.bot.framework.events.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -75,42 +76,47 @@ public class CreateNeedWithFacetsAction extends BaseEventBotAction
         }
         final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
         logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
-        final ListenableFuture<URI> futureNeedUri = getEventListenerContext().getOwnerService().createNeed(
-          needModel, true, wonNodeUri, createWonMessage(wonNodeUri, needModel));
-        //add a listener that adds the need URI to the botContext
-        futureNeedUri.addListener(new Runnable()
+        WonNodeInformationService wonNodeInformationService =
+          getEventListenerContext().getWonNodeInformationService();
+        final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
+        WonMessage createNeedMessage = createWonMessage(wonNodeInformationService,
+          needURI, wonNodeUri, needModel);
+      //remember the need URI so we can react to success/failure responses
+      EventBotActionUtils.rememberInListIfNamePresent(getEventListenerContext(), needURI, uriListName);
+
+        EventListener successCallback = new EventListener()
         {
-            @Override
-            public void run()
-            {
-                if (futureNeedUri.isDone()){
-                    try {
-                        URI uri = futureNeedUri.get();
-                        logger.debug("need creation finished, new need URI is: {}", uri);
-                        EventBotActionUtils.rememberInListIfNamePresent(getEventListenerContext(), uri, uriListName);
-                        getEventListenerContext().getEventBus().publish(new NeedCreatedEvent(uri, wonNodeUri, needModel,null));
-                    } catch (Exception e){
-                        logger.warn("createNeed failed", e);
-                    }
-                } else if (futureNeedUri.isCancelled()){
-                  try {
-                    logger.debug("need creation canceled");
-                    getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
-                  } catch (Exception e){
-                    logger.warn("createNeed failed", e);
-                  }
-                }
-            }
-        }, getEventListenerContext().getExecutor());
+          @Override
+          public void onEvent(Event event) throws Exception {
+            logger.debug("need creation successful, new need URI is {}", needURI);
+            getEventListenerContext().getEventBus()
+                                     .publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
+          }
+        };
+
+        EventListener failureCallback = new EventListener()
+        {
+          @Override
+          public void onEvent(Event event) throws Exception {
+            logger.debug("need creation failed for need URI {}, original message URI {}", needURI, ((FailureResponseEvent) event).getOriginalMessageURI());
+            EventBotActionUtils.removeFromListIfNamePresent(getEventListenerContext(), needURI, uriListName);
+            getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
+          }
+        };
+      EventBotActionUtils.makeAndSubscribeResponseListener(needURI,
+        createNeedMessage, successCallback, failureCallback, getEventListenerContext());
+
+      logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
+      getEventListenerContext().getWonMessageSender().sendWonMessage(createNeedMessage);
+      logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
     }
 
-  private WonMessage createWonMessage(URI wonNodeURI, Model needModel)
+
+  private WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI,
+                                      Model needModel)
     throws WonMessageBuilderException {
 
-    WonNodeInformationService wonNodeInformationService =
-      getEventListenerContext().getWonNodeInformationService();
 
-    URI needURI = wonNodeInformationService.generateNeedURI(wonNodeURI);
 
     RdfUtils.replaceBaseURI(needModel,needURI.toString());
 

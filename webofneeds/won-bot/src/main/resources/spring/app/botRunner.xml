@@ -30,7 +30,7 @@
     <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml" />
     <import resource="classpath:/spring/component/scheduling/scheduling.xml" />
     <import
-    resource="classpath:/spring/component/ownerProtocolOwnerServiceHandler/ownerProtocolOwnerServiceHandler.xml" />
+    resource="classpath:/spring/component/ownerCallback/ownerCallback.xml" />
     <import resource="classpath:/spring/component/matcherProtocolMatcherServiceHandler/matcherProtocolMatcherServiceHandler.xml"/>
     <import resource="classpath:/spring/component/botManager/botManager.xml" />
     <!--<import resource="classpath:/spring/component/needproducer/needproducer-mails.xml" />-->

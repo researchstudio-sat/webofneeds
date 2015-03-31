@@ -16,7 +16,7 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            classpath:/spring/node-jmsonly.xml
+            classpath:/spring/node.xml
         </param-value>
     </context-param>
 

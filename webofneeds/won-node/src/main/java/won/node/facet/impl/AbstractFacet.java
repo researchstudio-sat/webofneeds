@@ -12,12 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.node.service.DataAccessService;
-import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
-import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
-import won.protocol.message.WonEnvelopeType;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
@@ -63,14 +61,14 @@ public abstract class AbstractFacet implements Facet
    */
   protected OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService;
 
-  /**
-   * Client talking to this need service from the need side
-   */
-  protected NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService;
-  /**
-   * Client talking to this need service from the owner side
-   */
-  protected OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService;
+//  /**
+//   * Client talking to this need service from the need side
+//   */
+//  protected NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService;
+//  /**
+//   * Client talking to this need service from the owner side
+//   */
+//  protected OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService;
 
   protected NeedProtocolNeedClientSide needFacingConnectionClient;
   protected OwnerProtocolOwnerServiceClientSide ownerFacingConnectionClient;
@@ -352,13 +350,13 @@ public abstract class AbstractFacet implements Facet
           // For now, we call the close method as if it had been called from the owner side
           // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
           logger.warn("could not connectFromNeed, sending close back. Exception was: ",e);
-          try {
-            // ToDo (FS): wonMessage should be a response type
-            ownerFacingConnectionCommunicationService.close(
-                    connectionForRunnable.getConnectionURI(), content, wonMessage);
-          } catch (Exception e1) {
-            logger.warn("caught Exception sending close back from connectFromNeed:", e1);
-          }
+//          try {
+//            // ToDo
+//            ownerFacingConnectionCommunicationService.close(
+//                    connectionForRunnable.getConnectionURI(), content, wonMessage);
+//          } catch (Exception e1) {
+//            logger.warn("caught Exception sending close back from connectFromNeed:", e1);
+//          }
         }
       }
     });
@@ -424,11 +422,11 @@ public abstract class AbstractFacet implements Facet
           .setReceiverURI(wonMessage.getSenderURI())
           .setReceiverNeedURI(wonMessage.getSenderNeedURI())
           .setReceiverNodeURI(wonMessage.getSenderNodeURI())
-          .setWonEnvelopeType(WonEnvelopeType.NodeToOwner)
+          .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
           .build();
 
-        needFacingConnectionCommunicationService.close(
-                connectionForRunnable.getConnectionURI(), content, closeWonMessage);
+//        needFacingConnectionCommunicationService.close(
+//                connectionForRunnable.getConnectionURI(), content, closeWonMessage);
       } catch (Exception e1) {
         logger.warn("caught Exception sending close back from connectFromOwner::", e1);
       }
@@ -536,14 +534,6 @@ public abstract class AbstractFacet implements Facet
 
   public void setNeedFacingConnectionClient(NeedProtocolNeedClientSide needFacingConnectionClient) {
     this.needFacingConnectionClient = needFacingConnectionClient;
-  }
-
-  public void setOwnerFacingConnectionCommunicationService(OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService) {
-    this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
-  }
-
-  public void setNeedFacingConnectionCommunicationService(NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService) {
-    this.needFacingConnectionCommunicationService = needFacingConnectionCommunicationService;
   }
 
   public void setNeedProtocolNeedService(NeedProtocolNeedClientSide needProtocolNeedServiceClient) {

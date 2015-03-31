@@ -34,13 +34,13 @@ import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.repository.UserNeedRepository;
 import won.owner.repository.UserRepository;
-import won.owner.service.OwnerApplicationServiceCallback;
 import won.owner.service.impl.OwnerApplicationService;
 import won.owner.web.WonOwnerMailSender;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.processor.WonMessageProcessor;
 
 import java.io.IOException;
 import java.net.URI;
@@ -55,11 +55,11 @@ import java.util.Set;
  */
 public class WonWebSocketHandler
     extends TextWebSocketHandler
-    implements OwnerApplicationServiceCallback, InitializingBean
+    implements WonMessageProcessor, InitializingBean
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired
+
   private OwnerApplicationService ownerApplicationService;
 
   @Autowired
@@ -79,7 +79,7 @@ public class WonWebSocketHandler
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    this.ownerApplicationService.setOwnerApplicationServiceCallbackToClient(this);
+    this.ownerApplicationService.setMessageProcessorDelegate(this);
   }
 
   @Override
@@ -145,7 +145,7 @@ public class WonWebSocketHandler
     logger.debug("binding session to need URI {}", needUri);
     this.webSocketSessionService.addMapping(needUri, session);
 
-    ownerApplicationService.handleMessageEventFromClient(wonMessage);
+    ownerApplicationService.sendWonMessage(wonMessage);
   }
 
   /* update the session last accessed time, - spring-session was added to synchronize
@@ -165,7 +165,7 @@ public class WonWebSocketHandler
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public void onMessage(final WonMessage wonMessage) {
+  public WonMessage process(final WonMessage wonMessage) {
 
     String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
     WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
@@ -184,7 +184,7 @@ public class WonWebSocketHandler
     }
     // send per email notifications if it applies:
     notifyPerEmail(user, needUri, wonMessage);
-
+    return wonMessage;
   }
 
   private void notifyPerEmail(final User user, final URI needUri, final WonMessage wonMessage) {

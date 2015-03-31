@@ -21,7 +21,7 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
-    <bean id="matcherProtocolNeedJMSService" class="won.node.messaging.MatcherProtocolNeedServiceImplJMSBased">
+    <bean id="matcherProtocolNeedJMSService" class="won.node.message.MatcherProtocolNeedServiceImplJMSBased">
         <!-- the connection communication service injected here 7s owner facing -->
         <property name="delegate" ref="matcherProtocolNeedService" />
     </bean>
