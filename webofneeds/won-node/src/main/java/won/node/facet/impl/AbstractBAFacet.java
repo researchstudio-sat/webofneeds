@@ -10,8 +10,6 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.node.service.DataAccessService;
-import won.node.service.impl.NeedFacingConnectionCommunicationServiceImpl;
-import won.node.service.impl.OwnerFacingConnectionCommunicationServiceImpl;
 import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
@@ -44,14 +42,14 @@ public abstract class AbstractBAFacet implements Facet
    */
   protected OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService;
 
-  /**
-   * Client talking to this need service from the need side
-   */
-  protected NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService;
-  /**
-   * Client talking to this need service from the owner side
-   */
-  protected OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService;
+//  /**
+//   * Client talking to this need service from the need side
+//   */
+//  protected NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService;
+//  /**
+//   * Client talking to this need service from the owner side
+//   */
+//  protected OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService;
 
   protected NeedProtocolNeedClientSide needFacingConnectionClient;
   protected OwnerProtocolOwnerServiceClientSide ownerFacingConnectionClient;
@@ -279,15 +277,15 @@ public abstract class AbstractBAFacet implements Facet
           // For now, we call the close method as if it had been called from the owner side
           // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
           logger.warn("could not connectFromNeed, sending close back. Exception was: ",e);
-          try {
-            // ToDo (FS): in this case a close wonMessage should be created and send instead!!
-            ownerFacingConnectionCommunicationService.close(
-                    connectionForRunnable.getConnectionURI(),
-                    content,
-                    wonMessage);
-          } catch (Exception e1) {
-            logger.warn("caught Exception sending close back from connectFromNeed:", e1);
-          }
+//          try {
+//            // ToDo (FS): in this case a close wonMessage should be created and send instead!!
+//            ownerFacingConnectionCommunicationService.close(
+//                    connectionForRunnable.getConnectionURI(),
+//                    content,
+//                    wonMessage);
+//          } catch (Exception e1) {
+//            logger.warn("caught Exception sending close back from connectFromNeed:", e1);
+//          }
         }
       }
     });
@@ -329,14 +327,14 @@ public abstract class AbstractBAFacet implements Facet
           // For now, we call the close method as if it had been called from the remote side
           // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
           logger.warn("could not connectFromOwner, sending close back. Exception was: ",e);
-          try {
-            needFacingConnectionCommunicationService.close(
-                    connectionForRunnable.getConnectionURI(),
-                    content,
-                    wonMessage);
-          } catch (Exception e1) {
-            logger.warn("caught Exception sending close back from connectFromOwner::", e1);
-          }
+//          try {
+//            needFacingConnectionCommunicationService.close(
+//                    connectionForRunnable.getConnectionURI(),
+//                    content,
+//                    wonMessage);
+//          } catch (Exception e1) {
+//            logger.warn("caught Exception sending close back from connectFromOwner::", e1);
+//          }
         } catch (Exception e) {
           logger.warn("caught Exception in connectFromOwner: ",e);
         }
@@ -410,14 +408,6 @@ public abstract class AbstractBAFacet implements Facet
 
   public void setNeedFacingConnectionClient(NeedProtocolNeedClientSide needFacingConnectionClient) {
     this.needFacingConnectionClient = needFacingConnectionClient;
-  }
-
-  public void setOwnerFacingConnectionCommunicationService(OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService) {
-    this.ownerFacingConnectionCommunicationService = ownerFacingConnectionCommunicationService;
-  }
-
-  public void setNeedFacingConnectionCommunicationService(NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService) {
-    this.needFacingConnectionCommunicationService = needFacingConnectionCommunicationService;
   }
 
   public void setNeedProtocolNeedService(NeedProtocolNeedClientSide needProtocolNeedServiceClient) {

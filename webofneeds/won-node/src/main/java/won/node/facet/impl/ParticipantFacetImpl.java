@@ -54,15 +54,15 @@ public class ParticipantFacetImpl extends AbstractFacet
           // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
           // For now, we call the close method as if it had been called from the owner side
           // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
-          try {
-            // ToDo (FS): create close wonMessage
-            ownerFacingConnectionCommunicationService.close(
-                    connectionForRunnable.getConnectionURI(), content, null);
-          } catch (NoSuchConnectionException e1) {
-            logger.warn("caught NoSuchConnectionException:", e1);
-          } catch (IllegalMessageForConnectionStateException e1) {
-            logger.warn("caught IllegalMessageForConnectionStateException:", e1);
-          }
+//          try {
+//            // ToDo (FS): create close wonMessage
+//            ownerFacingConnectionCommunicationService.close(
+//                    connectionForRunnable.getConnectionURI(), content, null);
+//          } catch (NoSuchConnectionException e1) {
+//            logger.warn("caught NoSuchConnectionException:", e1);
+//          } catch (IllegalMessageForConnectionStateException e1) {
+//            logger.warn("caught IllegalMessageForConnectionStateException:", e1);
+//          }
         }
       }
     });
@@ -201,14 +201,14 @@ public class ParticipantFacetImpl extends AbstractFacet
           // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
           // For now, we call the close method as if it had been called from the remote side
           // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
-          try {
-            needFacingConnectionCommunicationService.close(
-                    connectionForRunnable.getConnectionURI(), content, wonMessage);
-          } catch (NoSuchConnectionException e1) {
-            logger.warn("caught NoSuchConnectionException:", e1);
-          } catch (IllegalMessageForConnectionStateException e1) {
-            logger.warn("caught IllegalMessageForConnectionStateException:", e1);
-          }
+//          try {
+//            needFacingConnectionCommunicationService.close(
+//                    connectionForRunnable.getConnectionURI(), content, wonMessage);
+//          } catch (NoSuchConnectionException e1) {
+//            logger.warn("caught NoSuchConnectionException:", e1);
+//          } catch (IllegalMessageForConnectionStateException e1) {
+//            logger.warn("caught IllegalMessageForConnectionStateException:", e1);
+//          }
         }
         catch (InterruptedException e) {
           e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
