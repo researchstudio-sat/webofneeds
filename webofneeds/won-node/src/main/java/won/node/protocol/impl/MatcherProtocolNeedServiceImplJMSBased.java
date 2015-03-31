@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package won.node.camel;
+package won.node.protocol.impl;
 
 import org.apache.camel.Header;
 import org.apache.jena.riot.Lang;
