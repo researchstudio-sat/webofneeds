@@ -3,7 +3,6 @@ package won.cryptography.rdfsign;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +11,6 @@ import won.cryptography.utils.TestSigningUtils;
 
 import java.io.File;
 import java.security.PublicKey;
-import java.security.Security;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
 import java.util.Map;
@@ -33,12 +31,12 @@ public class WonKeysExtractorTest
     "http://localhost:8080/won/resource/need/3144709509622353000/core/#data";
 
   private ECPublicKey needKey;
+  private WonKeysExtractor extractor;
 
   @Before
   public void init() {
 
-    // TODO this should be inside the extractor??
-    Security.addProvider(new BouncyCastleProvider());
+    extractor = new WonKeysExtractor();
 
     //load public key:
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
@@ -53,7 +51,7 @@ public class WonKeysExtractorTest
     // create dataset
     Dataset tempDataset = TestSigningUtils.prepareTestDataset(RESOURCE_FILE);
     // extract public keys
-    Map<String,PublicKey> keys = WonKeysExtractor.getPublicKeys(tempDataset);
+    Map<String,PublicKey> keys = extractor.fromDataset(tempDataset);
     Assert.assertEquals(1, keys.size());
 
 //    // create dataset that contains need core data graph and its signature graph
@@ -95,7 +93,7 @@ public class WonKeysExtractorTest
 
     Model testModel = testDataset.getNamedModel(NEED_CORE_DATA_URI);
     Resource keySubj = testModel.createResource(NEED_URI);
-    WonKeysExtractor.addPublicKeys(testModel, keySubj, needKey);
+    extractor.addToModel(testModel, keySubj, needKey);
 
     Assert.assertTrue(testModel.isIsomorphicWith(datasetWithExpectedModel.getNamedModel(NEED_CORE_DATA_URI)));
 

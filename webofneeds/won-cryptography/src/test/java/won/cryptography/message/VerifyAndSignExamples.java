@@ -87,7 +87,8 @@ public class VerifyAndSignExamples
                                                                                           EVENT_ENV1_SIG_URI,});
 
     // node extracts need's public keys
-    Map<String,PublicKey> extractedKeys = WonKeysExtractor.getPublicKeys(inputDataset);
+    WonKeysExtractor extractor = new WonKeysExtractor();
+    Map<String,PublicKey> extractedKeys = extractor.fromDataset(inputDataset);
     for (String key : extractedKeys.keySet()) {
       pubKeysMap.put(key, extractedKeys.get(key));
     }
@@ -106,7 +107,7 @@ public class VerifyAndSignExamples
     List<SignatureReference> refs = verifier.getVerificationResult().getVerifiedUnreferencedSignaturesAsReferences();
     WonMessage outputWonMessage = new WonMessageBuilder()
       .wrap(inputWonMessage)
-      .setWonEnvelopeType(WonEnvelopeType.NodeToNode)
+      .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM)
       .setSignatureReferences(refs)
       .build();
     Dataset outputDataset = WonMessageEncoder.encodeAsDataset(outputWonMessage);

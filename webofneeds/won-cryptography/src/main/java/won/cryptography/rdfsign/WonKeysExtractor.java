@@ -3,8 +3,10 @@ package won.cryptography.rdfsign;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.ontology.Ontology;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
@@ -17,13 +19,12 @@ import won.protocol.vocabulary.WONCRYPT;
 
 import javax.transaction.NotSupportedException;
 import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -32,65 +33,82 @@ import java.util.Map;
  */
 public class WonKeysExtractor
 {
+  public WonKeysExtractor() {
+    Provider provider = new BouncyCastleProvider();
+    Security.addProvider(provider);
+  }
 
-  public static Map<String, PublicKey> getPublicKeys(Dataset dataset)
+  public Map<String, PublicKey> fromDataset(Dataset dataset)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
     Map<String, PublicKey> keys = new HashMap<>();
-    addPublicKeys(dataset.getDefaultModel(), keys);
+    fromModel(dataset.getDefaultModel(), keys);
     for (String name : RdfUtils.getModelNames(dataset)) {
-      addPublicKeys(dataset.getNamedModel(name), keys);
+      fromModel(dataset.getNamedModel(name), keys);
     }
     return keys;
   }
 
-
-  public static Map<String, PublicKey> getPublicKeys(Model model)
+  public Map<String, PublicKey> fromDataset(Dataset dataset, String keyUri)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
     Map<String, PublicKey> keys = new HashMap<>();
-    addPublicKeys(model, keys);
+    fromModel(dataset.getDefaultModel(), keys, dataset.getDefaultModel().createResource(keyUri));
+    for (String name : RdfUtils.getModelNames(dataset)) {
+      fromModel(dataset.getNamedModel(name), keys, dataset.getNamedModel(name).createResource(keyUri));
+    }
     return keys;
   }
 
-  private static void addPublicKeys(final Model model, final Map<String, PublicKey> keys)
+  public Map<String, PublicKey> fromModel(Model model)
+    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
+    Map<String, PublicKey> keys = new HashMap<>();
+    fromModel(model, keys);
+    return keys;
+  }
+
+  private void fromModel(final Model model, final Map<String, PublicKey> keys)
+    throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
+    fromModel(model, keys, null);
+  }
+
+  private void fromModel(final Model model, final Map<String, PublicKey> keys, Resource keyAgent)
     throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
 
-    StmtIterator keyStmts = model.listStatements(null, CERT.KEY, RdfUtils.EMPTY_RDF_NODE);
+    StmtIterator keyStmts = model.listStatements(keyAgent, CERT.KEY, RdfUtils.EMPTY_RDF_NODE);
     // TODO replace if with while if we allow multiple keys
     if (keyStmts.hasNext()) {
       Statement statement = keyStmts.next();
-      Resource keyAgent = statement.getSubject();
+      keyAgent = statement.getSubject();
       RDFNode keyObj = statement.getObject();
 
       // pub key statements
       NodeIterator ni = model.listObjectsOfProperty(keyObj.asResource(), CERT.PUBLIC_KEY);
       if (ni.hasNext()) {
         RDFNode eccKeyObj = ni.next();
-
-
         // ECC pub key statements
         StmtIterator eccPubKeyStmts = model.listStatements(eccKeyObj.asResource(), RDF.type, WONCRYPT.ECC_PUBLIC_KEY);
         if (eccPubKeyStmts.hasNext()) {
           // extract properties of ECC public key:
           ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WONCRYPT.ECC_ALGORITHM);
-          //TODO actually should be nested ifs
           String algName = null;
           String curveId = null;
           String qx = null;
           String qy = null;
           if (ni.hasNext()) {
             algName = ni.next().asLiteral().toString();
-          }
-          ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WONCRYPT.ECC_CURVE_ID);
-          if (ni.hasNext()) {
-            curveId = ni.next().asLiteral().toString();
+          } else {
+            return;
           }
           ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WONCRYPT.ECC_QX);
           if (ni.hasNext()) {
             qx = ni.next().asLiteral().toString();
+          } else {
+            return;
           }
           ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WONCRYPT.ECC_QY);
           if (ni.hasNext()) {
             qy = ni.next().asLiteral().toString();
+          } else {
+            return;
           }
 
           ECNamedCurveParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(curveId);
@@ -98,10 +116,9 @@ public class WonKeysExtractor
                                                            .createPoint(new BigInteger(qx, 16), new BigInteger(qy, 16));
           ECParameterSpec paramSpec = new ECParameterSpec(ecSpec.getCurve(), ecSpec.getG(), ecSpec.getN());
           ECPublicKeySpec pubKeySpec = new ECPublicKeySpec(ecPoint, paramSpec);
-          // TODO add provider to RDF?
+          // TODO add provider to RDF triples?
           KeyFactory keyFactory = KeyFactory.getInstance(algName, "BC");
           PublicKey key = keyFactory.generatePublic(pubKeySpec);
-
           keys.put(keyAgent.getURI(), key);
         }
       }
@@ -109,7 +126,31 @@ public class WonKeysExtractor
 
   }
 
-  public static void addPublicKey(Model model, Resource keySubject, WonEccPublicKey pubKey) {
+
+
+  public Set<String> getKeyRefs(Dataset dataset)
+    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
+    Set<String> keyRefs = new HashSet<>();
+    getKeyRefs(dataset.getDefaultModel(), keyRefs);
+    for (String name : RdfUtils.getModelNames(dataset)) {
+      getKeyRefs(dataset.getNamedModel(name), keyRefs);
+    }
+    return keyRefs;
+  }
+
+  public void getKeyRefs(Model model, Set<String> keyRefs)
+    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
+
+    if (WonVerifier.isSignature(model)) {
+      Property typeProp = model.createProperty(Ontology.getSigIri(), "hasVerificationCertificate");
+      StmtIterator si = model.listStatements(null, typeProp, RdfUtils.EMPTY_RDF_NODE);
+      if (si.hasNext()) {
+        keyRefs.add(si.next().getObject().asResource().getURI());
+      }
+    }
+  }
+
+  public void addToModel(Model model, Resource keySubject, WonEccPublicKey pubKey) {
 
     // EC public key triples
     Resource bn = model.createResource();
@@ -135,22 +176,22 @@ public class WonKeysExtractor
 
   }
 
-  public static Model toModel(Resource keySubject, WonEccPublicKey pubKey) {
+  public Model toModel(Resource keySubject, WonEccPublicKey pubKey) {
 
     Model model = ModelFactory.createDefaultModel();
-    addPublicKey(model, keySubject, pubKey);
+    addToModel(model, keySubject, pubKey);
     return model;
 
   }
 
-  public static void addPublicKeys(Model model, Resource keySubject, PublicKey publicKey) throws NotSupportedException,
+  public void addToModel(Model model, Resource keySubject, PublicKey publicKey) throws NotSupportedException,
     KeyNotSupportedException {
 
     if (publicKey instanceof ECPublicKey) {
       KeyInformationExtractor info = new KeyInformationExtractorBouncyCastle();
-      addPublicKey(model, keySubject, new WonEccPublicKey(info.getCurveID(publicKey), info.getAlgorithm(publicKey),
-                                               info.getQX(publicKey),
-                                                   info.getQY(publicKey)));
+      addToModel(model, keySubject, new WonEccPublicKey(info.getCurveID(publicKey), info.getAlgorithm(publicKey),
+                                                        info.getQX(publicKey),
+                                                        info.getQY(publicKey)));
     } else {
       throw new NotSupportedException("Not supported key: " + publicKey.getClass().getName());
     }

@@ -190,6 +190,17 @@ public class WonVerifier
     return false;
   }
 
+  public static boolean isSignature(Model model) {
+    // TODO check the presence of all the required triples
+    Property typeProp = model.createProperty(Ontology.getW3CSyntaxURI(), "type");
+    Resource sigRes = model.createResource(Ontology.getSigIri() + "Signature");
+    StmtIterator si = model.listStatements(null, typeProp, sigRes);
+    if (si.hasNext()) {
+      return true;
+    }
+    return false;
+  }
+
   private void addSignatureToResult(final String graphUri, final Model model) {
     String signedGraphUri = null;
     String signatureValue = null;
