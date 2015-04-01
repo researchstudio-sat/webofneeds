@@ -62,8 +62,7 @@ public class FailResponder extends AbstractCamelProcessor
     WonMessage responseMessage = new WonMessageBuilder()
             .setPropertiesForNodeResponse(originalMessage, false,newMessageURI)
             .addContent(
-                    URI.create(newMessageURI.toString() + "/content"),
-                    errorMessageContent,
+              errorMessageContent,
                     null)
             .build();
 

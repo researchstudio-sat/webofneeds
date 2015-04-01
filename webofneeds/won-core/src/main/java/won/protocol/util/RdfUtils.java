@@ -1031,23 +1031,54 @@ public class RdfUtils
    * @param dataset the dataset that will be checked to determine if the resulting URI is new.
    * @return an URI that is previously unused as a graph URI.
    */
-   public static URI createNewGraphURI(String baseURI, String toAppend, int length, Dataset dataset){
-     if (toAppend.contains("#")){
-       int hashIndex = baseURI.indexOf('#');
-       if (hashIndex > -1){
-         baseURI = baseURI.substring(0,hashIndex);
+   public static URI createNewGraphURI(String baseURI, String toAppend, int length, final Dataset dataset){
+     return createNewGraphURI(baseURI, toAppend, length,
+       new GraphNameCheck()
+       {
+         @Override
+         public boolean isGraphUriOk(final String graphUri) {
+           return !dataset.containsNamedModel(graphUri);
+         }
        }
-     }
-     int maxTries = 5;
-     for (int i = 0; i < maxTries; i++){
-       String graphName = baseURI + toAppend + randomString.nextString(length);
-       if (!dataset.containsNamedModel(graphName)){
-         return URI.create(graphName);
-       }
-     } ;
-     throw new IllegalStateException("Tried " + maxTries +" times to generate a new graph URI (" + length + " random" +
-       " characters), but were unable to generate a previously unused one; giving up.");
+     );
    }
+
+  /**
+   * Creates a new graph URI for the specified dataset by appending
+   * a specified string (toAppend) and then n alphanumeric characters to the
+   * specified String.
+   * It is guaranteed that the resulting URI is not used as a graph
+   * name in the specified dataset.
+   *
+   * Note that the implementation is not synchronized, so concurrent
+   * executions of the method may result in identical URIs being returned.
+   *
+   * If both the specified baseURI and the toAppend string contain a hash sign ('#'),
+   * the hash-part will be removed from the base uri before the result will be crated.
+   *
+   * @param baseURI the URI to be extended.
+   * @param toAppend a string that will be appended directly to the URI.
+   * @param length number of alphanumeric characters that are appended to <code>toAppend</code>.
+   * @param disallowedGraphUris set of uris that are forbidden.
+   * @return an URI that is previously unused as a graph URI.
+   */
+  public static URI createNewGraphURI(String baseURI, String toAppend, int length, GraphNameCheck check){
+    if (toAppend.contains("#")){
+      int hashIndex = baseURI.indexOf('#');
+      if (hashIndex > -1){
+        baseURI = baseURI.substring(0,hashIndex);
+      }
+    }
+    int maxTries = 5;
+    for (int i = 0; i < maxTries; i++){
+      String graphName = baseURI + toAppend + randomString.nextString(length);
+      if (check.isGraphUriOk(graphName)){
+        return URI.create(graphName);
+      }
+    }
+    throw new IllegalStateException("Tried " + maxTries +" times to generate a new graph URI (" + length + " random" +
+      " characters), but were unable to generate a previously unused one; giving up.");
+  }
 
 
 
@@ -1154,5 +1185,10 @@ public class RdfUtils
         return null;
       }
     });
+  }
+
+  public static interface GraphNameCheck
+  {
+    public boolean isGraphUriOk(String graphUri);
   }
 }

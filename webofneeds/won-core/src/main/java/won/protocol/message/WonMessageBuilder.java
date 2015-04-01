@@ -30,8 +30,6 @@ public class WonMessageBuilder
   private static final CheapInsecureRandomString randomString = new CheapInsecureRandomString();
   private static final int RANDOM_SUFFIX_LENGTH = 5;
 
-  // ToDo (FS): move to some vocabulary class
-
   private URI messageURI;
   private URI senderURI;
   private URI senderNeedURI;
@@ -76,9 +74,6 @@ public class WonMessageBuilder
    */
   public WonMessage build(Dataset dataset)
     throws WonMessageBuilderException {
-
-    checkProperties();
-
 
     if (dataset == null) {
       dataset = DatasetFactory.createMem();
@@ -205,8 +200,6 @@ public class WonMessageBuilder
 
       //now replace the content URIs
     }
-
-    // ToDo (FS): add signature of the whole message
 
     return new WonMessage(dataset);
 
@@ -385,9 +378,8 @@ public class WonMessageBuilder
       .setSenderNeedURI(localNeed)
       .setSenderNodeURI(localWonNode)
       .setReceiverNeedURI(remoteNeed)
-      .setReceiverNodeURI(remoteWonNode)
-        // ToDo (FS): remove the hardcoded part of the URI
-      .addContent(URI.create(messageURI.toString() + "/content"), facetModel, null)
+      .setReceiverNodeURI(remoteWonNode);
+      this.addContent(facetModel, null)
       .setTimestampToNow();
 
     return this;
@@ -436,8 +428,7 @@ public class WonMessageBuilder
       .setReceiverNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
       .setTimestampToNow()
-        // ToDo (FS): remove the hardcoded part of the URI
-      .addContent(URI.create(messageURI.toString() + "/content"), contentModel, null);
+      .addContent(contentModel, null);
 
     return this;
   }
@@ -469,8 +460,7 @@ public class WonMessageBuilder
       .setReceiverURI(needConnectionURI)
       .setReceiverNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
-        // ToDo (FS): remove the hardcoded part of the URI
-      .addContent(URI.create(messageURI.toString() + "/content"), contentModel, null)
+      .addContent(contentModel, null)
       .setTimestampToNow();
 
     return this;
@@ -496,7 +486,7 @@ public class WonMessageBuilder
       .setReceiverURI(remoteConnection)
       .setReceiverNeedURI(remoteNeed)
       .setReceiverNodeURI(remoteWonNode)
-      .addContent(URI.create(messageURI.toString() + "/content"), content, null)
+      .addContent(content, null)
       .setTimestampToNow();
 
     return this;
@@ -613,21 +603,22 @@ public class WonMessageBuilder
    * Adds the specified content graph, and the specified signature graph, using the specified
    * contentURI as the graph name. The contentURI will be made unique inside the message dataset
    * by appending characters at the end.
-   * @param contentURI
    * @param content
-   * @param signature, may be null
    * @return
    */
-  public WonMessageBuilder addContent(URI contentURI, Model content, Model signature) {
-    Random rnd = new Random(System.currentTimeMillis());
-    URI originalContentUri = contentURI;
-    //add a random suffix to the uri
-    while (contentMap.containsKey(contentURI)){
-      contentURI = URI.create(originalContentUri.toString() + randomString.nextString(RANDOM_SUFFIX_LENGTH));
-    }
-    contentMap.put(contentURI, content);
+  public WonMessageBuilder addContent(Model content, Model signature) {
+    URI contentGraphUri = RdfUtils.createNewGraphURI(messageURI.toString(), CONTENT_URI_SUFFIX, 4,
+      new RdfUtils.GraphNameCheck()
+      {
+        @Override
+        public boolean isGraphUriOk(final String graphUri) {
+
+          return !contentMap.keySet().contains(URI.create(graphUri));
+        }
+      });
+    contentMap.put(contentGraphUri, content);
     if (signature != null)
-      signatureMap.put(contentURI, signature);
+      signatureMap.put(contentGraphUri, signature);
     return this;
   }
 
@@ -736,7 +727,7 @@ public class WonMessageBuilder
       //'URI space' of the message
       String newModelUri = this.messageURI.toString()+"/copied";
 
-      addContent(URI.create(newModelUri), model,null);
+      addContent(model,null);
     }
     return this;
   }
@@ -809,10 +800,6 @@ public class WonMessageBuilder
   }
 
 
-  private void checkProperties() {
 
-    // ToDo (FS): implement
-
-  }
 
 }

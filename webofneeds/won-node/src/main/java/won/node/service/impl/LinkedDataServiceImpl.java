@@ -169,7 +169,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     metaModel.add(metaModel.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
 
     // add need event container
-    Resource needEventContainer = metaModel.createResource(need.getNeedURI().toString()+"/events", WON.EVENT_CONTAINER);
+    Resource needEventContainer = metaModel.createResource(need.getNeedURI().toString()+"#events", WON.EVENT_CONTAINER);
     metaModel.add(metaModel.createStatement(needResource, WON.HAS_EVENT_CONTAINER, needEventContainer));
 
     // add need event URIs
@@ -184,7 +184,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     needResource.addProperty(WON.HAS_WON_NODE, metaModel.createResource(this.resourceURIPrefix));
 
     // add meta model to dataset
-    String needMetaInformationURI = uriService.createNeedMetaInformationURI(needUri).toString();
+    String needMetaInformationURI = uriService.createNeedSysInfoGraphURI(needUri).toString();
     dataset.addNamedModel(needMetaInformationURI, metaModel);
     addBaseUriAndDefaultPrefixes(dataset);
     return dataset;
