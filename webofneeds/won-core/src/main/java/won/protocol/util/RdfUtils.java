@@ -19,10 +19,7 @@ import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.IncorrectPropertyCountException;
-import won.protocol.model.Connection;
-import won.protocol.vocabulary.WON;
 
-import javax.sql.ConnectionEvent;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -1052,32 +1049,6 @@ public class RdfUtils
        " characters), but were unable to generate a previously unused one; giving up.");
    }
 
-  /**
-   * Stores additional data if there is any in the specified model.
-   * TODO: Move to WonRdfUtils
-   *
-   * @param eventURI
-   * @param content
-   * @param con
-   * @param event
-   * @param score
-   */
-  public static Model createContentForEvent(final URI eventURI, final Model content, final Connection con,
-                                            final ConnectionEvent event, final Double score) {
-    //TODO: define what content may contain and check that here! May content contain any RDF or must it be linked to the <> node?
-    Model extraDataModel = ModelFactory.createDefaultModel();
-    Resource eventNode = extraDataModel.createResource(eventURI.toString());
-    if(score != null)
-      eventNode.addLiteral(WON.HAS_MATCH_SCORE, score.doubleValue());
-    extraDataModel.setNsPrefix("", eventNode.getURI().toString());
-    if (content != null) {
-
-      //TODO: check if the correct data is saved
-      extraDataModel.add(content);
-      RdfUtils.replaceBaseResource(extraDataModel, eventNode);
-    }
-    return extraDataModel;
-  }
 
 
   public static void addAllStatements(Model toModel, Model fromModel) {
