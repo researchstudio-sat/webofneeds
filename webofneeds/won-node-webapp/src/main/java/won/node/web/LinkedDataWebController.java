@@ -37,7 +37,7 @@ import won.node.service.impl.URIService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.service.LinkedDataService;
-import won.protocol.util.HTTP;
+import won.protocol.vocabulary.HTTP;
 import won.protocol.util.RdfUtils;
 
 import javax.servlet.http.HttpServletRequest;
