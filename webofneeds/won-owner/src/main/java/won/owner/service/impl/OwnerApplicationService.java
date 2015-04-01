@@ -26,8 +26,13 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
   private WonMessageProcessor messageProcessorDelegate =
     new NopOwnerApplicationServiceCallback();
 
+  /**
+   * Sends a message to the won node.
+   * @param wonMessage
+   */
   public void sendWonMessage(WonMessage wonMessage) {
     try {
+      //TODO: add owner signature
       wonMessageSenderDelegate.sendWonMessage(wonMessage);
     } catch (Exception e) {
       //TODO: send error message back to client!
@@ -35,8 +40,13 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
     }
   }
 
+  /**
+   * Sends a message to the owner.
+   * @param wonMessage
+   */
   @Override
   public WonMessage process(final WonMessage wonMessage){
+    //todo: check signatures
     return messageProcessorDelegate.process(wonMessage);
   }
 
