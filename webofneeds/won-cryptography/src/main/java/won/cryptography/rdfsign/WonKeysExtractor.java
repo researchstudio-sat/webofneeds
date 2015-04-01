@@ -98,6 +98,12 @@ public class WonKeysExtractor
           } else {
             return;
           }
+          ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WONCRYPT.ECC_CURVE_ID);
+          if (ni.hasNext()) {
+            curveId = ni.next().asLiteral().toString();
+          } else {
+            return;
+          }
           ni = model.listObjectsOfProperty(eccKeyObj.asResource(), WONCRYPT.ECC_QX);
           if (ni.hasNext()) {
             qx = ni.next().asLiteral().toString();
