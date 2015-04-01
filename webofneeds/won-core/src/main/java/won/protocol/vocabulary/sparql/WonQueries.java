@@ -17,6 +17,9 @@ public class WonQueries {
 
     public static final String SPARQL_ALL_TRIPLES = SPARQL_PREFIX + "SELECT * WHERE { graph ?g {?s ?p ?o} . }";
 
+    public static final String SPARQL_ALL_GRAPHS = SPARQL_PREFIX + "SELECT DISTINCT ?g WHERE {graph ?g {?s ?p ?o }.}";
+
+
     public static final String SPARQL_ALL_NEEDS = SPARQL_PREFIX + "SELECT * WHERE " +
                                                     "{ ?need won:hasContent ?x; " +
                                                             "won:isInState ?state; " +
