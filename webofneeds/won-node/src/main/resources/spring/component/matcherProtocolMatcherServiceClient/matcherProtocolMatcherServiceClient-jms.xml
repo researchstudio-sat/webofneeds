@@ -22,6 +22,6 @@
 
 
 
-    <bean name="matcherProtocolMatcherClientJMSBased" class="won.node.message.MatcherProtocolMatcherClientImplJMSBased">
+    <bean name="matcherProtocolMatcherClientJMSBased" class="won.node.protocol.impl.MatcherProtocolMatcherClientImplJMSBased">
     </bean>
 </beans>

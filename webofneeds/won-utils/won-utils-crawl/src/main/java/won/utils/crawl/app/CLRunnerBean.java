@@ -5,6 +5,9 @@ import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.PathParser;
 import com.hp.hpl.jena.tdb.TDB;
+import com.hp.hpl.jena.update.GraphStore;
+import com.hp.hpl.jena.update.GraphStoreFactory;
+import com.hp.hpl.jena.update.UpdateAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +38,7 @@ public class CLRunnerBean implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if(args == null && args.length == 0){
-            logger.info("No Arguments present");
+            logger.warn("arguments: [space-separated list of uris to crawl]");
             return;
         }
 
@@ -44,9 +47,8 @@ public class CLRunnerBean implements CommandLineRunner {
         for(String arg : args) {
             URI uri = URI.create(arg);
             logger.info("Getting Data from uri: " + uri);
-            RdfUtils.addDatasetToDataset(needDataset, linkedDataSource.getDataForResourceWithPropertyPath(uri, configurePropertyPaths(), 10000, 4, false), true);
+            RdfUtils.addDatasetToDataset(needDataset, linkedDataSource.getDataForResourceWithPropertyPath(uri, configurePropertyPaths(), 10000, 5, false), true);
         }
-        //RDFDataMgr.write(System.err, needDataset, Lang.TRIG); //THIS IS TO PRINT THE WHOLE RDF
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String line;
@@ -58,6 +60,55 @@ public class CLRunnerBean implements CommandLineRunner {
                 break;
             }else if("help".equals(line)){
                 printHelp();
+            }else if(line.startsWith("%listgraphs")) {
+                try {
+                    Query query = QueryFactory.create(WonQueries.SPARQL_ALL_GRAPHS);
+                    QuerySolutionMap initialBinding = new QuerySolutionMap();
+                    // InitialBindings are used to set filters on the resultset
+                    //initialBinding.add("need", needDataset.getDefaultModel().createResource(uri.toString()));
+
+                    QueryExecution qExec = QueryExecutionFactory.create(query, needDataset, initialBinding);
+
+                    qExec.getContext().set(TDB.symUnionDefaultGraph, true);
+                    ResultSet results = qExec.execSelect();
+
+
+                    printResults(results);
+                    qExec.close();
+                } catch (QueryParseException e) {
+                    System.out.println("INVALID SPARQL-QUERY: " + e.getMessage());
+                    printHelp();
+                }
+            }else if(line.startsWith("%listall")) {
+                try {
+                    Query query = QueryFactory.create(WonQueries.SPARQL_ALL_NEEDS);
+                    QuerySolutionMap initialBinding = new QuerySolutionMap();
+                    // InitialBindings are used to set filters on the resultset
+                    //initialBinding.add("need", needDataset.getDefaultModel().createResource(uri.toString()));
+
+                    QueryExecution qExec = QueryExecutionFactory.create(query, needDataset, initialBinding);
+
+                    qExec.getContext().set(TDB.symUnionDefaultGraph, true);
+                    ResultSet results = qExec.execSelect();
+
+
+                    printResults(results);
+                    qExec.close();
+                } catch (QueryParseException e) {
+                    System.out.println("INVALID SPARQL-QUERY: " + e.getMessage());
+                    printHelp();
+                }
+            }else if(line.startsWith("#")) {
+                try {
+                    String updateString = WonQueries.SPARQL_PREFIX + line.substring(1);
+
+                    GraphStore graphStore = GraphStoreFactory.create(needDataset);
+                    UpdateAction.parseExecute(updateString, graphStore);
+                } catch (QueryParseException e) {
+                    e.printStackTrace();
+                    System.out.println("INVALID SPARQL-QUERY: " + e.getMessage());
+                    printHelp();
+                }
             }else {
                 String queryString = WonQueries.SPARQL_PREFIX + line;
                 try {
@@ -80,7 +131,7 @@ public class CLRunnerBean implements CommandLineRunner {
                 }
             }
 
-            System.out.println(RdfUtils.setSparqlVars(WonQueries.SPARQL_CONNECTIONS_FILTERED_BY_NEED_URI,"need",URI.create("http://rsa021.researchstudio.at:8080/won/resource/need/4871438545203495000")));
+//            System.out.println(RdfUtils.setSparqlVars(WonQueries.SPARQL_CONNECTIONS_FILTERED_BY_NEED_URI,"need",URI.create("http://rsa021.researchstudio.at:8080/won/resource/need/4871438545203495000")));
         }
     }
 
@@ -108,6 +159,11 @@ public class CLRunnerBean implements CommandLineRunner {
     private void printHelp(){
         System.out.println("Enter SPARQL Query (Prefix not needed), or type \"exit\" to exit");
         System.out.println("List all loaded Graphs: \"SELECT DISTINCT ?g WHERE {graph ?g {?s ?p ?o }.}\"");
+        System.out.println("Commands > [QUERY]     - executes the given query");
+        System.out.println("Commands > #[STMT]     - executes the given statement");
+        System.out.println("Commands > %listall    - lists all needs");
+        System.out.println("Commands > %listgraphs - lists all graphs");
+
     }
 
     /***
