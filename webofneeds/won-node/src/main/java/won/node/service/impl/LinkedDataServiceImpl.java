@@ -68,8 +68,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
   //prefix for human readable pages
   private String pageURIPrefix;
 
-  private int pageSize = 0;
-
   @Autowired
   private RDFStorageService rdfStorage;
   @Autowired
@@ -425,16 +423,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
     public void setRdfStorage(RDFStorageService rdfStorage)
   {
     this.rdfStorage = rdfStorage;
-  }
-
-  public int getPageSize()
-  {
-    return pageSize;
-  }
-
-  public void setPageSize(final int pageSize)
-  {
-    this.pageSize = pageSize;
   }
 
   public void setActiveMqOwnerProtcolQueueName(String activeMqOwnerProtcolQueueName) {

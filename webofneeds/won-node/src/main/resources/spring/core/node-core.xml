@@ -85,7 +85,6 @@
         <property name="activeMqMatcherProtocolTopicNameNeedDeactivated"
                   value="${activemq.matcher.outgoing.topicname.need.deactivated}"/>
         <property name="rdfStorage" ref="rdfStorageRef" />
-        <property name="pageSize" value="${linkeddata.pagesize}" />
         <property name="uriService" ref="uriService" />
     </bean>
 
