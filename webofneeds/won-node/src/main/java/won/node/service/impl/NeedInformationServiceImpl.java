@@ -24,11 +24,9 @@ import org.springframework.stereotype.Component;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.EventRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.NeedInformationService;
@@ -36,7 +34,6 @@ import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * User: fkleedorfer
@@ -52,8 +49,6 @@ public class NeedInformationServiceImpl implements NeedInformationService
   private NeedRepository needRepository;
   @Autowired
   private ConnectionRepository connectionRepository;
-  @Autowired
-  private EventRepository eventRepository;
   @Autowired
   private URIService uriService;
 
@@ -100,25 +95,6 @@ public class NeedInformationServiceImpl implements NeedInformationService
       this.pageSize));
     return new Page(slice.getContent(), slice.hasNext());
   }
-
-
-  @Override
-  public List<ConnectionEvent> readEvents(final URI connectionURI) throws NoSuchConnectionException
-  {
-    return eventRepository.findByConnectionURI(connectionURI);
-  }
-
-  /**
-   * Returns null if no event found.
-   * @param eventURI
-   * @return
-   */
-  @Override
-  public ConnectionEvent readEvent(final URI eventURI)
-  {
-    return eventRepository.findOne(uriService.getEventIdFromEventURI(eventURI));
-  }
-
 
   @Override
   public Need readNeed(final URI needURI) throws NoSuchNeedException

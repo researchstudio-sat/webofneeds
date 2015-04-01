@@ -17,7 +17,6 @@
 package won.node.service.impl;
 
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 import won.protocol.util.WonRdfUtils;
 
@@ -172,11 +171,6 @@ public class URIService
   public void setGeneralURIPrefix(final String generalURIPrefix)
   {
     this.generalURIPrefix = generalURIPrefix;
-  }
-
-  public URI createEventURI(final Connection con, final ConnectionEvent event)
-  {
-    return createEventURIForId(event.getId().toString());
   }
 
   public URI createNeedMetaInformationURI(final URI needURI) {

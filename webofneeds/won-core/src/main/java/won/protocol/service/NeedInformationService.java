@@ -20,12 +20,10 @@ import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Service for obtaining information about needs and connections in the system in RDF.
@@ -111,14 +109,6 @@ public interface NeedInformationService {
      */
     public Connection readConnection(URI connectionURI) throws NoSuchConnectionException;
 
-  /**
-   * Read all events for given connection URI.
-   *
-   * @param connectionURI
-   * @return
-   * @throws NoSuchConnectionException
-   */
-    public List<ConnectionEvent> readEvents(URI connectionURI) throws NoSuchConnectionException;
 
     /**
      * Retrieves the public description of the connection as an RDF graph.
@@ -131,8 +121,6 @@ public interface NeedInformationService {
      * @throws NoSuchNeedException
      */
     public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
-
-  ConnectionEvent readEvent(URI eventURI);
 
   public static class Page<T>{
     private Collection<T> content;

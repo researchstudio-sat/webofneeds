@@ -14,10 +14,6 @@ import won.protocol.model.FacetType;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.vocabulary.WON;
 
-import java.net.URI;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
 /**
  * Created with IntelliJ IDEA.
  * User: Danijel
@@ -45,25 +41,11 @@ public class ParticipantFacetImpl extends AbstractFacet
     executorService.execute(new Runnable() {
       @Override
       public void run() {
-        try {
-          ownerProtocolOwnerService.connect(
-                  con.getNeedURI(), con.getRemoteNeedURI(),
-                  connectionForRunnable.getConnectionURI(), content, wonMessage);
-        } catch (WonProtocolException e) {
-          // we can't connect the connection. we send a deny back to the owner
-          // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
-          // For now, we call the close method as if it had been called from the owner side
-          // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
-//          try {
-//            // ToDo (FS): create close wonMessage
-//            ownerFacingConnectionCommunicationService.close(
-//                    connectionForRunnable.getConnectionURI(), content, null);
-//          } catch (NoSuchConnectionException e1) {
-//            logger.warn("caught NoSuchConnectionException:", e1);
-//          } catch (IllegalMessageForConnectionStateException e1) {
-//            logger.warn("caught IllegalMessageForConnectionStateException:", e1);
-//          }
-        }
+          //TODO: use new system
+          // ownerProtocolOwnerService.connect(
+          //        con.getNeedURI(), con.getRemoteNeedURI(),
+          //        connectionForRunnable.getConnectionURI(), content, wonMessage);
+
       }
     });
   }
@@ -78,9 +60,8 @@ public class ParticipantFacetImpl extends AbstractFacet
         @Override
         public void run() {
           try {
-            needFacingConnectionClient.open(con, content, wonMessage);
-          } catch (WonProtocolException e) {
-            logger.debug("caught Exception:", e);
+            //TODO: use new system
+            // needFacingConnectionClient.open(con, content, wonMessage);
           } catch (Exception e) {
             logger.debug("caught Exception", e);
           }
@@ -101,9 +82,8 @@ public class ParticipantFacetImpl extends AbstractFacet
         public void run()
         {
           try {
-            needFacingConnectionClient.close(con, content, wonMessage);
-          } catch (WonProtocolException e) {
-            logger.warn("caught WonProtocolException:", e);
+            //TODO: use new system
+            // needFacingConnectionClient.close(con, content, wonMessage);
           } catch (Exception e) {
             logger.debug("caught Exception", e);
           }
@@ -141,10 +121,11 @@ public class ParticipantFacetImpl extends AbstractFacet
             else {
               logger.debug("Committed: "+con.getConnectionURI()+" "+con.getNeedURI()+" "+con.getRemoteNeedURI() +" "+con.getState()+ " "+con.getTypeURI());
             }
-            ownerFacingConnectionClient.close(con.getConnectionURI(), content, wonMessage);
+            //TODO: use new system
+            // ownerFacingConnectionClient.close(con.getConnectionURI(), content, wonMessage);
           }
 
-        } catch (WonProtocolException e) {
+        } catch (Exception e) {
           logger.warn("caught WonProtocolException:", e);
         }
       }
@@ -191,12 +172,13 @@ public class ParticipantFacetImpl extends AbstractFacet
       public void run() {
 
         try {
-          Future<URI> remoteConnectionURI = needProtocolNeedService.connect(
-                  con.getRemoteNeedURI(),con.getNeedURI(),
-                  connectionForRunnable.getConnectionURI(), remoteFacetModel, wonMessage);
-          dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
+          //TODO: use new system
+          // Future<URI> remoteConnectionURI = needProtocolNeedService.connect(
+          //        con.getRemoteNeedURI(),con.getNeedURI(),
+          //        connectionForRunnable.getConnectionURI(), remoteFacetModel, wonMessage);
+          //dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
 
-        } catch (WonProtocolException e) {
+        } catch (Exception e) {
           // we can't connect the connection. we send a close back to the owner
           // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
           // For now, we call the close method as if it had been called from the remote side
@@ -209,13 +191,6 @@ public class ParticipantFacetImpl extends AbstractFacet
 //          } catch (IllegalMessageForConnectionStateException e1) {
 //            logger.warn("caught IllegalMessageForConnectionStateException:", e1);
 //          }
-        }
-        catch (InterruptedException e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (ExecutionException e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (Exception e) {
-          logger.debug("caught Exception",e);
         }
       }
     });

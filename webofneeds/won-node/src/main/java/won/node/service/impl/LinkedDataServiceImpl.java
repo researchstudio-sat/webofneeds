@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEvent;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
 import won.protocol.repository.MessageEventRepository;
@@ -258,7 +257,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     if (includeEventData) {
       //create event container and attach it to the member
-      List<ConnectionEvent> events = needInformationService.readEvents(connectionUri);
       Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events", WON.EVENT_CONTAINER);
       connectionResource.addProperty(WON.HAS_EVENT_CONTAINER, eventContainer);
       connectionResource.addProperty(WON.HAS_REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));
