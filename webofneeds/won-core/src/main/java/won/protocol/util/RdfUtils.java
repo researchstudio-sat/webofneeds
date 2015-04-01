@@ -20,10 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEvent;
 import won.protocol.vocabulary.WON;
-import won.protocol.vocabulary.sparql.WonQueries;
 
+import javax.sql.ConnectionEvent;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
