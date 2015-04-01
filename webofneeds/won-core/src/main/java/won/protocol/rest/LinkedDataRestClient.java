@@ -80,7 +80,6 @@ public class LinkedDataRestClient
     assert resourceURI != null : "resource URI must not be null";
     logger.debug("fetching linked data resource: {}", resourceURI);
 
-    //TODO: improve error handling
     //If a RestClientException is thrown here complaining that it can't read a Model with MIME media type text/html,
     //it was probably the wrong resourceURI
     Dataset result;
