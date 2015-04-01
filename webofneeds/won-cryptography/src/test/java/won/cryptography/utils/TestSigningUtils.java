@@ -9,6 +9,7 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.PEMWriter;
+import org.junit.Test;
 import won.cryptography.service.CertificateService;
 import won.cryptography.service.KeyPairService;
 import won.cryptography.service.KeyStoreService;
@@ -117,16 +118,16 @@ public class TestSigningUtils {
     return objs;
   }
 
-  public void generateKey() throws URISyntaxException {
+
+  public void generateTestKeystore() throws URISyntaxException {
     URL keyUrl = TestSigningUtils.class.getResource(KEYS_FILE);
     File keysFile = null;
-    //if (keyUrl == null) {
+    if (keyUrl == null) {
       keysFile = new File("test-keys.jks");
-    //} else {
-    //  keysFile = new File(TestSigningUtils.class.getResource(KEYS_FILE).getFile());
-   // }
+    } else {
+      keysFile = new File(TestSigningUtils.class.getResource(KEYS_FILE).getFile());
+   }
 
-    System.out.println(keysFile);
     KeyStoreService storeService = new KeyStoreService(keysFile);
     KeyPairService keyPairService = new KeyPairService();
     CertificateService certificateService = new CertificateService();
@@ -137,13 +138,32 @@ public class TestSigningUtils {
 
   }
 
+  @Test
+  public void generateKeystoreForNodeAndOwner() throws URISyntaxException {
+
+    KeyStoreService storeServiceOnNode = new KeyStoreService(new File("node-keys.jks"));
+    KeyStoreService storeServiceOnOwner = new KeyStoreService(new File("owner-keys.jks"));
+    KeyPairService keyPairService = new KeyPairService();
+    CertificateService certificateService = new CertificateService();
+
+    addKeyByUris(new String[]{
+                   "http://rsa021.researchstudio.at:8080/won/page",
+                   "http://sat016.researchstudio.at:8080/won/page",
+                   "http://localhost:8080/won/page"},
+                 keyPairService, certificateService, storeServiceOnNode);
+    addKeyByUris(new String[]{
+                   "http://rsa021.researchstudio.at:8080/owner/rest/keys",
+                   "http://sat016.researchstudio.at:8080/owner/rest/keys",
+                   "http://localhost:8080/owner/rest/keys"},
+                 keyPairService, certificateService, storeServiceOnOwner);
+
+  }
+
 
   public void writeCert() throws IOException, CertificateException {
     //load public  keys:
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
     KeyStoreService storeService = new KeyStoreService(keysFile);
-
-
 
     writeCerificate(storeService, NEED_KEY_NAME, needCertUri);
     writeCerificate(storeService, OWNER_KEY_NAME, ownerCertUri);
@@ -185,6 +205,16 @@ public class TestSigningUtils {
 
     System.out.println(cert);
     //KeyInformationExtractorBouncyCastle extractor = new KeyInformationExtractorBouncyCastle();
+  }
+
+  private static void addKeyByUris(final String[] aliasUris, final KeyPairService keyPairService,
+                             final CertificateService certificateService, final KeyStoreService storeService) {
+    KeyPair keyPair = keyPairService.generateNewKeyPair();
+    BigInteger serialNumber = BigInteger.valueOf(1);
+    for (String aliasUri : aliasUris) {
+      Certificate cert = certificateService.createSelfSignedCertificate(serialNumber, keyPair, aliasUri);
+      storeService.putKey(aliasUri, keyPair.getPrivate(), new Certificate[]{cert});
+    }
   }
 
   public static void writeToTempFile(final Dataset testDataset) throws IOException {
