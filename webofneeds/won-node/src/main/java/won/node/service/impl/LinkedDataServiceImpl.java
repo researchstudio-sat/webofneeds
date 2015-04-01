@@ -221,13 +221,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
               .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME,this.activeMqMatcherProtocolTopicNameNeedDeactivated,XSDDatatype.XSDstring)
               .addProperty(WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_CREATED_TOPIC_NAME,this.activeMqMatcherProtocolTopicNameNeedCreated,XSDDatatype.XSDstring)
       ;
-      Resource blankNodeSoapWs = model.createResource();
-      res.addProperty(WON.SUPPORTS_WON_PROTOCOL_IMPL, blankNodeSoapWs);
-      blankNodeSoapWs
-              .addProperty(RDF.type, WON.WON_OVER_SOAP_WS)
-              .addProperty(WON.HAS_MATCHER_PROTOCOL_ENDPOINT,model.createResource(this.matcherProtocolEndpoint))
-              .addProperty(WON.HAS_NEED_PROTOCOL_ENDPOINT,model.createResource(this.needProtocolEndpoint))
-              .addProperty(WON.HAS_OWNER_PROTOCOL_ENDPOINT,model.createResource(this.ownerProtocolEndpoint));
+
       Resource blankNodeUriSpec = model.createResource();
       res.addProperty(WON.HAS_URI_PATTERN_SPECIFICATION, blankNodeUriSpec);
       blankNodeUriSpec.addProperty(WON.HAS_NEED_URI_PREFIX,
