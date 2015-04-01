@@ -16,26 +16,22 @@
 
 package won.protocol.util.linkeddata;
 
-import com.hp.hpl.jena.assembler.exceptions.AssemblerException;
-import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
-import com.hp.hpl.jena.sparql.expr.NodeValue;
 import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueBoolean;
 import com.hp.hpl.jena.sparql.path.Path;
-import com.hp.hpl.jena.sparql.util.graph.GraphUtils;
 import com.hp.hpl.jena.tdb.TDB;
 import com.hp.hpl.jena.tdb.TDBFactory;
-import com.hp.hpl.jena.tdb.assembler.VocabTDB;
-import com.hp.hpl.jena.tdb.base.file.Location;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
 import net.sf.ehcache.constructs.blocking.SelfPopulatingCache;
-import org.apache.jena.atlas.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -64,6 +60,7 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
   private EhCacheCacheManager cacheManager;
   private LinkedDataRestClient linkedDataRestClient;
   private Ehcache cache;
+  private CrawlerCallback crawlerCallback = null;
 
   //In-memory dataset for caching linked data.
 
@@ -266,12 +263,23 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
       public Object createEntry(final Object key) throws Exception {
           if (key instanceof URI) {
               logger.debug("fetching linked data for URI {}", key);
-              return linkedDataRestClient.readResourceData((URI) key);
+              Dataset dataset = linkedDataRestClient.readResourceData((URI) key);
+              if (crawlerCallback != null){
+                try {
+                  crawlerCallback.onDatasetCrawled((URI) key, dataset);
+                } catch (Exception e ){
+                  logger.info(String.format("error during callback execution for dataset %s", key.toString()), e);
+                }
+              }
+              return dataset;
           } else {
               throw new IllegalArgumentException("this cache only resolves URIs to Models");
           }
       }
   }
 
-
+  @Autowired(required = false)
+  public void setCrawlerCallback(final CrawlerCallback crawlerCallback) {
+    this.crawlerCallback = crawlerCallback;
+  }
 }

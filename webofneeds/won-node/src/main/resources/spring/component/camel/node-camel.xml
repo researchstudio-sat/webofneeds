@@ -2,13 +2,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
        xmlns:camel="http://camel.apache.org/schema/spring"
        xsi:schemaLocation=
                "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-
-
+                http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+                http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
-
+                http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.1.xsd
                 http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
     <!--
@@ -18,9 +21,9 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
 
     <!-- Camel configuration -->
-    <camel:camelContext id="wonNodeCamel">
+    <camel:camelContext id="wonNodeCamel" trace="false">
         <camel:packageScan>
-            <camel:package>won.node.camel.routes.fixed</camel:package>
+            <camel:package>won.node.camel.route.fixed</camel:package>
         </camel:packageScan>
         <camel:template id="producerTemplate" defaultEndpoint="direct:JMS"/>
         <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG" />
@@ -52,17 +55,81 @@
         <property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
         <property name="connectionFactory" ref="cachedConnectionFactory"/>
     </bean>
-    <bean id="needProtocolCommunicationService" class="won.node.messaging.NeedProtocolCommunicationServiceImpl">
+    <bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl">
 
     </bean>
 
-    <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.OwnerProtocolOutgoingMessagesProcessor">
+    <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.general.OwnerProtocolOutgoingMessagesProcessor">
         <property name="queueManagementService" ref="queueManagementService"/>
     </bean>
 
-    <bean name="needProtocolCamelConfigurator" class="won.node.messaging.NeedProtocolCamelConfiguratorImpl">
+    <bean name="needProtocolCamelConfigurator" class="won.node.camel.NeedProtocolCamelConfiguratorImpl">
         <property name="componentName" value="activemq"/>
     </bean>
 
+    <bean id="needProtocolOutgoingMessagesProcessor"
+          class="won.node.camel.processor.general.NeedProtocolOutgoingMessagesProcessor" />
 
+    <bean id="successResponder"
+          class="won.node.camel.processor.general.SuccessResponder" />
+
+    <bean id="toNodeSender"
+          class="won.node.camel.processor.general.ToNodeSender" />
+    <bean id="toOwnerSender"
+          class="won.node.camel.processor.general.ToOwnerSender" />
+    <bean id="facetExtractor"
+          class="won.protocol.message.processor.camel.FacetExtractingCamelProcessor" />
+
+
+    <!-- won-specific processors -->
+    <bean id="failResponder"
+          class="won.node.camel.processor.general.FailResponder" />
+  <!-- won-specific processors -->
+  <!-- start of the pipeline -->
+  <bean name="wonMessageIntoCamelProcessor" class="won.protocol.message.processor.camel.WonMessageIntoCamelProcessor" />
+  <!-- wrapping the messages for storage on node -->
+  <bean name="wrapperFromOwner" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.node.camel.processor.general.MessageWrappingWonMessageProcessor">
+        <constructor-arg name="direction" value="FROM_OWNER" />
+      </bean>
+    </constructor-arg>
+  </bean>
+  <bean name="wrapperFromExternal" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.node.camel.processor.general.MessageWrappingWonMessageProcessor">
+        <constructor-arg name="direction" value="FROM_EXTERNAL" />
+      </bean>
+    </constructor-arg>
+  </bean>
+  <!-- wrapping the messages for storage on node -->
+  <bean name="wrapperFromSystem" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.node.camel.processor.general.MessageWrappingWonMessageProcessor">
+        <constructor-arg name="direction" value="FROM_SYSTEM" />
+      </bean>
+    </constructor-arg>
+  </bean>
+  <!-- processor for checking well-formedness of messages -->
+  <bean name="wellformednessChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.protocol.message.processor.impl.WellformednessCheckingWonMessageProcessor" />
+    </constructor-arg>
+  </bean>
+  <!-- processor for checking signatures -->
+  <bean name="signatureChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor" />
+    </constructor-arg>
+  </bean>
+  <!-- persisting messages -->
+  <bean name="persister" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.node.camel.processor.general.PersistingWonMessageProcessor" />
+    </constructor-arg>
+  </bean>
+  <!-- routing logic for wonMessages, computing which message-type specific processor -->
+  <bean name="messageTypeSlip" class="won.node.camel.processor.general.MessageTypeSlipComputer"/>
+  <!-- routing logic for wonMessages, computing which facet-specific processor to use -->
+  <bean name="facetTypeSlip" class="won.node.camel.processor.general.FacetTypeSlipComputer"/>
 </beans>
