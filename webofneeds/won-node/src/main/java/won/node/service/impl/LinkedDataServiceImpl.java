@@ -27,6 +27,8 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.cryptography.rdfsign.WonKeysExtractor;
+import won.cryptography.service.KeyStoreService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
@@ -79,6 +81,9 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private NeedModelMapper needModelMapper;
   @Autowired
   private ConnectionModelMapper connectionModelMapper;
+
+  @Autowired
+  private KeyStoreService keyStoreService;
 
   private String needProtocolEndpoint;
   private String matcherProtocolEndpoint;
@@ -199,8 +204,18 @@ public class LinkedDataServiceImpl implements LinkedDataService
       addProtocolEndpoints(model, showNodePageResource);
       Dataset ret = newDatasetWithNamedModel(createDataGraphUri(showNodePageResource), model);
       addBaseUriAndDefaultPrefixes(ret);
+      addPublicKey(model, showNodePageResource);
       return ret;
     }
+
+  private void addPublicKey(Model model, Resource res) {
+    WonKeysExtractor extractor = new WonKeysExtractor();
+    try {
+      extractor.addToModel(model, res, keyStoreService.getPublicKey(res.getURI()));
+    } catch (Exception e) {
+      logger.warn("No public key could be added to RDF for " + res.getURI());
+    }
+  }
 
   //TODO: protocol endpoint specification in RDF model needs refactoring!
   private void addProtocolEndpoints(Model model, Resource res)
@@ -224,7 +239,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
       blankNodeUriSpec.addProperty(WON.HAS_NEED_URI_PREFIX,
         model.createLiteral(this.needResourceURIPrefix));
       blankNodeUriSpec.addProperty(WON.HAS_CONNECTION_URI_PREFIX,
-        model.createLiteral(this.connectionResourceURIPrefix));
+                                   model.createLiteral(this.connectionResourceURIPrefix));
       blankNodeUriSpec.addProperty(WON.HAS_EVENT_URI_PREFIX, model.createLiteral(this.eventResourceURIPrefix));
   }
 

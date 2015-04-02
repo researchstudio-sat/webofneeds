@@ -59,8 +59,8 @@ public class VerifyAndSignExamples
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
     KeyStoreService storeService = new KeyStoreService(keysFile);
 
-    this.needKey = (ECPrivateKey) storeService.getKey(TestSigningUtils.NEED_KEY_NAME);
-    this.nodeKey = (ECPrivateKey) storeService.getKey(TestSigningUtils.NODE_KEY_NAME);
+    this.needKey = (ECPrivateKey) storeService.getPrivateKey(TestSigningUtils.NEED_KEY_NAME);
+    this.nodeKey = (ECPrivateKey) storeService.getPrivateKey(TestSigningUtils.NODE_KEY_NAME);
 
     // TODO load public keys from certificate referenced from signatures
     needCertUri = "http://localhost:8080/won/resource/need/3144709509622353000";

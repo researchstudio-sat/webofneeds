@@ -43,4 +43,11 @@
     <bean id="executor" class="org.springframework.scheduling.concurrent.ConcurrentTaskExecutor" />
 
 	<bean id="wonUserDetailService" class="won.owner.service.impl.WONUserDetailService" />
+
+    <!-- private keys and their certificates for owner and needs,
+     possibly certificates of other parties-->
+    <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService">
+        <constructor-arg type="java.lang.String" value="${keystore.location}" />
+    </bean>
+
 </beans>

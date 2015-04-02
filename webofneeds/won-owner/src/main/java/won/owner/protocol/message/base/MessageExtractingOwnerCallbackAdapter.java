@@ -32,13 +32,14 @@ import won.protocol.util.WonRdfUtils;
  * are not part of messages.
  * Use with care.
  */
-public class MessageExtractingWonMessageHandlerAdapter extends WonMessageHandlerAdapter {
+public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter
+{
 
-  public MessageExtractingWonMessageHandlerAdapter(OwnerCallback adaptee) {
+  public MessageExtractingOwnerCallbackAdapter(OwnerCallback adaptee) {
     super(adaptee);
   }
 
-  public MessageExtractingWonMessageHandlerAdapter() {
+  public MessageExtractingOwnerCallbackAdapter() {
   }
 
   @Override

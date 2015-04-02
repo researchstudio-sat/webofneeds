@@ -85,7 +85,7 @@
   <bean id="ownerCallbackAdapter" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
     <constructor-arg>
       <!-- adapts an OwnerCallback to incoming messages. The callback is autowired -->
-      <bean class="won.owner.protocol.message.base.MessageExtractingWonMessageHandlerAdapter"/>
+      <bean class="won.owner.protocol.message.base.MessageExtractingOwnerCallbackAdapter"/>
     </constructor-arg>
   </bean>
 

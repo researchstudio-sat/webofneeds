@@ -65,7 +65,7 @@ public class CryptographyService {
 
     public Key getNeedPrivateKey(URI needURI) {
 
-        return keyStoreService.getKey(needURI.toString());
+        return keyStoreService.getPrivateKey(needURI.toString());
 
     }
 

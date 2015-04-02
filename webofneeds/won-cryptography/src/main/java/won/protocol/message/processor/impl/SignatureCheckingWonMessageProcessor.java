@@ -27,11 +27,13 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.service.LinkedDataService;
+import won.protocol.util.linkeddata.LinkedDataSource;
 
+import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 import java.util.Set;
@@ -44,9 +46,7 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-    //TODO for the node's public key - probably here it is better to use keystore directly
-    //to get node's cerificate and get public key from there
-  LinkedDataService linkedDataService;
+  private LinkedDataSource linkedDataSource;
 
   @Override
   public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
@@ -54,8 +54,7 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
     Dataset dataset = WonMessageEncoder.encodeAsDataset(message);
     SignatureVerificationResult result = null;
     try {
-      // extract public keys
-      // TODO replace with proper implementation
+      // obtain public keys
       Map<String,PublicKey> keys = getRequiredPublicKeys(dataset);
       // verify with those public keys
       WonVerifier verifier = new WonVerifier(dataset);
@@ -64,31 +63,49 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
     } catch (Exception e) {
       throw new WonMessageProcessingException(e);
     }
+    // throw exception if the verification fails:
     if (!result.isVerificationPassed()) {
-      throw new WonMessageProcessingException(result.getMessage());
+      throw new WonMessageProcessingException(new SignatureException(result.getMessage()));
     }
-    // TODO use adapter (WonMessageProcessorCamelAdapter) to add information about verified
-    // unreferenced signatures that should be referenced if this message is wrapped inside other
-    // message
+    // TODO find a way to pass information about verified unreferenced signatures to the
+    // following processors. This is useful because the values of such signatures should
+    // be referenced if this message is wrapped by another envelope.
     return message;
   }
 
-  // TODO what is the right approach here to store/get/verify public keys of
-  // the signatures in message?
-  private Map<String, PublicKey> getRequiredPublicKeys(final Dataset dataset)
+
+  // TODO If public key extracted from the message itself, there is a security flaw -
+  // no guarantee that that public key really belongs to original generator.
+  // in this case integration with webid-tls when the certificate has to be provided via tls might solve the problem
+  // TODO what about owner key?
+  // TODO maybe already known public keys can be taken from own cache/store?
+  // TODO proper exceptions
+  /**
+   * Extract public keys from content and from referenced in signature key uris data
+   * @param msgDataset
+   * @return
+   * @throws NoSuchAlgorithmException
+   * @throws NoSuchProviderException
+   * @throws InvalidKeySpecException
+   */
+  private Map<String, PublicKey> getRequiredPublicKeys(final Dataset msgDataset)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-    // extract public keys from content and from node data
-    // TODO what about owner key?
-    // TODO maybe already known public keys can be taken from own cache/store?
-    // also, if public key extracted from the message itself, there is a security flaw -
-    // no guarantee that that public key really belongs to original generator.
+
     WonKeysExtractor extractor = new WonKeysExtractor();
-    Map<String,PublicKey> keys = extractor.fromDataset(dataset);
-    Set<String> refKeys = extractor.getKeyRefs(dataset);
+    // extract keys if directly provided in the message content:
+    Map<String,PublicKey> keys = extractor.fromDataset(msgDataset);
+    // extract referenced key by dereferencing a (kind of) webid of a signer
+    Set<String> refKeys = extractor.getKeyRefs(msgDataset);
     for (String refKey : refKeys) {
-      Dataset nodeDataset = linkedDataService.getNodeDataset();
-      Map<String,PublicKey> nodeKeys = extractor.fromDataset(nodeDataset, refKey);
-      keys.putAll(nodeKeys);
+      Dataset keyDataset = linkedDataSource.getDataForResource(URI.create(refKey));
+      // TODO replace the extractor with WonRDFUtils method and use the extractor itself internally
+      // in that method
+      Set<PublicKey> resolvedKeys = extractor.fromDataset(keyDataset, refKey);
+      for (PublicKey resolvedKey : resolvedKeys) {
+        keys.put(refKey, resolvedKey);
+        // now we only expect one key but in future there could be several keys for one WebID
+        break;
+      }
     }
     return keys;
   }

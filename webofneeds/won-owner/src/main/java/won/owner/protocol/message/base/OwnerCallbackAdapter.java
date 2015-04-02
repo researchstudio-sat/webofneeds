@@ -32,15 +32,15 @@ import won.protocol.util.RdfUtils;
  * Maps incoming messages from the WonMessageProcessor interface to the WonEventCallback interface.
  * Outgoing messages sent by calling the adaptee's send(msg) method are delegated to the
  */
-public abstract class WonMessageHandlerAdapter implements WonMessageProcessor
+public abstract class OwnerCallbackAdapter implements WonMessageProcessor
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private OwnerCallback adaptee;
 
-  protected WonMessageHandlerAdapter() {
+  protected OwnerCallbackAdapter() {
   }
 
-  public WonMessageHandlerAdapter(final OwnerCallback adaptee) {
+  public OwnerCallbackAdapter(final OwnerCallback adaptee) {
     this.adaptee = adaptee;
   }
 

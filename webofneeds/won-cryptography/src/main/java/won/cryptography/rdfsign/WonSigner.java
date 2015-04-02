@@ -80,6 +80,12 @@ public class WonSigner
     return sigRefs;
   }
 
+  public List<SignatureReference> sign(PrivateKey privateKey, String cert, List<String> graphsToSign) throws
+    Exception {
+    String[] array = new String[graphsToSign.size()];
+    return sign(privateKey, cert, graphsToSign.toArray(array));
+  }
+
   private List<String> selectGraphsForSigning(final String[] graphsToSign) {
     List<String> signedGraphURIs = new ArrayList<String>();
     // if no names provided, sign all the graphs except for those that already have signature

@@ -108,4 +108,10 @@
 
     <bean id="ownerManagementService" class="won.node.service.impl.OwnerManagementServiceImpl"/>
 
+    <!-- private keys and their certificates for node,
+         possibly certificates of other parties-->
+    <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService">
+        <constructor-arg type="java.lang.String" value="${keystore.location}" />
+    </bean>
+
 </beans>

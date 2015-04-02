@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.Security;
 import java.security.cert.Certificate;
 
@@ -29,10 +31,8 @@ public class KeyStoreService {
 
     private java.security.KeyStore store;
 
-    public KeyStoreService() {
-
-        this(null);
-
+    public KeyStoreService(String filePath) {
+      this(new File(filePath));
     }
 
     public KeyStoreService(File storeFile) {
@@ -54,17 +54,31 @@ public class KeyStoreService {
         }
     }
 
-    public Key getKey(String alias) {
+    public PrivateKey getPrivateKey(String alias) {
 
-        Key retrieved = null;
+        PrivateKey retrieved = null;
 
         try {
-            retrieved = store.getKey(alias, storePW);
+            retrieved = (PrivateKey) store.getKey(alias, storePW);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return retrieved;
+
+    }
+
+    public PublicKey getPublicKey(String alias) {
+
+      PublicKey retrieved = null;
+
+      try {
+        retrieved = getCertificate(alias).getPublicKey();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      return retrieved;
 
     }
 

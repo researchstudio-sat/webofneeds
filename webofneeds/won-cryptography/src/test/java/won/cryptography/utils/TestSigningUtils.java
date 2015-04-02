@@ -9,7 +9,6 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.PEMWriter;
-import org.junit.Test;
 import won.cryptography.service.CertificateService;
 import won.cryptography.service.KeyPairService;
 import won.cryptography.service.KeyStoreService;
@@ -138,7 +137,6 @@ public class TestSigningUtils {
 
   }
 
-  @Test
   public void generateKeystoreForNodeAndOwner() throws URISyntaxException {
 
     KeyStoreService storeServiceOnNode = new KeyStoreService(new File("node-keys.jks"));
@@ -147,9 +145,9 @@ public class TestSigningUtils {
     CertificateService certificateService = new CertificateService();
 
     addKeyByUris(new String[]{
-                   "http://rsa021.researchstudio.at:8080/won/page",
-                   "http://sat016.researchstudio.at:8080/won/page",
-                   "http://localhost:8080/won/page"},
+                   "http://rsa021.researchstudio.at:8080/won/resource",
+                   "http://sat016.researchstudio.at:8080/won/resource",
+                   "http://localhost:8080/won/resource"},
                  keyPairService, certificateService, storeServiceOnNode);
     addKeyByUris(new String[]{
                    "http://rsa021.researchstudio.at:8080/owner/rest/keys",

@@ -21,10 +21,7 @@ import javax.transaction.NotSupportedException;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -48,12 +45,18 @@ public class WonKeysExtractor
     return keys;
   }
 
-  public Map<String, PublicKey> fromDataset(Dataset dataset, String keyUri)
+  public Set<PublicKey> fromDataset(Dataset dataset, String keyUri)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-    Map<String, PublicKey> keys = new HashMap<>();
-    fromModel(dataset.getDefaultModel(), keys, dataset.getDefaultModel().createResource(keyUri));
+    PublicKey key = fromModel(dataset.getDefaultModel(), keyUri);
+    Set<PublicKey> keys = new HashSet<>();
+    if (key != null) {
+      keys.add(key);
+    }
     for (String name : RdfUtils.getModelNames(dataset)) {
-      fromModel(dataset.getNamedModel(name), keys, dataset.getNamedModel(name).createResource(keyUri));
+      key = fromModel(dataset.getNamedModel(name), keyUri);
+      if (key != null) {
+        keys.add(key);
+      }
     }
     return keys;
   }
@@ -63,6 +66,14 @@ public class WonKeysExtractor
     Map<String, PublicKey> keys = new HashMap<>();
     fromModel(model, keys);
     return keys;
+  }
+
+  public PublicKey fromModel(Model model, String keyUri)
+    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
+    Map<String, PublicKey> keys = new HashMap<>();
+    Resource keyRes = model.createResource(keyUri);
+    fromModel(model, keys, keyRes);
+    return keys.get(keyUri);
   }
 
   private void fromModel(final Model model, final Map<String, PublicKey> keys)
