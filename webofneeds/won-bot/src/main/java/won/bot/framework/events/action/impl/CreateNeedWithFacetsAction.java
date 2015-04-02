@@ -127,7 +127,7 @@ public class CreateNeedWithFacetsAction extends BaseEventBotAction
           wonNodeURI),
         needURI,
         wonNodeURI)
-      .addContent(URI.create(needURI.toString()), needModel, null)
+      .addContent(needModel, null)
       .build();
   }
 }

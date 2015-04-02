@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package won.protocol.util;
+package won.protocol.vocabulary;
 
 /**
  * Some HTTP constants.
- * TODO [REFACTORING]: move to vocabulary package.
  */
 public class HTTP
 {
