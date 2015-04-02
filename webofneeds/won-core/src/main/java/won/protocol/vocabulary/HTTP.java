@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package won.protocol.owner;
-
-import won.protocol.service.*;
+package won.protocol.vocabulary;
 
 /**
- * User: fkleedorfer
- * Date: 31.10.12
+ * Some HTTP constants.
  */
-public interface OwnerProtocolNeedService extends NeedManagementService, NeedInformationService,
-        ConnectionCommunicationService, OwnerFacingNeedCommunicationService { }
+public class HTTP
+{
+  public static final String HEADER_LOCATION = "Location";
+  public static final String HEADER_DATE = "Date";
+  public static final String HEADER_EXPIRES = "Expires";
+}

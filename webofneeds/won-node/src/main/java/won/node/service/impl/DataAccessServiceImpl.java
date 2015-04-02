@@ -8,13 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.EventRepository;
 import won.protocol.repository.FacetRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
-import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -36,8 +34,6 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   private NeedRepository needRepository;
   @Autowired
   private ConnectionRepository connectionRepository;
-  @Autowired
-  private EventRepository eventRepository;
   @Autowired
   private FacetRepository facetRepository;
   @Autowired
@@ -158,17 +154,6 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     return con;
   }
 
-  @Override
-  public ConnectionEvent createConnectionEvent(final URI connectionURI, final URI originator,
-    final ConnectionEventType connectionEventType) {
-    ConnectionEvent event = new ConnectionEvent();
-    event.setConnectionURI(connectionURI);
-    event.setType(connectionEventType);
-    event.setOriginatorUri(originator);
-    eventRepository.save(event);
-
-    return event;
-  }
 
   @Override
   public Connection nextConnectionState(URI connectionURI, ConnectionEventType connectionEventType)
@@ -216,31 +201,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     return true;
   }
 
-  @Override
-  public void saveAdditionalContentForEvent(final Model content, final Connection con, final ConnectionEvent event) {
-    saveAdditionalContentForEvent(content, con, event, null);
-  }
 
-  @Override
-  public void saveAdditionalContentForEvent(final Model content, final Connection con, final ConnectionEvent event,
-    final Double score) {
-    rdfStorageService.storeModel(event,
-                                 RdfUtils.createContentForEvent(
-                                   this.URIService.createEventURI(con, event), content, con, event, score));
-  }
-    /*
-    public void saveAdditionalContentForEventReplace(final Model content, final Connection con, final ConnectionEvent event)
-    {
-        //TODO: define what content may contain and check that here! May content contain any RDF or must it be linked to the <> node?
-        Model extraDataModel = ModelFactory.createDefaultModel();
-        Resource eventNode = extraDataModel.createResource(this.URIService.createEventURI(con,event).toString());
-        extraDataModel.setNsPrefix("",eventNode.getURI().toString());
-        if (content != null) {
-            RdfUtils.replaceBaseResource(content, eventNode);
-            rdfStorageService.storeModel(event, extraDataModel);
-        }
-    }
-    */
 
   @Override
   public void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI) {

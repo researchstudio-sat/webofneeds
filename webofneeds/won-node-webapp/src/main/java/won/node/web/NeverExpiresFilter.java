@@ -16,7 +16,7 @@
 
 package won.node.web;
 
-import won.protocol.util.HTTP;
+import won.protocol.vocabulary.HTTP;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;

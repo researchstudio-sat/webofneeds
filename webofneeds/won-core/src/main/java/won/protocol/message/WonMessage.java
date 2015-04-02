@@ -8,7 +8,6 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WONMSG;
 
@@ -374,30 +373,5 @@ public class WonMessage implements Serializable
     return values;
   }
 
-  private String getNamedGraphNameForUri(final String resourceUri) {
-    String ngName = resourceUri;
-    // we commonly use resource url + #data for the name of named graph
-    // with this resource content
-    if (completeDataset.getNamedModel(resourceUri) == null) {
-      ngName = resourceUri + WonRdfUtils.NAMED_GRAPH_SUFFIX;
-    }
-    return ngName;
-  }
 
-  /**
-   * Returns a list of all the URIs of the message contents
-   * (not the corresponding graphs)
-   *
-   * @return List of strings each representing one of the requested URLs
-   */
-  public List<String> getMessageContentURIs()
-  {
-    List<String> result = new ArrayList<String>();
-
-    Iterator<String> graphNames = getMessageContent().listNames();
-    while (graphNames.hasNext()) {
-        result.add(graphNames.next().replaceAll("#.*", ""));
-    }
-    return result;
-  }
 }

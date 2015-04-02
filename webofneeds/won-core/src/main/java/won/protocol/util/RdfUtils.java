@@ -19,10 +19,6 @@ import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.IncorrectPropertyCountException;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEvent;
-import won.protocol.vocabulary.WON;
-import won.protocol.vocabulary.sparql.WonQueries;
 
 import java.io.*;
 import java.net.URI;
@@ -1035,50 +1031,55 @@ public class RdfUtils
    * @param dataset the dataset that will be checked to determine if the resulting URI is new.
    * @return an URI that is previously unused as a graph URI.
    */
-   public static URI createNewGraphURI(String baseURI, String toAppend, int length, Dataset dataset){
-     if (toAppend.contains("#")){
-       int hashIndex = baseURI.indexOf('#');
-       if (hashIndex > -1){
-         baseURI = baseURI.substring(0,hashIndex);
+   public static URI createNewGraphURI(String baseURI, String toAppend, int length, final Dataset dataset){
+     return createNewGraphURI(baseURI, toAppend, length,
+       new GraphNameCheck()
+       {
+         @Override
+         public boolean isGraphUriOk(final String graphUri) {
+           return !dataset.containsNamedModel(graphUri);
+         }
        }
-     }
-     int maxTries = 5;
-     for (int i = 0; i < maxTries; i++){
-       String graphName = baseURI + toAppend + randomString.nextString(length);
-       if (!dataset.containsNamedModel(graphName)){
-         return URI.create(graphName);
-       }
-     } ;
-     throw new IllegalStateException("Tried " + maxTries +" times to generate a new graph URI (" + length + " random" +
-       " characters), but were unable to generate a previously unused one; giving up.");
+     );
    }
 
   /**
-   * Stores additional data if there is any in the specified model.
-   * TODO: Move to WonRdfUtils
+   * Creates a new graph URI for the specified dataset by appending
+   * a specified string (toAppend) and then n alphanumeric characters to the
+   * specified String.
+   * It is guaranteed that the resulting URI is not used as a graph
+   * name in the specified dataset.
    *
-   * @param eventURI
-   * @param content
-   * @param con
-   * @param event
-   * @param score
+   * Note that the implementation is not synchronized, so concurrent
+   * executions of the method may result in identical URIs being returned.
+   *
+   * If both the specified baseURI and the toAppend string contain a hash sign ('#'),
+   * the hash-part will be removed from the base uri before the result will be crated.
+   *
+   * @param baseURI the URI to be extended.
+   * @param toAppend a string that will be appended directly to the URI.
+   * @param length number of alphanumeric characters that are appended to <code>toAppend</code>.
+   * @param disallowedGraphUris set of uris that are forbidden.
+   * @return an URI that is previously unused as a graph URI.
    */
-  public static Model createContentForEvent(final URI eventURI, final Model content, final Connection con,
-                                            final ConnectionEvent event, final Double score) {
-    //TODO: define what content may contain and check that here! May content contain any RDF or must it be linked to the <> node?
-    Model extraDataModel = ModelFactory.createDefaultModel();
-    Resource eventNode = extraDataModel.createResource(eventURI.toString());
-    if(score != null)
-      eventNode.addLiteral(WON.HAS_MATCH_SCORE, score.doubleValue());
-    extraDataModel.setNsPrefix("", eventNode.getURI().toString());
-    if (content != null) {
-
-      //TODO: check if the correct data is saved
-      extraDataModel.add(content);
-      RdfUtils.replaceBaseResource(extraDataModel, eventNode);
+  public static URI createNewGraphURI(String baseURI, String toAppend, int length, GraphNameCheck check){
+    if (toAppend.contains("#")){
+      int hashIndex = baseURI.indexOf('#');
+      if (hashIndex > -1){
+        baseURI = baseURI.substring(0,hashIndex);
+      }
     }
-    return extraDataModel;
+    int maxTries = 5;
+    for (int i = 0; i < maxTries; i++){
+      String graphName = baseURI + toAppend + randomString.nextString(length);
+      if (check.isGraphUriOk(graphName)){
+        return URI.create(graphName);
+      }
+    }
+    throw new IllegalStateException("Tried " + maxTries +" times to generate a new graph URI (" + length + " random" +
+      " characters), but were unable to generate a previously unused one; giving up.");
   }
+
 
 
   public static void addAllStatements(Model toModel, Model fromModel) {
@@ -1184,5 +1185,10 @@ public class RdfUtils
         return null;
       }
     });
+  }
+
+  public static interface GraphNameCheck
+  {
+    public boolean isGraphUriOk(String graphUri);
   }
 }

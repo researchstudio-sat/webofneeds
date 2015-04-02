@@ -30,7 +30,6 @@ import won.protocol.model.OwnerApplication;
 import won.protocol.repository.*;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.LinkedDataService;
-import won.protocol.service.NeedManagementService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;

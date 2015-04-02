@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEvent;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
 import won.protocol.repository.MessageEventRepository;
@@ -68,8 +67,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private String resourceURIPrefix;
   //prefix for human readable pages
   private String pageURIPrefix;
-
-  private int pageSize = 0;
 
   @Autowired
   private RDFStorageService rdfStorage;
@@ -172,7 +169,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     metaModel.add(metaModel.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
 
     // add need event container
-    Resource needEventContainer = metaModel.createResource(need.getNeedURI().toString()+"/events", WON.EVENT_CONTAINER);
+    Resource needEventContainer = metaModel.createResource(need.getNeedURI().toString()+"#events", WON.EVENT_CONTAINER);
     metaModel.add(metaModel.createStatement(needResource, WON.HAS_EVENT_CONTAINER, needEventContainer));
 
     // add need event URIs
@@ -187,7 +184,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     needResource.addProperty(WON.HAS_WON_NODE, metaModel.createResource(this.resourceURIPrefix));
 
     // add meta model to dataset
-    String needMetaInformationURI = uriService.createNeedMetaInformationURI(needUri).toString();
+    String needMetaInformationURI = uriService.createNeedSysInfoGraphURI(needUri).toString();
     dataset.addNamedModel(needMetaInformationURI, metaModel);
     addBaseUriAndDefaultPrefixes(dataset);
     return dataset;
@@ -252,7 +249,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     if (includeEventData) {
       //create event container and attach it to the member
-      List<ConnectionEvent> events = needInformationService.readEvents(connectionUri);
       Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events", WON.EVENT_CONTAINER);
       connectionResource.addProperty(WON.HAS_EVENT_CONTAINER, eventContainer);
       connectionResource.addProperty(WON.HAS_REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));
@@ -421,16 +417,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
     public void setRdfStorage(RDFStorageService rdfStorage)
   {
     this.rdfStorage = rdfStorage;
-  }
-
-  public int getPageSize()
-  {
-    return pageSize;
-  }
-
-  public void setPageSize(final int pageSize)
-  {
-    this.pageSize = pageSize;
   }
 
   public void setActiveMqOwnerProtcolQueueName(String activeMqOwnerProtcolQueueName) {

@@ -1,6 +1,5 @@
 package won.node.facet.impl;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -15,8 +14,6 @@ import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.need.NeedProtocolNeedClientSide;
-import won.protocol.owner.OwnerProtocolOwnerServiceClientSide;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
@@ -32,27 +29,6 @@ import java.util.concurrent.ExecutorService;
 public abstract class AbstractBAFacet implements Facet
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
-
-  /**
-   * Client talking another need via the need protocol
-   */
-  protected NeedProtocolNeedClientSide needProtocolNeedService;
-  /**
-   * Client talking to the owner side via the owner protocol
-   */
-  protected OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService;
-
-//  /**
-//   * Client talking to this need service from the need side
-//   */
-//  protected NeedFacingConnectionCommunicationServiceImpl needFacingConnectionCommunicationService;
-//  /**
-//   * Client talking to this need service from the owner side
-//   */
-//  protected OwnerFacingConnectionCommunicationServiceImpl ownerFacingConnectionCommunicationService;
-
-  protected NeedProtocolNeedClientSide needFacingConnectionClient;
-  protected OwnerProtocolOwnerServiceClientSide ownerFacingConnectionClient;
 
   protected won.node.service.impl.URIService URIService;
 
@@ -81,11 +57,11 @@ public abstract class AbstractBAFacet implements Facet
       executorService.execute(new Runnable() {
         @Override
         public void run() {
-          try {
-            needFacingConnectionClient.open(con, content, wonMessage);
-          } catch (Exception e) {
-            logger.warn("caught Exception in openFromOwner",e);
-          }
+//          try {
+//            needFacingConnectionClient.open(con, content, wonMessage);
+//          } catch (Exception e) {
+//            logger.warn("caught Exception in openFromOwner",e);
+//          }
         }
       });
     }
@@ -112,11 +88,11 @@ public abstract class AbstractBAFacet implements Facet
         @Override
         public void run()
         {
-          try {
-            needFacingConnectionClient.close(con, content, wonMessage);
-          } catch (Exception e) {
-            logger.warn("caught Exception in closeFromOwner: ",e);
-          }
+//          try {
+//            needFacingConnectionClient.close(con, content, wonMessage);
+//          } catch (Exception e) {
+//            logger.warn("caught Exception in closeFromOwner: ",e);
+//          }
         }
       });
     }
@@ -143,7 +119,7 @@ public abstract class AbstractBAFacet implements Facet
       public void run()
       {
         try {
-          ownerFacingConnectionClient.open(con.getConnectionURI(), content, wonMessage);
+          //ownerFacingConnectionClient.open(con.getConnectionURI(), content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception in openFromNeed:", e);
         }
@@ -173,7 +149,7 @@ public abstract class AbstractBAFacet implements Facet
       public void run()
       {
         try {
-          ownerFacingConnectionClient.close(con.getConnectionURI(), content, wonMessage);
+          //ownerFacingConnectionClient.close(con.getConnectionURI(), content, wonMessage);
         } catch (Exception e) {
           logger.warn("caught Exception in closeFromNeed:", e);
         }
@@ -225,21 +201,21 @@ public abstract class AbstractBAFacet implements Facet
       @Override
       public void run() {
         //here, we don't really need to handle exceptions, as we don't want to flood matching services with error messages
-        try {
-          ownerProtocolOwnerService.hint(
-                  con.getNeedURI(),
-                  con.getRemoteNeedURI(),
-                  score,
-                  originator,
-                  remoteFacetModel,
-                  wonMessage);
-        } catch (NoSuchNeedException e) {
-          logger.warn("error sending hint message to owner - no such need:", e);
-        } catch (IllegalMessageForNeedStateException e) {
-          logger.warn("error sending hint content to owner - illegal need state:", e);
-        } catch (Exception e) {
-          logger.warn("error sending hint content to owner:", e);
-        }
+//        try {
+////          ownerProtocolOwnerService.hint(
+////                  con.getNeedURI(),
+////                  con.getRemoteNeedURI(),
+////                  score,
+////                  originator,
+////                  remoteFacetModel,
+////                  wonMessage);
+//        } catch (NoSuchNeedException e) {
+//          logger.warn("error sending hint message to owner - no such need:", e);
+//        } catch (IllegalMessageForNeedStateException e) {
+//          logger.warn("error sending hint content to owner - illegal need state:", e);
+//        } catch (Exception e) {
+//          logger.warn("error sending hint content to owner:", e);
+//        }
       }
     });
   }
@@ -264,29 +240,29 @@ public abstract class AbstractBAFacet implements Facet
     executorService.execute(new Runnable() {
       @Override
       public void run() {
-        try {
-          ownerProtocolOwnerService.connect(
-                  con.getNeedURI(),
-                  con.getRemoteNeedURI(),
-                  connectionForRunnable.getConnectionURI(),
-                  content,
-                  wonMessage);
-        } catch (WonProtocolException e) {
-          // we can't connect the connection. we send a deny back to the owner
-          // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
-          // For now, we call the close method as if it had been called from the owner side
-          // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
-          logger.warn("could not connectFromNeed, sending close back. Exception was: ",e);
-//          try {
-//            // ToDo (FS): in this case a close wonMessage should be created and send instead!!
-//            ownerFacingConnectionCommunicationService.close(
-//                    connectionForRunnable.getConnectionURI(),
-//                    content,
-//                    wonMessage);
-//          } catch (Exception e1) {
-//            logger.warn("caught Exception sending close back from connectFromNeed:", e1);
-//          }
-        }
+//        try {
+//          ownerProtocolOwnerService.connect(
+//                  con.getNeedURI(),
+//                  con.getRemoteNeedURI(),
+//                  connectionForRunnable.getConnectionURI(),
+//                  content,
+//                  wonMessage);
+//        } catch (WonProtocolException e) {
+//          // we can't connect the connection. we send a deny back to the owner
+//          // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
+//          // For now, we call the close method as if it had been called from the owner side
+//          // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
+//          logger.warn("could not connectFromNeed, sending close back. Exception was: ",e);
+////          try {
+////            // ToDo (FS): in this case a close wonMessage should be created and send instead!!
+////            ownerFacingConnectionCommunicationService.close(
+////                    connectionForRunnable.getConnectionURI(),
+////                    content,
+////                    wonMessage);
+////          } catch (Exception e1) {
+////            logger.warn("caught Exception sending close back from connectFromNeed:", e1);
+////          }
+//        }
       }
     });
   }
@@ -312,32 +288,32 @@ public abstract class AbstractBAFacet implements Facet
     executorService.execute(new Runnable() {
       @Override
       public void run() {
-        try {
-          ListenableFuture<URI> remoteConnectionURI = needProtocolNeedService.connect(
-                  con.getRemoteNeedURI(),
-                  con.getNeedURI(),
-                  connectionForRunnable.getConnectionURI(),
-                  remoteFacetModel,
-                  wonMessage);
-          dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
-
-        } catch (WonProtocolException e) {
-          // we can't connect the connection. we send a close back to the owner
-          // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
-          // For now, we call the close method as if it had been called from the remote side
-          // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
-          logger.warn("could not connectFromOwner, sending close back. Exception was: ",e);
-//          try {
-//            needFacingConnectionCommunicationService.close(
-//                    connectionForRunnable.getConnectionURI(),
-//                    content,
-//                    wonMessage);
-//          } catch (Exception e1) {
-//            logger.warn("caught Exception sending close back from connectFromOwner::", e1);
-//          }
-        } catch (Exception e) {
-          logger.warn("caught Exception in connectFromOwner: ",e);
-        }
+//        try {
+//          ListenableFuture<URI> remoteConnectionURI = needProtocolNeedService.connect(
+//                  con.getRemoteNeedURI(),
+//                  con.getNeedURI(),
+//                  connectionForRunnable.getConnectionURI(),
+//                  remoteFacetModel,
+//                  wonMessage);
+//          dataService.updateRemoteConnectionURI(con, remoteConnectionURI.get());
+//
+//        } catch (WonProtocolException e) {
+//          // we can't connect the connection. we send a close back to the owner
+//          // TODO should we introduce a new protocol method connectionFailed (because it's not an owner deny but some protocol-level error)?
+//          // For now, we call the close method as if it had been called from the remote side
+//          // TODO: even with this workaround, it would be good to send a content along with the close (so we can explain what happened).
+//          logger.warn("could not connectFromOwner, sending close back. Exception was: ",e);
+////          try {
+////            needFacingConnectionCommunicationService.close(
+////                    connectionForRunnable.getConnectionURI(),
+////                    content,
+////                    wonMessage);
+////          } catch (Exception e1) {
+////            logger.warn("caught Exception sending close back from connectFromOwner::", e1);
+////          }
+//        } catch (Exception e) {
+//          logger.warn("caught Exception in connectFromOwner: ",e);
+//        }
       }
     });
 
@@ -390,9 +366,6 @@ public abstract class AbstractBAFacet implements Facet
     return NeedState.ACTIVE == need.getState();
   }
 
-  public void setOwnerFacingConnectionClient(OwnerProtocolOwnerServiceClientSide ownerFacingConnectionClient) {
-    this.ownerFacingConnectionClient = ownerFacingConnectionClient;
-  }
 
   public void setDataService(DataAccessService dataService) {
     this.dataService = dataService;
@@ -406,17 +379,6 @@ public abstract class AbstractBAFacet implements Facet
     this.URIService = URIService;
   }
 
-  public void setNeedFacingConnectionClient(NeedProtocolNeedClientSide needFacingConnectionClient) {
-    this.needFacingConnectionClient = needFacingConnectionClient;
-  }
-
-  public void setNeedProtocolNeedService(NeedProtocolNeedClientSide needProtocolNeedServiceClient) {
-    this.needProtocolNeedService = needProtocolNeedServiceClient;
-  }
-
-  public void setOwnerProtocolOwnerService(OwnerProtocolOwnerServiceClientSide ownerProtocolOwnerService) {
-    this.ownerProtocolOwnerService = ownerProtocolOwnerService;
-  }
 
   public void setRdfStorageService(final RDFStorageService rdfStorageService) {
     this.rdfStorageService = rdfStorageService;

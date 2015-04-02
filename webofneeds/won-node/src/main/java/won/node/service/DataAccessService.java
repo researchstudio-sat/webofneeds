@@ -16,12 +16,10 @@
 
 package won.node.service;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import won.node.service.impl.URIService;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.repository.rdfstorage.RDFStorageService;
@@ -46,8 +44,6 @@ public interface DataAccessService
     final URI facet, final ConnectionState connectionState, final ConnectionEventType connectionEventType)
     throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
-  ConnectionEvent createConnectionEvent(URI connectionURI, URI originator,
-    ConnectionEventType connectionEventType);
 
   Connection nextConnectionState(URI connectionURI, ConnectionEventType connectionEventType)
                                                         throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
@@ -60,11 +56,6 @@ public interface DataAccessService
    * @return true if feedback could be added false otherwise
    */
   boolean addFeedback(URI forResource, Resource feedback);
-
-  void saveAdditionalContentForEvent(Model content, Connection con, ConnectionEvent event);
-
-  void saveAdditionalContentForEvent(Model content, Connection con, ConnectionEvent event,
-    Double score);
 
   void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI);
 

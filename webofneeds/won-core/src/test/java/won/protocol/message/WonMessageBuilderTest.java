@@ -257,11 +257,11 @@ public class WonMessageBuilderTest
 
 
   private WonMessageBuilder addContent(WonMessageBuilder builder) {
-    return builder.addContent(CONTENT_GRAPH_URI_1, createDifferentContent(), null);
+    return builder.addContent(createDifferentContent(), null);
   }
 
   private WonMessageBuilder addContentWithDifferentURI(WonMessageBuilder builder) {
-    return builder.addContent(CONTENT_GRAPH_URI_2, createDifferentContent(), null);
+    return builder.addContent(createDifferentContent(), null);
   }
 
   private WonMessageBuilder wrapMessage(final WonMessage msg1) {
@@ -274,7 +274,7 @@ public class WonMessageBuilderTest
   private WonMessageBuilder createMessageWithContent(){
       return new WonMessageBuilder()
         .setMessageURI(MSG_URI_1)
-        .addContent(CONTENT_GRAPH_URI_1, createContent(), null)
+        .addContent(createContent(), null)
         .setWonMessageType(WonMessageType.HINT_MESSAGE)
         .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
   }
@@ -282,8 +282,8 @@ public class WonMessageBuilderTest
   private WonMessageBuilder createMessageWithTwoContentGraphs(){
     return new WonMessageBuilder()
       .setMessageURI(MSG_URI_1)
-      .addContent(CONTENT_GRAPH_URI_1, createContent(), null)
-      .addContent(CONTENT_GRAPH_URI_2, createDifferentContent(), null)
+      .addContent(createContent(), null)
+      .addContent(createDifferentContent(), null)
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
   }
@@ -294,7 +294,7 @@ public class WonMessageBuilderTest
       .copyEnvelopeFromWonMessage(msg)
       .copyContentFromMessageReplacingMessageURI(msg)
       .setReceiverURI(CONNECTION_URI_1)
-      .addContent(CONTENT_GRAPH_URI_1, createDifferentContent(), null)
+      .addContent(createDifferentContent(), null)
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
   }
 

@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageType;
-import won.protocol.model.Connection;
 import won.protocol.model.Facet;
 import won.protocol.model.Match;
 import won.protocol.model.NeedState;
@@ -258,42 +256,13 @@ public class WonRdfUtils
 
   }
 
-  // ToDo (FS): after the whole system has been adapted to the new message format check if the following methods are still in use and if they are make them pretty!
   public static class NeedUtils
   {
 
-    public static URI queryOwner(Dataset content) {
-
-      URI ownerURI = null;
-      // ToDo (FS): add as much as possible to vocabulary stuff
-      final String queryString =
-        "PREFIX won: <http://purl.org/webofneeds/model#> " +
-          "SELECT * { { ?s won:hasOwner ?owner } UNION { GRAPH ?g { ?s won:hasOwner ?owner } } }";
-      Query query = QueryFactory.create(queryString);
-      try (QueryExecution qexec = QueryExecutionFactory.create(query, content)) {
-        ResultSet results = qexec.execSelect();
-        boolean foundOneResult = false;
-        for (; results.hasNext(); ) {
-          if (foundOneResult)
-            throw new IncorrectPropertyCountException(1,2);
-          foundOneResult = true;
-          QuerySolution solution = results.nextSolution();
-          Resource r = solution.getResource("owner");
-          try {
-            ownerURI = new URI(r.getURI());
-          } catch (URISyntaxException e) {
-            logger.warn("caught URISyntaxException:", e);
-            throw new DataIntegrityException("could not parse ownerUri: " + r.getURI(), e);
-          }
-        }
-      }
-      return ownerURI;
-    }
 
     public static URI queryWonNode(Dataset content) {
 
       URI wonNodeURI = null;
-      // ToDo (FS): add as much as possible to vocabulary stuff
       final String queryString =
         "PREFIX won: <http://purl.org/webofneeds/model#> " +
           "SELECT * { { ?s won:hasWonNode ?wonNode } UNION { GRAPH ?g { ?s won:hasWonNode ?wonNode } } }";
