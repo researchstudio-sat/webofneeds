@@ -46,6 +46,8 @@ public class WonRdfUtils
      * @return
      */
     public static WonNodeInfo getWonNodeInfo(final URI wonNodeUri, Dataset dataset){
+      assert wonNodeUri != null: "wonNodeUri must not be null";
+      assert dataset != null: "dataset must not be null";
       return RdfUtils.findFirst(dataset, new RdfUtils.ModelVisitor<WonNodeInfo>()
         {
           @Override
