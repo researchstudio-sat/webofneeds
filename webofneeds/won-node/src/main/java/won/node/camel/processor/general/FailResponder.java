@@ -70,6 +70,12 @@ public class FailResponder extends AbstractCamelProcessor
       sendSystemMessageToOwner(responseMessage);
     } else if (WonMessageDirection.FROM_EXTERNAL == originalMessage.getEnvelopeType()){
       sendSystemMessageToRemoteNode(responseMessage);
+    } else {
+      logger.info(String.format("cannot route failure message for direction of original message, " +
+          "expected FROM_OWNER or FROM_EXTERNAL, but found %s. Original cause is logged.",
+        originalMessage.getEnvelopeType()), e);
     }
+
   }
+
 }
