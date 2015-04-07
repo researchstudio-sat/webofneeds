@@ -42,7 +42,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
 
 
   /**
-   * Creates a new Connection object. Excepts facet URI.
+   * Creates a new Connection object or returns an existing one.
    * @param needURI
    * @param otherNeedURI
    * @param otherConnectionURI
