@@ -424,7 +424,6 @@ public class WonMessageBuilder
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setSenderNodeURI(matcherURI)
-      .setReceiverURI(needFacetURI)
       .setReceiverNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
       .setTimestampToNow()
