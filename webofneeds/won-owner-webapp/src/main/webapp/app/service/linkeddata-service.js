@@ -981,9 +981,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                 won.WON.hasEventContainerCompacted + " ?container.\n" +
                                 "?container rdfs:member ?eventUri. \n" +
                                 " optional { " +
-                                "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
+                                "  ?eventUri msg:hasTimestamp ?timestamp; \n" +
+                                "            msg:hasMessageType ?messageType .\n" +
+                                //filter added so we don't show the success/failure events as last events
+                                " filter (?messageType != msg:SuccessResponse && ?messageType != msg:FailureResponse)" +
                                 " } \n" +
-                                "} order by desc(?timestamp) limit 1";
+                                "} " +
+                                "order by desc(?timestamp) limit 1";
                             privateData.store.execute(query, [], [], function (success, results) {
                                 if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: false, allowMultiple: false})) {
                                     return;
