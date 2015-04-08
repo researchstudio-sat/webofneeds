@@ -54,7 +54,6 @@ public class WonMessageIntoCamelProcessor implements Processor
     }
     exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(wonMessage.getMessageType().getResource().getURI()));
     exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, wonMessage);
-    exchange.getIn().setHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER, wonMessage);
   }
 
 }
