@@ -47,6 +47,8 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
                                                           ConnectionState.REQUEST_SENT,
                                                           ConnectionEventType.OWNER_OPEN);
     }
+    con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
+    connectionRepository.save(con);
     //prepare the message to pass to the remote node
     final WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage, con);
     //add the information about the new local connection to the original message
