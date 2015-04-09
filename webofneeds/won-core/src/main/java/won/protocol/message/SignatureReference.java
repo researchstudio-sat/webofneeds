@@ -21,6 +21,14 @@ public class SignatureReference {
     this.signatureValue = signatureValue;
   }
 
+  public SignatureReference(final String signedGraphUri,
+                            final String signatureGraphUri,
+                            final String signatureValue) {
+    this.signedGraphUri = signedGraphUri;
+    this.signatureGraphUri = signatureGraphUri;
+    this.signatureValue = signatureValue;
+  }
+
   public SignatureReference() {
   }
 
