@@ -42,7 +42,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
 
 
   /**
-   * Creates a new Connection object. Excepts facet URI.
+   * Creates a new Connection object or returns an existing one.
    * @param needURI
    * @param otherNeedURI
    * @param otherConnectionURI
@@ -119,38 +119,11 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   public Connection getConnection(List<Connection> connections, URI facetURI, ConnectionEventType eventType)
       throws ConnectionAlreadyExistsException {
     Connection con = null;
-
     for(Connection c : connections) {
-      //TODO: check remote need type as well or create GroupMemberFacet
+      //TODO: check remote need type as well
       if (facetURI.equals(c.getTypeURI()))
         con = c;
     }
-
-    /**
-     * check if there already exists a connection between those two
-     * we have multiple options:
-     * a) no connection exists -> create new
-     * b) a connection exists in state CONNECTED -> error message
-     * c) a connection exists in state REQUEST_SENT. The call must be a
-     * duplicate (or re-sent after the remote end hasn't replied for some time) -> error message
-     * d) a connection exists in state REQUEST_RECEIVED. The remote end tried to connect before we did.
-     * -> error message
-     * e) a connection exists in state CLOSED -> create new
-     */
-
-    //TODO: impose unique constraint on connections
-    if(con != null) {
-        if(con.getState()== ConnectionState.CONNECTED || con.getState()==ConnectionState.REQUEST_SENT)
-            throw new ConnectionAlreadyExistsException(con.getConnectionURI(), con.getNeedURI(), con.getRemoteNeedURI());
-      /*if(!eventType.isMessageAllowed(con.getState())){
-        throw new ConnectionAlreadyExistsException(con.getConnectionURI(), con.getNeedURI(), con.getRemoteNeedURI());
-      }*/ else {
-        //TODO: Move this to the transition() - Method in ATConnectionState
-        con.setState(con.getState().transit(eventType));
-        con = connectionRepository.save(con);
-      }
-    }
-
     return con;
   }
 

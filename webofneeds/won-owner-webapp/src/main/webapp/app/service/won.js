@@ -183,16 +183,17 @@
         won.WONMSG.hasTimestampCompacted = won.WONMSG.prefix + ":hasTimestamp";
         won.WONMSG.refersTo = won.WONMSG.baseUri + "refersTo";
         won.WONMSG.refersToCompacted = won.WONMSG.prefix + ":refersTo";
+        won.WONMSG.isResponseTo = won.WONMSG.baseUri + "isResponseTo";
+        won.WONMSG.isResponseToCompacted = won.WONMSG.prefix + ":isResponseTo";
         won.WONMSG.EnvelopeGraph = won.WONMSG.baseUri + "EnvelopeGraph";
         won.WONMSG.EnvelopeGraphCompacted = won.WONMSG.prefix+ ":EnvelopeGraph";
 
         won.WONMSG.hasContent = won.WONMSG.baseUri + "hasContent";
         won.WONMSG.hasContentCompacted = won.WONMSG.prefix+ ":hasContent";
 
-        won.WONMSG.NodeToOwnerEnvelope = won.WONMSG.baseUri + "NodeToOwnerEnvelope";
-        won.WONMSG.OwnerToNodeEnvelope = won.WONMSG.baseUri + "OwnerToNodeEnvelope";
-        won.WONMSG.NodeToNodeEnvelope = won.WONMSG.baseUri + "NodeToNodeEnvelope";
-        won.WONMSG.SystemMessageEnvelope = won.WONMSG.baseUri + "SystemMessageEnvelope"
+        won.WONMSG.FromOwner = won.WONMSG.baseUri + "FromOwner";
+        won.WONMSG.FromExternal = won.WONMSG.baseUri + "FromExternal";
+        won.WONMSG.FromSystem = won.WONMSG.baseUri + "FromSystem"
 
         //message types
         won.WONMSG.createMessage = won.WONMSG.baseUri + "CreateMessage";
@@ -572,7 +573,6 @@
                 "@graph": [
                     {
                         "@id":UNSET_URI,
-                        "@type":won.WONMSG.OwnerToNodeEnvelope,
                         "msg:hasMessageType": {'@id':messageType}
                     },
                     {   "@id": unsetMessageGraphUri,

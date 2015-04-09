@@ -37,25 +37,28 @@ public class FailResponder extends AbstractCamelProcessor
   @Override
   public void process(final Exchange exchange) throws Exception {
     WonMessage originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);
+
     if (originalMessage == null){
+      logger.debug("Processing an exception. camel header {} was null, assuming original message in header {}",
+        WonCamelConstants.ORIGINAL_MESSAGE_HEADER, WonCamelConstants.MESSAGE_HEADER);
       originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     }
+    if (originalMessage == null){
+      logger.warn("Could not obtain original message from camel headers {} or {} for error {}",new Object[]{
+        WonCamelConstants.ORIGINAL_MESSAGE_HEADER, WonCamelConstants.MESSAGE_HEADER,
+        exchange.getProperty(Exchange
+        .EXCEPTION_CAUGHT)});
+      return;
+    }
 
-    logger.error("an error occurred while processing WON message");
+    logger.info("an error occurred while processing WON message {}", originalMessage.getMessageURI());
     Exception e = (Exception) exchange.getProperty(Exchange.EXCEPTION_CAUGHT);
     String errormessage = null;
     if (e != null){
-      errormessage = e.getMessage();
+      errormessage = e.getClass().getSimpleName()+": "+ e.getMessage();
     } else {
       errormessage = String.format("An error occurred while processing message %s", originalMessage.getMessageURI());
     }
-    if (originalMessage == null) return;
-    //if (originalMessage == null) throw new WonMessageProcessingException("did not find the original message in the " +
-    //  "exchange header '" + WonCamelConstants.WON_MESSAGE_HEADER +"'");
-    //only send success message if the original message was sent on behalf of a need (otherwise we have to find out
-    // with other means which ownerapplications to send the response to.
-    //originalMessage.getCompleteDataset();
-    //if (originalMessage.getSenderURI() == null) return;
     URI newMessageURI = this.wonNodeInformationService.generateEventURI();
     Model errorMessageContent = WonRdfUtils.MessageUtils.textMessage(errormessage);
     RdfUtils.replaceBaseURI(errorMessageContent, newMessageURI.toString());
@@ -70,6 +73,12 @@ public class FailResponder extends AbstractCamelProcessor
       sendSystemMessageToOwner(responseMessage);
     } else if (WonMessageDirection.FROM_EXTERNAL == originalMessage.getEnvelopeType()){
       sendSystemMessageToRemoteNode(responseMessage);
+    } else {
+      logger.info(String.format("cannot route failure message for direction of original message, " +
+          "expected FROM_OWNER or FROM_EXTERNAL, but found %s. Original cause is logged.",
+        originalMessage.getEnvelopeType()), e);
     }
+
   }
+
 }

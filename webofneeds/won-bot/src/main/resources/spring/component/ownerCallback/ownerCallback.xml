@@ -35,5 +35,11 @@
         <property name="taskScheduler" ref="taskScheduler" />
     </bean>
 
-
+    <!-- provides the bean expected by the dynamic camel route configuration in won-owner -->
+    <bean id="mainOwnerMessageProcessor" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg>
+            <!-- adapts an OwnerCallback to incoming messages. The callback is autowired -->
+            <bean class="won.owner.protocol.message.base.MessageExtractingWonMessageHandlerAdapter"/>
+        </constructor-arg>
+    </bean>
 </beans>

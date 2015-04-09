@@ -222,8 +222,8 @@ angular.module('won.owner').factory('wonService', function (
             var message = new won.MessageBuilder(won.WONMSG.activateNeedMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
-                .hasFacet(won.WON.OwnerFacet)
-                .hasRemoteFacet(won.WON.OwnerFacet)
+                .hasFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
+                .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
                 .build();
             var callback = new messageService.MessageCallback(
                 function(event,msg){
@@ -299,8 +299,8 @@ angular.module('won.owner').factory('wonService', function (
             var message = new won.MessageBuilder(won.WONMSG.closeNeedMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
-                .hasFacet(won.WON.OwnerFacet)
-                .hasRemoteFacet(won.WON.OwnerFacet)
+                .hasFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
+                .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
                 .build();
             var callback = new messageService.MessageCallback(
                 function (event, msg) {
@@ -316,7 +316,7 @@ angular.module('won.owner').factory('wonService', function (
                 });
             callback.done = false;
             callback.shouldHandleTest = function (event, msg) {
-                var ret = event.refersTo == this.msgURI;
+                var ret = event.isResponseTo == this.msgURI;
                 $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
                 return ret;
             };
@@ -334,8 +334,8 @@ angular.module('won.owner').factory('wonService', function (
                         var messageTemp = new won.MessageBuilder(won.WONMSG.closeNeedSentMessage)
                             .eventURI(eventUri)
                             .forEnvelopeData(envelopeData)
-                            .hasFacet(won.WON.OwnerFacet)
-                            .hasRemoteFacet(won.WON.OwnerFacet)
+                            .hasFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
+                            .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
                             .build();
                         var eventData = getEventData(messageTemp);
                         //  eventData.eventType = messageTypeToEventType[eventData.hasMessageType];
@@ -433,7 +433,7 @@ angular.module('won.owner').factory('wonService', function (
         callback.done = false;
         callback.msgURI = eventUri;
         callback.shouldHandleTest = function (event, msg) {
-            var ret = event.refersTo == this.msgURI;
+            var ret = event.isResponseTo == this.msgURI;
             $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
             return ret;
         };
@@ -498,7 +498,7 @@ angular.module('won.owner').factory('wonService', function (
                 });
             callback.done = false;
             callback.shouldHandleTest = function (event, msg) {
-                var ret = event.refersTo == this.msgURI;
+                var ret = event.isResponseTo == this.msgURI;
                 $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
                 return ret;
             };
@@ -605,8 +605,8 @@ angular.module('won.owner').factory('wonService', function (
             var message = new won.MessageBuilder(won.WONMSG.connectMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
-                .hasFacet(won.WON.OwnerFacet)
-                .hasRemoteFacet(won.WON.OwnerFacet)
+                .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
+                .hasRemoteFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
                 .hasTextMessage(textMessage)
                 .build();
             var callback = new messageService.MessageCallback(
@@ -624,7 +624,7 @@ angular.module('won.owner').factory('wonService', function (
                 });
             callback.done = false;
             callback.shouldHandleTest = function (event, msg) {
-                var ret = event.refersTo == this.msgURI;
+                var ret = event.isResponseTo == this.msgURI;
                 $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
                 return ret;
             };
@@ -715,8 +715,8 @@ angular.module('won.owner').factory('wonService', function (
             var message = new won.MessageBuilder(won.WONMSG.openMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
-                .hasFacet(won.WON.OwnerFacet)
-                .hasRemoteFacet(won.WON.OwnerFacet)
+                .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
+                .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
                 .hasTextMessage(textMessage)
                 .build();
             var callback = new messageService.MessageCallback(
@@ -733,7 +733,7 @@ angular.module('won.owner').factory('wonService', function (
                 });
             callback.done = false;
             callback.shouldHandleTest = function (event, msg) {
-                var ret = event.refersTo == this.msgURI;
+                var ret = event.isResponseTo == this.msgURI;
                 $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
                 return ret;
             };
@@ -807,8 +807,8 @@ angular.module('won.owner').factory('wonService', function (
             var message = new won.MessageBuilder(won.WONMSG.closeMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
-                .hasFacet(won.WON.OwnerFacet)
-                .hasRemoteFacet(won.WON.OwnerFacet)
+                .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
+                .hasRemoteFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
                 .hasTextMessage(textMessage)
                 .build();
             var callback = new messageService.MessageCallback(
@@ -839,7 +839,7 @@ angular.module('won.owner').factory('wonService', function (
             callback.done = false;
             callback.msgURI = eventUri;
             callback.shouldHandleTest = function (event, msg) {
-                var ret = event.refersTo == this.msgURI;
+                var ret = event.isResponseTo == this.msgURI;
                 $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
                 return ret;
             };
@@ -920,7 +920,7 @@ angular.module('won.owner').factory('wonService', function (
                 });
             callback.done = false;
             callback.shouldHandleTest = function (event, msg) {
-                var ret = event.refersTo == this.msgURI;
+                var ret = event.isResponseTo == this.msgURI;
                 $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
                 return ret;
             };
@@ -940,8 +940,8 @@ angular.module('won.owner').factory('wonService', function (
                         var messageTemp = new won.MessageBuilder(won.WONMSG.connectionMessageSentMessage)
                             .eventURI(eventUri)
                             .forEnvelopeData(envelopeData)
-                            .hasFacet(won.WON.OwnerFacet)
-                            .hasRemoteFacet(won.WON.OwnerFacet)
+                            .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
+                            .hasRemoteFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
                             .build();
                         var eventData = getEventData(messageTemp);
                         //  eventData.eventType = messageTypeToEventType[eventData.hasMessageType];

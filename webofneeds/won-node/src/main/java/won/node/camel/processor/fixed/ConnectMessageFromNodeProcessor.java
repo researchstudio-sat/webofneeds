@@ -53,6 +53,9 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor
               ConnectionState.REQUEST_RECEIVED,
               ConnectionEventType.PARTNER_OPEN);
     }
+    con.setRemoteConnectionURI(remoteConnectionUri);
+    con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
+    connectionRepository.save(con);
 
 
     //build message to send to owner, put in header

@@ -299,7 +299,9 @@ public class WonWebSocketHandler
       logger.debug("session {} is closed, can't send message", session.getId());
       return;
     }
-    if (wonMessage.getMessageType() == WonMessageType.CREATE_RESPONSE) {
+    if (wonMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE
+      && WonMessageType.CREATE_NEED ==wonMessage.getIsResponseToMessageType()){
+
       if (session.getPrincipal() != null) {
         saveNeedUriWithUser(wonMessage, session);
       } else {

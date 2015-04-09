@@ -16,8 +16,6 @@
 
 package won.owner.protocol.message.base;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import won.owner.protocol.message.OwnerCallback;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
@@ -67,9 +65,7 @@ public class MessageExtractingWonMessageHandlerAdapter extends WonMessageHandler
     return con;
   }
 
-  @Autowired
-  @Qualifier("default")
-  @Override
+
   public void setAdaptee(OwnerCallback adaptee) {
     super.setAdaptee(adaptee);
   }

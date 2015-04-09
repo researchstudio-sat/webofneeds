@@ -26,15 +26,9 @@ import won.node.service.impl.URIService;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
-import won.protocol.model.Need;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.NeedRepository;
-import won.protocol.util.RdfUtils;
 
-import java.io.StringWriter;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MatcherProtocolMatcherClientImplJMSBased implements MatcherProtocolMatcherServiceClientSide
@@ -45,72 +39,42 @@ public class MatcherProtocolMatcherClientImplJMSBased implements MatcherProtocol
   private MessagingService messagingService;
 
   @Autowired
-  private NeedRepository needRepository;
-
-  @Autowired
-  private ConnectionRepository connectionRepository;
-
-  @Autowired
   private URIService uriService;
 
   @Override
   public void matcherRegistered(final URI wonNodeURI, final WonMessage wonMessage) {
     Map headerMap = new HashMap<String, String>();
     headerMap.put("wonNodeURI", wonNodeURI.toString());
-    headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
     headerMap.put("protocol","MatcherProtocol");
     headerMap.put("methodName", "matcherRegistered");
-    messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
+    messagingService.sendInOnlyMessage(null,headerMap,WonMessageEncoder.encode(wonMessage, Lang.TRIG),"seda:MatcherProtocolOut");
   }
 
   @Override
   public void needCreated(final URI needURI, final Model content, final WonMessage wonMessage)
   {
-
-      StringWriter sw = new StringWriter();
-      content.write(sw, "TTL");
-
-      List<Need> needs = needRepository.findByNeedURI(needURI);
-      Need need = needs.get(0);
-
       Map headerMap = new HashMap<String, String>();
       headerMap.put("needUri", needURI.toString());
-      headerMap.put("content",RdfUtils.toString(content));
-      headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
-      headerMap.put("protocol","MatcherProtocol");
       headerMap.put("methodName", "needCreated");
       headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix()+"/resource");
-      messagingService.sendInOnlyMessage(null,headerMap,null,"outgoingMessages");
+      messagingService.sendInOnlyMessage(null,headerMap,WonMessageEncoder.encode(wonMessage, Lang.TRIG),"seda:MatcherProtocolOut");
 
   }
   @Override
   public void needActivated(final URI needURI, final WonMessage wonMessage){
     Map headerMap = new HashMap<String, String>();
     headerMap.put("needURI", needURI.toString());
-    headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
-    headerMap.put("protocol","MatcherProtocol");
     headerMap.put("methodName","needActivated");
     headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix()+"/resource");
-    messagingService.sendInOnlyMessage(null, headerMap,null,"outgoingMessages");
+    messagingService.sendInOnlyMessage(null, headerMap,WonMessageEncoder.encode(wonMessage, Lang.TRIG),"seda:MatcherProtocolOut");
   }
   @Override
   public void needDeactivated(final URI needURI, final WonMessage wonMessage){
     Map headerMap = new HashMap<String, String>();
     headerMap.put("needURI", needURI.toString());
-    headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
-    headerMap.put("protocol","MatcherProtocol");
     headerMap.put("methodName","needDeactivated");
     headerMap.put("wonNodeURI", uriService.getGeneralURIPrefix()+"/resource");
-    messagingService.sendInOnlyMessage(null, headerMap,null,"outgoingMessages");
-  }
-
-
-  public void setNeedRepository(NeedRepository needRepository) {
-      this.needRepository = needRepository;
-  }
-
-  public void setMessagingService(MessagingService messagingService) {
-      this.messagingService = messagingService;
+    messagingService.sendInOnlyMessage(null, headerMap,WonMessageEncoder.encode(wonMessage, Lang.TRIG),"seda:MatcherProtocolOut");
   }
 
 }

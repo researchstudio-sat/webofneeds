@@ -39,6 +39,18 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
     logger.debug("OPEN received from the owner side for connection {}", connectionURIFromWonMessage);
 
     con = dataService.nextConnectionState(connectionURIFromWonMessage, ConnectionEventType.OWNER_OPEN);
+    assert con != null;
+    assert con.getRemoteNeedURI() != null;
+    assert con.getRemoteNeedURI().equals(wonMessage.getReceiverNeedURI());
+    assert con.getConnectionURI() != null;
+    assert con.getConnectionURI().equals(wonMessage.getSenderURI());
+    if (wonMessage.getReceiverURI() != null){
+      assert con.getRemoteConnectionURI().equals(wonMessage.getReceiverURI());
+    } else {
+      con.setRemoteConnectionURI(wonMessage.getReceiverURI());
+    }
+    con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
+    connectionRepository.save(con);
 
     //add the information about the corresponding message to the local one
     wonMessage = new WonMessageBuilder()

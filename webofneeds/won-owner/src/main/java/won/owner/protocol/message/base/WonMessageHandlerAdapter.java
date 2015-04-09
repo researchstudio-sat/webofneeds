@@ -19,6 +19,8 @@ package won.owner.protocol.message.base;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import won.owner.protocol.message.OwnerCallback;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
@@ -63,6 +65,7 @@ public abstract class WonMessageHandlerAdapter implements WonMessageProcessor
 
   @Override
   public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
+    assert adaptee != null : "adaptee is not set";
     logger.debug("processing message {} and calling appropriate method on adaptee", message.getMessageURI() );
     WonMessageType messageType = message.getMessageType();
     switch(messageType){
@@ -97,6 +100,8 @@ public abstract class WonMessageHandlerAdapter implements WonMessageProcessor
     return message;
   }
 
+  @Autowired(required = false)
+  @Qualifier("default")
   public void setAdaptee(OwnerCallback adaptee) {
     this.adaptee = adaptee;
   }

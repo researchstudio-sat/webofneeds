@@ -19,9 +19,12 @@ package won.protocol.message.processor.camel;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.protocol.message.WonMessage;
 import won.protocol.message.processor.exception.MissingMessagePropertyException;
+import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
@@ -35,10 +38,22 @@ public class FacetExtractingCamelProcessor implements Processor{
 
   @Override
   public void process(Exchange exchange) throws Exception {
-    URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
-    if (conUri == null) throw new MissingMessagePropertyException(URI.create(WONMSG.RECEIVER_PROPERTY.getURI().toString()));
-    Connection con = connectionRepository.findOneByConnectionURI(conUri);
-    URI facetType = con.getTypeURI();
+    URI facetType = null;
+    //first, try to extract the facet from the message
+    WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+    facetType = WonRdfUtils.FacetUtils.getFacet(wonMessage);
+    if (facetType == null) {
+      //not found.. look into the database. For that, we need to know the connection in question:
+      URI conUri = (URI) exchange.getIn().getHeader(WonCamelConstants.CONNECTION_URI_HEADER);
+      if (conUri == null)
+        throw new MissingMessagePropertyException(URI.create(WONMSG.RECEIVER_PROPERTY.getURI().toString()));
+      Connection con = connectionRepository.findOneByConnectionURI(conUri);
+      facetType = con.getTypeURI();
+    }
+    if (facetType == null){
+      throw new WonMessageProcessingException(String.format("Failed to determine connection " +
+        "facet for message %s", wonMessage.getMessageURI()));
+    }
     exchange.getIn().setHeader(WonCamelConstants.FACET_TYPE_HEADER, facetType);
   }
 }
