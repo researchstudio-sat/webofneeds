@@ -224,8 +224,6 @@ angular.module('won.owner').factory('wonService', function (
             var message = new won.MessageBuilder(won.WONMSG.activateNeedMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
-                .hasFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
-                .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
                 .build();
             var callback = new messageService.MessageCallback(
                 function(event,msg){
@@ -284,8 +282,6 @@ angular.module('won.owner').factory('wonService', function (
             var message = new won.MessageBuilder(won.WONMSG.closeNeedMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
-                .hasFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
-                .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
                 .build();
             var callback = new messageService.MessageCallback(
                 function (event, msg) {
@@ -656,8 +652,6 @@ angular.module('won.owner').factory('wonService', function (
             var message = new won.MessageBuilder(won.WONMSG.closeMessage)
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
-                .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
-                .hasRemoteFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
                 .hasTextMessage(textMessage)
                 .build();
             var callback = new messageService.MessageCallback(
