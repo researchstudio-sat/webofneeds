@@ -218,6 +218,138 @@ angular.module('won.owner').factory('wonService', function (
     }
 
 
+    var isSuccessMessage = function isSuccessMessage(event) {
+        return event.hasMessageType === won.WONMSG.successResponseCompacted;
+    }
+
+
+    /**
+     * Having received a response, and having transformed it to the specified
+     * event, set the commState property according to whether the response represents success or failure.
+     * Does this for a message that is directed at an owned need (create, activate, deactivate).
+     * @param event
+     */
+    var setCommStateFromResponseForLocalNeedMessage = function setCommStateFromResponseForLocalNeedMessage(event) {
+        if (isSuccessMessage(event)){
+            event.commState = won.COMMUNUCATION_STATE.ACCEPTED;
+        } else {
+            event.commState = won.COMMUNUCATION_STATE.NOT_TRANSMITTED;
+        }
+    }
+
+    var createMessageCallbackForLocalNeedMessage = function createMessageCallbackForLocalNeedMessage(eventUri, eventType){
+        var callback = new messageService.MessageCallback(
+            function(event,msg){
+                $log.debug("got response for " + eventType +": " + event.hasMessageType);
+                var eventData = won.clone(event);
+                setCommStateFromResponseForLocalNeedMessage(eventData);
+                eventData.eventType = eventType;
+                linkedDataService.invalidateCacheForNeed(needURI)
+                    .then(
+                    function (value) {
+                        linkedDataService.fetch(eventUri)
+                            .then(
+                            function (value2) {
+                                linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
+                                $log.debug("Broadcasting angular event " + eventType + " commState:" + eventData.commState);
+                                $rootScope.$broadcast(eventType, eventData);
+                            }, won.reportError("cannot fetch event " + eventUri)
+                        );
+                    }, won.reportError("cannot fetch event " + needURI)
+                );
+                this.done = true;
+            }
+        );
+        callback.done = false;
+        callback.msgURI = eventUri;
+        callback.shouldHandleTest = function(event,msg){
+            var ret = event.isResponseTo == this.msgURI;
+            $log.debug("event "+event.uri + "refers to event "+ this.msgURI+": "+ret);
+            return ret;
+        };
+        callback.shouldUnregisterTest = function(msg){
+            return this.done;
+        };
+        return callback;
+    }
+
+    /**
+     * Having received a response, and having transformed it to the specified
+     * event, set the commState property according to whether the response represents success or failure.
+     * Does this for a message that is directed at a remote need (connect/open/connectionMessage/close).
+     * @param event
+     * @parem isResponseFromRemoteNode - if true, the response is interpreted as coming from the remote node
+     */
+    var setCommStateFromResponseForRemoteNeedMessage = function setCommStateFromResponseForRemoteNeedMessage(event, isResponseFromRemoteNode) {
+        if (isResponseFromRemoteNode) {
+            if (isSuccessMessage(event)){
+                event.commState = won.COMMUNUCATION_STATE.ACCEPTED;
+            } else {
+                event.commState = won.COMMUNUCATION_STATE.NOT_CONNECTED;
+            }
+        } else {
+            if (isSuccessMessage(event)) {
+                event.commState = won.COMMUNUCATION_STATE.PENDING;
+            } else {
+                event.commState = won.COMMUNUCATION_STATE.NOT_TRANSMITTED;
+            }
+        }
+    }
+
+    var createMessageCallbackForRemoteNeedMessage = function createMessageCallbackForRemoteNeedMessage(eventUri, eventType){
+        var callback = new messageService.MessageCallback(
+            function (event, msg) {
+                $log.debug("got response for " + eventType +": " + event.hasMessageType);
+                var eventData = won.clone(event);
+                eventData.eventType = eventType;
+                var isRemoteResponse = false;
+                if (event.isRemoteResponseTo == this.msgURI){
+                    isRemoteResponse = true;
+                    this.gotResponseFromRemoteNode = true;
+                } else if (event.isResponseTo == this.msgURI) {
+                    isRemoteResponse = false;
+                    this.gotResponseFromOwnNode = true;
+                } else {
+                    $log.error("event is not a response to " + this.msgURI +" : " + JSON.stringify(event));
+                    return;
+                }
+                if (!isSuccessMessage(event)){
+                    this.done = true;
+                } else {
+                    this.done = this.gotResponseFromOwnNode && this.gotResponseFromRemoteNode;
+                }
+                setCommStateFromResponseForRemoteNeedMessage(eventData, isRemoteResponse);
+                linkedDataService.fetch(eventData.hasSender)
+                    .then(
+                    function (value) {
+                        linkedDataService.fetch(eventUri)
+                            .then(
+                            function(value2) {
+                                linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
+                                eventData.timestamp = new Date().getTime();
+                                $log.debug("Broadcasting angular event " + eventType + ", commState:" + eventData.commState);
+                                $rootScope.$broadcast(eventType,eventData);
+                            }, won.reportError("cannot fetch event " + eventUri)
+                        );
+                    }, won.reportError("cannot fetch connection for event " + eventUri)
+                );
+            });
+        callback.gotResponseFromOwnNode = false;
+        callback.gotResponseFromRemoteNode = false;
+        callback.done = false;
+        callback.msgURI = eventUri;
+        callback.shouldHandleTest = function (event, msg) {
+            var ret = event.isResponseTo == this.msgURI || event.isRemoteResponseTo == this.msgURI;
+            $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
+            return ret;
+        };
+        callback.shouldUnregisterTest = function(msg) {
+            return this.done;
+        };
+        return callback;
+    }
+
+
     wonService.activateNeed = function(needURI){
         var sendActivateNeed = function(envelopeData,needUri){
             var eventUri = envelopeData[won.WONMSG.hasSenderNode]+"/event/"+utilService.getRandomInt(1,9223372036854775807);
@@ -225,42 +357,15 @@ angular.module('won.owner').factory('wonService', function (
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
                 .build();
-            var callback = new messageService.MessageCallback(
-                function(event,msg){
-                    $log.debug("got response for DEACTIVATE: " + event.hasMessageType);
-                    var eventData = won.clone(event);
-                    eventData.eventType = won.EVENT.ACTIVATE_NEED_SENT;
-                    eventData.commState = won.COMMUNUCATION_STATE.PENDING;
-
-                    linkedDataService.invalidateCacheForNeed(needURI)
-                        .then(
-                        function (value) {
-                            linkedDataService.fetch(eventUri)
-                                .then(
-                                function (value2) {
-                                    linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
-                                    $log.debug("Broadcasting angular event " + won.EVENT.ACTIVATE_NEED_SENT);
-                                    $rootScope.$broadcast(won.EVENT.ACTIVATE_NEED_SENT, eventData);
-                                }, won.reportError("cannot fetch activate event " + eventUri)
-                            );
-                        }, won.reportError("cannot fetch activate event " + needURI)
-                    );
-                    this.done = true;
-                }
-            );
-            callback.done = false;
-            callback.msgURI = eventUri;
-            callback.shouldHandleTest = function(event,msg){
-                var ret = event.isResponseTo == this.msgURI;
-                $log.debug("event "+event.uri + "refers to event "+ this.msgURI+": "+ret);
-                return ret;
-            };
-            callback.shouldUnregisterTest = function(msg){
-                return this.done;
-            };
+            var callback = createMessageCallbackForLocalNeedMessage(eventUri, won.EVENT.ACTIVATE_NEED_SENT);
             messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
+                //now tell listeners that we sent the message
+                var eventData = {}
+                eventData.eventType = won.EVENT.ACTIVATE_NEED_SENT;
+                eventData.commState = won.COMMUNUCATION_STATE.PENDING;
+                $rootScope.$broadcast(won.EVENT.ACTIVATE_NEED_SENT, eventData);
             }catch (e) {
                 $log.warn("could not activate " + needURI + ". Reason" + e);
             }
@@ -283,37 +388,7 @@ angular.module('won.owner').factory('wonService', function (
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
                 .build();
-            var callback = new messageService.MessageCallback(
-                function (event, msg) {
-                    $log.debug("got response for CLOSE: " + event.hasMessageType);
-                    var eventData = won.clone(event);
-                    eventData.eventType = won.EVENT.CLOSE_NEED_SENT;
-                    eventData.commState = won.COMMUNUCATION_STATE.PENDING;
-                    linkedDataService.invalidateCacheForNeed(needURI)
-                        .then(
-                        function (value) {
-                            linkedDataService.fetch(eventUri)
-                                .then(
-                                function(value2) {
-                                    linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
-                                    $log.debug("Broadcasting angular event " + won.EVENT.CLOSE_NEED_SENT);
-                                    $rootScope.$broadcast(won.EVENT.CLOSE_NEED_SENT, eventData);
-                                }, won.reportError("cannot fetch closed event " + eventUri)
-                            );
-                        }, won.reportError("cannot fetch closed connection " + needURI)
-                    );
-                    this.done = true;
-                });
-            callback.done = false;
-            callback.msgURI = eventUri;
-            callback.shouldHandleTest = function (event, msg) {
-                var ret = event.isResponseTo == this.msgURI;
-                $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
-                return ret;
-            };
-            callback.shouldUnregisterTest = function(msg) {
-                return this.done;
-            };
+            var callback = createMessageCallbackForLocalNeedMessage(eventUri, won.EVENT.CLOSE_NEED_SENT);
             messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
@@ -357,7 +432,7 @@ angular.module('won.owner').factory('wonService', function (
             .hasSenderNeed(needUri)
             .build();
 
-
+        //TODO: this callback could be changed to be the same as activate/deactivate, but the special code (updateing the applicationStateService) needs to be moved to another place
         var callback = new messageService.MessageCallback(
             function (event, msg) {
                 //check if the message we got (the create need response message) indicates that all went well
@@ -373,6 +448,7 @@ angular.module('won.owner').factory('wonService', function (
                     function (value) {
                         var eventData = won.clone(event);
                         eventData.eventType = won.EVENT.NEED_CREATED;
+                        setCommStateFromResponseForLocalNeedMessage(eventData);
                         eventData.needURI = needURI;
                         linkedDataService.getNeed(needURI)
                             .then(function(need){
@@ -440,43 +516,7 @@ angular.module('won.owner').factory('wonService', function (
                 .hasRemoteFacet(won.WON.OwnerFacet)
                 .hasTextMessage(textMessage)
                 .build();
-
-
-            var callback = new messageService.MessageCallback(
-                function (event, msg) {
-                    $log.debug("got response for CONNECT: " + event.hasMessageType);
-                    var eventData = won.clone(event);
-                    eventData.eventType = won.EVENT.CONNECT_SENT;
-                    eventData.commState = won.COMMUNUCATION_STATE.PENDING;
-                    linkedDataService.fetch(eventData.hasSender)
-                        .then(
-                        function (value) {
-                            linkedDataService.fetch(eventUri)
-                                .then(
-                                function(value2) {
-                                    deferred.resolve(eventUri);
-                                    eventData.timestamp = new Date().getTime();
-                                    linkedDataService.invalidateCacheForNeed(eventData.hasSender).then(function(){
-                                        $log.debug("Broadcasting angular event " + won.EVENT.CONNECT_SENT);
-                                        $rootScope.$broadcast(won.EVENT.CONNECT_SENT, eventData);
-
-                                    });
-                                }, won.reportError("cannot fetch closed event " + eventUri)
-                            );
-                        }, won.reportError("cannot fetch closed connection " +eventUri)
-                    );
-                    this.done = true;
-                });
-            callback.done = false;
-            callback.msgURI = eventUri;
-            callback.shouldHandleTest = function (event, msg) {
-                var ret = event.isResponseTo == this.msgURI;
-                $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
-                return ret;
-            };
-            callback.shouldUnregisterTest = function(msg) {
-                return this.done;
-            };
+            var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECT_SENT)
             messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
@@ -517,38 +557,7 @@ angular.module('won.owner').factory('wonService', function (
                 .hasRemoteFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
                 .hasTextMessage(textMessage)
                 .build();
-            var callback = new messageService.MessageCallback(
-                function (event, msg) {
-                    //check if the message we got (the create need response message) indicates that all went well
-                    $log.debug("got response for OPEN-SUGGESTED (CONNECT): " + event.hasMessageType);
-                    var eventData = won.clone(event);
-                    eventData.eventType = won.EVENT.CONNECT_SENT;
-                    eventData.commState = won.COMMUNUCATION_STATE.PENDING;
-                    linkedDataService.fetch(eventData.hasSender)
-                        .then(
-                        function (value) {
-                            linkedDataService.fetch(eventUri)
-                                .then(
-                                function(value2) {
-                                    $log.debug("Broadcasting angular event " + won.EVENT.CONNECT_SENT);
-                                    eventData.timestamp = new Date().getTime();
-                                    $rootScope.$broadcast(won.EVENT.CONNECT_SENT, eventData);
-                                }, won.reportError("cannot fetch closed event " + eventUri)
-                            );
-                        }, won.reportError("cannot fetch closed connection " +eventUri)
-                    );
-                    this.done = true;
-                });
-            callback.done = false;
-            callback.msgURI = eventUri;
-            callback.shouldHandleTest = function (event, msg) {
-                var ret = event.isResponseTo == this.msgURI;
-                $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
-                return ret;
-            };
-            callback.shouldUnregisterTest = function(msg) {
-                return this.done;
-            };
+            var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECT_SENT)
             messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
@@ -589,37 +598,7 @@ angular.module('won.owner').factory('wonService', function (
                 .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
                 .hasTextMessage(textMessage)
                 .build();
-            var callback = new messageService.MessageCallback(
-                function (event, msg) {
-                    $log.debug("got response for OPEN-SUGGESTED (CONNECT): " + event.hasMessageType);
-                    var eventData = won.clone(event);
-                    eventData.eventType = won.EVENT.OPEN_SENT;
-                    eventData.commState = won.COMMUNUCATION_STATE.PENDING;
-                    linkedDataService.fetch(msgToOpenFor.connection.uri)
-                        .then(
-                        function (value) {
-                            linkedDataService.fetch(eventUri)
-                                .then(
-                                function(value2) {
-                                    linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
-                                    $log.debug("Broadcasting angular event " + won.EVENT.OPEN_SENT);
-                                    $rootScope.$broadcast(won.EVENT.OPEN_SENT, eventData);
-                                }, won.reportError("cannot fetch closed event " + eventUri)
-                            );
-                        }, won.reportError("cannot fetch closed connection " + msgToOpenFor.connection.uri)
-                    );
-                    this.done = true;
-                });
-            callback.done = false;
-            callback.msgURI = eventUri;
-            callback.shouldHandleTest = function (event, msg) {
-                var ret = event.isResponseTo == this.msgURI;
-                $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
-                return ret;
-            };
-            callback.shouldUnregisterTest = function(msg) {
-                return this.done;
-            };
+            var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.OPEN_SENT);
             messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
@@ -654,34 +633,7 @@ angular.module('won.owner').factory('wonService', function (
                 .forEnvelopeData(envelopeData)
                 .hasTextMessage(textMessage)
                 .build();
-            var callback = new messageService.MessageCallback(
-                function (event, msg) {
-                    $log.debug("got response for CLOSE: " + event.hasMessageType);
-                    var eventData = won.clone(event);
-                    linkedDataService.fetch(msgToClose.connection.uri)
-                        .then(
-                        function (value) {
-                            linkedDataService.fetch(eventUri)
-                                .then(
-                                function(value2) {
-                                    $log.debug("Broadcasting angular event " + won.EVENT.CLOSE_SENT);
-                                    $rootScope.$broadcast(won.EVENT.CLOSE_SENT, eventData);
-                                }, won.reportError("cannot fetch closed event " + eventUri)
-                            );
-                        }, won.reportError("cannot fetch closed connection " + msgToClose.connection.uri)
-                    );
-                    this.done = true;
-                });
-            callback.done = false;
-            callback.msgURI = eventUri;
-            callback.shouldHandleTest = function (event, msg) {
-                var ret = event.isResponseTo == this.msgURI;
-                $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
-                return ret;
-            };
-            callback.shouldUnregisterTest = function(msg) {
-                return this.done;
-            };
+            var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CLOSE_SENT);
             messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
@@ -712,38 +664,7 @@ angular.module('won.owner').factory('wonService', function (
                 .forEnvelopeData(envelopeData)
                 .addContentGraphData(won.WON.hasTextMessage, text)
                 .build();
-            var callback = new messageService.MessageCallback(
-                function (event, msg) {
-                    $log.debug("got response for CONNECTION_MESSAGE: " + event.hasMessageType);
-                    var eventData = won.clone(event);
-                    eventData.eventType = won.EVENT.CONNECTION_MESSAGE_SENT;
-                    eventData.commState = won.COMMUNUCATION_STATE.PENDING;
-                    linkedDataService.fetch(eventData.hasSender)
-                        .then(
-                        function (value) {
-                            linkedDataService.fetch(eventUri)
-                                .then(
-                                function(value2) {
-                                    linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
-                                    eventData.timestamp = new Date().getTime();
-                                    $log.debug("Broadcasting angular event " + won.EVENT.CONNECTION_MESSAGE_SENT);
-                                    $rootScope.$broadcast(won.EVENT.CONNECTION_MESSAGE_SENT,eventData);
-                                }, won.reportError("cannot fetch closed event " + eventUri)
-                            );
-                        }, won.reportError("cannot fetch closed connection " +eventUri)
-                    );
-                    this.done = true;
-                });
-            callback.done = false;
-            callback.msgURI = eventUri;
-            callback.shouldHandleTest = function (event, msg) {
-                var ret = event.isResponseTo == this.msgURI;
-                $log.debug("event " + event.uri + " refers to event " + this.msgURI + ": " + ret);
-                return ret;
-            };
-            callback.shouldUnregisterTest = function(msg) {
-                return this.done;
-            };
+            var callback = createMessageCallbackForRemoteMessage(eventUri, won.EVENT.CONNECTION_MESSAGE_SENT);
             messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);

@@ -185,6 +185,8 @@
         won.WONMSG.refersToCompacted = won.WONMSG.prefix + ":refersTo";
         won.WONMSG.isResponseTo = won.WONMSG.baseUri + "isResponseTo";
         won.WONMSG.isResponseToCompacted = won.WONMSG.prefix + ":isResponseTo";
+        won.WONMSG.isRemoteResponseTo = won.WONMSG.baseUri + "isRemoteResponseTo";
+        won.WONMSG.isRemoteResponseToCompacted = won.WONMSG.prefix + ":isRemoteResponseTo";
         won.WONMSG.EnvelopeGraph = won.WONMSG.baseUri + "EnvelopeGraph";
         won.WONMSG.EnvelopeGraphCompacted = won.WONMSG.prefix+ ":EnvelopeGraph";
 
@@ -224,22 +226,14 @@
         won.WONMSG.connectionMessageSentMessageCompacted = won.WONMSG.prefix + ":ConnectionMessageSentMessage";
         won.WONMSG.connectionMessageReceivedMessage = won.WONMSG.baseUri + "ConnectionMessageReceivedMessage";
         won.WONMSG.connectionMessageReceivedMessageCompacted = won.WONMSG.prefix + ":ConnectionMessageReceivedMessage";
+        
 
         //response types
-        won.WONMSG.hasResponseStateProperty = won.WONMSG.baseUri + "hasResponseStateProperty";
-        won.WONMSG.hasResponseStateCompacted = won.WONMSG.prefix + ":hasResponseStateProperty";
-        won.WONMSG.createResponseMessage = won.WONMSG.baseUri + "CreateResponseMessage";
-        won.WONMSG.createResponseMessageCompacted = won.WONMSG.prefix + ":CreateResponseMessage";
-        won.WONMSG.connectResponseMessage = won.WONMSG.baseUri + "ConnectResponseMessage";
-        won.WONMSG.connectResponseMessageCompacted = won.WONMSG.prefix + ":ConnectResponseMessage";
-        won.WONMSG.needStateResponseMessage = won.WONMSG.baseUri + "NeedStateResponseMessage";
-        won.WONMSG.needStateResponseMessageCompacted = won.WONMSG.prefix + ":NeedStateResponseMessage";
-        won.WONMSG.closeResponseMessage = won.WONMSG.baseUri + "CloseResponseMessage";
-        won.WONMSG.closeResponseMessageCompacted = won.WONMSG.prefix + ":CloseResponseMessage";
-        won.WONMSG.openResponseMessage = won.WONMSG.baseUri + "OpenResponseMessage";
-        won.WONMSG.openResponseMessageCompacted = won.WONMSG.prefix + ":OpenResponseMessage";
-        won.WONMSG.connectionMessageResponseMessage = won.WONMSG.baseUri + "ConnectionMessageResponseMessage";
-        won.WONMSG.connectionMessageResponseMessageCompacted = won.WONMSG.prefix + ":ConnectionMessageResponseMessage";
+        won.WONMSG.successResponse = won.WONMSG.baseUri + "SuccessResponse";
+        won.WONMSG.successResponseCompacted = won.WONMSG.prefix + ":SuccessResponse";
+        won.WONMSG.failureResponse = won.WONMSG.baseUri + "FailureResponse";
+        won.WONMSG.failureResponseCompacted = won.WONMSG.prefix + ":FailureResponse";
+      
 
 
 
