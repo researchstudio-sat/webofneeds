@@ -44,7 +44,7 @@ public class FailResponder extends AbstractCamelProcessor
     logger.error("an error occurred while processing WON message");
     Exception e = (Exception) exchange.getProperty(Exchange.EXCEPTION_CAUGHT);
     String errormessage = null;
-    if (e != null){
+    if (e != null && e.getMessage() != null){
       errormessage = e.getMessage();
     } else {
       errormessage = String.format("An error occurred while processing message %s", originalMessage.getMessageURI());
