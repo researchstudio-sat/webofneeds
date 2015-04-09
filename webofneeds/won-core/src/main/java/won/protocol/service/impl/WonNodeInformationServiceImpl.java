@@ -88,9 +88,9 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService
     this.linkedDataSource = linkedDataSource;
   }
 
+  public void setRandomNumberService(RandomNumberService randomNumberService) { this.randomNumberService = randomNumberService; }
+
   private String generateRandomID() {
     return randomNumberService.generateRandomString(RANDOM_ID_STRING_LENGTH);
   }
-
-
 }

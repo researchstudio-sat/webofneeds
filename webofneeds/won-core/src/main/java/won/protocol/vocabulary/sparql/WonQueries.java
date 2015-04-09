@@ -102,6 +102,41 @@ public class WonQueries {
             "?event won:hasTextMessage ?text."+
             "}";
 
+    //TODO: DO NOT USE THIS STATEMENT YET! RdfUtils.setSparqlVards DOES NOT PREVENT INJECTION FOR NOW
+    public static final String SPARQL_UPDATE_TITLE_OF_NEED = SPARQL_PREFIX +
+            "DELETE {" +
+                "GRAPH ?graph {" +
+                    "?content dc:title ?title." +
+                "}" +
+            "} " +
+            "INSERT {" +
+                "GRAPH ?graph {" +
+                    "?content dc:title \"::title::\"" +
+                "}" +
+            "} " +
+            "WHERE {" +
+                "GRAPH ?graph {" +
+                                "::need:: won:hasContent ?content. " +
+                                "?content dc:title ?title." +
+                "}" +
+            "}";
+
+    public static final String SPARQL_UPDATE_STATE_FOR_NEED = SPARQL_PREFIX +
+            "DELETE {" +
+                "GRAPH ?graph {" +
+                    "::need:: won:isInState ?state." +
+                "}" +
+            "} " +
+            "INSERT {" +
+                "GRAPH ?graph {" +
+                    "::need:: won:isInState ::state::" +
+                "}" +
+            "} " +
+            "WHERE {" +
+                "GRAPH ?graph{" +
+                    "::need:: won:isInState ?state." +
+                "}" +
+            "}";
 
     //public static final String SPARQL_MY_NEED = "SELECT * WHERE {?need won:containedInPrivateGraph ?graph. ?need won:hasContent ?x; won:isInState ?state. ?x won:hasTextDescription ?desc; won:hasTag ?tag; dc:title ?title.}";
     //public static final String SPARQL_NEEDS_FILTERED_BY_UUIDS = "SELECT * WHERE { ?need won:hasContent ?x; won:isInState ?state. ?x won:hasTextDescription ?desc; won:hasTag ?tag; dc:title ?title. filter (?need in (<http://rsa021.researchstudio.at:8080/won/resource/need/5630666034445812000>))}";
