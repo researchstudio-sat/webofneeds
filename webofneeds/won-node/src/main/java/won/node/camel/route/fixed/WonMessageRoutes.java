@@ -92,6 +92,8 @@ public class WonMessageRoutes  extends RouteBuilder
         // Also, it puts any outbound message in the respective header
       .routingSlip(method("messageTypeSlip"))
       .to("bean:persister")
+      //swap: outbound becomes 'normal' message, 'normal' becomes 'original' - note: in some cases (create, activate,
+      // deactivate) there is no outbound message, hence no 'normal' message after this step.
       .setHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER, header(WonCamelConstants.MESSAGE_HEADER))
       .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER))
         //now if the outbound message is one that facet implementations can
