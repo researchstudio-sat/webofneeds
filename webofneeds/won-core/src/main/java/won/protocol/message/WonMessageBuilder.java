@@ -688,6 +688,9 @@ public class WonMessageBuilder
     if (wonMessage.getIsResponseToMessageURI() != null){
       this.setIsResponseToMessageURI(wonMessage.getIsResponseToMessageURI());
     }
+    if (wonMessage.getIsRemoteResponseToMessageURI() != null){
+      this.setIsRemoteResponseToMessageURI(wonMessage.getIsRemoteResponseToMessageURI());
+    }
     return this;
   }
 
@@ -771,6 +774,9 @@ public class WonMessageBuilder
       .setTimestamp(new Date().getTime())
       .addRefersToURI(inboundWonMessage.getMessageURI())
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
+      .setIsRemoteResponseToMessageURI(inboundWonMessage.getIsRemoteResponseToMessageURI())
+      .setIsResponseToMessageURI(inboundWonMessage.getIsResponseToMessageURI())
+      .setIsResponseToMessageType(inboundWonMessage.getIsResponseToMessageType())
       .build();
   }
 
@@ -806,7 +812,11 @@ public class WonMessageBuilder
       .setReceiverURI(remoteConnectionURI)
       .setReceiverNeedURI(remoteNeedURI)
       .setReceiverNodeURI(remoteWonNodeUri)
+      .setIsRemoteResponseToMessageURI(wonMessage.getIsRemoteResponseToMessageURI())
+      .setIsResponseToMessageURI(wonMessage.getIsResponseToMessageURI())
+      .setIsResponseToMessageType(wonMessage.getIsResponseToMessageType())
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
+
     return builder.build();
   }
 
