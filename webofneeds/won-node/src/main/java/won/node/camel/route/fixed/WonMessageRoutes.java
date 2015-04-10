@@ -5,8 +5,8 @@ import org.apache.camel.Expression;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.PredicateBuilder;
 import org.apache.camel.builder.RouteBuilder;
-import won.node.camel.predicate.ShouldCallFacetImplForMessagePredicate;
 import won.node.camel.predicate.IsResponseMessagePredicate;
+import won.node.camel.predicate.ShouldCallFacetImplForMessagePredicate;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
@@ -62,7 +62,6 @@ public class WonMessageRoutes  extends RouteBuilder
       .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
       .to("bean:wonMessageIntoCamelProcessor")
       .to("bean:wellformednessChecker")
-      .to("bean:signatureChecker")
       .to("bean:wrapperFromSystem")
       //route to message processing logic
       .to("seda:OwnerProtocolLogic");
@@ -75,8 +74,8 @@ public class WonMessageRoutes  extends RouteBuilder
             .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
             .to("bean:wonMessageIntoCamelProcessor")
             .to("bean:wellformednessChecker")
-            .to("bean:signatureChecker")
             .to("bean:wrapperFromSystem")
+            .to("bean:signatureAdder")
                     //route to message processing logic
             .to("bean:persister")
             .to("bean:toOwnerSender");
@@ -89,6 +88,7 @@ public class WonMessageRoutes  extends RouteBuilder
         //call the default implementation, which may alter the message.
         // Also, it puts any outbound message in the respective header
       .routingSlip(method("messageTypeSlip"))
+      .to("bean:signatureAdder")
       .to("bean:persister")
       .setHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER, header(WonCamelConstants.MESSAGE_HEADER))
       .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER))
@@ -142,6 +142,7 @@ public class WonMessageRoutes  extends RouteBuilder
             .to("bean:wrapperFromExternal")
             //call the default implementation, which may alter the message.
             .routingSlip(method("messageTypeSlip"))
+            .to("bean:signatureAdder")
             .to("bean:persister")
              //put the local connection URI into the header
             .setHeader(WonCamelConstants.CONNECTION_URI_HEADER,
@@ -181,6 +182,7 @@ public class WonMessageRoutes  extends RouteBuilder
           .to("bean:signatureChecker")
           .to("bean:wrapperFromExternal")
           .to("bean:hintMessageProcessor?method=process")
+          .to("bean:signatureAdder")
           .to("bean:persister")
           .to("bean:toOwnerSender")
         .otherwise()
