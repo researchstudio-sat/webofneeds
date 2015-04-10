@@ -50,4 +50,26 @@
         <constructor-arg type="java.lang.String" value="${keystore.location}" />
     </bean>
 
+    <bean id="cryptoService" class="won.cryptography.service.CryptographyService">
+        <constructor-arg ref="keyStoreService" />
+    </bean>
+
+    <!-- processor for checking signatures -->
+    <bean name="signatureChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg>
+            <bean class="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor" />
+        </constructor-arg>
+    </bean>
+    <!-- processor for signing messages -->
+    <bean id="signatureAddingProcessor" class="won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor">
+        <constructor-arg type="java.lang.String" value="${uri.prefix.resource}" />
+    </bean>
+    <bean name="signatureAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg ref="signatureAddingProcessor" />
+    </bean>
+    <!-- processor for generating and adding keys for just created needs -->
+
+    <bean name="needKeyGeneratorAndAdder" class="won.protocol.message.processor.impl.KeyForNewNeedAddingProcessor" />
+
+
 </beans>

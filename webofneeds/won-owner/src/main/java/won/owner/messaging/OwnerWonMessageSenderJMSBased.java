@@ -25,12 +25,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import won.cryptography.service.CryptographyService;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.CamelConfiguration;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.processor.impl.KeyForNewNeedAddingProcessor;
+import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
 import won.protocol.message.sender.WonMessageSender;
 import won.protocol.model.WonNode;
 import won.protocol.repository.WonNodeRepository;
@@ -72,8 +75,21 @@ public class OwnerWonMessageSenderJMSBased
   @Autowired
   private WonNodeRepository wonNodeRepository;
 
+  @Autowired
+  private CryptographyService ownerCryptoService;
+
+  @Autowired
+  private SignatureAddingWonMessageProcessor signatureAddingProcessor ;
+
+  @Autowired
+  private KeyForNewNeedAddingProcessor needKeyGeneratorAndAdder;
+
   public void sendWonMessage(WonMessage wonMessage) {
     try {
+
+      // TODO check if there is a better place for applying signing logic
+      wonMessage = doSigningOnOwner(wonMessage);
+
       // ToDo (FS): change it to won node URI and create method in the MessageEvent class
       URI wonNodeUri = wonMessage.getSenderNodeURI();
 
@@ -111,6 +127,17 @@ public class OwnerWonMessageSenderJMSBased
     } catch (Exception e){
       throw new RuntimeException("could not send message", e);
     }
+  }
+
+  //TODO: adding public keys and signing can be removed when it happens in the browser
+  //in that case owner will have to sign only system messages, or in case it adds information to the message
+  //TODO exceptions
+  private WonMessage doSigningOnOwner(final WonMessage wonMessage)
+    throws Exception {
+    // add public key of the newly created need
+    WonMessage outMessage = needKeyGeneratorAndAdder.process(wonMessage);
+    // add signature:
+    return signatureAddingProcessor.processOnBehalfOfNeed(outMessage);
   }
 
 

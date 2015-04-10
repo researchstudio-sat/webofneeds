@@ -113,5 +113,8 @@
     <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService">
         <constructor-arg type="java.lang.String" value="${keystore.location}" />
     </bean>
+    <bean id="cryptoService" class="won.cryptography.service.CryptographyService">
+        <constructor-arg ref="keyStoreService" />
+    </bean>
 
 </beans>
