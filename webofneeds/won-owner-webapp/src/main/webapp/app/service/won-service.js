@@ -664,7 +664,7 @@ angular.module('won.owner').factory('wonService', function (
                 .forEnvelopeData(envelopeData)
                 .addContentGraphData(won.WON.hasTextMessage, text)
                 .build();
-            var callback = createMessageCallbackForRemoteMessage(eventUri, won.EVENT.CONNECTION_MESSAGE_SENT);
+            var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECTION_MESSAGE_SENT);
             messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
