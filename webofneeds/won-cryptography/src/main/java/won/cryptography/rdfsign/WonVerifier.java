@@ -3,15 +3,18 @@ package won.cryptography.rdfsign;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterface;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmList;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Triple;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.ontology.Ontology;
+import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import sun.misc.BASE64Decoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.protocol.message.SignatureReference;
 import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WONMSG;
 
 import java.security.Provider;
@@ -27,6 +30,8 @@ import java.util.Map;
  */
 public class WonVerifier
 {
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private Dataset dataset;
 
@@ -61,9 +66,7 @@ public class WonVerifier
     return result;
   }
 
-  //TODO chng exceptions to won exceptions?
-  //TODO extract the public key from the signature triple/reference in signature triples inside the method? could
-  // require http calls...
+  //TODO exceptions
   public boolean verify(Map<String,PublicKey> publicKeys) throws Exception {
 
     // check that the default graph is empty
@@ -89,13 +92,13 @@ public class WonVerifier
       PublicKey publicKey = null;
       Model sigModel = dataset.getNamedModel(sigGraphName);
       Resource resource = sigModel.getResource(sigGraphName);
-      Property certProp =  sigModel.createProperty(Ontology.getSigIri(), "hasVerificationCertificate");
-      NodeIterator ni = sigModel.listObjectsOfProperty(resource, certProp);
+      NodeIterator ni = sigModel.listObjectsOfProperty(resource, SFSIG.HAS_VERIFICATION_CERT);
       if (ni.hasNext()) {
         String cert = ni.next().asResource().getURI();
         publicKey = publicKeys.get(cert);
-      } else {
-        result.setVerificationFailed(sigGraphName, "No public key for " + sigGraphName);
+      }
+      if (publicKey == null) {
+        result.setVerificationFailed(sigGraphName, "No public key found for " + sigGraphName);
         return result.isVerificationPassed();
       }
 
@@ -147,34 +150,57 @@ public class WonVerifier
     if (sigString.length() == 0) {
       throw new Exception("Signature value is empty");
     }
-    byte[] sigBytes = new BASE64Decoder().decodeBuffer(sigString);
+
+    byte[] sigBytes = Base64.decodeBase64(sigString);
     sig.initVerify(publicKey);
     sig.update(sigData.getHash().toByteArray());
-
     return sig.verify(sigBytes);
   }
+
+  //cannot use SignatureAlgorithmList and their algorithms here because they are not thread-safe
+//  private SignatureAlgorithmInterface getHashingAlgorithm(final SignatureData sigData) {
+//
+//    SignatureAlgorithmInterface algorithm = null;
+//    for (SignatureAlgorithmInterface a : SignatureAlgorithmList.getList()) {
+//      //Get hashing algorithm
+//      if ((Ontology.getDigestPrefix() + a.getName()).equals(sigData.getGraphDigestMethod())) {
+//        return a;
+//      }
+//    }
+//    return algorithm;
+//  }
+//  private SignatureAlgorithmInterface getCanonicalizationAlgorithm(final SignatureData sigData) {
+//
+//    SignatureAlgorithmInterface algorithm = null;
+//    for (SignatureAlgorithmInterface a : SignatureAlgorithmList.getList()) {
+//      //Get canonicalization algorithm
+//      if ((Ontology.getCanonicalizationPrefix() + a.getName()).equals(sigData.getCanonicalizationMethod())) {
+//        return a;
+//      }
+//    }
+//    return algorithm;
+//  }
+
 
   private SignatureAlgorithmInterface getHashingAlgorithm(final SignatureData sigData) {
 
     SignatureAlgorithmInterface algorithm = null;
-    for (SignatureAlgorithmInterface a : SignatureAlgorithmList.getList()) {
-      //Get hashing algorithm
-      if ((Ontology.getDigestPrefix() + a.getName()).equals(sigData.getGraphDigestMethod())) {
-        return a;
-      }
+    if (SFSIG.DIGEST_METHOD_Fisteus2010.getURI().endsWith(sigData.getGraphDigestMethod())) {
+      // this is not efficient, but sharing the algorithm was not possible due to its thread-not-safety
+      algorithm = new SignatureAlgorithmFisteus2010();
     }
+    // TODO for other algorithms
     return algorithm;
   }
 
   private SignatureAlgorithmInterface getCanonicalizationAlgorithm(final SignatureData sigData) {
 
     SignatureAlgorithmInterface algorithm = null;
-    for (SignatureAlgorithmInterface a : SignatureAlgorithmList.getList()) {
-      //Get canonicalization algorithm
-      if ((Ontology.getCanonicalizationPrefix() + a.getName()).equals(sigData.getCanonicalizationMethod())) {
-        return a;
-      }
+    if (SFSIG.CANONICALIZATION_METHOD_Fisteus2010.getURI().endsWith(sigData.getCanonicalizationMethod())) {
+      // this is not efficient, but sharing the algorithm was not possible due to its thread-not-safety
+      algorithm = new SignatureAlgorithmFisteus2010();
     }
+    // TODO for other algorithms
     return algorithm;
   }
 

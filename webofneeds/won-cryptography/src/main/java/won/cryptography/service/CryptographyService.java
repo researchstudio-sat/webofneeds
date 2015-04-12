@@ -4,11 +4,10 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.math.BigInteger;
-import java.net.URI;
-import java.security.Key;
 import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -40,34 +39,45 @@ public class CryptographyService {
 
     private KeyStoreService keyStoreService;
 
-    public CryptographyService () {
+    public CryptographyService (KeyStoreService keyStoreService) {
 
         Security.addProvider(new BouncyCastleProvider());
 
         keyPairService = new KeyPairService();
         certificateService = new CertificateService();
-        keyStoreService = new KeyStoreService(new File("keys.jks"));
+        //keyStoreService = new KeyStoreService(new File("keys.jks"));
+      this.keyStoreService = keyStoreService;
     }
 
 
-    public KeyPair createNewNeedKeyPair(BigInteger certNumber, URI needURI) {
+    public KeyPair createNewKeyPair(BigInteger certNumber, String resourceURI) {
 
 
         KeyPair newKeyPair = keyPairService.generateNewKeyPair();
         X509Certificate newCertificate = certificateService.createSelfSignedCertificate(certNumber, newKeyPair,
-                                                                                        needURI.toString());
-        keyStoreService.putKey(needURI.toString(),
+                                                                                        resourceURI);
+        keyStoreService.putKey(resourceURI,
                 newKeyPair.getPrivate(), new Certificate[] {newCertificate});
 
         return newKeyPair;
 
     }
 
-    public Key getNeedPrivateKey(URI needURI) {
 
-        return keyStoreService.getPrivateKey(needURI.toString());
+  public KeyPair createNewKeyPair(String resourceURI) {
 
+    BigInteger certNumber = BigInteger.valueOf(keyStoreService.size() + 1);
+    return createNewKeyPair(certNumber, resourceURI);
+
+  }
+
+    public PrivateKey getPrivateKey(String needURI) {
+        return keyStoreService.getPrivateKey(needURI);
     }
+
+  public PublicKey getPublicKey(String needURI) {
+    return keyStoreService.getPublicKey(needURI);
+  }
 
 
 }

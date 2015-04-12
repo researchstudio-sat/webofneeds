@@ -17,16 +17,16 @@
 package won.protocol.message.processor.impl;
 
 import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.cryptography.rdfsign.SignatureVerificationResult;
-import won.cryptography.rdfsign.WonKeysExtractor;
-import won.cryptography.rdfsign.WonVerifier;
+import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
 import java.net.URI;
@@ -45,31 +45,41 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
+  public SignatureCheckingWonMessageProcessor() {
+  }
+
+  public void setLinkedDataSource(final LinkedDataSource linkedDataSource) {
+    this.linkedDataSource = linkedDataSource;
+  }
+
   @Autowired
   private LinkedDataSource linkedDataSource;
 
   @Override
   public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
 
-    Dataset dataset = WonMessageEncoder.encodeAsDataset(message);
+
+
     SignatureVerificationResult result = null;
     try {
       // obtain public keys
-      Map<String,PublicKey> keys = getRequiredPublicKeys(dataset);
+      Map<String,PublicKey> keys = getRequiredPublicKeys(message.getCompleteDataset());
       // verify with those public keys
-      WonVerifier verifier = new WonVerifier(dataset);
-      verifier.verify(keys);
-      result = verifier.getVerificationResult();
+      result = WonMessageSignerVerifier.verify(keys, message);
+
+      logger.debug("VERIFIED=" + result.isVerificationPassed() + " with keys: " + keys.values() + " for\n"
+                    + RdfUtils
+        .writeDatasetToString(message.getCompleteDataset(), Lang.TRIG));
+
     } catch (Exception e) {
+      //TODO SignatureProcessingException?
       throw new WonMessageProcessingException(e);
     }
     // throw exception if the verification fails:
     if (!result.isVerificationPassed()) {
+      //TODO SignatureProcessingException?
       throw new WonMessageProcessingException(new SignatureException(result.getMessage()));
     }
-    // TODO find a way to pass information about verified unreferenced signatures to the
-    // following processors. This is useful because the values of such signatures should
-    // be referenced if this message is wrapped by another envelope.
     return message;
   }
 
@@ -91,20 +101,23 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
   private Map<String, PublicKey> getRequiredPublicKeys(final Dataset msgDataset)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
 
-    WonKeysExtractor extractor = new WonKeysExtractor();
+    //extracted and then
+    WonKeysReaderWriter keyReader = new WonKeysReaderWriter();
     // extract keys if directly provided in the message content:
-    Map<String,PublicKey> keys = extractor.fromDataset(msgDataset);
+    Map<String,PublicKey> keys = keyReader.readFromDataset(msgDataset);
     // extract referenced key by dereferencing a (kind of) webid of a signer
-    Set<String> refKeys = extractor.getKeyRefs(msgDataset);
+    Set<String> refKeys = keyReader.readKeyReferences(msgDataset);
     for (String refKey : refKeys) {
-      Dataset keyDataset = linkedDataSource.getDataForResource(URI.create(refKey));
-      // TODO replace the extractor with WonRDFUtils method and use the extractor itself internally
-      // in that method
-      Set<PublicKey> resolvedKeys = extractor.fromDataset(keyDataset, refKey);
-      for (PublicKey resolvedKey : resolvedKeys) {
-        keys.put(refKey, resolvedKey);
-        // now we only expect one key but in future there could be several keys for one WebID
-        break;
+      if (!keys.containsKey(refKey)) {
+        Dataset keyDataset = linkedDataSource.getDataForResource(URI.create(refKey));
+        // TODO replace the WonKeysReaderWriter methods with WonRDFUtils methods and use the WonKeysReaderWriter
+        // itself internally there in those methods
+        Set<PublicKey> resolvedKeys = keyReader.readFromDataset(keyDataset, refKey);
+        for (PublicKey resolvedKey : resolvedKeys) {
+          keys.put(refKey, resolvedKey);
+          // TODO now we only expect one key but in future there could be several keys for one WebID
+          break;
+        }
       }
     }
     return keys;

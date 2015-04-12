@@ -27,7 +27,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.cryptography.rdfsign.WonKeysExtractor;
+import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.KeyStoreService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
@@ -209,9 +209,9 @@ public class LinkedDataServiceImpl implements LinkedDataService
     }
 
   private void addPublicKey(Model model, Resource res) {
-    WonKeysExtractor extractor = new WonKeysExtractor();
+    WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();
     try {
-      extractor.addToModel(model, res, keyStoreService.getPublicKey(res.getURI()));
+      keyWriter.writeToModel(model, res, keyStoreService.getPublicKey(res.getURI()));
     } catch (Exception e) {
       logger.warn("No public key could be added to RDF for " + res.getURI());
     }

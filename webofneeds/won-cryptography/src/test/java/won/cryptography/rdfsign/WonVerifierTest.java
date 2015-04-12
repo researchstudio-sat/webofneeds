@@ -3,19 +3,12 @@ package won.cryptography.rdfsign;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Statement;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import won.cryptography.service.KeyStoreService;
 import won.cryptography.utils.TestSigningUtils;
+import won.cryptography.utils.TestingKeys;
 import won.protocol.message.SignatureReference;
-
-import java.io.File;
-import java.security.PublicKey;
-import java.security.Security;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * User: ypanchenko
@@ -40,24 +33,12 @@ public class WonVerifierTest
     "http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl-sig";
 
 
-  Map<String,PublicKey> pubKeysMap = new HashMap<String,PublicKey>();
+  TestingKeys keys;
 
   @Before
   public void init() {
-    Security.addProvider(new BouncyCastleProvider());
 
-    //load public  keys:
-    File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    KeyStoreService storeService = new KeyStoreService(keysFile);
-
-    // TODO load public keys from certificate referenced from signatures
-    String needCertUri = "http://localhost:8080/won/resource/need/3144709509622353000";
-    String ownerCertUri = "http://localhost:8080/owner/certificate";
-    String nodeCertUri = "http://localhost:8080/node/certificate";
-
-    pubKeysMap.put(needCertUri, storeService.getCertificate(TestSigningUtils.NEED_KEY_NAME).getPublicKey());
-    pubKeysMap.put(ownerCertUri, storeService.getCertificate(TestSigningUtils.OWNER_KEY_NAME).getPublicKey());
-    pubKeysMap.put(nodeCertUri, storeService.getCertificate(TestSigningUtils.NODE_KEY_NAME).getPublicKey());
+    keys = new TestingKeys(TestSigningUtils.KEYS_FILE);
   }
 
 
@@ -72,10 +53,10 @@ public class WonVerifierTest
     // verify
     WonVerifier verifier = new WonVerifier(testDataset);
     // TODO load public keys from certificate referenced from signatures
-    boolean verified = verifier.verify(pubKeysMap);
+    boolean verified = verifier.verify(keys.getPublicKeys());
     SignatureVerificationResult result = verifier.getVerificationResult();
 
-    Assert.assertTrue(verified);
+    Assert.assertTrue(result.getMessage(), verified);
     Assert.assertEquals(1, result.getSignatureGraphNames().size());
     Assert.assertEquals(NEED_CORE_DATA_URI, result.getSignedGraphName(NEED_CORE_DATA_SIG_URI));
     Assert.assertEquals(1, result.getVerifiedUnreferencedSignaturesAsReferences().size());
@@ -90,7 +71,7 @@ public class WonVerifierTest
     m.remove(stmt);
 
     verifier = new WonVerifier(testDataset);
-    verified = verifier.verify(pubKeysMap);
+    verified = verifier.verify(keys.getPublicKeys());
     result = verifier.getVerificationResult();
 
     Assert.assertTrue(!verified);
@@ -100,7 +81,7 @@ public class WonVerifierTest
     // add the removed statement back
     m.add(stmt);
     verifier = new WonVerifier(testDataset);
-    verified = verifier.verify(pubKeysMap);
+    verified = verifier.verify(keys.getPublicKeys());
     // now it should verify again
     Assert.assertTrue(verified);
 
@@ -119,14 +100,14 @@ public class WonVerifierTest
     // verify
     WonVerifier verifier = new WonVerifier(testDataset);
     // TODO load public keys from certificate referenced from signatures
-    boolean verified = verifier.verify(pubKeysMap);
+    boolean verified = verifier.verify(keys.getPublicKeys());
     SignatureVerificationResult result = verifier.getVerificationResult();
 
-    Assert.assertTrue(verified);
-    Assert.assertEquals(2, verifier.getVerificationResult().getSignatureGraphNames().size());
+    Assert.assertTrue(result.getMessage(), verified);
+    Assert.assertEquals(2, result.getSignatureGraphNames().size());
     Assert.assertEquals(1, result.getVerifiedUnreferencedSignaturesAsReferences().size());
-    Assert.assertEquals(NEED_CORE_DATA_URI, verifier.getVerificationResult().getSignedGraphName(NEED_CORE_DATA_SIG_URI));
-    Assert.assertEquals(EVENT_ENV1_URI, verifier.getVerificationResult().getSignedGraphName(EVENT_ENV1_SIG_URI));
+    Assert.assertEquals(NEED_CORE_DATA_URI, result.getSignedGraphName(NEED_CORE_DATA_SIG_URI));
+    Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphName(EVENT_ENV1_SIG_URI));
 
   }
 
@@ -145,14 +126,14 @@ public class WonVerifierTest
       });
     // verify
     WonVerifier verifier = new WonVerifier(testDataset);
-    // TODO load public keys from certificate referenced from signatures
-    boolean verified = verifier.verify(pubKeysMap);
+    boolean verified = verifier.verify(keys.getPublicKeys());
+    SignatureVerificationResult result = verifier.getVerificationResult();
 
-    Assert.assertTrue(verified);
-    Assert.assertEquals(3, verifier.getVerificationResult().getSignatureGraphNames().size());
-    Assert.assertEquals(NEED_CORE_DATA_URI, verifier.getVerificationResult().getSignedGraphName(NEED_CORE_DATA_SIG_URI));
-    Assert.assertEquals(EVENT_ENV1_URI, verifier.getVerificationResult().getSignedGraphName(EVENT_ENV1_SIG_URI));
-    Assert.assertEquals(EVENT_ENV2_URI, verifier.getVerificationResult().getSignedGraphName(EVENT_ENV2_SIG_URI));
+    Assert.assertTrue(result.getMessage(), verified);
+    Assert.assertEquals(3, result.getSignatureGraphNames().size());
+    Assert.assertEquals(NEED_CORE_DATA_URI, result.getSignedGraphName(NEED_CORE_DATA_SIG_URI));
+    Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphName(EVENT_ENV1_SIG_URI));
+    Assert.assertEquals(EVENT_ENV2_URI, result.getSignedGraphName(EVENT_ENV2_SIG_URI));
 
   }
 

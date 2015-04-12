@@ -6,10 +6,9 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import won.cryptography.service.KeyStoreService;
 import won.cryptography.utils.TestSigningUtils;
+import won.cryptography.utils.TestingKeys;
 
-import java.io.File;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECParameterSpec;
@@ -19,7 +18,7 @@ import java.util.Map;
  * User: ypanchenko
  * Date: 27.03.2015
  */
-public class WonKeysExtractorTest
+public class WonKeysReaderWriterTest
 {
 
   private static final String NEED_URI = "http://localhost:8080/won/resource/need/3144709509622353000";
@@ -30,18 +29,14 @@ public class WonKeysExtractorTest
   private static final String NEED_CORE_DATA_URI =
     "http://localhost:8080/won/resource/need/3144709509622353000/core/#data";
 
-  private ECPublicKey needKey;
-  private WonKeysExtractor extractor;
+  private TestingKeys keys;
+  private WonKeysReaderWriter extractor;
 
   @Before
   public void init() {
 
-    extractor = new WonKeysExtractor();
-
-    //load public key:
-    File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    KeyStoreService storeService = new KeyStoreService(keysFile);
-    this.needKey = (ECPublicKey) storeService.getCertificate(TestSigningUtils.NEED_KEY_NAME).getPublicKey();
+    keys = new TestingKeys(TestSigningUtils.KEYS_FILE);
+    extractor = new WonKeysReaderWriter();
 
   }
 
@@ -51,22 +46,13 @@ public class WonKeysExtractorTest
     // create dataset
     Dataset tempDataset = TestSigningUtils.prepareTestDataset(RESOURCE_FILE);
     // extract public keys
-    Map<String,PublicKey> keys = extractor.fromDataset(tempDataset);
-    Assert.assertEquals(1, keys.size());
-
-//    // create dataset that contains need core data graph and its signature graph
-//    Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(
-//      RESOURCE_FILE, new String[]{NEED_CORE_DATA_URI, NEED_CORE_DATA_SIG_URI});
-//    // verify
-//    WonVerifier verifier = new WonVerifier(testDataset);
-//    boolean verified = verifier.verify(keys);
-//    Assert.assertTrue(verified);
+    Map<String,PublicKey> constructedKeys = extractor.readFromDataset(tempDataset);
+    Assert.assertEquals(1, constructedKeys.size());
 
     // expected public key
-    File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    KeyStoreService storeService = new KeyStoreService(keysFile);
-    ECPublicKey expectedKey = (ECPublicKey) storeService.getCertificate(TestSigningUtils.NEED_KEY_NAME).getPublicKey();
-    ECPublicKey constructedKey = (ECPublicKey) keys.get(NEED_URI);
+    ECPublicKey expectedKey = (ECPublicKey) keys.getPublicKey(TestSigningUtils.needCertUri);
+    // reconstructed public key
+    ECPublicKey constructedKey = (ECPublicKey) constructedKeys.get(NEED_URI);
 
     //KeyInformationExtractor info = new KeyInformationExtractorBouncyCastle();
     //Assert.assertTrue(info.getQX(expectedKey).equals(info.getQX(constructedKey)));
@@ -93,7 +79,7 @@ public class WonKeysExtractorTest
 
     Model testModel = testDataset.getNamedModel(NEED_CORE_DATA_URI);
     Resource keySubj = testModel.createResource(NEED_URI);
-    extractor.addToModel(testModel, keySubj, needKey);
+    extractor.writeToModel(testModel, keySubj, keys.getPublicKey(TestSigningUtils.needCertUri));
 
     Assert.assertTrue(testModel.isIsomorphicWith(datasetWithExpectedModel.getNamedModel(NEED_CORE_DATA_URI)));
 

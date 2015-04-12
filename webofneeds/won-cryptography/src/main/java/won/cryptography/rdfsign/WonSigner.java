@@ -2,21 +2,22 @@ package won.cryptography.rdfsign;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ResIterator;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterface;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
+import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import sun.misc.BASE64Encoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.protocol.message.SignatureReference;
-import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.WONMSG;
 
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
 import java.security.Signature;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by ypanchenko on 12.06.2014.
@@ -24,6 +25,7 @@ import java.util.*;
 public class WonSigner
 {
 
+  private final Logger logger = LoggerFactory.getLogger(getClass());
   // TODO make it configurable which algorithm is used RSA or ECDSA
 
   public static final String SIGNING_ALGORITHM_NAME = "NONEwithECDSA";
@@ -59,10 +61,9 @@ public class WonSigner
   //TODO chng exceptions to won exceptions?
   public List<SignatureReference> sign(PrivateKey privateKey, String cert, String ... graphsToSign) throws Exception {
 
-    List<String> signedGraphURIs = selectGraphsForSigning(graphsToSign);
-    List<SignatureReference> sigRefs = new ArrayList<>(signedGraphURIs.size());
+    List<SignatureReference> sigRefs = new ArrayList<>(graphsToSign.length);
 
-    for (String name : signedGraphURIs) {
+    for (String name : graphsToSign) {
       Model model = dataset.getNamedModel(name);
       //TODO should be generated in a more proper way and not here - check of the name already exists etc.
       String sigName = name + "-sig";
@@ -80,37 +81,10 @@ public class WonSigner
     return sigRefs;
   }
 
-  public List<SignatureReference> sign(PrivateKey privateKey, String cert, List<String> graphsToSign) throws
+  public List<SignatureReference> sign(PrivateKey privateKey, String cert, Collection<String> graphsToSign) throws
     Exception {
     String[] array = new String[graphsToSign.size()];
     return sign(privateKey, cert, graphsToSign.toArray(array));
-  }
-
-  private List<String> selectGraphsForSigning(final String[] graphsToSign) {
-    List<String> signedGraphURIs = new ArrayList<String>();
-    // if no names provided, sign all the graphs except for those that already have signature
-    if (graphsToSign.length == 0) {
-      List<String> graphURIs = RdfUtils.getModelNames(dataset);
-      Set<String> signedGraphs = new HashSet<>();
-      for (String graphURIi : graphURIs) {
-        Model model = dataset.getNamedModel(graphURIi);
-        for (String graphURIj: graphURIs) {
-          ResIterator resources = model.listSubjectsWithProperty(WONMSG.HAS_SIGNED_GRAPH_PROPERTY,
-                                                                 model.getResource(graphURIj));
-          if (resources.hasNext()) {
-            signedGraphs.add(graphURIj);
-          }
-        }
-      }
-      for (String graphURI : graphURIs) {
-        if (!signedGraphs.contains(graphURI)) {
-          signedGraphURIs.add(graphURI);
-        }
-      }
-    } else { // if names provided, - sign only those provided graphs
-      signedGraphURIs = Arrays.asList(graphsToSign);
-    }
-    return signedGraphURIs;
   }
 
   private String signNamedGraph(final GraphCollection inputWithOneNamedGraph, final PrivateKey privateKey, String cert)
@@ -142,11 +116,11 @@ public class WonSigner
     sig.update(sigData.getHash().toByteArray());
 
     byte[] signatureBytes = sig.sign();
-    String signature = new BASE64Encoder().encode(signatureBytes);
+    //String signature = new BASE64Encoder().encode(signatureBytes);
+    String signature = Base64.encodeBase64String(signatureBytes);
 
 
     //Update Signature Data
-    //TODO is it the right way to represent new lines in the signature value?
     sigData.setSignature("\"\"\"" + signature + "\"\"\"");
     sigData.setSignatureMethod(privateKey.getAlgorithm().toLowerCase());
     sigData.setVerificationCertificate(verificationCertificate);

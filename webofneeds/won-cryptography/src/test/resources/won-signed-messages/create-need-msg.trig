@@ -40,8 +40,8 @@
                                     a woncrypt:ECCPublicKey ;
                                     woncrypt:ecc_curveId "brainpoolp384r1" ;
                                     woncrypt:ecc_algorithm "EC" ;
-                                    woncrypt:ecc_qx "26de01d3bc95b7de3f50f813f0e25fc7e3334802d76594350d024f3b78d682eab6422b4285ddfa69b65deac5b063c058" ;
-                                    woncrypt:ecc_qy "5871bd0f6065bf6786dccc4f658b1aad83e3b22ac4dd65d480322fec2b94f8b175eeb02bd34a6c0a1526c29371164dd6" ;
+                                    woncrypt:ecc_qx "479d76295f6f84c9b7a48c3c542057642a4fec7b46c22c3846424d51aa5bab1eabd714caea113a2a919e1790963e10ff" ;
+                                    woncrypt:ecc_qy "239351cbda7c3366110f24d203395a2fb86226b98701276cefbe1d4428c927b681e572d0bee2913bbdcdbb41ac442794" ;
                                 ]
             ] .
 }
@@ -63,7 +63,7 @@
                     signature:hasSignatureMethod    signature:sm-ecdsa
                   ] ;
           signature:hasSignatureValue
-                  "MGQCMGyNqqqX51QXHlUYMmVDNs83veBQvwBO7W3BlYn5CVbStS9v/WfQJRvf4aCmZHDvgAIwM78j\r\nRg5x0Vu42Odi3U4R0AYBKmnzO0Db537Cc6uFWoNeBleqw259xxwOlpozMHfr" ;
+                  "MGQCMEss5VjkZYJiNWOMwMx3wXGH5VbhpcLncxjkii1nhH1HmiIlYmc4A1cFT7rp9/QzGwIwKJ17LBVzhThQSyc/ZdzTa5jza8Dzq2IutKXX8urDqr1vTBiehpryhYxLI9OWdpnl" ;
           signature:hasVerificationCertificate
                   <http://localhost:8080/won/resource/need/3144709509622353000>  .
 }
@@ -85,7 +85,7 @@
 
             msg:referencesSignature     [
                 msg:hasSignedGraph <http://localhost:8080/won/resource/need/3144709509622353000/core/#data> ;
-                msg:hasSignatureValue "MGQCMGyNqqqX51QXHlUYMmVDNs83veBQvwBO7W3BlYn5CVbStS9v/WfQJRvf4aCmZHDvgAIwM78j\r\nRg5x0Vu42Odi3U4R0AYBKmnzO0Db537Cc6uFWoNeBleqw259xxwOlpozMHfr" ;
+                msg:hasSignatureValue "MGQCMEss5VjkZYJiNWOMwMx3wXGH5VbhpcLncxjkii1nhH1HmiIlYmc4A1cFT7rp9/QzGwIwKJ17LBVzhThQSyc/ZdzTa5jza8Dzq2IutKXX8urDqr1vTBiehpryhYxLI9OWdpnl" ;
                 msg:hasSignatureGraph <http://localhost:8080/won/resource/need/3144709509622353000/core/#data-sig>
             ] ;
 
@@ -110,7 +110,7 @@
                                 signature:gsm-trig ;
                         signature:hasSignatureMethod    signature:sm-ecdsa
                       ] ;
-              signature:hasSignatureValue  "MGQCME+PugatzrSYuM++Se06b32fNvuilsHP/+7M4wbyzE3RVIzGDzVUmCLijp3ahayCHAIwGikN\r\nAXqoz8+5K2WfQq7kvBX/thMEzYmtiGwUfhUg5VwXUjLHkyww95YMtpaqQ6DG" ;
+              signature:hasSignatureValue  "MGUCMDxGzPJ9yMljEPOnf/3KbPdWIi+PG7GB3IIp6XHZBJKS6UY5ba2+bWqHR0gmtUfJ/gIxAIuiO0nsZuGMFtoMObJATdLGyd8TSQlDhz32xAtx34qNYsnh9kdwORistAPdhvwEng==" ;
               signature:hasVerificationCertificate
                       <http://localhost:8080/won/resource/need/3144709509622353000> .
 }
@@ -132,7 +132,7 @@
 
             msg:referencesSignature     [
                             msg:hasSignedGraph <http://localhost:8080/won/resource/event/7719577021233193000#data> ;
-                            msg:hasSignatureValue "MGQCME+PugatzrSYuM++Se06b32fNvuilsHP/+7M4wbyzE3RVIzGDzVUmCLijp3ahayCHAIwGikN\r\nAXqoz8+5K2WfQq7kvBX/thMEzYmtiGwUfhUg5VwXUjLHkyww95YMtpaqQ6DG" ;
+                            msg:hasSignatureValue "MGUCMDxGzPJ9yMljEPOnf/3KbPdWIi+PG7GB3IIp6XHZBJKS6UY5ba2+bWqHR0gmtUfJ/gIxAIuiO0nsZuGMFtoMObJATdLGyd8TSQlDhz32xAtx34qNYsnh9kdwORistAPdhvwEng==" ;
                             msg:hasSignatureGraph <http://localhost:8080/won/resource/event/7719577021233193000#data-sig>
                         ] ;
 
@@ -141,22 +141,22 @@
 }
 
 # 2nd ENVELOPE GRAPH SIGNATURE
-<http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl-sig>
-{
+<http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl-sig> {
     <http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl-sig>
-              a                            signature:Signature ;
-              msg:hasSignedGraph <http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl> ;
-              signature:hasGraphSigningMethod
-                      [ a                               signature:GraphSigningMethod ;
-                        signature:hasDigestMethod       signature:dm-sha-256 ;
-                        signature:hasGraphCanonicalizationMethod
-                                signature:gcm-fisteus-2010 ;
-                        signature:hasGraphDigestMethod  signature:gdm-fisteus-2010 ;
-                        signature:hasGraphSerializationMethod
-                                signature:gsm-trig ;
-                        signature:hasSignatureMethod    signature:sm-ecdsa
-                      ] ;
-              signature:hasSignatureValue  "MGQCMBQeADC8WyHtdJje9r8z2ihLCiadO//8nM+gwIEUWEpdrRKN97VXo7vEVMjbKBDvWgIwb+qO\r\n+xAnDq1TToTBY5yOy1rjhJjYW0lIVrCNyY1Txem/2z+DrWRExDsFSN7EpnXu" ;
-              signature:hasVerificationCertificate
-                      <http://localhost:8080/node/certificate> .
+            a                            signature:Signature ;
+            signature:hasGraphSigningMethod
+                    [ a                               signature:GraphSigningMethod ;
+                      signature:hasDigestMethod       signature:dm-sha-256 ;
+                      signature:hasGraphCanonicalizationMethod
+                              signature:gcm-fisteus-2010 ;
+                      signature:hasGraphDigestMethod  signature:gdm-fisteus-2010 ;
+                      signature:hasGraphSerializationMethod
+                              signature:gsm-trig ;
+                      signature:hasSignatureMethod    signature:sm-ecdsa
+                    ] ;
+            signature:hasSignatureValue  "MGQCMB4nUgCdUt0oIc9c3EorYV3lrETd1ARYItXCVsu4juvjSiFfy/fW5AX0zDeywgOKGAIwQUrObfaCSxH7XxiGV+TBtq3f1zHoFRlMgR26msX1u60QjMQ1Alr4iJi1j/TYSVTm" ;
+            signature:hasVerificationCertificate
+                    <http://localhost:8080/node/certificate> ;
+            msg:hasSignedGraph           <http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl> .
 }
+
