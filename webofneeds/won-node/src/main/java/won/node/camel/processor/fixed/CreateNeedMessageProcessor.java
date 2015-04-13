@@ -49,8 +49,6 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
       URI needURI = getNeedURIFromWonMessage(needContent);
       matcherProtocolMatcherClient.needCreated(needURI, ModelFactory.createDefaultModel(),
       newNeedNotificationMessage);
-      WonMessage responseWonMessage = makeCreateResponseMessage(wonMessage);
-      sendMessageToOwner(responseWonMessage, toStringIds(need.getAuthorizedApplications()));
     } catch (Exception e) {
       logger.warn("could not create NeedCreatedNotification", e);
     }

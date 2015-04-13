@@ -51,9 +51,11 @@ public class WonMessageRoutes  extends RouteBuilder
     /**
      * Owner protocol, outgoing
      */
-    from("seda:OwnerProtocolOut?concurrentConsumers=5").routeId("Node2OwnerRoute")
-            .to("bean:ownerProtocolOutgoingMessagesProcessor")
-            .recipientList(header("ownerApplicationIDs"));
+    from("seda:OwnerProtocolOut?concurrentConsumers=5")
+      .routeId("Node2OwnerRoute")
+      .to("bean:ownerProtocolOutgoingMessagesProcessor")
+      .recipientList(header("ownerApplicationIDs"));
+
     /**
      * System-to-remote messages: treated almost as incoming from owner.
      */
@@ -90,6 +92,8 @@ public class WonMessageRoutes  extends RouteBuilder
       .routingSlip(method("messageTypeSlip"))
       .to("bean:signatureAdder")
       .to("bean:persister")
+      //swap: outbound becomes 'normal' message, 'normal' becomes 'original' - note: in some cases (create, activate,
+      // deactivate) there is no outbound message, hence no 'normal' message after this step.
       .setHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER, header(WonCamelConstants.MESSAGE_HEADER))
       .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER))
         //now if the outbound message is one that facet implementations can
@@ -177,7 +181,7 @@ public class WonMessageRoutes  extends RouteBuilder
       .to("bean:wonMessageIntoCamelProcessor")
       .choice()
         //we only handle hint messages
-        .when(header(WonCamelConstants.MESSAGE_TYPE_HEADER).isEqualTo(WONMSG.TYPE_HINT))
+        .when(header(WonCamelConstants.MESSAGE_TYPE_HEADER).isEqualTo(URI.create(WONMSG.TYPE_HINT.getURI().toString())))
           .to("bean:wellformednessChecker")
           .to("bean:signatureChecker")
           .to("bean:wrapperFromExternal")
@@ -187,6 +191,13 @@ public class WonMessageRoutes  extends RouteBuilder
           .to("bean:toOwnerSender")
         .otherwise()
           .log(LoggingLevel.INFO, "could not route message");
+
+    /**
+     * Matcher protocol, outgoing
+     */
+    from("seda:MatcherProtocolOut?concurrentConsumers=5")
+      .routeId("Node2MatcherRoute")
+      .to("activemq:topic:MatcherProtocol.Out.Need");
 
 
   }

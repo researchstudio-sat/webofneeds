@@ -570,13 +570,11 @@ angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scop
         linkedDataService.getNeed(eventData.hasSenderNeed).then(function(need){
             $rootScope.postClosed = applicationStateService.checkIfNeedIsInactive(need);
         });
-
     });
     $scope.$on(won.EVENT.ACTIVATE_NEED_SENT, function(ngEvent, eventData) {
         linkedDataService.getNeed(eventData.hasSenderNeed).then(function(need){
             $rootScope.postClosed = applicationStateService.checkIfNeedIsInactive(need);
         });
-
     });
 
     $scope.onClickYes = function () {

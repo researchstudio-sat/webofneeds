@@ -49,7 +49,7 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
   }
 
   private void saveMessage(final WonMessage wonMessage, URI parent) {
-    logger.debug("STORING message with id {}", wonMessage.getMessageURI());
+    logger.debug("STORING message with uri {} and parent uri", wonMessage.getMessageURI(), parent);
     rdfStorage.storeDataset(wonMessage.getMessageURI(),
             WonMessageEncoder.encodeAsDataset(wonMessage));
     messageEventRepository.save(new MessageEventPlaceholder(parent,

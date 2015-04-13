@@ -367,7 +367,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             options.message = "Query failed.";
         }
         if (!success){
-            errorMessage = "Query failed.";
+            errorMessage = "Query failed: " + data;
         } else if (typeof options.allowNone !== undefined  && options.allowNone == false && data.length == 0){
             errorMessage = "No results found.";
         } else if (typeof options.allowMultiple !== undefined  && options.allowMultiple == false && data.length > 1){
@@ -981,9 +981,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                 won.WON.hasEventContainerCompacted + " ?container.\n" +
                                 "?container rdfs:member ?eventUri. \n" +
                                 " optional { " +
-                                "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
+                                "  ?eventUri msg:hasTimestamp ?timestamp; \n" +
+                                "            msg:hasMessageType ?messageType .\n" +
+                                //filter added so we don't show the success/failure events as last events
+                                " filter (?messageType != msg:SuccessResponse && ?messageType != msg:FailureResponse)" +
                                 " } \n" +
-                                "} order by desc(?timestamp) limit 1";
+                                "} " +
+                                "order by desc(?timestamp) limit 1";
                             privateData.store.execute(query, [], [], function (success, results) {
                                 if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: false, allowMultiple: false})) {
                                     return;
@@ -1020,16 +1024,22 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                 "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
                                 "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
                                 "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                                "select distinct ?eventUri ?timestamp ?text ?senderNeed where { " +
+                                    //note: we have to take the max timestamp as there might be multiple timestamps added to the
+                                    //message dataset during processing
+                                "select ?eventUri (max(?tmstmp) AS ?timestamp) ?text ?senderNeed where { " +
                                 "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
                                 won.WON.hasEventContainerCompacted + " ?container.\n" +
                                 "?container rdfs:member ?eventUri. \n" +
-                                "?eventUri won:hasTextMessage ?text. \n" +
-                                "?eventUri msg:hasSenderNeed ?senderNeed. \n" +
+                                "?eventUri won:hasTextMessage ?text; \n" +
+                                "          msg:hasMessageType ?messageType; \n" +
+                                "          msg:hasSenderNeed ?senderNeed. \n" +
                                 " optional { " +
-                                "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
+                                "  ?eventUri msg:hasTimestamp ?tmstmp .\n" +
                                 " } \n" +
-                                "} order by asc(?timestamp) ";//limit " + limit;
+                                //filter added so we don't show the success/failure events as last events
+                                " filter (?messageType != msg:SuccessResponse && ?messageType != msg:FailureResponse)" +
+                                "} group by ?eventUri ?text ?senderNeed order by asc(?timestamp) ";
+
 
                             privateData.store.execute(query, [], [], function (success, results) {
                                 if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: true, allowMultiple: true})) {

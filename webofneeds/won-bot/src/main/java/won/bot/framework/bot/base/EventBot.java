@@ -153,10 +153,10 @@ public class EventBot extends TriggeredBot
     }
   }
   @Override
-  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needUri, final Dataset needModel)
+  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needUri, final Dataset wonMessageDataset)
   {
     if (getLifecyclePhase().isActive()){
-      eventBus.publish(new NeedCreatedEventForMatcher(needUri, needModel));
+      eventBus.publish(new NeedCreatedEventForMatcher(needUri, wonMessageDataset));
     } else {
       logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
     }

@@ -46,6 +46,7 @@ public class WonMessage implements Serializable
   private URI receiverNodeURI;
   private List<URI> refersTo = new ArrayList<>();
   private URI isResponseToMessageURI;
+  private URI isRemoteResponseToMessageURI;
     private List<String> contentGraphNames;
   private WonMessageType isResponseToMessageType;
   private URI correspondingRemoteMessageURI;
@@ -310,6 +311,13 @@ public class WonMessage implements Serializable
       this.isResponseToMessageURI = getEnvelopePropertyURIValue(WONMSG.IS_RESPONSE_TO);
     }
     return this.isResponseToMessageURI;
+  }
+
+  public URI getIsRemoteResponseToMessageURI() {
+    if (this.isRemoteResponseToMessageURI == null) {
+      this.isRemoteResponseToMessageURI = getEnvelopePropertyURIValue(WONMSG.IS_REMOTE_RESPONSE_TO);
+    }
+    return this.isRemoteResponseToMessageURI;
   }
 
   public URI getCorrespondingRemoteMessageURI() {

@@ -47,7 +47,8 @@ public class WonMessageBuilder
   private Set<URI> refersToURIs = new HashSet<>();
   //if the message is a response message, it MUST have exactly one isResponseToMessageURI set.
   private URI isResponseToMessageURI;
-
+  //if the message is a response message, and the original message has a correspondingRemoteMessage, set it here
+  private URI isRemoteResponseToMessageURI;
 
   private WonMessageType isResponseToMessageType;
   //some message exist twice: once on the receiver's won node and once on the sender's.
@@ -160,6 +161,11 @@ public class WonMessageBuilder
         envelopeGraph.createResource(isResponseToMessageURI.toString()));
       messageEventResource.addProperty(
         WONMSG.IS_RESPONSE_TO_MESSAGE_TYPE, this.isResponseToMessageType.getResource());
+      if (isRemoteResponseToMessageURI != null) {
+        messageEventResource.addProperty(
+          WONMSG.IS_REMOTE_RESPONSE_TO,
+          envelopeGraph.createResource(isRemoteResponseToMessageURI.toString()));
+      }
     }
 
     if (correspondingRemoteMessageURI != null) {
@@ -427,7 +433,6 @@ public class WonMessageBuilder
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setSenderNodeURI(matcherURI)
-      .setReceiverURI(needFacetURI)
       .setReceiverNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
       .setTimestampToNow()
@@ -537,7 +542,8 @@ public class WonMessageBuilder
       this
         .setSenderNodeURI(originalMessage.getReceiverNodeURI())
         .setSenderNeedURI(originalMessage.getReceiverNeedURI())
-        .setSenderURI(originalMessage.getReceiverURI());
+        .setSenderURI(originalMessage.getReceiverURI())
+        .setIsRemoteResponseToMessageURI(originalMessage.getCorrespondingRemoteMessageURI());
     } else if (WonMessageDirection.FROM_OWNER == origDirection|| WonMessageDirection.FROM_SYSTEM == origDirection ){
       //if the message comes from the owner, the original sender is also
       //the sender of the response
@@ -635,6 +641,11 @@ public class WonMessageBuilder
     return this;
   }
 
+  public WonMessageBuilder setIsRemoteResponseToMessageURI(final URI isRemoteResponseToMessageURI) {
+    this.isRemoteResponseToMessageURI = isRemoteResponseToMessageURI;
+    return this;
+  }
+
   public WonMessageBuilder setIsResponseToMessageType(final WonMessageType isResponseToMessageType) {
     this.isResponseToMessageType = isResponseToMessageType;
     return this;
@@ -679,6 +690,9 @@ public class WonMessageBuilder
     }
     if (wonMessage.getIsResponseToMessageURI() != null){
       this.setIsResponseToMessageURI(wonMessage.getIsResponseToMessageURI());
+    }
+    if (wonMessage.getIsRemoteResponseToMessageURI() != null){
+      this.setIsRemoteResponseToMessageURI(wonMessage.getIsRemoteResponseToMessageURI());
     }
     return this;
   }
@@ -763,6 +777,9 @@ public class WonMessageBuilder
       .setTimestamp(new Date().getTime())
       .addRefersToURI(inboundWonMessage.getMessageURI())
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
+      .setIsRemoteResponseToMessageURI(inboundWonMessage.getIsRemoteResponseToMessageURI())
+      .setIsResponseToMessageURI(inboundWonMessage.getIsResponseToMessageURI())
+      .setIsResponseToMessageType(inboundWonMessage.getIsResponseToMessageType())
       .build();
   }
 
@@ -798,7 +815,11 @@ public class WonMessageBuilder
       .setReceiverURI(remoteConnectionURI)
       .setReceiverNeedURI(remoteNeedURI)
       .setReceiverNodeURI(remoteWonNodeUri)
+      .setIsRemoteResponseToMessageURI(wonMessage.getIsRemoteResponseToMessageURI())
+      .setIsResponseToMessageURI(wonMessage.getIsResponseToMessageURI())
+      .setIsResponseToMessageType(wonMessage.getIsResponseToMessageType())
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
+
     return builder.build();
   }
 

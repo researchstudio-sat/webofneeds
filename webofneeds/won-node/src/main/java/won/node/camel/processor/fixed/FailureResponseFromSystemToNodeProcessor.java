@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package won.node.camel.processor.general;
+package won.node.camel.processor.fixed;
 
 import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;

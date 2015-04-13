@@ -42,25 +42,29 @@ public class SendMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
     if (con.getState() != ConnectionState.CONNECTED) {
       throw new IllegalMessageForConnectionStateException(connectionUri, "CONNECTION_MESSAGE", con.getState());
     }
-    WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage);
+    WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage, con);
     //add the information about the remote message to the locally stored one
-    wonMessage = new WonMessageBuilder()
-            .wrap(wonMessage)
-            .setCorrespondingRemoteMessageURI(newWonMessage.getMessageURI())
-            .build();
+    WonMessageBuilder builder = new WonMessageBuilder();
+    builder.wrap(wonMessage)
+            .setCorrespondingRemoteMessageURI(newWonMessage.getMessageURI());
+    if (wonMessage.getReceiverURI() == null){
+       builder.setReceiverURI(con.getRemoteConnectionURI());
+    }
+    wonMessage = builder.build();
     //put it into the header so the persister will pick it up later
     message.setHeader(WonCamelConstants.MESSAGE_HEADER,wonMessage);
 
     exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER,newWonMessage);
   }
 
-  private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage) {
+  private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage, final Connection con) {
     //create the message to send to the remote node
     return new WonMessageBuilder()
       .setPropertiesForPassingMessageToRemoteNode(
         wonMessage,
         wonNodeInformationService
           .generateEventURI(wonMessage.getReceiverNodeURI()))
+      .setReceiverURI(con.getRemoteConnectionURI())
       .build();
   }
 
