@@ -1,5 +1,8 @@
-import actors.LinkedDataCrawlerActor;
+import actors.DeadLetterActor;
+import actors.MasterCrawlerActor;
+import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import akka.actor.DeadLetter;
 import akka.actor.Props;
 
 import java.io.IOException;
@@ -14,7 +17,9 @@ public class AkkaSystemMain
   public static void main(String[] args) throws IOException {
 
     ActorSystem system = ActorSystem.create("AkkaMatchingService");
-    system.actorOf(Props.create(LinkedDataCrawlerActor.class), "LinkedDataCrawler");
+    system.actorOf(Props.create(MasterCrawlerActor.class), "MasterCrawlerActor");
+    ActorRef actor = system.actorOf(Props.create(DeadLetterActor.class), "DeadLetterActor");
+    system.eventStream().subscribe(actor, DeadLetter.class);
   }
 
 }
