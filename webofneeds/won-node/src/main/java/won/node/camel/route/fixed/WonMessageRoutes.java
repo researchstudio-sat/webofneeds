@@ -171,6 +171,7 @@ public class WonMessageRoutes  extends RouteBuilder
      * Need protocol, outgoing
      */
     from("seda:NeedProtocolOut?concurrentConsumers=5").routeId("Node2NodeRoute")
+            .to("bean:signatureAdder")
             .to("bean:needProtocolOutgoingMessagesProcessor");
 
     /**

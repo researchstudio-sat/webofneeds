@@ -73,12 +73,15 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
 
     } catch (Exception e) {
       //TODO SignatureProcessingException?
-      throw new WonMessageProcessingException(e);
+      throw new WonMessageProcessingException("Error by signature verification of "
+                                                + message.getMessageURI(), e);
     }
     // throw exception if the verification fails:
     if (!result.isVerificationPassed()) {
       //TODO SignatureProcessingException?
-      throw new WonMessageProcessingException(new SignatureException(result.getMessage()));
+      throw new WonMessageProcessingException(
+        new SignatureException("Error by signature verification of " + message.getMessageURI()
+                                 + ": " + result.getMessage()));
     }
     return message;
   }

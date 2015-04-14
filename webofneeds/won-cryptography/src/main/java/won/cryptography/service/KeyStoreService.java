@@ -35,9 +35,6 @@ public class KeyStoreService {
 
     public KeyStoreService(File storeFile) {
 
-      //TODO delete
-      logger.info("Initializing keystore from " + storeFile + " with pass: " + new String(this.storePW));
-
         Security.addProvider(new BouncyCastleProvider());
 
         this.storeFile = storeFile;
@@ -57,10 +54,6 @@ public class KeyStoreService {
 
     public PrivateKey getPrivateKey(String alias) {
 
-      //TODO delete (temp for debugging)
-      logger.info("Getting private key from keystore: " + this.storeFile.getName() + ", for " + alias + ", " +
-                    "with pass: " + new String(this.storePW));
-
         PrivateKey retrieved = null;
 
         try {
@@ -74,10 +67,6 @@ public class KeyStoreService {
     }
 
     public PublicKey getPublicKey(String alias) {
-
-      //TODO delete (temp for debugging)
-      logger.info("Getting public key from keystore: " + this.storeFile.getName() + ", for " + alias + ", " +
-                    "with pass: " + new String(this.storePW));
 
       PublicKey retrieved = null;
 
@@ -106,10 +95,6 @@ public class KeyStoreService {
     }
 
     public synchronized void putKey(String alias, Key key, Certificate[] certificateChain) {
-
-      //TODO delete (temp for debugging)
-      logger.info("Putting keys in keystore: " + this.storeFile.getName() + ", for " + alias + ", " +
-                    "with pass: " + new String(this.storePW));
 
         try {
             store.setKeyEntry(alias, key, storePW, certificateChain);
@@ -143,9 +128,6 @@ public class KeyStoreService {
             } finally {
                 try {
                     outputStream.close();
-                  //TODO delete (temp for debugging)
-                  logger.info("Saved keystore: " + this.storeFile.getName() + ", " +
-                                "with pass: " + new String(this.storePW));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
