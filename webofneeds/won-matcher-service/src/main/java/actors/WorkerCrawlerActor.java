@@ -11,7 +11,7 @@ import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.update.UpdateExecutionFactory;
 import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.update.UpdateRequest;
-import messages.URIActionMessage;
+import messages.UriActionMessage;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.springframework.http.*;
@@ -69,38 +69,38 @@ public class WorkerCrawlerActor extends UntypedActor
    * Receives messages with an URI and processes them by requesting the resource,
    * saving it to a triple store, extracting URIs from content and answering the sender.
    *
-   * @param msg if type is {@link messages.URIActionMessage} then process it
+   * @param msg if type is {@link messages.UriActionMessage} then process it
    * @throws IOException
    */
   @Override
   public void onReceive(Object msg) throws IOException {
 
-    if (msg instanceof URIActionMessage) {
+    if (msg instanceof UriActionMessage) {
 
       // request and save data
-      URIActionMessage uriMsg = (URIActionMessage) msg;
+      UriActionMessage uriMsg = (UriActionMessage) msg;
       Dataset ds = requestDataset(uriMsg.getUri());
       save(ds);
 
       // send extracted non-base URIs back to sender
       Set<String> extractedURIs = extractURIs(uriMsg.getBaseUri(), nonBasePropertyPaths);
       for (String extractedURI : extractedURIs) {
-        URIActionMessage newUriMsg = new URIActionMessage(
-          extractedURI, uriMsg.getBaseUri(), URIActionMessage.ACTION.PROCESS);
+        UriActionMessage newUriMsg = new UriActionMessage(
+          extractedURI, uriMsg.getBaseUri(), UriActionMessage.ACTION.PROCESS);
         getSender().tell(newUriMsg, getSelf());
       }
 
       // send extracted base URIs back to sender
       extractedURIs = extractURIs(uriMsg.getBaseUri(), basePropertyPaths);
       for (String extractedURI : extractedURIs) {
-        URIActionMessage newUriMsg = new URIActionMessage(
-          extractedURI, extractedURI, URIActionMessage.ACTION.PROCESS);
+        UriActionMessage newUriMsg = new UriActionMessage(
+          extractedURI, extractedURI, UriActionMessage.ACTION.PROCESS);
         getSender().tell(newUriMsg, getSelf());
       }
 
       // signal sender that this URI is processed
-      URIActionMessage uriDoneMsg = new URIActionMessage(
-        uriMsg.getUri(), uriMsg.getBaseUri(), URIActionMessage.ACTION.REMOVE);
+      UriActionMessage uriDoneMsg = new UriActionMessage(
+        uriMsg.getUri(), uriMsg.getBaseUri(), UriActionMessage.ACTION.REMOVE);
       getSender().tell(uriDoneMsg, getSelf());
 
     } else {

@@ -5,7 +5,7 @@ package messages;
  * User: hfriedrich
  * Date: 30.03.2015
  */
-public class URIActionMessage
+public class UriActionMessage
 {
 
   public static enum ACTION {
@@ -19,7 +19,7 @@ public class URIActionMessage
    * @param baseUri base URI that is used with property paths to extract further URIs
    * @param action describes what to with the URI
    */
-  public URIActionMessage(final String uri, final String baseUri, final ACTION action) {
+  public UriActionMessage(final String uri, final String baseUri, final ACTION action) {
     this.uri = uri;
     this.baseUri = baseUri;
     this.action = action;

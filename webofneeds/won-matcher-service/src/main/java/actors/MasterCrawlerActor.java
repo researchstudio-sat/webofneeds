@@ -8,7 +8,7 @@ import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.PathParser;
-import messages.URIActionMessage;
+import messages.UriActionMessage;
 import won.protocol.vocabulary.WON;
 
 import java.util.ArrayList;
@@ -25,13 +25,13 @@ import java.util.Map;
 public class MasterCrawlerActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-  private Map<String, URIActionMessage> pendingMessages = null;
+  private Map<String, UriActionMessage> pendingMessages = null;
   private ActorRef worker = null;
   private int numBaseUrisCrawled = 0;
   private int numNonBaseUrisCrawled = 0;
 
   public MasterCrawlerActor() {
-    pendingMessages = new HashMap<String, URIActionMessage>();
+    pendingMessages = new HashMap<String, UriActionMessage>();
   }
 
   /**
@@ -82,15 +82,15 @@ public class MasterCrawlerActor extends UntypedActor
         configureNonBasePropertyPaths()), "WorkerCrawlerActor");
 
     String uri = "http://rsa021.researchstudio.at:8080/won/resource/need/y1mjzvzlh8avwl6m2tre";
-    URIActionMessage msg = new URIActionMessage(uri, uri, URIActionMessage.ACTION.PROCESS);
+    UriActionMessage msg = new UriActionMessage(uri, uri, UriActionMessage.ACTION.PROCESS);
     process(msg);
   }
 
   @Override
   public void onReceive(final Object message) throws Exception {
-    if (message instanceof URIActionMessage) {
-      URIActionMessage actionMsg = (URIActionMessage) message;
-      if (actionMsg.getAction().equals(URIActionMessage.ACTION.REMOVE)) {
+    if (message instanceof UriActionMessage) {
+      UriActionMessage actionMsg = (UriActionMessage) message;
+      if (actionMsg.getAction().equals(UriActionMessage.ACTION.REMOVE)) {
         log.debug("Successfully processed URI: {}", actionMsg.getUri());
         if (actionMsg.getUri().equals(actionMsg.getBaseUri())) {
           numBaseUrisCrawled++;
@@ -98,7 +98,7 @@ public class MasterCrawlerActor extends UntypedActor
           numNonBaseUrisCrawled++;
         }
         pendingMessages.remove(actionMsg.getUri());
-      } else if (actionMsg.getAction().equals(URIActionMessage.ACTION.PROCESS)) {
+      } else if (actionMsg.getAction().equals(UriActionMessage.ACTION.PROCESS)) {
         process(actionMsg);
       }
 
@@ -112,7 +112,7 @@ public class MasterCrawlerActor extends UntypedActor
     }
   }
 
-  private void process(URIActionMessage msg) {
+  private void process(UriActionMessage msg) {
 
     if(pendingMessages.get(msg.getUri()) != null) {
       log.debug("message for URI {} already sent, await answer ...");
