@@ -1,5 +1,3 @@
-package actors;
-
 import akka.actor.DeadLetter;
 import akka.actor.UntypedActor;
 
