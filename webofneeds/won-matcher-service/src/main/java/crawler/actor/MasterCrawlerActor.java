@@ -129,17 +129,14 @@ public class MasterCrawlerActor extends UntypedActor
         } else {
           numNonBaseUrisCrawled++;
         }
+        log.info("Number of URIs crawled: \nBase URIs: {}\nNon-base URIs: {}\nFailed URIs: {}",
+                 numBaseUrisCrawled, numNonBaseUrisCrawled, numFailedUris);
         endpoint.updateCrawlingMetadata(uriMsg);
         pendingMessages.remove(uriMsg.getUri());
       } else if (uriMsg.getStatus().equals(UriStatusMessage.STATUS.PROCESS)) {
         process(uriMsg);
       }
-
-      log.info("Number of pending messages: {}", pendingMessages.size());
-      if (pendingMessages.isEmpty()) {
-        log.info("Number of URIs crawled: \nBase URIs: {}\nNon-base URIs: {}\nFailed URIs: {}",
-                 numBaseUrisCrawled, numNonBaseUrisCrawled, numFailedUris);
-      }
+      log.debug("Number of pending messages: {}", pendingMessages.size());
     } else {
       unhandled(message);
     }
@@ -151,11 +148,10 @@ public class MasterCrawlerActor extends UntypedActor
    * @param msg
    */
   private void process(UriStatusMessage msg) {
-
     if(pendingMessages.get(msg.getUri()) != null) {
       log.debug("message for URI {} already sent, await answer ...", msg.getUri());
     } else {
-      log.debug("crawl URI: {}", msg.getUri());
+      log.info("Crawl URI: {}", msg.getUri());
       pendingMessages.put(msg.getUri(), msg);
       endpoint.updateCrawlingMetadata(msg);
       worker.tell(msg, getSelf());

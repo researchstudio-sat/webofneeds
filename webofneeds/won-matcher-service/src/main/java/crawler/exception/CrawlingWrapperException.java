@@ -14,6 +14,7 @@ public class CrawlingWrapperException extends RuntimeException
   private UriStatusMessage breakingMessage;
 
   public CrawlingWrapperException(Exception e, UriStatusMessage msg) {
+    super(e.getMessage());
     exception = e;
     breakingMessage = new UriStatusMessage(msg.getUri(), msg.getBaseUri(), UriStatusMessage.STATUS.FAILED);
   }

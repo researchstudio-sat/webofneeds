@@ -17,6 +17,7 @@ import won.protocol.vocabulary.WON;
 
 import java.io.StringWriter;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -100,7 +101,7 @@ public class SparqlEndpointAccess
    */
   public Set<UriStatusMessage> getMessagesForCrawling(UriStatusMessage.STATUS status) {
 
-    Set<UriStatusMessage> msgs = new HashSet<UriStatusMessage>();
+    Set<UriStatusMessage> msgs = new LinkedHashSet<>();
     String queryTemplate = "\nSELECT ?uri ?base WHERE { GRAPH <%s> {?uri ?p '%s'. ?uri <%s> ?base}}\n";
     String queryString = String.format(queryTemplate, METADATA_GRAPH, status, CRAWL_BASE_URI_PREDICATE);
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);

@@ -115,7 +115,7 @@ public class WorkerCrawlerActor extends UntypedActor
 
     ResponseEntity<Dataset> response = null;
     try {
-      log.debug("Request from URL: {}", msg.getUri());
+      log.debug("Request URI: {}", msg.getUri());
       response = restTemplate.exchange(msg.getUri(), HttpMethod.GET, entity, Dataset.class);
 
       if (response.getStatusCode() != HttpStatus.OK) {
