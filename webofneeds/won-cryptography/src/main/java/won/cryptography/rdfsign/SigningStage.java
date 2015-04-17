@@ -1,13 +1,12 @@
 package won.cryptography.rdfsign;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.NodeIterator;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.*;
 import won.protocol.message.SignatureReference;
 import won.protocol.message.WonMessage;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WONMSG;
 
@@ -36,6 +35,7 @@ public class SigningStage {
 
   private List<String> envOrderedByContainment = new ArrayList<>();
   private String messageUri;
+  private Map<String,String> graphUriToItsMessageUri = new HashMap<>();
 
   public SigningStage(WonMessage message) {
     extractData(message);
@@ -45,14 +45,18 @@ public class SigningStage {
     return messageUri;
   }
 
+  public String getMessageUri(String envelopeGraphUri) {
+    return graphUriToItsMessageUri.get(envelopeGraphUri);
+  }
+
   private void extractData(final WonMessage message) {
     messageUri = message.getMessageURI().toString();
     Dataset dataset = message.getCompleteDataset();
     for (String uri : RdfUtils.getModelNames(dataset)) {
       Model model = dataset.getNamedModel(uri);
       if (message.isEnvelopeGraph(uri, model)) {
-        extractEnvelopeData(uri, model);
-      } else if (WonVerifier.isSignature(model)) {
+        extractEnvelopeData(uri, model, message);
+      } else if (WonRdfUtils.SignatureUtils.isSignature(model)) {
         extractSignatureData(uri, model);
       } else { // should be content
         extractContentData(uri);
@@ -96,13 +100,17 @@ public class SigningStage {
     }
   }
 
-  private void extractEnvelopeData(final String envelopeGraphUri, final Model envelopeGraph) {
+  private void extractEnvelopeData(final String envelopeGraphUri, final Model envelopeGraph, final WonMessage message) {
 
     // add to envelope uris
     envUris.add(envelopeGraphUri);
 
-    // find if it contains has content
-    Resource msgEventResource = envelopeGraph.getResource(messageUri);
+    // find if it contains has_content
+
+    //TODO this duplicates private findmessageuri method from wonmessage, refactor to avoid code repetition
+    String envMessageUri = RdfUtils.findOnePropertyFromResource(envelopeGraph, envelopeGraph.getResource(envelopeGraphUri), RDFG.SUBGRAPH_OF).asResource().getURI();
+    graphUriToItsMessageUri.put(envelopeGraphUri, envMessageUri);
+    Resource msgEventResource = envelopeGraph.getResource(envMessageUri);
     Resource msgEnvelopeResource = envelopeGraph.getResource(envelopeGraphUri);
     StmtIterator it = msgEventResource.listProperties(WONMSG.HAS_CONTENT_PROPERTY);
     while (it.hasNext()) {

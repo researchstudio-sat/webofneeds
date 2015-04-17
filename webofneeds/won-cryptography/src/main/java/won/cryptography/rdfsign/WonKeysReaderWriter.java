@@ -14,6 +14,7 @@ import won.cryptography.exception.KeyNotSupportedException;
 import won.cryptography.key.KeyInformationExtractor;
 import won.cryptography.key.KeyInformationExtractorBouncyCastle;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.CERT;
 import won.protocol.vocabulary.WONCRYPT;
 
@@ -164,7 +165,7 @@ public class WonKeysReaderWriter
   public void readKeyReferences(Model model, Set<String> keyRefs)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
 
-    if (WonVerifier.isSignature(model)) {
+    if (WonRdfUtils.SignatureUtils.isSignature(model)) {
       Property typeProp = model.createProperty(Ontology.getSigIri(), "hasVerificationCertificate");
       StmtIterator si = model.listStatements(null, typeProp, RdfUtils.EMPTY_RDF_NODE);
       if (si.hasNext()) {

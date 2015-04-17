@@ -52,7 +52,7 @@ public class WonMessageSignerVerifier
     SignatureReference sigRef = null;
     for (String envUri : sigStage.getUnsignedEnvUrisOrderedByContainment()) {
       if (sigRef != null) {
-        addSignatureReference(sigStage.getMessageUri(), sigRef, envUri, msgDataset);
+        addSignatureReference(sigStage.getMessageUri(envUri), sigRef, envUri, msgDataset);
       }
       sigRef = signer.sign(privateKey, privateKeyUri, envUri).get(0);
     }
@@ -91,7 +91,7 @@ public class WonMessageSignerVerifier
     List<SignatureReference> sigRefs = signer.sign(privateKey, privateKeyUri, sigStage.getUnsignedContentUris());
     for (SignatureReference sigRef : sigRefs) {
       String envUri = sigStage.getEnvelopeUriContainingContent(sigRef.getSignedGraphUri());
-      addSignatureReference(sigStage.getMessageUri(), sigRef, envUri, msgDataset);
+      addSignatureReference(sigStage.getMessageUri(envUri), sigRef, envUri, msgDataset);
     }
   }
 
@@ -111,7 +111,7 @@ public class WonMessageSignerVerifier
       innemostUnsignedEnvUri = envUris.get(0);
     }
     for (SignatureReference sigRef : sigStage.getNotReferencedSignaturesAsReferences()) {
-      addSignatureReference(sigStage.getMessageUri(), sigRef, innemostUnsignedEnvUri, msgDataset);
+      addSignatureReference(sigStage.getMessageUri(innemostUnsignedEnvUri), sigRef, innemostUnsignedEnvUri, msgDataset);
     }
   }
 

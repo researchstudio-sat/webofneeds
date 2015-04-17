@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.message.SignatureReference;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WONMSG;
 
@@ -51,7 +52,7 @@ public class WonVerifier
 
     for (String graphURI : RdfUtils.getModelNames(dataset)) {
       Model model = dataset.getNamedModel(graphURI);
-      if (isSignatureGraph(graphURI, model)) {
+      if (WonRdfUtils.SignatureUtils.isSignatureGraph(graphURI, model)) {
         addSignatureToResult(graphURI, model);
       } else {
         result.addSignedGraphName(graphURI);
@@ -204,42 +205,9 @@ public class WonVerifier
     return algorithm;
   }
 
-  public static boolean isSignatureGraph(String graphUri, Model model) {
-    // TODO check the presence of all the required triples
-    Resource resource = model.getResource(graphUri);
-    Property typeProp = model.createProperty(Ontology.getW3CSyntaxURI(), "type");
-    Resource sigRes = model.createResource(Ontology.getSigIri() + "Signature");
-    StmtIterator si = model.listStatements(resource, typeProp, sigRes);
-    if (si.hasNext()) {
-      return true;
-    }
-    return false;
-  }
-
-  public static boolean isSignature(Model model) {
-    // TODO check the presence of all the required triples
-    Property typeProp = model.createProperty(Ontology.getW3CSyntaxURI(), "type");
-    Resource sigRes = model.createResource(Ontology.getSigIri() + "Signature");
-    StmtIterator si = model.listStatements(null, typeProp, sigRes);
-    if (si.hasNext()) {
-      return true;
-    }
-    return false;
-  }
-
   private void addSignatureToResult(final String graphUri, final Model model) {
-    String signedGraphUri = null;
-    String signatureValue = null;
-    Resource resource = model.getResource(graphUri);
-    NodeIterator ni = model.listObjectsOfProperty(resource, WONMSG.HAS_SIGNED_GRAPH_PROPERTY);
-    if (ni.hasNext()) {
-      signedGraphUri = ni.next().asResource().getURI();
-    }
-    Property hasSigValueProp = model.createProperty(Ontology.getSigIri(), "hasSignatureValue");
-    NodeIterator ni2 = model.listObjectsOfProperty(resource, hasSigValueProp);
-    if (ni2.hasNext()) {
-      signatureValue = ni2.next().asLiteral().toString();
-    }
+    String signedGraphUri = WonRdfUtils.SignatureUtils.getSignedGraphUri(graphUri, model);
+    String signatureValue = WonRdfUtils.SignatureUtils.getSignatureValue(graphUri, model);
     if (signedGraphUri != null && signatureValue != null) {
       result.addSignatureData(graphUri, signedGraphUri, signatureValue);
     }

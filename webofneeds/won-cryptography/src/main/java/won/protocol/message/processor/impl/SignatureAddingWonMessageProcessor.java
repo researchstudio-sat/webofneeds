@@ -77,7 +77,6 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor
 
   private WonMessage processWithKey(final WonMessage wonMessage, final String privateKeyUri,
                                     final PrivateKey privateKey) throws Exception {
-    logger.debug("TO SIGN:\n" + WonMessageEncoder.encode(wonMessage, Lang.TRIG));
     WonMessage signed = WonMessageSignerVerifier.sign(privateKey, privateKeyUri, wonMessage);
     logger.debug("SIGNED with key " + privateKeyUri + ":\n" + WonMessageEncoder.encode(signed, Lang.TRIG));
     return signed;

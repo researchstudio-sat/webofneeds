@@ -5,6 +5,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.*;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.ontology.Ontology;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
 import java.util.ArrayList;
@@ -88,7 +89,7 @@ public class WonAssembler
   public static void removeSignatureGraphs(Dataset dataset) {
 
     for (String name : RdfUtils.getModelNames(dataset)) {
-      if (WonVerifier.isSignatureGraph(name, dataset.getNamedModel(name))) {
+      if (WonRdfUtils.SignatureUtils.isSignatureGraph(name, dataset.getNamedModel(name))) {
         dataset.removeNamedModel(name);
       }
     }
