@@ -1,5 +1,6 @@
 package won.cryptography.service;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -18,6 +19,8 @@ import java.security.KeyPair;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: fsalcher
@@ -33,57 +36,73 @@ public class CertificateService {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public X509Certificate createSelfSignedCertificate(KeyPair key) {
 
-        DateTime today = new DateTime();
+  public X509Certificate createSelfSignedCertificate(BigInteger serialNumber, KeyPair key, Map<ASN1ObjectIdentifier,
+    String> subjectData) {
 
-        Date notBefore = today.minusDays(1).withTimeAtStartOfDay().toDate();
-        Date notAfter = today.plusYears(2).withTimeAtStartOfDay().toDate();
+    DateTime today = new DateTime();
 
-        BigInteger serialNumber = BigInteger.valueOf(1);
+    Date notBefore = today.minusDays(1).withTimeAtStartOfDay().toDate();
+    Date notAfter = today.plusYears(2).withTimeAtStartOfDay().toDate();
 
-        X500NameBuilder nameBuilder = new X500NameBuilder(BCStyle.INSTANCE);
+    //BigInteger serialNumber = BigInteger.valueOf(1);
 
-        // ToDo: which attributes to use? make them configurable?
-        nameBuilder.addRDN(BCStyle.C, "Austria");
-        nameBuilder.addRDN(BCStyle.O, "RSA");
-        nameBuilder.addRDN(BCStyle.E, "office.sat@researchstudio.at");
-        nameBuilder.addRDN(BCStyle.CN, "SelfSignedStuff");
-        nameBuilder.addRDN(BCStyle.SN, "SN1234");
-        X500Name subject = nameBuilder.build();
+    X500NameBuilder nameBuilder = new X500NameBuilder(BCStyle.INSTANCE);
 
-        X509v3CertificateBuilder certGen = new JcaX509v3CertificateBuilder(
-                subject,
-                serialNumber,
-                notBefore,
-                notAfter,
-                subject, key.getPublic());
+
+//        // ToDo: which attributes to use? make them configurable?
+//        nameBuilder.addRDN(BCStyle.C, "Austria");
+//        nameBuilder.addRDN(BCStyle.O, "RSA");
+//        nameBuilder.addRDN(BCStyle.E, "office.sat@researchstudio.at");
+//        nameBuilder.addRDN(BCStyle.CN, "SelfSignedStuff");
+//        nameBuilder.addRDN(BCStyle.SN, "SN1234");
+    for (ASN1ObjectIdentifier objectIdentifier : subjectData.keySet()) {
+      nameBuilder.addRDN(objectIdentifier, subjectData.get(objectIdentifier));
+    }
+    X500Name subject = nameBuilder.build();
+
+    X509v3CertificateBuilder certGen = new JcaX509v3CertificateBuilder(
+      subject,
+      serialNumber,
+      notBefore,
+      notAfter,
+      subject, key.getPublic());
 
 
 //            AlgorithmIdentifier sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find("SHA1WithRSA");
 
-        JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA256WithECDSA");
+    //TODO this information should probably be extracted from public key
+    JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA256WithECDSA");
 
-        X509Certificate cert = null;
+    X509Certificate cert = null;
 
-        try {
+    try {
 
-            ContentSigner sigGen = csBuilder
-                    .setProvider(PROVIDER_BC).build(key.getPrivate());
+      ContentSigner sigGen = csBuilder
+        .setProvider(PROVIDER_BC).build(key.getPrivate());
 
-            cert = new JcaX509CertificateConverter().setProvider(PROVIDER_BC)
-                    .getCertificate(certGen.build(sigGen));
-            cert.checkValidity(new Date());
-            cert.verify(cert.getPublicKey());
+      cert = new JcaX509CertificateConverter().setProvider(PROVIDER_BC)
+                                              .getCertificate(certGen.build(sigGen));
+      cert.checkValidity(new Date());
+      cert.verify(cert.getPublicKey());
 
 
-        } catch (Exception e) {
-            // ToDo: proper error handling
-            e.printStackTrace();
-        }
-
-        return cert;
-
+    } catch (Exception e) {
+      // ToDo: proper error handling
+      e.printStackTrace();
     }
+
+    return cert;
+
+  }
+
+  public X509Certificate createSelfSignedCertificate(BigInteger serialNumber,
+                                                     KeyPair key,
+                                                     String subjectId
+                                                     ) {
+    Map<ASN1ObjectIdentifier,String> subjectData = new HashMap<ASN1ObjectIdentifier,String>();
+    subjectData.put(BCStyle.UNIQUE_IDENTIFIER, subjectId);
+    return createSelfSignedCertificate(serialNumber, key, subjectData);
+  }
 
 }

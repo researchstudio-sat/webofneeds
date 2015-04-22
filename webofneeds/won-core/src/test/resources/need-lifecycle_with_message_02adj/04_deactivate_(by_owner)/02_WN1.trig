@@ -48,7 +48,7 @@
             :won:hasEventContainer [
                 rdfs:member
                     <http://www.example.com/resource/need/randomNeedID_1/connection/randomConnectionID_1_1/event/0> ,
-                    <http://www.remote-example.com/resource/need/randomNeedID_2/connection/randomConnectionID_2_1/event/randomEventID_2_2> .
+                    <http://www.remote-example.com/resource/need/randomNeedID_2/connection/randomConnectionID_2_1/event/randomEventID_2_2>
             ]
 
 }

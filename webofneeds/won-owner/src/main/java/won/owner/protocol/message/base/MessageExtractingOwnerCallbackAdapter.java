@@ -16,6 +16,8 @@
 
 package won.owner.protocol.message.base;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import won.owner.protocol.message.OwnerCallback;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
@@ -30,13 +32,14 @@ import won.protocol.util.WonRdfUtils;
  * are not part of messages.
  * Use with care.
  */
-public class MessageExtractingWonMessageHandlerAdapter extends WonMessageHandlerAdapter {
+public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter
+{
 
-  public MessageExtractingWonMessageHandlerAdapter(OwnerCallback adaptee) {
+  public MessageExtractingOwnerCallbackAdapter(OwnerCallback adaptee) {
     super(adaptee);
   }
 
-  public MessageExtractingWonMessageHandlerAdapter() {
+  public MessageExtractingOwnerCallbackAdapter() {
   }
 
   @Override
@@ -65,7 +68,8 @@ public class MessageExtractingWonMessageHandlerAdapter extends WonMessageHandler
     return con;
   }
 
-
+  @Autowired(required = false)
+  @Qualifier("default")
   public void setAdaptee(OwnerCallback adaptee) {
     super.setAdaptee(adaptee);
   }

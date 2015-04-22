@@ -1,11 +1,8 @@
-package won.cryptography.rdfsign;
+package won.cryptography.utils;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.util.FileUtils;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusReader;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;
@@ -15,7 +12,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import won.cryptography.service.CryptographyUtils;
 
 import java.io.*;
 import java.util.Iterator;
