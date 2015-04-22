@@ -42,7 +42,7 @@ import java.net.URI;
  * Sent and received messages are added to the dataset automatically. Missing data is
  * automatically loaded via linked data.
  */
-public class DatasetBackedWonMessageHandlerAdapter extends WonMessageHandlerAdapter
+public class DatasetBackedOwnerCallbackAdapter extends OwnerCallbackAdapter
 {
   //TODO move to the queries object!
   private static final String QUERY_CONNECTION =
@@ -64,7 +64,7 @@ public class DatasetBackedWonMessageHandlerAdapter extends WonMessageHandlerAdap
   private LinkedDataSource linkedDataSource;
 
 
-  public DatasetBackedWonMessageHandlerAdapter(final OwnerCallback adaptee) {
+  public DatasetBackedOwnerCallbackAdapter(final OwnerCallback adaptee) {
     super(adaptee);
   }
 

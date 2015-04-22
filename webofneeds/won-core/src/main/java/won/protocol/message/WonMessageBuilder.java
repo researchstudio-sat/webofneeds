@@ -30,6 +30,8 @@ public class WonMessageBuilder
   private static final CheapInsecureRandomString randomString = new CheapInsecureRandomString();
   private static final int RANDOM_SUFFIX_LENGTH = 5;
 
+  // ToDo (FS): move to some vocabulary class
+
   private URI messageURI;
   private URI senderURI;
   private URI senderNeedURI;
@@ -178,13 +180,13 @@ public class WonMessageBuilder
         envelopeGraph.createTypedLiteral(this.timestamp));
     }
 
+
     for (URI contentURI : contentMap.keySet()) {
-      String uniqueContentUri = RdfUtils.createNewGraphURI(contentURI.toString(), CONTENT_URI_SUFFIX, 5,
-        dataset).toString();
-      dataset.addNamedModel(uniqueContentUri, contentMap.get(contentURI));
+      String contentUriString = contentURI.toString();
+      dataset.addNamedModel(contentUriString, contentMap.get(contentURI));
       messageEventResource.addProperty(
         WONMSG.HAS_CONTENT_PROPERTY, messageEventResource
-          .getModel().createResource(uniqueContentUri));
+          .getModel().createResource(contentUriString));
       //add the [content-graph] rdfg:subGraphOf [message-uri] triple to the envelope
       envelopeGraph.createStatement(envelopeGraph.getResource(contentURI.toString()), RDFG.SUBGRAPH_OF,
         messageEventResource);
@@ -226,7 +228,7 @@ public class WonMessageBuilder
     if (this.forwardedMessage != null){
       if (this.wrappedMessage != null) throw new IllegalStateException("cannot wrap and forward with the same " +
         "builder");
-      addAsContainedEnvelope(dataset, envelopeGraph, envelopeGraphResource, wrappedMessage, messageURI);
+      addAsContainedEnvelope(dataset, envelopeGraph, envelopeGraphResource, forwardedMessage, messageURI);
     }
   }
 
@@ -240,7 +242,7 @@ public class WonMessageBuilder
     //copy all named graphs to the new message dataset
     for (Iterator<String> names = messageToAdd.getCompleteDataset().listNames(); names.hasNext(); ){
       String graphUri = names.next();
-      Model modelToAdd = this.wrappedMessage.getCompleteDataset().getNamedModel(graphUri);
+      Model modelToAdd = messageToAdd.getCompleteDataset().getNamedModel(graphUri);
       dataset.addNamedModel(graphUri, modelToAdd);
       //define that the added graph is a subgraph of the message if that is not yet
       //expressed in the graph itself
@@ -266,7 +268,10 @@ public class WonMessageBuilder
   public WonMessageBuilder wrap(WonMessage toWrap){
     this.setMessageURI(toWrap.getMessageURI());
     this.setWonMessageDirection(toWrap.getEnvelopeType());
-    this.wrappedMessage = toWrap;
+
+    //make a copy to avoid modification in current message in case wrapped message
+    //is modified externally
+    this.wrappedMessage = WonRdfUtils.MessageUtils.copyByDatasetSerialization(toWrap);
     return this;
   }
 
@@ -278,7 +283,9 @@ public class WonMessageBuilder
    * @return
    */
   public WonMessageBuilder forward(WonMessage toForward){
-    this.forwardedMessage = toForward;
+    //make a copy to avoid modification in current message in case wrapped message
+    //is modified externally
+    this.forwardedMessage = WonRdfUtils.MessageUtils.copyByDatasetSerialization(toForward);
     return this;
   }
 
@@ -513,10 +520,43 @@ public class WonMessageBuilder
   }
 
   public WonMessageBuilder setPropertiesForPassingMessageToRemoteNode(final WonMessage ownerOrSystemMsg, URI newMessageUri){
+     return setPropertiesForPassingMessageToRemoteNodeAndCopyLocalMessage(ownerOrSystemMsg, newMessageUri);
+  }
+
+  @Deprecated
+  /**
+   * The message to remote node will contain envelope with properties extracted from corresponding
+   * local message, as well as copy of the local message content with replaced uris (remote message uris).
+   * The method should no longer be used since introducing signatures, which led to preserving
+   * exact copy of local envelopes and local contents in remote message (no uris are replaced)
+   *
+   */
+  private WonMessageBuilder setPropertiesForPassingMessageToRemoteNodeAndCopyLocalMessageReplacingUris(final WonMessage
+                                                                                                      ownerOrSystemMsg,
+                                                                       URI newMessageUri){
     this.setMessageURI(newMessageUri)
       .setTimestamp(new Date().getTime())
       .copyContentFromMessageReplacingMessageURI(ownerOrSystemMsg)
       .copyEnvelopeFromWonMessage(ownerOrSystemMsg)
+      .setCorrespondingRemoteMessageURI(ownerOrSystemMsg.getMessageURI())
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
+    return this;
+  }
+
+  /**
+   * The message to remote node will contain envelope with timestamp, remoteMessageUri, direction,
+   * as well as exact copy of the local message envelopes and contents.
+   *
+   * @param ownerOrSystemMsg
+   * @param newMessageUri
+   * @return
+   */
+  private WonMessageBuilder setPropertiesForPassingMessageToRemoteNodeAndCopyLocalMessage(final WonMessage
+                                                                                         ownerOrSystemMsg,
+                                                                          URI newMessageUri){
+    this.setMessageURI(newMessageUri)
+      .setTimestamp(new Date().getTime())
+      .forward(ownerOrSystemMsg) // copy
       .setCorrespondingRemoteMessageURI(ownerOrSystemMsg.getMessageURI())
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
     return this;
@@ -627,7 +667,7 @@ public class WonMessageBuilder
       signatureMap.put(contentGraphUri, signature);
     return this;
   }
-
+  
   public WonMessageBuilder addRefersToURI(URI refersTo) {
     refersToURIs.add(refersTo);
     return this;

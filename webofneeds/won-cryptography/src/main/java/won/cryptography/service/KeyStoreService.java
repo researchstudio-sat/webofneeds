@@ -5,9 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.security.Key;
-import java.security.Security;
+import java.security.*;
 import java.security.cert.Certificate;
+import java.util.Arrays;
 
 /**
  * User: fsalcher
@@ -29,10 +29,8 @@ public class KeyStoreService {
 
     private java.security.KeyStore store;
 
-    public KeyStoreService() {
-
-        this(null);
-
+    public KeyStoreService(String filePath) {
+      this(new File(filePath));
     }
 
     public KeyStoreService(File storeFile) {
@@ -54,12 +52,12 @@ public class KeyStoreService {
         }
     }
 
-    public Key getKey(String alias) {
+    public PrivateKey getPrivateKey(String alias) {
 
-        Key retrieved = null;
+        PrivateKey retrieved = null;
 
         try {
-            retrieved = store.getKey("key1", storePW);
+            retrieved = (PrivateKey) store.getKey(alias, storePW);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,8 +66,35 @@ public class KeyStoreService {
 
     }
 
-    public void putKey(String alias, Key key, Certificate[] certificateChain) {
+    public PublicKey getPublicKey(String alias) {
 
+      PublicKey retrieved = null;
+
+      try {
+        retrieved = getCertificate(alias).getPublicKey();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      return retrieved;
+
+    }
+
+    public Certificate getCertificate(String alias) {
+
+      Certificate retrieved = null;
+
+      try {
+        retrieved = store.getCertificate(alias);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      return retrieved;
+
+    }
+
+    public synchronized void putKey(String alias, Key key, Certificate[] certificateChain) {
 
         try {
             store.setKeyEntry(alias, key, storePW, certificateChain);
@@ -81,7 +106,7 @@ public class KeyStoreService {
     }
 
 
-    private void saveStoreToFile() {
+    private synchronized void saveStoreToFile() {
 
         OutputStream outputStream = null;
 
@@ -96,7 +121,7 @@ public class KeyStoreService {
         if (outputStream != null) {
             try {
 
-                store.store(outputStream, storePW);
+                store.store(outputStream, Arrays.copyOf(storePW, storePW.length));
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -126,7 +151,7 @@ public class KeyStoreService {
         if (inputStream != null) {
             try {
 
-                store.load(inputStream, storePW);
+                store.load(inputStream, Arrays.copyOf(storePW, storePW.length));
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -139,4 +164,14 @@ public class KeyStoreService {
             }
         }
     }
+
+  public int size() {
+    try {
+      return store.size();
+    } catch (KeyStoreException e) {
+      //TODO proper logging
+      logger.warn(e.toString());
+    }
+    return 0;
+  }
 }

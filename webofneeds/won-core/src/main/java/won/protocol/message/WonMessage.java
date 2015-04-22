@@ -113,8 +113,9 @@ public class WonMessage implements Serializable
 
   public URI getOuterEnvelopeGraphURI(){
     if (this.outerEnvelopeGraphURI != null) {
-      getEnvelopeGraphs(); //also sets the outerEnvelopeUri
+      return this.outerEnvelopeGraphURI;
     }
+    getEnvelopeGraphs(); //also sets the outerEnvelopeUri
     return this.outerEnvelopeGraphURI;
   }
 
@@ -132,7 +133,7 @@ public class WonMessage implements Serializable
     List<Model> allEnvelopes = new ArrayList<Model>();
     this.envelopeGraphNames = new ArrayList<String>();
     this.contentGraphNames = new ArrayList<String>();
-    this.messageURI = null;
+    URI currentMessageURI = null;
     this.outerEnvelopeGraph = null;
     Set<String> envelopesContainedInOthers = new HashSet<String>();
     Set<String> allEnvelopeGraphNames = new HashSet<String>();
@@ -146,16 +147,14 @@ public class WonMessage implements Serializable
         this.envelopeGraphNames.add(envelopeGraphUri);
         allEnvelopeGraphNames.add(envelopeGraphUri);
         allEnvelopes.add(envelopeGraph);
-        //find out the message's URI (if we haven't yet)
-        if (this.messageURI == null) {
-          findMessageUri(envelopeGraph, envelopeGraphUri);
-        }
+        currentMessageURI = findMessageUri(envelopeGraph, envelopeGraphUri);
         //check if the envelope contains references to 'contained' envelopes and remember their names
         List<String> containedEnvelopes = findContainedEnvelopeUris(envelopeGraph, envelopeGraphUri);
         envelopesContainedInOthers.addAll(containedEnvelopes);
-        if (this.messageURI != null) {
-          for (NodeIterator it = getContentGraphReferences(envelopeGraph, envelopeGraph.getResource(getMessageURI().toString())); it
-            .hasNext(); ) {
+        if (currentMessageURI != null) {
+            for (NodeIterator it = getContentGraphReferences(envelopeGraph,
+                                                             envelopeGraph.getResource(currentMessageURI.toString())); it
+              .hasNext(); ) {
             RDFNode node = it.next();
             this.contentGraphNames.add(node.asResource().toString());
           }
@@ -180,9 +179,9 @@ public class WonMessage implements Serializable
 
 
 
-  private void findMessageUri(final Model model, final String modelUri) {
+  private URI findMessageUri(final Model model, final String modelUri) {
     RDFNode messageUriNode = RdfUtils.findOnePropertyFromResource(model, model.getResource(modelUri), RDFG.SUBGRAPH_OF);
-    this.messageURI = URI.create(messageUriNode.asResource().getURI());
+    return URI.create(messageUriNode.asResource().getURI());
   }
 
   private List<String> findContainedEnvelopeUris(final Model envelopeGraph, final String envelopeGraphUri) {
@@ -227,7 +226,7 @@ public class WonMessage implements Serializable
 
   public URI getMessageURI() {
     if (this.messageURI == null) {
-      this.messageURI = getEnvelopeSubjectURIValue(WONMSG.HAS_MESSAGE_TYPE_PROPERTY, null);
+      this.messageURI = findMessageUri(getOuterEnvelopeGraph(), getOuterEnvelopeGraphURI().toString());
     }
     return this.messageURI;
   }
@@ -336,23 +335,30 @@ public class WonMessage implements Serializable
     return isResponseToMessageType;
   }
 
-  public URI getEnvelopePropertyURIValue(URI property){
-    for (Model envelopeGraph: getEnvelopeGraphs()){
-      StmtIterator it = envelopeGraph.listStatements(envelopeGraph.getResource(getMessageURI().toString()), envelopeGraph.getProperty(property.toString()),
-              (RDFNode) null);
+  public URI getEnvelopePropertyURIValue(URI propertyURI){
+    Property property = getCompleteDataset().getDefaultModel().createProperty(propertyURI.toString());
+    return getEnvelopePropertyURIValue(property);
+  }
+
+  public URI getEnvelopePropertyURIValue(Property property){
+    Model currentEnvelope = getOuterEnvelopeGraph();
+    URI currentEnvelopeUri = getOuterEnvelopeGraphURI();
+    //TODO would make sense to order envelope graphs in order from container to containee in the first place,
+    //if proper done, we should avoid ending up in infinite loop if someone sends us malformed envelopes that
+    // contain-in-other circular...
+    while (currentEnvelope != null) {
+      URI currentMessageURI = findMessageUri(currentEnvelope, currentEnvelopeUri.toString());
+      StmtIterator it = currentEnvelope.listStatements(currentEnvelope.getResource(currentMessageURI.toString()),
+                                                       property,
+                                                       (RDFNode) null);
       if (it.hasNext()){
         return URI.create(it.nextStatement().getObject().asResource().toString());
       }
-    }
-    return null;
-  }
-
-  private URI getEnvelopePropertyURIValue(Property property){
-    for (Model envelopeGraph: getEnvelopeGraphs()){
-      StmtIterator it = envelopeGraph.listStatements(envelopeGraph.getResource(getMessageURI().toString()), property,
-        (RDFNode) null);
-      if (it.hasNext()){
-        return URI.create(it.nextStatement().getObject().asResource().toString());
+      // move to the next envelope
+      currentEnvelopeUri = RdfUtils.findFirstObjectUri(currentEnvelope, WONMSG.CONTAINS_ENVELOPE, null, true, true);
+      currentEnvelope = null;
+      if (currentEnvelopeUri != null) {
+        currentEnvelope = this.completeDataset.getNamedModel(currentEnvelopeUri.toString());
       }
     }
     return null;
@@ -360,7 +366,7 @@ public class WonMessage implements Serializable
 
   private URI getEnvelopeSubjectURIValue(Property property, RDFNode object){
     for (Model envelopeGraph: getEnvelopeGraphs()){
-      URI val = RdfUtils.findFirstObjectUri(envelopeGraph, property, object, true, true);
+      URI val = RdfUtils.findFirstSubjectUri(envelopeGraph, property, object, true, true);
       if (val != null) {
         return val;
       }
@@ -370,11 +376,21 @@ public class WonMessage implements Serializable
 
   private List<URI> getEnvelopePropertyURIValues(Property property){
     List<URI> values = new ArrayList<URI>();
-    for (Model envelopeGraph: getEnvelopeGraphs()){
-      StmtIterator it = envelopeGraph.listStatements(envelopeGraph.getResource(getMessageURI().toString()), property,
-        (RDFNode) null);
+    Model currentEnvelope = getOuterEnvelopeGraph();
+    URI currentEnvelopeUri = getOuterEnvelopeGraphURI();
+    //TODO would make sense to order envelope graphs in order from container to containee in the first place
+    while (currentEnvelope != null) {
+      URI currentMessageURI = findMessageUri(currentEnvelope, currentEnvelopeUri.toString());
+      StmtIterator it = currentEnvelope.listStatements(currentEnvelope.getResource(currentMessageURI.toString()),
+                                                       property,
+                                                       (RDFNode) null);
       while (it.hasNext()){
         values.add(URI.create(it.nextStatement().getObject().asResource().toString()));
+      }
+      currentEnvelopeUri = RdfUtils.findFirstObjectUri(currentEnvelope, WONMSG.CONTAINS_ENVELOPE, null, true, true);
+      currentEnvelope = null;
+      if (currentEnvelopeUri != null) {
+        currentEnvelope = this.completeDataset.getNamedModel(currentEnvelopeUri.toString());
       }
     }
     return values;

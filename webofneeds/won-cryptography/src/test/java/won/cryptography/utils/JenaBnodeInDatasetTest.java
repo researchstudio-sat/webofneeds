@@ -1,4 +1,4 @@
-package won.cryptography.rdfsign;
+package won.cryptography.utils;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;

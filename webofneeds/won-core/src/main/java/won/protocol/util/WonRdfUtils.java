@@ -6,6 +6,7 @@ import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.rdf.model.impl.PropertyImpl;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.DataIntegrityException;
@@ -15,6 +16,7 @@ import won.protocol.model.Facet;
 import won.protocol.model.Match;
 import won.protocol.model.NeedState;
 import won.protocol.service.WonNodeInfo;
+import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
@@ -34,6 +36,47 @@ public class WonRdfUtils
   public static final String NAMED_GRAPH_SUFFIX = "#data";
 
   private static final Logger logger = LoggerFactory.getLogger(WonRdfUtils.class);
+
+  public static class SignatureUtils {
+    public static boolean isSignatureGraph(String graphUri, Model model) {
+      // TODO check the presence of all the required triples
+      Resource resource = model.getResource(graphUri);
+      StmtIterator si = model.listStatements(resource, RDF.type, SFSIG.SIGNATURE);
+      if (si.hasNext()) {
+        return true;
+      }
+      return false;
+    }
+
+    public static boolean isSignature(Model model) {
+      // TODO check the presence of all the required triples
+      StmtIterator si = model.listStatements(null, RDF.type, SFSIG.SIGNATURE);
+      if (si.hasNext()) {
+        return true;
+      }
+      return false;
+    }
+
+    public static String getSignedGraphUri(String signatureGraphUri, Model signatureGraph) {
+      String signedGraphUri = null;
+      Resource resource = signatureGraph.getResource(signatureGraphUri);
+      NodeIterator ni = signatureGraph.listObjectsOfProperty(resource, WONMSG.HAS_SIGNED_GRAPH_PROPERTY);
+      if (ni.hasNext()) {
+        signedGraphUri = ni.next().asResource().getURI();
+      }
+      return signedGraphUri;
+    }
+
+    public static String getSignatureValue(String signatureGraphUri, Model signatureGraph) {
+      String signatureValue = null;
+      Resource resource = signatureGraph.getResource(signatureGraphUri);
+      NodeIterator ni2 = signatureGraph.listObjectsOfProperty(resource, SFSIG.HAS_SIGNATURE_VALUE);
+      if (ni2.hasNext()) {
+        signatureValue = ni2.next().asLiteral().toString();
+      }
+      return signatureValue;
+    }
+  }
 
   public static class WonNodeUtils
   {
@@ -167,6 +210,12 @@ public class WonRdfUtils
     }
 
 
+    public static WonMessage copyByDatasetSerialization(final WonMessage toWrap) {
+      WonMessage copied = new WonMessage(RdfUtils.readDatasetFromString(
+        RdfUtils.writeDatasetToString(toWrap.getCompleteDataset(),
+                                      Lang.TRIG) ,Lang.TRIG));
+      return copied;
+    }
   }
 
   public static class FacetUtils {
@@ -174,11 +223,19 @@ public class WonRdfUtils
 
 
     public static URI getFacet(WonMessage message){
-      return getObjectOfMessageProperty(message, WON.HAS_FACET);
+      URI uri = getObjectOfMessageProperty(message, WON.HAS_FACET);
+      if (uri == null) {
+        uri = getObjectOfRemoteMessageProperty(message, WON.HAS_REMOTE_FACET);
+      }
+      return uri;
     }
 
     public static URI getRemoteFacet(WonMessage message) {
-      return getObjectOfMessageProperty(message, WON.HAS_REMOTE_FACET);
+      URI uri = getObjectOfMessageProperty(message, WON.HAS_REMOTE_FACET);
+      if (uri == null) {
+        uri = getObjectOfRemoteMessageProperty(message, WON.HAS_FACET);
+      }
+      return uri;
     }
 
     /**
@@ -194,6 +251,27 @@ public class WonRdfUtils
         StmtIterator smtIter = contentGraph.getResource(messageURI.toString()).listProperties(property);
         if (smtIter.hasNext()) {
           return URI.create(smtIter.nextStatement().getObject().asResource().getURI());
+        }
+      }
+      return null;
+    }
+
+    /**
+     * Returns a property of the corresponding remote message (i.e. the object of the first triple (
+     * [corresponding-remote-message-uri] [property] X )
+     * found in one of the content graphs of the specified message.
+     */
+    private static URI getObjectOfRemoteMessageProperty(final WonMessage message, final Property property) {
+      List<String> contentGraphUris = message.getContentGraphURIs();
+      Dataset contentGraphs = message.getMessageContent();
+      URI messageURI = message.getCorrespondingRemoteMessageURI();
+      if (messageURI != null) {
+        for (String graphUri : contentGraphUris) {
+          Model contentGraph = contentGraphs.getNamedModel(graphUri);
+          StmtIterator smtIter = contentGraph.getResource(messageURI.toString()).listProperties(property);
+          if (smtIter.hasNext()) {
+            return URI.create(smtIter.nextStatement().getObject().asResource().getURI());
+          }
         }
       }
       return null;

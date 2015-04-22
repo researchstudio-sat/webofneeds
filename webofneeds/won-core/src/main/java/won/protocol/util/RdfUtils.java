@@ -1000,13 +1000,25 @@ public class RdfUtils
    * @param allowNone if false, will throw an IllegalArgumentException if no triple is found
    * @return
    */
-  public static URI findFirstObjectUri(Model model, Property property, RDFNode object, boolean allowMultiple,
+  public static URI findFirstSubjectUri(Model model, Property property, RDFNode object, boolean allowMultiple,
     boolean allowNone){
     URI retVal = null;
     StmtIterator it = model.listStatements(null, property, object);
     if (!it.hasNext() && !allowNone) throw new IllegalArgumentException("expecting at least one triple");
     if (it.hasNext()){
       retVal = URI.create(it.nextStatement().getSubject().asResource().toString());
+    }
+    if (!allowMultiple && it.hasNext()) throw new IllegalArgumentException("not expecting more than one triple");
+    return retVal;
+  }
+
+  public static URI findFirstObjectUri(Model model, Property property, RDFNode object, boolean allowMultiple,
+                                        boolean allowNone){
+    URI retVal = null;
+    StmtIterator it = model.listStatements(null, property, object);
+    if (!it.hasNext() && !allowNone) throw new IllegalArgumentException("expecting at least one triple");
+    if (it.hasNext()){
+      retVal = URI.create(it.nextStatement().getObject().asResource().toString());
     }
     if (!allowMultiple && it.hasNext()) throw new IllegalArgumentException("not expecting more than one triple");
     return retVal;
