@@ -8,7 +8,6 @@ import akka.routing.FromConfig;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.PathParser;
-import crawler.db.SparqlEndpointAccess;
 import crawler.exception.CrawlingWrapperException;
 import crawler.message.UriStatusMessage;
 import scala.concurrent.duration.Duration;
@@ -20,10 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Coordinates recursive crawling of linked data resources by assigning {@link crawler.message.UriStatusMessage} to
- * workers of type {@link crawler.actor.WorkerCrawlerActor}.
+ * Coordinates recursive crawling of linked data resources by assigning {@link crawler.message.UriStatusMessage}
+ * to workers of type {@link crawler.actor.WorkerCrawlerActor} and one single worker of type
+ * {@link UpdateMetadataActor}.
  * The process can be stopped at any time and continued since meta data about the crawling process is saved
- * in the SPARQL endpoint and (unfinished) messages can be resend for crawling again.
+ * in the SPARQL endpoint by a single actor of type {@link UpdateMetadataActor} which
+ * keeps message order to guarantee consistency in case of failure. Unfinished messages can
+ * be resend for restarting crawling.
  *
  * User: hfriedrich
  * Date: 30.03.2015
@@ -32,16 +34,18 @@ public class MasterCrawlerActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private Map<String, UriStatusMessage> pendingMessages = null;
-  private ActorRef worker;
-  private SparqlEndpointAccess endpoint;
-  private int numBaseUrisCrawled = 0;
-  private int numNonBaseUrisCrawled = 0;
-  private int numFailedUris = 0;
-
+  private Map<String, UriStatusMessage> doneMessages = null;
+  private Map<String, UriStatusMessage> failedMessages = null;
+  private int numDoubleMessages = 0;
+  private ActorRef crawlingWorker;
+  private ActorRef updateMetaDataWorker;
+  private String sparqlEndpoint;
 
   public MasterCrawlerActor(String sparqlEndpoint) {
-    pendingMessages = new HashMap<String, UriStatusMessage>();
-    endpoint = new SparqlEndpointAccess(sparqlEndpoint);
+    pendingMessages = new HashMap<>();
+    doneMessages = new HashMap<>();
+    failedMessages = new HashMap<>();
+    this.sparqlEndpoint = sparqlEndpoint;
   }
 
   /**
@@ -79,12 +83,22 @@ public class MasterCrawlerActor extends UntypedActor
   @Override
   public void preStart() {
 
-    Props workerProps = Props.create(WorkerCrawlerActor.class, endpoint.getSparqlEndpoint(),
-                                     configureBasePropertyPaths(), configureNonBasePropertyPaths());
-    worker = getContext().actorOf(
-      new FromConfig().props(workerProps), "CrawlingRouter");
+    // Create the router/pool with worker actors that do the actual crawling
+    Props workerProps = Props.create(WorkerCrawlerActor.class, sparqlEndpoint,
+                                     configureBasePropertyPaths(),
+                                     configureNonBasePropertyPaths());
+    crawlingWorker = getContext().actorOf(new FromConfig().props(workerProps), "CrawlingRouter");
+
+    // create a single meta data update actor for all worker actors in blazegraph
+    updateMetaDataWorker = getContext().actorOf(
+      Props.create(UpdateMetadataActor.class, sparqlEndpoint), "MetaDataUpdateWorker");
   }
 
+  /**
+   * set supervision strategy for worker actors and handle failed crawling actions
+   *
+   * @return
+   */
   @Override
   public SupervisorStrategy supervisorStrategy() {
 
@@ -94,13 +108,12 @@ public class MasterCrawlerActor extends UntypedActor
       @Override
       public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
-        // save the failed status of a worker during crawling
+        // save the failed status of a crawlingWorker during crawling
         if (t instanceof CrawlingWrapperException) {
           CrawlingWrapperException e = (CrawlingWrapperException) t;
-          endpoint.updateCrawlingMetadata(e.getBreakingMessage());
           log.warning("Handled breaking message: {}", e.getBreakingMessage());
           log.warning("Exception was: {}", e.getException());
-          numFailedUris++;
+          process(e.getBreakingMessage());
           return SupervisorStrategy.resume();
         }
 
@@ -113,48 +126,75 @@ public class MasterCrawlerActor extends UntypedActor
   }
 
   /**
-   * Receive {@link crawler.message.UriStatusMessage} messages and pass them over to workers for crawling.
+   * Process {@link crawler.message.UriStatusMessage} objects
    *
    * @param message
-   * @throws Exception
    */
   @Override
-  public void onReceive(final Object message) throws Exception {
+  public void onReceive(final Object message) {
+
     if (message instanceof UriStatusMessage) {
       UriStatusMessage uriMsg = (UriStatusMessage) message;
-      if (uriMsg.getStatus().equals(UriStatusMessage.STATUS.DONE)) {
-        log.debug("Successfully processed URI: {}", uriMsg.getUri());
-        if (uriMsg.getUri().equals(uriMsg.getBaseUri())) {
-          numBaseUrisCrawled++;
-        } else {
-          numNonBaseUrisCrawled++;
-        }
-        log.info("Number of URIs crawled: \nBase URIs: {}\nNon-base URIs: {}\nFailed URIs: {}",
-                 numBaseUrisCrawled, numNonBaseUrisCrawled, numFailedUris);
-        endpoint.updateCrawlingMetadata(uriMsg);
-        pendingMessages.remove(uriMsg.getUri());
-      } else if (uriMsg.getStatus().equals(UriStatusMessage.STATUS.PROCESS)) {
-        process(uriMsg);
-      }
+      process(uriMsg);
       log.debug("Number of pending messages: {}", pendingMessages.size());
     } else {
       unhandled(message);
     }
   }
 
+  private void logStatus() {
+    log.info("Number of URIs\n Crawled: {}\n Failed: {}\n Pending: {}\n Double: {}",
+             doneMessages.size(), failedMessages.size(), pendingMessages.size(), numDoubleMessages);
+  }
+
   /**
-   * Pass the messages to process to the workers
+   * Pass the messages to process to the workers and update meta data about crawling
    *
    * @param msg
    */
   private void process(UriStatusMessage msg) {
-    if(pendingMessages.get(msg.getUri()) != null) {
-      log.debug("message for URI {} already sent, await answer ...", msg.getUri());
-    } else {
-      log.info("Crawl URI: {}", msg.getUri());
+
+    log.debug("Process message: {}", msg);
+    if (msg.getStatus().equals(UriStatusMessage.STATUS.PROCESS)) {
+
+      // multiple extractions of the same URI can happen quite often since the extraction
+      // query uses property path from base URI which may return URIs that are already
+      // processed. So filter out these messages here
+      if (pendingMessages.get(msg.getUri()) != null ||
+        doneMessages.get(msg.getUri()) != null ||
+        failedMessages.get(msg.getUri()) != null) {
+        log.debug("message {} already processing/processed ...", msg);
+        return;
+      }
+
+      // start crawling URI
+      updateMetaDataWorker.tell(msg, getSelf());
       pendingMessages.put(msg.getUri(), msg);
-      endpoint.updateCrawlingMetadata(msg);
-      worker.tell(msg, getSelf());
+      crawlingWorker.tell(msg, getSelf());
+
+    } else if (msg.getStatus().equals(UriStatusMessage.STATUS.DONE)) {
+
+      // URI crawled successfully
+      log.debug("Successfully processed URI: {}", msg.getUri());
+      updateMetaDataWorker.tell(msg, getSelf());
+      pendingMessages.remove(msg.getUri());
+      if (doneMessages.put(msg.getUri(), msg) != null) {
+        log.warning("URI message received twice: {}", msg.getUri());
+        numDoubleMessages++;
+      }
+      logStatus();
+
+    } else if (msg.getStatus().equals(UriStatusMessage.STATUS.FAILED)) {
+
+      // Crawling failed
+      log.debug("Crawling URI failed: {}", msg.getUri());
+      updateMetaDataWorker.tell(msg, getSelf());
+      pendingMessages.remove(msg.getUri());
+      failedMessages.put(msg.getUri(), msg);
+      crawlingWorker.tell(msg, getSelf());
+      logStatus();
     }
   }
+
+
 }

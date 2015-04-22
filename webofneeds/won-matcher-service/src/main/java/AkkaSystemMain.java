@@ -3,7 +3,7 @@ import akka.actor.ActorSystem;
 import akka.actor.DeadLetter;
 import akka.actor.Props;
 import crawler.actor.MasterCrawlerActor;
-import crawler.db.SparqlEndpointAccess;
+import crawler.db.SparqlEndpointService;
 import crawler.message.UriStatusMessage;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ public class AkkaSystemMain
 
     String endpointURI = args[0];
     String uri = args[1];
-    SparqlEndpointAccess endpoint = new SparqlEndpointAccess(endpointURI);
+    SparqlEndpointService endpoint = new SparqlEndpointService(endpointURI);
 
     ActorSystem system = ActorSystem.create("AkkaMatchingService");
     ActorRef master = system.actorOf(

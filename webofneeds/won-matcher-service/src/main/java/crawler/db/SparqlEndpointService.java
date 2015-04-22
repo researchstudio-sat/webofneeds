@@ -16,17 +16,15 @@ import org.slf4j.LoggerFactory;
 import won.protocol.vocabulary.WON;
 
 import java.io.StringWriter;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
- * Access of Sparql enpoint database to save or query linked data.
+ * Service to access of Sparql enpoint database to save or query linked data.
  *
  * User: hfriedrich
  * Date: 15.04.2015
  */
-public class SparqlEndpointAccess
+public class SparqlEndpointService
 {
   private static final String METADATA_GRAPH = WON.BASE_URI + "crawlMetadata";
   private static final String CRAWL_DATE_PREDICATE = WON.BASE_URI + "crawlDate";
@@ -36,12 +34,8 @@ public class SparqlEndpointAccess
   private final Logger log = LoggerFactory.getLogger(getClass());
   private String sparqlEndpoint;
 
-  public SparqlEndpointAccess(String sparqlEndpoint) {
+  public SparqlEndpointService(String sparqlEndpoint) {
     this.sparqlEndpoint = sparqlEndpoint;
-  }
-
-  public String getSparqlEndpoint() {
-    return sparqlEndpoint;
   }
 
   private void executeUpdateQuery(String updateQuery) {
@@ -55,7 +49,7 @@ public class SparqlEndpointAccess
   }
 
   /**
-   * Update a graph by first clearing it completely and afterwards inserting the triples of the new model.
+   * Update a graph by first deleting it and afterwards inserting the triples of the new model.
    *
    * @param graph graph to be updated
    * @param model model that holds triples to set
@@ -69,11 +63,29 @@ public class SparqlEndpointAccess
   }
 
   /**
+   * Update a dataset of graphs first deleting them and afterwards inserting the triples of the new models.
+   *
+   * @param ds
+   */
+  public void updateDataset(Dataset ds) {
+
+    Iterator<String> graphNames = ds.listNames();
+    while (graphNames.hasNext()) {
+
+      log.debug("Save dataset");
+      String graphName = graphNames.next();
+      Model model = ds.getNamedModel(graphName);
+      updateGraph(graphName, model);
+    }
+  }
+
+  /**
    * Update the message meta data about the crawling process using a separate graph.
    * For each crawled URI save the date, the current status and the baseUri.
-   * This enables to construct the message again (e.g. for executing (unfinished) crawling again later)
+   * This enables to construct the message again (e.g. for executing (unfinished)
+   * crawling again later)
    *
-   * @param msg message about which crawling meta data is updated
+   * @param msg message that describe crawling meta data to update
    */
   public void updateCrawlingMetadata(UriStatusMessage msg) {
 
@@ -81,8 +93,8 @@ public class SparqlEndpointAccess
     String queryTemplate = "\nDELETE WHERE { GRAPH <%s> { <%s> ?y ?z}};";
     String queryString = String.format(queryTemplate, METADATA_GRAPH, msg.getUri());
 
-    // insert now entry
-    queryTemplate = "\nINSERT DATA { GRAPH <%s> { <%s> <%s> %d. <%s> <%s> '%s'. <%s> <%s> <%s>}}\n";
+    // insert new entry
+    queryTemplate = "\nINSERT DATA { GRAPH <%s> { <%s> <%s> %d. <%s> <%s> '%s'. <%s> <%s> <%s> }}\n";
     queryString += String.format(queryTemplate, METADATA_GRAPH,
                                  msg.getUri(), CRAWL_DATE_PREDICATE, System.currentTimeMillis(),
                                  msg.getUri(), CRAWL_STATUS_PREDICATE, msg.getStatus(),
@@ -93,8 +105,40 @@ public class SparqlEndpointAccess
   }
 
   /**
-   * Gets all messages saved in the db of a certain status (e.g. FAILED) and puts them in the STATUS PROCESS to be
-   * able to execute the crawling again.
+   * Bulk update of several meta data messages about the crawling process using a separate graph.
+   * For each crawled URI save the date, the current status and the baseUri using only a
+   * single Sparql update query.
+   * This enables to construct the message again (e.g. for executing (unfinished)
+   * crawling again later).
+   *
+   * @param msgs multiple messages that describe crawling meta data to update
+   */
+  public void bulkUpdateCrawlingMetadata(Collection<UriStatusMessage> msgs) {
+
+    // delete the old entries
+    StringBuilder builder = new StringBuilder();
+    for (UriStatusMessage msg : msgs) {
+      builder.append("\nDELETE WHERE { GRAPH  <").append(METADATA_GRAPH).append(">  { <");
+      builder.append(msg.getUri()).append("> ?p ?o }};");
+    }
+
+    // insert the new entries
+    String insertTemplate = "\n<%s> <%s> %d. <%s> <%s> '%s'. <%s> <%s> <%s>. ";
+    builder.append("\nINSERT DATA { GRAPH <").append(METADATA_GRAPH).append(">  { ");
+    for (UriStatusMessage msg : msgs) {
+      builder.append(String.format(insertTemplate, msg.getUri(), CRAWL_DATE_PREDICATE, System.currentTimeMillis(),
+                                   msg.getUri(), CRAWL_STATUS_PREDICATE, msg.getStatus(),
+                                   msg.getUri(), CRAWL_BASE_URI_PREDICATE, msg.getBaseUri()));
+    }
+    builder.append("}};\n");
+
+    // execute the bulk query
+    executeUpdateQuery(builder.toString());
+  }
+
+  /**
+   * Gets all messages saved in the db of a certain status (e.g. FAILED) and puts
+   * them in the STATUS PROCESS to be able to execute the crawling again.
    *
    * @param status
    * @return
@@ -136,10 +180,13 @@ public class SparqlEndpointAccess
     Set<String> extractedURIs = new HashSet<String>();
     for (Path prop : properties) {
 
-      // select URIs specified by property paths that have not already been crawled successfully
-      String queryTemplate = "\nSELECT ?obj WHERE { <%s> %s ?obj FILTER NOT EXISTS { <%s> <%s> '%s'}}\n";
-      String queryString = String.format(queryTemplate, baseUri, prop.toString(), uri, CRAWL_STATUS_PREDICATE,
-                                         UriStatusMessage.STATUS.DONE);
+      // select URIs specified by property paths that have not already been crawled
+      String queryTemplate = "\nSELECT ?obj WHERE { <%s> %s ?obj " +
+        "FILTER NOT EXISTS { { <%s> <%s> '%s' } UNION { <%s> <%s> '%s'} } }\n";
+      String queryString = String.format(queryTemplate, baseUri, prop.toString(),
+                                         uri, CRAWL_STATUS_PREDICATE, UriStatusMessage.STATUS.DONE,
+                                         uri, CRAWL_STATUS_PREDICATE, UriStatusMessage.STATUS.FAILED);
+
       log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
       log.debug("Execute query: {}", queryString);
       Query query = QueryFactory.create(queryString);
