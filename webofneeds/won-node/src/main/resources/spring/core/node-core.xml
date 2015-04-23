@@ -117,4 +117,9 @@
         <constructor-arg ref="keyStoreService" />
     </bean>
 
+    <bean id="nodeCertificateOnStartupCreator"
+          class="won.node.service.impl.NodeCertificateOnStartupCreator"
+          autowire="byType" />
+
+
 </beans>
