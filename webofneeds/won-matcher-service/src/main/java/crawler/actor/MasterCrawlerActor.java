@@ -92,6 +92,7 @@ public class MasterCrawlerActor extends UntypedActor
     // create a single meta data update actor for all worker actors in blazegraph
     updateMetaDataWorker = getContext().actorOf(
       Props.create(UpdateMetadataActor.class, sparqlEndpoint), "MetaDataUpdateWorker");
+    getContext().watch(updateMetaDataWorker);
   }
 
   /**
@@ -132,6 +133,14 @@ public class MasterCrawlerActor extends UntypedActor
    */
   @Override
   public void onReceive(final Object message) {
+
+    // if the update meta data worker terminated the master can be terminated too
+    if (message instanceof Terminated) {
+      if (((Terminated) message).getActor().equals(updateMetaDataWorker)) {
+        log.info("Crawler shut down");
+        getContext().system().shutdown();
+      }
+    }
 
     if (message instanceof UriStatusMessage) {
       UriStatusMessage uriMsg = (UriStatusMessage) message;
@@ -193,6 +202,12 @@ public class MasterCrawlerActor extends UntypedActor
       failedMessages.put(msg.getUri(), msg);
       crawlingWorker.tell(msg, getSelf());
       logStatus();
+    }
+
+    // terminate
+    if (pendingMessages.size() == 0) {
+      log.info("Terminating crawler ...");
+      updateMetaDataWorker.tell(PoisonPill.getInstance(), getSelf());
     }
   }
 
