@@ -27,7 +27,7 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
   private CryptographyService cryptoService;
 
   //when the callback is a bean in a child context, it sets itself as a dependency here
-  @Autowired(required = false)
+  //we don't do autowiring.
   private WonMessageProcessor messageProcessorDelegate =
     new NopOwnerApplicationServiceCallback();
 
