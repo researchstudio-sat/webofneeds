@@ -109,6 +109,21 @@
       </bean>
     </constructor-arg>
   </bean>
+  <!-- processor for checking if message event, create need, or create connection uri is well-formed -->
+  <bean name="uriNodePathChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+     <constructor-arg>
+       <bean class="won.node.camel.processor.fixed.UriNodePathCheckingWonMessageProcessor">
+           <constructor-arg name="needUriPrefix" value="${uri.prefix.need}" />
+           <constructor-arg name="eventUriPrefix" value="${uri.prefix.event}" />
+       </bean>
+     </constructor-arg>
+  </bean>
+  <!-- processor for checking if message event, create need, or create connection uri is already in use -->
+  <bean name="uriInUseChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.node.camel.processor.fixed.UriAlreadyUsedCheckingWonMessageProcessor"/>
+    </constructor-arg>
+  </bean>
   <!-- processor for checking well-formedness of messages -->
   <bean name="wellformednessChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
     <constructor-arg>
