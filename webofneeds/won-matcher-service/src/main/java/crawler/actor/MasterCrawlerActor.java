@@ -22,9 +22,10 @@ import java.util.Map;
  * Coordinates recursive crawling of linked data resources by assigning {@link crawler.message.UriStatusMessage}
  * to workers of type {@link crawler.actor.WorkerCrawlerActor} and one single worker of type
  * {@link UpdateMetadataActor}.
- * The process can be stopped at any time and continued since meta data about the crawling process is saved
- * in the SPARQL endpoint by a single actor of type {@link UpdateMetadataActor} which
- * keeps message order to guarantee consistency in case of failure. Unfinished messages can
+ * The process can be stopped at any time and continued by passing the messages that
+ * should be recrawled again since meta data about the crawling process is saved
+ * in the SPARQL endpoint. This is done by a single actor of type {@link UpdateMetadataActor}
+ * which keeps message order to guarantee consistency in case of failure. Unfinished messages can
  * be resend for restarting crawling.
  *
  * User: hfriedrich

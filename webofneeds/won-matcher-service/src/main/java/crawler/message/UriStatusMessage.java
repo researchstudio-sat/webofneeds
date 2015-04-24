@@ -48,6 +48,23 @@ public class UriStatusMessage
     return new UriStatusMessage(uri, baseUri, status);
   }
 
+  @Override
+  public boolean equals(Object obj) {
+
+    if (obj instanceof UriStatusMessage) {
+      UriStatusMessage msg = (UriStatusMessage) obj;
+      return uri.equals(msg.getUri()) && baseUri.equals(msg.getBaseUri()) &&
+        status.equals(msg.getStatus());
+    }
+
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return (uri + baseUri + status.toString()).hashCode();
+  }
+
   private String uri;
   private String baseUri;
   private STATUS status;

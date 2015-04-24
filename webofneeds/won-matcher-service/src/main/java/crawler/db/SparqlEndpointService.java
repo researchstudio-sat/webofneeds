@@ -182,10 +182,12 @@ public class SparqlEndpointService
 
       // select URIs specified by property paths that have not already been crawled
       String queryTemplate = "\nSELECT ?obj WHERE { <%s> %s ?obj " +
-        "FILTER NOT EXISTS { { <%s> <%s> '%s' } UNION { <%s> <%s> '%s'} } }\n";
+        "FILTER NOT EXISTS { { <%s> <%s> '%s' } UNION { <%s> <%s> '%s'} " +
+        "UNION { ?obj <%s> ?any } } }\n";
       String queryString = String.format(queryTemplate, baseUri, prop.toString(),
                                          uri, CRAWL_STATUS_PREDICATE, UriStatusMessage.STATUS.DONE,
-                                         uri, CRAWL_STATUS_PREDICATE, UriStatusMessage.STATUS.FAILED);
+                                         uri, CRAWL_STATUS_PREDICATE, UriStatusMessage.STATUS.FAILED,
+                                         CRAWL_STATUS_PREDICATE);
 
       log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
       log.debug("Execute query: {}", queryString);
