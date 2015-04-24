@@ -7,12 +7,13 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.UriAlreadyInUseException;
 import won.protocol.message.processor.exception.UriNodePathException;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 
 /**
- * Check if the event or need uri is well-formed according the node's
+ * Check if the event, graph or need uri is well-formed according the node's
  * domain and its path conventions
  *
  * User: ypanchenko
@@ -35,9 +36,8 @@ public class UriNodePathCheckingWonMessageProcessor implements WonMessageProcess
   public WonMessage process(final WonMessage message) throws UriAlreadyInUseException {
 
     checkEventURI(message);
+    checkEventGraphURIs(message);
     checkNeedURI(message);
-
-    //TODO check graph uris? for those graphs that start with event uri?
 
     return message;
   }
@@ -63,6 +63,31 @@ public class UriNodePathCheckingWonMessageProcessor implements WonMessageProcess
     String prefix = getPrefix(eventURI);
     if (!prefix.equals(eventUriPrefix)) {
       throw new UriNodePathException(eventURI);
+    }
+    return;
+  }
+
+
+  private void checkEventGraphURIs(final WonMessage message) {
+    //check that graph uris start local or remote message event uris
+    URI eventURI = message.getMessageURI();
+    URI remoteEventURI = message.getCorrespondingRemoteMessageURI();
+    String localPrefix = eventURI.toString() + "#";
+    String remotePrefix = null;
+    if (remoteEventURI != null) {
+      remotePrefix = remoteEventURI.toString();
+    }
+    for (String graphURI : RdfUtils.getModelNames(message.getCompleteDataset())) {
+      if (graphURI.startsWith(localPrefix)) {
+        // name OK
+        continue;
+      }
+      if (remotePrefix != null && graphURI.startsWith(remotePrefix)) {
+        // name OK
+        continue;
+      }
+      // it seems there is a graph name with unexpected URI:
+      throw new UriNodePathException(URI.create(graphURI));
     }
     return;
   }
