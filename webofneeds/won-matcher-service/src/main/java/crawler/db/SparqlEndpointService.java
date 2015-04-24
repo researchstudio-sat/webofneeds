@@ -4,7 +4,6 @@ import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.sparql.modify.UpdateProcessRemote;
-import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.update.UpdateExecutionFactory;
 import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.update.UpdateRequest;
@@ -175,16 +174,16 @@ public class SparqlEndpointService
    * @param properties property paths used to query the sparql endpoint
    * @return set of extracted URIs from the resource URI
    */
-  public Set<String> extractURIs(String uri, String baseUri, Iterable<Path> properties) {
+  public Set<String> extractURIs(String uri, String baseUri, Iterable<String> properties) {
 
     Set<String> extractedURIs = new HashSet<String>();
-    for (Path prop : properties) {
+    for (String prop : properties) {
 
       // select URIs specified by property paths that have not already been crawled
       String queryTemplate = "\nSELECT ?obj WHERE { <%s> %s ?obj " +
         "FILTER NOT EXISTS { { <%s> <%s> '%s' } UNION { <%s> <%s> '%s'} " +
         "UNION { ?obj <%s> ?any } } }\n";
-      String queryString = String.format(queryTemplate, baseUri, prop.toString(),
+      String queryString = String.format(queryTemplate, baseUri, prop,
                                          uri, CRAWL_STATUS_PREDICATE, UriStatusMessage.STATUS.DONE,
                                          uri, CRAWL_STATUS_PREDICATE, UriStatusMessage.STATUS.FAILED,
                                          CRAWL_STATUS_PREDICATE);

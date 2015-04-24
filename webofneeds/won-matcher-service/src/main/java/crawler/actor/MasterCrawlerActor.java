@@ -5,17 +5,13 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
 import akka.routing.FromConfig;
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.sparql.path.Path;
-import com.hp.hpl.jena.sparql.path.PathParser;
+import crawler.config.Settings;
+import crawler.config.SettingsImpl;
 import crawler.exception.CrawlingWrapperException;
 import crawler.message.UriStatusMessage;
 import scala.concurrent.duration.Duration;
-import won.protocol.vocabulary.WON;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,65 +30,28 @@ import java.util.Map;
 public class MasterCrawlerActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+  private final SettingsImpl settings = Settings.SettingsProvider.get(getContext().system());
   private Map<String, UriStatusMessage> pendingMessages = null;
   private Map<String, UriStatusMessage> doneMessages = null;
   private Map<String, UriStatusMessage> failedMessages = null;
-  private int numDoubleMessages = 0;
   private ActorRef crawlingWorker;
   private ActorRef updateMetaDataWorker;
-  private String sparqlEndpoint;
 
-  public MasterCrawlerActor(String sparqlEndpoint) {
+  public MasterCrawlerActor() {
     pendingMessages = new HashMap<>();
     doneMessages = new HashMap<>();
     failedMessages = new HashMap<>();
-    this.sparqlEndpoint = sparqlEndpoint;
-  }
-
-  /**
-   * Build the non-base property paths (connections and events) needed for crawling need data.
-   * @return
-   */
-  private static List<Path> configureNonBasePropertyPaths(){
-    List<Path> propertyPaths = new ArrayList<Path>();
-    addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">");
-    addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member");
-    addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" +
-      WON.HAS_EVENT_CONTAINER + ">/rdfs:member");
-
-    return propertyPaths;
-  }
-
-  /**
-   * Build the base property paths needed for crawling need data. Base can be won node which lists needs or the need
-   * document itself
-   * @return
-   */
-  private static List<Path> configureBasePropertyPaths() {
-    List<Path> propertyPaths = new ArrayList<Path>();
-    addPropertyPath(propertyPaths, "rdfs:member");
-    addPropertyPath(propertyPaths, "<" + WON.HAS_CONNECTIONS + ">" + "/" + "rdfs:member" + "/<" +
-      WON.HAS_REMOTE_NEED + ">");
-    return propertyPaths;
-  }
-
-  private static void addPropertyPath(final List<Path> propertyPaths, String pathString) {
-    Path path = PathParser.parse(pathString, PrefixMapping.Standard);
-    propertyPaths.add(path);
   }
 
   @Override
   public void preStart() {
 
     // Create the router/pool with worker actors that do the actual crawling
-    Props workerProps = Props.create(WorkerCrawlerActor.class, sparqlEndpoint,
-                                     configureBasePropertyPaths(),
-                                     configureNonBasePropertyPaths());
+    Props workerProps = Props.create(WorkerCrawlerActor.class);
     crawlingWorker = getContext().actorOf(new FromConfig().props(workerProps), "CrawlingRouter");
 
-    // create a single meta data update actor for all worker actors in blazegraph
-    updateMetaDataWorker = getContext().actorOf(
-      Props.create(UpdateMetadataActor.class, sparqlEndpoint), "MetaDataUpdateWorker");
+    // create a single meta data update actor for all worker actors
+    updateMetaDataWorker = getContext().actorOf(Props.create(UpdateMetadataActor.class), "MetaDataUpdateWorker");
     getContext().watch(updateMetaDataWorker);
   }
 
@@ -153,8 +112,8 @@ public class MasterCrawlerActor extends UntypedActor
   }
 
   private void logStatus() {
-    log.info("Number of URIs\n Crawled: {}\n Failed: {}\n Pending: {}\n Double: {}",
-             doneMessages.size(), failedMessages.size(), pendingMessages.size(), numDoubleMessages);
+    log.info("Number of URIs\n Crawled: {}\n Failed: {}\n Pending: {}",
+             doneMessages.size(), failedMessages.size(), pendingMessages.size());
   }
 
   /**
@@ -190,7 +149,6 @@ public class MasterCrawlerActor extends UntypedActor
       pendingMessages.remove(msg.getUri());
       if (doneMessages.put(msg.getUri(), msg) != null) {
         log.warning("URI message received twice: {}", msg.getUri());
-        numDoubleMessages++;
       }
       logStatus();
 

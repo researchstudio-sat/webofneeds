@@ -3,13 +3,13 @@ package crawler.actor;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import crawler.config.Settings;
+import crawler.config.SettingsImpl;
 import crawler.db.SparqlEndpointService;
 import crawler.message.UriStatusMessage;
-import scala.concurrent.duration.Duration;
 
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Actor that updates the meta data of the crawling of URIs (baseUri, date, status) in a Sparql endpoint.
@@ -24,14 +24,13 @@ import java.util.concurrent.TimeUnit;
 public class UpdateMetadataActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+  private final SettingsImpl settings = Settings.SettingsProvider.get(getContext().system());
   private SparqlEndpointService endpoint;
   private Collection<UriStatusMessage> bulkMessages;
-  private static final int MAX_BULK_SIZE = 10;
-  private static final int SCHEDULE_UPDATE_EXECUTION = 10000;
   private static final String TICK = "tick";
 
-  public UpdateMetadataActor(String sparqlEndpoint) {
-    endpoint = new SparqlEndpointService(sparqlEndpoint);
+  public UpdateMetadataActor() {
+    endpoint = new SparqlEndpointService(settings.SPARQL_ENDPOINT);
     bulkMessages = new LinkedList<>();
   }
 
@@ -39,10 +38,8 @@ public class UpdateMetadataActor extends UntypedActor
   public void preStart() {
 
     // Execute the bulk update at least once a while even if not enough messages are there
-    getContext().system().scheduler().schedule(
-      Duration.create(SCHEDULE_UPDATE_EXECUTION, TimeUnit.MILLISECONDS),
-      Duration.create(SCHEDULE_UPDATE_EXECUTION, TimeUnit.MILLISECONDS),
-      getSelf(), TICK, getContext().dispatcher(), null);
+    getContext().system().scheduler().schedule(settings.METADATA_UPDATE_DURATION,
+      settings.METADATA_UPDATE_DURATION, getSelf(), TICK, getContext().dispatcher(), null);
   }
 
   /**
@@ -57,7 +54,7 @@ public class UpdateMetadataActor extends UntypedActor
       UriStatusMessage uriMsg = (UriStatusMessage) message;
       log.debug("Add message to bulk update list: {}", uriMsg);
       bulkMessages.add(uriMsg);
-      if (bulkMessages.size() >= MAX_BULK_SIZE) {
+      if (bulkMessages.size() >= settings.METADATA_UPDATE_MAX_BULK_SIZE) {
         update();
       }
     } else if (message instanceof String) {
