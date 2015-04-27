@@ -57,24 +57,6 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor
     }
   }
 
-//  private WonMessage processWithKey(final WonMessage wonMessage, final String privateKeyUri,
-//                                    final PrivateKey privateKey) throws Exception {
-//    logger.info("TO SIGN:\n" + WonMessageEncoder.encode(wonMessage, Lang.TRIG) +
-//                  "\nwith obtained private key: " + (privateKey != null) + "\n" + privateKeyUri);
-//    Dataset msgDataset =  WonMessageEncoder.encodeAsDataset(wonMessage);
-//    WonSigner signer = new WonSigner(msgDataset, new SignatureAlgorithmFisteus2010());
-//    List<SignatureReference> sigRefs = signer.sign(privateKey, privateKeyUri,
-//                                                   wonMessage.getContentGraphURIs());
-//    WonKeysExtractor extractor = new WonKeysExtractor();
-//    extractor.addSigReferences(msgDataset.getNamedModel(wonMessage.getOuterEnvelopeGraphURI().toString()),
-//                               wonMessage.getMessageURI(), sigRefs);
-//    signer.sign(privateKey, privateKeyUri, wonMessage.getOuterEnvelopeGraphURI().toString());
-//    WonMessage wonMessageSigned = WonMessageDecoder.decodeFromDataset(msgDataset);
-//    logger.info("SIGNED:\n" + WonMessageEncoder.encode(wonMessageSigned, Lang.TRIG));
-//
-//    return wonMessageSigned;
-//  }
-
   private WonMessage processWithKey(final WonMessage wonMessage, final String privateKeyUri,
                                     final PrivateKey privateKey) throws Exception {
     WonMessage signed = WonMessageSignerVerifier.sign(privateKey, privateKeyUri, wonMessage);
