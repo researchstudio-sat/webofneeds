@@ -110,6 +110,8 @@ public class KeyStoreService {
     private synchronized void saveStoreToFile() {
 
         FileOutputStream outputStream = null;
+      //TODO the lock seem to not work. Anyway, we wanted to change keystore to be generated per web app,
+      //then we will not have to lock the keystore file at all.
         FileLock lock = null;
 
         try {
@@ -131,7 +133,12 @@ public class KeyStoreService {
             } finally {
                 if (lock != null) {
                   try {
-                    lock.release();
+                    if (lock.isValid()) {
+                      lock.release();
+                    } else {
+                      logger.warn("Keystore file lock was not valid!");
+                    }
+
                   } catch (IOException e) {
                     e.printStackTrace();
                   }
