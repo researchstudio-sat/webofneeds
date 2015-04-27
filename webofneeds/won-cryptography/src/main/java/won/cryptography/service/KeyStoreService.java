@@ -5,9 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.security.Key;
-import java.security.Security;
+import java.nio.channels.FileLock;
+import java.security.*;
 import java.security.cert.Certificate;
+import java.util.Arrays;
 
 /**
  * User: fsalcher
@@ -29,10 +30,8 @@ public class KeyStoreService {
 
     private java.security.KeyStore store;
 
-    public KeyStoreService() {
-
-        this(null);
-
+    public KeyStoreService(String filePath) {
+      this(new File(filePath));
     }
 
     public KeyStoreService(File storeFile) {
@@ -54,12 +53,12 @@ public class KeyStoreService {
         }
     }
 
-    public Key getKey(String alias) {
+    public PrivateKey getPrivateKey(String alias) {
 
-        Key retrieved = null;
+        PrivateKey retrieved = null;
 
         try {
-            retrieved = store.getKey("key1", storePW);
+            retrieved = (PrivateKey) store.getKey(alias, storePW);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,8 +67,35 @@ public class KeyStoreService {
 
     }
 
-    public void putKey(String alias, Key key, Certificate[] certificateChain) {
+    public PublicKey getPublicKey(String alias) {
 
+      PublicKey retrieved = null;
+
+      try {
+        retrieved = getCertificate(alias).getPublicKey();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      return retrieved;
+
+    }
+
+    public Certificate getCertificate(String alias) {
+
+      Certificate retrieved = null;
+
+      try {
+        retrieved = store.getCertificate(alias);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      return retrieved;
+
+    }
+
+    public synchronized void putKey(String alias, Key key, Certificate[] certificateChain) {
 
         try {
             store.setKeyEntry(alias, key, storePW, certificateChain);
@@ -81,26 +107,42 @@ public class KeyStoreService {
     }
 
 
-    private void saveStoreToFile() {
+    private synchronized void saveStoreToFile() {
 
-        OutputStream outputStream = null;
+        FileOutputStream outputStream = null;
+      //TODO the lock seem to not work. Anyway, we wanted to change keystore to be generated per web app,
+      //then we will not have to lock the keystore file at all.
+        FileLock lock = null;
 
         try {
 
             outputStream = new FileOutputStream(storeFile);
+            lock = outputStream.getChannel().lock();
 
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
         if (outputStream != null) {
             try {
 
-                store.store(outputStream, storePW);
+                store.store(outputStream, Arrays.copyOf(storePW, storePW.length));
 
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
+                if (lock != null) {
+                  try {
+                    if (lock.isValid()) {
+                      lock.release();
+                    } else {
+                      logger.warn("Keystore file lock was not valid!");
+                    }
+
+                  } catch (IOException e) {
+                    e.printStackTrace();
+                  }
+                }
                 try {
                     outputStream.close();
                 } catch (Exception e) {
@@ -113,20 +155,20 @@ public class KeyStoreService {
 
     private void loadStoreFromFile() {
 
-        InputStream inputStream = null;
+        FileInputStream inputStream = null;
 
         try {
 
             inputStream = new FileInputStream(storeFile);
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+          e.printStackTrace();
         }
 
-        if (inputStream != null) {
+      if (inputStream != null) {
             try {
 
-                store.load(inputStream, storePW);
+                store.load(inputStream, Arrays.copyOf(storePW, storePW.length));
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -136,7 +178,18 @@ public class KeyStoreService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
             }
         }
     }
+
+  public int size() {
+    try {
+      return store.size();
+    } catch (KeyStoreException e) {
+      //TODO proper logging
+      logger.warn(e.toString());
+    }
+    return 0;
+  }
 }

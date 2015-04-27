@@ -37,7 +37,7 @@ import won.node.service.impl.URIService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.service.LinkedDataService;
-import won.protocol.util.HTTP;
+import won.protocol.vocabulary.HTTP;
 import won.protocol.util.RdfUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -271,7 +271,7 @@ public class
       HttpServletRequest request) {
     URI resourceUriPrefix = URI.create(this.resourceURIPrefix);
     URI dataUri = URI.create(this.dataURIPrefix);
-    String requestUri = request.getRequestURI();
+    String requestUri = getRequestUriWithQueryString(request);
     String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), dataUri.getPath());
     logger.debug("resource URI requested with data mime type. redirecting from {} to {}", requestUri, redirectToURI);
     if (redirectToURI.equals(requestUri)) {
@@ -285,6 +285,15 @@ public class
     headers.setLocation(URI.create(redirectToURI));
     addCORSHeader(headers);
       return new ResponseEntity<Dataset>(null, headers, HttpStatus.SEE_OTHER);
+  }
+
+  private String getRequestUriWithQueryString(final HttpServletRequest request) {
+    String requestUri = request.getRequestURI();
+    String queryString = request.getQueryString();
+    if (queryString != null){
+      requestUri += "?" + queryString;
+    }
+    return requestUri;
   }
 
 
@@ -303,8 +312,7 @@ public class
       HttpServletRequest request) {
     URI resourceUriPrefix = URI.create(this.resourceURIPrefix);
     URI pageUriPrefix = URI.create(this.pageURIPrefix);
-    String requestUri = request.getRequestURI();
-
+    String requestUri = getRequestUriWithQueryString(request);
     String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), pageUriPrefix.getPath());
     logger.debug("resource URI requested with page mime type. redirecting from {} to {}", requestUri, redirectToURI);
     if (redirectToURI.equals(requestUri)) {

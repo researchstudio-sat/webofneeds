@@ -50,6 +50,5 @@
   },
   "_source": "git://github.com/blueimp/JavaScript-MD5.git",
   "_target": "~1.1.0",
-  "_originalSource": "js-md5",
-  "_direct": true
+  "_originalSource": "js-md5"
 }

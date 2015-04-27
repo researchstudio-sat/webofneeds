@@ -1,24 +1,16 @@
 package won.cryptography.rdfsign;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import won.cryptography.service.CryptographyService;
+import won.cryptography.utils.TestSigningUtils;
+import won.cryptography.utils.TestingKeys;
+import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.SFSIG;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.*;
+import java.util.List;
 
 /**
  * User: ypanchenko
@@ -27,181 +19,142 @@ import java.util.*;
 public class WonSignerTest
 {
 
-  private static final String RESOURCE_FILE_1 = "/test_1_graph.trig";
-  private static final String RESOURCE_FILE_2 = "/test_1_2graphs.trig";
-  private static final String RESOURCE_FILE_3 = "/test_1_2graphs_1sig.trig";
-  private static final String RESOURCE_URI = "http://www.example.com/resource/need/12";
+  private static final String RESOURCE_FILE = "/won-signed-messages/create-need-msg.trig";
 
-  @Test
-  public void testSignOneGraph() throws Exception {
+  private static final String NEED_CORE_DATA_URI =
+    "http://localhost:8080/won/resource/need/3144709509622353000/core/#data";
+  private static final String NEED_CORE_DATA_SIG_URI =
+    "http://localhost:8080/won/resource/need/3144709509622353000/core/#data-sig";
 
-    // create dataset with one named graph
-    InputStream is = this.getClass().getResourceAsStream(RESOURCE_FILE_1);
-    Dataset dataset = DatasetFactory.createMem();
-    RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
-    is.close();
-    String modelName = dataset.listNames().next();
+  private static final String EVENT_ENV1_URI =
+    "http://localhost:8080/won/resource/event/7719577021233193000#data";
+  private static final String EVENT_ENV1_SIG_URI =
+    "http://localhost:8080/won/resource/event/7719577021233193000#data-sig";
 
-    // test sign()
-    WonSigner signer = new WonSigner(dataset, new SignatureAlgorithmFisteus2010());
-    CryptographyService crypService = new CryptographyService();
-    KeyPair keyPair = crypService.createNewNeedKeyPair(URI.create(RESOURCE_URI));
+  private static final String EVENT_ENV2_URI =
+    "http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl";
+  private static final String EVENT_ENV2_SIG_URI =
+    "http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl-sig";
 
-    //KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-    //kpg.initialize(2048);
-    //KeyPair keyPair = kpg.genKeyPair();
 
-    PrivateKey privateKey = keyPair.getPrivate();
-    PublicKey publicKey = keyPair.getPublic();
-    signer.sign(privateKey);
 
-    // write for debugging
-    File outFile = File.createTempFile("won", ".trig");
-    System.out.println(outFile);
-    OutputStream os = new FileOutputStream(outFile);
-    RDFDataMgr.write(os, dataset, RDFFormat.TRIG.getLang());
-    os.close();
+  private TestingKeys keys;
 
-    // extract names of the named graphs
-    Iterator<String> names = dataset.listNames();
-    List<String> namesList = new ArrayList<String>();
-    while (names.hasNext()) {
-      namesList.add(names.next());
-    }
-
-    // do some checks to make sure there is 1 signed names graph
-    // and one signature
-    Assert.assertEquals(1, namesList.size());
-    Assert.assertTrue(dataset.getDefaultModel().listStatements().hasNext());
-    Set<String> subjs = new HashSet<String>();
-    int countTriples = 0;
-    StmtIterator sti = dataset.getDefaultModel().listStatements();
-    while (sti.hasNext()) {
-      String subj = sti.next().getSubject().toString();
-      subjs.add(subj);
-      countTriples++;
-    }
-    Assert.assertEquals(10, countTriples);
-    Assert.assertTrue(subjs.contains(modelName));
+  @Before
+  public void init() {
+    keys = new TestingKeys(TestSigningUtils.KEYS_FILE);
   }
 
   @Test
-  public void testSignTwoGraphs() throws Exception {
+  public void testSignCreatedNeed() throws Exception {
 
-    // create dataset with two named graphs
-    InputStream is = this.getClass().getResourceAsStream(RESOURCE_FILE_2);
-    Dataset dataset = DatasetFactory.createMem();
-    RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
-    is.close();
-    Iterator<String> origNames = dataset.listNames();
-    String modelName1 = origNames.next();
-    String modelName2 = origNames.next();
+    // create dataset that contains need core data graph
+    Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(RESOURCE_FILE,
+                                                                             new String[]{NEED_CORE_DATA_URI});
 
-    // test sign()
-    WonSigner signer = new WonSigner(dataset, new SignatureAlgorithmFisteus2010());
-    CryptographyService crypService = new CryptographyService();
-    KeyPair keyPair = crypService.createNewNeedKeyPair(URI.create(RESOURCE_URI));
-
-    //KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-    //kpg.initialize(2048);
-    //KeyPair keyPair = kpg.genKeyPair();
-
-    PrivateKey privateKey = keyPair.getPrivate();
-    PublicKey publicKey = keyPair.getPublic();
-    signer.sign(privateKey);
+    // sign it
+    WonSigner signer = new WonSigner(testDataset, new SignatureAlgorithmFisteus2010());
+    signer.sign(keys.getPrivateKey(TestSigningUtils.needCertUri), TestSigningUtils.needCertUri, NEED_CORE_DATA_URI);
 
     // write for debugging
-    File outFile = File.createTempFile("won", ".trig");
-    System.out.println(outFile);
-    OutputStream os = new FileOutputStream(outFile);
-    RDFDataMgr.write(os, dataset, RDFFormat.TRIG.getLang());
-    os.close();
+    //TestSigningUtils.writeToTempFile(testDataset);
 
     // extract names of the named graphs
-    Iterator<String> names = dataset.listNames();
-    List<String> namesList = new ArrayList<String>();
-    while (names.hasNext()) {
-      namesList.add(names.next());
-    }
-
-    // do some checks to make sure there is 2 signed names graphs
-    // and two signatures
+    List<String> namesList = RdfUtils.getModelNames(testDataset);
+    // do some checks to make sure the signatures are added
     Assert.assertEquals(2, namesList.size());
-    Assert.assertTrue(namesList.get(0).equals(modelName1) || namesList.get(1).equals(modelName1));
-    Assert.assertTrue(namesList.get(0).equals(modelName2) || namesList.get(1).equals(modelName2));
-    Assert.assertTrue(dataset.getDefaultModel().listStatements().hasNext());
-    Set<String> subjs = new HashSet<String>();
-    int countTriples = 0;
-    StmtIterator sti = dataset.getDefaultModel().listStatements();
-    while (sti.hasNext()) {
-      String subj = sti.next().getSubject().toString();
-      subjs.add(subj);
-      countTriples++;
-    }
-    Assert.assertEquals(20, countTriples);
-    Assert.assertTrue(subjs.contains(modelName1) && subjs.contains(modelName2));
+    Assert.assertTrue(namesList.contains(NEED_CORE_DATA_URI));
+    Assert.assertTrue(namesList.contains(NEED_CORE_DATA_SIG_URI));
+    int triplesCounter = TestSigningUtils.countTriples(testDataset.getNamedModel(NEED_CORE_DATA_SIG_URI)
+                                                                  .listStatements());
+    Assert.assertEquals(11, triplesCounter);
+    String sigValue = TestSigningUtils.getObjectOfPredAsString(testDataset.getNamedModel(NEED_CORE_DATA_SIG_URI),
+                                                               SFSIG.HAS_SIGNATURE_VALUE.getURI());
+    // even with the same key the signature for the same input is different each time due to the random
+    // integer used by the elliptic curve signing algorithm, therefore, we cannot really test here properly
+    // if the signature is correct
+    Assert.assertTrue(sigValue.length() > 75);
   }
 
   @Test
-  public void testSignTwoGraphsWhereOneAlreadyHasSignature() throws Exception {
+  // test signing the event that already contains graph with corresponding graph signature
+  public void testSignCreatedNeedOwnerEvent() throws Exception {
+    // create dataset that contains need core data graph, its signature, and message envelope generated by the owner
+    Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(RESOURCE_FILE,
+                                                                             new String[]{NEED_CORE_DATA_URI,
+                                                                                          NEED_CORE_DATA_SIG_URI,
+                                                                                          EVENT_ENV1_URI});
 
-    // create dataset with two named graph where one is already signed
-    InputStream is = this.getClass().getResourceAsStream(RESOURCE_FILE_3);
-    Dataset dataset = DatasetFactory.createMem();
-    RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
-    is.close();
-    Iterator<String> origNames = dataset.listNames();
-    String modelName1 = origNames.next();
-    String modelName2 = origNames.next();
-
-    // test sign()
-    WonSigner signer = new WonSigner(dataset, new SignatureAlgorithmFisteus2010());
-    CryptographyService crypService = new CryptographyService();
-    KeyPair keyPair = crypService.createNewNeedKeyPair(URI.create(RESOURCE_URI));
-
-    //KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-    //kpg.initialize(2048);
-    //KeyPair keyPair = kpg.genKeyPair();
-
-    PrivateKey privateKey = keyPair.getPrivate();
-    PublicKey publicKey = keyPair.getPublic();
-    signer.sign(privateKey);
+    // sign it
+    WonSigner signer = new WonSigner(testDataset, new SignatureAlgorithmFisteus2010());
+    signer.sign(keys.getPrivateKey(TestSigningUtils.needCertUri), TestSigningUtils.needCertUri, new String[]{EVENT_ENV1_URI});
 
     // write for debugging
-    File outFile = File.createTempFile("won", ".trig");
-    System.out.println(outFile);
-    OutputStream os = new FileOutputStream(outFile);
-    RDFDataMgr.write(os, dataset, RDFFormat.TRIG.getLang());
-    os.close();
+    //TestSigningUtils.writeToTempFile(testDataset);
 
     // extract names of the named graphs
-    Iterator<String> names = dataset.listNames();
-    List<String> namesList = new ArrayList<String>();
-    while (names.hasNext()) {
-      namesList.add(names.next());
-    }
+    List<String> namesList = RdfUtils.getModelNames(testDataset);
+    // do some checks to make sure the signatures are added
+    Assert.assertEquals(4, namesList.size());
+    Assert.assertTrue(namesList.contains(EVENT_ENV1_URI));
+    Assert.assertTrue(namesList.contains(EVENT_ENV1_SIG_URI));
+    int triplesCounter = TestSigningUtils.countTriples(testDataset.getNamedModel(EVENT_ENV1_SIG_URI).listStatements());
+    Assert.assertEquals(11, triplesCounter);
+    String sigValue = TestSigningUtils.getObjectOfPredAsString(testDataset.getNamedModel(EVENT_ENV1_SIG_URI),
+                                                               "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature" +
+                                                                 ".owl#hasSignatureValue");
+    // even with the same key the signature for the same input is different each time due to the random
+    // integer used by the elliptic curve signing algorithm, therefore, we cannot really test here properly
+    // if the signature is correct
+    Assert.assertTrue(sigValue.length() > 75);
 
-    // do some checks to make sure there is 2 signed names graphs
-    // and two signatures
-    Assert.assertEquals(3, namesList.size());
-    Assert.assertTrue(namesList.get(0).equals(modelName1)
-                        || namesList.get(1).equals(modelName1)
-                        || namesList.get(2).equals(modelName1));
-    Assert.assertTrue(namesList.get(0).equals(modelName2)
-                        || namesList.get(1).equals(modelName2)
-                        || namesList.get(2).equals(modelName2));
-    Assert.assertTrue(dataset.getDefaultModel().listStatements().hasNext());
-    Set<String> subjs = new HashSet<String>();
-    int countTriples = 0;
-    StmtIterator sti = dataset.getDefaultModel().listStatements();
-    while (sti.hasNext()) {
-      String subj = sti.next().getSubject().toString();
-      subjs.add(subj);
-      countTriples++;
-    }
-    Assert.assertEquals(20, countTriples);
-    Assert.assertTrue(
-      (subjs.contains(modelName1) && !subjs.contains(modelName2))
-    || (subjs.contains(modelName2) && !subjs.contains(modelName1)));
   }
+
+  @Test
+  public void testSignCreatedNeedNodeEvent() throws Exception {
+
+    // create dataset that contains need core data graph, its signature, message envelope generated by the owner,
+    // its signature, and message envelope generated by the node
+    Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(RESOURCE_FILE,
+                                                                             new String[]{
+                                                                               NEED_CORE_DATA_URI,
+                                                                               NEED_CORE_DATA_SIG_URI,
+                                                                               EVENT_ENV1_URI, EVENT_ENV1_SIG_URI,
+                                                                               EVENT_ENV2_URI
+                                                                             });
+
+    // sign it
+    WonSigner signer = new WonSigner(testDataset, new SignatureAlgorithmFisteus2010());
+    signer.sign(keys.getPrivateKey(TestSigningUtils.nodeCertUri), TestSigningUtils.nodeCertUri,
+                new String[]{EVENT_ENV2_URI});
+
+    // write for debugging
+    TestSigningUtils.writeToTempFile(testDataset);
+    // verify
+    WonVerifier verifier = new WonVerifier(testDataset);
+    boolean verified = verifier.verify(keys.getPublicKeys());
+    SignatureVerificationResult result = verifier.getVerificationResult();
+    Assert.assertTrue(result.getMessage(), verified);
+
+    // extract names of the named graphs
+    List<String> namesList = RdfUtils.getModelNames(testDataset);
+    // do some checks to make sure the signatures are added
+    Assert.assertEquals(6, namesList.size());
+    Assert.assertTrue(namesList.contains(EVENT_ENV2_URI));
+    Assert.assertTrue(namesList.contains(EVENT_ENV2_SIG_URI));
+    int triplesCounter = TestSigningUtils.countTriples(testDataset.getNamedModel(EVENT_ENV2_SIG_URI).listStatements());
+    Assert.assertEquals(11, triplesCounter);
+    String sigValue = TestSigningUtils.getObjectOfPredAsString(testDataset.getNamedModel(EVENT_ENV2_SIG_URI),
+                                                               "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature" +
+                                                                 ".owl#hasSignatureValue");
+    // even with the same key the signature for the same input is different each time due to the random
+    // integer used by the elliptic curve signing algorithm, therefore, we cannot really test here properly
+    // if the signature is correct
+    Assert.assertTrue(sigValue.length() > 75);
+
+
+
+  }
+
+
 }

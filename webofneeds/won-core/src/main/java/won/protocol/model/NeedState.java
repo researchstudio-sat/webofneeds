@@ -60,4 +60,18 @@ public enum NeedState
     logger.warn("No enum could be matched for: {}", fragment);
     return null;
   }
+
+  /**
+   * Tries to match the given URI against all enum values.
+   *
+   * @param uri URI to match
+   * @return matched enum, null otherwise
+   */
+  public static NeedState fromURI(final URI uri)
+  {
+    for (NeedState state : values())
+      if (state.getURI().equals(uri))
+        return state;
+    return null;
+  }
 }

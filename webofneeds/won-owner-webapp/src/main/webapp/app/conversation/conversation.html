@@ -3,7 +3,11 @@
     <div class="panel-heading">
         <div class="row">
             <div class="col-md-1"><i ng-class="getIconClass(chosenMessage.typeText)" tooltip="{{chosenMessage.typeText}}"/></div>
-            <h3 class="panel-title col-md-9">Conversation with <a href="#/post-detail" class="underline">{{chosenMessage.remoteNeed.title}}</a></h3>  <!--TODO put parameter into url -->
+            <h3 class="panel-title col-md-9">Conversation with
+                <a href="" class="underline"
+                   ng-click="clickOnPostLink({needUri:chosenMessage.remoteNeed.uri})"
+                   ng-bind="chosenMessage.remoteNeed.title"></a>
+            </h3>
         </div>
     </div>
     <!--scrollable-table watch="chosenMessage.lastMessages"-->
@@ -15,7 +19,9 @@
                  ng-repeat="message in chosenMessage.lastMessages | orderBy:sortedField:reversedSort"
                  notify-render-finished>
                 <td class="col-lg-12">
-                    <text-message class="col-lg-12" chosen-message='chosenMessage' message="message"
+                    <text-message class="col-lg-12" chosen-message='chosenMessage'
+                                  click-on-sender-link='clickOnPostLink({needUri:message.senderNeed})'
+                                  message="message"
                                   ng-attr-id="{{$index}}"></text-message>
                 </td>
             </tr>

@@ -61,11 +61,10 @@ public class MatcherProtocolNeedServiceClientJMSBased implements MatcherProtocol
         headerMap.put("score",String.valueOf(score));
         headerMap.put("originator",originator.toString());
         headerMap.put("content",RdfUtils.toString(content));
-        headerMap.put("wonMessage", WonMessageEncoder.encode(wonMessage, Lang.TRIG));
+
         headerMap.put("remoteBrokerEndpoint", endpoint);
         headerMap.put("methodName","hint");
-
-        messagingService.sendInOnlyMessage(null, headerMap,null,startingEndpoint );
+        messagingService.sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG),startingEndpoint );
   }
 
     @Override

@@ -19,7 +19,6 @@ package won.bot.framework.events.event.impl;
 import won.bot.framework.events.event.BaseNeedAndConnectionSpecificEvent;
 import won.bot.framework.events.event.MessageEvent;
 import won.protocol.message.WonMessage;
-import won.protocol.model.ChatMessage;
 import won.protocol.model.Connection;
 
 /**
@@ -27,19 +26,12 @@ import won.protocol.model.Connection;
  */
 public class MessageFromOtherNeedEvent extends BaseNeedAndConnectionSpecificEvent  implements MessageEvent
 {
-  private final ChatMessage message;
   private final WonMessage wonMessage;
 
-  public MessageFromOtherNeedEvent(final Connection con, final ChatMessage message, final WonMessage wonMessage) {
+  public MessageFromOtherNeedEvent(final Connection con, final WonMessage wonMessage) {
     super(con);
-    this.message = message;
     this.wonMessage = wonMessage;
   }
-
-  public ChatMessage getMessage() {
-    return message;
-  }
-
   public WonMessage getWonMessage() {
     return wonMessage;
   }
@@ -47,8 +39,7 @@ public class MessageFromOtherNeedEvent extends BaseNeedAndConnectionSpecificEven
   @Override
   public String toString() {
     return "MessageFromOtherNeedEvent{" +
-      "message=" + message +
-      ", wonMessage=" + wonMessage +
+      "wonMessage=" + wonMessage +
       '}';
   }
 }

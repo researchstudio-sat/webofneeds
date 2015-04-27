@@ -36,6 +36,16 @@
 angular.module('won.owner').controller("MainCtrl", function($scope,$location, applicationStateService, applicationControlService, $rootScope, $log, messageService, wonService, userService) {
     //we use the messageService dependency in order to force websocket creation from the very beginning
     //we use the wonService dependency because it initializes messageService's callback (addMessageCallback)
+    $rootScope.$on("$routeChangeSuccess", function(event, currentRoute, previousRoute) {
+        $rootScope.title = currentRoute.title;
+        if(previousRoute!=undefined){
+            if(previousRoute.$$route.originalPath =="/private-link"&&previousRoute.$$route.originalPath != currentRoute.$$route.originalPath){
+                applicationStateService.setCurrentConnectionURI("");
+            }
+        }
+
+       // $log("info: from route "+previousRoute+"to route "+currentRoute)
+    });
     $scope.selectedType = -1;
     $scope.applicationStateService = applicationStateService;
     $scope.unreadEventsByNeedByType = applicationStateService.getUnreadEventsByNeedByType();
@@ -46,9 +56,23 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     //allow acces to service methods from angular expressions:
     $scope.openNeedDetailView = applicationControlService.openNeedDetailView;
     $scope.getTypePicURI = applicationControlService.getTypePicURI;
+    $scope.clickOnGetStarted = applicationControlService.goHome;
+    $scope.clickOnWon = applicationControlService.goHome;
     $scope.currentNeed = {};
     $scope.lastEventOfEachConnectionOfCurrentNeed = [];
     $scope.eventCommState = {};
+
+    $scope.logClipCopied = function() {
+        $log.debug("clip-click works!");
+    };
+
+    $scope.fallbackForClipCopy = function(copy) {
+        window.prompt('Press cmd+c to confirm copy the link.', copy);
+    };
+
+
+
+
     var reloadCurrentNeedDataIfNecessary = function(uriOfChangeNeed){
         var currentNeedURI = applicationStateService.getCurrentNeedURI()
         if (currentNeedURI == null ) return; //can't update: no need selected
@@ -57,18 +81,23 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         }
     }
 
-    $scope.goHome = function(){
-        $location.url("/home");
-    }
-
     var reloadCurrentNeedData = function(){
         applicationStateService.getCurrentNeed()
-            .then(function (need) {
+            .then(
+            function success(need) {
                 $scope.currentNeed = need;
+            },
+            function error(respond) {
+                // it is expected in case the applicationstate
+                // gets reset and there is no current need
+                $scope.currentNeed = {};
             });
         applicationStateService.getLastEventOfEachConnectionOfCurrentNeed()
-            .then(function (events) {
+            .then(
+            function success(events) {
                 $scope.lastEventOfEachConnectionOfCurrentNeed = events;
+            },function error(events) {
+                $scope.lastEventOfEachConnectionOfCurrentNeed = [];
             });
     }
 
@@ -98,7 +127,16 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeed);
+    })
+
+    $scope.$on(won.EVENT.CLOSE_NEED_SENT, function(ngEvent, eventData) {
+        linkedDataService.getNeed(eventData.hasSender).then(function(need){
+            applicationStateService.updateNeed(need);
+        })
+
+
     });
+
     $scope.$on(won.EVENT.CONNECT_SENT, function(ngEvent, eventData) {
         //for now, just update the current need data. Later, we can alter just the entry for
         // the one connection we are processing the event for.
@@ -137,11 +175,22 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         // the one connection we are processing the event for.
         reloadCurrentNeedDataIfNecessary(eventData.hasReceiverNeed);
     });
+    $scope.$on(won.EVENT.CLOSE_NEED_SENT, function(ngEvent, eventData) {
+        reloadCurrentNeedDataIfNecessary(eventData.hasSender)
+
+    });
+    $scope.$on(won.EVENT.ACTIVATE_NEED_SENT, function(ngEvent, eventData) {
+        reloadCurrentNeedDataIfNecessary(eventData.hasSender)
+        linkedDataService.getNeed(eventData.hasSender).then(function(need){
+            applicationStateService.updateNeed(need);
+        })
+    });
 
     $scope.$on(won.EVENT.CLOSE_SENT, function(ngEvent, eventData) {
         //removeEventFromUnreadAndUpdateUnreadObjects(eventData);
         //applicationStateService.removeEvent(eventData);
         reloadCurrentNeedData();
+
     });
     $scope.checkIfMessageViewIsOpen = function(eventData){
 
@@ -170,16 +219,23 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
         reloadCurrentNeedData();
     });
 
-    $scope.$on(won.EVENT.USER_SIGNED_IN, function(event){
-       messageService.reconnect();
-        applicationStateService.reset();
-        userService.fetchPostsAndDrafts();
-    });
+    // This is moved to another function that is a promise function  
+//    $scope.$on(won.EVENT.USER_SIGNED_IN, function(event){
+//       messageService.reconnect();
+//        applicationStateService.reset();
+//        userService.fetchPostsAndDrafts();
+//    });
     $scope.$on('RenderFinishedEvent', function(event){
         $log.debug("render finished event") ;
     });
-    $scope.$on(won.EVENT.USER_SIGNED_OUT, function(event){
-        messageService.reconnect();
+
+    // This is moved to another function that is a promise function  
+//    $scope.$on(won.EVENT.USER_SIGNED_OUT, function(event){
+//        messageService.reconnect();
+//    });
+    
+    $scope.$on(won.EVENT.WON_SEARCH_RECEIVED,function(ngEvent, event){
+       $log.debug("search received");
     });
 
     // This is probably a temporary solution for socket disconnecting with code 1011,
@@ -196,7 +252,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
                 messageService.reconnect();
             } else if (wasAuth) {
                 $log.warn("WEBSOCKET CLOSED code 1011, user was authenticated. Logging out.");
-                userService.logOut().then(onResponseSignOut);
+                userService.logOutAndSetUpApplicationState().then(onResponseSignOut);
             } else {
                 $log.warn("WEBSOCKET CLOSED code 1011, user was not authenticated. Reconnecting.");
                 messageService.reconnect();

@@ -5,11 +5,13 @@
 
 package won.owner.web.rest;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,18 +30,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import won.owner.model.User;
+import won.owner.model.UserNeed;
 import won.owner.pojo.UserPojo;
+import won.owner.pojo.UserSettingsPojo;
+import won.owner.repository.UserNeedRepository;
+import won.owner.repository.UserRepository;
 import won.owner.service.impl.WONUserDetailService;
+import won.owner.web.WonOwnerMailSender;
 import won.owner.web.validator.UserRegisterValidator;
+import won.protocol.util.CheapInsecureRandomString;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * User: t.kozel
@@ -60,13 +67,29 @@ public class RestUserController
 
   private UserRegisterValidator userRegisterValidator;
 
+  private WonOwnerMailSender emailSender;
+
+  private UserNeedRepository userNeedRepository;
+
+  private UserRepository userRepository;
+
+  @Autowired
+  ServletContext context;
+
   @Autowired
   public RestUserController(final WONUserDetailService wonUserDetailService, final AuthenticationManager authenticationManager,
-                            final SecurityContextRepository securityContextRepository, final UserRegisterValidator userRegisterValidator) {
+                            final SecurityContextRepository securityContextRepository,
+                            final UserRegisterValidator userRegisterValidator,
+                            final WonOwnerMailSender emailSender,
+                            final UserRepository userRepository,
+                            final UserNeedRepository userNeedRepository) {
     this.wonUserDetailService = wonUserDetailService;
     this.authenticationManager = authenticationManager;
     this.securityContextRepository = securityContextRepository;
     this.userRegisterValidator = userRegisterValidator;
+    this.emailSender = emailSender;
+    this.userRepository = userRepository;
+    this.userNeedRepository = userNeedRepository;
   }
 
   /**
@@ -103,6 +126,166 @@ public class RestUserController
       return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
     }
     return new ResponseEntity("New user was created", HttpStatus.CREATED);
+  }
+
+
+  @ResponseBody
+  @RequestMapping(
+    value = "/email",
+    method = RequestMethod.POST
+  )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity sendEmail(@RequestBody JsonNode input) {
+
+    String type = input.get("type").asText();
+    String to = input.get("to").asText();
+    User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    if ("PRIVATE_LINK".equals(type)) {
+      if ("ROLE_PRIVATE".equals(user.getRole())) {
+        try{
+          emailSender.sendPrivateLink(to, user.getUsername());
+        }
+        catch (Exception ex) { // org.springframework.mail.MailException
+          logger.error("Email could not be sent", ex);
+          return new ResponseEntity("Email could not be sent", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+      } else {
+        return new ResponseEntity("Cannot send private link to not private user", HttpStatus.BAD_REQUEST);
+      }
+    } else {
+      return new ResponseEntity("Mail type " + type + " not supported", HttpStatus.BAD_REQUEST);
+    }
+
+    return new ResponseEntity("Email sent", HttpStatus.OK);
+  }
+
+  @ResponseBody
+  @RequestMapping(
+    value = "/settings",
+    produces = MediaType.APPLICATION_JSON_VALUE,
+    method = RequestMethod.GET
+  )
+
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public UserSettingsPojo getUserSettings(@RequestParam("uri") String uri) {
+
+    String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    // cannot use user object from context since hw doesn't know about created in this session need,
+    // therefore, we have to retrieve the user object from the user repository
+    User user = userRepository.findByUsername(username);
+    UserSettingsPojo userSettingsPojo = new UserSettingsPojo(user.getUsername(), user.getEmail());
+    URI needUri = null;
+    try {
+      needUri = new URI(uri);
+      userSettingsPojo.setNeedUri(uri);
+      for (UserNeed userNeed : user.getUserNeeds()) {
+        if (userNeed.getUri().equals(needUri)) {
+          userSettingsPojo.setNotify(userNeed.isMatches(), userNeed.isRequests(), userNeed.isConversations());
+          //userSettingsPojo.setEmail(user.getEmail());
+          break;
+        }
+      }
+    } catch (URISyntaxException e) {
+      // TODO error response
+      logger.warn(uri + " need uri problem", e);
+    }
+    return userSettingsPojo;
+  }
+
+  @ResponseBody
+  @RequestMapping(
+    value = "/settings",
+    produces = MediaType.APPLICATION_JSON_VALUE,
+    method = RequestMethod.POST
+  )
+
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity setUserSettings(@RequestBody UserSettingsPojo userSettingsPojo) {
+
+    String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    // cannot use user object from context since hw doesn't know about created in this session need,
+    // therefore, we have to retrieve the user object from the user repository
+    User user = userRepository.findByUsername(username);
+    if (!user.getUsername().equals(userSettingsPojo.getUsername())) {
+      logger.warn("user name wrong");
+      return new ResponseEntity("user name problem", HttpStatus.BAD_REQUEST);
+    }
+
+    if (user.getEmail() == null) {
+      //TODO validate email server-side?
+      // set email:
+      user.setEmail(userSettingsPojo.getEmail());
+      userRepository.save(user);
+    } else if (!user.getEmail().equals(userSettingsPojo.getEmail())) {
+      //TODO validate email server-side?
+      // change email:
+      user.setEmail(userSettingsPojo.getEmail());
+      userRepository.save(user);
+      logger.info("change email requested - email changed");
+    }
+
+    // retrieve UserNeed
+    URI needUri = null;
+    try {
+      needUri = new URI(userSettingsPojo.getNeedUri());
+      for (UserNeed userNeed : user.getUserNeeds()) {
+        if (userNeed.getUri().equals(needUri)) {
+          userNeed.setMatches(userSettingsPojo.isNotifyMatches());
+          userNeed.setRequests(userSettingsPojo.isNotifyRequests());
+          userNeed.setConversations(userSettingsPojo.isNotifyConversations());
+          userNeedRepository.save(userNeed);
+          break;
+        }
+      }
+    } catch (URISyntaxException e) {
+      logger.warn(userSettingsPojo.getNeedUri() + " need uri problem.", e);
+      return new ResponseEntity(userSettingsPojo.getNeedUri() + " need uri problem.", HttpStatus.BAD_REQUEST);
+    }
+   return new ResponseEntity("Settings created", HttpStatus.CREATED);
+  }
+
+  /**
+   * registers user
+   *
+   * @param user   registration data of a user
+   * @param errors
+   * @return ResponseEntity with Http Status Code
+   */
+  @ResponseBody
+  @RequestMapping(
+    value = "/private",
+    method = RequestMethod.POST
+  )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  public ResponseEntity registerPrivateLinkAsUser(@RequestBody UserPojo user, Errors errors) {
+    String privateLink = null;
+    try {
+      privateLink = (new CheapInsecureRandomString()).nextString(32); // TODO more secure random alphanum string
+      user.setUsername(privateLink);
+      userRegisterValidator.validate(user, errors);
+      if (errors.hasErrors()) {
+        if (errors.getFieldErrorCount() > 0) {
+          // someone trying to go around js validation
+          return new ResponseEntity(errors.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
+        } else {
+          // username is already in database
+          return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
+        }
+      } else {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        User userDetails = new User(user.getUsername(), passwordEncoder.encode(user.getPassword()), "ROLE_PRIVATE");
+        wonUserDetailService.save(userDetails);
+      }
+    } catch (DataIntegrityViolationException e) {
+      // username is already in database
+      return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
+    }
+    return new ResponseEntity(privateLink, HttpStatus.CREATED);
   }
 
   /**
@@ -159,6 +342,27 @@ public class RestUserController
       return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
     } else {
       return new ResponseEntity("Current session is still valid. asdf", HttpStatus.OK);
+    }
+  }
+
+  @RequestMapping(
+    value = "/isSignedInRole",
+    method = RequestMethod.GET
+  )
+  //TODO: move transactionality annotation into the service layer
+  @Transactional(propagation = Propagation.SUPPORTS)
+  //public ResponseEntity isSignedIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
+  public ResponseEntity isSignedInRole() {
+    // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
+    // code by itself if the session isn't valid any more
+    SecurityContext context = SecurityContextHolder.getContext();
+    //if(context.getAuthentication() )
+    if (context == null || context.getAuthentication() == null) {
+      return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
+    } else if ("anonymousUser".equals(context.getAuthentication().getPrincipal())) {
+      return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
+    } else {
+      return new ResponseEntity(SecurityContextHolder.getContext().getAuthentication().getAuthorities(), HttpStatus.OK);
     }
   }
 
@@ -219,7 +423,7 @@ public class RestUserController
   @ResponseBody
   @RequestMapping(
     value = "/ping",
-    produces = MediaType.APPLICATION_JSON,
+    produces = MediaType.APPLICATION_JSON_VALUE,
     method = RequestMethod.GET
   )
   public String doPing() {

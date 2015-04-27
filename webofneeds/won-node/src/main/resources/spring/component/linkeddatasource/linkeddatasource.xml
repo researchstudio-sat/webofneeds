@@ -26,7 +26,6 @@
 
     <!-- REST stuff -->
     <!-- required so our linked data client can convert http responses into jena models -->
-    <context:annotation-config />
     <context:component-scan base-package="won.protocol.rest">
         <context:include-filter type="regex" expression="won.protocol.rest.*"/>
     </context:component-scan>

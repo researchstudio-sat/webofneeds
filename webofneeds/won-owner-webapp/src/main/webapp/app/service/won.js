@@ -45,9 +45,18 @@
 
         won.WON = {};
         won.WON.baseUri = "http://purl.org/webofneeds/model#";
+        //won.WON.matcherURI = "http://localhost:8080/matcher/search/"
+        won.WON.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
+        //privateData.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
+
         won.WON.prefix = "won";
         won.WON.hasWonNode = won.WON.baseUri+"hasWonNode";
         won.WON.hasWonNodeCompacted = won.WON.prefix+":hasWonNode";
+        won.WON.Active = won.WON.baseUri + "Active";
+        won.WON.ActiveCompacted = won.WON.prefix + ":Active";
+
+        won.WON.Inactive = won.WON.baseUri + "Inactive"
+        won.WON.InactiveCompacted = won.WON.prefix + ":Inactive"
 
         won.WON.isInState = won.WON.baseUri+"isInState";
         won.WON.isInStateCompacted = won.WON.prefix+":isInState";
@@ -144,6 +153,10 @@
         won.WON.hasTextMessage= won.WON.baseUri + "hasTextMessage";
         won.WON.hasTextMessageCompacted= won.WON.prefix + ":hasTextMessage";
 
+        won.WON.searchResultURI =  won.WON.baseUri + "uri";
+        won.WON.searchResultPreview =  won.WON.baseUri + "preview";
+        //todo: change to SearchResult
+        won.WON.searchResult =  won.WON.baseUri + "Match";
 
 
 
@@ -170,14 +183,29 @@
         won.WONMSG.hasTimestampCompacted = won.WONMSG.prefix + ":hasTimestamp";
         won.WONMSG.refersTo = won.WONMSG.baseUri + "refersTo";
         won.WONMSG.refersToCompacted = won.WONMSG.prefix + ":refersTo";
+        won.WONMSG.isResponseTo = won.WONMSG.baseUri + "isResponseTo";
+        won.WONMSG.isResponseToCompacted = won.WONMSG.prefix + ":isResponseTo";
+        won.WONMSG.isRemoteResponseTo = won.WONMSG.baseUri + "isRemoteResponseTo";
+        won.WONMSG.isRemoteResponseToCompacted = won.WONMSG.prefix + ":isRemoteResponseTo";
         won.WONMSG.EnvelopeGraph = won.WONMSG.baseUri + "EnvelopeGraph";
         won.WONMSG.EnvelopeGraphCompacted = won.WONMSG.prefix+ ":EnvelopeGraph";
+
         won.WONMSG.hasContent = won.WONMSG.baseUri + "hasContent";
         won.WONMSG.hasContentCompacted = won.WONMSG.prefix+ ":hasContent";
+
+        won.WONMSG.FromOwner = won.WONMSG.baseUri + "FromOwner";
+        won.WONMSG.FromExternal = won.WONMSG.baseUri + "FromExternal";
+        won.WONMSG.FromSystem = won.WONMSG.baseUri + "FromSystem"
 
         //message types
         won.WONMSG.createMessage = won.WONMSG.baseUri + "CreateMessage";
         won.WONMSG.createMessageCompacted = won.WONMSG.prefix + ":CreateMessage";
+        won.WONMSG.activateNeedMessage = won.WONMSG.baseUri + "ActivateMessage";
+        won.WONMSG.activateNeedMessageCompacted = won.WONMSG.prefix + ":ActivateMessage"
+        won.WONMSG.closeNeedMessage = won.WONMSG.baseUri + "DeactivateMessage";
+        won.WONMSG.closeNeedMessageCompacted = won.WONMSG.prefix + ":DeactivateMessage";
+        won.WONMSG.closeNeedSentMessage = won.WONMSG.baseUri +"DeactivateSentMessage";
+        won.WONMSG.closeNeedSentMessageCompacted = won.WONMSG.prefix +":DeactivateSentMessage";
         won.WONMSG.hintMessage = won.WONMSG.baseUri + "HintMessage";
         won.WONMSG.hintMessageCompacted = won.WONMSG.prefix + ":HintMessage";
         won.WONMSG.connectMessage = won.WONMSG.baseUri + "ConnectMessage";
@@ -198,32 +226,29 @@
         won.WONMSG.connectionMessageSentMessageCompacted = won.WONMSG.prefix + ":ConnectionMessageSentMessage";
         won.WONMSG.connectionMessageReceivedMessage = won.WONMSG.baseUri + "ConnectionMessageReceivedMessage";
         won.WONMSG.connectionMessageReceivedMessageCompacted = won.WONMSG.prefix + ":ConnectionMessageReceivedMessage";
+        
 
         //response types
-        won.WONMSG.hasResponseStateProperty = won.WONMSG.baseUri + "hasResponseStateProperty";
-        won.WONMSG.hasResponseStateCompacted = won.WONMSG.prefix + ":hasResponseStateProperty";
-        won.WONMSG.createResponseMessage = won.WONMSG.baseUri + "CreateResponseMessage";
-        won.WONMSG.createResponseMessageCompacted = won.WONMSG.prefix + ":CreateResponseMessage";
-        won.WONMSG.connectResponseMessage = won.WONMSG.baseUri + "ConnectResponseMessage";
-        won.WONMSG.connectResponseMessageCompacted = won.WONMSG.prefix + ":ConnectResponseMessage";
-        won.WONMSG.needStateResponseMessage = won.WONMSG.baseUri + "NeedStateResponseMessage";
-        won.WONMSG.needStateResponseMessageCompacted = won.WONMSG.prefix + ":NeedStateResponseMessage";
-        won.WONMSG.closeResponseMessage = won.WONMSG.baseUri + "CloseResponseMessage";
-        won.WONMSG.closeResponseMessageCompacted = won.WONMSG.prefix + ":CloseResponseMessage";
-        won.WONMSG.openResponseMessage = won.WONMSG.baseUri + "OpenResponseMessage";
-        won.WONMSG.openResponseMessageCompacted = won.WONMSG.prefix + ":OpenResponseMessage";
-        won.WONMSG.connectionMessageResponseMessage = won.WONMSG.baseUri + "ConnectionMessageResponseMessage";
-        won.WONMSG.connectionMessageResponseMessageCompacted = won.WONMSG.prefix + ":ConnectionMessageResponseMessage";
+        won.WONMSG.successResponse = won.WONMSG.baseUri + "SuccessResponse";
+        won.WONMSG.successResponseCompacted = won.WONMSG.prefix + ":SuccessResponse";
+        won.WONMSG.failureResponse = won.WONMSG.baseUri + "FailureResponse";
+        won.WONMSG.failureResponseCompacted = won.WONMSG.prefix + ":FailureResponse";
+      
 
 
 
         won.EVENT = {};
         won.EVENT.WON_MESSAGE_RECEIVED = "WonMessageReceived";
+        won.EVENT.WON_SEARCH_RECEIVED = "SearchReceivedEvent";
         won.EVENT.NEED_CREATED = "NeedCreatedEvent";
         won.EVENT.HINT_RECEIVED = "HintReceivedEvent";
         won.EVENT.CONNECT_SENT ="ConnectSentEvent";
         won.EVENT.CONNECT_RECEIVED = "ConnectReceivedEvent";
         won.EVENT.OPEN_SENT = "OpenSentEvent";
+        won.EVENT.ACTIVATE_NEED_SENT = "ActivateNeedSentEvent"
+        won.EVENT.ACTIVATE_NEED_RECEIVED = "ActivateNeedReceivedEvent"
+        won.EVENT.CLOSE_NEED_SENT = "DeactivateSentEvent";
+        won.EVENT.CLOSE_NEED_RECEIVED = "Deactivate_Received_Event"
         won.EVENT.OPEN_RECEIVED = "OpenReceivedEvent";
         won.EVENT.CLOSE_SENT = "CloseSentEvent";
         won.EVENT.CLOSE_RECEIVED = "CloseReceivedEvent";
@@ -258,6 +283,7 @@
         won.UNREAD.GROUP = {};
         won.UNREAD.GROUP.ALL="all";
         won.UNREAD.GROUP.BYNEED="byNeed";
+
 
         //UTILS
         var UNSET_URI= "no:uri";
@@ -379,7 +405,8 @@
         won.minimalContext = {
             "msg": "http://purl.org/webofneeds/message#",
             "won": "http://purl.org/webofneeds/model#",
-            "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+            "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+            "rdfg": "http://www.w3.org/2004/03/trix/rdfg-1/"
         }
 
         won.defaultContext = {
@@ -393,6 +420,7 @@
                 "won": "http://purl.org/webofneeds/model#",
                 "gr": "http://purl.org/goodrelations/v1#",
                 "ldp": "http://www.w3.org/ns/ldp#",
+                "rdfg": "http://www.w3.org/2004/03/trix/rdfg-1/",
                 "won:hasContent":{
                     "@id":"http://purl.org/webofneeds/model#hasContent",
                     "@type":"@id"
@@ -533,27 +561,20 @@
          */
         won.addMessageGraph = function (builder, graphURIs, messageType) {
             graphs = builder.data['@graph'];
-            //add the default graph to the graphs of the builder
-            var defaultGraph = won.JsonLdHelper.getDefaultGraph(builder.data);
-            if (defaultGraph == null) {
-                defaultGraph =
-                    {
-                        "@graph": [],
-                        "@id": "@default"
-                    };
-                graphs.push(defaultGraph);
-            }
-            defaultGraph["@graph"].push({"@id": UNSET_URI + "#data", "@type": "msg:EnvelopeGraph" });
-
+            unsetMessageGraphUri = UNSET_URI+"#data";
             //create the message graph, containing the message type
             var messageGraph = {
                 "@graph": [
                     {
                         "@id":UNSET_URI,
                         "msg:hasMessageType": {'@id':messageType}
+                    },
+                    {   "@id": unsetMessageGraphUri,
+                        "@type": "msg:EnvelopeGraph",
+                        "rdfg:subGraphOf" : {"@id":UNSET_URI}
                     }
                 ],
-                "@id": UNSET_URI + "#data"
+                "@id": unsetMessageGraphUri
             };
             won.addContentGraphReferencesToMessageGraph(messageGraph, graphURIs);
             //add the message graph to the graphs of the builder
@@ -689,20 +710,6 @@
                 this.getMainNode()["won:hasFacet"]=facetType;
                 return this;
             },
-            active: function(){
-                return this.inState("won:Active")
-            },
-            inactive: function(){
-                return this.inState("won:Inactive")
-            },
-            inState: function(state){
-                this.getContext()["won:isInState"]={
-                    "@id":"http://purl.org/webofneeds/model#isInState",
-                    "@type":"@id"
-                },
-                this.getMainNode()["won:isInState"] = state;
-                return this;
-            },
           /*  facets: function(facets){
                 this.getMainNode()["won:hasFacet"]=
             }     */
@@ -755,36 +762,46 @@
                 }
                 return this;
             },
-            hasLocationSpecification: function(latitude, longitude){
-                this.getContext()["geo:latitude"]={
-                    "@type":"xsd:float"
-                },
-                this.getContext()["geo:latitude"]={
-                    "@type":"xsd:float"
-                },
-                this.getContentDescriptionNode()["won:hasLocationSpecification"]={
-                    "@id":"_:locationSpecification",
-                    "@type":"geo:Point",
-                    "geo:latitude":latitude.toFixed(6),
-                    "geo:longitude":longitude.toFixed(6)
+            hasLocationSpecification: function(latitude, longitude, addressStr){
+                // Convert to number if necessary. Strings, undefined, etc result in them being NaN
+                latitude = +latitude;
+                longitude = +longitude;
+                if(addressStr === undefined) {
+                    addressStr = "";
                 }
-                return this;
+
+                if(!isNaN(latitude) && !isNaN(longitude)) { //check if parsing worked
+                    this.getContext()["geo:latitude"] = {
+                        "@type": "xsd:float"
+                    };
+                    this.getContext()["geo:latitude"] = {
+                        "@type": "xsd:float"
+                    };
+                    this.getContentDescriptionNode()["won:hasLocationSpecification"] = {
+                        "@id": "_:locationSpecification",
+                        "@type": "geo:Point",
+                        "geo:latitude": latitude.toFixed(6),
+                        "geo:longitude": longitude.toFixed(6),
+                        "won:hasAddress" : addressStr //TODO add to onto
+                    };
+                }
+                return this; // to allow cascading calls
             },
             hasTimeSpecification: function(startTime, endTime, recurInfinite, recursIn, recurTimes){
-                this.getContext()["won:hasStartTime"]= {
-                    "@type":"xsd:dateTime"
+                this.getContext()["won:hasStartTime"] = {
+                    "@type": "xsd:dateTime"
                 }
-                this.getContext()["won:hasEndTime"]={
-                    "@type":"xsd:dateTime"
+                this.getContext()["won:hasEndTime"] = {
+                    "@type": "xsd:dateTime"
                 }
-                this.getContentDescriptionNode()["won:hasTimespecification"]={
-                    "@type":"won:TimeSpecification",
-                    "won:hasRecurInfiniteTimes":recurInfinite,
-                    "won:hasRecursIn":recursIn,
-                    "won:hasStartTime":startTime,
-                    "won:hasEndTime":endTime
+                this.getContentDescriptionNode()["won:hasTimespecification"] = {
+                    "@type": "won:TimeSpecification",
+                    "won:hasRecurInfiniteTimes": recurInfinite,
+                    "won:hasRecursIn": recursIn,
+                    "won:hasStartTime": startTime,
+                    "won:hasEndTime": endTime
                 }
-                return this;
+                return this; // to allow cascading calls
             },
             hasTag: function(tags){
                 this.getContentNode()["won:hasTag"] = tags;

@@ -60,28 +60,35 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      */
     var somePromises = function(promises, errorHandler){
         var deferred = $q.defer(),
-            counter = 0,
+            numPromises = promises.length,
+            successes = 0,
+            failures = 0,
             results = angular.isArray(promises) ? [] : {},
             handler = typeof errorHandler === 'function' ? errorHandler : function(x,y){};
 
+        if (promises.length == 0) {
+            deferred.reject(results);
+        }
+
         angular.forEach(promises, function(promise, key) {
-            counter++;
             promise.then(function(value) {
-                if (results.hasOwnProperty(key)) return;
+                successes++;
+                if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
                 results[key] = value;
-                if (!(--counter)) deferred.resolve(results);
+                if (failures + successes >= numPromises) deferred.resolve(results);
             }, function(reason) {
+                failures ++;
                 $log.error("warning: promise failed. Reason " + JSON.stringify(reason));
-                if (results.hasOwnProperty(key)) return;
+                if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
                 results[key] = null;
                 handler(key, reason);
-                if (!(--counter)) deferred.reject("all promises failed");
+                if (failures >= numPromises) {
+                    deferred.reject(results);
+                } else if (failures + successes >= numPromises) {
+                    deferred.resolve(results);
+                }
             });
         });
-
-        if (counter === 0) {
-            deferred.resolve(results);
-        }
 
         return deferred.promise;
     }
@@ -360,14 +367,17 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             options.message = "Query failed.";
         }
         if (!success){
-            errorMessage = "Query failed.";
+            errorMessage = "Query failed: " + data;
         } else if (typeof options.allowNone !== undefined  && options.allowNone == false && data.length == 0){
             errorMessage = "No results found.";
         } else if (typeof options.allowMultiple !== undefined  && options.allowMultiple == false && data.length > 1){
             errorMessage = "More than one result found.";
         }
-        if (errorMessage != null){
-            $log.error(errorMessage);
+        if (errorMessage != null) {
+            // observation: the error happens for #hasRemoteConnection property of suggested connection, but this
+            // property is really not there (and should not be), so in that case it's not an error...
+            $log.error(options.message + " " + errorMessage);
+            // TODO: this $q.reject seems to have no effect
             $q.reject(options.message + " " + errorMessage);
             return true;
         }
@@ -416,7 +426,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                     linkedDataService.cacheItemInsertOrOverwrite(uri);
                                     deferred.resolve(uri);
                                 } else {
-                                    $q.reject("failed to load " + uri);
+                                    deferred.reject("failed to load " + uri);
                                 }
                             });
                         });
@@ -482,12 +492,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
                                "prefix " + "dc" + ":<" + "http://purl.org/dc/elements/1.1/>\n" +
                                "prefix " + "geo" + ":<" + "http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
-                               "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime where { " +
+                               "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime ?state where { " +
                                //TODO: add as soon as named graphs are handled by the rdf store
                                //
                                //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
                                //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
-                               //                "GRAPH ?coreURI {"+
+                               //                "GRAPH ?coreURI {"+,
+                               "<" + uri + ">" + won.WON.isInStateCompacted + " ?state ." +
                                "<" + uri + ">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ." +
                                "<" + uri + ">" + won.WON.hasContentCompacted + " ?content ." +
                                "?content dc:title ?title ." +
@@ -524,10 +535,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                resultObject.tags = getSafeValue(result.tags);
                                resultObject.textDescription = getSafeValue(result.textDescription);
                                resultObject.creationDate = getSafeValue(result.creationDate);
+                               resultObject.state = getSafeValue(result.state);
                            });
                            return resultObject;
                        } catch (e) {
-                           $q.reject("could not load need " + uri + ". Reason: " + e);
+                           return $q.reject("could not load need " + uri + ". Reason: " + e);
                        } finally {
                            lock.releaseReadLock();
                        }
@@ -568,11 +580,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             });
                             return resultData.result;
                         } catch (e) {
-                            $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI + ". Reason: " + e);
+                            return $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI + ". Reason: " + e);
                         } finally {
                             lock.releaseReadLock();
                         }
-                        $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI);
+                        return $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI);
                     }
                 );
             })
@@ -585,7 +597,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getUniqueObjectOfProperty(needUri, won.WON.hasWonNode)
             .then(
                 function(result){return result;},
-                function(reason) { $q.reject("could not get WonNodeUri of Need " + needUri + ". Reason: " + reason)});
+                function(reason) { return $q.reject("could not get WonNodeUri of Need " + needUri + ". Reason: " + reason)});
     }
 
     linkedDataService.getNeedUriOfConnection = function(connectionUri){
@@ -594,8 +606,12 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         }
         return linkedDataService.getUniqueObjectOfProperty(connectionUri, won.WON.belongsToNeed)
             .then(
-                function(result){return result;},
-                function(reason) { $q.reject("could not get need uri of connection " + connectionUri + ". Reason: " + reason)});
+                function(result) {
+                    return result;
+                },
+                function(reason) {
+                    return $q.reject("could not get need uri of connection " + connectionUri + ". Reason: " + reason)
+                });
     }
 
     linkedDataService.getRemoteConnectionUriOfConnection = function(connectionUri){
@@ -605,7 +621,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getUniqueObjectOfProperty(connectionUri, won.WON.hasRemoteConnection)
             .then(
                 function(result){return result;},
-                function(reason) { $q.reject("could not get remote connection uri of connection " + connectionUri + ". Reason: " + reason)});
+                function(reason) { return $q.reject("could not get remote connection uri of connection " + connectionUri + ". Reason: " + reason)});
     }
 
     linkedDataService.getRemoteneedUriOfConnection = function(connectionUri){
@@ -615,9 +631,36 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getUniqueObjectOfProperty(connectionUri, won.WON.hasRemoteNeed)
             .then(
                 function(result){return result;},
-                function(reason) { $q.reject("could not get remote need uri of connection " + connectionUri + ". Reason: " + reason)});
+                function(reason) { return $q.reject("could not get remote need uri of connection " + connectionUri + ". Reason: " + reason)});
     }
 
+    linkedDataService.getEnvelopeDataForNeed=function(needUri){
+        if(typeof needUri === 'undefined'||needUri == null){
+            throw {message: "getEnvelopeDataForNeed: needUri must not be null"};
+
+        }
+        return linkedDataService.getWonNodeUriOfNeed(needUri)
+            .then(function(wonNodeUri){
+                var ret = {};
+                ret[won.WONMSG.hasSender] = needUri;
+                ret[won.WONMSG.hasSenderNeed] = needUri;
+                ret[won.WONMSG.hasSenderNode] = wonNodeUri;
+                ret[won.WONMSG.hasReceiverNeed] = needUri;
+                ret[won.WONMSG.hasReceiverNode] = wonNodeUri;
+                return ret;
+
+            },function(reason) {
+                //no connection found
+                var deferred = $q.defer();
+                var ret = {};
+                ret[won.WONMSG.hasSender] = needUri;
+                ret[won.WONMSG.hasSenderNeed] = needUri;
+                ret[won.WONMSG.hasReceiverNeed] = needUri;
+                return ret;
+                deferred.resolve(ret);
+                return deferred.promise;}
+        )
+    }
     /**
      * Fetches a structure that can be used directly (in a JSON-LD node) as the envelope data
      * to send a message via the specified connectionUri (that is interpreted as a local connection.
@@ -684,9 +727,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     }
                     return somePromises(promises, function(key, reason){
                         won.reportError("could not fetch last event of connection " + conUris[key], reason);
-                    }).then(function(val) { return won.deleteWhereNull(val)});
+                    }).then(function(val) {
+                        return won.deleteWhereNull(val)
+                    });
                 } catch (e) {
-                    $q.reject("could not get last event of connection " + uri + ". Reason: " + e);
+                    return $q.reject("could not get last event of connection " + uri + ". Reason: " + e);
                 }
             }
         );
@@ -732,7 +777,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     }
                     return $q.all(eventPromises)
                 } catch (e) {
-                    $q.reject("could not get all connection events for connection " + connectionUri + ". Reason: " + e);
+                    return $q.reject("could not get all connection events for connection " + connectionUri + ". Reason: " + e);
                 }
             });
     }
@@ -827,7 +872,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             });
                             return result.result;
                         } catch (e) {
-                            $q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
+                            return $q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
                         } finally {
                             lock.releaseReadLock();
                         }
@@ -887,7 +932,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                            });
                            return eventUris;
                        } catch (e) {
-                           $q.reject("Could not get all connection event URIs for connection " + connectionUri +". Reason: " + e);
+                           return $q.reject("Could not get all connection event URIs for connection " + connectionUri +". Reason: " + e);
                        } finally {
                            lock.releaseReadLock();
                        }
@@ -936,9 +981,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                 won.WON.hasEventContainerCompacted + " ?container.\n" +
                                 "?container rdfs:member ?eventUri. \n" +
                                 " optional { " +
-                                "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
+                                "  ?eventUri msg:hasTimestamp ?timestamp; \n" +
+                                "            msg:hasMessageType ?messageType .\n" +
+                                //filter added so we don't show the success/failure events as last events
+                                " filter (?messageType != msg:SuccessResponse && ?messageType != msg:FailureResponse)" +
                                 " } \n" +
-                                "} order by desc(?timestamp) limit 1";
+                                "} " +
+                                "order by desc(?timestamp) limit 1";
                             privateData.store.execute(query, [], [], function (success, results) {
                                 if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: false, allowMultiple: false})) {
                                     return;
@@ -953,7 +1002,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             });
                             return resultObject.eventUri;
                         } catch (e) {
-                            $q.reject("Could not get last connection event URI for connection " + connectionUri + ". Reason: " + e);
+                            return $q.reject("Could not get last connection event URI for connection " + connectionUri + ". Reason: " + e);
                         } finally {
                             lock.releaseReadLock();
                         }
@@ -975,16 +1024,22 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                 "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
                                 "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
                                 "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                                "select distinct ?eventUri ?timestamp ?text ?senderNeed where { " +
+                                    //note: we have to take the max timestamp as there might be multiple timestamps added to the
+                                    //message dataset during processing
+                                "select ?eventUri (max(?tmstmp) AS ?timestamp) ?text ?senderNeed where { " +
                                 "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
                                 won.WON.hasEventContainerCompacted + " ?container.\n" +
                                 "?container rdfs:member ?eventUri. \n" +
-                                "?eventUri won:hasTextMessage ?text. \n" +
-                                "?eventUri msg:hasSenderNeed ?senderNeed. \n" +
+                                "?eventUri won:hasTextMessage ?text; \n" +
+                                "          msg:hasMessageType ?messageType; \n" +
+                                "          msg:hasSenderNeed ?senderNeed. \n" +
                                 " optional { " +
-                                "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
+                                "  ?eventUri msg:hasTimestamp ?tmstmp .\n" +
                                 " } \n" +
-                                "} order by asc(?timestamp) ";//limit " + limit;
+                                //filter added so we don't show the success/failure events as last events
+                                " filter (?messageType != msg:SuccessResponse && ?messageType != msg:FailureResponse)" +
+                                "} group by ?eventUri ?text ?senderNeed order by asc(?timestamp) ";
+
 
                             privateData.store.execute(query, [], [], function (success, results) {
                                 if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: true, allowMultiple: true})) {
@@ -1007,7 +1062,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             });
                             return textMessages;
                         } catch (e) {
-                            $q.reject("Could not get connection events' text messages " + connectionUri + ". Reason: " + e);
+                            return $q.reject("Could not get connection events' text messages " + connectionUri + ". Reason: " + e);
                         } finally {
                             lock.releaseReadLock();
                         }
@@ -1057,7 +1112,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             });
                             return lastEventTypeBeforeTime;
                         } catch (e) {
-                            $q.reject("Could not get connection event type before time " + connectionUri + ". Reason: " + e);
+                            return $q.reject("Could not get connection event type before time " + connectionUri + ". Reason: " + e);
                         } finally {
                             lock.releaseReadLock();
                         }
@@ -1085,7 +1140,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                         try {
                             var node = {};
                             privateData.store.node(uri, function (success, graph) {
-                                if (graph.length == 0){
+                                if (graph.length == 0) {
                                     $log.error("warn: could not load any attributes for node with uri: " + uri);
                                 }
                                 if (rejectIfFailed(success, graph,{message : "Error loading node with attributes for URI " + uri+".", allowNone : false, allowMultiple: true})){
@@ -1099,7 +1154,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             node.uri = uri;
                             return node;
                         } catch (e) {
-                            $q.reject("could not get node " + uri + "with attributes: " + e);
+                            return $q.reject("could not get node " + uri + "with attributes: " + e);
                         } finally {
                             lock.releaseReadLock();
                         }

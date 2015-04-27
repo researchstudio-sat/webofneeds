@@ -2,7 +2,6 @@ package won.protocol.repository.rdfstorage;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
-import won.protocol.model.ConnectionEvent;
 
 import java.net.URI;
 
@@ -16,14 +15,6 @@ import java.net.URI;
 public interface RDFStorageService
 {
 
-  /**
-   * Stores a copy of the specified model, iff it contains at least one triple.
-   * @param event
-   * @param graph
-   */
-  public void storeModel(ConnectionEvent event, Model graph);
-
-  public Model loadModel(ConnectionEvent event);
 
   /**
    * Stores a copy of the specified model, iff it contains at least one triple.

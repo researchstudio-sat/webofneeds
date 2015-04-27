@@ -1,10 +1,9 @@
 package won.protocol.message;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.sparql.lib.DatasetLib;
+import com.hp.hpl.jena.sparql.util.IsoMatcher;
 import org.apache.jena.riot.Lang;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import won.protocol.util.RdfUtils;
 
@@ -15,7 +14,6 @@ import won.protocol.util.RdfUtils;
 public class EncodeDecodeMessageTest
 {
 
-  //TODO Lang.JSONLD is replaced temporarily by Lang.TRIG due to the bug with JSONLD
   private static final Lang LANG =  Lang.JSONLD;
   //private static final Lang LANG =  Lang.TRIG;
 
@@ -32,23 +30,18 @@ public class EncodeDecodeMessageTest
 
 
   @Test
-  @Ignore
   public void testEncodeDecodeOneMessage() throws Exception {
     Dataset msgDatasetIn = Utils.createTestDataset(RESOURCE_FILE);
     performTest(msgDatasetIn);
   }
 
   @Test
-  @Ignore
   public void testEncodeDecodeAllMessagesWithoutSignature() throws Exception {
     for (String inResource : RESOURCE_FILES_WITHOUT_SIG) {
       Dataset msgDatasetIn = Utils.createTestDataset(inResource);
       performTest(msgDatasetIn);
     }
   }
-
-  // TODO test with signatures
-
 
   private void performTest(final Dataset msgDatasetIn) {
 
@@ -66,13 +59,7 @@ public class EncodeDecodeMessageTest
     // for debugging
     System.out.println(RdfUtils.writeDatasetToString(msgDatasetOut, Lang.TRIG));
 
-    Assert.assertTrue(wonMessageIn.equals(wonMessageOut));
-
-    // TODO This test doesn't pass with JSONLD!!! The Jena has a bug, see:
-    // https://issues.apache.org/jira/browse/JENA-758
-    // The Jena people seem to already solve this bug in the Jena svn,
-    // so probably it will be working in next Jena release
-    Assert.assertTrue(DatasetLib.isomorphic(msgDatasetIn, msgDatasetOut));
+    Assert.assertTrue(IsoMatcher.isomorphic(msgDatasetIn.asDatasetGraph(), msgDatasetOut.asDatasetGraph()));
   }
 
 }

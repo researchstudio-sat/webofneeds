@@ -6,13 +6,17 @@ import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.rdf.model.impl.PropertyImpl;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
+import won.protocol.message.WonMessage;
 import won.protocol.model.Facet;
+import won.protocol.model.Match;
 import won.protocol.model.NeedState;
 import won.protocol.service.WonNodeInfo;
+import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
@@ -33,6 +37,47 @@ public class WonRdfUtils
 
   private static final Logger logger = LoggerFactory.getLogger(WonRdfUtils.class);
 
+  public static class SignatureUtils {
+    public static boolean isSignatureGraph(String graphUri, Model model) {
+      // TODO check the presence of all the required triples
+      Resource resource = model.getResource(graphUri);
+      StmtIterator si = model.listStatements(resource, RDF.type, SFSIG.SIGNATURE);
+      if (si.hasNext()) {
+        return true;
+      }
+      return false;
+    }
+
+    public static boolean isSignature(Model model) {
+      // TODO check the presence of all the required triples
+      StmtIterator si = model.listStatements(null, RDF.type, SFSIG.SIGNATURE);
+      if (si.hasNext()) {
+        return true;
+      }
+      return false;
+    }
+
+    public static String getSignedGraphUri(String signatureGraphUri, Model signatureGraph) {
+      String signedGraphUri = null;
+      Resource resource = signatureGraph.getResource(signatureGraphUri);
+      NodeIterator ni = signatureGraph.listObjectsOfProperty(resource, WONMSG.HAS_SIGNED_GRAPH_PROPERTY);
+      if (ni.hasNext()) {
+        signedGraphUri = ni.next().asResource().getURI();
+      }
+      return signedGraphUri;
+    }
+
+    public static String getSignatureValue(String signatureGraphUri, Model signatureGraph) {
+      String signatureValue = null;
+      Resource resource = signatureGraph.getResource(signatureGraphUri);
+      NodeIterator ni2 = signatureGraph.listObjectsOfProperty(resource, SFSIG.HAS_SIGNATURE_VALUE);
+      if (ni2.hasNext()) {
+        signatureValue = ni2.next().asLiteral().toString();
+      }
+      return signatureValue;
+    }
+  }
+
   public static class WonNodeUtils
   {
     /**
@@ -44,6 +89,8 @@ public class WonRdfUtils
      * @return
      */
     public static WonNodeInfo getWonNodeInfo(final URI wonNodeUri, Dataset dataset){
+      assert wonNodeUri != null: "wonNodeUri must not be null";
+      assert dataset != null: "dataset must not be null";
       return RdfUtils.findFirst(dataset, new RdfUtils.ModelVisitor<WonNodeInfo>()
         {
           @Override
@@ -136,107 +183,98 @@ public class WonRdfUtils
     }
 
 
+    /**
+     * Converts the specified hint message into a Match object.
+     * @param wonMessage
+     * @return a match object or null if the message is not a hint message.
+     */
+    public static Match toMatch(final WonMessage wonMessage) {
+      if (!WONMSG.TYPE_HINT.equals(wonMessage.getMessageType())){
+        return null;
+      }
+      Match match = new Match();
+      match.setFromNeed(wonMessage.getReceiverNeedURI());
+      match.setToNeed(wonMessage.getSenderURI());
+      Dataset messageContent = wonMessage.getMessageContent();
+
+      RDFNode score = RdfUtils.findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
+        WON.HAS_MATCH_SCORE);
+      if (!score.isLiteral()) return null;
+      match.setScore(score.asLiteral().getDouble());
+
+      RDFNode counterpart = RdfUtils.findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
+        WON.HAS_MATCH_COUNTERPART);
+      if (!counterpart.isResource()) return null;
+      match.setToNeed(URI.create(score.asResource().getURI()));
+      return match;
+    }
+
+
+    public static WonMessage copyByDatasetSerialization(final WonMessage toWrap) {
+      WonMessage copied = new WonMessage(RdfUtils.readDatasetFromString(
+        RdfUtils.writeDatasetToString(toWrap.getCompleteDataset(),
+                                      Lang.TRIG) ,Lang.TRIG));
+      return copied;
+    }
   }
 
   public static class FacetUtils {
 
-    /**
-     * Returns the first facet found in the model, attached to the null relative URI '<>'.
-     * Returns null if there is no such facet.
-     * @param content
-     * @return
-     */
-    public static URI getFacet(URI subject, Model content) {
-      logger.debug("getFacet(model) called");
-      Resource baseRes = content.getResource(subject.toString());
-      StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
-      if (!stmtIterator.hasNext()) {
-        logger.debug("no facet found in model");
-        return null;
+
+
+    public static URI getFacet(WonMessage message){
+      URI uri = getObjectOfMessageProperty(message, WON.HAS_FACET);
+      if (uri == null) {
+        uri = getObjectOfRemoteMessageProperty(message, WON.HAS_REMOTE_FACET);
       }
-      URI facetURI = URI.create(stmtIterator.next().getObject().asResource().getURI());
-      if (logger.isDebugEnabled()){
-        if (stmtIterator.hasNext()){
-          logger.debug("returning facet {}, but model has more facets than just this one.");
-        }
+      return uri;
+    }
+
+    public static URI getRemoteFacet(WonMessage message) {
+      URI uri = getObjectOfMessageProperty(message, WON.HAS_REMOTE_FACET);
+      if (uri == null) {
+        uri = getObjectOfRemoteMessageProperty(message, WON.HAS_FACET);
       }
-      return facetURI;
+      return uri;
     }
 
     /**
-     * Returns the first RemoteFacet found in the model, attached to the specified subject.
-     * Returns null if there is no such facet.
-     * @param content
-     * @return
+     * Returns a property of the message (i.e. the object of the first triple ( [message-uri] [property] X )
+     * found in one of the content graphs of the specified message.
      */
-    public static URI getRemoteFacet(URI subject, Model content) {
-      logger.debug("getFacet(model) called");
-      Resource baseRes = content.getResource(subject.toString());
-      StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_REMOTE_FACET);
-      if (!stmtIterator.hasNext()) {
-        logger.debug("no RemoteFacet found in model");
-        return null;
-      }
-      URI remoteFacetURI = URI.create(stmtIterator.next().getObject().asResource().getURI());
-      if (logger.isDebugEnabled()){
-        if (stmtIterator.hasNext()){
-          logger.debug("returning RemoteFacet {}, but model has more RemoteFacets than just this one.");
+    private static URI getObjectOfMessageProperty(final WonMessage message, final Property property) {
+      List<String> contentGraphUris = message.getContentGraphURIs();
+      Dataset contentGraphs = message.getMessageContent();
+      URI messageURI = message.getMessageURI();
+      for (String graphUri: contentGraphUris) {
+        Model contentGraph = contentGraphs.getNamedModel(graphUri);
+        StmtIterator smtIter = contentGraph.getResource(messageURI.toString()).listProperties(property);
+        if (smtIter.hasNext()) {
+          return URI.create(smtIter.nextStatement().getObject().asResource().getURI());
         }
       }
-      return remoteFacetURI;
-    }
-
-    public static URI getFacet(final URI subject, Dataset content){
-      return RdfUtils.findFirst(content, new RdfUtils.ModelVisitor<URI>()
-      {
-        @Override
-        public URI visit(final Model model) {
-          return getFacet(subject, model);
-        }
-      });
-    }
-
-    public static URI getRemoteFacet(final URI subject, Dataset content){
-      return RdfUtils.findFirst(content, new RdfUtils.ModelVisitor<URI>()
-      {
-        @Override
-        public URI visit(final Model model) {
-          return getRemoteFacet(subject, model);
-        }
-      });
+      return null;
     }
 
     /**
-     * Returns the first facet found in the model, attached to the null relative URI '<>'.
-     * Returns null if there is no such facet.
-     * @param content
-     * @return
+     * Returns a property of the corresponding remote message (i.e. the object of the first triple (
+     * [corresponding-remote-message-uri] [property] X )
+     * found in one of the content graphs of the specified message.
      */
-    public static URI getFacet(Model content) {
-      logger.debug("getFacet(model) called");
-      Resource baseRes = RdfUtils.getBaseResource(content);
-      StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
-      if (!stmtIterator.hasNext()) {
-        logger.debug("no facet found in model");
-        return null;
-      }
-      URI facetURI = URI.create(stmtIterator.next().getObject().asResource().getURI());
-      if (logger.isDebugEnabled()){
-        if (stmtIterator.hasNext()){
-          logger.debug("returning facet {}, but model has more facets than just this one.");
+    private static URI getObjectOfRemoteMessageProperty(final WonMessage message, final Property property) {
+      List<String> contentGraphUris = message.getContentGraphURIs();
+      Dataset contentGraphs = message.getMessageContent();
+      URI messageURI = message.getCorrespondingRemoteMessageURI();
+      if (messageURI != null) {
+        for (String graphUri : contentGraphUris) {
+          Model contentGraph = contentGraphs.getNamedModel(graphUri);
+          StmtIterator smtIter = contentGraph.getResource(messageURI.toString()).listProperties(property);
+          if (smtIter.hasNext()) {
+            return URI.create(smtIter.nextStatement().getObject().asResource().getURI());
+          }
         }
       }
-      return facetURI;
-    }
-
-    public static URI getFacet(Dataset content){
-      return RdfUtils.findFirst(content, new RdfUtils.ModelVisitor<URI>()
-      {
-        @Override
-        public URI visit(final Model model) {
-          return getFacet(model);
-        }
-      });
+      return null;
     }
 
     /**
@@ -257,6 +295,8 @@ public class WonRdfUtils
       }
       return ret;
     }
+
+
 
     /**
      * Adds a triple to the model of the form <> won:hasFacet [facetURI].
@@ -296,42 +336,13 @@ public class WonRdfUtils
 
   }
 
-  // ToDo (FS): after the whole system has been adapted to the new message format check if the following methods are still in use and if they are make them pretty!
   public static class NeedUtils
   {
 
-    public static URI queryOwner(Dataset content) {
-
-      URI ownerURI = null;
-      // ToDo (FS): add as much as possible to vocabulary stuff
-      final String queryString =
-        "PREFIX won: <http://purl.org/webofneeds/model#> " +
-          "SELECT * { { ?s won:hasOwner ?owner } UNION { GRAPH ?g { ?s won:hasOwner ?owner } } }";
-      Query query = QueryFactory.create(queryString);
-      try (QueryExecution qexec = QueryExecutionFactory.create(query, content)) {
-        ResultSet results = qexec.execSelect();
-        boolean foundOneResult = false;
-        for (; results.hasNext(); ) {
-          if (foundOneResult)
-            throw new IncorrectPropertyCountException(1,2);
-          foundOneResult = true;
-          QuerySolution solution = results.nextSolution();
-          Resource r = solution.getResource("owner");
-          try {
-            ownerURI = new URI(r.getURI());
-          } catch (URISyntaxException e) {
-            logger.warn("caught URISyntaxException:", e);
-            throw new DataIntegrityException("could not parse ownerUri: " + r.getURI(), e);
-          }
-        }
-      }
-      return ownerURI;
-    }
 
     public static URI queryWonNode(Dataset content) {
 
       URI wonNodeURI = null;
-      // ToDo (FS): add as much as possible to vocabulary stuff
       final String queryString =
         "PREFIX won: <http://purl.org/webofneeds/model#> " +
           "SELECT * { { ?s won:hasWonNode ?wonNode } UNION { GRAPH ?g { ?s won:hasWonNode ?wonNode } } }";
@@ -514,17 +525,15 @@ public class WonRdfUtils
      */
     public static Model getNeedModelFromNeedDataset(Dataset dataset){
       assert dataset != null : "dataset must not be null";
-      Model result = ModelFactory.createDefaultModel();
-      Model defaultModel = dataset.getDefaultModel();
-      //find the hasGraph triples that should reference graphs in the dataset.
-      // Get their data and copy it to the result graph.
-      NodeIterator it = defaultModel.listObjectsOfProperty(WON.HAS_GRAPH);
-      while(it.hasNext()){
-        Model namedModel = dataset.getNamedModel(it.next().toString());
-        if (namedModel != null){
-          result.add(namedModel);
+      final Model result = ModelFactory.createDefaultModel();
+
+      RdfUtils.visit(dataset,new RdfUtils.ModelVisitor<Object>() {
+        @Override
+        public Object visit(Model model) {
+          result.add(model);
+          return null;
         }
-      }
+      });
       return result;
     }
 

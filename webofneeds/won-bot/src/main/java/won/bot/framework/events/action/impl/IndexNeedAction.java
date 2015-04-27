@@ -26,6 +26,7 @@ import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.impl.NeedAddedToSolrEvent;
 import won.bot.framework.events.event.impl.NeedCreatedEventForMatcher;
 import won.matcher.solr.NeedSolrInputDocumentBuilder;
+import won.protocol.message.WonMessage;
 import won.protocol.util.NeedModelBuilder;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -82,14 +83,15 @@ public class IndexNeedAction extends BaseEventBotAction
   {
     logger.debug("adding need {} to solr server", ((NeedCreatedEventForMatcher) event).getNeedURI());
     NeedCreatedEventForMatcher needEvent = (NeedCreatedEventForMatcher) event;
-    Dataset needDataset = needEvent.getNeedData();
+    Dataset wonMessageDataset = needEvent.getNeedData();
+    WonMessage wonMessage = new WonMessage(wonMessageDataset);
     //this dataset contains the complete need data
     NeedSolrInputDocumentBuilder builder = new NeedSolrInputDocumentBuilder();
     NeedModelBuilder needModelBuilder = new NeedModelBuilder();
-    needModelBuilder.copyValuesFromProduct(WonRdfUtils.NeedUtils.getNeedModelFromNeedDataset(needDataset));
+    needModelBuilder.copyValuesFromProduct(WonRdfUtils.NeedUtils.getNeedModelFromNeedDataset(wonMessage.getMessageContent()));
     needModelBuilder.copyValuesToBuilder(builder);
     if (logger.isDebugEnabled()){
-      logger.debug("got this model from won node: {}", RdfUtils.toString(needDataset));
+      logger.debug("got this model from won node: {}", RdfUtils.toString(wonMessageDataset));
       logger.debug("writing this solrInputDocument to siren: {}", builder.build());
     }
 

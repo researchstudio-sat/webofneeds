@@ -14,41 +14,55 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $timeout, $location,$log, $http, $routeParams, needService,applicationStateService, mapService, userService, utilService, wonService) {
+angular.module('won.owner').controller('CreateNeedCtrlNew', function
+    ( $scope
+    , $timeout
+    , $location
+    , $log
+    , $http
+    , $routeParams
+    , $anchorScroll
+    , needService
+    , applicationStateService
+    , userService
+    , utilService
+    , wonService
+    , $q
+    ) {
     $scope.currentStep = $routeParams.step;
     $scope.selectedType = $routeParams.selectedType;
     $scope.title = $routeParams.title;
     // we pass draft uri in query param "draft". Care should be taken to remove this param when redirecting with location.path(...).search("draft", null)
     $scope.draftURI = $routeParams.draft;
 
-    $scope.$on(won.EVENT.NEED_CREATED, onNeedCreated = function(event, eventData){
+    $scope.$on(won.EVENT.NEED_CREATED, onNeedCreated = function (event, eventData) {
         $scope.needURI = eventData.needURI;
         applicationStateService.setCurrentNeedURI($scope.needURI);
         $location.url("/private-link");
     });
 
     $scope.showChangeType = false;
-    $scope.clickOnChangeTypeOfNeed = function(){
+    $scope.clickOnChangeTypeOfNeed = function () {
         $scope.showChangeType = !$scope.showChangeType;
         $('#changePostMenuItem' + $scope.selectedType).addClass('active');
     }
     /*Block for working with checking another post type */
     var typeStrings = [
-         "Want - I'm looking for...",
-         "Offer - I'm offering...",
-         "Together - Looking for people to...",
-         "Change - Let's do something about..." ]
-    $scope.getCurrentTypeOfOffer = function() {
+        "Want - I'm looking for...",
+        "Offer - I'm offering...",
+        "Together - Looking for people to...",
+        "Change - Let's do something about..."]
+    $scope.getCurrentTypeOfOffer = function () {
         if ($scope.selectedType == undefined || $scope.selectedType < 0
-                || $scope.selectedType >= typeStrings.length)
+            || $scope.selectedType >= typeStrings.length)
             $scope.showChangeType = true;
         else
             return typeStrings[$scope.selectedType];
     }
 
-    $scope.onClickChangePostMenuItem = function(item) {
-        if(item > -1){
-            if($scope.selectedType > -1){
+    $scope.onClickChangePostMenuItem = function (item) {
+        if (item > -1) {
+            if ($scope.selectedType > -1) {
                 $('#changePostMenuItem' + $scope.selectedType).removeClass('active');
             }
             $scope.selectedType = item;
@@ -59,11 +73,11 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
         }
     }
 
-    var typeIcons = ["want", "offer", "todo", "change"].map(function(t){
+    var typeIcons = ["want", "offer", "todo", "change"].map(function (t) {
         return "/owner/images/type_posts/" + t + ".png";
     })
 
-    $scope.currentTypeIcon = function() {
+    $scope.currentTypeIcon = function () {
         return typeIcons[$scope.selectedType];
     }
 
@@ -75,7 +89,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
         'Roughly, what are you planning for which you need people?',
         'Roughly, what are you pointing out and want to change?'];
 
-    $scope.getTitlePlaceholder = function() {
+    $scope.getTitlePlaceholder = function () {
         return titlePlaceholder[$scope.selectedType];
     }
 
@@ -85,202 +99,190 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
         'And now with details! (By the way, there\'s specialised textboxes for specifying an event location and time)',
         'And now with details! (By the way, there\'s specialised textboxes for specifying when and where the thing you want to change occurred).'];
 
-    $scope.getDescriptionPlaceholder = function() {
+    $scope.getDescriptionPlaceholder = function () {
         return descriptionPlaceholder[$scope.selectedType];
     }
 
     var tagsPlaceholder = [
-    'Shoes, Entertainment, For Children, ... ',
-    'Shoes, Entertainment, For Children, ... ',
-    'Soccer, Party, Discussion Group, Food Coop ...',
-    'Clean Park Initiative, Recycling, Occupy, Privacy, FML, ... '];
+        'Shoes, Entertainment, For Children, ... ',
+        'Shoes, Entertainment, For Children, ... ',
+        'Soccer, Party, Discussion Group, Food Coop ...',
+        'Clean Park Initiative, Recycling, Occupy, Privacy, FML, ... '];
 
-    $scope.getTagsPlaceholder = function() {
+    $scope.getTagsPlaceholder = function () {
         return tagsPlaceholder[$scope.selectedType];
     }
 
-	$scope.uploadOptions = {
-		maxFileSize:5000000,
-		acceptFileTypes:/(\.|\/)(gif|jpe?g|png)$/i
-	};
+    $scope.uploadOptions = {
+        maxFileSize: 5000000,
+        acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i
+    };
 
     $scope.numberOfSteps = 3;
     $scope.toJump = 0;
-	$scope.successShow = false;
+    $scope.successShow = false;
     $scope.collapsed = false;
 
-    $scope.setShowButtons = function(step){
+    $scope.setShowButtons = function (step) {
         /*if(step == 1){
-            $scope.previousButton = false;
-            $scope.saveDraftButton = false;
-            $scope.nextButton = false;
-            $scope.previewButton = false;
-        }else*/ if(step == 1){//2  ){
+         $scope.previousButton = false;
+         $scope.saveDraftButton = false;
+         $scope.nextButton = false;
+         $scope.previewButton = false;
+         }else*/
+        if (step == 1) {//2  ){
             $scope.previousButton = false;
 
-            $scope.saveDraftButton = userService.isAuth();
+            $scope.saveDraftButton = userService.isAccountUser();
             $scope.nextButton = true;
             $scope.previewButton = true;
             $scope.publishButton = false;
-        } else if(step == 2){//3){
-            if($scope.collapsed == true){
+        } else if (step == 2) {//3){
+            if ($scope.collapsed == true) {
                 $scope.previousButton = true;
-                $scope.saveDraftButton = userService.isAuth();
+                $scope.saveDraftButton = userService.isAccountUser();
                 $scope.nextButton = false;
                 $scope.previewButton = false;
                 $scope.publishButton = true;
             } else {
                 $scope.previousButton = true;
-                $scope.saveDraftButton = userService.isAuth();
+                $scope.saveDraftButton = userService.isAccountUser();
                 $scope.nextButton = false;
                 $scope.previewButton = true;
                 $scope.publishButton = false;
             }
-        }else if(step == 3){
+        } else if (step == 3) {
             $scope.previousButton = true;
-            $scope.saveDraftButton = userService.isAuth();
+            $scope.saveDraftButton = userService.isAccountUser();
             $scope.nextButton = false;
             $scope.previewButton = false;
             $scope.publishButton = true;
         } else { // default
             $scope.previousButton = false;
-            $scope.saveDraftButton = userService.isAuth();
+            $scope.saveDraftButton = userService.isAccountUser();
             $scope.nextButton = true;
             $scope.previewButton = true;
             $scope.publishButton = false;
         }
 
-    }
+    };
     $scope.setShowButtons($scope.currentStep);
 
-    $scope.needType = function(){
-        if($scope.selectedType == 0){
+    $scope.needType = function () {
+        if ($scope.selectedType == 0) {
             return won.WON.BasicNeedTypeDemand;
-        }else if($scope.selectedType == 1){
+        } else if ($scope.selectedType == 1) {
             return won.WON.BasicNeedTypeSupply;
-        } else if($scope.selectedType == 2){
+        } else if ($scope.selectedType == 2) {
             return won.WON.BasicNeedTypeDotogether;
-        } else if($scope.selectedType == 3){
+        } else if ($scope.selectedType == 3) {
             return won.WON.BasicNeedTypeCritique;
         }
     }
 
-    $scope.marker = null;
-
-    $scope.getMapOptions = function(){
-
-        return {
-            center:mapService.getGeolocation(),
-            zoom:15,
-            mapTypeId:google.maps.MapTypeId.ROADMAP
-        };
-    }
-    $scope.mapOptions = $scope.getMapOptions();
-
-    $scope.showPublic = function(num){
-        if(num==$scope.currentStep){
+    $scope.addressSelected = function(lat, lon, name) {
+        $scope.need.latitude = lat;
+        $scope.need.longitude = lon;
+        $scope.need.name = name;
+    };
+    $scope.showPublic = function (num) {
+        if (num == $scope.currentStep) {
             return true;
-        }else{
+        } else {
             return false;
         }
 
     }
-    $scope.getNeed = function() {
+    $scope.getNeed = function () {
         if ($scope.draftURI == null) {
             return $scope.getCleanNeed();
         } else {
-            return  applicationStateService.getDraft($scope.draftURI);
+            var localDraft = applicationStateService.getDraft($scope.draftURI);
+            if (localDraft == null) { // can happen if someone enters create-need-preview url without any of previous steps
+                $scope.draftURI == null
+                return $scope.getCleanNeed();
+            } else {
+                return localDraft;
+            }
         }
     }
 
-    $scope.getCleanNeed = function() {
+    $scope.getCleanNeed = function () {
         return {
-            title               :$scope.title,
-            needURI             :'',
-            textDescription     :'',
-            contentDescription  :'',
-            state               : 'ACTIVE',
-            basicNeedType       : $scope.needType(),
-            tags                :'',
-            latitude            :'',
-            longitude           :'',
-            startDate           :'',
-            startTime           :'',
-            endDate             :'',
-            endTime             :'',
-            recursIn            :'P0D',
-            recurTimes          :0,         // not used for now, 0 is default value
-            wonNode             :'',
-            binaryFolder        :md5((new Date().getTime() + Math.random(1)).toString())
+            title: $scope.title,
+            needURI: '',
+            textDescription: '',
+            contentDescription: '',
+            state: 'ACTIVE',
+            basicNeedType: $scope.needType(),
+            tags: '',
+            latitude: '',
+            longitude: '',
+            startDate: '',
+            startTime: '',
+            endDate: '',
+            endTime: '',
+            recursIn: 'P0D',
+            recurTimes: 0,         // not used for now, 0 is default value
+            wonNode: '',
+            binaryFolder: md5((new Date().getTime() + Math.random(1)).toString())
         };
     };
 
-	$scope.need = $scope.getNeed();
+    $scope.need = $scope.getNeed();
     $scope.need.basicNeedType = $scope.needType();
 
-	$scope.onClickMap = function($event, $params) {
-		if (this.marker == null) {
-			this.marker = new google.maps.Marker({
-				position : $params[0].latLng,
-				map : this.myMap
-			});
-		} else {
-			this.marker.setPosition($params[0].latLng);
-		}
-		$scope.need.latitude = $params[0].latLng.lat();
-		$scope.need.longitude = $params[0].latLng.lng();
-	};
 
-	$scope.addTag = function() {
-		var tags = $scope.need.tags;
-		var tagName = $("#inputTagName").val();
-		if(tags.indexOf(tagName) == -1) {
-			$scope.need.tags.push(tagName);
-		}
-		$("#inputTagName").val('');
-	};
+    // previewNeed object is intended for the input to detail preview directive
+    // used in create-need page, because that directive that expects string
+    // as tags value. Additionally,using previewNeed instead of need object avoids
+    // constant calling of the detail preview directive functions due to every
+    // change of need object during its construction
+    $scope.getPreviewNeed = function () {
+        var copy = angular.copy($scope.need);
+        copy.tags = utilService.concatTags($scope.need.tags);
+        return copy;
+    }
+    $scope.previewNeed = $scope.getPreviewNeed();
 
-	$scope.removeTag = function (tagName) {
-		$scope.need.tags.splice($scope.need.tags.indexOf(tagName),1);
-	};
-
-    /*$scope.saveDraft = function () {
-      //  needService.saveDraft($scope.need);
-        if($scope.currentStep <= $scope.numberOfSteps) {
-            $scope.currentStep ++;
+    $scope.addTag = function () {
+        var tags = $scope.need.tags;
+        var tagName = $("#inputTagName").val();
+        if (tags.indexOf(tagName) == -1) {
+            $scope.need.tags.push(tagName);
         }
-    };  */
-    $scope.nextStep = function(){
-        if($scope.currentStep <= $scope.numberOfSteps) {
+        $("#inputTagName").val('');
+    };
 
-            $scope.currentStep ++;
-            $scope.successShow = false;
-            $scope.setShowButtons($scope.currentStep);
+    $scope.removeTag = function (tagName) {
+        $scope.need.tags.splice($scope.need.tags.indexOf(tagName), 1);
+    };
+
+    $scope.nextStep = function () {
+        if ($scope.currentStep <= $scope.numberOfSteps) {
+			// -(-1) instead of +1 is just a hack to interpret currentStep as int and not as string
+            $scope.jumpToStep( $scope.currentStep - (-1));
         }
 
     }
-    $scope.previousStep = function(){
-        if($scope.currentStep >=1) {
-
-            $scope.currentStep --;
-            $scope.successShow = false;
-            $scope.setShowButtons($scope.currentStep);
+    $scope.previousStep = function () {
+        if ($scope.currentStep >= 1) {
+			      $scope.jumpToStep( $scope.currentStep - 1)
         }
-
     }
+
     $scope.jumpToStep = function(num){
         $log.debug(num);
+        $scope.saveDraft();
         if(num<=$scope.numberOfSteps){
             $scope.currentStep = num;
-            $scope.successShow = false;
-            $scope.setShowButtons($scope.currentStep);
-         //   var newPath = '/create-need/'+$scope.currentStep+'/'+$scope.iPost.selectedType+'/'+$scope.need.title;
-         //   $location.path(newPath);
+            $location.url("create-need/"+$scope.currentStep+"/"+$scope.selectedType +"/"+$scope.need.title).search({"draft": $scope.draftURI});
 
         }
 
     }
-    $scope.saveDraft = function(){
+
+    $scope.saveDraft = function () {
         var draftBuilderObject = new window.won.DraftBuilder().setContext();
         draftBuilderObject.setCurrentStep($scope.currentStep);
         draftBuilderObject.setCurrentMenuposition($scope.selectedType);
@@ -303,12 +305,9 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
             .hasTag($scope.need.tags)
             .hasContentDescription()    // mandatory
             //.hasPriceSpecification("EUR",5.0,10.0)
-            .active()                   // mandatory: active or inactive
 
-        if (hasLocationSpecification($scope.need)) {
-            // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
-            draftBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
-        }
+        // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
+        draftBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude, $scope.need.name);
 
         if (hasTimeSpecification($scope.need)) {
             draftBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
@@ -317,18 +316,37 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
         // building need as JSON object
         var draftJson = draftBuilderObject.build();
         if ($scope.need.needURI == null || 0 === $scope.need.needURI.length) {
-            $scope.need.needURI =  wonService.getDefaultWonNodeUri() + "/need/" + utilService.getRandomInt(1,9223372036854775807);
+            $scope.need.needURI = wonService.getDefaultWonNodeUri() + "/need/" + utilService.getRandomInt(1, 9223372036854775807);
             draftJson['@graph'][0]['@graph'][0]['@id'] = $scope.need.needURI;
         }
-        var createDraftObject = {"draftURI":$scope.need.needURI,"draft":JSON.stringify(draftJson)};
+        var createDraftObject = {"draftURI": $scope.need.needURI, "draft": JSON.stringify(draftJson)};
 
-        needService.saveDraft(createDraftObject).then(function(saveDraftResponse){
-            if (saveDraftResponse.status === "OK") {
-                $scope.successShow = true;
-            } else {
-                // TODO inform about an error
+        // save locally
+        applicationStateService.addDraft(createDraftObject);
+        $scope.draftURI = $scope.need.needURI;
+
+        // save to the server if the user is logged in
+        if (userService.isAccountUser()) {
+            needService.saveDraft(createDraftObject).then(function(saveDraftResponse){
+                if (saveDraftResponse.status === "OK") {
+                    $scope.successShow = true;
+                } else {
+                    // TODO inform about an error
+                }
+            });
+        }
+    }
+
+    $scope.validStep = function() {
+        if($scope.currentStep > 1) { // after the first step, the need is required to have title, type, description and tags
+            if (!$scope.need.basicNeedType || !$scope.need.title || !$scope.need.textDescription || !$scope.need.tags) {
+                return false;
             }
-        });
+        }
+        return true;
+    };
+    if (!$scope.validStep()) {
+        $scope.jumpToStep(1);
     }
 
     // TODO does not update models
@@ -361,54 +379,24 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
         return need.startDate != '' && need.startTime != '' && need.endDate != '' && need.endTime != '';
     }
 
-    function hasLocationSpecification(need) {
-        return need.latitude != '' && need.longitude != null;
-    }
-
     function hasUri(need) {
         return need.needURI != '' && need.needURI != null;
     }
+
+
     var lock = false;
-	$scope.publish = function () {
+    $scope.publishClicked = function () {
         if(lock== false){
             lock = true;
-            // creating need object
-            var needBuilderObject = new window.won.NeedBuilder().setContext();
-            if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
-                needBuilderObject.demand();
-            } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
-                needBuilderObject.supply();
-            } else if ($scope.need.basicNeedType ==  won.WON.BasicNeedTypeDotogether) {
-                needBuilderObject.doTogether();
-            } else {
-                needBuilderObject.critique();
-            }
+            var needJson = $scope.buildNeedJson();
 
-            needBuilderObject.title($scope.need.title)
-                .ownerFacet()               // mandatory
-                .description($scope.need.textDescription)
-                .hasTag($scope.need.tags)
-                .hasContentDescription()    // mandatory
-                //.hasPriceSpecification("EUR",5.0,10.0)
-                .active()                   // mandatory: active or inactive
-
-            if (hasLocationSpecification($scope.need)) {
-                // never called now, because location is not known for now   hasLocationSpecification(48.218748, 16.360783)
-                needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude);
-            }
-
-            if (hasTimeSpecification($scope.need)) {
-                needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
-            }
-
-            if (hasUri($scope.need)) {
-                needBuilderObject.uri($scope.need.needURI);
-            }
-
-            // building need as JSON object
-            var needJson = needBuilderObject.build();
-
-            var newNeedUriPromise = wonService.createNeed(needJson);
+            // make sure the user is registered (either with account or private link),
+            // then publish the need, so that it is under that account
+            var newNeedUriPromise = userService.setUpRegistrationForUserPublishingNeed().then(
+                function() {
+                     return wonService.createNeed(needJson);
+                }
+            );
 
             // TODO: should the draft removing part be changed to run only on success from newNeedUriPromise?
             if ($scope.draftURI != null) {
@@ -416,30 +404,75 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
                 $scope.draftURI = null;
             }
 
-            //$scope.need = $scope.getCleanNeed();      TODO decide what to do
             $scope.successShow = true;
+
             newNeedUriPromise['finally'](function(){
                 lock=false;
             });
         }
+    }
 
-	};
+
+	$scope.buildNeedJson = function () {
+
+        // creating need object
+        var needBuilderObject = new window.won.NeedBuilder().setContext();
+        if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
+            needBuilderObject.demand();
+        } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
+            needBuilderObject.supply();
+        } else if ($scope.need.basicNeedType ==  won.WON.BasicNeedTypeDotogether) {
+            needBuilderObject.doTogether();
+        } else {
+            needBuilderObject.critique();
+        }
+
+        needBuilderObject.title($scope.need.title)
+            .ownerFacet()               // mandatory
+            .description($scope.need.textDescription)
+            .hasTag(utilService.concatTags($scope.need.tags))
+            .hasContentDescription()    // mandatory
+            //.hasPriceSpecification("EUR",5.0,10.0)
+        
+            needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude, $scope.need.name);
+
+        if (hasTimeSpecification($scope.need)) {
+            needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
+        }
+
+        if (hasUri($scope.need)) {
+            needBuilderObject.uri($scope.need.needURI);
+        }
+
+        // building need as JSON object
+        var needJson = needBuilderObject.build();
+
+        return needJson;
+
+    };
+
+    $scope.goToDetailPostPreview = function() {
+        var detailPreviewElementId = 'detail-preview';
+        $location.hash(detailPreviewElementId);
+        $anchorScroll();
+    }
 
 	$scope.cancel = function () {
 		$location.url("/");
 	};
 
-    $scope.validatePostForm = function() {
-        var result =  ($scope.need.basicNeedType != 'undefined' && $scope.need.basicNeedType != null && $scope.need.basicNeedType != '') &&
+
+    $scope.validatePostForm = function () {
+        var result = ($scope.need.basicNeedType != 'undefined' && $scope.need.basicNeedType != null && $scope.need.basicNeedType != '') &&
             ($scope.need.title != 'undefined' && $scope.need.title != null && $scope.need.title != '') &&
             ($scope.need.textDescription != 'undefined' && $scope.need.textDescription != null && $scope.need.textDescription != '') &&
-            ($scope.need.tags != 'undefined' &&  $scope.need.tags != null &&  $scope.need.tags != '');
+            ($scope.need.tags != 'undefined' && $scope.need.tags != null && $scope.need.tags != '');
 
         $scope.$broadcast('validatePostFormEvent', result);
         return result;
     }
 
-    $scope.validateDateTimeRange = function() {
+    $scope.validateDateTimeRange = function () {
         // check date values
         if (($scope.need.startDate == '' && $scope.need.endDate != '') ||
             ($scope.need.startDate != '' && $scope.need.endDate == '')) {
@@ -471,22 +504,25 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
     }
 
     //TODO remove all those cases of double negatives (ng-disabled -> ng-show)
-    $scope.goToPreviewButtonDisabled = function() {
+    $scope.goToPreviewButtonDisabled = function () {
         switch (parseInt($scope.currentStep)) {
-            case 1: return !$scope.validatePostForm() || !$scope.validateDateTimeRange();
-            case 2: return !$scope.validateDateTimeRange();
-            default: return true;
+            case 1:
+                return !$scope.validatePostForm() || !$scope.validateDateTimeRange();
+            case 2:
+                return !$scope.validateDateTimeRange();
+            default:
+                return true;
         }
     }
 
     var previewButtonText = ["Skip to Preview", "Preview", ""]
-    $scope.gotoPreviewButtonText = function() {
+    $scope.gotoPreviewButtonText = function () {
         return previewButtonText[$scope.currentStep - 1];
     }
 
     $scope.allDay = false;
 
-    $scope.clickOnAllDay = function() {
+    $scope.clickOnAllDay = function () {
         $scope.allDay = !$scope.allDay;
         if ($scope.allDay) {
             $("#start_time").prop('type', 'text');
@@ -507,40 +543,43 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function ($scope, $t
     }
 
 });
-angular.module('won.owner').directive('wonProgressTracker',function factory($log){
+angular.module('won.owner').directive('wonProgressTracker', function factory($log) {
     return {
         restrict: 'AE',
-        templateUrl : "app/create-need/progress-tracker.html",
-        scope : {
-            numberOfSteps : '=numberOfSteps',
-            currentStep : '=currentStep', //TODO bind this as integer
-            jumpToStep : '&'
-        } ,
-        controller : function($scope){
-            $scope.processSteps = {firstStep : false,
-                                     secondStep: false,
-                                     thirdStep: false,
-                                     fourthStep: false};
-
-            $scope.setFlagForCurrentStep = function(){
-                if(currentStep == 1){
-                    $scope.processSteps.firstStep = true;
-                }else if(currentStep == 2){
-                    $scope.processSteps.secondStep = true;
-                }else if(currentStep == 3) {
-                    $scope.processSteps.thirdStep = true;
-                }/*else if(currentStep == 4){
-                    $scope.processSteps.fourthStep = true;
-                } */
+        templateUrl: "app/create-need/progress-tracker.html",
+        scope: {
+            numberOfSteps: '=numberOfSteps',
+            currentStep: '=currentStep', //TODO bind this as integer
+            jumpToStep: '&'
+        },
+        controller: function ($scope) {
+            $scope.processSteps = {
+                firstStep: false,
+                secondStep: false,
+                thirdStep: false,
+                fourthStep: false
             };
-            $scope.showPublic = function(num) {
-                if($scope.currentStep != num){
+
+            $scope.setFlagForCurrentStep = function () {
+                if (currentStep == 1) {
+                    $scope.processSteps.firstStep = true;
+                } else if (currentStep == 2) {
+                    $scope.processSteps.secondStep = true;
+                } else if (currentStep == 3) {
+                    $scope.processSteps.thirdStep = true;
+                }
+                /*else if(currentStep == 4){
+                 $scope.processSteps.fourthStep = true;
+                 } */
+            };
+            $scope.showPublic = function (num) {
+                if ($scope.currentStep != num) {
                     return false;
-                }else if($scope.currentStep == num){
+                } else if ($scope.currentStep == num) {
                     return true;
                 }
             };
-            $scope.increaseStep = function(){
+            $scope.increaseStep = function () {
                 $scope.currentStep++;
             }
 
@@ -550,7 +589,7 @@ angular.module('won.owner').directive('wonProgressTracker',function factory($log
             $scope.navStep2Disabled = 'disabled';
             $scope.navStep3Disabled = 'disabled';
 
-            $scope.$on('validatePostFormEvent', function(event, eventData) {
+            $scope.$on('validatePostFormEvent', function (event, eventData) {
                 if (eventData == true) {
                     $scope.navStep2Disabled = '';
                 } else {
@@ -558,121 +597,123 @@ angular.module('won.owner').directive('wonProgressTracker',function factory($log
                 }
             })
 
-            $scope.$on('validateDateTimeRangeEvent', function(event, eventData) {
+            $scope.$on('validateDateTimeRangeEvent', function (event, eventData) {
                 if (eventData == true) {
                     $scope.navStep3Disabled = '';
                 } else {
                     $scope.navStep3Disabled = 'disabled';
                 }
             })
-        } ,
-        link: function(scope, element, attrs){
+        },
+        link: function (scope, element, attrs) {
             $log.debug("Progress Tracker");
         }
     }
 })
 angular.module('won.owner').directive('wonGallery', function factory() {
-	return {
-		restrict : 'A',
-		templateUrl : "app/create-need/won-gallery.html",
-		scope : {
-			need : '=need'
-		},
-		link : function (scope, element, attrs) {
+    return {
+        restrict: 'A',
+        templateUrl: "app/create-need/won-gallery.html",
+        scope: {
+            need: '=need'
+        },
+        link: function (scope, element, attrs) {
 
-			$('#photo').change(function () {
-				angular.element("#photo-form").scope().submit();
-			});
-		},
-		controller : function($scope, $location,$log) {
-			$scope.selectedPhoto = 0;
-			$scope.getCleanPhotos = function() {
-				return [
-					{uri:''},
-					{uri:''},
-					{uri:''}
-				];
-			};
-			$scope.photos = $scope.getCleanPhotos();
+            $('#photo').change(function () {
+                angular.element("#photo-form").scope().submit();
+            });
+        },
+        controller: function ($scope, $location, $log) {
+            $scope.selectedPhoto = 0;
+            $scope.getCleanPhotos = function () {
+                return [
+                    {uri: ''},
+                    {uri: ''},
+                    {uri: ''}
+                ];
+            };
+            $scope.photos = $scope.getCleanPhotos();
 
-			$scope.onClickPhoto = function(num) {
-				$scope.selectedPhoto = num;
+            $scope.onClickPhoto = function (num) {
+                $scope.selectedPhoto = num;
                 $log.debug($scope.selectedPhoto);
-			};
-			$scope.$on('fileuploadsubmit', function (e, data) {
-				var filename = data.files[0].name;
-				$scope.lastExtension =  extension = filename.substr(filename.lastIndexOf(".") , filename.lenght);
-			});
+            };
+            $scope.$on('fileuploadsubmit', function (e, data) {
+                var filename = data.files[0].name;
+                $scope.lastExtension = extension = filename.substr(filename.lastIndexOf("."), filename.lenght);
+            });
 
-			$scope.$watch('need', function (newVal, oldVal) {
-				if(newVal.binaryFolder != oldVal.binaryFolder) {
-					$scope.photos = $scope.getCleanPhotos();
-				}
-			});
+            $scope.$watch('need', function (newVal, oldVal) {
+                if (newVal.binaryFolder != oldVal.binaryFolder) {
+                    $scope.photos = $scope.getCleanPhotos();
+                }
+            });
 
-			$scope.$on('file uploadstop', function (e, data) {
-				var absPath = $location.absUrl();
-				var ownerPath = absPath.substr(0,absPath.indexOf('#'));
-				$scope.photos[$scope.selectedPhoto].uri = ownerPath + 'rest/needphoto/' + $scope.need.binaryFolder + "/" + $scope.selectedPhoto + $scope.lastExtension + '/';
-				$scope.need.images = [];
-				angular.forEach($scope.photos, function(photo) {
-					if(photo.uri) {
-						$scope.need.images.push(angular.copy(photo));
-					}
-				}, $scope);
-			});
+            $scope.$on('file uploadstop', function (e, data) {
+                var absPath = $location.absUrl();
+                var ownerPath = absPath.substr(0, absPath.indexOf('#'));
+                $scope.photos[$scope.selectedPhoto].uri = ownerPath + 'rest/needphoto/'
+                + $scope.need.binaryFolder + "/" + $scope.selectedPhoto + $scope.lastExtension + '/';
+                $scope.need.images = [];
+                angular.forEach($scope.photos, function (photo) {
+                    if (photo.uri) {
+                        $scope.need.images.push(angular.copy(photo));
+                    }
+                }, $scope);
+            });
             $scope.currentStep = 1;
 
-            $scope.onClickNeedType = function(currentStep) {
-                $scope.currentStep = $scope.currentStep+1;
+            $scope.onClickNeedType = function (currentStep) {
+                $scope.currentStep = $scope.currentStep + 1;
             };
-		}
-	};
+        }
+    };
 });
-angular.module('won.owner').controller('AdditionalInfoCtrl', function ($scope,  $location, $http, needService, mapService, userService){
-    $scope.imageInputFieldCollapsed = true;
-    $scope.locationInputFieldCollapsed = true;
-    $scope.timeInputFieldCollapsed = true;
+angular.module('won.owner').controller('AdditionalInfoCtrl',
+    function ($scope, $location, $http, $log, needService, userService) {
+        $scope.imageInputFieldCollapsed = true;
+        $scope.locationInputFieldCollapsed = true;
+        $scope.timeInputFieldCollapsed = true;
 
-    $scope.imageCollapseClick = function(){
-        $scope.imageInputFieldCollapsed = !$scope.imageInputFieldCollapsed;
-        if($scope.imageInputFieldCollapsed==false){
-         /*   $location.hash('imagesInfoTitleWell');
-            $anchorScroll();*/
+        $scope.imageCollapseClick = function () {
+            $scope.imageInputFieldCollapsed = !$scope.imageInputFieldCollapsed;
+            if ($scope.imageInputFieldCollapsed == false) {
+                /*   $location.hash('imagesInfoTitleWell');
+                 $anchorScroll();*/
+            }
+        };
+
+        $scope.locationCollapseClick = function () {
+            $scope.locationInputFieldCollapsed = !$scope.locationInputFieldCollapsed;
+            if ($scope.locationInputFieldCollapsed == false) {
+
+                /*  $location.hash('locationInfoTitleWell');
+                 $anchorScroll();  */
+            }
+        };
+
+        $scope.timeCollapseClick = function () {
+            $scope.timeInputFieldCollapsed = !$scope.timeInputFieldCollapsed;
+            if ($scope.timeInputFieldCollapsed == false) {
+                /*   $location.hash('timeInfoTitleWell');
+                 $anchorScroll();    */
+            }
+        };
+
+        $scope.getImagesComment = function () {
+            if ($scope.selectedType == 0) return "Add photos of similar things or sketches to give people a better idea what you have in mind."
+            if ($scope.selectedType == 1) return "Add photos or sketches to give people a better idea what you're offering.";
+            if ($scope.selectedType == 2) return "If you want you can add an image or photo here to illustrate the activity.";
+            if ($scope.selectedType == 3) return "Add a photo, sketch (or screenshot) of the problem you want to point out.";
         }
-    };
 
-    $scope.locationCollapseClick = function(){
-        $scope.locationInputFieldCollapsed = !$scope.locationInputFieldCollapsed;
-        if($scope.locationInputFieldCollapsed==false){
-
-          /*  $location.hash('locationInfoTitleWell');
-            $anchorScroll();  */
+        $scope.getLocationComment = function () {
+            if ($scope.selectedType == 0) return "Where should the thing be available? i.e. where would you pick it up or where should it be delivered to?"
+            if ($scope.selectedType == 1) return "Where\'s your offer available? i.e. where can people pick it up or where would you deliver it too?";
+            if ($scope.selectedType == 2) return "Where's the action happening?";
+            if ($scope.selectedType == 3) return "Where did the problem occur / where have things to be changed?";
         }
-    };
 
-    $scope.timeCollapseClick = function(){
-        $scope.timeInputFieldCollapsed = !$scope.timeInputFieldCollapsed;
-        if($scope.timeInputFieldCollapsed==false){
-         /*   $location.hash('timeInfoTitleWell');
-            $anchorScroll();    */
-        }
-    };
-
-    $scope.getImagesComment = function(){
-        if($scope.selectedType == 0) return "Add photos of similar things or sketches to give people a better idea what you have in mind."
-        if($scope.selectedType == 1) return "Add photos or sketches to give people a better idea what you're offering.";
-        if($scope.selectedType == 2) return "If you want you can add an image or photo here to illustrate the activity.";
-        if($scope.selectedType == 3) return "Add a photo, sketch (or screenshot) of the problem you want to point out.";
-    }
-
-    $scope.getLocationComment = function() {
-        if($scope.selectedType == 0) return "Where should the thing be available? i.e. where would you pick it up or where should it be delivered to?"
-        if($scope.selectedType == 1) return "Where\'s your offer available? i.e. where can people pick it up or where would you deliver it too?";
-        if($scope.selectedType == 2) return "Where's the action happening?";
-        if($scope.selectedType == 3) return "Where did the problem occur / where have things to be changed?";
-    }
-
-});
+    });
 
 

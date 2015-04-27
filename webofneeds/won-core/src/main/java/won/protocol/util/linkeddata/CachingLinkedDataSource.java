@@ -22,7 +22,12 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.sparql.core.DatasetGraph;
+import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueBoolean;
 import com.hp.hpl.jena.sparql.path.Path;
+import com.hp.hpl.jena.tdb.TDB;
+import com.hp.hpl.jena.tdb.TDBFactory;
+import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
@@ -55,6 +60,7 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
   private EhCacheCacheManager cacheManager;
   private LinkedDataRestClient linkedDataRestClient;
   private Ehcache cache;
+  private CrawlerCallback crawlerCallback = null;
 
   //In-memory dataset for caching linked data.
 
@@ -75,7 +81,15 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
   public Dataset getDataForResource(URI resource){
 
     assert resource != null : "resource must not be null";
-    Element element = cache.get(resource);
+    Element element = null;
+
+    try {
+        element = cache.get(resource);
+    }catch(CacheException e){
+        logger.debug(String.format("Couldn't fetch resource %s",resource),e);
+        return DatasetFactory.createMem();
+    }
+
     Object dataset = element.getObjectValue();
     if (dataset instanceof Dataset) return (Dataset) dataset;
     throw new IllegalStateException(
@@ -93,9 +107,7 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
     int depth = 0;
     int requests = 0;
 
-    Dataset dataset = getDataForResource(resourceURI);
-
-
+    Dataset dataset = makeDataset();
     OUTER: while (newlyDiscoveredURIs.size() > 0 && depth < maxDepth && requests < maxRequest){
       urisToCrawl = newlyDiscoveredURIs;
       newlyDiscoveredURIs = new HashSet<URI>();
@@ -127,7 +139,7 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
     int depth = 0;
     int requests = 0;
 
-    Dataset resultDataset = DatasetFactory.createMem();
+    Dataset resultDataset = makeDataset();
 
     OUTER: while (newlyDiscoveredURIs.size() > 0 && depth < maxDepth && requests < maxRequest){
       urisToCrawl = newlyDiscoveredURIs;
@@ -169,7 +181,7 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
                                                   List<Path> properties){
     Set<URI> toCrawl = new HashSet<URI>();
     for (int i = 0; i<properties.size();i++){
-      Iterator<URI> newURIs = RdfUtils.getURIsForPropertyPath(dataset,
+      Iterator<URI> newURIs = RdfUtils.getURIsForPropertyPathByQuery(dataset,
         resourceURI,
         properties.get(i));
       while (newURIs.hasNext()){
@@ -221,6 +233,10 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
   public void afterPropertiesSet() throws Exception
   {
     Ehcache baseCache = cacheManager.getCacheManager().getCache(CACHE_NAME);
+    if (baseCache == null) {
+      throw new IllegalArgumentException(String.format("could not find a cache with name '%s' in ehcache config",
+                                                    CACHE_NAME));
+    }
     this.cache = new SelfPopulatingCache(baseCache, new LinkedDataCacheEntryFactory());
   }
 
@@ -233,18 +249,37 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
     this.linkedDataRestClient = linkedDataRestClient;
   }
 
-  private class LinkedDataCacheEntryFactory implements CacheEntryFactory {
-    private LinkedDataCacheEntryFactory(){}
-
-    @Override
-    public Object createEntry(final Object key) throws Exception
-    {
-      if (key instanceof URI) {
-        logger.debug("fetching linked data for URI {}", key);
-        return linkedDataRestClient.readResourceData((URI) key);
-      } else {
-        throw new IllegalArgumentException("this cache only resolves URIs to Models");
-      }
+    public static Dataset makeDataset() {
+        DatasetGraph dsg = TDBFactory.createDatasetGraph();
+        dsg.getContext().set(TDB.symUnionDefaultGraph, new NodeValueBoolean(true));
+        return DatasetFactory.create(dsg);
     }
+
+  private class LinkedDataCacheEntryFactory implements CacheEntryFactory {
+      private LinkedDataCacheEntryFactory() {
+      }
+
+      @Override
+      public Object createEntry(final Object key) throws Exception {
+          if (key instanceof URI) {
+              logger.debug("fetching linked data for URI {}", key);
+              Dataset dataset = linkedDataRestClient.readResourceData((URI) key);
+              if (crawlerCallback != null){
+                try {
+                  crawlerCallback.onDatasetCrawled((URI) key, dataset);
+                } catch (Exception e ){
+                  logger.info(String.format("error during callback execution for dataset %s", key.toString()), e);
+                }
+              }
+              return dataset;
+          } else {
+              throw new IllegalArgumentException("this cache only resolves URIs to Models");
+          }
+      }
+  }
+
+  @Autowired(required = false)
+  public void setCrawlerCallback(final CrawlerCallback crawlerCallback) {
+    this.crawlerCallback = crawlerCallback;
   }
 }

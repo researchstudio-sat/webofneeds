@@ -17,13 +17,11 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:aop="http://www.springframework.org/schema/aop"
-       xsi:schemaLocation="
-        http://www.springframework.org/schema/beans
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+
+
         http://www.springframework.org/schema/aop
         http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
 
@@ -43,7 +41,8 @@
         <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.protocol.impl.OwnerProtocolNeedServiceImpl.*(..))"/>
         <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.service.impl.DataAccessServiceImpl.*(..))"/>
         <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.node.service.impl.LinkedDataServiceImpl.*(..))"/>
-        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.protocol.repository.rdfstorage.RDFStorageService.*(..))"/>
+        <aop:advisor advice-ref="monitoringInterceptor"
+                     pointcut="execution(* won.protocol.repository.rdfstorage.RDFStorageService.*(..))"/>
     </aop:config>
 
     <!-- this may not be needed... not sure when and why -->
