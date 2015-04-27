@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.channels.FileLock;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.util.Arrays;
@@ -108,13 +109,15 @@ public class KeyStoreService {
 
     private synchronized void saveStoreToFile() {
 
-        OutputStream outputStream = null;
+        FileOutputStream outputStream = null;
+        FileLock lock = null;
 
         try {
 
             outputStream = new FileOutputStream(storeFile);
+            lock = outputStream.getChannel().lock();
 
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -126,6 +129,13 @@ public class KeyStoreService {
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
+                if (lock != null) {
+                  try {
+                    lock.release();
+                  } catch (IOException e) {
+                    e.printStackTrace();
+                  }
+                }
                 try {
                     outputStream.close();
                 } catch (Exception e) {
@@ -138,17 +148,17 @@ public class KeyStoreService {
 
     private void loadStoreFromFile() {
 
-        InputStream inputStream = null;
+        FileInputStream inputStream = null;
 
         try {
 
             inputStream = new FileInputStream(storeFile);
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+          e.printStackTrace();
         }
 
-        if (inputStream != null) {
+      if (inputStream != null) {
             try {
 
                 store.load(inputStream, Arrays.copyOf(storePW, storePW.length));
@@ -161,6 +171,7 @@ public class KeyStoreService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
             }
         }
     }
