@@ -33,6 +33,12 @@ public class AkkaSystemMain
 
     // read crawling URIs from cmd line
     for (String arg : args) {
+      if (arg.endsWith("/")) {
+        endpoint.updateCrawlingMetadata(new UriStatusMessage(
+          arg.substring(0, arg.length()-1), arg.substring(0, arg.length()-1), UriStatusMessage.STATUS.PROCESS));
+      } else {
+        endpoint.updateCrawlingMetadata(new UriStatusMessage(arg + "/", arg + "/", UriStatusMessage.STATUS.PROCESS));
+      }
       endpoint.updateCrawlingMetadata(new UriStatusMessage(arg, arg, UriStatusMessage.STATUS.PROCESS));
     }
 
