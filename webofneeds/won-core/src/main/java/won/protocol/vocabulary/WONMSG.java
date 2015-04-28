@@ -135,7 +135,8 @@ public class WONMSG
   public static final Property IS_RESPONSE_TO_MESSAGE_TYPE = m.createProperty(BASE_URI, "isResponseToMessageType");;
   public static final Property HAS_CORRESPONDING_REMOTE_MESSAGE = m.createProperty(BASE_URI, "hasCorrespondingRemoteMessage");
   public static final Property NEW_NEED_STATE_PROPERTY = m.createProperty(BASE_URI, "newNeedState");
-  public static final Property HAS_TIMESTAMP = m.createProperty(BASE_URI, "hasTimestamp");
+  public static final Property HAS_SENT_TIMESTAMP = m.createProperty(BASE_URI, "hasSentTimestamp");
+  public static final Property HAS_RECEIVED_TIMESTAMP = m.createProperty(BASE_URI, "hasReceivedTimestamp");
   //public static final String MESSAGE_HAS_CONTENT_PROPERTY = "hasContent";
   //public static final String MESSAGE_REFERS_TO_PROPERTY = "refersTo";
   //public static final String MESSAGE_NEW_NEED_STATE_PROPERTY = "newNeedState";
