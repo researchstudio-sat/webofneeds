@@ -1,3 +1,5 @@
+package crawler.actor;
+
 import akka.actor.DeadLetter;
 import akka.actor.UntypedActor;
 

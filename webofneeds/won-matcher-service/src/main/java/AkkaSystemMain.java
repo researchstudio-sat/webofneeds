@@ -2,8 +2,11 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.DeadLetter;
 import akka.actor.Props;
+import crawler.actor.DeadLetterActor;
 import crawler.actor.MasterCrawlerActor;
-import crawler.db.SparqlEndpointAccess;
+import crawler.config.Settings;
+import crawler.config.SettingsImpl;
+import crawler.db.SparqlEndpointService;
 import crawler.message.UriStatusMessage;
 
 import java.io.IOException;
@@ -18,22 +21,30 @@ public class AkkaSystemMain
 
   public static void main(String[] args) throws IOException {
 
-    String endpointURI = args[0];
-    String uri = args[1];
-    SparqlEndpointAccess endpoint = new SparqlEndpointAccess(endpointURI);
-
+    // setup Akka
     ActorSystem system = ActorSystem.create("AkkaMatchingService");
+    SettingsImpl settings = Settings.SettingsProvider.get(system);
+    SparqlEndpointService endpoint = new SparqlEndpointService(settings.SPARQL_ENDPOINT);
     ActorRef master = system.actorOf(
-      Props.create(MasterCrawlerActor.class, endpointURI),
+      Props.create(MasterCrawlerActor.class),
       "MasterCrawlerActor");
-    ActorRef actor = system.actorOf(Props.create(DeadLetterActor.class), "DeadLetterActor");
+    ActorRef actor = system.actorOf(Props.create(DeadLetterActor.class), "crawler.actor.DeadLetterActor");
     system.eventStream().subscribe(actor, DeadLetter.class);
 
+    // read crawling URIs from cmd line
+    for (String arg : args) {
+      if (arg.endsWith("/")) {
+        endpoint.updateCrawlingMetadata(new UriStatusMessage(
+          arg.substring(0, arg.length()-1), arg.substring(0, arg.length()-1), UriStatusMessage.STATUS.PROCESS));
+      } else {
+        endpoint.updateCrawlingMetadata(new UriStatusMessage(arg + "/", arg + "/", UriStatusMessage.STATUS.PROCESS));
+      }
+      endpoint.updateCrawlingMetadata(new UriStatusMessage(arg, arg, UriStatusMessage.STATUS.PROCESS));
+    }
+
     // (re-)start crawling
-    endpoint.updateCrawlingMetadata(new UriStatusMessage(uri, uri, UriStatusMessage.STATUS.PROCESS));
     Set<UriStatusMessage> msgs = endpoint.getMessagesForCrawling(UriStatusMessage.STATUS.PROCESS);
     msgs.addAll(endpoint.getMessagesForCrawling(UriStatusMessage.STATUS.FAILED));
-
     for (UriStatusMessage msg : msgs) {
       master.tell(msg, master);
     }

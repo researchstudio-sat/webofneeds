@@ -18,12 +18,12 @@ public class UriStatusMessage
    * Constructor
    * @param uri URI that should be or is already crawled
    * @param baseUri base URI that is used with property paths to extract further URIs
-   * @param action describes what to with the URI
+   * @param status describes what to with the URI
    */
-  public UriStatusMessage(final String uri, final String baseUri, final STATUS action) {
+  public UriStatusMessage(final String uri, final String baseUri, final STATUS status) {
     this.uri = uri;
     this.baseUri = baseUri;
-    this.status = action;
+    this.status = status;
   }
 
   public String getUri() {
@@ -41,6 +41,28 @@ public class UriStatusMessage
   @Override
   public String toString() {
     return "[" + uri + "," + baseUri + "," + status + "]";
+  }
+
+  @Override
+  public UriStatusMessage clone() {
+    return new UriStatusMessage(uri, baseUri, status);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+
+    if (obj instanceof UriStatusMessage) {
+      UriStatusMessage msg = (UriStatusMessage) obj;
+      return uri.equals(msg.getUri()) && baseUri.equals(msg.getBaseUri()) &&
+        status.equals(msg.getStatus());
+    }
+
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return (uri + baseUri + status.toString()).hashCode();
   }
 
   private String uri;
