@@ -203,13 +203,7 @@ public class WonMessageBuilderTest
     check_get_content_in_message_with_two_content_graphs(msg);
   }
 
-  @Test
-  public void test_copyInboundWonMessageForLocalStorage(){
-    WonMessageBuilder msg = this.createMessageWithContent();
-    WonMessage msg2 = WonMessageBuilder.copyInboundNodeToNodeMessageAsNodeToOwnerMessage(MSG_URI_2, CONNECTION_URI_2,
-                                                                                         msg.build());
 
-  }
   @Test
   public void test_envelope_type_exists(){
     WonMessageBuilder msgbuilder = this.createMessageWithEnvelopeType();
