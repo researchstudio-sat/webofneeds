@@ -80,11 +80,16 @@ public abstract class AbstractCamelProcessor implements Processor
 
 
 
-  protected void sendMessageToOwner(WonMessage message, URI needURI){
+  protected void sendMessageToOwner(WonMessage message, URI needURI, String fallbackOwnerApplicationId){
     Need need = needRepository.findOneByNeedURI(needURI);
     List<OwnerApplication> ownerApplications = need.getAuthorizedApplications();
+    List<String> ownerApplicationIds = toStringIds(ownerApplications);
+    //if no owner application ids are authorized, we use the fallback specified (if any)
+    if (ownerApplicationIds.isEmpty() && fallbackOwnerApplicationId != null) {
+      ownerApplicationIds.add(fallbackOwnerApplicationId);
+    }
     Map headerMap = new HashMap<String, Object>();
-    headerMap.put("ownerApplications", toStringIds(ownerApplications));
+    headerMap.put(WonCamelConstants.OWNER_APPLICATIONS, ownerApplicationIds);
     messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),
         WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
                                        "seda:OwnerProtocolOut");
@@ -93,7 +98,7 @@ public abstract class AbstractCamelProcessor implements Processor
   protected void sendMessageToOwner(WonMessage message, List<String> ownerApplicationIds){
     Map headerMap = new HashMap<String, Object>();
     headerMap.put("protocol","OwnerProtocol");
-    headerMap.put("ownerApplications", ownerApplicationIds);
+    headerMap.put(WonCamelConstants.OWNER_APPLICATIONS, ownerApplicationIds);
     messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),
         WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
                                        "seda:OwnerProtocolOut");
@@ -101,7 +106,7 @@ public abstract class AbstractCamelProcessor implements Processor
 
   protected void sendMessageToOwner(WonMessage message, String... ownerApplicationIds){
     Map headerMap = new HashMap<String, Object>();
-    headerMap.put("ownerApplications", Arrays.asList(ownerApplicationIds));
+    headerMap.put(WonCamelConstants.OWNER_APPLICATIONS, Arrays.asList(ownerApplicationIds));
     messagingService.sendInOnlyMessage(null, headerMap, RdfUtils.writeDatasetToString(message.getCompleteDataset(),WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE),
                                        "seda:OwnerProtocolOut");
   }
@@ -120,9 +125,28 @@ public abstract class AbstractCamelProcessor implements Processor
       "seda:SystemMessageToRemoteNode");
   }
 
-  protected void sendSystemMessageToOwner(WonMessage message){
+  protected void sendSystemMessageToOwner(WonMessage message) {
+    sendSystemMessageToOwner(message, null);
+  }
+
+  /**
+   * Allows for adding the ownerApplicationId to the exchange used during creation and
+   * sending of the system message. This is useful for cases in which the owner application
+   * cannot determined otherwise, which can happen when need creation fails.
+   *
+   * If that value is non-null, it is set as the 'ownerApplicationId' header, which is used in
+   * AbstractCamelProcessor#sendMessageToOwner(..) as a fallback to determine the recipients of
+   * the message to be sent.
+   *
+   * @param message
+   * @param ownerApplicationId
+   */
+  protected void sendSystemMessageToOwner(WonMessage message, String ownerApplicationId){
     Map headerMap = new HashMap<String, Object>();
     headerMap.put(WonCamelConstants.MESSAGE_HEADER, message);
+    if (ownerApplicationId != null){
+      headerMap.put(WonCamelConstants.OWNER_APPLICATION_ID, ownerApplicationId);
+    }
     messagingService.sendInOnlyMessage(null, headerMap, null,
             "seda:SystemMessageToOwner");
   }

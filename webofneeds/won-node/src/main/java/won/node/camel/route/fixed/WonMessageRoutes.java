@@ -9,7 +9,6 @@ import won.node.camel.predicate.IsResponseMessagePredicate;
 import won.node.camel.predicate.ShouldCallFacetImplForMessagePredicate;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.exception.EventAlreadyProcessedException;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
@@ -29,10 +28,7 @@ public class WonMessageRoutes  extends RouteBuilder
       .handled(true)
       .wireTap("bean:messagingService?method=inspectMessage");
 
-    onException(EventAlreadyProcessedException.class)
-      .to("bean:resendResponseResponder")
-      .handled(true)
-      .wireTap("bean:messagingService?method=inspectMessage");
+
 
     /**
      * owner protocol, incoming
@@ -47,8 +43,6 @@ public class WonMessageRoutes  extends RouteBuilder
             .to("bean:queueManagementService?method=getEndpointsForOwnerApplication")
           .otherwise()
             .to("bean:wonMessageIntoCamelProcessor")
-            .to("bean:uriNodePathChecker")
-            .to("bean:uriInUseChecker")
             .to("bean:wellformednessChecker")
             .to("bean:signatureChecker")
             .to("bean:wrapperFromOwner")
@@ -147,8 +141,6 @@ public class WonMessageRoutes  extends RouteBuilder
           .to("bean:queueManagementService?method=getEndpointsForOwnerApplication")
          .otherwise()
             .to("bean:wonMessageIntoCamelProcessor")
-            .to("bean:uriNodePathChecker")
-            .to("bean:uriInUseChecker")
             .to("bean:wellformednessChecker")
             .to("bean:signatureChecker")
             .to("bean:wrapperFromExternal")

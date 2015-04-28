@@ -33,6 +33,7 @@ public class InMemoryBotContext implements BotContext
   private Map<String, URI> namedNeedUris = new HashMap<String, URI>();
   private Map<String, List<URI>> namedNeedUriLists = new HashMap<String, List<URI>>();
   private Logger logger = LoggerFactory.getLogger(this.getClass());
+  private Map<Object, Object> genericContext = new HashMap<Object,Object>();
 
   @Override
   public synchronized List<URI> listNeedUris() {
@@ -142,5 +143,15 @@ public class InMemoryBotContext implements BotContext
   @Override
   public synchronized List<URI> getNamedNeedUriList(String name) {
     return this.namedNeedUriLists.get(name);
+  }
+
+  @Override
+  public synchronized void put(Object key, Object value) {
+    this.genericContext.put(key, value);
+  }
+
+  @Override
+  public synchronized Object get(Object key) {
+    return this.genericContext.get(key);
   }
 }

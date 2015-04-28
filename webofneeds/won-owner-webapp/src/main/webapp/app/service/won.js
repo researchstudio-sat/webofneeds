@@ -293,11 +293,12 @@
         }
 
         //get the URI from a jsonld resource (expects an object with an '@id' property)
-        //or a value from a literal
+        //or the value from a typed literal
         won.getSafeJsonLdValue = function(dataItem) {
             if (dataItem == null) return null;
             if (typeof dataItem === 'object') {
                 if (dataItem['@id'] != null) return dataItem['@id'];
+                if (dataItem['@type'] != null && dataItem['@value'] != null) return dataItem['@value'];
             } else {
                 return dataItem;
             }
@@ -369,6 +370,20 @@
             return array;
         }
 
+        won.containsAll = function (array, subArray){
+            for (skey in subArray){
+                var found = false;
+                for (key in array){
+                    if (subArray[skey] === array[key]){
+                        found = true;
+                        break;
+                    }
+                }
+                if (found == false) return false;
+            }
+            return true;
+        }
+
         /**
          * Deletes all null entries in the specified array.
          * @param array
@@ -398,6 +413,24 @@
             }
             //not a container: visit value.
             callback(data, currentKey, currentContainer);
+        }
+
+        /**
+         * Adds all elements of array2 to array1 that are not yet
+         * contained in array1.
+         * If both arrays are non-null, array1 is modified and returned.
+         * If either one of the two is null/undefined, the other is returned
+         *
+         * @param array1
+         * @param array2
+         */
+        won.appendStrippingDuplicates = function(array1, array2){
+            if (typeof array1 === 'undefined') return array2;
+            if (typeof array2 === 'undefined') return array1;
+            array2.filter(function (item) {
+                return array1.indexOf(item) < 0;
+            }).map(function(item){array1.push(item)});
+            return array1;
         }
 
 

@@ -30,6 +30,6 @@ public class ToOwnerSender extends AbstractCamelProcessor
   @Override
   public void process(final Exchange exchange) throws Exception {
     WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-    sendMessageToOwner(message, message.getReceiverNeedURI());
+    sendMessageToOwner(message, message.getReceiverNeedURI(), (String) exchange.getIn().getHeader(WonCamelConstants.OWNER_APPLICATION_ID));
   }
 }

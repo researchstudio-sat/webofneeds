@@ -54,4 +54,10 @@ public class DefaultPrefixUtils
     prefixMapping.setNsPrefix("xsd", XSD.getURI());
     prefixMapping.setNsPrefix("dc", DC.getURI());    
   }
+
+  public static PrefixMapping getDefaultPrefixes(){
+    PrefixMapping ret = PrefixMapping.Factory.create();
+    setDefaultPrefixes(ret);
+    return ret;
+  }
 }

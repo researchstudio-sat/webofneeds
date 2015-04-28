@@ -67,18 +67,19 @@ public class KeyStoreService {
 
     }
 
+  /**
+   * Returns the public key of the certificate stored under the specified alias or null
+   * if no such certificat is found.
+   * @param alias
+   * @return
+   */
     public PublicKey getPublicKey(String alias) {
-
-      PublicKey retrieved = null;
-
-      try {
-        retrieved = getCertificate(alias).getPublicKey();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-
-      return retrieved;
-
+        Certificate cert = getCertificate(alias);
+        if (cert == null){
+          logger.info("No certificate found for alias {}", alias);
+          return null;
+        }
+        return cert.getPublicKey();
     }
 
     public Certificate getCertificate(String alias) {

@@ -20,6 +20,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.service.QueueManagementService;
@@ -44,7 +45,7 @@ public class OwnerProtocolOutgoingMessagesProcessor implements Processor {
         logger.debug("processing messages for dynamic recipients generation");
         Map headers = exchange.getIn().getHeaders();
         Map properties = exchange.getProperties();
-        List<String> ownerApplications = (List<String>)headers.get("ownerApplications");
+        List<String> ownerApplications = (List<String>)headers.get(WonCamelConstants.OWNER_APPLICATIONS);
  //       String methodName =headers.get("methodName").toString();
         logger.debug(ownerApplications.get(0));
         List<String> queueNames = convertToQueueName(ownerApplications,"wonMessage",exchange);

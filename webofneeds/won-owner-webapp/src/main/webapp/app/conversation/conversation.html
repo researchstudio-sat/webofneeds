@@ -16,7 +16,7 @@
 
 
             <tr class="col-lg-12 pre-scrollable" ng-show="showPublic()"
-                 ng-repeat="message in chosenMessage.lastMessages | orderBy:sortedField:reversedSort"
+                 ng-repeat="message in chosenMessage.lastMessages | orderBy :'timestamp':false "
                  notify-render-finished>
                 <td class="col-lg-12">
                     <text-message class="col-lg-12" chosen-message='chosenMessage'

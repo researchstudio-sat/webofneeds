@@ -17,17 +17,61 @@
 package won.protocol.util.linkeddata.impl;
 
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.sparql.modify.UpdateProcessRemote;
+import com.hp.hpl.jena.update.UpdateExecutionFactory;
+import com.hp.hpl.jena.update.UpdateFactory;
+import com.hp.hpl.jena.update.UpdateRequest;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.protocol.util.linkeddata.CrawlerCallback;
 
+import java.io.StringWriter;
 import java.net.URI;
+import java.util.Iterator;
 
 /**
  * Crawler callback implementation that writes crawled data to a predefined sparql endpoint.
  */
 public class SparqlUpdateCrawlerCallback implements CrawlerCallback
 {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+  String sparqlEndpoint = null;
+
+  public void setSparqlEndpoint(final String sparqlEndpoint) {
+    this.sparqlEndpoint = sparqlEndpoint;
+  }
+
   @Override
   public void onDatasetCrawled(final URI uri, final Dataset dataset) {
 
+    if (null == sparqlEndpoint) {
+      logger.warn("no SPARQL endpoint defined");
+      return;
+    }
+
+    Iterator<String> graphNames = dataset.listNames();
+    while (graphNames.hasNext()) {
+
+      StringBuilder quadpatterns = new StringBuilder();
+      String graphName = graphNames.next();
+      Model model = dataset.getNamedModel(graphName);
+      StringWriter sw = new StringWriter();
+      RDFDataMgr.write(sw, model, Lang.NTRIPLES);
+      quadpatterns.append("\nINSERT DATA { GRAPH <")
+                  .append(graphName)
+                  .append("> { ")
+                  .append(sw)
+                  .append("}};\n");
+
+      logger.info(quadpatterns.toString());
+      UpdateRequest update = UpdateFactory.create(quadpatterns.toString());
+      UpdateProcessRemote riStore = (UpdateProcessRemote)
+        UpdateExecutionFactory.createRemote(update, sparqlEndpoint);
+      riStore.execute();
+
+    }
   }
 }

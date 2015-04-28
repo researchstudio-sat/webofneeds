@@ -72,7 +72,7 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
 
     List<Facet> facets = WonRdfUtils.NeedUtils.getFacets(needURI, needContent);
     if (facets.size() == 0)
-      throw new IllegalArgumentException("at least one RDF node must be of type won:HAS_FACET");
+      throw new IllegalArgumentException("at least one property won:hasFacet required ");
     for (Facet f : facets) {
       // TODO: check if there is a implementation for the facet on the node
       facetRepository.save(f);
@@ -83,7 +83,7 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
   }
 
   private void authorizeOwnerApplicationForNeed(final Message message, final Need need) {
-    String ownerApplicationID = message.getHeader("ownerApplicationId").toString();
+    String ownerApplicationID = message.getHeader(WonCamelConstants.OWNER_APPLICATION_ID).toString();
     authorizeOwnerApplicationForNeed(ownerApplicationID, need);
   }
 

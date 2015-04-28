@@ -16,8 +16,10 @@
 
 package won.bot.framework.events.filter.impl;
 
-import won.bot.framework.events.event.Event;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.event.Event;
 
 import java.net.URI;
 import java.util.List;
@@ -27,6 +29,8 @@ import java.util.List;
  */
 public abstract class AbstractNamedUriListFilter extends EventListenerContextAwareFilter
 {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+
   private String listname;
 
   public AbstractNamedUriListFilter(final EventListenerContext context, final String listname)
@@ -41,6 +45,10 @@ public abstract class AbstractNamedUriListFilter extends EventListenerContextAwa
     URI uri = getURIFromEvent(event);
     if (uri == null) return false;
     List<URI> uris = getContext().getBotContext().getNamedNeedUriList(listname);
+    if (uris == null) {
+      logger.debug("filtering by named need uri list, but no list found with name '{}'", listname );
+      return false;
+    }
     return uris.contains(uri);
   }
 
