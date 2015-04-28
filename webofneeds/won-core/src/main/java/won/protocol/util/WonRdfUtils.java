@@ -171,9 +171,11 @@ public class WonRdfUtils
 
     /**
      * Returns the first won:hasTextMessage object, or null if none is found.
+     * Won't work on WonMessage models, removal depends on refactoring of BA facet code
      * @param model
      * @return
      */
+    @Deprecated
     public static String getTextMessage(Model model){
       Statement stmt = model.getProperty(RdfUtils.getBaseResource(model),WON.HAS_TEXT_MESSAGE);
       if (stmt != null) {
@@ -182,6 +184,27 @@ public class WonRdfUtils
       return null;
     }
 
+    /**
+     * Returns the first won:hasTextMessage object, or null if none is found.
+     * @param wonMessage
+     * @return
+     */
+    public static String getTextMessage(final WonMessage wonMessage){
+      return RdfUtils.findFirst(wonMessage.getCompleteDataset(), new RdfUtils.ModelVisitor<String>() {
+        @Override
+        public String visit(Model model) {
+          Statement stmt = model.getProperty(model.getResource(wonMessage.getMessageURI().toString()), WON.HAS_TEXT_MESSAGE);
+          if (stmt != null) {
+            return stmt.getObject().asLiteral().getLexicalForm();
+          }
+          stmt = model.getProperty(model.getResource(wonMessage.getCorrespondingRemoteMessageURI().toString()), WON.HAS_TEXT_MESSAGE);
+          if (stmt != null) {
+            return stmt.getObject().asLiteral().getLexicalForm();
+          }
+          return null;
+        }
+      });
+    }
 
     /**
      * Converts the specified hint message into a Match object.
