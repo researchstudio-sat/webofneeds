@@ -263,6 +263,12 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     Resource needResource = needModel.createResource(getNeedURIString(), WON.NEED);
     // need type
     addResourceIfPresent(needResource, WON.HAS_BASIC_NEED_TYPE, getBasicNeedTypeURI());
+    //facets
+    if (this.getFacetTypes() != null){
+      for (URI facetType: this.getFacetTypes()){
+        needResource.addProperty(WON.HAS_FACET, needModel.getResource(facetType.toString()));
+      }
+    }
     addLiteralValueIfPresent(needModel, needResource, DCTerms.created, DateTimeUtils.toLiteral(getCreationDate(), needModel));
     // need content
     addNeedContent(needModel, needResource);
