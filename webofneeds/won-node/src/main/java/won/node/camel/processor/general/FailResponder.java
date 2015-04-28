@@ -36,49 +36,70 @@ public class FailResponder extends AbstractCamelProcessor
 {
   @Override
   public void process(final Exchange exchange) throws Exception {
-    WonMessage originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);
+    Exception exception = null;
+    WonMessage originalMessage = null;
+    try {
+      originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);
 
-    if (originalMessage == null){
-      logger.debug("Processing an exception. camel header {} was null, assuming original message in header {}",
-        WonCamelConstants.ORIGINAL_MESSAGE_HEADER, WonCamelConstants.MESSAGE_HEADER);
-      originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-    }
-    if (originalMessage == null){
-      logger.warn("Could not obtain original message from camel headers {} or {} for error {}",new Object[]{
-        WonCamelConstants.ORIGINAL_MESSAGE_HEADER, WonCamelConstants.MESSAGE_HEADER,
-        exchange.getProperty(Exchange
-        .EXCEPTION_CAUGHT)});
-      return;
-    }
+      if (originalMessage == null){
+        logger.debug("Processing an exception. camel header {} was null, assuming original message in header {}",
+          WonCamelConstants.ORIGINAL_MESSAGE_HEADER, WonCamelConstants.MESSAGE_HEADER);
+        originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+      }
+      if (originalMessage == null){
+        //we didn't find the original message, so we can't send a response.
+        //Log all we can so that we can start debugging the problem
+        logger.warn("Could not obtain original message from camel headers {} or {} for error {}",new Object[]{
+          WonCamelConstants.ORIGINAL_MESSAGE_HEADER, WonCamelConstants.MESSAGE_HEADER,
+          exchange.getProperty(Exchange
+          .EXCEPTION_CAUGHT)});
+        logger.warn("original exception:", exchange.getProperty(Exchange
+                .EXCEPTION_CAUGHT));
+        return;
+      }
+      exception = (Exception) exchange.getProperty(Exchange.EXCEPTION_CAUGHT);
+      String errormessage = null;
+      if (exception != null){
+        errormessage = exception.getClass().getSimpleName()+": "+ exception.getMessage();
+      } else {
+        errormessage = String.format("An error occurred while processing message %s", originalMessage.getMessageURI());
+      }
+      logger.debug("Caught error while processing WON message {}: {} - sending FailureResponse", originalMessage.getMessageURI(), errormessage);
+      URI newMessageURI = this.wonNodeInformationService.generateEventURI();
+      logger.debug("Sending FailureResponse {}", newMessageURI);
+      Model errorMessageContent = WonRdfUtils.MessageUtils.textMessage(errormessage);
+      RdfUtils.replaceBaseURI(errorMessageContent, newMessageURI.toString());
+      WonMessage responseMessage = new WonMessageBuilder()
+              .setPropertiesForNodeResponse(originalMessage, false,newMessageURI)
+              .addContent(
+                errorMessageContent,
+                      null)
+              .build();
 
-    logger.info("an error occurred while processing WON message {}", originalMessage.getMessageURI());
-    Exception e = (Exception) exchange.getProperty(Exchange.EXCEPTION_CAUGHT);
-    String errormessage = null;
-    if (e != null){
-      errormessage = e.getClass().getSimpleName()+": "+ e.getMessage();
-    } else {
-      errormessage = String.format("An error occurred while processing message %s", originalMessage.getMessageURI());
+      if (WonMessageDirection.FROM_OWNER == originalMessage.getEnvelopeType()){
+        String ownerApplicationId = (String) exchange.getIn().getHeader(WonCamelConstants.OWNER_APPLICATION_ID);
+        sendSystemMessageToOwner(responseMessage, ownerApplicationId);
+      } else if (WonMessageDirection.FROM_EXTERNAL == originalMessage.getEnvelopeType()){
+        sendSystemMessageToRemoteNode(responseMessage);
+      } else {
+        logger.info(String.format("cannot route failure message for direction of original message, " +
+            "expected FROM_OWNER or FROM_EXTERNAL, but found %s. Original cause is logged.",
+          originalMessage.getEnvelopeType()), exception);
+      }
+    } catch (Throwable t){
+      //something went wrong - we can't inform the sender of the message.
+      //now:
+      // 1. log the error we had here
+      // 2. log the original error, otherwise it is swallowed completely
+      URI originalMessageURI = originalMessage == null? null : originalMessage.getMessageURI();
+      if (exception != null){
+        logger.warn(String.format("Could not send FailureResponse for original Exception %s (message: %s) that occurred while processing message %s.", exception.getClass().getSimpleName(), exception.getMessage(), originalMessageURI), t);
+        logger.warn("original error: ", exception);
+      } else {
+        logger.warn(String.format("Could not send FailureResponse to original message %s.", originalMessageURI), t);
+        logger.warn("original error: ", exception);
+      }
     }
-    URI newMessageURI = this.wonNodeInformationService.generateEventURI();
-    Model errorMessageContent = WonRdfUtils.MessageUtils.textMessage(errormessage);
-    RdfUtils.replaceBaseURI(errorMessageContent, newMessageURI.toString());
-    WonMessage responseMessage = new WonMessageBuilder()
-            .setPropertiesForNodeResponse(originalMessage, false,newMessageURI)
-            .addContent(
-              errorMessageContent,
-                    null)
-            .build();
-
-    if (WonMessageDirection.FROM_OWNER == originalMessage.getEnvelopeType()){
-      sendSystemMessageToOwner(responseMessage);
-    } else if (WonMessageDirection.FROM_EXTERNAL == originalMessage.getEnvelopeType()){
-      sendSystemMessageToRemoteNode(responseMessage);
-    } else {
-      logger.info(String.format("cannot route failure message for direction of original message, " +
-          "expected FROM_OWNER or FROM_EXTERNAL, but found %s. Original cause is logged.",
-        originalMessage.getEnvelopeType()), e);
-    }
-
   }
 
 }

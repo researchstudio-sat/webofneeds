@@ -72,19 +72,25 @@ angular.module('won.owner').factory('messageService', function ($http, $q,$log, 
                 "won":"http://purl.org/webofneeds/model#",
                 "msg":"http://purl.org/webofneeds/message#"
             },
-            "@type": "msg:FromSystem"
+            "@type": "msg:FromOwner"
         }
 
         //copy data from the framed message to the event object
         var framedMessage = jsonld.frame(json, frame);
 
         if (framedMessage == null){
-            //not FromSystem? maybe it's FromExternal?
-            frame['@type'] = "msg:FromExternal";
+            //not FromSystem? maybe it's FromSystem?
+            frame['@type'] = "msg:FromSystem";
             //copy data from the framed message to the event object
             framedMessage = jsonld.frame(json, frame);
        }
 
+        if (framedMessage == null){
+            //not FromSystem? maybe it's FromExternal?
+            frame['@type'] = "msg:FromExternal";
+            //copy data from the framed message to the event object
+            framedMessage = jsonld.frame(json, frame);
+        }
 
         for (key in framedMessage){
             var propName = won.getLocalName(key);

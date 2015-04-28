@@ -1,7 +1,5 @@
 package won.node.camel.processor.fixed;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
@@ -51,7 +49,6 @@ public class HintMessageProcessor extends AbstractCamelProcessor
 
     //create Connection in Database
     Connection con = null;
-    Model facetModel = ModelFactory.createDefaultModel();
 
     URI facet = WonRdfUtils.FacetUtils.getFacet(wonMessage);
     if (facet == null) {
@@ -65,9 +62,6 @@ public class HintMessageProcessor extends AbstractCamelProcessor
     con = dataService.createConnection(
       needURIFromWonMessage, otherNeedURIFromWonMessage,
       null, facet, ConnectionState.SUGGESTED, ConnectionEventType.MATCHER_HINT);
-
-
-    URI wrappedMessageURI = this.wonNodeInformationService.generateEventURI();
     //build message to send to owner, put in header
     final WonMessage newWonMessage = createMessageToSendToOwner(wonMessage, con);
     exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, newWonMessage);

@@ -59,7 +59,9 @@ public class WonMessageBuilder
   private Map<URI, Model> signatureMap = new HashMap<>();
   private WonMessage wrappedMessage;
   private WonMessage forwardedMessage;
-  private Long timestamp;
+  private Long sentTimestamp;
+  private Long receivedTimestamp;
+
 
 
 
@@ -174,12 +176,17 @@ public class WonMessageBuilder
               envelopeGraph.createResource(correspondingRemoteMessageURI.toString()));
     }
 
-    if (timestamp != null) {
+    if (sentTimestamp != null) {
       messageEventResource.addProperty(
-        WONMSG.HAS_TIMESTAMP,
-        envelopeGraph.createTypedLiteral(this.timestamp));
+        WONMSG.HAS_SENT_TIMESTAMP,
+        envelopeGraph.createTypedLiteral(this.sentTimestamp));
     }
 
+    if (receivedTimestamp != null) {
+      messageEventResource.addProperty(
+              WONMSG.HAS_RECEIVED_TIMESTAMP,
+              envelopeGraph.createTypedLiteral(this.receivedTimestamp));
+    }
 
     for (URI contentURI : contentMap.keySet()) {
       String contentUriString = contentURI.toString();
@@ -309,7 +316,7 @@ public class WonMessageBuilder
       .setReceiverURI(remoteConnection)
       .setReceiverNeedURI(remoteNeed)
       .setReceiverNodeURI(remoteWonNode)
-      .setTimestampToNow();
+      .setSentTimestampToNow();
 
     return this;
   }
@@ -333,7 +340,7 @@ public class WonMessageBuilder
       .setReceiverURI(remoteConnection)
       .setReceiverNeedURI(remoteNeed)
       .setReceiverNodeURI(remoteWonNode)
-      .setTimestampToNow();
+      .setSentTimestampToNow();
 
     return this;
   }
@@ -352,7 +359,7 @@ public class WonMessageBuilder
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
       .setSenderNodeURI(localWonNode)
-      .setTimestampToNow();
+      .setSentTimestampToNow();
     return this;
   }
 
@@ -367,7 +374,7 @@ public class WonMessageBuilder
       .setSenderNeedURI(localNeed)
       .setReceiverNeedURI(localNeed)
       .setReceiverNodeURI(localWonNode)
-      .setTimestampToNow();
+      .setSentTimestampToNow();
 
     return this;
   }
@@ -393,7 +400,7 @@ public class WonMessageBuilder
       .setReceiverNeedURI(remoteNeed)
       .setReceiverNodeURI(remoteWonNode);
       this.addContent(facetModel, null)
-      .setTimestampToNow();
+      .setSentTimestampToNow();
 
     return this;
   }
@@ -409,7 +416,7 @@ public class WonMessageBuilder
       .setWonMessageType(WonMessageType.CREATE_NEED)
       .setSenderNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
-      .setTimestampToNow();
+      .setSentTimestampToNow();
 
     return this;
   }
@@ -439,7 +446,7 @@ public class WonMessageBuilder
       .setSenderNodeURI(matcherURI)
       .setReceiverNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
-      .setTimestampToNow()
+      .setSentTimestampToNow()
       .addContent(contentModel, null);
 
     return this;
@@ -473,7 +480,7 @@ public class WonMessageBuilder
       .setReceiverNeedURI(needURI)
       .setReceiverNodeURI(wonNodeURI)
       .addContent(contentModel, null)
-      .setTimestampToNow();
+      .setSentTimestampToNow();
 
     return this;
   }
@@ -499,7 +506,7 @@ public class WonMessageBuilder
       .setReceiverNeedURI(remoteNeed)
       .setReceiverNodeURI(remoteWonNode)
       .addContent(content, null)
-      .setTimestampToNow();
+      .setSentTimestampToNow();
 
     return this;
   }
@@ -515,7 +522,7 @@ public class WonMessageBuilder
         .setMessageURI(messageURI)
         .setSenderNeedURI(localNeed)
         .setSenderNodeURI(localWonNode)
-        .setTimestampToNow();
+        .setSentTimestampToNow();
     return this;
   }
 
@@ -535,7 +542,7 @@ public class WonMessageBuilder
                                                                                                       ownerOrSystemMsg,
                                                                        URI newMessageUri){
     this.setMessageURI(newMessageUri)
-      .setTimestamp(new Date().getTime())
+      .setSentTimestamp(new Date().getTime())
       .copyContentFromMessageReplacingMessageURI(ownerOrSystemMsg)
       .copyEnvelopeFromWonMessage(ownerOrSystemMsg)
       .setCorrespondingRemoteMessageURI(ownerOrSystemMsg.getMessageURI())
@@ -544,7 +551,7 @@ public class WonMessageBuilder
   }
 
   /**
-   * The message to remote node will contain envelope with timestamp, remoteMessageUri, direction,
+   * The message to remote node will contain envelope with sentTimestamp, remoteMessageUri, direction,
    * as well as exact copy of the local message envelopes and contents.
    *
    * @param ownerOrSystemMsg
@@ -555,7 +562,7 @@ public class WonMessageBuilder
                                                                                          ownerOrSystemMsg,
                                                                           URI newMessageUri){
     this.setMessageURI(newMessageUri)
-      .setTimestamp(new Date().getTime())
+      .setSentTimestamp(new Date().getTime())
       .forward(ownerOrSystemMsg) // copy
       .setCorrespondingRemoteMessageURI(ownerOrSystemMsg.getMessageURI())
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
@@ -564,7 +571,7 @@ public class WonMessageBuilder
 
   public WonMessageBuilder setPropertiesForPassingMessageToOwner(final WonMessage externalMsg){
     this.wrap(externalMsg)
-      .setTimestamp(new Date().getTime());
+      .setReceivedTimestamp(new Date().getTime());
     return this;
   }
 
@@ -694,15 +701,26 @@ public class WonMessageBuilder
     return this;
   }
 
-  public WonMessageBuilder setTimestamp(final long timestamp) {
-    this.timestamp = timestamp;
+  public WonMessageBuilder setSentTimestamp(final long sentTimestamp) {
+    this.sentTimestamp = sentTimestamp;
     return this;
   }
 
-  public WonMessageBuilder setTimestampToNow() {
-    this.timestamp = System.currentTimeMillis();
+  public WonMessageBuilder setReceivedTimestamp(Long receivedTimestamp) {
+    this.receivedTimestamp = receivedTimestamp;
     return this;
   }
+
+  public WonMessageBuilder setSentTimestampToNow() {
+    this.sentTimestamp = System.currentTimeMillis();
+    return this;
+  }
+
+  public WonMessageBuilder setReceivedTimestampToNow() {
+    this.receivedTimestamp = System.currentTimeMillis();
+    return this;
+  }
+
 
   /**
    * Copies the envelope properties from the specified message to this message.
@@ -786,57 +804,17 @@ public class WonMessageBuilder
     return this;
   }
 
-  /**
-   * Returns a WonMessageBuilder that is fully prepared to build a copy of the specified
-   * inbound message.
-   * That message will have a the specified newMessageUri and a copy of the
-   * content that is modified such that the URI of the inbound message is replaced
-   * by the new message URI. A timestamp will be set, and it will link to the original
-   * message.
-   *
-   * @param newMessageUri
-   * @param localConnectionUri
-   * @param inboundWonMessage
-   * @return
-   */
-  public static WonMessage copyInboundNodeToNodeMessageAsNodeToOwnerMessage(final URI newMessageUri,
-                                                                            final URI localConnectionUri, final WonMessage inboundWonMessage) {
-    URI inboundReceiverURI = inboundWonMessage.getReceiverURI();
-    if (inboundReceiverURI != null){
-      assert inboundReceiverURI.equals(localConnectionUri) : "inbound wonMessage's receiverURI is not the expected " +
-        "localConnectionURI";
-    }
-    return new WonMessageBuilder()
-      .setMessageURI(newMessageUri)
-      .copyEnvelopeFromWonMessage(inboundWonMessage)
-      .copyContentFromMessageReplacingMessageURI(inboundWonMessage)
-      .setReceiverURI(localConnectionUri)
-      .setTimestamp(new Date().getTime())
-      .addRefersToURI(inboundWonMessage.getMessageURI())
-      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
-      .setIsRemoteResponseToMessageURI(inboundWonMessage.getIsRemoteResponseToMessageURI())
-      .setIsResponseToMessageURI(inboundWonMessage.getIsResponseToMessageURI())
-      .setIsResponseToMessageType(inboundWonMessage.getIsResponseToMessageType())
-      .build();
-  }
 
 
 
-  @Deprecated
-  public static WonMessage wrapOutboundOwnerToNodeOrSystemMessageAsNodeToNodeMessage(final WonMessage
-                                                                                       ownerToNeedWonMessage){
-    WonMessageBuilder builder = new WonMessageBuilder()
-      .wrap(ownerToNeedWonMessage)
-      .setTimestamp(new Date().getTime());
-    builder.setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
-    return builder.build();
-  }
+
+
 
   public static WonMessage wrapMessageReceivedByNode(final WonMessage wonMessage, WonMessageDirection direction){
     WonMessageBuilder builder = new WonMessageBuilder()
       .wrap(wonMessage)
       .setWonMessageDirection(direction)
-      .setTimestamp(new Date().getTime());
+      .setReceivedTimestamp(new Date().getTime());
     return builder.build();
   }
 
@@ -848,7 +826,7 @@ public class WonMessageBuilder
       .setWonMessageType(wonMessage.getMessageType())
       .forward(wonMessage)
       .copyContentFromMessageReplacingMessageURI(wonMessage)
-      .setTimestamp(System.currentTimeMillis())
+      .setSentTimestamp(System.currentTimeMillis())
       .setReceiverURI(remoteConnectionURI)
       .setReceiverNeedURI(remoteNeedURI)
       .setReceiverNodeURI(remoteWonNodeUri)

@@ -84,4 +84,18 @@ public interface BotContext
    */
   public List<String> listNeedUriNames();
 
+  /**
+   * Put an arbitrary object in the context.
+   * @param key
+   * @param value
+   */
+  public void put(Object key, Object value);
+
+  /**
+   * Retrieve an object previously  added using put().
+   * @param key
+   * @return
+   */
+  public Object get(Object key);
+
 }

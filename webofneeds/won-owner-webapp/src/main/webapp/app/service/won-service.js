@@ -168,11 +168,12 @@ angular.module('won.owner').factory('wonService', function (
         var incomingMessageHandler = new messageService.MessageCallback(
             function (event, msg) {
                 $log.debug("processing incoming message");
+                linkedDataService.addJsonLdData(event.uri, msg);
                 var configForEvent = messageTypeToEventType[event.hasMessageType];
                 //only do something if a type/handler combination is registered
                 if (configForEvent.eventType != null) {
                     event.eventType = configForEvent.eventType;
-                    event.timestamp = new Date().getTime();
+                    event.sentTimestamp = new Date().getTime();
                     $log.debug("incoming message: \n  " + JSON.stringify(msg));
                     if (configForEvent.handler != null) {
                         //the handler is responsible for broadcasting the event!
@@ -241,13 +242,14 @@ angular.module('won.owner').factory('wonService', function (
         var callback = new messageService.MessageCallback(
             function(event,msg){
                 $log.debug("got response for " + eventType +": " + event.hasMessageType);
+                linkedDataService.addJsonLdData(event.uri, msg);
                 var eventData = won.clone(event);
                 setCommStateFromResponseForLocalNeedMessage(eventData);
                 eventData.eventType = eventType;
                 linkedDataService.invalidateCacheForNeed(needURI)
                     .then(
                     function (value) {
-                        linkedDataService.fetch(eventUri)
+                        linkedDataService.ensureLoaded(eventUri)
                             .then(
                             function (value2) {
                                 linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
@@ -300,6 +302,7 @@ angular.module('won.owner').factory('wonService', function (
         var callback = new messageService.MessageCallback(
             function (event, msg) {
                 $log.debug("got response for " + eventType +": " + event.hasMessageType);
+                linkedDataService.addJsonLdData(event.uri, msg);
                 var eventData = won.clone(event);
                 eventData.eventType = eventType;
                 var isRemoteResponse = false;
@@ -319,14 +322,14 @@ angular.module('won.owner').factory('wonService', function (
                     this.done = this.gotResponseFromOwnNode && this.gotResponseFromRemoteNode;
                 }
                 setCommStateFromResponseForRemoteNeedMessage(eventData, isRemoteResponse);
-                linkedDataService.fetch(eventData.hasSender)
+                linkedDataService.ensureLoaded(eventData.hasSender)
                     .then(
                     function (value) {
-                        linkedDataService.fetch(eventUri)
+                        linkedDataService.ensureLoaded(eventUri)
                             .then(
                             function(value2) {
                                 linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
-                                eventData.timestamp = new Date().getTime();
+                                eventData.sentTimestamp = new Date().getTime();
                                 $log.debug("Broadcasting angular event " + eventType + ", commState:" + eventData.commState);
                                 $rootScope.$broadcast(eventType,eventData);
                             }, won.reportError("cannot fetch event " + eventUri)
@@ -349,6 +352,30 @@ angular.module('won.owner').factory('wonService', function (
         return callback;
     }
 
+    /**
+     * Sends the specified message via the messageService (registering the specified callback befor that.
+     * In addition to that, the message is stored in the local rdf store.
+     * @param callback
+     * @param message
+     * @param eventUri
+     * @param connectionUri
+     */
+    var sendAndStoreMessageAndBroadcastAngularEvent = function sendAndStoreMessage(callback, message, eventUri, eventType) {
+        messageService.addMessageCallback(callback);
+        try {
+            linkedDataService.addJsonLdData(eventUri, message);
+            messageService.sendMessage(message);
+            var eventData = {}
+            eventData.eventType = eventType;
+            eventData.commState = won.COMMUNUCATION_STATE.PENDING;
+            $rootScope.$broadcast(eventType, eventData);
+        } catch (e) {
+            var eventData = {"uri": eventUri, "commState": won.COMMUNUCATION_STATE.NOT_CONNECTED};
+            $log.warn("could not send message " + eventUri + ". Reason" + e);
+            $rootScope.$broadcast(won.EVENT.NO_CONNECTION, eventData);
+        }
+    }
+
 
     wonService.activateNeed = function(needURI){
         var sendActivateNeed = function(envelopeData,needUri){
@@ -358,6 +385,7 @@ angular.module('won.owner').factory('wonService', function (
                 .forEnvelopeData(envelopeData)
                 .build();
             var callback = createMessageCallbackForLocalNeedMessage(eventUri, won.EVENT.ACTIVATE_NEED_SENT);
+
             messageService.addMessageCallback(callback);
             try {
                 messageService.sendMessage(message);
@@ -389,12 +417,7 @@ angular.module('won.owner').factory('wonService', function (
                 .forEnvelopeData(envelopeData)
                 .build();
             var callback = createMessageCallbackForLocalNeedMessage(eventUri, won.EVENT.CLOSE_NEED_SENT);
-            messageService.addMessageCallback(callback);
-            try {
-                messageService.sendMessage(message);
-            } catch (e) {
-                $log.warn("could not open " + needURI + ". Reason" + e);
-            }
+            sendAndStoreMessageAndBroadcastAngularEvent(callback, message, eventUri, won.EVENT.CLOSE_NEED_SENT);
         }
 
         //fetch all data needed
@@ -443,7 +466,7 @@ angular.module('won.owner').factory('wonService', function (
 
                 //load the data into the local rdf store and publish NeedCreatedEvent when done
                 var needURI = event.hasReceiverNeed;
-                linkedDataService.fetch(needURI)
+                linkedDataService.ensureLoaded(needURI)
                     .then(
                     function (value) {
                         var eventData = won.clone(event);
@@ -517,13 +540,7 @@ angular.module('won.owner').factory('wonService', function (
                 .hasTextMessage(textMessage)
                 .build();
             var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECT_SENT)
-            messageService.addMessageCallback(callback);
-            try {
-                messageService.sendMessage(message);
-            } catch (e) {
-                deferred.reject(e);
-                $log.warn("could not connect " + need1 + " and " + need2 + ". Reason" + e);
-            }
+            sendAndStoreMessageAndBroadcastAngularEvent(callback, message, eventUri, won.EVENT.CONNECT_SENT);
         }
 
         //fetch the won nodes of both needs
@@ -539,6 +556,8 @@ angular.module('won.owner').factory('wonService', function (
         );
         return deferred.promise;
     }
+
+
 
     /**
      * Opens the existing connection specified by connectionUri.
@@ -558,15 +577,7 @@ angular.module('won.owner').factory('wonService', function (
                 .hasTextMessage(textMessage)
                 .build();
             var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECT_SENT)
-            messageService.addMessageCallback(callback);
-            try {
-                messageService.sendMessage(message);
-            } catch (e) {
-                var eventData = {"uri":eventUri,"commState":won.COMMUNUCATION_STATE.NOT_CONNECTED};
-                $log.warn("could not open suggested connection " + connectionUri + ". Reason" + e);
-                $log.debug("Broadcasting angular event " + won.EVENT.NO_CONNECTION);
-                $rootScope.$broadcast(won.EVENT.NO_CONNECTION, eventData);
-            }
+            sendAndStoreMessageAndBroadcastAngularEvent(callback, message, eventUri, won.EVENT.CONNECT_SENT);
         }
 
         //fetch all data needed
@@ -599,12 +610,7 @@ angular.module('won.owner').factory('wonService', function (
                 .hasTextMessage(textMessage)
                 .build();
             var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.OPEN_SENT);
-            messageService.addMessageCallback(callback);
-            try {
-                messageService.sendMessage(message);
-            } catch (e) {
-                $log.warn("could not open " + msgToOpenFor.connection.uri + ". Reason" + e);
-            }
+            sendAndStoreMessageAndBroadcastAngularEvent(callback, message, eventUri, won.EVENT.OPEN_SENT);
         }
 
         //fetch all data needed
@@ -634,12 +640,7 @@ angular.module('won.owner').factory('wonService', function (
                 .hasTextMessage(textMessage)
                 .build();
             var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CLOSE_SENT);
-            messageService.addMessageCallback(callback);
-            try {
-                messageService.sendMessage(message);
-            } catch (e) {
-                $log.warn("could not open suggested connection " +  msgToClose.connection.uri + ". Reason" + e);
-            }
+            sendAndStoreMessageAndBroadcastAngularEvent(callback, message, eventUri, won.EVENT.CLOSE_SENT);
         }
 
         //fetch all data needed
@@ -665,12 +666,7 @@ angular.module('won.owner').factory('wonService', function (
                 .addContentGraphData(won.WON.hasTextMessage, text)
                 .build();
             var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECTION_MESSAGE_SENT);
-            messageService.addMessageCallback(callback);
-            try {
-                messageService.sendMessage(message);
-            } catch (e) {
-                $log.warn("could not open " + connectionUri + ". Reason" + e);
-            }
+            sendAndStoreMessageAndBroadcastAngularEvent(callback, message, eventUri, won.EVENT.CONNECTION_MESSAGE_SENT);
         }
 
         //fetch all data needed
