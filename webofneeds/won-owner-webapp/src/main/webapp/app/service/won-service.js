@@ -173,7 +173,7 @@ angular.module('won.owner').factory('wonService', function (
                 //only do something if a type/handler combination is registered
                 if (configForEvent.eventType != null) {
                     event.eventType = configForEvent.eventType;
-                    event.timestamp = new Date().getTime();
+                    event.sentTimestamp = new Date().getTime();
                     $log.debug("incoming message: \n  " + JSON.stringify(msg));
                     if (configForEvent.handler != null) {
                         //the handler is responsible for broadcasting the event!
@@ -329,7 +329,7 @@ angular.module('won.owner').factory('wonService', function (
                             .then(
                             function(value2) {
                                 linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
-                                eventData.timestamp = new Date().getTime();
+                                eventData.sentTimestamp = new Date().getTime();
                                 $log.debug("Broadcasting angular event " + eventType + ", commState:" + eventData.commState);
                                 $rootScope.$broadcast(eventType,eventData);
                             }, won.reportError("cannot fetch event " + eventUri)

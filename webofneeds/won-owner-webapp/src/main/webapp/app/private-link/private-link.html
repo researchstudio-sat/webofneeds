@@ -75,7 +75,7 @@
                                         <td><a style="font-weight:bold;" href=""
                                                ng-click="clickOnMessage(event)">{{event
                                             .remoteNeed.title}}</a></td>
-                                        <td>{{event.event.hasTimestamp | date}}</td>
+                                        <td>{{event.event.hasReceivedTimestamp | date}}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -232,7 +232,7 @@
 
                             <div class="row">
                                 <div class="col-lg-8">
-                                    <h4 class="pull-left">{{chosenMessage.event.timestamp}}</h4>
+                                    <h4 class="pull-left">{{chosenMessage.event.sentTimestamp}}</h4>
                                 </div>
 
                                 <div class ="col-lg-4">

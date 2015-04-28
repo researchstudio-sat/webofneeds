@@ -38,7 +38,7 @@
                 <tr>
                     <th st-sort="type">Type</th>
                     <th ng-click="setSortParams('title')">Title</th>
-                    <th ng-click="setSortParams('meta.timestamp')">
+                    <th ng-click="setSortParams('meta.sentTimestamp')">
                         Created on
                     </th>
                     <th></th>
@@ -56,7 +56,7 @@
                     <!-- TODO step in create need needs to be specified -->
                     <td><a href="" ng-click="clickOn(item);" style="font-weight:bold;">{{item
                         .title}}</a></td>
-                    <td>{{item.meta.timestamp | date}}</td>
+                    <td>{{item.meta.sentTimestamp | date}}</td>
                     <td><a href="" ng-click="clickOnRemove(item);"><i class
                                                                                      ="fa fa-times-circle-o fa-lg"></i></a></td>
                 </tr>

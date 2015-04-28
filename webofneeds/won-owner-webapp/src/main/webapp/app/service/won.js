@@ -293,11 +293,12 @@
         }
 
         //get the URI from a jsonld resource (expects an object with an '@id' property)
-        //or a value from a literal
+        //or the value from a typed literal
         won.getSafeJsonLdValue = function(dataItem) {
             if (dataItem == null) return null;
             if (typeof dataItem === 'object') {
                 if (dataItem['@id'] != null) return dataItem['@id'];
+                if (dataItem['@type'] != null && dataItem['@value'] != null) return dataItem['@value'];
             } else {
                 return dataItem;
             }

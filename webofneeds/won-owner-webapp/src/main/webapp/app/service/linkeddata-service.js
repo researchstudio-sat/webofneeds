@@ -458,7 +458,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     linkedDataService.addJsonLdData = function(uri, data) {
         $log.debug("storing jsonld data for uri: " + uri);
         privateData.store.load("application/ld+json", data, function (success, results) {
-            $log.debug("loaded data, success: " + success);
+            $log.debug("added jsonld data to rdf store, success: " + success);
             if (success) {
                 cacheItemMarkAccessed(uri);
             }
@@ -883,7 +883,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             });
     }
 
-
+/*
     linkedDataService.getLastEventOfEachConnectionOfNeed = function(uri) {
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "getLastEventOfEachConnectionOfNeed: uri must not be null"};
@@ -906,7 +906,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             }
         );
     }
-
+  */
 
 
     linkedDataService.getLastEventOfConnection = function(connectionUri) {
@@ -1155,7 +1155,14 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                 won.WON.hasEventContainerCompacted + " ?container.\n" +
                                 "?container rdfs:member ?eventUri. \n" +
                                 " optional { " +
-                                "  ?eventUri msg:hasTimestamp ?timestamp; \n" +
+                                "  ?eventUri msg:hasReceivedTimestamp ?timestamp; \n" +
+                                "            msg:hasMessageType ?messageType .\n" +
+                                //filter added so we don't show the success/failure events as last events
+                                " filter (?messageType != msg:SuccessResponse && ?messageType != msg:FailureResponse)" +
+                                " } \n" +
+                                " optional { " +
+                                "  ?eventUri msg:hasCorrespondingRemoteMessage ?remoteEventUri. \n" +
+                                "  ?remoteEventUri msg:hasReceivedTimestamp ?timestamp; \n" +
                                 "            msg:hasMessageType ?messageType .\n" +
                                 //filter added so we don't show the success/failure events as last events
                                 " filter (?messageType != msg:SuccessResponse && ?messageType != msg:FailureResponse)" +
@@ -1188,7 +1195,42 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     }
 
-    linkedDataService.getConnectionTextMessages = function(connectionUri) {
+
+    linkedDataService.getLastEventOfEachConnectionOfNeed = function(needUri) {
+        //fetch all connection uris of the need
+        var allConnectionsPromise = linkedDataService.executeCrawlableQuery(queries["getAllConnectionUrisOfNeed"], needUri);
+        return allConnectionsPromise.then(
+            function getLastEventForConnections(connectionsData){
+                return somePromises(
+                    //for each connection uri:
+                    connectionsData.map(
+                        function(conData){
+                            return linkedDataService.executeCrawlableQuery(
+                                        queries["getLastEventUriOfConnection"],
+                                        conData.connection.value
+                                ).then(function(eventUriResult){
+                                            return $q.all(
+                                                [linkedDataService.getNodeWithAttributes(eventUriResult[0].eventUri.value),
+                                                 linkedDataService.getNodeWithAttributes(conData.connection.value),
+                                                 linkedDataService.getNeed(conData.remoteNeed.value)
+                                                ]
+                                            )
+                                        }
+                                ).then(function (result) {
+                                            //make a nice structure for the data
+                                            return {
+                                                event: result[0],
+                                                connection: result[1],
+                                                remoteNeed: result[2]
+                                            }
+                                        });
+                        }
+                    )
+                )
+            });
+    }
+
+     linkedDataService.getConnectionTextMessages = function(connectionUri) {
         var queryResultPromise = linkedDataService.executeCrawlableQuery(queries["getConnectionTextMessages"], connectionUri);
         return queryResultPromise.then(
                 function processConnectionTextMessages(results){
@@ -1196,7 +1238,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                         for (var key in results) {
                             var textMessage = {};
                             var eventUri = getSafeValue(results[key].eventUri);
-                            var timestamp = getSafeValue(results[key].timestamp);
+                            var timestamp = getSafeValue(results[key].receivedTimestamp);
                             var text = getSafeValue(results[key].text);
                             var senderNeed = getSafeValue(results[key].senderNeed);
                             var ownNodeResponseType = getSafeValue(results[key].ownNodeResponseType);
@@ -1490,41 +1532,6 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      */
     var queries = {
         "getConnectionTextMessages" : {
-            query:
-                //note: we have to take the max timestamp as there might be multiple timestamps added to the
-                //message dataset during processing
-                    "prefix msg: <http://purl.org/webofneeds/message#> \n"+
-                    "prefix won: <http://purl.org/webofneeds/model#> \n" +
-                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
-                    "select distinct ?eventUri ?timestamp ?text ?senderNeed ?sender ?remoteNodeResponseType ?ownNodeResponseType \n" +
-                    " where { \n" +
-                    " <::baseUri::> a won:Connection; \n" +
-                    " won:hasEventContainer ?container.\n" +
-                    " ?container rdfs:member ?eventUri. \n" +
-                    " ?eventUri won:hasTextMessage ?text; \n" +
-                    "          msg:hasMessageType ?messageType; \n" +
-                    "          msg:hasSenderNeed ?senderNeed; \n" +
-                    "          msg:hasSender ?sender; \n" +
-                    " { \n" +
-                    "   select ?eventUri ( max(?tstmp) as ?timestamp ) \n" +
-                    "   where { \n" +
-                    "     <::baseUri::> won:hasEventContainer/rdfs:member ?eventUri. \n" +
-                    "	    ?eventUri msg:hasTimestamp ?tstmp. \n" +
-                    "    } group by ?eventUri \n" +
-                    " } \n" +
-                    " optional { \n" +
-                    "   ?ownNodeResponse msg:isResponseTo ?eventUri;  \n" +
-                    "                    msg:hasMessageType ?ownNodeResponseType. \n" +
-                    " } \n" +
-                    " optional { \n" +
-                    "   ?remoteNodeResponse msg:isRemoteResponseTo ?eventUri; \n" +
-                    "                    msg:hasMessageType ?remoteNodeResponseType. \n" +
-                    " } \n" +
-                    " filter (\n" +
-                    "   ?messageType != msg:SuccessResponse \n" +
-                    "   && ?messageType != msg:FailureResponse) \n" +
-                    "} \n" +
-                    "order by asc(?timestamp) ",
             propertyPaths : [
                 { prefixes :
                     "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
@@ -1538,8 +1545,112 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
                     propertyPath : "won:hasEventContainer/rdfs:member"
                 }
-            ]}
+            ],
+        query:
+        //note: we have to take the max timestamp as there might be multiple timestamps added to the
+        //message dataset during processing
+            "prefix msg: <http://purl.org/webofneeds/message#> \n"+
+                "prefix won: <http://purl.org/webofneeds/model#> \n" +
+                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
+                "select distinct ?eventUri ?receivedTimestamp ?text ?senderNeed ?sender ?ownNodeResponseType ?remoteNodeResponseType\n" +
+                " where { \n" +
+                "  <::baseUri::> a won:Connection; \n" +
+                "  won:hasEventContainer ?container.\n" +
+                " {\n" +
+                "  ?container rdfs:member ?eventUri.\n" +
+                "  ?eventUri msg:hasReceivedTimestamp ?receivedTimestamp;\n" +
+                " } union {\n" +
+                "  ?container rdfs:member/msg:hasCorrespondingRemoteMessage ?eventUri.\n" +
+                "  ?eventUri msg:hasReceivedTimestamp ?receivedTimestamp;\n" +
+                " }\n" +
+                "  ?eventUri msg:hasMessageType ?messageType;\n" +
+                "       won:hasTextMessage ?text;\n" +
+                "       msg:hasSenderNeed ?senderNeed;\n" +
+                "       msg:hasSender ?sender.\n" +
+                " optional { \n" +
+                "   ?ownNodeResponse msg:isResponseTo ?eventUri; \n" +
+                "                    msg:hasMessageType ?ownNodeResponseType. \n" +
+                " } \n" +
+                " optional { \n" +
+                "   ?remoteNodeResponse msg:isRemoteResponseTo ?eventUri; \n" +
+                "                    msg:hasMessageType ?remoteNodeResponseType. \n" +
+                " } \n" +
+                " filter (?messageType != msg:SuccessResponse && ?messageType != msg:FailureResponse)\n" +
+                "}\n" +
+                "order by desc(?receivedTimestamp)"
+        },
 
+        // get each connection of the specified need
+        "getAllConnectionUrisOfNeed" : {
+            propertyPaths : [
+                { prefixes :
+                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
+                        "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
+                        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
+                    propertyPath : "won:hasConnections"
+                },
+                { prefixes :
+                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
+                        "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
+                        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
+                    propertyPath : "won:hasConnections/rdfs:member"
+                }
+            ],
+        query:
+                "prefix msg: <http://purl.org/webofneeds/message#> \n"+
+                "prefix won: <http://purl.org/webofneeds/model#> \n" +
+                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
+                "select ?connection ?need ?remoteNeed  \n" +
+                " where { \n" +
+                " <::baseUri::> a won:Need; \n" +
+                "           won:hasConnections ?connections.\n" +
+                "  ?connections rdfs:member ?connection. \n" +
+                "  ?connection won:belongsToNeed ?need; \n" +
+                "              won:hasRemoteNeed ?remoteNeed. \n"+
+                "} \n"
+
+        },
+
+
+        "getLastEventUriOfConnection" : {
+        propertyPaths : [
+            { prefixes :
+                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
+                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
+                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
+                propertyPath : "won:hasEventContainer"
+            },
+            { prefixes :
+                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
+                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
+                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
+                propertyPath : "won:hasEventContainer/rdfs:member"
+            }
+        ],
+        query:
+            "prefix msg: <http://purl.org/webofneeds/message#> \n" +
+            "prefix won: <http://purl.org/webofneeds/model#> \n" +
+            "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
+            "select ?eventUri  \n" +
+            "where { \n" +
+            " {\n" +
+            "  <::baseUri::> a won:Connection; \n" +
+            "  won:hasEventContainer ?container.\n" +
+            "  ?container rdfs:member ?eventUri.\n" +
+            "  ?eventUri msg:hasReceivedTimestamp ?receivedTimestamp.\n" +
+            "  ?eventUri msg:hasMessageType ?messageType.\n" +
+            " } union {\n" +
+            "  <::baseUri::> a won:Connection; \n" +
+            "  won:hasEventContainer ?container.\n" +
+            "  ?container rdfs:member/msg:hasCorrespondingRemoteMessage ?eventUri.\n" +
+            "  ?eventUri msg:hasReceivedTimestamp ?receivedTimestamp.\n" +
+            "  ?eventUri msg:hasMessageType ?messageType.\n" +
+            " }\n" +
+            " filter (?messageType != msg:SuccessResponse)\n" +
+            "}\n" +
+            "order by desc(?receivedTimestamp) limit 1 \n"
+
+            }
     }
 
 

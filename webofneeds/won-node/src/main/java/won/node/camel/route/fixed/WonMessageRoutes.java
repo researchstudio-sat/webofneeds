@@ -183,8 +183,8 @@ public class WonMessageRoutes  extends RouteBuilder
       .choice()
         //we only handle hint messages
         .when(header(WonCamelConstants.MESSAGE_TYPE_HEADER).isEqualTo(URI.create(WONMSG.TYPE_HINT.getURI().toString())))
-          .to("bean:wellformednessChecker")
-          .to("bean:signatureChecker")
+          //TODO: add signature checker here as soon as the matcher signs its msgs
+          //TODO: add well-formedness checker here as soon as the matcher signs its msgs
           .to("bean:wrapperFromExternal")
           .to("bean:hintMessageProcessor?method=process")
           .to("bean:signatureAdder")
