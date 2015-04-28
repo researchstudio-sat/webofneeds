@@ -18,10 +18,11 @@ package won.bot.framework.events.action.impl;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
-import won.bot.framework.events.event.Event;
+import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.event.ConnectionSpecificEvent;
-import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.event.MessageEvent;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -36,15 +37,15 @@ import java.util.Date;
  * Listener that responds to open and message events with automatic messages.
  * Can be configured to apply a timeout (non-blocking) before sending messages.
  */
-public class RespondToMessageAction extends BaseEventBotAction
+public class RespondWithEchoToMessageAction extends BaseEventBotAction
 {
   private long millisTimeoutBeforeReply = 0;
 
-  public RespondToMessageAction(EventListenerContext eventListenerContext) {
+  public RespondWithEchoToMessageAction(EventListenerContext eventListenerContext) {
     super(eventListenerContext);
   }
 
-  public RespondToMessageAction(final EventListenerContext eventListenerContext, final long millisTimeoutBeforeReply) {
+  public RespondWithEchoToMessageAction(final EventListenerContext eventListenerContext, final long millisTimeoutBeforeReply) {
     super(eventListenerContext);
     this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
   }
@@ -63,7 +64,12 @@ public class RespondToMessageAction extends BaseEventBotAction
       @Override
       public void run()
       {
-        String message = createMessage();
+        String message = null;
+        if (messageEvent instanceof  MessageEvent) {
+          message = createMessage(extractTextMessageFromWonMessage(((MessageEvent)messageEvent).getWonMessage()));
+        } else {
+          message = createMessage(null);
+        }
         Model messageContent = WonRdfUtils.MessageUtils.textMessage(message);
         URI connectionUri = messageEvent.getConnectionURI();
         logger.debug("sending message " + message);
@@ -76,10 +82,18 @@ public class RespondToMessageAction extends BaseEventBotAction
     }, new Date(System.currentTimeMillis() + this.millisTimeoutBeforeReply));
   }
 
-  private String createMessage()
+  private String extractTextMessageFromWonMessage(WonMessage wonMessage){
+    if (wonMessage == null) return null;
+    return WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
+  }
+
+  private String createMessage(String toEcho)
   {
-    String message = "auto reply (delay: "+ millisTimeoutBeforeReply + " millis)";
-    return message;
+    if (toEcho == null) {
+      return "auto reply (delay: "+ millisTimeoutBeforeReply + " millis)";
+    } else {
+      return "You said: '" + toEcho + "' (delay: "+ millisTimeoutBeforeReply + " millis)";
+    }
   }
 
   private WonMessage createWonMessage(URI connectionURI, Model content) throws WonMessageBuilderException {
