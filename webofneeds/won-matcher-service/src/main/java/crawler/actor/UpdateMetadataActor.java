@@ -42,6 +42,13 @@ public class UpdateMetadataActor extends UntypedActor
       settings.METADATA_UPDATE_DURATION, getSelf(), TICK, getContext().dispatcher(), null);
   }
 
+  @Override
+  public void postStop() {
+
+    // execute update for the remaining messages before stop
+    update();
+  }
+
   /**
    * Collects messages until the maximum bulk update size is reached or a timer is
    * elapsed to execute the meta data bulk update.
