@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.channels.FileLock;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.util.Arrays;
@@ -109,13 +110,17 @@ public class KeyStoreService {
 
     private synchronized void saveStoreToFile() {
 
-        OutputStream outputStream = null;
+        FileOutputStream outputStream = null;
+      //TODO the lock seem to not work. Anyway, we wanted to change keystore to be generated per web app,
+      //then we will not have to lock the keystore file at all.
+        FileLock lock = null;
 
         try {
 
             outputStream = new FileOutputStream(storeFile);
+            lock = outputStream.getChannel().lock();
 
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -127,6 +132,18 @@ public class KeyStoreService {
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
+                if (lock != null) {
+                  try {
+                    if (lock.isValid()) {
+                      lock.release();
+                    } else {
+                      logger.warn("Keystore file lock was not valid!");
+                    }
+
+                  } catch (IOException e) {
+                    e.printStackTrace();
+                  }
+                }
                 try {
                     outputStream.close();
                 } catch (Exception e) {
@@ -139,17 +156,17 @@ public class KeyStoreService {
 
     private void loadStoreFromFile() {
 
-        InputStream inputStream = null;
+        FileInputStream inputStream = null;
 
         try {
 
             inputStream = new FileInputStream(storeFile);
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+          e.printStackTrace();
         }
 
-        if (inputStream != null) {
+      if (inputStream != null) {
             try {
 
                 store.load(inputStream, Arrays.copyOf(storePW, storePW.length));
@@ -162,6 +179,7 @@ public class KeyStoreService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
             }
         }
     }

@@ -80,6 +80,11 @@ public class WonVerifier
     for (String sigGraphName : result.getSignatureGraphNames()) {
       // extract signature graph, signature data and corresponding signed graph
       String signedGraphName = result.getSignedGraphName(sigGraphName);
+      // make sure the signed graph specified in signature exists in the message
+      if (dataset.getNamedModel(signedGraphName) == null) {
+        result.setVerificationFailed(sigGraphName, "No signed graph found for signature " + sigGraphName);
+        return result.isVerificationPassed();
+      }
       GraphCollection inputGraph = ModelConverter.modelToGraphCollection(signedGraphName, dataset);
       GraphCollection sigGraph = ModelConverter.modelToGraphCollection(sigGraphName, dataset);
       Ontology o = new Ontology();

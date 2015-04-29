@@ -45,7 +45,24 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
   public WonMessage process(WonMessage message) throws WonMessageProcessingException {
     URI parentURI = WonMessageUtils.getParentEntityUri(message);
     saveMessage(message, parentURI);
+    updateResponseInfo(message);
     return message;
+  }
+
+  /**
+   * If we are saving response message, update original massage with the
+   * information about response message uri
+   * @param message response message
+   */
+  private void updateResponseInfo(final WonMessage message) {
+    // find a message it responds to
+    URI originalMessageURI = message.getIsResponseToMessageURI();
+    if (originalMessageURI != null) {
+      // update the message it responds to with the uri of the response
+      MessageEventPlaceholder event = messageEventRepository.findOneByMessageURI(originalMessageURI);
+      event.setResponseMessageURI(message.getMessageURI());
+      messageEventRepository.save(event);
+    }
   }
 
   private void saveMessage(final WonMessage wonMessage, URI parent) {
