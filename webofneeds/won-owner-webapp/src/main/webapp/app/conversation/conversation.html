@@ -30,6 +30,18 @@
             <tbody>
             <tr>
                 <td>
+                    <script language="JavaScript">
+                    $("#textMessage").keydown(function(event){
+                        if(event.keyCode == 13 ){
+                            if (event.ctrlKey || event.shiftKey){
+                                return true;
+                            } else {
+                                $("#submit").click();
+                                return false
+                            }
+                        }
+                    });
+                    </script>
                     <form class="form-horizontal container" novalidate name="sendMessageForm" ng-submit="sendMessage()">
                         <fieldset>
                             <div class="form-group">
@@ -44,7 +56,7 @@
                                 <!--<span class="help-block">Message mustn't be empty</span> -->
                             </div>
                             <div class="pull-right">
-                                <button ng-disabled="sendMessageForm.$invalid" type="submit" class="btn btn-primary">Send</button>
+                                <button id="submit" ng-disabled="sendMessageForm.$invalid" type="submit" class="btn btn-primary">Send</button>
                             </div>
                             <div class="pull-left">
                                 <button class="btn btn-default" type="button" ng-click="clickOnLeaveConversation()"
