@@ -17,30 +17,26 @@
 package won.bot.framework.events.action.impl;
 
 import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.event.Event;
 
 /**
  * Outputs a message via the configured logging system.
  */
-public class LogAction extends BaseEventBotAction
+public class LogErrorAction extends LogAction
 {
-  protected String message;
 
-  public LogAction(final EventListenerContext eventListenerContext)
-  {
-    this(eventListenerContext, "Log action executed.");
+  public LogErrorAction(EventListenerContext eventListenerContext) {
+    super(eventListenerContext);
   }
 
-  public LogAction(final EventListenerContext eventListenerContext, final String message) {
-    super(eventListenerContext);
-    this.message = message;
+  public LogErrorAction(EventListenerContext eventListenerContext, String message) {
+    super(eventListenerContext, message);
   }
 
   @Override
   protected void doRun(Event event) throws Exception
   {
-    logger.info(message);
+    logger.error(message);
   }
 
 }
