@@ -415,6 +415,7 @@
             callback(data, currentKey, currentContainer);
         }
 
+
         /**
          * Adds all elements of array2 to array1 that are not yet
          * contained in array1.
@@ -423,16 +424,22 @@
          *
          * @param array1
          * @param array2
+         * @param comparatorFun (optional) comparator function to compare elements. A return value of 0 means the elements are equal.
          */
-        won.appendStrippingDuplicates = function(array1, array2){
+        won.appendStrippingDuplicates = function(array1, array2, comparatorFun){
             if (typeof array1 === 'undefined') return array2;
             if (typeof array2 === 'undefined') return array1;
+            if (typeof comparatorFun === 'undefined') comparatorFun = function(a,b){ return a === b};
             array2.filter(function (item) {
-                return array1.indexOf(item) < 0;
+                for (i = 0; i < array1.length; i++){
+                    if (comparatorFun(item, array1[i]) == 0) {
+                        return false;
+                    }
+                }
+                return true;
             }).map(function(item){array1.push(item)});
             return array1;
         }
-
 
 
         won.minimalContext = {
