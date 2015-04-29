@@ -16,7 +16,7 @@ import java.util.Set;
  * User: hfriedrich
  * Date: 27.03.2015
  */
-public class AkkaSystemMain
+public class AkkaSystemCrawlerMain
 {
 
   public static void main(String[] args) throws IOException {
