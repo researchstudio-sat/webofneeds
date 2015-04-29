@@ -22,7 +22,6 @@ import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.PathParser;
 import org.apache.commons.lang3.StringUtils;
 import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.action.EventBotActionUtils;
 import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.NeedCreationFailedEvent;
@@ -30,11 +29,8 @@ import won.bot.framework.events.event.impl.FailureResponseEvent;
 import won.bot.framework.events.event.impl.NeedCreatedEvent;
 import won.bot.framework.events.event.impl.NeedCreatedEventForMatcher;
 import won.bot.framework.events.listener.EventListener;
-import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.BasicNeedType;
-import won.protocol.model.FacetType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.NeedModelBuilder;
@@ -42,45 +38,22 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
 * Creates a need with the specified facets.
 * If no facet is specified, the ownerFacet will be used.
 */
-public class CreateEchoNeedWithFacetsAction extends BaseEventBotAction
+public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction
 {
-    private List<URI> facets;
-    private String uriListName;
+  public CreateEchoNeedWithFacetsAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
+    super(eventListenerContext, uriListName, facets);
+  }
 
-    /**
-     * Creates a need with the specified facets.
-     * If no facet is specified, the ownerFacet will be used.
-     */
-    public CreateEchoNeedWithFacetsAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
-      super(eventListenerContext);
-      if (facets == null || facets.length == 0) {
-        //add the default facet if none is present.
-        this.facets = new ArrayList<URI>(1);
-        this.facets.add(FacetType.OwnerFacet.getURI());
-      } else {
-        this.facets = Arrays.asList(facets);
-      }
-      this.uriListName = uriListName;
-    }
+  public CreateEchoNeedWithFacetsAction(EventListenerContext eventListenerContext, URI... facets) {
+    super(eventListenerContext, facets);
+  }
 
-    /**
-     * Creates a need with the specified facets.
-     * If no facet is specified, the ownerFacet will be used.
-     */
-    public CreateEchoNeedWithFacetsAction(final EventListenerContext eventListenerContext, URI... facets)
-    {
-        this(eventListenerContext, null, facets);
-    }
-
-    @Override
+  @Override
     protected void doRun(Event event) throws Exception
     {
         String replyText = "";
@@ -152,22 +125,4 @@ public class CreateEchoNeedWithFacetsAction extends BaseEventBotAction
     }
 
 
-  private WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI,
-                                      Model needModel)
-    throws WonMessageBuilderException {
-
-
-
-    RdfUtils.replaceBaseURI(needModel,needURI.toString());
-
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
-      .setMessagePropertiesForCreate(
-        wonNodeInformationService.generateEventURI(
-          wonNodeURI),
-        needURI,
-        wonNodeURI)
-      .addContent(needModel, null)
-      .build();
-  }
 }
