@@ -60,8 +60,12 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
     if (originalMessageURI != null) {
       // update the message it responds to with the uri of the response
       MessageEventPlaceholder event = messageEventRepository.findOneByMessageURI(originalMessageURI);
-      event.setResponseMessageURI(message.getMessageURI());
-      messageEventRepository.save(event);
+      if (event != null){
+        //we may not have saved the event yet if the current message is a FailureResponse
+        //and the error causing the response happened before saving the original message.
+        event.setResponseMessageURI(message.getMessageURI());
+        messageEventRepository.save(event);
+      }
     }
   }
 
