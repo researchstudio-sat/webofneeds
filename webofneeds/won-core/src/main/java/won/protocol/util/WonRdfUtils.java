@@ -197,9 +197,12 @@ public class WonRdfUtils
           if (stmt != null) {
             return stmt.getObject().asLiteral().getLexicalForm();
           }
-          stmt = model.getProperty(model.getResource(wonMessage.getCorrespondingRemoteMessageURI().toString()), WON.HAS_TEXT_MESSAGE);
-          if (stmt != null) {
-            return stmt.getObject().asLiteral().getLexicalForm();
+          URI remoteMessageURI = wonMessage.getCorrespondingRemoteMessageURI();
+          if (remoteMessageURI != null){
+            stmt = model.getProperty(model.getResource(remoteMessageURI.toString()), WON.HAS_TEXT_MESSAGE);
+            if (stmt != null) {
+              return stmt.getObject().asLiteral().getLexicalForm();
+            }
           }
           return null;
         }

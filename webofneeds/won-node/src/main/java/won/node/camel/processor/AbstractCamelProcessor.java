@@ -82,7 +82,7 @@ public abstract class AbstractCamelProcessor implements Processor
 
   protected void sendMessageToOwner(WonMessage message, URI needURI, String fallbackOwnerApplicationId){
     Need need = needRepository.findOneByNeedURI(needURI);
-    List<OwnerApplication> ownerApplications = need.getAuthorizedApplications();
+    List<OwnerApplication> ownerApplications = need != null ? need.getAuthorizedApplications() : Collections.EMPTY_LIST;
     List<String> ownerApplicationIds = toStringIds(ownerApplications);
     //if no owner application ids are authorized, we use the fallback specified (if any)
     if (ownerApplicationIds.isEmpty() && fallbackOwnerApplicationId != null) {

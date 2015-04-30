@@ -33,7 +33,7 @@
                     <script language="JavaScript">
                     $("#textMessage").keydown(function(event){
                         if(event.keyCode == 13 ){
-                            if (event.ctrlKey || event.shiftKey){
+                            if (event.shiftKey){
                                 return true;
                             } else {
                                 $("#submit").click();

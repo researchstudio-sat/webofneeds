@@ -21,26 +21,19 @@ import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.event.Event;
 
 /**
- * Outputs a message via the configured logging system.
+ * Action that publishes the specified event.
  */
-public class LogAction extends BaseEventBotAction
-{
-  protected String message;
+public class PublishEventAction extends BaseEventBotAction {
 
-  public LogAction(final EventListenerContext eventListenerContext)
-  {
-    this(eventListenerContext, "Log action executed.");
-  }
+  private Event event;
 
-  public LogAction(final EventListenerContext eventListenerContext, final String message) {
+  public PublishEventAction(EventListenerContext eventListenerContext, Event event) {
     super(eventListenerContext);
-    this.message = message;
+    this.event = event;
   }
 
   @Override
-  protected void doRun(Event event) throws Exception
-  {
-    logger.info(message);
+  protected void doRun(Event e) throws Exception {
+    getEventListenerContext().getEventBus().publish(event);
   }
-
 }
