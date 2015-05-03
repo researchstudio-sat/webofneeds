@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package won.bot.impl.failsim;
+package won.bot.integrationtest.failsim;
 
 import won.bot.framework.events.EventListenerContext;
 import won.protocol.service.WonNodeInformationService;
