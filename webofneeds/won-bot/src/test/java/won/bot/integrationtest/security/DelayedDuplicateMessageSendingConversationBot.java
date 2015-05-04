@@ -14,26 +14,20 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.events.event.impl;
+package won.bot.integrationtest.security;
 
-import won.bot.framework.events.event.BaseEvent;
+import won.bot.framework.events.EventListenerContext;
+import won.bot.integrationtest.failsim.BaseEventListenerContextDecorator;
+import won.bot.integrationtest.failsim.DelayedDuplicateMessageSenderDecorator;
 
 /**
- * Event to be published when an error occurs.
+ * User: fkleedorfer
+ * Date: 03.05.15
  */
-public class ErrorEvent extends BaseEvent
-{
-  private Throwable throwable;
+public class DelayedDuplicateMessageSendingConversationBot extends DuplicateMessageSendingConversationBot {
 
-  public ErrorEvent(final Throwable throwable) {
-    this.throwable = throwable;
-  }
-
-  public Throwable getThrowable() {
-    return throwable;
-  }
-
-  public void setThrowable(final Throwable throwable) {
-    this.throwable = throwable;
+  @Override
+  protected BaseEventListenerContextDecorator getDuplicateMessageSenderDecorator(EventListenerContext eventListenerContext) {
+    return new DelayedDuplicateMessageSenderDecorator(eventListenerContext, 1000);
   }
 }

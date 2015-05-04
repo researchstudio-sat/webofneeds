@@ -47,20 +47,14 @@ public class KeyForNewNeedAddingProcessor implements WonMessageProcessor
         // generate and add need's public key to the need content
         if (cryptoService.getPrivateKey(needUri) == null) {
           cryptoService.createNewKeyPair(needUri);
-          PublicKey pubKey = cryptoService.getPublicKey(needUri);
-          WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();
-          String contentName = message.getContentGraphURIs().get(0);
-          Model contentModel = msgDataset.getNamedModel(contentName);
-          keyWriter.writeToModel(contentModel, contentModel.createResource(needUri), pubKey);
-        } else {
-          //something is wrong, there should exist no key for the need that have just been created
-          throw new WonMessageProcessingException("Failed to generate key for need " + needUri + ", " +
-                                                    "key already exist!");
         }
+        PublicKey pubKey = cryptoService.getPublicKey(needUri);
+        WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();
+        String contentName = message.getContentGraphURIs().get(0);
+        Model contentModel = msgDataset.getNamedModel(contentName);
+        keyWriter.writeToModel(contentModel, contentModel.createResource(needUri), pubKey);
       }
     } catch (Exception e) {
-      //TODO proper exceptions
-      e.printStackTrace();
       throw new WonMessageProcessingException("Failed to add key for need in message " + message.getMessageURI()
                                                                                                 .toString());
     }

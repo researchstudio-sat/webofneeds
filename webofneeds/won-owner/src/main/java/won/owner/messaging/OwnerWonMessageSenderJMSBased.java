@@ -38,6 +38,7 @@ import won.protocol.message.sender.WonMessageSender;
 import won.protocol.model.WonNode;
 import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.DataAccessUtils;
+import won.protocol.util.RdfUtils;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -89,6 +90,10 @@ public class OwnerWonMessageSenderJMSBased
 
       // TODO check if there is a better place for applying signing logic
       wonMessage = doSigningOnOwner(wonMessage);
+
+      if (logger.isDebugEnabled()){
+        logger.debug("sending this message: {}", RdfUtils.writeDatasetToString(wonMessage.getCompleteDataset(), Lang.TRIG));
+      }
 
       // ToDo (FS): change it to won node URI and create method in the MessageEvent class
       URI wonNodeUri = wonMessage.getSenderNodeURI();

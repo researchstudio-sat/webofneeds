@@ -16,24 +16,21 @@
 
 package won.bot.framework.events.event.impl;
 
+import won.bot.framework.bot.Bot;
 import won.bot.framework.events.event.BaseEvent;
 
 /**
- * Event to be published when an error occurs.
+ * Base class for TestPassedEvent and TestFailedEvent.
  */
-public class ErrorEvent extends BaseEvent
-{
-  private Throwable throwable;
+public abstract class TestFinishedEvent extends BaseEvent {
+  protected Bot bot;
 
-  public ErrorEvent(final Throwable throwable) {
-    this.throwable = throwable;
+  public TestFinishedEvent(Bot bot) {
+    this.bot = bot;
   }
 
-  public Throwable getThrowable() {
-    return throwable;
+  public Bot getBot() {
+    return bot;
   }
 
-  public void setThrowable(final Throwable throwable) {
-    this.throwable = throwable;
-  }
 }

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package won.bot.impl.failsim;
+package won.bot.integrationtest.failsim;
 
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.BotContext;
