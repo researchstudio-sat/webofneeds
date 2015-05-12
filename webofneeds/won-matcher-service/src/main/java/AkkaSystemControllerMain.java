@@ -3,8 +3,8 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.camel.Camel;
 import akka.camel.CamelExtension;
+import node.actor.NeedConsumerProtocolActor;
 import org.apache.activemq.camel.component.ActiveMQComponent;
-import service.actor.NeedConsumerProtocolActor;
 
 import java.io.IOException;
 
@@ -20,6 +20,8 @@ public class AkkaSystemControllerMain
     Camel camel = CamelExtension.get(system);
     String amqUrl = "tcp://localhost:61616";
     camel.context().addComponent("activemq", ActiveMQComponent.activeMQComponent(amqUrl));
-    ActorRef actor = system.actorOf(Props.create(NeedConsumerProtocolActor.class, "activemq:topic:MatcherProtocol.Out.Need"), "JmsConsumerProtocolActor");
+    ActorRef actor = system
+      .actorOf(Props.create(NeedConsumerProtocolActor.class, "activemq:topic:MatcherProtocol.Out.Need"),
+               "JmsConsumerProtocolActor");
   }
 }
