@@ -1,81 +1,31 @@
-package crawler.db;
+package crawler.service;
 
 import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.sparql.modify.UpdateProcessRemote;
-import com.hp.hpl.jena.update.UpdateExecutionFactory;
-import com.hp.hpl.jena.update.UpdateFactory;
-import com.hp.hpl.jena.update.UpdateRequest;
-import crawler.message.UriStatusMessage;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import commons.service.SparqlService;
+import crawler.msg.CrawlUriMessage;
 import won.protocol.vocabulary.WON;
 
-import java.io.StringWriter;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
- * Service to access of Sparql enpoint database to save or query linked data.
+ * Sparql service extended with methods for crawling
  *
  * User: hfriedrich
- * Date: 15.04.2015
+ * Date: 04.05.2015
  */
-public class SparqlEndpointService
+public class CrawlSparqlService extends SparqlService
 {
   private static final String METADATA_GRAPH = WON.BASE_URI + "crawlMetadata";
   private static final String CRAWL_DATE_PREDICATE = WON.BASE_URI + "crawlDate";
   private static final String CRAWL_STATUS_PREDICATE = WON.BASE_URI + "crawlStatus";
   private static final String CRAWL_BASE_URI_PREDICATE = WON.BASE_URI + "crawlBaseUri";
 
-  private final Logger log = LoggerFactory.getLogger(getClass());
-  private String sparqlEndpoint;
-
-  public SparqlEndpointService(String sparqlEndpoint) {
-    this.sparqlEndpoint = sparqlEndpoint;
-  }
-
-  private void executeUpdateQuery(String updateQuery) {
-
-    log.debug("Update SPARQL Endpoint: {}", sparqlEndpoint);
-    log.debug("Execute query: {}", updateQuery);
-    UpdateRequest query = UpdateFactory.create(updateQuery);
-    UpdateProcessRemote riStore = (UpdateProcessRemote)
-      UpdateExecutionFactory.createRemote(query, sparqlEndpoint);
-    riStore.execute();
-  }
-
-  /**
-   * Update a graph by first deleting it and afterwards inserting the triples of the new model.
-   *
-   * @param graph graph to be updated
-   * @param model model that holds triples to set
-   */
-  public void updateGraph(String graph, Model model) {
-
-    StringWriter sw = new StringWriter();
-    RDFDataMgr.write(sw, model, Lang.NTRIPLES);
-    String query = "\nCLEAR GRAPH <" + graph + ">;\n" + "\nINSERT DATA { GRAPH <"+ graph + "> { " + sw + "}};\n";
-    executeUpdateQuery(query);
-  }
-
-  /**
-   * Update a dataset of graphs first deleting them and afterwards inserting the triples of the new models.
-   *
-   * @param ds
-   */
-  public void updateDataset(Dataset ds) {
-
-    Iterator<String> graphNames = ds.listNames();
-    while (graphNames.hasNext()) {
-
-      log.debug("Save dataset");
-      String graphName = graphNames.next();
-      Model model = ds.getNamedModel(graphName);
-      updateGraph(graphName, model);
-    }
+  public CrawlSparqlService(final String sparqlEndpoint) {
+    super(sparqlEndpoint);
   }
 
   /**
@@ -86,7 +36,7 @@ public class SparqlEndpointService
    *
    * @param msg message that describe crawling meta data to update
    */
-  public void updateCrawlingMetadata(UriStatusMessage msg) {
+  public void updateCrawlingMetadata(CrawlUriMessage msg) {
 
     // delete the old entry
     String queryTemplate = "\nDELETE WHERE { GRAPH <%s> { <%s> ?y ?z}};";
@@ -112,11 +62,11 @@ public class SparqlEndpointService
    *
    * @param msgs multiple messages that describe crawling meta data to update
    */
-  public void bulkUpdateCrawlingMetadata(Collection<UriStatusMessage> msgs) {
+  public void bulkUpdateCrawlingMetadata(Collection<CrawlUriMessage> msgs) {
 
     // delete the old entries
     StringBuilder builder = new StringBuilder();
-    for (UriStatusMessage msg : msgs) {
+    for (CrawlUriMessage msg : msgs) {
       builder.append("\nDELETE WHERE { GRAPH  <").append(METADATA_GRAPH).append(">  { <");
       builder.append(msg.getUri()).append("> ?p ?o }};");
     }
@@ -124,7 +74,7 @@ public class SparqlEndpointService
     // insert the new entries
     String insertTemplate = "\n<%s> <%s> %d. <%s> <%s> '%s'. <%s> <%s> <%s>. ";
     builder.append("\nINSERT DATA { GRAPH <").append(METADATA_GRAPH).append(">  { ");
-    for (UriStatusMessage msg : msgs) {
+    for (CrawlUriMessage msg : msgs) {
       builder.append(String.format(insertTemplate, msg.getUri(), CRAWL_DATE_PREDICATE, System.currentTimeMillis(),
                                    msg.getUri(), CRAWL_STATUS_PREDICATE, msg.getStatus(),
                                    msg.getUri(), CRAWL_BASE_URI_PREDICATE, msg.getBaseUri()));
@@ -142,9 +92,9 @@ public class SparqlEndpointService
    * @param status
    * @return
    */
-  public Set<UriStatusMessage> getMessagesForCrawling(UriStatusMessage.STATUS status) {
+  public Set<CrawlUriMessage> retrieveMessagesForCrawling(CrawlUriMessage.STATUS status) {
 
-    Set<UriStatusMessage> msgs = new LinkedHashSet<>();
+    Set<CrawlUriMessage> msgs = new LinkedHashSet<>();
     String queryTemplate = "\nSELECT ?uri ?base WHERE { GRAPH <%s> {?uri ?p '%s'. ?uri <%s> ?base}}\n";
     String queryString = String.format(queryTemplate, METADATA_GRAPH, status, CRAWL_BASE_URI_PREDICATE);
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
@@ -158,7 +108,7 @@ public class SparqlEndpointService
       QuerySolution qs = results.nextSolution();
       RDFNode uri = qs.get("uri");
       RDFNode baseUri = qs.get("base");
-      UriStatusMessage msg = new UriStatusMessage(uri.toString(), baseUri.toString(), UriStatusMessage.STATUS.PROCESS);
+      CrawlUriMessage msg = new CrawlUriMessage(uri.toString(), baseUri.toString(), CrawlUriMessage.STATUS.PROCESS);
       log.debug("Created message: {}", msg);
       msgs.add(msg);
     }
@@ -184,8 +134,8 @@ public class SparqlEndpointService
         "FILTER NOT EXISTS { { <%s> <%s> '%s' } UNION { <%s> <%s> '%s'} " +
         "UNION { ?obj <%s> ?any } } }\n";
       String queryString = String.format(queryTemplate, baseUri, prop,
-                                         uri, CRAWL_STATUS_PREDICATE, UriStatusMessage.STATUS.DONE,
-                                         uri, CRAWL_STATUS_PREDICATE, UriStatusMessage.STATUS.FAILED,
+                                         uri, CRAWL_STATUS_PREDICATE, CrawlUriMessage.STATUS.DONE,
+                                         uri, CRAWL_STATUS_PREDICATE, CrawlUriMessage.STATUS.FAILED,
                                          CRAWL_STATUS_PREDICATE);
 
       log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
