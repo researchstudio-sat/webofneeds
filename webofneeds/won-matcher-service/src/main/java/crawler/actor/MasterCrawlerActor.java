@@ -5,24 +5,24 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
 import akka.routing.FromConfig;
-import crawler.config.Settings;
-import crawler.config.SettingsImpl;
-import crawler.exception.CrawlingWrapperException;
-import crawler.message.UriStatusMessage;
+import crawler.exception.CrawlWrapperException;
+import crawler.msg.CrawlUriMessage;
 import scala.concurrent.duration.Duration;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * Coordinates recursive crawling of linked data resources by assigning {@link crawler.message.UriStatusMessage}
- * to workers of type {@link crawler.actor.WorkerCrawlerActor} and one single worker of type
- * {@link UpdateMetadataActor}.
+ * Coordinates recursive crawling of linked data resources by assigning {@link CrawlUriMessage}
+ * to workers {@link WorkerCrawlerActor} and one single worker of type {@link UpdateMetadataActor}.
  * The process can be stopped at any time and continued by passing the messages that
- * should be recrawled again since meta data about the crawling process is saved
+ * should be crawled again since meta data about the crawling process is saved
  * in the SPARQL endpoint. This is done by a single actor of type {@link UpdateMetadataActor}
  * which keeps message order to guarantee consistency in case of failure. Unfinished messages can
  * be resend for restarting crawling.
+ * {@link node.actor.WonNodeControllerActor} is informed about newly discovered won nodes during crawling.
  *
  * User: hfriedrich
  * Date: 30.03.2015
@@ -30,17 +30,22 @@ import java.util.Map;
 public class MasterCrawlerActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-  private final SettingsImpl settings = Settings.SettingsProvider.get(getContext().system());
-  private Map<String, UriStatusMessage> pendingMessages = null;
-  private Map<String, UriStatusMessage> doneMessages = null;
-  private Map<String, UriStatusMessage> failedMessages = null;
+  private Map<String, CrawlUriMessage> pendingMessages = null;
+  private Map<String, CrawlUriMessage> doneMessages = null;
+  private Map<String, CrawlUriMessage> failedMessages = null;
+  private Set<String> crawlWonNodeUris = null;
+  private Set<String> skipWonNodeUris = null;
   private ActorRef crawlingWorker;
   private ActorRef updateMetaDataWorker;
+  private ActorRef wonNodeController;
 
-  public MasterCrawlerActor() {
+  public MasterCrawlerActor(ActorRef wonNodeController) {
     pendingMessages = new HashMap<>();
     doneMessages = new HashMap<>();
     failedMessages = new HashMap<>();
+    crawlWonNodeUris = new HashSet<>();
+    skipWonNodeUris = new HashSet<>();
+    this.wonNodeController = wonNodeController;
   }
 
   @Override
@@ -64,14 +69,15 @@ public class MasterCrawlerActor extends UntypedActor
   public SupervisorStrategy supervisorStrategy() {
 
     SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
-      0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>() {
+      0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>()
+    {
 
       @Override
       public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
         // save the failed status of a crawlingWorker during crawling
-        if (t instanceof CrawlingWrapperException) {
-          CrawlingWrapperException e = (CrawlingWrapperException) t;
+        if (t instanceof CrawlWrapperException) {
+          CrawlWrapperException e = (CrawlWrapperException) t;
           log.warning("Handled breaking message: {}", e.getBreakingMessage());
           log.warning("Exception was: {}", e.getException());
           process(e.getBreakingMessage());
@@ -87,7 +93,7 @@ public class MasterCrawlerActor extends UntypedActor
   }
 
   /**
-   * Process {@link crawler.message.UriStatusMessage} objects
+   * Process {@link crawler.msg.CrawlUriMessage} objects
    *
    * @param message
    */
@@ -102,8 +108,8 @@ public class MasterCrawlerActor extends UntypedActor
       }
     }
 
-    if (message instanceof UriStatusMessage) {
-      UriStatusMessage uriMsg = (UriStatusMessage) message;
+    if (message instanceof CrawlUriMessage) {
+      CrawlUriMessage uriMsg = (CrawlUriMessage) message;
       process(uriMsg);
       log.debug("Number of pending messages: {}", pendingMessages.size());
     } else {
@@ -116,32 +122,53 @@ public class MasterCrawlerActor extends UntypedActor
              doneMessages.size(), failedMessages.size(), pendingMessages.size());
   }
 
+  private boolean discoveredNewWonNode(String uri) {
+    if (uri == null || uri.isEmpty() || crawlWonNodeUris.contains(uri) || skipWonNodeUris.contains(uri)) {
+      return false;
+    }
+    return true;
+  }
+
   /**
    * Pass the messages to process to the workers and update meta data about crawling
    *
    * @param msg
    */
-  private void process(UriStatusMessage msg) {
+  private void process(CrawlUriMessage msg) {
 
     log.debug("Process message: {}", msg);
-    if (msg.getStatus().equals(UriStatusMessage.STATUS.PROCESS)) {
+    if (msg.getStatus().equals(CrawlUriMessage.STATUS.PROCESS)) {
 
-      // multiple extractions of the same URI can happen quite often since the extraction
-      // query uses property path from base URI which may return URIs that are already
-      // processed. So filter out these messages here
-      if (pendingMessages.get(msg.getUri()) != null ||
-        doneMessages.get(msg.getUri()) != null ||
-        failedMessages.get(msg.getUri()) != null) {
-        log.debug("message {} already processing/processed ...", msg);
-        return;
+      if (getSender().path().equals(crawlingWorker.path())) {
+
+        // multiple extractions of the same URI can happen quite often since the extraction
+        // query uses property path from base URI which may return URIs that are already
+        // processed. So filter out these messages here
+        if (pendingMessages.get(msg.getUri()) != null ||
+          doneMessages.get(msg.getUri()) != null ||
+          failedMessages.get(msg.getUri()) != null) {
+          log.debug("message {} already processing/processed ...", msg);
+          return;
+        }
+      } else if (getSender().path().equals(wonNodeController.path())) {
+
+        // if a message from won node controller about processing an URI from
+        // a certain won node is received, then crawl from that won node in the future
+        crawlWonNodeUris.add(msg.getWonNodeUri());
       }
 
-      // start crawling URI
       updateMetaDataWorker.tell(msg, getSelf());
       pendingMessages.put(msg.getUri(), msg);
-      crawlingWorker.tell(msg, getSelf());
 
-    } else if (msg.getStatus().equals(UriStatusMessage.STATUS.DONE)) {
+      // check if the uri belongs to a known and not skipped won node.
+      // if so continue crawling, otherwise first ask the won node controller
+      if (discoveredNewWonNode(msg.getWonNodeUri())) {
+        wonNodeController.tell(msg, getSelf());
+      } else if (!skipWonNodeUris.contains(msg.getWonNodeUri())) {
+        crawlingWorker.tell(msg, getSelf());
+      }
+
+    } else if (msg.getStatus().equals(CrawlUriMessage.STATUS.DONE)) {
 
       // URI crawled successfully
       log.debug("Successfully processed URI: {}", msg.getUri());
@@ -152,7 +179,7 @@ public class MasterCrawlerActor extends UntypedActor
       }
       logStatus();
 
-    } else if (msg.getStatus().equals(UriStatusMessage.STATUS.FAILED)) {
+    } else if (msg.getStatus().equals(CrawlUriMessage.STATUS.FAILED)) {
 
       // Crawling failed
       log.debug("Crawling URI failed: {}", msg.getUri());
@@ -161,6 +188,13 @@ public class MasterCrawlerActor extends UntypedActor
       failedMessages.put(msg.getUri(), msg);
       crawlingWorker.tell(msg, getSelf());
       logStatus();
+
+    } else if (msg.getStatus().equals(CrawlUriMessage.STATUS.SKIP)) {
+
+      // Skip crawling this won node
+      log.debug("Crawling skipped for URI '{}' of WON node '{}'", msg.getUri(), msg.getWonNodeUri());
+      skipWonNodeUris.add(msg.getWonNodeUri());
+      pendingMessages.remove(msg.getUri());
     }
 
     // terminate

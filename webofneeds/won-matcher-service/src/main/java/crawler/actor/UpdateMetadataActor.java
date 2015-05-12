@@ -3,10 +3,10 @@ package crawler.actor;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import crawler.config.Settings;
-import crawler.config.SettingsImpl;
-import crawler.db.SparqlEndpointService;
-import crawler.message.UriStatusMessage;
+import crawler.config.CrawlSettings;
+import crawler.config.CrawlSettingsImpl;
+import crawler.msg.CrawlUriMessage;
+import crawler.service.CrawlSparqlService;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -24,13 +24,13 @@ import java.util.LinkedList;
 public class UpdateMetadataActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-  private final SettingsImpl settings = Settings.SettingsProvider.get(getContext().system());
-  private SparqlEndpointService endpoint;
-  private Collection<UriStatusMessage> bulkMessages;
+  private final CrawlSettingsImpl settings = CrawlSettings.SettingsProvider.get(getContext().system());
+  private CrawlSparqlService endpoint;
+  private Collection<CrawlUriMessage> bulkMessages;
   private static final String TICK = "tick";
 
   public UpdateMetadataActor() {
-    endpoint = new SparqlEndpointService(settings.SPARQL_ENDPOINT);
+    endpoint = new CrawlSparqlService(settings.SPARQL_ENDPOINT);
     bulkMessages = new LinkedList<>();
   }
 
@@ -42,6 +42,13 @@ public class UpdateMetadataActor extends UntypedActor
       settings.METADATA_UPDATE_DURATION, getSelf(), TICK, getContext().dispatcher(), null);
   }
 
+  @Override
+  public void postStop() {
+
+    // execute update for the remaining messages before stop
+    update();
+  }
+
   /**
    * Collects messages until the maximum bulk update size is reached or a timer is
    * elapsed to execute the meta data bulk update.
@@ -50,8 +57,8 @@ public class UpdateMetadataActor extends UntypedActor
    */
   @Override
   public void onReceive(final Object message) {
-    if (message instanceof UriStatusMessage) {
-      UriStatusMessage uriMsg = (UriStatusMessage) message;
+    if (message instanceof CrawlUriMessage) {
+      CrawlUriMessage uriMsg = (CrawlUriMessage) message;
       log.debug("Add message to bulk update list: {}", uriMsg);
       bulkMessages.add(uriMsg);
       if (bulkMessages.size() >= settings.METADATA_UPDATE_MAX_BULK_SIZE) {

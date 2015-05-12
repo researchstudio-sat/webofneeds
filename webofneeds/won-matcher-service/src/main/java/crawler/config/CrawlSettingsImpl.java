@@ -9,10 +9,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Settings configuration class of the crawler
+ *
  * User: hfriedrich
  * Date: 24.04.2015
  */
-public class SettingsImpl implements Extension
+public class CrawlSettingsImpl implements Extension
 {
 
   public final String SPARQL_ENDPOINT;
@@ -23,7 +25,7 @@ public class SettingsImpl implements Extension
   public final int HTTP_CONNECTION_TIMEOUT;
   public final int HTTP_READ_TIMEOUT;
 
-  public SettingsImpl(Config config) {
+  public CrawlSettingsImpl(Config config) {
 
     SPARQL_ENDPOINT = config.getString("crawler.sparqlEndpoint");
     PROPERTYPATHS_BASE = config.getStringList("crawler.propertyPaths.base");
