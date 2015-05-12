@@ -4,10 +4,11 @@ import akka.actor.DeadLetter;
 import akka.actor.Props;
 import crawler.actor.DeadLetterActor;
 import crawler.actor.MasterCrawlerActor;
-import crawler.config.Settings;
-import crawler.config.SettingsImpl;
-import crawler.db.SparqlEndpointService;
-import crawler.message.UriStatusMessage;
+import crawler.config.CrawlSettings;
+import crawler.config.CrawlSettingsImpl;
+import crawler.msg.CrawlUriMessage;
+import crawler.service.CrawlSparqlService;
+import node.actor.WonNodeControllerActor;
 
 import java.io.IOException;
 import java.util.Set;
@@ -23,10 +24,11 @@ public class AkkaSystemCrawlerMain
 
     // setup Akka
     ActorSystem system = ActorSystem.create("AkkaMatchingService");
-    SettingsImpl settings = Settings.SettingsProvider.get(system);
-    SparqlEndpointService endpoint = new SparqlEndpointService(settings.SPARQL_ENDPOINT);
+    CrawlSettingsImpl settings = CrawlSettings.SettingsProvider.get(system);
+    CrawlSparqlService endpoint = new CrawlSparqlService(settings.SPARQL_ENDPOINT);
+    ActorRef controller = system.actorOf(Props.create(WonNodeControllerActor.class), "WonNodeConrollerActor");
     ActorRef master = system.actorOf(
-      Props.create(MasterCrawlerActor.class),
+      Props.create(MasterCrawlerActor.class, controller),
       "MasterCrawlerActor");
     ActorRef actor = system.actorOf(Props.create(DeadLetterActor.class), "crawler.actor.DeadLetterActor");
     system.eventStream().subscribe(actor, DeadLetter.class);
@@ -34,18 +36,18 @@ public class AkkaSystemCrawlerMain
     // read crawling URIs from cmd line
     for (String arg : args) {
       if (arg.endsWith("/")) {
-        endpoint.updateCrawlingMetadata(new UriStatusMessage(
-          arg.substring(0, arg.length()-1), arg.substring(0, arg.length()-1), UriStatusMessage.STATUS.PROCESS));
+        endpoint.updateCrawlingMetadata(new CrawlUriMessage(
+          arg.substring(0, arg.length() - 1), arg.substring(0, arg.length() - 1), CrawlUriMessage.STATUS.PROCESS));
       } else {
-        endpoint.updateCrawlingMetadata(new UriStatusMessage(arg + "/", arg + "/", UriStatusMessage.STATUS.PROCESS));
+        endpoint.updateCrawlingMetadata(new CrawlUriMessage(arg + "/", arg + "/", CrawlUriMessage.STATUS.PROCESS));
       }
-      endpoint.updateCrawlingMetadata(new UriStatusMessage(arg, arg, UriStatusMessage.STATUS.PROCESS));
+      endpoint.updateCrawlingMetadata(new CrawlUriMessage(arg, arg, CrawlUriMessage.STATUS.PROCESS));
     }
 
     // (re-)start crawling
-    Set<UriStatusMessage> msgs = endpoint.getMessagesForCrawling(UriStatusMessage.STATUS.PROCESS);
-    msgs.addAll(endpoint.getMessagesForCrawling(UriStatusMessage.STATUS.FAILED));
-    for (UriStatusMessage msg : msgs) {
+    Set<CrawlUriMessage> msgs = endpoint.retrieveMessagesForCrawling(CrawlUriMessage.STATUS.PROCESS);
+    msgs.addAll(endpoint.retrieveMessagesForCrawling(CrawlUriMessage.STATUS.FAILED));
+    for (CrawlUriMessage msg : msgs) {
       master.tell(msg, master);
     }
   }
