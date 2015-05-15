@@ -16,6 +16,11 @@
 
 package won.protocol.service;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /**
 * User: fkleedorfer
 * Date: 27.10.2014
@@ -24,21 +29,54 @@ public class WonNodeInfo
 {
 
   public WonNodeInfo() {
+    supportedProtocolImpl = new HashMap<>();
   }
 
-  public WonNodeInfo(
-    String eventURIPrefix,
-    String connectionURIPrefix,
-    String needURIPrefix) {
+  public WonNodeInfo(String eventURIPrefix, String connectionURIPrefix, String needURIPrefix) {
 
     this.eventURIPrefix = eventURIPrefix;
     this.connectionURIPattern = connectionURIPrefix;
     this.needURIPattern = needURIPrefix;
+    supportedProtocolImpl = new HashMap<>();
   }
 
   private String eventURIPrefix;
   private String connectionURIPattern;
   private String needURIPattern;
+  private Map<String, Map <String, String>> supportedProtocolImpl;
+
+  public void setSupportedProtocolImplParamValue(String protocol, String paramName, String paramValue) {
+    Map<String,String> protocolMap = supportedProtocolImpl.get(protocol);
+    if (protocolMap == null) {
+      protocolMap = new HashMap<>();
+      supportedProtocolImpl.put(protocol, protocolMap);
+    }
+    protocolMap.put(paramName, paramValue);
+  }
+
+  public String getSupportedProtocolImplParamValue(String protocol, String paramName) {
+    Map<String,String> protocolMap = supportedProtocolImpl.get(protocol);
+    if (protocolMap != null) {
+      return protocolMap.get(paramName);
+    }
+    return null;
+  }
+
+  public Set<String> getSupportedProtocolImpls() {
+    Set<String> protocols = new HashSet<>();
+    protocols.addAll(supportedProtocolImpl.keySet());
+    return protocols;
+  }
+
+  public Set<String> getSupportedProtocolImplParams(String protocol) {
+
+    Set<String> protocols = new HashSet<>();
+    Map<String,String> protocolMap = supportedProtocolImpl.get(protocol);
+    if (protocolMap != null) {
+      protocols.addAll(protocolMap.keySet());
+    }
+    return protocolMap.keySet();
+  }
 
   public String getEventURIPrefix() {
     return eventURIPrefix;
