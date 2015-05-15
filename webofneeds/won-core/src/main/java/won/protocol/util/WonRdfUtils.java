@@ -111,6 +111,23 @@ public class WonRdfUtils
             it = model.listObjectsOfProperty(node.asResource(), WON.HAS_EVENT_URI_PREFIX);
             if (! it.hasNext() ) return null;
             wonNodeInfo.setEventURIPrefix(it.next().asLiteral().getString());
+
+            // set the supported protocol implementations
+            String queryString = "SELECT ?protocol ?param ?value WHERE { ?a <%s> ?c. " +
+              "?c <%s> ?protocol. ?c ?param ?value. FILTER ( ?value != ?protocol ) }";
+            queryString = String.format(queryString, WON.SUPPORTS_WON_PROTOCOL_IMPL.toString(), RDF.getURI() + "type");
+            Query protocolQuery = QueryFactory.create(queryString);
+            QueryExecution qexec = QueryExecutionFactory.create(protocolQuery, model);
+
+            ResultSet rs = qexec.execSelect();
+            while (rs.hasNext()) {
+              QuerySolution qs = rs.nextSolution();
+              String protocol = qs.get("protocol").toString();
+              String param = qs.get("param").toString();
+              String value = qs.get("value").toString();
+              wonNodeInfo.setSupportedProtocolImplParamValue(protocol, param, value);
+            }
+
             return wonNodeInfo;
           }
       });
