@@ -57,6 +57,8 @@ public class WonRdfUtils
             if (!it.hasNext()) return null;
             WonNodeInfo wonNodeInfo = new WonNodeInfo();
             RDFNode node = it.next();
+
+            // set the URI prefixes
             it = model.listObjectsOfProperty(node.asResource(), WON.HAS_NEED_URI_PREFIX);
             if (! it.hasNext() ) return null;
             wonNodeInfo.setNeedURIPrefix(it.next().asLiteral().getString());
@@ -66,6 +68,11 @@ public class WonRdfUtils
             it = model.listObjectsOfProperty(node.asResource(), WON.HAS_EVENT_URI_PREFIX);
             if (! it.hasNext() ) return null;
             wonNodeInfo.setEventURIPrefix(it.next().asLiteral().getString());
+
+            // set the need list URI
+            it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()), WON.HAS_NEED_LIST);
+            if (! it.hasNext() ) return null;
+            wonNodeInfo.setNeedListURI(it.next().asNode().getURI());
 
             // set the supported protocol implementations
             String queryString = "SELECT ?protocol ?param ?value WHERE { ?a <%s> ?c. " +

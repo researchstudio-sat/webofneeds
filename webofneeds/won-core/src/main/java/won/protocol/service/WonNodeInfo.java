@@ -32,18 +32,19 @@ public class WonNodeInfo
     supportedProtocolImpl = new HashMap<>();
   }
 
-  public WonNodeInfo(String eventURIPrefix, String connectionURIPrefix, String needURIPrefix) {
-
-    this.eventURIPrefix = eventURIPrefix;
-    this.connectionURIPattern = connectionURIPrefix;
-    this.needURIPattern = needURIPrefix;
-    supportedProtocolImpl = new HashMap<>();
-  }
-
   private String eventURIPrefix;
   private String connectionURIPattern;
   private String needURIPattern;
+  private String needListURI;
   private Map<String, Map <String, String>> supportedProtocolImpl;
+
+  public String getNeedListURI() {
+    return needListURI;
+  }
+
+  public void setNeedListURI(final String needListURI) {
+    this.needListURI = needListURI;
+  }
 
   public void setSupportedProtocolImplParamValue(String protocol, String paramName, String paramValue) {
     Map<String,String> protocolMap = supportedProtocolImpl.get(protocol);
