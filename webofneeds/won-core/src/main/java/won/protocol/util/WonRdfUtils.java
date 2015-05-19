@@ -56,6 +56,7 @@ public class WonRdfUtils
               WON.HAS_URI_PATTERN_SPECIFICATION);
             if (!it.hasNext()) return null;
             WonNodeInfo wonNodeInfo = new WonNodeInfo();
+            wonNodeInfo.setWonNodeURI(wonNodeUri.toString());
             RDFNode node = it.next();
 
             // set the URI prefixes
@@ -71,8 +72,11 @@ public class WonRdfUtils
 
             // set the need list URI
             it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()), WON.HAS_NEED_LIST);
-            if (! it.hasNext() ) return null;
-            wonNodeInfo.setNeedListURI(it.next().asNode().getURI());
+            if (it.hasNext() ) {
+              wonNodeInfo.setNeedListURI(it.next().asNode().getURI());
+            } else {
+              wonNodeInfo.setNeedListURI(wonNodeInfo.getNeedURIPrefix());
+            }
 
             // set the supported protocol implementations
             String queryString = "SELECT ?protocol ?param ?value WHERE { ?a <%s> ?c. " +
@@ -84,15 +88,25 @@ public class WonRdfUtils
             ResultSet rs = qexec.execSelect();
             while (rs.hasNext()) {
               QuerySolution qs = rs.nextSolution();
-              String protocol = qs.get("protocol").toString();
-              String param = qs.get("param").toString();
-              String value = qs.get("value").toString();
+
+              String protocol = rdfNodeToString(qs.get("protocol"));
+              String param = rdfNodeToString(qs.get("param"));
+              String value = rdfNodeToString(qs.get("value"));
               wonNodeInfo.setSupportedProtocolImplParamValue(protocol, param, value);
             }
 
             return wonNodeInfo;
           }
       });
+    }
+
+    private static String rdfNodeToString(RDFNode node) {
+      if (node.isLiteral()) {
+        return node.asLiteral().getString();
+      } else if (node.isResource()) {
+        return node.asResource().getURI();
+      }
+      return null;
     }
 
   }
