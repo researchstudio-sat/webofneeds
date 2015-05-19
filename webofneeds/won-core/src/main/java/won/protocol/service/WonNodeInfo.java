@@ -32,11 +32,20 @@ public class WonNodeInfo
     supportedProtocolImpl = new HashMap<>();
   }
 
+  private String wonNodeURI;
   private String eventURIPrefix;
   private String connectionURIPattern;
   private String needURIPattern;
   private String needListURI;
   private Map<String, Map <String, String>> supportedProtocolImpl;
+
+  public String getWonNodeURI() {
+    return wonNodeURI;
+  }
+
+  public void setWonNodeURI(final String wonNodeURI) {
+    this.wonNodeURI = wonNodeURI;
+  }
 
   public String getNeedListURI() {
     return needListURI;
