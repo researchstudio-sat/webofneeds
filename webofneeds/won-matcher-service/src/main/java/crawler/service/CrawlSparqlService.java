@@ -1,7 +1,6 @@
 package crawler.service;
 
 import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import commons.service.SparqlService;
 import crawler.msg.CrawlUriMessage;
 import won.protocol.vocabulary.WON;
@@ -106,9 +105,9 @@ public class CrawlSparqlService extends SparqlService
     while (results.hasNext()) {
 
       QuerySolution qs = results.nextSolution();
-      RDFNode uri = qs.get("uri");
-      RDFNode baseUri = qs.get("base");
-      CrawlUriMessage msg = new CrawlUriMessage(uri.toString(), baseUri.toString(), CrawlUriMessage.STATUS.PROCESS);
+      String uri = qs.get("uri").asResource().getURI();
+      String baseUri = qs.get("base").asResource().getURI();
+      CrawlUriMessage msg = new CrawlUriMessage(uri, baseUri, CrawlUriMessage.STATUS.PROCESS);
       log.debug("Created message: {}", msg);
       msgs.add(msg);
     }
@@ -146,9 +145,9 @@ public class CrawlSparqlService extends SparqlService
 
       while (results.hasNext()) {
         QuerySolution qs = results.nextSolution();
-        RDFNode node = qs.get("obj");
-        log.debug("Extracted URI: {}", node.toString());
-        extractedURIs.add(node.toString());
+        String extractedUri = qs.get("obj").asResource().getURI();
+        log.debug("Extracted URI: {}", extractedUri);
+        extractedURIs.add(extractedUri);
       }
       qexec.close();
     }

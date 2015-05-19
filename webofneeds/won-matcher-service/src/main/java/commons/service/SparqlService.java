@@ -1,8 +1,12 @@
 package commons.service;
 
-import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.sparql.core.DatasetGraph;
+import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueBoolean;
 import com.hp.hpl.jena.sparql.modify.UpdateProcessRemote;
+import com.hp.hpl.jena.tdb.TDB;
+import com.hp.hpl.jena.tdb.TDBFactory;
 import com.hp.hpl.jena.update.UpdateExecutionFactory;
 import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.update.UpdateRequest;
@@ -10,7 +14,6 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.vocabulary.WON;
 
 import java.io.StringWriter;
 import java.util.Iterator;
@@ -23,11 +26,6 @@ import java.util.Iterator;
  */
 public class SparqlService
 {
-  private static final String METADATA_GRAPH = WON.BASE_URI + "crawlMetadata";
-  private static final String CRAWL_DATE_PREDICATE = WON.BASE_URI + "crawlDate";
-  private static final String CRAWL_STATUS_PREDICATE = WON.BASE_URI + "crawlStatus";
-  private static final String CRAWL_BASE_URI_PREDICATE = WON.BASE_URI + "crawlBaseUri";
-
   protected final Logger log = LoggerFactory.getLogger(getClass());
   protected String sparqlEndpoint;
 
@@ -64,6 +62,20 @@ public class SparqlService
       Model model = ds.getNamedModel(graphName);
       updateGraph(graphName, model);
     }
+  }
+
+  public Dataset retrieveDataset(String graphName) {
+
+    DatasetGraph dsg = TDBFactory.createDatasetGraph();
+    dsg.getContext().set(TDB.symUnionDefaultGraph, new NodeValueBoolean(true));
+    Dataset ds = DatasetFactory.create(dsg);
+    String queryTemplate = "CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <%s> { ?s ?p ?o } . }";
+    String queryString = String.format(queryTemplate, graphName);
+    Query query = QueryFactory.create(queryString);
+    QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+    Model model = qexec.execConstruct();
+    ds.addNamedModel(graphName, model);
+    return ds;
   }
 
   /**
