@@ -2,7 +2,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.DeadLetter;
 import akka.actor.Props;
-import crawler.actor.DeadLetterActor;
+import commons.actor.DeadLetterActor;
 import crawler.actor.MasterCrawlerActor;
 import crawler.config.CrawlSettings;
 import crawler.config.CrawlSettingsImpl;

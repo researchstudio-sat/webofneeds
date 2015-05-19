@@ -7,6 +7,7 @@ import node.actor.NeedConsumerProtocolActor;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * User: hfriedrich
@@ -19,9 +20,10 @@ public class AkkaSystemControllerMain
     ActorSystem system = ActorSystem.create("AkkaMatchingService");
     Camel camel = CamelExtension.get(system);
     String amqUrl = "tcp://localhost:61616";
-    camel.context().addComponent("activemq", ActiveMQComponent.activeMQComponent(amqUrl));
+    String uuid = UUID.randomUUID().toString();
+    camel.context().addComponent("activemq"+uuid, ActiveMQComponent.activeMQComponent(amqUrl));
     ActorRef actor = system
-      .actorOf(Props.create(NeedConsumerProtocolActor.class, "activemq:topic:MatcherProtocol.Out.Need"),
+      .actorOf(Props.create(NeedConsumerProtocolActor.class, "activemq"+ uuid+":topic:MatcherProtocol.Out.Need"),
                "JmsConsumerProtocolActor");
   }
 }

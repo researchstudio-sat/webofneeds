@@ -1,11 +1,15 @@
 package node.service;
 
 import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Model;
 import commons.service.SparqlService;
+import won.protocol.exception.DataIntegrityException;
+import won.protocol.service.WonNodeInfo;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
-import java.util.LinkedHashSet;
+import java.net.URI;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -16,23 +20,20 @@ import java.util.Set;
  */
 public class WonNodeSparqlService extends SparqlService
 {
-  private final static String URI_PREFIX_SPECIFICATION = WON.BASE_URI + "hasUriPrefixSpecification";
-
-
   public WonNodeSparqlService(final String sparqlEndpoint) {
     super(sparqlEndpoint);
   }
 
   /**
-   * Retrieve won node URIs that are saved in the Sparql endpoint
+   * Retrieve resource data of all known won nodes that are saved in the Sparql endpoint.
    *
-   * @return Set of all known won node URIs
+   * @return Set of all known won node resource data
    */
-  public Set<String> retrieveWonNodeUris() {
+  public Set<WonNodeInfo> retrieveAllWonNodeInfo() {
 
-    Set<String> wonNodeUris = new LinkedHashSet<>();
-    String queryTemplate = "\nSELECT ?node WHERE { GRAPH ?g {?node <%s> ?c}}\n";
-    String queryString = String.format(queryTemplate, URI_PREFIX_SPECIFICATION);
+    Set<WonNodeInfo> wonNodeInfos = new HashSet<>();
+    String queryString = "SELECT ?graphUri ?nodeUri WHERE { GRAPH ?graphUri {?nodeUri <%s> ?c} }";
+    queryString = String.format(queryString, WON.HAS_URI_PATTERN_SPECIFICATION.toString());
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
     log.debug("Execute query: {}", queryString);
     Query query = QueryFactory.create(queryString);
@@ -42,11 +43,48 @@ public class WonNodeSparqlService extends SparqlService
     while (results.hasNext()) {
 
       QuerySolution qs = results.nextSolution();
-      RDFNode uri = qs.get("node");
-      wonNodeUris.add(uri.toString());
+      String graphUri = qs.get("graphUri").asResource().getURI();
+      Dataset ds = retrieveDataset(graphUri);
+      WonNodeInfo nodeInfo = getWonNodeInfoFromDataset(ds);
+      wonNodeInfos.add(nodeInfo);
     }
     qexec.close();
-
-    return wonNodeUris;
+    return wonNodeInfos;
   }
+
+  /**
+   * Get the {@link won.protocol.service.WonNodeInfo} as an object from a {@link com.hp.hpl.jena.query.Dataset}
+   *
+   * @param ds Dataset which holds won node information
+   * @return
+   */
+  public WonNodeInfo getWonNodeInfoFromDataset(Dataset ds) {
+
+    String dsWonNodeUri = getWonNodeUriFromDataset(ds);
+    WonNodeInfo nodeInfo = WonRdfUtils.WonNodeUtils.getWonNodeInfo(URI.create(dsWonNodeUri), ds);
+    if (nodeInfo == null) {
+      throw new DataIntegrityException(
+        "Could not load won node info from dataset with URI: " + dsWonNodeUri);
+    }
+
+    return nodeInfo;
+  }
+
+  /**
+   * Get the won node URI from a {@link com.hp.hpl.jena.query.Dataset}
+   *
+   * @param ds Dataset which holds won node information
+   * @return
+   */
+  private String getWonNodeUriFromDataset(Dataset ds) {
+
+    if (ds.listNames().hasNext()) {
+      Model model = ds.getNamedModel(ds.listNames().next());
+      if (model.listSubjectsWithProperty(WON.HAS_URI_PATTERN_SPECIFICATION).hasNext()) {
+        return model.listSubjectsWithProperty(WON.HAS_URI_PATTERN_SPECIFICATION).nextResource().toString();
+      }
+    }
+    return null;
+  }
+
 }
