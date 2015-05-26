@@ -40,4 +40,5 @@ public class WonNodeConnection
   public ActorRef getNeedDeactivatedConsumer() {
     return needDeactivatedConsumer;
   }
+
 }

@@ -7,7 +7,9 @@ import akka.camel.Camel;
 import akka.camel.CamelExtension;
 import node.actor.NeedConsumerProtocolActor;
 import node.pojo.WonNodeConnection;
-import org.apache.activemq.camel.component.ActiveMQComponent;
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.camel.FailedToCreateConsumerException;
+import org.apache.camel.component.jms.JmsComponent;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.vocabulary.WON;
 
@@ -26,9 +28,11 @@ public class ActiveMqNeedConsumerFactory
    *
    * @param context actor context to create the message consuming actors in
    * @param wonNodeInfo info about the won node (e.g. topics to subscribe)
-   * @return
+   * @return the connection
+   * @throws FailedToCreateConsumerException
    */
-  public static WonNodeConnection createWonNodeConnection(UntypedActorContext context, WonNodeInfo wonNodeInfo) {
+  public static WonNodeConnection createWonNodeConnection(UntypedActorContext context,
+                                                          WonNodeInfo wonNodeInfo) {
 
     // read won node info
     String activeMq = WON.WON_OVER_ACTIVE_MQ.toString();
@@ -41,19 +45,21 @@ public class ActiveMqNeedConsumerFactory
     String deactivatedTopic = wonNodeInfo.getSupportedProtocolImplParamValue(
       activeMq, WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME.toString());
 
-    // init akka camel
+    // create the components
     String uuid = UUID.randomUUID().toString();
     String componentName = "activemq-" + uuid;
-    Camel camel = CamelExtension.get(context.system());
-    camel.context().addComponent(componentName, ActiveMQComponent.activeMQComponent(brokerUri));
 
     // create the actors that receive the messages
-    Props createdProps = Props.create(NeedConsumerProtocolActor.class, componentName + ":topic:" + createdTopic);
+    Props createdProps = Props.create(NeedConsumerProtocolActor.class,
+                                      componentName + ":topic:" + createdTopic +
+                                      "?testConnectionOnStartup=false");
     ActorRef created = context.actorOf(createdProps, "ActiveMqNeedCreatedConsumerProtocolActor-" + uuid);
 
     ActorRef activated = created;
     if (!activatedTopic.equals(createdTopic)) {
-      Props activatedProps = Props.create(NeedConsumerProtocolActor.class, componentName + ":topic:" + activatedTopic);
+      Props activatedProps = Props.create(NeedConsumerProtocolActor.class,
+                                          componentName + ":topic:" + activatedTopic
+                                          + "?testConnectionOnStartup=false");
       activated = context.actorOf(activatedProps, "ActiveMqNeedActivatedConsumerProtocolActor-" + uuid);
     }
 
@@ -63,10 +69,24 @@ public class ActiveMqNeedConsumerFactory
     } else if (deactivatedTopic.equals(activatedTopic)) {
       deactivated = activated;
     } else {
-      Props deactivatedProps = Props.create(NeedConsumerProtocolActor.class, componentName + ":topic:" + deactivatedTopic);
+      Props deactivatedProps = Props.create(NeedConsumerProtocolActor.class,
+                                            componentName + ":topic:" + deactivatedTopic +
+                                              "?testConnectionOnStartup=false");
       deactivated = context.actorOf(deactivatedProps, "ActiveMqNeedDeactivatedConsumerProtocolActor-" + uuid);
     }
 
-    return new WonNodeConnection(wonNodeInfo, created, activated, deactivated);
+    // watch the created consumers from the context to get informed when they are terminated
+    context.watch(created);
+    context.watch(activated);
+    context.watch(deactivated);
+
+    // create the connection
+    WonNodeConnection jmsConnection = new WonNodeConnection(wonNodeInfo, created, activated, deactivated);
+    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerUri);
+    // connectionFactory.setExceptionListener( ... )
+    Camel camel = CamelExtension.get(context.system());
+    camel.context().addComponent(componentName, JmsComponent.jmsComponent(connectionFactory));
+
+    return jmsConnection;
   }
 }

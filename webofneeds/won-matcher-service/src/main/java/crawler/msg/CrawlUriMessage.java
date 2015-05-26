@@ -67,8 +67,10 @@ public class CrawlUriMessage
 
     if (obj instanceof CrawlUriMessage) {
       CrawlUriMessage msg = (CrawlUriMessage) obj;
-      return uri.equals(msg.getUri()) && baseUri.equals(msg.getBaseUri()) &&
-        status.equals(msg.getStatus()) && wonNodeUri.equals(msg.getWonNodeUri());
+      if (uri.equals(msg.getUri()) && baseUri.equals(msg.getBaseUri()) &&
+        status.equals(msg.getStatus())) {
+        return (wonNodeUri == null) ? msg.getWonNodeUri() == null : wonNodeUri.equals(msg.getWonNodeUri());
+      }
     }
 
     return false;
