@@ -118,7 +118,7 @@ public class MasterCrawlerActor extends UntypedActor
   }
 
   private void logStatus() {
-    log.info("Number of URIs\n Crawled: {}\n Failed: {}\n Pending: {}",
+    log.debug("Number of URIs\n Crawled: {}\n Failed: {}\n Pending: {}",
              doneMessages.size(), failedMessages.size(), pendingMessages.size());
   }
 
