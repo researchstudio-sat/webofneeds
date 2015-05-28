@@ -22,6 +22,7 @@ public class CrawlSparqlService extends SparqlService
   private static final String CRAWL_DATE_PREDICATE = WON.BASE_URI + "crawlDate";
   private static final String CRAWL_STATUS_PREDICATE = WON.BASE_URI + "crawlStatus";
   private static final String CRAWL_BASE_URI_PREDICATE = WON.BASE_URI + "crawlBaseUri";
+  private static final String CRAWL_WON_NODE_URI_PREDICATE = WON.BASE_URI + "wonNodeUri";
 
   public CrawlSparqlService(final String sparqlEndpoint) {
     super(sparqlEndpoint);
@@ -42,11 +43,16 @@ public class CrawlSparqlService extends SparqlService
     String queryString = String.format(queryTemplate, METADATA_GRAPH, msg.getUri());
 
     // insert new entry
-    queryTemplate = "\nINSERT DATA { GRAPH <%s> { <%s> <%s> %d. <%s> <%s> '%s'. <%s> <%s> <%s> }}\n";
+    queryTemplate = "\nINSERT DATA { GRAPH <%s> { <%s> <%s> %d. <%s> <%s> '%s'. <%s> <%s> <%s>. ";
+    if (msg.getWonNodeUri() != null) {
+      queryTemplate += "<%s> <%s> <%s>. ";
+    }
+    queryTemplate += "}}\n";
     queryString += String.format(queryTemplate, METADATA_GRAPH,
                                  msg.getUri(), CRAWL_DATE_PREDICATE, System.currentTimeMillis(),
                                  msg.getUri(), CRAWL_STATUS_PREDICATE, msg.getStatus(),
-                                 msg.getUri(), CRAWL_BASE_URI_PREDICATE, msg.getBaseUri());
+                                 msg.getUri(), CRAWL_BASE_URI_PREDICATE, msg.getBaseUri(),
+                                 msg.getUri(), CRAWL_WON_NODE_URI_PREDICATE, msg.getWonNodeUri());
 
     // execute query
     executeUpdateQuery(queryString);
@@ -74,9 +80,14 @@ public class CrawlSparqlService extends SparqlService
     String insertTemplate = "\n<%s> <%s> %d. <%s> <%s> '%s'. <%s> <%s> <%s>. ";
     builder.append("\nINSERT DATA { GRAPH <").append(METADATA_GRAPH).append(">  { ");
     for (CrawlUriMessage msg : msgs) {
-      builder.append(String.format(insertTemplate, msg.getUri(), CRAWL_DATE_PREDICATE, System.currentTimeMillis(),
+      String specificInsertTemplate = insertTemplate;
+      if (msg.getWonNodeUri() != null) {
+        specificInsertTemplate += "<%s> <%s> <%s>. ";
+      }
+      builder.append(String.format(specificInsertTemplate, msg.getUri(), CRAWL_DATE_PREDICATE, System.currentTimeMillis(),
                                    msg.getUri(), CRAWL_STATUS_PREDICATE, msg.getStatus(),
-                                   msg.getUri(), CRAWL_BASE_URI_PREDICATE, msg.getBaseUri()));
+                                   msg.getUri(), CRAWL_BASE_URI_PREDICATE, msg.getBaseUri(),
+                                   msg.getUri(), CRAWL_WON_NODE_URI_PREDICATE, msg.getWonNodeUri()));
     }
     builder.append("}};\n");
 
@@ -94,8 +105,9 @@ public class CrawlSparqlService extends SparqlService
   public Set<CrawlUriMessage> retrieveMessagesForCrawling(CrawlUriMessage.STATUS status) {
 
     Set<CrawlUriMessage> msgs = new LinkedHashSet<>();
-    String queryTemplate = "\nSELECT ?uri ?base WHERE { GRAPH <%s> {?uri ?p '%s'. ?uri <%s> ?base}}\n";
-    String queryString = String.format(queryTemplate, METADATA_GRAPH, status, CRAWL_BASE_URI_PREDICATE);
+    String queryTemplate = "\nSELECT ?uri ?base ?wonNode WHERE { GRAPH <%s> " +
+      "{?uri ?p '%s'. ?uri <%s> ?base OPTIONAL { ?uri <%s> ?wonNode } }}\n";
+    String queryString = String.format(queryTemplate, METADATA_GRAPH, status, CRAWL_BASE_URI_PREDICATE, CRAWL_WON_NODE_URI_PREDICATE);
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
     log.debug("Execute query: {}", queryString);
     Query query = QueryFactory.create(queryString);
@@ -107,7 +119,14 @@ public class CrawlSparqlService extends SparqlService
       QuerySolution qs = results.nextSolution();
       String uri = qs.get("uri").asResource().getURI();
       String baseUri = qs.get("base").asResource().getURI();
-      CrawlUriMessage msg = new CrawlUriMessage(uri, baseUri, CrawlUriMessage.STATUS.PROCESS);
+      CrawlUriMessage msg = null;
+      if (qs.get("wonNode") != null) {
+        String wonNode = qs.get("wonNode").asResource().getURI();
+        msg = new CrawlUriMessage(uri, baseUri, wonNode, CrawlUriMessage.STATUS.PROCESS);
+      } else {
+        msg = new CrawlUriMessage(uri, baseUri, CrawlUriMessage.STATUS.PROCESS);
+      }
+
       log.debug("Created message: {}", msg);
       msgs.add(msg);
     }
