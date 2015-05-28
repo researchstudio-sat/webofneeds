@@ -5,8 +5,11 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
 import akka.routing.FromConfig;
+import crawler.config.CrawlSettings;
+import crawler.config.CrawlSettingsImpl;
 import crawler.exception.CrawlWrapperException;
 import crawler.msg.CrawlUriMessage;
+import crawler.service.CrawlSparqlService;
 import scala.concurrent.duration.Duration;
 
 import java.util.HashMap;
@@ -30,6 +33,8 @@ import java.util.Set;
 public class MasterCrawlerActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+  private final CrawlSettingsImpl settings = CrawlSettings.SettingsProvider.get(getContext().system());
+  private CrawlSparqlService sparqlService;
   private Map<String, CrawlUriMessage> pendingMessages = null;
   private Map<String, CrawlUriMessage> doneMessages = null;
   private Map<String, CrawlUriMessage> failedMessages = null;
@@ -46,6 +51,7 @@ public class MasterCrawlerActor extends UntypedActor
     crawlWonNodeUris = new HashSet<>();
     skipWonNodeUris = new HashSet<>();
     this.wonNodeController = wonNodeController;
+    sparqlService = new CrawlSparqlService(settings.SPARQL_ENDPOINT);
   }
 
   @Override
@@ -58,6 +64,15 @@ public class MasterCrawlerActor extends UntypedActor
     // create a single meta data update actor for all worker actors
     updateMetaDataWorker = getContext().actorOf(Props.create(UpdateMetadataActor.class), "MetaDataUpdateWorker");
     getContext().watch(updateMetaDataWorker);
+
+    // load the unfinished uris and start crawling
+    for (CrawlUriMessage msg : sparqlService.retrieveMessagesForCrawling(CrawlUriMessage.STATUS.PROCESS)) {
+      getSelf().tell(msg, getSelf());
+    }
+
+    for (CrawlUriMessage msg : sparqlService.retrieveMessagesForCrawling(CrawlUriMessage.STATUS.FAILED)) {
+      getSelf().tell(msg, getSelf());
+    }
   }
 
   /**
@@ -118,7 +133,7 @@ public class MasterCrawlerActor extends UntypedActor
   }
 
   private void logStatus() {
-    log.debug("Number of URIs\n Crawled: {}\n Failed: {}\n Pending: {}",
+    log.info("Number of URIs\n Crawled: {}\n Failed: {}\n Pending: {}",
              doneMessages.size(), failedMessages.size(), pendingMessages.size());
   }
 
