@@ -10,7 +10,7 @@ angular.module('won.owner')
             restrict: 'E',
             //controllerAs: 'myComponent',
             scope: {},
-            template: '<h1>Hello Image Uploader!</h1>',
+            template: '<h1>Image upload isn\'t implemented yet.</h1>',
             controller: function ($scope){ //, MyStore) {
                 /*
                 $scope.comments = MyStore.comments;
