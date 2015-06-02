@@ -118,6 +118,7 @@
 
         <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/create-need/location-selector.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/create-need/image-uploader.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/conversation/conversation.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/draft/draft.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
