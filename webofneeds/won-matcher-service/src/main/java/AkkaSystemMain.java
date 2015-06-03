@@ -14,7 +14,7 @@ import java.io.IOException;
  * User: hfriedrich
  * Date: 27.03.2015
  */
-public class AkkaSystemCrawlerMain
+public class AkkaSystemMain
 {
 
   public static void main(String[] args) throws IOException {
