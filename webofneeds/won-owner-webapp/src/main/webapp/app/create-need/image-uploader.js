@@ -5,13 +5,19 @@
 
 /*
 
-ways to do this:
+ways to implement the part on the...
+
+...client:
 
 * use fileReader: https://developer.mozilla.org/en/docs/Web/API/FileReader
 * angulars $http
 * there are a few angular-directives for this, that i have to evaluate
-
 * source of http://download.tizen.org/misc/examples/w3c_html5/communication/xmlhttprequest_level_2/xhr1.html using vanilla XHR
+
+...server:
+
+* There's the class RestNeedPhotoController that already allows uploading images but probably needs some work.
+* A server-side snippet for spring can be found at https://spring.io/guides/gs/uploading-files/
 
  */
 
@@ -30,7 +36,7 @@ angular.module('won.owner')
             controller: function ($scope){ //, MyStore) {
 
                 $scope.setFile = function(fileInput){
-                    //TODO only accept images & limit their size !!!!!!!!!!!!!!!
+                    //TODO only accept images & limit their size !!!!!!!!!!!!!!! (limit on server-side)
                     console.log(fileInput.files[0]);
 
                     var xhr = new XMLHttpRequest();
