@@ -8,6 +8,10 @@ package crawler.msg;
  */
 public class CrawlUriMessage
 {
+  public static enum STATUS
+  {
+    PROCESS, FAILED, DONE
+  }
 
   private String uri;
   private String baseUri;
@@ -79,10 +83,5 @@ public class CrawlUriMessage
   @Override
   public int hashCode() {
     return (uri + baseUri + wonNodeUri + status.toString()).hashCode();
-  }
-
-  public static enum STATUS
-  {
-    PROCESS, FAILED, DONE, SKIP
   }
 }

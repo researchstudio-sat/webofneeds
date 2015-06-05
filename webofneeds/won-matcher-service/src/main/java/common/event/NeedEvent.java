@@ -1,4 +1,4 @@
-package events.msg;
+package common.event;
 
 
 import com.hp.hpl.jena.query.Dataset;
@@ -11,6 +11,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 /**
+ * This event is used in the matching service to indicate that a new need has been found.
+ * It includes the URIs of the need and the won node and optionally the serialized resource
+ *
  * User: hfriedrich
  * Date: 04.06.2015
  */
