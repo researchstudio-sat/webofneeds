@@ -51,7 +51,7 @@ public class MasterCrawlerActor extends UntypedActor
     crawlWonNodeUris = new HashSet<>();
     skipWonNodeUris = new HashSet<>();
     this.wonNodeController = wonNodeController;
-    sparqlService = new CrawlSparqlService(settings.SPARQL_ENDPOINT);
+    sparqlService = new CrawlSparqlService(settings.METADATA_SPARQL_ENDPOINT);
   }
 
   @Override

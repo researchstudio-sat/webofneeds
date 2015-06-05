@@ -4,6 +4,18 @@ import akka.camel.CamelMessage;
 import akka.camel.javaapi.UntypedConsumerActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import com.hp.hpl.jena.query.Dataset;
+import commons.config.CommonSettings;
+import commons.config.CommonSettingsImpl;
+import commons.service.SparqlService;
+import events.msg.NeedEvent;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFFormat;
+import won.protocol.util.RdfUtils;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Camel actor represents the need consumer protocol to a won node.
@@ -22,11 +34,14 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
   private static final String MSG_HEADER_METHODNAME_NEEDDEACTIVATED = "needDeactivated";
   private static final String MSG_HEADER_WON_NODE_URI = "wonNodeURI";
   private static final String MSG_HEADER_NEED_URI = "needUri";
+  private final CommonSettingsImpl settings = CommonSettings.SettingsProvider.get(getContext().system());
+  private SparqlService sparqlService;
   private final String endpoint;
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
   public NeedConsumerProtocolActor(String endpoint) {
     this.endpoint = endpoint;
+    this.sparqlService = new SparqlService(settings.SPARQL_ENDPOINT);
   }
 
   @Override
@@ -45,14 +60,24 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
         Object methodName = camelMsg.getHeaders().get(MSG_HEADER_METHODNAME);
         if (methodName != null) {
           log.debug("Received event '{}' for needUri '{}' and wonNeedUri '{}'", methodName, needUri, wonNodeUri);
+
+          // save the need
+          Dataset ds = convertBodyToDataset(camelMsg.body(), Lang.TRIG);
+          sparqlService.updateDataset(ds);
+
+          // publish an internal need event
+          NeedEvent event = null;
           if (methodName.equals(MSG_HEADER_METHODNAME_NEEDCREATED)) {
-            onNeedCreated(needUri, wonNodeUri);
+            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.CREATED, camelMsg.body().toString(), Lang.TRIG);
+            getContext().system().eventStream().publish(event);
             return;
           } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDACTIVATED)) {
-            onNeedActivated(needUri, wonNodeUri);
+            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVATED, camelMsg.body().toString(), Lang.TRIG);
+            getContext().system().eventStream().publish(event);
             return;
           } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDDEACTIVATED)) {
-            onNeedDeactivated(needUri, wonNodeUri);
+            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.DEACTIVATED, camelMsg.body().toString(), Lang.TRIG);
+            getContext().system().eventStream().publish(event);
             return;
           }
         }
@@ -63,18 +88,9 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
     unhandled(message);
   }
 
-  private void onNeedCreated(String needUri, String wonNodeUri) {
-
+  private Dataset convertBodyToDataset(Object body, Lang lang) {
+    InputStream is = new ByteArrayInputStream(body.toString().getBytes(StandardCharsets.UTF_8));
+    return RdfUtils.toDataset(is, new RDFFormat(lang));
   }
-
-  private void onNeedActivated(String needUri, String wonNodeUri) {
-
-  }
-
-  private void onNeedDeactivated(String needUri, String wonNodeUri) {
-
-  }
-
-
 
 }

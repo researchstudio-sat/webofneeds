@@ -4,6 +4,8 @@ import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
+import commons.config.CommonSettings;
+import commons.config.CommonSettingsImpl;
 import commons.service.HttpRequestService;
 import crawler.config.CrawlSettings;
 import crawler.config.CrawlSettingsImpl;
@@ -31,14 +33,15 @@ import java.util.Set;
  */
 public class WorkerCrawlerActor extends UntypedActor
 {
-  private final CrawlSettingsImpl settings = CrawlSettings.SettingsProvider.get(getContext().system());
+  private final CrawlSettingsImpl crawlSettings = CrawlSettings.SettingsProvider.get(getContext().system());
+  private final CommonSettingsImpl commonSettings = CommonSettings.SettingsProvider.get(getContext().system());
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private HttpRequestService httpRequestService;
-  private CrawlSparqlService endpoint;
+  private CrawlSparqlService sparqlService;
 
   public WorkerCrawlerActor() {
-    httpRequestService = new HttpRequestService(settings.HTTP_READ_TIMEOUT, settings.HTTP_CONNECTION_TIMEOUT);
-    endpoint = new CrawlSparqlService(settings.SPARQL_ENDPOINT);
+    httpRequestService = new HttpRequestService(crawlSettings.HTTP_READ_TIMEOUT, crawlSettings.HTTP_CONNECTION_TIMEOUT);
+    sparqlService = new CrawlSparqlService(commonSettings.SPARQL_ENDPOINT);
   }
 
   /**
@@ -71,7 +74,7 @@ public class WorkerCrawlerActor extends UntypedActor
     }
 
     // Save dataset to triple store
-    endpoint.updateDataset(ds);
+    sparqlService.updateDataset(ds);
     String wonNodeUri = extractWonNodeUri(ds, uriMsg.getUri());
     if (wonNodeUri == null) {
       wonNodeUri = uriMsg.getWonNodeUri();
@@ -79,8 +82,8 @@ public class WorkerCrawlerActor extends UntypedActor
 
     // send extracted non-base URIs back to sender and save meta data about crawling the URI
     log.debug("Extract non-base URIs from message {}", uriMsg);
-    Set<String> extractedURIs = endpoint.extractURIs(
-      uriMsg.getUri(), uriMsg.getBaseUri(), settings.PROPERTYPATHS_NONBASE);
+    Set<String> extractedURIs = sparqlService.extractURIs(
+      uriMsg.getUri(), uriMsg.getBaseUri(), crawlSettings.PROPERTYPATHS_NONBASE);
     for (String extractedURI : extractedURIs) {
       CrawlUriMessage newUriMsg = new CrawlUriMessage(
         extractedURI, uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.PROCESS);
@@ -89,7 +92,7 @@ public class WorkerCrawlerActor extends UntypedActor
 
     // send extracted base URIs back to sender and save meta data about crawling the URI
     log.debug("Extract base URIs from message {}", uriMsg);
-    extractedURIs = endpoint.extractURIs(uriMsg.getUri(), uriMsg.getBaseUri(), settings.PROPERTYPATHS_BASE);
+    extractedURIs = sparqlService.extractURIs(uriMsg.getUri(), uriMsg.getBaseUri(), crawlSettings.PROPERTYPATHS_BASE);
     for (String extractedURI : extractedURIs) {
       CrawlUriMessage newUriMsg = new CrawlUriMessage(
         extractedURI, extractedURI, wonNodeUri, CrawlUriMessage.STATUS.PROCESS);

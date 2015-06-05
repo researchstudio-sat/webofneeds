@@ -30,7 +30,7 @@ public class UpdateMetadataActor extends UntypedActor
   private static final String TICK = "tick";
 
   public UpdateMetadataActor() {
-    endpoint = new CrawlSparqlService(settings.SPARQL_ENDPOINT);
+    endpoint = new CrawlSparqlService(settings.METADATA_SPARQL_ENDPOINT);
     bulkMessages = new LinkedList<>();
   }
 
