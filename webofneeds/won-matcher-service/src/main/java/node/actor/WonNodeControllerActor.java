@@ -98,10 +98,12 @@ public class WonNodeControllerActor extends UntypedActor
 
     if (message instanceof Terminated) {
       handleConnectionErrors((Terminated) message);
+      return;
     }
 
     if (message.equals(TICK)) {
       lifeCheck();
+      return;
     }
 
     if (message instanceof CrawlUriMessage) {
