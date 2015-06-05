@@ -1,4 +1,4 @@
-package commons.service;
+package common.service;
 
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;

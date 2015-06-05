@@ -7,7 +7,8 @@ import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
-import commons.service.HttpRequestService;
+import common.event.WonNodeEvent;
+import common.service.HttpRequestService;
 import crawler.actor.MasterCrawlerActor;
 import crawler.msg.CrawlUriMessage;
 import node.config.ActiveMqNeedConsumerFactory;
@@ -23,8 +24,8 @@ import java.util.*;
 
 /**
  * Actor that knows all won nodes the matching service is communicating. It gets informed
- * about new won nodes (e.g. by he crawler) and decides which won nodes to crawl and to
- * register with for receiving need updates.
+ * about new won nodes over the event stream (e.g. by he crawler) and decides which
+ * won nodes to crawl and to register with for receiving need events.
  *
  * User: hfriedrich
  * Date: 27.04.2015
@@ -58,6 +59,10 @@ public class WonNodeControllerActor extends UntypedActor
     getContext().system().scheduler().schedule(settings.WON_NODE_LIFE_CHECK_DURATION,
                                                settings.WON_NODE_LIFE_CHECK_DURATION, getSelf(), TICK, getContext().dispatcher(), null);
 
+    // Subscribe for won node events
+    getContext().system().eventStream().subscribe(getSelf(), WonNodeEvent.class);
+
+    // set won nodes to skip by configuration
     skipWonNodeUris.addAll(settings.WON_NODES_SKIP);
 
     // get all known won node uris
@@ -67,23 +72,20 @@ public class WonNodeControllerActor extends UntypedActor
       crawlWonNodes.put(nodeInfo.getWonNodeURI(), con);
     }
 
-    // initialize the won nodes to crawl or skip
+    // initialize the won nodes to crawl
     for (String nodeUri : settings.WON_NODES_CRAWL) {
       if (!skipWonNodeUris.contains(nodeUri)) {
         if (!crawlWonNodes.containsKey(nodeUri)) {
-          // add the won node uri that we still have to crawl to the mailbox of this actor
-          getSelf().tell(new CrawlUriMessage(nodeUri, nodeUri, nodeUri, CrawlUriMessage.STATUS.PROCESS), getSelf());
+          // publish event (to self) for discovering new won node from config file
+          getContext().system().eventStream().publish(new WonNodeEvent(
+            nodeUri, WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED));
         }
       }
     }
 
-    // initialize the crawler and start crawling
+    // initialize the crawler
     crawler = getContext().system().actorOf(
-      Props.create(MasterCrawlerActor.class, getSelf()), "MasterCrawlerActor");
-
-    for (WonNodeConnection con : crawlWonNodes.values()) {
-      startCrawling(con.getWonNodeInfo());
-    }
+      Props.create(MasterCrawlerActor.class), "MasterCrawlerActor");
   }
 
   /**
@@ -106,53 +108,46 @@ public class WonNodeControllerActor extends UntypedActor
       return;
     }
 
-    if (message instanceof CrawlUriMessage) {
-      CrawlUriMessage uriMsg = (CrawlUriMessage) message;
-      if (uriMsg.getStatus().equals(CrawlUriMessage.STATUS.PROCESS) &&
-          uriMsg.getWonNodeUri() != null && !uriMsg.getWonNodeUri().isEmpty()) {
+    if (message instanceof WonNodeEvent) {
+      WonNodeEvent event = (WonNodeEvent) message;
+
+      if (event.getStatus().equals(WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED)) {
 
         // continue crawling of known won nodes
-        if (crawlWonNodes.containsKey(uriMsg.getWonNodeUri())) {
-            log.debug("Won node uri '{}' already discovered", uriMsg.getWonNodeUri());
-            getSender().tell(uriMsg, getSelf());
+        if (crawlWonNodes.containsKey(event.getWonNodeUri())) {
+            log.debug("Won node uri '{}' already discovered", event.getWonNodeUri());
+            getContext().system().eventStream().publish(new WonNodeEvent(
+              event.getWonNodeUri(), WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE));
             return;
         }
 
         // skip crawling of won nodes in the skip list
-        if (skipWonNodeUris.contains(uriMsg.getWonNodeUri())) {
-          log.debug("Skip crawling won node with uri '{}'", uriMsg.getWonNodeUri());
-          getSender().tell(skipCrawlMessage(uriMsg), getSelf());
+        if (skipWonNodeUris.contains(event.getWonNodeUri())) {
+          log.debug("Skip crawling won node with uri '{}'", event.getWonNodeUri());
+          getContext().system().eventStream().publish(new WonNodeEvent(
+            event.getWonNodeUri(), WonNodeEvent.STATUS.SKIP_WON_NODE));
           return;
         }
 
-        // try the connect o won node
-        addWonNodeForCrawling(uriMsg.getWonNodeUri());
+        // try the connect to won node
+        WonNodeConnection con = addWonNodeForCrawling(event.getWonNodeUri());
 
         // connection failed ?
-        if (failedWonNodeUris.contains(uriMsg.getWonNodeUri())) {
-          log.debug("Still could not connect to won node with uri: {}", uriMsg.getWonNodeUri());
-          getSender().tell(failedCrawlMessage(uriMsg), getSelf());
+        if (failedWonNodeUris.contains(event.getWonNodeUri())) {
+          log.debug("Still could not connect to won node with uri: {}, will retry later ...",
+                    event.getWonNodeUri());
           return;
         }
 
         // crawl all new discovered won nodes
-        getSender().tell(uriMsg, getSelf());
-        startCrawling(crawlWonNodes.get(uriMsg.getWonNodeUri()).getWonNodeInfo());
+        getContext().system().eventStream().publish(new WonNodeEvent(
+          event.getWonNodeUri(), WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE));
+        startCrawling(crawlWonNodes.get(event.getWonNodeUri()).getWonNodeInfo());
         return;
       }
     }
 
     unhandled(message);
-  }
-
-  private static CrawlUriMessage skipCrawlMessage(CrawlUriMessage msg) {
-    return new CrawlUriMessage(msg.getUri(), msg.getBaseUri(),
-                               msg.getWonNodeUri(), CrawlUriMessage.STATUS.SKIP);
-  }
-
-  private static CrawlUriMessage failedCrawlMessage(CrawlUriMessage msg) {
-    return new CrawlUriMessage(msg.getUri(), msg.getBaseUri(),
-                               msg.getWonNodeUri(), CrawlUriMessage.STATUS.FAILED);
   }
 
   /**

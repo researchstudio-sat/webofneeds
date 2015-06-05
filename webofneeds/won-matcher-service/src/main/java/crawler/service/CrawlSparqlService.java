@@ -1,7 +1,7 @@
 package crawler.service;
 
 import com.hp.hpl.jena.query.*;
-import commons.service.SparqlService;
+import common.service.SparqlService;
 import crawler.msg.CrawlUriMessage;
 import won.protocol.vocabulary.WON;
 

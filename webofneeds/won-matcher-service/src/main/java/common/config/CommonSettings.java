@@ -1,11 +1,11 @@
-package commons.config;
+package common.config;
 
 import akka.actor.AbstractExtensionId;
 import akka.actor.ExtendedActorSystem;
 import akka.actor.ExtensionIdProvider;
 
 /**
- * Settings configuration class of the crawler
+ * Common settings configuration class
  *
  * User: hfriedrich
  * Date: 24.04.2015

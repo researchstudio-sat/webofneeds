@@ -1,10 +1,10 @@
-package commons.config;
+package common.config;
 
 import akka.actor.Extension;
 import com.typesafe.config.Config;
 
 /**
- * Settings configuration class of the crawler
+ * Common settings configuration class
  *
  * User: hfriedrich
  * Date: 24.04.2015

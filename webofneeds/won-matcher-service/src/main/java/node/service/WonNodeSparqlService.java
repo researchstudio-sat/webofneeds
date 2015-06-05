@@ -2,7 +2,7 @@ package node.service;
 
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
-import commons.service.SparqlService;
+import common.service.SparqlService;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.util.WonRdfUtils;
