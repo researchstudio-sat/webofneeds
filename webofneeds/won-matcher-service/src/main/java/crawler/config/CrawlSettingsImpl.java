@@ -16,10 +16,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class CrawlSettingsImpl implements Extension
 {
-
-  public final String SPARQL_ENDPOINT;
   public final List<String> PROPERTYPATHS_BASE;
   public final List<String> PROPERTYPATHS_NONBASE;
+  public final String METADATA_SPARQL_ENDPOINT;
   public final FiniteDuration METADATA_UPDATE_DURATION;
   public final int METADATA_UPDATE_MAX_BULK_SIZE;
   public final int HTTP_CONNECTION_TIMEOUT;
@@ -27,9 +26,9 @@ public class CrawlSettingsImpl implements Extension
 
   public CrawlSettingsImpl(Config config) {
 
-    SPARQL_ENDPOINT = config.getString("crawler.sparqlEndpoint");
     PROPERTYPATHS_BASE = config.getStringList("crawler.propertyPaths.base");
     PROPERTYPATHS_NONBASE = config.getStringList("crawler.propertyPaths.nonBase");
+    METADATA_SPARQL_ENDPOINT = config.getString("crawler.metaDataUpdate.sparqlEndpoint");
     METADATA_UPDATE_DURATION = Duration.create(config.getDuration(
       "crawler.metaDataUpdate.maxDuration", TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
     METADATA_UPDATE_MAX_BULK_SIZE = config.getInt("crawler.metaDataUpdate.maxBulkSize");
