@@ -68,6 +68,8 @@ public class UriNodePathCheckingWonMessageProcessor implements WonMessageProcess
   }
 
 
+  // TODO: this should be moved to Well-Formedness check, better done with SPARQL, since
+  // it does not depend on a particular node, and should also be checked at owner app
   private void checkEventGraphURIs(final WonMessage message) {
     //check that graph uris start local or remote message event uris
     URI eventURI = message.getMessageURI();
