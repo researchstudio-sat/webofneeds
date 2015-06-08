@@ -1,0 +1,95 @@
+prefix dc:    <http://purl.org/dc/elements/1.1/>
+prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>
+prefix conn:  <http://localhost:8080/won/resource/connection/>
+prefix event: <http://localhost:8080/won/resource/event/>
+prefix woncrypt: <http://purl.org/webofneeds/woncrypt#>
+prefix xsd:   <http://www.w3.org/2001/XMLSchema#>
+prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix local: <http://localhost:8080/won/resource/>
+prefix won:   <http://purl.org/webofneeds/model#>
+prefix msg:   <http://purl.org/webofneeds/message#>
+prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+prefix ldp:   <http://www.w3.org/ns/ldp#>
+
+
+# true => the content does not form the chain: each content graph should be referenced from exactly one envelope
+#ASK
+#{
+  SELECT
+
+    #?numOfMultiRefContent
+    (if(?numOfMultiRefContent>0, "expected content is referenced from only 1 envelope", "OK") AS
+    ?contentMultiReferenceCheck)
+
+    #?ttlGraphs
+    #?ttlSignatures
+    #?ttlContents
+    #?ttlEnvelopes
+    (if((?ttlContents*2+?ttlEnvelopes*2)!=?ttlGraphs, "a content is not referenced from an envelope", "OK") AS
+    ?contentNotReferencedCheck)
+
+    (if(?numOfMultiRefContent>0 || ((?ttlContents*2+?ttlEnvelopes*2)!=?ttlGraphs), "FAIL", "OK") AS ?check)
+
+  WHERE
+  {
+
+
+    # get number of content graphs that have more than one reference from envelopes
+    { SELECT (count(?multiReferenced) as ?numOfMultiRefContent)
+      { SELECT (?content as ?multiReferenced)
+               (count(?event) as ?refCount)
+        WHERE
+        {
+          GRAPH ?envelope
+          {
+            OPTIONAL {?event msg:hasContent ?content } .
+            ?envelope rdf:type msg:EnvelopeGraph .
+            FILTER ( bound(?content) )
+          } .
+        } GROUP BY ?content
+        HAVING (?refCount > 1)
+      }
+     }
+
+
+
+
+   # get number of named graphs
+   { SELECT (count(DISTINCT  ?graph) as ?ttlGraphs)
+     WHERE
+     {
+      GRAPH ?graph
+      {
+       ?a ?b ?c
+      } .
+     }
+   }
+
+    # get number of envelope graphs
+    { SELECT (count(DISTINCT  ?envelope) as ?ttlEnvelopes)
+      WHERE
+      {
+       GRAPH ?envelope
+       {
+        ?envelope rdf:type msg:EnvelopeGraph .
+       } .
+      }
+    }
+
+
+    # get number of content graphs
+   { SELECT (count(DISTINCT  ?content) as ?ttlContents)
+     WHERE
+     {
+      GRAPH ?envelope
+      {
+      ?envelope rdf:type msg:EnvelopeGraph .
+      ?envelope <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf> ?event .
+      OPTIONAL {?event msg:hasContent ?content } .
+      } .
+     }
+   }
+
+  }
+#}
