@@ -3,11 +3,13 @@ package common.event;
 
 import com.hp.hpl.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import won.protocol.util.RdfUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -45,6 +47,16 @@ public class NeedEvent
     this.eventType = eventType;
     serializedNeedResource = resource;
     serializationFormat = format;
+  }
+
+  public NeedEvent(String uri, String wonNodeUri, TYPE eventType, Dataset ds) {
+    this.uri = uri;
+    this.wonNodeUri = wonNodeUri;
+    this.eventType = eventType;
+    StringWriter sw = new StringWriter();
+    RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
+    serializedNeedResource = sw.toString();
+    serializationFormat = RDFFormat.TRIG.getLang();
   }
 
   public String getUri() {
