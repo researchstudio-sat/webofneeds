@@ -42,6 +42,23 @@ angular.module('won.owner').factory('utilService', function ($http, $q) {
         return typeof o == "string" || (typeof o == "object" && o.constructor === String);
     }
 
+    utilService.readAsDataURL  = function(file) {
+        var deferred = $q.defer();
+
+        var reader = new FileReader();
+
+        reader.onload = function() {
+            deferred.resolve(reader.result);
+        };
+        reader.onerror = function() {
+            deferred.reject(f);
+        };
+
+        reader.readAsDataURL(file);
+
+        return deferred.promise;
+    };
+
     utilService.concatTags = function(tags) {
         if(tags.length>0){
             var concTags ='';
