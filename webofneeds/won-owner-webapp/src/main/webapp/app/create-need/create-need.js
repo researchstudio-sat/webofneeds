@@ -444,12 +444,20 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             needBuilderObject.uri($scope.need.needURI);
         }
 
+        if($scope.need && $scope.need.images) {
+            needBuilderObject.images($scope.need.images);
+        }
+
         // building need as JSON object
         var needJson = needBuilderObject.build();
 
         return needJson;
 
     };
+
+    $scope.onImagesPicked = function(images) {
+        $scope.need.images = images;
+    }
 
     $scope.goToDetailPostPreview = function() {
         var detailPreviewElementId = 'detail-preview';

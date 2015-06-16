@@ -21,13 +21,17 @@ ways to implement the part on the...
 
  */
 
+
 //angular.module('app', ['flux'])
 angular.module('won.owner')
-    .directive('imageUploader', function factory($log, utilService) {
+    .directive('imagePicker', function factory($log, utilService) {
         return {
             restrict: 'E',
             //controllerAs: 'myComponent',
-            scope: {},
+            scope: {
+                onImagesPicked: '='
+                //selectedImages: '=' // use api-methods in controller instead?
+            },
             template: '\
             <h1>Image upload isn\'t fully implemented yet.</h1>\
             <!--<input type="file"/>-->\
@@ -36,8 +40,8 @@ angular.module('won.owner')
                    onchange="angular.element(this).scope().setFile(this.files[0])"> \
             <img ng-show="imageData" src="{{imageData}}" alt="The image you just picked."/>\
             ',
-            controller: function ($scope){ //, MyStore) {
-                $scope.setFile = function(file){
+            link: function (scope){ //, MyStore) {
+                scope.setFile = function(file){
                     //TODO only accept images & limit their size !!!!!!!!!!!!!!! (limit on server-side)
 
                     //https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
@@ -49,8 +53,11 @@ angular.module('won.owner')
                     }
                     utilService.readAsDataURL(file).then(function(fileData){
                         $log.debug("image-uploader.js - readAsDataURL of " + file.name + ": "  + fileData.substring(0, 50) + "(...)");
-                        $scope.imageData = fileData;
+                        scope.imageData = fileData;
                     });
+                    scope.onImagesPicked([file]);
+
+
 
 
                     /*var xhr = new XMLHttpRequest();

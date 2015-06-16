@@ -843,6 +843,12 @@
                 }
                 return this; // to allow cascading calls
             },
+            images: function(imgs) {
+                console.error("won.js - needbuilder.images - NOT IMPLEMENTED YET");
+                //this.getContext()["ma:locator"] = "URL_TO_IMAGE"; //TODO
+                //this.getContext()["ma:height"] = "HEIGHT_OF_IMAGE";
+                //this.getContext()["ma:width"] = "WIDTH_OF_IMAGE";
+            },
             hasTag: function(tags){
                 this.getContentNode()["won:hasTag"] = tags;
                 return this;
