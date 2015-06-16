@@ -649,6 +649,8 @@
                                 }
                             ]
                         }
+                        //{} // add attachments here
+                        // as named graphs (they need to have an uri
 
                     ]
                 };
@@ -845,9 +847,26 @@
             },
             images: function(imgs) {
                 console.error("won.js - needbuilder.images - NOT IMPLEMENTED YET");
-                //this.getContext()["ma:locator"] = "URL_TO_IMAGE"; //TODO
-                //this.getContext()["ma:height"] = "HEIGHT_OF_IMAGE";
-                //this.getContext()["ma:width"] = "WIDTH_OF_IMAGE";
+                //this.getContext()["schema.org.foo:contentLocation"] = "URL_TO_IMAGE"; //TODO
+                //this.getContext()["schema.org.foo:content"] = "/9j/4AAQSkZJRgABAQAAAQABAAD{...}"^^xsd:base64Binary
+                //this.getContext()["schema.org.foo:datePublished"] = "NOW"; //TODO
+
+                /*
+
+                 http://schema.org/ImageObject:
+
+                 "@context": "http://schema.org",
+                 "@type": "ImageObject",
+                 "author": "Jane Doe",
+                 "contentLocation": "Puerto Vallarta, Mexico",
+                 "contentUrl": "mexico-beach.jpg",
+                 "datePublished": "2008-01-25",
+                 "description": "I took this picture while on vacation last year.",
+                 "name": "Beach in Mexico"
+
+                 */
+                //for(var i = 0; i < imgs.size; i++) {
+                //}
             },
             hasTag: function(tags){
                 this.getContentNode()["won:hasTag"] = tags;
