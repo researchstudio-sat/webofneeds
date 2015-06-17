@@ -45,8 +45,8 @@ public class WonSparqlValidator
   private boolean validateSelect(final Dataset input) {
     QueryExecution qe = QueryExecutionFactory.create(constraint, input);
     ResultSet result = qe.execSelect();
-    // for debugging only
-    printResult((QueryExecutionFactory.create(constraint, input)).execSelect());
+    // for debugging only, uncomment when writing new validation queries
+    //printResult((QueryExecutionFactory.create(constraint, input)).execSelect());
 
     while (result.hasNext()) {
       Binding binding = result.nextBinding();
@@ -64,24 +64,7 @@ public class WonSparqlValidator
   }
 
   private void printResult(final ResultSet result) {
-
-
     System.out.println(ResultSetFormatter.asText(result));
-
-//    Map<Var, Set<Node>> resultMap = new HashMap<>();
-//    while (result.hasNext()) {
-//      Binding binding = result.nextBinding();
-//      Iterator<Var> iv = binding.vars();
-//      while (iv.hasNext()) {
-//        Var var = iv.next();
-//        if (!resultMap.containsKey(var)) {
-//          resultMap.put(var, new LinkedHashSet<Node>());
-//        }
-//        Node node = binding.get(var);
-//        resultMap.get(var).add(node);
-//      }
-//    }
-//    System.out.println(resultMap);
   }
 
   private boolean validateAsk(final Dataset input) {
