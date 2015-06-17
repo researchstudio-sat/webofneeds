@@ -31,6 +31,7 @@ public class WonMessageValidator
     dirToValidator.put(resourceDir + "01_basic/", new ArrayList<WonSparqlValidator>());
     dirToValidator.put(resourceDir + "02_prop/", new ArrayList<WonSparqlValidator>());
     dirToValidator.put(resourceDir + "03_chain/", new ArrayList<WonSparqlValidator>());
+    dirToValidator.put(resourceDir + "04_uri/", new ArrayList<WonSparqlValidator>());
     dirToValidator.put(resourceDir + "05_sign/", new ArrayList<WonSparqlValidator>());
     PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 

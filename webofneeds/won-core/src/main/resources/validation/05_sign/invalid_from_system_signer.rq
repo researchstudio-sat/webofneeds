@@ -13,7 +13,7 @@ prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.o
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 
-# the fromSystem envelopes should be signed by senderNode
+# all 'fromSystem' envelopes should be signed by senderNode
 #ASK
 #{
   SELECT
