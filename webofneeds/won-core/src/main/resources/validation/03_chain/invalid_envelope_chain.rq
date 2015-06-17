@@ -13,26 +13,22 @@ prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.o
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 
-# true => the envelopes do not form the chain: one parent envelope containing <=1 child envelope, one leave envelope,
+# the envelopes should form the chain: one parent envelope containing <=1 child envelope, one leave envelope,
 # each envelope in between, if any exist, contains exactly one child envelope.
 #ASK
 #{
   SELECT
-    #?numOfEnvelopes
+    ?numOfEnvelopes
 
-    #?numOfEnvelopesWithoutParent
+    ?numOfEnvelopesWithoutParent
     (if(?numOfEnvelopesWithoutParent!=1, "expected 1 parent envelope", "OK") AS ?parentEnvelopesCheck)
 
-    #?numOfEnvelopesWithoutChild
+    ?numOfEnvelopesWithoutChild
     (if(?numOfEnvelopesWithoutChild!=1, "expected 1 leaf envelope", "OK") AS ?leafEnvelopesCheck)
 
-    #?numOfEnvelopesWithMultiChild
+    ?numOfEnvelopesWithMultiChild
     (if(?numOfEnvelopesWithMultiChild>0, "expected an envelope contains 1 or 0 child envelope", "OK") AS
     ?multichildCheck)
-
-    #TODO
-    #?numOfMissingEnvelopes
-    #?numOfCycles
 
     (if(?numOfEnvelopesWithMultiChild>0 || ?numOfEnvelopesWithoutChild!=1 || ?numOfEnvelopesWithoutParent!=1, "FAIL", "OK") AS
     ?check)

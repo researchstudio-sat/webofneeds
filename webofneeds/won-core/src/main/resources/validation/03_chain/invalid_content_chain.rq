@@ -13,19 +13,18 @@ prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.o
 prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 
-# true => the content does not form the chain: each content graph should be referenced from exactly one envelope
+# the content should be part of the envelope chain: each content graph should be referenced from exactly one envelope
 #ASK
 #{
   SELECT
 
-    #?numOfMultiRefContent
+    ?numOfMultiRefContent
     (if(?numOfMultiRefContent>0, "expected content is referenced from only 1 envelope", "OK") AS
     ?contentMultiReferenceCheck)
 
-    #?ttlGraphs
-    #?ttlSignatures
-    #?ttlContents
-    #?ttlEnvelopes
+    ?ttlGraphs
+    ?ttlContents
+    ?ttlEnvelopes
     (if((?ttlContents*2+?ttlEnvelopes*2)!=?ttlGraphs, "a content is not referenced from an envelope", "OK") AS
     ?contentNotReferencedCheck)
 

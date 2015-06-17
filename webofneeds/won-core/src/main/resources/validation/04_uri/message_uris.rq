@@ -1,0 +1,49 @@
+prefix dc:    <http://purl.org/dc/elements/1.1/>
+prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>
+prefix conn:  <http://localhost:8080/won/resource/connection/>
+prefix event: <http://localhost:8080/won/resource/event/>
+prefix woncrypt: <http://purl.org/webofneeds/woncrypt#>
+prefix xsd:   <http://www.w3.org/2001/XMLSchema#>
+prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
+prefix local: <http://localhost:8080/won/resource/>
+prefix won:   <http://purl.org/webofneeds/model#>
+prefix msg:   <http://purl.org/webofneeds/message#>
+prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+prefix ldp:   <http://www.w3.org/ns/ldp#>
+
+#Any message URI used must conform to a URI pattern specified
+#by the respective publishing service - TODO by another validator?
+
+#there should be not more than 2 message uris?
+#the message uri changes from child ro parent envelope only ones?
+#if there is more than 1 event, they should be related by envelope chain, and
+#the one that is first in the chain (child) should also be specified in the second one
+#as remoteEvent event
+
+#ASK
+#{
+  SELECT
+
+
+    (if(false, "FAIL", "OK")
+    AS ?check)
+
+  WHERE
+  {
+
+    #TODO
+    { SELECT (count(?g) as ?envChainSize)
+      WHERE
+      {
+        GRAPH ?envelope
+        {
+          ?envelope msg:containsEnvelope ?g .
+        } .
+      }
+    }
+
+
+  }
+#}
