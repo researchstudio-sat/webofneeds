@@ -721,6 +721,46 @@ public class WonMessageValidatorTest
     sigModel.add(stmtNew3);
 
 
+    //String test = RdfUtils.writeDatasetToString(invalidDataset, Lang.TRIG);
+    //System.out.println("OUT:\n" + test);
+
+
+    WonMessageValidator validator = new WonMessageValidator();
+    StringBuilder message = new StringBuilder();
+    // validate this invalid dataset
+    boolean valid = validator.validate(invalidDataset, message);
+    Assert.assertTrue("validation is expected to fail", !valid);
+    // actually
+    Assert.assertTrue(message.toString().contains("graph_uris"));
+
+    //reset for further testing:
+    //env2sigModel.add(stmtOld);
+    //env2sigModel.remove(stmtNew);
+
+  }
+
+  @Test
+  public void testEventConsistency() throws IOException {
+
+
+    // create a dataset with invalid remoteEvent uri by replacing the original remote event uri
+    // with the dummy uri
+    Dataset invalidDataset = WonRdfUtils.MessageUtils.copyByDatasetSerialization(new WonMessage(textMessageDataset)
+    ).getCompleteDataset();
+    Model envModel = invalidDataset.getNamedModel(TEXT_ENV3_NAME);
+    String dummyName = TEXT_ENV3_NAME;
+
+    StmtIterator iter = envModel.listStatements(null,
+                                                 WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE,
+                                                 RdfUtils.EMPTY_RDF_NODE);
+    Statement stmtOld = iter.removeNext();
+    Statement stmtNew = envModel.createStatement(stmtOld.getSubject(),
+                                                  stmtOld.getPredicate(),
+                                                  ResourceFactory.createResource(dummyName));
+    envModel.add(stmtNew);
+
+
+
     String test = RdfUtils.writeDatasetToString(invalidDataset, Lang.TRIG);
     System.out.println("OUT:\n" + test);
 
@@ -731,7 +771,7 @@ public class WonMessageValidatorTest
     boolean valid = validator.validate(invalidDataset, message);
     Assert.assertTrue("validation is expected to fail", !valid);
     // actually
-    Assert.assertTrue(message.toString().contains("graph_uris"));
+    Assert.assertTrue(message.toString().contains("number_of_events"));
 
     //reset for further testing:
     //env2sigModel.add(stmtOld);
