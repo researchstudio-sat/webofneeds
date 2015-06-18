@@ -64,7 +64,14 @@ public class FailResponder extends AbstractCamelProcessor
       } else {
         errormessage = String.format("An error occurred while processing message %s", originalMessage.getMessageURI());
       }
-      logger.debug("Caught error while processing WON message {}: {} - sending FailureResponse", originalMessage.getMessageURI(), errormessage);
+      if (logger.isDebugEnabled()){
+        logger.debug("Caught error while processing WON message {} (type:{}) : {} - sending FailureResponse",
+                     new Object[]{originalMessage.getMessageURI(), originalMessage.getMessageType(), errormessage});
+        if (exception != null) {
+          logger.debug("stacktrace of caught exception:", exception);
+        }
+        logger.debug("original message: {}", RdfUtils.toString(originalMessage.getCompleteDataset()));
+      }
       URI newMessageURI = this.wonNodeInformationService.generateEventURI();
       logger.debug("Sending FailureResponse {}", newMessageURI);
       Model errorMessageContent = WonRdfUtils.MessageUtils.textMessage(errormessage);

@@ -117,6 +117,7 @@
        <bean class="won.node.camel.processor.fixed.UriNodePathCheckingWonMessageProcessor">
            <constructor-arg name="needUriPrefix" value="${uri.prefix.need}" />
            <constructor-arg name="eventUriPrefix" value="${uri.prefix.event}" />
+           <constructor-arg name="connUriPrefix" value="${uri.prefix.connection}" />
        </bean>
      </constructor-arg>
   </bean>
