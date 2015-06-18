@@ -47,7 +47,10 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
     {
       GRAPH ?g1
       {
-          ?event msg:hasSenderNode    ?envsigner
+          # delete the line below and uncomment the next line when
+          # the matcher can sign its own envelopes!!!!!!!!!!!!!!!!
+          ?event msg:hasReceiverNode    ?envsigner
+          #?event msg:hasSenderNode    ?envsigner
       } .
       GRAPH ?env
       {
@@ -196,6 +199,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
             ?g3 a msg:EnvelopeGraph .
             ?g3 <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf> ?leafevent .
         } .
+
         GRAPH ?g4
         {
            ?leafevent a msg:FromExternal .
