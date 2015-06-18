@@ -18,11 +18,11 @@ import java.util.Set;
  */
 public class CrawlSparqlService extends SparqlService
 {
-  private static final String METADATA_GRAPH = WON.BASE_URI + "crawlMetadata";
-  private static final String CRAWL_DATE_PREDICATE = WON.BASE_URI + "crawlDate";
-  private static final String CRAWL_STATUS_PREDICATE = WON.BASE_URI + "crawlStatus";
-  private static final String CRAWL_BASE_URI_PREDICATE = WON.BASE_URI + "crawlBaseUri";
-  private static final String CRAWL_WON_NODE_URI_PREDICATE = WON.BASE_URI + "wonNodeUri";
+  public static final String METADATA_GRAPH = WON.BASE_URI + "crawlMetadata";
+  public static final String CRAWL_DATE_PREDICATE = WON.BASE_URI + "crawlDate";
+  public static final String CRAWL_STATUS_PREDICATE = WON.BASE_URI + "crawlStatus";
+  public static final String CRAWL_BASE_URI_PREDICATE = WON.BASE_URI + "crawlBaseUri";
+  public static final String CRAWL_WON_NODE_URI_PREDICATE = WON.BASE_URI + "wonNodeUri";
 
   public CrawlSparqlService(final String sparqlEndpoint) {
     super(sparqlEndpoint);
