@@ -677,8 +677,14 @@
             getMainNode: function () {
                 return this.data["@graph"][0]["@graph"][0];
             },
-
-            uri: function (needURI) {
+            getNeedUri: function() {
+                return this.data["@graph"][0]["@graph"][0]['@id'];
+            },
+            envelopeContentUri: function(uri) {
+                this.data['@graph'][0]['@id'] = uri;
+                return this;
+            },
+            needUri: function (needURI) {
                 this.data["@graph"][0]["@graph"][0]['@id'] = needURI;
                 return this;
             },
@@ -845,6 +851,7 @@
                 }
                 return this; // to allow cascading calls
             },
+            //TODO: add images
             images: function(imgs) {
                 console.error("won.js - needbuilder.images - NOT IMPLEMENTED YET");
                 //this.getContext()["schema.org.foo:contentLocation"] = "URL_TO_IMAGE"; //TODO
@@ -872,10 +879,8 @@
                 this.getContentNode()["won:hasTag"] = tags;
                 return this;
             },
-            //TODO: add images
             build: function () {
-
-                return this.data;
+                return won.clone(this.data);
             }
         }
         won.DraftBuilder = function DraftBuilder(data){

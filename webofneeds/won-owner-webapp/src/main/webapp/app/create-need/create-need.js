@@ -388,13 +388,13 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     $scope.publishClicked = function () {
         if(lock== false){
             lock = true;
-            var needJson = $scope.buildNeedJson();
+            var needBuilder = $scope.partiallyInitNeedBuilder();
 
             // make sure the user is registered (either with account or private link),
             // then publish the need, so that it is under that account
             var newNeedUriPromise = userService.setUpRegistrationForUserPublishingNeed().then(
                 function() {
-                     return wonService.createNeed(needJson);
+                     return wonService.createNeed(needBuilder);
                 }
             );
             //TODO why are the following calls not part of the promise chain?
@@ -414,7 +414,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     }
 
 
-	$scope.buildNeedJson = function () {
+	$scope.partiallyInitNeedBuilder = function () {
 
         // creating need object
         var needBuilderObject = new window.won.NeedBuilder().setContext();
@@ -442,17 +442,15 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }
 
         if (hasUri($scope.need)) {
-            needBuilderObject.uri($scope.need.needURI);
+            needBuilderObject.needUri($scope.need.needURI);
         }
 
         if($scope.need && $scope.need.images) {
             needBuilderObject.images($scope.need.images);
         }
 
-        // building need as JSON object
-        var needJson = needBuilderObject.build();
 
-        return needJson;
+        return needBuilderObject;
 
     };
 

@@ -437,19 +437,27 @@ angular.module('won.owner').factory('wonService', function (
      * @param needAsJsonLd
      * @returns {*}
      */
-    wonService.createNeed = function(needAsJsonLd) {
+    wonService.createNeed = function(needBuilder) {
         var deferred = $q.defer();
-        var needData = won.clone(needAsJsonLd);
+        var needData = won.clone(needBuilder.build());
         //TODO: Fix hard-coded URIs here!
-        var eventUri = privateData.defaultWonNodeUri + "/event/" + utilService.getRandomInt(1,9223372036854775807);
-        var needUri = needData['@graph'][0]['@graph'][0]['@id'];
+        var genRndUri = function(path) {
+            return privateData.defaultWonNodeUri + "/" + path + "/" + utilService.getRandomInt(1,9223372036854775807);
+        }
+        var genRndEventUri = genRndUri.bind(null, "event"); //applies "event" without resolving the function
+        var genRndNeedUri = genRndUri.bind(null, "need"); //applies "event" without resolving the function
+        var eventUri = genRndEventUri();
+        var needUri = needBuilder.getNeedUri();
         if (needUri == null || 0 === needUri.length) {
-            needUri =  privateData.defaultWonNodeUri + "/need/" + utilService.getRandomInt(1,9223372036854775807);
-            needData['@graph'][0]['@graph'][0]['@id'] = needUri;
+            needUri = genRndNeedUri();
+            needBuilder.needUri(needUri);
         }
         var wonNode = privateData.defaultWonNodeUri;
-        needData['@graph'][0]['@id'] = needUri + "/core/#data";
-        var message = new won.MessageBuilder(won.WONMSG.createMessage, needData)
+
+        // TODO for images() generate more of these and append as sibling graphs (via subindex?)
+        needBuilder.envelopeContentUri(eventUri + "#envelope-content");
+
+        var message = new won.MessageBuilder(won.WONMSG.createMessage, needBuilder.build())
             .eventURI(eventUri)
             .hasReceiverNode(wonNode)
             .hasSenderNeed(needUri)
