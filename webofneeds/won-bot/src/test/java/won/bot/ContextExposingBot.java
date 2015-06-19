@@ -14,26 +14,13 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.events.event.impl;
+package won.bot;
 
-import won.bot.framework.events.event.BaseEvent;
+import won.bot.framework.events.EventListenerContext;
 
 /**
- * Event to be published when an error occurs.
+ *
  */
-public class ErrorEvent extends BaseEvent
-{
-  private Throwable throwable;
-
-  public ErrorEvent(final Throwable throwable) {
-    this.throwable = throwable;
-  }
-
-  public Throwable getThrowable() {
-    return throwable;
-  }
-
-  public void setThrowable(final Throwable throwable) {
-    this.throwable = throwable;
-  }
+public interface ContextExposingBot {
+  public EventListenerContext getExposedEventListenerContext();
 }

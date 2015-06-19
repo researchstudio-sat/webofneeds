@@ -363,7 +363,7 @@ public class EventBot extends TriggeredBot
           if (! done) {
             //make sure we send only one WorkDoneEvent
             logger.warn("saw an ErrorEvent, stopping the bot by publishing a WorkDoneEvent");
-            getEventListenerContext().getEventBus().publish(new WorkDoneEvent());
+            getEventListenerContext().getEventBus().publish(new WorkDoneEvent(EventBot.this));
           }
           setDoneAndUnsubscribe();
         }

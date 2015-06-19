@@ -16,24 +16,20 @@
 
 package won.bot.framework.events.event.impl;
 
-import won.bot.framework.events.event.BaseEvent;
+import won.bot.framework.bot.Bot;
 
 /**
- * Event to be published when an error occurs.
+ * Indicates the failure of an integration test.
  */
-public class ErrorEvent extends BaseEvent
-{
-  private Throwable throwable;
+public class TestFailedEvent extends TestFinishedEvent {
+  private String message;
 
-  public ErrorEvent(final Throwable throwable) {
-    this.throwable = throwable;
+  public TestFailedEvent(Bot bot, String message) {
+    super(bot);
+    this.message = message;
   }
 
-  public Throwable getThrowable() {
-    return throwable;
-  }
-
-  public void setThrowable(final Throwable throwable) {
-    this.throwable = throwable;
+  public String getMessage() {
+    return message;
   }
 }

@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-package won.bot.impl.failsim;
+package won.bot.integrationtest.security;
 
-import won.bot.framework.bot.base.EventBot;
+import won.bot.IntegrationtestBot;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.impl.*;
 import won.bot.framework.events.bus.EventBus;
@@ -25,11 +25,12 @@ import won.bot.framework.events.event.impl.*;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.events.listener.impl.ActionOnFirstNEventsListener;
 import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
+import won.bot.integrationtest.failsim.ConstantNewEventURIDecorator;
 
 /**
  *
  */
-public class SameNeedURIFailureBot extends EventBot
+public class DuplicateMessageURIFailureBot extends IntegrationtestBot
 {
   private static final String NAME_NEEDS = "needs";
 
@@ -47,7 +48,7 @@ public class SameNeedURIFailureBot extends EventBot
               ctx,
               new CreateNeedWithFacetsAction(
                 //use a decorator that will cause the same need URI to be used in each create message
-                new ConstantNewNeedURIDecorator(ctx, "constantNeedURI" + System.currentTimeMillis()),NAME_NEEDS),
+                new ConstantNewEventURIDecorator(ctx, "constantMsgURI" + System.currentTimeMillis()),NAME_NEEDS),
               2));
 
     //log error if we can create 2 needs
@@ -57,8 +58,8 @@ public class SameNeedURIFailureBot extends EventBot
               ctx, 2,
               new MultipleActions(ctx,
                 new LogErrorAction(ctx,
-                        "Should not have been able to create 2 needs with identical URI"),
-                new PublishEventAction(ctx, new FailureEvent()))));
+                        "Should not have been able to create 2 needs using message with identical URIs"),
+                new PublishEventAction(ctx, new TestFailedEvent(this,"Should not have been able to create 2 needs with identical URI")))));
 
     //log success if we could create 1 need
     bus.subscribe(
@@ -84,11 +85,12 @@ public class SameNeedURIFailureBot extends EventBot
             new ActionOnceAfterNEventsListener(ctx,2,
               new MultipleActions(ctx,
                 new LogAction(ctx,"Test passed."),
+                new PublishEventAction(ctx, new TestPassedEvent(this)),
                 new DeactivateAllNeedsAction(ctx))));
 
     //when we have a FailureEvent, we're done, too. Deacivate the needs and signal we're finished
     bus.subscribe(
-            FailureEvent.class,
+            TestFailedEvent.class,
             new ActionOnceAfterNEventsListener(ctx,1,
                     new MultipleActions(ctx,
                             new LogAction(ctx,"Test failed."),
@@ -98,7 +100,7 @@ public class SameNeedURIFailureBot extends EventBot
     //wait for the needDeactivated event, then say we're done.
     bus.subscribe(
             NeedDeactivatedEvent.class, new ActionOnceAfterNEventsListener(
-            ctx, 1, new SignalWorkDoneAction(ctx)));
+            ctx, 1, new SignalWorkDoneAction(ctx, this)));
 
 
     //TODO: fix: bot runs forever even if test fails.
