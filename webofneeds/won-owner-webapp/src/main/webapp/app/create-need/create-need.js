@@ -397,6 +397,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
                      return wonService.createNeed(needJson);
                 }
             );
+            //TODO why are the following calls not part of the promise chain?
 
             // TODO: should the draft removing part be changed to run only on success from newNeedUriPromise?
             if ($scope.draftURI != null) {
