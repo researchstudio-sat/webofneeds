@@ -45,7 +45,6 @@ public class WellformednessCheckingWonMessageProcessor implements WonMessageProc
 
   @Override
   public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
-    logger.warn("well-formedness check not yet completely implemented!");
     Dataset dataset = message.getCompleteDataset();
     WonMessageValidator validator = new WonMessageValidator();
     StringBuilder errorMessage = new StringBuilder("Message is not valid, failed at check ");
