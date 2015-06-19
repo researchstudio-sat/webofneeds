@@ -680,6 +680,15 @@
             getNeedUri: function() {
                 return this.data["@graph"][0]["@graph"][0]['@id'];
             },
+            /* not sure if good practice to mix up message creation with need creation like this :|
+            on the other hand there's references to the message. these are necessarily unbound variables
+            that should be set via a single accessor function. the question is, why are they there in
+            the first place?
+            eventUri: function(eventUri) {
+                this.data['@graph'][0]['@id'] = eventUri + "#content-need";
+                //TODO set eventUri + "#content-attachment-0" for all attachments
+                return this;
+            },*/
             envelopeContentUri: function(uri) {
                 this.data['@graph'][0]['@id'] = uri;
                 return this;

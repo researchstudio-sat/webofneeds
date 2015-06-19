@@ -454,8 +454,13 @@ angular.module('won.owner').factory('wonService', function (
         }
         var wonNode = privateData.defaultWonNodeUri;
 
+        needBuilder.envelopeContentUri(eventUri + "#content-need");
+
         // TODO for images() generate more of these and append as sibling graphs (via subindex?)
-        needBuilder.envelopeContentUri(eventUri + "#envelope-content");
+        // e.g. first image:
+        // needBuilder.envelopeContentUri(eventUri + "#content-attachment-0");
+        // it also needs a new "needUri"
+
 
         var message = new won.MessageBuilder(won.WONMSG.createMessage, needBuilder.build())
             .eventURI(eventUri)
