@@ -81,5 +81,11 @@
       <bean class="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor" />
     </constructor-arg>
   </bean>
+  <!-- uri related well-formedness of messages -->
+  <bean name="uriNodePathChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+        <bean class="won.protocol.message.processor.impl.UriConsistencyCheckingWonMessageProcessor" />
+    </constructor-arg>
+  </bean>
 
 </beans>

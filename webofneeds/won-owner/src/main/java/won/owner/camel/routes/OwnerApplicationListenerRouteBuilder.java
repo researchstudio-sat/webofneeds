@@ -53,6 +53,7 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
                            .wireTap("bean:messagingService?method=inspectMessage")
                             .to("bean:wonMessageIntoCamelProcessor")
                             .to("bean:wellformednessChecker")
+                            .to("bean:uriNodePathChecker")
                             .to("bean:signatureChecker")
                             //this expects a bean with name 'mainOwnerMessageProcessor' in the application context
                             //this bean is *not* provided by the won-owner module. This allows the definition of a
