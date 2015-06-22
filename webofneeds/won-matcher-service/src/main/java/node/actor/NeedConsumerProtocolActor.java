@@ -63,7 +63,7 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
 
           // save the need
           Dataset ds = convertBodyToDataset(camelMsg.body(), Lang.TRIG);
-          sparqlService.updateDataset(ds);
+          sparqlService.updateNamedGraphsOfDataset(ds);
 
           // publish an internal need event
           NeedEvent event = null;

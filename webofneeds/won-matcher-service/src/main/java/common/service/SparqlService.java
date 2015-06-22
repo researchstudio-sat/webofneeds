@@ -34,12 +34,12 @@ public class SparqlService
   }
 
   /**
-   * Update a graph by first deleting it and afterwards inserting the triples of the new model.
+   * Update named graph by first deleting it and afterwards inserting the triples of the new model.
    *
-   * @param graph graph to be updated
+   * @param graph named graph to be updated
    * @param model model that holds triples to set
    */
-  public void updateGraph(String graph, Model model) {
+  public void updateNamedGraph(String graph, Model model) {
 
     StringWriter sw = new StringWriter();
     RDFDataMgr.write(sw, model, Lang.NTRIPLES);
@@ -48,11 +48,11 @@ public class SparqlService
   }
 
   /**
-   * Update a dataset of graphs first deleting them and afterwards inserting the triples of the new models.
+   * Update a dataset of names graphs first deleting them and afterwards inserting the triples of the new models.
    *
    * @param ds
    */
-  public void updateDataset(Dataset ds) {
+  public void updateNamedGraphsOfDataset(Dataset ds) {
 
     Iterator<String> graphNames = ds.listNames();
     while (graphNames.hasNext()) {
@@ -60,7 +60,7 @@ public class SparqlService
       log.debug("Save dataset");
       String graphName = graphNames.next();
       Model model = ds.getNamedModel(graphName);
-      updateGraph(graphName, model);
+      updateNamedGraph(graphName, model);
     }
   }
 
