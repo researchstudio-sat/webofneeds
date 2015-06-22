@@ -74,7 +74,7 @@ public class WorkerCrawlerActor extends UntypedActor
     }
 
     // Save dataset to triple store
-    sparqlService.updateDataset(ds);
+    sparqlService.updateNamedGraphsOfDataset(ds);
     String wonNodeUri = extractWonNodeUri(ds, uriMsg.getUri());
     if (wonNodeUri == null) {
       wonNodeUri = uriMsg.getWonNodeUri();

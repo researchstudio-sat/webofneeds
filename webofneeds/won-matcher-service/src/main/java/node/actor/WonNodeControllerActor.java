@@ -162,7 +162,7 @@ public class WonNodeControllerActor extends UntypedActor
     try {
       // request the resource and save the data
       Dataset ds = httpRequestService.requestDataset(wonNodeUri);
-      sparqlService.updateDataset(ds);
+      sparqlService.updateNamedGraphsOfDataset(ds);
       WonNodeInfo nodeInfo = sparqlService.getWonNodeInfoFromDataset(ds);
 
       // subscribe for need updates
