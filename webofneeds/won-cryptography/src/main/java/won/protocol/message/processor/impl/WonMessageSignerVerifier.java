@@ -8,6 +8,7 @@ import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgor
 import won.cryptography.rdfsign.*;
 import won.protocol.message.SignatureReference;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonSigner;
 import won.protocol.vocabulary.WONMSG;
 
 import java.security.PrivateKey;

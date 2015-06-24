@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingKeys;
+import won.protocol.message.WonSigner;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.SFSIG;
 

@@ -26,6 +26,14 @@
     <version>0.2-SNAPSHOT</version>
     <name>Core</name>
 
+    <repositories>
+        <repository>
+            <id>signingframework-repo-local</id>
+            <name>repository for signingframework</name>
+            <url>file:${project.basedir}/signingframework-repo</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!--
 
@@ -215,6 +223,13 @@
         <dependency>
             <groupId>net.sf.supercsv</groupId>
             <artifactId>super-csv</artifactId>
+        </dependency>
+
+
+        <!-- doesn't exist in the public repository -->
+        <dependency>
+            <groupId>de.uni_koblenz.aggrimm.icp</groupId>
+            <artifactId>signingframework</artifactId>
         </dependency>
 
     </dependencies>

@@ -12,6 +12,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import won.protocol.message.ModelConverter;
 
 import java.io.*;
 import java.util.LinkedList;

@@ -6,6 +6,8 @@ import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
 import org.junit.Assert;
 import org.junit.Test;
 import won.cryptography.utils.TestSigningUtils;
+import won.protocol.message.ModelConverter;
+import won.protocol.message.WonAssembler;
 import won.protocol.util.RdfUtils;
 
 import java.math.BigInteger;

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.cryptography.service.CryptographyService;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
@@ -45,6 +46,18 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor
     }
   }
 
+  public WonMessage process(final WonMessageBuilder builder) throws WonMessageProcessingException {
+    // use default key for signing
+    PrivateKey privateKey = cryptoService.getPrivateKey(defaultKeyUri);
+    try {
+      return processWithKey(builder, defaultKeyUri, privateKey);
+    } catch (Exception e) {
+      //TODO proper exceptions
+      e.printStackTrace();
+      throw new WonMessageProcessingException("Failed to sign message", e);
+    }
+  }
+
   public WonMessage processOnBehalfOfNeed(final WonMessage message) throws WonMessageProcessingException {
     // use senderNeed key for signing
     PrivateKey privateKey = cryptoService.getPrivateKey(message.getSenderNeedURI().toString());
@@ -57,9 +70,48 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor
     }
   }
 
+  public WonMessage processOnBehalfOfNeed(final WonMessageBuilder builder) throws WonMessageProcessingException {
+    // use senderNeed key for signing
+    //TODO temp necessity to retrieve the need uri for the key
+    WonMessage tempMessage = builder.build();
+    PrivateKey privateKey = cryptoService.getPrivateKey(tempMessage.getSenderNeedURI().toString());
+    try {
+      return processWithKey(tempMessage, tempMessage.getSenderNeedURI().toString(), privateKey);
+    } catch (Exception e) {
+      //TODO proper exceptions
+      e.printStackTrace();
+      throw new WonMessageProcessingException("Failed to sign message " + tempMessage.getMessageURI().toString());
+    }
+  }
+
+//  private WonMessage processWithKey(final WonMessage wonMessage, final String privateKeyUri,
+//                                    final PrivateKey privateKey) throws Exception {
+//    logger.info("TO SIGN:\n" + WonMessageEncoder.encode(wonMessage, Lang.TRIG) +
+//                  "\nwith obtained private key: " + (privateKey != null) + "\n" + privateKeyUri);
+//    Dataset msgDataset =  WonMessageEncoder.encodeAsDataset(wonMessage);
+//    WonSigner signer = new WonSigner(msgDataset, new SignatureAlgorithmFisteus2010());
+//    List<SignatureReference> sigRefs = signer.sign(privateKey, privateKeyUri,
+//                                                   wonMessage.getContentGraphURIs());
+//    WonKeysExtractor extractor = new WonKeysExtractor();
+//    extractor.addSigReferences(msgDataset.getNamedModel(wonMessage.getOuterEnvelopeGraphURI().toString()),
+//                               wonMessage.getMessageURI(), sigRefs);
+//    signer.sign(privateKey, privateKeyUri, wonMessage.getOuterEnvelopeGraphURI().toString());
+//    WonMessage wonMessageSigned = WonMessageDecoder.decodeFromDataset(msgDataset);
+//    logger.info("SIGNED:\n" + WonMessageEncoder.encode(wonMessageSigned, Lang.TRIG));
+//
+//    return wonMessageSigned;
+//  }
+
   private WonMessage processWithKey(final WonMessage wonMessage, final String privateKeyUri,
                                     final PrivateKey privateKey) throws Exception {
     WonMessage signed = WonMessageSignerVerifier.sign(privateKey, privateKeyUri, wonMessage);
+    logger.debug("SIGNED with key " + privateKeyUri + ":\n" + WonMessageEncoder.encode(signed, Lang.TRIG));
+    return signed;
+  }
+
+  private WonMessage processWithKey(final WonMessageBuilder wonMessageBuilder, final String privateKeyUri,
+                                    final PrivateKey privateKey) throws Exception {
+    WonMessage signed = wonMessageBuilder.build(privateKeyUri, privateKey);
     logger.debug("SIGNED with key " + privateKeyUri + ":\n" + WonMessageEncoder.encode(signed, Lang.TRIG));
     return signed;
   }

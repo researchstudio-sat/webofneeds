@@ -2,9 +2,8 @@ package won.protocol.message;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.*;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.util.CheapInsecureRandomString;
 import won.protocol.util.DefaultPrefixUtils;
@@ -15,6 +14,7 @@ import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
+import java.security.PrivateKey;
 import java.util.*;
 
 /**
@@ -63,7 +63,7 @@ public class WonMessageBuilder
   private Long receivedTimestamp;
 
 
-
+  private String envelopeGraphURI;
 
   public WonMessage build() throws WonMessageBuilderException {
     return build(null);
@@ -79,7 +79,12 @@ public class WonMessageBuilder
    */
   public WonMessage build(Dataset dataset)
     throws WonMessageBuilderException {
+    Dataset messageDataset = buildDataset(dataset);
+    return new WonMessage(messageDataset);
 
+  }
+
+  private Dataset buildDataset(Dataset dataset) {
     if (dataset == null) {
       dataset = DatasetFactory.createMem();
     }
@@ -87,18 +92,14 @@ public class WonMessageBuilder
       throw new WonMessageBuilderException("No messageURI specified");
     }
 
-
-
-
-
     Model envelopeGraph = ModelFactory.createDefaultModel();
     DefaultPrefixUtils.setDefaultPrefixes(envelopeGraph);
     //create a new envelope graph uri and add the envelope graph to the dataset
-    String envelopeGraphURI = RdfUtils.createNewGraphURI(messageURI.toString(), ENVELOPE_URI_SUFFIX,4,dataset).toString();
+    envelopeGraphURI = RdfUtils.createNewGraphURI(messageURI.toString(), ENVELOPE_URI_SUFFIX,4,dataset).toString();
     dataset.addNamedModel(envelopeGraphURI, envelopeGraph);
     // message URI
     Resource messageEventResource = envelopeGraph.createResource(messageURI.toString(),
-      this.wonMessageDirection.getResource());
+                                                                 this.wonMessageDirection.getResource());
     //the [envelopeGraphURI] rdf:type msg:EnvelopeGraph makes it easy to select graphs by type
     Resource envelopeGraphResource = envelopeGraph.createResource(envelopeGraphURI, WONMSG.ENVELOPE_GRAPH);
     envelopeGraphResource.addProperty(RDFG.SUBGRAPH_OF, messageEventResource);
@@ -152,11 +153,11 @@ public class WonMessageBuilder
     if (isResponseToMessageURI != null) {
       if (wonMessageType != WonMessageType.SUCCESS_RESPONSE && wonMessageType != WonMessageType.FAILURE_RESPONSE ){
         throw new IllegalArgumentException("isResponseToMessageURI can only be used for SUCCESS_RESPONSE and " +
-          "FAILURE_RESPONSE types");
+                                             "FAILURE_RESPONSE types");
       }
       if (isResponseToMessageType == null){
         throw new IllegalArgumentException("response messages must specify the type of message they are a response to" +
-          ". Use setIsResponseToMessageType(type)");
+                                             ". Use setIsResponseToMessageType(type)");
       }
       messageEventResource.addProperty(
         WONMSG.IS_RESPONSE_TO,
@@ -172,8 +173,8 @@ public class WonMessageBuilder
 
     if (correspondingRemoteMessageURI != null) {
       messageEventResource.addProperty(
-              WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE,
-              envelopeGraph.createResource(correspondingRemoteMessageURI.toString()));
+        WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE,
+        envelopeGraph.createResource(correspondingRemoteMessageURI.toString()));
     }
 
     if (sentTimestamp != null) {
@@ -196,7 +197,7 @@ public class WonMessageBuilder
           .getModel().createResource(contentUriString));
       //add the [content-graph] rdfg:subGraphOf [message-uri] triple to the envelope
       envelopeGraph.createStatement(envelopeGraph.getResource(contentURI.toString()), RDFG.SUBGRAPH_OF,
-        messageEventResource);
+                                    messageEventResource);
 
       Model signatureGraph = signatureMap.get(contentURI);
       if (signatureGraph != null) {
@@ -215,9 +216,80 @@ public class WonMessageBuilder
 
       //now replace the content URIs
     }
+    return dataset;
+  }
 
-    return new WonMessage(dataset);
+  public WonMessage build(final String privateKeyUri,
+                          final PrivateKey privateKey) throws WonMessageBuilderException {
+      Dataset msgDataset = buildDataset(null);
 
+
+    // this assumes that only content referenced from the outer envelope has to be signed
+    // and the envelope itself. Additionally, if the envelope contains another envelope,
+    // that envelope signature reference has to be included in this envelope before it is signed.
+    WonSigner signer = new WonSigner(msgDataset, new SignatureAlgorithmFisteus2010());
+    try {
+      signContents(msgDataset, signer, privateKey, privateKeyUri);
+      addContainedEnvelopeSigReference(msgDataset);
+      signEnvelope(signer, privateKey, privateKeyUri);
+    } catch (Exception e) {
+      throw new WonMessageBuilderException(e);
+    }
+    return new WonMessage(msgDataset);
+
+  }
+
+  private void signContents(final Dataset msgDataset,
+                                   final WonSigner signer, final PrivateKey privateKey,
+                                   final String privateKeyUri) throws Exception {
+
+    for (URI contentURI : this.contentMap.keySet()) {
+      SignatureReference sigRef = signer.sign(privateKey, privateKeyUri, contentURI.toString()).get(0);
+      addSignatureReference(this.messageURI.toString(), sigRef, this.envelopeGraphURI, msgDataset);
+    }
+  }
+
+  private void addContainedEnvelopeSigReference(final Dataset msgDataset) {
+    Model envelope = msgDataset.getNamedModel(this.envelopeGraphURI);
+    NodeIterator it = envelope.listObjectsOfProperty(WONMSG.CONTAINS_ENVELOPE);
+    if (it.hasNext()) {
+      String containedEnvelopeURI = it.next().asResource().getURI();
+      //find its signature and add as reference
+      for (String uri : RdfUtils.getModelNames(msgDataset)) {
+        Model model = msgDataset.getNamedModel(uri);
+        if (WonRdfUtils.SignatureUtils.isSignature(model)) {
+          String signedURI = WonRdfUtils.SignatureUtils.getSignedGraphUri(uri, model);
+          if (signedURI.equals(containedEnvelopeURI)) {
+            String value = WonRdfUtils.SignatureUtils.getSignatureValue(uri, model);
+            SignatureReference sigRef = new SignatureReference(this.envelopeGraphURI, signedURI, uri, value);
+            addSignatureReference(this.messageURI.toString(), sigRef, this.envelopeGraphURI, msgDataset);
+          }
+        }
+      }
+    }
+
+  }
+
+  private void signEnvelope(final WonSigner signer, final PrivateKey privateKey,
+                                    final String privateKeyUri) throws Exception {
+    signer.sign(privateKey, privateKeyUri, this.envelopeGraphURI).get(0);
+  }
+
+  private void addSignatureReference(final String msgUri, final SignatureReference sigRef,
+                                            final String envUri, final Dataset msgDataset) {
+
+    Model envelopeGraph = msgDataset.getNamedModel(envUri);
+    Resource messageEventResource = envelopeGraph.createResource(msgUri);
+    Resource bnode = envelopeGraph.createResource(AnonId.create());
+    messageEventResource.addProperty(
+      WONMSG.REFERENCES_SIGNATURE_PROPERTY,
+      bnode);
+    bnode.addProperty(WONMSG.HAS_SIGNATURE_GRAPH_PROPERTY,
+                      envelopeGraph.createResource(sigRef.getSignatureGraphUri()));
+    bnode.addProperty(WONMSG.HAS_SIGNED_GRAPH_PROPERTY,
+                      envelopeGraph.createResource(sigRef.getSignedGraphUri()));
+    bnode.addProperty(WONMSG.HAS_SIGNATURE_VALUE_PROPERTY,
+                      envelopeGraph.createLiteral(sigRef.getSignatureValue()));
   }
 
   public void addWrappedOrForwardedMessage(final Dataset dataset, final Model envelopeGraph,
