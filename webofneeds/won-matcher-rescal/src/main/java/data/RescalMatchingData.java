@@ -46,9 +46,9 @@ public class RescalMatchingData
   private static final Logger logger = LoggerFactory.getLogger(RescalMatchingData.class);
 
   private static final int MAX_DIMENSION = 1000000;
-  private static final String NEED_PREFIX = "Need: ";
-  private static final String ATTRIBUTE_PREFIX = "Attr: ";
-  private static final String HEADERS_FILE = "headers.txt";
+  public static final String NEED_PREFIX = "Need: ";
+  public static final String ATTRIBUTE_PREFIX = "Attr: ";
+  public static final String HEADERS_FILE = "headers.txt";
 
   private ThirdOrderSparseTensor tensor;
   private ArrayList<String> needs;
@@ -234,6 +234,10 @@ public class RescalMatchingData
       tensor.hasNonZeroEntryInRow(needIndex, SliceType.NEED_TYPE.ordinal()) ||
       tensor.hasNonZeroEntryInRow(needIndex, SliceType.TITLE.ordinal()));
     return hasAttribute;
+  }
+
+  public ArrayList<String> getNeedHeaders() {
+    return needs;
   }
 
   public List<String> getNeeds() {

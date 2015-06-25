@@ -5,12 +5,13 @@ import org.la4j.matrix.Matrix;
 import org.la4j.matrix.functor.MatrixProcedure;
 import org.la4j.matrix.sparse.CCSMatrix;
 import org.la4j.vector.Vector;
+import org.la4j.vector.functor.VectorProcedure;
 import org.la4j.vector.sparse.CompressedVector;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Sparse third order tensor based on la4j implementation of sparse matrices.
@@ -115,24 +116,14 @@ public class ThirdOrderSparseTensor
     return dims;
   }
 
-  public void writeToFile(String folder, String filePrefix) throws IOException {
-
-    int i = 0;
-    for (CCSMatrix slice : slices) {
-      MatrixMarketStream mms = new MatrixMarketStream(
-        new FileOutputStream(new File(folder + filePrefix + "-" + i + ".mtx")));
-      mms.writeMatrix(slice);
-      i++;
-    }
-  }
-
   public void writeSliceToFile(String fileName, int slice) throws IOException {
     MatrixMarketStream mms = new MatrixMarketStream(
       new FileOutputStream(new File(fileName)));
     mms.writeMatrix(slices[slice]);
   }
 
-  private static class CopyToMatrix implements MatrixProcedure
+  // class used to make a copy of a matrix
+  private class CopyToMatrix implements MatrixProcedure
   {
     private Matrix copy;
 
@@ -143,6 +134,25 @@ public class ThirdOrderSparseTensor
     @Override
     public void apply(int i, int j, double value) {
       copy.set(i, j, value);
+    }
+  }
+
+  // class used to return all non-zero indices of a Vector
+  private class NonZeroVectorProcedure implements VectorProcedure
+  {
+    private List<Integer> nonZeroIndices;
+
+    public NonZeroVectorProcedure() {
+      nonZeroIndices = new LinkedList<>();
+    }
+
+    @Override
+    public void apply(final int i, final double value) {
+      nonZeroIndices.add(i);
+    }
+
+    public Collection<Integer> getNonZeroIndices() {
+      return nonZeroIndices;
     }
   }
 }
