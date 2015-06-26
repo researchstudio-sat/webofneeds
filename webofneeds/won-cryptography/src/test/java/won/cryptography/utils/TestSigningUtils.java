@@ -128,6 +128,7 @@ public class TestSigningUtils {
 
     KeyStoreService storeServiceOnNode = new KeyStoreService(new File("node-keys.jks"));
     KeyStoreService storeServiceOnOwner = new KeyStoreService(new File("owner-keys.jks"));
+    KeyStoreService storeServiceOnMatcher = new KeyStoreService(new File("matcher-keys.jks"));
     KeyPairService keyPairService = new KeyPairService();
     CertificateService certificateService = new CertificateService();
 
@@ -141,6 +142,10 @@ public class TestSigningUtils {
                    "http://sat016.researchstudio.at:8080/owner/rest/keys",
                    "http://localhost:8080/owner/rest/keys"},
                  keyPairService, certificateService, storeServiceOnOwner);
+    addKeyByUris(new String[]{
+                   "http://sat001.researchstudio.at:8080/matcher/resource",
+                   "http://localhost:8080/matcher/resource"},
+                 keyPairService, certificateService, storeServiceOnMatcher);
 
   }
 

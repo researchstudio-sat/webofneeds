@@ -1,0 +1,62 @@
+prefix dc:    <http://purl.org/dc/elements/1.1/>
+prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>
+prefix conn:  <http://localhost:8080/won/resource/connection/>
+prefix event: <http://localhost:8080/won/resource/event/>
+prefix woncrypt: <http://purl.org/webofneeds/woncrypt#>
+prefix xsd:   <http://www.w3.org/2001/XMLSchema#>
+prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix local: <http://localhost:8080/won/resource/>
+prefix won:   <http://purl.org/webofneeds/model#>
+prefix msg:   <http://purl.org/webofneeds/message#>
+prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+prefix ldp:   <http://www.w3.org/ns/ldp#>
+
+# any named graph in D should be either a signature graph or a signed graph.
+
+#ASK
+#{
+  SELECT
+
+  ?numGraphs
+  ?numCorrectSignatures
+
+
+    (if((?numCorrectSignatures*2) != ?numGraphs || ?numCorrectSignatures < 1, "FAIL", "OK") AS ?check)
+
+  WHERE
+  {
+
+
+    # count number of signature graphs that have corresponding signed graph
+    { SELECT (count(?g) as ?numCorrectSignatures)
+        WHERE
+        {
+        GRAPH ?g
+            {
+              ?g rdf:type signature:Signature .
+              ?g msg:hasSignedGraph ?signed .
+            } .
+
+        GRAPH ?signed
+            {
+                FILTER NOT EXISTS
+                    {  ?signed rdf:type signature:Signature . }
+            } .
+        }
+     }
+
+
+    # count number of graphs
+    {  SELECT (count(DISTINCT ?g) as ?numGraphs) WHERE
+     {
+       GRAPH ?g
+       {
+               ?a ?b ?c .
+       } .
+     }
+    }
+
+
+  }
+#}

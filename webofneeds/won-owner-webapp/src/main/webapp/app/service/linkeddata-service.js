@@ -812,7 +812,6 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getWonNodeUriOfNeed(needUri)
             .then(function(wonNodeUri){
                 var ret = {};
-                ret[won.WONMSG.hasSender] = needUri;
                 ret[won.WONMSG.hasSenderNeed] = needUri;
                 ret[won.WONMSG.hasSenderNode] = wonNodeUri;
                 ret[won.WONMSG.hasReceiverNeed] = needUri;
@@ -823,7 +822,6 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 //no connection found
                 var deferred = $q.defer();
                 var ret = {};
-                ret[won.WONMSG.hasSender] = needUri;
                 ret[won.WONMSG.hasSenderNeed] = needUri;
                 ret[won.WONMSG.hasReceiverNeed] = needUri;
                 return ret;

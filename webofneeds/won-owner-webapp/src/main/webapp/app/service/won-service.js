@@ -382,6 +382,10 @@ angular.module('won.owner').factory('wonService', function (
             var eventUri = envelopeData[won.WONMSG.hasSenderNode]+"/event/"+utilService.getRandomInt(1,9223372036854775807);
             var message = new won.MessageBuilder(won.WONMSG.activateNeedMessage)
                 .eventURI(eventUri)
+                .hasReceiverNode(privateData.defaultWonNodeUri)
+                .hasSenderNeed(needUri)
+                .hasOwnerDirection()
+                .hasSentTimestamp(new Date().getTime())
                 .forEnvelopeData(envelopeData)
                 .build();
             var callback = createMessageCallbackForLocalNeedMessage(eventUri, won.EVENT.ACTIVATE_NEED_SENT);
@@ -409,11 +413,15 @@ angular.module('won.owner').factory('wonService', function (
 
 
     wonService.closeNeed = function(needURI){
-        var sendCloseNeed = function(envelopeData, eventToOpenFor) {
+        var sendCloseNeed = function(envelopeData, needUri) {
             //TODO: use event URI pattern specified by WoN node
             var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  utilService.getRandomInt(1,9223372036854775807);
             var message = new won.MessageBuilder(won.WONMSG.closeNeedMessage)
                 .eventURI(eventUri)
+                .hasReceiverNode(privateData.defaultWonNodeUri)
+                .hasSenderNeed(needUri)
+                .hasOwnerDirection()
+                .hasSentTimestamp(new Date().getTime())
                 .forEnvelopeData(envelopeData)
                 .build();
             var callback = createMessageCallbackForLocalNeedMessage(eventUri, won.EVENT.CLOSE_NEED_SENT);
@@ -448,11 +456,14 @@ angular.module('won.owner').factory('wonService', function (
             needData['@graph'][0]['@graph'][0]['@id'] = needUri;
         }
         var wonNode = privateData.defaultWonNodeUri;
-        needData['@graph'][0]['@id'] = needUri + "/core/#data";
+        //needData['@graph'][0]['@id'] = needUri + "/core/#data";
+        needData['@graph'][0]['@id'] = eventUri + "#core-data";
         var message = new won.MessageBuilder(won.WONMSG.createMessage, needData)
             .eventURI(eventUri)
             .hasReceiverNode(wonNode)
             .hasSenderNeed(needUri)
+            .hasOwnerDirection()
+            .hasSentTimestamp(new Date().getTime())
             .build();
 
         //TODO: this callback could be changed to be the same as activate/deactivate, but the special code (updateing the applicationStateService) needs to be moved to another place
@@ -538,6 +549,8 @@ angular.module('won.owner').factory('wonService', function (
                 .hasFacet(won.WON.OwnerFacet)
                 .hasRemoteFacet(won.WON.OwnerFacet)
                 .hasTextMessage(textMessage)
+                .hasOwnerDirection()
+                .hasSentTimestamp(new Date().getTime())
                 .build();
             var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECT_SENT)
             sendAndStoreMessageAndBroadcastAngularEvent(callback, message, eventUri, won.EVENT.CONNECT_SENT);
@@ -575,6 +588,8 @@ angular.module('won.owner').factory('wonService', function (
                 .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
                 .hasRemoteFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
                 .hasTextMessage(textMessage)
+                .hasOwnerDirection()
+                .hasSentTimestamp(new Date().getTime())
                 .build();
             var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECT_SENT)
             sendAndStoreMessageAndBroadcastAngularEvent(callback, message, eventUri, won.EVENT.CONNECT_SENT);
@@ -608,6 +623,8 @@ angular.module('won.owner').factory('wonService', function (
                 .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
                 .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
                 .hasTextMessage(textMessage)
+                .hasOwnerDirection()
+                .hasSentTimestamp(new Date().getTime())
                 .build();
             var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.OPEN_SENT);
             sendAndStoreMessageAndBroadcastAngularEvent(callback, message, eventUri, won.EVENT.OPEN_SENT);
@@ -638,6 +655,8 @@ angular.module('won.owner').factory('wonService', function (
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
                 .hasTextMessage(textMessage)
+                .hasOwnerDirection()
+                .hasSentTimestamp(new Date().getTime())
                 .build();
             var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CLOSE_SENT);
             sendAndStoreMessageAndBroadcastAngularEvent(callback, message, eventUri, won.EVENT.CLOSE_SENT);
@@ -664,6 +683,8 @@ angular.module('won.owner').factory('wonService', function (
                 .eventURI(eventUri)
                 .forEnvelopeData(envelopeData)
                 .addContentGraphData(won.WON.hasTextMessage, text)
+                .hasOwnerDirection()
+                .hasSentTimestamp(new Date().getTime())
                 .build();
             var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECTION_MESSAGE_SENT);
             sendAndStoreMessageAndBroadcastAngularEvent(callback, message, eventUri, won.EVENT.CONNECTION_MESSAGE_SENT);
