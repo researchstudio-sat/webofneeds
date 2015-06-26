@@ -1,9 +1,11 @@
-package crawler.actor;
+package common.actor;
 
 import akka.actor.DeadLetter;
 import akka.actor.UntypedActor;
 
 /**
+ * Prints messages that could not be delivered
+ *
  * User: hfriedrich
  * Date: 09.04.2015
  */
