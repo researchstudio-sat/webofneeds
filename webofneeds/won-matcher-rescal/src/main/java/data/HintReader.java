@@ -20,7 +20,7 @@ public class HintReader
 
     // read the header file
     ArrayList<String> needHeaders = new ArrayList<>();
-    FileInputStream fis = new FileInputStream(folder + RescalMatchingData.HEADERS_FILE);
+    FileInputStream fis = new FileInputStream(folder + "/"+ RescalMatchingData.HEADERS_FILE);
     BufferedReader br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
     String line = null;
     int i = 0;
