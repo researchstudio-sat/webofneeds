@@ -863,9 +863,35 @@
             //TODO: add images
             images: function(imgs) {
                 console.error("won.js - needbuilder.images - NOT IMPLEMENTED YET");
+                //console.log(this.getContext()); //message context / meta infos, e.g. namespaces
+                //console.log(this.getMainNode()); // the need root node. // add :hasAttachments here
+                //console.log(this.getNeedGraph()); // the need graph
+                //console.log(this.data); // the whole msg graph incl content, context and soon-to-be: attachments
+
                 //this.getContext()["schema.org.foo:contentLocation"] = "URL_TO_IMAGE"; //TODO
                 //this.getContext()["schema.org.foo:content"] = "/9j/4AAQSkZJRgABAQAAAQABAAD{...}"^^xsd:base64Binary
                 //this.getContext()["schema.org.foo:datePublished"] = "NOW"; //TODO
+
+
+                /*
+
+                 dependency hierarchy of builders
+                 in builders setters just collect variables
+                 build the jsonld in a template-ish build() method <- "return {pred:myvar, pred2:myfun()}"
+
+                 *mandatory args* throw exception if unset or as arguments to build(...)?
+
+                    (on publish, randomly set unbound variables?)
+
+                    if need & msgbuilder are split, the needbuilder needs to set dummy-urls
+                    and the message builder know which to replace
+
+                    needs will be send to a node in any case anyway
+
+
+                    s/NeedBuilder/ContentBuilder
+                    contentbuilder has array of attachment builders
+                 */
 
                 /*
 
