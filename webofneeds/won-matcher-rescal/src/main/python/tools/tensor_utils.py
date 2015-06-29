@@ -331,6 +331,14 @@ def predict_rescal_hints_by_threshold(A, R, threshold, tensor, keepConnections=F
     if not keepScore:
         hint_prediction_array[hint_indices] = 1
 
+    # use only need to need indices for hint connection prediction
+    need_indices = np.zeros(tensor.getShape()[0])
+    need_indices[tensor.getNeedIndices()] = 1
+    need_vector = need_indices[np.newaxis]
+    need_array = need_vector * need_vector.T
+    np.fill_diagonal(need_array, 0)
+    mask_array = np.multiply(mask_array, need_array)
+
     # optionally exclude already existing connections from prediction
     if not keepConnections:
         connection_array = np.asarray(tensor.getSliceMatrix(SparseTensor.CONNECTION_SLICE).toarray())

@@ -47,8 +47,9 @@ if __name__ == '__main__':
     A,R = execute_extrescal(input_tensor, args.rank)
 
     # predict hints (without the already known connections)
-    _log.info("predict connections with threshold: %f" % args.threshold)
+    _log.info("predict hints from connections with threshold: %f" % args.threshold)
     connection_prediction = predict_rescal_hints_by_threshold(A, R, args.threshold, input_tensor)
+    _log.info("number of hints created: %d" % len(connection_prediction.nonzero()[0]))
 
     # write the hint output matrix
     output  = args.folder + "/" + "hints.mtx"
