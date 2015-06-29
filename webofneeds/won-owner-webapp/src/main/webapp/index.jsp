@@ -92,6 +92,8 @@
 
         <script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/won.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/need-builder.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/message-builder.js"/>"></script>
 
         <script type="text/javascript" src="<c:url value="/app/service/application-state-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/application-control-service.js"/>"></script>

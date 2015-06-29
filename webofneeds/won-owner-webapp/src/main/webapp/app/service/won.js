@@ -292,6 +292,52 @@
             return JSON.parse(JSON.stringify(obj));
         }
 
+
+        /**
+         * Copies all arguments properties recursively into a
+         * new object and returns that.
+         */
+
+        won.merge = function(/*args...*/) {
+            var o = {};
+            for(var i = 0; i < arguments.length; i++) {
+                won.mergeIntoLast(arguments[i], o);
+            }
+            return o;
+        }
+        /*
+         * Recursively merge properties of several objects
+         * Copies all properties from the passed objects into the last one starting
+         * from the left (thus the further right, the higher the priority in
+         * case of name-clashes)
+         * You might prefer this function over won.merge for performance reasons
+         * (e.g. if you're copying into a very large object). Otherwise the former
+         * is recommended.
+         * @param args merges all passed objects onto the first passed
+         */
+        won.mergeIntoLast = function(/*args...*/) {
+            for(var i = 0; i < arguments.length -1 ; i++) {
+                var obj1 = arguments[arguments.length - 1];
+                var obj2 = arguments[i];
+                for (var p in obj2) {
+                    try {
+                        // Property in destination object set; update its value.
+                        if ( obj2[p].constructor == Object ) {
+                            obj1[p] = won.mergeRecursive(obj1[p], obj2[p]);
+                        } else {
+                            obj1[p] = obj2[p];
+                        }
+                    } catch(e) {
+                        // Property in destination object not set; create it and set its value.
+                        obj1[p] = obj2[p];
+
+                    }
+                }
+            }
+            return obj1;
+        }
+
+
         //get the URI from a jsonld resource (expects an object with an '@id' property)
         //or the value from a typed literal
         won.getSafeJsonLdValue = function(dataItem) {

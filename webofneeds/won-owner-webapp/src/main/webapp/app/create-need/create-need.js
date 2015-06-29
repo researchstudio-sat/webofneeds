@@ -27,6 +27,8 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     , userService
     , utilService
     , wonService
+    , NeedBuilder
+    , MessageBuilder
     , $q
     ) {
     $scope.currentStep = $routeParams.step;
@@ -415,6 +417,23 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
 
 
 	$scope.partiallyInitNeedBuilder = function () {
+
+        //<TODO-testing-stuff>
+        var type = won.WON.BasicNeedTypeDemandCompacted;
+        var needBuilderRefactored = new NeedBuilder(type, $scope.need.title, $scope.need.textDescription);
+        var attachmentUris = ['http://example.org/.../1234.png', 'http://example.org/.../1234.pdf'];
+        needBuilderRefactored.attachmentUris = attachmentUris;
+        var msgBuilderRefactored = new MessageBuilder(
+            'http://localhost:8080/won/resource',
+            'http://purl.org/webofneeds/message#CreateMessage');
+        var msgJson = msgBuilderRefactored.build(needBuilderRefactored,
+            'http://localhost:8080/won/resource/need/4567',
+            'http://localhost:8080/won/resource/event/1234',
+            attachmentUris
+        )
+        console.log("create-need.js:424: ", msgJson);
+        console.log("create-need.js:425: stringified ", JSON.stringify(msgJson));
+        //</TODO-testing-stuff>
 
         // creating need object
         var needBuilderObject = new window.won.NeedBuilder().setContext();
