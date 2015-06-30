@@ -47,6 +47,8 @@ public class DefaultPrefixUtils
     prefixMapping.setNsPrefix(WONMSG.DEFAULT_PREFIX, WONMSG.getURI());
     prefixMapping.setNsPrefix(WONCRYPT.DEFAULT_PREFIX, WONCRYPT.getURI());
     prefixMapping.setNsPrefix(SFSIG.DEFAULT_PREFIX, SFSIG.getURI());
+    prefixMapping.setNsPrefix(CERT.DEFAULT_PREFIX, CERT.getURI());
+    prefixMapping.setNsPrefix("sioc", SIOC.getURI());
     prefixMapping.setNsPrefix("rdf", RDF.getURI());
     prefixMapping.setNsPrefix("ldp", LDP.getURI());
     prefixMapping.setNsPrefix("rdfs", RDFS.getURI());

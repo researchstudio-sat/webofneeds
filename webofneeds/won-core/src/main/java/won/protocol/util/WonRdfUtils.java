@@ -101,7 +101,10 @@ public class WonRdfUtils
               WON.HAS_URI_PATTERN_SPECIFICATION);
             if (!it.hasNext()) return null;
             WonNodeInfo wonNodeInfo = new WonNodeInfo();
+            wonNodeInfo.setWonNodeURI(wonNodeUri.toString());
             RDFNode node = it.next();
+
+            // set the URI prefixes
             it = model.listObjectsOfProperty(node.asResource(), WON.HAS_NEED_URI_PREFIX);
             if (! it.hasNext() ) return null;
             wonNodeInfo.setNeedURIPrefix(it.next().asLiteral().getString());
@@ -111,9 +114,44 @@ public class WonRdfUtils
             it = model.listObjectsOfProperty(node.asResource(), WON.HAS_EVENT_URI_PREFIX);
             if (! it.hasNext() ) return null;
             wonNodeInfo.setEventURIPrefix(it.next().asLiteral().getString());
+
+            // set the need list URI
+            it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()), WON.HAS_NEED_LIST);
+            if (it.hasNext() ) {
+              wonNodeInfo.setNeedListURI(it.next().asNode().getURI());
+            } else {
+              wonNodeInfo.setNeedListURI(wonNodeInfo.getNeedURIPrefix());
+            }
+
+            // set the supported protocol implementations
+            String queryString = "SELECT ?protocol ?param ?value WHERE { ?a <%s> ?c. " +
+              "?c <%s> ?protocol. ?c ?param ?value. FILTER ( ?value != ?protocol ) }";
+            queryString = String.format(queryString, WON.SUPPORTS_WON_PROTOCOL_IMPL.toString(), RDF.getURI() + "type");
+            Query protocolQuery = QueryFactory.create(queryString);
+            QueryExecution qexec = QueryExecutionFactory.create(protocolQuery, model);
+
+            ResultSet rs = qexec.execSelect();
+            while (rs.hasNext()) {
+              QuerySolution qs = rs.nextSolution();
+
+              String protocol = rdfNodeToString(qs.get("protocol"));
+              String param = rdfNodeToString(qs.get("param"));
+              String value = rdfNodeToString(qs.get("value"));
+              wonNodeInfo.setSupportedProtocolImplParamValue(protocol, param, value);
+            }
+
             return wonNodeInfo;
           }
       });
+    }
+
+    private static String rdfNodeToString(RDFNode node) {
+      if (node.isLiteral()) {
+        return node.asLiteral().getString();
+      } else if (node.isResource()) {
+        return node.asResource().getURI();
+      }
+      return null;
     }
 
   }

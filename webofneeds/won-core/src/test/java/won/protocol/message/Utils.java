@@ -2,6 +2,8 @@ package won.protocol.message;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
@@ -9,8 +11,10 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import won.protocol.util.RdfUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * User: ypanchenko
@@ -38,6 +42,38 @@ public class Utils
     is.close();
     return model;
 
+  }
+
+  public static Query createTestQuery(String resourceName) throws IOException {
+    String queryString = loadQueryFromResource(resourceName);
+    return QueryFactory.create(queryString);
+  }
+
+  private static String loadQueryFromResource(final String path) {
+    BufferedReader reader = null;
+    StringBuilder sb = new StringBuilder();
+    String line;
+    try {
+
+      reader = new BufferedReader(new InputStreamReader(Utils.class.getResourceAsStream(path),
+                                                        "UTF-8"));
+      while ((line = reader.readLine()) != null) {
+        sb.append(line);
+        sb.append("\n");
+      }
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      if (reader != null) {
+        try {
+          reader.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    return sb.toString();
   }
 
   public static void print(Model model) {

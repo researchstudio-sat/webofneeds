@@ -53,6 +53,7 @@ public class WON
   public static final Property HAS_CONNECTION_URI_PREFIX = m.createProperty(BASE_URI, "hasConnectionUriPrefix");
   public static final Property HAS_EVENT_URI_PREFIX = m.createProperty(BASE_URI, "hasEventUriPrefix");
 
+  public static final Property HAS_NEED_LIST = m.createProperty(BASE_URI, "hasNeedList");
 
   public static final Property EMBED_SPIN_ASK = m.createProperty(BASE_URI, "embedSpinAsk");
 

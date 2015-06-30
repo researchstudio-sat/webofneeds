@@ -44,6 +44,8 @@ public class WonMessageRoutes  extends RouteBuilder
           .otherwise()
             .to("bean:wonMessageIntoCamelProcessor")
             .to("bean:wellformednessChecker")
+            .to("bean:uriNodePathChecker")
+            .to("bean:uriInUseChecker")
             .to("bean:signatureChecker")
             .to("bean:wrapperFromOwner")
             //route to msg processing logic
@@ -63,7 +65,7 @@ public class WonMessageRoutes  extends RouteBuilder
       .routeId("SystemMessageToRemoteNode")
       .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
       .to("bean:wonMessageIntoCamelProcessor")
-      .to("bean:wellformednessChecker")
+      //TODO: as soon as messages are signed when they reach this route, perform signature/wellformedness checks here?
       .to("bean:wrapperFromSystem")
       //route to message processing logic
       .to("seda:OwnerProtocolLogic");
@@ -75,7 +77,7 @@ public class WonMessageRoutes  extends RouteBuilder
             .routeId("SystemMessageToOwner")
             .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
             .to("bean:wonMessageIntoCamelProcessor")
-            .to("bean:wellformednessChecker")
+              //TODO: as soon as messages are signed when they reach this route, perform signature/wellformedness checks here?
             .to("bean:wrapperFromSystem")
             .to("bean:signatureAdder")
                     //route to message processing logic
@@ -142,6 +144,8 @@ public class WonMessageRoutes  extends RouteBuilder
          .otherwise()
             .to("bean:wonMessageIntoCamelProcessor")
             .to("bean:wellformednessChecker")
+            .to("bean:uriNodePathChecker")
+            .to("bean:uriInUseChecker")
             .to("bean:signatureChecker")
             .to("bean:wrapperFromExternal")
             //call the default implementation, which may alter the message.
@@ -183,9 +187,9 @@ public class WonMessageRoutes  extends RouteBuilder
       .choice()
         //we only handle hint messages
         .when(header(WonCamelConstants.MESSAGE_TYPE_HEADER).isEqualTo(URI.create(WONMSG.TYPE_HINT.getURI().toString())))
+          //TODO as soon as Matcher can sign his messages, perform here .to("bean:wellformednessChecker") and .to("bean:signatureChecker")
           .to("bean:uriNodePathChecker")
           .to("bean:uriInUseChecker")
-          .to("bean:wellformednessChecker")
           .to("bean:wrapperFromExternal")
           .to("bean:hintMessageProcessor?method=process")
           .to("bean:signatureAdder")

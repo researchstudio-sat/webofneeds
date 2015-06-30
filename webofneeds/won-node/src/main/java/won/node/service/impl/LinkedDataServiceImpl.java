@@ -201,12 +201,17 @@ public class LinkedDataServiceImpl implements LinkedDataService
       setNsPrefixes(model);
       Resource showNodePageResource = null;
       showNodePageResource = model.createResource(this.resourceURIPrefix);
+      addNeedList(model, showNodePageResource);
       addProtocolEndpoints(model, showNodePageResource);
       Dataset ret = newDatasetWithNamedModel(createDataGraphUri(showNodePageResource), model);
       addBaseUriAndDefaultPrefixes(ret);
       addPublicKey(model, showNodePageResource);
       return ret;
     }
+
+  private void addNeedList(Model model, Resource res) {
+    res.addProperty(WON.HAS_NEED_LIST, model.createResource(this.needResourceURIPrefix));
+  }
 
   private void addPublicKey(Model model, Resource res) {
     WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();
