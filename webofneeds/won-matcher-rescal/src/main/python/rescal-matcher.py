@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO,
 _log = logging.getLogger()
 
 from tools.tensor_utils import read_input_tensor, SparseTensor, execute_extrescal, \
-    predict_rescal_hints_by_threshold
+    predict_rescal_hints_by_threshold, create_hint_mask_matrix
 
 
 # ==========================================================================
@@ -46,12 +46,13 @@ if __name__ == '__main__':
     # execute rescal
     A,R = execute_extrescal(input_tensor, args.rank)
 
-    # predict hints (without the already known connections)
-    _log.info("predict hints from connections with threshold: %f" % args.threshold)
-    connection_prediction = predict_rescal_hints_by_threshold(A, R, args.threshold, input_tensor)
+    # predict new hints
+    _log.info("predict hints with threshold: %f" % args.threshold)
+    mask_matrix = create_hint_mask_matrix(input_tensor)
+    connection_prediction = predict_rescal_hints_by_threshold(A, R, args.threshold, mask_matrix)
     _log.info("number of hints created: %d" % len(connection_prediction.nonzero()[0]))
 
     # write the hint output matrix
     output  = args.folder + "/" + "hints.mtx"
-    _log.info("write connection prediction output matrix: " + output)
+    _log.info("write hint prediction output matrix: " + output)
     mmwrite(output, connection_prediction)
