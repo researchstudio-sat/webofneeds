@@ -2,11 +2,13 @@ package data;
 
 import common.event.BulkHintEvent;
 import common.event.HintEvent;
-import org.la4j.io.MatrixMarketStream;
-import org.la4j.matrix.Matrix;
+import org.la4j.matrix.SparseMatrix;
 import org.la4j.matrix.functor.MatrixProcedure;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
@@ -34,9 +36,23 @@ public class HintReader
     br.close();
 
     // read the hint matrix (supposed to contain new hints only, without the connection entries)
-    MatrixMarketStream mms = new MatrixMarketStream(
-      new FileInputStream(new File(folder + "/hints.mtx")));
-    Matrix hintMatrix = mms.readMatrix();
+    fis = new FileInputStream(folder + "/hints.mtx");
+    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+    StringBuffer stringBuffer = new StringBuffer();
+    line = null;
+    while ((line=bufferedReader.readLine())!=null) {
+      if (line.startsWith("%%MatrixMarket")) {
+        if (!line.contains("row-major") || !line.contains("column-major")) {
+          stringBuffer.append(line).append(" row-major\n");
+        } else {
+          stringBuffer.append(line).append("\n");
+        }
+      } else if (!line.startsWith("%")) {
+        stringBuffer.append(line).append("\n");
+      }
+    }
+    String hintMatrixString = stringBuffer.toString();
+    SparseMatrix hintMatrix = SparseMatrix.fromMatrixMarket(hintMatrixString);
 
     // create the hint events and return them in one bulk hint object
     BulkHintEventMatrixProcedure hintProcedure = new BulkHintEventMatrixProcedure(needHeaders);

@@ -319,7 +319,8 @@ def predict_rescal_connections_by_threshold(A, R, threshold, all_offers, all_wan
 # - threshold: write out only those predictions that are above the threshold
 # - keepConnections: if true keep the predictions between the needs where a connection existed before
 # - keepScore: if true keep the original score of the predictions, otherwise set all above the threshold o 1
-def predict_rescal_hints_by_threshold(A, R, threshold, tensor, keepConnections=False, keepScore=True):
+def predict_rescal_hints_by_threshold(A, R, threshold, tensor, keepConnections=False, keepScore=True,
+                                      matchOnlyDifferentTypes=True):
 
     # compute prediction array with scores
     hint_prediction_array = np.dot(A, np.dot(R[SparseTensor.CONNECTION_SLICE], A.T))

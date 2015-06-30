@@ -43,7 +43,7 @@
         <dependency>
             <groupId>org.la4j</groupId>
             <artifactId>la4j</artifactId>
-            <version>0.4.9</version>
+            <version>0.5.5</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

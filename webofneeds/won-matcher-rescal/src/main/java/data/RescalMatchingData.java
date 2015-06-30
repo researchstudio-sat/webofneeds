@@ -58,7 +58,7 @@ public class RescalMatchingData
   public RescalMatchingData() {
 
     int dim = MAX_DIMENSION;
-    tensor = new ThirdOrderSparseTensor(dim, dim, SliceType.values().length, 1);
+    tensor = new ThirdOrderSparseTensor(dim, dim, SliceType.values().length);
     needs = new ArrayList<String>();
     attributes = new ArrayList<String>();
   }
@@ -216,7 +216,7 @@ public class RescalMatchingData
     for (SliceType types : SliceType.values()) {
       maxNZ = Math.max(tensor.getNonZeroEntries(types.ordinal()), maxNZ);
     }
-    tensor.resize(dim, dim, SliceType.values().length, maxNZ);
+    tensor.resize(dim, dim, SliceType.values().length);
     return tensor;
   }
 

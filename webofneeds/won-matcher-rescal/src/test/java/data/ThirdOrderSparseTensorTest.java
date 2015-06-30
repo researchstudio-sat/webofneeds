@@ -33,13 +33,13 @@ public class ThirdOrderSparseTensorTest
 
   @Before
   public void initTestTensor() {
-    testTensor1 = new ThirdOrderSparseTensor(4, 4, 3, 10);
+    testTensor1 = new ThirdOrderSparseTensor(4, 4, 3);
   }
 
   @Test
   public void tensorCreation() {
 
-    ThirdOrderSparseTensor tensor = new ThirdOrderSparseTensor(4, 3, 2, 10);
+    ThirdOrderSparseTensor tensor = new ThirdOrderSparseTensor(4, 3, 2);
     int[] dim = {4, 3, 2};
     Assert.assertArrayEquals(tensor.getDimensions(), dim);
     for (int x3 = 0; x3 < dim[2]; x3++) {
@@ -75,7 +75,7 @@ public class ThirdOrderSparseTensorTest
     int[] dim = testTensor1.getDimensions();
     testTensor1.setEntry(1.0d, 3, 1, 2);
     int[] newDim = {dim[0]+1, dim[1]+2, dim[2]+3};
-    testTensor1.resize(newDim[0], newDim[1], newDim[2], 10);
+    testTensor1.resize(newDim[0], newDim[1], newDim[2]);
     Assert.assertArrayEquals(newDim, testTensor1.getDimensions());
     Assert.assertEquals(1.0d, testTensor1.getEntry(3, 1, 2), DELTA);
 
@@ -96,7 +96,7 @@ public class ThirdOrderSparseTensorTest
     int[] dim = testTensor1.getDimensions();
     testTensor1.setEntry(1.0d, 3, 1, 2);
     int[] newDim = {dim[0]-1, dim[1]-1, dim[2]-1};
-    testTensor1.resize(newDim[0], newDim[1], newDim[2], 10);
+    testTensor1.resize(newDim[0], newDim[1], newDim[2]);
     Assert.assertArrayEquals(newDim, testTensor1.getDimensions());
 
     for (int x3 = 0; x3 < newDim[2]; x3++) {
@@ -109,51 +109,21 @@ public class ThirdOrderSparseTensorTest
   }
 
   @Test
-  public void zeroAllRows() {
+  public void getNonZeroIndicesOfRow() {
 
     testTensor1.setEntry(0.5d, 0, 0, 0);
-    testTensor1.setEntry(1.0d, 0, 0, 0);
-    testTensor1.setEntry(2.0d, 1, 0, 1);
-    testTensor1.setEntry(3.0d, 0, 2, 2);
-    testTensor1.setEntry(3.0d, 1, 2, 2);
-    testTensor1.setEntry(4.0d, 3, 3, 2);
-    testTensor1.setEntry(4.0d, 3, 3, 0);
+    testTensor1.setEntry(1.0d, 0, 1, 0);
+    testTensor1.setEntry(0.5d, 1, 0, 0);
+    testTensor1.setEntry(1.0d, 1, 1, 1);
 
-    Assert.assertEquals(2, testTensor1.getNonZeroEntries(0), DELTA);
-    Assert.assertEquals(1, testTensor1.getNonZeroEntries(1), DELTA);
-    Assert.assertEquals(3, testTensor1.getNonZeroEntries(2), DELTA);
-    Assert.assertEquals(1.0d, testTensor1.getEntry(0, 0, 0), DELTA);
-    Assert.assertEquals(3.0d, testTensor1.getEntry(0, 2, 2), DELTA);
-    testTensor1.zeroAllRows(0);
-    Assert.assertEquals(0.0d, testTensor1.getEntry(0, 0, 0), DELTA);
-    Assert.assertEquals(0.0d, testTensor1.getEntry(0, 2, 2), DELTA);
-    Assert.assertEquals(1, testTensor1.getNonZeroEntries(0), DELTA);
-    Assert.assertEquals(1, testTensor1.getNonZeroEntries(1), DELTA);
-    Assert.assertEquals(2, testTensor1.getNonZeroEntries(2), DELTA);
-  }
+    Collection<Integer> indices = new ArrayList<>();
+    indices.add(0);
+    indices.add(1);
+    Assert.assertEquals(indices, testTensor1.getNonZeroIndicesOfRow(0, 0));
 
-  @Test
-  public void zeroAllColumns() {
-
-    testTensor1.setEntry(0.5d, 0, 0, 0);
-    testTensor1.setEntry(1.0d, 0, 0, 0);
-    testTensor1.setEntry(2.0d, 1, 0, 1);
-    testTensor1.setEntry(3.0d, 0, 2, 2);
-    testTensor1.setEntry(3.0d, 1, 2, 2);
-    testTensor1.setEntry(4.0d, 3, 3, 2);
-    testTensor1.setEntry(4.0d, 3, 3, 0);
-
-    Assert.assertEquals(2, testTensor1.getNonZeroEntries(0), DELTA);
-    Assert.assertEquals(1, testTensor1.getNonZeroEntries(1), DELTA);
-    Assert.assertEquals(3, testTensor1.getNonZeroEntries(2), DELTA);
-    Assert.assertEquals(3.0d, testTensor1.getEntry(1, 2, 2), DELTA);
-    Assert.assertEquals(3.0d, testTensor1.getEntry(0, 2, 2), DELTA);
-    testTensor1.zeroAllColumns(2);
-    Assert.assertEquals(0.0d, testTensor1.getEntry(1, 2, 2), DELTA);
-    Assert.assertEquals(0.0d, testTensor1.getEntry(0, 2, 2), DELTA);
-    Assert.assertEquals(2, testTensor1.getNonZeroEntries(0), DELTA);
-    Assert.assertEquals(1, testTensor1.getNonZeroEntries(1), DELTA);
-    Assert.assertEquals(1, testTensor1.getNonZeroEntries(2), DELTA);
+    indices.clear();
+    indices.add(0);
+    Assert.assertEquals(indices, testTensor1.getNonZeroIndicesOfRow(1, 0));
   }
 
   @Test
@@ -182,59 +152,4 @@ public class ThirdOrderSparseTensorTest
     Assert.assertFalse(testTensor1.hasNonZeroEntryInRow(2, 2));
 
   }
-
-  @Test
-  public void copyAllRows() {
-
-    testTensor1.setEntry(0.5d, 0, 0, 0);
-    testTensor1.setEntry(1.0d, 0, 0, 0);
-    testTensor1.setEntry(2.0d, 1, 0, 1);
-    testTensor1.setEntry(3.0d, 0, 2, 2);
-    testTensor1.setEntry(3.0d, 1, 2, 2);
-    testTensor1.setEntry(4.0d, 3, 3, 2);
-    testTensor1.setEntry(4.0d, 3, 3, 0);
-
-    Assert.assertEquals(0.0d, testTensor1.getEntry(0, 3, 2), DELTA);
-    Assert.assertEquals(0.0d, testTensor1.getEntry(0, 3, 0), DELTA);
-    testTensor1.copyAllRows(3, 0);
-    Assert.assertEquals(4.0d, testTensor1.getEntry(0, 3, 2), DELTA);
-    Assert.assertEquals(4.0d, testTensor1.getEntry(0, 3, 0), DELTA);
-  }
-
-  @Test
-  public void copyAllColumns() {
-
-    testTensor1.setEntry(0.5d, 0, 0, 0);
-    testTensor1.setEntry(1.0d, 0, 0, 0);
-    testTensor1.setEntry(2.0d, 1, 0, 1);
-    testTensor1.setEntry(3.0d, 0, 2, 2);
-    testTensor1.setEntry(3.0d, 1, 2, 2);
-    testTensor1.setEntry(4.0d, 3, 3, 2);
-    testTensor1.setEntry(4.0d, 3, 3, 0);
-
-    Assert.assertEquals(0.0d, testTensor1.getEntry(0, 0, 2), DELTA);
-    Assert.assertEquals(0.0d, testTensor1.getEntry(1, 0, 2), DELTA);
-    testTensor1.copyAllColumns(2, 0);
-    Assert.assertEquals(3.0d, testTensor1.getEntry(0, 0, 2), DELTA);
-    Assert.assertEquals(3.0d, testTensor1.getEntry(1, 0, 2), DELTA);
-  }
-
-  @Test
-  public void getNonZeroIndicesOfRow() {
-
-    testTensor1.setEntry(0.5d, 0, 0, 0);
-    testTensor1.setEntry(1.0d, 0, 1, 0);
-    testTensor1.setEntry(0.5d, 1, 0, 0);
-    testTensor1.setEntry(1.0d, 1, 1, 1);
-
-    Collection<Integer> indices = new ArrayList<>();
-    indices.add(0);
-    indices.add(1);
-    Assert.assertEquals(indices, testTensor1.getNonZeroIndicesOfRow(0, 0));
-
-    indices.clear();
-    indices.add(0);
-    Assert.assertEquals(indices, testTensor1.getNonZeroIndicesOfRow(1, 0));
-  }
-
 }
