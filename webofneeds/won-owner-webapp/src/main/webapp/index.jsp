@@ -61,10 +61,12 @@
         <script src="bower_components/angular-mocks/angular-mocks.js"></script>
 
         <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-        <link rel="stylesheet" href="style/ui-bootstrap-patches.css"/> <!-- disable after updating ui-bootstrap -->
+        <!--<link rel="stylesheet" href="style/ui-bootstrap-patches.css"/> <!-- disable after updating ui-bootstrap -->
 
 
+        <%--
         <script type="text/javascript" src="bower_components/angular-ui-utils/ui-utils.js"></script> <!-- to include all ui-utils TODO deleteme-->
+        --%>
         <script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
         <script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
         <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
