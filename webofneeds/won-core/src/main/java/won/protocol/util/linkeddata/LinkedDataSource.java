@@ -27,6 +27,11 @@ import java.util.List;
  */
 public interface LinkedDataSource
 {
+    /**
+     *
+      * @param resourceURI
+     * @return empty Dataset if not a valid URI or not found
+     */
   public Dataset getDataForResource(URI resourceURI);
 
   public Dataset getDataForResource(final URI resourceURI, List<URI> properties,

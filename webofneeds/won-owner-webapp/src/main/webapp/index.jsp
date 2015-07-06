@@ -22,38 +22,64 @@
 <html>
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<title>Web Of Needs</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- see http://getbootstrap.com/css/#overview-mobile -->
+		<title ng-bind="'Web Of Needs - '+$root.title">Web Of Needs</title>
 		<link rel="stylesheet" href="style/bootstrap.min.css" />
-		<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>
-		<link rel="stylesheet" href="style/main.css"/>
+		<%--<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>--%>
+
+        <!--<link rel="stylesheet" href="bower_components/bootsketch/build/css/bootsketch.css"/>-->
+        <!--<link rel="stylesheet" href="style/bootsketch-patches.css"/>-->
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css"/>
+
 	    <link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
 	    <link rel="stylesheet" href="style/datepicker.css"/>
-	    <link rel="stylesheet" href="font-awesome-4.1.0/css/font-awesome.min.css">
+	    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
 	    <link rel="stylesheet" href="style/lightbox.css"/>
 	    <link rel="stylesheet" href="style/bootstrap-tagsinput.css"/>
         <link rel="stylesheet" href="style/star-rating.css"/>
         <link rel="stylesheet" href="scripts/angular-scrollable-table/scrollable-table.css"/>
+        <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.css"/>
+        <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.bootstrap.css"/>
+
 
         <link rel="stylesheet" href="bower_components/ng-scrollbar/dist/ng-scrollbar.min.css"/>
+
+        <!--leaflet.js provides us with a map-widget which can display map material from different sources-->
+        <script type="text/javascript" src="resources/leaflet-0.7.3/leaflet.js"></script>
+        <link rel="stylesheet" href="resources/leaflet-0.7.3/leaflet.css"/>
+
+
+        <!-- Our CSS'. Included last so it wins in clashes vs libraries. -->
+        <link rel="stylesheet" href="style/main.css"/>
 
 
         <script src="scripts/jquery.10.2.js"></script>
         <script src="scripts/jquery.fs.scroller.min.js"></script>
         <script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
         <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="bower_components/angular-mocks/angular-mocks.js"></script>
-        <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 
-        <script type="text/javascript" src="bower_components/angular-ui-utils/modules/event/event.js "></script>
-        <script type="text/javascript" src="bower_components/angular-ui-map/src/map.js"></script>
+        <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+        <!--<link rel="stylesheet" href="style/ui-bootstrap-patches.css"/> <!-- disable after updating ui-bootstrap -->
+
+
+        <%--
+        <script type="text/javascript" src="bower_components/angular-ui-utils/ui-utils.js"></script> <!-- to include all ui-utils TODO deleteme-->
+        --%>
+        <script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
         <script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
         <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
         <script type="text/javascript" src="bower_components/ng-scrollbar/src/ng-scrollbar.js"></script>
+        <script type="text/javascript" src="bower_components/zeroclipboard/dist/ZeroClipboard.js"></script>
+        <script type="text/javascript" src="bower_components/ng-clip/src/ngClip.js"></script>
+
         <script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
         <script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
         <script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
         <script type="text/javascript" src="scripts/upload/jquery.fileupload-process.js"></script>
         <script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
+        <%--<script type="text/javascript" src="scripts/osm/angular-leaflet-directive.min.js"></script>--%>
         <script type="text/javascript" src="scripts/bootstrap-datepicker.js"></script>
         <script type="text/javascript" src="scripts/lightbox.min.js"></script>
         <script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>
@@ -72,13 +98,17 @@
         <script type="text/javascript" src="<c:url value="/app/service/application-state-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/application-control-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
+        <%--<script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>--%>
+        <script type="text/javascript" src="<c:url value="/app/service/osm-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/util-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/message-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/search-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/won-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/linkeddata-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/message-factory-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/sign-in/sign-in.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/sign-in/sign-up.js"/>"></script>
 
 
         <script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
@@ -89,6 +119,8 @@
         <script type="text/javascript" src="<c:url value="/app/main/main.js"/>"></script>
 
         <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/create-need/location-selector.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/create-need/image-uploader.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/conversation/conversation.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/draft/draft.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
@@ -112,13 +144,15 @@
 		<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">
 
 			<ul class="nav navbar-nav">
-				<li ng-class="isActive()"><a href="" ng-click="goHome()">
+				<li ng-class="isActive()"><a href="" ng-click="clickOnWon()">
 					<i class="fa fa-arrows-alt fa-lg"></i>&nbsp;WoN</a>
 				</li>
 			</ul>
 			<ul class="nav navbar-nav">
-                <li class="dropdown" ng-class="isActive('create-need')" ng-cloak>
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <li class="dropdown"
+                    ng-class="isActive('create-need')"
+                    ng-cloak>
+					<a href="" class="dropdown-toggle" data-toggle="dropdown">
 						<i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
 					</a>
 					<ul class="dropdown-menu">
@@ -134,7 +168,7 @@
                                 src="/owner/images/type_posts/todo.png"/>&nbsp;I
 							want to do something <strong>together</strong></a></li>
 						<li class="divider"></li>
-						<li class="top-layer"><a href="#/create-need/1/3/title"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img
+						<li class="top-layer"><a href="#/create-need/1/3/"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img
                                 src="/owner/images/type_posts/change.png"/>&nbsp;I
 							want to <strong>change</strong> something</a></li>
 						<li class="divider" ng-show="!showPublic()"></li>
@@ -142,7 +176,7 @@
 							<a tabindex="-1" href="#"><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Drafts:&nbsp;Unfinished Posts</a>
 							<ul class="dropdown-menu" ng-controller="DraftCtrl"  >
 								<li
-                                        ng-repeat="draft in allDrafts | orderObjectBy:'meta.timestamp':true | limitTo: recordsToDisplay">
+                                        ng-repeat="draft in allDrafts | orderObjectBy:'meta.sentTimestamp':true | limitTo: recordsToDisplay">
                                     <a href ng-click="clickOn(draft.uri)">
                                     <span style="display: none;">{{draft.basicNeedType}}</span>
                                     <img ng-src="{{getTypePicURI(draft.basicNeedType)}}"/>
@@ -159,37 +193,45 @@
 
 
 
-				<li ng-show="!showPublic()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
+				<li ng-show="showAccountUser()" ng-class="isActive('postbox')" ng-cloak><a href="#/postbox/">
 					<i class="fa fa-clipboard fa-lg"></i>&nbsp;Post box</a>
 				</li>
 
-                <li ng-show="!showPublic()" ng-cloak notif-dropdown
+                <li ng-show="showAccountUser()" ng-cloak notif-dropdown
                     event-type = "message"
                     unread-events-by-type-by-need="unreadEventsByTypeByNeed"
                     unread-events-by-need-by-type="unreadEventsByNeedByType"
                     on-click="openNeedDetailView(needURI)"
                     get-type-pic-uri = "getTypePicURI(type)">
                 </li>
-                <li ng-show="!showPublic()" ng-cloak notif-dropdown
+                <li ng-show="showAccountUser()" ng-cloak notif-dropdown
                     event-type = "connect"
                     unread-events-by-type-by-need="unreadEventsByTypeByNeed"
                     unread-events-by-need-by-type="unreadEventsByNeedByType"
                     on-click="openNeedDetailView(needURI)"
                     get-type-pic-uri = "getTypePicURI(type)">
                 </li>
-                <li ng-show="!showPublic()" ng-cloak notif-dropdown
+                <li ng-show="showAccountUser()" ng-cloak notif-dropdown
                     event-type = "hint"
                     unread-events-by-type-by-need="unreadEventsByTypeByNeed"
                     unread-events-by-need-by-type="unreadEventsByNeedByType"
                     on-click="openNeedDetailView(needURI)"
                     get-type-pic-uri = "getTypePicURI(type)">
                 </li>
-
 			</ul>
 					<ul class="nav navbar-nav navbar-right" ng-cloak>
                         <li><span ng-show="checkRegistered()"></span></li>
-				<li ng-show="showPublic()" ng-class="isActive('register')"><a href="#/register">Sign up&nbsp;<span class="caret"/></a></li>
-				<li ng-show="showPublic()" ng-class="isActive('signin')"><a href="#/signin">Sign in&nbsp;<span class="caret"/></a></li>
+
+                        <li ng-show="showPublic()" ng-class="isActive('register')">
+                            <a ng-click="displaySignUp()">
+                                Sign Up&nbsp;<span class="caret"/>
+                            </a>
+                        </li>
+                        <li ng-show="showPublic()" ng-class="isActive('signin')">
+                            <a ng-click="displaySignIn()">
+                                Sign In&nbsp;<span class="caret"/>
+                            </a>
+                        </li>
 				<!--<li ng-show="!showPublic()"><a href="#/need-list">{{userdata.username}}</a></li>
 										<li ng-show="!showPublic()"><a href="" ng-click="onClickSignOut()">Sign out</a></li>     -->
 
@@ -228,6 +270,7 @@
             window.user = {
                 <sec:authorize access="isAuthenticated()">
                 username : '<sec:authentication property="principal.username" />',
+                authorities : '<sec:authentication property="principal.authorities" />',
                 isAuth : true
                 </sec:authorize>
                 <sec:authorize access="!isAuthenticated()">

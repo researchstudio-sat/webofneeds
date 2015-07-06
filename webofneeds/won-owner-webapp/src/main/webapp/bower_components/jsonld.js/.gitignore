@@ -1,9 +1,0 @@
-*.sw[op]
-*~
-.cproject
-.project
-.settings
-coverage.html
-js-cov
-node_modules
-v8.log

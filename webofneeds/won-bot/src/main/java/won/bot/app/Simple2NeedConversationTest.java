@@ -26,6 +26,7 @@ public class Simple2NeedConversationTest
     SpringApplication app = new SpringApplication(
         new Object[]{"classpath:/spring/app/simple2NeedConversationTest.xml"}
     );
+    app.setWebEnvironment(false);
     ConfigurableApplicationContext applicationContext =  app.run(args);
     Thread.sleep(5*60*1000);
     app.exit(applicationContext);

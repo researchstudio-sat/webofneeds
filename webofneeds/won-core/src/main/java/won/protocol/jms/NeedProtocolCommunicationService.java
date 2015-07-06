@@ -26,11 +26,8 @@ public interface NeedProtocolCommunicationService extends ProtocolCommunicationS
   /**
    * Checks if there is a camel component configured that allows the specified needs to communicate and sets it up
    * if necessary. The data required to send messages is encapsulated in the newly created CamelConfiguration.
-   * @param needUri
-   * @param otherNeedUri
-   * @param startingEndpoint
    * @return
    * @throws Exception
    */
-    CamelConfiguration configureCamelEndpoint(URI needUri,URI otherNeedUri,String startingEndpoint) throws Exception;
+    CamelConfiguration configureCamelEndpoint(URI wonNodeUri) throws Exception;
 }

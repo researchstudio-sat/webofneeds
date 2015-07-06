@@ -36,34 +36,40 @@
         <property name="ownerProtocolOwnerURI" value="${uri.prefix.owner}"/>
     </bean>
 
-    <bean id="dataReloadService" class="won.owner.service.impl.DataReloadService">
-        <property name="ownerService" ref="ownerProtocolNeedReadService" />
-    </bean>
-
     <!-- Model Mapper for RDF -->
     <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"/>
     <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"/>
 
-    <bean id="ownerProtocolOwnerService" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" />
-
-    <bean id="ownerProtocolOwnerServiceJMSBased" class="won.owner.messaging.OwnerProtocolOwnerServiceImplJMSBased"></bean>
-
     <bean id="executor" class="org.springframework.scheduling.concurrent.ConcurrentTaskExecutor" />
 
-    <bean id="ownerProtocolNeedServiceClient" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClient">
-        <!-- used to distinguish different implementations when auto-wiring -->
-        <!-- see http://docs.spring.io/spring/docs/3.0.0.M3/reference/html/ch04s11.html -->
-        <qualifier value="default" />
-
-        <!-- expects a bean named "ownerProtocolNeedServiceClientDelegate" in the context.
-             That bean may be used to make clever decisions regarding the transport or just be hard-wired to
-             use eg jms
-         -->
-        <property name="delegate" ref="ownerProtocolNeedServiceClientJMSBased" />
-    </bean>
-
-    <bean id="ownerProtocolNeedReadService" class="won.owner.protocol.impl.OwnerProtocolNeedReadServiceImpl">
-    </bean>
-
 	<bean id="wonUserDetailService" class="won.owner.service.impl.WONUserDetailService" />
+
+    <!-- private keys and their certificates for owner and needs,
+     possibly certificates of other parties-->
+    <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService">
+        <constructor-arg type="java.lang.String" value="${keystore.location}" />
+    </bean>
+
+    <bean id="cryptoService" class="won.cryptography.service.CryptographyService">
+        <constructor-arg ref="keyStoreService" />
+    </bean>
+
+    <!-- processor for checking signatures -->
+    <bean name="signatureChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg>
+            <bean class="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor" />
+        </constructor-arg>
+    </bean>
+    <!-- processor for signing messages -->
+    <bean id="signatureAddingProcessor" class="won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor">
+        <constructor-arg type="java.lang.String" value="${uri.prefix.resource}" />
+    </bean>
+    <bean name="signatureAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg ref="signatureAddingProcessor" />
+    </bean>
+    <!-- processor for generating and adding keys for just created needs -->
+
+    <bean name="needKeyGeneratorAndAdder" class="won.protocol.message.processor.impl.KeyForNewNeedAddingProcessor" />
+
+
 </beans>

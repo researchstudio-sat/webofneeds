@@ -14,446 +14,411 @@
   ~    limitations under the License.
   -->
 
-<div xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
-<div class="col-lg-12">
-<div id="needSaveAlert" class="row top-buffer">
-	<div class="col-lg-8 col-lg-offset-2">
-		<div ng-cloak class="alert alert-dismissible alert-success" ng-show="successShow"
-		     style="margin-top:10px; margin-bottom: 10px;" data-dismiss="alert">
-			<span class="close" data-ng-click="successShow=false">&times;</span>
-			<button type="button" class="close" data-ng-click="successShow=false">×</button>
-			Need has been successfully saved
-		</div>
-		<div ng-cloak class="alert alert-dismissable alert-error" ng-show="error" style="margin-top:10px; margin-bottom: 10px;">
-			Error occurred during saving of need
-		</div>
-	</div>
-</div>
-<div id="progressTracker" class="row top-buffer">
-	<div class="col-lg-12">
-		<div class="row">
-			<won-progress-tracker current-step='currentStep' number-of-steps='numberOfSteps'
-			                      jump-To-Step="jumpToStep(num)"
-			                      class="col-lg-12" style="z-index: 0"
-					></won-progress-tracker>
-		</div>
-
-	</div>
-</div>
-
-
-<div id="createNeedContent" class="row top-buffer">
-<div class="col-lg-12">
-<form class="form-horizontal">
-<!--<div ng-show="showPublic(1)" class="col-lg-6 col-lg-offset-3">
-						<fieldset>
-							<div class="form-group">
-								<div class="btn-group-vertical col-lg-12">
-									<button type="button" class="btn ng-valid ng-dirty" ng-model="need.basicNeedType"
-											btn-radio="'DEMAND'" ng-click="nextStep()">Want: I'm looking for
-									</button>
-									<button type="button" class="btn ng-valid ng-dirty" ng-model="need.basicNeedType"
-											btn-radio="'OFFER'" ng-click="nextStep()">Offer: I'm offering
-									</button>
-									<button type="button" class="btn ng-valid ng-dirty" ng-model="need.basicNeedType"
-											btn-radio="'DO_TOGETHER'" ng-click="nextStep()">Activity: Looking for
-										people
-										to
-									</button>
-									<button type="button" class="btn ng-valid ng-dirty" ng-model="need.basicNeedType"
-											btn-radio="'CRITIQUE'" ng-click="nextStep()">Critique: Let's do something
-										about
-									</button>
-								</div>
-							</div>
-
-						</fieldset>
-
-					</div>  -->
-<div ng-show="showPublic(1)" class="col-lg-8 col-lg-offset-2">
-
-	<div class="well">
-        <form id="post-form" name="postForm" novalidate>
-		<fieldset>
-			<div class="form-group">
-				<label class="col-lg-2 col-lg-offset-2" tooltip="{{tooltipText}}">Type *</label>
-
-				<div class="row">
-					<div class="col-lg-8 col-lg-offset-2" ng-show="!showChangeType">
-						<img src="{{currentTypeIcon()}}"/> {{getCurrentTypeOfOffer()}}
-						<a ng-click="clickOnChangeTypeOfNeed()">(change)</a>
-					</div>
-				</div>
-				<div ng-show="showChangeType" class="col-lg-8 col-lg-offset-2">
-					<div>
-						<a href="" id="changePostMenuItem0"
-                           class="list-group-item list-group-item-info i_panel_menu_item"
-						   ng-click="onClickChangePostMenuItem(0)">
-							<h4 class="list-group-item-heading">
-                                <!--<i class="fa fa-circle fa-lg"></i>--><img src="/owner/images/type_posts/want.png"/>&nbsp;<strong>Want:</strong> I'm looking for...
-							</h4>
-						</a>
-						<a href="" id="changePostMenuItem1" class="list-group-item list-group-item-info i_panel_menu_item"
-						   ng-click="onClickChangePostMenuItem(1)">
-							<h4 class="list-group-item-heading">
-                                <!--<i class="fa fa-circle-o fa-lg"></i>--><img src="/owner/images/type_posts/offer.png"/>&nbsp;<strong>Offer:</strong> I'm offering...
-							</h4>
-						</a>
-						<a href="" id="changePostMenuItem2" class="list-group-item list-group-item-info i_panel_menu_item"
-						   ng-click="onClickChangePostMenuItem(2)">
-							<h4 class="list-group-item-heading">
-                                <!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img src="/owner/images/type_posts/todo.png"/>&nbsp;<strong>Together:</strong> Looking for people to...
-							</h4>
-						</a>
-						<a href="" id="changePostMenuItem3" class="list-group-item list-group-item-info i_panel_menu_item"
-						   ng-click="onClickChangePostMenuItem(3)">
-							<h4 class="list-group-item-heading">
-                                <!--<i class="fa fa-circle-thin fa-lg"></i>--><img src="/owner/images/type_posts/change.png"/>&nbsp;<strong>Change:</strong> Let's do something about...
-							</h4>
-						</a>
-					</div>
-				</div>
-			</div>
-			<div class="form-group">
-				<label for="inputName" class="col-lg-2 col-lg-offset-2" tooltip="{{tooltipText}}">Title *</label>
-
-				<div class="row">
-					<div class="col-lg-8 col-lg-offset-2">
-						<input type="text" class="form-control" id="inputName" name="title" ng-model="need.title"
-						       placeholder="{{getTitlePlaceholder()}}" required/>
-					</div>
-				</div>
-			</div>
-			<div class="form-group">
-				<label for="textarea-description" class="col-lg-3 col-lg-offset-2" tooltip="{{tooltipText}}">Description *</label>
-
-				<div class="row">
-					<div class="col-lg-8 col-lg-offset-2">
-						<textarea style="resize: none;" class="form-control" name="description" rows="8" id="textarea-description"
-						          ng-model="need.textDescription"
-
-
-
-						           placeholder="{{getDescriptionPlaceholder()}}"
-						          required></textarea>
-					</div>
-				</div>
-				<!--span class="help-block">A longer block of help text that breaks onto a new line and may extend beyond one line.</span-->
-			</div>
-			<div class="form-group">
-				<label for="inputTagName" class="col-lg-2 col-lg-offset-2" tooltip="{{tooltipText}}">Tags *</label>
-                <div class="row">
-                    <div class="col-lg-8 col-lg-offset-2">
-                        Using tags improves results by a great deal.
-                    </div>
-                </div>
-                <!--
-				<div class="row">
-					<div class="col-lg-8 col-lg-offset-2">
-                                            <span style="margin-right:5px;cursor:pointer;" class="label label-primary btnTag"
-                                                  ng-click="removeTag('{{tagName}}')"
-                                                  ng-repeat="tagName in need.tags">{{tagName}}&nbsp;&nbsp;|&nbsp;x
-                                            </span>
-					</div>
-				</div>
-				-->
-				<div class="row">
-					<div class="col-lg-8 col-lg-offset-2">
-						<input type="text" class="form-control" id="inputTagName" name="tags" ng-model="need.tags"
-						       placeholder="{{getTagsPlaceholder()}}" required>
-					</div>
-				</div>
-			</div>
-		</fieldset>
-        </form>
-	</div>
-</div>
-<div ng-show="showPublic(2)" class="col-lg-10 col-lg-offset-1" ng-controller="AdditionalInfoCtrl">
+<div id="createNeed" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
     <div class="col-lg-12">
-        <div class="col-lg-12 bottom-buffer" style="font-size: 1.8em;">
+        <div id="needSaveAlert" class="row top-buffer">
+            <div class="col-lg-8 col-lg-offset-2">
+                <div ng-cloak class="alert alert-dismissible alert-success" ng-show="successShow"
+                     style="margin-top:10px; margin-bottom: 10px;" data-dismiss="alert">
+                    <span class="close" data-ng-click="successShow=false">&times;</span>
+                    <!--<button type="button" class="close" data-ng-click="successShow=false">×</button>-->
+                    Need has been successfully saved. Redirecting...
+                </div>
+                <div ng-cloak class="alert alert-dismissable alert-error" ng-show="error"
+                     style="margin-top:10px; margin-bottom: 10px;">
+                    Error occurred during saving of need
+                </div>
+            </div>
+        </div>
+        <div id="progressTracker" class="row top-buffer">
+            <div class="col-lg-12">
+                <div class="row">
+                    <won-progress-tracker current-step='currentStep' number-of-steps='numberOfSteps'
+                                          jump-To-Step="jumpToStep(num)"
+                                          class="col-lg-12" style="z-index: 0"
+                            ></won-progress-tracker>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div id="createNeedContent" class="row top-buffer">
+            <div class="col-lg-12">
+                <form class="form-horizontal">
+                    <div ng-show="showPublic(1)" class="col-lg-8 col-lg-offset-2">
+                        <div class="well">
+                            <form id="post-form" name="postForm" novalidate>
+                                <fieldset>
+                                    <div class="form-group">
+                                        <label class="col-lg-2 col-lg-offset-2" tooltip="{{tooltipText}}">Type *</label>
+
+                                        <div class="row">
+                                            <div class="col-lg-8 col-lg-offset-2" ng-show="!showChangeType">
+                                                <img ng-src="{{currentTypeIcon()}}"/> {{getCurrentTypeOfOffer()}}
+                                                <a ng-click="clickOnChangeTypeOfNeed()">(change)</a>
+                                            </div>
+                                        </div>
+                                        <div ng-show="showChangeType" class="col-lg-8 col-lg-offset-2">
+                                            <div>
+                                                <a href="" id="changePostMenuItem0"
+                                                   class="list-group-item list-group-item-info i_panel_menu_item"
+                                                   ng-click="onClickChangePostMenuItem(0)">
+                                                    <h4 class="list-group-item-heading">
+                                                        <!--<i class="fa fa-circle fa-lg"></i>--><img
+                                                            src="/owner/images/type_posts/want.png"/>&nbsp;<strong>Want:</strong>
+                                                        I'm looking for...
+                                                    </h4>
+                                                </a>
+                                                <a href="" id="changePostMenuItem1"
+                                                   class="list-group-item list-group-item-info i_panel_menu_item"
+                                                   ng-click="onClickChangePostMenuItem(1)">
+                                                    <h4 class="list-group-item-heading">
+                                                        <!--<i class="fa fa-circle-o fa-lg"></i>--><img
+                                                            src="/owner/images/type_posts/offer.png"/>&nbsp;<strong>Offer:</strong>
+                                                        I'm offering...
+                                                    </h4>
+                                                </a>
+                                                <a href="" id="changePostMenuItem2"
+                                                   class="list-group-item list-group-item-info i_panel_menu_item"
+                                                   ng-click="onClickChangePostMenuItem(2)">
+                                                    <h4 class="list-group-item-heading">
+                                                        <!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img
+                                                            src="/owner/images/type_posts/todo.png"/>&nbsp;<strong>Together:</strong>
+                                                        Looking for people to...
+                                                    </h4>
+                                                </a>
+                                                <a href="" id="changePostMenuItem3"
+                                                   class="list-group-item list-group-item-info i_panel_menu_item"
+                                                   ng-click="onClickChangePostMenuItem(3)">
+                                                    <h4 class="list-group-item-heading">
+                                                        <!--<i class="fa fa-circle-thin fa-lg"></i>--><img
+                                                            src="/owner/images/type_posts/change.png"/>&nbsp;<strong>Change:</strong>
+                                                        Let's do something about...
+                                                    </h4>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inputName" class="col-lg-2 col-lg-offset-2"
+                                               tooltip="{{tooltipText}}">Title *</label>
+
+                                        <div class="row">
+                                            <div class="col-lg-8 col-lg-offset-2">
+                                                <input type="text" class="form-control" id="inputName" name="title"
+                                                       ng-model="need.title"
+                                                       placeholder="{{getTitlePlaceholder()}}" required/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="textarea-description" class="col-lg-3 col-lg-offset-2"
+                                               tooltip="{{tooltipText}}">Description *</label>
+
+                                        <div class="row">
+                                            <div class="col-lg-8 col-lg-offset-2">
+                                                <textarea style="resize: none;" class="form-control" name="description"
+                                                          rows="8" id="textarea-description"
+                                                          ng-model="need.textDescription"
+
+
+                                                          placeholder="{{getDescriptionPlaceholder()}}"
+                                                          required></textarea>
+                                            </div>
+                                        </div>
+                                        <!--span class="help-block">A longer block of help text that breaks onto a new line and may extend beyond one line.</span-->
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inputTagName" class="col-lg-2 col-lg-offset-2"
+                                               tooltip="{{tooltipText}}">Tags *</label>
+
+                                        <div class="row">
+                                            <div class="col-lg-8 col-lg-offset-2">
+                                                Using tags improves results by a great deal.
+                                            </div>
+                                        </div>
+                                        <!--
+                                        <div class="row">
+                                            <div class="col-lg-8 col-lg-offset-2">
+                                                                    <span style="margin-right:5px;cursor:pointer;" class="label label-primary btnTag"
+                                                                          ng-click="removeTag('{{tagName}}')"
+                                                                          ng-repeat="tagName in need.tags">{{tagName}}&nbsp;&nbsp;|&nbsp;x
+                                                                    </span>
+                                            </div>
+                                        </div>
+                                        -->
+                                        <!--div class="row">
+                                            <div class="col-lg-8 col-lg-offset-2">
+                                                <input type="text" class="form-control" id="inputTagName" name="tags"
+                                                       ng-model="need.tags"
+                                                       placeholder="{{getTagsPlaceholder()}}" required>
+                                            </div>
+                                        </div-->
+                                        <div class="row">
+                                            <div class="col-lg-8 col-lg-offset-2">
+                                                <tags-input id="inputTagName" ng-model="need.tags" addOnComma="true"
+                                                            class="ti-input-sm"
+                                                            placeholder="Shoes, Entertainment, For Children, etc.."></tags-input>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                    <div ng-show="showPublic(2)" class="col-lg-10 col-lg-offset-1" ng-controller="AdditionalInfoCtrl">
+                        <div class="col-lg-12">
+                            <div class="col-lg-12 bottom-buffer" style="font-size: 1.8em;">
                                     <span>
-                                        <p class="text-justify">Filling out the following categories makes it easier for people, who need what you have to offer, to find this
-                                            post and start messaging with you.<br>You can add <a class="link-to-collapse-panel"
-                                                                                                 ng-click="imageCollapseClick()">photos or
+                                        <p class="text-justify">Filling out the following categories makes it easier for
+                                            people, who need what you have to offer, to find this
+                                            post and start messaging with you.<br>You can add <a
+                                                    class="link-to-collapse-panel"
+                                                    ng-click="imageCollapseClick()">photos or
                                                 sketches</a>
                                             of the thing you're offering, or specify
-                                            <a class="link-to-collapse-panel" ng-click="locationCollapseClick()">where</a>
+                                            <a class="link-to-collapse-panel"
+                                               ng-click="locationCollapseClick()">where</a>
                                             and
                                             <a class="link-to-collapse-panel" ng-click="timeCollapseClick()">when</a>
                                             it will be available.
                                         </p>
                                     </span>
-        </div>
-    </div>
-<!--TODO rebuild image component. make it drag and drop-->
-<div id="imagesInfoCollapsed" ng-show="imageInputFieldCollapsed"
-     class="well div-table col-lg-12">
-	<div class="div-table-row">
-		<div class="col-lg-3 div-table-cell centered-text additional-info-title">Images</div>
-		<div class="col-lg-8 div-table-cell">{{getImagesComment()}}
-		</div>
-		<div class="col-lg-1 div-table-cell centered-text">
-                                        <span>
-                                            <a href="" class="glyphicon glyphicon-chevron-right"
-                                               ng-click="imageCollapseClick()">
-                                            </a>
-                                        </span>
-		</div>
-	</div>
-</div>
+                            </div>
+                        </div>
 
-<div id="imagesInfoTitleWell" ng-show="!imageInputFieldCollapsed"
-     class="well div-table col-lg-12">
-	<div class="div-table-row">
-		<div class="col-lg-3 div-table-cell centered-text additional-info-title">Images</div>
-		<div class="col-lg-1 col-lg-offset-8 div-table-cell centered-text">
-                                        <span>
-                                            <a href="" class="glyphicon glyphicon-chevron-down"
-                                               ng-click="imageCollapseClick()"></a>
-                                        </span>
-		</div>
-	</div>
-</div>
+                        <div id="imagesInfo" class="panel panel-default">
+                            <div class="panel-heading" ng-click="imageCollapseClick()">
+                                <div class="div-table-row">
+                                    <div class="col-lg-3 div-table-cell centered-text additional-info-title">
+                                        <h2 class="panel-title">Images</h2>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        {{getImagesComment()}}
+                                    </div>
+                                    <div class="col-lg-1 div-table-cell centered-text">
+                                        <!--TODO: code duplication-->
+                                        <span class="glyphicon glyphicon-chevron-right"
+                                              ng-show="imageInputFieldCollapsed"/>
+                                        <span class="glyphicon glyphicon-chevron-down"
+                                              ng-show="!imageInputFieldCollapsed"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-body" ng-show="!imageInputFieldCollapsed">
+                                <!--<location-selector address-selected="addressSelected(lat, lon, name)"></location-selector>-->
+                                <image-picker on-images-picked="onImagesPicked"></image-picker>
+                            </div>
+                        </div>
 
-<div id="imagesInfoInputFields" ng-show="!imageInputFieldCollapsed" class="div-table col-lg-12">
-	<div class="div-table-row">
-		<div class="col-lg-10 col-lg-offset-1 div-table-cell">{{getImagesComment()}}
-		</div>
-	</div>
-	<div class="div-table-row">
-		<div class="col-lg-10 col-lg-offset-1" style="font-size: 1.8em;">
-			Title Picture
-		</div>
+                        <!--<div id="imagesInfoInputFields" ng-show="!imageInputFieldCollapsed" class="div-table col-lg-12">-->
 
-		<div class="col-lg-10 col-lg-offset-1">Use something that's as expressive as possible as title picture.</div>
 
-		<div class="row col-lg-10 col-lg-offset-1">
-			<div class="col-lg-4 well">
-                <span class="glyphicon glyphicon-camera"/>
-			</div>
-			<div class="col-lg-6 col-lg-offset-1">You can change the title picture by dragging a different one here.</div>
-		</div>
+                        <!--
+                                <div class="col-lg-10 col-lg-offset-1" style="font-size: 1.8em;">
+                                    Title Picture
+                                </div>
 
-		<div class="col-lg-10 col-lg-offset-1" style="font-size: 1.8em;">
-			Additional Pictures
-		</div>
-		<div class="col-lg-10 col-lg-offset-1">These will show up as gallery when someone views your post in depth.</div>
-		<div class="col-lg-10 col-lg-offset-1 div-table-cell" won-gallery need="need"></div>
-		<div class="well col-lg-4 col-lg-offset-1">
-			<span class="glyphicon glyphicon-trash"/>
-			Drag image here to<br/> remove it from the post.
-		</div>
-	</div>
-</div>
+                                <div class="col-lg-10 col-lg-offset-1">Use something that's as expressive as possible as
+                                    title picture.
+                                </div>
 
-<div id="locationInfoCollapsed" ng-show="locationInputFieldCollapsed"
-     class="well div-table col-lg-12">
-	<div class="div-table-row">
-		<div class="col-lg-3 div-table-cell centered-text additional-info-title">Location</div>
-		<div class="col-lg-8">{{getLocationComment()}}
-		</div>
-		<div class="col-lg-1 div-table-cell centered-text">
+                                <div class="row col-lg-10 col-lg-offset-1">
+                                    <div class="col-lg-4 well">
+                                        <span class="glyphicon glyphicon-camera"/>
+                                    </div>
+                                    <div class="col-lg-6 col-lg-offset-1">You can change the title picture by dragging a
+                                        different one here.
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-10 col-lg-offset-1" style="font-size: 1.8em;">
+                                    Additional Pictures
+                                </div>
+                                <div class="col-lg-10 col-lg-offset-1">These will show up as gallery when someone views
+                                    your post in depth.
+                                </div>
+                                <div class="col-lg-10 col-lg-offset-1 div-table-cell" won-gallery need="need"></div>
+                                <div class="well col-lg-4 col-lg-offset-1">
+                                    <span class="glyphicon glyphicon-trash"/>
+                                    Drag image here to<br/> remove it from the post.
+                                </div>
+                        -->
+
+                        <div id="locationInfo" class="panel panel-default">
+                            <div class="panel-heading" ng-click="locationCollapseClick()">
+                                <div class="div-table-row">
+                                    <div class="col-lg-3 div-table-cell centered-text additional-info-title">
+                                        <h2 class="panel-title">Location</h2>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        {{getLocationComment()}}
+                                    </div>
+                                    <div class="col-lg-1 div-table-cell centered-text">
+                                        <!--TODO: code duplication-->
+                                        <span class="glyphicon glyphicon-chevron-right"
+                                              ng-show="locationInputFieldCollapsed"/>
+                                        <span class="glyphicon glyphicon-chevron-down"
+                                              ng-show="!locationInputFieldCollapsed"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-body" ng-show="!locationInputFieldCollapsed">
+                                <location-selector address-selected="addressSelected(lat, lon, name)"></location-selector>
+                            </div>
+                        </div>
+
+                        <div id="timeInfoCollapsed" ng-show="timeInputFieldCollapsed" class="well div-table col-lg-12">
+                            <div class="div-table-row">
+                                <div class="col-lg-3 div-table centered-text additional-info-title">Time</div>
+                                <div class="col-lg-8">Is it only available during a limited time interval or up till a
+                                    deadline? Then use these.
+                                </div>
+                                <div class="col-lg-1 div-table-cell centered-text">
                                     <span><a href="" class="glyphicon glyphicon-chevron-right"
-                                             ng-click="locationCollapseClick()"></a></span>
-		</div>
-	</div>
+                                             ng-click="timeCollapseClick()"></a></span>
+                                </div>
+                            </div>
+                        </div>
 
-</div>
-
-<div id="locationInfoTitleWell" ng-show="!locationInputFieldCollapsed"
-     class="well div-table col-lg-12">
-	<div class="div-table-row">
-		<div class="col-lg-3 div-table-cell centered-text additional-info-title">Location</div>
-		<div class="col-lg-1 col-lg-offset-8 div-table-cell centered-text">
-                                    <span><a href="" class="glyphicon glyphicon-chevron-down"
-                                             ng-click="locationCollapseClick()"></a></span>
-		</div>
-
-	</div>
-</div>
-
-<div id="locationInfoInputFields" ng-show="!locationInputFieldCollapsed"
-     class="div-table col-lg-12">
-	<div class="div-table-row">
-		<div class="col-lg-10 col-lg-offset-1">
-            <div>
-                {{getLocationComment()}}
-            </div>
-            <div>
-                Enter as many of these as you wish (e.g. only "Austria" works as well).
-            </div>
-
-            <label for="country" class="col-lg-10 col-lg-offset-1">Country</label>
-            <div class="col-lg-10 col-lg-offset-1">
-                <input type="text" class="form-control" id="country"
-                       placeholder="Austria" required/>
-            </div>
-
-            <label for="postal" class="col-lg-5 col-lg-offset-1">Postal</label>
-            <label for="city" class="col-lg-5">City</label>
-
-            <div class="col-lg-5 col-lg-offset-1">
-                <input type="text" class="form-control" id="postal"
-                       placeholder="1010" required/>
-            </div>
-            <div class="col-lg-5">
-                <input type="text" class="form-control" id="city"
-                       placeholder="Vienna" required/>
-            </div>
-
-
-
-            <label for="street" class="col-lg-10 col-lg-offset-1">Street</label>
-            <div class="col-lg-10 col-lg-offset-1">
-                <input type="text" class="form-control" id="street"
-                    placeholder="Yellowbrick road" required/>
-            </div>
-
-            <div class="col-lg-10 col-lg-offset-1">
-                <strong>Showing:&nbsp;</strong><span>Yellowbrick road, Vienna, Austria</span>
-                <section id="map">
-                    <div ui-map="myMap" ui-options="mapOptions" class="map-canvas"
-                         ui-event="{'map-click' : 'onClickMap($event, $params, $myMap)'}"></div>
-                </section>
-            </div>
-		</div>
-
-	</div>
-</div>
-
-<div id="timeInfoCollapsed" ng-show="timeInputFieldCollapsed" class="well div-table col-lg-12">
-	<div class="div-table-row">
-		<div class="col-lg-3 div-table centered-text additional-info-title">Time</div>
-		<div class="col-lg-8">Is it only available during a limited time interval or up till a
-			deadline? Then use these.
-		</div>
-		<div class="col-lg-1 div-table-cell centered-text">
-			<span><a href="" class="glyphicon glyphicon-chevron-right" ng-click="timeCollapseClick()"></a></span>
-		</div>
-	</div>
-</div>
-
-<div id="timeInfoTitleWell" ng-show="!timeInputFieldCollapsed"
-     class="well div-table col-lg-12">
-	<div class="div-table-row">
-		<div class="col-lg-3 div-table centered-text additional-info-title">Time</div>
-		<div class="col-lg-1 col-lg-offset-8 div-table-cell centered-text">
+                        <div id="timeInfoTitleWell" ng-show="!timeInputFieldCollapsed"
+                             class="well div-table col-lg-12">
+                            <div class="div-table-row">
+                                <div class="col-lg-3 div-table centered-text additional-info-title">Time</div>
+                                <div class="col-lg-1 col-lg-offset-8 div-table-cell centered-text">
                                     <span><a href="" class="glyphicon glyphicon-chevron-down"
                                              ng-click="timeCollapseClick()"></a></span>
-		</div>
-	</div>
-</div>
+                                </div>
+                            </div>
+                        </div>
 
-<div id="timeInfoInputFields" ng-show="!timeInputFieldCollapsed" class="div-table col-lg-12">
-	<div class="div-table-row">
-        <!--
-		<div class="col-lg-10 col-lg-offset-1 div-table-cell">Is it only available during a limited time interval or up till a
-			deadline? then use these
-		</div> -->
-		<div class="col-lg-10 col-lg-offset-1">
-			<div>
-				Is it only available during a limited time interval or up till a deadline?
-				If you don't specify anything here, the post is assumed to be relevant 24/7 all-year-round
-				until you manually deactivate it.
-			</div>
+                        <div id="timeInfoInputFields" ng-show="!timeInputFieldCollapsed" class="div-table col-lg-12">
+                            <div class="div-table-row">
+                                <!--
+                                <div class="col-lg-10 col-lg-offset-1 div-table-cell">Is it only available during a limited time interval or up till a
+                                    deadline? then use these
+                                </div> -->
+                                <div class="col-lg-10 col-lg-offset-1">
+                                    <div>
+                                        Is it only available during a limited time interval or up till a deadline?
+                                        If you don't specify anything here, the post is assumed to be relevant 24/7
+                                        all-year-round
+                                        until you manually deactivate it.
+                                    </div>
 
-            <div class="col-lg-offset-1">
-                <div>
-                    <label for="start_date" style="width: 23em; margin-left: 1em;">From:</label>
-                    <label for="end_date">To:</label>
-                </div>
+                                    <div class="col-lg-offset-1">
+                                        <div>
+                                            <label for="start_date" style="width: 23em; margin-left: 1em;">From:</label>
+                                            <label for="end_date">To:</label>
+                                        </div>
 
-                <div>
-                    <input type="date" class="form-control inline field-date-width field-right-margin" id="start_date" ng-model="need.startDate"
-                           placeholder="today"/>
+                                        <div>
+                                            <input type="date"
+                                                   class="form-control inline field-date-width field-right-margin"
+                                                   id="start_date" ng-model="need.startDate"
+                                                   placeholder="today"/>
 
-                    <input type="time" class="form-control inline field-time-width" id="start_time" ng-model="need.startTime" ng-disabled="allDay"
-                           placeholder="now"/>
-                    <span class="side-margins">-</span>
+                                            <input type="time" class="form-control inline field-time-width"
+                                                   id="start_time" ng-model="need.startTime" ng-disabled="allDay"
+                                                   placeholder="now"/>
+                                            <span class="side-margins">-</span>
 
-                    <input type="date" class="form-control inline field-date-width field-right-margin" id="end_date" ng-model="need.endDate"
-                           placeholder="27.8.2013"/>
+                                            <input type="date"
+                                                   class="form-control inline field-date-width field-right-margin"
+                                                   id="end_date" ng-model="need.endDate"
+                                                   placeholder="27.8.2013"/>
 
-                    <input type="time" class="form-control inline field-time-width" id="end_time" ng-model="need.endTime" ng-disabled="allDay"
-                           placeholder="23:59"/>
-                </div>
+                                            <input type="time" class="form-control inline field-time-width"
+                                                   id="end_time" ng-model="need.endTime" ng-disabled="allDay"
+                                                   placeholder="23:59"/>
+                                        </div>
 
-                <div>
-                    <input type="checkbox" ng-model="allDay" ng-click="clickOnAllDay()">&nbsp;All day
-                </div>
-                <div>
-                    Repeat:&nbsp;
-                    <div>
-                        <select ng-model="need.recursIn" style="width: 7em;">
-                            <option value='P0D' selected>Don't</option>
-                            <option value='P7D'>Weekly</option>
-                            <option value='P30D'>Monthly</option>
-                        </select>
+                                        <div>
+                                            <input type="checkbox" ng-model="allDay" ng-click="clickOnAllDay()">&nbsp;All
+                                            day
+                                        </div>
+                                        <div>
+                                            Repeat:&nbsp;
+                                            <div>
+                                                <select ng-model="need.recursIn" style="width: 7em;">
+                                                    <option value='P0D' selected>Don't</option>
+                                                    <option value='P7D'>Weekly</option>
+                                                    <option value='P30D'>Monthly</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+
+                    <div ng-show="showPublic(3)" class="col-lg-8 col-lg-offset-2">
+                        <div>
+                            This is how other people will see your post when they get a request from you or find it on
+                            the Web of Needs:
+                        </div>
+
+                        <div class="row">
+                            <div class="media well">
+                                <img class="thumbnail thumbnail-size media-object pull-left"
+                                     src="/owner/images/need.jpg"/>
+
+                                <div class="media-body">
+                                    <h4 class="media-heading">{{need.title}}</h4>
+
+                                    <p class="text-justify">
+                                        <!-- TODO shorten the text description -->
+                                        {{need.textDescription}} (<a href="" ng-click="goToDetailPostPreview()">go to full description</a>).
+                                        <!-- TODO link needs to be extended by parameters -->
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            And this is how it will look if they view it in greater detail:
+                        </div>
+
+                        <div id="detail-preview" class="col-md-12 well">
+                            <!--TODO controller should be specified in the directive-->
+                            <won-Post-Detail need="previewNeed"></won-Post-Detail>
+                            <!--deactivate conatct, map and calendar-->
+                        </div>
+                    </div>
+
+                </form>
             </div>
 
+        </div>
 
-		</div>
-	</div>
-</div>
-</div>
 
-<div ng-show="showPublic(3)" class="col-lg-8 col-lg-offset-2">
-    <div>
-        This is how other people will see your post when they get a request from you or find it on the Web of Needs:
-    </div>
+        <div class="row top-buffer">
+            <div class="col-lg-6 col-lg-offset-3"
+                 style="text-align:center;margin-top:15px;">
+                <button ng-show="previousButton" type="button" class="btn btn-primary" ng-click="previousStep()">
+                    <i class="fa fa-chevron-left fa-lg"></i>&nbsp;Previous
+                </button>
+                <button ng-show="saveDraftButton" type="button" class="btn btn-primary" ng-click="saveDraft()">
+                    <!--<span class="glyphicon glyphicon-floppy-disk">)-->
+                    <i class="fa fa-pencil fa-lg"></i>&nbsp;Save Draft {{counter}}</span>
+                </button>
+                <button ng-show="nextButton" type="button" class="btn btn-success" ng-disabled="!validatePostForm()"
+                        ng-click="nextStep()">
+                    <i class="fa fa-chevron-right fa-lg"></i>&nbsp;Next
+                </button>
+                <button ng-show="previewButton" type="button" class="btn btn-primary"
+                        ng-disabled="goToPreviewButtonDisabled()" ng-click="jumpToStep(3)">
+                    <i class="fa fa-chevron-right fa-lg"></i><i class="fa fa-chevron-right fa-lg"></i>&nbsp;{{gotoPreviewButtonText()}}
+                </button>
+                <button ng-show="publishButton" type="button" class="btn btn-success" ng-click="publishClicked()">
+                    <i class="fa fa-check fa-lg"></i>&nbsp;Publish
+                </button>
 
-    <div class="row">
-        <div class="media well">
-            <img class="thumbnail thumbnail-size media-object pull-left" src="/owner/images/need.jpg"/>
-            <div class="media-body">
-                <h4 class="media-heading">{{need.title}}{{need.uri}}</h4>
-                <p class="text-justify">
-                    <!-- TODO shorten the text description -->
-                    {{need.textDescription}} (<a href="#/post-detail/">go to full description</a>).
-                    <!-- TODO link needs to be extended by parameters -->
-                </p>
             </div>
         </div>
     </div>
-
-    <div>
-        And this is how it will look if they view it in greater detail:
-    </div>
-
-    <div class="col-md-12 well">
-        <won-Post-Detail need="need"></won-Post-Detail>
-        <!--deactivate conatct, map and calendar-->
-    </div>
-</div>
-
-</form>
-</div>
-
-</div>
-
-<div class="row top-buffer">
-	<div class="col-lg-6 col-lg-offset-3"
-	     style="text-align:center;margin-top:15px;">
-		<button ng-show="previousButton" type="button" class="btn btn-primary" ng-click="previousStep()">
-            <i class="fa fa-chevron-left fa-lg"></i>&nbsp;Previous
-		</button>
-		<button ng-show="saveDraftButton" type="button" class="btn btn-primary" ng-click="saveDraft()">
-			<!--<span class="glyphicon glyphicon-floppy-disk">)-->
-            <i class="fa fa-pencil fa-lg"></i>&nbsp;Save Draft {{counter}}</span>
-		</button>
-		<button ng-show="nextButton" type="button" class="btn btn-success" ng-disabled="!validatePostForm()" ng-click="nextStep()">
-            <i class="fa fa-chevron-right fa-lg"></i>&nbsp;Next</button>
-		<button ng-show="previewButton" type="button" class="btn btn-primary" ng-disabled="goToPreviewButtonDisabled()" ng-click="jumpToStep(3)">
-            <i class="fa fa-chevron-right fa-lg"></i><i class="fa fa-chevron-right fa-lg"></i>&nbsp;{{gotoPreviewButtonText()}}
-		</button>
-		<button ng-show="publishButton" type="button" class="btn btn-success" ng-click="publish()">
-            <i class="fa fa-check fa-lg"></i>&nbsp;Publish</button>
-	</div>
-</div>
-
-
-</div>
-
 </div>

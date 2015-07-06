@@ -39,7 +39,8 @@ import java.util.List;
  * User: syim
  * Date: 27.01.14
  */
-public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommunicationService {
+public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommunicationService
+{
 
     @Autowired
     private OwnerProtocolCamelConfigurator ownerProtocolCamelConfigurator;

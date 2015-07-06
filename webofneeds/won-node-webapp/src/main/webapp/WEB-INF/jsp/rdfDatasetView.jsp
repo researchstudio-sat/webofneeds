@@ -1,9 +1,9 @@
-<%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
-<%@ page import="java.io.StringWriter" %>
-<%@ page import="org.springframework.web.util.HtmlUtils" %>
 <%@ page import="com.hp.hpl.jena.query.Dataset" %>
 <%@ page import="org.apache.jena.riot.RDFDataMgr" %>
 <%@ page import="org.apache.jena.riot.RDFFormat" %>
+<%@ page import="java.io.StringWriter" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.regex.Pattern" %>
 <%--
 ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
 ~
@@ -46,6 +46,12 @@
         RDFDataMgr.write(stringWriter, dataset, RDFFormat.TRIG.getLang());
         //String escapedTurtle = HtmlUtils.htmlEscape(stringWriter.toString());
         String htmlTurtle = stringWriter.toString().replaceAll("<([^>]+)>","<a href=\"$1\">&lt;$1&gt;</a>");
+        //convert all prefixed URIs to links
+        Map<String, String> prefixes = dataset.getDefaultModel().getNsPrefixMap();
+        for(String key: prefixes.keySet()) {
+            String value = prefixes.get(key);
+            htmlTurtle = htmlTurtle.replaceAll("("+Pattern.quote(key)+":(\\w+))", "<a href=\"" + value + "$2\">$1</a>");
+        }
         out.print(htmlTurtle);
 %>
     </pre>

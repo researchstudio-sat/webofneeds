@@ -17,9 +17,7 @@
 package won.node.service.impl;
 
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
-import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 
@@ -38,10 +36,6 @@ public class URIService
   private String connectionResourceURIPrefix;
   //prefix of an event resource
   private String eventResourceURIPrefix;
-  //prefix of a messageEvent resource
-  private String messageEventResourceURIInfix;
-  //need meta information suffix
-  private String needMetaInformationURISuffix;
   //prefix for URISs of RDF data
   private String dataURIPrefix;
   //prefix for URIs referring to real-world things
@@ -146,14 +140,6 @@ public class URIService
     this.eventResourceURIPrefix = eventResourceURIPrefix;
   }
 
-  public void setMessageEventResourceURIInfix(final String messageEventResourceURIInfix) {
-    this.messageEventResourceURIInfix = messageEventResourceURIInfix;
-  }
-
-  public void setNeedMetaInformationURISuffix(final String needMetaInformationURISuffix) {
-    this.needMetaInformationURISuffix = needMetaInformationURISuffix;
-  }
-
   public void setDataURIPrefix(final String dataURIPrefix)
   {
     this.dataURIPrefix = dataURIPrefix;
@@ -174,13 +160,10 @@ public class URIService
     this.generalURIPrefix = generalURIPrefix;
   }
 
-  public URI createEventURI(final Connection con, final ConnectionEvent event)
-  {
-    return createEventURIForId(event.getId().toString());
-  }
-
-  public URI createNeedMetaInformationURI(final URI needURI) {
-    return URI.create(needURI.toString() + needMetaInformationURISuffix + WonRdfUtils.NAMED_GRAPH_SUFFIX);
+  public URI createNeedSysInfoGraphURI(final URI needURI) {
+    //TODO: [SECURITY] it's possible to submit need data that clashes with this name,
+    // which may lead to undefined behavior
+    return URI.create(needURI.toString() + "#sysinfo");
   }
 
   /**
