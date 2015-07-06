@@ -1,4 +1,4 @@
-package data;
+package rescal;
 
 
 import com.hp.hpl.jena.query.*;
@@ -26,9 +26,9 @@ public class RescalSparqlService extends CrawlSparqlService
   private static final Logger log = LoggerFactory.getLogger(RescalSparqlService.class);
   private OpenNlpTokenExtraction preprocessing;
 
-  public RescalSparqlService(final String sparqlEndpoint) throws IOException {
+  public RescalSparqlService(final String sparqlEndpoint, String nlpResourceDir) throws IOException {
     super(sparqlEndpoint);
-    preprocessing = new OpenNlpTokenExtraction();
+    preprocessing = new OpenNlpTokenExtraction(nlpResourceDir);
   }
 
   /**

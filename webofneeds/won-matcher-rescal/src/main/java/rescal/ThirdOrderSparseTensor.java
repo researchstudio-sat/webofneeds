@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package data;
+package rescal;
 
 import org.la4j.Matrices;
 import org.la4j.matrix.sparse.CCSMatrix;
@@ -24,9 +24,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Sparse third order tensor based on la4j implementation of sparse matrices.
@@ -77,8 +80,11 @@ public class ThirdOrderSparseTensor
   }
 
   public void writeSliceToFile(String fileName, int slice) throws IOException {
+
+    // write the mtx file (remove the column-major specification cause python mm does not read it)
     OutputStream os = new FileOutputStream(new File(fileName));
-    os.write(slices[slice].toMatrixMarket().getBytes());
+    NumberFormat format = DecimalFormat.getInstance(Locale.US);
+    os.write(slices[slice].toMatrixMarket(format).replace("column-major", "").getBytes());
   }
 
   public Collection<Integer> getNonZeroIndicesOfRow(int x1, int x3) {

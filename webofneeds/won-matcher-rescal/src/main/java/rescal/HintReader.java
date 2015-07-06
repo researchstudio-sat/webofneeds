@@ -1,4 +1,4 @@
-package data;
+package rescal;
 
 import common.event.BulkHintEvent;
 import common.event.HintEvent;
@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
+ * Used to read a hint matrix mtx file and create (bulk) hint event objects from it.
+ *
  * User: hfriedrich
  * Date: 23.06.2015
  */

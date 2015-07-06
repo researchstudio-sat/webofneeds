@@ -1,13 +1,15 @@
 import argparse
 import logging
+import sys
 from scipy.io import mmwrite
 
 __author__ = 'hfriedrich'
 
-logging.basicConfig(level=logging.INFO,
+logging.basicConfig(level=logging.INFO, stream=sys.stdout,
                     format='%(asctime)s %(levelname)-8s %(message)s',
                     datefmt='%a, %d %b %Y %H:%M:%S')
 _log = logging.getLogger()
+
 
 from tools.tensor_utils import read_input_tensor, SparseTensor, execute_extrescal, \
     predict_rescal_hints_by_threshold, create_hint_mask_matrix

@@ -4,6 +4,7 @@ __author__ = 'hfriedrich'
 
 import logging
 import codecs
+import sys
 import numpy as np
 from scipy.io import mmread
 from scipy.sparse import csr_matrix, lil_matrix
@@ -12,7 +13,7 @@ from scipy.spatial.distance import squareform
 from rescal import rescal_als
 from extrescal.extrescal import rescal
 
-logging.basicConfig(level=logging.INFO,
+logging.basicConfig(level=logging.INFO, stream=sys.stdout,
                     format='%(asctime)s %(levelname)-8s %(message)s',
                     datefmt='%a, %d %b %Y %H:%M:%S')
 _log = logging.getLogger()
@@ -77,9 +78,11 @@ class SparseTensor:
             return attr
 
         def getNeedIndicesForAttribute(self, attribute):
-            attr_idx = self.getHeaders().index(attribute)
-            needs = [need for need in self.getNeedIndices() if
-                     (self.getSliceMatrix(SparseTensor.NEED_TYPE_SLICE)[need, attr_idx] == 1)]
+            needs = []
+            if (attribute in self.getHeaders()):
+                attr_idx = self.getHeaders().index(attribute)
+                needs = [need for need in self.getNeedIndices() if
+                         (self.getSliceMatrix(SparseTensor.NEED_TYPE_SLICE)[need, attr_idx] == 1)]
             return needs
 
         def hasConnection(self, need1, need2):

@@ -1,4 +1,4 @@
-package data;/*
+package rescal;/*
  * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");

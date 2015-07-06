@@ -24,10 +24,10 @@ public class OpenNlpTokenExtraction
   Tokenizer tokenizer = SimpleTokenizer.INSTANCE;
   POSTaggerME posTagger = null;
 
-  public OpenNlpTokenExtraction() throws IOException {
+  public OpenNlpTokenExtraction(String resourceDir) throws IOException {
 
     InputStream modelIn = null;
-    modelIn = new FileInputStream("src/main/resources/en-pos-maxent.bin");
+    modelIn = new FileInputStream(resourceDir + "/en-pos-maxent.bin");
     POSModel model = new POSModel(modelIn);
     posTagger = new POSTaggerME(model);
   }
