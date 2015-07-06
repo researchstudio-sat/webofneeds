@@ -33,13 +33,5 @@
     "ng-tags-input": "~2.3.0",
     "ng-clip": "~0.2.6",
     "font-awesome": "~4.3.0"
-  },
-  "resolutions": {
-    "angular": "~1.4.1",
-    "angular-bootstrap": "~0.13.0",
-    "angular-mocks": "~1.4.1",
-    "angular-route": "~1.4.1",
-    "angular-ui-utils": "~2.0.0",
-    "ng-tags-input": "~2.3.0"
   }
 }
