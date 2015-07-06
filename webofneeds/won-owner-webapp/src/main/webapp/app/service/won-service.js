@@ -36,8 +36,11 @@ angular.module('won.owner').factory('wonService', function (
         .success(
         function onGetDefaultWonNodeUri(data, status, headers, config) {
             if (status == 200){
-                $log.debug("setting default won node uri to value obtained from server: " + JSON.stringify(data));
-                privateData.defaultWonNodeUri = JSON.parse(data);
+                $log.debug("setting default won node uri to value obtained from server: " + data);
+                //angular defaults to JSON as response-return now and already parses it automatically
+                // we don't need to parse it again here.
+                //privateData.defaultWonNodeUri = JSON.parse(data);
+                privateData.defaultWonNodeUri = data;
             } else {
                 $log.error("Error obtaining default won node uri, http status=" + status);
 
