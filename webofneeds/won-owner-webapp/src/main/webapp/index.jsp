@@ -294,17 +294,17 @@
                 isAuth : false
                 </sec:authorize>
             };
-        </script>
 
-        <!--
-        <script type="text/javascript">
-            window.user = {
-            function onGoogleReady() {
-                angular.bootstrap(document.getElementsByTagName("html")[0], ['won.owner']);
-            }
+            angular.bootstrap(document.getElementsByTagName("html")[0], ['won.owner']);
+            /*
+             angular.bootstrap(document, ['won.owner'], {
+             // make sure dependency injection works after minification
+             // see https://docs.angularjs.org/guide/production
+             // and https://docs.angularjs.org/guide/di#dependency-annotation
+             //strictDi: true //TODO
+             });*/
         </script>
-        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&callback=onGoogleReady"></script>
-        -->
+        <!--<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&callback=onGoogleReady"></script>-->
 	</body>
 </html>
 
