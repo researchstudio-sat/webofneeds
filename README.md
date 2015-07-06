@@ -52,6 +52,7 @@ See also: http://events.linkeddata.org/ldow2013/papers/ldow2013-paper-13.pdf
         * Node.js (should be in your $PATH)
         * Bower (should be in your $PATH)
         * Git (should be in your $PATH)
+        * Gulp (should be in your $PATH)
         * Nodejs-plugin for IntelliJ 
 1. Import into IntelliJ via the Maven task
 1. Create Gulp-configuration according to: <https://www.jetbrains.com/idea/help/using-gulp-task-runner.html#d588211e148>, pointing to the owner-app's gulpfile.js [1]
