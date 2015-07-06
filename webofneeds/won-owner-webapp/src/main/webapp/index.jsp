@@ -27,9 +27,9 @@
 		<link rel="stylesheet" href="style/bootstrap.min.css" />
 		<%--<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>--%>
 
-        <link rel="stylesheet" href="bower_components/bootsketch/build/css/bootsketch.css"/>
-        <link rel="stylesheet" href="style/bootsketch-patches.css"/>
-        <%--<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css"/> --%>
+        <!--<link rel="stylesheet" href="bower_components/bootsketch/build/css/bootsketch.css"/>-->
+        <!--<link rel="stylesheet" href="style/bootsketch-patches.css"/>-->
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css"/>
 
 	    <link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
 	    <link rel="stylesheet" href="style/datepicker.css"/>
@@ -96,7 +96,7 @@
         <script type="text/javascript" src="<c:url value="/app/service/application-state-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/application-control-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
+        <%--<script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>--%>
         <script type="text/javascript" src="<c:url value="/app/service/osm-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/util-service.js"/>"></script>
