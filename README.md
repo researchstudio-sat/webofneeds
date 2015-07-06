@@ -54,7 +54,7 @@ See also: http://events.linkeddata.org/ldow2013/papers/ldow2013-paper-13.pdf
         * Git (should be in your $PATH)
         * Nodejs-plugin for IntelliJ 
 1. Import into IntelliJ via the Maven task
-1. Create Gulp-configuration according to: <https://www.jetbrains.com/idea/help/using-gulp-task-runner.html#d588211e148>, pointing to the owner-app's gulpfile.js
+1. Create Gulp-configuration according to: <https://www.jetbrains.com/idea/help/using-gulp-task-runner.html#d588211e148>, pointing to the owner-app's gulpfile.js [1]
 1. Create tomcat-configurations, e.g.:
     * After-launch: `http://localhost:8080/won/`
     * VM-Options: `-XX:MaxPermSize=250m -Dlogback.configurationFile=C:\WoN\webofneeds\webofneeds\conf.local\logback.xml -DWON_CONFIG_DIR=C:\WoN\webofneeds\webofneeds\conf.local -Dsolr.solr.home=C:\WoN\webofneeds\webofneeds\won-matcher-solr\target\won-matcher-solr-0.1-SNAPSHOT\siren\solr`
@@ -64,9 +64,9 @@ See also: http://events.linkeddata.org/ldow2013/papers/ldow2013-paper-13.pdf
         * `won-node-webapp:war exploded` as `/won`
         * `won-owner-webapp:war exploded` as `/owner`
         * `apache-solr-3.5.0.war` as `/siren`
-1. Make your tomcat deploy-configuration depend on the gulp configuration (don't forget to insert it *before* the packing of the `.war`-files)
+1. Make your tomcat deploy-configuration depend on the gulp configuration (don't forget to insert it *before* the packing of the `.war`-files) [1]
 
-Sadly there doesn't seem to be a way to run the gulp configuration when just reloading resources. During development you either need to run gulp manually (there's a handy `watch`-task in gulp) or restart the server every time to see the changes in the scss.
+[1]: If you don't want to develop at the SCSS, you can skip these steps. Maven install will run gulp. If you do want to develop at the SCSS: Sadly there doesn't seem to be a way to run the gulp configuration when just reloading resources. During development you either need to run gulp manually (there's a handy `watch`-task in gulp) or restart the server every time to see the changes in the scss.
 
-A major build speedup can be achieved by running the maven install task with the `copy-*-dependencies` options enabled and then copying the war files from the most generic `target`-folder to `$TOMCAT/shared/lib` and afterwards always using the `skip-dependencies` option for maven install.
+A **major build speedup** can be achieved by running the maven install task with the `copy-*-dependencies` options enabled and then copying the war files from the most generic `target`-folder to `$TOMCAT/shared/lib` and afterwards always using the `skip-dependencies` option for maven install.
 

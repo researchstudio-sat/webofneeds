@@ -210,6 +210,14 @@
                             <arguments>install</arguments>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>gulp</id>
+                        <goals>
+                            <goal>gulp</goal>
+                        </goals>
+                        <configuration>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
