@@ -53,6 +53,7 @@ webofneeds/conf.local
 #local package caches
 bower_components/
 node_modules/
+jspm_packages/
 
 #generated styles
-style/generated/
+**/style/generated/

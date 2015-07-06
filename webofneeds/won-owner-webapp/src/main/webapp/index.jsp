@@ -228,9 +228,9 @@
         <script type="text/javascript" src="scripts/star-rating.min.js"></script>
 
 
-        <!--
         <script src="jspm_packages/system.js"></script>
         <script src="jspm_config.js"></script>
+        <!--
         <script>
             //System.import('app/app')
             System.import('app/jspm_test')
