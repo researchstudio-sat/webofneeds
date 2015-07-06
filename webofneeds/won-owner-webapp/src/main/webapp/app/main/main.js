@@ -51,7 +51,7 @@ angular.module('won.owner').controller("MainCtrl", function($scope,$location, ap
     $scope.unreadEventsByNeedByType = applicationStateService.getUnreadEventsByNeedByType();
     $scope.unreadEventsByTypeByNeed = applicationStateService.getUnreadEventsByTypeByNeed();
     $scope.allDrafts = applicationStateService.getAllDrafts();
-    $scope.allNeeds = applicationStateService.getAllNeeds();
+    //$scope.allNeeds = applicationStateService.getAllNeeds();
     //TODO; reafactor this. move it to applicationStateService. it is used by private link controller
     //allow acces to service methods from angular expressions:
     $scope.openNeedDetailView = applicationControlService.openNeedDetailView;
