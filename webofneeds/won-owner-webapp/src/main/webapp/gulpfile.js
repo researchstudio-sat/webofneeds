@@ -12,9 +12,9 @@ var autoprefixer = require('gulp-autoprefixer');
 //        .pipe(gulp.dest('./css'));
 //});
 
-gulp.task('sass:watch', function () {
-    gulp.watch('./sass/**/*.scss', ['sass']);
-});
+//gulp.task('sass:watch', function () {
+//    gulp.watch('./sass/**/*.scss', ['sass']);
+//});
 
 gulp.task('default', ['sass']);
 

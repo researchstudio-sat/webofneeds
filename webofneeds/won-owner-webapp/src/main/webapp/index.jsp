@@ -49,8 +49,11 @@
         <link rel="stylesheet" href="resources/leaflet-0.7.3/leaflet.css"/>
 
 
-        <!-- Our CSS'. Included last so it wins in clashes vs libraries. -->
+        <!-- Our legacy CSS'. -->
         <link rel="stylesheet" href="style/main.css"/>
+        <!-- The CSS generated from our ./style/won.scss
+        Included last so it wins in clashes vs libraries. -->
+        <link rel="stylesheet" href="style/generated/won.min.css" />
 
 
         <script src="scripts/jquery.10.2.js"></script>
@@ -147,6 +150,7 @@
 				<li ng-class="isActive()"><a href="" ng-click="clickOnWon()">
 					<i class="fa fa-arrows-alt fa-lg"></i>&nbsp;WoN</a>
 				</li>
+                <!--<li class="testfoo">If you see me moving, SCSS is working!</li>-->
 			</ul>
 			<ul class="nav navbar-nav">
                 <li class="dropdown"
