@@ -17,6 +17,20 @@
 //import angular from 'angular';
 //window.angular = angular; //for backwards compatibility with the old code base;
 
+/*
+import ngRoute from 'angular-route';
+
+console.log('------------------');
+console.log(ngRoute);
+console.log('------------------');
+*/
+
+/*
+require('angular-animate'),
+    require('angular-mocks/ngMock'),
+    require('angular-mocks/ngAnimateMock'),
+    require('angular-i18n/en-us')*/
+
 //export var app = angular.module('won.owner',
 var app = angular.module('won.owner',
         [ 'ui.bootstrap'

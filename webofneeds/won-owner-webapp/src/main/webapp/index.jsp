@@ -60,6 +60,8 @@
 
 
 	</head>
+    <body>
+    <!--
 	<body ng-controller="MainCtrl">
 		<span ng-init=""></span>
 		<nav class="navbar navbar-default" role="navigation" ng-controller="HeaderCtrl">
@@ -71,7 +73,6 @@
 				<li ng-class="isActive()"><a href="" ng-click="clickOnWon()">
 					<i class="fa fa-arrows-alt fa-lg"></i>&nbsp;WoN</a>
 				</li>
-                <!--<li class="testfoo">If you see me moving, SCSS is working!</li>-->
 			</ul>
 			<ul class="nav navbar-nav">
                 <li class="dropdown"
@@ -81,19 +82,21 @@
 						<i class="fa fa-plus-circle fa-lg"></i>&nbsp;New Post
 					</a>
 					<ul class="dropdown-menu">
-						<li class="top-layer"><a href="#/create-need/1/0/"><!--<i class="fa fa-circle fa-lg"></i>--><img
-                                src="/owner/images/type_posts/want.png"/>&nbsp;I want
+						<li class="top-layer"><a href="#/create-need/1/0/">
+                            <img src="/owner/images/type_posts/want.png"/>&nbsp;I want
 							to <strong>have</strong> something</a></li>
 						<li class="divider"></li>
-						<li class="top-layer"><a href="#/create-need/1/1/"><!--<i class="fa fa-circle-o fa-lg"></i>--><img
-                                src="/owner/images/type_posts/offer.png"/>&nbsp;I
+						<li class="top-layer"><a href="#/create-need/1/1/">
+                            <img src="/owner/images/type_posts/offer.png"/>&nbsp;I
 							<strong>offer</strong> something</a></li>
 						<li class="divider"></li>
-						<li class="top-layer"><a href="#/create-need/1/2/"><!--<i class="fa fa-circle-o-notch fa-lg"></i>--><img
+						<li class="top-layer"><a href="#/create-need/1/2/">
+                            <img
                                 src="/owner/images/type_posts/todo.png"/>&nbsp;I
 							want to do something <strong>together</strong></a></li>
 						<li class="divider"></li>
-						<li class="top-layer"><a href="#/create-need/1/3/"><!--<i class="fa fa-circle-thin fa-lg"></i>--><img
+						<li class="top-layer"><a href="#/create-need/1/3/">
+                            <img
                                 src="/owner/images/type_posts/change.png"/>&nbsp;I
 							want to <strong>change</strong> something</a></li>
 						<li class="divider" ng-show="!showPublic()"></li>
@@ -157,8 +160,6 @@
                                 Sign In&nbsp;<span class="caret"/>
                             </a>
                         </li>
-				<!--<li ng-show="!showPublic()"><a href="#/need-list">{{userdata.username}}</a></li>
-										<li ng-show="!showPublic()"><a href="" ng-click="onClickSignOut()">Sign out</a></li>     -->
 
 				<li class="dropdown" ng-show="!showPublic()" ng-cloak>
 					<a class="dropdown-toggle" data-toggle="dropdown" href="">
@@ -176,26 +177,39 @@
 
 		<div ng-view id="content" class="container">
 		</div>
+        -->
 
 		<!--actually there's a footer html tag for this use-case-->
 		<!--also we should get rid of these nested divs--->
-<nav class="navbar navbar-default navbar-bottom" role="navigation">
-    <div class="container" style="padding:0">
-        <!--<div class="collapse navbar-collapse navbar-ex1-collapse" style="padding-left:0;padding-right:15px">-->
-        <ul class="nav navbar-nav">
-            <li><a href="#/why-use">&nbsp;Why use the Web of Needs</a></li>
-            <li><a href="#/faq">&nbsp;FAQ</a></li>
-            <li><a href="#/impressum">&nbsp;Impressum</a></li>
-        </ul>
-    </div>
-</nav>
+        <!--
+        <nav class="navbar navbar-default navbar-bottom" role="navigation">
+            <div class="container" style="padding:0">
+                <ul class="nav navbar-nav">
+                    <li><a href="#/why-use">&nbsp;Why use the Web of Needs</a></li>
+                    <li><a href="#/faq">&nbsp;FAQ</a></li>
+                    <li><a href="#/impressum">&nbsp;Impressum</a></li>
+                </ul>
+            </div>
+        </nav>
+        -->
 
         <script src="scripts/jquery.10.2.js"></script>
         <script src="scripts/jquery.fs.scroller.min.js"></script>
 
+        <script src="jspm_packages/system.js"></script>
+        <script src="jspm_config.js"></script>
+        <script>
+            console.log(System);
+
+            //System.import('app/app')
+            System.import('app/app_jspm')
+                    .catch(console.error.bind(console));
+        </script>
+        <!--
         <script type="text/javascript" src="jspm_packages/bower/angular@1.4.2/angular.js"></script>
-        <script type="text/javascript" src="jspm_packages/github/twbs/bootstrap@3.3.5/js/bootstrap.js"></script>
         <script type="text/javascript" src="jspm_packages/github/angular/bower-angular-route@1.4.2/angular-route.js"></script>
+        <script type="text/javascript" src="jspm_packages/github/twbs/bootstrap@3.3.5/js/bootstrap.js"></script>
+
         <script type="text/javascript" src="jspm_packages/github/angular/bower-angular-mocks@1.4.2/angular-mocks.js"></script>
         <script type="text/javascript" src="jspm_packages/github/angular-ui/bootstrap-bower@0.13.0/ui-bootstrap-tpls.js"></script>
         <script type="text/javascript" src="jspm_packages/bower/ng-tags-input@2.3.0/ng-tags-input.js"></script>
@@ -219,20 +233,14 @@
         <script type="text/javascript" src="scripts/rdfstore-js/rdf_store.js"></script>
         <script type="text/javascript" src="scripts/angular-scrollable-table/angular-scrollable-table.js"></script>
         <script type="text/javascript" src="scripts/star-rating.min.js"></script>
+        <!--
+        -->
 
-        <script src="jspm_packages/system.js"></script>
-        <script src="jspm_config.js"></script>
-        <script>
-            console.log(System);
-
-            //System.import('app/app')
-            System.import('app/jspm_test')
-                    .catch(console.error.bind(console));
-        </script>
 
         <!--
         TODO app.js should be included via jspm/system.js
         -->
+        <!--
         <script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/won.js"/>"></script>
 
