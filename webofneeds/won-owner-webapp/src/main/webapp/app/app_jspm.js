@@ -11,9 +11,36 @@ console.log('System.import working');
 
 import angular from 'angular';
 
-var app = angular.module('won.owner',[])
+import wonAppTag from 'app/wonAppTag';
 
-angular.bootstrap(document, ['won.owner'], { });
+let app = angular.module('won.owner',[])
+                 .directive('wonApp', wonAppTag);
+//let app = angular.module('won.owner',[]);
+angular.bootstrap(document, ['won.owner'], {
+    // make sure dependency injection works after minification
+    // see https://docs.angularjs.org/guide/production
+    // and https://docs.angularjs.org/guide/di#dependency-annotation
+    strictDi: true
+});
 
-console.log(angular);
+console.log('app_jspm.js: ', angular);
+window.app = app; //TODO for debugging only. remove me.
+window.wonAppTag = wonAppTag; //TODO for debugging only. remove me.
+
+
+function appTag() {
+    let template = '<h1>Hello, from your lovely app-directive!</h1>'
+
+    function link() {
+    }
+
+    let directive = {
+        restrict: 'E',
+        link: link,
+        template: template
+    }
+    return directive
+}
+
+class Foo{}
 

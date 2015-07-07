@@ -61,6 +61,7 @@
 
 	</head>
     <body>
+        <won-app></won-app>
     <!--
 	<body ng-controller="MainCtrl">
 		<span ng-init=""></span>
@@ -199,8 +200,7 @@
         <script src="jspm_packages/system.js"></script>
         <script src="jspm_config.js"></script>
         <script>
-            console.log(System);
-
+            //console.log(System);
             //System.import('app/app')
             System.import('app/app_jspm')
                     .catch(console.error.bind(console));
