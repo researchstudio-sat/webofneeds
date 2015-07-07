@@ -190,7 +190,6 @@
     </div>
 </nav>
 
-
         <script src="scripts/jquery.10.2.js"></script>
         <script src="scripts/jquery.fs.scroller.min.js"></script>
         <script src="bower_components/angular/angular.js"></script>
@@ -200,9 +199,6 @@
 
         <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 
-        <%--
-        <script type="text/javascript" src="bower_components/angular-ui-utils/ui-utils.js"></script> <!-- to include all ui-utils TODO deleteme-->
-        --%>
         <script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
         <script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
         <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
@@ -215,7 +211,6 @@
         <script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
         <script type="text/javascript" src="scripts/upload/jquery.fileupload-process.js"></script>
         <script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
-        <%--<script type="text/javascript" src="scripts/osm/angular-leaflet-directive.min.js"></script>--%>
         <script type="text/javascript" src="scripts/bootstrap-datepicker.js"></script>
         <script type="text/javascript" src="scripts/lightbox.min.js"></script>
         <script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>
@@ -224,19 +219,17 @@
         <script type="text/javascript" src="scripts/jsonld.js"></script>
         <script type="text/javascript" src="scripts/rdfstore-js/rdf_store.js"></script>
         <script type="text/javascript" src="scripts/angular-scrollable-table/angular-scrollable-table.js"></script>
-
         <script type="text/javascript" src="scripts/star-rating.min.js"></script>
-
 
         <script src="jspm_packages/system.js"></script>
         <script src="jspm_config.js"></script>
-        <!--
         <script>
+            console.log(System);
+
             //System.import('app/app')
             System.import('app/jspm_test')
                     .catch(console.error.bind(console));
         </script>
-        -->
 
         <!--
         TODO app.js should be included via jspm/system.js
@@ -247,7 +240,6 @@
         <script type="text/javascript" src="<c:url value="/app/service/application-state-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/application-control-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
-        <%--<script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>--%>
         <script type="text/javascript" src="<c:url value="/app/service/osm-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/util-service.js"/>"></script>
@@ -304,7 +296,8 @@
              //strictDi: true //TODO
              });*/
         </script>
-        <!--<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&callback=onGoogleReady"></script>-->
+        <!--
+        -->
 	</body>
 </html>
 

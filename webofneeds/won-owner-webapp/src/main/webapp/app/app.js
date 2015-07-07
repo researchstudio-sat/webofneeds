@@ -298,3 +298,5 @@ app.config(['ngClipProvider', function(ngClipProvider){
 app.config(['$logProvider', function($logProvider){
     $logProvider.debugEnabled(true);
 }])
+
+//export default app;
