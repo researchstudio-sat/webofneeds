@@ -41,4 +41,4 @@ matching-service
 
 See also: http://events.linkeddata.org/ldow2013/papers/ldow2013-paper-13.pdf
 
-**Build-instructions** can be found in [this project's wiki](https://github.com/researchstudio-sat/webofneeds/wiki)
+**Build-instructions** can be found in the [project wiki](https://github.com/researchstudio-sat/webofneeds/wiki)
