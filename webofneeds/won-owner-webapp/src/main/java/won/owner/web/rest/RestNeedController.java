@@ -216,7 +216,7 @@ public class RestNeedController {
       } else {
         draftRepository.delete(draft);
       }
-      return ResponseEntity.ok().body("deleted draft: " + uri);
+      return ResponseEntity.ok().body("\"deleted draft: " + uri + "\"");
     } catch (URISyntaxException e) {
       logger.warn("draft uri problem.", e);
       return ResponseEntity.badRequest().body("draft uri problem");

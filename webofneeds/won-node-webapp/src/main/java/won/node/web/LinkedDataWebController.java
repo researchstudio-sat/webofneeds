@@ -317,7 +317,7 @@ public class
     logger.debug("resource URI requested with page mime type. redirecting from {} to {}", requestUri, redirectToURI);
     if (redirectToURI.equals(requestUri)) {
         logger.debug("redirecting to same URI avoided, sending status 500 instead");
-        return new ResponseEntity<String>("Could not redirect to linked data page", HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<String>("\"Could not redirect to linked data page\"", HttpStatus.INTERNAL_SERVER_ERROR);
     }
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
     HttpHeaders headers = new HttpHeaders();
@@ -325,7 +325,7 @@ public class
     addCORSHeader(headers);
     //add a location header
     headers.add("Location",redirectToURI);
-    return new ResponseEntity<String>("", headers, HttpStatus.SEE_OTHER);
+    return new ResponseEntity<String>("{}", headers, HttpStatus.SEE_OTHER);
   }
 
   /**

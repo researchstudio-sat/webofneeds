@@ -291,6 +291,7 @@
 						if (data.dataType &&
 								data.dataType.indexOf('json') === data.dataType.length - 4) {
 							try {
+								console.log('jquery.fileupload-angular.js:294');
 								data.result = angular.fromJson(data.jqXHR.responseText);
 							} catch (ignore) {
 							}

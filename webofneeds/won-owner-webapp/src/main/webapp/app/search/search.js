@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams,$window,searchService, linkedDataService, mapService, applicationStateService, applicationControlService) {
+angular.module('won.owner').controller('SearchCtrl', function ($scope, $location,$log,$routeParams,$window,searchService, linkedDataService, applicationStateService, applicationControlService) {
 
     $scope.results = applicationStateService.getSearchResults();
     $scope.search = {};

@@ -22,14 +22,14 @@ app = angular.module('won.owner',
         , 'smart-table'
         , 'ngScrollbar'
         , 'scrollable-table'
-        , 'ui.utils'
+        //, 'ui.utils'
         , 'ngTagsInput'
         , 'ngClipboard'
         //, 'ui.event'
         //, 'ui.keypress'
         ]
     ).config(function ($routeProvider, $httpProvider, $provide) {
-        $httpProvider.responseInterceptors.push('redirectInterceptor');
+        //$httpProvider.responseInterceptors.push('redirectInterceptor');
 	    $routeProvider.
             when('/create-need/:step/:selectedType/:title', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html',title:'Create Need'}).
             when('/create-need/:step/:selectedType', {controller : 'CreateNeedCtrlNew', templateUrl:'app/create-need/create-need.html',title:'Create Need'}).
@@ -255,6 +255,7 @@ app.run(function($httpBackend,$rootScope ){
        // $httpBackend.whenGET('/app.*/').passThrough();
     }
 );
+/*
 app.factory('redirectInterceptor', ['$location', '$q', function($location, $q) { return function(promise) {
     promise.then(
         function(response) {
@@ -273,6 +274,7 @@ app.factory('redirectInterceptor', ['$location', '$q', function($location, $q) {
     return promise;
 };
 }]);
+*/
 angular.resetForm = function (scope, formName, defaults) {
 	$('form[name=' + formName + '], form[name=' + formName + '] .ng-dirty').removeClass('ng-dirty').addClass('ng-pristine');
 	var form = scope[formName];
@@ -296,3 +298,5 @@ app.config(['ngClipProvider', function(ngClipProvider){
 app.config(['$logProvider', function($logProvider){
     $logProvider.debugEnabled(true);
 }])
+
+//export default app;

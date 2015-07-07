@@ -27,9 +27,9 @@
 		<link rel="stylesheet" href="style/bootstrap.min.css" />
 		<%--<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>--%>
 
-        <link rel="stylesheet" href="bower_components/bootsketch/build/css/bootsketch.css"/>
-        <link rel="stylesheet" href="style/bootsketch-patches.css"/>
-        <%--<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css"/> --%>
+        <!--<link rel="stylesheet" href="bower_components/bootsketch/build/css/bootsketch.css"/>-->
+        <!--<link rel="stylesheet" href="style/bootsketch-patches.css"/>-->
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css"/>
 
 	    <link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
 	    <link rel="stylesheet" href="style/datepicker.css"/>
@@ -48,94 +48,20 @@
         <script type="text/javascript" src="resources/leaflet-0.7.3/leaflet.js"></script>
         <link rel="stylesheet" href="resources/leaflet-0.7.3/leaflet.css"/>
 
+        <!--<link rel="stylesheet" href="style/ui-bootstrap-patches.css"/> <!-- disable after updating ui-bootstrap -->
 
-        <!-- Our CSS'. Included last so it wins in clashes vs libraries. -->
+
+        <!-- Our legacy CSS'. -->
         <link rel="stylesheet" href="style/main.css"/>
+        <!-- The CSS generated from our ./style/won.scss
+        Included last so it wins in clashes vs libraries. -->
+        <link rel="stylesheet" href="style/generated/won.min.css" />
 
 
-        <script src="scripts/jquery.10.2.js"></script>
-        <script src="scripts/jquery.fs.scroller.min.js"></script>
-        <script src="bower_components/angular/angular.js"></script>
-        <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
-        <script src="bower_components/angular-route/angular-route.js"></script>
-        <script src="bower_components/angular-mocks/angular-mocks.js"></script>
-
-        <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-        <link rel="stylesheet" href="style/ui-bootstrap-patches.css"/> <!-- disable after updating ui-bootstrap -->
-
-
-        <script type="text/javascript" src="bower_components/angular-ui-utils/ui-utils.js"></script> <!-- to include all ui-utils TODO deleteme-->
-        <script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
-        <script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
-        <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
-        <script type="text/javascript" src="bower_components/ng-scrollbar/src/ng-scrollbar.js"></script>
-        <script type="text/javascript" src="bower_components/zeroclipboard/dist/ZeroClipboard.js"></script>
-        <script type="text/javascript" src="bower_components/ng-clip/src/ngClip.js"></script>
-
-        <script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
-        <script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
-        <script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
-        <script type="text/javascript" src="scripts/upload/jquery.fileupload-process.js"></script>
-        <script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
-        <%--<script type="text/javascript" src="scripts/osm/angular-leaflet-directive.min.js"></script>--%>
-        <script type="text/javascript" src="scripts/bootstrap-datepicker.js"></script>
-        <script type="text/javascript" src="scripts/lightbox.min.js"></script>
-        <script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>
-        <script type="text/javascript" src="scripts/smart-table.min.js"></script>
-        <script type="text/javascript" src="scripts/bootstrap-tagsinput.min.js"></script>
-        <script type="text/javascript" src="scripts/jsonld.js"></script>
-        <script type="text/javascript" src="scripts/rdfstore-js/rdf_store.js"></script>
-        <script type="text/javascript" src="scripts/angular-scrollable-table/angular-scrollable-table.js"></script>
-
-        <script type="text/javascript" src="scripts/star-rating.min.js"></script>
-
-
-        <script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/won.js"/>"></script>
-
-        <script type="text/javascript" src="<c:url value="/app/service/application-state-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/application-control-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/map-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/osm-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/util-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/message-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/search-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/won-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/linkeddata-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/service/message-factory-service.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/sign-in/sign-in.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/sign-in/sign-up.js"/>"></script>
-
-
-        <script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/header/notification-dropdown.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/faq/faq.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/impressum/impressum.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/main/main.js"/>"></script>
-
-        <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/create-need/location-selector.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/create-need/image-uploader.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/conversation/conversation.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/draft/draft.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
-
-        <script type="text/javascript" src="<c:url value="/app/why-use/why-use.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/forgot-pwd/forgot-pwd.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/forgot-pwd/enter-new-pwd.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/postbox/postbox.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/private-link/private-link.js"/>"></script>
-
-        <script type="text/javascript" src="<c:url value="/app/search/search.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/app/post-detail/post-detail.js"/>"></script>
 
 	</head>
 	<body ng-controller="MainCtrl">
 		<span ng-init=""></span>
-		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&callback=onGoogleReady"></script>
 		<nav class="navbar navbar-default" role="navigation" ng-controller="HeaderCtrl">
 			<div class="container" style="padding:0">
 
@@ -145,6 +71,7 @@
 				<li ng-class="isActive()"><a href="" ng-click="clickOnWon()">
 					<i class="fa fa-arrows-alt fa-lg"></i>&nbsp;WoN</a>
 				</li>
+                <!--<li class="testfoo">If you see me moving, SCSS is working!</li>-->
 			</ul>
 			<ul class="nav navbar-nav">
                 <li class="dropdown"
@@ -263,6 +190,90 @@
     </div>
 </nav>
 
+        <script src="scripts/jquery.10.2.js"></script>
+        <script src="scripts/jquery.fs.scroller.min.js"></script>
+        <script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="bower_components/angular-route/angular-route.js"></script>
+        <script src="bower_components/angular-mocks/angular-mocks.js"></script>
+
+        <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+
+        <script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
+        <script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
+        <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
+        <script type="text/javascript" src="bower_components/ng-scrollbar/src/ng-scrollbar.js"></script>
+        <script type="text/javascript" src="bower_components/zeroclipboard/dist/ZeroClipboard.js"></script>
+        <script type="text/javascript" src="bower_components/ng-clip/src/ngClip.js"></script>
+
+        <script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
+        <script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
+        <script type="text/javascript" src="scripts/upload/jquery.iframe-transport.js"></script>
+        <script type="text/javascript" src="scripts/upload/jquery.fileupload-process.js"></script>
+        <script type="text/javascript" src="scripts/upload/jquery.fileupload-angular.js"></script>
+        <script type="text/javascript" src="scripts/bootstrap-datepicker.js"></script>
+        <script type="text/javascript" src="scripts/lightbox.min.js"></script>
+        <script type="text/javascript" src="scripts/jquery.bootpag.min.js"></script>
+        <script type="text/javascript" src="scripts/smart-table.min.js"></script>
+        <script type="text/javascript" src="scripts/bootstrap-tagsinput.min.js"></script>
+        <script type="text/javascript" src="scripts/jsonld.js"></script>
+        <script type="text/javascript" src="scripts/rdfstore-js/rdf_store.js"></script>
+        <script type="text/javascript" src="scripts/angular-scrollable-table/angular-scrollable-table.js"></script>
+        <script type="text/javascript" src="scripts/star-rating.min.js"></script>
+
+        <script src="jspm_packages/system.js"></script>
+        <script src="jspm_config.js"></script>
+        <script>
+            console.log(System);
+
+            //System.import('app/app')
+            System.import('app/jspm_test')
+                    .catch(console.error.bind(console));
+        </script>
+
+        <!--
+        TODO app.js should be included via jspm/system.js
+        -->
+        <script type="text/javascript" src="<c:url value="/app/app.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/won.js"/>"></script>
+
+        <script type="text/javascript" src="<c:url value="/app/service/application-state-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/application-control-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/user-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/osm-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/util-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/message-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/search-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/won-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/linkeddata-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/message-factory-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/sign-in/sign-in.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/sign-in/sign-up.js"/>"></script>
+
+
+        <script type="text/javascript" src="<c:url value="/app/home/home.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/header/header.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/header/notification-dropdown.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/faq/faq.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/impressum/impressum.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/main/main.js"/>"></script>
+
+        <script type="text/javascript" src="<c:url value="/app/create-need/create-need.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/create-need/location-selector.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/create-need/image-uploader.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/conversation/conversation.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/draft/draft.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/need-list/need-list.js"/>"></script>
+
+        <script type="text/javascript" src="<c:url value="/app/why-use/why-use.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/forgot-pwd/forgot-pwd.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/forgot-pwd/enter-new-pwd.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/postbox/postbox.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/private-link/private-link.js"/>"></script>
+
+        <script type="text/javascript" src="<c:url value="/app/search/search.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/post-detail/post-detail.js"/>"></script>
 
         <script type="text/javascript">
             window.user = {
@@ -276,10 +287,17 @@
                 </sec:authorize>
             };
 
-            function onGoogleReady() {
-                angular.bootstrap(document.getElementsByTagName("html")[0], ['won.owner']);
-            }
+            angular.bootstrap(document.getElementsByTagName("html")[0], ['won.owner']);
+            /*
+             angular.bootstrap(document, ['won.owner'], {
+             // make sure dependency injection works after minification
+             // see https://docs.angularjs.org/guide/production
+             // and https://docs.angularjs.org/guide/di#dependency-annotation
+             //strictDi: true //TODO
+             });*/
         </script>
+        <!--
+        -->
 	</body>
 </html>
 
