@@ -19,19 +19,6 @@
     "tests"
   ],
   "dependencies": {
-    "angular-bootstrap": "~0.13.0",
-    "angular-mocks": "~1.4.1",
-    "angular-route": "~1.4.1",
-    "angular-ui-utils": "~2.0.0",
-    "angular": "~1.4.1",
-    "bootstrap": "~3.0.0",
-    "jquery": "~2.0.3",
-    "js-md5": "~1.1.0",
-    "jsonld.js": "https://github.com/digitalbazaar/jsonld.js.git#~0.3.1",
-    "ng-scrollbar": "~0.0.6",
-    "sockjs": "0.3.4",
-    "ng-tags-input": "~2.3.0",
-    "ng-clip": "~0.2.6",
-    "font-awesome": "~4.3.0"
   }
 }
+

@@ -14,7 +14,11 @@
  *    limitations under the License.
  */
 
-app = angular.module('won.owner',
+//import angular from 'angular';
+//window.angular = angular; //for backwards compatibility with the old code base;
+
+//export var app = angular.module('won.owner',
+var app = angular.module('won.owner',
         [ 'ui.bootstrap'
         , 'ngRoute'
         , 'blueimp.fileupload'
@@ -297,6 +301,5 @@ app.config(['ngClipProvider', function(ngClipProvider){
 }]);
 app.config(['$logProvider', function($logProvider){
     $logProvider.debugEnabled(true);
-}])
+}]);
 
-//export default app;

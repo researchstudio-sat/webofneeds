@@ -3,7 +3,28 @@
  * Created by ksinger on 06.07.2015.
  */
 
-console.log('jspm working');
+// enable es6 in jshint:
+/* jshint esnext: true */
 
-//import {} from 'app/app';
+console.log('System.import working');
+
+//import {app} from './app';
+//console.log(app);
+
+
+import angular from 'angular';
+console.log(angular);
+
+
+/*
+class Person {
+    constructor(name) {
+        this.name = name;
+    }
+    describe() {
+        return 'Person called ' + this.name;
+    }
+}
+console.log(new Person());
+*/
 

@@ -192,19 +192,18 @@
 
         <script src="scripts/jquery.10.2.js"></script>
         <script src="scripts/jquery.fs.scroller.min.js"></script>
-        <script src="bower_components/angular/angular.js"></script>
-        <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
-        <script src="bower_components/angular-route/angular-route.js"></script>
-        <script src="bower_components/angular-mocks/angular-mocks.js"></script>
 
-        <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-
-        <script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
-        <script type="text/javascript" src="bower_components/js-md5/js/md5.js"></script>
-        <script type="text/javascript" src="bower_components/sockjs/sockjs.js"></script>
-        <script type="text/javascript" src="bower_components/ng-scrollbar/src/ng-scrollbar.js"></script>
-        <script type="text/javascript" src="bower_components/zeroclipboard/dist/ZeroClipboard.js"></script>
-        <script type="text/javascript" src="bower_components/ng-clip/src/ngClip.js"></script>
+        <script type="text/javascript" src="jspm_packages/bower/angular@1.4.2/angular.js"></script>
+        <script type="text/javascript" src="jspm_packages/github/twbs/bootstrap@3.3.5/js/bootstrap.js"></script>
+        <script type="text/javascript" src="jspm_packages/github/angular/bower-angular-route@1.4.2/angular-route.js"></script>
+        <script type="text/javascript" src="jspm_packages/github/angular/bower-angular-mocks@1.4.2/angular-mocks.js"></script>
+        <script type="text/javascript" src="jspm_packages/github/angular-ui/bootstrap-bower@0.13.0/ui-bootstrap-tpls.js"></script>
+        <script type="text/javascript" src="jspm_packages/bower/ng-tags-input@2.3.0/ng-tags-input.js"></script>
+        <script type="text/javascript" src="jspm_packages/bower/js-md5@1.1.0/js/md5.js"></script>
+        <script type="text/javascript" src="jspm_packages/bower/sockjs@0.3.4/sockjs.js"></script>
+        <script type="text/javascript" src="jspm_packages/bower/ng-scrollbar@0.0.6/src/ng-scrollbar.js"></script>
+        <script type="text/javascript" src="jspm_packages/bower/zeroclipboard@2.2.0/dist/ZeroClipboard.js"></script>
+        <script type="text/javascript" src="jspm_packages/bower/ng-clip@0.2.6/src/ngClip.js"></script>
 
         <script type="text/javascript" src="scripts/upload/vendor/jquery.ui.widget.js"></script>
         <script type="text/javascript" src="scripts/upload/jquery.fileupload.js"></script>
