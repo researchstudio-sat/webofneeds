@@ -19,7 +19,7 @@ var autoprefixer = require('gulp-autoprefixer');
 gulp.task('default', ['sass']);
 
 gulp.task('sass', function(done) {
-    var generatedStyleFolder =  './style/generated/';
+    var generatedStyleFolder =  './generated/';
     gulp.src('./style/won.scss')
         .pipe(sass({
             errLogToConsole: true

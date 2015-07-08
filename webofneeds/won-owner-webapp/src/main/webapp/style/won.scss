@@ -16,3 +16,41 @@
     width: 100%;
   }
 }
+
+// coolors
+
+$won-red: #F04646;
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400; //normal
+  src:
+    local('Open Sans'),
+    local('OpenSans'),
+    url("../fonts/open-sans/OpenSans-Regular.ttf") format('ttf');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700; //bold
+  src:
+  local('Open Sans Bold'),
+  local('OpenSans-Bold'),
+  url("../fonts/open-sans/OpenSans-Bold.ttf") format('ttf');
+}
+
+.topnav { //TODO split into single-purpose-classes
+  color: $won-red;
+  font-family: 'Open Sans';
+  font-weight: 400; //normal
+  font-style: normal;
+
+
+  & .topnav__list {
+
+    & .topnav__list__title {
+
+    }
+  }
+}
