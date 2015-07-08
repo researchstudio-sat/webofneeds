@@ -24,11 +24,8 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- see http://getbootstrap.com/css/#overview-mobile -->
 		<title ng-bind="'Web Of Needs - '+$root.title">Web Of Needs</title>
+        <!--
 		<link rel="stylesheet" href="style/bootstrap.min.css" />
-		<%--<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>--%>
-
-        <!--<link rel="stylesheet" href="bower_components/bootsketch/build/css/bootsketch.css"/>-->
-        <!--<link rel="stylesheet" href="style/bootsketch-patches.css"/>-->
         <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css"/>
 
 	    <link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
@@ -40,22 +37,21 @@
         <link rel="stylesheet" href="scripts/angular-scrollable-table/scrollable-table.css"/>
         <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.css"/>
         <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.bootstrap.css"/>
-
-
         <link rel="stylesheet" href="bower_components/ng-scrollbar/dist/ng-scrollbar.min.css"/>
+        -->
 
         <!--leaflet.js provides us with a map-widget which can display map material from different sources-->
         <script type="text/javascript" src="resources/leaflet-0.7.3/leaflet.js"></script>
         <link rel="stylesheet" href="resources/leaflet-0.7.3/leaflet.css"/>
 
-        <!--<link rel="stylesheet" href="style/ui-bootstrap-patches.css"/> <!-- disable after updating ui-bootstrap -->
-
-
         <!-- Our legacy CSS'. -->
-        <link rel="stylesheet" href="style/main.css"/>
+        <!--<link rel="stylesheet" href="style/main.css"/>-->
+
         <!-- The CSS generated from our ./style/won.scss
         Included last so it wins in clashes vs libraries. -->
-        <link rel="stylesheet" href="style/generated/won.min.css" />
+        <link rel="stylesheet" href="style/generated/won.css" />
+        <!-- Minified variant: -->
+        <!--<link rel="stylesheet" href="style/generated/won.min.css" />-->
 
 
 

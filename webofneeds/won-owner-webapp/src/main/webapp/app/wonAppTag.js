@@ -7,9 +7,9 @@
 export default function wonAppTag() {
     let template = '\
         <header>\
-            <nav>\
-                <ul>\
-                    <li>[Web of Needs]</li>\
+            <nav class="topnav">\
+                <ul class="topnav__list">\
+                    <li class="topnav__list__title">[Web of Needs]</li>\
                     <li>New Need</li>\
                     <li>Groups</li>\
                     <li>Username</li>\
