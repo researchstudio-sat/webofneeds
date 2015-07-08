@@ -38,5 +38,5 @@ gulp.task('sass', function(done) {
 });
 
 gulp.task('watch', function() {
-    gulp.watch('./style/won.scss', ['sass']);
+    gulp.watch('./style/**/*.scss', ['sass']);
 });
