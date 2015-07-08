@@ -7,14 +7,61 @@ $won-red: #F04646;
 
 @import "fonts";
 
+
+%spring-container {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+
+  & > * {
+    order: 1;
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-self: auto
+  }
+  & > .spring { //TODO test class. delete it. inserting elements just for stying should be done via pseude-elements
+    content: "";
+    min-width: 1px; //keep it from collapsing
+    min-height: 1px; //keep it from collapsing
+    order: 1;
+    flex-grow: 10;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-self: auto
+  }
+
+  & > .spring-before::before {
+    content: "";
+    background-color: brown;
+    display: block;
+    min-width: 1em; //keep it from collapsing
+    min-height: 1em; //keep it from collapsing
+    order: 1;
+    flex-grow: 10;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-self: auto
+  }
+}
+
+.spring-row {
+  @extend %spring-container;
+  flex-direction: row;
+}
+
+
 //wonAppTag
 
 .topnav { //TODO split into single-purpose-classes
-  color: $won-red;
 
   font-family: 'Open Sans';
-  font-weight: 400;
+  font-weight: 300;
   font-style: normal;
+  //text-align: center;
+  //overflow: hidden;
 
   & .topnav__list {
 
@@ -22,9 +69,17 @@ $won-red: #F04646;
     margin: 0;
     padding: 0;
 
+    & > li {
 
-    & .topnav__list__title {
+      &.topnav__list__title {
 
+      }
+      & > a {
+        color: $won-red;
+
+        text-decoration: none;
+        display: block;
+      }
     }
   }
 }
