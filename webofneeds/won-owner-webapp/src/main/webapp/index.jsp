@@ -49,7 +49,7 @@
 
         <!-- The CSS generated from our ./style/won.scss
         Included last so it wins in clashes vs libraries. -->
-        <link rel="stylesheet" href="style/generated/won.css" />
+        <link rel="stylesheet" href="generated/won.css" />
         <!-- Minified variant: -->
         <!--<link rel="stylesheet" href="style/generated/won.min.css" />-->
 
