@@ -1,53 +1,27 @@
-.testfoo {
-  background: cadetblue;
-  animation-duration: 3s;
-  animation-name: slidein;
-  position: absolute;
-}
-
-@keyframes slidein {
-  from {
-    margin-left: 100%;
-    width: 300%;
-  }
-
-  to {
-    margin-left: 0%;
-    width: 100%;
-  }
-}
-
-// coolors
+// colors
 
 $won-red: #F04646;
 
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 400; //normal
-  src:
-    local('Open Sans'),
-    local('OpenSans'),
-    url("../fonts/open-sans/OpenSans-Regular.ttf") format('ttf');
-}
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 700; //bold
-  src:
-  local('Open Sans Bold'),
-  local('OpenSans-Bold'),
-  url("../fonts/open-sans/OpenSans-Bold.ttf") format('ttf');
-}
+
+// fonts
+
+@import "fonts";
+
+//wonAppTag
 
 .topnav { //TODO split into single-purpose-classes
   color: $won-red;
+
   font-family: 'Open Sans';
-  font-weight: 400; //normal
+  font-weight: 400;
   font-style: normal;
 
-
   & .topnav__list {
+
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
 
     & .topnav__list__title {
 
