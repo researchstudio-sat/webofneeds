@@ -1,0 +1,29 @@
+/**
+ * abstract flex-direction
+ */
+%flex {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+
+  & > * {
+    display: block;
+    order: 1;
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-self: auto
+  }
+}
+
+%flex-row {
+  @extend %flex;
+  flex-direction: row;
+}
+
+%flex-row-spaced {
+  @extend %flex-row;
+  justify-content: space-between;
+}
