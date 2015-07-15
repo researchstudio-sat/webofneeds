@@ -4,42 +4,44 @@
  */
 ;
 export default function wonAppTag() {
-    let template = '\
-        <header>\
-            <nav class="topnav">\
-                <ul class="topnav__list spring-row">\
-                    <li class="topnav__list__title">\
-                        <a href="#">[Logo] Web of Needs</a>\
-                    </li>\
-                    <li class="spring"></li>\
-                    <li class="">\
-                        <a href="#">New Need</a>\
-                    </li>\
-                    <li class="spring"></li>\
-                    <li class="">\
-                        <a href="#">Groups</a>\
-                    </li>\
-                    <li><a href="#">Username</a></li>\
-                </ul>\
-            </nav>\
-            <nav ng-cloak ng-hide="{{true}}">\
-                <ul>\
-                    <li><a href="#">Feed</a></li>\
-                    <li><a href="#">Posts</a></li>\
-                    <li><a href="#">Incoming Requests</a></li>\
-                    <li><a href="#">Matches</a></li>\
-                    <li><a href="#">[Search]</a></li>\
-                </ul>\
-            </nav>\
-        </header>\
-        <section id="main">\
-            <h1 ng-click="ctrl.fooFun()">Hello, from your lovely app-directive! Foo{{ctrl.foo}}! </h1>\
-        </section>\
-        <footer></footer>\
-        ';
+    let template = `
+        <header>
+            <nav class="topnav">
+                <div class="topnav__left">
+                    <a href="#">[Logo] Web of Needs</a>
+                </div>
+                <div class="topnav__center">
+                    <a href="#">New Need</a>
+                </div>
+                <div class="topnav__right">
+                    <ul class="topnav__list">
+                        <li class="">
+                            <a href="#">Groups</a>
+                        </li>
+                        <li><a href="#">Username</a></li>
+                    </ul>
+                </div>
+            </nav>
+            <nav ng-cloak ng-hide="{{true}}">
+                <ul>
+                    <li><a href="#">Feed</a></li>
+                    <li><a href="#">Posts</a></li>
+                    <li><a href="#">Incoming Requests</a></li>
+                    <li><a href="#">Matches</a></li>
+                    <li><a href="#">[Search]</a></li>
+                </ul>
+            </nav>
+        </header>
+        <section id="main">
+            <h1 ng-click="ctrl.fooFun()">Hello, from your lovely app-directive! Foo{{ctrl.foo}}! </h1>
+        </section>
+        <footer></footer>
+        `;
 
         //<won-tabs></won-tabs>\
     function link() {
+        console.log(`foo
+        bar`)
     }
 
     /*

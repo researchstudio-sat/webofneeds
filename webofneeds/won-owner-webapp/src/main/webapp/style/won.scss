@@ -52,10 +52,39 @@ $won-red: #F04646;
   flex-direction: row;
 }
 
+%flex {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+
+  & > * {
+    display: block;
+    order: 1;
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-basis: auto;
+    align-self: auto
+  }
+}
+
+.flex-row {
+  @extend %flex;
+  flex-direction: row;
+}
+
+.flex-row-spaced {
+  @extend .flex-row;
+  justify-content: space-between;
+}
+
 
 //wonAppTag
 
 .topnav { //TODO split into single-purpose-classes
+
+  @extend .flex-row-spaced;
 
   font-family: 'Open Sans';
   font-weight: 300;
@@ -63,23 +92,18 @@ $won-red: #F04646;
   //text-align: center;
   //overflow: hidden;
 
-  & .topnav__list {
+  & a {
+    color: $won-red;
+    text-decoration: none;
+  }
 
+  & > .topnav__right > .topnav__list {
     list-style: none;
     margin: 0;
     padding: 0;
-
+    //@extend .flex-row;
     & > li {
-
-      &.topnav__list__title {
-
-      }
-      & > a {
-        color: $won-red;
-
-        text-decoration: none;
-        display: block;
-      }
+      display: inline-block;
     }
   }
 }
