@@ -1,12 +1,31 @@
+
+// <style-resetting> ---------------------------------------
+
+body, header, section, nav, div, ul {
+  padding: 0;
+  margin: 0;
+}
+
+// </style-resetting> --------------------------------------
+
+
+
 // colors
 
 $won-red: #F04646;
+$won-light-gray: #F0F2F4; //used for headings
+$won-lighter-gray: #F8F9F9; //used for background
+$won-line-gray: #CBD2D1; //use for lines
+
 
 
 // fonts
 
 @import "fonts";
 @import "flex-layout";
+
+
+//utils --- TODO: move these to seperate files
 
 %list-nav-horizontal {
   list-style: none;
@@ -17,8 +36,24 @@ $won-red: #F04646;
   }
 }
 
+// global styling
 
-//wonAppTag
+body {
+  min-height: 100vh;
+  min-width: 100vw;
+}
+
+//<wonAppTag> ----------------------------------------------
+
+won-app {
+  background-color: $won-lighter-gray;
+
+  @extend %fill;
+
+  @extend %flex-column;
+  align-items: stretch; //TODO this is bad style! it overwrites flex-col's align-items
+  & > .contentArea { flex-grow: 1; }
+}
 
 .topnav { //TODO split into single-purpose-classes
 
@@ -30,13 +65,43 @@ $won-red: #F04646;
   //text-align: center;
   //overflow: hidden;
 
+  background-color: white;
+
   & a {
     color: $won-red;
     text-decoration: none;
   }
 
-  & > .topnav__right > .topnav__list {
-    @extend %list-nav-horizontal;
+  & .topnav__list {
+    //@extend %list-nav-horizontal;
+    @extend %flex-row;
   }
 }
+
+.mainTabs {
+
+  font-family: 'Open Sans';
+  font-weight: 300;
+  font-style: normal;
+
+  background-color: $won-light-gray;
+  border: 1px solid $won-line-gray;
+  //background-color: black;
+
+  & a {
+    color: black;
+    text-decoration: none;
+  }
+
+  & > .mainTabs__list {
+    //@extend %list-nav-horizontal;
+    @extend %flex-row;
+  }
+  & > .mainTabs__right {
+  }
+}
+
+
+
+//</wonAppTag> ----------------------------------------
 

@@ -22,17 +22,21 @@ export default function wonAppTag() {
                     </ul>
                 </div>
             </nav>
-            <nav ng-cloak ng-hide="{{true}}">
-                <ul>
+            <nav ng-cloak ng-hide="{{false}}" class="mainTabs">
+                <ul class="mainTabs__list">
                     <li><a href="#">Feed</a></li>
                     <li><a href="#">Posts</a></li>
                     <li><a href="#">Incoming Requests</a></li>
                     <li><a href="#">Matches</a></li>
-                    <li><a href="#">[Search]</a></li>
                 </ul>
+                <!-- TODO
+                <div class="mainTabs__right">
+                    <a href="#">[Search]</a>
+                </div>
+                -->
             </nav>
         </header>
-        <section id="main">
+        <section id="main" class="contentArea">
             <h1 ng-click="ctrl.fooFun()">Hello, from your lovely app-directive! Foo{{ctrl.foo}}! </h1>
         </section>
         <footer></footer>
@@ -40,8 +44,9 @@ export default function wonAppTag() {
 
         //<won-tabs></won-tabs>\
     function link() {
-        console.log(`foo
-        bar`)
+        console.log(`multiline
+        template
+        string`)
     }
 
     /*
