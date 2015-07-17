@@ -1,3 +1,5 @@
+//span the following over the whole scss to win specificity battles
+//#body-id {
 
 // <style-resetting> ---------------------------------------
 
@@ -21,8 +23,6 @@ $won-line-gray: #CBD2D1; //use for lines
 
 // fonts
 
-@import "fonts";
-@import "flex-layout";
 
 
 //utils --- TODO: move these to seperate files
@@ -45,10 +45,18 @@ body {
 
 //<wonAppTag> ----------------------------------------------
 
+@import "fonts";
+@import "flex-layout";
+@import "sizing-utils";
+
 won-app {
   background-color: $won-lighter-gray;
 
+  //display: block;
+  //  height: 100%;
   @extend %fill;
+  @extend %fixed-fill;
+  //@extend %fixed-fullscreen; //works but is hacky imho
 
   @extend %flex-column;
   align-items: stretch; //TODO this is bad style! it overwrites flex-col's align-items
@@ -96,6 +104,10 @@ won-app {
   & > .mainTabs__list {
     //@extend %list-nav-horizontal;
     @extend %flex-row;
+    & > li {
+      padding-left: 1em;
+      padding-right: 1em;
+    }
   }
   & > .mainTabs__right {
   }
