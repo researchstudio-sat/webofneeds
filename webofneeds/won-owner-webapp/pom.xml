@@ -162,6 +162,7 @@
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
+                <version>0.0.22</version>
                 <!-- optional -->
                 <configuration>
                   <workingDirectory>src/main/webapp</workingDirectory>
@@ -210,6 +211,18 @@
                             <arguments>install</arguments>
                         </configuration>
                     </execution>
+                    <!--
+                    version 0.0.24 requires a newer maven version
+                    <execution>
+                        <id>jspm install</id>
+                        <goals>
+                            <goal>jspm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+                    -->
                     <execution>
                         <id>gulp</id>
                         <goals>
@@ -221,6 +234,30 @@
                 </executions>
             </plugin>
 
+            <!--
+            works
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <executions>
+                    <execution>
+                        <id>foo</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <!- -needs to end with .bat for winwaows - ->
+                            <executable>echo.bat</executable>
+                            <arguments>
+                                <argument>HELLOEXEC</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
             <!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -244,7 +281,7 @@
                     </execution>
                 </executions>
             </plugin>
-                -->
+            -->
 
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
