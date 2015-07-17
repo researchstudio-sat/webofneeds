@@ -26,21 +26,3 @@ angular.bootstrap(document, ['won.owner'], {
 console.log('app_jspm.js: ', angular);
 window.app = app; //TODO for debugging only. remove me.
 window.wonAppTag = wonAppTag; //TODO for debugging only. remove me.
-
-
-function appTag() {
-    let template = '<h1>Hello, from your lovely app-directive!</h1>'
-
-    function link() {
-    }
-
-    let directive = {
-        restrict: 'E',
-        link: link,
-        template: template
-    }
-    return directive
-}
-
-class Foo{}
-

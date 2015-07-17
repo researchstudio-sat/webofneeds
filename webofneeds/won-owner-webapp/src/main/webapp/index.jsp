@@ -56,8 +56,15 @@
 
 
 	</head>
-    <body>
-        <won-app></won-app>
+    <won-app></won-app>
+    <!-- TODO make sure to only show the svgs once angular has finished rendering -->
+    <!-- start loading the svg so it's already in the cache once angular has finished loading its templates -->
+
+    <!--
+    <img src="generated/icon-sprite.svg#WON_ico_header"
+         style="height:100px; width:100px"> <!-- TODO inline styles :{ -->
+    <img src="generated/icon-sprite.svg" style="display:none">
+
     <!--
 	<body ng-controller="MainCtrl">
 		<span ng-init=""></span>

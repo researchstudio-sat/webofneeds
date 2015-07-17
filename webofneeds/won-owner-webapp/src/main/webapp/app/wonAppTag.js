@@ -8,7 +8,11 @@ export default function wonAppTag() {
         <header>
             <nav class="topnav">
                 <div class="topnav__left">
-                    <a href="#">[Logo] Web of Needs</a>
+                    <a href="#">
+                        <img src="generated/icon-sprite.svg#WON_ico_header"
+                             style="height:100px; width:100px"> <!-- TODO inline styles :{ -->
+                        Web of Needs
+                    </a>
                 </div>
                 <div class="topnav__center">
                     <a href="#">New Need</a>
@@ -42,7 +46,8 @@ export default function wonAppTag() {
         <footer></footer>
         `;
 
-        //<won-tabs></won-tabs>\
+    console.log('updated this file at last');
+
     function link() {
         console.log(`multiline
         template
@@ -57,6 +62,8 @@ export default function wonAppTag() {
         }
     }
     */
+
+
     class WonAppCtrl {
         constructor() {
             this.foo = 'bar';
@@ -65,7 +72,7 @@ export default function wonAppTag() {
             console.log('fooFun called!');
         }
     }
-    WonAppCtrl.$inject = [/*injections as strings here*/];
+    WonAppCtrl.$inject = ['$http'/*injections as strings here*/];
 
 
     let directive = {
