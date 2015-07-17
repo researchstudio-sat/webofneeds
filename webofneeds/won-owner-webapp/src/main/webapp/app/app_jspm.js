@@ -10,6 +10,7 @@ console.log('System.import working');
 
 
 import angular from 'angular';
+window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
 
 import wonAppTag from 'app/wonAppTag';
 
