@@ -41,8 +41,7 @@
     </bean>
 
     <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" >
-        <!--property name="brokerURL" value="tcp://localhost:61616"/-->
-        <!--property name="brokerURL" value="amqp://localhost:5672"/-->
+        <property name="brokerURL" value="tcp://localhost:61616"/>
     </bean>
 
 

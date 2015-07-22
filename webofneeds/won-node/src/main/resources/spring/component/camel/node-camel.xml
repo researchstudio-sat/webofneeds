@@ -34,9 +34,7 @@
     </bean>
 
     <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker" >
-        <!-- note: this URI does not need to be configurable via the
-        config file, it will be the same on any system -->
-        <property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
+        <property name="brokerURL" value="tcp://localhost:${activemq.broker.port}"/>
     </bean>
     <!-- Configuring Broker -->
     <bean id="embeddedBroker" class="org.apache.activemq.xbean.PooledBrokerFactoryBean">
@@ -49,9 +47,7 @@
     <bean id="brokerComponentFactory" class="won.protocol.jms.BrokerComponentFactory"/>
 
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent" >
-        <!-- note: this URI does not need to be configurable via the
-        config file, it will be the same on any system -->
-        <property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
+        <property name="brokerURL" value="tcp://localhost:${activemq.broker.port}"/>
         <property name="connectionFactory" ref="cachedConnectionFactory"/>
     </bean>
     <bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl">
