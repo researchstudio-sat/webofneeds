@@ -152,7 +152,8 @@
             <!-- DOS protection, limit concurrent connections to 1000 and frame size to 100MB -->
             <!--transportConnector name="openwire" uri="tcp://localhost:62616?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600"/-->
             <!--transportConnector name="amqp" uri="amqp://localhost:5672?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600"/-->
-            <transportConnector name="tcp" uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600" />
+            <transportConnector name="tcp"
+                                uri="tcp://0.0.0.0:${activemq.broker.port}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600" />
         </transportConnectors>
         <!--networkConnectors>
             <networkConnector uri="static:(tcp://localhost:61617)" ></networkConnector>
