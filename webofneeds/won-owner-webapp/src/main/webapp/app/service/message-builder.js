@@ -38,7 +38,7 @@ angular.module('won.owner').factory('MessageBuilder', function () {//$q,$log, $r
 
                     {
                         '@id': msgContentUri,
-                        '@graph': contentBuilder.build(publishedContentUri, msgContentUri)
+                        '@graph': contentBuilder.build(publishedContentUri)
                     },
                     /*
                     {
@@ -46,7 +46,6 @@ angular.module('won.owner').factory('MessageBuilder', function () {//$q,$log, $r
                     }
                      */
                     {
-                        //TODO the graph below contains dummy data
                         '@id': msgDataUri,
                         '@graph': [
                             {

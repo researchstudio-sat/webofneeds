@@ -180,6 +180,11 @@ angular.module('won.owner').factory('NeedBuilder', function (){//$q,$log, $rootS
             }
         },
 
+        addAttachment: function(uri, content) {
+            //TODO stopped here
+
+
+        },
         _hasModalities: function(){
             return this._hasImage() || this._hasLocation() || this._hasTimeConstraint();
         },

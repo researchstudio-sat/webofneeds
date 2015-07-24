@@ -53,6 +53,7 @@ angular.module('won.owner')
                     }
                     utilService.readAsDataURL(file).then(function(fileData){
                         $log.debug("image-uploader.js - readAsDataURL of " + file.name + ": "  + fileData.substring(0, 50) + "(...)");
+                        $log.debug("image-uploader.js - readAsDataURL of " + file.name + ": "  + fileData + "(...)");
                         scope.imageData = fileData;
                     });
                     scope.onImagesPicked([file]);

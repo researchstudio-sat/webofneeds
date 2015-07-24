@@ -390,6 +390,10 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     $scope.publishClicked = function () {
         if(lock== false){
             lock = true;
+
+            $scope.buildNeed();
+
+
             var needBuilder = $scope.partiallyInitNeedBuilder();
 
             // make sure the user is registered (either with account or private link),
@@ -415,25 +419,40 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }
     }
 
-
-	$scope.partiallyInitNeedBuilder = function () {
-
+    $scope.buildNeed = function() {
         //<TODO-testing-stuff>
         var type = won.WON.BasicNeedTypeDemandCompacted;
-        var needBuilderRefactored = new NeedBuilder(type, $scope.need.title, $scope.need.textDescription);
         var attachmentUris = ['http://example.org/.../1234.png', 'http://example.org/.../1234.pdf'];
+        var demoImg = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAAXNSR0IArs'+
+                      '4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAVSURBVBhXYwCCtzIqDPYeZ5'+
+                      'Q2+gAAE5IDoEnVovYAAAAASUVORK5CYII=';
+        var attachments = [demoImg, demoImg];
+
+
+        var needBuilderRefactored = new NeedBuilder(type, $scope.need.title, $scope.need.textDescription);
         needBuilderRefactored.attachmentUris = attachmentUris;
+
         var msgBuilderRefactored = new MessageBuilder(
             'http://localhost:8080/won/resource',
             'http://purl.org/webofneeds/message#CreateMessage');
+
+        msgBuilderRefactored.addAttachment(attachmentUris[0], attachments[0]);
+
+
         var msgJson = msgBuilderRefactored.build(needBuilderRefactored,
             'http://localhost:8080/won/resource/need/4567',
             'http://localhost:8080/won/resource/event/1234',
             attachmentUris
         )
-        console.log("create-need.js:424: ", msgJson);
-        console.log("create-need.js:425: stringified ", JSON.stringify(msgJson));
+        console.log("create-need.js:434: ", msgJson);
+        console.log("create-need.js:435: stringified ", JSON.stringify(msgJson));
+        console.log("create-need.js:436 - need: ", $scope.need);
         //</TODO-testing-stuff>
+
+    }
+
+
+	$scope.partiallyInitNeedBuilder = function () {
 
         // creating need object
         var needBuilderObject = new window.won.NeedBuilder().setContext();
