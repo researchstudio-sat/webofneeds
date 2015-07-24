@@ -48,6 +48,13 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
+        <!-- apache commons -->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <scope>${dependencies.scope}</scope>
+        </dependency>
+
         <!-- JSTL/Servlet-->
 		<dependency>
 			<groupId>javax.servlet</groupId>
