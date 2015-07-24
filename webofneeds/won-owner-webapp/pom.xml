@@ -211,6 +211,15 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>jspmInstall</id>
+                        <goals>
+                            <goal>jspm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>init</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>gulp</id>
                         <goals>
                             <goal>gulp</goal>
