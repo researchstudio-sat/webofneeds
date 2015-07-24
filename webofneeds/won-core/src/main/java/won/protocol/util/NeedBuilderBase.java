@@ -198,6 +198,12 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
     return null;
   }
 
+  protected NeedState getStateNS(){
+    if (this.stateNS != null) return this.stateNS;
+    if (this.stateURI != null) return NeedState.fromURI(this.stateURI);
+    return null;
+  }
+
   protected String getTitle()
   {
     return title;
@@ -429,6 +435,7 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
 
   protected Interval parseDateInterval(String interval, String separator)
   {
+    if (interval == null ) return null;
     String[] parts = interval.split(separator);
     if (parts.length != 2)
       throw new IllegalArgumentException("There should be exactly two parts. Found " + parts.length);
@@ -555,7 +562,10 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   }
 
   public BasicNeedType getBasicNeedTypeBNT() {
-    return basicNeedTypeBNT;
+    if (this.basicNeedTypeBNT != null) return this.basicNeedTypeBNT;
+    if (this.basicNeedTypeURI != null) return BasicNeedType.fromURI(this.basicNeedTypeURI);
+    if (this.basicNeedTypeURIString != null) return BasicNeedType.fromURI(URI.create(this.basicNeedTypeURIString));
+    return null;
   }
 
   @Override

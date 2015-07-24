@@ -16,7 +16,7 @@
 
 package won.protocol.service;
 
-import org.springframework.transaction.annotation.Transactional;
+import org.apache.camel.Exchange;
 import won.protocol.model.OwnerApplication;
 
 import java.util.List;
@@ -29,5 +29,5 @@ public interface QueueManagementService {
 
     public List<String> generateQueueNamesForOwnerApplication(OwnerApplication ownerApplication);
     public String getEndpointForMessage(String methodName, String ownerApplicationID);
-    public List<String> getEndpointsForOwnerApplication(String ownerApplication);
+    public List<String> getEndpointsForOwnerApplication(String ownerApplicationID, Exchange exchange);
 }

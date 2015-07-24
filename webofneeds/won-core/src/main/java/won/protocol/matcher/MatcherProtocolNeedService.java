@@ -17,7 +17,6 @@
 package won.protocol.matcher;
 
 import won.protocol.service.MatcherFacingNeedCommunicationService;
-import won.protocol.service.NeedInformationService;
 
 /**
  * User: fkleedorfer

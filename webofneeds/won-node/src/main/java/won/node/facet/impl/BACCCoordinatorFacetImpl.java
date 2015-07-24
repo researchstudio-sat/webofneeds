@@ -9,7 +9,6 @@ import won.node.facet.businessactivity.coordinatorcompletion.BACCState;
 import won.node.facet.businessactivity.statemanager.BAStateManager;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.WonProtocolException;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
@@ -50,9 +49,10 @@ public class BACCCoordinatorFacetImpl extends AbstractBAFacet
                 try {
                     stateManager.setStateForNeedUri(BACCState.ACTIVE.getURI(), con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI());
                     storeBAStateForConnection(con, BACCState.ACTIVE.getURI());
-                    ownerFacingConnectionClient.open(con.getConnectionURI(), content, wonMessage);
+                  //TODO: use new system
+                  // ownerFacingConnectionClient.open(con.getConnectionURI(), content, wonMessage);
                     logger.debug("Coordinator state: "+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
-                } catch (WonProtocolException e) {
+                } catch (Exception e) {
                     logger.warn("caught Exception:", e);
                 }
             }
@@ -121,7 +121,8 @@ public class BACCCoordinatorFacetImpl extends AbstractBAFacet
                             // eventType -> URI Resource
                             r = myContent.createResource(eventType.getURI().toString());
                             baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                            needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
+                          //TODO: use new system
+                          // needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
                         }
                         else
                         {
@@ -132,8 +133,6 @@ public class BACCCoordinatorFacetImpl extends AbstractBAFacet
                     {
                         logger.debug("The event type denoted by "+messageForSending+" is not allowed.");
                     }
-                } catch (WonProtocolException e) {
-                    logger.warn("caught WonProtocolException:", e);
                 } catch (Exception e) {
                     logger.warn("caught Exception", e);
                 }
@@ -178,7 +177,8 @@ public class BACCCoordinatorFacetImpl extends AbstractBAFacet
                     logger.debug("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
 
 
-                    ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, wonMessage);
+                  //TODO: use new system
+                  // ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, wonMessage);
 
                     BACCEventType resendEventType = state.getResendEvent();
                     if(resendEventType!=null)
@@ -202,15 +202,14 @@ public class BACCCoordinatorFacetImpl extends AbstractBAFacet
                             // eventType -> URI Resource
                             Resource r = myContent.createResource(resendEventType.getURI().toString());
                             baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                            needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
+                          //TODO: use new system
+                          // needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
                         }
                         else
                         {
                             logger.debug("The eventType: "+eventType.getURI().toString()+" can not be triggered by Participant.");
                         }
                     }
-                } catch (WonProtocolException e) {
-                    logger.warn("caught WonProtocolException:", e);
                 } catch (Exception e) {
                     logger.warn("caught Exception",e);
                 }

@@ -58,7 +58,8 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
               stateManager.setStateForNeedUri(BAPCState.ACTIVE.getURI(), URI.create(WON_TX.PHASE_FIRST.getURI().toString()), con.getNeedURI(), con.getRemoteNeedURI(),
                 getFacetType().getURI());
               storeBAStateForConnection(con, BAPCState.ACTIVE.getURI());
-              ownerFacingConnectionClient.open(con.getConnectionURI(), content, null);
+              //TODO: use new system
+              // ownerFacingConnectionClient.open(con.getConnectionURI(), content, null);
 
               logger.debug("Opened from Participant = coordinator:"+con.getNeedURI()+ " participant:"+con.getRemoteNeedURI()+
                 " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()+
@@ -71,7 +72,8 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
               myContent.setNsPrefix("","no:uri");
               Resource res = myContent.createResource("no:uri");
               //close the initiated connection
-              needFacingConnectionClient.close(con, myContent, wonMessage);
+              //TODO: use new system
+              // needFacingConnectionClient.close(con, myContent, wonMessage);
             }
           } catch (Exception e) {
               logger.debug("could not handle participant connect", e);
@@ -158,7 +160,8 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
                   // eventType -> URI Resource
                   r = myContent.createResource(eventType.getURI().toString());
                   baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                  needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
+                  //TODO: use new system
+                  // needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
 
                   logger.debug("Coordinator sent message to participant");
 
@@ -196,7 +199,8 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
                 // eventType -> URI Resource
                 r = myContent.createResource(eventType.getURI().toString());
                 baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
+                //TODO: use new system
+                // needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
                 logger.debug("Coordinator sent message to participant");
               }
             }
@@ -209,8 +213,6 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
           {
             logger.debug("The event type denoted by {} is not allowed.", messageForSending);
           }
-        } catch (WonProtocolException e) {
-          logger.warn("caught WonProtocolException:", e);
         } catch (Exception e) {
           logger.debug("caught Exception", e);
         }
@@ -320,7 +322,8 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
 
                 Resource r = myContent.createResource(BAPCEventType.MESSAGE_CANCEL.getURI().toString());
                 baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                needFacingConnectionClient.sendMessage(tmpCon, myContent, wonMessage);
+                //TODO: use new system
+                // needFacingConnectionClient.sendMessage(tmpCon, myContent, wonMessage);
 
                 baseResource.removeAll(WON_TX.COORDINATION_MESSAGE) ;
               }
@@ -350,12 +353,14 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
 
                 Resource r = myContent.createResource(BAPCEventType.MESSAGE_COMPENSATE.getURI().toString());
                 baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                needFacingConnectionClient.sendMessage(tmpCon, myContent, wonMessage);
+                //TODO: use new system
+                // needFacingConnectionClient.sendMessage(tmpCon, myContent, wonMessage);
                 baseResource.removeAll(WON_TX.COORDINATION_MESSAGE) ;
               }
             }
             //now, after all messages were sent to partners, tell the owner.
-            ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, null);
+            //TODO: use new system
+            // ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, null);
           }
           else
           {
@@ -372,7 +377,8 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
               " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()+
               " phase:"+ BAPCState.parsePhase(stateManager.getStatePhaseForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()));
 
-            ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, null);
+            //TODO: use new system
+            // ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, null);
 
             logger.debug("Coordinator received the message.");
           }
@@ -409,7 +415,8 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
               // eventType -> URI Resource
               Resource r = myContent.createResource(resendEventType.getURI().toString());
               baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-              needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
+              //TODO: use new system
+              // needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
             }
             else
             {
@@ -417,8 +424,6 @@ public class BAAtomicPCCoordinatorFacetImpl extends AbstractBAFacet{
                              "Participant.");
             }
           }
-        } catch (WonProtocolException e) {
-          logger.warn("caught WonProtocolException:", e);
         } catch (Exception e) {
           logger.debug("caught Exception",e);
         }

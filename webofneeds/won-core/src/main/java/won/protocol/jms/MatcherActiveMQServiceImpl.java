@@ -19,17 +19,16 @@ package won.protocol.jms;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.PathParser;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 import won.protocol.model.ProtocolType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
-import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -77,9 +76,8 @@ public class MatcherActiveMQServiceImpl extends ActiveMQServiceImpl implements M
                         resourceURI,
                         path
                 ));
-            }catch (UniformInterfaceException e){
-                ClientResponse response = e.getResponse();
-                if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
+            }catch (HttpClientErrorException e){
+                if (e.getStatusCode() == HttpStatus.NOT_FOUND){
                     return null;
                 }
                 else throw e;

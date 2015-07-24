@@ -1,0 +1,81 @@
+prefix dc:    <http://purl.org/dc/elements/1.1/>
+prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>
+prefix conn:  <http://localhost:8080/won/resource/connection/>
+prefix event: <http://localhost:8080/won/resource/event/>
+prefix woncrypt: <http://purl.org/webofneeds/woncrypt#>
+prefix xsd:   <http://www.w3.org/2001/XMLSchema#>
+prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfg:   <http://www.w3.org/2004/03/trix/rdfg-1/>
+prefix local: <http://localhost:8080/won/resource/>
+prefix won:   <http://purl.org/webofneeds/model#>
+prefix msg:   <http://purl.org/webofneeds/message#>
+prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+prefix ldp:   <http://www.w3.org/ns/ldp#>
+
+# signature chain must be parallel to the content/envelope chain (assumes content/envelope chain has been validated
+# and found valid)
+
+#ASK
+#{
+  SELECT
+
+    ?envChainSize
+    ?parallelEnvSigChainSize
+    ?contentChainSize
+    ?parallelContentSigChainSize
+
+    (if(?envChainSize != ?parallelEnvSigChainSize || ?contentChainSize != ?parallelContentSigChainSize, "FAIL", "OK")
+    AS ?check)
+
+  WHERE
+  {
+
+    { SELECT (count(?g) as ?envChainSize)
+      WHERE
+      {
+        GRAPH ?envelope
+        {
+          ?envelope msg:containsEnvelope ?g .
+        } .
+      }
+    }
+
+    { SELECT (count(?g) as ?parallelEnvSigChainSize)
+      WHERE
+      {
+        GRAPH ?envelope
+        {
+          ?envelope msg:containsEnvelope ?g .
+          ?event msg:referencesSignature ?ref .
+          ?ref msg:hasSignatureGraph ?signature .
+          ?ref msg:hasSignedGraph ?g .
+        } .
+      }
+    }
+
+    { SELECT (count(?g) as ?contentChainSize)
+      WHERE
+      {
+        GRAPH ?envelope
+        {
+          ?event msg:hasContent ?g .
+        } .
+      }
+    }
+
+    { SELECT (count(?g) as ?parallelContentSigChainSize)
+      WHERE
+      {
+        GRAPH ?envelope
+        {
+          ?event msg:hasContent ?g .
+          ?event msg:referencesSignature ?ref .
+          ?ref msg:hasSignatureGraph ?signature .
+          ?ref msg:hasSignedGraph ?g .
+        } .
+      }
+    }
+
+  }
+#}
