@@ -84,6 +84,17 @@ angular.module('won.owner').factory('MessageBuilder', function () {//$q,$log, $r
             }
         },
         /*
+        STOPPED HERE
+        attachFile: function(file) {
+            1. generate uri
+            2. serialise file into desired format
+            3. push into arrays of uris and files (or an object or an array of objects)
+        }
+        //TODO it should be possible to do the creation without initialising two message builders. 
+        --> CreateMessageBuilder that passes through calls to it's internal needmsgbuilder 
+            and then builds the messsage from that?
+        */
+        /*
          TODO missing parameters for equivalence with old builder:
 
          see won-service:548f
