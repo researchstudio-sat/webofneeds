@@ -1,5 +1,0 @@
-{
-  "name": "es6-promise",
-  "version": "2.0.1",
-  "main": "./promise.js"
-}

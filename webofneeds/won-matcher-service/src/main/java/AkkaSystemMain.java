@@ -2,15 +2,14 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.DeadLetter;
 import akka.actor.Props;
-import crawler.actor.DeadLetterActor;
-import crawler.actor.MasterCrawlerActor;
-import crawler.config.Settings;
-import crawler.config.SettingsImpl;
-import crawler.db.SparqlEndpointService;
-import crawler.message.UriStatusMessage;
+import common.actor.DeadLetterActor;
+import crawler.config.CrawlSettings;
+import crawler.config.CrawlSettingsImpl;
+import crawler.service.CrawlSparqlService;
+import matcher.actor.MatcherActor;
+import node.actor.WonNodeControllerActor;
 
 import java.io.IOException;
-import java.util.Set;
 
 /**
  * User: hfriedrich
@@ -23,31 +22,12 @@ public class AkkaSystemMain
 
     // setup Akka
     ActorSystem system = ActorSystem.create("AkkaMatchingService");
-    SettingsImpl settings = Settings.SettingsProvider.get(system);
-    SparqlEndpointService endpoint = new SparqlEndpointService(settings.SPARQL_ENDPOINT);
-    ActorRef master = system.actorOf(
-      Props.create(MasterCrawlerActor.class),
-      "MasterCrawlerActor");
-    ActorRef actor = system.actorOf(Props.create(DeadLetterActor.class), "crawler.actor.DeadLetterActor");
+    CrawlSettingsImpl settings = CrawlSettings.SettingsProvider.get(system);
+    CrawlSparqlService endpoint = new CrawlSparqlService(settings.METADATA_SPARQL_ENDPOINT);
+    ActorRef controller = system.actorOf(Props.create(WonNodeControllerActor.class), "WonNodeControllerActor");
+    ActorRef actor = system.actorOf(Props.create(DeadLetterActor.class), "DeadLetterActor");
     system.eventStream().subscribe(actor, DeadLetter.class);
-
-    // read crawling URIs from cmd line
-    for (String arg : args) {
-      if (arg.endsWith("/")) {
-        endpoint.updateCrawlingMetadata(new UriStatusMessage(
-          arg.substring(0, arg.length()-1), arg.substring(0, arg.length()-1), UriStatusMessage.STATUS.PROCESS));
-      } else {
-        endpoint.updateCrawlingMetadata(new UriStatusMessage(arg + "/", arg + "/", UriStatusMessage.STATUS.PROCESS));
-      }
-      endpoint.updateCrawlingMetadata(new UriStatusMessage(arg, arg, UriStatusMessage.STATUS.PROCESS));
-    }
-
-    // (re-)start crawling
-    Set<UriStatusMessage> msgs = endpoint.getMessagesForCrawling(UriStatusMessage.STATUS.PROCESS);
-    msgs.addAll(endpoint.getMessagesForCrawling(UriStatusMessage.STATUS.FAILED));
-    for (UriStatusMessage msg : msgs) {
-      master.tell(msg, master);
-    }
+    ActorRef matcher = system.actorOf(Props.create(MatcherActor.class), "MatcherActor");
   }
 
 }

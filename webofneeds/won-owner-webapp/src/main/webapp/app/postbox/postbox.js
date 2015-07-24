@@ -201,7 +201,6 @@ angular.module('won.owner').controller("PostInboxCtrl", function($scope,$locatio
     $scope.postData.unreadEventsByNeedByType =    applicationStateService.getUnreadEventsByNeedByType();
     $scope.postData.unreadEventsByTypeByNeed = applicationStateService.getUnreadEventsByTypeByNeed();
     $scope.templateUrl = 'app/postbox/post-inbox-table.html';
-    //$scope.allNeeds = applicationStateService.getAllNeeds();
     $scope.allNeeds = applicationStateService.getAllNeeds();
     $scope.clickOnPost = function(){
         //$location.path("create-need/"+draft.currentStep+"/"+draft.selectedType);

@@ -595,6 +595,11 @@ public class WonMessageBuilder
         .setSenderNodeURI(originalMessage.getSenderNodeURI())
         .setSenderNeedURI(originalMessage.getSenderNeedURI())
         .setSenderURI(originalMessage.getSenderURI());
+      if (originalMessage.getSenderNodeURI() == null) {
+        // special case for e.g. create message where there is no sender node uri specified
+        // in this case it should be send to the receiver node uri
+        this.setSenderNodeURI(originalMessage.getReceiverNodeURI());
+      }
     }
     this
       .setReceiverNeedURI(originalMessage.getSenderNeedURI())

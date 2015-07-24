@@ -49,3 +49,11 @@ bin/setenv.*
 #local config and data
 webofneeds/conf.local
 /webofneeds/data.local
+
+#local package caches
+bower_components/
+node_modules/
+jspm_packages/
+
+#generated styles
+**/style/generated/

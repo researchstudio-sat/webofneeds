@@ -1,0 +1,194 @@
+package won.protocol.message.processor.impl;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
+import won.protocol.message.processor.WonMessageProcessor;
+import won.protocol.message.processor.exception.UriAlreadyInUseException;
+import won.protocol.message.processor.exception.UriNodePathException;
+import won.protocol.service.WonNodeInfo;
+import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.WonRdfUtils;
+
+import java.net.URI;
+
+/**
+ * Check if the event, graph or need uri is well-formed according the node's
+ * domain and its path conventions
+ *
+ * User: ypanchenko
+ * Date: 23.04.2015
+ */
+public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProcessor
+{
+
+  @Autowired
+  protected WonNodeInformationService wonNodeInformationService;
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+
+
+  @Override
+  public WonMessage process(final WonMessage message) throws UriAlreadyInUseException {
+
+
+    // extract info about own, sender and receiver nodes:
+
+    URI senderNode = message.getSenderNodeURI();
+    URI receiverNode = message.getReceiverNodeURI();
+    WonNodeInfo senderNodeInfo = null;
+    WonNodeInfo receiverNodeInfo = null;
+    if (senderNode != null) {
+      senderNodeInfo = wonNodeInformationService.getWonNodeInformation(senderNode);
+    }
+    if (receiverNode != null) {
+      receiverNodeInfo = wonNodeInformationService.getWonNodeInformation(receiverNode);
+    }
+    URI ownNode = wonNodeInformationService.getDefaultWonNodeURI();
+    WonNodeInfo ownNodeInfo = null;
+    if (ownNode.equals(senderNode)) {
+      ownNodeInfo = senderNodeInfo;
+    } else if (ownNode.equals(receiverNode)) {
+      ownNodeInfo = receiverNodeInfo;
+    }
+
+
+    // do checks for consistency between these nodes and message direction, as well as needs,
+    // events and connection uris:
+
+    // my node should be either receiver or sender node
+    checkHasMyNode(message, ownNode);
+    // Any message URI used must conform to a URI pattern specified by the respective publishing service:
+    // Check that event URI corresponds to my pattern
+    checkLocalEventURI(message, ownNodeInfo);
+    // Check that remote URI, if any, correspond to ?senderNode's event pattern
+    checkRemoteEventURI(message, senderNodeInfo);
+    // Check that need URI for create_need message corresponds to my pattern
+    checkCreateMsgNeedURI(message, ownNodeInfo);
+
+    // Specified sender-receiverNeed/Connection must conform to sender-receiverNode URI pattern
+    checkSenders(senderNodeInfo, receiverNodeInfo, message);
+    checkReceivers(receiverNodeInfo, message);
+
+    // Check that my node is sender or receiver node URI, depending on the message direction
+    checkDirection(message, ownNode);
+
+    return message;
+  }
+
+  private void checkHasMyNode(final WonMessage message, URI ownNode) {
+    if (!ownNode.equals(message.getSenderNodeURI())
+      && !ownNode.equals(message.getReceiverNodeURI())) {
+      throw new UriNodePathException(message.getMessageURI());
+    }
+  }
+
+  private void checkReceivers(final WonNodeInfo receiverNodeInfo, final WonMessage message) {
+    checkNodeConformance(receiverNodeInfo, message.getReceiverNeedURI(),
+                         message.getReceiverURI(), null);
+  }
+
+  private void checkSenders(final WonNodeInfo senderNodeInfo, final WonNodeInfo receiverNodeInfo, final WonMessage message) {
+
+    // special case for e.g. create_message that has only sender need and receiver node
+    if (message.getSenderNodeURI() == null) {
+      checkNodeConformance(receiverNodeInfo, message.getSenderNeedURI(), null, null);
+    } else { // common case
+      checkNodeConformance(senderNodeInfo, message.getSenderNeedURI(),
+                           message.getSenderURI(), null);
+    }
+  }
+
+  private void checkDirection(final WonMessage message, final URI ownNode) {
+
+    WonMessageDirection direction = message.getEnvelopeType();
+    URI receiverNode = message.getReceiverNodeURI();
+    URI senderNode = message.getSenderNodeURI();
+    URI node;
+    switch (direction) {
+      case FROM_EXTERNAL:
+        // my node should be a receiver node
+        if (!ownNode.equals(receiverNode)) {
+          throw new UriNodePathException(receiverNode);
+        }
+        break;
+      case FROM_OWNER:
+        // my node should be a sender node; if sender node is not specified - then the receiver node
+        node = senderNode;
+        if (senderNode == null) {
+          node = receiverNode;
+        }
+        if (!ownNode.equals(node)) {
+          throw new UriNodePathException(node);
+        }
+        break;
+      case FROM_SYSTEM:
+        // my node should be a sender node
+        if (!ownNode.equals(senderNode)) {
+          throw new UriNodePathException(senderNode);
+        }
+        break;
+    }
+
+  }
+
+  private void checkLocalEventURI(final WonMessage message, WonNodeInfo ownNodeInfo) {
+    checkNodeConformance(ownNodeInfo, null, null, message.getMessageURI());
+  }
+
+  private void checkRemoteEventURI(final WonMessage message, final WonNodeInfo senderNodeInfo) {
+    checkNodeConformance(senderNodeInfo, null, null, message.getCorrespondingRemoteMessageURI());
+  }
+
+  private void checkCreateMsgNeedURI(final WonMessage message, final WonNodeInfo ownNodeInfo) {
+    // check only for create message
+    if (message.getMessageType() == WonMessageType.CREATE_NEED) {
+      URI needURI = WonRdfUtils.NeedUtils.getNeedURI(message.getCompleteDataset());
+      checkNodeConformance(ownNodeInfo, needURI, null, null);
+    }
+    return;
+  }
+
+  private void checkNodeConformance(final WonNodeInfo info, final URI needURI, final URI connURI,
+                                    final URI eventURI) {
+
+    if (info == null) {
+      return;
+    }
+
+    if (needURI == null && connURI == null && eventURI == null) {
+      return;
+    }
+
+    String needPrefix = info.getNeedURIPrefix();
+    String connPrefix = info.getConnectionURIPrefix();
+    String eventPrefix = info.getEventURIPrefix();
+
+    if (needURI != null) {
+      checkPrefix(needURI, needPrefix);
+    }
+    if (connURI != null) {
+      checkPrefix(connURI, connPrefix);
+    }
+    if (eventURI != null) {
+      checkPrefix(eventURI, eventPrefix);
+    }
+  }
+
+  private String getPrefix(final URI needURI) {
+    return needURI.toString().substring(0, needURI.toString().lastIndexOf("/"));
+  }
+
+  private void checkPrefix(URI uri, String expectedPrefix) {
+    String prefix = getPrefix(uri);
+    if (!prefix.equals(expectedPrefix)) {
+      throw new UriNodePathException(uri);
+    }
+    return;
+  }
+
+
+}

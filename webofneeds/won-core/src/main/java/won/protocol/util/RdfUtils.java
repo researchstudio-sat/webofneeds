@@ -962,7 +962,10 @@ public class RdfUtils
    * @return <code>URI</code> of the resource
    */
   public static RDFNode findOnePropertyFromResource(Model model, URI resourceURI, Property property) {
-    Resource resource = model.getResource(resourceURI.toString());
+    Resource resource = null;
+    if (resourceURI != null) {
+      resource = model.getResource(resourceURI.toString());
+    }
 
     return findOnePropertyFromResource(model, resource, property);
   }
@@ -1071,7 +1074,6 @@ public class RdfUtils
    * @param baseURI the URI to be extended.
    * @param toAppend a string that will be appended directly to the URI.
    * @param length number of alphanumeric characters that are appended to <code>toAppend</code>.
-   * @param disallowedGraphUris set of uris that are forbidden.
    * @return an URI that is previously unused as a graph URI.
    */
   public static URI createNewGraphURI(String baseURI, String toAppend, int length, GraphNameCheck check){

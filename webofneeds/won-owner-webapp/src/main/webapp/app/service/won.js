@@ -194,6 +194,7 @@
         won.WONMSG.hasContentCompacted = won.WONMSG.prefix+ ":hasContent";
 
         won.WONMSG.FromOwner = won.WONMSG.baseUri + "FromOwner";
+        won.WONMSG.FromOwnerCompacted = won.WONMSG.prefix + ":FromOwner";
         won.WONMSG.FromExternal = won.WONMSG.baseUri + "FromExternal";
         won.WONMSG.FromSystem = won.WONMSG.baseUri + "FromSystem"
 
@@ -1132,6 +1133,14 @@
             },
             hasReceiverNode: function(receiverURI){
                 this.getMessageEventNode()[won.WONMSG.hasReceiverNodeCompacted]={"@id":receiverURI};
+                return this;
+            },
+            hasOwnerDirection: function() {
+                this.getMessageEventNode()["@type"]=won.WONMSG.FromOwnerCompacted;
+                return this;
+            },
+            hasSentTimestamp: function(timestamp) {
+                this.getMessageEventNode()["msg:hasSentTimestamp"]=timestamp;
                 return this;
             },
             /**

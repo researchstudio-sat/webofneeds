@@ -4,20 +4,20 @@ import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
-import crawler.config.Settings;
-import crawler.config.SettingsImpl;
-import crawler.db.SparqlEndpointService;
-import crawler.exception.CrawlingWrapperException;
-import crawler.message.UriStatusMessage;
-import org.springframework.http.*;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.client.HttpClientErrorException;
+import common.config.CommonSettings;
+import common.config.CommonSettingsImpl;
+import common.service.HttpRequestService;
+import crawler.config.CrawlSettings;
+import crawler.config.CrawlSettingsImpl;
+import crawler.exception.CrawlWrapperException;
+import crawler.msg.CrawlUriMessage;
+import crawler.service.CrawlSparqlService;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import won.protocol.rest.RdfDatasetConverter;
+import won.protocol.exception.IncorrectPropertyCountException;
+import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.WON;
 
-import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 /**
@@ -33,102 +33,93 @@ import java.util.Set;
  */
 public class WorkerCrawlerActor extends UntypedActor
 {
+  private final CrawlSettingsImpl crawlSettings = CrawlSettings.SettingsProvider.get(getContext().system());
+  private final CommonSettingsImpl commonSettings = CommonSettings.SettingsProvider.get(getContext().system());
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-  private final SettingsImpl settings = Settings.SettingsProvider.get(getContext().system());
-  private RestTemplate restTemplate;
-  private HttpEntity entity;
-  private SparqlEndpointService endpoint;
+  private HttpRequestService httpRequestService;
+  private CrawlSparqlService sparqlService;
 
   public WorkerCrawlerActor() {
-
-    HttpMessageConverter datasetConverter = new RdfDatasetConverter();
-    HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-    factory.setReadTimeout(settings.HTTP_READ_TIMEOUT);
-    factory.setConnectTimeout(settings.HTTP_CONNECTION_TIMEOUT);
-    restTemplate = new RestTemplate(factory);
-    restTemplate.getMessageConverters().add(datasetConverter);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setAccept(datasetConverter.getSupportedMediaTypes());
-    entity = new HttpEntity(headers);
-    endpoint = new SparqlEndpointService(settings.SPARQL_ENDPOINT);
+    httpRequestService = new HttpRequestService(crawlSettings.HTTP_READ_TIMEOUT, crawlSettings.HTTP_CONNECTION_TIMEOUT);
+    sparqlService = new CrawlSparqlService(commonSettings.SPARQL_ENDPOINT);
   }
 
   /**
    * Receives messages with an URI and processes them by requesting the resource,
    * saving it to a triple store, extracting URIs from content and answering the sender.
    *
-   * @param msg if type is {@link crawler.message.UriStatusMessage} then process it
-   * @throws IOException
+   * @param msg if type is {@link CrawlUriMessage} then process it
    */
   @Override
-  public void onReceive(Object msg) throws IOException {
+  public void onReceive(Object msg) throws RestClientException {
 
-    if (!(msg instanceof UriStatusMessage)) {
+    if (!(msg instanceof CrawlUriMessage)) {
       unhandled(msg);
       return;
     }
 
-    UriStatusMessage uriMsg = (UriStatusMessage) msg;
-    if (!uriMsg.getStatus().equals(UriStatusMessage.STATUS.PROCESS)) {
+    CrawlUriMessage uriMsg = (CrawlUriMessage) msg;
+    if (!uriMsg.getStatus().equals(CrawlUriMessage.STATUS.PROCESS)) {
       unhandled(msg);
       return;
     }
 
     // URI message to process received
     // start the crawling request
-    Dataset ds = requestDataset(uriMsg);
+    Dataset ds = null;
+    try {
+      ds = httpRequestService.requestDataset(uriMsg.getUri());
+    } catch (RestClientException e) {
+      throw new CrawlWrapperException(e, uriMsg);
+    }
 
     // Save dataset to triple store
-    endpoint.updateDataset(ds);
+    sparqlService.updateNamedGraphsOfDataset(ds);
+    String wonNodeUri = extractWonNodeUri(ds, uriMsg.getUri());
+    if (wonNodeUri == null) {
+      wonNodeUri = uriMsg.getWonNodeUri();
+    }
 
     // send extracted non-base URIs back to sender and save meta data about crawling the URI
     log.debug("Extract non-base URIs from message {}", uriMsg);
-    Set<String> extractedURIs = endpoint.extractURIs(
-      uriMsg.getUri(), uriMsg.getBaseUri(), settings.PROPERTYPATHS_NONBASE);
+    Set<String> extractedURIs = sparqlService.extractURIs(
+      uriMsg.getUri(), uriMsg.getBaseUri(), crawlSettings.PROPERTYPATHS_NONBASE);
     for (String extractedURI : extractedURIs) {
-      UriStatusMessage newUriMsg = new UriStatusMessage(
-        extractedURI, uriMsg.getBaseUri(), UriStatusMessage.STATUS.PROCESS);
+      CrawlUriMessage newUriMsg = new CrawlUriMessage(
+        extractedURI, uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.PROCESS);
       getSender().tell(newUriMsg, getSelf());
     }
 
     // send extracted base URIs back to sender and save meta data about crawling the URI
     log.debug("Extract base URIs from message {}", uriMsg);
-    extractedURIs = endpoint.extractURIs(uriMsg.getUri(), uriMsg.getBaseUri(), settings.PROPERTYPATHS_BASE);
+    extractedURIs = sparqlService.extractURIs(uriMsg.getUri(), uriMsg.getBaseUri(), crawlSettings.PROPERTYPATHS_BASE);
     for (String extractedURI : extractedURIs) {
-      UriStatusMessage newUriMsg = new UriStatusMessage(
-        extractedURI, extractedURI, UriStatusMessage.STATUS.PROCESS);
+      CrawlUriMessage newUriMsg = new CrawlUriMessage(
+        extractedURI, extractedURI, wonNodeUri, CrawlUriMessage.STATUS.PROCESS);
       getSender().tell(newUriMsg, getSelf());
     }
 
     // signal sender that this URI is processed and save meta data about crawling the URI.
     // This needs to be done after all extracted URI messages have been sent to guarantee consistency
     // in case of failure
-    UriStatusMessage uriDoneMsg = new UriStatusMessage(
-      uriMsg.getUri(), uriMsg.getBaseUri(), UriStatusMessage.STATUS.DONE);
+    CrawlUriMessage uriDoneMsg = new CrawlUriMessage(
+      uriMsg.getUri(), uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.DONE);
     log.debug("Crawling done for URI {}", uriDoneMsg.getUri());
     getSender().tell(uriDoneMsg, getSelf());
   }
 
   /**
-   * Request the URI using HTTP
+   * Extract won node uri from a won resource
    *
-   * @param msg message which holds the requested URI
-   * @return dataset that represents the linked data URI
+   * @param ds resource as dataset
+   * @param uri uri that represents resource
+   * @return won node uri or null if link to won node is not linked in the resource
    */
-  private Dataset requestDataset(UriStatusMessage msg)  {
-
-    ResponseEntity<Dataset> response = null;
+  private String extractWonNodeUri(Dataset ds, String uri) {
     try {
-      log.debug("Request URI: {}", msg.getUri());
-      response = restTemplate.exchange(msg.getUri(), HttpMethod.GET, entity, Dataset.class);
-
-      if (response.getStatusCode() != HttpStatus.OK) {
-        log.warning("HTTP GET request returned status code: {}", response.getStatusCode());
-        throw new HttpClientErrorException(response.getStatusCode());
-      }
-      return response.getBody();
-    } catch (RestClientException e) {
-      throw new CrawlingWrapperException(e, msg);
+      return RdfUtils.findOnePropertyFromResource(ds, URI.create(uri), WON.HAS_WON_NODE).asResource().getURI();
+    } catch (IncorrectPropertyCountException e) {
+      return null;
     }
   }
 
