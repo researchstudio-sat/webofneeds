@@ -191,10 +191,10 @@
         <script src="scripts/jquery.10.2.js"></script>
         <script src="scripts/jquery.fs.scroller.min.js"></script>
 
-        <script type="text/javascript" src="jspm_packages/bower/angular@1.4.3/angular.js"></script>
+        <script type="text/javascript" src="jspm_packages/bower/angular@1.4.2/angular.js"></script>
         <script type="text/javascript" src="jspm_packages/github/twbs/bootstrap@3.3.5/js/bootstrap.js"></script>
-        <script type="text/javascript" src="jspm_packages/github/angular/bower-angular-route@1.4.3/angular-route.js"></script>
-        <script type="text/javascript" src="jspm_packages/github/angular/bower-angular-mocks@1.4.3/angular-mocks.js"></script>
+        <script type="text/javascript" src="jspm_packages/github/angular/bower-angular-route@1.4.2/angular-route.js"></script>
+        <script type="text/javascript" src="jspm_packages/github/angular/bower-angular-mocks@1.4.2/angular-mocks.js"></script>
         <script type="text/javascript" src="jspm_packages/github/angular-ui/bootstrap-bower@0.13.0/ui-bootstrap-tpls.js"></script>
         <script type="text/javascript" src="jspm_packages/bower/ng-tags-input@2.3.0/ng-tags-input.js"></script>
         <script type="text/javascript" src="jspm_packages/bower/js-md5@1.1.0/js/md5.js"></script>
