@@ -26,12 +26,8 @@ public enum WonMessageType
   NEED_CREATED_NOTIFICATION(WONMSG.TYPE_NEED_CREATED_NOTIFICATION),
 
   // response messages
-  CREATE_RESPONSE(WONMSG.TYPE_CREATE_RESPONSE),
-  CONNECT_RESPONSE(WONMSG.TYPE_CONNECT_RESPONSE),
-  NEED_STATE_RESPONSE(WONMSG.TYPE_NEED_STATE_RESPONSE),
-  CLOSE_RESPONSE(WONMSG.TYPE_CLOSE_RESPONSE),
-  OPEN_RESPONSE(WONMSG.TYPE_OPEN_RESPONSE),
-  CONNECTION_MESSAGE_RESPONSE(WONMSG.TYPE_CONNECTION_MESSAGE_RESPONSE);
+  SUCCESS_RESPONSE(WONMSG.TYPE_SUCCESS_RESPONSE),
+  FAILURE_RESPONSE(WONMSG.TYPE_FAILURE_RESPONSE);
 
 
   private Resource resource;
@@ -46,8 +42,17 @@ public enum WonMessageType
     return resource;
   }
 
+  public URI getURI(){
+    return URI.create(getResource().getURI().toString());
+  }
+
   public static WonMessageType getWonMessageType(URI uri){
     return getWonMessageType(WONMSG.toResource(uri));
+  }
+
+  public boolean isIdentifiedBy(URI uri){
+    if (uri == null) return false;
+    return getResource().getURI().toString().equals(uri.toString());
   }
 
 
@@ -71,18 +76,11 @@ public enum WonMessageType
       return HINT_MESSAGE;
 
     // response classes
-    if (WONMSG.TYPE_CREATE_RESPONSE.equals(resource))
-      return CREATE_RESPONSE;
-    if (WONMSG.TYPE_CONNECT_RESPONSE.equals(resource))
-      return CONNECT_RESPONSE;
-    if (WONMSG.TYPE_NEED_STATE_RESPONSE.equals(resource))
-      return NEED_STATE_RESPONSE;
-    if (WONMSG.TYPE_CLOSE_RESPONSE.equals(resource))
-      return CLOSE_RESPONSE;
-    if (WONMSG.TYPE_OPEN_RESPONSE.equals(resource))
-      return OPEN_RESPONSE;
-    if (WONMSG.TYPE_CONNECTION_MESSAGE_RESPONSE.equals(resource))
-      return CONNECT_RESPONSE;
+    if (WONMSG.TYPE_SUCCESS_RESPONSE.equals(resource))
+      return SUCCESS_RESPONSE;
+    if (WONMSG.TYPE_FAILURE_RESPONSE.equals(resource))
+      return FAILURE_RESPONSE;
+
 
     //notification classes
     if (WONMSG.TYPE_HINT_NOTIFICATION.equals(resource))

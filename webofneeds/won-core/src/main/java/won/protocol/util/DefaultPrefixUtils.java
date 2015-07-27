@@ -35,7 +35,7 @@ public class DefaultPrefixUtils
    * @param model
    */
   public static void setDefaultPrefixes(Model model) {
-    setDefaultPrefixes(model.getGraph().getPrefixMapping());         
+    setDefaultPrefixes(model.getGraph().getPrefixMapping());
   }
 
   /**
@@ -45,12 +45,21 @@ public class DefaultPrefixUtils
   public static void setDefaultPrefixes(PrefixMapping prefixMapping) {
     prefixMapping.setNsPrefix("won", WON.getURI());
     prefixMapping.setNsPrefix(WONMSG.DEFAULT_PREFIX, WONMSG.getURI());
+    prefixMapping.setNsPrefix(WONCRYPT.DEFAULT_PREFIX, WONCRYPT.getURI());
+    prefixMapping.setNsPrefix(SFSIG.DEFAULT_PREFIX, SFSIG.getURI());
+    prefixMapping.setNsPrefix(CERT.DEFAULT_PREFIX, CERT.getURI());
+    prefixMapping.setNsPrefix("sioc", SIOC.getURI());
     prefixMapping.setNsPrefix("rdf", RDF.getURI());
     prefixMapping.setNsPrefix("ldp", LDP.getURI());
     prefixMapping.setNsPrefix("rdfs", RDFS.getURI());
     prefixMapping.setNsPrefix("geo", GEO.getURI());
-    prefixMapping.setNsPrefix("gr", GR.getURI());
     prefixMapping.setNsPrefix("xsd", XSD.getURI());
     prefixMapping.setNsPrefix("dc", DC.getURI());    
+  }
+
+  public static PrefixMapping getDefaultPrefixes(){
+    PrefixMapping ret = PrefixMapping.Factory.create();
+    setDefaultPrefixes(ret);
+    return ret;
   }
 }

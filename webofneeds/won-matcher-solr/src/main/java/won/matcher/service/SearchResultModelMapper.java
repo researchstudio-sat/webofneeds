@@ -41,7 +41,7 @@ public class SearchResultModelMapper implements ModelMapper<SearchResult>
     Resource mainResource = ret.createResource();
     mainResource.addProperty(WON.HAS_ORIGINATOR, ret.createResource(searchResult.getOriginator().toString()));
     for(SearchResultItem item: searchResult.getItems()){
-      Resource itemResource = ret.createResource();
+      Resource itemResource = ret.createResource(WON.Match);
       itemResource.addProperty(WON.SEARCH_RESULT_URI, ret.createResource(item.getUri().toString()));
       itemResource.addProperty(WON.HAS_MATCH_SCORE, ret.createTypedLiteral(item.getScore(), XSDDatatype.XSDfloat));
       if (item.getExplanation() != null) {

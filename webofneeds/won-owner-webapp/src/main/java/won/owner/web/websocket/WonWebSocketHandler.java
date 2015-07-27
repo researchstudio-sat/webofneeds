@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
 import org.springframework.transaction.annotation.Propagation;
@@ -33,12 +34,13 @@ import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.repository.UserNeedRepository;
 import won.owner.repository.UserRepository;
-import won.owner.service.OwnerApplicationServiceCallback;
 import won.owner.service.impl.OwnerApplicationService;
+import won.owner.web.WonOwnerMailSender;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.processor.WonMessageProcessor;
 
 import java.io.IOException;
 import java.net.URI;
@@ -53,11 +55,11 @@ import java.util.Set;
  */
 public class WonWebSocketHandler
     extends TextWebSocketHandler
-    implements OwnerApplicationServiceCallback, InitializingBean
+    implements WonMessageProcessor, InitializingBean
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Autowired
+
   private OwnerApplicationService ownerApplicationService;
 
   @Autowired
@@ -72,10 +74,12 @@ public class WonWebSocketHandler
   @Autowired
   SessionRepository sessionRepository;
 
+  @Autowired
+  private WonOwnerMailSender emailSender;
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    this.ownerApplicationService.setOwnerApplicationServiceCallbackToClient(this);
+    this.ownerApplicationService.setMessageProcessorDelegate(this);
   }
 
   @Override
@@ -141,7 +145,7 @@ public class WonWebSocketHandler
     logger.debug("binding session to need URI {}", needUri);
     this.webSocketSessionService.addMapping(needUri, session);
 
-    ownerApplicationService.handleMessageEventFromClient(wonMessage);
+    ownerApplicationService.sendWonMessage(wonMessage);
   }
 
   /* update the session last accessed time, - spring-session was added to synchronize
@@ -161,12 +165,13 @@ public class WonWebSocketHandler
 
   @Override
   @Transactional(propagation = Propagation.SUPPORTS)
-  public void onMessage(final WonMessage wonMessage) {
+  public WonMessage process(final WonMessage wonMessage) {
 
     String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);
     WebSocketMessage<String> webSocketMessage = new TextMessage(wonMessageJsonLdString);
     URI needUri = wonMessage.getReceiverNeedURI();
     User user = getUserForWonMessage(wonMessage);
+
     Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForWonMessage(wonMessage, needUri, user);
     if (webSocketSessions.size() == 0) {
       logger.info("cannot deliver message of type {} for need {}, receiver {}: no websocket session found",
@@ -176,6 +181,57 @@ public class WonWebSocketHandler
     }
     for (WebSocketSession session : webSocketSessions) {
       sendMessageForSession(wonMessage, webSocketMessage, session, needUri, user);
+    }
+    // send per email notifications if it applies:
+    notifyPerEmail(user, needUri, wonMessage);
+    return wonMessage;
+  }
+
+  private void notifyPerEmail(final User user, final URI needUri, final WonMessage wonMessage) {
+
+    if (user == null) {
+      return;
+    }
+
+    UserNeed userNeed = getNeedOfUser(user, needUri);
+    if (userNeed == null) {
+      return;
+    }
+
+    try {
+      switch (wonMessage.getMessageType()) {
+        case OPEN:
+          if (userNeed.isConversations()) {
+            emailSender.sendNotificationMessage(user.getEmail(), "Conversation Message",
+                                                wonMessage.getReceiverNeedURI().toString());
+          }
+          return;
+        case CONNECTION_MESSAGE:
+          if (userNeed.isConversations()) {
+            emailSender.sendNotificationMessage(user.getEmail(), "Conversation Message",
+                                                wonMessage.getReceiverNeedURI().toString());
+          }
+          return;
+        case CONNECT:
+          if (userNeed.isRequests()) {
+            emailSender.sendNotificationMessage(user.getEmail(), "Conversation Request",
+                                                wonMessage.getReceiverNeedURI().toString());
+          }
+          return;
+        case HINT_MESSAGE:
+          if (userNeed.isRequests()) {
+            emailSender.sendNotificationMessage(user.getEmail(), "Match", wonMessage.getReceiverNeedURI().toString());
+          }
+          return;
+        //TODO close message can be of either type depending of state of the connection...
+        case CLOSE:
+          //TODO
+          return;
+        default:
+          return;
+      }
+    } catch (MailException ex) { // org.springframework.mail.MailException
+      logger.error("Email could not be sent", ex);
     }
   }
 
@@ -226,6 +282,16 @@ public class WonWebSocketHandler
     return userRepository.findByNeedUri(needUri);
   }
 
+  private UserNeed getNeedOfUser(final User user, final URI needUri) {
+
+    for (UserNeed userNeed : user.getUserNeeds()) {
+      if (userNeed.getUri().equals(needUri)) {
+        return userNeed;
+      }
+    }
+    return null;
+  }
+
   private synchronized void sendMessageForSession(final WonMessage wonMessage, final WebSocketMessage<String>
     webSocketMessage,
     final WebSocketSession session, URI needUri, User user) {
@@ -233,7 +299,9 @@ public class WonWebSocketHandler
       logger.debug("session {} is closed, can't send message", session.getId());
       return;
     }
-    if (wonMessage.getMessageType() == WonMessageType.CREATE_RESPONSE) {
+    if (wonMessage.getMessageType() == WonMessageType.SUCCESS_RESPONSE
+      && WonMessageType.CREATE_NEED ==wonMessage.getIsResponseToMessageType()){
+
       if (session.getPrincipal() != null) {
         saveNeedUriWithUser(wonMessage, session);
       } else {

@@ -17,7 +17,6 @@
 package won.protocol.jms;
 
 import org.apache.camel.CamelContext;
-import won.protocol.exception.CamelConfigurationFailedException;
 
 import java.net.URI;
 
@@ -30,7 +29,6 @@ public interface NeedProtocolCamelConfigurator extends CamelConfigurator {
     public String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName);
     public void addCamelComponentForWonNodeBroker(URI brokerUri,String brokerComponentName);
 
-    void addRouteForEndpoint(String startingEndpoint, final URI wonNodeURI) throws CamelConfigurationFailedException;
 
     void setCamelContext(CamelContext camelContext);
 

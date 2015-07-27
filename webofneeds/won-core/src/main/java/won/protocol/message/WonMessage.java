@@ -1,5 +1,6 @@
 package won.protocol.message;
 
+import com.google.common.collect.Sets;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.*;
@@ -7,20 +8,18 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WONMSG;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 
 /**
- * User: ypanchenko
- * Date: 04.08.2014
+ * Wraps an RDF dataset representing a WoN message.
+ *
+ * Note: this implementation is not thread-safe.
  */
 public class WonMessage implements Serializable
 {
@@ -38,6 +37,7 @@ public class WonMessage implements Serializable
 
   private URI messageURI;
   private WonMessageType messageType; // ConnectMessage, CreateMessage, NeedStateMessage
+  private WonMessageDirection envelopeType;
   private URI senderURI;
   private URI senderNeedURI;
   private URI senderNodeURI;
@@ -45,8 +45,11 @@ public class WonMessage implements Serializable
   private URI receiverNeedURI;
   private URI receiverNodeURI;
   private List<URI> refersTo = new ArrayList<>();
-  private URI responseState;
-  private List<String> contentGraphNames;
+  private URI isResponseToMessageURI;
+  private URI isRemoteResponseToMessageURI;
+    private List<String> contentGraphNames;
+  private WonMessageType isResponseToMessageType;
+  private URI correspondingRemoteMessageURI;
 
 
   //private Resource msgBnode;
@@ -112,57 +115,93 @@ public class WonMessage implements Serializable
     if (this.outerEnvelopeGraphURI != null) {
       return this.outerEnvelopeGraphURI;
     }
-    Model model = this.completeDataset.getDefaultModel();
-    if (model == null) throw new IllegalStateException("default model must not be null");
-    Resource envelopeGraphResource = getEnvelopeGraphReference(model, true);
-    this.outerEnvelopeGraphURI =  URI.create(envelopeGraphResource.getURI().toString());
+    getEnvelopeGraphs(); //also sets the outerEnvelopeUri
     return this.outerEnvelopeGraphURI;
   }
 
-  public List<Model> getEnvelopeGraphs(){
-    if (envelopeGraphs != null) return envelopeGraphs;
+  /**
+   * Returns all envelope graphs found in the message.
+   *
+   * Not that this method has side effects: all intermediate results are cached for re-use. This
+   * concerns the envelopeGraphNames, contentGraphNames and messageURI members.
+   * @return
+   */
+  public List<Model> getEnvelopeGraphs() {
+    //return cached instance if we have it
+    if (this.envelopeGraphs != null) return this.envelopeGraphs;
+    //initialize
+    List<Model> allEnvelopes = new ArrayList<Model>();
     this.envelopeGraphNames = new ArrayList<String>();
     this.contentGraphNames = new ArrayList<String>();
-    Model model = this.completeDataset.getDefaultModel();
-    if (model == null) throw new IllegalStateException("default model must not be null");
-    boolean mustContainEnvelopeGraphRef = true;
-    List<Model> ret = new ArrayList<Model>();
-    do {
-      //find the reference to the envelope graph in the current model (the default model in the first iteration)
-      Resource envelopeGraphResource = getEnvelopeGraphReference(model, mustContainEnvelopeGraphRef);
-      model = null;
-      if (envelopeGraphResource != null) {
-        //look at the envelope graph (model):
-        this.envelopeGraphNames.add(envelopeGraphResource.toString());
-        mustContainEnvelopeGraphRef = false; //only needed for default model
-        model = this.completeDataset.getNamedModel(envelopeGraphResource.toString());
-        if (model == null) throw new IllegalStateException("envelope graph referenced in model" +
-          envelopeGraphResource + " but not found as named graph in dataset!");
-        //find all content graphs referenced in it
-        if (this.messageURI == null) {
-          //this can only happen when this method is called before getMessageURI.
-          //we will search for the msg:hasMessageType triple.
-          this.messageURI = RdfUtils.findFirstObjectUri(model, WONMSG.HAS_MESSAGE_TYPE_PROPERTY, null, false, true);
-        }
-        if (this.messageURI == null) {
-          //this can only happen when this method is called before getMessageURI.
-          //we will search for the msg:hasContent triple (because we need it for the code below
-          this.messageURI = RdfUtils.findFirstObjectUri(model, WONMSG.HAS_CONTENT_PROPERTY, null, true, true);
-        }
-        if (this.messageURI != null) {
-          for (NodeIterator it = getContentGraphReferences(model, model.getResource(getMessageURI().toString())); it
-            .hasNext(); ) {
+    URI currentMessageURI = null;
+    this.outerEnvelopeGraph = null;
+    Set<String> envelopesContainedInOthers = new HashSet<String>();
+    Set<String> allEnvelopeGraphNames = new HashSet<String>();
+    //iterate over named graphs
+    Iterator<String> modelUriIterator = this.completeDataset.listNames();
+    while (modelUriIterator.hasNext()) {
+      String envelopeGraphUri = modelUriIterator.next();
+      Model envelopeGraph = this.completeDataset.getNamedModel(envelopeGraphUri);
+      //check if the current named graph is an envelope graph (G rdf:type wonmsg:EnvelopeGraph)
+      if (isEnvelopeGraph(envelopeGraphUri, envelopeGraph)) {
+        this.envelopeGraphNames.add(envelopeGraphUri);
+        allEnvelopeGraphNames.add(envelopeGraphUri);
+        allEnvelopes.add(envelopeGraph);
+        currentMessageURI = findMessageUri(envelopeGraph, envelopeGraphUri);
+        //check if the envelope contains references to 'contained' envelopes and remember their names
+        List<String> containedEnvelopes = findContainedEnvelopeUris(envelopeGraph, envelopeGraphUri);
+        envelopesContainedInOthers.addAll(containedEnvelopes);
+        if (currentMessageURI != null) {
+            for (NodeIterator it = getContentGraphReferences(envelopeGraph,
+                                                             envelopeGraph.getResource(currentMessageURI.toString())); it
+              .hasNext(); ) {
             RDFNode node = it.next();
             this.contentGraphNames.add(node.asResource().toString());
           }
         }
-        //add it to the list of envelope graph models
-        ret.add(model);
       }
-    } while (model != null);
-    this.envelopeGraphs = ret;
-    return Collections.unmodifiableList(ret);
+    }
+    Set<String> candidatesForOuterEnvelope = Sets.symmetricDifference(allEnvelopeGraphNames,
+      envelopesContainedInOthers);
+    //we've now visited all named graphs. We should now have exactly one candidate for the outer envelope
+    if (candidatesForOuterEnvelope.size() != 1){
+      throw new IllegalStateException(String.format("Message dataset must contain exactly one envelope graph that is " +
+        "not included " +
+        "in another one, but found %d", candidatesForOuterEnvelope.size()));
+    }
+    String outerEnvelopeUri = candidatesForOuterEnvelope.iterator().next();
+    this.outerEnvelopeGraphURI = URI.create(outerEnvelopeUri);
+    this.outerEnvelopeGraph = this.completeDataset.getNamedModel(outerEnvelopeUri);
+    this.envelopeGraphs = allEnvelopes;
+    return Collections.unmodifiableList(allEnvelopes);
   }
+
+
+
+
+  private URI findMessageUri(final Model model, final String modelUri) {
+    RDFNode messageUriNode = RdfUtils.findOnePropertyFromResource(model, model.getResource(modelUri), RDFG.SUBGRAPH_OF);
+    return URI.create(messageUriNode.asResource().getURI());
+  }
+
+  private List<String> findContainedEnvelopeUris(final Model envelopeGraph, final String envelopeGraphUri) {
+    Resource envelopeGraphResource = envelopeGraph.getResource(envelopeGraphUri);
+    StmtIterator it = envelopeGraphResource.listProperties(WONMSG.CONTAINS_ENVELOPE);
+    if (it.hasNext()) {
+      List ret = new ArrayList<String>();
+      while (it.hasNext()) {
+        ret.add(it.nextStatement().getObject().asResource().getURI());
+      }
+      return ret;
+    }
+    return Collections.emptyList();
+  }
+
+  public boolean isEnvelopeGraph(final String modelUri, final Model model) {
+    return model.contains(model.getResource(modelUri), RDF.type, WONMSG.ENVELOPE_GRAPH);
+  }
+
+
 
   public List<String> getEnvelopeGraphURIs(){
     if (this.envelopeGraphs == null) {
@@ -181,30 +220,13 @@ public class WonMessage implements Serializable
     return Collections.unmodifiableList(this.contentGraphNames);
   }
 
-  private Resource getEnvelopeGraphReference(Model model, boolean mustContainEnvelopeGraphRef){
-    StmtIterator it = model.listStatements(null, RDF.type, WONMSG.ENVELOPE_GRAPH);
-    if (!it.hasNext()){
-      if (mustContainEnvelopeGraphRef) {
-        throw new IllegalStateException("no envelope graph found");
-      } else {
-        return null;
-      }
-    }
-    Resource envelopeGraphResource = it.nextStatement().getSubject();
-    if (it.hasNext()) throw new IllegalStateException("more than one envelope graphs " +
-      "referenced in model!");
-    return envelopeGraphResource;
-  }
-
-  private NodeIterator getContentGraphReferences(Model model, Resource envelopeGraphResource){
+   private NodeIterator getContentGraphReferences(Model model, Resource envelopeGraphResource){
     return model.listObjectsOfProperty(envelopeGraphResource, WONMSG.HAS_CONTENT_PROPERTY);
   }
 
-
-
   public URI getMessageURI() {
     if (this.messageURI == null) {
-      this.messageURI = getEnvelopeSubjectURIValue(WONMSG.HAS_MESSAGE_TYPE_PROPERTY, null);
+      this.messageURI = findMessageUri(getOuterEnvelopeGraph(), getOuterEnvelopeGraphURI().toString());
     }
     return this.messageURI;
   }
@@ -215,6 +237,16 @@ public class WonMessage implements Serializable
       this.messageType = WonMessageType.getWonMessageType(type);
     }
     return this.messageType;
+  }
+
+  public WonMessageDirection getEnvelopeType() {
+    if (this.envelopeType == null){
+      URI type = getEnvelopePropertyURIValue(RDF.type);
+      if (type != null){
+        this.envelopeType = WonMessageDirection.getWonMessageDirection(type);
+      }
+    }
+    return this.envelopeType;
   }
 
   public URI getSenderURI() {
@@ -272,20 +304,61 @@ public class WonMessage implements Serializable
 
   }
 
-
-  public URI getResponseState() {
-    if (this.responseState == null) {
-      this.responseState = getEnvelopePropertyURIValue(WONMSG.HAS_RESPONSE_STATE_PROPERTY);
+  public URI getIsResponseToMessageURI() {
+    if (this.isResponseToMessageURI == null) {
+      this.isResponseToMessageURI = getEnvelopePropertyURIValue(WONMSG.IS_RESPONSE_TO);
     }
-    return this.responseState;
+    return this.isResponseToMessageURI;
   }
 
-  private URI getEnvelopePropertyURIValue(Property property){
-    for (Model envelopeGraph: getEnvelopeGraphs()){
-      StmtIterator it = envelopeGraph.listStatements(envelopeGraph.getResource(getMessageURI().toString()), property,
-        (RDFNode) null);
+  public URI getIsRemoteResponseToMessageURI() {
+    if (this.isRemoteResponseToMessageURI == null) {
+      this.isRemoteResponseToMessageURI = getEnvelopePropertyURIValue(WONMSG.IS_REMOTE_RESPONSE_TO);
+    }
+    return this.isRemoteResponseToMessageURI;
+  }
+
+  public URI getCorrespondingRemoteMessageURI() {
+    if (this.correspondingRemoteMessageURI == null) {
+      this.correspondingRemoteMessageURI = getEnvelopePropertyURIValue(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE);
+    }
+    return this.correspondingRemoteMessageURI;
+  }
+
+  public WonMessageType getIsResponseToMessageType() {
+    if (this.isResponseToMessageType == null){
+       URI typeURI = getEnvelopePropertyURIValue(WONMSG.IS_RESPONSE_TO_MESSAGE_TYPE);
+      if (typeURI != null) {
+        this.isResponseToMessageType = WonMessageType.getWonMessageType(typeURI);
+      }
+    }
+    return isResponseToMessageType;
+  }
+
+  public URI getEnvelopePropertyURIValue(URI propertyURI){
+    Property property = getCompleteDataset().getDefaultModel().createProperty(propertyURI.toString());
+    return getEnvelopePropertyURIValue(property);
+  }
+
+  public URI getEnvelopePropertyURIValue(Property property){
+    Model currentEnvelope = getOuterEnvelopeGraph();
+    URI currentEnvelopeUri = getOuterEnvelopeGraphURI();
+    //TODO would make sense to order envelope graphs in order from container to containee in the first place,
+    //if proper done, we should avoid ending up in infinite loop if someone sends us malformed envelopes that
+    // contain-in-other circular...
+    while (currentEnvelope != null) {
+      URI currentMessageURI = findMessageUri(currentEnvelope, currentEnvelopeUri.toString());
+      StmtIterator it = currentEnvelope.listStatements(currentEnvelope.getResource(currentMessageURI.toString()),
+                                                       property,
+                                                       (RDFNode) null);
       if (it.hasNext()){
         return URI.create(it.nextStatement().getObject().asResource().toString());
+      }
+      // move to the next envelope
+      currentEnvelopeUri = RdfUtils.findFirstObjectUri(currentEnvelope, WONMSG.CONTAINS_ENVELOPE, null, true, true);
+      currentEnvelope = null;
+      if (currentEnvelopeUri != null) {
+        currentEnvelope = this.completeDataset.getNamedModel(currentEnvelopeUri.toString());
       }
     }
     return null;
@@ -293,7 +366,7 @@ public class WonMessage implements Serializable
 
   private URI getEnvelopeSubjectURIValue(Property property, RDFNode object){
     for (Model envelopeGraph: getEnvelopeGraphs()){
-      URI val = RdfUtils.findFirstObjectUri(envelopeGraph, property, object, true, true);
+      URI val = RdfUtils.findFirstSubjectUri(envelopeGraph, property, object, true, true);
       if (val != null) {
         return val;
       }
@@ -303,40 +376,25 @@ public class WonMessage implements Serializable
 
   private List<URI> getEnvelopePropertyURIValues(Property property){
     List<URI> values = new ArrayList<URI>();
-    for (Model envelopeGraph: getEnvelopeGraphs()){
-      StmtIterator it = envelopeGraph.listStatements(envelopeGraph.getResource(getMessageURI().toString()), property,
-        (RDFNode) null);
+    Model currentEnvelope = getOuterEnvelopeGraph();
+    URI currentEnvelopeUri = getOuterEnvelopeGraphURI();
+    //TODO would make sense to order envelope graphs in order from container to containee in the first place
+    while (currentEnvelope != null) {
+      URI currentMessageURI = findMessageUri(currentEnvelope, currentEnvelopeUri.toString());
+      StmtIterator it = currentEnvelope.listStatements(currentEnvelope.getResource(currentMessageURI.toString()),
+                                                       property,
+                                                       (RDFNode) null);
       while (it.hasNext()){
         values.add(URI.create(it.nextStatement().getObject().asResource().toString()));
+      }
+      currentEnvelopeUri = RdfUtils.findFirstObjectUri(currentEnvelope, WONMSG.CONTAINS_ENVELOPE, null, true, true);
+      currentEnvelope = null;
+      if (currentEnvelopeUri != null) {
+        currentEnvelope = this.completeDataset.getNamedModel(currentEnvelopeUri.toString());
       }
     }
     return values;
   }
 
-  private String getNamedGraphNameForUri(final String resourceUri) {
-    String ngName = resourceUri;
-    // we commonly use resource url + #data for the name of named graph
-    // with this resource content
-    if (completeDataset.getNamedModel(resourceUri) == null) {
-      ngName = resourceUri + WonRdfUtils.NAMED_GRAPH_SUFFIX;
-    }
-    return ngName;
-  }
 
-  /**
-   * Returns a list of all the URIs of the message contents
-   * (not the corresponding graphs)
-   *
-   * @return List of strings each representing one of the requested URLs
-   */
-  public List<String> getMessageContentURIs()
-  {
-    List<String> result = new ArrayList<String>();
-
-    Iterator<String> graphNames = getMessageContent().listNames();
-    while (graphNames.hasNext()) {
-        result.add(graphNames.next().replaceAll("#.*", ""));
-    }
-    return result;
-  }
 }

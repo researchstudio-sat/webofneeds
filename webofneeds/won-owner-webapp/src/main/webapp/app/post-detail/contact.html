@@ -1,5 +1,5 @@
 <div class="col-lg-12">
-    <div ng-show="showPublic()" class="col-lg-12">
+    <div ng-show="showAccountUser()" class="col-lg-12">
         <form ng-show="!sendStatus" class="form-horizontal container" novalidate name="contactAuthForm" ng-submit="sendMessage()">
             <div class="well">
                 <fieldset>
@@ -61,7 +61,7 @@
             </div>
         </div>
     </div>
-    <div ng-show="!showPublic()" class="col-lg-12">
+    <div ng-show="!showAccountUser()" class="col-lg-12">
         <form ng-show="!sendStatus" class="form-horizontal container" novalidate name="contactNotAuthForm" ng-submit="sendMessage()">
             <div class="well">
                 <fieldset>
@@ -124,8 +124,10 @@
                     <input type="text" class="form-control" name="privateLink" id="privateLink" ng-model="privateLink" readonly>
                 </div>
                 <div class="col-md-2">
-                    <button id="copy-button" type="submit" class="btn btn-primary"
-                            ng-click="copyLinkToClipboard()"><!--<span class="glyphicon glyphicon-floppy-disk"></span>--><i class="fa fa-file-text-o fa-lg"></i>&nbsp;Copy link</button>
+                    <button id="copy-button" class="btn btn-primary"
+                            type="button" clip-copy="privateLink" clip-click-fallback="fallbackForClipCopy(copy)"
+                            clip-click="logClipCopied()"><!--<span class="glyphicon glyphicon-floppy-disk"></span>--><i
+                            class="fa fa-file-text-o fa-lg"></i>&nbsp;Copy link</button>
                 </div>
             </div>
         </div>

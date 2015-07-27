@@ -21,8 +21,9 @@ import org.javasimon.Split;
 import org.javasimon.Stopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.events.event.Event;
 import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.event.impl.ErrorEvent;
 
 /**
  *
@@ -55,7 +56,7 @@ public abstract class BaseEventBotAction implements EventBotAction
           doRun(event);
           split.stop();
         } catch (Exception e) {
-          logger.warn("could not run action {}", stopwatchName, e);
+          eventListenerContext.getEventBus().publish(new ErrorEvent(e));
           split.stop(EXCEPTION_TAG);
         } catch (Throwable t) {
           logger.warn("could not run action {}", stopwatchName, t);

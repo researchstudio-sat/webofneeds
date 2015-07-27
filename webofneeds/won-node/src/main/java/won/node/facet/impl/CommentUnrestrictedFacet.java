@@ -30,8 +30,8 @@ public class CommentUnrestrictedFacet extends AbstractFacet
     super.connectFromNeed(con, content, wonMessage);
     /* send a connect back */
     try {
-      // ToDo (FS): create open WonMessage
-      needFacingConnectionClient.open(con, content, null);
+     //TODO: use new system
+     // needFacingConnectionClient.open(con, content, null);
       Model needContent = rdfStorageService.loadModel(con.getNeedURI());
       PrefixMapping prefixMapping = PrefixMapping.Factory.create();
 //    prefixMapping.setNsPrefix(SIOC.getURI(),"sioc");
@@ -45,10 +45,10 @@ public class CommentUnrestrictedFacet extends AbstractFacet
       // add WON node link
       logger.debug("linked data:"+ RdfUtils.toString(needContent));
       rdfStorageService.storeModel(con.getNeedURI(), needContent);
-    } catch (NoSuchConnectionException e) {
-      e.printStackTrace();
-    } catch (IllegalMessageForConnectionStateException e) {
-      e.printStackTrace();
+//    } catch (NoSuchConnectionException e) {
+//      e.printStackTrace();
+//    } catch (IllegalMessageForConnectionStateException e) {
+//      e.printStackTrace();
     } catch (Exception e) {
         e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }

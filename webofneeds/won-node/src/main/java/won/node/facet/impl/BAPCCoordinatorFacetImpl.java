@@ -58,8 +58,9 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
                     logger.debug("opened from Participant");
                     logger.debug("coordinator {}, participant {}", con.getNeedURI().toString(), con.getRemoteNeedURI().toString());
                     logger.debug("con {}, con BAstate {}",con.getConnectionURI().toString(), stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString());
-                    ownerFacingConnectionClient.open(con.getConnectionURI(), content, wonMessage);
-                } catch (WonProtocolException e) {
+                  //TODO: use new system
+                   // ownerFacingConnectionClient.open(con.getConnectionURI(), content, wonMessage);
+                } catch (Exception e) {
                     logger.warn("caught Exception:", e);
                 }
             }
@@ -133,7 +134,8 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
                             // eventType -> URI Resource
                             r = myContent.createResource(eventType.getURI().toString());
                             baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                            needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
+                            //TODO: use new system
+                            //needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
                         }
                         else
                         {
@@ -144,8 +146,6 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
                     {
                         logger.debug("The event type denoted by "+messageForSending+" is not allowed.");
                     }
-                } catch (WonProtocolException e) {
-                    logger.warn("caught WonProtocolException:", e);
                 } catch (Exception e) {
                     logger.warn("caught Exception;",e);
                 }
@@ -189,7 +189,8 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
                     storeBAStateForConnection(con, newState.getURI());
                     logger.debug("New state of the Coordinator:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()));
 
-                    ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, wonMessage);
+                  //TODO: use new system
+                  //ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, wonMessage);
 
                     BAPCEventType resendEventType = state.getResendEvent();
                     if(resendEventType!=null)
@@ -214,15 +215,14 @@ public class BAPCCoordinatorFacetImpl extends AbstractBAFacet
                             Resource r = myContent.createResource(resendEventType.getURI().toString());
                             baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
                             //baseResource.addProperty(WON_BA.COORDINATION_MESSAGE, WON_BA.COORDINATION_MESSAGE_COMMIT);
-                            needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
+                          //TODO: use new system
+                          // needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
                         }
                         else
                         {
                             logger.debug("The eventType: "+eventType.getURI().toString()+" can not be triggered by Participant.");
                         }
                     }
-                } catch (WonProtocolException e) {
-                    logger.warn("caught WonProtocolException:", e);
                 } catch (Exception e) {
                     logger.warn("caught Exception; ",e);
                 }

@@ -15,13 +15,13 @@
  */
 
 angular.module('won.owner').controller('HomeCtrl',
-    function ($scope,$routeParams, $location, userService, $log) {
+    function ($scope,$routeParams, $location, userService, $log,searchService,applicationControlService) {
 
     var firstDisplay = true;
     var time = 400;
 
 
-    $log.debug("Initializing HeaderCtrl.");
+    $log.debug("Initializing HomeCtrl.");
 
 
 
@@ -264,7 +264,8 @@ angular.module('won.owner').controller('HomeCtrl',
 
         if ($scope.otherNewSearch.$valid && validPanel) {
             //userService.registerUser($scope.registerUser).then(onRegisterResponse);
-            $location.url('/search');
+            searchService.search($scope.othersPost.selectedType, $scope.othersPost.searchText,applicationControlService.getNeedType($scope.othersPost.selectedType));
+            //$location.url('/search');
         }
     }
 
@@ -280,7 +281,6 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
 	$scope.error = '';
 
 
-    //TODO move to userService.login
 	onLoginResponse = function(response) {
 		if (response.status == "OK") {
             $location.url('/postbox');
@@ -294,7 +294,10 @@ angular.module('won.owner').controller('SignInCtrl', function ($scope,$route,$wi
 	$scope.onClickSignIn = function () {
 		$scope.error = '';
 		if($scope.signInForm.$valid) {
-			userService.logIn($scope.user).then(onLoginResponse);
+			//userService.logIn($scope.user).then(onLoginResponse);
+            // TODO probably such functions as logInAndSetUpApplicationState() (that combine then->then of several
+            //services) should be kept in application-control-service?
+            userService.logInAndSetUpApplicationState($scope.user).then(onLoginResponse);
 		}
 	}
 
@@ -336,7 +339,7 @@ angular.module('won.owner').controller('RegisterCtrl', function ($scope, $route,
             $scope.success = '';
             angular.resetForm($scope, "registerForm");
             $scope.registered = true;
-            userService.logIn($scope.registerUser).then(onLoginSuccessful, onLoginError);
+            userService.logInAndSetUpApplicationState($scope.registerUser).then(onLoginSuccessful, onLoginError);
         } else if (response.status == "ERROR") {
             $scope.error = response.message;
         } else {
