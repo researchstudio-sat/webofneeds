@@ -27,8 +27,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     , userService
     , utilService
     , wonService
-    , NeedBuilder
-    , MessageBuilder
     , $q
     ) {
     $scope.currentStep = $routeParams.step;
@@ -289,6 +287,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         draftBuilderObject.setCurrentStep($scope.currentStep);
         draftBuilderObject.setCurrentMenuposition($scope.selectedType);
         draftBuilderObject.setDraftObject($scope.need);
+        console.log('create-need.js:saveDraft - saved need: ', $scope.need);
         draftBuilderObject.setLastSavedTimestamp(new Date().getTime());
 
         if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
@@ -304,6 +303,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         draftBuilderObject.title($scope.need.title)
             .ownerFacet()               // mandatory
             .description($scope.need.textDescription)
+
             .hasTag($scope.need.tags)
             .hasContentDescription()    // mandatory
             //.hasPriceSpecification("EUR",5.0,10.0)
@@ -391,7 +391,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         if(lock== false){
             lock = true;
 
-            $scope.buildNeed();
+            $scope.buildNeedRefactored(); //TODO just testing stuff here; deleteme
 
 
             var needBuilder = $scope.partiallyInitNeedBuilder();
@@ -419,34 +419,54 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }
     }
 
-    $scope.buildNeed = function() {
+    $scope.buildNeedRefactored = function() {
+
         //<TODO-testing-stuff>
+
+
+        console.log('create-need.js:oiu; - need.images:', $scope.need.images);
+
         var type = won.WON.BasicNeedTypeDemandCompacted;
-        var attachmentUris = ['http://example.org/.../1234.png', 'http://example.org/.../1234.pdf'];
-        var demoImg = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAAXNSR0IArs'+
-                      '4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAVSURBVBhXYwCCtzIqDPYeZ5'+
-                      'Q2+gAAE5IDoEnVovYAAAAASUVORK5CYII=';
-        var attachments = [demoImg, demoImg];
 
 
-        var needBuilderRefactored = new NeedBuilder(type, $scope.need.title, $scope.need.textDescription);
-        needBuilderRefactored.attachmentUris = attachmentUris;
 
-        var msgBuilderRefactored = new MessageBuilder(
-            'http://localhost:8080/won/resource',
-            'http://purl.org/webofneeds/message#CreateMessage');
+        var imgs = $scope.need.images;
+        var attachmentUris = []
+        console.log('create-need.js:qweorij - imgs:', imgs);
+        if(imgs) {
+            for (var img of imgs) {
+                var uri = 'http://localhost:8080/won/resource/need/attachment/' + utilService.getRandomPosInt();
+                attachmentUris.push(uri);
+                img.uri = uri;
+            }
+        }
+        console.log('create-need.js:qweorij - imgs:', imgs);
 
-        msgBuilderRefactored.addAttachment(attachmentUris[0], attachments[0]);
+        var publishedContentUri = 'http://localhost:8080/won/resource/need/' + utilService.getRandomPosInt();
 
+        //if type === create -> use needBuilder as well
 
-        var msgJson = msgBuilderRefactored.build(needBuilderRefactored,
-            'http://localhost:8080/won/resource/need/4567',
-            'http://localhost:8080/won/resource/event/1234',
-            attachmentUris
-        )
+        var contentRdf = won.buildNeedRdf({
+            type : type,
+            title: $scope.need.title,
+            description: $scope.need.textDescription,
+            publishedContentUri: publishedContentUri,
+            attachmentUris: attachmentUris, //optional
+        });
+        var msgJson = won.buildMessageRdf(contentRdf, {
+            receiverNode : 'http://localhost:8080/won/resource',
+            msgType : won.WONMSG.createMessage,
+            publishedContentUri: publishedContentUri,
+            msgUri: 'http://localhost:8080/won/resource/event/' + utilService.getRandomPosInt(),
+            attachments: imgs
+        });
+
         console.log("create-need.js:434: ", msgJson);
         console.log("create-need.js:435: stringified ", JSON.stringify(msgJson));
         console.log("create-need.js:436 - need: ", $scope.need);
+
+        ///----------------------
+
         //</TODO-testing-stuff>
 
     }
@@ -492,8 +512,17 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
 
     };
 
+    //make sure we've got an array for gathering the images
+    $scope.need.images = $scope.need.images? $scope.need.images : [];
+
     $scope.onImagesPicked = function(images) {
-        $scope.need.images = images;
+        won.mergeIntoLast(images, $scope.need.images);
+        //$scope.need.images = images;
+        // TODO <testing>
+        $scope.need.images = [];
+        $scope.need.images[0] = images[0];
+        console.log('create-need.js:imgPick - need.images:', $scope.need.images);
+        // TODO </testing>
     }
 
     $scope.goToDetailPostPreview = function() {

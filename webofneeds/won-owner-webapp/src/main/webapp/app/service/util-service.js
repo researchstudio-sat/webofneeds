@@ -33,6 +33,9 @@ angular.module('won.owner').factory('utilService', function ($http, $q) {
         }
         return size;*/
     };
+    utilService.getRandomPosInt = function() {
+        return utilService.getRandomInt(1,9223372036854775807);
+    }
     utilService.getRandomInt = function(min, max){
         return Math.floor(Math.random()*(max-min+1))+min;
     }
