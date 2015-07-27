@@ -16,6 +16,7 @@
 
 package won.matcher.protocol.impl;
 
+import org.apache.camel.Body;
 import org.apache.camel.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,10 +54,11 @@ public class MatcherProtocolMatcherServiceImplJMSBased
   private MatcherProtocolCommunicationService matcherProtocolCommunicationService;
 
 
+    //TODO: [msg-refactoring] process only WonMessage, don't send additional headers
 
     public void needCreated(@Header("wonNodeURI") final String wonNodeURI,
                             @Header("needURI") final String needURI,
-                            @Header("wonMessage") final String content) {
+                            @Body final String content) {
         logger.debug("new need received: {} with content {}", needURI, content);
 
         delegate.onNewNeed(URI.create(wonNodeURI), URI.create(needURI), RdfUtils.toDataset(content));

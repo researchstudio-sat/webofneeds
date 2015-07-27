@@ -34,8 +34,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         privateData.store.setPrefix("won","http://purl.org/webofneeds/model#");
 
         privateData.readUpdateLocksPerUri = {}; //uri -> ReadUpdateLock
-        privateData.cacheStatus = {} //uri -> [last access timestamp, 0 if dirty]
+        privateData.cacheStatus = {} //uri -> {timestamp, cacheItemState}
     }
+    var CACHE_ITEM_STATE = { OK: 1, DIRTY: 2, UNRESOLVABLE: 3, FETCHING: 4};
+
     linkedDataService.reset();
 
 
@@ -44,7 +46,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     }
 
     var getSafeValue = function(dataItem) {
+        if (typeof dataItem === 'undefined') return null;
         if (dataItem == null) return null;
+        if (typeof dataItem.value === 'undefined') return dataItem;
         if (dataItem.value != null) return dataItem.value;
         return null;
     }
@@ -60,28 +64,35 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      */
     var somePromises = function(promises, errorHandler){
         var deferred = $q.defer(),
-            counter = 0,
+            numPromises = promises.length,
+            successes = 0,
+            failures = 0,
             results = angular.isArray(promises) ? [] : {},
             handler = typeof errorHandler === 'function' ? errorHandler : function(x,y){};
 
+        if (promises.length == 0) {
+            deferred.reject(results);
+        }
+
         angular.forEach(promises, function(promise, key) {
-            counter++;
             promise.then(function(value) {
-                if (results.hasOwnProperty(key)) return;
+                successes++;
+                if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
                 results[key] = value;
-                if (!(--counter)) deferred.resolve(results);
+                if (failures + successes >= numPromises) deferred.resolve(results);
             }, function(reason) {
+                failures ++;
                 $log.error("warning: promise failed. Reason " + JSON.stringify(reason));
-                if (results.hasOwnProperty(key)) return;
+                if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
                 results[key] = null;
                 handler(key, reason);
-                if (!(--counter)) deferred.reject("all promises failed");
+                if (failures >= numPromises) {
+                    deferred.reject(results);
+                } else if (failures + successes >= numPromises) {
+                    deferred.resolve(results);
+                }
             });
         });
-
-        if (counter === 0) {
-            deferred.resolve(results);
-        }
 
         return deferred.promise;
     }
@@ -91,9 +102,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * as long as there is no updater trying to acquire it. An updater that tries
      * to acquire the lock is blocked until all readers have released their lock.
      * All updaters acquiring the lock are blocked until the update function is execeuted,
-     * then all writers are unblocked. The update function can be passed with every
-     * acquireUpdateLock(function) call, but the function passed in the first call
-     * since the last update is really used.
+     * then all writers are unblocked.
+     *
+     * Clients have to make sure to call releaseReadLock() or releaseWriteLock() after their
+     * critical section is finished, including all promises that were created in them.
      *
      * @constructor
      */
@@ -104,38 +116,48 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         this.blockedReaders = [];
         //number of readers currently in possession of the lock
         this.activeReaderCount = 0;
+        this.activeUpdaterCount = 0;
         this.updateInProgress = false;
-        this.updateFunction = null;
     };
     ReadUpdateLock.prototype = {
         constructor: won.ReadUpdateLock,
+        isLocked: function() {
+          return this.blockedUpdaters.length > 0
+              || this.blockedReaders.length > 0
+              || this.activeReaderCount > 0
+              || this.activeUpdaterCount > 0;
+        },
+        getLockStatusString: function(){
+            return "[blockedUpdaters: "+this.blockedUpdaters.length
+                + ", blockedReaders: "+ this.blockedReaders.length
+                + ", activeUpdaters:" + this.activeUpdaterCount
+                + ", activeReaders: " + this.activeReaderCount
+                + "]";
+        },
         acquireReadLock: function(){
             var deferred = $q.defer();
             if (this.updateInProgress || this.blockedUpdaters.length > 0){
                 //updates are already in progress or are waiting. block.
-                $log.debug("rul:read:block:  " + this.uri);
+                $log.debug("rul:read:block:  " + this.uri + " " + this.getLockStatusString());
                 this.blockedReaders.push(deferred);
             } else {
                 //nobody wishes to update the resource, the caller may read it
                 //add the deferred execution to the blocked list, just in case
                 //there are others blocket there, and then grant access to all
-                $log.debug("rul:read:grant:  " + this.uri);
+                $log.debug("rul:read:grant:  " + this.uri + " " + this.getLockStatusString());
                 this.blockedReaders.push(deferred);
                 this.grantLockToReaders();
             }
             return deferred.promise;
         },
-        runAsUpdate: function(updateFunction){
-            if (this.updateFunction == null) {
-                this.updateFunction = updateFunction;
-            }
+        acquireUpdateLock: function(){
             var deferred = $q.defer();
             if (this.activeReaderCount > 0 ) {
                 //readers are present, we have to wait till they are done
-                $log.debug("rul:updt:block:  " + this.uri);
+                $log.debug("rul:updt:block:  " + this.uri + " " + this.getLockStatusString());
                 this.blockedUpdaters.push(deferred);
             } else {
-                $log.debug("rul:updt:grant:  " + this.uri);
+                $log.debug("rul:updt:grant:  " + this.uri + " " + this.getLockStatusString());
                 //add the deferred update to the list of blocked updates just
                 //in case there are more, then grant the lock to all of them
                 this.blockedUpdaters.push(deferred);
@@ -144,6 +166,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             return deferred.promise;
         },
         releaseReadLock: function(){
+            $log.debug("rul:read:release:" + this.uri + " " + this.getLockStatusString());
             this.activeReaderCount --;
             if (this.activeReaderCount < 0){
                 throw {message: "Released a read lock that was never acquired"}
@@ -152,47 +175,34 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 this.grantLockToUpdaters();
             }
         },
+        releaseUpdateLock: function(){
+            $log.debug("rul:updt:release:" + this.uri + " " + this.getLockStatusString());
+            this.activeUpdaterCount --;
+            if (this.activeUpdaterCount < 0){
+                throw {message: "Released an update lock that was never acquired"}
+            } else if (this.activeUpdaterCount == 0) {
+                //no readers currently have a lock: we can update - if we should
+                this.updateInProgress = false;
+                this.grantLockToReaders();
+            }
+        },
         grantLockToUpdaters: function() {
             if (this.blockedUpdaters.length > 0 && ! this.updateInProgress) {
-                $log.debug("rul:updt:all:    " + this.uri + "(unblocking " + this.blockedUpdaters.length +")");
+                $log.debug("rul:updt:all:    " + this.uri + " " + this.getLockStatusString());
                 //there are blocked updaters. let them proceed.
                 this.updateInProgress = true;
-                var updatePromise = null;
-                if (this.updateFunction != null){
-                    updatePromise = this.updateFunction();
-                    this.updateFunction = null;
+                for (var i = 0; i < this.blockedUpdaters.length; i++) {
+                    var deferredUpdate = this.blockedUpdaters[i];
+                    this.activeUpdaterCount ++;
+                    deferredUpdate.resolve();
+                    this.blockedUpdaters.splice(i, 1);
+                    i--;
                 }
-                if (updatePromise == null){
-                    var deferred = $q.defer();
-                    deferred.resolve();
-                    updatePromise = deferred.promise;
-                }
-                var that = this;
-                updatePromise.then(
-                    function(value){
-                        for (var i = 0; i < that.blockedUpdaters.length; i++) {
-                            var deferredUpdate = that.blockedUpdaters[i];
-                            deferredUpdate.resolve(value);
-                            that.blockedUpdaters.splice(i, 1);
-                            i--;
-                        }
-                        that.updateInProgress = false;
-                    },
-                    function(reason){
-                        for (var i = 0; i < that.blockedUpdaters.length; i++) {
-                            var deferredUpdate = that.blockedUpdaters[i];
-                            deferredUpdate.reject(reason);
-                            that.blockedUpdaters.splice(i, 1);
-                            i--;
-                        }
-                        that.updateInProgress = false;
-                    }
-                );
             }
         },
         grantLockToReaders: function() {
             if (this.blockedReaders.length > 0) {
-                $log.debug("rul:readers:all: " + this.uri + "(unblocking " + this.blockedReaders.length +")");
+                $log.debug("rul:readers:all: " + this.uri + " " + this.getLockStatusString());
                 //there are blocked readers. let them proceed.
                 for (var i = 0; i < this.blockedReaders.length; i++) {
                     var deferredRead = this.blockedReaders[i];
@@ -206,79 +216,116 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     };
 
-    var CACHE_DIRTY = -1;
 
-    linkedDataService.cacheItemInsertOrOverwrite = function(uri){
+
+    var cacheItemInsertOrOverwrite = function(uri){
         $log.debug("add to cache:    " + uri);
-        privateData.cacheStatus[uri] = new Date().getTime();
+        privateData.cacheStatus[uri] = {
+            timestamp: new Date().getTime(),
+            state: CACHE_ITEM_STATE.OK
+        };
     }
 
-    linkedDataService.cacheItemIsLoaded = function(uri){
-        var ret = typeof privateData.cacheStatus[uri] !== 'undefined';
+    var cacheItemIsInState = function cacheItemIsInState(uri, state, nameOfState){
+        var entry = privateData.cacheStatus[uri];
+        var ret = false;
+        if (typeof entry === 'undefined') {
+            ret = false
+        } else {
+            ret = entry.state === state;
+        }
         var retStr = (ret + "     ").substr(0,5);
-        $log.debug("inCache: " + retStr + "   " + uri);
+        $log.debug("cacheSt: " + nameOfState + ":" +retStr + "   " + uri);
+        return ret;
+    }
+
+    var cacheItemIsOkOrUnresolvableOrFetching = function cacheItemIsOkOrUnresolvableOrFetching(uri){
+        var entry = privateData.cacheStatus[uri];
+        var ret = false;
+        if (typeof entry === 'undefined') {
+            ret = false
+        } else {
+            ret = entry.state === CACHE_ITEM_STATE.OK || entry.state === CACHE_ITEM_STATE.UNRESOLVABLE || entry.state == CACHE_ITEM_STATE.FETCHING;
+        }
+        var retStr = (ret + "     ").substr(0,5);
+        $log.debug("cacheSt: OK or Unresolvable:" +retStr + "   " + uri);
         return ret;
     }
 
     /**
-     * Returns true iff the uri is loaded and marked as dirty. (i.e. last access
-     * timestamp == CACHE_DIRTY ( == -1)
+     * Returns true iff the uri is loaded and marked as dirty.
      * @param uri
      * @returns {boolean}
      */
-    linkedDataService.cacheItemIsDirty = function(uri){
-        var lastAccess = privateData.cacheStatus[uri];
-        var ret = false;
-        if (typeof lastAccess === 'undefined') {
-            ret = false
-        } else {
-            ret = lastAccess == CACHE_DIRTY;
-        }
-        var retStr = (ret + "     ").substr(0,5);
-        $log.debug("isDirty: " + retStr + "   " + uri);
-        return ret;
+    var cacheItemIsDirty = function cacheItemIsDirty(uri){
+        return cacheItemIsInState(uri, CACHE_ITEM_STATE.DIRTY, "dirty");
     }
 
     /**
-     * Returns true iff the uri is loaded and not marked as dirty.
+     * Returns true iff the uri is loaded and marked ok.
      * @param uri
      * @returns {boolean}
      */
-    linkedDataService.cacheItemIsOk = function(uri){
-        var lastAccess = privateData.cacheStatus[uri];
-        var ret = false;
-        if (typeof lastAccess === 'undefined') {
-            ret = false
-        } else {
-            ret = lastAccess != CACHE_DIRTY;
-        }
-        var retStr = (ret + "     ").substr(0,5);
-        $log.debug("isCacheOk: " + retStr + " " + uri);
-        return ret;
+    var cacheItemIsOk = function cacheItemIsOk(uri){
+        return cacheItemIsInState(uri, CACHE_ITEM_STATE.OK, "loaded");
     }
 
-    linkedDataService.cacheItemMarkAccessed = function(uri){
-        var lastAccess = privateData.cacheStatus[uri];
-        if (typeof lastAccess === 'undefined') {
+    /**
+     * Returns true iff the uri is loaded and marked unresolvable.
+     * @param uri
+     * @returns {boolean}
+     */
+    var cacheItemIsUnresolvable = function cacheItemIsUnresolvable(uri){
+        return cacheItemIsInState(uri, CACHE_ITEM_STATE.UNRESOLVABLE, "unresolvable");
+    }
+
+    var cacheItemMarkAccessed = function cacheItemMarkAccessed(uri){
+        var entry = privateData.cacheStatus[uri];
+        if (typeof entry === 'undefined') {
             throw {message : "Trying to mark unloaded uri " + uri +" as accessed"}
-        } else if (lastAccess === CACHE_DIRTY){
+        } else if (entry.state === CACHE_ITEM_STATE.DIRTY){
             throw {message : "Trying to mark uri " + uri +" as accessed, but it is already dirty"}
         }
         $log.debug("mark accessed:   " + uri);
-        privateData.cacheStatus[uri] = new Date().getTime();
+        privateData.cacheStatus[uri].timestamp = new Date().getTime();
     }
 
-    linkedDataService.cacheItemMarkDirty = function(uri){
-        var lastAccess = privateData.cacheStatus[uri];
-        if (typeof lastAccess === 'undefined') {
+    var cacheItemMarkDirty = function cacheItemMarkDirty(uri){
+        var entry = privateData.cacheStatus[uri];
+        if (typeof entry === 'undefined') {
             return;
         }
         $log.debug("mark dirty:      " + uri);
-        privateData.cacheStatus[uri] = CACHE_DIRTY;
+        privateData.cacheStatus[uri].state = CACHE_ITEM_STATE.DIRTY;
     }
 
-    linkedDataService.cacheItemRemove = function(uri){
+    var cacheItemMarkUnresolvable = function cacheItemMarkUnresolvable(uri){
+        $log.debug("mark unres:      " + uri);
+        privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.UNRESOLVABLE};
+    }
+
+    var cacheItemMarkFetching = function cacheItemMarkFetching(uri){
+        $log.debug("mark fetching:   " + uri);
+        privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.FETCHING};
+    }
+
+    var cacheItemRemove = function cacheItemRemove(uri){
         delete privateData.cacheStatus[uri];
+    }
+
+
+    /**
+     * Method used for debugging pending locks.
+     */
+    linkedDataService.getUnreleasedLocks = function(){
+        var unreleasedLocks = [];
+        for (key in privateData.readUpdateLocksPerUri){
+            var lock = privateData.readUpdateLocksPerUri[key];
+            if (lock.isLocked()){
+                unreleasedLocks.push(lock);
+            }
+        }
+        return unreleasedLocks;
     }
 
     /**
@@ -294,12 +341,12 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      */
     linkedDataService.invalidateCacheForNewConnection = function(connectionUri, needUri){
         if (connectionUri != null) {
-            linkedDataService.cacheItemMarkDirty(connectionUri);
+            cacheItemMarkDirty(connectionUri);
         }
         return linkedDataService.getNeedConnectionsUri(needUri).then(
             function(connectionsUri){
                 if (connectionsUri != null){
-                    linkedDataService.cacheItemMarkDirty(connectionsUri);
+                    cacheItemMarkDirty(connectionsUri);
                 }
             }
         );
@@ -317,14 +364,14 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      */
     linkedDataService.invalidateCacheForNewMessage = function(connectionUri){
         if (connectionUri != null) {
-            linkedDataService.cacheItemMarkDirty(connectionUri);
+            cacheItemMarkDirty(connectionUri);
         }
         return $q.when(true); //return a promise for chaining
     }
     linkedDataService.invalidateCacheForNeed = function(needUri){
         if (needUri != null) {
-            linkedDataService.cacheItemMarkDirty(needUri);
-            linkedDataService.cacheItemMarkDirty(needUri+'/connections/')
+            cacheItemMarkDirty(needUri);
+            cacheItemMarkDirty(needUri+'/connections/')
         }
         return $q.when(true); //return a promise for chaining
     }
@@ -338,6 +385,32 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             privateData.readUpdateLocksPerUri[uri] = lock;
         }
         return lock;
+    }
+
+    var getReadUpdateLocksPerUris = function(uris){
+        locks = [];
+        uris.map(
+            function(uri){
+                locks.push(getReadUpdateLockPerUri(uri));
+            }
+        );
+        return locks;
+    }
+
+    /**
+     * Acquires all locks, returns an array of promises.
+     * @param locks
+     * @returns {Array|*}
+     */
+    var acquireReadLocks = function acquireReadLocks(locks){
+        acquiredLocks = [];
+        locks.map(
+            function(lock){
+                var promise = lock.acquireReadLock();
+                acquiredLocks.push(promise);
+            }
+        );
+        return acquiredLocks;
     }
 
 
@@ -360,20 +433,101 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             options.message = "Query failed.";
         }
         if (!success){
-            errorMessage = "Query failed.";
+            errorMessage = "Query failed: " + data;
         } else if (typeof options.allowNone !== undefined  && options.allowNone == false && data.length == 0){
             errorMessage = "No results found.";
         } else if (typeof options.allowMultiple !== undefined  && options.allowMultiple == false && data.length > 1){
             errorMessage = "More than one result found.";
         }
-        if (errorMessage != null){
-            $log.error(errorMessage);
+        if (errorMessage != null) {
+            // observation: the error happens for #hasRemoteConnection property of suggested connection, but this
+            // property is really not there (and should not be), so in that case it's not an error...
+            $log.error(options.message + " " + errorMessage);
+            // TODO: this $q.reject seems to have no effect
             $q.reject(options.message + " " + errorMessage);
             return true;
         }
         return false;
     }
 
+
+    /**
+     * Adds the specified JSON-LD dataset to the store, identified by the specified uri.
+     * The uri is used for cache control.
+     */
+    linkedDataService.addJsonLdData = function(uri, data) {
+        $log.debug("storing jsonld data for uri: " + uri);
+        privateData.store.load("application/ld+json", data, function (success, results) {
+            $log.debug("added jsonld data to rdf store, success: " + success);
+            if (success) {
+                cacheItemMarkAccessed(uri);
+            }
+        });
+    }
+
+
+    /**
+     * Evaluates the specified property path via sparql on the default graph starting with the specified base uri.
+     * Returns true if the query has at least one solution.
+     * @param baseUri
+     * @param propertyPath
+     * @param optionalSparqlPrefixes
+     * @returns {*}
+     */
+    linkedDataService.canResolvePropertyPathFromBaseUri = function canResolvePropertyPath(baseUri, propertyPath, optionalSparqlPrefixes){
+        var query = "";
+        if (won.isNull(baseUri)){
+            throw new Error("cannot evaluate property path: baseUri is null");
+        }
+        if (won.isNull(propertyPath)){
+            throw new Error("cannot evaluate property path: propertyPath is null");
+        }
+        if (!won.isNull(optionalSparqlPrefixes)){
+            query = query + optionalSparqlPrefixes;
+        }
+        query = query +
+            "ASK where { \n" +
+            "<" + baseUri +"> " + propertyPath + " ?target. \n" +
+            "} ";
+        var resultObject = {};
+        privateData.store.execute(query, [], [], function (success, results) {
+            resultObject.result = results;
+        });
+        return resultObject.result;
+    }
+
+    /**
+     * Evaluates the specified property path via sparql on the default graph starting with the specified base uri.
+     * Returns all solutions of the path.
+     * @param baseUri
+     * @param propertyPath
+     * @param optionalSparqlPrefixes
+     * @returns {*}
+     */
+    linkedDataService.resolvePropertyPathFromBaseUri = function resolvePropertyPath(baseUri, propertyPath, optionalSparqlPrefixes){
+        var query = "";
+        if (won.isNull(baseUri)){
+            throw new Error("cannot evaluate property path: baseUri is null");
+        }
+        if (won.isNull(propertyPath)){
+            throw new Error("cannot evaluate property path: propertyPath is null");
+        }
+        if (!won.isNull(optionalSparqlPrefixes)){
+            query = query + optionalSparqlPrefixes;
+        }
+        query = query +
+            "SELECT ?target where { \n" +
+            "<" + baseUri +"> " + propertyPath + " ?target. \n" +
+            "} ";
+        var resultObject = {};
+        privateData.store.execute(query, [], [], function (success, results) {
+            resultObject.result = [];
+            for (key in results) {
+                resultObject.result.push(results[key].target.value);
+            }
+        });
+        return resultObject.result;
+    }
 
     /**
      * Deletes the node with specified uri from the local triplestore, then
@@ -388,12 +542,16 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             throw {message : "fetch: uri must not be null"};
         }
         $log.debug("fetch announced: " + uri);
-        return getReadUpdateLockPerUri(uri)
-            .runAsUpdate(
+        var lock = getReadUpdateLockPerUri(uri);
+        return lock.acquireUpdateLock().then(
                 function() {
                     var deferred = $q.defer();
                     $log.debug("updating:        " + uri);
                     try {
+                        /*
+                        TODO: uncommenting the delete block is experimental. Using it is not exactly safe, either, as we risk to delete triples that the subsequent fetch will not restore.
+
+
                         $log.debug("deleting :       " + uri);
                         var query = "delete where {<" + uri + "> ?anyP ?anyO}";
                         var failed = {};
@@ -406,17 +564,17 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                         });
                         if (failed.failed) {
                             return deferred.promise;
-                        }
+                        }                   */
                         //the execute call above is not asynchronous, so we can safely continue outside the callback.
                         $log.debug("fetching:        " + uri);
                         privateData.store.load('remote', uri, function (success, results) {
                             $rootScope.$apply(function () {
                                 if (success) {
                                     $log.debug("fetched:         " + uri)
-                                    linkedDataService.cacheItemInsertOrOverwrite(uri);
+                                    cacheItemInsertOrOverwrite(uri);
                                     deferred.resolve(uri);
                                 } else {
-                                    $q.reject("failed to load " + uri);
+                                    deferred.reject("failed to load " + uri);
                                 }
                             });
                         });
@@ -425,13 +583,19 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             deferred.reject("failed to load " + uri + ". Reason: " + e);
                         });
                     }
-                    return deferred.promise;
+                    var promise = deferred.promise;
+                    return promise;
                 }
-            );
+        )
+        //make sure we only release the lock when our main promise resolves
+        ["finally"](function(){
+            lock.releaseUpdateLock();
+        });
     }
 
     /**
-     * Fetches the linked data for the specified URI and saves it in the local triplestore.
+     * Fetches the linked data for the specified URI and saves it in the local triplestore if necessary.
+     * Note: this method does not grant the caller any locks. This has to be done by the caller after calling this method.
      * @param uri
      * @return a promise to a boolean which indicates success
      */
@@ -440,14 +604,26 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             throw {message : "ensureLoaded: uri must not be null"};
         }
         $log.debug("ensuring loaded: " +uri);
-        if (linkedDataService.cacheItemIsOk(uri)){
+        //we also allow unresolvable resources, so as to avoid re-fetching them.
+        //we also allow resources that are currently being fetched.
+        if (cacheItemIsOkOrUnresolvableOrFetching(uri)){
             var deferred = $q.defer();
-            linkedDataService.cacheItemMarkAccessed(uri);
+            cacheItemMarkAccessed(uri);
             deferred.resolve(uri);
             return deferred.promise;
         }
         //uri isn't loaded or needs to be refrehed. fetch it.
-        return linkedDataService.fetch(uri);
+        cacheItemMarkFetching(uri);
+        return linkedDataService.fetch(uri)
+            .then(
+                function(x){
+                    cacheItemMarkAccessed(uri);
+                },
+                function(reason){
+                    cacheItemMarkUnresolvable(uri);
+                }
+            )
+
     }
 
     /**
@@ -482,12 +658,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
                                "prefix " + "dc" + ":<" + "http://purl.org/dc/elements/1.1/>\n" +
                                "prefix " + "geo" + ":<" + "http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
-                               "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime where { " +
+                               "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime ?state where { " +
                                //TODO: add as soon as named graphs are handled by the rdf store
                                //
                                //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
                                //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
-                               //                "GRAPH ?coreURI {"+
+                               //                "GRAPH ?coreURI {"+,
+                               "<" + uri + ">" + won.WON.isInStateCompacted + " ?state ." +
                                "<" + uri + ">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ." +
                                "<" + uri + ">" + won.WON.hasContentCompacted + " ?content ." +
                                "?content dc:title ?title ." +
@@ -524,11 +701,14 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                resultObject.tags = getSafeValue(result.tags);
                                resultObject.textDescription = getSafeValue(result.textDescription);
                                resultObject.creationDate = getSafeValue(result.creationDate);
+                               resultObject.state = getSafeValue(result.state);
                            });
                            return resultObject;
                        } catch (e) {
-                           $q.reject("could not load need " + uri + ". Reason: " + e);
+                           return $q.reject("could not load need " + uri + ". Reason: " + e);
                        } finally {
+                           //we don't need to release after a promise resolves because
+                           //this function isn't deferred.
                            lock.releaseReadLock();
                        }
                    })
@@ -568,11 +748,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             });
                             return resultData.result;
                         } catch (e) {
-                            $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI + ". Reason: " + e);
+                            return $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI + ". Reason: " + e);
                         } finally {
+                            //we don't need to release after a promise resolves because
+                            //this function isn't deferred.
                             lock.releaseReadLock();
                         }
-                        $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI);
+                        return $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI);
                     }
                 );
             })
@@ -585,7 +767,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getUniqueObjectOfProperty(needUri, won.WON.hasWonNode)
             .then(
                 function(result){return result;},
-                function(reason) { $q.reject("could not get WonNodeUri of Need " + needUri + ". Reason: " + reason)});
+                function(reason) { return $q.reject("could not get WonNodeUri of Need " + needUri + ". Reason: " + reason)});
     }
 
     linkedDataService.getNeedUriOfConnection = function(connectionUri){
@@ -594,8 +776,12 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         }
         return linkedDataService.getUniqueObjectOfProperty(connectionUri, won.WON.belongsToNeed)
             .then(
-                function(result){return result;},
-                function(reason) { $q.reject("could not get need uri of connection " + connectionUri + ". Reason: " + reason)});
+                function(result) {
+                    return result;
+                },
+                function(reason) {
+                    return $q.reject("could not get need uri of connection " + connectionUri + ". Reason: " + reason)
+                });
     }
 
     linkedDataService.getRemoteConnectionUriOfConnection = function(connectionUri){
@@ -605,7 +791,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getUniqueObjectOfProperty(connectionUri, won.WON.hasRemoteConnection)
             .then(
                 function(result){return result;},
-                function(reason) { $q.reject("could not get remote connection uri of connection " + connectionUri + ". Reason: " + reason)});
+                function(reason) { return $q.reject("could not get remote connection uri of connection " + connectionUri + ". Reason: " + reason)});
     }
 
     linkedDataService.getRemoteneedUriOfConnection = function(connectionUri){
@@ -615,9 +801,34 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getUniqueObjectOfProperty(connectionUri, won.WON.hasRemoteNeed)
             .then(
                 function(result){return result;},
-                function(reason) { $q.reject("could not get remote need uri of connection " + connectionUri + ". Reason: " + reason)});
+                function(reason) { return $q.reject("could not get remote need uri of connection " + connectionUri + ". Reason: " + reason)});
     }
 
+    linkedDataService.getEnvelopeDataForNeed=function(needUri){
+        if(typeof needUri === 'undefined'||needUri == null){
+            throw {message: "getEnvelopeDataForNeed: needUri must not be null"};
+
+        }
+        return linkedDataService.getWonNodeUriOfNeed(needUri)
+            .then(function(wonNodeUri){
+                var ret = {};
+                ret[won.WONMSG.hasSenderNeed] = needUri;
+                ret[won.WONMSG.hasSenderNode] = wonNodeUri;
+                ret[won.WONMSG.hasReceiverNeed] = needUri;
+                ret[won.WONMSG.hasReceiverNode] = wonNodeUri;
+                return ret;
+
+            },function(reason) {
+                //no connection found
+                var deferred = $q.defer();
+                var ret = {};
+                ret[won.WONMSG.hasSenderNeed] = needUri;
+                ret[won.WONMSG.hasReceiverNeed] = needUri;
+                return ret;
+                deferred.resolve(ret);
+                return deferred.promise;}
+        )
+    }
     /**
      * Fetches a structure that can be used directly (in a JSON-LD node) as the envelope data
      * to send a message via the specified connectionUri (that is interpreted as a local connection.
@@ -670,7 +881,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             });
     }
 
-
+/*
     linkedDataService.getLastEventOfEachConnectionOfNeed = function(uri) {
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "getLastEventOfEachConnectionOfNeed: uri must not be null"};
@@ -684,14 +895,16 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     }
                     return somePromises(promises, function(key, reason){
                         won.reportError("could not fetch last event of connection " + conUris[key], reason);
-                    }).then(function(val) { return won.deleteWhereNull(val)});
+                    }).then(function(val) {
+                        return won.deleteWhereNull(val)
+                    });
                 } catch (e) {
-                    $q.reject("could not get last event of connection " + uri + ". Reason: " + e);
+                    return $q.reject("could not get last event of connection " + uri + ". Reason: " + e);
                 }
             }
         );
     }
-
+  */
 
 
     linkedDataService.getLastEventOfConnection = function(connectionUri) {
@@ -732,7 +945,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     }
                     return $q.all(eventPromises)
                 } catch (e) {
-                    $q.reject("could not get all connection events for connection " + connectionUri + ". Reason: " + e);
+                    return $q.reject("could not get all connection events for connection " + connectionUri + ". Reason: " + e);
                 }
             });
     }
@@ -827,8 +1040,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             });
                             return result.result;
                         } catch (e) {
-                            $q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
+                            return $q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
                         } finally {
+                            //we don't need to release after a promise resolves because
+                            //this function isn't deferred.
                             lock.releaseReadLock();
                         }
                     }
@@ -887,8 +1102,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                            });
                            return eventUris;
                        } catch (e) {
-                           $q.reject("Could not get all connection event URIs for connection " + connectionUri +". Reason: " + e);
+                           return $q.reject("Could not get all connection event URIs for connection " + connectionUri +". Reason: " + e);
                        } finally {
+                           //we don't need to release after a promise resolves because
+                           //this function isn't deferred.
                            lock.releaseReadLock();
                        }
                    }
@@ -936,9 +1153,20 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                 won.WON.hasEventContainerCompacted + " ?container.\n" +
                                 "?container rdfs:member ?eventUri. \n" +
                                 " optional { " +
-                                "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
+                                "  ?eventUri msg:hasReceivedTimestamp ?timestamp; \n" +
+                                "            msg:hasMessageType ?messageType .\n" +
+                                //filter added so we don't show the success/failure events as last events
+                                " filter (?messageType != msg:SuccessResponse && ?messageType != msg:FailureResponse)" +
                                 " } \n" +
-                                "} order by desc(?timestamp) limit 1";
+                                " optional { " +
+                                "  ?eventUri msg:hasCorrespondingRemoteMessage ?remoteEventUri. \n" +
+                                "  ?remoteEventUri msg:hasReceivedTimestamp ?timestamp; \n" +
+                                "            msg:hasMessageType ?messageType .\n" +
+                                //filter added so we don't show the success/failure events as last events
+                                " filter (?messageType != msg:SuccessResponse && ?messageType != msg:FailureResponse)" +
+                                " } \n" +
+                                "} " +
+                                "order by desc(?timestamp) limit 1";
                             privateData.store.execute(query, [], [], function (success, results) {
                                 if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: false, allowMultiple: false})) {
                                     return;
@@ -953,8 +1181,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             });
                             return resultObject.eventUri;
                         } catch (e) {
-                            $q.reject("Could not get last connection event URI for connection " + connectionUri + ". Reason: " + e);
+                            return $q.reject("Could not get last connection event URI for connection " + connectionUri + ". Reason: " + e);
                         } finally {
+                            //we don't need to release after a promise resolves because
+                            //this function isn't deferred.
                             lock.releaseReadLock();
                         }
                     })
@@ -963,57 +1193,80 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     }
 
-    linkedDataService.getConnectionTextMessages = function(connectionUri) {
-        return linkedDataService.crawlConnectionData(connectionUri).then(
-            function collectTextMessages() {
-                var lock = getReadUpdateLockPerUri(connectionUri);
-                return lock.acquireReadLock().then(
-                    function (success) {
-                        try {
-                            var textMessages = [];
-                            var query =
-                                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
-                                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-                                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                                "select distinct ?eventUri ?timestamp ?text ?senderNeed where { " +
-                                "<" + connectionUri + "> a " + won.WON.ConnectionCompacted + ";\n" +
-                                won.WON.hasEventContainerCompacted + " ?container.\n" +
-                                "?container rdfs:member ?eventUri. \n" +
-                                "?eventUri won:hasTextMessage ?text. \n" +
-                                "?eventUri msg:hasSenderNeed ?senderNeed. \n" +
-                                " optional { " +
-                                "  ?eventUri msg:hasTimestamp ?timestamp .\n" +
-                                " } \n" +
-                                "} order by asc(?timestamp) ";//limit " + limit;
 
-                            privateData.store.execute(query, [], [], function (success, results) {
-                                if (rejectIfFailed(success, results, {message: "Error loading last connection event URI for connection " + connectionUri + ".", allowNone: true, allowMultiple: true})) {
-                                    return;
-                                }
-                                for (var key in results) {
-                                    var textMessage = {};
-                                    var eventUri = getSafeValue(results[key].eventUri);
-                                    var timestamp = getSafeValue(results[key].timestamp);
-                                    var text = getSafeValue(results[key].text);
-                                    var senderNeed = getSafeValue(results[key].senderNeed);
-                                    if (eventUri != null && timestamp != null && text != null) {
-                                        textMessage.eventUri = eventUri;
-                                        textMessage.timestamp = timestamp;
-                                        textMessage.text = text;
-                                        textMessage.senderNeed = senderNeed;
-                                        textMessages.push(textMessage);
-                                    }
-                                }
-                            });
-                            return textMessages;
-                        } catch (e) {
-                            $q.reject("Could not get connection events' text messages " + connectionUri + ". Reason: " + e);
-                        } finally {
-                            lock.releaseReadLock();
+    linkedDataService.getLastEventOfEachConnectionOfNeed = function(needUri) {
+        //fetch all connection uris of the need
+        var allConnectionsPromise = linkedDataService.executeCrawlableQuery(queries["getAllConnectionUrisOfNeed"], needUri);
+        return allConnectionsPromise.then(
+            function getLastEventForConnections(connectionsData){
+                return somePromises(
+                    //for each connection uri:
+                    connectionsData.map(
+                        function(conData){
+                            return linkedDataService.executeCrawlableQuery(
+                                        queries["getLastEventUriOfConnection"],
+                                        conData.connection.value
+                                ).then(function(eventUriResult){
+                                            return $q.all(
+                                                [linkedDataService.getNodeWithAttributes(eventUriResult[0].eventUri.value),
+                                                 linkedDataService.getNodeWithAttributes(conData.connection.value),
+                                                 linkedDataService.getNeed(conData.remoteNeed.value)
+                                                ]
+                                            )
+                                        }
+                                ).then(function (result) {
+                                            //make a nice structure for the data
+                                            return {
+                                                event: result[0],
+                                                connection: result[1],
+                                                remoteNeed: result[2]
+                                            }
+                                        });
                         }
-                })
-             }
-        );
+                    )
+                )
+            });
+    }
+
+     linkedDataService.getConnectionTextMessages = function(connectionUri) {
+        var queryResultPromise = linkedDataService.executeCrawlableQuery(queries["getConnectionTextMessages"], connectionUri);
+        return queryResultPromise.then(
+                function processConnectionTextMessages(results){
+                        var textMessages = [];
+                        for (var key in results) {
+                            var textMessage = {};
+                            var eventUri = getSafeValue(results[key].eventUri);
+                            var timestamp = getSafeValue(results[key].receivedTimestamp);
+                            var text = getSafeValue(results[key].text);
+                            var senderNeed = getSafeValue(results[key].senderNeed);
+                            var ownNodeResponseType = getSafeValue(results[key].ownNodeResponseType);
+                            var remoteNodeResponseType = getSafeValue(results[key].remoteNodeResponseType);
+                            var sender = getSafeValue(results[key].sender);
+                            var isOwnMessage = sender == connectionUri;
+                            var commState = "pending";
+                            if (isOwnMessage){
+                                if (ownNodeResponseType == won.WONMSG.successResponse && remoteNodeResponseType == won.WONMSG.successResponse){
+                                    commState = "sent";
+                                } else if (ownNodeResponseType == won.WONMSG.failureResponse) {
+                                    commState = "failed"
+                                } else if (remoteNodeResponseType == won.WONMSG.failureResponse) {
+                                    commState = "failed"
+                                }
+                            } else {
+                                commState = "";
+                            }
+                            if (eventUri != null && timestamp != null && text != null) {
+                                textMessage.eventUri = eventUri;
+                                textMessage.timestamp = timestamp;
+                                textMessage.text = text;
+                                textMessage.senderNeed = senderNeed;
+                                textMessage.communicationState = commState;
+                                textMessages.push(textMessage);
+                            }
+
+                        }
+                        return textMessages;
+                    });
     }
 
     linkedDataService.getLastEventTypeBeforeTime = function(connectionUri, beforeTimestamp) {
@@ -1057,14 +1310,18 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             });
                             return lastEventTypeBeforeTime;
                         } catch (e) {
-                            $q.reject("Could not get connection event type before time " + connectionUri + ". Reason: " + e);
+                            return $q.reject("Could not get connection event type before time " + connectionUri + ". Reason: " + e);
                         } finally {
+                            //we don't need to release after a promise resolves because
+                            //this function isn't deferred.
                             lock.releaseReadLock();
                         }
                     })
             }
         );
     }
+
+
 
     /**
      * Fetches the triples where URI is subject and add objects of those triples to the
@@ -1085,7 +1342,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                         try {
                             var node = {};
                             privateData.store.node(uri, function (success, graph) {
-                                if (graph.length == 0){
+                                if (graph.length == 0) {
                                     $log.error("warn: could not load any attributes for node with uri: " + uri);
                                 }
                                 if (rejectIfFailed(success, graph,{message : "Error loading node with attributes for URI " + uri+".", allowNone : false, allowMultiple: true})){
@@ -1099,8 +1356,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                             node.uri = uri;
                             return node;
                         } catch (e) {
-                            $q.reject("could not get node " + uri + "with attributes: " + e);
+                            return $q.reject("could not get node " + uri + "with attributes: " + e);
                         } finally {
+                            //we don't need to release after a promise resolves because
+                            //this function isn't deferred.
                             lock.releaseReadLock();
                         }
                     }
@@ -1124,7 +1383,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
                 return;
             } else {
-                linkedDataService.cacheItemRemove(uri);
+                cacheItemRemove(uri);
                 deferred.resolve();
             }
         });
@@ -1156,6 +1415,242 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     linkedDataService.getConnections = function(uri) {
         //TODO: SPARQL query that returns an array of connections
     }
+
+
+    /**
+     * Executes the specified crawlableQuery, returns a promise to its results, which may become available
+     * after downloading the required content.
+     */
+    linkedDataService.executeCrawlableQuery = function (crawlableQuery, baseUri) {
+        var relevantResources = [];
+        var recursionData = {};
+        var MAX_RECURSIONS = 10;
+
+        var executeQuery = function executeQuery(query, baseUri, relevantResources){
+            query = query.replace(/\:\:baseUri\:\:/g, baseUri);
+            $log.debug("executing query: \n"+query);
+            var locks = getReadUpdateLocksPerUris(relevantResources);
+            var promises = acquireReadLocks(locks);
+            return $q.all(promises).then(
+                function () {
+                    var resultObject = {};
+                    try {
+                        privateData.store.execute(query, [], [], function (success, results) {
+                            if (rejectIfFailed(success, results, {message: "Error executing query.", allowNone: true, allowMultiple: true})) {
+                                return;
+                            }
+                            resultObject.results = results;
+                        });
+                        return resultObject.results;
+                    } catch (e) {
+                        $log.warn("Could not execute query. Reason: " + e);
+                        return $q.reject("Could not execute query. Reason: " + e);
+                    } finally {
+                        //release the read locks
+                        locks.map(
+                            function(lock){
+                                lock.releaseReadLock();
+                            }
+                        );
+                    }
+                }
+            )
+        }
+
+        var resolvePropertyPathsFromBaseUri = function resolvePropertyPathsFromBaseUri(propertyPaths, baseUri, relevantResources){
+            $log.debug("resolving " + propertyPaths.length + " property paths on baseUri " + baseUri);
+            var locks = getReadUpdateLocksPerUris(relevantResources);
+            var promises = acquireReadLocks(locks);
+            return $q.all(promises).then(
+                function () {
+                    try {
+                        var resolvedUris = [];
+                        propertyPaths.map(
+                            function(propertyPath){
+                                $log.debug("resolving property path: " + propertyPath.propertyPath);
+                                var foundUris = linkedDataService
+                                    .resolvePropertyPathFromBaseUri(
+                                        baseUri,
+                                        propertyPath.propertyPath,
+                                        propertyPath.prefixes);
+
+                                //resolve all property paths, add to 'resolvedUris'
+                                Array.prototype.push.apply(resolvedUris, foundUris);
+                                $log.debug("resolved to " + foundUris.length + " resources (total " + resolvedUris.length+")");
+                        });
+                        return resolvedUris;
+                    } finally {
+                        //release the read locks
+                        locks.map(
+                            function(lock){
+                                lock.releaseReadLock();
+                            }
+                        );
+                    }
+                });
+        }
+
+        var resolveOrExecuteQuery = function resolveOrExecuteQuery(resolvedUris){
+            if (won.isNull(recursionData.depth)){
+                recursionData.depth = 0;
+            }
+            $log.debug("crawlableQuery:resolveOrExecute depth=" + recursionData.depth + ", resolvedUris=" + JSON.stringify(resolvedUris)+", relevantResources=" + JSON.stringify(relevantResources));
+            recursionData.depth++;
+            if (won.containsAll(relevantResources, resolvedUris) || recursionData.depth >= MAX_RECURSIONS) {
+                $log.debug("crawlableQuery:resolveOrExecute crawling done");
+                return executeQuery(crawlableQuery.query, baseUri, relevantResources);
+            } else {
+                $log.debug("crawlableQuery:resolveOrExecute resolving property paths ...");
+                Array.prototype.push.apply(relevantResources, resolvedUris);
+                var loadedPromises = relevantResources.map(function(x){ return linkedDataService.ensureLoaded(x)});
+                return $q.all(loadedPromises)
+                    .then(
+                        function (x) {
+                            return resolvePropertyPathsFromBaseUri(crawlableQuery.propertyPaths, baseUri, relevantResources);
+                        })
+                    .then(
+                        function(newlyResolvedUris) {
+                            return resolveOrExecuteQuery(newlyResolvedUris);
+                        });
+            }
+        }
+
+        return resolveOrExecuteQuery([baseUri]);
+
+    }
+
+    /**
+     * SPARQL queries and property paths for identifying the resources required for the query to work.
+     * All URIs resolved by the specified property paths will locked (using the read-update-lock) and if
+     * necessary, downloaded prior to execution of the query.
+     *
+     * For passing the baseUri to the query, it must contain the placeholder '::baseUri::' (without the quotes).
+     *
+     * @type {{connectionMessages: {query: string, propertyPaths: *[]}}}
+     */
+    var queries = {
+        "getConnectionTextMessages" : {
+            propertyPaths : [
+                { prefixes :
+                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
+                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
+                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
+                  propertyPath : "won:hasEventContainer"
+                },
+                { prefixes :
+                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
+                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
+                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
+                    propertyPath : "won:hasEventContainer/rdfs:member"
+                }
+            ],
+        query:
+        //note: we have to take the max timestamp as there might be multiple timestamps added to the
+        //message dataset during processing
+            "prefix msg: <http://purl.org/webofneeds/message#> \n"+
+                "prefix won: <http://purl.org/webofneeds/model#> \n" +
+                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
+                "select distinct ?eventUri ?receivedTimestamp ?text ?senderNeed ?sender ?ownNodeResponseType ?remoteNodeResponseType\n" +
+                " where { \n" +
+                "  <::baseUri::> a won:Connection; \n" +
+                "  won:hasEventContainer ?container.\n" +
+                " {\n" +
+                "  ?container rdfs:member ?eventUri.\n" +
+                "  ?eventUri msg:hasReceivedTimestamp ?receivedTimestamp;\n" +
+                " } union {\n" +
+                "  ?container rdfs:member/msg:hasCorrespondingRemoteMessage ?eventUri.\n" +
+                "  ?eventUri msg:hasReceivedTimestamp ?receivedTimestamp;\n" +
+                " }\n" +
+                "  ?eventUri msg:hasMessageType ?messageType;\n" +
+                "       won:hasTextMessage ?text;\n" +
+                "       msg:hasSenderNeed ?senderNeed;\n" +
+                "       msg:hasSender ?sender.\n" +
+                " optional { \n" +
+                "   ?ownNodeResponse msg:isResponseTo ?eventUri; \n" +
+                "                    msg:hasMessageType ?ownNodeResponseType. \n" +
+                " } \n" +
+                " optional { \n" +
+                "   ?remoteNodeResponse msg:isRemoteResponseTo ?eventUri; \n" +
+                "                    msg:hasMessageType ?remoteNodeResponseType. \n" +
+                " } \n" +
+                " filter (?messageType != msg:SuccessResponse && ?messageType != msg:FailureResponse)\n" +
+                "}\n" +
+                "order by desc(?receivedTimestamp)"
+        },
+
+        // get each connection of the specified need
+        "getAllConnectionUrisOfNeed" : {
+            propertyPaths : [
+                { prefixes :
+                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
+                        "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
+                        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
+                    propertyPath : "won:hasConnections"
+                },
+                { prefixes :
+                    "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
+                        "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
+                        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
+                    propertyPath : "won:hasConnections/rdfs:member"
+                }
+            ],
+        query:
+                "prefix msg: <http://purl.org/webofneeds/message#> \n"+
+                "prefix won: <http://purl.org/webofneeds/model#> \n" +
+                "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
+                "select ?connection ?need ?remoteNeed  \n" +
+                " where { \n" +
+                " <::baseUri::> a won:Need; \n" +
+                "           won:hasConnections ?connections.\n" +
+                "  ?connections rdfs:member ?connection. \n" +
+                "  ?connection won:belongsToNeed ?need; \n" +
+                "              won:hasRemoteNeed ?remoteNeed. \n"+
+                "} \n"
+
+        },
+
+
+        "getLastEventUriOfConnection" : {
+        propertyPaths : [
+            { prefixes :
+                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
+                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
+                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
+                propertyPath : "won:hasEventContainer"
+            },
+            { prefixes :
+                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> " +
+                    "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> " +
+                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ",
+                propertyPath : "won:hasEventContainer/rdfs:member"
+            }
+        ],
+        query:
+            "prefix msg: <http://purl.org/webofneeds/message#> \n" +
+            "prefix won: <http://purl.org/webofneeds/model#> \n" +
+            "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
+            "select ?eventUri  \n" +
+            "where { \n" +
+            " {\n" +
+            "  <::baseUri::> a won:Connection; \n" +
+            "  won:hasEventContainer ?container.\n" +
+            "  ?container rdfs:member ?eventUri.\n" +
+            "  ?eventUri msg:hasReceivedTimestamp ?receivedTimestamp.\n" +
+            "  ?eventUri msg:hasMessageType ?messageType.\n" +
+            " } union {\n" +
+            "  <::baseUri::> a won:Connection; \n" +
+            "  won:hasEventContainer ?container.\n" +
+            "  ?container rdfs:member/msg:hasCorrespondingRemoteMessage ?eventUri.\n" +
+            "  ?eventUri msg:hasReceivedTimestamp ?receivedTimestamp.\n" +
+            "  ?eventUri msg:hasMessageType ?messageType.\n" +
+            " }\n" +
+            " filter (?messageType != msg:SuccessResponse)\n" +
+            "}\n" +
+            "order by desc(?receivedTimestamp) limit 1 \n"
+
+            }
+    }
+
 
 
     return linkedDataService;

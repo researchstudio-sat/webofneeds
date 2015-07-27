@@ -21,12 +21,11 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
 
     <!-- Camel configuration -->
-    <camel:camelContext id="wonNodeCamel">
+    <camel:camelContext id="wonNodeCamel" trace="false">
         <camel:packageScan>
-            <camel:package>won.node.camel.routes.fixed</camel:package>
+            <camel:package>won.node.camel.route.fixed</camel:package>
         </camel:packageScan>
         <camel:template id="producerTemplate" defaultEndpoint="direct:JMS"/>
-        <camel:endpoint id="outgoingMessages" uri="seda:OUTMSG" />
     </camel:camelContext>
 
     <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
@@ -51,17 +50,102 @@
         <property name="brokerURL" value="tcp://localhost:${activemq.broker.port}"/>
         <property name="connectionFactory" ref="cachedConnectionFactory"/>
     </bean>
-    <bean id="needProtocolCommunicationService" class="won.node.messaging.NeedProtocolCommunicationServiceImpl">
+    <bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl">
 
     </bean>
 
-    <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.OwnerProtocolOutgoingMessagesProcessor">
+    <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.general.OwnerProtocolOutgoingMessagesProcessor">
         <property name="queueManagementService" ref="queueManagementService"/>
     </bean>
 
-    <bean name="needProtocolCamelConfigurator" class="won.node.messaging.NeedProtocolCamelConfiguratorImpl">
+    <bean name="needProtocolCamelConfigurator" class="won.node.camel.NeedProtocolCamelConfiguratorImpl">
         <property name="componentName" value="activemq"/>
     </bean>
 
+    <bean id="needProtocolOutgoingMessagesProcessor"
+          class="won.node.camel.processor.general.NeedProtocolOutgoingMessagesProcessor" />
 
+    <bean id="successResponder"
+          class="won.node.camel.processor.general.SuccessResponder" />
+
+    <bean id="toNodeSender"
+          class="won.node.camel.processor.general.ToNodeSender" />
+    <bean id="toOwnerSender"
+          class="won.node.camel.processor.general.ToOwnerSender" />
+    <bean id="facetExtractor"
+          class="won.protocol.message.processor.camel.FacetExtractingCamelProcessor" />
+
+
+    <!-- won-specific processors -->
+    <bean id="failResponder"
+          class="won.node.camel.processor.general.FailResponder" />
+    <bean name="resendResponseResponder"
+          class="won.node.camel.processor.general.ResponseResenderProcessor"/>
+  <!-- won-specific processors -->
+  <!-- start of the pipeline -->
+  <bean name="wonMessageIntoCamelProcessor" class="won.protocol.message.processor.camel.WonMessageIntoCamelProcessor" />
+  <!-- wrapping the messages for storage on node -->
+  <bean name="wrapperFromOwner" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.node.camel.processor.general.MessageWrappingWonMessageProcessor">
+        <constructor-arg name="direction" value="FROM_OWNER" />
+      </bean>
+    </constructor-arg>
+  </bean>
+  <bean name="wrapperFromExternal" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.node.camel.processor.general.MessageWrappingWonMessageProcessor">
+        <constructor-arg name="direction" value="FROM_EXTERNAL" />
+      </bean>
+    </constructor-arg>
+  </bean>
+  <!-- wrapping the messages for storage on node -->
+  <bean name="wrapperFromSystem" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.node.camel.processor.general.MessageWrappingWonMessageProcessor">
+        <constructor-arg name="direction" value="FROM_SYSTEM" />
+      </bean>
+    </constructor-arg>
+  </bean>
+  <!-- processor for checking if message event, create need, or create connection uri is well-formed -->
+  <bean name="uriNodePathChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+     <constructor-arg>
+       <bean class="won.protocol.message.processor.impl.UriConsistencyCheckingWonMessageProcessor" />
+     </constructor-arg>
+  </bean>
+  <!-- processor for checking if message event, create need, or create connection uri is already in use -->
+  <bean name="uriInUseChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.node.camel.processor.fixed.UriAlreadyUsedCheckingWonMessageProcessor"/>
+    </constructor-arg>
+  </bean>
+  <!-- processor for checking well-formedness of messages -->
+  <bean name="wellformednessChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.protocol.message.processor.impl.WellformednessCheckingWonMessageProcessor" />
+    </constructor-arg>
+  </bean>
+  <!-- processor for checking signatures -->
+  <bean name="signatureChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor" />
+    </constructor-arg>
+  </bean>
+    <!-- signing messages -->
+    <bean id="signatureAddingProcessor" class="won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor">
+        <constructor-arg type="java.lang.String" value="${uri.prefix.resource}" />
+    </bean>
+    <bean name="signatureAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg ref="signatureAddingProcessor" />
+    </bean>
+  <!-- persisting messages -->
+  <bean name="persister" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+    <constructor-arg>
+      <bean class="won.node.camel.processor.general.PersistingWonMessageProcessor" />
+    </constructor-arg>
+  </bean>
+  <!-- routing logic for wonMessages, computing which message-type specific processor -->
+  <bean name="messageTypeSlip" class="won.node.camel.processor.general.MessageTypeSlipComputer"/>
+  <!-- routing logic for wonMessages, computing which facet-specific processor to use -->
+  <bean name="facetTypeSlip" class="won.node.camel.processor.general.FacetTypeSlipComputer"/>
 </beans>

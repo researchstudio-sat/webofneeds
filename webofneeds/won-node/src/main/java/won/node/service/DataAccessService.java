@@ -16,13 +16,10 @@
 
 package won.node.service;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import won.node.service.impl.URIService;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEvent;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.repository.rdfstorage.RDFStorageService;
@@ -39,21 +36,6 @@ public interface DataAccessService
 {
   Collection<URI> getSupportedFacets(URI needUri) throws NoSuchNeedException;
 
-  /**
-   * Returns the first facet found in the model, attached to the null relative URI '<>'.
-   * Returns null if there is no such facet.
-   * @param content
-   * @return
-   */
-  URI getFacet(Model content);
-  URI getFacet(Dataset content);
-
-  /**
-   * Adds a triple to the model of the form <> won:hasFacet [facetURI].
-   * @param content
-   * @param facetURI
-   */
-  void addFacet(Model content, URI facetURI);
 
   Connection getConnection(List<Connection> connections, URI facetURI, ConnectionEventType eventType)
       throws ConnectionAlreadyExistsException;
@@ -62,8 +44,6 @@ public interface DataAccessService
     final URI facet, final ConnectionState connectionState, final ConnectionEventType connectionEventType)
     throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
-  ConnectionEvent createConnectionEvent(URI connectionURI, URI originator,
-    ConnectionEventType connectionEventType);
 
   Connection nextConnectionState(URI connectionURI, ConnectionEventType connectionEventType)
                                                         throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
@@ -76,11 +56,6 @@ public interface DataAccessService
    * @return true if feedback could be added false otherwise
    */
   boolean addFeedback(URI forResource, Resource feedback);
-
-  void saveAdditionalContentForEvent(Model content, Connection con, ConnectionEvent event);
-
-  void saveAdditionalContentForEvent(Model content, Connection con, ConnectionEvent event,
-    Double score);
 
   void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI);
 

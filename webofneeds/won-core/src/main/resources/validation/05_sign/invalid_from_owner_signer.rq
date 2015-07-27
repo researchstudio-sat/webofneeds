@@ -1,0 +1,173 @@
+prefix dc:    <http://purl.org/dc/elements/1.1/>
+prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>
+prefix conn:  <http://localhost:8080/won/resource/connection/>
+prefix event: <http://localhost:8080/won/resource/event/>
+prefix woncrypt: <http://purl.org/webofneeds/woncrypt#>
+prefix xsd:   <http://www.w3.org/2001/XMLSchema#>
+prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix local: <http://localhost:8080/won/resource/>
+prefix won:   <http://purl.org/webofneeds/model#>
+prefix msg:   <http://purl.org/webofneeds/message#>
+prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+prefix ldp:   <http://www.w3.org/ns/ldp#>
+
+
+# 'fromOwner' envelopes should be signed by:
+# - if it is the envelope without child envelopes - by sender need
+# - if it is any other envelope - by sender Node, if specified,
+# and by receiver Node, if senderNode is unspecified
+#ASK
+#{
+  SELECT
+
+    ?correctOwnerLeafEnvNum
+
+    ?ownerLeafEnvNum
+
+    ?correctOwnerNotLeafReceiverNodeEnvNum
+
+    ?correctOwnerNotLeafSenderNodeEnvNum
+
+    ?ownerNotLeafEnvNum
+
+
+    (if(?ownerLeafEnvNum != ?correctOwnerLeafEnvNum  ||
+    (?correctOwnerNotLeafReceiverNodeEnvNum != ?ownerNotLeafEnvNum
+    && ?correctOwnerNotLeafSenderNodeEnvNum != ?ownerNotLeafEnvNum), "FAIL", "OK") AS ?check)
+
+
+  WHERE
+  {
+
+
+    # count fromOwner leaf that have correct signers
+    {SELECT
+    (count(DISTINCT ?env) as ?correctOwnerLeafEnvNum)
+    WHERE
+    {
+      GRAPH ?g1
+      {
+          ?event msg:hasSenderNeed    ?envsigner
+      } .
+      GRAPH ?g2
+      {
+          ?event a msg:FromOwner .
+      } .
+      GRAPH ?g3
+      {
+          ?event a msg:FromOwner .
+          FILTER NOT EXISTS
+              {  ?env msg:containsEnvelope ?g4 . }
+      } .
+      GRAPH ?env
+      {
+          ?env a msg:EnvelopeGraph .
+          ?env <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf> ?event .
+      } .
+      GRAPH ?envsig
+      {
+          ?envsig a signature:Signature .
+          ?envsig msg:hasSignedGraph ?env .
+          ?envsig signature:hasVerificationCertificate ?envsigner .
+      } .
+    } ORDER BY ?event
+    }
+
+
+    # count all fromOwner leaf envelopes
+    {SELECT
+    (count (DISTINCT ?g) AS ?ownerLeafEnvNum)
+    WHERE
+    {
+      GRAPH ?g
+      {
+          ?event a msg:FromOwner .
+          FILTER NOT EXISTS
+              {  ?g msg:containsEnvelope ?g2 . }
+      } .
+    }
+    }
+
+
+
+
+
+    # count all non leaf fromOwner envelopes that have senderNode specified and have it as signer
+    {SELECT
+        (count(DISTINCT ?env) as ?correctOwnerNotLeafSenderNodeEnvNum)
+        WHERE
+        {
+          GRAPH ?g1
+          {
+              ?event msg:hasSenderNode    ?envsigner
+          } .
+          GRAPH ?g2
+          {
+              ?event a msg:FromOwner .
+              ?env msg:containsEnvelope ?g3 .
+          } .
+          GRAPH ?env
+          {
+              ?env a msg:EnvelopeGraph .
+              ?env <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf> ?event .
+          } .
+          GRAPH ?envsig
+          {
+              ?envsig a signature:Signature .
+              ?envsig msg:hasSignedGraph ?env .
+              ?envsig signature:hasVerificationCertificate ?envsigner .
+          } .
+        } ORDER BY ?event
+     }
+
+
+     # count all non leaf fromOwner envelopes that have senderNode unspecified and have receiver node as signer
+     {SELECT
+         (count(DISTINCT ?env) as ?correctOwnerNotLeafReceiverNodeEnvNum)
+         WHERE
+         {
+           GRAPH ?g1
+           {
+               ?event msg:hasReceiverNode    ?envsigner .
+               FILTER NOT EXISTS
+                   {   ?event msg:hasSenderNode    ?envsigner . }
+           } .
+           GRAPH ?g2
+           {
+               ?event a msg:FromOwner .
+               ?env msg:containsEnvelope ?g3 .
+           } .
+           GRAPH ?env
+           {
+               ?env a msg:EnvelopeGraph .
+               ?env <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf> ?event .
+           } .
+           GRAPH ?envsig
+           {
+               ?envsig a signature:Signature .
+               ?envsig msg:hasSignedGraph ?env .
+               ?envsig signature:hasVerificationCertificate ?envsigner .
+           } .
+         } ORDER BY ?event
+      }
+
+
+    # count all non leaf fromOwner envelopes
+    {SELECT
+        (count (DISTINCT ?g) AS ?ownerNotLeafEnvNum)
+        WHERE
+        {
+          GRAPH ?g
+          {
+              ?event a msg:FromOwner .
+              ?g msg:containsEnvelope ?g2 .
+              FILTER ( bound(?g2) )
+          } .
+        }
+    }
+
+  }
+
+
+#}

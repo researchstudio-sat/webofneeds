@@ -1,23 +1,14 @@
 package won.cryptography.rdfsign;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.*;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Statement;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import won.cryptography.service.CryptographyService;
-
-import java.io.*;
-import java.net.URI;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Iterator;
+import won.cryptography.utils.TestSigningUtils;
+import won.cryptography.utils.TestingKeys;
+import won.protocol.message.SignatureReference;
 
 /**
  * User: ypanchenko
@@ -26,204 +17,128 @@ import java.util.Iterator;
 public class WonVerifierTest
 {
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  private static final String RESOURCE_FILE = "/won-signed-messages/create-need-msg.trig";
 
-  private static final String RESOURCE_FILE_1 = "/test_1_graph.trig";
-  private static final String RESOURCE_FILE_2 = "/test_1_2graphs.trig";
-  private static final String RESOURCE_FILE_3 = "/test_1_2graphs_1sig.trig";
-  private static final String RESOURCE_URI = "http://www.example.com/resource/need/12";
+  private static final String NEED_CORE_DATA_URI =
+    "http://localhost:8080/won/resource/need/3144709509622353000/core/#data";
+  private static final String NEED_CORE_DATA_SIG_URI =
+    "http://localhost:8080/won/resource/need/3144709509622353000/core/#data-sig";
+  private static final String EVENT_ENV1_URI =
+    "http://localhost:8080/won/resource/event/7719577021233193000#data";
+  private static final String EVENT_ENV1_SIG_URI =
+    "http://localhost:8080/won/resource/event/7719577021233193000#data-sig";
+  private static final String EVENT_ENV2_URI =
+    "http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl";
+  private static final String EVENT_ENV2_SIG_URI =
+    "http://localhost:8080/won/resource/event/7719577021233193000#envelope-s7gl-sig";
 
-  @Test
-  public void testSignAndVerifyOneGraph() throws Exception {
 
-    // create dataset with one named graph
-    InputStream is = this.getClass().getResourceAsStream(RESOURCE_FILE_1);
-    Dataset dataset = DatasetFactory.createMem();
-    RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
-    is.close();
+  TestingKeys keys;
 
-    // sign it
-    WonSigner signer = new WonSigner(dataset, new SignatureAlgorithmFisteus2010());
-    CryptographyService crypService = new CryptographyService();
-    KeyPair keyPair = crypService.createNewNeedKeyPair(URI.create(RESOURCE_URI));
+  @Before
+  public void init() {
 
-    //KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-    //kpg.initialize(2048);
-    //KeyPair keyPair = kpg.genKeyPair();
-
-    PrivateKey privateKey = keyPair.getPrivate();
-    PublicKey publicKey = keyPair.getPublic();
-    signer.sign(privateKey);
-
-    // write for debugging
-    //File outFile = testFolder.newFile();
-    // use this when debugging:
-    File outFile = File.createTempFile("won", ".trig");
-    System.out.println(outFile);
-    OutputStream os = new FileOutputStream(outFile);
-    RDFDataMgr.write(os, dataset, RDFFormat.TRIG_BLOCKS);
-    os.close();
-
-    // read it again
-    InputStream is2 = new FileInputStream(outFile);
-    Dataset dataset2 = DatasetFactory.createMem();
-    RDFDataMgr.read(dataset2, is2, RDFFormat.TRIG.getLang());
-    is2.close();
-
-    WonVerifier verifier = new WonVerifier(dataset2);
-    boolean verified = verifier.verify(publicKey);
-
-    Assert.assertTrue(verified);
-    Assert.assertEquals(1, verifier.getVerifiedURIs().size());
-
-    // modify a model and check that it does not verify..
-    Model m = dataset2.getNamedModel(dataset2.listNames().next());
-    Statement stmt = m.listStatements().nextStatement();
-    m.remove(stmt);
-
-    verifier = new WonVerifier(dataset2);
-    verified = verifier.verify(publicKey);
-
-    Assert.assertTrue(!verified);
-
+    keys = new TestingKeys(TestSigningUtils.KEYS_FILE);
   }
 
+
   @Test
-  public void testSignAndVerifyTwoGraphs() throws Exception {
+  public void testVerifyCreateNeedData() throws Exception {
 
-    // create dataset with two named graphs
-    InputStream is = this.getClass().getResourceAsStream(RESOURCE_FILE_2);
-    Dataset dataset = DatasetFactory.createMem();
-    RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
-    is.close();
+    // create dataset that contains need core data graph and its signature graph
+    Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(
+      RESOURCE_FILE, new String[]{NEED_CORE_DATA_URI, NEED_CORE_DATA_SIG_URI});
 
-    // sign it
-    WonSigner signer = new WonSigner(dataset, new SignatureAlgorithmFisteus2010());
-    CryptographyService crypService = new CryptographyService();
-    KeyPair keyPair = crypService.createNewNeedKeyPair(URI.create(RESOURCE_URI));
 
-    PrivateKey privateKey = keyPair.getPrivate();
-    PublicKey publicKey = keyPair.getPublic();
-    signer.sign(privateKey);
+    // verify
+    WonVerifier verifier = new WonVerifier(testDataset);
+    // TODO load public keys from certificate referenced from signatures
+    boolean verified = verifier.verify(keys.getPublicKeys());
+    SignatureVerificationResult result = verifier.getVerificationResult();
 
-    // write for debugging
-    //File outFile = testFolder.newFile();
-    // use this when debugging:
-    File outFile = File.createTempFile("won", ".trig");
-    System.out.println(outFile);
-    OutputStream os = new FileOutputStream(outFile);
-    RDFDataMgr.write(os, dataset, RDFFormat.TRIG_BLOCKS);
-    os.close();
-
-    // read it again
-    InputStream is2 = new FileInputStream(outFile);
-    Dataset dataset2 = DatasetFactory.createMem();
-    RDFDataMgr.read(dataset2, is2, RDFFormat.TRIG.getLang());
-    is2.close();
-
-    WonVerifier verifier = new WonVerifier(dataset2);
-    boolean verified = verifier.verify(publicKey);
-
-    Assert.assertTrue(verified);
-    Assert.assertEquals(2, verifier.getVerifiedURIs().size());
+    Assert.assertTrue(result.getMessage(), verified);
+    Assert.assertEquals(1, result.getSignatureGraphNames().size());
+    Assert.assertEquals(NEED_CORE_DATA_URI, result.getSignedGraphName(NEED_CORE_DATA_SIG_URI));
+    Assert.assertEquals(1, result.getVerifiedUnreferencedSignaturesAsReferences().size());
+    SignatureReference ref = result.getVerifiedUnreferencedSignaturesAsReferences().get(0);
+    Assert.assertEquals(null, ref.getReferencerGraphUri());
+    Assert.assertEquals(NEED_CORE_DATA_SIG_URI, ref.getSignatureGraphUri());
+    Assert.assertEquals(NEED_CORE_DATA_URI, ref.getSignedGraphUri());
 
     // modify a model and check that it does not verify..
-    Iterator<String> names = dataset2.listNames();
-    Model m = dataset2.getNamedModel(names.next());
-    Model m2 = dataset2.getNamedModel(names.next());
+    Model m = testDataset.getNamedModel(NEED_CORE_DATA_URI);
     Statement stmt = m.listStatements().nextStatement();
     m.remove(stmt);
 
-    verifier = new WonVerifier(dataset2);
-    verified = verifier.verify(publicKey);
+    verifier = new WonVerifier(testDataset);
+    verified = verifier.verify(keys.getPublicKeys());
+    result = verifier.getVerificationResult();
 
     Assert.assertTrue(!verified);
-    Assert.assertEquals(1, verifier.getVerifiedURIs().size());
+    Assert.assertEquals(1, result.getSignatureGraphNames().size());
+    Assert.assertEquals(NEED_CORE_DATA_URI, result.getSignedGraphName(NEED_CORE_DATA_SIG_URI));
 
     // add the removed statement back
     m.add(stmt);
-    verifier = new WonVerifier(dataset2);
-    verified = verifier.verify(publicKey);
+    verifier = new WonVerifier(testDataset);
+    verified = verifier.verify(keys.getPublicKeys());
     // now it should verify again
     Assert.assertTrue(verified);
-
-
-    // this shows that the attack is possible when a shared between graph
-    // blank node can be replaced by other blank node in one or both of the
-    // graphs, this should not validate, but currently this is a weak point
-//    StmtIterator i1 = m.listStatements();
-//    Resource anon = null;
-//    StmtIterator i2 = null;
-//    Statement s2 = null;
-//    RDFNode node = null;
-//    while (i1.hasNext()) {
-//      Statement s1 = i1.nextStatement();
-//      if (s1.getSubject().isAnon()) {
-//        anon = s1.getSubject();
-//        i2 = m2.listStatements(anon, null, node);
-//        if (i2.hasNext()) {
-//          s2 = i2.next();
-//          break;
-//        }
-//      }
-//    }
-//    m2.remove(s2);
-//    Resource bn = m2.createResource();
-//    Statement s2mod = m2.createStatement(bn, s2.getPredicate(), s2.getObject());
-//    m2.add(s2mod);
-//    Assert.assertTrue(!verified);
 
   }
 
   @Test
-  public void testSignTwoGraphsWhereOneAlreadyHasSignatureAndVerify() throws Exception {
+  public void testVerifyCreatedNeedOwnerEvent() throws Exception {
 
-    // create dataset with two named graphs one of them already with the signature
-    InputStream is = this.getClass().getResourceAsStream(RESOURCE_FILE_3);
-    Dataset dataset = DatasetFactory.createMem();
-    RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
-    is.close();
+    // create dataset that contains need core data graph and its signature graph,
+    // envelope created by owner and the envelope's signature
+    Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(
+      RESOURCE_FILE, new String[]{
+        NEED_CORE_DATA_URI, NEED_CORE_DATA_SIG_URI,
+        EVENT_ENV1_URI, EVENT_ENV1_SIG_URI
+      });
+    // verify
+    WonVerifier verifier = new WonVerifier(testDataset);
+    // TODO load public keys from certificate referenced from signatures
+    boolean verified = verifier.verify(keys.getPublicKeys());
+    SignatureVerificationResult result = verifier.getVerificationResult();
 
-    // sign it
-    WonSigner signer = new WonSigner(dataset, new SignatureAlgorithmFisteus2010());
-    CryptographyService crypService = new CryptographyService();
-    KeyPair keyPair = crypService.createNewNeedKeyPair(URI.create(RESOURCE_URI));
+    Assert.assertTrue(result.getMessage(), verified);
+    Assert.assertEquals(2, result.getSignatureGraphNames().size());
+    Assert.assertEquals(1, result.getVerifiedUnreferencedSignaturesAsReferences().size());
+    Assert.assertEquals(NEED_CORE_DATA_URI, result.getSignedGraphName(NEED_CORE_DATA_SIG_URI));
+    Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphName(EVENT_ENV1_SIG_URI));
 
-    PrivateKey privateKey = keyPair.getPrivate();
-    PublicKey publicKey = keyPair.getPublic();
-    signer.sign(privateKey);
-
-    // write for debugging
-    //File outFile = testFolder.newFile();
-    // use this when debugging:
-    File outFile = File.createTempFile("won", ".trig");
-    System.out.println(outFile);
-    OutputStream os = new FileOutputStream(outFile);
-    RDFDataMgr.write(os, dataset, RDFFormat.TRIG);
-    os.close();
-
-    // read it again
-    InputStream is2 = new FileInputStream(outFile);
-    Dataset dataset2 = DatasetFactory.createMem();
-    RDFDataMgr.read(dataset2, is2, RDFFormat.TRIG.getLang());
-    is2.close();
-
-    WonVerifier verifier = new WonVerifier(dataset2);
-    boolean verified = verifier.verify(publicKey);
-
-    Assert.assertTrue(verified);
-    Assert.assertEquals(2, verifier.getVerifiedURIs().size());
-
-    // modify a model and check that it does not verify..
-    Model m = dataset2.getNamedModel(dataset2.listNames().next());
-    Statement stmt = m.listStatements().nextStatement();
-    m.remove(stmt);
-
-    verifier = new WonVerifier(dataset2);
-    verified = verifier.verify(publicKey);
-
-    Assert.assertTrue(!verified);
-    Assert.assertEquals(1, verifier.getVerifiedURIs().size());
   }
+
+
+  @Test
+  public void testVerifyCreatedNeedNodeEvent() throws Exception {
+
+    // create dataset that contains need core data graph and its signature graph,
+    // envelope created by owner and the envelope's signature, envelope created
+    // by node and its signature
+    Dataset testDataset = TestSigningUtils.prepareTestDatasetFromNamedGraphs(
+      RESOURCE_FILE, new String[]{
+        NEED_CORE_DATA_URI, NEED_CORE_DATA_SIG_URI,
+        EVENT_ENV1_URI, EVENT_ENV1_SIG_URI,
+        EVENT_ENV2_URI, EVENT_ENV2_SIG_URI
+      });
+    // verify
+    WonVerifier verifier = new WonVerifier(testDataset);
+    boolean verified = verifier.verify(keys.getPublicKeys());
+    SignatureVerificationResult result = verifier.getVerificationResult();
+
+    Assert.assertTrue(result.getMessage(), verified);
+    Assert.assertEquals(3, result.getSignatureGraphNames().size());
+    Assert.assertEquals(NEED_CORE_DATA_URI, result.getSignedGraphName(NEED_CORE_DATA_SIG_URI));
+    Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphName(EVENT_ENV1_SIG_URI));
+    Assert.assertEquals(EVENT_ENV2_URI, result.getSignedGraphName(EVENT_ENV2_SIG_URI));
+
+  }
+
+  // TODO test more versions of not valid signatures, e.g. signatures missing, graphs missing,
+  // wrong signature value, references signature values are wrong, etc.
 }
+
+

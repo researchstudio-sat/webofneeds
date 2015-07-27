@@ -23,6 +23,8 @@ angular.module('won.owner').controller("HeaderCtrl",
              , $filter
              , $interval
              , $log
+             , $window
+             , $modal //TODO testing
              ) {
 
 
@@ -52,19 +54,49 @@ angular.module('won.owner').controller("HeaderCtrl",
         $location.url("/");
     }
 
+    $scope.displaySignIn = function() {
+        $modal.open({
+            controller: 'SignInModalInstanceCtrl',
+            templateUrl: 'app/sign-in/sign-in-modal-content.html',
+            size: 'sm'
+        });
+    };
+    $scope.displaySignUp = function() {
+        $modal.open({
+            controller: 'SignUpModalInstanceCtrl',
+            templateUrl: 'app/sign-in/sign-up-modal-content.html',
+            size: 'sm'
+        });
+    };
+
 	$scope.showPublic = function() {
         return !userService.isAuth();
 	};
 
-    $scope.checkRegistered = function(){
-        return userService.getRegistered();
+    $scope.showAccountUser = function() {
+        return userService.isAccountUser();
     };
-    $scope.userdata = { username : userService.getUnescapeUserName()};
+
+    $scope.showPrivateLinkUser = function() {
+        return userService.isPrivateUser();
+    };
+
+    $scope.checkRegistered = function () {
+        return userService.isRegistered();
+    };
+
+    var getDisplayUserName = function () {
+        $scope.userdata = { username: userService.getUnescapeUserName()};
+        if (userService.isPrivateUser()) {
+            $scope.userdata.username = "private user";
+        }
+    }
+    getDisplayUserName();
 
 
     $scope.$watch(userService.isAuth, function(logged_in){
         if(logged_in){
-            $scope.userdata = { username : userService.getUnescapeUserName()};
+            getDisplayUserName();
         }
     })
     $scope.onDropDownClick=function(num){
@@ -79,8 +111,7 @@ angular.module('won.owner').controller("HeaderCtrl",
 
 	$scope.onClickSignOut = function() {
 		applicationStateService.reset();
-		linkedDataService.reset();
-		userService.logOut().then(onResponseSignOut);
+		userService.logOutAndSetUpApplicationState().then(onResponseSignOut);
 	};
 
 });

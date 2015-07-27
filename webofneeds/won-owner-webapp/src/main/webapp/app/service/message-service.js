@@ -61,36 +61,43 @@ angular.module('won.owner').factory('messageService', function ($http, $q,$log, 
     privateData.pendingOutMessages = [];
 
 
+
     var getEventData = function(json){
         $log.debug("getting data from jsonld message");
         var eventData = {};
         //call handler if there is one - it may modify the event object
         //frame the incoming jsonld to get the data that interest us
-        var frame = {"@context" : {
-            "won":"http://purl.org/webofneeds/model#",
-            "msg":"http://purl.org/webofneeds/message#" //message is the default vocabulary
-        },
-            "msg:hasMessageType": { }
-        };
+        var frame = {
+            "@context" : {
+                "won":"http://purl.org/webofneeds/model#",
+                "msg":"http://purl.org/webofneeds/message#"
+            },
+            "@type": "msg:FromOwner"
+        }
+
         //copy data from the framed message to the event object
         var framedMessage = jsonld.frame(json, frame);
+
+        if (framedMessage == null){
+            //not FromSystem? maybe it's FromSystem?
+            frame['@type'] = "msg:FromSystem";
+            //copy data from the framed message to the event object
+            framedMessage = jsonld.frame(json, frame);
+       }
+
+        if (framedMessage == null){
+            //not FromSystem? maybe it's FromExternal?
+            frame['@type'] = "msg:FromExternal";
+            //copy data from the framed message to the event object
+            framedMessage = jsonld.frame(json, frame);
+        }
+
         for (key in framedMessage){
             var propName = won.getLocalName(key);
             if (propName != null && ! won.isJsonLdKeyword(propName)) {
                 eventData[propName] = won.getSafeJsonLdValue(framedMessage[key]);
             }
         }
-/*
-        eventData.messageType = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasMessageTypeCompacted]);
-        eventData.receiverURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasReceiverCompacted]);
-        eventData.receiverNeedURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasReceiverNeedCompacted]);
-        eventData.receiverNodeURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasReceiverNodeCompacted]);
-        eventData.senderURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasSenderCompacted]);
-        eventData.senderNeedURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasSenderNeedCompacted]);
-        eventData.senderNodeURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasSenderNodeCompacted]);
-        eventData.refersToURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.refersToCompacted]);
-        eventData.responseState = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasResponseStateCompacted]);
-        */
         eventData.uri = won.getSafeJsonLdValue(framedMessage);
         eventData.framedMessage = framedMessage;
         $log.debug("done copying the data to the event object, returning the result");

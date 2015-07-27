@@ -1,0 +1,93 @@
+prefix dc:    <http://purl.org/dc/elements/1.1/>
+prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>
+prefix conn:  <http://localhost:8080/won/resource/connection/>
+prefix event: <http://localhost:8080/won/resource/event/>
+prefix woncrypt: <http://purl.org/webofneeds/woncrypt#>
+prefix xsd:   <http://www.w3.org/2001/XMLSchema#>
+prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix local: <http://localhost:8080/won/resource/>
+prefix won:   <http://purl.org/webofneeds/model#>
+prefix msg:   <http://purl.org/webofneeds/message#>
+prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>
+prefix ldp:   <http://www.w3.org/ns/ldp#>
+
+
+# the envelopes should form the chain: one parent envelope containing <=1 child envelope, one leave envelope,
+# each envelope in between, if any exist, contains exactly one child envelope.
+#ASK
+#{
+  SELECT
+    ?numOfEnvelopes
+
+    ?numOfEnvelopesWithoutParent
+    (if(?numOfEnvelopesWithoutParent!=1, "expected 1 parent envelope", "OK") AS ?parentEnvelopesCheck)
+
+    ?numOfEnvelopesWithoutChild
+    (if(?numOfEnvelopesWithoutChild!=1, "expected 1 leaf envelope", "OK") AS ?leafEnvelopesCheck)
+
+    ?numOfEnvelopesWithMultiChild
+    (if(?numOfEnvelopesWithMultiChild>0, "expected an envelope contains 1 or 0 child envelope", "OK") AS
+    ?multichildCheck)
+
+    (if(?numOfEnvelopesWithMultiChild>0 || ?numOfEnvelopesWithoutChild!=1 || ?numOfEnvelopesWithoutParent!=1, "FAIL", "OK") AS
+    ?check)
+
+  WHERE
+  {
+    # get total number of envelopes
+    { SELECT (count(?envelope) as ?numOfEnvelopes)
+      WHERE
+      {
+        GRAPH ?envelope
+        {
+          ?envelope rdf:type msg:EnvelopeGraph .
+        }
+      }
+    }
+    # get number of envelopes that don't have a parent envelope
+    { SELECT (count(?envelope) as ?numOfEnvelopesWithoutParent)
+      WHERE
+      {
+        GRAPH ?envelope
+        {
+          OPTIONAL {?g msg:containsEnvelope ?envelope } .
+          ?envelope rdf:type msg:EnvelopeGraph .
+          FILTER ( !bound(?g) )
+        } .
+      }
+    }
+
+    # get number of envelopes that don't have a child envelope
+    { SELECT (count(?envelope) as ?numOfEnvelopesWithoutChild)
+      WHERE
+      {
+        GRAPH ?envelope
+        {
+          OPTIONAL {?envelope msg:containsEnvelope ?g } .
+          ?envelope rdf:type msg:EnvelopeGraph .
+          FILTER ( !bound(?g) )
+        } .
+      }
+    }
+
+
+    # get the number of envelopes that have more than one child envelopes
+    { SELECT (count(?multiParent) as ?numOfEnvelopesWithMultiChild)
+      { SELECT (?envelope as ?multiParent)
+               (count(?g) as ?childCount)
+        WHERE
+        {
+          GRAPH ?envelope
+          {
+            OPTIONAL {?envelope msg:containsEnvelope ?g } .
+            ?envelope rdf:type msg:EnvelopeGraph .
+            FILTER ( bound(?g) )
+          } .
+        } GROUP BY ?envelope
+        HAVING (?childCount > 1)
+      }
+    }
+
+  }
+#}

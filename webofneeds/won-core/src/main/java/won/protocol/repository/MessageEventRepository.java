@@ -7,8 +7,10 @@ import java.util.List;
 
 public interface MessageEventRepository extends WonRepository<MessageEventPlaceholder> {
 
-  List<MessageEventPlaceholder> findByMessageURI(URI URI);
+  MessageEventPlaceholder findOneByMessageURI(URI URI);
 
   List<MessageEventPlaceholder> findByParentURI(URI URI);
+
+  MessageEventPlaceholder findOneByCorrespondingRemoteMessageURI(URI uri);
 
 }
