@@ -391,7 +391,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         if(lock== false){
             lock = true;
 
-            $scope.buildNeedRefactored(); //TODO just testing stuff here; deleteme
+            var buildCreateMessage = function() { return $scope.buildCreateMsgRefactored() }
 
 
             var needBuilder = $scope.partiallyInitNeedBuilder();
@@ -400,7 +400,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             // then publish the need, so that it is under that account
             var newNeedUriPromise = userService.setUpRegistrationForUserPublishingNeed().then(
                 function() {
-                     return wonService.createNeed(needBuilder);
+                     return wonService.createNeed(buildCreateMessage, needBuilder);
                 }
             );
             //TODO why are the following calls not part of the promise chain?
@@ -419,9 +419,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }
     }
 
-    $scope.buildNeedRefactored = function() {
-
-        //<TODO-testing-stuff>
+    $scope.buildCreateMsgRefactored = function() {
 
 
         console.log('create-need.js:oiu; - need.images:', $scope.need.images);
@@ -442,6 +440,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         }
         console.log('create-need.js:qweorij - imgs:', imgs);
 
+
         var publishedContentUri = 'http://localhost:8080/won/resource/need/' + utilService.getRandomPosInt();
 
         //if type === create -> use needBuilder as well
@@ -451,6 +450,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             title: $scope.need.title, //mandatory
             description: $scope.need.textDescription, //mandatory
             publishedContentUri: publishedContentUri, //mandatory
+            tags: $scope.need.tags.map(function(t) {return t.text}).join(','),
             attachmentUris: attachmentUris, //optional
         });
         var msgJson = won.buildMessageRdf(contentRdf, {
@@ -465,9 +465,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         console.log("create-need.js:435: stringified ", JSON.stringify(msgJson));
         console.log("create-need.js:436 - need: ", $scope.need);
 
-        ///----------------------
-
-        //</TODO-testing-stuff>
+        return msgJson;
 
     }
 

@@ -94,7 +94,7 @@
                 'won:hasContent': '_:n01',
                 'won:hasBasicNeedType': args.type,
                 'won:hasFacet': args.facet? args.facet : 'won:OwnerFacet',
-                'won:hasAttachments': won.clone(args.attachmentUris)
+                'won:hasAttachments': (args.attachmentUris? won.clone(args.attachmentUris) : undefined)
             },
             {
                 '@id': '_:n01',

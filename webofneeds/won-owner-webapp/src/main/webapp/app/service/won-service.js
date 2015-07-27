@@ -448,7 +448,15 @@ angular.module('won.owner').factory('wonService', function (
      * @param needAsJsonLd
      * @returns {*}
      */
-    wonService.createNeed = function(needBuilder) {
+    wonService.createNeed = function(buildCreateMessage, needBuilder ) {
+        //TODO reroll on clashes; curry the build function
+        //TODO stopped here; refactor code below. use createMsgRefactored
+        // calling this clojure-function here, allows us to regenerate the random uris on a name-clash
+        // by simply calling this function again
+        var createMsgRefactored = buildCreateMessage();
+
+
+
         var deferred = $q.defer();
         var needData = won.clone(needBuilder.build());
         //TODO: Fix hard-coded URIs here!
