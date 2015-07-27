@@ -447,18 +447,18 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         //if type === create -> use needBuilder as well
 
         var contentRdf = won.buildNeedRdf({
-            type : type,
-            title: $scope.need.title,
-            description: $scope.need.textDescription,
-            publishedContentUri: publishedContentUri,
+            type : type, //mandatory
+            title: $scope.need.title, //mandatory
+            description: $scope.need.textDescription, //mandatory
+            publishedContentUri: publishedContentUri, //mandatory
             attachmentUris: attachmentUris, //optional
         });
         var msgJson = won.buildMessageRdf(contentRdf, {
-            receiverNode : 'http://localhost:8080/won/resource',
-            msgType : won.WONMSG.createMessage,
-            publishedContentUri: publishedContentUri,
-            msgUri: 'http://localhost:8080/won/resource/event/' + utilService.getRandomPosInt(),
-            attachments: imgs
+            receiverNode : 'http://localhost:8080/won/resource', //mandatory
+            msgType : won.WONMSG.createMessage, //mandatory
+            publishedContentUri: publishedContentUri, //mandatory
+            msgUri: 'http://localhost:8080/won/resource/event/' + utilService.getRandomPosInt(), //mandatory
+            attachments: imgs //mandatory
         });
 
         console.log("create-need.js:434: ", msgJson);
