@@ -112,6 +112,12 @@
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-amqp</artifactId>
                 <version>${activemq.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>bcpkix-jdk15on</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>javax.jms</groupId>
@@ -281,12 +287,14 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk15on</artifactId>
                 <version>${bouncycastle.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk15on</artifactId>
                 <version>${bouncycastle.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- spring stuff -->
