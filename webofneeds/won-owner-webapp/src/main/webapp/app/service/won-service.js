@@ -484,32 +484,6 @@ angular.module('won.owner').factory('wonService', function (
      */
     wonService.createNeed = function(need, needBuilder) {
 
-        //<deletme>
-        var deferred = $q.defer();
-        var needData = won.clone(needBuilder.build());
-        //TODO: Fix hard-coded URIs here!
-        var genRndUri = function(path) {
-            return privateData.defaultWonNodeUri + "/" + path + "/" + utilService.getRandomInt(1,9223372036854775807);
-        }
-        var genRndEventUri = genRndUri.bind(null, "event"); //applies "event" without resolving the function
-        var genRndNeedUri = genRndUri.bind(null, "need"); //applies "event" without resolving the function
-        var eventUri = genRndEventUri();
-        var needUri = needBuilder.getNeedUri();
-        if (needUri == null || 0 === needUri.length) {
-            needUri = genRndNeedUri();
-            needBuilder.needUri(needUri);
-        }
-        var wonNode = privateData.defaultWonNodeUri;
-        needBuilder.envelopeContentUri(eventUri + "#content-need");
-        var message = new won.MessageBuilder(won.WONMSG.createMessage, needBuilder.build())
-            .eventURI(eventUri)
-            .hasReceiverNode(wonNode)
-            .hasSenderNeed(needUri)
-            .hasOwnerDirection()
-            .hasSentTimestamp(new Date().getTime())
-            .build();
-        //</deleteme>
-
         //TODO reroll on clashes; curry the build function
         //TODO stopped here; refactor code below. use createMsgRefactored
         // calling this clojure-function here, allows us to regenerate the random uris on a name-clash
