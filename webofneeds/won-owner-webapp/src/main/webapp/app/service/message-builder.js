@@ -44,27 +44,17 @@
             '@graph': [
                 {
                     '@id': args.msgUri,
-                    'msg:hasMessageType': {
-                        '@id': args.msgType
-                    },
-                    'msg:hasContent': [
-                        {
-                            '@id': msgContentUri
-                        }
-                    ],
-                    'msg:hasReceiverNode': {
-                        '@id': args.receiverNode
-                    },
-                    'msg:hasSenderNeed': {
-                        '@id': args.publishedContentUri
-                    }
+                    '@type' : 'msg:FromOwner',
+                    'msg:hasSentTimestamp' : (new Date().getTime()),
+                    'msg:hasMessageType': { '@id': args.msgType },
+                    'msg:hasContent': [ { '@id': msgContentUri } ],
+                    'msg:hasReceiverNode': { '@id': args.receiverNode },
+                    'msg:hasSenderNeed': { '@id': args.publishedContentUri }
                 },
                 {
                     '@id': msgDataUri,
                     '@type': 'msg:EnvelopeGraph',
-                    'rdfg:subGraphOf': {
-                        '@id': args.msgUri
-                    }
+                    'rdfg:subGraphOf': { '@id': args.msgUri }
                 }
             ]
 

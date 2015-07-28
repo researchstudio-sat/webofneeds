@@ -441,7 +441,9 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         console.log('create-need.js:qweorij - imgs:', imgs);
 
 
-        var publishedContentUri = 'http://localhost:8080/won/resource/need/' + utilService.getRandomPosInt();
+
+        var wonNodeUri = $location.protocol()+"://"+$location.host()+"/won/resource";
+        var publishedContentUri = wonNodeUri + '/need/' + utilService.getRandomPosInt();
 
         //if type === create -> use needBuilder as well
 
@@ -454,10 +456,10 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             attachmentUris: attachmentUris, //optional
         });
         var msgJson = won.buildMessageRdf(contentRdf, {
-            receiverNode : 'http://localhost:8080/won/resource', //mandatory
+            receiverNode : wonNodeUri, //mandatory
             msgType : won.WONMSG.createMessage, //mandatory
             publishedContentUri: publishedContentUri, //mandatory
-            msgUri: 'http://localhost:8080/won/resource/event/' + utilService.getRandomPosInt(), //mandatory
+            msgUri: wonNodeUri + '/event/' + utilService.getRandomPosInt(), //mandatory
             attachments: imgs //mandatory
         });
 
