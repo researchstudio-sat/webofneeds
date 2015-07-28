@@ -127,6 +127,8 @@
         won.WON.hasConnectionStateCompacted = won.WON.prefix + ":hasConnectionState";
         won.WON.hasContent = won.WON.baseUri + "hasContent";
         won.WON.hasContentCompacted = won.WON.prefix + ":hasContent";
+        won.WON.hasContentDescription = won.WON.baseUri + "hasContentDescription";
+        won.WON.hasContentDescriptionCompacted = won.WON.prefix + ":hasContentDescription";
         won.WON.hasEndTime = won.WON.baseUri + "hasEndTime";
         won.WON.hasEndTimeCompacted = won.WON.prefix + ":hasEndTime";
         won.WON.hasEventContainer = won.WON.baseUri + "hasEventContainer";
@@ -301,7 +303,7 @@
         won.toCompacted = function(longValue) {
             var propertyPath = won.constantsReverseLookupTable[longValue];
             propertyPath[propertyPath.length - 1] += 'Compacted';
-            return won.lookup(propertyPath);
+            return won.lookup(won, propertyPath);
         }
 
 
@@ -404,11 +406,11 @@
             return lookupAcc;
         }
 
-        won.lookup = lookup.bind(null,won);
+        won.lookup = lookup;
         /**
          * Traverses a path of properties over the object, where the folllowing holds:
          *
-         *     o.propA[1].moreprop === o['propA', 1, 'moreprop']
+         *     o.propA[1].moreprop === lookup(o, ['propA', 1, 'moreprop'])
          *
          * @param o
          * @param propertyPath

@@ -87,6 +87,8 @@
      */
     won.buildNeedRdf = function(args){
 
+        console.log('need-builder.js:buildNeedRdf:attachmentUris', args.attachmentUris);
+
         var graph = [
             {
                 '@id': args.publishedContentUri,
@@ -94,7 +96,7 @@
                 'won:hasContent': '_:n01',
                 'won:hasBasicNeedType': args.type,
                 'won:hasFacet': args.facet? args.facet : 'won:OwnerFacet',
-                'won:hasAttachments': (args.attachmentUris? won.clone(args.attachmentUris) : undefined)
+                'msg:hasAttachments': (args.attachmentUris == [] ? undefined : won.clone(args.attachmentUris))
             },
             {
                 '@id': '_:n01',
@@ -147,8 +149,12 @@
                  */
 
                 'won:hasContentDescription': {
-                    '@id': 'http://purl.org/webofneeds/model#hasContentDescription',
+                    '@id': won.WON.hasContentDescription, //'http://purl.org/webofneeds/model#hasContentDescription',
                     '@type': '@id'
+                },
+                'won:hasBasicNeedType':{
+                    '@id': won.WON.hasBasicNeedType,//'http://purl.org/webofneeds/model#hasBasicNeedType',
+                    '@type':'@id'
                 },
 
                 'won:hasCurrency': 'xsd:string',

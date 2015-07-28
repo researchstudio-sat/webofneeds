@@ -397,7 +397,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             // then publish the need, so that it is under that account
             var newNeedUriPromise = userService.setUpRegistrationForUserPublishingNeed().then(
                 function() {
-                     return wonService.createNeed($scope.buildCreateMsgRefactored, needBuilder);
+                     return wonService.createNeed($scope.buildCreateMsgRefactored, $scope.need, needBuilder);
                 }
             );
             //TODO why are the following calls not part of the promise chain?
@@ -418,17 +418,12 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
 
     $scope.buildCreateMsgRefactored = function() {
 
-
-        console.log('create-need.js:oiu; - need.images:', $scope.need.images);
-
-        var type = won.WON.BasicNeedTypeDemandCompacted;
-
-        var wonNodeUri = $location.protocol()+"://"+$location.host()+"/won/resource";
-
+        //var wonNodeUri = $location.protocol()+"://"+$location.host()+"/won/resource";
+        var wonNodeUri = wonService.getDefaultWonNodeUri();
+        var publishedContentUri = wonNodeUri + '/need/' + utilService.getRandomPosInt();
 
         var imgs = $scope.need.images;
         var attachmentUris = []
-        console.log('create-need.js:qweorij - imgs:', imgs);
         if(imgs) {
             for (var img of imgs) {
                 var uri = wonNodeUri + '/need/attachment/' + utilService.getRandomPosInt();
@@ -436,9 +431,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
                 img.uri = uri;
             }
         }
-        console.log('create-need.js:qweorij - imgs:', imgs);
-
-        var publishedContentUri = wonNodeUri + '/need/' + utilService.getRandomPosInt();
 
         //if type === create -> use needBuilder as well
 
@@ -446,7 +438,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         //      this would break idempotency unless a seed is passed as well (!)
 
         var contentRdf = won.buildNeedRdf({
-            type : type, //mandatory
+            type : won.toCompacted($scope.need.basicNeedType), //mandatory
             title: $scope.need.title, //mandatory
             description: $scope.need.textDescription, //mandatory
             publishedContentUri: publishedContentUri, //mandatory
@@ -461,12 +453,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             attachments: imgs //mandatory
         });
 
-        console.log("create-need.js:434: ", msgJson);
-        console.log("create-need.js:435: stringified ", JSON.stringify(msgJson));
-        console.log("create-need.js:436 - need: ", $scope.need);
-
         return msgJson;
-
     }
 
 

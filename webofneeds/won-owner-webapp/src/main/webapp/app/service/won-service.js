@@ -441,22 +441,50 @@ angular.module('won.owner').factory('wonService', function (
 
     }
 
+    function buildCreateMessage(need) {
+
+        var wonNodeUri = wonService.getDefaultWonNodeUri();
+        var publishedContentUri = wonNodeUri + '/need/' + utilService.getRandomPosInt();
+
+        var imgs = need.images;
+        var attachmentUris = []
+        if(imgs) {
+            for (var img of imgs) {
+                var uri = wonNodeUri + '/need/attachment/' + utilService.getRandomPosInt();
+                attachmentUris.push(uri);
+                img.uri = uri;
+            }
+        }
+
+        //if type === create -> use needBuilder as well
+
+        // TODO pull random generating into build-function?
+        //      this would break idempotency unless a seed is passed as well (!)
+
+        var contentRdf = won.buildNeedRdf({
+            type : won.toCompacted(need.basicNeedType), //mandatory
+            title: need.title, //mandatory
+            description: need.textDescription, //mandatory
+            publishedContentUri: publishedContentUri, //mandatory
+            tags: need.tags.map(function(t) {return t.text}).join(','),
+            attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
+        });
+        var msgJson = won.buildMessageRdf(contentRdf, {
+            receiverNode : wonNodeUri, //mandatory
+            msgType : won.WONMSG.createMessage, //mandatory
+            publishedContentUri: publishedContentUri, //mandatory
+            msgUri: wonNodeUri + '/event/' + utilService.getRandomPosInt(), //mandatory
+            attachments: imgs //optional, should be same as in `attachmentUris` above
+        });
+        return msgJson;
+    }
 
     /**
-     * Creates a need and returns a Promise to the URI of the newly created need (which may differ from the one
-     * specified in the need object here.
-     * @param needAsJsonLd
-     * @returns {*}
+     * Creates a need and returns a Promise to the URI of the newly created need
      */
-    wonService.createNeed = function(buildCreateMessage, needBuilder ) {
-        //TODO reroll on clashes; curry the build function
-        //TODO stopped here; refactor code below. use createMsgRefactored
-        // calling this clojure-function here, allows us to regenerate the random uris on a name-clash
-        // by simply calling this function again
-        var createMsgRefactored = buildCreateMessage();
+    wonService.createNeed = function(buildCreateMessage2, need, needBuilder) {
 
-
-
+        //<deletme>
         var deferred = $q.defer();
         var needData = won.clone(needBuilder.build());
         //TODO: Fix hard-coded URIs here!
@@ -472,15 +500,7 @@ angular.module('won.owner').factory('wonService', function (
             needBuilder.needUri(needUri);
         }
         var wonNode = privateData.defaultWonNodeUri;
-
         needBuilder.envelopeContentUri(eventUri + "#content-need");
-
-        // TODO for images() generate more of these and append as sibling graphs (via subindex?)
-        // e.g. first image:
-        // needBuilder.envelopeContentUri(eventUri + "#content-attachment-0");
-        // it also needs a new "needUri"
-
-
         var message = new won.MessageBuilder(won.WONMSG.createMessage, needBuilder.build())
             .eventURI(eventUri)
             .hasReceiverNode(wonNode)
@@ -488,7 +508,24 @@ angular.module('won.owner').factory('wonService', function (
             .hasOwnerDirection()
             .hasSentTimestamp(new Date().getTime())
             .build();
+        //</deleteme>
 
+        //TODO reroll on clashes; curry the build function
+        //TODO stopped here; refactor code below. use createMsgRefactored
+        // calling this clojure-function here, allows us to regenerate the random uris on a name-clash
+        // by simply calling this function again
+        //var eventUri = wonNodeUri + '/event/' + utilService.getRandomPosInt(); //mandatory
+        var message = buildCreateMessage2(); // the refactored code. equivalent to everything up to MsgBldr.build()
+        //var message = buildCreateMessage(need);
+
+        console.log("won-service.js:createNeed:msg-refactored: ", JSON.stringify(message));
+        // TODO super fragile and fugly (e.g. doesn't work with attachments)
+        //e.g.: http://localhost:8080/won/resource/event/7672388677512006000
+        var eventUri = won.lookup(message, ['@graph', 1, '@graph', 0, '@id']);
+
+
+
+        var deferred = $q.defer();
         //TODO: this callback could be changed to be the same as activate/deactivate, but the special code (updateing the applicationStateService) needs to be moved to another place
         var callback = new messageService.MessageCallback(
             function (event, msg) {
