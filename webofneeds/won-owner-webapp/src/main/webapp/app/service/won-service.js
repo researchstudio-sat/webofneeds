@@ -482,7 +482,7 @@ angular.module('won.owner').factory('wonService', function (
     /**
      * Creates a need and returns a Promise to the URI of the newly created need
      */
-    wonService.createNeed = function(need, needBuilder) {
+    wonService.createNeed = function(need) {
 
         //TODO reroll on clashes; curry the build function
         //TODO stopped here; refactor code below. use createMsgRefactored
@@ -495,8 +495,6 @@ angular.module('won.owner').factory('wonService', function (
         // TODO super fragile and fugly (e.g. doesn't work with attachments)
         //e.g.: http://localhost:8080/won/resource/event/7672388677512006000
         var eventUri = won.lookup(message, ['@graph', 1, '@graph', 0, '@id']);
-
-
 
         var deferred = $q.defer();
         //TODO: this callback could be changed to be the same as activate/deactivate, but the special code (updateing the applicationStateService) needs to be moved to another place
