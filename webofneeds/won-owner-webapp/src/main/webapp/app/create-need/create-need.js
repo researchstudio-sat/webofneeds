@@ -391,16 +391,13 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         if(lock== false){
             lock = true;
 
-            var buildCreateMessage = function() { return $scope.buildCreateMsgRefactored() }
-
-
             var needBuilder = $scope.partiallyInitNeedBuilder();
 
             // make sure the user is registered (either with account or private link),
             // then publish the need, so that it is under that account
             var newNeedUriPromise = userService.setUpRegistrationForUserPublishingNeed().then(
                 function() {
-                     return wonService.createNeed(buildCreateMessage, needBuilder);
+                     return wonService.createNeed($scope.buildCreateMsgRefactored, needBuilder);
                 }
             );
             //TODO why are the following calls not part of the promise chain?
