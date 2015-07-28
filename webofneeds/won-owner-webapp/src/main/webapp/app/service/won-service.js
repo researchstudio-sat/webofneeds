@@ -469,14 +469,15 @@ angular.module('won.owner').factory('wonService', function (
             tags: need.tags.map(function(t) {return t.text}).join(','),
             attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
         });
+        var msgUri = wonNodeUri + '/event/' + utilService.getRandomPosInt(); //mandatory
         var msgJson = won.buildMessageRdf(contentRdf, {
             receiverNode : wonNodeUri, //mandatory
             msgType : won.WONMSG.createMessage, //mandatory
             publishedContentUri: publishedContentUri, //mandatory
-            msgUri: wonNodeUri + '/event/' + utilService.getRandomPosInt(), //mandatory
+            msgUri: msgUri,
             attachments: imgs //optional, should be same as in `attachmentUris` above
         });
-        return msgJson;
+        return [msgJson, msgUri];
     }
 
     /**
@@ -485,16 +486,14 @@ angular.module('won.owner').factory('wonService', function (
     wonService.createNeed = function(need) {
 
         //TODO reroll on clashes; curry the build function
-        //TODO stopped here; refactor code below. use createMsgRefactored
+        //TODO use ES6 deconstruction here (or better: use a stable query to retrieve the info from the rdf)
         // calling this clojure-function here, allows us to regenerate the random uris on a name-clash
         // by simply calling this function again
-        //var eventUri = wonNodeUri + '/event/' + utilService.getRandomPosInt(); //mandatory
-        var message = buildCreateMessage(need);
+        var ret = buildCreateMessage(need);
+        var message = ret[0];
+        var eventUri = ret[1];
 
         console.log("won-service.js:createNeed:msg-refactored: ", JSON.stringify(message));
-        // TODO super fragile and fugly (e.g. doesn't work with attachments)
-        //e.g.: http://localhost:8080/won/resource/event/7672388677512006000
-        var eventUri = won.lookup(message, ['@graph', 1, '@graph', 0, '@id']);
 
         var deferred = $q.defer();
         //TODO: this callback could be changed to be the same as activate/deactivate, but the special code (updateing the applicationStateService) needs to be moved to another place
