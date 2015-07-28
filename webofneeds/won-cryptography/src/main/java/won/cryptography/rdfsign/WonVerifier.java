@@ -20,7 +20,6 @@ import won.protocol.vocabulary.WONMSG;
 
 import java.security.Provider;
 import java.security.PublicKey;
-import java.security.Security;
 import java.security.Signature;
 import java.util.LinkedList;
 import java.util.Map;
@@ -40,7 +39,6 @@ public class WonVerifier
 
   public WonVerifier(Dataset dataset) {
     Provider provider = new BouncyCastleProvider();
-    Security.addProvider(provider);
     this.dataset = dataset;
     prepareForVerifying();
   }

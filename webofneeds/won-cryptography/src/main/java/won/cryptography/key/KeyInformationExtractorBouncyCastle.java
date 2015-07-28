@@ -1,6 +1,8 @@
 package won.cryptography.key;
 
 import org.bouncycastle.jce.spec.ECNamedCurveSpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.cryptography.exception.KeyNotSupportedException;
 
 import java.security.Key;
@@ -14,16 +16,13 @@ import java.security.spec.ECParameterSpec;
  * Date: 24.07.2014
  */
 public class KeyInformationExtractorBouncyCastle implements KeyInformationExtractor {
-
-    // ToDo: add logging
+    private static final Logger logger = LoggerFactory.getLogger(KeyInformationExtractorBouncyCastle.class);
 
     public String getAlgorithm(Key key) {
         return key.getAlgorithm();
     }
 
-    public String getCurveID(Key key)
-            throws KeyNotSupportedException {
-
+    public String getCurveID(Key key) throws KeyNotSupportedException {
         if (key instanceof ECKey) {
             ECParameterSpec spec = ((ECKey) key).getParams();
 
@@ -36,9 +35,7 @@ public class KeyInformationExtractorBouncyCastle implements KeyInformationExtrac
         }
     }
 
-    public String getQX(PublicKey publicKey)
-            throws KeyNotSupportedException {
-
+    public String getQX(PublicKey publicKey) throws KeyNotSupportedException {
         if (publicKey instanceof ECPublicKey) {
             return ((ECPublicKey) publicKey).getW().getAffineX().toString(16);
         } else {
@@ -46,9 +43,7 @@ public class KeyInformationExtractorBouncyCastle implements KeyInformationExtrac
         }
     }
 
-    public String getQY(PublicKey publicKey)
-            throws KeyNotSupportedException {
-
+    public String getQY(PublicKey publicKey) throws KeyNotSupportedException {
         if (publicKey instanceof ECPublicKey) {
             return ((ECPublicKey) publicKey).getW().getAffineY().toString(16);
         } else {

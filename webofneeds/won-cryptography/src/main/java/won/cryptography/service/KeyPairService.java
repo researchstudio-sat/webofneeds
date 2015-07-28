@@ -2,15 +2,18 @@ package won.cryptography.service;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.cryptography.exception.KeyNotSupportedException;
 import won.cryptography.key.KeyInformationExtractor;
 import won.cryptography.model.WONCryptographyModel;
 
-import java.security.*;
-import java.security.spec.*;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.spec.ECGenParameterSpec;
 
 /**
  * All kind of stuff with cryptographic keys.
@@ -22,30 +25,25 @@ public class KeyPairService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private KeyPairGenerator keyPairGenerator = new KeyPairGeneratorSpi.ECDSA();
+
     public KeyPairService(KeyInformationExtractor keyInformationExtractor) {
         this.keyInformationExtractor = keyInformationExtractor;
     }
 
     private KeyInformationExtractor keyInformationExtractor;
 
-    public KeyPairService() {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+    public KeyPairService() {}
 
     public KeyPair generateNewKeyPair() {
-
-        Security.addProvider(new BouncyCastleProvider());
-
         KeyPair pair = null;
 
         try {
 
             // use the predefined curves
             ECGenParameterSpec ecGenSpec = new ECGenParameterSpec("brainpoolp384r1");
-
-            KeyPairGenerator g = KeyPairGenerator.getInstance("ECDSA", "BC");
-            g.initialize(ecGenSpec, new SecureRandom());
-            pair = g.generateKeyPair();
+            keyPairGenerator.initialize(ecGenSpec, new SecureRandom());
+            pair = keyPairGenerator.generateKeyPair();
 
         } catch (Exception e) {
             logger.warn("An error occurred!", e);

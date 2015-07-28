@@ -110,7 +110,7 @@
 
     <!-- private keys and their certificates for node,
          possibly certificates of other parties-->
-    <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService">
+    <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService" init-method="init">
         <constructor-arg type="java.lang.String" value="${keystore.location}" />
     </bean>
     <bean id="cryptoService" class="won.cryptography.service.CryptographyService">
