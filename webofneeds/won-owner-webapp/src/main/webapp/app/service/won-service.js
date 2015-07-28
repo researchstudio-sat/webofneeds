@@ -482,7 +482,7 @@ angular.module('won.owner').factory('wonService', function (
     /**
      * Creates a need and returns a Promise to the URI of the newly created need
      */
-    wonService.createNeed = function(buildCreateMessage2, need, needBuilder) {
+    wonService.createNeed = function(need, needBuilder) {
 
         //<deletme>
         var deferred = $q.defer();
@@ -515,8 +515,7 @@ angular.module('won.owner').factory('wonService', function (
         // calling this clojure-function here, allows us to regenerate the random uris on a name-clash
         // by simply calling this function again
         //var eventUri = wonNodeUri + '/event/' + utilService.getRandomPosInt(); //mandatory
-        var message = buildCreateMessage2(); // the refactored code. equivalent to everything up to MsgBldr.build()
-        //var message = buildCreateMessage(need);
+        var message = buildCreateMessage(need);
 
         console.log("won-service.js:createNeed:msg-refactored: ", JSON.stringify(message));
         // TODO super fragile and fugly (e.g. doesn't work with attachments)

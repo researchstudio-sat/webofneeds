@@ -397,7 +397,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             // then publish the need, so that it is under that account
             var newNeedUriPromise = userService.setUpRegistrationForUserPublishingNeed().then(
                 function() {
-                     return wonService.createNeed($scope.buildCreateMsgRefactored, $scope.need, needBuilder);
+                     return wonService.createNeed($scope.need, needBuilder);
                 }
             );
             //TODO why are the following calls not part of the promise chain?
@@ -414,46 +414,6 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
                 lock=false;
             });
         }
-    }
-
-    $scope.buildCreateMsgRefactored = function() {
-
-        //var wonNodeUri = $location.protocol()+"://"+$location.host()+"/won/resource";
-        var wonNodeUri = wonService.getDefaultWonNodeUri();
-        var publishedContentUri = wonNodeUri + '/need/' + utilService.getRandomPosInt();
-
-        var imgs = $scope.need.images;
-        var attachmentUris = []
-        if(imgs) {
-            for (var img of imgs) {
-                var uri = wonNodeUri + '/need/attachment/' + utilService.getRandomPosInt();
-                attachmentUris.push(uri);
-                img.uri = uri;
-            }
-        }
-
-        //if type === create -> use needBuilder as well
-
-        // TODO pull random generating into build-function?
-        //      this would break idempotency unless a seed is passed as well (!)
-
-        var contentRdf = won.buildNeedRdf({
-            type : won.toCompacted($scope.need.basicNeedType), //mandatory
-            title: $scope.need.title, //mandatory
-            description: $scope.need.textDescription, //mandatory
-            publishedContentUri: publishedContentUri, //mandatory
-            tags: $scope.need.tags.map(function(t) {return t.text}).join(','),
-            attachmentUris: attachmentUris, //optional
-        });
-        var msgJson = won.buildMessageRdf(contentRdf, {
-            receiverNode : wonNodeUri, //mandatory
-            msgType : won.WONMSG.createMessage, //mandatory
-            publishedContentUri: publishedContentUri, //mandatory
-            msgUri: wonNodeUri + '/event/' + utilService.getRandomPosInt(), //mandatory
-            attachments: imgs //mandatory
-        });
-
-        return msgJson;
     }
 
 
