@@ -22,11 +22,10 @@
 
         for(var attachment of args.attachments){
             msgGraph.push({
-                // attachment 1
                 // link to attachment metadata (e.g. signatures, autor-info,...)
                 // and b64-encoded attachment
-                '@id': 'http://.../resource/attachment/3827681755765819400',
-                // + .png to get image later (but unsigned).
+                '@id': attachment.uri,
+                // + .png to get image later (but without crypto-signature).
 
                 // using ContentAsBase64: http://www.w3.org/TR/Content-in-RDF10/#ContentAsBase64Class
                 'cnt:ContentAsBase64' : {

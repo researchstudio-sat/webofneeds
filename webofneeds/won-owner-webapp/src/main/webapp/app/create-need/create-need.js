@@ -426,6 +426,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
 
         var type = won.WON.BasicNeedTypeDemandCompacted;
 
+        var wonNodeUri = $location.protocol()+"://"+$location.host()+"/won/resource";
 
 
         var imgs = $scope.need.images;
@@ -433,19 +434,19 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         console.log('create-need.js:qweorij - imgs:', imgs);
         if(imgs) {
             for (var img of imgs) {
-                var uri = 'http://localhost:8080/won/resource/need/attachment/' + utilService.getRandomPosInt();
+                var uri = wonNodeUri + '/need/attachment/' + utilService.getRandomPosInt();
                 attachmentUris.push(uri);
                 img.uri = uri;
             }
         }
         console.log('create-need.js:qweorij - imgs:', imgs);
 
-
-
-        var wonNodeUri = $location.protocol()+"://"+$location.host()+"/won/resource";
         var publishedContentUri = wonNodeUri + '/need/' + utilService.getRandomPosInt();
 
         //if type === create -> use needBuilder as well
+
+        // TODO pull random generating into build-function?
+        //      this would break idempotency unless a seed is passed as well (!)
 
         var contentRdf = won.buildNeedRdf({
             type : type, //mandatory
