@@ -285,9 +285,25 @@
         won.UNREAD.GROUP.ALL="all";
         won.UNREAD.GROUP.BYNEED="byNeed";
 
-
         //UTILS
         var UNSET_URI= "no:uri";
+
+
+        /**
+         * Returns the "compacted" alternative of the value (e.g.
+         *    "http://purl.org/webofneeds/model#Demand"
+         *    ->  via 'won.WON.BasicNeedTypeDemand'
+         *    ->  and 'won.WON.BasicNeedTypeDemandCompacted'
+         *    ->  to: "won:Demand";
+         * returns `undefined` if the compacted version couldn't be found (see `lookup(...)`)
+         * @param longValue
+         */
+        won.toCompacted = function(longValue) {
+            var propertyPath = won.constantsReverseLookupTable[longValue];
+            propertyPath[propertyPath.length - 1] += 'Compacted';
+            return won.lookup(propertyPath);
+        }
+
 
         won.clone = function(obj){
             return JSON.parse(JSON.stringify(obj));
@@ -336,6 +352,78 @@
                 }
             }
             return obj1;
+        }
+
+        // as the constants above should be unique (thus their mapping bijective)
+        // it is possible to do a reverse lookup. The table contains former values
+        // as keys and maps to arrays that define the lookup-path.
+        won.constantsReverseLookupTable = {};
+        for(var root of ['WON', 'UNREAD', 'WONMSG', 'EVENT', 'COMMUNUCATION_STATE' ]) {
+            won.mergeIntoLast(buildReverseLookup(won[root], [root]), won.constantsReverseLookupTable);
+        }
+
+
+        won.buildReverseLookup = buildReverseLookup;
+        /**
+         * Builds a reverse lookup-table for the objects properties.
+         *
+         * NOTE: all properties of the object need to have unique values!
+         *
+         * e.g.:
+         *
+         *     var obj = { propA: { subProp: 'foo'}, probB: 2 }
+         *
+         *     buildReverseLookup(obj)
+         *          ----> {foo  ['propA', 'subProp'], 2: ['probB']}
+         *
+         * @param obj
+         * @param accumulatedPath
+         * @returns {{}}
+         */
+        function buildReverseLookup(obj, accumulatedPath /* = [] */) { //TODO this should be in a utils file
+            accumulatedPath = typeof accumulatedPath !== 'undefined' ?
+                accumulatedPath : []; // to allow calling with only obj
+
+            var lookupAcc = {};
+            for(var k in obj) {
+                if (obj.hasOwnProperty(k)) {
+                    var v = obj[k];
+                    var accPathAppended = accumulatedPath.concat([k])
+                    var foundLookups = {};
+                    if (typeof v === 'string' || typeof v === 'number') {
+                        //terminal node
+                        foundLookups[v] = accPathAppended;
+
+                    } else if (typeof v === 'object') {
+                        //recurse into objects
+                        foundLookups = buildReverseLookup(v, accPathAppended);
+                    }
+                    won.mergeIntoLast(foundLookups, lookupAcc);
+                }
+            }
+            return lookupAcc;
+        }
+
+        won.lookup = lookup.bind(null,won);
+        /**
+         * Traverses a path of properties over the object, where the folllowing holds:
+         *
+         *     o.propA[1].moreprop === o['propA', 1, 'moreprop']
+         *
+         * @param o
+         * @param propertyPath
+         * @returns {*}
+         */
+        function lookup(o, propertyPath){ //TODO this should be in a utils file
+            if(!o || !propertyPath) {
+                return undefined;
+            }
+            var resolvedStep = o[propertyPath[0]];
+            if(propertyPath.length === 1) {
+                return resolvedStep
+            } else {
+                return lookup(resolvedStep, propertyPath.slice(1))
+            }
         }
 
 
