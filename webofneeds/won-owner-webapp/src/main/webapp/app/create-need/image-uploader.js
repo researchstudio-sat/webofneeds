@@ -24,7 +24,7 @@ ways to implement the part on the...
 
 //angular.module('app', ['flux'])
 angular.module('won.owner')
-    .directive('imagePicker', function factory($log, utilService) {
+    .directive('imagePicker', ['$log', 'utilService', '$q', function factory($log, utilService, $q) {
         return {
             restrict: 'E',
             //controllerAs: 'myComponent',
@@ -41,47 +41,47 @@ angular.module('won.owner')
                    type="file" \
                    accept="image/*"\
                    multiple\
-                   onchange="angular.element(this).scope().setFile(this.files[0])"> \
+                   onchange="angular.element(this).scope().setFile(this.files)"> \
             <img ng-show="imageDataURL" src="{{imageDataURL}}" alt="The image you just picked."/>\
             <!--<img ng-show="imageDataURL" src="{{imageUrl}}" alt="The image you just picked."/>-->\
             ',
-            link: function (scope, element, attr){ //, MyStore) {
+            link: function (scope, element, attr) { //, MyStore) {
 
                 /*
-                TODO move gallery to seperate directive (that pulls it's infos from the store)
+                 TODO move gallery to seperate directive (that pulls it's infos from the store)
                  */
-                scope.setFile = function(file){
+                scope.setFile = function (files) {
+                    console.log('image-uploader.js:setFile asdfas;fljas;f', files);
+
                     //TODO only accept images & limit their size !!!!!!!!!!!!!!! (limit on server-side)
 
                     //https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
                     //http://stackoverflow.com/questions/25811693/angularjs-promise-not-resolving-file-with-filereader
 
-                    if (!/^image\//.test(file.type)) {
+                    var imageHandles = Array.filter(files, function(f) {
                         //TODO trigger error notification to please pick images only!
-                        return;
-                    }
-                    console.log('image-uploader.js - image-handle: ', file);
+                        return /^image\//.test(f.type);
+                    });
 
-                    utilService.readAsDataURL(file).then(function (dataURL) {
-                        console.log("image-uploader.js - readAsDataURL - " +
-                            + dataURL.length + ": " + dataURL.substring(0, 50) + "(...)");
-                        scope.imageDataURL = dataURL;
-
-                        var b64data = dataURL.split('base64,')[1];
-                        //window.dataURL=fileData;
-                        console.log("image-uploader.js - readAsDataURL - q4235 ", file.type);
-                        console.log("image-uploader.js - readAsDataURL - wrtyw ", file.name);
-                        //console.log("image-uploader.js - readAsDataURL - qvqwe ", b64);
-                        scope.onImagesPicked([
-                            {
-                                name: file.name,
-                                type: file.type,
+                    var imageDataPromises = imageHandles.map(function(f){
+                        return utilService.readAsDataURL(f).then(function(dataUrl) {
+                            scope.imageDataURL = dataUrl; //TODO display more than one image in the gui; last one wins currently
+                            var b64data = dataUrl.split('base64,')[1];
+                            var imageData  = {
+                                name: f.name,
+                                type: f.type,
                                 data: b64data
                             }
-                        ]);
+                            console.log('image-uploader.js:setFile:imageData: ', imageData);
+                            return imageData;
+                        });
+                    });
+
+                    $q.all(imageDataPromises).then(function(imageDataArray){
+                        scope.onImagesPicked(imageDataArray);
                     });
                 }
             }
     };
-});
+}]);
 

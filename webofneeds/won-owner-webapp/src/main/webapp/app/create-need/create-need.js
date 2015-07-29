@@ -391,6 +391,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         if(lock== false){
             lock = true;
 
+            console.log('create-need.js:publishClicked:imgs: ', $scope.need.images);
             // make sure the user is registered (either with account or private link),
             // then publish the need, so that it is under that account
             var newNeedUriPromise = userService.setUpRegistrationForUserPublishingNeed().then(
@@ -422,8 +423,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         won.mergeIntoLast(images, $scope.need.images);
         //$scope.need.images = images;
         // TODO <testing>
-        $scope.need.images = [];
-        $scope.need.images[0] = images[0];
+        $scope.need.images = Array.concat([], images);
         console.log('create-need.js:imgPick - need.images:', $scope.need.images);
         // TODO </testing>
     }
