@@ -450,7 +450,7 @@ angular.module('won.owner').factory('wonService', function (
         var attachmentUris = []
         if(imgs) {
             for (var img of imgs) {
-                var uri = wonNodeUri + '/need/attachment/' + utilService.getRandomPosInt();
+                var uri = wonNodeUri + '/attachment/' + utilService.getRandomPosInt();
                 attachmentUris.push(uri);
                 img.uri = uri;
             }

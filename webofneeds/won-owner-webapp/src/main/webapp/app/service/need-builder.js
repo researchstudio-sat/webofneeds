@@ -92,6 +92,13 @@
 
         console.log('need-builder.js:buildNeedRdf:attachmentUris', args.attachmentUris);
 
+        if(hasAttachmentUrls(args)) {
+            var attachmentUrisTyped = args.attachmentUris.map(function (uri) {
+                return {'@id': uri}
+            });
+        }
+
+
         var graph = [
             {
                 '@id': args.publishedContentUri,
@@ -99,7 +106,7 @@
                 'won:hasContent': '_:n01',
                 'won:hasBasicNeedType': args.type,
                 'won:hasFacet': args.facet? args.facet : 'won:OwnerFacet',
-                'msg:hasAttachments': (hasAttachmentUrls(args) ? won.clone(args.attachmentUris) : undefined)
+                'msg:hasAttachment': (hasAttachmentUrls(args) ? attachmentUrisTyped : undefined)
             },
             {
                 '@id': '_:n01',
