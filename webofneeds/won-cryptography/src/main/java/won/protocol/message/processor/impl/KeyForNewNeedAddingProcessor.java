@@ -26,10 +26,8 @@ import java.security.PublicKey;
  * User: ypanchenko
  * Date: 10.04.2015
  */
-public class KeyForNewNeedAddingProcessor implements WonMessageProcessor
-{
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
+public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
+  private static final Logger logger = LoggerFactory.getLogger(KeyForNewNeedAddingProcessor.class);
 
   @Autowired
   private CryptographyService cryptoService;
@@ -55,8 +53,8 @@ public class KeyForNewNeedAddingProcessor implements WonMessageProcessor
         keyWriter.writeToModel(contentModel, contentModel.createResource(needUri), pubKey);
       }
     } catch (Exception e) {
-      throw new WonMessageProcessingException("Failed to add key for need in message " + message.getMessageURI()
-                                                                                                .toString());
+      logger.error(e.getMessage());
+      throw new WonMessageProcessingException("Failed to add key for need in message " + message.getMessageURI().toString());
     }
     return message;
   }
