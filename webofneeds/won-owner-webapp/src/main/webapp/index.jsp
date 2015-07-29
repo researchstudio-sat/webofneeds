@@ -1,5 +1,3 @@
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
-<%@ page import="org.springframework.context.ApplicationContext" %>
 <%--
   ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
   ~

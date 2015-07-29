@@ -13,7 +13,6 @@ import won.protocol.message.SignatureReference;
 
 import java.security.PrivateKey;
 import java.security.Provider;
-import java.security.Security;
 import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +42,6 @@ public class WonSigner
     this.algorithm = algorithm;
 
     Provider provider = new BouncyCastleProvider();
-    Security.addProvider(provider);
   }
 
 

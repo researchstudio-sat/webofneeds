@@ -1,12 +1,14 @@
 package won.cryptography.service;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.channels.FileLock;
-import java.security.*;
+import java.security.Key;
+import java.security.KeyStoreException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.util.Arrays;
 
@@ -36,21 +38,9 @@ public class KeyStoreService {
 
     public KeyStoreService(File storeFile) {
 
-        Security.addProvider(new BouncyCastleProvider());
-
         this.storeFile = storeFile;
 
-        try {
-            store = java.security.KeyStore.getInstance(KEY_STORE_TYPE, PROVIDER_BC);
 
-            if (storeFile == null || !storeFile.exists() || !storeFile.isFile())
-                store.load(null, null);
-            else {
-                loadStoreFromFile();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public PrivateKey getPrivateKey(String alias) {
@@ -193,4 +183,19 @@ public class KeyStoreService {
     }
     return 0;
   }
+
+    public void init(){
+        try {
+            store = java.security.KeyStore.getInstance(KEY_STORE_TYPE, PROVIDER_BC);
+            logger.debug("KEYSTORE: "+store);
+
+            if (storeFile == null || !storeFile.exists() || !storeFile.isFile())
+                store.load(null, null);
+            else {
+                loadStoreFromFile();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
