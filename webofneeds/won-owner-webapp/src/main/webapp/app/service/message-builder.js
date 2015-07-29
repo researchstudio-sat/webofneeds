@@ -9,10 +9,20 @@
     if(!won) won = {};
 
 
+    /**
+     * Builds the dataset that makes up the message. The set consists of several named
+     * graphs (usually `args.msgUri + '#nameOfSubgraph'`), that contain the payload-
+     * and meta-data.
+     * @param contentRdf
+     * @param args
+     * @returns {{@graph: Array, @context}}
+     */
     won.buildMessageRdf = function (contentRdf, args) {
         var msgContentUri = args.msgUri + '#content-need';
         var msgDataUri = args.msgUri + '#data';
         var msgGraph = [];
+        var attachmentGraphIds = args.attachments.map(function(a, i){ return args.msgUri + '#attachment-' + i })
+        var nonEnvelopeGraphIds = Array.concat([msgContentUri], attachmentGraphIds);
 
         msgGraph.push({
             // content
@@ -20,22 +30,27 @@
             '@graph': contentRdf['@graph']
         });
 
-        for(var attachment of args.attachments){
+        args.attachments.forEach(function(attachment, i) {
             msgGraph.push({
-                // link to attachment metadata (e.g. signatures, autor-info,...)
-                // and b64-encoded attachment
-                '@id': attachment.uri,
-                // + .png to get image later (but without crypto-signature).
+                '@id' : attachmentGraphIds[i],
+                '@graph' : [
+                    {
+                        // link to attachment metadata (e.g. signatures, autor-info,...)
+                        // and b64-encoded attachment
+                        '@id': attachment.uri,
+                        // + .png to get image later (but without crypto-signature).
 
-                // using ContentAsBase64: http://www.w3.org/TR/Content-in-RDF10/#ContentAsBase64Class
-                'cnt:ContentAsBase64' : {
-                    'cnt:bytes': attachment.data,
-                    'msg:contentType': attachment.type
-                    //'dct:isFormatOf : { '@id' : 'http://...png' }
-                    //'dct:format' : { '@id' : 'mime:png' }
-                }
+                        // using ContentAsBase64: http://www.w3.org/TR/Content-in-RDF10/#ContentAsBase64Class
+                        'cnt:ContentAsBase64' : {
+                            'cnt:bytes': attachment.data,
+                            'msg:contentType': attachment.type
+                            //'dct:isFormatOf : { '@id' : 'http://...png' }
+                            //'dct:format' : { '@id' : 'mime:png' }
+                        }
+                    }
+                ]
             });
-        }
+        });
 
         msgGraph.push({
             // msg envelope
@@ -46,7 +61,7 @@
                     '@type' : 'msg:FromOwner',
                     'msg:hasSentTimestamp' : (new Date().getTime()),
                     'msg:hasMessageType': { '@id': args.msgType },
-                    'msg:hasContent': [ { '@id': msgContentUri } ],
+                    'msg:hasContent': nonEnvelopeGraphIds.map(function(graphId) {return {'@id': graphId} }),
                     'msg:hasReceiverNode': { '@id': args.receiverNode },
                     'msg:hasSenderNeed': { '@id': args.publishedContentUri }
                 },
@@ -73,6 +88,7 @@
             )
         }
     }
+
 
     function getTypesForContext(){
         var o = {
