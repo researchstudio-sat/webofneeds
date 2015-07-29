@@ -22,6 +22,9 @@
     function hasTimeConstraint(args){
         return false; //TODO time-constraint-attachment not implemented yet
     }
+    function hasAttachmentUrls(args) {
+        return args.attachmentUris && Array.isArray(args.attachmentUris) && args.attachmentUris.length > 0
+    }
 
     /**
      * Usage:  `won.buildNeedRdf(args)`
@@ -96,7 +99,7 @@
                 'won:hasContent': '_:n01',
                 'won:hasBasicNeedType': args.type,
                 'won:hasFacet': args.facet? args.facet : 'won:OwnerFacet',
-                'msg:hasAttachments': (args.attachmentUris == [] ? undefined : won.clone(args.attachmentUris))
+                'msg:hasAttachments': (hasAttachmentUrls(args) ? won.clone(args.attachmentUris) : undefined)
             },
             {
                 '@id': '_:n01',
