@@ -70,6 +70,8 @@ won-app {
   font-family: 'Open Sans';
   font-weight: 300;
   font-style: normal;
+
+  @include fixed-height(6rem); //TODO might be a bit too much
   //text-align: center;
   //overflow: hidden;
 
@@ -78,6 +80,17 @@ won-app {
   & a {
     color: $won-red;
     text-decoration: none;
+  }
+
+  & .topnav__icon {
+    @include fixed-square(3.6rem);
+  }
+
+  & .topnav__left {
+    //@extend %flex-row;
+    //@extend %vcenter;
+    //@include fixed-height(1rem);
+
   }
 
   & .topnav__list {

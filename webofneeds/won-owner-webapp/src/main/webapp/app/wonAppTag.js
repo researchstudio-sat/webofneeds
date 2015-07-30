@@ -9,8 +9,7 @@ export default function wonAppTag() {
             <nav class="topnav">
                 <div class="topnav__left">
                     <a href="#">
-                        <img src="generated/icon-sprite.svg#WON_ico_header"
-                             style="height:100px; width:100px"> <!-- TODO inline styles :{ -->
+                        <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__icon">
                         Web of Needs
                     </a>
                 </div>
