@@ -22,7 +22,7 @@
         var msgDataUri = args.msgUri + '#data';
         var msgGraph = [];
         var attachmentGraphIds = args.attachments.map(function(a, i){ return args.msgUri + '#attachment-' + i })
-        var nonEnvelopeGraphIds = Array.concat([msgContentUri], attachmentGraphIds);
+        var nonEnvelopeGraphIds = Array.prototype.concat([msgContentUri], attachmentGraphIds);
 
         msgGraph.push({
             // content
