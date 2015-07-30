@@ -106,7 +106,7 @@
                 'won:hasContent': '_:n01',
                 'won:hasBasicNeedType': args.type,
                 'won:hasFacet': args.facet? args.facet : 'won:OwnerFacet',
-                'msg:hasAttachment': (hasAttachmentUrls(args) ? attachmentUrisTyped : undefined)
+                'won:hasAttachment': (hasAttachmentUrls(args) ? attachmentUrisTyped : undefined)
             },
             {
                 '@id': '_:n01',
