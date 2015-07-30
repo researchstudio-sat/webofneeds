@@ -241,6 +241,8 @@
         <script type="text/javascript" src="<c:url value="/app/service/need-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/util-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/message-service.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/need-builder.js"/>"></script>
+        <script type="text/javascript" src="<c:url value="/app/service/message-builder.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/search-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/won-service.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/app/service/linkeddata-service.js"/>"></script>

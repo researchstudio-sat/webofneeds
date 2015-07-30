@@ -24,89 +24,64 @@ ways to implement the part on the...
 
 //angular.module('app', ['flux'])
 angular.module('won.owner')
-    .directive('imagePicker', function factory($log, utilService) {
+    .directive('imagePicker', ['$log', 'utilService', '$q', function factory($log, utilService, $q) {
         return {
             restrict: 'E',
             //controllerAs: 'myComponent',
             scope: {
                 onImagesPicked: '='
-                //selectedImages: '=' // use api-methods in controller instead?
+                //preselectedImages: '=?' // use api-methods in controller instead?
             },
             template: '\
             <h1>Image upload isn\'t fully implemented yet.</h1>\
-            <!--<input type="file"/>-->\
-            <input name="fooUpload" scope="{{contentOptions.currentValue}}" key="value" type="file" \
+            <input name="fooUpload" \
+                   id="fooUpload"\
+                   scope="{{contentOptions.currentValue}}" \
+                   key="value" \
+                   type="file" \
                    accept="image/*"\
-                   onchange="angular.element(this).scope().setFile(this.files[0])"> \
-            <img ng-show="imageData" src="{{imageData}}" alt="The image you just picked."/>\
+                   multiple\
+                   onchange="angular.element(this).scope().setFile(this.files)"> \
+            <img ng-show="imageDataURL" src="{{imageDataURL}}" alt="The image you just picked."/>\
+            <!--<img ng-show="imageDataURL" src="{{imageUrl}}" alt="The image you just picked."/>-->\
             ',
-            link: function (scope){ //, MyStore) {
-                scope.setFile = function(file){
+            link: function (scope, element, attr) { //, MyStore) {
+
+                /*
+                 TODO move gallery to seperate directive (that pulls it's infos from the store)
+                 */
+                scope.setFile = function (files) {
+                    console.log('image-uploader.js:setFile asdfas;fljas;f', files);
+
                     //TODO only accept images & limit their size !!!!!!!!!!!!!!! (limit on server-side)
 
                     //https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
                     //http://stackoverflow.com/questions/25811693/angularjs-promise-not-resolving-file-with-filereader
 
-                    if(!/^image/.test(file.type)) {
-                        //TODO trigger error notification to please pick an image
-                        return;
-                    }
-                    utilService.readAsDataURL(file).then(function(fileData){
-                        $log.debug("image-uploader.js - readAsDataURL of " + file.name + ": "  + fileData.substring(0, 50) + "(...)");
-                        scope.imageData = fileData;
+                    var imageHandles = Array.filter(files, function(f) {
+                        //TODO trigger error notification to please pick images only!
+                        return /^image\//.test(f.type);
                     });
-                    scope.onImagesPicked([file]);
 
+                    var imageDataPromises = imageHandles.map(function(f){
+                        return utilService.readAsDataURL(f).then(function(dataUrl) {
+                            scope.imageDataURL = dataUrl; //TODO display more than one image in the gui; last one wins currently
+                            var b64data = dataUrl.split('base64,')[1];
+                            var imageData  = {
+                                name: f.name,
+                                type: f.type,
+                                data: b64data
+                            }
+                            console.log('image-uploader.js:setFile:imageData: ', imageData);
+                            return imageData;
+                        });
+                    });
 
-
-
-                    /*var xhr = new XMLHttpRequest();
-                    var formData = new FormData();
-                    // add the file intended to be upload to the created FormData instance
-                    formData.append("upload", file);
-
-                    xhr.open("post", "/upload", true);
-                    xhr.setRequestHeader("Content-Type", "multipart/form-data");
-                    xhr.onreadystatechange = function () {
-                        if (xhr.readyState == 4 && xhr.status == 200) {
-                            alert(xhr.statusText);
-                        }
-                    }
-                    xhr.send(formData);  // send formData to the server using XHRar formData = new FormData();
-                    */
+                    $q.all(imageDataPromises).then(function(imageDataArray){
+                        scope.onImagesPicked(imageDataArray);
+                    });
                 }
-
-
-                /*
-                $http.put(
-
-                 'http://localhost:5984/demo/d06917e8d1fae1ae162ea7773c003f0b/' + file.name + '?rev=4-c10029f35a5c5ed9bd8cc31bf8589d3c',
-                 file,
-                 { headers: { 'Content-Type' : file.type } });
-                */
             }
     };
-});
+}]);
 
-/*
-from https://github.com/angular/angular.js/issues/1375 :
- return {
- restrict: 'E',
- template: '<input type="file" />',
- replace: true,
- require: 'ngModel',
- link: function(scope, element, attr, ctrl) {
- var listener = function() {
- scope.$apply(function() {
- attr.multiple ? ctrl.$setViewValue(element[0].files) : ctrl.$setViewValue(element[0].files[0]);
- });
- }
- element.bind('change', listener);
- }
- }
-
- <file name="image" ng-model="inputFile" accept="image/png,image/jpg,image/jpeg" />
-
-
- var file = $scope.inputFile;
- */

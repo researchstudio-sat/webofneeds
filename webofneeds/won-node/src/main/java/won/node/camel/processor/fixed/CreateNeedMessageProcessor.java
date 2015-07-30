@@ -2,6 +2,8 @@ package won.node.camel.processor.fixed;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.sparql.path.Path;
+import com.hp.hpl.jena.sparql.path.PathParser;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.javasimon.SimonManager;
@@ -19,6 +21,7 @@ import won.protocol.model.Facet;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.model.OwnerApplication;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -152,6 +155,15 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     need = needRepository.save(need);
     split.stop();
   }
+
+  /*
+  private List<String> getAttachmentGraphUris(URI needURI, Dataset dataset){
+    Path propertyPath = PathParser.parse("<http://purl.org/webofneeds/model#hasAttachment>");
+    RdfUtils.getURIPropertyForPropertyPath(dataset, needURI, propertyPath);
+
+  }
+  */
+
 
 
 }
