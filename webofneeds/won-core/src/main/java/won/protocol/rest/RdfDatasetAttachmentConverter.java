@@ -91,4 +91,3 @@ public class RdfDatasetAttachmentConverter extends AbstractHttpMessageConverter<
       return Arrays.asList(supportedMediaTypes);
   }
 }
-k
