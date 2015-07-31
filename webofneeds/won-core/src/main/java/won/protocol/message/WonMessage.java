@@ -1,8 +1,9 @@
 package won.protocol.message;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
+import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ public class WonMessage implements Serializable
     private List<String> contentGraphNames;
   private WonMessageType isResponseToMessageType;
   private URI correspondingRemoteMessageURI;
-
+  private List<AttachmentMetaData> attachmentMetaData;
 
   //private Resource msgBnode;
   // private Signature signature;
@@ -86,6 +87,7 @@ public class WonMessage implements Serializable
         newMsgContent.addNamedModel(modelName, this.completeDataset.getNamedModel(modelName));
       }
       //copy the default model, but delete the triples referencing the envelope graphs
+      //TODO: this deletion is no longer necessary, right?
       Model newDefaultModel = ModelFactory.createDefaultModel();
       newDefaultModel.add(this.completeDataset.getDefaultModel());
       StmtIterator it = newDefaultModel.listStatements(null, RDF.type, WONMSG.ENVELOPE_GRAPH);
@@ -102,6 +104,94 @@ public class WonMessage implements Serializable
     return this.messageContent;
   }
 
+
+  public List<AttachmentMetaData> getAttachmentMetaData() {
+    if (attachmentMetaData != null) {
+      return attachmentMetaData;
+    }
+    List<AttachmentMetaData> newMetaData = new ArrayList<>();
+
+
+    final List<String> envelopeGraphUris = getEnvelopeGraphURIs();
+    String queryString =
+        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
+        "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n" +
+        "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+        "prefix won:   <http://purl.org/webofneeds/model#>\n" +
+        "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+        "select ?envelopeGraph ?attachmentDestinationUri ?attachmentGraphUri where { \n" +
+                "?envelopeGraph rdf:type msg:Envelope;  \n" +
+                "               msg:hasAttachment ?attachmentData. \n" +
+                "?attachmentData msg:hasDestinationUri ?attachmentDestinationUri; \n" +
+                "                msg:hasAttachmentGraphUri ?attachmentGraphUri.\n" +
+                "}";
+
+    Query query = QueryFactory.create(queryString);
+    try (QueryExecution queryExecution = QueryExecutionFactory.create(query, completeDataset))  {
+      ResultSet result = queryExecution.execSelect();
+      while (result.hasNext()){
+        QuerySolution solution = result.nextSolution();
+        String envelopeGraphUri = solution.getResource("envelopeGraph").getURI();
+        if (!envelopeGraphUris.contains(envelopeGraphUri)) {
+          logger.warn("found resource {} of type msg:EnvelopeGraph that is not the URI of an envelope graph in message {}", envelopeGraphUri,  this.messageURI);
+          continue;
+        }
+        AttachmentMetaData metaData = new AttachmentMetaData(
+                URI.create(solution.getResource("attachmentDestinationUri").getURI()),
+                URI.create(solution.getResource("attachmentGraphUri").getURI()));
+        newMetaData.add(metaData);
+      }
+    }
+    this.attachmentMetaData = newMetaData;
+    return this.attachmentMetaData;
+  }
+
+  /**
+   * Returns all content graphs that are attachments, including their signature graphs.
+   * @return
+   */
+  public List<AttachmentHolder> getAttachments(){
+    List<AttachmentMetaData> attachmentMetaData = getAttachmentMetaData();
+    List<String> attachmentGraphUris = Lists.transform(attachmentMetaData, new Function<AttachmentMetaData, String>() {
+      @Override
+      public String apply(AttachmentMetaData attachmentMetaData) {
+        return attachmentMetaData.attachmentGraphUri.toString();
+      }
+    });
+    List<AttachmentHolder> attachmentHolders = new ArrayList<>();
+    String queryString =
+            "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                    "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n" +
+                    "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                    "prefix won:   <http://purl.org/webofneeds/model#>\n" +
+                    "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+                    "prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>\n" +
+                    "\n"+
+                    "select ?attachmentSigGraphUri ?attachmentGraphUri where { \n" +
+                    "?attachmentSigGraphUri " +
+                    "              a sig:Signature; \n" +
+                    "              sig:hasSignedGraph ?attachmentGraphUri.\n" +
+                    "}";
+    Query query = QueryFactory.create(queryString);
+    try (QueryExecution queryExecution = QueryExecutionFactory.create(query, completeDataset))  {
+      ResultSet result = queryExecution.execSelect();
+      while (result.hasNext()){
+        QuerySolution solution = result.nextSolution();
+        String attachmentGraphUri = solution.getResource("attachmentGraphUri").getURI();
+        if (!attachmentGraphUris.contains(attachmentGraphUri)){
+          continue;
+        }
+        String sigGraphUri = solution.getResource("attachmentSigGraphUri").getURI().toString();
+        AttachmentHolder attachmentHolder = new AttachmentHolder(
+        completeDataset.getNamedModel(attachmentGraphUri),
+        completeDataset.getNamedModel(sigGraphUri),
+
+      }
+    }
+    this.attachmentMetaData = newMetaData;
+    return this.attachmentMetaData;
+    return getMessageContent();
+  }
 
   public Model getOuterEnvelopeGraph(){
     if (this.outerEnvelopeGraph != null) {
@@ -396,5 +486,46 @@ public class WonMessage implements Serializable
     return values;
   }
 
+  //Used to remember attachment graph uri and destination uri during the process of extracting attachments.
+  public class AttachmentMetaData {
+    URI attachmentGraphUri;
+    URI destinationUri;
 
+    AttachmentMetaData(URI attachmentGraphUri, URI destinationUri) {
+      this.attachmentGraphUri = attachmentGraphUri;
+      this.destinationUri = destinationUri;
+    }
+
+    public URI getAttachmentGraphUri() {
+      return attachmentGraphUri;
+    }
+
+    public URI getDestinationUri() {
+      return destinationUri;
+    }
+  }
+
+  public class AttachmentHolder{
+    private URI destinationUri;
+    private Model attachmentGraph;
+    private Model signatureGraph;
+
+    AttachmentHolder(URI destinationUri, Model attachmentGraph, Model signatureGraph) {
+      this.destinationUri = destinationUri;
+      this.attachmentGraph = attachmentGraph;
+      this.signatureGraph = signatureGraph;
+    }
+
+    public URI getDestinationUri() {
+      return destinationUri;
+    }
+
+    public Model getAttachmentGraph() {
+      return attachmentGraph;
+    }
+
+    public Model getSignatureGraph() {
+      return signatureGraph;
+    }
+  }
 }

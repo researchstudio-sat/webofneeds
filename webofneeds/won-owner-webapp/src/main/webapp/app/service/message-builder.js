@@ -57,8 +57,8 @@
         var attachmentBlankNodes = args.attachments.map(function(a, i) {
             return {
                 '@id': '_:attachment-' + i,
-                'msg:hasDestinationURI': {'@id' : a.uri},
-                'msg:hasAttachmentGraphURI': {'@id' : attachmentGraphIds[i]}
+                'msg:hasDestinationUri': {'@id' : a.uri},
+                'msg:hasAttachmentGraphUri': {'@id' : attachmentGraphIds[i]}
             }
         });
 
