@@ -51,7 +51,7 @@ public class WonMessage implements Serializable
     private List<String> contentGraphNames;
   private WonMessageType isResponseToMessageType;
   private URI correspondingRemoteMessageURI;
-  private List<AttachmentMetaData> attachmentMetaData;
+  private List<AttachmentHolder> attachmentHolders;
 
   //private Resource msgBnode;
   // private Signature signature;
@@ -104,93 +104,56 @@ public class WonMessage implements Serializable
     return this.messageContent;
   }
 
-
-  public List<AttachmentMetaData> getAttachmentMetaData() {
-    if (attachmentMetaData != null) {
-      return attachmentMetaData;
-    }
-    List<AttachmentMetaData> newMetaData = new ArrayList<>();
-
-
-    final List<String> envelopeGraphUris = getEnvelopeGraphURIs();
-    String queryString =
-        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
-        "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n" +
-        "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-        "prefix won:   <http://purl.org/webofneeds/model#>\n" +
-        "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
-        "select ?envelopeGraph ?attachmentDestinationUri ?attachmentGraphUri where { \n" +
-                "?envelopeGraph rdf:type msg:Envelope;  \n" +
-                "               msg:hasAttachment ?attachmentData. \n" +
-                "?attachmentData msg:hasDestinationUri ?attachmentDestinationUri; \n" +
-                "                msg:hasAttachmentGraphUri ?attachmentGraphUri.\n" +
-                "}";
-
-    Query query = QueryFactory.create(queryString);
-    try (QueryExecution queryExecution = QueryExecutionFactory.create(query, completeDataset))  {
-      ResultSet result = queryExecution.execSelect();
-      while (result.hasNext()){
-        QuerySolution solution = result.nextSolution();
-        String envelopeGraphUri = solution.getResource("envelopeGraph").getURI();
-        if (!envelopeGraphUris.contains(envelopeGraphUri)) {
-          logger.warn("found resource {} of type msg:EnvelopeGraph that is not the URI of an envelope graph in message {}", envelopeGraphUri,  this.messageURI);
-          continue;
-        }
-        AttachmentMetaData metaData = new AttachmentMetaData(
-                URI.create(solution.getResource("attachmentDestinationUri").getURI()),
-                URI.create(solution.getResource("attachmentGraphUri").getURI()));
-        newMetaData.add(metaData);
-      }
-    }
-    this.attachmentMetaData = newMetaData;
-    return this.attachmentMetaData;
-  }
-
   /**
    * Returns all content graphs that are attachments, including their signature graphs.
    * @return
    */
   public List<AttachmentHolder> getAttachments(){
-    List<AttachmentMetaData> attachmentMetaData = getAttachmentMetaData();
-    List<String> attachmentGraphUris = Lists.transform(attachmentMetaData, new Function<AttachmentMetaData, String>() {
-      @Override
-      public String apply(AttachmentMetaData attachmentMetaData) {
-        return attachmentMetaData.attachmentGraphUri.toString();
-      }
-    });
-    List<AttachmentHolder> attachmentHolders = new ArrayList<>();
+    if (this.attachmentHolders != null) {
+      return this.attachmentHolders;
+    }
+    final List<String> envelopeGraphUris = getEnvelopeGraphURIs();
+    List<AttachmentHolder> newAttachmentHolders = new ArrayList<>();
     String queryString =
-            "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
-                    "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n" +
-                    "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-                    "prefix won:   <http://purl.org/webofneeds/model#>\n" +
-                    "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
-                    "prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>\n" +
-                    "\n"+
-                    "select ?attachmentSigGraphUri ?attachmentGraphUri where { \n" +
-                    "?attachmentSigGraphUri " +
-                    "              a sig:Signature; \n" +
-                    "              sig:hasSignedGraph ?attachmentGraphUri.\n" +
-                    "}";
+    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
+            "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n" +
+            "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+            "prefix won:   <http://purl.org/webofneeds/model#>\n" +
+            "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+            "prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>\n" +
+            "\n"+
+            "select ?attachmentSigGraphUri ?attachmentGraphUri ?envelopeGraphUri ?attachmentDestinationUri where { \n" +
+            "?attachmentSigGraphUri " +
+            "              a sig:Signature; \n" +
+            "              sig:hasSignedGraph ?attachmentGraphUri.\n" +
+            "?envelopeGraphUri rdf:type msg:Envelope;  \n" +
+            "               msg:hasAttachment ?attachmentData. \n" +
+            "?attachmentData msg:hasDestinationUri ?attachmentDestinationUri; \n" +
+            "                msg:hasAttachmentGraphUri ?attachmentGraphUri.\n" +
+            "}";
     Query query = QueryFactory.create(queryString);
     try (QueryExecution queryExecution = QueryExecutionFactory.create(query, completeDataset))  {
       ResultSet result = queryExecution.execSelect();
       while (result.hasNext()){
         QuerySolution solution = result.nextSolution();
-        String attachmentGraphUri = solution.getResource("attachmentGraphUri").getURI();
-        if (!attachmentGraphUris.contains(attachmentGraphUri)){
+        String envelopeGraphUri = solution.getResource("envelopeGraphUri").getURI();
+        if (!envelopeGraphUris.contains(envelopeGraphUri)) {
+          logger.warn("found resource {} of type msg:EnvelopeGraph that is not the URI of an envelope graph in message {}", envelopeGraphUri,  this.messageURI);
           continue;
         }
         String sigGraphUri = solution.getResource("attachmentSigGraphUri").getURI().toString();
-        AttachmentHolder attachmentHolder = new AttachmentHolder(
-        completeDataset.getNamedModel(attachmentGraphUri),
-        completeDataset.getNamedModel(sigGraphUri),
-
+        String attachmentGraphUri = solution.getResource("attachmentGraphUri").getURI();
+        String attachmentSigGraphUri = solution.getResource("attachmentSigGraphUri").getURI();
+        String attachmentDestinationUri = solution.getResource("attachmentDestinationUri").getURI();
+        Dataset attachmentDataset = DatasetFactory.createMem();
+        attachmentDataset.addNamedModel(attachmentGraphUri, this.completeDataset.getNamedModel(attachmentGraphUri));
+        attachmentDataset.addNamedModel(attachmentSigGraphUri, this.completeDataset.getNamedModel(attachmentSigGraphUri));
+        AttachmentHolder attachmentHolder = new AttachmentHolder(URI.create(attachmentDestinationUri),attachmentDataset);
+        newAttachmentHolders.add(attachmentHolder);
       }
     }
-    this.attachmentMetaData = newMetaData;
-    return this.attachmentMetaData;
-    return getMessageContent();
+    this.attachmentHolders = newAttachmentHolders;
+    return newAttachmentHolders;
   }
 
   public Model getOuterEnvelopeGraph(){
@@ -505,27 +468,22 @@ public class WonMessage implements Serializable
     }
   }
 
-  public class AttachmentHolder{
+  public static class AttachmentHolder{
     private URI destinationUri;
-    private Model attachmentGraph;
-    private Model signatureGraph;
+    //holds the attachment graph and the signature graph
+    private Dataset attachmentDataset;
 
-    AttachmentHolder(URI destinationUri, Model attachmentGraph, Model signatureGraph) {
+    public AttachmentHolder(URI destinationUri, Dataset attachmentDataset) {
       this.destinationUri = destinationUri;
-      this.attachmentGraph = attachmentGraph;
-      this.signatureGraph = signatureGraph;
+      this.attachmentDataset = attachmentDataset;
     }
 
     public URI getDestinationUri() {
       return destinationUri;
     }
 
-    public Model getAttachmentGraph() {
-      return attachmentGraph;
-    }
-
-    public Model getSignatureGraph() {
-      return signatureGraph;
+    public Dataset getAttachmentDataset() {
+      return attachmentDataset;
     }
   }
 }

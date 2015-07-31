@@ -64,6 +64,9 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
 
   private Need storeNeed(final WonMessage wonMessage) {
     Dataset needContent = wonMessage.getMessageContent();
+    List<WonMessage.AttachmentHolder> attachmentHolders = wonMessage.getAttachments();
+    //remove attachment and its signature from the needContent
+    removeAttachmentsFromNeedContent(needContent, attachmentHolders);
     URI needURI = getNeedURIFromWonMessage(needContent);
     if (!needURI.equals(wonMessage.getSenderNeedURI()))
       throw new IllegalArgumentException("receiverNeedURI and NeedURI of the content are not equal");
@@ -87,7 +90,20 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     }
 
     rdfStorage.storeDataset(needURI, needContent);
+    //now store attachments
+    for(WonMessage.AttachmentHolder attachmentHolder: attachmentHolders){
+      rdfStorage.storeDataset(attachmentHolder.getDestinationUri(), attachmentHolder.getAttachmentDataset());
+    }
     return need;
+  }
+
+  private void removeAttachmentsFromNeedContent(Dataset needContent, List<WonMessage.AttachmentHolder> attachmentHolders) {
+    for (WonMessage.AttachmentHolder attachmentHolder: attachmentHolders){
+      for (Iterator<String> it = attachmentHolder.getAttachmentDataset().listNames(); it.hasNext(); ){
+        String modelName =it.next();
+        needContent.removeNamedModel(modelName);
+      }
+    }
   }
 
   private void authorizeOwnerApplicationForNeed(final Message message, final Need need) {

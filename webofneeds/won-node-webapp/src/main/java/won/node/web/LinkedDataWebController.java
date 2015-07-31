@@ -159,7 +159,7 @@ public class
                               Model model,
                               HttpServletResponse response) {
     URI eventURI = uriService.createEventURIForId(identifier);
-    Dataset rdfDataset = linkedDataService.getEventDataset(eventURI);
+    Dataset rdfDataset = linkedDataService.getDatasetForUri(eventURI);
     if (model != null) {
       model.addAttribute("rdfDataset", rdfDataset);
       model.addAttribute("resourceURI", eventURI.toString());
@@ -170,6 +170,24 @@ public class
       return "notFoundView";
     }
   }
+
+    //webmvc controller method
+    @RequestMapping("${uri.path.page.attachment}/{identifier}")
+    public String showAttachmentPage(@PathVariable(value = "identifier") String identifier,
+                                Model model,
+                                HttpServletResponse response) {
+        URI attachmentURI = uriService.createAttachmentURIForId(identifier);
+        Dataset rdfDataset = linkedDataService.getDatasetForUri(attachmentURI);
+        if (model != null) {
+            model.addAttribute("rdfDataset", rdfDataset);
+            model.addAttribute("resourceURI", attachmentURI.toString());
+            model.addAttribute("dataURI", uriService.toDataURIIfPossible(attachmentURI).toString());
+            return "rdfDatasetView";
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "notFoundView";
+        }
+    }
 
   //webmvc controller method
   @RequestMapping("${uri.path.page.need}")
@@ -459,7 +477,7 @@ public class
     logger.debug("readConnectionEvent() called");
 
     URI eventURI = uriService.createEventURIForId(identifier);
-    Dataset rdfDataset = linkedDataService.getEventDataset(eventURI);
+    Dataset rdfDataset = linkedDataService.getDatasetForUri(eventURI);
     if (rdfDataset != null) {
       HttpHeaders headers = new HttpHeaders();
       addCORSHeader(headers);
@@ -467,7 +485,31 @@ public class
     } else {
       return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
     }
+
   }
+
+    @RequestMapping(
+            value="${uri.path.data.resource}/{identifier}",
+            method = RequestMethod.GET,
+            produces={"application/ld+json",
+                    "application/trig",
+                    "application/n-quads"})
+    public ResponseEntity<Dataset> readAttachment(
+            HttpServletRequest request,
+            @PathVariable(value = "identifier") String identifier) {
+        logger.debug("readAttachment() called");
+
+        URI attachmentURI = uriService.createAttachmentURIForId(identifier);
+        Dataset rdfDataset = linkedDataService.getDatasetForUri(attachmentURI);
+        if (rdfDataset != null) {
+            HttpHeaders headers = new HttpHeaders();
+            addCORSHeader(headers);
+            return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+        }
+    }
+    
 
     /**
      * Get the RDF for the connections of the specified need.
