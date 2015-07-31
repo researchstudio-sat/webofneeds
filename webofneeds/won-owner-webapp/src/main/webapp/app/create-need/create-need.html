@@ -187,41 +187,35 @@
                                     </span>
                             </div>
                         </div>
-                        <!--TODO rebuild image component. make it drag and drop-->
-                        <div id="imagesInfoCollapsed" ng-show="imageInputFieldCollapsed"
-                             class="well div-table col-lg-12">
-                            <div class="div-table-row">
-                                <div class="col-lg-3 div-table-cell centered-text additional-info-title">Images</div>
-                                <div class="col-lg-8 div-table-cell">{{getImagesComment()}}</div>
-                                <div class="col-lg-1 div-table-cell centered-text">
-                                        <span>
-                                            <a href="" class="glyphicon glyphicon-chevron-right"
-                                               ng-click="imageCollapseClick()">
-                                            </a>
-                                        </span>
+
+                        <div id="imagesInfo" class="panel panel-default">
+                            <div class="panel-heading" ng-click="imageCollapseClick()">
+                                <div class="div-table-row">
+                                    <div class="col-lg-3 div-table-cell centered-text additional-info-title">
+                                        <h2 class="panel-title">Images</h2>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        {{getImagesComment()}}
+                                    </div>
+                                    <div class="col-lg-1 div-table-cell centered-text">
+                                        <!--TODO: code duplication-->
+                                        <span class="glyphicon glyphicon-chevron-right"
+                                              ng-show="imageInputFieldCollapsed"/>
+                                        <span class="glyphicon glyphicon-chevron-down"
+                                              ng-show="!imageInputFieldCollapsed"/>
+                                    </div>
                                 </div>
+                            </div>
+                            <div class="panel-body" ng-show="!imageInputFieldCollapsed">
+                                <!--<location-selector address-selected="addressSelected(lat, lon, name)"></location-selector>-->
+                                <image-picker on-images-picked="onImagesPicked"></image-picker>
                             </div>
                         </div>
 
-                        <div id="imagesInfoTitleWell" ng-show="!imageInputFieldCollapsed"
-                             class="well div-table col-lg-12">
-                            <div class="div-table-row">
-                                <div class="col-lg-3 div-table-cell centered-text additional-info-title">Images</div>
-                                <div class="col-lg-1 col-lg-offset-8 div-table-cell centered-text">
-                                        <span>
-                                            <a href="" class="glyphicon glyphicon-chevron-down"
-                                               ng-click="imageCollapseClick()"></a>
-                                        </span>
-                                </div>
-                            </div>
-                        </div>
+                        <!--<div id="imagesInfoInputFields" ng-show="!imageInputFieldCollapsed" class="div-table col-lg-12">-->
 
-                        <div id="imagesInfoInputFields" ng-show="!imageInputFieldCollapsed" class="div-table col-lg-12">
-                            <div class="div-table-row">
-                                <div class="col-lg-10 col-lg-offset-1 div-table-cell">{{getImagesComment()}}
-                                </div>
-                            </div>
-                            <div class="div-table-row">
+
+                        <!--
                                 <div class="col-lg-10 col-lg-offset-1" style="font-size: 1.8em;">
                                     Title Picture
                                 </div>
@@ -250,8 +244,7 @@
                                     <span class="glyphicon glyphicon-trash"/>
                                     Drag image here to<br/> remove it from the post.
                                 </div>
-                            </div>
-                        </div>
+                        -->
 
                         <div id="locationInfo" class="panel panel-default">
                             <div class="panel-heading" ng-click="locationCollapseClick()">

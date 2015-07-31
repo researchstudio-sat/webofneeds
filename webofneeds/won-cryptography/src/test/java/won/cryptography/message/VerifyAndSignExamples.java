@@ -2,7 +2,6 @@ package won.cryptography.message;
 
 import com.hp.hpl.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +18,6 @@ import won.protocol.util.RdfUtils;
 
 import java.io.File;
 import java.net.URI;
-import java.security.Security;
 
 /**
  * User: ypanchenko
@@ -57,10 +55,6 @@ public class VerifyAndSignExamples
 
   @Before
   public void init() {
-
-
-    Security.addProvider(new BouncyCastleProvider());
-
     // initialize signature adding and signature checking processors:
 
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());

@@ -18,6 +18,7 @@ Requirements for getting started:
 - jdk 1.6 or later
 - maven 2 or later
 - tomcat 6 or later as application-server
+- nodejs
 
 To prevent reinventing the wheel every single day, 
 we come back to existing (old) technology for the matching services:
@@ -25,7 +26,8 @@ we come back to existing (old) technology for the matching services:
 - triplestore(virtuoso)   -> http://virtuoso.openlinksw.com/
 - solr                    -> http://lucene.apache.org/solr/
 - ldspider                -> https://code.google.com/p/ldspider/
-__________________________________________________________________________________________
+
+---
 
 won-node
 - all needs and offers will be saved there
@@ -38,3 +40,5 @@ matching-service
 
 
 See also: http://events.linkeddata.org/ldow2013/papers/ldow2013-paper-13.pdf
+
+**Build-instructions** can be found in the [project wiki](https://github.com/researchstudio-sat/webofneeds/wiki)

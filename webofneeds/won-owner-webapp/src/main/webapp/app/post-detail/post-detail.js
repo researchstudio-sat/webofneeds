@@ -117,7 +117,6 @@ angular.module('won.owner').controller('PostDetailCtrl',
         ( $scope
         , $log
         , $location
-        , mapService
         , $compile
         , $routeParams
         , applicationControlService

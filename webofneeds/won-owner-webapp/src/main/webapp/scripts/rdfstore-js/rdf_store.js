@@ -1,13 +1,17 @@
-(function() {
+(function() {
+
 
 
   if(typeof(console)=='undefined') {
      console = {};
      console.log = function(e){};
   }
-  
-  window.process = {};
-  process.nextTick = function(f) {
+
+  // renamed s/process/rdfProcess/ so it doesn't overwrite
+  // the system variable `process` (e.g. process.plattform)
+  // NOTE: this is why not to use global variables. exactly this.
+  window.rdfProcess = {};
+  rdfProcess.nextTick = function(f) {
     setTimeout(f,0);
   };
 var Utils = {};
@@ -407,8 +411,10 @@ Utils.hashTerm = function(term) {
         return term;
     }
 };
-
-// end of ./src/js-trees/src/utils.js 
+
+
+// end of ./src/js-trees/src/utils.js 
+
 // exports
 var InMemoryBTree = {};
 
@@ -1268,8 +1274,10 @@ InMemoryBTree.Node = function() {
     this.children = [];
     this.level = 0;
 };
-
-// end of ./src/js-trees/src/in_memory_b_tree.js 
+
+
+// end of ./src/js-trees/src/in_memory_b_tree.js 
+
 // exports
 var QuadIndexCommon = {};
 
@@ -1342,8 +1350,10 @@ QuadIndexCommon.Pattern = function (components) {
     this.order = order.concat(indif);
     this.key = new QuadIndexCommon.NodeKey(this.keyComponents, this.order);
 };
-
-// end of ./src/js-rdf-persistence/src/quad_index_common.js 
+
+
+// end of ./src/js-rdf-persistence/src/quad_index_common.js 
+
 // exports
 var QuadIndex = {};
 
@@ -1467,8 +1477,10 @@ QuadIndex.Tree.prototype._rangeTraverse = function(tree,node, pattern) {
     }
     return acum;
 };
-
-// end of ./src/js-rdf-persistence/src/quad_index.js 
+
+
+// end of ./src/js-rdf-persistence/src/quad_index.js 
+
 // exports
 var QuadBackend = {};
 
@@ -1592,8 +1604,10 @@ QuadBackend.QuadBackend.prototype['delete'] = function (quad, callback) {
 
     return true;
 };
-
-// end of ./src/js-rdf-persistence/src/quad_backend.js 
+
+
+// end of ./src/js-rdf-persistence/src/quad_backend.js 
+
 // exports
 var Lexicon = {};
 
@@ -1895,8 +1909,10 @@ Lexicon.Lexicon.prototype.unregisterTerm = function (kind, oid) {
         delete this.OIDToBlank["" + oid];
     }
 };
-
-// end of ./src/js-rdf-persistence/src/lexicon.js 
+
+
+// end of ./src/js-rdf-persistence/src/lexicon.js 
+
 // exports
 var NetworkTransport = {};
 
@@ -1939,8 +1955,10 @@ NetworkTransport.load = function (uri, accept, callback, redirect) {
         }
     });
 };
-
-// end of ./src/js-communication/src/ajax_transport.js 
+
+
+// end of ./src/js-communication/src/ajax_transport.js 
+
 
 /**
  * Javascript implementation of JSON-LD.
@@ -5105,8 +5123,10 @@ JSONLDParser.parser.parse = function(data, graph) {
     return jsonldParser.toTriples(data, graph);
 };
 
-
-// end of ./src/js-communication/src/jsonld_parser.js 
+
+
+// end of ./src/js-communication/src/jsonld_parser.js 
+
 // **N3Lexer** tokenizes N3 documents.
 // ## Regular expressions
 var patterns = {
@@ -5460,8 +5480,10 @@ N3Lexer.prototype = {
 // ## Exports
 
 // Export the `N3Lexer` class as a whole.
-
-// end of ./node_modules/n3/lib/N3Lexer.js 
+
+
+// end of ./node_modules/n3/lib/N3Lexer.js 
+
 // **N3Parser** parses N3 documents.
 
 var RDF_PREFIX = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
@@ -5971,8 +5993,10 @@ N3Parser.prototype = {
 // ## Exports
 
 // Export the `N3Parser` class as a whole.
-
-// end of ./node_modules/n3/lib/N3Parser.js 
+
+
+// end of ./node_modules/n3/lib/N3Parser.js 
+
 
 // Add a wrapper around the N3.js parser
 var RVN3Parser = {};
@@ -6028,8 +6052,10 @@ function convertEntity(entity) {
     default:  return { token: 'uri', value: entity, prefix: null, suffix: null };
   };
 }
-
-// end of ./src/js-communication/src/rvn3_parser.js 
+
+
+// end of ./src/js-communication/src/rvn3_parser.js 
+
 // exports
 var RDFLoader = {};
 
@@ -6175,8 +6201,10 @@ RDFLoader.RDFLoader.prototype.tryToParse = function(parser, graph, input, option
 
 
 // var loader = require("./js-communication/src/rdf_loader").RDFLoader; loader = new loader.RDFLoader(); loader.load('http://dbpedialite.org/titles/Lisp_%28programming_language%29', function(success, results){console.log("hey"); console.log(success); console.log(results)})
-
-// end of ./src/js-communication/src/rdf_loader.js 
+
+
+// end of ./src/js-communication/src/rdf_loader.js 
+
 // exports
 var AbstractQueryTree = {};
 
@@ -6804,8 +6832,10 @@ AbstractQueryTree.AbstractQueryTree.prototype.treeWithUnion = function(aqt) {
 	return false;
     }
 };
-
-// end of ./src/js-sparql-parser/src/abstract_query_tree.js 
+
+
+// end of ./src/js-sparql-parser/src/abstract_query_tree.js 
+
 // exports
 var SparqlParser = {};
 
@@ -24434,8 +24464,10 @@ SparqlParser.parser = (function(){
   
   return result;
 })();
-
-// end of ./src/js-sparql-parser/src/sparql_parser.js 
+
+
+// end of ./src/js-sparql-parser/src/sparql_parser.js 
+
 // exports
 var RDFJSInterface = {};
 
@@ -25110,8 +25142,10 @@ RDFJSInterface.buildNamedNode = function(value, bindings, engine, env) {
 };
 
 RDFJSInterface.rdf = new RDFJSInterface.RDFEnvironment();
-
-// end of ./src/js-query-engine/src/rdf_js_interface.js 
+
+
+// end of ./src/js-query-engine/src/rdf_js_interface.js 
+
 // exports
 var QueryFilters = {};
 
@@ -26824,8 +26858,10 @@ QueryFilters.runIriRefOrFunction = function(iriref, args, bindings,queryEngine, 
         }
     }
 };
-
-// end of ./src/js-query-engine/src/query_filters.js 
+
+
+// end of ./src/js-query-engine/src/query_filters.js 
+
 // exports
 var QueryPlanDPSize = {};
 
@@ -27457,8 +27493,10 @@ QueryPlanDPSize.unionManyBindings = function(bindingLists) {
 
     return acum;
 };
-
-// end of ./src/js-query-engine/src/query_plan_sync_dpsize.js 
+
+
+// end of ./src/js-query-engine/src/query_plan_sync_dpsize.js 
+
 // exports
 var QueryEngine = {};
 
@@ -29233,8 +29271,10 @@ QueryEngine.QueryEngine.prototype.checkGroupSemantics = function(groupVars, proj
 QueryEngine.QueryEngine.prototype.registerDefaultNamespace = function(ns, prefix) {
     this.defaultPrefixes[ns] = prefix;
 };
-
-// end of ./src/js-query-engine/src/query_engine.js 
+
+
+// end of ./src/js-query-engine/src/query_engine.js 
+
 // exports
 var Callbacks = {};
 
@@ -29725,8 +29765,10 @@ Callbacks.CallbacksBackend.prototype.dispatchQueries = function(callback) {
             callback();
         });
 };
-
-// end of ./src/js-query-engine/src/callbacks.js 
+
+
+// end of ./src/js-query-engine/src/callbacks.js 
+
 //imports
 
 // exports
@@ -30187,8 +30229,10 @@ if(!!Worker) {
     // make possible for clients to test if this i being executed inside a connection
     RDFStoreClient.RDFStoreClient.prototype.isWebWorkerConnection = true;
 }
-
-// end of ./src/js-connection/src/rdfstore_client.js 
+
+
+// end of ./src/js-connection/src/rdfstore_client.js 
+
 // exports
 var Store = {};
 
@@ -31148,8 +31192,10 @@ Store.Store.prototype.close = function(cb) {
     else
 	      cb();
 };
-
-// end of ./src/js-store/src/store.js 
+
+
+// end of ./src/js-store/src/store.js 
+
 // imports
     RDFStoreWorker = {};
 
@@ -31361,8 +31407,10 @@ Store.Store.prototype.close = function(cb) {
 
     // set the receiver message
     onmessage = RDFStoreWorker.receive;
-
-// end of ./src/js-connection/src/rdfstore_worker.js 
+
+
+// end of ./src/js-connection/src/rdfstore_worker.js 
+
 try {
   window.rdfstore = Store;
 } catch(e) { }

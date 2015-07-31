@@ -5,7 +5,7 @@
 ;
 angular.module('won.owner').controller('SignInModalInstanceCtrl',
     function ($scope, $route, $window, $location, $http,
-              $modalInstance, applicationStateService, userService) {
+              $modalInstance, applicationStateService, userService, $log) {
 
         $scope.username = '';
         $scope.password = '';
@@ -29,10 +29,11 @@ angular.module('won.owner').controller('SignInModalInstanceCtrl',
                         $scope.processing = false;
                         if (response.status == "OK") {
                             $modalInstance.close(); //close() could also take params that would be returned
-                        } else if (response.status == "ERROR") {
+                        } else if (response.status == "ERROR" || response.status == "FATAL_ERROR") {
                             $scope.error = response.message;
+                            $log.debug('sign-in.js - ERROR:', response.messsage, response);
                         } else {
-                            $log.debug(response.messsage);
+                            $log.debug('sign-in.js:', response.messsage, response);
                         }
                 });
             }

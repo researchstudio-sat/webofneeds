@@ -46,7 +46,7 @@
 
     <!-- private keys and their certificates for owner and needs,
      possibly certificates of other parties-->
-    <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService">
+    <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService" init-method="init">
         <constructor-arg type="java.lang.String" value="${keystore.location}" />
     </bean>
 

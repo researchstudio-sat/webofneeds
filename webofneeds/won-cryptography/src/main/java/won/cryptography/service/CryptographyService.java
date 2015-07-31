@@ -1,6 +1,5 @@
 package won.cryptography.service;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,7 +7,6 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
@@ -20,15 +18,13 @@ public class CryptographyService {
 
     // ToDo: make class with CryptoConfiguration
 
-    // ToDo: fix logging
-
     // ToDo: proper error handling
 
     // ToDo: how to get public key?
 
     // ToDo: proper initialization of JCE provider!
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     //private final String PRIVATE_KEY_STORE_PREFIX = "PR-";
     //private final String PUBLIC_KEY_STORE_PREFIX = "PU-";
@@ -41,12 +37,12 @@ public class CryptographyService {
 
     public CryptographyService (KeyStoreService keyStoreService) {
 
-        Security.addProvider(new BouncyCastleProvider());
+        //Security.addProvider(new BouncyCastleProvider());
 
         keyPairService = new KeyPairService();
         certificateService = new CertificateService();
         //keyStoreService = new KeyStoreService(new File("keys.jks"));
-      this.keyStoreService = keyStoreService;
+        this.keyStoreService = keyStoreService;
     }
 
 
@@ -76,8 +72,6 @@ public class CryptographyService {
     }
 
   public PublicKey getPublicKey(String needURI) {
-    return keyStoreService.getPublicKey(needURI);
+      return keyStoreService.getPublicKey(needURI);
   }
-
-
 }

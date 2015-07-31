@@ -1,13 +1,11 @@
 package won.cryptography.utils;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import won.cryptography.service.KeyStoreService;
 
 import java.io.File;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.Security;
 
 /**
  * User: ypanchenko
@@ -27,7 +25,6 @@ public class SignatureTest
   @Before
   public void init() {
 
-    Security.addProvider(new BouncyCastleProvider());
     //load public  keys:
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
     KeyStoreService storeService = new KeyStoreService(keysFile);

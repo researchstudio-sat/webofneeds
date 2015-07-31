@@ -128,6 +128,8 @@
         won.WON.hasConnectionStateCompacted = won.WON.prefix + ":hasConnectionState";
         won.WON.hasContent = won.WON.baseUri + "hasContent";
         won.WON.hasContentCompacted = won.WON.prefix + ":hasContent";
+        won.WON.hasContentDescription = won.WON.baseUri + "hasContentDescription";
+        won.WON.hasContentDescriptionCompacted = won.WON.prefix + ":hasContentDescription";
         won.WON.hasEndTime = won.WON.baseUri + "hasEndTime";
         won.WON.hasEndTimeCompacted = won.WON.prefix + ":hasEndTime";
         won.WON.hasEventContainer = won.WON.baseUri + "hasEventContainer";
@@ -286,13 +288,147 @@
         won.UNREAD.GROUP.ALL="all";
         won.UNREAD.GROUP.BYNEED="byNeed";
 
-
         //UTILS
         var UNSET_URI= "no:uri";
+
+
+        /**
+         * Returns the "compacted" alternative of the value (e.g.
+         *    "http://purl.org/webofneeds/model#Demand"
+         *    ->  via 'won.WON.BasicNeedTypeDemand'
+         *    ->  and 'won.WON.BasicNeedTypeDemandCompacted'
+         *    ->  to: "won:Demand";
+         * returns `undefined` if the compacted version couldn't be found (see `lookup(...)`)
+         * @param longValue
+         */
+        won.toCompacted = function(longValue) {
+            var propertyPath = won.constantsReverseLookupTable[longValue];
+            propertyPath[propertyPath.length - 1] += 'Compacted';
+            return won.lookup(won, propertyPath);
+        }
+
 
         won.clone = function(obj){
             return JSON.parse(JSON.stringify(obj));
         }
+
+
+        /**
+         * Copies all arguments properties recursively into a
+         * new object and returns that.
+         */
+
+        won.merge = function(/*args...*/) {
+            var o = {};
+            for(var i = 0; i < arguments.length; i++) {
+                won.mergeIntoLast(arguments[i], o);
+            }
+            return o;
+        }
+        /*
+         * Recursively merge properties of several objects
+         * Copies all properties from the passed objects into the last one starting
+         * from the left (thus the further right, the higher the priority in
+         * case of name-clashes)
+         * You might prefer this function over won.merge for performance reasons
+         * (e.g. if you're copying into a very large object). Otherwise the former
+         * is recommended.
+         * @param args merges all passed objects onto the first passed
+         */
+        won.mergeIntoLast = function(/*args...*/) {
+            for(var i = 0; i < arguments.length -1 ; i++) {
+                var obj1 = arguments[arguments.length - 1];
+                var obj2 = arguments[i];
+                for (var p in obj2) {
+                    try {
+                        // Property in destination object set; update its value.
+                        if ( obj2[p].constructor == Object ) {
+                            obj1[p] = won.mergeRecursive(obj1[p], obj2[p]);
+                        } else {
+                            obj1[p] = obj2[p];
+                        }
+                    } catch(e) {
+                        // Property in destination object not set; create it and set its value.
+                        obj1[p] = obj2[p];
+
+                    }
+                }
+            }
+            return obj1;
+        }
+
+        // as the constants above should be unique (thus their mapping bijective)
+        // it is possible to do a reverse lookup. The table contains former values
+        // as keys and maps to arrays that define the lookup-path.
+        won.constantsReverseLookupTable = {};
+        for(var root of ['WON', 'UNREAD', 'WONMSG', 'EVENT', 'COMMUNUCATION_STATE' ]) {
+            won.mergeIntoLast(buildReverseLookup(won[root], [root]), won.constantsReverseLookupTable);
+        }
+
+
+        won.buildReverseLookup = buildReverseLookup;
+        /**
+         * Builds a reverse lookup-table for the objects properties.
+         *
+         * NOTE: all properties of the object need to have unique values!
+         *
+         * e.g.:
+         *
+         *     var obj = { propA: { subProp: 'foo'}, probB: 2 }
+         *
+         *     buildReverseLookup(obj)
+         *          ----> {foo  ['propA', 'subProp'], 2: ['probB']}
+         *
+         * @param obj
+         * @param accumulatedPath
+         * @returns {{}}
+         */
+        function buildReverseLookup(obj, accumulatedPath /* = [] */) { //TODO this should be in a utils file
+            accumulatedPath = typeof accumulatedPath !== 'undefined' ?
+                accumulatedPath : []; // to allow calling with only obj
+
+            var lookupAcc = {};
+            for(var k in obj) {
+                if (obj.hasOwnProperty(k)) {
+                    var v = obj[k];
+                    var accPathAppended = accumulatedPath.concat([k])
+                    var foundLookups = {};
+                    if (typeof v === 'string' || typeof v === 'number') {
+                        //terminal node
+                        foundLookups[v] = accPathAppended;
+
+                    } else if (typeof v === 'object') {
+                        //recurse into objects
+                        foundLookups = buildReverseLookup(v, accPathAppended);
+                    }
+                    won.mergeIntoLast(foundLookups, lookupAcc);
+                }
+            }
+            return lookupAcc;
+        }
+
+        won.lookup = lookup;
+        /**
+         * Traverses a path of properties over the object, where the folllowing holds:
+         *
+         *     o.propA[1].moreprop === lookup(o, ['propA', 1, 'moreprop'])
+         *
+         * @param o
+         * @param propertyPath
+         * @returns {*}
+         */
+        function lookup(o, propertyPath){ //TODO this should be in a utils file
+            if(!o || !propertyPath) {
+                return undefined;
+            }
+            var resolvedStep = o[propertyPath[0]];
+            if(propertyPath.length === 1) {
+                return resolvedStep
+            } else {
+                return lookup(resolvedStep, propertyPath.slice(1))
+            }
+        }
+
 
         //get the URI from a jsonld resource (expects an object with an '@id' property)
         //or the value from a typed literal
@@ -651,6 +787,8 @@
                                 }
                             ]
                         }
+                        //{} // add attachments here
+                        // as named graphs (they need to have an uri
 
                     ]
                 };
@@ -677,8 +815,23 @@
             getMainNode: function () {
                 return this.data["@graph"][0]["@graph"][0];
             },
-
-            uri: function (needURI) {
+            getNeedUri: function() {
+                return this.data["@graph"][0]["@graph"][0]['@id'];
+            },
+            /* not sure if good practice to mix up message creation with need creation like this :|
+            on the other hand there's references to the message. these are necessarily unbound variables
+            that should be set via a single accessor function. the question is, why are they there in
+            the first place?
+            eventUri: function(eventUri) {
+                this.data['@graph'][0]['@id'] = eventUri + "#content-need";
+                //TODO set eventUri + "#content-attachment-0" for all attachments
+                return this;
+            },*/
+            envelopeContentUri: function(uri) {
+                this.data['@graph'][0]['@id'] = uri;
+                return this;
+            },
+            needUri: function (needURI) {
                 this.data["@graph"][0]["@graph"][0]['@id'] = needURI;
                 return this;
             },
@@ -845,14 +998,62 @@
                 }
                 return this; // to allow cascading calls
             },
+            //TODO: add images
+            images: function(imgs) {
+                console.error("won.js - needbuilder.images - NOT IMPLEMENTED YET");
+                //console.log(this.getContext()); //message context / meta infos, e.g. namespaces
+                //console.log(this.getMainNode()); // the need root node. // add :hasAttachments here
+                //console.log(this.getNeedGraph()); // the need graph
+                //console.log(this.data); // the whole msg graph incl content, context and soon-to-be: attachments
+
+                //this.getContext()["schema.org.foo:contentLocation"] = "URL_TO_IMAGE"; //TODO
+                //this.getContext()["schema.org.foo:content"] = "/9j/4AAQSkZJRgABAQAAAQABAAD{...}"^^xsd:base64Binary
+                //this.getContext()["schema.org.foo:datePublished"] = "NOW"; //TODO
+
+
+                /*
+
+                 dependency hierarchy of builders
+                 in builders setters just collect variables
+                 build the jsonld in a template-ish build() method <- "return {pred:myvar, pred2:myfun()}"
+
+                 *mandatory args* throw exception if unset or as arguments to build(...)?
+
+                    (on publish, randomly set unbound variables?)
+
+                    if need & msgbuilder are split, the needbuilder needs to set dummy-urls
+                    and the message builder know which to replace
+
+                    needs will be send to a node in any case anyway
+
+
+                    s/NeedBuilder/ContentBuilder
+                    contentbuilder has array of attachment builders
+                 */
+
+                /*
+
+                 http://schema.org/ImageObject:
+
+                 "@context": "http://schema.org",
+                 "@type": "ImageObject",
+                 "author": "Jane Doe",
+                 "contentLocation": "Puerto Vallarta, Mexico",
+                 "contentUrl": "mexico-beach.jpg",
+                 "datePublished": "2008-01-25",
+                 "description": "I took this picture while on vacation last year.",
+                 "name": "Beach in Mexico"
+
+                 */
+                //for(var i = 0; i < imgs.size; i++) {
+                //}
+            },
             hasTag: function(tags){
                 this.getContentNode()["won:hasTag"] = tags;
                 return this;
             },
-            //TODO: add images
             build: function () {
-
-                return this.data;
+                return won.clone(this.data);
             }
         }
         won.DraftBuilder = function DraftBuilder(data){

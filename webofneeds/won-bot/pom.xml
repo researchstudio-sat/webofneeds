@@ -143,5 +143,21 @@
           <groupId>org.javasimon</groupId>
           <artifactId>javasimon-spring</artifactId>
       </dependency>
+
+      <!-- security stuff -->
+      <dependency>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcpkix-jdk15on</artifactId>
+          <version>${bouncycastle.version}</version>
+          <scope>runtime</scope>
+      </dependency>
+
+      <dependency>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcprov-jdk15on</artifactId>
+          <version>${bouncycastle.version}</version>
+          <scope>runtime</scope>
+      </dependency>
+
   </dependencies>
 </project>

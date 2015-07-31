@@ -6,10 +6,11 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.ontology.Ontology;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.cryptography.exception.KeyNotSupportedException;
 import won.cryptography.key.KeyInformationExtractor;
 import won.cryptography.key.KeyInformationExtractorBouncyCastle;
@@ -20,7 +21,10 @@ import won.protocol.vocabulary.WONCRYPT;
 
 import javax.transaction.NotSupportedException;
 import java.math.BigInteger;
-import java.security.*;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,11 +39,10 @@ import java.util.Set;
  * User: ypanchenko
  * Date: 27.03.2015
  */
-public class WonKeysReaderWriter
-{
+public class WonKeysReaderWriter {
+  private static final Logger logger = LoggerFactory.getLogger(WonKeysReaderWriter.class);
+
   public WonKeysReaderWriter() {
-    Provider provider = new BouncyCastleProvider();
-    Security.addProvider(provider);
   }
 
   public Map<String, PublicKey> readFromDataset(Dataset dataset)
@@ -208,17 +211,14 @@ public class WonKeysReaderWriter
 
   }
 
-  public void writeToModel(Model model, Resource keySubject, PublicKey publicKey) throws NotSupportedException,
-    KeyNotSupportedException {
-
+  public void writeToModel(Model model, Resource keySubject, PublicKey publicKey) throws NotSupportedException, KeyNotSupportedException {
     if (publicKey instanceof ECPublicKey) {
       KeyInformationExtractor info = new KeyInformationExtractorBouncyCastle();
       writeToModel(model, keySubject, new WonEccPublicKey(info.getCurveID(publicKey), info.getAlgorithm(publicKey),
                                                           info.getQX(publicKey),
                                                           info.getQY(publicKey)));
     } else {
-      throw new NotSupportedException("Not supported key: " + publicKey.getClass().getName());
+        throw new NotSupportedException("Not supported key: " + publicKey.getClass().getName());
     }
   }
-
 }

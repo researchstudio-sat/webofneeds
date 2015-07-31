@@ -115,7 +115,7 @@ public class RestUserController
           return new ResponseEntity(errors.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
         } else {
           // username is already in database
-          return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
+          return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
         }
       } else {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -123,9 +123,9 @@ public class RestUserController
       }
     } catch (DataIntegrityViolationException e) {
       // username is already in database
-      return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
+      return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
     }
-    return new ResponseEntity("New user was created", HttpStatus.CREATED);
+    return new ResponseEntity("\"New user was created\"", HttpStatus.CREATED);
   }
 
 
@@ -149,16 +149,16 @@ public class RestUserController
         }
         catch (Exception ex) { // org.springframework.mail.MailException
           logger.error("Email could not be sent", ex);
-          return new ResponseEntity("Email could not be sent", HttpStatus.INTERNAL_SERVER_ERROR);
+          return new ResponseEntity("\"Email could not be sent\"", HttpStatus.INTERNAL_SERVER_ERROR);
         }
       } else {
-        return new ResponseEntity("Cannot send private link to not private user", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity("\"Cannot send private link to not private user\"", HttpStatus.BAD_REQUEST);
       }
     } else {
-      return new ResponseEntity("Mail type " + type + " not supported", HttpStatus.BAD_REQUEST);
+      return new ResponseEntity("\"Mail type " + type + " not supported\"", HttpStatus.BAD_REQUEST);
     }
 
-    return new ResponseEntity("Email sent", HttpStatus.OK);
+    return new ResponseEntity("\"Email sent\"", HttpStatus.OK);
   }
 
   @ResponseBody
@@ -212,7 +212,7 @@ public class RestUserController
     User user = userRepository.findByUsername(username);
     if (!user.getUsername().equals(userSettingsPojo.getUsername())) {
       logger.warn("user name wrong");
-      return new ResponseEntity("user name problem", HttpStatus.BAD_REQUEST);
+      return new ResponseEntity("\"user name problem\"", HttpStatus.BAD_REQUEST);
     }
 
     if (user.getEmail() == null) {
@@ -243,9 +243,9 @@ public class RestUserController
       }
     } catch (URISyntaxException e) {
       logger.warn(userSettingsPojo.getNeedUri() + " need uri problem.", e);
-      return new ResponseEntity(userSettingsPojo.getNeedUri() + " need uri problem.", HttpStatus.BAD_REQUEST);
+      return new ResponseEntity("\"" + userSettingsPojo.getNeedUri() + " need uri problem.\"", HttpStatus.BAD_REQUEST);
     }
-   return new ResponseEntity("Settings created", HttpStatus.CREATED);
+   return new ResponseEntity("\"Settings created\"", HttpStatus.CREATED);
   }
 
   /**
@@ -271,10 +271,10 @@ public class RestUserController
       if (errors.hasErrors()) {
         if (errors.getFieldErrorCount() > 0) {
           // someone trying to go around js validation
-          return new ResponseEntity(errors.getAllErrors().get(0).getDefaultMessage(), HttpStatus.BAD_REQUEST);
+          return new ResponseEntity("\"" + errors.getAllErrors().get(0).getDefaultMessage() + "\"", HttpStatus.BAD_REQUEST);
         } else {
           // username is already in database
-          return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
+          return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
         }
       } else {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -283,9 +283,9 @@ public class RestUserController
       }
     } catch (DataIntegrityViolationException e) {
       // username is already in database
-      return new ResponseEntity("Cannot create user: name is already in use.", HttpStatus.CONFLICT);
+      return new ResponseEntity("\"Cannot create user: name is already in use.\"", HttpStatus.CONFLICT);
     }
-    return new ResponseEntity(privateLink, HttpStatus.CREATED);
+    return new ResponseEntity("\"" + privateLink + "\"", HttpStatus.CREATED);
   }
 
   /**
@@ -310,9 +310,9 @@ public class RestUserController
       Authentication auth = authenticationManager.authenticate(token);
       SecurityContextHolder.getContext().setAuthentication(auth);
       securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
-      return new ResponseEntity("Signed in.", HttpStatus.OK);
+      return new ResponseEntity("\"Signed in.\"", HttpStatus.OK);
     } catch (BadCredentialsException ex) {
-      return new ResponseEntity("No such username/password combination registered.", HttpStatus.FORBIDDEN);
+      return new ResponseEntity("\"No such username/password combination registered.\"", HttpStatus.FORBIDDEN);
     }
   }
 
@@ -337,11 +337,11 @@ public class RestUserController
     SecurityContext context = SecurityContextHolder.getContext();
     //if(context.getAuthentication() )
     if (context == null || context.getAuthentication() == null) {
-      return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
+      return new ResponseEntity("\"User not signed in.\"", HttpStatus.UNAUTHORIZED);
     } else if ("anonymousUser".equals(context.getAuthentication().getPrincipal())) {
-      return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
+      return new ResponseEntity("\"User not signed in.\"", HttpStatus.UNAUTHORIZED);
     } else {
-      return new ResponseEntity("Current session is still valid. asdf", HttpStatus.OK);
+      return new ResponseEntity("\"Current session is still valid.\"", HttpStatus.OK);
     }
   }
 
@@ -358,11 +358,11 @@ public class RestUserController
     SecurityContext context = SecurityContextHolder.getContext();
     //if(context.getAuthentication() )
     if (context == null || context.getAuthentication() == null) {
-      return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
+      return new ResponseEntity("\"User not signed in.\"", HttpStatus.UNAUTHORIZED);
     } else if ("anonymousUser".equals(context.getAuthentication().getPrincipal())) {
-      return new ResponseEntity("User not signed in.", HttpStatus.UNAUTHORIZED);
+      return new ResponseEntity("\"User not signed in.\"", HttpStatus.UNAUTHORIZED);
     } else {
-      return new ResponseEntity(SecurityContextHolder.getContext().getAuthentication().getAuthorities(), HttpStatus.OK);
+      return new ResponseEntity("\"" + SecurityContextHolder.getContext().getAuthentication().getAuthorities() + "\"", HttpStatus.OK);
     }
   }
 
@@ -378,10 +378,10 @@ public class RestUserController
   public ResponseEntity logOut(HttpServletRequest request, HttpServletResponse response) {
     SecurityContext context = SecurityContextHolder.getContext();
     if (context.getAuthentication() == null) {
-      return new ResponseEntity("No user is signed in, ignoring this request.", HttpStatus.NOT_MODIFIED);
+      return new ResponseEntity("\"No user is signed in, ignoring this request.\"", HttpStatus.NOT_MODIFIED);
     }
     myLogoff(request, response);
-    return new ResponseEntity("Signed out", HttpStatus.OK);
+    return new ResponseEntity("\"Signed out\"", HttpStatus.OK);
   }
 
 

@@ -44,7 +44,8 @@
             <tbody>
             <tr
                     ng-show="hasItems()"
-                    ng-repeat="item in items | orderObjectBy:sortedField:reversedSort |filter: search| filterByNeedState: 'Active'">
+                    ng-repeat="(uri, item) in items | orderObjectBy:sortedField:reversedSort |filter: search| filterByNeedState: 'Active'">
+                <!--ng-repeat="item in items">-->
                 <td class="col-lg-1">
                     <span style="display: none;">{{item.basicNeedType}}</span>
                     <img  application-control ng-src="{{getTypePicURI(item.basicNeedType)}}"

@@ -287,6 +287,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         draftBuilderObject.setCurrentStep($scope.currentStep);
         draftBuilderObject.setCurrentMenuposition($scope.selectedType);
         draftBuilderObject.setDraftObject($scope.need);
+        console.log('create-need.js:saveDraft - saved need: ', $scope.need);
         draftBuilderObject.setLastSavedTimestamp(new Date().getTime());
 
         if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
@@ -302,6 +303,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         draftBuilderObject.title($scope.need.title)
             .ownerFacet()               // mandatory
             .description($scope.need.textDescription)
+
             .hasTag($scope.need.tags)
             .hasContentDescription()    // mandatory
             //.hasPriceSpecification("EUR",5.0,10.0)
@@ -388,15 +390,16 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     $scope.publishClicked = function () {
         if(lock== false){
             lock = true;
-            var needJson = $scope.buildNeedJson();
 
+            console.log('create-need.js:publishClicked:imgs: ', $scope.need.images);
             // make sure the user is registered (either with account or private link),
             // then publish the need, so that it is under that account
             var newNeedUriPromise = userService.setUpRegistrationForUserPublishingNeed().then(
                 function() {
-                     return wonService.createNeed(needJson);
+                     return wonService.createNeed($scope.need);
                 }
             );
+            //TODO why are the following calls not part of the promise chain?
 
             // TODO: should the draft removing part be changed to run only on success from newNeedUriPromise?
             if ($scope.draftURI != null) {
@@ -413,43 +416,17 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
     }
 
 
-	$scope.buildNeedJson = function () {
+    //make sure we've got an array for gathering the images
+    $scope.need.images = $scope.need.images? $scope.need.images : [];
 
-        // creating need object
-        var needBuilderObject = new window.won.NeedBuilder().setContext();
-        if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
-            needBuilderObject.demand();
-        } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
-            needBuilderObject.supply();
-        } else if ($scope.need.basicNeedType ==  won.WON.BasicNeedTypeDotogether) {
-            needBuilderObject.doTogether();
-        } else {
-            needBuilderObject.critique();
-        }
-
-        needBuilderObject.title($scope.need.title)
-            .ownerFacet()               // mandatory
-            .description($scope.need.textDescription)
-            .hasTag(utilService.concatTags($scope.need.tags))
-            .hasContentDescription()    // mandatory
-            //.hasPriceSpecification("EUR",5.0,10.0)
-        
-            needBuilderObject.hasLocationSpecification($scope.need.latitude, $scope.need.longitude, $scope.need.name);
-
-        if (hasTimeSpecification($scope.need)) {
-            needBuilderObject.hasTimeSpecification(createISODateTimeString($scope.need.startDate, $scope.need.startTime), createISODateTimeString($scope.need.endDate, $scope.need.endTime), $scope.need.recursIn != 'P0D' ? true : false, $scope.need.recursIn, $scope.need.recurTimes);
-        }
-
-        if (hasUri($scope.need)) {
-            needBuilderObject.uri($scope.need.needURI);
-        }
-
-        // building need as JSON object
-        var needJson = needBuilderObject.build();
-
-        return needJson;
-
-    };
+    $scope.onImagesPicked = function(images) {
+        won.mergeIntoLast(images, $scope.need.images);
+        //$scope.need.images = images;
+        // TODO <testing>
+        $scope.need.images = Array.prototype.concat([], images);
+        console.log('create-need.js:imgPick - need.images:', $scope.need.images);
+        // TODO </testing>
+    }
 
     $scope.goToDetailPostPreview = function() {
         var detailPreviewElementId = 'detail-preview';

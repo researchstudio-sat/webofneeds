@@ -14,6 +14,7 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
     <context:component-scan base-package="won.*" />
     <import resource="classpath:/spring/component/camel/message-processors.xml"/>
+    <import resource="classpath:/spring/component/cryptographyServices.xml" />
     <import resource="classpath:/spring/core/node-core.xml" />
     <import resource="classpath:/spring/component/storage/jdbc-storage.xml" />
     <import resource="classpath:/spring/component/storage/jpabased-rdf-storage.xml" />
@@ -30,8 +31,6 @@
     <import resource="classpath:/spring/component/monitoring/monitoring-recorder.xml" />
     -->
     <import resource="classpath:/spring/component/ehcache/spring-node-ehcache.xml" />
-
-    <import resource="classpath:/spring/component/cryptographyServices.xml" />
     <import resource="classpath:/spring/component/wonNodeInformationService.xml" />
 
 
