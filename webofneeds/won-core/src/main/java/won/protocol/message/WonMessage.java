@@ -5,6 +5,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
+import com.hp.hpl.jena.tdb.TDB;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,25 +116,30 @@ public class WonMessage implements Serializable
     }
     final List<String> envelopeGraphUris = getEnvelopeGraphURIs();
     List<AttachmentHolder> newAttachmentHolders = new ArrayList<>();
-    String queryString =
-    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
-            "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n" +
-            "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-            "prefix won:   <http://purl.org/webofneeds/model#>\n" +
-            "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
-            "prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>\n" +
-            "\n"+
-            "select ?attachmentSigGraphUri ?attachmentGraphUri ?envelopeGraphUri ?attachmentDestinationUri where { \n" +
-            "?attachmentSigGraphUri " +
-            "              a sig:Signature; \n" +
-            "              sig:hasSignedGraph ?attachmentGraphUri.\n" +
-            "?envelopeGraphUri rdf:type msg:Envelope;  \n" +
-            "               msg:hasAttachment ?attachmentData. \n" +
-            "?attachmentData msg:hasDestinationUri ?attachmentDestinationUri; \n" +
-            "                msg:hasAttachmentGraphUri ?attachmentGraphUri.\n" +
-            "}";
+    String queryString = "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n" +
+      "prefix xsd:   <http://www.w3.org/2001/XMLSchema#>\n" +
+      "prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+      "prefix won:   <http://purl.org/webofneeds/model#>\n" +
+      "prefix msg:   <http://purl.org/webofneeds/message#>\n" +
+      "prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#>\n" +
+      "\n"+
+      "select ?attachmentSigGraphUri ?attachmentGraphUri ?envelopeGraphUri ?attachmentDestinationUri where { \n" +
+      "graph ?attachmentSigGraphUri {?attachmentSigGraphUri " +
+      "              a sig:Signature; \n" +
+      "              msg:hasSignedGraph ?attachmentGraphUri.\n" +
+      "}\n" +
+      "graph ?envelopeGraphUri {?envelopeGraphUri rdf:type msg:EnvelopeGraph.  \n" +
+      "    ?messageUri msg:hasAttachment ?attachmentData. \n" +
+      "?attachmentData msg:hasDestinationUri ?attachmentDestinationUri; \n" +
+      "                msg:hasAttachmentGraphUri ?attachmentGraphUri.\n" +
+      "}\n" +
+      "}";
     Query query = QueryFactory.create(queryString);
+    QuerySolutionMap initialBinding = new QuerySolutionMap();
+    initialBinding.add("messageUri", new ResourceImpl(getMessageURI().toString()));
     try (QueryExecution queryExecution = QueryExecutionFactory.create(query, completeDataset))  {
+      queryExecution.getContext().set(TDB.symUnionDefaultGraph, true);
+
       ResultSet result = queryExecution.execSelect();
       while (result.hasNext()){
         QuerySolution solution = result.nextSolution();
@@ -151,6 +158,8 @@ public class WonMessage implements Serializable
         AttachmentHolder attachmentHolder = new AttachmentHolder(URI.create(attachmentDestinationUri),attachmentDataset);
         newAttachmentHolders.add(attachmentHolder);
       }
+    } catch (Exception e){
+      throw e;
     }
     this.attachmentHolders = newAttachmentHolders;
     return newAttachmentHolders;

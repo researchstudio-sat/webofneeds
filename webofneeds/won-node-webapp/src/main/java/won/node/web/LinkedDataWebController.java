@@ -284,7 +284,8 @@ public class
       method = RequestMethod.GET,
       produces={"application/ld+json",
                 "application/trig",
-                "application/n-quads"})
+                "application/n-quads",
+                "image/png"})
   public ResponseEntity<Dataset> redirectToData(
       HttpServletRequest request) {
     URI resourceUriPrefix = URI.create(this.resourceURIPrefix);
@@ -493,7 +494,8 @@ public class
             method = RequestMethod.GET,
             produces={"application/ld+json",
                     "application/trig",
-                    "application/n-quads"})
+                    "application/n-quads",
+                    "image/png"})
     public ResponseEntity<Dataset> readAttachment(
             HttpServletRequest request,
             @PathVariable(value = "identifier") String identifier) {
