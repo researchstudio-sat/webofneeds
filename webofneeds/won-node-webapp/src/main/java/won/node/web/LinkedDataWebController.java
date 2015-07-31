@@ -490,7 +490,7 @@ public class
   }
 
     @RequestMapping(
-            value="${uri.path.data.resource}/{identifier}",
+            value="${uri.path.data.attachment}/{identifier}",
             method = RequestMethod.GET,
             produces={"application/ld+json",
                     "application/trig",

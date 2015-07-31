@@ -14,7 +14,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
  */
 public class CNT {
 
-    public static final String BASE_URI = " http://www.w3.org/2011/content#";
+    public static final String BASE_URI = "http://www.w3.org/2011/content#";
     private static Model m = ModelFactory.createDefaultModel();
 
     public static final Property BYTES = m.createProperty(BASE_URI + "bytes");

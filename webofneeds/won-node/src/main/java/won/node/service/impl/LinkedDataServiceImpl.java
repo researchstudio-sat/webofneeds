@@ -290,6 +290,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   public Dataset getDatasetForUri(URI datasetUri) {
     Dataset result = rdfStorage.loadDataset(datasetUri);
+    if (result == null) return null;
     DefaultPrefixUtils.setDefaultPrefixes(result.getDefaultModel());
     addBaseUriAndDefaultPrefixes(result);
     return result;

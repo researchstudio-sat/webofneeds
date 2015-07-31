@@ -22,6 +22,7 @@ import won.protocol.vocabulary.CNT;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -75,8 +76,8 @@ public class RdfDatasetAttachmentConverter extends AbstractHttpMessageConverter<
         return content;
       }
     }, false);
-    OutputStreamWriter writer = new OutputStreamWriter(httpOutputMessage.getBody());
-    writer.write(content);
+    //TODO: here, we decode the base64 content only to have it encoded again by the framework. Can we tell the webMVC framework not to encode in base64 somehow?
+    httpOutputMessage.getBody().write(Base64.getDecoder().decode(content));
     httpOutputMessage.getBody().flush();
   }
 
@@ -90,3 +91,4 @@ public class RdfDatasetAttachmentConverter extends AbstractHttpMessageConverter<
       return Arrays.asList(supportedMediaTypes);
   }
 }
+k
