@@ -9,31 +9,38 @@ export default function wonAppTag() {
             <nav class="topnav">
                 <div class="topnav__left">
                     <a href="#" class="topnav__button">
-                        <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__button__icon">
-                        Web of Needs
+                        <img src="generated/icon-sprite.svg#WON_ico_header" class="bigicon">
+                        <span class="topnav__button__caption">Web of Needs</span>
                     </a>
                 </div>
                 <div class="topnav__center">
-                    <a href="#">New Need</a>
+                    <a href="#" class="topnav__button">
+                        <img src="generated/icon-sprite.svg#ico36_plus" class="bigicon">
+                        <span class="topnav__button__caption">New Need</span>
+                    </a>
                 </div>
                 <div class="topnav__right">
                     <ul class="topnav__list">
                         <li class="">
-                            <a href="#">
-                                Groups
+                            <a href="#" class="topnav__button">
+                                <span class="topnav__button__caption">Groups</span>
+                                <img src="generated/icon-sprite.svg#ico36_help" class="bigicon">
                                 <!--
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__icon">
                                 <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__icon">
                                 -->
                             </a>
                         </li>
-                        <li><a href="#">
-                                Username
+                        <li>
+                            <a href="#" class="topnav__button">
+                                <span class="topnav__button__caption">Username</span>
+                                <img src="generated/icon-sprite.svg#ico36_help" class="bigicon">
                                 <!--
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__icon">
                                 <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__icon">
                                 -->
-                            </a></li>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </nav>

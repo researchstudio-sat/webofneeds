@@ -83,22 +83,24 @@ won-app {
   }
 
   & .topnav__button {
-    & .topnav__button__icon {
-      @include fixed-square(3.6rem);
-    }
-  }
-
-  & .topnav__left {
-    //@extend %flex-row;
-    //@extend %vcenter;
-    //@include fixed-height(1rem);
-
-  }
-
-  & .topnav__list {
-    //@extend %list-nav-horizontal;
     @extend %flex-row;
+
+    & .bigicon {
+      //TODO; generic classes shouldn't be styled in non-bem classes
+      margin: 0.75rem;
+
+    }
+
+    & .topnav__button__caption { }
   }
+
+  & .topnav__left { /* @extend %flex-row; */ }
+
+  & .topnav__list { @extend %flex-row; }
+}
+
+.bigicon {
+  @include fixed-square(3.6rem);
 }
 
 .mainTabs {
