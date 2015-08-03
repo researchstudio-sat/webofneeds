@@ -127,6 +127,8 @@
         won.WON.hasConnectionStateCompacted = won.WON.prefix + ":hasConnectionState";
         won.WON.hasContent = won.WON.baseUri + "hasContent";
         won.WON.hasContentCompacted = won.WON.prefix + ":hasContent";
+        won.WON.hasContentDescription = won.WON.baseUri + "hasContentDescription";
+        won.WON.hasContentDescriptionCompacted = won.WON.prefix + ":hasContentDescription";
         won.WON.hasEndTime = won.WON.baseUri + "hasEndTime";
         won.WON.hasEndTimeCompacted = won.WON.prefix + ":hasEndTime";
         won.WON.hasEventContainer = won.WON.baseUri + "hasEventContainer";
@@ -285,13 +287,147 @@
         won.UNREAD.GROUP.ALL="all";
         won.UNREAD.GROUP.BYNEED="byNeed";
 
-
         //UTILS
         var UNSET_URI= "no:uri";
+
+
+        /**
+         * Returns the "compacted" alternative of the value (e.g.
+         *    "http://purl.org/webofneeds/model#Demand"
+         *    ->  via 'won.WON.BasicNeedTypeDemand'
+         *    ->  and 'won.WON.BasicNeedTypeDemandCompacted'
+         *    ->  to: "won:Demand";
+         * returns `undefined` if the compacted version couldn't be found (see `lookup(...)`)
+         * @param longValue
+         */
+        won.toCompacted = function(longValue) {
+            var propertyPath = won.constantsReverseLookupTable[longValue];
+            propertyPath[propertyPath.length - 1] += 'Compacted';
+            return won.lookup(won, propertyPath);
+        }
+
 
         won.clone = function(obj){
             return JSON.parse(JSON.stringify(obj));
         }
+
+
+        /**
+         * Copies all arguments properties recursively into a
+         * new object and returns that.
+         */
+
+        won.merge = function(/*args...*/) {
+            var o = {};
+            for(var i = 0; i < arguments.length; i++) {
+                won.mergeIntoLast(arguments[i], o);
+            }
+            return o;
+        }
+        /*
+         * Recursively merge properties of several objects
+         * Copies all properties from the passed objects into the last one starting
+         * from the left (thus the further right, the higher the priority in
+         * case of name-clashes)
+         * You might prefer this function over won.merge for performance reasons
+         * (e.g. if you're copying into a very large object). Otherwise the former
+         * is recommended.
+         * @param args merges all passed objects onto the first passed
+         */
+        won.mergeIntoLast = function(/*args...*/) {
+            for(var i = 0; i < arguments.length -1 ; i++) {
+                var obj1 = arguments[arguments.length - 1];
+                var obj2 = arguments[i];
+                for (var p in obj2) {
+                    try {
+                        // Property in destination object set; update its value.
+                        if ( obj2[p].constructor == Object ) {
+                            obj1[p] = won.mergeRecursive(obj1[p], obj2[p]);
+                        } else {
+                            obj1[p] = obj2[p];
+                        }
+                    } catch(e) {
+                        // Property in destination object not set; create it and set its value.
+                        obj1[p] = obj2[p];
+
+                    }
+                }
+            }
+            return obj1;
+        }
+
+        // as the constants above should be unique (thus their mapping bijective)
+        // it is possible to do a reverse lookup. The table contains former values
+        // as keys and maps to arrays that define the lookup-path.
+        won.constantsReverseLookupTable = {};
+        for(var root of ['WON', 'UNREAD', 'WONMSG', 'EVENT', 'COMMUNUCATION_STATE' ]) {
+            won.mergeIntoLast(buildReverseLookup(won[root], [root]), won.constantsReverseLookupTable);
+        }
+
+
+        won.buildReverseLookup = buildReverseLookup;
+        /**
+         * Builds a reverse lookup-table for the objects properties.
+         *
+         * NOTE: all properties of the object need to have unique values!
+         *
+         * e.g.:
+         *
+         *     var obj = { propA: { subProp: 'foo'}, probB: 2 }
+         *
+         *     buildReverseLookup(obj)
+         *          ----> {foo  ['propA', 'subProp'], 2: ['probB']}
+         *
+         * @param obj
+         * @param accumulatedPath
+         * @returns {{}}
+         */
+        function buildReverseLookup(obj, accumulatedPath /* = [] */) { //TODO this should be in a utils file
+            accumulatedPath = typeof accumulatedPath !== 'undefined' ?
+                accumulatedPath : []; // to allow calling with only obj
+
+            var lookupAcc = {};
+            for(var k in obj) {
+                if (obj.hasOwnProperty(k)) {
+                    var v = obj[k];
+                    var accPathAppended = accumulatedPath.concat([k])
+                    var foundLookups = {};
+                    if (typeof v === 'string' || typeof v === 'number') {
+                        //terminal node
+                        foundLookups[v] = accPathAppended;
+
+                    } else if (typeof v === 'object') {
+                        //recurse into objects
+                        foundLookups = buildReverseLookup(v, accPathAppended);
+                    }
+                    won.mergeIntoLast(foundLookups, lookupAcc);
+                }
+            }
+            return lookupAcc;
+        }
+
+        won.lookup = lookup;
+        /**
+         * Traverses a path of properties over the object, where the folllowing holds:
+         *
+         *     o.propA[1].moreprop === lookup(o, ['propA', 1, 'moreprop'])
+         *
+         * @param o
+         * @param propertyPath
+         * @returns {*}
+         */
+        function lookup(o, propertyPath){ //TODO this should be in a utils file
+            if(!o || !propertyPath) {
+                return undefined;
+            }
+            var resolvedStep = o[propertyPath[0]];
+            if(propertyPath.length === 1) {
+                return resolvedStep
+            } else {
+                return lookup(resolvedStep, propertyPath.slice(1))
+            }
+        }
+
 
         //get the URI from a jsonld resource (expects an object with an '@id' property)
         //or the value from a typed literal

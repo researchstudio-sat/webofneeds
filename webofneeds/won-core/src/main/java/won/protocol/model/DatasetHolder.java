@@ -47,7 +47,7 @@ public class DatasetHolder
   private URI uri;
 
   //the model as a byte array
-  @Lob @Column( name = "dataset", nullable = false, length = 100000)
+  @Lob @Column( name = "dataset", nullable = false, length = 10000000)
   private byte[] datasetBytes;
 
   //for multiple accesses to model, cache it.

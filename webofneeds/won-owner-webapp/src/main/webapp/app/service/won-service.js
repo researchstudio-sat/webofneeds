@@ -441,46 +441,61 @@ angular.module('won.owner').factory('wonService', function (
 
     }
 
+    function buildCreateMessage(need) {
+
+        var wonNodeUri = wonService.getDefaultWonNodeUri();
+        var publishedContentUri = wonNodeUri + '/need/' + utilService.getRandomPosInt();
+
+        var imgs = need.images;
+        var attachmentUris = []
+        if(imgs) {
+            for (var img of imgs) {
+                var uri = wonNodeUri + '/attachment/' + utilService.getRandomPosInt();
+                attachmentUris.push(uri);
+                img.uri = uri;
+            }
+        }
+
+        //if type === create -> use needBuilder as well
+
+        // TODO pull random generating into build-function?
+        //      this would break idempotency unless a seed is passed as well (!)
+
+        var contentRdf = won.buildNeedRdf({
+            type : won.toCompacted(need.basicNeedType), //mandatory
+            title: need.title, //mandatory
+            description: need.textDescription, //mandatory
+            publishedContentUri: publishedContentUri, //mandatory
+            tags: need.tags.map(function(t) {return t.text}).join(','),
+            attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
+        });
+        var msgUri = wonNodeUri + '/event/' + utilService.getRandomPosInt(); //mandatory
+        var msgJson = won.buildMessageRdf(contentRdf, {
+            receiverNode : wonNodeUri, //mandatory
+            msgType : won.WONMSG.createMessage, //mandatory
+            publishedContentUri: publishedContentUri, //mandatory
+            msgUri: msgUri,
+            attachments: imgs //optional, should be same as in `attachmentUris` above
+        });
+        return [msgJson, msgUri];
+    }
 
     /**
-     * Creates a need and returns a Promise to the URI of the newly created need (which may differ from the one
-     * specified in the need object here.
-     * @param needAsJsonLd
-     * @returns {*}
+     * Creates a need and returns a Promise to the URI of the newly created need
      */
-    wonService.createNeed = function(needBuilder) {
+    wonService.createNeed = function(need) {
+
+        //TODO reroll on clashes; curry the build function
+        //TODO use ES6 deconstruction here (or better: use a stable query to retrieve the info from the rdf)
+        // calling this clojure-function here, allows us to regenerate the random uris on a name-clash
+        // by simply calling this function again
+        var ret = buildCreateMessage(need);
+        var message = ret[0];
+        var eventUri = ret[1];
+
+        console.log("won-service.js:createNeed:msg-refactored: ", JSON.stringify(message));
+
         var deferred = $q.defer();
-        var needData = won.clone(needBuilder.build());
-        //TODO: Fix hard-coded URIs here!
-        var genRndUri = function(path) {
-            return privateData.defaultWonNodeUri + "/" + path + "/" + utilService.getRandomInt(1,9223372036854775807);
-        }
-        var genRndEventUri = genRndUri.bind(null, "event"); //applies "event" without resolving the function
-        var genRndNeedUri = genRndUri.bind(null, "need"); //applies "event" without resolving the function
-        var eventUri = genRndEventUri();
-        var needUri = needBuilder.getNeedUri();
-        if (needUri == null || 0 === needUri.length) {
-            needUri = genRndNeedUri();
-            needBuilder.needUri(needUri);
-        }
-        var wonNode = privateData.defaultWonNodeUri;
-
-        needBuilder.envelopeContentUri(eventUri + "#content-need");
-
-        // TODO for images() generate more of these and append as sibling graphs (via subindex?)
-        // e.g. first image:
-        // needBuilder.envelopeContentUri(eventUri + "#content-attachment-0");
-        // it also needs a new "needUri"
-
-
-        var message = new won.MessageBuilder(won.WONMSG.createMessage, needBuilder.build())
-            .eventURI(eventUri)
-            .hasReceiverNode(wonNode)
-            .hasSenderNeed(needUri)
-            .hasOwnerDirection()
-            .hasSentTimestamp(new Date().getTime())
-            .build();
-
         //TODO: this callback could be changed to be the same as activate/deactivate, but the special code (updateing the applicationStateService) needs to be moved to another place
         var callback = new messageService.MessageCallback(
             function (event, msg) {
