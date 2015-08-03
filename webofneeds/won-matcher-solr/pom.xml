@@ -68,8 +68,7 @@
         <!-- START: used for testing solr -->
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>test</scope>
+            <artifactId>javax.servlet-api</artifactId>
         </dependency>
 
 

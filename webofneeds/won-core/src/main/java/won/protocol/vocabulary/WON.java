@@ -30,7 +30,6 @@ import won.protocol.model.NeedState;
 public class WON
 {
   public static final String BASE_URI = "http://purl.org/webofneeds/model#";
-
   private static Model m = ModelFactory.createDefaultModel();
 
 

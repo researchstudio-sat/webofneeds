@@ -34,10 +34,9 @@
         </dependency>
 
         <!-- servlet stuff -->
-        <dependency> <!-- tomcat always complains about this.. should we omit it? -->
+        <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>provided</scope>
+            <artifactId>javax.servlet-api</artifactId>
         </dependency>
 
     </dependencies>

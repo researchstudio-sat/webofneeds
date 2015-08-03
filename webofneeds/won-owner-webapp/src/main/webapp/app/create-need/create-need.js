@@ -423,7 +423,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
         won.mergeIntoLast(images, $scope.need.images);
         //$scope.need.images = images;
         // TODO <testing>
-        $scope.need.images = Array.concat([], images);
+        $scope.need.images = Array.prototype.concat([], images);
         console.log('create-need.js:imgPick - need.images:', $scope.need.images);
         // TODO </testing>
     }

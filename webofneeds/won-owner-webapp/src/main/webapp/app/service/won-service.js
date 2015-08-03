@@ -449,11 +449,8 @@ angular.module('won.owner').factory('wonService', function (
         var imgs = need.images;
         var attachmentUris = []
         if(imgs) {
-            for (var img of imgs) {
-                var uri = wonNodeUri + '/attachment/' + utilService.getRandomPosInt();
-                attachmentUris.push(uri);
-                img.uri = uri;
-            }
+            imgs.forEach(function(img) { img.uri = wonNodeUri + '/attachment/' + utilService.getRandomPosInt(); })
+            attachmentUris = imgs.map(function(img) { return img.uri });
         }
 
         //if type === create -> use needBuilder as well

@@ -13,21 +13,22 @@
      * Builds the dataset that makes up the message. The set consists of several named
      * graphs (usually `args.msgUri + '#nameOfSubgraph'`), that contain the payload-
      * and meta-data.
-     * @param contentRdf
+     * @param needRdf
      * @param args
      * @returns {{@graph: Array, @context}}
      */
-    won.buildMessageRdf = function (contentRdf, args) {
-        var msgContentUri = args.msgUri + '#content-need';
-        var msgDataUri = args.msgUri + '#data';
+    won.buildMessageRdf = function (needRdf, args) {
+        var needGraphId = args.msgUri + '#need';
+        var msgDataUri = args.msgUri + '#envelope';
         var msgGraph = [];
+
         var attachmentGraphIds = args.attachments.map(function(a, i){ return args.msgUri + '#attachment-' + i })
-        var nonEnvelopeGraphIds = Array.concat([msgContentUri], attachmentGraphIds);
+        var nonEnvelopeGraphIds = Array.prototype.concat([needGraphId], attachmentGraphIds);
 
         msgGraph.push({
             // content
-            '@id': msgContentUri,
-            '@graph': contentRdf['@graph']
+            '@id': needGraphId,
+            '@graph': needRdf['@graph']
         });
 
         args.attachments.forEach(function(attachment, i) {
@@ -52,26 +53,39 @@
             });
         });
 
+        var attachmentBlankNodes = args.attachments.map(function(a, i) {
+            return {
+                '@id': '_:attachment-' + i,
+                'msg:hasDestinationUri': {'@id' : a.uri},
+                'msg:hasAttachmentGraphUri': {'@id' : attachmentGraphIds[i]}
+            }
+        });
+
+        var envelopeGraph = [
+            {
+                '@id': args.msgUri,
+                '@type' : 'msg:FromOwner',
+                'msg:hasSentTimestamp' : (new Date().getTime()),
+                'msg:hasMessageType': { '@id': args.msgType },
+                'msg:hasContent': nonEnvelopeGraphIds.map(function(graphId) {return {'@id': graphId} }),
+                'msg:hasReceiverNode': { '@id': args.receiverNode },
+                'msg:hasSenderNeed': { '@id': args.publishedContentUri },
+                'msg:hasAttachment': attachmentBlankNodes.map(function(n) {return {'@id' : n['@id']} }),
+            },
+            {
+                '@id': msgDataUri,
+                '@type': 'msg:EnvelopeGraph',
+                'rdfg:subGraphOf': { '@id': args.msgUri }
+            }
+        ];
+
+        console.log('message-builder.js:buildMessageRdf:attachmentBlankNodes: ', attachmentBlankNodes);
+        console.log('message-builder.js:buildMessageRdf:envelopeGraph: ', envelopeGraph.concat(attachmentBlankNodes));
+
         msgGraph.push({
             // msg envelope
             '@id': msgDataUri,
-            '@graph': [
-                {
-                    '@id': args.msgUri,
-                    '@type' : 'msg:FromOwner',
-                    'msg:hasSentTimestamp' : (new Date().getTime()),
-                    'msg:hasMessageType': { '@id': args.msgType },
-                    'msg:hasContent': nonEnvelopeGraphIds.map(function(graphId) {return {'@id': graphId} }),
-                    'msg:hasReceiverNode': { '@id': args.receiverNode },
-                    'msg:hasSenderNeed': { '@id': args.publishedContentUri }
-                },
-                {
-                    '@id': msgDataUri,
-                    '@type': 'msg:EnvelopeGraph',
-                    'rdfg:subGraphOf': { '@id': args.msgUri }
-                }
-            ]
-
+            '@graph': envelopeGraph.concat(attachmentBlankNodes)
         });
 
 
@@ -83,7 +97,7 @@
             '@graph': msgGraph,
             '@context': won.merge(
                 won.defaultContext,
-                contentRdf['@context'],
+                needRdf['@context'],
                 getTypesForContext()
             )
         }
