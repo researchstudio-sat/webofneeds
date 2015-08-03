@@ -22,25 +22,22 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- see http://getbootstrap.com/css/#overview-mobile -->
 		<title ng-bind="'Web Of Needs - '+$root.title">Web Of Needs</title>
-		<link rel="stylesheet" href="style/bootstrap.min.css" />
-		<%--<link rel="stylesheet" href="style/bootstrap.theme.cerulean.css"/>--%>
 
-        <!--<link rel="stylesheet" href="bower_components/bootsketch/build/css/bootsketch.css"/>-->
-        <!--<link rel="stylesheet" href="style/bootsketch-patches.css"/>-->
-        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css"/>
+        <link rel="stylesheet" href="jspm_packages/github/twbs/bootstrap@3.3.5/css/bootstrap.css"/>
+        <link rel="stylesheet" href="jspm_packages/github/twbs/bootstrap@3.3.5/css/bootstrap-theme.css"/>
 
 	    <link rel="stylesheet" href="style/jquery.fs.scroller.css"/>
 	    <link rel="stylesheet" href="style/datepicker.css"/>
-	    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="jspm_packages/bower/font-awesome@4.3.0/css/font-awesome.css"/>
 	    <link rel="stylesheet" href="style/lightbox.css"/>
 	    <link rel="stylesheet" href="style/bootstrap-tagsinput.css"/>
         <link rel="stylesheet" href="style/star-rating.css"/>
         <link rel="stylesheet" href="scripts/angular-scrollable-table/scrollable-table.css"/>
-        <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.css"/>
-        <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.bootstrap.css"/>
+        <link rel="stylesheet" href="jspm_packages/bower/ng-tags-input@2.3.0/ng-tags-input.css"/>
+        <link rel="stylesheet" href="jspm_packages/bower/ng-tags-input@2.3.0/ng-tags-input.bootstrap.css"/>
 
 
-        <link rel="stylesheet" href="bower_components/ng-scrollbar/dist/ng-scrollbar.min.css"/>
+        <link rel="stylesheet" href="jspm_packages/bower/ng-scrollbar@0.0.6/dist/ng-scrollbar.css"/>
 
         <!--leaflet.js provides us with a map-widget which can display map material from different sources-->
         <script type="text/javascript" src="resources/leaflet-0.7.3/leaflet.js"></script>
@@ -224,8 +221,8 @@
             console.log(System);
 
             //System.import('app/app')
-            System.import('app/jspm_test')
-                    .catch(console.error.bind(console));
+            //System.import('app/jspm_test')
+            //        .catch(console.error.bind(console));
         </script>
 
         <!--
