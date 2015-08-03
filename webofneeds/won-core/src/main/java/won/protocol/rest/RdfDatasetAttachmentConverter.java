@@ -4,8 +4,6 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpInputMessage;
@@ -34,7 +32,10 @@ public class RdfDatasetAttachmentConverter extends AbstractHttpMessageConverter<
   private static final Logger logger = LoggerFactory.getLogger(RdfDatasetAttachmentConverter.class);
 
   private static final MediaType[] supportedMediaTypes =  {
-    MediaType.ALL
+    MediaType.ALL // we can do this because we have placed a hack in the LinkedDataWebController that
+    //looks into the dataset and determines the concrete MediaType of the base64-encoded content in the
+    //dataset. Thus, spring's content negotiation will choose this class as a compatible converter and the
+    //concrete media type as the response media type.
   };
 
 
@@ -92,12 +93,6 @@ public class RdfDatasetAttachmentConverter extends AbstractHttpMessageConverter<
       throw new IncorrectPropertyCountException("found more than one property of cnt:bytes", 1, 2);
     }
     return ret;
-  }
-
-  private static Lang mimeTypeToJenaLanguage(MediaType mediaType, Lang defaultLanguage) {
-    Lang lang = RDFLanguages.contentTypeToLang(mediaType.toString());
-    if (lang == null) return defaultLanguage;
-    return lang;
   }
 
   public List<MediaType> getSupportedMediaTypes(){
