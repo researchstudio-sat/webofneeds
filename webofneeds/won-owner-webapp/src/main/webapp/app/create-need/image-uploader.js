@@ -51,14 +51,14 @@ angular.module('won.owner')
                  TODO move gallery to seperate directive (that pulls it's infos from the store)
                  */
                 scope.setFile = function (files) {
-                    console.log('image-uploader.js:setFile asdfas;fljas;f', files);
+                    $log.debug('image-uploader.js:setFile asdfas;fljas;f', files);
 
                     //TODO only accept images & limit their size !!!!!!!!!!!!!!! (limit on server-side)
 
                     //https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
                     //http://stackoverflow.com/questions/25811693/angularjs-promise-not-resolving-file-with-filereader
 
-                    var imageHandles = Array.prototype.filter(files, function(f) {
+                    var imageHandles = Array.prototype.filter.call(files, function(f) {
                         //TODO trigger error notification to please pick images only!
                         return true; //TODO: disabled check if file is image for testing purposes
                         //return /^image\//.test(f.type);
