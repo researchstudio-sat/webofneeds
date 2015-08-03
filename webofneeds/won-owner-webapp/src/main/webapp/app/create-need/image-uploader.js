@@ -58,8 +58,7 @@ angular.module('won.owner')
                     //https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
                     //http://stackoverflow.com/questions/25811693/angularjs-promise-not-resolving-file-with-filereader
 
-
-                    var imageHandles = Array.filter(files, function(f) {
+                    var imageHandles = Array.prototype.filter(files, function(f) {
                         //TODO trigger error notification to please pick images only!
                         return true; //TODO: disabled check if file is image for testing purposes
                         //return /^image\//.test(f.type);
