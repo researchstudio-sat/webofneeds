@@ -82,8 +82,10 @@ won-app {
     text-decoration: none;
   }
 
-  & .topnav__icon {
-    @include fixed-square(3.6rem);
+  & .topnav__button {
+    & .topnav__button__icon {
+      @include fixed-square(3.6rem);
+    }
   }
 
   & .topnav__left {

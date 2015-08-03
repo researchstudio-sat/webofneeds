@@ -8,8 +8,8 @@ export default function wonAppTag() {
         <header>
             <nav class="topnav">
                 <div class="topnav__left">
-                    <a href="#">
-                        <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__icon">
+                    <a href="#" class="topnav__button">
+                        <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__button__icon">
                         Web of Needs
                     </a>
                 </div>
@@ -19,9 +19,21 @@ export default function wonAppTag() {
                 <div class="topnav__right">
                     <ul class="topnav__list">
                         <li class="">
-                            <a href="#">Groups</a>
+                            <a href="#">
+                                Groups
+                                <!--
+                                <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__icon">
+                                <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__icon">
+                                -->
+                            </a>
                         </li>
-                        <li><a href="#">Username</a></li>
+                        <li><a href="#">
+                                Username
+                                <!--
+                                <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__icon">
+                                <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__icon">
+                                -->
+                            </a></li>
                     </ul>
                 </div>
             </nav>
