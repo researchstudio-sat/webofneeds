@@ -1,6 +1,8 @@
 webofneeds
 ==========
 
+[![Join the chat at https://gitter.im/researchstudio-sat/webofneeds](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/researchstudio-sat/webofneeds?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 The central idea of the Web of needs is this: the WWW looks like a marketplace; 
 everyone knows what there is for sale, only a few know what is needed. We want to change that.
 
@@ -19,6 +21,8 @@ Requirements for getting started:
 - maven 2 or later
 - tomcat 6 or later as application-server
 - nodejs
+
+For Build instructions and more detailed information, [please consult the wiki](https://github.com/researchstudio-sat/webofneeds/wiki).
 
 To prevent reinventing the wheel every single day, 
 we come back to existing (old) technology for the matching services:
