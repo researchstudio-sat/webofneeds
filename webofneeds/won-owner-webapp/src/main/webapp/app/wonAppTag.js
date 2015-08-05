@@ -42,7 +42,7 @@ export default function wonAppTag() {
                 <div class="mainTabs__left"></div>
                 <div class="mainTabs__center">
                     <ul class="mainTabs__list">
-                        <li><a href="#">Feed</a></li>
+                        <li><a href="#" class="selectedTab">Feed</a></li>
                         <li><a href="#">Posts
                             <span class="mainTabs__list__unread">5</span>
                         </a></li>

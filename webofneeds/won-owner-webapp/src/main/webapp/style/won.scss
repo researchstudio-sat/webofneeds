@@ -138,11 +138,16 @@ won-app {
     & .mainTabs__list {
       @extend %flex-row;
 
-      & > li {
+      & a {
+        display: block;
         padding-left: 1.5rem;
         padding-right: 1.5rem;
         padding-bottom: 1.43rem;
         padding-top: 1.43rem;
+
+        &.selectedTab {
+          border-bottom: 4px solid $won-red;
+        }
       }
 
       & .mainTabs__list__unread {
