@@ -1,6 +1,12 @@
 //span the following over the whole scss to win specificity battles
 //#body-id {
 
+
+@import 'fonts';
+@import 'flex-layout';
+@import 'sizing-utils';
+@import 'positioning-utils';
+
 // <style-resetting> ---------------------------------------
 
 body, header, section, nav, div, ul {
@@ -38,17 +44,24 @@ $won-line-gray: #CBD2D1; //use for lines
 
 // global styling
 
-body {
-  min-height: 100vh;
-  min-width: 100vw;
+/*
+html {
+  overflow-x: scroll;
+  overflow-y: scroll;
+}*/
+html, body {
+  //TODO make sure the body covers everything perfectly but doesn't cause external scrollbars.
+  //min-height: 100vh; //doesn't ignore scrollbars in chrome
+  //min-height: 100%;
+  //min-width: 100vw; //doesn't ignore scrollbars in chrome
+  //min-width: 100%;
+  //@include fixed-square(99.9%); //dirty
+  //@include fixed-height(100vh);
+
+  //position: absolute; top: 01px; bottom: 01px; right: 01px; left: 01px;
 }
 
 //<wonAppTag> ----------------------------------------------
-
-@import 'fonts';
-@import 'flex-layout';
-@import 'sizing-utils';
-@import 'positioning-utils';
 
 won-app {
   background-color: $won-lighter-gray;
@@ -69,12 +82,10 @@ won-app {
   @extend %flex-row-spaced;
 
   font-family: 'Open Sans';
-  font-weight: 300;
+  font-weight: 400;
   font-style: normal;
 
-  @include fixed-height(6rem); //TODO might be a bit too much
-  //text-align: center;
-  //overflow: hidden;
+  //@include fixed-height(6rem); //TODO might be a bit too much
 
   background-color: white;
 
@@ -114,17 +125,20 @@ won-app {
 }
 
 .bigicon {
-  @include fixed-square(3.6rem);
+  //@include fixed-square(3.6rem);
+  @include fixed-square(2.25rem);
+
 }
 
 .mainTabs {
 
   font-family: 'Open Sans';
-  font-weight: 300;
+  font-weight: 400;
   font-style: normal;
 
   background-color: $won-light-gray;
-  border: 1px solid $won-line-gray;
+  border-top: 1px solid $won-line-gray;
+  border-bottom: 1px solid $won-line-gray;
   @extend %flex-row-spaced;
 
   & a {
@@ -137,16 +151,25 @@ won-app {
 
     & .mainTabs__list {
       @extend %flex-row;
+      align-items: stretch;
 
-      & a {
-        display: block;
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
-        padding-bottom: 1.43rem;
-        padding-top: 1.43rem;
+      $verticalPadding: 1rem;
+      $horizontalPadding: 3.0rem;
+
+      & li {
 
         &.selectedTab {
-          border-bottom: 4px solid $won-red;
+          $borderWidth: 0.25rem;
+          border-bottom: $borderWidth solid $won-red;
+          //padding-bottom: $verticalPadding - $borderWidth;
+        }
+
+        & a {
+          display: block;
+          padding-bottom: $verticalPadding;
+          padding-top: $verticalPadding;
+          padding-left: $horizontalPadding;
+          padding-right: $horizontalPadding;
         }
       }
 
