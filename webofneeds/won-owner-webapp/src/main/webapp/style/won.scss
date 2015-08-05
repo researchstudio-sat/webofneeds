@@ -45,9 +45,10 @@ body {
 
 //<wonAppTag> ----------------------------------------------
 
-@import "fonts";
-@import "flex-layout";
-@import "sizing-utils";
+@import 'fonts';
+@import 'flex-layout';
+@import 'sizing-utils';
+@import 'positioning-utils';
 
 won-app {
   background-color: $won-lighter-gray;
@@ -82,17 +83,30 @@ won-app {
     text-decoration: none;
   }
 
+  & .topnav__page-title {
+    font-weight: 700;
+  }
+
+  & .topnav__carret {
+    /*
+    // without svg-included margins
+    @include fixed-height(0.5rem);
+    @include fixed-width(0.875rem);
+    */
+
+    // with svg-included margins
+    @include fixed-square(1rem);
+  }
+
   & .topnav__button {
     @extend %flex-row;
 
     & .bigicon {
       //TODO; generic classes shouldn't be styled in non-bem classes
       margin: 0.75rem;
-
     }
-
-    & .topnav__button__caption { }
   }
+  //TODO some of the images contain white-space within them (e.g. the help-, plus- and carret-icons)
 
   & .topnav__left { /* @extend %flex-row; */ }
 
@@ -111,22 +125,47 @@ won-app {
 
   background-color: $won-light-gray;
   border: 1px solid $won-line-gray;
-  //background-color: black;
+  @extend %flex-row-spaced;
 
   & a {
     color: black;
     text-decoration: none;
   }
 
-  & > .mainTabs__list {
-    //@extend %list-nav-horizontal;
-    @extend %flex-row;
-    & > li {
-      padding-left: 1em;
-      padding-right: 1em;
+  & .mainTabs__center {
+    display: inline-block;
+
+    & .mainTabs__list {
+      @extend %flex-row;
+
+      & > li {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        padding-bottom: 1.43rem;
+        padding-top: 1.43rem;
+      }
+
+      & .mainTabs__list__unread {
+        color: $won-red;
+      }
     }
   }
-  & > .mainTabs__right {
+
+  & .mainTabs__right {
+
+    //float: right;
+
+    /* use the springs, luke! */
+
+    //using position:absolute here would require placing a parent-div with position:relative
+    //@extend %center-right;
+    display: inline-block;
+
+
+    @extend %flex-row;
+    & .mainTabs__right__searchicon {
+     @include fixed-square(2rem);
+    }
   }
 }
 

@@ -10,7 +10,7 @@ export default function wonAppTag() {
                 <div class="topnav__left">
                     <a href="#" class="topnav__button">
                         <img src="generated/icon-sprite.svg#WON_ico_header" class="bigicon">
-                        <span class="topnav__button__caption">Web of Needs</span>
+                        <span class="topnav__page-title">Web of Needs</span>
                     </a>
                 </div>
                 <div class="topnav__center">
@@ -24,38 +24,41 @@ export default function wonAppTag() {
                         <li class="">
                             <a href="#" class="topnav__button">
                                 <span class="topnav__button__caption">Groups</span>
+                                <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__carret">
                                 <img src="generated/icon-sprite.svg#ico36_help" class="bigicon">
-                                <!--
-                                <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__icon">
-                                <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__icon">
-                                -->
                             </a>
                         </li>
                         <li>
                             <a href="#" class="topnav__button">
                                 <span class="topnav__button__caption">Username</span>
+                                <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__carret">
                                 <img src="generated/icon-sprite.svg#ico36_help" class="bigicon">
-                                <!--
-                                <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__icon">
-                                <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__icon">
-                                -->
                             </a>
                         </li>
                     </ul>
                 </div>
             </nav>
             <nav ng-cloak ng-hide="{{false}}" class="mainTabs">
-                <ul class="mainTabs__list">
-                    <li><a href="#">Feed</a></li>
-                    <li><a href="#">Posts</a></li>
-                    <li><a href="#">Incoming Requests</a></li>
-                    <li><a href="#">Matches</a></li>
-                </ul>
-                <!-- TODO
-                <div class="mainTabs__right">
-                    <a href="#">[Search]</a>
+                <div class="mainTabs__left"></div>
+                <div class="mainTabs__center">
+                    <ul class="mainTabs__list">
+                        <li><a href="#">Feed</a></li>
+                        <li><a href="#">Posts
+                            <span class="mainTabs__list__unread">5</span>
+                        </a></li>
+                        <li><a href="#">Incoming Requests
+                            <span class="mainTabs__list__unread">5</span>
+                        </a></li>
+                        <li><a href="#">Matches
+                            <span class="mainTabs__list__unread">18</span>
+                        </a></li>
+                    </ul>
                 </div>
-                -->
+                <div class="mainTabs__right">
+                    <a href="#">
+                        <img src="generated/icon-sprite.svg#ico36_search" class="mainTabs__right__searchicon">
+                    </a>
+                </div>
             </nav>
         </header>
         <section id="main" class="contentArea">

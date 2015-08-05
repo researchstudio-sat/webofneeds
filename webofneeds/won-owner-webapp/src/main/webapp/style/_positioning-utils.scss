@@ -8,6 +8,12 @@
   position: relative;
   left: 50%;
 }
+%center-right {
+  transform: translateY(-100%) translateX(-50%);
+  position: relative;
+  left: 100%;
+  top: 50%;
+}
 %center {
   transform: translateY(-50%) translateX(-50%);
   position: relative;
