@@ -153,20 +153,19 @@ won-app {
       @extend %flex-row;
       align-items: stretch;
 
-      $verticalPadding: 1rem;
-      $horizontalPadding: 3.0rem;
-
       & li {
+        $verticalPadding: 1rem;
+        $horizontalPadding: 3.0rem;
+        $borderWidth: 0.25rem;
 
         &.selectedTab {
-          $borderWidth: 0.25rem;
           border-bottom: $borderWidth solid $won-red;
           //padding-bottom: $verticalPadding - $borderWidth;
         }
 
         & a {
           display: block;
-          padding-bottom: $verticalPadding;
+          padding-bottom: $verticalPadding - $borderWidth;
           padding-top: $verticalPadding;
           padding-left: $horizontalPadding;
           padding-right: $horizontalPadding;
