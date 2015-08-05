@@ -152,17 +152,8 @@ won-app {
   }
 
   & .mainTabs__right {
+    //@extend %flex-row;
 
-    //float: right;
-
-    /* use the springs, luke! */
-
-    //using position:absolute here would require placing a parent-div with position:relative
-    //@extend %center-right;
-    display: inline-block;
-
-
-    @extend %flex-row;
     & .mainTabs__right__searchicon {
      @include fixed-square(2rem);
     }
