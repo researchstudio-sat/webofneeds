@@ -1,0 +1,20 @@
+# start the wonnode and owner application on satsrv07 (jenkins node)
+wonnode:
+  image: webofneeds/wonnode
+  ports: 
+  - 8888:8080
+  - 61616:61616
+  environment:
+  - uri.host=satsrv07.researchstudio.at
+  - http.port=8888
+  - activemq.broker.port=61616
+owner:
+  image: webofneeds/owner
+  ports: 
+  - 8081:8080
+  environment:
+  - node.default.host=satsrv07.researchstudio.at
+  - node.default.http.port=8888
+  # let start wonnode before owner
+  links:
+  - wonnode
