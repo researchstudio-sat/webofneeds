@@ -25,14 +25,14 @@ export default function wonAppTag() {
                             <a href="#" class="topnav__button">
                                 <span class="topnav__button__caption">Groups</span>
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__carret">
-                                <img src="generated/icon-sprite.svg#ico36_help" class="bigicon">
+                                <img src="generated/icon-sprite.svg#ico36_group" class="bigicon">
                             </a>
                         </li>
                         <li>
                             <a href="#" class="topnav__button">
                                 <span class="topnav__button__caption">Username</span>
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__carret">
-                                <img src="generated/icon-sprite.svg#ico36_help" class="bigicon">
+                                <img src="generated/icon-sprite.svg#ico36_person" class="bigicon">
                             </a>
                         </li>
                     </ul>
