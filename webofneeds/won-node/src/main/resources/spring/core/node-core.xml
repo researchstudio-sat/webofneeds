@@ -40,6 +40,7 @@
         <property name="dataURIPrefix" value="${uri.prefix.data}" />
         <property name="connectionResourceURIPrefix" value="${uri.prefix.connection}" />
         <property name="eventResourceURIPrefix" value="${uri.prefix.event}" />
+        <property name="attachmentResourceURIPrefix" value="${uri.prefix.attachment}" />
         <property name="needResourceURIPrefix" value="${uri.prefix.need}" />
         <property name="pageURIPrefix" value="${uri.prefix.page}" />
         <property name="generalURIPrefix" value="${uri.prefix}" />

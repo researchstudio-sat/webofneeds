@@ -93,8 +93,7 @@
         <!-- servlet & web layer dependencies -->
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>${dependencies.scope}</scope>
+            <artifactId>javax.servlet-api</artifactId>
         </dependency>
 
         <dependency>

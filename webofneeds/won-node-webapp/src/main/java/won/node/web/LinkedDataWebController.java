@@ -18,6 +18,7 @@ package won.node.web;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,19 +35,26 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.HandlerMapping;
 import won.node.service.impl.URIService;
+import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.service.LinkedDataService;
-import won.protocol.vocabulary.HTTP;
 import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.CNT;
+import won.protocol.vocabulary.HTTP;
+import won.protocol.vocabulary.WONMSG;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * TODO: check the working draft here and see to conformance:
@@ -159,7 +168,7 @@ public class
                               Model model,
                               HttpServletResponse response) {
     URI eventURI = uriService.createEventURIForId(identifier);
-    Dataset rdfDataset = linkedDataService.getEventDataset(eventURI);
+    Dataset rdfDataset = linkedDataService.getDatasetForUri(eventURI);
     if (model != null) {
       model.addAttribute("rdfDataset", rdfDataset);
       model.addAttribute("resourceURI", eventURI.toString());
@@ -170,6 +179,24 @@ public class
       return "notFoundView";
     }
   }
+
+    //webmvc controller method
+    @RequestMapping("${uri.path.page.attachment}/{identifier}")
+    public String showAttachmentPage(@PathVariable(value = "identifier") String identifier,
+                                Model model,
+                                HttpServletResponse response) {
+        URI attachmentURI = uriService.createAttachmentURIForId(identifier);
+        Dataset rdfDataset = linkedDataService.getDatasetForUri(attachmentURI);
+        if (model != null) {
+            model.addAttribute("rdfDataset", rdfDataset);
+            model.addAttribute("resourceURI", attachmentURI.toString());
+            model.addAttribute("dataURI", uriService.toDataURIIfPossible(attachmentURI).toString());
+            return "rdfDatasetView";
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "notFoundView";
+        }
+    }
 
   //webmvc controller method
   @RequestMapping("${uri.path.page.need}")
@@ -266,9 +293,10 @@ public class
       method = RequestMethod.GET,
       produces={"application/ld+json",
                 "application/trig",
-                "application/n-quads"})
-  public ResponseEntity<Dataset> redirectToData(
-      HttpServletRequest request) {
+                "application/n-quads",
+                "*/*"})
+  public ResponseEntity<String> redirectToData(
+      HttpServletRequest request, HttpServletResponse response) throws IOException {
     URI resourceUriPrefix = URI.create(this.resourceURIPrefix);
     URI dataUri = URI.create(this.dataURIPrefix);
     String requestUri = getRequestUriWithQueryString(request);
@@ -276,15 +304,16 @@ public class
     logger.debug("resource URI requested with data mime type. redirecting from {} to {}", requestUri, redirectToURI);
     if (redirectToURI.equals(requestUri)) {
         logger.debug("redirecting to same URI avoided, sending status 500 instead");
-        return new ResponseEntity<Dataset>(HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
     HttpHeaders headers = new HttpHeaders();
     headers = addExpiresHeadersBasedOnRequestURI(headers, requestUri);
-    headers.setLocation(URI.create(redirectToURI));
+    //headers.setLocation(URI.create(redirectToURI));
     addCORSHeader(headers);
-      return new ResponseEntity<Dataset>(null, headers, HttpStatus.SEE_OTHER);
+    response.sendRedirect(redirectToURI);
+    return null;
   }
 
   private String getRequestUriWithQueryString(final HttpServletRequest request) {
@@ -309,7 +338,7 @@ public class
       method = RequestMethod.GET,
       produces="text/html")
   public ResponseEntity<String> redirectToPage(
-      HttpServletRequest request) {
+      HttpServletRequest request, HttpServletResponse response)  throws IOException {
     URI resourceUriPrefix = URI.create(this.resourceURIPrefix);
     URI pageUriPrefix = URI.create(this.pageURIPrefix);
     String requestUri = getRequestUriWithQueryString(request);
@@ -324,8 +353,9 @@ public class
     headers = addExpiresHeadersBasedOnRequestURI(headers, requestUri);
     addCORSHeader(headers);
     //add a location header
-    headers.add("Location",redirectToURI);
-    return new ResponseEntity<String>("{}", headers, HttpStatus.SEE_OTHER);
+    //headers.add("Location",redirectToURI);
+    response.sendRedirect(redirectToURI);
+    return null;
   }
 
   /**
@@ -361,7 +391,9 @@ public class
       @RequestParam(value="page",defaultValue = "-1") int page) {
     logger.debug("listNeedURIs() called");
     Dataset model = linkedDataService.listNeedURIs(page);
-    HttpHeaders headers = addAlreadyExpiredHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), URI.create(this.needResourceURIPrefix)));
+    HttpHeaders headers = addAlreadyExpiredHeaders(
+      addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()),
+                                   URI.create(this.needResourceURIPrefix)));
     addCORSHeader(headers);
     return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
   }
@@ -459,7 +491,7 @@ public class
     logger.debug("readConnectionEvent() called");
 
     URI eventURI = uriService.createEventURIForId(identifier);
-    Dataset rdfDataset = linkedDataService.getEventDataset(eventURI);
+    Dataset rdfDataset = linkedDataService.getDatasetForUri(eventURI);
     if (rdfDataset != null) {
       HttpHeaders headers = new HttpHeaders();
       addCORSHeader(headers);
@@ -467,7 +499,58 @@ public class
     } else {
       return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
     }
+
   }
+
+    @RequestMapping(
+            value="${uri.path.data.attachment}/{identifier}",
+            method = RequestMethod.GET,
+            produces={"application/ld+json",
+                    "application/trig",
+                    "application/n-quads",
+                    "*/*"})
+    public ResponseEntity<Dataset> readAttachment(
+            HttpServletRequest request,
+            @PathVariable(value = "identifier") String identifier) {
+        logger.debug("readAttachment() called");
+
+        URI attachmentURI = uriService.createAttachmentURIForId(identifier);
+        Dataset rdfDataset = linkedDataService.getDatasetForUri(attachmentURI);
+        if (rdfDataset != null) {
+            HttpHeaders headers = new HttpHeaders();
+            addCORSHeader(headers);
+          String mimeTypeOfResponse = RdfUtils.findFirst(rdfDataset, new RdfUtils.ModelVisitor<String>() {
+            @Override
+            public String visit(com.hp.hpl.jena.rdf.model.Model model) {
+              String content = getObjectOfPropertyAsString(model, CNT.BYTES);
+              if (content == null) return null;
+              String contentType = getObjectOfPropertyAsString(model, WONMSG.CONTENT_TYPE);
+              return contentType;
+            }
+          });
+          if (mimeTypeOfResponse != null){
+            //we found a base64 encoded attachment, we obtained its contentType, so we set it as the
+            //contentType of the response.
+            Set<MediaType> producibleMediaTypes = new HashSet<>();
+            producibleMediaTypes.add(MediaType.valueOf(mimeTypeOfResponse));
+            request.setAttribute(HandlerMapping.PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE, producibleMediaTypes);
+          }
+          return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+  private String getObjectOfPropertyAsString(com.hp.hpl.jena.rdf.model.Model model, Property property){
+    NodeIterator nodeIteratr = model.listObjectsOfProperty(property);
+    if (!nodeIteratr.hasNext()) return null;
+    String ret = nodeIteratr.next().asLiteral().getString();
+    if (nodeIteratr.hasNext()) {
+      throw new IncorrectPropertyCountException("found more than one property of cnt:bytes", 1, 2);
+    }
+    return ret;
+  }
+    
 
     /**
      * Get the RDF for the connections of the specified need.

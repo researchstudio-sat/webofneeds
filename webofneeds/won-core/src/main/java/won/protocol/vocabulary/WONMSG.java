@@ -150,6 +150,8 @@ public class WONMSG
   public static final Property HAS_SIGNATURE_GRAPH_PROPERTY = m.createProperty(BASE_URI, "hasSignatureGraph");
 
 
+  public static final Property CONTENT_TYPE = m.createProperty(BASE_URI,"contentType");
+
   public static final String GRAPH_URI_FRAGMENT = "data";
 
   /**

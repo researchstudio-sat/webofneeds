@@ -40,6 +40,7 @@
         <mvc:message-converters>
             <bean class="won.protocol.rest.RdfModelConverter"/>
             <bean class="won.protocol.rest.RdfDatasetConverter"/>
+            <bean class="won.protocol.rest.RdfDatasetAttachmentConverter"/>
         </mvc:message-converters>
     </mvc:annotation-driven>
     <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" />

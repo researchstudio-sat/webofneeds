@@ -1,7 +1,10 @@
 package won.node.camel.processor.fixed;
 
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.PathParser;
 import org.apache.camel.Exchange;
@@ -21,12 +24,14 @@ import won.protocol.model.Facet;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.model.OwnerApplication;
+import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -59,6 +64,9 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
 
   private Need storeNeed(final WonMessage wonMessage) {
     Dataset needContent = wonMessage.getMessageContent();
+    List<WonMessage.AttachmentHolder> attachmentHolders = wonMessage.getAttachments();
+    //remove attachment and its signature from the needContent
+    removeAttachmentsFromNeedContent(needContent, attachmentHolders);
     URI needURI = getNeedURIFromWonMessage(needContent);
     if (!needURI.equals(wonMessage.getSenderNeedURI()))
       throw new IllegalArgumentException("receiverNeedURI and NeedURI of the content are not equal");
@@ -82,7 +90,20 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     }
 
     rdfStorage.storeDataset(needURI, needContent);
+    //now store attachments
+    for(WonMessage.AttachmentHolder attachmentHolder: attachmentHolders){
+      rdfStorage.storeDataset(attachmentHolder.getDestinationUri(), attachmentHolder.getAttachmentDataset());
+    }
     return need;
+  }
+
+  private void removeAttachmentsFromNeedContent(Dataset needContent, List<WonMessage.AttachmentHolder> attachmentHolders) {
+    for (WonMessage.AttachmentHolder attachmentHolder: attachmentHolders){
+      for (Iterator<String> it = attachmentHolder.getAttachmentDataset().listNames(); it.hasNext(); ){
+        String modelName =it.next();
+        needContent.removeNamedModel(modelName);
+      }
+    }
   }
 
   private void authorizeOwnerApplicationForNeed(final Message message, final Need need) {
@@ -155,15 +176,4 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     need = needRepository.save(need);
     split.stop();
   }
-
-  /*
-  private List<String> getAttachmentGraphUris(URI needURI, Dataset dataset){
-    Path propertyPath = PathParser.parse("<http://purl.org/webofneeds/model#hasAttachment>");
-    RdfUtils.getURIPropertyForPropertyPath(dataset, needURI, propertyPath);
-
-  }
-  */
-
-
-
 }

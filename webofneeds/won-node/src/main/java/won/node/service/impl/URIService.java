@@ -36,6 +36,8 @@ public class URIService
   private String connectionResourceURIPrefix;
   //prefix of an event resource
   private String eventResourceURIPrefix;
+  //prefix of an attachment resource
+  private String attachmentResourceURIPrefix;
   //prefix for URISs of RDF data
   private String dataURIPrefix;
   //prefix for URIs referring to real-world things
@@ -115,6 +117,10 @@ public class URIService
     return URI.create(eventResourceURIPrefix.toString() + "/"   + id);
   }
 
+  public URI createAttachmentURIForId(String id) {
+    return URI.create(attachmentResourceURIPrefix.toString() + "/"   + id);
+  }
+
   public URI createNeedURI(Need need)
   {
     return URI.create(needResourceURIPrefix.toString() + "/" + need.getId());
@@ -138,6 +144,10 @@ public class URIService
   public void setEventResourceURIPrefix(final String eventResourceURIPrefix)
   {
     this.eventResourceURIPrefix = eventResourceURIPrefix;
+  }
+
+  public void setAttachmentResourceURIPrefix(String attachmentResourceURIPrefix) {
+    this.attachmentResourceURIPrefix = attachmentResourceURIPrefix;
   }
 
   public void setDataURIPrefix(final String dataURIPrefix)
