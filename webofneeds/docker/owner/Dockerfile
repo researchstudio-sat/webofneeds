@@ -2,11 +2,12 @@
 # and the conf directory have to be copied into this folder
 FROM tomcat:7.0
 RUN apt-get update && apt-get install -y \
+    openjdk-8-jre \
     vim \
     less \
 	dos2unix
-ADD ./owner.war /usr/local/tomcat/webapps/
 ADD ./tomcat-libs/* /usr/local/tomcat/lib/
+ADD ./owner.war /usr/local/tomcat/webapps/
 ADD ./conf /usr/local/tomcat/won/conf
 ADD ./setenv.sh /usr/local/tomcat/bin/
 ADD ./tomcat-users.xml /usr/local/tomcat/conf/
