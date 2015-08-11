@@ -15,10 +15,12 @@ RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true 
 RUN apt-get install oracle-java8-installer -y
 RUN apt-get install oracle-java8-set-default
 
-# add the won files
+# add the webofneeds files
 ADD ./tomcat-libs/* /usr/local/tomcat/lib/
 ADD ./won.war /usr/local/tomcat/webapps/
 ADD ./conf /usr/local/tomcat/won/conf
+
+# configure tomcat
 ADD ./setenv.sh /usr/local/tomcat/bin/
 ADD ./tomcat-users.xml /usr/local/tomcat/conf/
 RUN dos2unix /usr/local/tomcat/bin/setenv.sh
