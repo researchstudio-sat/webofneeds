@@ -130,60 +130,124 @@ won-app {
 
 }
 
-.mainTabs {
-
-  font-family: 'Open Sans';
-  font-weight: 400;
-  font-style: normal;
-
+%mainTabBar {
+  //TODO this class doesn't adhere to the SRP yet, imho.
   background-color: $won-light-gray;
   border-top: 1px solid $won-line-gray;
   border-bottom: 1px solid $won-line-gray;
   @extend %flex-row-spaced;
 
-  & a {
-    color: black;
-    text-decoration: none;
-  }
+  font-family: 'Open Sans';
 
-  & .mainTabs__center {
-    display: inline-block;
+  & .tabs {
+    font-weight: 400;
+    @extend %flex-row;
+    align-items: stretch;
 
-    & .mainTabs__list {
-      @extend %flex-row;
-      align-items: stretch;
+    $selectedBorderWidth: 0.25rem;
+    & .selectedTab {
+      border-bottom: $selectedBorderWidth solid $won-red;
+    }
 
-      & li {
-        $verticalPadding: 1rem;
-        $horizontalPadding: 3.0rem;
-        $borderWidth: 0.25rem;
+    & li {
+      $verticalPadding: 1rem;
+      $horizontalPadding: 3.0rem;
 
-        &.selectedTab {
-          border-bottom: $borderWidth solid $won-red;
-          //padding-bottom: $verticalPadding - $borderWidth;
-        }
+      /* TODO use max-width and flex-space-in-between instead? This
+       * collapses the padding on smaller viewports automatically. But
+       * then again, this would make an assumption about the number
+       * of contained tabs, which is bad.
+       */
+      margin-left: $horizontalPadding;
+      margin-right: $horizontalPadding;
+      padding-bottom: $verticalPadding - $selectedBorderWidth;
+      padding-top: $verticalPadding;
 
-        & a {
-          display: block;
-          padding-bottom: $verticalPadding - $borderWidth;
-          padding-top: $verticalPadding;
-          padding-left: $horizontalPadding;
-          padding-right: $horizontalPadding;
-        }
-      }
-
-      & .mainTabs__list__unread {
-        color: $won-red;
+      & a {
+        color: black;
+        text-decoration: none;
       }
     }
+
+    & .tabs__unread {
+      color: $won-red;
+    }
   }
+}
+
+.mainTabs {
+  @extend %mainTabBar;
 
   & .mainTabs__right {
-    //@extend %flex-row;
-
-    & .mainTabs__right__searchicon {
-     @include fixed-square(2rem);
+    //TODO position properly according to reference
+    & a {
+      display: block;
     }
+    & .mainTabs__right__searchicon {
+      @include fixed-height(1.7rem);
+    }
+  }
+}
+
+.createNeedTitle {
+  @extend %mainTabBar
+}
+
+
+
+
+/**
+ * a hacky solution to the speech-bubble-triangle using :before and :after
+ * based on:
+ * * http://nicolasgallagher.com/pure-css-speech-bubbles/
+ * * http://ilikepixels.co.uk/drop/bubbler/
+ */
+.speechbubbletest {
+  background-color: $won-light-gray;
+  border: 1px solid $won-line-gray;
+
+  position: relative;
+
+  padding: 1rem;
+
+  $triangleSize: 16px;
+
+  &:before, &:after {
+
+    content: "";
+    display: block;
+
+    position: absolute; // might be problematic
+    right: 50%;
+    left: auto;
+    bottom: auto;
+
+    border-style: solid;
+    //background-color: maroon;
+    border-width: 0px $triangleSize $triangleSize;
+  }
+
+  &:before {
+    // border
+    border-color: $won-line-gray transparent;
+    top: -$triangleSize;
+  }
+
+  &:after {
+    // triangle content
+    border-color: $won-light-gray transparent;
+    top: -$triangleSize + 1.8px;
+
+    //box-shadow: 1px 1px 1px $won-line-gray;
+
+  }
+}
+.speech-bubble-triangle {
+  @include fixed-square(2rem);
+  & .speech-bubble-colors {
+    fill: $won-light-gray;
+    stroke: $won-line-gray;
+    stroke-width: 0.338px;
   }
 }
 
