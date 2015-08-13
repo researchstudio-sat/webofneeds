@@ -51,10 +51,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * TODO: check the working draft here and see to conformance:
@@ -312,8 +309,17 @@ public class
     headers = addExpiresHeadersBasedOnRequestURI(headers, requestUri);
     //headers.setLocation(URI.create(redirectToURI));
     addCORSHeader(headers);
-    response.sendRedirect(redirectToURI);
+      setResponseHeaders(response, headers);
+      response.sendRedirect(redirectToURI);
     return null;
+  }
+
+  public void setResponseHeaders(final HttpServletResponse response, final HttpHeaders headers) {
+    for(Map.Entry<String, List<String>> entry : headers.entrySet()){
+      for (String value : entry.getValue()) {
+        response.setHeader(entry.getKey(), value);
+      }
+    }
   }
 
   private String getRequestUriWithQueryString(final HttpServletRequest request) {
@@ -354,6 +360,7 @@ public class
     addCORSHeader(headers);
     //add a location header
     //headers.add("Location",redirectToURI);
+    setResponseHeaders(response, headers);
     response.sendRedirect(redirectToURI);
     return null;
   }
