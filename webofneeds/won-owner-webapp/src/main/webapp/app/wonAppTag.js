@@ -38,7 +38,7 @@ export default function wonAppTag() {
                     </ul>
                 </div>
             </nav>
-            <nav ng-cloak ng-show="{{true}}" class="mainTabs">
+            <nav ng-cloak ng-show="{{false}}" class="mainTabs">
                 <div class="mainTabs__left"></div>
                 <div class="mainTabs__center">
                     <ul class="tabs">
@@ -71,24 +71,6 @@ export default function wonAppTag() {
             <h1 ng-click="ctrl.fooFun()">Hello, from your lovely app-directive! Foo{{ctrl.foo}}! </h1>
 
             <div class="speechbubbletest">Hello!</div>
-
-            <div class="speechbubble-svg">Hello Svg!</div>
-
-
-            <svg class="speech-bubble-triangle"
-                 xmlns="http://www.w3.org/2000/svg"
-                 version="1.1"
-                 viewBox="0 0 16.063818 8.2639771"
-                 height="8.26"
-                 width="16.06">
-                <path class="speech-bubble-colors"
-                      d="m 0, 8 8, -8 8, 8"/>
-            </svg>
-
-            <div style="background-color: black">
-                <img src="generated/icon-sprite.svg#speechbubble-triangle">
-                <img src="images/won-icons/speechbubble-triangle.svg">
-            </div>
 
         </section>
         <footer></footer>

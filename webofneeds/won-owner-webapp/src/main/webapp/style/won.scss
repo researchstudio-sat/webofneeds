@@ -190,23 +190,30 @@ won-app {
 }
 
 .createNeedTitle {
-  @extend %mainTabBar
+  @extend %mainTabBar;
+  @extend %speech-bubble--top;
+}
+
+
+.speechbubbletest {
+  @extend %speech-bubble--top;
+  padding: 1rem;
 }
 
 
 
-
+//TODO change this into an @include macro
+// parameters: color, borderColor, borderWidth? (requires sqrt), side
 /**
  * a hacky solution to the speech-bubble-triangle using :before and :after
  * based on:
  * * http://nicolasgallagher.com/pure-css-speech-bubbles/
  * * http://ilikepixels.co.uk/drop/bubbler/
  */
-.speechbubbletest {
+%speech-bubble--top {
   background-color: $won-light-gray;
   border: 1px solid $won-line-gray;
-  position: relative;
-  padding: 1rem;
+  position: relative; // to allow positioning the triangle-parts as absolute
 
   $triangleSize: 16px;
 
@@ -232,47 +239,10 @@ won-app {
   &:after {
     // triangle content
     border-color: $won-light-gray transparent;
-    top: -$triangleSize + 1.8px;
+    //top: -$triangleSize + 1.8px;
+    top: -$triangleSize + 1.44px; //sqrt(2 * borderwidth^2)
+
   }
-}
-.speech-bubble-triangle {
-  $height: 16px;
-  height: $height;
-  width: 2 * $height;
-
-  & .speech-bubble-colors {
-    fill: $won-light-gray;
-    stroke: $won-line-gray;
-    stroke-width: 0.5px;
-  }
-}
-
-.speechbubble-svg {
-  background-color: $won-light-gray;
-  border: 1px solid $won-line-gray;
-  position: relative;
-  padding: 1rem;
-
-  &:after {
-    content: url('../generated/icon-sprite.svg#speechbubble-triangle');
-
-    $height: 16px;
-    display: block;
-    @include fixed-width($height * 2);
-    @include fixed-height($height);
-
-    position: absolute; // might be problematic
-    right: 50%;
-    left: auto;
-    bottom: auto;
-    top: -$height;
-
-    & * {
-      @include fixed-width($height * 2);
-      @include fixed-height($height);
-    }
-  }
-
 }
 
 
