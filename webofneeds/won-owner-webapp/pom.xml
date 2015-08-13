@@ -218,12 +218,12 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>jspmInstall</id>
+                        <id>jspm install</id>
                         <goals>
                             <goal>jspm</goal>
                         </goals>
                         <configuration>
-                            <arguments>init</arguments>
+                            <arguments>install</arguments>
                         </configuration>
                     </execution>
                     <execution>

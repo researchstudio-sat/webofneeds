@@ -39,6 +39,7 @@
         <module>won-cryptography</module>
         <module>won-utils</module>
         <module>won-vocab</module>
+        <module>won-docker</module>
     </modules>
 
     <dependencyManagement>
