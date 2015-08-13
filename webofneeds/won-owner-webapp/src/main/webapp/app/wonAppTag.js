@@ -72,28 +72,27 @@ export default function wonAppTag() {
 
             <div class="speechbubbletest">Hello!</div>
 
+            <div class="speechbubble-svg">Hello Svg!</div>
 
-            <svg id="speech-bubble-triangle"
-                 class="speech-bubble-triangle"
+
+            <svg class="speech-bubble-triangle"
                  xmlns="http://www.w3.org/2000/svg"
                  version="1.1"
                  viewBox="0 0 16.063818 8.2639771"
-                 height="8.2639771"
-                 width="16.063818">
-              <g transform="translate(-0.08281408,-1044.1785)"
-                 id="layer1">
-                <path id="speech-bubble-triangle-path" class="speech-bubble-colors"
-                      d="m 0.00174102,1052.5466 8.11893778,-8.1188 8.1189362,8.1188"
-                      style="fill-opacity:1;fill-rule:evenodd;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-              </g>
+                 height="8.26"
+                 width="16.06">
+                <path class="speech-bubble-colors"
+                      d="m 0, 8 8, -8 8, 8"/>
             </svg>
+
+            <div style="background-color: black">
+                <img src="generated/icon-sprite.svg#speechbubble-triangle">
+                <img src="images/won-icons/speechbubble-triangle.svg">
+            </div>
 
         </section>
         <footer></footer>
         `;
-
-
-    // style="fill:#00a9ca;fill-opacity:1;fill-rule:evenodd;stroke:#dc0000;stroke-width:0.33678553px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
 
     console.log('updated this file at last');
 

@@ -205,9 +205,7 @@ won-app {
 .speechbubbletest {
   background-color: $won-light-gray;
   border: 1px solid $won-line-gray;
-
   position: relative;
-
   padding: 1rem;
 
   $triangleSize: 16px;
@@ -226,31 +224,56 @@ won-app {
     //background-color: maroon;
     border-width: 0px $triangleSize $triangleSize;
   }
-
   &:before {
     // border
     border-color: $won-line-gray transparent;
     top: -$triangleSize;
   }
-
   &:after {
     // triangle content
     border-color: $won-light-gray transparent;
     top: -$triangleSize + 1.8px;
-
-    //box-shadow: 1px 1px 1px $won-line-gray;
-
   }
 }
 .speech-bubble-triangle {
-  @include fixed-square(2rem);
+  $height: 16px;
+  height: $height;
+  width: 2 * $height;
+
   & .speech-bubble-colors {
     fill: $won-light-gray;
     stroke: $won-line-gray;
-    stroke-width: 0.338px;
+    stroke-width: 0.5px;
   }
 }
 
+.speechbubble-svg {
+  background-color: $won-light-gray;
+  border: 1px solid $won-line-gray;
+  position: relative;
+  padding: 1rem;
+
+  &:after {
+    content: url('../generated/icon-sprite.svg#speechbubble-triangle');
+
+    $height: 16px;
+    display: block;
+    @include fixed-width($height * 2);
+    @include fixed-height($height);
+
+    position: absolute; // might be problematic
+    right: 50%;
+    left: auto;
+    bottom: auto;
+    top: -$height;
+
+    & * {
+      @include fixed-width($height * 2);
+      @include fixed-height($height);
+    }
+  }
+
+}
 
 
 //</wonAppTag> ----------------------------------------
