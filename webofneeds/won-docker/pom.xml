@@ -11,7 +11,7 @@
     <artifactId>won-docker</artifactId>
     <version>0.2-SNAPSHOT</version>
     <name>won-docker</name>
-
+    <packaging>pom</packaging>
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
         <jar.skipIfEmpty>true</jar.skipIfEmpty>
