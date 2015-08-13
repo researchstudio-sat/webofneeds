@@ -792,8 +792,8 @@
             -Xlint:deprecation,fallthrough,finally,path,serial,unchecked
         </maven.compile.compilerargs>
         <compile.forked>false</compile.forked>
-        <java.source.version>1.7</java.source.version>
-        <java.target.version>1.7</java.target.version>
+        <java.source.version>1.8</java.source.version>
+        <java.target.version>1.8</java.target.version>
         <surefire.skip>false</surefire.skip>
         <surefire.failure.ignore>true</surefire.failure.ignore>
         <surefire.forkmode>once</surefire.forkmode>
