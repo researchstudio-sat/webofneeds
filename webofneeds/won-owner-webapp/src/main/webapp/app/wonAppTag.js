@@ -38,32 +38,61 @@ export default function wonAppTag() {
                     </ul>
                 </div>
             </nav>
-            <nav ng-cloak ng-show="{{false}}" class="mainTabs">
-                <div class="mainTabs__left"></div>
-                <div class="mainTabs__center">
-                    <ul class="tabs">
-                        <li class=""><a href="#">Feed</a></li>
-                        <li><a href="#">Posts
-                            <span class="tabs__unread">5</span>
-                        </a></li>
-                        <li class="selectedTab"><a href="#">Incoming Requests
-                            <span class="tabs__unread">5</span>
-                        </a></li>
-                        <li><a href="#">Matches
-                            <span class="tabs__unread">18</span>
-                        </a></li>
-                    </ul>
-                </div>
-                <div class="mainTabs__right">
-                    <a href="#">
-                        <img src="generated/icon-sprite.svg#ico36_search_nomargin" class="mainTabs__right__searchicon">
+            <nav ng-cloak ng-show="{{true}}" class="main-tab-bar">
+                <div class="mtb__left"></div>
+                <ul class="mtb__center won-tabs">
+                    <li class=""><a href="#">Feed</a></li>
+                    <li><a href="#">Posts
+                        <span class="main-tab-bar__unread">5</span>
+                    </a></li>
+                    <li class="selectedTab"><a href="#">Incoming Requests
+                        <span class="main-tab-bar__unread">5</span>
+                    </a></li>
+                    <li><a href="#">Matches
+                        <span class="tabs__unread">18</span>
+                    </a></li>
+                </ul>
+                <div class="mtb__right">
+                    <a href="#" class="mtb__searchbtn">
+                        <img src="generated/icon-sprite.svg#ico36_search_nomargin" class="mtb__searchbtn__icon">
                     </a>
                 </div>
             </nav>
-            <nav ng-cloak ng-show="{{true}}" class="createNeedTitle">
-                <div class="cNT_left">x</div>
-                <div class="cNT__center">What is your need?</div>
-                <div class="cNT__right">
+            <nav class="create-need-title" ng-cloak ng-show="{{true}}">
+                <!--<nav ng-cloak ng-show="{{true}}" class="create-need-title__content">-->
+                    <div class="cnt__left">x</div>
+                    <div class="cnt__center">What is your need?</div>
+                    <div class="cnt__right"></div>
+                <!--</nav>-->
+            </nav>
+            <nav class="need-tab-bar" ng-cloak ng-show="{{true}}">
+                <div class="ntb__left">
+                    <
+                    <img src="images/someNeedTitlePic.png"></img>
+                    <h1>New flat, need furniture [TITLE]</h1>
+                    <div>I want to have something [TYPE]</div>
+                </div>
+                <div class="ntb__center"></div>
+                <div class="ntb__right">
+                    [SETTINGS]
+                    <ul class="won-tabs">
+                        <li><a href="#">
+                            Messages
+                            <span class="main-tab-bar__unread">5</span>
+                        </a></li>
+                        <li class="selectedTab"><a href="#">
+                            Matches
+                            <span class="main-tab-bar__unread">5</span>
+                        </a></li>
+                        <li><a href="#">
+                             Requests
+                            <span class="main-tab-bar__unread">18</span>
+                        </a></li>
+                        <li><a href="#">
+                             Sent Requests
+                            <span class="main-tab-bar__unread">18</span>
+                        </a></li>
+                    </ul>
                 </div>
             </nav>
         </header>

@@ -6,6 +6,7 @@
 @import 'flex-layout';
 @import 'sizing-utils';
 @import 'positioning-utils';
+@import 'speech-bubble';
 
 // <style-resetting> ---------------------------------------
 
@@ -72,7 +73,7 @@ won-app {
   @extend %fixed-fill;
   //@extend %fixed-fullscreen; //works but is hacky imho
 
-  @extend %flex-column;
+  @extend %flex-aligned;
   align-items: stretch; //TODO this is bad style! it overwrites flex-col's align-items
   & > .contentArea { flex-grow: 1; }
 }
@@ -130,16 +131,31 @@ won-app {
 
 }
 
-%mainTabBar {
-  //TODO this class doesn't adhere to the SRP yet, imho.
-  background-color: $won-light-gray;
-  border-top: 1px solid $won-line-gray;
-  border-bottom: 1px solid $won-line-gray;
-  @extend %flex-row-spaced;
+%tri-center{color: red !important;}
 
-  font-family: 'Open Sans';
+//TODO extending cascaded classes like this leads to quadratic growth of selectors
+// unless the extending happens also in the style of & > .myfoo { @extends %foo }
+%tri-aligned {
+  display:flex;
 
-  & .tabs {
+  & > %tri__left {
+    order: 10;
+    //margin-right: auto;
+  }
+  & > %tri__center {
+    order: 20;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  & > %tri__right {
+    order: 30;
+    //margin-left: auto;
+  }
+
+}
+
+.won-tabs {
+    font-family: 'Open Sans';
     font-weight: 400;
     @extend %flex-row;
     align-items: stretch;
@@ -169,80 +185,72 @@ won-app {
       }
     }
 
-    & .tabs__unread {
+    & .main-tab-bar__unread {
       color: $won-red;
     }
   }
+
+
+.need-tab-bar {
+  background-color: $won-light-gray;
+  border-top: 1px solid $won-line-gray;
+  border-bottom: 1px solid $won-line-gray;
+
+  @extend %tri-aligned;
+  & > .ntb__left { @extend %tri__left; }
+  & > .ntb__center { @extend %tri__center; }
+  & > .ntb__right { @extend %tri__right; }
 }
 
-.mainTabs {
-  @extend %mainTabBar;
+.main-tab-bar {
+  background-color: $won-light-gray;
+  border-top: 1px solid $won-line-gray;
+  border-bottom: 1px solid $won-line-gray;
 
-  & .mainTabs__right {
-    //TODO position properly according to reference
-    & a {
-      display: block;
-    }
-    & .mainTabs__right__searchicon {
+  @extend %tri-aligned;
+  & > .mtb__left { @extend %tri__left; }
+  & > .mtb__center { @extend %tri__center; }
+  & > .mtb__right { @extend %tri__right; }
+
+
+  & .mtb__searchbtn {
+    display: block;
+    height: 100%;
+    position: relative; // to allow position:absolute for the icon
+
+    & > .mtb__searchbtn__icon {
+      position: absolute;
+      transform: translateX(-100%) translateY(-50%);
+      top: 50%;
       @include fixed-height(1.7rem);
     }
   }
 }
 
-.createNeedTitle {
-  @extend %mainTabBar;
-  @extend %speech-bubble--top;
+%speech-bubble-top--gray-center {
+  @include speech-bubble-top($won-light-gray, $won-line-gray, 16px, 50%);
 }
 
+.create-need-title {
+  background-color: $won-light-gray;
+  border-top: 1px solid $won-line-gray;
+  border-bottom: 1px solid $won-line-gray;
+
+  @extend %tri-aligned;
+  & > .cnt__left { @extend %tri__left; }
+  & > .cnt__center { @extend %tri__center; }
+  & > .cnt__right { @extend %tri__right; }
+
+  @extend %speech-bubble-top--gray-center;
+  &:before, &:after {
+    order: 100;
+    flex-base: 0;
+  }
+}
 
 .speechbubbletest {
-  @extend %speech-bubble--top;
+  @extend %speech-bubble-top--gray-center;
   padding: 1rem;
-}
-
-
-
-//TODO change this into an @include macro
-// parameters: color, borderColor, borderWidth? (requires sqrt), side
-/**
- * a hacky solution to the speech-bubble-triangle using :before and :after
- * based on:
- * * http://nicolasgallagher.com/pure-css-speech-bubbles/
- * * http://ilikepixels.co.uk/drop/bubbler/
- */
-%speech-bubble--top {
-  background-color: $won-light-gray;
-  border: 1px solid $won-line-gray;
-  position: relative; // to allow positioning the triangle-parts as absolute
-
-  $triangleSize: 16px;
-
-  &:before, &:after {
-
-    content: "";
-    display: block;
-
-    position: absolute; // might be problematic
-    right: 50%;
-    left: auto;
-    bottom: auto;
-
-    border-style: solid;
-    //background-color: maroon;
-    border-width: 0px $triangleSize $triangleSize;
-  }
-  &:before {
-    // border
-    border-color: $won-line-gray transparent;
-    top: -$triangleSize;
-  }
-  &:after {
-    // triangle content
-    border-color: $won-light-gray transparent;
-    //top: -$triangleSize + 1.8px;
-    top: -$triangleSize + 1.44px; //sqrt(2 * borderwidth^2)
-
-  }
 }
 
 

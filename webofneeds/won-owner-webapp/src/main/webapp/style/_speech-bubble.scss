@@ -1,0 +1,44 @@
+//TODO parameter borderWidth? (requires sqrt), side
+/**
+ * a hacky solution to the speech-bubble-triangle using :before and :after
+ * based on:
+ * * http://nicolasgallagher.com/pure-css-speech-bubbles/
+ * * http://ilikepixels.co.uk/drop/bubbler/
+ *
+ * @param $triangleSize: needs to be an absolute value (that can be added to the 1px border-width)
+ * @param $hpos: a %-value determining where on the top edge the triangle is placed.
+ */
+@mixin speech-bubble-top($background-color, $border-color, $triangle-size, $hpos) {
+  background-color: $background-color;
+  border: 1px solid $border-color;
+  position: relative; // to allow positioning the triangle-parts as absolute
+
+  $triangleSize: 16px;
+
+  &:before, &:after {
+
+    content: "";
+    display: block;
+
+    position: absolute; // might be problematic
+    right: auto;
+    left: $hpos;
+    bottom: auto;
+
+    border-style: solid;
+    //background-color: maroon;
+    border-width: 0px $triangleSize $triangle-size;
+  }
+  &:before {
+    // border
+    border-color: $border-color transparent;
+    top: -$triangle-size;
+  }
+  &:after {
+    // triangle content
+    border-color: $background-color transparent;
+    //top: -$triangleSize + 1.8px;
+    top: -$triangle-size + 1.44px; //sqrt(2 * borderwidth^2)
+
+  }
+}
