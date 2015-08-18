@@ -72,7 +72,7 @@ export default function wonAppTag() {
                 <div class="cnt__left">
                     <img src="generated/icon-sprite.svg#ico36_close" class="cnt__left__close">
                 </div>
-                <div class="cnt__center">What is your need?</div>
+                <h1 class="cnt__center cnt__title">What is your need?</div>
                 <div class="cnt__right"></div>
             </nav>
 
@@ -86,7 +86,7 @@ export default function wonAppTag() {
                     <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__left__backarrow">
                     <img class="ntb__left__image" src="images/someNeedTitlePic.png"></img>
                     <div class="ntb__left__titles">
-                        <h1 class="ntb__left__titles__title">New flat, need furniture [TITLE]</h1>
+                        <h1 class="ntb__title">New flat, need furniture [TITLE]</h1>
                         <div class="ntb__left__titles__type">I want to have something [TYPE]</div>
                     </div>
                 </div>

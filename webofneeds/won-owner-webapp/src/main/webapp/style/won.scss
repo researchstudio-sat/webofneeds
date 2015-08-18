@@ -82,11 +82,14 @@ won-app {
   & > .contentArea { flex-grow: 1; }
 }
 
-.topnav { //TODO split into single-purpose-classes
 
-  font-family: 'Open Sans';
-  font-weight: 400;
-  font-style: normal;
+
+
+
+
+
+
+.topnav { //TODO split into single-purpose-classes
 
   @include tri-aligned('topnav', 1rem);
 
@@ -120,77 +123,92 @@ won-app {
       margin: 0.75rem;
     }
   }
-  //TODO some of the images contain white-space within them (e.g. the help-, plus- and carret-icons)
-
-  & .topnav__left { /* @extend %flex-row; */ }
 
   & .topnav__list { @extend %flex-row; }
 }
 
-.bigicon {
-  //@include fixed-square(3.6rem);
-  @include fixed-square(2.25rem);
-
-}
-
-.won-tabs {
-    //@extend %flex-row;
-    @extend %flex-row-spaced;
-    align-items: stretch;
-
-    $selectedBorderWidth: 0.25rem;
-    & .selectedTab {
-      border-bottom: $selectedBorderWidth solid $won-red;
-    }
-
-    & li {
-      /* TODO use max-width and flex-space-in-between instead? This
-       * collapses the padding on smaller viewports automatically. But
-       * then again, this would make an assumption about the number
-       * of contained tabs, which is bad.
-       */
-
-      $verticalPadding: 1rem;
-      //$horizontalSpace: 3.0rem;
-      $horizontalSpace: 1rem;
-
-      margin-left: $horizontalSpace;
-      margin-right: $horizontalSpace;
-      padding-bottom: $verticalPadding - $selectedBorderWidth;
-      padding-top: $verticalPadding;
-
-      text-align: center;
-
-      & a {
-        color: black;
-        text-decoration: none;
-      }
-    }
-
-    & .mtb__unread {
-      color: $won-red;
-    }
-  }
 
 
-.need-tab-bar {
+
+
+
+%title-bar {
   background-color: $won-light-gray;
   border-top: 1px solid $won-line-gray;
   border-bottom: 1px solid $won-line-gray;
 
-  @include tri-aligned('ntb', 1rem);
+  & %tb__title {
+    font-size: 1.5rem;
+    font-weight: 300;
+  }
+
+  @include tri-aligned('tb', 1rem);
+}
+@mixin title-bar($prefix) {
+  @extend %title-bar;
+  & .#{$prefix}__title { @extend %tb__title; }
+  & > .#{$prefix}__left { @extend .tb__left }
+  & > .#{$prefix}__center { @extend .tb__center }
+  & > .#{$prefix}__right { @extend .tb__right }
+}
+
+
+
+.bigicon {
+  //@include fixed-square(3.6rem);
+  @include fixed-square(2.25rem);
+}
+
+
+
+
+.won-tabs {
+  @extend %flex-row-spaced;
+  align-items: stretch;
+
+  $selectedBorderWidth: 0.25rem;
+  & .selectedTab {
+    border-bottom: $selectedBorderWidth solid $won-red;
+  }
+
+  & li {
+
+    $verticalPadding: 1rem;
+    $horizontalSpace: 1rem;
+
+    margin-left: $horizontalSpace;
+    margin-right: $horizontalSpace;
+    padding-bottom: $verticalPadding - $selectedBorderWidth;
+    padding-top: $verticalPadding;
+
+    text-align: center;
+
+    & a {
+      color: black;
+      text-decoration: none;
+    }
+  }
+
+  & .mtb__unread {
+    color: $won-red;
+  }
+}
+
+
+
+
+
+.need-tab-bar {
+  @include title-bar('ntb');
 
   & > .ntb__left {
     @extend %flex-row;
 
     & .ntb__left__backarrow {
-      //@include fixed-square(2rem);
       @include fixed-height(1.7rem);
-      //transform: rotate(90deg);
     }
 
     & .ntb__left__image {
-      //@include fixed-height(6.18rem); //99px / 16
       @include fixed-height(4.7rem); //99px / 21
 
       margin-left: 1rem;
@@ -201,9 +219,6 @@ won-app {
       @extend %flex-column;
       align-items: flex-start;
 
-      & .ntb__left__titles__title {
-        font-weight: 300;
-      }
 
       & .ntb__left__titles__type {
         color: #A7A7A7;
@@ -213,14 +228,14 @@ won-app {
   }
 
   & > .ntb__right {
-    @extend %flex-column;
-    align-items: flex-end;
-
     //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
     // or make won-tabs a parametrized mixin?
     flex-basis: 35rem;
     max-width: 35rem;
 
+
+    @extend %flex-column;
+    align-items: flex-end;
 
     & .ntb__right__settingscontainer {
       flex-grow: 1;
@@ -230,14 +245,11 @@ won-app {
         @include fixed-height(1.7rem);
         margin-top: 1rem;
         margin-right: 1rem;
-        //@extend %bottom-center;
       }
     }
 
     & .ntb__right__tabbarcontainer {
-      //width: 100%;
       align-self: stretch;
-      //flex-grow: 1;
 
       & .won-tabs {
         height: 100%;
@@ -246,14 +258,17 @@ won-app {
   }
 }
 
-.main-tab-bar {
-  background-color: $won-light-gray;
-  border-top: 1px solid $won-line-gray;
-  border-bottom: 1px solid $won-line-gray;
 
-  @include tri-aligned('mtb', 1rem);
+
+
+
+
+.main-tab-bar {
+  @include title-bar('mtb');
 
   & > .mtb__center {
+    //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
+    // or make won-tabs a parametrized mixin?
     flex-basis: 33rem;
     max-width: 33rem;
   }
@@ -261,51 +276,44 @@ won-app {
   & .mtb__searchbtn {
     display: block;
     height: 100%;
-    position: relative; // to allow position:absolute for the icon
+    position: relative; // to allow %vcenter for the icon
     margin-right: 1rem;
 
     & > .mtb__searchbtn__icon {
-      position: absolute;
-      transform: translateX(-100%) translateY(-50%);
-      top: 50%;
+      @extend %vcenter;
       @include fixed-height(1.7rem);
     }
   }
 }
 
-//%speech-bubble-top--gray-center {
-//}
+
+
 
 .create-need-title {
-  background-color: $won-light-gray;
-  border-top: 1px solid $won-line-gray;
-  border-bottom: 1px solid $won-line-gray;
-
-  @include tri-aligned('cnt', 1rem);
+  @include title-bar('cnt');
 
   & > .cnt__left {
     position: relative;
 
     & .cnt__left__close {
-      //@include fixed-height(1.7rem);
       @include fixed-height(2rem);
       @extend %vcenter;
     }
   }
 
   & > .cnt__center {
-    font-size: 1.5rem;
-    font-weight: 300;
     margin: 0.5rem auto;
   }
 
-  //@extend %speech-bubble-top--gray-center;
-  @include speech-bubble-top($won-light-gray, $won-line-gray, 16px, 45%);
-  &:before, &:after {
-    order: 100;
-    flex-base: 0;
-  }
+  @include speech-bubble-top($won-light-gray, $won-line-gray, 16px, 50%);
 }
+
+
+
+
+
+
+
 
 //</wonAppTag> ----------------------------------------
 
