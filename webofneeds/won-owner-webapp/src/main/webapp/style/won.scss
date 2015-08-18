@@ -134,8 +134,6 @@ won-app {
 
 }
 
-%tri-center{color: red !important;}
-
 //TODO extending cascaded classes like this leads to quadratic growth of selectors
 // unless the extending happens also in the style of & > .myfoo { @extends %foo }
 %tri-aligned {
