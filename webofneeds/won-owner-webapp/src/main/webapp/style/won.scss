@@ -271,9 +271,8 @@ won-app {
   }
 }
 
-%speech-bubble-top--gray-center {
-  @include speech-bubble-top($won-light-gray, $won-line-gray, 16px, 50%);
-}
+//%speech-bubble-top--gray-center {
+//}
 
 .create-need-title {
   background-color: $won-light-gray;
@@ -298,7 +297,8 @@ won-app {
     margin: 0.5rem auto;
   }
 
-  @extend %speech-bubble-top--gray-center;
+  //@extend %speech-bubble-top--gray-center;
+  @include speech-bubble-top($won-light-gray, $won-line-gray, 16px, 45%);
   &:before, &:after {
     order: 100;
     flex-base: 0;
