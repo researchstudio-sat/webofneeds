@@ -7,6 +7,7 @@
 @import 'sizing-utils';
 @import 'positioning-utils';
 @import 'speech-bubble';
+@import 'tri-aligned';
 
 // <style-resetting> ---------------------------------------
 
@@ -83,13 +84,11 @@ won-app {
 
 .topnav { //TODO split into single-purpose-classes
 
-  @extend %flex-row-spaced;
-
   font-family: 'Open Sans';
   font-weight: 400;
   font-style: normal;
 
-  //@include fixed-height(6rem); //TODO might be a bit too much
+  @include tri-aligned('topnav', 1rem);
 
   background-color: white;
 
@@ -131,27 +130,6 @@ won-app {
 .bigicon {
   //@include fixed-square(3.6rem);
   @include fixed-square(2.25rem);
-
-}
-
-//TODO extending cascaded classes like this leads to quadratic growth of selectors
-// unless the extending happens also in the style of & > .myfoo { @extends %foo }
-%tri-aligned {
-  display:flex;
-
-  & > %tri__left {
-    order: 10;
-    //margin-right: auto;
-  }
-  & > %tri__center {
-    order: 20;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  & > %tri__right {
-    order: 30;
-    //margin-left: auto;
-  }
 
 }
 
@@ -198,10 +176,7 @@ won-app {
   border-top: 1px solid $won-line-gray;
   border-bottom: 1px solid $won-line-gray;
 
-  @extend %tri-aligned;
-  & > .ntb__left { @extend %tri__left; }
-  & > .ntb__center { @extend %tri__center; }
-  & > .ntb__right { @extend %tri__right; }
+  @include tri-aligned('ntb', 1rem);
 
   & > .ntb__left {
     @extend %flex-row;
@@ -274,10 +249,7 @@ won-app {
   border-top: 1px solid $won-line-gray;
   border-bottom: 1px solid $won-line-gray;
 
-  @extend %tri-aligned;
-  & > .mtb__left { @extend %tri__left; }
-  & > .mtb__center { @extend %tri__center; }
-  & > .mtb__right { @extend %tri__right; }
+  @include tri-aligned('mtb', 1rem);
 
   & > .mtb__center {
     flex-basis: 33rem;
@@ -308,10 +280,7 @@ won-app {
   border-top: 1px solid $won-line-gray;
   border-bottom: 1px solid $won-line-gray;
 
-  @extend %tri-aligned;
-  & > .cnt__left { @extend %tri__left; }
-  & > .cnt__center { @extend %tri__center; }
-  & > .cnt__right { @extend %tri__right; }
+  @include tri-aligned('cnt', 1rem);
 
   & > .cnt__left {
     position: relative;

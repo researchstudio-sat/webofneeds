@@ -1,0 +1,16 @@
+@mixin tri-aligned($prefix, $minMargin) {
+  display: flex;
+  & > .#{$prefix}__left {
+    order: 10;
+    margin-right: $minMargin;
+  }
+  & > .#{$prefix}__center {
+    order: 20;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  & > .#{$prefix}__right {
+    order: 30;
+    margin-left: $minMargin;
+  }
+}
