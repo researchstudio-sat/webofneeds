@@ -159,6 +159,8 @@ won-app {
       padding-bottom: $verticalPadding - $selectedBorderWidth;
       padding-top: $verticalPadding;
 
+      text-align: center;
+
       & a {
         color: black;
         text-decoration: none;
