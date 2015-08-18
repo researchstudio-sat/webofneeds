@@ -10,7 +10,7 @@
 
 // <style-resetting> ---------------------------------------
 
-body, header, section, nav, div, ul {
+body, header, section, nav, div, ul, h1, h2, h3, h4, h5, h6 {
   padding: 0;
   margin: 0;
 }
@@ -65,6 +65,9 @@ html, body {
 //<wonAppTag> ----------------------------------------------
 
 won-app {
+  font-family: 'Open Sans';
+  font-weight: 400;
+
   background-color: $won-lighter-gray;
 
   //display: block;
@@ -155,8 +158,7 @@ won-app {
 }
 
 .won-tabs {
-    font-family: 'Open Sans';
-    font-weight: 400;
+    //@extend %flex-row;
     @extend %flex-row;
     align-items: stretch;
 
@@ -166,16 +168,18 @@ won-app {
     }
 
     & li {
-      $verticalPadding: 1rem;
-      $horizontalPadding: 3.0rem;
-
       /* TODO use max-width and flex-space-in-between instead? This
        * collapses the padding on smaller viewports automatically. But
        * then again, this would make an assumption about the number
        * of contained tabs, which is bad.
        */
-      margin-left: $horizontalPadding;
-      margin-right: $horizontalPadding;
+
+      $verticalPadding: 1rem;
+      $horizontalSpace: 3.0rem;
+      //$horizontalSpace: 0.5rem;
+
+      margin-left: $horizontalSpace;
+      margin-right: $horizontalSpace;
       padding-bottom: $verticalPadding - $selectedBorderWidth;
       padding-top: $verticalPadding;
 
@@ -185,7 +189,7 @@ won-app {
       }
     }
 
-    & .main-tab-bar__unread {
+    & .mtb__unread {
       color: $won-red;
     }
   }
@@ -200,6 +204,64 @@ won-app {
   & > .ntb__left { @extend %tri__left; }
   & > .ntb__center { @extend %tri__center; }
   & > .ntb__right { @extend %tri__right; }
+
+  & > .ntb__left {
+    @extend %flex-row;
+
+    & .ntb__left__backarrow {
+      //@include fixed-square(2rem);
+      @include fixed-height(1.7rem);
+      //transform: rotate(90deg);
+    }
+
+    & .ntb__left__image {
+      //@include fixed-height(6.18rem); //99px / 16
+      @include fixed-height(4.7rem); //99px / 21
+
+      margin-left: 1rem;
+      margin-right: 1rem;
+
+    }
+    & .ntb__left__titles {
+      @extend %flex-column;
+      align-items: flex-start;
+
+      & .ntb__left__titles__title {
+        font-weight: 300;
+      }
+
+      & .ntb__left__titles__type {
+        color: #A7A7A7;
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  & > .ntb__right {
+    @extend %flex-column;
+    align-items: flex-end;
+
+
+    & .ntb__right__settingscontainer {
+      flex-grow: 1;
+      position: relative;
+
+      & .ntb__right__settings {
+        @include fixed-height(1.7rem);
+        margin-top: 1rem;
+        margin-right: 1rem;
+        //@extend %bottom-center;
+      }
+    }
+
+    & .ntb__right__tabbarcontainer {
+      //flex-grow: 1;
+
+      & .won-tabs {
+        height: 100%;
+      }
+    }
+  }
 }
 
 .main-tab-bar {
@@ -240,6 +302,22 @@ won-app {
   & > .cnt__left { @extend %tri__left; }
   & > .cnt__center { @extend %tri__center; }
   & > .cnt__right { @extend %tri__right; }
+
+  & > .cnt__left {
+    position: relative;
+
+    & .cnt__left__close {
+      //@include fixed-height(1.7rem);
+      @include fixed-height(2rem);
+      @extend %vcenter;
+    }
+  }
+
+  & > .cnt__center {
+    font-size: 1.5rem;
+    font-weight: 300;
+    margin: 0.5rem auto;
+  }
 
   @extend %speech-bubble-top--gray-center;
   &:before, &:after {
