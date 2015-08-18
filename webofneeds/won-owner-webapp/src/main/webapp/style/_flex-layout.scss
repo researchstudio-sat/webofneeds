@@ -2,6 +2,7 @@
  * abstract flex-direction
  */
 %flex {
+  /* flex */
   display: flex;
   flex-wrap: nowrap;
   justify-content: center;
@@ -9,6 +10,7 @@
   align-items: center;
 
   & > * {
+    /* flex-child */
     display: block;
     order: 1;
     flex-grow: 0;
@@ -19,15 +21,18 @@
 }
 
 %flex-row {
+  /* flex-row */
   @extend %flex;
   flex-direction: row;
 }
 %flex-column {
+  /* flex-column */
   @extend %flex;
   flex-direction: column;
 }
 
 %flex-row-spaced {
+  /* flex-row-spaced */
   @extend %flex-row;
   justify-content: space-between;
 }

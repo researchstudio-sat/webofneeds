@@ -6,6 +6,9 @@
 export default function wonAppTag() {
     let template = `
         <header>
+
+
+
             <nav class="topnav">
                 <div class="topnav__left">
                     <a href="#" class="topnav__button">
@@ -38,18 +41,21 @@ export default function wonAppTag() {
                     </ul>
                 </div>
             </nav>
+
+
+
             <nav ng-cloak ng-show="{{true}}" class="main-tab-bar">
                 <div class="mtb__left"></div>
                 <ul class="mtb__center won-tabs">
                     <li class=""><a href="#">Feed</a></li>
                     <li><a href="#">Posts
-                        <span class="main-tab-bar__unread">5</span>
+                        <span class="mtb__unread">5</span>
                     </a></li>
                     <li class="selectedTab"><a href="#">Incoming Requests
-                        <span class="main-tab-bar__unread">5</span>
+                        <span class="mtb__unread">5</span>
                     </a></li>
                     <li><a href="#">Matches
-                        <span class="tabs__unread">18</span>
+                        <span class="mtb__unread">18</span>
                     </a></li>
                 </ul>
                 <div class="mtb__right">
@@ -58,43 +64,58 @@ export default function wonAppTag() {
                     </a>
                 </div>
             </nav>
+
+
+
             <nav class="create-need-title" ng-cloak ng-show="{{true}}">
-                <!--<nav ng-cloak ng-show="{{true}}" class="create-need-title__content">-->
-                    <div class="cnt__left">x</div>
-                    <div class="cnt__center">What is your need?</div>
-                    <div class="cnt__right"></div>
-                <!--</nav>-->
+                <div class="cnt__left">
+                    <img src="generated/icon-sprite.svg#ico36_close" class="cnt__left__close">
+                </div>
+                <div class="cnt__center">What is your need?</div>
+                <div class="cnt__right"></div>
             </nav>
+
+
+
             <nav class="need-tab-bar" ng-cloak ng-show="{{true}}">
                 <div class="ntb__left">
-                    <
-                    <img src="images/someNeedTitlePic.png"></img>
-                    <h1>New flat, need furniture [TITLE]</h1>
-                    <div>I want to have something [TYPE]</div>
+                    <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__left__backarrow">
+                    <img class="ntb__left__image" src="images/someNeedTitlePic.png"></img>
+                    <div class="ntb__left__titles">
+                        <h1 class="ntb__left__titles__title">New flat, need furniture [TITLE]</h1>
+                        <div class="ntb__left__titles__type">I want to have something [TYPE]</div>
+                    </div>
                 </div>
                 <div class="ntb__center"></div>
                 <div class="ntb__right">
-                    [SETTINGS]
-                    <ul class="won-tabs">
-                        <li><a href="#">
-                            Messages
-                            <span class="main-tab-bar__unread">5</span>
-                        </a></li>
-                        <li class="selectedTab"><a href="#">
-                            Matches
-                            <span class="main-tab-bar__unread">5</span>
-                        </a></li>
-                        <li><a href="#">
-                             Requests
-                            <span class="main-tab-bar__unread">18</span>
-                        </a></li>
-                        <li><a href="#">
-                             Sent Requests
-                            <span class="main-tab-bar__unread">18</span>
-                        </a></li>
-                    </ul>
+                    <div class="ntb__right__settingscontainer">
+                        <img class="ntb__right__settings" src="generated/icon-sprite.svg#ico_settings">
+                    </div>
+                    <div class="ntb__right__tabbarcontainer">
+                        <ul class="won-tabs">
+                            <li><a href="#">
+                                Messages
+                                <span class="mtb__unread">5</span>
+                            </a></li>
+                            <li class="selectedTab"><a href="#">
+                                Matches
+                                <span class="mtb__unread">5</span>
+                            </a></li>
+                            <li><a href="#">
+                                 Requests
+                                <span class="mtb__unread">18</span>
+                            </a></li>
+                            <li><a href="#">
+                                 Sent Requests
+                                <span class="mtb__unread">18</span>
+                            </a></li>
+                        </ul>
+                    </div>
                 </div>
             </nav>
+
+
+
         </header>
         <section id="main" class="contentArea">
             <h1 ng-click="ctrl.fooFun()">Hello, from your lovely app-directive! Foo{{ctrl.foo}}! </h1>

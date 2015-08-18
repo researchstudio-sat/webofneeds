@@ -20,3 +20,9 @@
   left: 50%;
   top: 50%;
 }
+%bottom-center {
+  transform: translateY(-100%) translateX(-50%);
+  position: relative;
+  left: 50%;
+  top: 100%;
+}
