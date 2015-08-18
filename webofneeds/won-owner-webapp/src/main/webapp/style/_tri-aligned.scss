@@ -1,4 +1,4 @@
-@mixin tri-aligned($prefix, $minMargin) {
+@mixin tri-aligned($prefix: 'tri', $minMargin: 0) {
   display: flex;
   & > .#{$prefix}__left {
     order: 10;
