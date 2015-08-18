@@ -43,7 +43,6 @@ export default function wonAppTag() {
             </nav>
 
 
-
             <nav ng-cloak ng-show="{{true}}" class="main-tab-bar">
                 <div class="mtb__left"></div>
                 <ul class="mtb__center won-tabs">
@@ -66,6 +65,8 @@ export default function wonAppTag() {
             </nav>
 
 
+            <br/>
+
 
             <nav class="create-need-title" ng-cloak ng-show="{{true}}">
                 <div class="cnt__left">
@@ -74,6 +75,9 @@ export default function wonAppTag() {
                 <div class="cnt__center">What is your need?</div>
                 <div class="cnt__right"></div>
             </nav>
+
+
+            <br/>
 
 
 
@@ -119,9 +123,6 @@ export default function wonAppTag() {
         </header>
         <section id="main" class="contentArea">
             <h1 ng-click="ctrl.fooFun()">Hello, from your lovely app-directive! Foo{{ctrl.foo}}! </h1>
-
-            <div class="speechbubbletest">Hello!</div>
-
         </section>
         <footer></footer>
         `;

@@ -159,7 +159,7 @@ won-app {
 
 .won-tabs {
     //@extend %flex-row;
-    @extend %flex-row;
+    @extend %flex-row-spaced;
     align-items: stretch;
 
     $selectedBorderWidth: 0.25rem;
@@ -175,8 +175,8 @@ won-app {
        */
 
       $verticalPadding: 1rem;
-      $horizontalSpace: 3.0rem;
-      //$horizontalSpace: 0.5rem;
+      //$horizontalSpace: 3.0rem;
+      $horizontalSpace: 1rem;
 
       margin-left: $horizontalSpace;
       margin-right: $horizontalSpace;
@@ -241,6 +241,11 @@ won-app {
     @extend %flex-column;
     align-items: flex-end;
 
+    //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
+    // or make won-tabs a parametrized mixin?
+    flex-basis: 35rem;
+    max-width: 35rem;
+
 
     & .ntb__right__settingscontainer {
       flex-grow: 1;
@@ -255,6 +260,8 @@ won-app {
     }
 
     & .ntb__right__tabbarcontainer {
+      //width: 100%;
+      align-self: stretch;
       //flex-grow: 1;
 
       & .won-tabs {
@@ -274,11 +281,16 @@ won-app {
   & > .mtb__center { @extend %tri__center; }
   & > .mtb__right { @extend %tri__right; }
 
+  & > .mtb__center {
+    flex-basis: 33rem;
+    max-width: 33rem;
+  }
 
   & .mtb__searchbtn {
     display: block;
     height: 100%;
     position: relative; // to allow position:absolute for the icon
+    margin-right: 1rem;
 
     & > .mtb__searchbtn__icon {
       position: absolute;
@@ -325,12 +337,6 @@ won-app {
     flex-base: 0;
   }
 }
-
-.speechbubbletest {
-  @extend %speech-bubble-top--gray-center;
-  padding: 1rem;
-}
-
 
 //</wonAppTag> ----------------------------------------
 

@@ -51,6 +51,15 @@ var svgSpriteConf = {
         dimension : {
             //default would be just 2
             precision: 4
+        },
+        spacing : {
+            /*
+            Margin is what we need actually. Padding makes the icons smaller in effect / prebakes
+            the padding and thus needs accounting for it in the styling.
+            The minimal padding of 1 should avoid glitches in layouting (where viewports show parts
+            of adjacent svgs as well) without affecting sizes too drastically.
+            */
+            padding: 1
         }
     },
     mode : {
