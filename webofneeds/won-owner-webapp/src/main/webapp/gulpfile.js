@@ -51,20 +51,23 @@ var svgSpriteConf = {
         dimension : {
             //default would be just 2
             precision: 4
-        },
-        spacing : {
-            /*
-            Margin is what we need actually. Padding makes the icons smaller in effect / prebakes
-            the padding and thus needs accounting for it in the styling.
-            The minimal padding of 1 should avoid glitches in layouting (where viewports show parts
-            of adjacent svgs as well) without affecting sizes too drastically.
-            */
-            padding: 1
         }
     },
     mode : {
         view : {
             //example: true //generates html with usage-demo
+
+            /*
+             Problem: Glitches in layouting where viewports show parts
+             of adjacent svgs as well.
+             Solution:
+                * `root.shape.spacing.padding: 1` -> It has the side effect to make icons a bit
+                  smaller which needs to be accounted for during styling. Margin would be
+                  better but, alas, is not available.
+                * `mode.view.layout: 'diagonal'` seems to be a better solution, which solves the issue for all
+                  except adjacent rectangular icons.
+             */
+            layout: 'diagonal',
 
             //default would be './view'
             dest: '.',
