@@ -255,6 +255,7 @@ won-app {
 
     .ntb__right__settings {
       height: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
+      width: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
       align-self: flex-end;
       margin-top: 1rem;
       margin-right: 1rem;

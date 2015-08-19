@@ -70,7 +70,7 @@ export default function wonAppTag() {
 
             <nav class="create-need-title" ng-cloak ng-show="{{true}}">
                 <div class="cnt__left">
-                    <img src="generated/icon-sprite.svg#ico36_close" class="cnt__icon">
+                    <img src="generated/icon-sprite.svg#ico27_close" class="cnt__icon">
                 </div>
                 <h1 class="cnt__center cnt__title">What is your need?</div>
                 <div class="cnt__right"></div>
