@@ -59,7 +59,7 @@ export default function wonAppTag() {
                 </ul>
                 <div class="mtb__right">
                     <a href="#" class="mtb__searchbtn">
-                        <img src="generated/icon-sprite.svg#ico36_search_nomargin" class="mtb__searchbtn__icon">
+                        <img src="generated/icon-sprite.svg#ico36_search_nomargin" class="mtb__icon">
                     </a>
                 </div>
             </nav>
@@ -70,7 +70,7 @@ export default function wonAppTag() {
 
             <nav class="create-need-title" ng-cloak ng-show="{{true}}">
                 <div class="cnt__left">
-                    <img src="generated/icon-sprite.svg#ico36_close" class="cnt__left__close">
+                    <img src="generated/icon-sprite.svg#ico36_close" class="cnt__icon">
                 </div>
                 <h1 class="cnt__center cnt__title">What is your need?</div>
                 <div class="cnt__right"></div>
@@ -83,7 +83,7 @@ export default function wonAppTag() {
 
             <nav class="need-tab-bar" ng-cloak ng-show="{{true}}">
                 <div class="ntb__left">
-                    <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__left__backarrow">
+                    <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__icon">
                     <img class="ntb__left__image" src="images/someNeedTitlePic.png"></img>
                     <div class="ntb__left__titles">
                         <h1 class="ntb__title">New flat, need furniture [TITLE]</h1>
@@ -92,9 +92,9 @@ export default function wonAppTag() {
                 </div>
                 <div class="ntb__center"></div>
                 <div class="ntb__right">
-                    <div class="ntb__right__settingscontainer">
-                        <img class="ntb__right__settings" src="generated/icon-sprite.svg#ico_settings">
-                    </div>
+                    <!--<div class="ntb__right__settingscontainer">-->
+                        <img class=" ntb__right__settings ntb__icon" src="generated/icon-sprite.svg#ico_settings">
+                    <!--</div>-->
                     <ul class="won-tabs">
                         <li><a href="#">
                             Messages
@@ -123,11 +123,11 @@ export default function wonAppTag() {
 
 
             <nav class="settings-tab-bar" ng-cloak ng-show="{{true}}">
-                <div class="stb__left">
-                    <img src="generated/icon-sprite.svg#ico36_backarrow" class="stb__left__backarrow">
+                <div class="astb__left">
+                    <img src="generated/icon-sprite.svg#ico36_backarrow" class="astb__icon">
                 </div>
-                <div class="stb__center">
-                    <h1 class="stb__title">Account Settings</h1>
+                <div class="astb__center">
+                    <h1 class="astb__title">Account Settings</h1>
                     <ul class="won-tabs">
                         <li class="selectedTab"><a href="#">
                             General Settings
@@ -139,7 +139,7 @@ export default function wonAppTag() {
                         </a></li>
                     </ul>
                 </div>
-                <div class="ntb__right">
+                <div class="astb__right">
                 </div>
             </nav>
 

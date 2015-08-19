@@ -44,8 +44,16 @@
   flex-direction: column;
 }
 
+%flex-bottom-center {
+  @extend %flex-column;
+  justify-content: flex-end;
+}
+
 %flex-row-spaced {
-  /* flex-row-spaced */
   @extend %flex-row;
+  justify-content: space-between;
+}
+%flex-column-spaced {
+  @extend %flex-column;
   justify-content: space-between;
 }

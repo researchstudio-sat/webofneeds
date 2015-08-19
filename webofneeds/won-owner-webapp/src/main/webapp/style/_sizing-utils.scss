@@ -31,3 +31,10 @@
   @include fixed-width(100vw);
 }
 
+@mixin max-square($maxSize) {
+  max-width: $maxSize;
+  max-height: $maxSize;
+  width: auto;
+  height: auto;
+}
+

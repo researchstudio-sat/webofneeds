@@ -147,6 +147,10 @@ won-app {
   border-top: 1px solid $won-line-gray;
   border-bottom: 1px solid $won-line-gray;
 
+  & %tb__icon {
+    @include max-square(1.8rem);
+  }
+
   & %tb__title {
     font-size: 1.5rem;
     font-weight: 300;
@@ -157,6 +161,7 @@ won-app {
 @mixin title-bar($prefix) {
   @extend %title-bar;
   & .#{$prefix}__title { @extend %tb__title; }
+  & .#{$prefix}__icon { @extend %tb__icon }
   & > .#{$prefix}__left { @extend .tb__left }
   & > .#{$prefix}__center { @extend .tb__center }
   & > .#{$prefix}__right { @extend .tb__right }
@@ -194,15 +199,12 @@ won-app {
 
     text-align: center;
 
-    position:relative;
+    @extend %flex-bottom-center;
 
     & a {
       color: black;
       text-decoration: none;
-
       display: block;
-
-      @extend %bottom-center;
     }
   }
 
@@ -219,59 +221,46 @@ won-app {
 .need-tab-bar {
   @include title-bar('ntb');
 
-  & > .ntb__left {
+  > .ntb__left {
     @extend %flex-row;
 
-    & .ntb__left__backarrow {
-      @include fixed-height(1.7rem);
-    }
 
-    & .ntb__left__image {
+    .ntb__left__image {
       display: block;
-      $maxSize: 4.7rem; //99px/21
-      max-width: $maxSize;
-      max-height: $maxSize;
-      width: auto;
-      height: auto;
+      @include max-square(4.7rem); //99px/21
 
       margin-left: 1rem;
       margin-right: 1rem;
-
     }
-    & .ntb__left__titles {
+
+    .ntb__left__titles {
       @extend %flex-column;
       align-items: flex-start;
 
 
-      & .ntb__left__titles__type {
+      .ntb__left__titles__type {
         color: #A7A7A7;
         font-size: 0.8rem;
       }
     }
   }
 
-  & > .ntb__right {
+  > .ntb__right {
     //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
     // or make won-tabs a parametrized mixin?
     flex-basis: 35rem;
     max-width: 35rem;
 
+    @extend %flex-column-spaced;
 
-    @extend %flex-column;
-    align-items: flex-end;
-
-    & .ntb__right__settingscontainer {
-      flex-grow: 1;
-      position: relative;
-
-      & .ntb__right__settings {
-        @include fixed-height(1.7rem);
-        margin-top: 1rem;
-        margin-right: 1rem;
-      }
+    .ntb__right__settings {
+      height: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
+      align-self: flex-end;
+      margin-top: 1rem;
+      margin-right: 1rem;
     }
 
-    & .won-tabs {
+    .won-tabs {
       //TODO bad style. not bem.
       align-self: stretch;
       height: 100%;
@@ -287,23 +276,19 @@ won-app {
 .main-tab-bar {
   @include title-bar('mtb');
 
-  & > .mtb__center {
+  > .mtb__center {
     //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
     // or make won-tabs a parametrized mixin?
     flex-basis: 33rem;
     max-width: 33rem;
   }
 
-  & .mtb__searchbtn {
-    display: block;
-    height: 100%;
-    position: relative; // to allow %vcenter for the icon
-    margin-right: 1rem;
+  .mtb__right {
+    @extend %flex-column;
+  }
 
-    & > .mtb__searchbtn__icon {
-      @extend %vcenter;
-      @include fixed-height(1.7rem);
-    }
+  .mtb__searchbtn {
+    margin-right: 1rem;
   }
 }
 
@@ -313,16 +298,11 @@ won-app {
 .create-need-title {
   @include title-bar('cnt');
 
-  & > .cnt__left {
-    position: relative;
-
-    & .cnt__left__close {
-      @include fixed-height(2rem);
-      @extend %vcenter;
-    }
+  > .cnt__left {
+    @extend %flex-column;
   }
 
-  & > .cnt__center {
+  > .cnt__center {
     margin: 0.5rem auto;
   }
 
@@ -330,21 +310,18 @@ won-app {
 }
 
 .settings-tab-bar {
-  @include title-bar('stb');
+  @include title-bar('astb');
 
-  & .stb__center {
+  .astb__left {
     @extend %flex-column;
-
-    & .stb__title {
-      margin-top: 0.5rem;
-    }
   }
 
-  //& .
+  .astb__center {
+    @extend %flex-column;
 
-  & .stb__left__backarrow {
-    @include fixed-height(1.7rem);
-    @extend %vcenter;
+    .astb__title {
+      margin-top: 0.5rem;
+    }
   }
 }
 
