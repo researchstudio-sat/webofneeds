@@ -1,7 +1,6 @@
 @import 'won-config';
 @import 'flex-layout';
 @import 'title-bar';
-@import 'sizing-utils';
 
 .main-tab-bar {
   @include title-bar('mtb');

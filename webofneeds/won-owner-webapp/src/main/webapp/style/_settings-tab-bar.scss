@@ -1,7 +1,5 @@
-@import 'won-config';
 @import 'flex-layout';
 @import 'title-bar';
-@import 'sizing-utils';
 
 .settings-tab-bar {
   @include title-bar('astb');
