@@ -227,7 +227,12 @@ won-app {
     }
 
     & .ntb__left__image {
-      @include fixed-height(4.7rem); //99px / 21
+      display: block;
+      $maxSize: 4.7rem; //99px/21
+      max-width: $maxSize;
+      max-height: $maxSize;
+      width: auto;
+      height: auto;
 
       margin-left: 1rem;
       margin-right: 1rem;
