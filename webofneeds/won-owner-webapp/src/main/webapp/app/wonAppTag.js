@@ -131,7 +131,7 @@ export default function wonAppTag() {
                     <ul class="won-tabs">
                         <li class="selectedTab"><a href="#">
                             General Settings
-                            <span class="stb__unread">5</span>
+                            <span class="won-tabs__unread">5</span>
                         </a></li>
                         <li><a href="#">
                             Manage Avatars
