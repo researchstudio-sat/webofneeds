@@ -12,13 +12,13 @@ export default function wonAppTag() {
             <nav class="topnav">
                 <div class="topnav__left">
                     <a href="#" class="topnav__button">
-                        <img src="generated/icon-sprite.svg#WON_ico_header" class="bigicon">
+                        <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__button__icon">
                         <span class="topnav__page-title">Web of Needs</span>
                     </a>
                 </div>
                 <div class="topnav__center">
                     <a href="#" class="topnav__button">
-                        <img src="generated/icon-sprite.svg#ico36_plus" class="bigicon">
+                        <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon">
                         <span class="topnav__button__caption">New Need</span>
                     </a>
                 </div>
@@ -28,14 +28,14 @@ export default function wonAppTag() {
                             <a href="#" class="topnav__button">
                                 <span class="topnav__button__caption">Groups</span>
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__carret">
-                                <img src="generated/icon-sprite.svg#ico36_group" class="bigicon">
+                                <img src="generated/icon-sprite.svg#ico36_group" class="topnav__button__icon">
                             </a>
                         </li>
                         <li>
                             <a href="#" class="topnav__button">
                                 <span class="topnav__button__caption">Username</span>
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__carret">
-                                <img src="generated/icon-sprite.svg#ico36_person" class="bigicon">
+                                <img src="generated/icon-sprite.svg#ico36_person" class="topnav__button__icon">
                             </a>
                         </li>
                     </ul>

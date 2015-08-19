@@ -28,6 +28,9 @@ $won-lighter-gray: #F8F9F9; //used for background
 $won-line-gray: #CBD2D1; //use for lines
 
 
+$bigiconSize: 2.25rem;
+
+
 
 // fonts
 
@@ -117,6 +120,15 @@ won-app {
 
   & .topnav__button {
     @extend %flex-row;
+
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    & .topnav__button__icon {
+      @include fixed-square($bigiconSize);
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+    }
   }
 
   & .topnav__list {
@@ -148,14 +160,6 @@ won-app {
   & > .#{$prefix}__left { @extend .tb__left }
   & > .#{$prefix}__center { @extend .tb__center }
   & > .#{$prefix}__right { @extend .tb__right }
-}
-
-
-
-.bigicon {
-  //@include fixed-square(3.6rem);
-  @include fixed-square(2.25rem);
-  margin: 0.75rem;
 }
 
 
