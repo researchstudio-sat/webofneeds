@@ -1,0 +1,55 @@
+@import 'won-config';
+@import 'flex-layout';
+@import 'title-bar';
+@import 'sizing-utils';
+
+.need-tab-bar {
+  @include title-bar('ntb');
+
+  > .ntb__left {
+    @extend %flex-row;
+
+
+    .ntb__left__image {
+      display: block;
+      @include max-square(4.7rem); //99px/21
+
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
+
+    .ntb__left__titles {
+      @extend %flex-column;
+      align-items: flex-start;
+
+
+      .ntb__left__titles__type {
+        color: #A7A7A7;
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  > .ntb__right {
+    //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
+    // or make won-tabs a parametrized mixin?
+    flex-basis: 35rem;
+    max-width: 35rem;
+
+    @extend %flex-column-spaced;
+
+    .ntb__right__settings {
+      height: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
+      width: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
+      align-self: flex-end;
+      margin-top: 1rem;
+      margin-right: 1rem;
+    }
+
+    .ntb__tabs {
+      //TODO bad style. not bem.
+      align-self: stretch;
+      height: 100%;
+    }
+  }
+}

@@ -1,0 +1,19 @@
+@import 'won-config';
+@import 'flex-layout';
+@import 'title-bar';
+@import 'sizing-utils';
+@import 'speech-bubble';
+
+.create-need-title {
+  @include title-bar('cnt');
+
+  > .cnt__left {
+    @extend %flex-column;
+  }
+
+  > .cnt__center {
+    margin: 0.5rem auto;
+  }
+
+  @include speech-bubble-top($won-light-gray, $won-line-gray, 16px, 50%);
+}

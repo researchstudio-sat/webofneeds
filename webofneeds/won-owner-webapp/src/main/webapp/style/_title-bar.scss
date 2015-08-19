@@ -1,0 +1,37 @@
+@import 'won-config';
+@import 'underlined-tabs';
+@import 'sizing-utils';
+
+%title-bar {
+  background-color: $won-light-gray;
+  border-top: 1px solid $won-line-gray;
+  border-bottom: 1px solid $won-line-gray;
+
+  %tb__icon {
+    @include max-square(1.8rem);
+  }
+
+  %tb__title {
+    font-size: 1.5rem;
+    font-weight: 300;
+  }
+
+  %tb__tabs {
+    @include underlined-tabs($won-red);
+  }
+  %tb__tabs__selected { @extend %tabs__selected }
+  %tb__tabs__unread { @extend %tabs__unread }
+
+  @include tri-aligned('tb', 1rem);
+}
+@mixin title-bar($prefix) {
+  @extend %title-bar;
+  .#{$prefix}__title { @extend %tb__title; }
+  .#{$prefix}__icon { @extend %tb__icon }
+  .#{$prefix}__tabs { @extend %tb__tabs }
+  .#{$prefix}__tabs__selected { @extend %tb__tabs__selected }
+  .#{$prefix}__tabs__unread { @extend %tb__tabs__unread }
+  > .#{$prefix}__left { @extend .tb__left }
+  > .#{$prefix}__center { @extend .tb__center }
+  > .#{$prefix}__right { @extend .tb__right }
+}

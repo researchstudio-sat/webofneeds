@@ -1,0 +1,23 @@
+@import 'won-config';
+@import 'flex-layout';
+@import 'title-bar';
+@import 'sizing-utils';
+
+.main-tab-bar {
+  @include title-bar('mtb');
+
+  > .mtb__center {
+    //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
+    // or make won-tabs a parametrized mixin?
+    flex-basis: 33rem;
+    max-width: 33rem;
+  }
+
+  .mtb__right {
+    @extend %flex-column;
+  }
+
+  .mtb__searchbtn {
+    margin-right: 1rem;
+  }
+}

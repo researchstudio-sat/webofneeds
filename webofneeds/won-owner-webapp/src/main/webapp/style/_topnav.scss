@@ -1,0 +1,49 @@
+@import 'won-config';
+@import 'tri-aligned';
+@import 'flex-layout';
+@import 'sizing-utils';
+
+.topnav { //TODO split into single-purpose-classes
+
+  @include tri-aligned('topnav', 1rem);
+
+  background-color: white;
+
+  & a {
+    color: $won-red;
+    text-decoration: none;
+  }
+
+  & .topnav__page-title {
+    font-weight: 700;
+  }
+
+  & .topnav__carret {
+    /*
+    // without svg-included margins
+    @include fixed-height(0.5rem);
+    @include fixed-width(0.875rem);
+    */
+
+    // with svg-included margins
+    @include fixed-square(1rem);
+  }
+
+  & .topnav__button {
+    @extend %flex-row;
+
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    & .topnav__button__icon {
+      @include fixed-square($bigiconSize);
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+    }
+  }
+
+  & .topnav__list {
+    @extend %flex-row;
+    list-style: none;
+  }
+}

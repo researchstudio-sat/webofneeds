@@ -45,16 +45,16 @@ export default function wonAppTag() {
 
             <nav ng-cloak ng-show="{{true}}" class="main-tab-bar">
                 <div class="mtb__left"></div>
-                <ul class="mtb__center won-tabs">
+                <ul class="mtb__center mtb__tabs">
                     <li class=""><a href="#">Feed</a></li>
                     <li><a href="#">Posts
-                        <span class="won-tabs__unread">5</span>
+                        <span class="mtb__tabs__unread">5</span>
                     </a></li>
-                    <li class="selectedTab"><a href="#">Incoming Requests
-                        <span class="won-tabs__unread">5</span>
+                    <li class="mtb__tabs__selected"><a href="#">Incoming Requests
+                        <span class="mtb__tabs__unread">5</span>
                     </a></li>
                     <li><a href="#">Matches
-                        <span class="won-tabs__unread">18</span>
+                        <span class="mtb__tabs__unread">18</span>
                     </a></li>
                 </ul>
                 <div class="mtb__right">
@@ -95,22 +95,22 @@ export default function wonAppTag() {
                     <!--<div class="ntb__right__settingscontainer">-->
                         <img class=" ntb__right__settings ntb__icon" src="generated/icon-sprite.svg#ico_settings">
                     <!--</div>-->
-                    <ul class="won-tabs">
+                    <ul class="ntb__tabs">
                         <li><a href="#">
                             Messages
-                            <span class="won-tabs__unread">5</span>
+                            <span class="ntb__tabs__unread">5</span>
                         </a></li>
-                        <li class="selectedTab"><a href="#">
+                        <li class="ntb__tabs__selected"><a href="#">
                             Matches
-                            <span class="won-tabs__unread">5</span>
+                            <span class="ntb__tabs__unread">5</span>
                         </a></li>
                         <li><a href="#">
                              Requests
-                            <span class="won-tabs__unread">18</span>
+                            <span class="ntb__tabs__unread">18</span>
                         </a></li>
                         <li><a href="#">
                              Sent Requests
-                            <span class="won-tabs__unread">18</span>
+                            <span class="ntb__tabs__unread">18</span>
                         </a></li>
                     </ul>
                 </div>
@@ -128,14 +128,14 @@ export default function wonAppTag() {
                 </div>
                 <div class="astb__center">
                     <h1 class="astb__title">Account Settings</h1>
-                    <ul class="won-tabs">
-                        <li class="selectedTab"><a href="#">
+                    <ul class="astb__tabs">
+                        <li class="astb__tabs__selected"><a href="#">
                             General Settings
-                            <span class="won-tabs__unread">5</span>
+                            <span class="astb__tabs__unread">5</span>
                         </a></li>
                         <li><a href="#">
                             Manage Avatars
-                            <span class="won-tabs__unread">5</span>
+                            <span class="astb__tabs__unread">5</span>
                         </a></li>
                     </ul>
                 </div>
