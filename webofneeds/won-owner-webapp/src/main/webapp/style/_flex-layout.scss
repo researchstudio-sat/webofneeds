@@ -11,6 +11,7 @@
 
   & > * {
     /* flex-child */
+    //TODO only set block if it's been `inline` before. (don't overwrite e.g. flex)
     display: block;
     order: 1;
     flex-grow: 0;
