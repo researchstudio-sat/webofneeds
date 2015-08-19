@@ -33,13 +33,32 @@
         <property name="sessionCacheSize" value="10"></property>
     </bean>
 
-    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker" >
+
+    <!--bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
+           depends-on="embeddedBroker" -->
         <!-- note: this URI does not need to be configurable via the
         config file, it will be the same on any system -->
+        <!--property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
+    </bean-->
+
+    <!-- This is used for the connections from internal node client to embedded (internal) node broker. In order to trust
+     my own internal connections, it can be configured with predefined key/trust stores that only contain this
+     node-server's private/public certificate. TODO: It would be correct though, to use here vm connection without any ssl stuff-->
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQSslConnectionFactory"
+          depends-on="embeddedBroker" >
         <property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
+        <property name="keyStore" value="${activemq.broker.keystore}"/>
+        <property name="keyStorePassword" value="${activemq.broker.keystore.password}"/>
+        <property name="trustStore" value="${activemq.broker.truststore}"/>
+        <property name="trustStorePassword" value="${activemq.broker.truststore.password}"/>
     </bean>
+
     <!-- Configuring Broker -->
-    <bean id="embeddedBroker" class="org.apache.activemq.xbean.PooledBrokerFactoryBean">
+    <!-- we used to have the o.a.a.x.PooledBrokerFactoryBean here, but it does not set the main spring
+         context as its parent context in its onPropertiesSet() method, so we can't use any of our beans
+         inside the broker's spring context - but we need to use the same trustStoreService bean inside and
+         outside the broker, so we changed to use the o.a.a.x.BrokerFactoryBean instead -->
+    <bean id="embeddedBroker" class="org.apache.activemq.xbean.BrokerFactoryBean">
         <property name="config" value="classpath:spring/component/broker/activemq.xml"/>
         <property name="start" value="true"/>
     </bean>
@@ -48,14 +67,17 @@
     </bean>
     <bean id="brokerComponentFactory" class="won.protocol.jms.BrokerComponentFactory"/>
 
-    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent" >
+    <!--bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent"-->
         <!-- note: this URI does not need to be configurable via the
         config file, it will be the same on any system -->
-        <property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
-        <property name="connectionFactory" ref="cachedConnectionFactory"/>
-    </bean>
-    <bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl">
 
+        <!--property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
+        <property name="connectionFactory" ref="cachedConnectionFactory"/>
+    </bean-->
+    <!--bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl"-->
+    <bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolSecureCommunicationServiceImpl">
+        <property name="keyStoreService" ref="keyStoreService" />
+        <property name="trustStoreService" ref="trustStoreService" />
     </bean>
 
     <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.general.OwnerProtocolOutgoingMessagesProcessor">

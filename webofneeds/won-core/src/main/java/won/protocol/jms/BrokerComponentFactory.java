@@ -17,6 +17,7 @@
 package won.protocol.jms;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQSslConnectionFactory;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.Component;
 import org.slf4j.Logger;
@@ -25,6 +26,8 @@ import org.springframework.jms.connection.CachingConnectionFactory;
 import won.protocol.model.MessagingType;
 
 import javax.jms.ConnectionFactory;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
 import java.net.URI;
 
 /**
@@ -34,12 +37,10 @@ import java.net.URI;
 public class BrokerComponentFactory {
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
     public synchronized Component getBrokerComponent(URI brokerURI,MessagingType type){
       //TODO: make this configurable for different broker implementations.
-      logger.info("establishing activemq connection for brokerUri {}",brokerURI);
+      logger.info("establishing activemq connection for brokerUri {}", brokerURI);
       ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(brokerURI);
-
       CachingConnectionFactory cachingConnectionFactory = (CachingConnectionFactory) configureCachingConnectionFactory
         (activeMQConnectionFactory);
 
@@ -48,8 +49,10 @@ public class BrokerComponentFactory {
       switch (type){
         case Queue:
           jmsConfiguration.configureJmsConfigurationForQueues();
+          break;
         case Topic:
           jmsConfiguration.configureJmsConfigurationForTopics();
+          break;
       }
 
       ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent();
@@ -59,6 +62,36 @@ public class BrokerComponentFactory {
       return activeMQComponent;
 
     }
+
+  public synchronized Component getBrokerComponent(URI brokerURI,MessagingType type, KeyManager keyManager,
+                                                   TrustManager trustManager){
+    //TODO: make this configurable for different broker implementations.
+    logger.info("establishing activemq connection for brokerUri {}",brokerURI);
+    ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory(brokerURI);
+
+    activeMQConnectionFactory.setKeyAndTrustManagers(new KeyManager[]{keyManager}, new TrustManager[]{trustManager},
+                                                     null);
+    CachingConnectionFactory cachingConnectionFactory = (CachingConnectionFactory) configureCachingConnectionFactory
+      (activeMQConnectionFactory);
+
+    WonJmsConfiguration jmsConfiguration = new WonJmsConfiguration(cachingConnectionFactory);
+
+    switch (type){
+      case Queue:
+        jmsConfiguration.configureJmsConfigurationForQueues();
+        break;
+      case Topic:
+        jmsConfiguration.configureJmsConfigurationForTopics();
+        break;
+    }
+
+    ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent();
+
+    activeMQComponent.setConfiguration(jmsConfiguration);
+
+    return activeMQComponent;
+
+  }
 
   public synchronized ConnectionFactory configureCachingConnectionFactory(ConnectionFactory connectionFactory){
     CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(connectionFactory);

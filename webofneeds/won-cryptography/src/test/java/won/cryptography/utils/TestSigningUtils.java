@@ -7,8 +7,10 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.PEMWriter;
+import org.junit.Test;
 import won.cryptography.service.CertificateService;
 import won.cryptography.service.KeyPairService;
 import won.cryptography.service.KeyStoreService;
@@ -17,6 +19,7 @@ import java.io.*;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.security.KeyPair;
+import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -105,7 +108,9 @@ public class TestSigningUtils {
     return objs;
   }
 
+
   public void generateTestKeystore() throws URISyntaxException {
+    Security.addProvider(new BouncyCastleProvider());
     //URL keyUrl = TestSigningUtils.class.getResource(KEYS_FILE);
     File keysFile = null;
     //if (keyUrl == null) {
@@ -115,6 +120,8 @@ public class TestSigningUtils {
     //}
 
     KeyStoreService storeService = new KeyStoreService(keysFile);
+    storeService.init();
+
     KeyPairService keyPairService = new KeyPairService();
     CertificateService certificateService = new CertificateService();
 
@@ -124,28 +131,31 @@ public class TestSigningUtils {
 
   }
 
+  @Test
   public void generateKeystoreForNodeAndOwner() throws URISyntaxException {
 
-    KeyStoreService storeServiceOnNode = new KeyStoreService(new File("node-keys.jks"));
+    Security.addProvider(new BouncyCastleProvider());
+    //KeyStoreService storeServiceOnNode = new KeyStoreService(new File("node-keys.jks"));
     KeyStoreService storeServiceOnOwner = new KeyStoreService(new File("owner-keys.jks"));
-    KeyStoreService storeServiceOnMatcher = new KeyStoreService(new File("matcher-keys.jks"));
+    storeServiceOnOwner.init();
+    //KeyStoreService storeServiceOnMatcher = new KeyStoreService(new File("matcher-keys.jks"));
     KeyPairService keyPairService = new KeyPairService();
     CertificateService certificateService = new CertificateService();
 
-    addKeyByUris(new String[]{
-                   "http://rsa021.researchstudio.at:8080/won/resource",
-                   "http://sat016.researchstudio.at:8080/won/resource",
-                   "http://localhost:8080/won/resource"},
-                 keyPairService, certificateService, storeServiceOnNode);
+//    addKeyByUris(new String[]{
+//                   "http://rsa021.researchstudio.at:8080/won/resource",
+//                   "http://sat016.researchstudio.at:8080/won/resource",
+//                   "http://localhost:8080/won/resource"},
+//                 keyPairService, certificateService, storeServiceOnNode);
     addKeyByUris(new String[]{
                    "http://rsa021.researchstudio.at:8080/owner/rest/keys",
                    "http://sat016.researchstudio.at:8080/owner/rest/keys",
                    "http://localhost:8080/owner/rest/keys"},
                  keyPairService, certificateService, storeServiceOnOwner);
-    addKeyByUris(new String[]{
-                   "http://sat001.researchstudio.at:8080/matcher/resource",
-                   "http://localhost:8080/matcher/resource"},
-                 keyPairService, certificateService, storeServiceOnMatcher);
+//    addKeyByUris(new String[]{
+//                   "http://sat001.researchstudio.at:8080/matcher/resource",
+//                   "http://localhost:8080/matcher/resource"},
+//                 keyPairService, certificateService, storeServiceOnMatcher);
 
   }
 

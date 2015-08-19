@@ -18,6 +18,8 @@ package won.protocol.jms;
 
 import org.apache.camel.CamelContext;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
 import java.net.URI;
 
 /**
@@ -27,6 +29,8 @@ import java.net.URI;
 public interface NeedProtocolCamelConfigurator extends CamelConfigurator {
 
     public String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName);
+    public String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName, KeyManager km, TrustManager tm);
+
     public void addCamelComponentForWonNodeBroker(URI brokerUri,String brokerComponentName);
 
 

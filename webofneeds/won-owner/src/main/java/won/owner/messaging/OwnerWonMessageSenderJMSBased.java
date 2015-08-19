@@ -16,6 +16,10 @@
 
 package won.owner.messaging;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +29,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import won.cryptography.service.CryptographyService;
+import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
+import won.cryptography.service.*;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.CamelConfiguration;
@@ -40,7 +47,11 @@ import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
 
+import javax.net.ssl.*;
 import java.net.URI;
+import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +78,8 @@ public class OwnerWonMessageSenderJMSBased
   //todo: make this configurable
   private String startingEndpoint;
 
+  private String ownerAlias;
+
 
   //private OwnerProtocolActiveMQServiceImpl ownerProtocolActiveMQService;
   @Autowired
@@ -77,7 +90,12 @@ public class OwnerWonMessageSenderJMSBased
   private WonNodeRepository wonNodeRepository;
 
   @Autowired
-  private CryptographyService ownerCryptoService;
+  private TrustStoreService trustStoreService;
+  @Autowired
+  private KeyStoreService keyStoreService;
+  @Autowired
+  private CertificateService certificateService;
+  //private CryptographyService ownerCryptoService;
 
   @Autowired
   private SignatureAddingWonMessageProcessor signatureAddingProcessor ;
@@ -101,30 +119,41 @@ public class OwnerWonMessageSenderJMSBased
       if (wonNodeUri == null)
         wonNodeUri = defaultNodeURI;
 
-      List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
-      String ownerApplicationId;
-      /**
-       * if owner application is not connected to any won node, register owner application to the node with wonNodeURI.
-       */
-      CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
-      if (wonNodeList.size() == 0) {
-        //todo: methods of ownerProtocolActiveMQService might have some concurrency issues. this problem will be resolved in the future, and this code here shall be revisited then.
-        ownerApplicationId = register(wonNodeUri);
-        configureRemoteEndpointsForOwnerApplication(ownerApplicationId,
-                ownerProtocolCommunicationServiceImpl.getProtocolCamelConfigurator()
-                        .getEndpoint(wonNodeUri));
-        logger.debug("registered ownerappID: " + ownerApplicationId);
-        wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
-      } else {
-        //todo refactor with register()
-        //TODO what happens with persistent WonNodeRepository? shouldn't camel configured again?
-        //camelContext.getComponent()
-        ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
-      }
+//      List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
+//      String ownerApplicationId;
+//      /**
+//       * if owner application is not connected to any won node, register owner application to the node with wonNodeURI.
+//       */
+//      //CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint
+//      // (wonNodeUri);
+//      if (wonNodeList.size() == 0) {
+//        //todo: methods of ownerProtocolActiveMQService might have some concurrency issues. this problem will be resolved in the future, and this code here shall be revisited then.
+//        logger.info("I AM NEVER CALLED!!! AND IF I AM YOU WILL GET AN ERROR!!!");
+//        ownerApplicationId = register(wonNodeUri);
+//        logger.debug("registered ownerappID: " + ownerApplicationId);
+//        wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
+//      } else {
+//        //todo refactor with register()
+//        //TODO what happens with persistent WonNodeRepository? shouldn't camel configured again?
+//        //camelContext.getComponent()
+//        ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
+//      }
 
+      //TODO if possible, make it similar to when sending a message node-node, when before sending message a camel
+      // configure is called, that either uses the existing one, or creates (and registers) if not exists
+      if (!isRegistered(wonNodeUri)) {
+        registerViaRest(wonNodeUri);
+      }
+      List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
+      String ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
+
+
+      //String ep = camelConfiguration.getEndpoint()
+      String ep = ownerProtocolCommunicationServiceImpl.getProtocolCamelConfigurator()
+                                           .getEndpoint(wonNodeUri);
       Map<String, Object> headerMap = new HashMap<>();
       headerMap.put("ownerApplicationID", ownerApplicationId);
-      headerMap.put("remoteBrokerEndpoint",camelConfiguration.getEndpoint());
+      headerMap.put("remoteBrokerEndpoint",ep);
       messagingService
               .sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG), startingEndpoint);
 
@@ -163,9 +192,9 @@ public class OwnerWonMessageSenderJMSBased
           @Override
           public void run() {
             try {
-              String ownerApplicationId = register(defaultNodeURI);
-              configureRemoteEndpointsForOwnerApplication(ownerApplicationId, ownerProtocolCommunicationServiceImpl
-                .getProtocolCamelConfigurator().getEndpoint(defaultNodeURI));
+              //TODO get here json with owner id and endpoints
+              registerViaRest(defaultNodeURI);
+              //TODO call camel configuration
 
             } catch (Exception e) {
               logger.warn("Could not register with default won node {}", defaultNodeURI, e);
@@ -182,6 +211,7 @@ public class OwnerWonMessageSenderJMSBased
 
   /**
    * registers the owner application at a won node.
+   * TODO: the protocol communication or camel configurator might be a better place for this method...
    *
    * @return ownerApplicationId
    * @throws Exception
@@ -209,8 +239,101 @@ public class OwnerWonMessageSenderJMSBased
     storeWonNode(ownerApplicationId, camelConfiguration, wonNodeURI);
 
 
+    configureRemoteEndpointsForOwnerApplication(ownerApplicationId, ownerProtocolCommunicationServiceImpl
+      .getProtocolCamelConfigurator().getEndpoint(wonNodeURI));
+
     return ownerApplicationId;
   }
+
+  /**
+   * Registers the owner application at a won node. Owner Id is typically his Key ID (lower 64 bits of the owner public
+   * key fingerprint). Unless there is a collision of owner ids on the node - then the owner can assign another id...
+   *
+   * @return ownerApplicationId
+   * @throws Exception
+   */
+  public synchronized void registerViaRest(URI wonNodeURI) throws Exception {
+    logger.debug("WON NODE: " + wonNodeURI);
+
+    // by the time we entered this synchronized method, the owner might have already registered:
+    if (isRegistered(wonNodeURI)) {
+      return;
+    }
+
+    // make a call to register REST api in the SSL context with custom key and trust managers
+    //TODO do it correctly with spring bean config, this can be helpful:
+    //http://thespringway.info/spring-web/access-self-signed-ssl-certificate-with-resttemplate/
+    TOFUTrustStrategy trustStrategy = new TOFUTrustStrategy();
+    trustStrategy.setTrustStoreService(trustStoreService);
+    PredefinedAliasPrivateKeyStrategy keyStrategy = new PredefinedAliasPrivateKeyStrategy(ownerAlias);
+
+    SSLContext sslContext = new SSLContextBuilder().loadKeyMaterial(keyStoreService.getUnderlyingKeyStore(), "temp"
+      .toCharArray(), keyStrategy)
+                                                   .loadTrustMaterial(null, trustStrategy)
+                                                   .build();
+    // here in the constructor, also hostname verifier, protocol version, cipher suits, etc. can be specified
+    SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext);
+
+    HttpClient httpClient = HttpClients.custom()//.useSystemProperties()
+    .setSSLSocketFactory(sslConnectionSocketFactory).build();
+    HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+    requestFactory.setHttpClient(httpClient);
+
+    RestTemplate restTemplate = new RestTemplate(requestFactory);
+    HttpHeaders headers = new HttpHeaders();
+    headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN));
+    HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+//    ResponseEntity<String> result = restTemplate.exchange("https://localhost:8443/won/register-owner", HttpMethod.POST,
+//                                                          entity,
+//                                                          String.class);
+    ResponseEntity<String> result = restTemplate.exchange(wonNodeURI + "?register=owner", HttpMethod
+                                                            .POST,
+                                                          entity,
+                                                          String.class);
+    logger.info("Receiver application id: " +  result.getBody());
+    String ownerApplicationId = result.getBody();
+
+
+    X509KeyManager km = null;
+    TrustManager tm = null;
+    try {
+      KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+      kmf.init(keyStoreService.getUnderlyingKeyStore(), "temp".toCharArray());
+      // TODO instead of this cast, iterate and select instance of X509KeyManager
+      km = (X509KeyManager) kmf.getKeyManagers()[0];
+      km = new KeyManagerWrapperWithStrategy(km, new PredefinedAliasPrivateKeyStrategy(ownerAlias));
+
+      KeyStore trustStore = trustStoreService.getUnderlyingKeyStore();
+      TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
+      //TODO what about password???
+      tmf.init(trustStore);
+      tm = tmf.getTrustManagers()[0];
+    } catch (NoSuchAlgorithmException e) {
+      e.printStackTrace();
+    }
+
+
+    CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeURI,
+    ownerApplicationId, km, tm);
+
+    //TODO: check if won node is already in the db
+    logger.debug("registered ownerappID: " + ownerApplicationId);
+    storeWonNode(ownerApplicationId, camelConfiguration, wonNodeURI);
+
+    configureRemoteEndpointsForOwnerApplication(ownerApplicationId, ownerProtocolCommunicationServiceImpl
+      .getProtocolCamelConfigurator().getEndpoint(wonNodeURI));
+
+  }
+
+  private boolean isRegistered(URI wonNodeURI) {
+    List<WonNode> wonNodes = wonNodeRepository.findByWonNodeURI(wonNodeURI);
+    if (!wonNodes.isEmpty()) {
+      return true;
+    }
+    return false;
+  }
+
+
 
   /**
    * Stores the won node information, possibly overwriting existing data.
@@ -276,4 +399,7 @@ public class OwnerWonMessageSenderJMSBased
     this.startingEndpoint = startingEndpoint;
   }
 
+  public void setOwnerAlias(String ownerAlias) {
+    this.ownerAlias = ownerAlias;
+  }
 }

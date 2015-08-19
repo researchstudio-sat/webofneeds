@@ -16,8 +16,9 @@
 -->
 <!-- START SNIPPET: example -->
 
-<beans
-        xmlns="http://www.springframework.org/schema/beans"
+<spring:beans
+        xmlns="http://activemq.apache.org/schema/core"
+        xmlns:spring="http://www.springframework.org/schema/beans"
         xmlns:context="http://www.springframework.org/schema/context"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -32,6 +33,7 @@
     -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
 
+    <!--spring:import resource="classpath:/spring/component/security/key-services.xml" /-->
 
     <!--
         The <broker> element is used to configure the ActiveMQ broker.
@@ -154,19 +156,34 @@
             <!--transportConnector name="tcp"
             uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600" /-->
             <transportConnector name="ssl"
-                                uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true" />
+                                uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;trace=true" />
             <!--transportConnector name="ssl"
                                 uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;transport.enabledProtocols=TLSv1.2" /-->
             <!-- &amp;transport.enabledProtocols=TLSv1.2-->
         </transportConnectors>
         <sslContext>
-            <sslContext
+            <!--sslContext
                     keyStore="${activemq.broker.keystore}"
                     keyStorePassword="${activemq.broker.keystore.password}"
                     trustStore="${activemq.broker.truststore}"
-                    trustStorePassword="${activemq.broker.truststore.password}"
-                    />
+                    trustStorePassword="${activemq.broker.truststore.password}"-->
+                <!-- broker's private key is the same as server's private key, and his trust is defined by the custom trust manager-->
+                <sslContext
+                        keyStore="${activemq.broker.keystore}"
+                        keyStorePassword="${activemq.broker.keystore.password}"
+                        >
+                    <trustManagers>
+                        <spring:bean class="won.cryptography.service.TrustManagerWrapperWithTrustService">
+                            <spring:constructor-arg ref="trustStoreService" />
+                            <spring:constructor-arg type="java.lang.String" value="${activemq.broker.keystore}" />
+                            <spring:constructor-arg type="java.lang.String" value="${activemq.broker.keystore.password}" />
+                            <spring:constructor-arg type="java.lang.String" value="${activemq.broker.keystore.alias}" />
+                        </spring:bean>
+                    </trustManagers>
+                </sslContext>
+
         </sslContext>
+
         <!--networkConnectors>
             <networkConnector uri="static:(tcp://localhost:61617)" ></networkConnector>
         </networkConnectors-->
@@ -177,7 +194,6 @@
         </shutdownHooks>
 
     </broker>
-
     <!--
         Enable web consoles, REST and Ajax APIs and demos
 
@@ -185,5 +201,5 @@
     -->
     <!-- <import resource="jetty.xml"/>       -->
 
-</beans>
+</spring:beans>
 <!-- END SNIPPET: example -->

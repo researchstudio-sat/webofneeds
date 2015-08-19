@@ -18,6 +18,8 @@ package won.protocol.jms;
 
 import won.protocol.exception.CamelConfigurationFailedException;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
 import java.net.URI;
 import java.util.List;
 
@@ -27,6 +29,9 @@ import java.util.List;
  */
 public interface OwnerProtocolCamelConfigurator extends CamelConfigurator {
     String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI, String ownerProtocolQueueName) throws CamelConfigurationFailedException;
+
+    String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI, String
+      ownerProtocolQueueName, KeyManager km, TrustManager tm) throws CamelConfigurationFailedException;
 
     void addRemoteQueueListeners(List<String> endpoints, URI remoteEndpoint) throws CamelConfigurationFailedException;
 

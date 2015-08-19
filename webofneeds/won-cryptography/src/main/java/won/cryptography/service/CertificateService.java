@@ -99,6 +99,8 @@ public class CertificateService {
                                                      ) {
     Map<ASN1ObjectIdentifier,String> subjectData = new HashMap<ASN1ObjectIdentifier,String>();
     subjectData.put(BCStyle.UNIQUE_IDENTIFIER, subjectId);
+    subjectData.put(BCStyle.CN, subjectId);
+    //TODO web-id into alternative names certificate extension field
     return createSelfSignedCertificate(serialNumber, key, subjectData);
   }
 

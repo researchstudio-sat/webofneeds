@@ -9,10 +9,7 @@ import won.cryptography.exception.KeyNotSupportedException;
 import won.cryptography.key.KeyInformationExtractor;
 import won.cryptography.model.WONCryptographyModel;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PublicKey;
-import java.security.SecureRandom;
+import java.security.*;
 import java.security.spec.ECGenParameterSpec;
 
 /**
@@ -94,9 +91,18 @@ public class KeyPairService {
                 keyInformationExtractor.getQX(publicKey));
 
         blankNode.addProperty(WONCryptographyModel.CRYPT_ecc_qy_Property,
-                keyInformationExtractor.getQY(publicKey));
+                              keyInformationExtractor.getQY(publicKey));
 
 
     }
 
+    //TODO make better api for curve support, and ideally also add RSA support...
+
+    public KeyPair generateNewKeyPairInSecp384r1() throws InvalidAlgorithmParameterException {
+        ECGenParameterSpec ecGenSpec = new ECGenParameterSpec("secp384r1");
+        org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi keyPairGenerator = new org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi.ECDSA();
+        keyPairGenerator.initialize(ecGenSpec, new SecureRandom());
+        KeyPair pair = keyPairGenerator.generateKeyPair();
+        return pair;
+    }
 }

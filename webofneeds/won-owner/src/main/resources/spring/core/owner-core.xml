@@ -48,10 +48,22 @@
      possibly certificates of other parties-->
     <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService" init-method="init">
         <constructor-arg type="java.lang.String" value="${keystore.location}" />
+        <property name="defaultAlias" value="${uri.prefix.owner}" />
+    </bean>
+    <bean id="trustStoreService" class="won.cryptography.service.TrustStoreService" init-method="init">
+        <constructor-arg type="java.lang.String" value="${truststore.location}" />
+    </bean>
+    <bean id="certificateService" class="won.cryptography.service.CertificateService">
     </bean>
 
     <bean id="cryptoService" class="won.cryptography.service.CryptographyService">
         <constructor-arg ref="keyStoreService" />
+    </bean>
+
+    <bean id="ownerCertificateOnStartupCreator"
+          class="won.owner.service.impl.OwnerCertificateOnStartupCreator">
+        <property name="alias" value="${uri.prefix.owner}" />
+        <property name="keyStoreService" ref="keyStoreService" />
     </bean>
 
     <!-- processor for checking signatures -->

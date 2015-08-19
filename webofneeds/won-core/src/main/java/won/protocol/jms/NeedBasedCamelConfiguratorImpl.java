@@ -27,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.model.MessagingType;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
 import java.net.URI;
 
 //import won.node.camel.routes.NeedProtocolDynamicRoutes;
@@ -50,6 +52,7 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
 
     @Override
     public synchronized String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName){
+
         String brokerComponentName = setupBrokerComponentName(brokerUri);
         if (!brokerComponentName.contains("brokerUri")){
           addCamelComponentForWonNodeBroker(brokerUri, brokerComponentName);
@@ -59,6 +62,20 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
         logger.info("endpoint of wonNodeURI {} is {}",brokerUri,endpointMap.get(brokerUri));
         return endpoint;
     }
+
+  @Override
+  public synchronized String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName, KeyManager km, TrustManager tm){
+
+    //TODO km and tm
+    String brokerComponentName = setupBrokerComponentName(brokerUri);
+    if (!brokerComponentName.contains("brokerUri")){
+      addCamelComponentForWonNodeBroker(brokerUri, brokerComponentName, km, tm);
+    }
+    String endpoint = brokerComponentName+":queue:"+needProtocolQueueName;
+    endpointMap.put(brokerUri,endpoint);
+    logger.info("endpoint of wonNodeURI {} is {}",brokerUri,endpointMap.get(brokerUri));
+    return endpoint;
+  }
 
     @Override
     public synchronized String setupBrokerComponentName(URI brokerUri){
@@ -85,6 +102,25 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
         }
         brokerComponentMap.put(brokerUri,brokerComponentName);
     }
+
+  public synchronized void addCamelComponentForWonNodeBroker(URI brokerUri,String brokerComponentName, KeyManager km,
+                                                             TrustManager tm){
+
+    //TODO km and tm
+    ActiveMQComponent activeMQComponent;
+    if (camelContext.getComponent(brokerComponentName)==null){
+      activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri, MessagingType
+        .Queue, km, tm);
+      logger.info("adding activemqComponent for brokerUri {}",brokerUri);
+      camelContext.addComponent(brokerComponentName,activeMQComponent);
+      try {
+        activeMQComponent.start();
+      } catch (Exception e) {
+        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      }
+    }
+    brokerComponentMap.put(brokerUri,brokerComponentName);
+  }
 
   @Override
   public synchronized void addRouteForEndpoint(String startingEndpoint,URI brokerUri) throws CamelConfigurationFailedException {
