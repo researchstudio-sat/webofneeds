@@ -12,13 +12,19 @@ console.log('System.import working');
 import angular from 'angular';
 window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
 
-import wonAppTag from 'app/wonAppTag';
+import appTagModule from './components/wonAppTag';
 
-let app = angular.module('won.owner',[])
-                 .directive('wonApp', wonAppTag);
-//let app = angular.module('won.owner',[]);
+/*
+ * TODO would be nice if components could specify their own
+ * dependencies (and these only got loaded once each)
+ */
+let app = angular.module('won.owner', [appTagModule]);
+
+//let app = angular.module('won.owner',[...other modules...]);
 angular.bootstrap(document, ['won.owner'], {
-    // make sure dependency injection works after minification
+    // make sure dependency injection works after minification (or
+    // at least angular explains about sloppy imports with a
+    // reference to the right place)
     // see https://docs.angularjs.org/guide/production
     // and https://docs.angularjs.org/guide/di#dependency-annotation
     strictDi: true
@@ -26,4 +32,5 @@ angular.bootstrap(document, ['won.owner'], {
 
 console.log('app_jspm.js: ', angular);
 window.app = app; //TODO for debugging only. remove me.
-window.wonAppTag = wonAppTag; //TODO for debugging only. remove me.
+
+
