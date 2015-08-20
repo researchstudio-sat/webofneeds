@@ -7,7 +7,7 @@
   @include title-bar('cnt');
 
   > .cnt__left {
-    @extend %flex-column;
+    @include flex-column;
   }
 
   > .cnt__center {

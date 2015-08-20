@@ -7,19 +7,17 @@
   @include title-bar('ntb');
 
   > .ntb__left {
-    @extend %flex-row;
-
+    @include flex-row;
 
     .ntb__left__image {
       display: block;
-      @include max-square(4.7rem); //99px/21
+      @include fixed-square(4.7rem); //99px/21
 
-      margin-left: 1rem;
-      margin-right: 1rem;
+      margin: 1rem;
     }
 
     .ntb__left__titles {
-      @extend %flex-column;
+      @include flex-column;
       align-items: flex-start;
 
 
@@ -36,14 +34,14 @@
     flex-basis: 35rem;
     max-width: 35rem;
 
-    @extend %flex-column-spaced;
+    @include flex-column-spaced;
 
     .ntb__right__settings {
       height: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
       width: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
       align-self: flex-end;
       margin-top: 1rem;
-      margin-right: 1rem;
+      margin-right: $minContentPadding;
     }
 
     .ntb__tabs {

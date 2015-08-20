@@ -13,7 +13,7 @@
   }
 
   .mtb__right {
-    @extend %flex-column;
+    @include flex-column;
   }
 
   .mtb__searchbtn {

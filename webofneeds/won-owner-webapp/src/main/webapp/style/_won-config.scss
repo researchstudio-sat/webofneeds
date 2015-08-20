@@ -12,3 +12,10 @@ $won-line-gray: #CBD2D1; //use for lines
 // sizes
 
 $bigiconSize: 2.25rem;
+
+// should be used as max-width on all root-elements so the app has some
+// whitespace to the sides where it can be afforded
+$maxContentWidth: 40rem;
+
+// use this to leave a consistent amount of space towards the edge of the viewport
+$minContentPadding: 1rem;

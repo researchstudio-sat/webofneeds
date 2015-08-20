@@ -2,7 +2,7 @@
 @import 'sizing-utils';
 
 @mixin underlined-tabs($underlineColor) {
-  @extend %flex-row-spaced;
+  @include flex-row-spaced;
   align-items: stretch;
   list-style: none;
 
@@ -30,7 +30,7 @@
 
     text-align: center;
 
-    @extend %flex-bottom-center;
+    @include flex-bottom-center;
 
     & a {
       color: black;

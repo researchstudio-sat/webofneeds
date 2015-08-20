@@ -7,6 +7,11 @@
   border-top: 1px solid $won-line-gray;
   border-bottom: 1px solid $won-line-gray;
 
+  > %titlebar-inner {
+    max-width: $maxContentWidth;
+    padding: 0 $minContentPadding;
+  }
+
   %tb__icon {
     @include max-square(1.8rem);
   }
@@ -26,6 +31,9 @@
 }
 @mixin title-bar($prefix) {
   @extend %title-bar;
+  > .#{$prefix}__inner {
+    @extend %tb__inner;
+  }
   .#{$prefix}__title { @extend %tb__title; }
   .#{$prefix}__icon { @extend %tb__icon }
   .#{$prefix}__tabs { @extend %tb__tabs }

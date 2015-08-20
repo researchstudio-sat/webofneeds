@@ -30,7 +30,7 @@
   }
 
   & .topnav__button {
-    @extend %flex-row;
+    @include flex-row;
 
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
@@ -43,7 +43,7 @@
   }
 
   & .topnav__list {
-    @extend %flex-row;
+    @include flex-row;
     list-style: none;
   }
 }

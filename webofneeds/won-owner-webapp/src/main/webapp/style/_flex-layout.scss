@@ -57,3 +57,30 @@
   @extend %flex-column;
   justify-content: space-between;
 }
+
+@mixin flex {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+@mixin flex-row {
+  @include flex;
+  flex-direction: row;
+}
+@mixin flex-column {
+  @include flex;
+  flex-direction: column;
+}
+@mixin flex-bottom-center {
+  @include flex-column;
+  justify-content: flex-end;
+}
+@mixin flex-row-spaced {
+  @include flex-row;
+  justify-content: space-between;
+}
+@mixin flex-column-spaced {
+  @include flex-column;
+  justify-content: space-between;
+}

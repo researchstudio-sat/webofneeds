@@ -5,11 +5,11 @@
   @include title-bar('astb');
 
   .astb__left {
-    @extend %flex-column;
+    @include flex-column;
   }
 
   .astb__center {
-    @extend %flex-column;
+    @include flex-column;
 
     .astb__title {
       margin-top: 0.5rem;
