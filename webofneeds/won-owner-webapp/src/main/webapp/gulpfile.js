@@ -6,16 +6,7 @@ var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
 var autoprefixer = require('gulp-autoprefixer');
 var svgSprite = require('gulp-svg-sprite');
-
-//gulp.task('sass', function () {
-//    gulp.src('./sass/**/*.scss')
-//        .pipe(sass().on('error', sass.logError))
-//        .pipe(gulp.dest('./css'));
-//});
-
-//gulp.task('sass:watch', function () {
-//    gulp.watch('./sass/**/*.scss', ['sass']);
-//});
+var sassImportOnce = require('node-sass-import-once');
 
 gulp.task('default', ['sass', 'iconsprite']);
 gulp.task('watch', function() {
@@ -23,12 +14,17 @@ gulp.task('watch', function() {
     gulp.watch('./images/won-icons/**/*.svg', ['iconsprite']);
 });
 
-
-
 gulp.task('sass', function(done) {
     var generatedStyleFolder =  './generated/';
     gulp.src('./style/won.scss')
         .pipe(sass({
+            // TODO get import-once working
+            importer: sassImportOnce,
+            importOnce: {
+                index: false,
+                css: false,
+                bower: false
+            },
             errLogToConsole: true
         }))
         .pipe(autoprefixer({
