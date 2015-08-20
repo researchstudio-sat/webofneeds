@@ -4,15 +4,17 @@
 .settings-tab-bar {
   @include title-bar('astb');
 
-  .astb__left {
-    @include flex-column;
-  }
+  > .astb__inner {
+    > .astb__inner__left {
+      @include flex-column;
+    }
 
-  .astb__center {
-    @include flex-column;
+    > .astb__inner__center {
+      @include flex-column;
 
-    .astb__title {
-      margin-top: 0.5rem;
+      .astb__title {
+        margin-top: 0.5rem;
+      }
     }
   }
 }

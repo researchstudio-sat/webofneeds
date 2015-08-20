@@ -6,29 +6,29 @@
 .need-tab-bar {
   @include title-bar('ntb');
 
-  > .ntb__left {
+  .ntb__inner__left {
     @include flex-row;
 
-    .ntb__left__image {
+    .ntb__inner__left__image {
       display: block;
       @include fixed-square(4.7rem); //99px/21
 
       margin: 1rem;
     }
 
-    .ntb__left__titles {
+    .ntb__inner__left__titles {
       @include flex-column;
       align-items: flex-start;
 
 
-      .ntb__left__titles__type {
+      .ntb__inner__left__titles__type {
         color: #A7A7A7;
         font-size: 0.8rem;
       }
     }
   }
 
-  > .ntb__right {
+  .ntb__inner__right {
     //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
     // or make won-tabs a parametrized mixin?
     flex-basis: 35rem;
@@ -36,7 +36,7 @@
 
     @include flex-column-spaced;
 
-    .ntb__right__settings {
+    .ntb__inner__right__settings {
       height: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
       width: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
       align-self: flex-end;

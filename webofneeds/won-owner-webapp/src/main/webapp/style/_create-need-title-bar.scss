@@ -6,12 +6,14 @@
 .create-need-title {
   @include title-bar('cnt');
 
-  > .cnt__left {
-    @include flex-column;
-  }
+  > .cnt__inner {
+    > .cnt__inner__left {
+      @include flex-column;
+    }
 
-  > .cnt__center {
-    margin: 0.5rem auto;
+    > .cnt__inner__center {
+      margin: 0.5rem auto;
+    }
   }
 
   @include speech-bubble-top($won-light-gray, $won-line-gray, 16px, 50%);

@@ -5,9 +5,13 @@
 
 .topnav { //TODO split into single-purpose-classes
 
-  @include tri-aligned('topnav', 1rem);
-
   background-color: white;
+
+  @include max-content-width($maxContentWidth, $minContentPadding, 'topnav');
+
+  > .topnav__inner {
+    @include tri-aligned('topnav__inner', 1rem);
+  }
 
   & a {
     color: $won-red;

@@ -38,3 +38,23 @@
   height: auto;
 }
 
+/**
+ * Use this mixin on root-elements to limit the maximal width
+ * of the content (which needs to be placed in an $prefix__inner
+ * element. Also handles a minimum remaining margin (for when the
+ * viewport becomes small)
+ */
+@mixin max-content-width($maxCntWidth, $cntMargin, $prefix) {
+  // to center the sole child
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  flex-direction: row;
+
+  > .#{$prefix}__inner {
+    max-width: $maxCntWidth;
+    width: 100%; // take as much space as possible without exceeding the maxContentWidth
+    margin: 0 $cntMargin;
+  }
+}
