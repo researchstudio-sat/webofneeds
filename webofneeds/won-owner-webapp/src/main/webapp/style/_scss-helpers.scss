@@ -1,0 +1,15 @@
+
+
+// IMPORT ONCE
+// Taken from: http://4waisenkinder.de/blog/2014/03/06/import-once-in-sass-the-foundation-way/
+// We use this to prevent styles from being loaded multiple times for compenents that rely on other components.
+$modules: () !default;
+@mixin exports($name) {
+  // check if code with name is already stored inside of $modules
+  @if (index($modules, $name) == false) {
+    // if not push it into the list
+    $modules: append($modules, $name);
+    // include code that particular code
+    @content;
+  }
+}

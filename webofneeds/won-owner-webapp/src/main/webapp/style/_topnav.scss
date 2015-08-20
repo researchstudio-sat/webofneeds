@@ -12,10 +12,16 @@
   > .topnav__inner {
     //@include tri-aligned('topnav__inner', 1rem);
     @include flex-row-spaced;
-    > .topnav__inner__left { margin-right: 1rem; }
-    > .topnav__inner__right { margin-left: 1rem; }
-  }
+    > .topnav__inner__left {
+      margin-right: 1rem;
+      .topnav__button__icon { margin-right: 0.5rem; }
 
+    }
+    > .topnav__inner__right {
+      margin-left: 1rem;
+      .topnav__button { margin-left: 0.5rem; }
+    }
+  }
   & a {
     color: $won-red;
     text-decoration: none;
@@ -44,8 +50,6 @@
 
     & .topnav__button__icon {
       @include fixed-square($bigiconSize);
-      margin-left: 0.5rem;
-      margin-right: 0.5rem;
     }
   }
 
