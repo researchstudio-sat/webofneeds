@@ -6,48 +6,60 @@
 .need-tab-bar {
   @include title-bar('ntb');
 
-  .ntb__inner__left {
-    @include flex-row;
+  > .ntb__inner {
 
-    .ntb__inner__left__image {
-      display: block;
-      @include fixed-square(4.7rem); //99px/21
+    // ntb isn't using the tri-aligned that it inherits
+    // via the `@include title-bar` as there's no
+    // centered element
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 
-      margin: 1rem;
-    }
+    > .ntb__inner__left {
+      @include flex-row;
 
-    .ntb__inner__left__titles {
-      @include flex-column;
-      align-items: flex-start;
+      .ntb__inner__left__image {
+        display: block;
+        @include fixed-square(4.7rem); //99px/21
+
+        margin: 1rem;
+      }
+
+      .ntb__inner__left__titles {
+        @include flex-column;
+        align-items: flex-start;
+
+        margin: 1rem 0;
 
 
-      .ntb__inner__left__titles__type {
-        color: #A7A7A7;
-        font-size: 0.8rem;
+        .ntb__inner__left__titles__type {
+          color: #A7A7A7;
+          font-size: 0.8rem;
+        }
       }
     }
-  }
 
-  .ntb__inner__right {
-    //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
-    // or make won-tabs a parametrized mixin?
-    flex-basis: 35rem;
-    max-width: 35rem;
+    > .ntb__inner__right {
+      //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
+      // or make won-tabs a parametrized mixin?
+      flex-basis: 35rem;
+      max-width: 35rem;
 
-    @include flex-column-spaced;
+      @include flex-column-spaced;
 
-    .ntb__inner__right__settings {
-      height: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
-      width: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
-      align-self: flex-end;
-      margin-top: 1rem;
-      margin-right: $minContentPadding;
-    }
+      .ntb__inner__right__settings {
+        height: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
+        width: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
+        align-self: flex-end;
+        margin-top: 1rem;
+        margin-right: $minContentPadding;
+      }
 
-    .ntb__tabs {
-      //TODO bad style. not bem.
-      align-self: stretch;
-      height: 100%;
+      .ntb__tabs {
+        //TODO bad style. not bem.
+        align-self: stretch;
+        height: 100%;
+      }
     }
   }
 }

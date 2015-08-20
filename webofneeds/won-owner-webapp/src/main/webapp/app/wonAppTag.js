@@ -47,7 +47,6 @@ export default function wonAppTag() {
 
             <nav ng-cloak ng-show="{{true}}" class="main-tab-bar">
                 <div class="mtb__inner">
-                    <div class="mtb__inner__left"></div>
                     <ul class="mtb__inner__center mtb__tabs">
                         <li class=""><a href="#">Feed</a></li>
                         <li><a href="#">Posts
@@ -78,7 +77,6 @@ export default function wonAppTag() {
                         <img src="generated/icon-sprite.svg#ico27_close" class="cnt__icon">
                     </div>
                     <h1 class="cnt__inner__center cnt__title">What is your need?</div>
-                    <div class="cnt__inner__right"></div>
                 </div>
             </nav>
 
@@ -97,11 +95,8 @@ export default function wonAppTag() {
                             <div class="ntb__inner__left__titles__type">I want to have something [TYPE]</div>
                         </div>
                     </div>
-                    <div class="ntb__inner__center"></div>
                     <div class="ntb__inner__right">
-                        <!--<div class="ntb__inner__right__settingscontainer">-->
-                            <img class=" ntb__inner__right__settings ntb__icon" src="generated/icon-sprite.svg#ico_settings">
-                        <!--</div>-->
+                        <img class=" ntb__inner__right__settings ntb__icon" src="generated/icon-sprite.svg#ico_settings">
                         <ul class="ntb__tabs">
                             <li><a href="#">
                                 Messages
@@ -147,8 +142,6 @@ export default function wonAppTag() {
                                 <span class="astb__tabs__unread">5</span>
                             </a></li>
                         </ul>
-                    </div>
-                    <div class="astb__inner__right">
                     </div>
                 </div>
             </nav>

@@ -14,7 +14,13 @@
   }
 
   .#{$prefix}__icon {
-    @include max-square(1.8rem);
+    @include fixed-height(1.8rem);
+    // assuming there's no icons that are wider than tall.
+    // this assumption has to be made, to prevent chrome
+    // from showing immensly wide svg-snippets (id-selected
+    // viewports reaching to the right edge of the svg-sprite)
+    max-width: 1.8rem;
+    width: auto;
   }
 
   .#{$prefix}__title {
