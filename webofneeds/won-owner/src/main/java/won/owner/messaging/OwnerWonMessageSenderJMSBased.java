@@ -98,8 +98,11 @@ public class OwnerWonMessageSenderJMSBased
       // ToDo (FS): change it to won node URI and create method in the MessageEvent class
       URI wonNodeUri = wonMessage.getSenderNodeURI();
 
-      if (wonNodeUri == null)
-        wonNodeUri = defaultNodeURI;
+      if (wonNodeUri == null){
+        //obtain the sender won node from the sender need
+          throw new IllegalStateException("a message needs a SenderNodeUri otherwise we can't determine the won node " +
+                                            "via which to send it");
+      }
 
       List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
       String ownerApplicationId;
@@ -166,7 +169,6 @@ public class OwnerWonMessageSenderJMSBased
               String ownerApplicationId = register(defaultNodeURI);
               configureRemoteEndpointsForOwnerApplication(ownerApplicationId, ownerProtocolCommunicationServiceImpl
                 .getProtocolCamelConfigurator().getEndpoint(defaultNodeURI));
-
             } catch (Exception e) {
               logger.warn("Could not register with default won node {}", defaultNodeURI, e);
             }

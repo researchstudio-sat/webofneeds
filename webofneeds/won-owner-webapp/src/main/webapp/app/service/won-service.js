@@ -469,6 +469,7 @@ angular.module('won.owner').factory('wonService', function (
         var msgUri = wonNodeUri + '/event/' + utilService.getRandomPosInt(); //mandatory
         var msgJson = won.buildMessageRdf(contentRdf, {
             receiverNode : wonNodeUri, //mandatory
+            senderNode : wonNodeUri, //mandatory
             msgType : won.WONMSG.createMessage, //mandatory
             publishedContentUri: publishedContentUri, //mandatory
             msgUri: msgUri,
