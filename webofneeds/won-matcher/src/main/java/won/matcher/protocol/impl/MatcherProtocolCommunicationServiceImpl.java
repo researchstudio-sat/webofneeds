@@ -56,7 +56,8 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
       } else {
         matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,needBrokerUri);
         matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(needUri);
-        camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(needBrokerUri,
+        camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(needUri,
+                                                                                                         needBrokerUri,
                                                                                                          matcherProtocolQueueName));
       }
       camelConfiguration.setBrokerComponentName(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(needBrokerUri));
@@ -67,7 +68,9 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
       URI brokerUri = needBrokerUri;
 
       matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
-      camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(brokerUri,matcherProtocolQueueName));
+      camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(resourceUri,
+                                                                                                       brokerUri,
+                                                                                                       matcherProtocolQueueName));
       matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,brokerUri);
       camelConfiguration.setBrokerComponentName(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
       ActiveMQComponent activeMQComponent = (ActiveMQComponent)matcherProtocolCamelConfigurator.getCamelContext().getComponent(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));

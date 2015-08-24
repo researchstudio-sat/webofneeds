@@ -47,13 +47,17 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
     if (receiverNode != null) {
       receiverNodeInfo = wonNodeInformationService.getWonNodeInformation(receiverNode);
     }
-    URI ownNode = wonNodeInformationService.getDefaultWonNodeURI();
+
     WonNodeInfo ownNodeInfo = null;
-    if (ownNode.equals(senderNode)) {
+
+    URI msgUri = message.getMessageURI();
+
+    if (msgUri.getScheme().equals(senderNode.getScheme()) && msgUri.getAuthority().equals(senderNode.getAuthority())) {
       ownNodeInfo = senderNodeInfo;
-    } else if (ownNode.equals(receiverNode)) {
+    } else if (msgUri.getScheme().equals(receiverNode.getScheme()) && msgUri.getAuthority().equals(receiverNode.getAuthority())) {
       ownNodeInfo = receiverNodeInfo;
     }
+    URI ownNode = URI.create(ownNodeInfo.getWonNodeURI());
 
 
     // do checks for consistency between these nodes and message direction, as well as needs,
