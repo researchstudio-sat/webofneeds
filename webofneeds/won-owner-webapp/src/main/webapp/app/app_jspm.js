@@ -52,10 +52,18 @@ class AppController {
 
             { path: '/create-need', component: 'create-need'},
             { path: '/settings', component: 'settings'},
-            { path: '/incoming-requests', component: 'incoming-requests'},
 
-            { path: '/need/:id/', component: 'matches'}, //default tab
-            { path: '/need/:id/matches', component: 'matches'}
+            { path: '/overview/incoming-requests', component: 'incoming-requests'},
+            //{ path: '/overview/matches', component: 'matches'}, //TODO
+            //{ path: '/overview/posts', component: 'posts'}, //TODO
+            //{ path: '/overview/feed', component: 'posts'}, //TODO
+
+            //TODO database id needs to be send to the client after the create-msg acknowledgment
+            { path: '/post/:id/visitor', component: 'need-public'},
+            { path: '/post/:id/owner/matches', component: 'matches'}
+            //{ path: '/post/:id/owner/messages', component: 'need-messages'} //TODO
+            //{ path: '/post/:id/owner/incoming-requests', component: 'need-incoming-requests'} //TODO
+            //{ path: '/post/:id/owner/outgoing-requests', component: 'need-outgoing-requests'} //TODO
         ]);
     }
 }
