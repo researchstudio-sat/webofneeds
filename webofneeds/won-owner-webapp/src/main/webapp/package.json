@@ -22,6 +22,7 @@
       "angular": "github:angular/bower-angular@1.4.2",
       "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.13.0",
       "angular-mocks": "github:angular/bower-angular-mocks@1.4.2",
+      "angular-new-router": "npm:angular-new-router@^0.5.3",
       "angular-route": "github:angular/bower-angular-route@1.4.2",
       "angular-ui-utils": "github:angular-ui/ui-utils@2.0.0",
       "bootstrap": "github:twbs/bootstrap@3.3.5",

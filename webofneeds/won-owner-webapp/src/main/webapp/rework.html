@@ -22,31 +22,37 @@
 		<title ng-bind="'Web Of Needs - '+$root.title">Web Of Needs</title>
 
         <!--leaflet.js provides us with a map-widget which can display map material from different sources-->
-        <script type="text/javascript" src="resources/leaflet-0.7.3/leaflet.js"></script>
-        <link rel="stylesheet" href="resources/leaflet-0.7.3/leaflet.css"/>
+        <script type="text/javascript" src="./resources/leaflet-0.7.3/leaflet.js"></script>
+        <link rel="stylesheet" href="./resources/leaflet-0.7.3/leaflet.css"/>
 
-        <link rel="stylesheet" href="generated/won.css" />
+        <link rel="stylesheet" href="./generated/won.css" />
 
 	</head>
-    <won-app></won-app>
-    <!-- TODO make sure to only show the svgs once angular has finished rendering -->
-    <!-- start loading the svg so it's already in the cache once angular has finished loading its templates -->
+    <!--<body ng-app="won.owner" ng-controller="AppController as app">-->
+    <body ng-controller="AppController">
+        <won-app></won-app>
+        <ng-viewport></ng-viewport>
 
-    <!--
-    <img src="generated/icon-sprite.svg#WON_ico_header"
-         style="height:100px; width:100px"> <!-- TODO inline styles :{ -->
-    <img src="generated/icon-sprite.svg" style="display:none">
+        <a ng-link="create-need">To create-need</a>
+        <a ng-link="settings">To settings</a>
+        <!-- TODO make sure to only show the svgs once angular has finished rendering -->
+        <!-- start loading the svg so it's already in the cache once angular has finished loading its templates -->
+
+        <!--
+        <img src="generated/icon-sprite.svg#WON_ico_header"
+             style="height:100px; width:100px"> <!-- TODO inline styles :{ -->
+        <img src="./generated/icon-sprite.svg" style="display:none">
 
 
-        <script src="scripts/jquery.10.2.js"></script>
-        <script src="scripts/jquery.fs.scroller.min.js"></script>
+        <script src="./scripts/jquery.10.2.js"></script>
+        <script src="./scripts/jquery.fs.scroller.min.js"></script>
 
-        <script src="jspm_packages/system.js"></script>
-        <script src="jspm_config.js"></script>
+        <script src="./jspm_packages/system.js"></script>
+        <script src="./jspm_config.js"></script>
         <script>
             //console.log(System);
             //System.import('app/app')
-            System.import('app/app_jspm')
+            System.import('./app/app_jspm')
                     .catch(console.error.bind(console));
         </script>
 	</body>
