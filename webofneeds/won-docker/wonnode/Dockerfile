@@ -30,10 +30,10 @@ ADD ./setenv.sh /usr/local/tomcat/bin/
 #ADD ./tomcat-users.xml /usr/local/tomcat/conf/
 
 # configure tomcat for ssl
-ADD .ssl/server.xml /usr/local/tomcat/conf/
-ADD .ssl/t-cert.pem /usr/local/tomcat/conf/ssl/
-ADD .ssl/t-key.pem /usr/local/tomcat/conf/ssl/
-ADD .ssl/t-truststore.jks /usr/local/tomcat/conf/ssl/
-ADD .ssl/t-keystore.jks /usr/local/tomcat/conf/ssl/
+ADD ./ssl/server.xml /usr/local/tomcat/conf/
+ADD ./ssl/t-cert.pem /usr/local/tomcat/conf/ssl/
+ADD ./ssl/t-key.pem /usr/local/tomcat/conf/ssl/
+ADD ./ssl/t-truststore.jks /usr/local/tomcat/conf/ssl/
+ADD ./ssl/t-keystore.jks /usr/local/tomcat/conf/ssl/
 
 RUN dos2unix /usr/local/tomcat/bin/setenv.sh
