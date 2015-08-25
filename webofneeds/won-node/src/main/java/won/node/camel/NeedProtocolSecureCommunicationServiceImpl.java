@@ -87,6 +87,11 @@ public class NeedProtocolSecureCommunicationServiceImpl implements NeedProtocolC
             resourceUri = wonNodeUri;
             brokerUri = remoteNodeBrokerUri;
 
+
+
+
+
+
             needProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
             // register with remote node in order to exchange certificates if necessary. IF the same trust strategy will
             // be used when doing GET on won resource, we probably don't need this separate register for node
@@ -94,11 +99,10 @@ public class NeedProtocolSecureCommunicationServiceImpl implements NeedProtocolC
             // initialize key and trust managers and pass them to configuration
             KeyManager km = initializeKeyManager();
             TrustManager tm = initializeTrustManager(wonNodeUri.toString());
-            String endpoint = needProtocolCamelConfigurator.configureCamelEndpointForNeedUri(brokerUri,
+            String endpoint = needProtocolCamelConfigurator.configureCamelEndpointForNeedUri(resourceUri, brokerUri,
                                                                                              needProtocolQueueName,
                                                                                              km, tm);
             camelConfiguration.setEndpoint(endpoint);
-
             camelConfiguration.setBrokerComponentName(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
             ActiveMQComponent activeMQComponent = (ActiveMQComponent)needProtocolCamelConfigurator.getCamelContext().getComponent(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
             logger.info("ActiveMQ Service Status : {}",activeMQComponent.getStatus().toString());
