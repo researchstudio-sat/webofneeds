@@ -4,7 +4,7 @@
 ;
 
 import angular from 'angular';
-import needTitleBarModule from '../need-title-bar';
+import overviewTitleBarModule from '../owner-title-bar';
 
 class MatchesController {
     constructor() {}
@@ -14,7 +14,7 @@ class MatchesController {
 MatchesController.$inject = [];
 
 export default angular.module('won.owner.components.matches', [
-        needTitleBarModule
+        overviewTitleBarModule
     ])
     .controller('MatchesController', MatchesController)
     .name;

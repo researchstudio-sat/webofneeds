@@ -4,7 +4,7 @@
 ;
 
 import angular from 'angular';
-import mainTabBarModule from '../main-tab-bar';
+import overviewTitleBarModule from '../overview-title-bar';
 
 class IncomingRequestsController {
     constructor() {}
@@ -14,7 +14,7 @@ class IncomingRequestsController {
 IncomingRequestsController.$inject = [];
 
 export default angular.module('won.owner.components.incomingRequests', [
-        mainTabBarModule
+        overviewTitleBarModule
     ])
     .controller('Incoming-requestsController', IncomingRequestsController)
     .name;

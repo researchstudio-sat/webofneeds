@@ -42,6 +42,6 @@ function genComponentConf() {
     }
 }
 
-export default angular.module('won.owner.components.mainTabBar', [])
-    .directive('wonMainTabBar', genComponentConf)
+export default angular.module('won.owner.components.overviewTitleBar', [])
+    .directive('wonOverviewTitleBar', genComponentConf)
     .name;

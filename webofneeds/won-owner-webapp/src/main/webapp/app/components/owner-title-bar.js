@@ -58,5 +58,5 @@ function genComponentConf() {
 }
 
 export default angular.module('won.owner.components.needTitleBar', [])
-    .directive('wonNeedTitleBar', genComponentConf)
+    .directive('wonOwnerTitleBar', genComponentConf)
     .name;
