@@ -15,6 +15,10 @@ RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true 
 RUN apt-get install oracle-java8-installer -y
 RUN apt-get install oracle-java8-set-default
 
+# add webofneeds default config env variables
+ENV WON_CONFIG_DIR=/usr/local/tomcat/won/conf
+ENV LOGBACK_CONFIG=logback_info.xml
+
 # add the webofneeds files
 ADD ./tomcat-libs/* /usr/local/tomcat/lib/
 ADD ./owner.war /usr/local/tomcat/webapps/
@@ -22,7 +26,9 @@ ADD ./conf /usr/local/tomcat/won/conf
 
 # configure tomcat
 ADD ./setenv.sh /usr/local/tomcat/bin/
-ADD ./tomcat-users.xml /usr/local/tomcat/conf/
+# uncomment the following line to access tomcat manager with admin user
+#ADD ./tomcat-users.xml /usr/local/tomcat/conf/
+
 # configure tomcat for ssl
 ADD .ssl/server.xml /usr/local/tomcat/conf/
 ADD .ssl/t-cert.pem /usr/local/tomcat/conf/ssl/
