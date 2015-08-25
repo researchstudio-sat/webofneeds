@@ -9,9 +9,9 @@ function genComponentConf() {
     let template = `
         <nav class="settings-tab-bar" ng-cloak ng-show="{{true}}">
             <div class="astb__inner">
-                <div class="astb__inner__left">
+                <a class="astb__inner__left" href="javascript:void(0)" ng-click="self.back()">
                     <img src="generated/icon-sprite.svg#ico36_backarrow" class="astb__icon">
-                </div>
+                </a>
                 <div class="astb__inner__center">
                     <h1 class="astb__title">Account Settings</h1>
                     <ul class="astb__tabs">
@@ -29,8 +29,15 @@ function genComponentConf() {
         </nav>
     `;
 
+    class Controller {
+        constructor() { }
+        back() { window.history.back() }
+    }
+
     return {
         restrict: 'E',
+        controller: Controller,
+        controllerAs: 'self',
         template: template
     }
 }

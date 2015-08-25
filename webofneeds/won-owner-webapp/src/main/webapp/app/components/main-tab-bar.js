@@ -30,11 +30,18 @@ function genComponentConf() {
         </nav>
     `;
 
+    class Controller {
+        constructor() { }
+    }
+
     return {
         restrict: 'E',
+        controller: Controller,
+        controllerAs: 'self',
         template: template
     }
 }
+
 export default angular.module('won.owner.components.mainTabBar', [])
     .directive('wonMainTabBar', genComponentConf)
     .name;

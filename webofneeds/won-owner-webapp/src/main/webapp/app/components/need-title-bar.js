@@ -10,7 +10,9 @@ function genComponentConf() {
         <nav class="need-tab-bar" ng-cloak ng-show="{{true}}">
             <div class="ntb__inner">
                 <div class="ntb__inner__left">
-                    <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__icon">
+                    <a href="javascript:void(0)" ng-click="self.back()">
+                        <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__icon">
+                    </a>
                     <img class="ntb__inner__left__image" src="images/someNeedTitlePic.png"></img>
                     <div class="ntb__inner__left__titles">
                         <h1 class="ntb__title">New flat, need furniture [TITLE]</h1>
@@ -42,11 +44,19 @@ function genComponentConf() {
         </nav>
     `;
 
+    class Controller {
+        constructor() { }
+        back() { window.history.back() }
+    }
+
     return {
         restrict: 'E',
+        controller: Controller,
+        controllerAs: 'self',
         template: template
     }
 }
+
 export default angular.module('won.owner.components.needTitleBar', [])
     .directive('wonNeedTitleBar', genComponentConf)
     .name;

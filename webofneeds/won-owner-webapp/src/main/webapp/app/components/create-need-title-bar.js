@@ -14,6 +14,13 @@ function genComponentConf() {
         </nav>
     `;
 
+    class Controller {
+        constructor() {
+            //this.testVar = 42;
+        }
+        back() { window.history.back() }
+    }
+
     return {
         restrict: 'E',
         controller: Controller,
@@ -22,14 +29,6 @@ function genComponentConf() {
     }
 }
 
-class Controller {
-    constructor() {
-        //this.testVar = 42;
-    }
-    back() { window.history.back() }
-
-
-}
 export default angular.module('won.owner.components.createNeedTitleBar', [])
     .directive('wonCreateNeedTitleBar', genComponentConf)
     .name;
