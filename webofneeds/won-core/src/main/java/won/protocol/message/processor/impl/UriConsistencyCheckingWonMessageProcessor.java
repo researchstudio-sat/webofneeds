@@ -47,13 +47,17 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
     if (receiverNode != null) {
       receiverNodeInfo = wonNodeInformationService.getWonNodeInformation(receiverNode);
     }
-    URI ownNode = wonNodeInformationService.getDefaultWonNodeURI();
+
     WonNodeInfo ownNodeInfo = null;
-    if (ownNode.equals(senderNode)) {
+
+    URI msgUri = message.getMessageURI();
+
+    if (msgUri.getScheme().equals(senderNode.getScheme()) && msgUri.getAuthority().equals(senderNode.getAuthority())) {
       ownNodeInfo = senderNodeInfo;
-    } else if (ownNode.equals(receiverNode)) {
+    } else if (msgUri.getScheme().equals(receiverNode.getScheme()) && msgUri.getAuthority().equals(receiverNode.getAuthority())) {
       ownNodeInfo = receiverNodeInfo;
     }
+    URI ownNode = URI.create(ownNodeInfo.getWonNodeURI());
 
 
     // do checks for consistency between these nodes and message direction, as well as needs,
@@ -70,7 +74,7 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
     checkCreateMsgNeedURI(message, ownNodeInfo);
 
     // Specified sender-receiverNeed/Connection must conform to sender-receiverNode URI pattern
-    checkSenders(senderNodeInfo, receiverNodeInfo, message);
+    checkSenders(senderNodeInfo, message);
     checkReceivers(receiverNodeInfo, message);
 
     // Check that my node is sender or receiver node URI, depending on the message direction
@@ -91,15 +95,9 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
                          message.getReceiverURI(), null);
   }
 
-  private void checkSenders(final WonNodeInfo senderNodeInfo, final WonNodeInfo receiverNodeInfo, final WonMessage message) {
-
-    // special case for e.g. create_message that has only sender need and receiver node
-    if (message.getSenderNodeURI() == null) {
-      checkNodeConformance(receiverNodeInfo, message.getSenderNeedURI(), null, null);
-    } else { // common case
-      checkNodeConformance(senderNodeInfo, message.getSenderNeedURI(),
+  private void checkSenders(final WonNodeInfo senderNodeInfo, final WonMessage message) {
+    checkNodeConformance(senderNodeInfo, message.getSenderNeedURI(),
                            message.getSenderURI(), null);
-    }
   }
 
   private void checkDirection(final WonMessage message, final URI ownNode) {
@@ -116,13 +114,9 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
         }
         break;
       case FROM_OWNER:
-        // my node should be a sender node; if sender node is not specified - then the receiver node
-        node = senderNode;
-        if (senderNode == null) {
-          node = receiverNode;
-        }
-        if (!ownNode.equals(node)) {
-          throw new UriNodePathException(node);
+        // my node should be a sender node
+        if (!ownNode.equals(senderNode)) {
+          throw new UriNodePathException(senderNode);
         }
         break;
       case FROM_SYSTEM:

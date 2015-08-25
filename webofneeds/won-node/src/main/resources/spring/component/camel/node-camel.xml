@@ -41,12 +41,19 @@
         <!--property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
     </bean-->
 
+    
+    <!--
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker" >
+        <property name="brokerURL" value="tcp://localhost:${activemq.broker.port}"/>
+    </bean>
+    -->
     <!-- This is used for the connections from internal node client to embedded (internal) node broker. In order to trust
      my own internal connections, it can be configured with predefined key/trust stores that only contain this
      node-server's private/public certificate. TODO: It would be correct though, to use here vm connection without any ssl stuff-->
     <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQSslConnectionFactory"
           depends-on="embeddedBroker" >
-        <property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
+        <property name="brokerURL" 
+                  value="${activemq.broker.scheme}://localhost:${activemq.broker.port}"/>
         <property name="keyStore" value="${activemq.broker.keystore}"/>
         <property name="keyStorePassword" value="${activemq.broker.keystore.password}"/>
         <property name="trustStore" value="${activemq.broker.truststore}"/>
@@ -71,7 +78,7 @@
         <!-- note: this URI does not need to be configurable via the
         config file, it will be the same on any system -->
 
-        <!--property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
+        <!--property name="brokerURL" value="tcp://localhost:${activemq.broker.port}"/>
         <property name="connectionFactory" ref="cachedConnectionFactory"/>
     </bean-->
     <!--bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl"-->

@@ -28,8 +28,9 @@ import java.net.URI;
  */
 public interface NeedProtocolCamelConfigurator extends CamelConfigurator {
 
-    public String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName);
-    public String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName, KeyManager km, TrustManager tm);
+    public String configureCamelEndpointForNeedUri(URI wonNodeUri, URI brokerUri, String needProtocolQueueName);
+    public String configureCamelEndpointForNeedUri(URI wonNodeUri, URI brokerUri, String needProtocolQueueName, 
+                                                   KeyManager km, TrustManager tm);
 
     public void addCamelComponentForWonNodeBroker(URI brokerUri,String brokerComponentName);
 

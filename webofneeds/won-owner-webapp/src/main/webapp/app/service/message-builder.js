@@ -69,6 +69,7 @@
                 'msg:hasMessageType': { '@id': args.msgType },
                 'msg:hasContent': nonEnvelopeGraphIds.map(function(graphId) {return {'@id': graphId} }),
                 'msg:hasReceiverNode': { '@id': args.receiverNode },
+                'msg:hasSenderNode': { '@id': args.senderNode },
                 'msg:hasSenderNeed': { '@id': args.publishedContentUri },
                 'msg:hasAttachment': attachmentBlankNodes.map(function(n) {return {'@id' : n['@id']} }),
             },

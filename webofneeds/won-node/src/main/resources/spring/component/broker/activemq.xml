@@ -33,7 +33,6 @@
     -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
 
-    <!--spring:import resource="classpath:/spring/component/security/key-services.xml" /-->
 
     <!--
         The <broker> element is used to configure the ActiveMQ broker.
@@ -155,8 +154,12 @@
             <!--transportConnector name="amqp" uri="amqp://localhost:5672?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600"/-->
             <!--transportConnector name="tcp"
             uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600" /-->
-            <transportConnector name="ssl"
-                                uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;trace=true" />
+            <!--transportConnector name="ssl"
+                                uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;trace=true" /-->
+
+            <transportConnector name="${activemq.broker.scheme}"
+                                uri="${activemq.broker.scheme}://0.0.0.0:${activemq.broker.port}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;trace=true" />
+
             <!--transportConnector name="ssl"
                                 uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;transport.enabledProtocols=TLSv1.2" /-->
             <!-- &amp;transport.enabledProtocols=TLSv1.2-->
@@ -194,6 +197,7 @@
         </shutdownHooks>
 
     </broker>
+
     <!--
         Enable web consoles, REST and Ajax APIs and demos
 
