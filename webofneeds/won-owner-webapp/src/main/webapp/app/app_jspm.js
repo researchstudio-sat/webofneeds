@@ -19,11 +19,6 @@ import settingsViewModule from './components/settings/settings';
 
 window.newRouter = newRouter; //TODO deletme
 
-/*
- * TODO would be nice if components could specify their own
- * dependencies (and these only got loaded once each)
- */
-//let app = angular.module('won.owner', [appTagModule, createNeedViewModule]);
 let app = angular.module('won.owner', [
     'ngNewRouter',
     appTagModule,
@@ -51,9 +46,7 @@ class AppController {
         ]);
     }
 }
-//AppController.$inject = ['$router'];
 app.controller('AppController', ['$router', AppController]);
-//app.controller('AppController', [AppController]);
 
 //let app = angular.module('won.owner',[...other modules...]);
 angular.bootstrap(document, ['won.owner'], {
