@@ -37,7 +37,7 @@ let app = angular.module('won.owner', [
  */
 app.config(['$componentLoaderProvider', setTemplatesPath]);
 function setTemplatesPath ($componentLoaderProvider){
-    window.componentLoaderProviderFoo = $componentLoaderProvider;
+    //the default wouldn't include 'app/'
     $componentLoaderProvider.setTemplateMapping(name => `app/components/${name}/${name}.html`);
 }
 

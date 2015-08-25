@@ -16,5 +16,5 @@ CreateNeedController.$inject = [];
 export default angular.module('won.owner.components.createNeed', [
         createNeedTitleBarModule
     ])
-    .controller('CreateNeedController', CreateNeedController)
+    .controller('Create-needController', CreateNeedController)
     .name;

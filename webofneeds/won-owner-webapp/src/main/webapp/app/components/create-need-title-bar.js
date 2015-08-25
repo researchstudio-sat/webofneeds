@@ -6,9 +6,10 @@ function genComponentConf() {
     let template = `
         <nav class="create-need-title" ng-cloak ng-show="{{true}}">
             <div class="cnt__inner">
-                <div class="cnt__inner__left">
-                    <img src="generated/icon-sprite.svg#ico27_close" class="cnt__icon">
-                </div>
+                <!--<a href="#" class="cnt__inner__left" ng-click="window.history.back()">-->
+                <a class="cnt__inner__left" ng-click="window.console.log(123456)">
+                    <img  src="generated/icon-sprite.svg#ico27_close" class="cnt__icon">
+                </a>
                 <h1 class="cnt__inner__center cnt__title">What is your need?</div>
             </div>
         </nav>

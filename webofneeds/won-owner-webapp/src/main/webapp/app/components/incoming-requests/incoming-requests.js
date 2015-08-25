@@ -16,5 +16,5 @@ IncomingRequestsController.$inject = [];
 export default angular.module('won.owner.components.incomingRequests', [
         mainTabBarModule
     ])
-    .controller('IncomingRequestsController', IncomingRequestsController)
+    .controller('Incoming-requestsController', IncomingRequestsController)
     .name;
