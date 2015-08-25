@@ -16,14 +16,20 @@ import appTagModule from './components/wonAppTag';
 import newRouter from 'angular-new-router';
 import createNeedViewModule from './components/create-need/create-need';
 import settingsViewModule from './components/settings/settings';
+import incomingRequestsViewModule from './components/incoming-requests/incoming-requests';
+import matchesViewModule from './components/matches/matches';
+import topnavModule from './components/topnav';
 
 window.newRouter = newRouter; //TODO deletme
 
 let app = angular.module('won.owner', [
     'ngNewRouter',
     appTagModule,
+    topnavModule, //used in index.html
     createNeedViewModule,
-    settingsViewModule
+    settingsViewModule,
+    incomingRequestsViewModule,
+    matchesViewModule
 ]);
 
 /*
@@ -40,9 +46,16 @@ class AppController {
         console.log('in appcontroller constructor');
         window.routerfoo = $router;
         $router.config([
-            { path: '/', redirectTo: '/create-need'},
+
+            //TODO should be landing page if not logged in or feed if logged in
+            { path: '/', redirectTo: '/incoming-requests'},
+
             { path: '/create-need', component: 'create-need'},
-            { path: '/settings', component: 'settings'}
+            { path: '/settings', component: 'settings'},
+            { path: '/incoming-requests', component: 'incoming-requests'},
+
+            { path: '/need/:id/', component: 'matches'}, //default tab
+            { path: '/need/:id/matches', component: 'matches'}
         ]);
     }
 }

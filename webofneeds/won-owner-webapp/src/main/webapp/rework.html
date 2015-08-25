@@ -30,11 +30,20 @@
 	</head>
     <!--<body ng-app="won.owner" ng-controller="AppController as app">-->
     <body ng-controller="AppController">
-        <won-app></won-app>
+        <header><won-topnav></won-topnav></header>
+        <!-- <won-app></won-app>-->
         <ng-viewport></ng-viewport>
 
-        <a ng-link="create-need">To create-need</a>
-        <a ng-link="settings">To settings</a>
+        <!-- <debug-navigation> -->
+        <div style="position: absolute; bottom: 0px;">
+            debug navigation: |
+            <a ng-link="create-need">create-need</a> |
+            <a ng-link="settings">settings</a> |
+            <a ng-link="incoming-requests">incoming-requests</a> |
+            <a ng-href="need/121337345/matches">matches</a> |
+        </div>
+        <!-- </debug-navigation> -->
+
         <!-- TODO make sure to only show the svgs once angular has finished rendering -->
         <!-- start loading the svg so it's already in the cache once angular has finished loading its templates -->
 

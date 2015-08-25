@@ -4,6 +4,7 @@
 ;
 
 import angular from 'angular';
+import settingsTitleBarModule from '../settings-title-bar';
 
 class SettingsController {
     constructor() {}
@@ -12,6 +13,8 @@ class SettingsController {
 
 SettingsController.$inject = [];
 
-export default angular.module('won.owner.components.settings', [])
+export default angular.module('won.owner.components.settings', [
+        settingsTitleBarModule
+    ])
     .controller('SettingsController', SettingsController)
     .name;
