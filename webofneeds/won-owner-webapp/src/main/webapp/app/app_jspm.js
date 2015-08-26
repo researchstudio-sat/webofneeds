@@ -21,6 +21,7 @@ import createNeedComponent from './components/create-need/create-need';
 import settingsComponent from './components/settings/settings';
 import overviewIncomingRequestsComponent from './components/overview-incoming-requests/overview-incoming-requests';
 import matchesComponent from './components/matches/matches';
+import postVisitorComponent from './components/post-visitor/post-visitor';
 
 let app = angular.module('won.owner', [
     'ngNewRouter',
@@ -29,7 +30,8 @@ let app = angular.module('won.owner', [
     createNeedComponent,
     settingsComponent,
     overviewIncomingRequestsComponent,
-    matchesComponent
+    matchesComponent,
+    postVisitorComponent
 ]);
 
 /*
@@ -59,7 +61,7 @@ class AppController {
             //{ path: '/overview/feed', component: 'posts'}, //TODO
 
             //TODO database id needs to be send to the client after the create-msg acknowledgment
-            { path: '/post/:id/visitor', component: 'need-public'},
+            { path: '/post/:id/visitor', component: 'post-visitor'},
             { path: '/post/:id/owner/matches', component: 'matches'}
             //{ path: '/post/:id/owner/messages', component: 'need-messages'} //TODO
             //{ path: '/post/:id/owner/incoming-requests', component: 'need-incoming-requests'} //TODO
