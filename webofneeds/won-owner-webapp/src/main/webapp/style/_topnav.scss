@@ -7,15 +7,25 @@
 
   background-color: white;
 
+  $responsivenessBreakPoint: 31rem;
+
   @include max-content-width($maxContentWidth, $minContentPadding, 'topnav');
 
   > .topnav__inner {
     //@include tri-aligned('topnav__inner', 1rem);
     @include flex-row-spaced;
+
+    position: relative; //to allow absolute on *__center
+
     > .topnav__inner__left {
       margin-right: 1rem;
       .topnav__button__icon { margin-right: 0.5rem; }
 
+    }
+    > .topnav__inner__center {
+      // so the create-need-speechbubble-triangle centers correctly
+      // on the icon (when the caption isn't visible)
+      @extend  %center--absolute;
     }
     > .topnav__inner__right {
       margin-left: 1rem;
@@ -48,7 +58,16 @@
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
 
-    & .topnav__button__icon {
+    //TODO drop text (only use icons when there's no space)
+    .topnav__button__caption {
+      white-space: nowrap;
+
+      @media (max-width: $responsivenessBreakPoint) {
+        display: none;
+      }
+    }
+
+    .topnav__button__icon {
       @include fixed-square($bigiconSize);
     }
   }
@@ -58,3 +77,5 @@
     list-style: none;
   }
 }
+
+

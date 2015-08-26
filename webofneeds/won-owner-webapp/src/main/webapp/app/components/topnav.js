@@ -11,7 +11,7 @@ function genTopnavConf() {
                     <div class="topnav__inner__left">
                         <a href="#" class="topnav__button">
                             <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__button__icon">
-                            <span class="topnav__page-title">Web of Needs</span>
+                            <span class="topnav__page-title topnav__button__caption">Web of Needs</span>
                         </a>
                     </div>
                     <div class="topnav__inner__center">
@@ -22,16 +22,9 @@ function genTopnavConf() {
                     </div>
                     <div class="topnav__inner__right">
                         <ul class="topnav__list">
-                            <li class="">
-                                <a href="#" class="topnav__button">
-                                    <span class="topnav__button__caption">Groups</span>
-                                    <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__carret">
-                                    <img src="generated/icon-sprite.svg#ico36_group" class="topnav__button__icon">
-                                </a>
-                            </li>
                             <li>
                                 <a href="#" class="topnav__button">
-                                    <span class="topnav__button__caption">Username</span>
+                                    <span class="topnav__button__caption">Username D...</span>
                                     <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__carret">
                                     <img src="generated/icon-sprite.svg#ico36_person" class="topnav__button__icon">
                                 </a>
