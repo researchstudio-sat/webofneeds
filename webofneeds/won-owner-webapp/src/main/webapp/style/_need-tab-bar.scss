@@ -3,62 +3,61 @@
 @import 'title-bar';
 @import 'sizing-utils';
 
-.need-tab-bar {
-  @include title-bar('ntb');
+@mixin need-tab-bar($prefix, $tabBarWidth) {
+  @include title-bar($prefix);
 
-  > .ntb__inner {
+  > .#{$prefix}__inner {
 
-    // ntb isn't using the tri-aligned that it inherits
+    // #{$prefix} isn't using the tri-aligned that it inherits
     // via the `@include title-bar` as there's no
     // centered element
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 
-    > .ntb__inner__left {
+    > .#{$prefix}__inner__left {
       @include flex-row;
 
-      .ntb__inner__left__image {
+      .#{$prefix}__inner__left__image {
         display: block;
         @include fixed-square(4.7rem); //99px/21
 
         margin: 1rem;
       }
 
-      .ntb__inner__left__titles {
+      .#{$prefix}__inner__left__titles {
         @include flex-column;
         align-items: flex-start;
 
         margin: 1rem 0;
 
-
-        .ntb__inner__left__titles__type {
+        .#{$prefix}__inner__left__titles__type {
           color: #A7A7A7;
           font-size: 0.8rem;
         }
       }
     }
 
-    > .ntb__inner__right {
+    > .#{$prefix}__inner__right {
       //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
       // or make won-tabs a parametrized mixin?
-      flex-basis: 35rem;
-      max-width: 35rem;
+      flex-basis: $tabBarWidth;
+      max-width: $tabBarWidth;
 
       @include flex-column-spaced;
+      align-items: flex-end;
 
-      .ntb__inner__right__settings {
-        height: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
-        width: 1.8rem; //TODO overwrites ntb__icon size. in FF the icon keeps it's own size if smaller
-        align-self: flex-end;
-        margin-top: 1rem;
-      }
+      padding-top: 1rem;
 
-      .ntb__tabs {
+      .#{$prefix}__tabs {
         //TODO bad style. not bem.
         align-self: stretch;
         height: 100%;
       }
     }
   }
+}
+
+.need-tab-bar {
+  @include need-tab-bar('ntb', 35rem);
 }
