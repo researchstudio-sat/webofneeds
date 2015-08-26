@@ -60,5 +60,24 @@ body {
 @import 'settings-tab-bar';
 
 
+/* style adapted from http://cssdeck.com/labs/beautiful-flat-buttons */
+.won-button--filled {
+  //padding: 0.5em 1em;
+  padding: 0.875em 2.25em;
+  font-size: 1em;
+  color: white;
+  text-align: center;
+  background: $won-red;
+  border: 0;
+  border-radius: 0.19rem;
+  cursor: pointer;
+
+  &:active {
+    background: darken($won-red, 15%);
+    outline: none;
+  }
+}
+
+
 //</wonAppTag> ----------------------------------------
 
