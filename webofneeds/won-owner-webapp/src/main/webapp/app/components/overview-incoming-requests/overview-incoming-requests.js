@@ -13,8 +13,8 @@ class IncomingRequestsController {
 
 IncomingRequestsController.$inject = [];
 
-export default angular.module('won.owner.components.incomingRequests', [
+export default angular.module('won.owner.components.overviewIncomingRequests', [
         overviewTitleBarModule
     ])
-    .controller('Incoming-requestsController', IncomingRequestsController)
+    .controller('Overview-incoming-requestsController', IncomingRequestsController)
     .name;

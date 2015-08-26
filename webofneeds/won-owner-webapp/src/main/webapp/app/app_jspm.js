@@ -12,24 +12,24 @@ console.log('System.import working');
 import angular from 'angular';
 window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
 
-import appTagModule from './components/wonAppTag';
 import newRouter from 'angular-new-router';
-import createNeedViewModule from './components/create-need/create-need';
-import settingsViewModule from './components/settings/settings';
-import incomingRequestsViewModule from './components/incoming-requests/incoming-requests';
-import matchesViewModule from './components/matches/matches';
-import topnavModule from './components/topnav';
 
-window.newRouter = newRouter; //TODO deletme
+// Components
+import appTag from './components/wonAppTag';
+import topnav from './components/topnav';
+import createNeedComponent from './components/create-need/create-need';
+import settingsComponent from './components/settings/settings';
+import overviewIncomingRequestsComponent from './components/overview-incoming-requests/overview-incoming-requests';
+import matchesComponent from './components/matches/matches';
 
 let app = angular.module('won.owner', [
     'ngNewRouter',
-    appTagModule,
-    topnavModule, //used in index.html
-    createNeedViewModule,
-    settingsViewModule,
-    incomingRequestsViewModule,
-    matchesViewModule
+    appTag,
+    topnav, //used in index.html
+    createNeedComponent,
+    settingsComponent,
+    overviewIncomingRequestsComponent,
+    matchesComponent
 ]);
 
 /*
@@ -53,7 +53,7 @@ class AppController {
             { path: '/create-need', component: 'create-need'},
             { path: '/settings', component: 'settings'},
 
-            { path: '/overview/incoming-requests', component: 'incoming-requests'},
+            { path: '/overview/incoming-requests', component: 'overview-incoming-requests'},
             //{ path: '/overview/matches', component: 'matches'}, //TODO
             //{ path: '/overview/posts', component: 'posts'}, //TODO
             //{ path: '/overview/feed', component: 'posts'}, //TODO
