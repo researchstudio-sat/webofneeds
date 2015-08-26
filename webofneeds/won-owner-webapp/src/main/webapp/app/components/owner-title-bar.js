@@ -20,7 +20,7 @@ function genComponentConf() {
                     </div>
                 </div>
                 <div class="ntb__inner__right">
-                    <img class=" ntb__inner__right__settings ntb__icon" src="generated/icon-sprite.svg#ico_settings">
+                    <img class="ntb__icon" src="generated/icon-sprite.svg#ico_settings">
                     <ul class="ntb__tabs">
                         <li><a href="#">
                             Messages
