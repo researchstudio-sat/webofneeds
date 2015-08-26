@@ -33,12 +33,12 @@
     // border
     border-color: $border-color transparent;
     top: -$triangle-size;
+    transform: translateX(-50%);
   }
   &:after {
     // triangle content
     border-color: $background-color transparent;
-    //top: -$triangleSize + 1.8px;
     top: -$triangle-size + 1.44px; //sqrt(2 * borderwidth^2)
-
+    transform: translateX(-50%);
   }
 }

@@ -9,6 +9,10 @@
   > .cnt__inner {
     > .cnt__inner__left {
       @include flex-column;
+
+      @extend %vcenter--absolute;
+
+      .cnt__icon { }
     }
 
     > .cnt__inner__center {

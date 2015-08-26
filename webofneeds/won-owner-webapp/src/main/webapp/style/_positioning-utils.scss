@@ -3,9 +3,19 @@
   position: relative;
   top: 50%;
 }
+%vcenter--absolute {
+  transform: translateY(-50%);
+  position: absolute;
+  top: 50%;
+}
 %hcenter {
   transform: translateX(-50%);
   position: relative;
+  left: 50%;
+}
+%hcenter--absolute {
+  transform: translateX(-50%);
+  position: absolute;
   left: 50%;
 }
 %center-right {
@@ -17,6 +27,12 @@
 %center {
   transform: translateY(-50%) translateX(-50%);
   position: relative;
+  left: 50%;
+  top: 50%;
+}
+%center--absolute {
+  transform: translateY(-50%) translateX(-50%);
+  position: absolute;
   left: 50%;
   top: 50%;
 }
