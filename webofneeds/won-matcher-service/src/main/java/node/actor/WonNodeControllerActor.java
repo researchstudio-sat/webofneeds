@@ -4,6 +4,8 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.Terminated;
 import akka.actor.UntypedActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
@@ -41,6 +43,7 @@ public class WonNodeControllerActor extends UntypedActor
   private WonNodeSparqlService sparqlService;
   private WonNodeControllerSettingsImpl settings;
   private static final String TICK = "tick";
+  private ActorRef pubSubMediator;
 
   public WonNodeControllerActor() {
 
@@ -60,7 +63,8 @@ public class WonNodeControllerActor extends UntypedActor
                                                settings.WON_NODE_LIFE_CHECK_DURATION, getSelf(), TICK, getContext().dispatcher(), null);
 
     // Subscribe for won node events
-    getContext().system().eventStream().subscribe(getSelf(), WonNodeEvent.class);
+    pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
+    pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(WonNodeEvent.class.getName(), getSelf()), getSelf());
 
     // set won nodes to skip by configuration
     skipWonNodeUris.addAll(settings.WON_NODES_SKIP);
@@ -76,9 +80,8 @@ public class WonNodeControllerActor extends UntypedActor
     for (String nodeUri : settings.WON_NODES_CRAWL) {
       if (!skipWonNodeUris.contains(nodeUri)) {
         if (!crawlWonNodes.containsKey(nodeUri)) {
-          // publish event (to self) for discovering new won node from config file
-          getContext().system().eventStream().publish(new WonNodeEvent(
-            nodeUri, WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED));
+          WonNodeEvent e = new WonNodeEvent(nodeUri, WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED);
+          pubSubMediator.tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf());
         }
       }
     }
@@ -116,16 +119,16 @@ public class WonNodeControllerActor extends UntypedActor
         // continue crawling of known won nodes
         if (crawlWonNodes.containsKey(event.getWonNodeUri())) {
             log.debug("Won node uri '{}' already discovered", event.getWonNodeUri());
-            getContext().system().eventStream().publish(new WonNodeEvent(
-              event.getWonNodeUri(), WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE));
+            WonNodeEvent e = new WonNodeEvent(event.getWonNodeUri(), WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE);
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf());
             return;
         }
 
         // skip crawling of won nodes in the skip list
         if (skipWonNodeUris.contains(event.getWonNodeUri())) {
           log.debug("Skip crawling won node with uri '{}'", event.getWonNodeUri());
-          getContext().system().eventStream().publish(new WonNodeEvent(
-            event.getWonNodeUri(), WonNodeEvent.STATUS.SKIP_WON_NODE));
+          WonNodeEvent e = new WonNodeEvent(event.getWonNodeUri(), WonNodeEvent.STATUS.SKIP_WON_NODE);
+          pubSubMediator.tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf());
           return;
         }
 
@@ -140,8 +143,8 @@ public class WonNodeControllerActor extends UntypedActor
         }
 
         // crawl all new discovered won nodes
-        getContext().system().eventStream().publish(new WonNodeEvent(
-          event.getWonNodeUri(), WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE));
+        WonNodeEvent e = new WonNodeEvent(event.getWonNodeUri(), WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE);
+        pubSubMediator.tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf());
         startCrawling(crawlWonNodes.get(event.getWonNodeUri()).getWonNodeInfo());
         return;
       }

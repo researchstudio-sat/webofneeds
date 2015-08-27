@@ -1,5 +1,7 @@
 package common.event;
 
+import java.io.Serializable;
+
 /**
  * This event is used in the matching service to indicate status about won nodes.
  * Usually first a new won node is discovered, then some component can decide to
@@ -8,9 +10,9 @@ package common.event;
  * User: hfriedrich
  * Date: 05.06.2015
  */
-public class WonNodeEvent
+public class WonNodeEvent implements Serializable
 {
-  public static enum STATUS
+  public enum STATUS
   {
     NEW_WON_NODE_DISCOVERED, CONNECTED_TO_WON_NODE, SKIP_WON_NODE;
   }

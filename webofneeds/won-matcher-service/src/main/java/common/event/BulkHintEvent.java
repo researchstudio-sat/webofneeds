@@ -1,5 +1,6 @@
 package common.event;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -8,7 +9,7 @@ import java.util.LinkedList;
  * User: hfriedrich
  * Date: 23.06.2015
  */
-public class BulkHintEvent
+public class BulkHintEvent implements Serializable
 {
   private Collection<HintEvent> hintEvents;
 

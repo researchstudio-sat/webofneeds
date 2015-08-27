@@ -3,12 +3,14 @@ package common.event;
 
 import com.hp.hpl.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.LangBuilder;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import won.protocol.util.RdfUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
@@ -19,12 +21,13 @@ import java.nio.charset.StandardCharsets;
  * User: hfriedrich
  * Date: 04.06.2015
  */
-public class NeedEvent
+public class NeedEvent implements Serializable
 {
   private String uri;
   private String wonNodeUri;
   private String serializedNeedResource;
-  private Lang serializationFormat;
+  private String serializationLangName;
+  private String serializationLangContentType;
 
   private TYPE eventType;
 
@@ -33,20 +36,13 @@ public class NeedEvent
     CREATED, ACTIVATED, DEACTIVATED
   }
 
-  public NeedEvent(String uri, String wonNodeUri, TYPE eventType) {
-    this.uri = uri;
-    this.wonNodeUri = wonNodeUri;
-    this.eventType = eventType;
-    serializedNeedResource = null;
-    serializationFormat = null;
-  }
-
   public NeedEvent(String uri, String wonNodeUri, TYPE eventType, String resource, Lang format) {
     this.uri = uri;
     this.wonNodeUri = wonNodeUri;
     this.eventType = eventType;
     serializedNeedResource = resource;
-    serializationFormat = format;
+    serializationLangName = format.getName();
+    serializationLangContentType = format.getContentType().getContentType();
   }
 
   public NeedEvent(String uri, String wonNodeUri, TYPE eventType, Dataset ds) {
@@ -56,7 +52,8 @@ public class NeedEvent
     StringWriter sw = new StringWriter();
     RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
     serializedNeedResource = sw.toString();
-    serializationFormat = RDFFormat.TRIG.getLang();
+    serializationLangName = RDFFormat.TRIG.getLang().getName();
+    serializationLangContentType = RDFFormat.TRIG.getLang().getContentType().getContentType();
   }
 
   public String getUri() {
@@ -76,12 +73,14 @@ public class NeedEvent
   }
 
   public Lang getSerializationFormat() {
-    return serializationFormat;
+    Lang format = LangBuilder.create(serializationLangName, serializationLangContentType).build();
+    return format;
   }
 
   public Dataset deserializeNeedDataset() {
     InputStream is = new ByteArrayInputStream(serializedNeedResource.getBytes(StandardCharsets.UTF_8));
-    return RdfUtils.toDataset(is, new RDFFormat(serializationFormat));
+    Lang format = getSerializationFormat();
+    return RdfUtils.toDataset(is, new RDFFormat(format));
   }
 
 }

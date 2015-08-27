@@ -1,7 +1,10 @@
 package node.actor;
 
+import akka.actor.ActorRef;
 import akka.camel.CamelMessage;
 import akka.camel.javaapi.UntypedConsumerActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
@@ -37,11 +40,13 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
   private final CommonSettingsImpl settings = CommonSettings.SettingsProvider.get(getContext().system());
   private SparqlService sparqlService;
   private final String endpoint;
+  private ActorRef pubSubMediator;
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
   public NeedConsumerProtocolActor(String endpoint) {
     this.endpoint = endpoint;
-    this.sparqlService = new SparqlService(settings.SPARQL_ENDPOINT);
+    sparqlService = new SparqlService(settings.SPARQL_ENDPOINT);
+    pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
   }
 
   @Override
@@ -69,15 +74,15 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
           NeedEvent event = null;
           if (methodName.equals(MSG_HEADER_METHODNAME_NEEDCREATED)) {
             event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.CREATED, camelMsg.body().toString(), Lang.TRIG);
-            getContext().system().eventStream().publish(event);
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
             return;
           } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDACTIVATED)) {
             event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVATED, camelMsg.body().toString(), Lang.TRIG);
-            getContext().system().eventStream().publish(event);
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
             return;
           } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDDEACTIVATED)) {
             event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.DEACTIVATED, camelMsg.body().toString(), Lang.TRIG);
-            getContext().system().eventStream().publish(event);
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
             return;
           }
         }

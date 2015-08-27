@@ -1,6 +1,8 @@
 package crawler.actor;
 
 import akka.actor.*;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
@@ -48,6 +50,7 @@ public class MasterCrawlerActor extends UntypedActor
   private Set<String> skipWonNodeUris = null;
   private ActorRef crawlingWorker;
   private ActorRef updateMetaDataWorker;
+  private ActorRef pubSubMediator;
 
   public MasterCrawlerActor() {
     pendingMessages = new HashMap<>();
@@ -70,7 +73,8 @@ public class MasterCrawlerActor extends UntypedActor
     getContext().watch(updateMetaDataWorker);
 
     // subscribe for won node events
-    getContext().system().eventStream().subscribe(getSelf(), WonNodeEvent.class);
+    pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
+    pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(WonNodeEvent.class.getName(), getSelf()), getSelf());
 
     // load the unfinished uris and start crawling
     for (CrawlUriMessage msg : sparqlService.retrieveMessagesForCrawling(CrawlUriMessage.STATUS.PROCESS)) {
@@ -175,7 +179,8 @@ public class MasterCrawlerActor extends UntypedActor
       // we received an answer for the discovered won node event
       if (discoveredNewWonNode(msg.getWonNodeUri())) {
         log.debug("discovered new won node {}", msg.getWonNodeUri());
-        getContext().system().eventStream().publish(new WonNodeEvent(msg.getWonNodeUri(), WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED));
+        WonNodeEvent event = new WonNodeEvent(msg.getWonNodeUri(), WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED);
+        pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
         getContext().system().scheduler().scheduleOnce(
           RESCHEDULE_MESSAGE_DURATION, getSelf(), msg, getContext().dispatcher(), null);
       } else if (!skipWonNodeUris.contains(msg.getWonNodeUri())) {
