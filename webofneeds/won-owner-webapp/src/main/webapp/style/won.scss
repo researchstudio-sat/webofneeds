@@ -15,34 +15,25 @@
 
 // global styling
 
-/*
-html {
-  overflow-x: scroll;
-  overflow-y: scroll;
-}*/
-html, body {
-  //TODO make sure the body covers everything perfectly but doesn't cause external scrollbars.
-  //min-height: 100vh; //doesn't ignore scrollbars in chrome
-  //min-height: 100%;
-  //min-width: 100vw; //doesn't ignore scrollbars in chrome
-  //min-width: 100%;
-  //@include fixed-square(99.9%); //dirty
-  //@include fixed-height(100vh);
 
-  //position: absolute; top: 01px; bottom: 01px; right: 01px; left: 01px;
+/*
+ * form elements don't inherit the font-family so we
+ * need to set it manually here
+ */
+button, input, textarea {
+  font-family: inherit;
+  font-weight: inherit;
 }
 
 body {
+
+  //this font will be inherited down the cascade
   font-family: 'Open Sans';
   font-weight: 400;
 
   background-color: $won-lighter-gray;
 
-  //display: block;
-  //  height: 100%;
-  //@extend %fill;
   @extend %fixed-fill;
-  //@extend %fixed-fullscreen; //works but is hacky imho
 
   @include flex-column;
   align-items: stretch; //TODO this is bad style! it overwrites flex-col's align-items
@@ -80,11 +71,12 @@ body {
   border: 1px solid $won-line-gray;
   position: relative;
   > img {
-    @extend %center--absolute;
-    max-height: 100%;
-    max-width: 100%;
+    //99% so they don't overlap the borders in Chrome
+    max-height: 99%;
+    max-width: 99%;
     height: auto;
     width: auto;
+    @extend %center--absolute;
   }
 }
 
@@ -93,8 +85,6 @@ body {
   width: $width; //TODO testing stuff; deletme
 
   @include flex-column;
-
-  padding: 4rem;
 
   $whiteSpace: 1rem;
 
@@ -120,9 +110,8 @@ body {
     .won-gallery__thumbs__frame {
       @extend %won-gallery__frame;
 
-      //4 images, 3 gaps in between
+      //4 images, 3 gaps in between (ignoring the 1px borders for now)
       $size: ($width - 3 * $whiteSpace)/4;
-      //$size: ($width - 3.6 * $whiteSpace)/4;
       width: $size;
       height: $size;
     }
@@ -154,18 +143,36 @@ body {
 
 }
 
-won-framed-image {
-  > .wfi__image {
-    display: block;
-    background-repeat: no-repeat;
-    background-size: contain;
+.post-info {
 
-    //TODO remove me. size should be adapted dynamically
-    height: 10rem;
-    width: 10rem;
+  @include max-content-width($maxContentWidth, $minContentPadding, 'post-info');
+  padding-top: 2rem;
+
+  .post-info__heading {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  .post-info__details {
+    margin-bottom: 1rem;
+
+  }
+
+  .post-info__inner {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: flex-start;
+
+    .post-info__inner__left {
+      //TODO drop margin on break (so it's centered on slim screens
+      margin-right: 4rem;
+      margin-bottom: 2rem;
+    }
+    .post-info__inner__right {
+      flex-grow: 1;
+      flex-basis: 15rem;
+    }
   }
 }
-
-
 
 
