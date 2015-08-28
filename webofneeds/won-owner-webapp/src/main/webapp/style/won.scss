@@ -52,7 +52,7 @@ body {
 /* style adapted from http://cssdeck.com/labs/beautiful-flat-buttons */
 .won-button--filled {
   //padding: 0.5em 1em;
-  padding: 0.875em 2.25em;
+  padding: 0.66em 2em;
   font-size: 1em;
   color: white;
   text-align: center;
@@ -67,112 +67,5 @@ body {
   }
 }
 
-%won-gallery__frame {
-  border: 1px solid $won-line-gray;
-  position: relative;
-  > img {
-    //99% so they don't overlap the borders in Chrome
-    max-height: 99%;
-    max-width: 99%;
-    height: auto;
-    width: auto;
-    @extend %center--absolute;
-  }
-}
-
-.won-gallery {
-  $width: 22.7rem;
-  width: $width; //TODO testing stuff; deletme
-
-  @include flex-column;
-
-  $whiteSpace: 1rem;
-
-  &:before, &:after {
-    /* to prevent margin collapsing of the the selected image */
-    content: ' ';
-    display: table;
-  }
-
-  .won-gallery__selected {
-    width: $width;
-    height: $width;
-    @extend %won-gallery__frame;
-  }
-
-  .won-gallery__thumbs {
-    align-self: stretch;
-
-    @include flex-row-spaced;
-
-    margin-top: $whiteSpace;
-
-    .won-gallery__thumbs__frame {
-      @extend %won-gallery__frame;
-
-      //4 images, 3 gaps in between (ignoring the 1px borders for now)
-      $size: ($width - 3 * $whiteSpace)/4;
-      width: $size;
-      height: $size;
-    }
-
-  }
-
-  .won-gallery__controls {
-    margin-top: $whiteSpace;
-    align-self: stretch;
-
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .won-gallery__back {}
-  .won-gallery__forward {
-    transform: rotate(0.5turn);
-  }
-  .won-gallery__back, .won-gallery__forward {
-    @include fixed-height(1.8rem);
-    // assuming there's no icons that are wider than tall.
-    // this assumption has to be made, to prevent chrome
-    // from showing immensly wide svg-snippets (id-selected
-    // viewports reaching to the right edge of the svg-sprite)
-    max-width: 1.8rem;
-    width: auto;
-  }
-
-
-}
-
-.post-info {
-
-  @include max-content-width($maxContentWidth, $minContentPadding, 'post-info');
-  padding-top: 2rem;
-
-  .post-info__heading {
-    font-size: 1rem;
-    font-weight: 700;
-  }
-  .post-info__details {
-    margin-bottom: 1rem;
-
-  }
-
-  .post-info__inner {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    align-items: flex-start;
-
-    .post-info__inner__left {
-      //TODO drop margin on break (so it's centered on slim screens
-      margin-right: 4rem;
-      margin-bottom: 2rem;
-    }
-    .post-info__inner__right {
-      flex-grow: 1;
-      flex-basis: 15rem;
-    }
-  }
-}
-
-
+@import 'gallery';
+@import 'post-info';
