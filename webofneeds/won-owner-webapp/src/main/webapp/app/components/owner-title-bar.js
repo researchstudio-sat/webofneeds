@@ -15,8 +15,8 @@ function genComponentConf() {
                     </a>
                     <img class="ntb__inner__left__image" src="images/someNeedTitlePic.png"></img>
                     <div class="ntb__inner__left__titles">
-                        <h1 class="ntb__title">New flat, need furniture [TITLE]</h1>
-                        <div class="ntb__inner__left__titles__type">I want to have something [TYPE]</div>
+                        <h1 class="ntb__title">New flat, need furniture</h1>
+                        <div class="ntb__inner__left__titles__type">I want to have something</div>
                     </div>
                 </div>
                 <div class="ntb__inner__right">
