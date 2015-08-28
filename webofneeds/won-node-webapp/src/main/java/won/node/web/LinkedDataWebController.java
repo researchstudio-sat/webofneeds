@@ -22,6 +22,7 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.camel.Exchange;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -780,7 +781,8 @@ public class
     // Register with fingerprint as owner id
     String ownerId = null;
     try {
-      ownerId = ownerManagementService.registerOwnerApplication(ownerSha1Fingerprint);
+      //ownerId = ownerManagementService.registerOwnerApplication(ownerSha1Fingerprint);
+      ownerId = ownerManagementService.registerOwnerApplication((Exchange) null);
     } catch (Exception e) {
       return new ResponseEntity<String>(e.toString(), HttpStatus.BAD_REQUEST);
     }
