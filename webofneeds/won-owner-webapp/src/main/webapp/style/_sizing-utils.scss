@@ -30,6 +30,15 @@
   @include fixed-height(100vh);
   @include fixed-width(100vw);
 }
+%fillwidth {
+  min-width: 100%;
+  height: auto;
+}
+
+%fillheight {
+  min-height: 100%;
+  width: auto;
+}
 
 @mixin max-square($maxSize) {
   max-width: $maxSize;
