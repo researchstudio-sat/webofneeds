@@ -83,4 +83,10 @@ public class NeedEvent implements Serializable
     return RdfUtils.toDataset(is, new RDFFormat(format));
   }
 
+  @Override
+  public NeedEvent clone() {
+    NeedEvent e = new NeedEvent(uri, wonNodeUri, eventType, serializedNeedResource, getSerializationFormat());
+    return e;
+  }
+
 }

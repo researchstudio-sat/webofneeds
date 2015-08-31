@@ -9,18 +9,27 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
+import common.config.CommonSettings;
+import common.config.CommonSettingsImpl;
+import common.event.BulkHintEvent;
+import common.event.HintEvent;
 import common.event.WonNodeEvent;
 import common.service.HttpRequestService;
 import crawler.actor.MasterCrawlerActor;
 import crawler.msg.CrawlUriMessage;
-import node.config.ActiveMqNeedConsumerFactory;
+import node.config.ActiveMqWonNodeConnectionFactory;
 import node.config.WonNodeControllerSettings;
 import node.config.WonNodeControllerSettingsImpl;
 import node.pojo.WonNodeConnection;
 import node.service.WonNodeSparqlService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import won.protocol.service.WonNodeInfo;
+import won.protocol.service.WonNodeInformationService;
 
+import java.net.URI;
 import java.util.*;
 
 
@@ -32,6 +41,8 @@ import java.util.*;
  * User: hfriedrich
  * Date: 27.04.2015
  */
+@Component
+@Scope("prototype")
 public class WonNodeControllerActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
@@ -42,14 +53,19 @@ public class WonNodeControllerActor extends UntypedActor
   private Set<String> failedWonNodeUris;
   private WonNodeSparqlService sparqlService;
   private WonNodeControllerSettingsImpl settings;
+  private CommonSettingsImpl commonSettings;
   private static final String TICK = "tick";
   private ActorRef pubSubMediator;
+
+  @Autowired
+  private WonNodeInformationService wonNodeInformationService;
 
   public WonNodeControllerActor() {
 
     settings = WonNodeControllerSettings.SettingsProvider.get(getContext().system());
+    commonSettings = CommonSettings.SettingsProvider.get(getContext().system());
     httpRequestService = new HttpRequestService();
-    sparqlService = new WonNodeSparqlService(settings.SPARQL_ENDPOINT);
+    sparqlService = new WonNodeSparqlService(commonSettings.SPARQL_ENDPOINT);
     crawlWonNodes = new HashMap<>();
     skipWonNodeUris = new HashSet<>();
     failedWonNodeUris = new HashSet<>();
@@ -60,11 +76,16 @@ public class WonNodeControllerActor extends UntypedActor
 
     // Create a scheduler to execute the life check for each won node regularly
     getContext().system().scheduler().schedule(settings.WON_NODE_LIFE_CHECK_DURATION,
-                                               settings.WON_NODE_LIFE_CHECK_DURATION, getSelf(), TICK, getContext().dispatcher(), null);
+                                               settings.WON_NODE_LIFE_CHECK_DURATION, getSelf(), TICK,
+                                               getContext().dispatcher(), null);
 
     // Subscribe for won node events
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
     pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(WonNodeEvent.class.getName(), getSelf()), getSelf());
+
+    // Subscribe for hint events
+    pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(HintEvent.class.getName(), getSelf()), getSelf());
+    pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(BulkHintEvent.class.getName(), getSelf()), getSelf());
 
     // set won nodes to skip by configuration
     skipWonNodeUris.addAll(settings.WON_NODES_SKIP);
@@ -150,7 +171,33 @@ public class WonNodeControllerActor extends UntypedActor
       }
     }
 
+    // send back hints to won nodes
+    if (message instanceof HintEvent) {
+      sendHint((HintEvent) message);
+      return;
+    } else if(message instanceof BulkHintEvent) {
+      BulkHintEvent bulkHintEvent = (BulkHintEvent) message;
+      for (HintEvent hint : bulkHintEvent.getHintEvents()) {
+        sendHint(hint);
+      }
+      return;
+    }
+
     unhandled(message);
+  }
+
+  private void sendHint(HintEvent hint) {
+
+    if (!crawlWonNodes.containsKey(hint.getFromWonNodeUri())) {
+      log.warning("cannot send hint to won node {}! Is registered with the won node controller?", hint.getFromWonNodeUri());
+      return;
+    }
+
+    // send hint to first won node
+    URI eventUri = wonNodeInformationService.generateEventURI(URI.create(hint.getFromWonNodeUri()));
+    hint.setGeneratedEventUri(eventUri);
+    WonNodeConnection fromWonNodeConnection = crawlWonNodes.get(hint.getFromWonNodeUri());
+    fromWonNodeConnection.getHintProducer().tell(hint, getSelf());
   }
 
   /**
@@ -237,7 +284,7 @@ public class WonNodeControllerActor extends UntypedActor
   }
 
   private WonNodeConnection subscribeNeedUpdates(WonNodeInfo wonNodeInfo) {
-    return ActiveMqNeedConsumerFactory.createWonNodeConnection(getContext(), wonNodeInfo);
+    return ActiveMqWonNodeConnectionFactory.createWonNodeConnection(getContext(), wonNodeInfo);
   }
 
   /**
@@ -258,10 +305,14 @@ public class WonNodeControllerActor extends UntypedActor
         } else if (con.getNeedDeactivatedConsumer().equals(t.getActor())) {
           log.error("NeedDeactivatedConsumer '{}' of won '{}' has been shut down", t.getActor(), uri);
           addFailedWonNode(con.getWonNodeInfo().getWonNodeURI(), con);
+        } else if (con.getHintProducer().equals(t.getActor())) {
+          log.error("HintProducer '{}' of won '{}' has been shut down", t.getActor(), uri);
+          addFailedWonNode(con.getWonNodeInfo().getWonNodeURI(), con);
         }
       }
     }
   }
+
 
 }
 

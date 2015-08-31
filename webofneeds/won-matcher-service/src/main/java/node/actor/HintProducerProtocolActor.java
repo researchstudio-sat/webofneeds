@@ -1,0 +1,75 @@
+package node.actor;
+
+import akka.camel.CamelMessage;
+import akka.camel.javaapi.UntypedProducerActor;
+import common.event.HintEvent;
+import org.apache.jena.riot.Lang;
+import won.protocol.exception.WonMessageBuilderException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageEncoder;
+import won.protocol.model.FacetType;
+import won.protocol.util.RdfUtils;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by hfriedrich on 27.08.2015.
+ */
+public class HintProducerProtocolActor extends UntypedProducerActor
+{
+  private String endpoint;
+  private String localBrokerUri;
+
+  public HintProducerProtocolActor(String endpoint, String localBrokerUri) {
+    this.endpoint = endpoint;
+    this.localBrokerUri = localBrokerUri;
+  }
+
+  @Override
+  public String getEndpointUri() {
+    return endpoint;
+  }
+
+  @Override
+  public Object onTransformOutgoingMessage(Object message) {
+
+    HintEvent hint = (HintEvent) message;
+    Map<String, Object> headers = new HashMap<>();
+    headers.put("needURI", hint.getFromNeedUri());
+    headers.put("otherNeedURI", hint.getToNeedUri());
+    headers.put("score", String.valueOf(hint.getScore()));
+    headers.put("originator", hint.getMatcherUri());
+    headers.put("content", RdfUtils.toString(hint.deserializeExplanationModel()));
+    headers.put("remoteBrokerEndpoint", localBrokerUri);
+    headers.put("methodName", "hint");
+
+    WonMessage wonMessage = createHintWonMessage(hint);
+    Object body = WonMessageEncoder.encode(wonMessage, Lang.TRIG);
+    CamelMessage camelMsg = new CamelMessage(body, headers);
+    return camelMsg;
+  }
+
+  private WonMessage createHintWonMessage(HintEvent hint)
+    throws WonMessageBuilderException {
+
+    URI wonNode = URI.create(hint.getFromWonNodeUri());
+    WonMessageBuilder builder = new WonMessageBuilder();
+    return builder
+      .setMessagePropertiesForHint(
+        hint.getGeneratedEventUri(),
+        URI.create(hint.getFromNeedUri()),
+        FacetType.OwnerFacet.getURI(),
+        wonNode,
+        URI.create(hint.getToNeedUri()),
+        FacetType.OwnerFacet.getURI(),
+        URI.create(hint.getMatcherUri()),
+        hint.getScore())
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
+      .build();
+  }
+
+}

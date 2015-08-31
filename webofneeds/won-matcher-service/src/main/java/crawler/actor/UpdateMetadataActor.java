@@ -3,6 +3,8 @@ package crawler.actor;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import common.config.CommonSettings;
+import common.config.CommonSettingsImpl;
 import crawler.config.CrawlSettings;
 import crawler.config.CrawlSettingsImpl;
 import crawler.msg.CrawlUriMessage;
@@ -24,13 +26,14 @@ import java.util.LinkedList;
 public class UpdateMetadataActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+  private final CommonSettingsImpl commonSettings = CommonSettings.SettingsProvider.get(getContext().system());
   private final CrawlSettingsImpl settings = CrawlSettings.SettingsProvider.get(getContext().system());
   private CrawlSparqlService endpoint;
   private Collection<CrawlUriMessage> bulkMessages;
   private static final String TICK = "tick";
 
   public UpdateMetadataActor() {
-    endpoint = new CrawlSparqlService(settings.METADATA_SPARQL_ENDPOINT);
+    endpoint = new CrawlSparqlService(commonSettings.SPARQL_ENDPOINT);
     bulkMessages = new LinkedList<>();
   }
 

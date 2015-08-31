@@ -15,14 +15,16 @@ public class WonNodeConnection
   private ActorRef needCreatedConsumer;
   private ActorRef needActivatedConsumer;
   private ActorRef needDeactivatedConsumer;
+  private ActorRef hintProducer;
 
   public WonNodeConnection(WonNodeInfo info, ActorRef needCreatedConsumer,
-                           ActorRef needActivatedConsumer, ActorRef needDeactivatedConsumer) {
+                           ActorRef needActivatedConsumer, ActorRef needDeactivatedConsumer, ActorRef hintProducer) {
 
     wonNodeInfo = info;
     this.needCreatedConsumer = needCreatedConsumer;
     this.needActivatedConsumer = needActivatedConsumer;
     this.needDeactivatedConsumer = needDeactivatedConsumer;
+    this.hintProducer = hintProducer;
   }
 
   public WonNodeInfo getWonNodeInfo() {
@@ -39,6 +41,10 @@ public class WonNodeConnection
 
   public ActorRef getNeedDeactivatedConsumer() {
     return needDeactivatedConsumer;
+  }
+
+  public ActorRef getHintProducer() {
+    return hintProducer;
   }
 
 }

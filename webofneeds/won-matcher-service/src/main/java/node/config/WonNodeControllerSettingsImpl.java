@@ -17,14 +17,12 @@ import java.util.concurrent.TimeUnit;
 public class WonNodeControllerSettingsImpl implements Extension
 {
 
-  public final String SPARQL_ENDPOINT;
   public final List<String> WON_NODES_CRAWL;
   public final List<String> WON_NODES_SKIP;
   public final FiniteDuration WON_NODE_LIFE_CHECK_DURATION;
 
   public WonNodeControllerSettingsImpl(Config config) {
 
-    SPARQL_ENDPOINT = config.getString("wonNodeController.sparqlEndpoint");
     WON_NODES_CRAWL = config.getStringList("wonNodeController.wonNode.crawl");
     WON_NODES_SKIP = config.getStringList("wonNodeController.wonNode.skip");
     WON_NODE_LIFE_CHECK_DURATION = Duration.create(config.getDuration(

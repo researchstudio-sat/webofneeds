@@ -7,6 +7,8 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
 import akka.routing.FromConfig;
+import common.config.CommonSettings;
+import common.config.CommonSettingsImpl;
 import crawler.config.CrawlSettings;
 import crawler.config.CrawlSettingsImpl;
 import crawler.exception.CrawlWrapperException;
@@ -41,6 +43,7 @@ public class MasterCrawlerActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private final CrawlSettingsImpl settings = CrawlSettings.SettingsProvider.get(getContext().system());
+  private final CommonSettingsImpl commonSettings = CommonSettings.SettingsProvider.get(getContext().system());
   private static final FiniteDuration RESCHEDULE_MESSAGE_DURATION = Duration.create(500, TimeUnit.MILLISECONDS);
   private CrawlSparqlService sparqlService;
   private Map<String, CrawlUriMessage> pendingMessages = null;
@@ -58,7 +61,7 @@ public class MasterCrawlerActor extends UntypedActor
     failedMessages = new HashMap<>();
     crawlWonNodeUris = new HashSet<>();
     skipWonNodeUris = new HashSet<>();
-    sparqlService = new CrawlSparqlService(settings.METADATA_SPARQL_ENDPOINT);
+    sparqlService = new CrawlSparqlService(commonSettings.SPARQL_ENDPOINT);
   }
 
   @Override

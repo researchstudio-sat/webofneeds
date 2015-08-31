@@ -5,6 +5,7 @@ import akka.actor.Props;
 import akka.actor.UntypedActorContext;
 import akka.camel.Camel;
 import akka.camel.CamelExtension;
+import node.actor.HintProducerProtocolActor;
 import node.actor.NeedConsumerProtocolActor;
 import node.pojo.WonNodeConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -21,7 +22,7 @@ import java.util.UUID;
  * User: hfriedrich
  * Date: 18.05.2015
  */
-public class ActiveMqNeedConsumerFactory
+public class ActiveMqWonNodeConnectionFactory
 {
   /**
    * Create a {@link node.pojo.WonNodeConnection} for active mq
@@ -44,15 +45,21 @@ public class ActiveMqNeedConsumerFactory
       activeMq, WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_ACTIVATED_TOPIC_NAME.toString());
     String deactivatedTopic = wonNodeInfo.getSupportedProtocolImplParamValue(
       activeMq, WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_NEED_DEACTIVATED_TOPIC_NAME.toString());
+    String hintQueue = wonNodeInfo.getSupportedProtocolImplParamValue(
+      activeMq, WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME.toString());
 
-    // create the components
+    // create the activemq component for this won node
     String uuid = UUID.randomUUID().toString();
     String componentName = "activemq-" + uuid;
+    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerUri);
+    // connectionFactory.setExceptionListener( ... )
+    Camel camel = CamelExtension.get(context.system());
+    camel.context().addComponent(componentName, JmsComponent.jmsComponent(connectionFactory));
 
-    // create the actors that receive the messages
+    // create the actors that receive the messages (need events)
     Props createdProps = Props.create(NeedConsumerProtocolActor.class,
                                       componentName + ":topic:" + createdTopic +
-                                      "?testConnectionOnStartup=false");
+                                        "?testConnectionOnStartup=false");
     ActorRef created = context.actorOf(createdProps, "ActiveMqNeedCreatedConsumerProtocolActor-" + uuid);
 
     ActorRef activated = created;
@@ -75,18 +82,19 @@ public class ActiveMqNeedConsumerFactory
       deactivated = context.actorOf(deactivatedProps, "ActiveMqNeedDeactivatedConsumerProtocolActor-" + uuid);
     }
 
+    // create the actor that sends messages (hint events)
+    Props hintProps = Props.create(HintProducerProtocolActor.class,
+                                   componentName + ":queue:" + hintQueue, brokerUri);
+    ActorRef hintProducer = context.actorOf(hintProps, "ActiveMqHintProducerProtocolActor-" + uuid);
+
     // watch the created consumers from the context to get informed when they are terminated
     context.watch(created);
     context.watch(activated);
     context.watch(deactivated);
+    context.watch(hintProducer);
 
     // create the connection
-    WonNodeConnection jmsConnection = new WonNodeConnection(wonNodeInfo, created, activated, deactivated);
-    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerUri);
-    // connectionFactory.setExceptionListener( ... )
-    Camel camel = CamelExtension.get(context.system());
-    camel.context().addComponent(componentName, JmsComponent.jmsComponent(connectionFactory));
-
+    WonNodeConnection jmsConnection = new WonNodeConnection(wonNodeInfo, created, activated, deactivated, hintProducer);
     return jmsConnection;
   }
 }
