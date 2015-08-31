@@ -49,7 +49,7 @@
     */
 
     // with svg-included margins
-    @include fixed-square(1rem);
+    @include carretSized;
   }
 
   & .topnav__button {

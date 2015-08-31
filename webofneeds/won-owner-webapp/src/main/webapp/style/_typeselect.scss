@@ -1,3 +1,5 @@
+@import 'won-config';
+
 $verticalPadding: 0.2rem;
 $horizontalPadding: 0.5rem;
 
@@ -16,8 +18,9 @@ $horizontalPadding: 0.5rem;
     &:hover, &:focus { background-color: $won-light-gray; }
     &:active { background-color: darken($won-light-gray, 10%) }
 
-
-
+    .ts__option__carret {
+      @include carretSized;
+    }
   }
 
   .ts__option--selected .ts__option__help-btn {
@@ -49,6 +52,8 @@ $horizontalPadding: 0.5rem;
 
       display: none;
     }
+
+    .ts__option__carret { display: none }
   }
 }
 
@@ -57,8 +62,6 @@ $horizontalPadding: 0.5rem;
   .ts__option:not(.ts__option--selected) {
     display: none;
 
-    .ts__option__help-btn {
-      display: none;
-    }
+    .ts__option__help-btn { display: none; }
   }
 }

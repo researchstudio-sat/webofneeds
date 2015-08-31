@@ -14,6 +14,18 @@ $won-line-gray: #CBD2D1; //use for lines
 $bigiconSize: 2.25rem;
 $iconSize: 1.8rem;
 
+@mixin carretSized { //the small down-arrow
+  /*
+  // without svg-included margins
+  @include fixed-height(0.5rem);
+  @include fixed-width(0.875rem);
+  */
+
+  // with svg-included margins
+  @include fixed-square(1rem);
+
+}
+
 // should be used as max-width on all root-elements so the app has some
 // whitespace to the sides where it can be afforded
 $maxContentWidth: 70rem;

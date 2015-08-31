@@ -14,6 +14,7 @@ function genComponentConf() {
                 ng-click="self.clickedItem($index)">
                     <span>{{o.text}}</span>
                     <img src="generated/icon-sprite.svg#ico36_help" class="ts__option__help-btn">
+                    <img src="generated/icon-sprite.svg#ico16_arrow_down_hi" class="ts__option__carret">
             </dt>
         </dl>
     `
