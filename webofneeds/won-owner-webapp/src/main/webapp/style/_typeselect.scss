@@ -1,0 +1,64 @@
+$verticalPadding: 0.2rem;
+$horizontalPadding: 0.5rem;
+
+%typeselect {
+  cursor: default;
+  list-style: none;
+  border: 1px solid $won-line-gray;
+  background-color: white;
+  padding: 0.5rem;
+
+
+  & .ts__option, & .ts__option--selected {
+    padding: $verticalPadding $horizontalPadding;
+    min-height: $iconSize + $verticalPadding * 2;
+    @include flex-row-spaced;
+    &:hover, &:focus { background-color: $won-light-gray; }
+    &:active { background-color: darken($won-light-gray, 10%) }
+
+
+
+  }
+
+  .ts__option--selected .ts__option__help-btn {
+    display: none;
+  }
+
+  .ts__help {
+    display: none;
+  }
+}
+.typeselect--expanded {
+  @extend %typeselect;
+
+  & .ts__option, & .ts__option--selected {
+
+    &:hover, &:focus  {
+      .ts__option__help-btn { display: inline-block; }
+    }
+
+    .ts__option__help-btn {
+      margin-left: $horizontalPadding;
+      @include fixed-height($iconSize);
+      // assuming there's no icons that are wider than tall.
+      // this assumption has to be made, to prevent chrome
+      // from showing immensly wide svg-snippets (id-selected
+      // viewports reaching to the right edge of the svg-sprite)
+      max-width: $iconSize;
+      width: auto;
+
+      display: none;
+    }
+  }
+}
+
+.typeselect--collapsed {
+  @extend %typeselect;
+  .ts__option:not(.ts__option--selected) {
+    display: none;
+
+    .ts__option__help-btn {
+      display: none;
+    }
+  }
+}

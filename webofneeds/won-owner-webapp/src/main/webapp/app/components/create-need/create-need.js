@@ -5,6 +5,7 @@
 
 import angular from 'angular';
 import createNeedTitleBarModule from '../create-need-title-bar';
+import posttypeSelectModule from '../posttype-select';
 
 class CreateNeedController {
     constructor() {}
@@ -14,7 +15,8 @@ class CreateNeedController {
 CreateNeedController.$inject = [];
 
 export default angular.module('won.owner.components.createNeed', [
-        createNeedTitleBarModule
+        createNeedTitleBarModule,
+        posttypeSelectModule
     ])
     .controller('Create-needController', CreateNeedController)
     .name;
