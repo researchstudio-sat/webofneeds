@@ -7,15 +7,24 @@
 import angular from 'angular';
 
 function genComponentConf() {
+    /*
+     * The template for the directive.
+     *
+     * The $event.stopPropagation() makes sure clicking help doesn't also select the item.
+     */
     let template = `
-        <dl ng-class="self.expandedFun() ? 'typeselect--expanded' : 'typeselect--collapsed'">
-            <dt ng-repeat="o in self.options"
+        <ul ng-class="self.expanded() ? 'typeselect--expanded' : 'typeselect--collapsed'">
+            <li ng-repeat="o in self.options"
                 ng-class="$index === self.selectedIdx? 'ts__option--selected' : 'ts__option'"
-                ng-click="self.clickedItem($index)">
+                ng-click="self.unSelect($index)">
                     <span>{{o.text}}</span>
-                    <img src="generated/icon-sprite.svg#ico36_help" class="ts__option__help-btn">
+                    <img src="generated/icon-sprite.svg#ico36_help"
+                         ng-click="self.unSelectHelpFor($index); $event.stopPropagation();"
+                         class="ts__option__help-btn">
                     <img src="generated/icon-sprite.svg#ico16_arrow_down_hi" class="ts__option__carret">
-            </dt>
+                    <div class="ts__option__help"
+                         ng-show="self.isHelpVisible($index)"> {{o.helpText}} </div>
+            </li>
         </dl>
     `
 
@@ -34,7 +43,7 @@ function genComponentConf() {
         },
         {
             text: 'I want to change something',
-            helpText: 'Use this type in case (change) sam quam aspic temod et que in prendiae perovidel.'
+            helpText: 'Use this type in case (change) case sam quam aspic temod et que in prendiae perovidel.'
         }
     ]
 
@@ -43,25 +52,41 @@ function genComponentConf() {
             this.options = options;
 
             this.selectedIdx = undefined;
+            this.selectedHelp = undefined;
             //this.selectedIdx = 3;
 
 
             console.log('posttype-select.js : in ctrl')
         }
-        clickedItem(idx) {
+        /*
+         * sets selection to that item or entirely unsets it if type-select was already collapsed.
+         */
+        unSelect(idx) {
             if(this.selectedIdx !== idx) {
                 this.selectedIdx = idx;
+                this.selectedHelp = undefined;
             } else {
                 this.selectedIdx = undefined;
             }
             //TODO publish an event
             //TODO initialise from draft
         }
-        expandedFun() {
+        expanded() {
             return isNaN(this.selectedIdx) || this.selectedIdx < 0 || this.selectedIdx >= this.options.length;
         }
-        doSomething (arg) {
-            console.log(this, arg);
+        unSelectHelpFor(idx) {
+            //TODO also do this onHover
+
+            if(this.selectedHelp !== idx) {
+                this.selectedHelp = idx;
+            } else {
+                this.selectedHelp = undefined;
+            }
+
+            console.log('help: ', idx, this.options[idx].helpText);
+        }
+        isHelpVisible(idx) {
+            return !isNaN(this.selectedHelp) && this.selectedHelp === idx;
         }
     }
     Controller.$inject = [/*injections as strings here*/];
