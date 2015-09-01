@@ -7,8 +7,30 @@ import angular from 'angular';
 import createNeedTitleBarModule from '../create-need-title-bar';
 import posttypeSelectModule from '../posttype-select';
 
+
+let options = [
+    {
+        text: 'I want to have something',
+        helpText: 'Use this type in case (want) case sam quam aspic temod et que in prendiae perovidel.'
+    },
+    {
+        text: 'I offer something',
+        helpText: 'Use this type in case (offer) case sam quam aspic temod et que in prendiae perovidel.'
+    },
+    {
+        text: 'I want to do something together',
+        helpText: 'Use this type in case case (together) sam quam aspic temod et que in prendiae perovidel.'
+    },
+    {
+        text: 'I want to change something',
+        helpText: 'Use this type in case (change) case sam quam aspic temod et que in prendiae perovidel.'
+    }
+]
+
 class CreateNeedController {
-    constructor() {}
+    constructor() {
+        this.options = options;
+    }
 
 }
 
