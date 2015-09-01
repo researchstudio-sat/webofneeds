@@ -58,12 +58,25 @@ class AppController {
         $router.config([
 
             //TODO should be landing page if not logged in or feed if logged in
-            { path: '/', redirectTo: '/incoming-requests'},
+            {
+                path: '/',
+                redirectTo: '/incoming-requests'
+            },
 
-            { path: '/create-need', component: 'create-need', as: 'createNeed'},
-            { path: '/settings', component: 'settings'},
-
-            { path: '/overview/incoming-requests', component: 'overview-incoming-requests'},
+            {
+                path: '/create-need',
+                component: 'create-need',
+                as: 'createNeed'
+            },
+            {
+                path: '/settings',
+                component: 'settings'
+            },
+            {
+                path: '/overview/incoming-requests',
+                component: 'overview-incoming-requests',
+                as: 'overviewIncomingRequests'
+            },
             //{ path: '/overview/matches', component: 'matches'}, //TODO
             //{ path: '/overview/posts', component: 'posts'}, //TODO
             //{ path: '/overview/feed', component: 'posts'}, //TODO
