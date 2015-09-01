@@ -35,7 +35,9 @@ $minHeight: $iconSize + $verticalPadding * 2;
       left: 100%;
 
       border: 1px solid $won-line-gray;
+
       width: 20rem;
+      padding: 1rem;
       //@include fixed-width(20rem);
       //min-width: 20rem;
     }
