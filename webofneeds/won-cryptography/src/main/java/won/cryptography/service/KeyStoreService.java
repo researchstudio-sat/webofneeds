@@ -4,10 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.channels.FileLock;
 import java.security.*;
 import java.security.cert.Certificate;
-import java.util.Arrays;
 
 /**
  * User: fsalcher
@@ -20,9 +18,10 @@ public class KeyStoreService
 
   private static final String PROVIDER_BC = org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME;
   private static final String KEY_STORE_TYPE = "UBER";
+  //private static final String KEY_STORE_TYPE = "PKCS12";
 
   // ToDo: password should really not be here! (FS)
-  private final char[] storePW = "temp".toCharArray();
+  private final String storePW = "temp";
 
   // ToDo: load from config file (FS)
 
@@ -37,10 +36,7 @@ public class KeyStoreService
   }
 
   public KeyStoreService(File storeFile) {
-
     this.storeFile = storeFile;
-
-
   }
 
   public PrivateKey getPrivateKey(String alias) {
@@ -48,9 +44,9 @@ public class KeyStoreService
     PrivateKey retrieved = null;
 
     try {
-      retrieved = (PrivateKey) store.getKey(alias, storePW);
+      retrieved = (PrivateKey) store.getKey(alias, storePW.toCharArray());
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.warn("Could not retrieve key for " + alias + " from ks " + storeFile.getName(), e);
     }
 
     return retrieved;
@@ -67,7 +63,7 @@ public class KeyStoreService
   public PublicKey getPublicKey(String alias) {
     Certificate cert = getCertificate(alias);
     if (cert == null) {
-      logger.info("No certificate found for alias {}", alias);
+      logger.warn("No certificate found for alias {}", alias);
       return null;
     }
     return cert.getPublicKey();
@@ -80,7 +76,7 @@ public class KeyStoreService
     try {
       retrieved = store.getCertificate(alias);
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.warn("No certificate found for alias " + alias, e);
     }
 
     return retrieved;
@@ -94,7 +90,7 @@ public class KeyStoreService
     try {
       retrieved = store.getCertificateAlias(cert);
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.warn("No alias found for certificate", e);
     }
 
     return retrieved;
@@ -114,10 +110,10 @@ public class KeyStoreService
   public synchronized void putKey(String alias, Key key, Certificate[] certificateChain) {
 
     try {
-      store.setKeyEntry(alias, key, storePW, certificateChain);
+      store.setKeyEntry(alias, key, storePW.toCharArray(), certificateChain);
       saveStoreToFile();
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error("Could not add key of " + alias + " to the key store", e);
     }
 
   }
@@ -128,7 +124,7 @@ public class KeyStoreService
       store.setCertificateEntry(alias, certificate);
       saveStoreToFile();
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error("Could not add certificate of " + alias + " to the key store", e);
     }
 
   }
@@ -136,43 +132,25 @@ public class KeyStoreService
   private synchronized void saveStoreToFile() {
 
     FileOutputStream outputStream = null;
-    //TODO the lock seem to not work. Anyway, we wanted to change keystore to be generated per web app,
-    //then we will not have to lock the keystore file at all.
-    FileLock lock = null;
 
     try {
-
       outputStream = new FileOutputStream(storeFile);
-      lock = outputStream.getChannel().lock();
-
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error("Could not create key store in file" + storeFile.getName(), e);
     }
 
     if (outputStream != null) {
       try {
 
-        store.store(outputStream, Arrays.copyOf(storePW, storePW.length));
+        store.store(outputStream, storePW.toCharArray());
 
       } catch (Exception e) {
-        e.printStackTrace();
+        logger.error("Could not save key store to file" + storeFile.getName(), e);
       } finally {
-        if (lock != null) {
-          try {
-            if (lock.isValid()) {
-              lock.release();
-            } else {
-              logger.warn("Keystore file lock was not valid!");
-            }
-
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-        }
         try {
           outputStream.close();
         } catch (Exception e) {
-          e.printStackTrace();
+          logger.error("Error closing stream of file" + storeFile.getName(), e);
         }
       }
     }
@@ -184,25 +162,21 @@ public class KeyStoreService
     FileInputStream inputStream = null;
 
     try {
-
       inputStream = new FileInputStream(storeFile);
-
     } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      logger.error("Could not load key store from file" + storeFile.getName(), e);
     }
 
     if (inputStream != null) {
       try {
-
-        store.load(inputStream, Arrays.copyOf(storePW, storePW.length));
-
+        store.load(inputStream, storePW.toCharArray());
       } catch (Exception e) {
-        e.printStackTrace();
+        logger.error("Could not load key store from file" + storeFile.getName(), e);
       } finally {
         try {
           inputStream.close();
         } catch (Exception e) {
-          e.printStackTrace();
+          logger.error("Error closing stream of file" + storeFile.getName(), e);
         }
 
       }
@@ -214,7 +188,7 @@ public class KeyStoreService
       return store.size();
     } catch (KeyStoreException e) {
       //TODO proper logging
-      logger.warn(e.toString());
+      logger.warn("Could not get size of the key store " + storeFile.getName(), e);
     }
     return 0;
   }
@@ -230,7 +204,7 @@ public class KeyStoreService
         loadStoreFromFile();
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error("Error initializing key store " + storeFile.getName(), e);
     }
   }
 

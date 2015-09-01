@@ -109,7 +109,7 @@ public class TestSigningUtils {
   }
 
 
-  public void generateTestKeystore() throws URISyntaxException {
+  public void generateTestKeystore() throws URISyntaxException, IOException {
     Security.addProvider(new BouncyCastleProvider());
     //URL keyUrl = TestSigningUtils.class.getResource(KEYS_FILE);
     File keysFile = null;
@@ -132,7 +132,7 @@ public class TestSigningUtils {
   }
 
   @Test
-  public void generateKeystoreForNodeAndOwner() throws URISyntaxException {
+  public void generateKeystoreForNodeAndOwner() throws URISyntaxException, IOException {
 
     Security.addProvider(new BouncyCastleProvider());
     //KeyStoreService storeServiceOnNode = new KeyStoreService(new File("node-keys.jks"));
@@ -197,10 +197,11 @@ public class TestSigningUtils {
   }
 
   private static void addKeyByUri(String certUri, final KeyPairService keyPairService,
-                      final CertificateService certificateService, final KeyStoreService storeService) {
-    KeyPair keyPair = keyPairService.generateNewKeyPair();
+                      final CertificateService certificateService, final KeyStoreService storeService)
+    throws IOException {
+    KeyPair keyPair = keyPairService.generateNewKeyPairInBrainpoolp384r1();
     BigInteger serialNumber = BigInteger.valueOf(1);
-    Certificate cert = certificateService.createSelfSignedCertificate(serialNumber, keyPair, certUri);
+    Certificate cert = certificateService.createSelfSignedCertificate(serialNumber, keyPair, certUri, certUri);
     storeService.putKey(certUri, keyPair.getPrivate(), new Certificate[]{cert});
 
     System.out.println(cert);
@@ -208,11 +209,12 @@ public class TestSigningUtils {
   }
 
   private static void addKeyByUris(final String[] aliasUris, final KeyPairService keyPairService,
-                             final CertificateService certificateService, final KeyStoreService storeService) {
-    KeyPair keyPair = keyPairService.generateNewKeyPair();
+                             final CertificateService certificateService, final KeyStoreService storeService)
+    throws IOException {
+    KeyPair keyPair = keyPairService.generateNewKeyPairInBrainpoolp384r1();
     BigInteger serialNumber = BigInteger.valueOf(1);
     for (String aliasUri : aliasUris) {
-      Certificate cert = certificateService.createSelfSignedCertificate(serialNumber, keyPair, aliasUri);
+      Certificate cert = certificateService.createSelfSignedCertificate(serialNumber, keyPair, aliasUri, aliasUri);
       storeService.putKey(aliasUri, keyPair.getPrivate(), new Certificate[]{cert});
     }
   }

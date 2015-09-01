@@ -8,6 +8,7 @@ import won.cryptography.service.KeyPairService;
 import won.cryptography.service.KeyStoreService;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.security.KeyPair;
 import java.security.cert.Certificate;
 
@@ -44,7 +45,7 @@ public class OwnerCertificateOnStartupCreator implements InitializingBean
     logger.info("owner certificate not found under alias {}, creating new one", alias);
     KeyPair pair = keyPairService.generateNewKeyPairInSecp384r1();
     BigInteger serialNumber = BigInteger.valueOf(1);
-    cert = certificateService.createSelfSignedCertificate(serialNumber, pair, alias);
+    cert = certificateService.createSelfSignedCertificate(serialNumber, pair, URI.create(alias).getAuthority(), null);
     keyStoreService.putKey(alias, pair.getPrivate(), new Certificate[]{cert});
 
     logger.info("owner certificate created");

@@ -44,7 +44,7 @@ public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
       if (message.getMessageType() == WonMessageType.CREATE_NEED) {
         // generate and add need's public key to the need content
         if (cryptoService.getPrivateKey(needUri) == null) {
-          cryptoService.createNewKeyPair(needUri);
+          cryptoService.createNewKeyPair(needUri, needUri);
         }
         PublicKey pubKey = cryptoService.getPublicKey(needUri);
         WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();

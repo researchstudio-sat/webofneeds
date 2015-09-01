@@ -26,6 +26,7 @@ import won.cryptography.service.KeyPairService;
 import won.cryptography.service.KeyStoreService;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.security.KeyPair;
 import java.security.cert.Certificate;
 
@@ -54,10 +55,9 @@ public class NodeCertificateOnStartupCreator implements InitializingBean {
     }
     //no certificate, create it:
     logger.info("node certificate not found under alias {}, creating new one", alias);
-    //KeyPair keyPair = keyPairService.generateNewKeyPair();
     KeyPair keyPair = keyPairService.generateNewKeyPairInSecp384r1();
     BigInteger serialNumber = BigInteger.valueOf(1);
-    cert = certificateService.createSelfSignedCertificate(serialNumber, keyPair, alias);
+    cert = certificateService.createSelfSignedCertificate(serialNumber, keyPair, URI.create(alias).getAuthority(), alias);
     keyStoreService.putKey(alias, keyPair.getPrivate(), new Certificate[]{cert});
     logger.info("node certificate created");
   }

@@ -813,12 +813,6 @@ public class
       return new ResponseEntity<String>(HttpStatus.ALREADY_REPORTED);
     }
 
-    // TODO the case when its the same physical node with another certificate we probably cannot detect
-    // But we could at least check that the node with the same web-id is not
-    // registered with different certificate already - in that case we should return an error.
-    // we should also in this case do the web-id verification check
-
-
     String alias;
     try {
       X500Name dnName = new X500Name(nodeCert.getSubjectDN().getName());
@@ -829,6 +823,11 @@ public class
       return new ResponseEntity<String>("No CN or Web-ID name provided in certificate", HttpStatus.BAD_REQUEST);
     }
 
+    // TODO the case when its the same physical node with another certificate we probably cannot detect
+    // But we could at least check that the node with the same web-id is not
+    // registered with different certificate already - in that case we should return an error.
+    // we should also in this case do the web-id verification check
+    // for now - as we take alias from common name - we check against that, i.e:
     // If the alias is known but certificate differs, we report an error:
     Certificate retrieved = trustStoreService.getCertificate(alias);
     if (retrieved != null) {

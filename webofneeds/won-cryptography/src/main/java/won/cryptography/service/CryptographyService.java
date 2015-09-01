@@ -3,6 +3,7 @@ package won.cryptography.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -38,36 +39,36 @@ public class CryptographyService {
     public CryptographyService (KeyStoreService keyStoreService) {
 
         //Security.addProvider(new BouncyCastleProvider());
-
         keyPairService = new KeyPairService();
         certificateService = new CertificateService();
-        //keyStoreService = new KeyStoreService(new File("keys.jks"));
         this.keyStoreService = keyStoreService;
     }
 
 
-    public KeyPair createNewKeyPair(BigInteger certNumber, String resourceURI) {
+    public KeyPair createNewKeyPair(BigInteger certNumber, String commonName, String webId) {
 
-
-        KeyPair newKeyPair = keyPairService.generateNewKeyPair();
+      KeyPair newKeyPair = keyPairService.generateNewKeyPairInSecp384r1();
         X509Certificate newCertificate = certificateService.createSelfSignedCertificate(certNumber, newKeyPair,
-                                                                                        resourceURI);
-        keyStoreService.putKey(resourceURI,
+                                                                                        commonName, webId);
+      String alias = webId;
+      if (alias == null) {
+        alias = commonName;
+      }
+        keyStoreService.putKey(alias,
                 newKeyPair.getPrivate(), new Certificate[] {newCertificate});
 
         return newKeyPair;
-
     }
 
 
-  public KeyPair createNewKeyPair(String resourceURI) {
+  public KeyPair createNewKeyPair(String commonName, String webId) throws IOException {
 
     BigInteger certNumber = BigInteger.valueOf(keyStoreService.size() + 1);
-    return createNewKeyPair(certNumber, resourceURI);
+    return createNewKeyPair(certNumber, commonName, webId);
 
   }
 
-    public PrivateKey getPrivateKey(String needURI) {
+  public PrivateKey getPrivateKey(String needURI) {
         return keyStoreService.getPrivateKey(needURI);
     }
 

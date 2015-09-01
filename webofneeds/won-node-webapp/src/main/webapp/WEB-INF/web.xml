@@ -5,6 +5,16 @@
 
     <display-name>WON Node Webapp</display-name>
 
+    <filter>
+        <filter-name>filterChainProxy</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>filterChainProxy</filter-name> <!-- filterChainProxy -->
+        <!-- springSecurityFilterChain -->
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <!-- SPRING config -->
 
     <listener>
@@ -17,6 +27,7 @@
         <param-name>contextConfigLocation</param-name>
         <param-value>
             classpath:/spring/node.xml
+            classpath:/spring/webid-security.xml
         </param-value>
     </context-param>
 
