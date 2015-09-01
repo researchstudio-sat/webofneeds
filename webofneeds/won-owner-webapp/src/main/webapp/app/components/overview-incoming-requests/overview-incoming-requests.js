@@ -16,5 +16,5 @@ IncomingRequestsController.$inject = [];
 export default angular.module('won.owner.components.overviewIncomingRequests', [
         overviewTitleBarModule
     ])
-    .controller('Overview-incoming-requestsController', IncomingRequestsController)
+    .controller('OverviewIncomingRequestsController', IncomingRequestsController)
     .name;

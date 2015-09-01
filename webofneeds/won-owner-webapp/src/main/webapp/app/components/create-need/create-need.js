@@ -18,5 +18,6 @@ export default angular.module('won.owner.components.createNeed', [
         createNeedTitleBarModule,
         posttypeSelectModule
     ])
-    .controller('Create-needController', CreateNeedController)
+    //.controller('Create-needController', CreateNeedController)
+    .controller('CreateNeedController', CreateNeedController)
     .name;

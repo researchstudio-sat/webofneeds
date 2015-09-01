@@ -17,5 +17,5 @@ export default angular.module('won.owner.components.postVisitor', [
         visitorTitleBarModule,
         galleryModule
     ])
-    .controller('Post-visitorController', Controller)
+    .controller('PostVisitorController', Controller)
     .name;

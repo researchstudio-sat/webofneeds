@@ -22,6 +22,7 @@ import settingsComponent from './components/settings/settings';
 import overviewIncomingRequestsComponent from './components/overview-incoming-requests/overview-incoming-requests';
 import matchesComponent from './components/matches/matches';
 import postVisitorComponent from './components/post-visitor/post-visitor';
+import {camel2Hyphen, hyphen2Camel} from './utils';
 
 let app = angular.module('won.owner', [
     'ngNewRouter',
@@ -41,6 +42,13 @@ app.config(['$componentLoaderProvider', setTemplatesPath]);
 function setTemplatesPath ($componentLoaderProvider){
     //the default wouldn't include 'app/'
     $componentLoaderProvider.setTemplateMapping(name => `app/components/${name}/${name}.html`);
+    $componentLoaderProvider.setCtrlNameMapping(componentName =>
+        hyphen2Camel(componentName) + 'Controller'
+    )
+    $componentLoaderProvider.setComponentFromCtrlMapping(ctrlName =>
+        camel2Hyphen(ctrlName.replace(/Controller$/, ''))
+    )
+    window.loader = $componentLoaderProvider;
 }
 
 class AppController {
