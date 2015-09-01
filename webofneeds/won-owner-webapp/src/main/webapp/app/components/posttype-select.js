@@ -29,10 +29,13 @@ function genComponentConf() {
     `
 
     class Controller {
-        constructor() {
+        constructor($scope) {
             this.selectedIdx = undefined;
             this.selectedHelp = undefined;
+            this.$scope = $scope;
 
+            //TODO debug; deleteme
+            window.ptctrl = this;
             console.log('posttype-select.js : in ctrl', this)
         }
         /*
@@ -42,10 +45,13 @@ function genComponentConf() {
             if(this.selectedIdx !== idx) {
                 this.selectedIdx = idx;
                 this.selectedHelp = undefined;
+                this.onSelect({idx: idx});
+                this.$scope.$broadcast('selected-type', idx);
             } else {
                 this.selectedIdx = undefined;
+                this.onUnselect();
+                this.$scope.$broadcast('unselected-type');
             }
-            //TODO publish an event
             //TODO initialise from draft
         }
         expanded() {
@@ -66,7 +72,7 @@ function genComponentConf() {
             return !isNaN(this.selectedHelp) && this.selectedHelp === idx;
         }
     }
-    Controller.$inject = [/*injections as strings here*/];
+    Controller.$inject = ['$scope'/*injections as strings here*/];
 
     return {
         restrict: 'E',
@@ -84,6 +90,12 @@ function genComponentConf() {
              * [ { text: '...', helpText: '...' }, ..., { text: '...', helpText: '...' }]
              */
             options: '=',
+            /*
+             * Usage:
+             *  on-select="myCallack(idx)"
+             */
+            onSelect: '&',
+            onUnselect: '&'
         }
     }
 }

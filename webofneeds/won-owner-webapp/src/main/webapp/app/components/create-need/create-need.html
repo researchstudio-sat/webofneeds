@@ -4,17 +4,17 @@
 <main class="create-post">
     <div class="cp__inner">
 
-        <won-posttype-select options="::this['create-need'].postTypeTexts"></won-posttype-select>
+        <won-posttype-select
+                options="::this['create-need'].postTypeTexts"
+                on-select="::this['create-need'].selectType(idx)"
+                on-unselect="::this['create-need'].unselectType()">
+        </won-posttype-select>
 
         <select name="select" class="cp__typeselect2">
             <option value="value1">Value 1</option>
             <option value="value2" selected>Value 2</option>
             <option value="value3">Value 3</option>
         </select>
-
-        <p>options: {{ this['create-need'].options.length }}</p>
-        <p>options: {{ self.options.length }}</p>
-        <p>options: {{ self.options.length }}</p>
 
         <div class="cp__pic-and-title">
             <img src="generated/icon-sprite.svg#illu_drag_here" class="create-post__dropzone">

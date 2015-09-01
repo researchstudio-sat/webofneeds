@@ -30,16 +30,27 @@ let postTypeTexts = [
 class CreateNeedController {
     constructor() {
         this.postTypeTexts = postTypeTexts;
+
+
+        //TODO debug; deleteme
+        window.cnc = this;
+    }
+
+    selectType(idx) {
+        console.log('selected type ', idx);
+    }
+    unselectType() {
+        console.log('unselected type ');
     }
 
 }
 
+//CreateNeedController.$inject = ['$scope'];
 CreateNeedController.$inject = [];
 
 export default angular.module('won.owner.components.createNeed', [
         createNeedTitleBarModule,
         posttypeSelectModule
     ])
-    //.controller('Create-needController', CreateNeedController)
-    .controller('CreateNeedController', CreateNeedController)
+    .controller('CreateNeedController', [/*dependency injections as strings here*/ CreateNeedController])
     .name;
