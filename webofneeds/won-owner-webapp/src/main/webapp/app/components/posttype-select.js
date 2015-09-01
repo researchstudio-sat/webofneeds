@@ -95,7 +95,15 @@ function genComponentConf() {
         restrict: 'E',
         template: template,
         controller: Controller,
-        controllerAs: 'self'
+        controllerAs: 'self',
+        /*
+         * make sure the isolated-scope/directive's properties below are
+         * are bound to the controller instead
+         */
+        bindToController: true,
+        scope: {
+            options: '='
+        }
     }
 }
 

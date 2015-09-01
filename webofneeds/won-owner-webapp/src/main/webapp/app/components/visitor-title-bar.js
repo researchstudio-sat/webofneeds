@@ -44,6 +44,8 @@ function genComponentConf() {
         restrict: 'E',
         controller: Controller,
         controllerAs: 'self',
+        bindToController: true, //scope-bindings -> ctrl
+        scope: {},
         template: template
     }
 }
