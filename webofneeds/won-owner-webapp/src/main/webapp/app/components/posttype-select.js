@@ -28,35 +28,12 @@ function genComponentConf() {
         </dl>
     `
 
-    let options = [
-        {
-            text: 'I want to have something',
-            helpText: 'Use this type in case (want) case sam quam aspic temod et que in prendiae perovidel.'
-        },
-        {
-            text: 'I offer something',
-            helpText: 'Use this type in case (offer) case sam quam aspic temod et que in prendiae perovidel.'
-        },
-        {
-            text: 'I want to do something together',
-            helpText: 'Use this type in case case (together) sam quam aspic temod et que in prendiae perovidel.'
-        },
-        {
-            text: 'I want to change something',
-            helpText: 'Use this type in case (change) case sam quam aspic temod et que in prendiae perovidel.'
-        }
-    ]
-
     class Controller {
         constructor() {
-            this.options = options;
-
             this.selectedIdx = undefined;
             this.selectedHelp = undefined;
-            //this.selectedIdx = 3;
 
-
-            console.log('posttype-select.js : in ctrl')
+            console.log('posttype-select.js : in ctrl', this)
         }
         /*
          * sets selection to that item or entirely unsets it if type-select was already collapsed.
@@ -102,7 +79,11 @@ function genComponentConf() {
          */
         bindToController: true,
         scope: {
-            options: '='
+            /*
+             * An array of objects in the form of:
+             * [ { text: '...', helpText: '...' }, ..., { text: '...', helpText: '...' }]
+             */
+            options: '=',
         }
     }
 }

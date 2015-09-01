@@ -8,10 +8,10 @@ import createNeedTitleBarModule from '../create-need-title-bar';
 import posttypeSelectModule from '../posttype-select';
 
 
-let options = [
+let postTypeTexts = [
     {
         text: 'I want to have something',
-        helpText: 'Use this type in case (want) case sam quam aspic temod et que in prendiae perovidel.'
+        helpText: 'Use this type in case (want) foo sam quam aspic temod et que in prendiae perovidel.'
     },
     {
         text: 'I offer something',
@@ -29,7 +29,7 @@ let options = [
 
 class CreateNeedController {
     constructor() {
-        this.options = options;
+        this.postTypeTexts = postTypeTexts;
     }
 
 }
