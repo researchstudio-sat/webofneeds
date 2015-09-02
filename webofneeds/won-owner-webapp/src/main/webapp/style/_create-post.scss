@@ -52,7 +52,6 @@
 
       .cp__m__t__shortdescription {
         align-self: stretch;
-        color: $won-line-gray;
         @extend .dynamic-textarea;
       }
       .cp__m__t__charcount {
@@ -65,7 +64,12 @@
 
 .dynamic-textarea {
   border: 1px solid $won-line-gray;
+  color: $won-line-gray;
   border-radius: 0.1rem;
   padding: 0.3rem;
   background-color: white;
+
+  &:focus {
+    color: black;
+  }
 }
