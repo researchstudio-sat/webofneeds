@@ -18,9 +18,8 @@ won-labelled-hr {
 
     text-align: center;
     vertical-align: middle;
-    font-size: $fontSize;
-    color: darken($won-line-gray, 10%);
     background: $won-lighter-gray;
+    @include fine-print;
     padding: 0 0.3rem;
   }
 }

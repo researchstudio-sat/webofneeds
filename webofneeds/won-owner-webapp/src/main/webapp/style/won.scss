@@ -13,6 +13,8 @@
 
 @import 'won-config';
 
+@import 'text';
+
 // global styling
 
 
@@ -28,8 +30,7 @@ button, input, textarea {
 body {
 
   //this font will be inherited down the cascade
-  font-family: 'Open Sans';
-  font-weight: 400;
+  @include default-font;
 
   background-color: $won-lighter-gray;
 
@@ -69,54 +70,7 @@ body {
 
 @import 'gallery';
 @import 'post-info';
-
-
-.create-post {
-  //@include flex-column;
-  //max-width: 20rem;
-  width: 100%;
-
-  //$createPostMaxContentWidth: 46.25rem;
-  $createPostMaxContentWidth: 35rem;
-  @include max-content-width($createPostMaxContentWidth, $minContentPadding, 'cp');
-
-  > .cp__inner {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-
-    margin-top: $minContentPadding;
-  }
-
-  .create-post__dropzone {
-    @include fixed-square(4.7rem);
-    padding: 1rem;
-    border: 3px dashed $won-line-gray;
-    border-radius: 3px;
-  }
-
-  .cp__icon {
-    @include fixed-square($bigiconSize);
-  }
-
-  .cp__pic-and-title {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-
-    .cp__pat__title {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-
-      > input {
-        align-self: stretch;
-      }
-    }
-  }
-}
+@import 'create-post';
 
 //TODO in topnav, make create-button black when the dialog is open
 //TODO the :hover isn't usable on touch displays (require alternate path to get to the help text) - dog-ears + peel-slide?
