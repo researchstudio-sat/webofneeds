@@ -23,6 +23,7 @@ import overviewIncomingRequestsComponent from './components/overview-incoming-re
 import matchesComponent from './components/matches/matches';
 import postVisitorComponent from './components/post-visitor/post-visitor';
 import {camel2Hyphen, hyphen2Camel} from './utils';
+import landingPageComponent from './components/landingpage/landingpage';
 
 let app = angular.module('won.owner', [
     'ngNewRouter',
@@ -32,7 +33,8 @@ let app = angular.module('won.owner', [
     settingsComponent,
     overviewIncomingRequestsComponent,
     matchesComponent,
-    postVisitorComponent
+    postVisitorComponent,
+    landingPageComponent
 ]);
 
 /*
@@ -72,6 +74,9 @@ class AppController {
                 path: '/settings',
                 component: 'settings'
             },
+            {   
+                path: '/landingpage', 
+                component: 'landingpage'},
             {
                 path: '/overview/incoming-requests',
                 component: 'overview-incoming-requests',
