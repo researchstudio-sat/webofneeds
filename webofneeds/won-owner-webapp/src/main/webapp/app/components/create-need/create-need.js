@@ -6,6 +6,7 @@
 import angular from 'angular';
 import createNeedTitleBarModule from '../create-need-title-bar';
 import posttypeSelectModule from '../posttype-select';
+import labelledHrModule from '../labelled-hr';
 
 
 let postTypeTexts = [
@@ -50,7 +51,8 @@ CreateNeedController.$inject = [];
 
 export default angular.module('won.owner.components.createNeed', [
         createNeedTitleBarModule,
-        posttypeSelectModule
+        posttypeSelectModule,
+        labelledHrModule
     ])
     .controller('CreateNeedController', [/*dependency injections as strings here*/ CreateNeedController])
     .name;

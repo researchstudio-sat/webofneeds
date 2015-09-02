@@ -3,7 +3,7 @@
 import angular from 'angular';
 
 function genComponentConf() {
-    let template = `<div class="wlh__label">or</div>`;
+    let template = `<div class="wlh__label" ng-show="self.label">{{self.label}}</div>`;
 
     class Controller {
         constructor() { }
@@ -14,7 +14,9 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {},
+        scope: {
+            label: '='
+        },
         template: template
     }
 }
