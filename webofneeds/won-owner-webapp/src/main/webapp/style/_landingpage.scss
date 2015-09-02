@@ -77,7 +77,8 @@ $won-dark-gray: #303A43;
     padding: 1rem;
     background-color: $won-lighter-gray;
 
-    .accordion {
+     won-accordion {
+      display: block;
       max-width: 30rem;
       margin: 0 auto;
 
