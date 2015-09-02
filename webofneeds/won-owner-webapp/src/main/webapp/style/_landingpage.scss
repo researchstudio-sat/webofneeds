@@ -125,6 +125,10 @@ $won-dark-gray: #303A43;
   align-items: stretch;
   flex-wrap: wrap;
 
+  input[type=text] {
+    margin: 1rem 0;
+  }
+
   .flexgrid__item {
     display: flex;
     flex-direction: column;
@@ -218,7 +222,6 @@ $won-dark-gray: #303A43;
 input[type=text] {
   display: block;
   padding: 0.5rem;
-  margin: 1rem 0;
   box-sizing: border-box;
   border-radius: 0.1rem;
   border: 0.1rem solid $won-line-gray;
