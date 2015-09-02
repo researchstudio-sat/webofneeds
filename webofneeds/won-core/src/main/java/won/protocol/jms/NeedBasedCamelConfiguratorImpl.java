@@ -112,8 +112,8 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
 
 
     @Override
-    public String getEndpoint(URI brokerUri) {
-        return  endpointMap.get(brokerUri);
+    public String getEndpoint(URI nodeUri) {
+        return  endpointMap.get(nodeUri);
     }
     public void setComponentName(String componentName) {
         this.componentName = componentName;
