@@ -8,7 +8,7 @@
 $won-blue: #00325A;
 $won-white: #FFFFFF;
 $won-light-blue: #673A68;
-$black: #000000;
+$won-dark-gray: #303A43;
 
 .welcome {
     background-color: $won-blue;
@@ -16,7 +16,7 @@ $black: #000000;
     width: 100%;
     font-family: $font-family-sans-serif;
     font-weight: 300;
-    padding: 5rem 1rem 1rem 0rem;
+    padding: 5rem 1rem 1rem 0;
 
     .title{
       color: $won-red;
@@ -51,7 +51,12 @@ $black: #000000;
 
         .welcome__description__more {
           color: $won-red;
-          cursor: pointer;
+        }
+
+        .arrow {
+          display: block;
+          margin: 0 auto;
+          width: 1rem;
         }
     }
 }
@@ -72,8 +77,28 @@ $black: #000000;
     padding: 1rem;
     background-color: $won-lighter-gray;
 
-    .title {
+    .accordion {
+      max-width: 30rem;
+      margin: 0 auto;
 
+      .accordion__element:first-of-type {
+        border: 0;
+      }
+
+      .accordion__element {
+        display: table;
+        border-spacing: 0.5rem;
+        border-top: 0.1rem solid $won-line-gray;
+
+        .question{
+          display: table-cell;
+          width: 100%;
+        }
+        .arrow {
+          display: table-cell;
+          width: 1rem;
+        }
+      }
     }
 }
 
@@ -106,11 +131,15 @@ $black: #000000;
     width: 10rem;
     padding: 1rem 2rem;
 
+    .block {
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
     .welcome__face {
       width: 7rem;
       margin: 0 auto;
       display: block;
-
     }
 
     .welcome__text {
@@ -119,20 +148,87 @@ $black: #000000;
       display: block;
     }
 
-    .additionalblock {
+    .arrow {
+      display: block;
+      margin: 0 auto;
+      width: 1rem;
+    }
+
+    .additionaltext {
       padding-top: 1rem;
+      display: block;
       align-self: flex-end;
+    }
+  }
+}
 
-      .arrow {
-        display: block;
-        margin: 0 auto;
-        width: 1rem;
+.try {
+  .flexgrid {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+
+    .anonymous,
+    .signup {
+      width: 18rem;
+      padding: 0 5rem;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .signup {
+      border-right: 0.1rem solid $won-light-gray;
+    }
+
+    @media screen and (max-width: 20rem) {
+      .anonymous,
+      .signup {
+        width: 18rem;
+        padding: 0;
+        border: 0;
       }
+    }
 
-      .additionaltext {
-        padding-top: 1rem;
-        display: block;
+    .button,
+    input {
+      width: 100%;
+    }
+
+    .anonymous {
+      .description {
+        color: $won-white;
+        padding: 1rem 0;
       }
     }
   }
+}
+
+.button {
+  display: block;
+  padding: 0.5rem;
+  margin: 1rem 0;
+  border-radius: 0.1rem;
+  border: 0;
+}
+
+input[type=text] {
+  display: block;
+  padding: 0.5rem;
+  margin: 1rem 0;
+  box-sizing: border-box;
+  border-radius: 0.1rem;
+  border: 0.1rem solid $won-light-gray;
+}
+
+.clickable,
+.button {
+  cursor: pointer;
+}
+
+.darkgray.button {
+  background-color: $won-dark-gray;
+  color: $won-white;
 }

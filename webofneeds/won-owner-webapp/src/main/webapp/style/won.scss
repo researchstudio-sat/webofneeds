@@ -97,31 +97,6 @@ body {
   .cp__icon {
     @include fixed-square($bigiconSize);
   }
-
-  .cp__hr {
-    border-top: 1px solid $won-line-gray;
-    width: 100%;
-    height: 0;
-
-    $fontSize: 0.75rem;
-
-    margin: $fontSize 0;
-
-    .cp__hr__label {
-
-      color: darken($won-line-gray, 10%);
-      background: $won-lighter-gray;
-
-      font-size: $fontSize;
-      margin-top: -0.7 * $fontSize;
-
-      width: 1.5rem;
-      text-align: center;
-      vertical-align: middle;
-      margin-left: 50%;
-      transform: translateX(-50%);
-    }
-  }
 }
 
 //TODO in topnav, make create-button black when the dialog is open
@@ -130,5 +105,5 @@ body {
 
 @import 'typeselect';
 
-
+@import 'labelledhr';
 @import 'landingpage';

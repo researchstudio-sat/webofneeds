@@ -1,18 +1,19 @@
 ;
 
 import angular from 'angular';
-import overviewTitleBarModule from '../owner-title-bar';
+import labelledHrModule from '../labelled-hr';
+import overviewTitleBarModule from '../visitor-title-bar';
 
-class LandingPageController {
+class LandingpageController {
     constructor() {}
-
 }
 
-LandingPageController.$inject = [];
+LandingpageController.$inject = [];
 
 export default angular.module('won.owner.components.landingpage', [
-    overviewTitleBarModule
+    overviewTitleBarModule,
+    labelledHrModule
 ])
-    .controller('LandingPageController', LandingPageController)
+    .controller('LandingpageController', LandingpageController)
     .name;
 
