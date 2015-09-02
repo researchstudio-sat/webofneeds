@@ -15,10 +15,10 @@
     justify-content: flex-start;
     align-items: stretch;
 
-    margin-top: $minContentPadding;
+    padding: $minContentPadding;
   }
 
-  .create-post__dropzone {
+  .cp__dropzone {
     @include fixed-square(4.7rem);
     padding: 1rem;
     border: 3px dashed $won-line-gray;
@@ -29,22 +29,42 @@
     @include fixed-square($bigiconSize);
   }
 
-  .cp__pic-and-title {
+  won-posttype-select {
+    margin-bottom: $minContentPadding;
+  }
+
+  .cp__mandatory-rest {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
 
-    .cp__pat__title {
+    .cp__dropzone {
+      margin-right: $minContentPadding;
+      margin-bottom: $minContentPadding;
+    }
+    .cp__m__title {
       flex-grow: 1;
+      flex-basis: 10rem;
+
       display: flex;
       flex-direction: column;
       align-items: flex-end;
 
-      > input {
+      .cp__m__t__shortdescription {
         align-self: stretch;
+        @extend .dynamic-textarea;
       }
-
-      > .cp__pat__title__charcount { @include fine-print }
+      .cp__m__t__charcount {
+        @include fine-print;
+        margin-top: $smallFontSize * 0.5;
+      }
     }
   }
+}
+
+.dynamic-textarea {
+  border: 1px solid $won-line-gray;
+  border-radius: 0.1rem;
+  padding: 0.3rem;
+  background-color: white;
 }
