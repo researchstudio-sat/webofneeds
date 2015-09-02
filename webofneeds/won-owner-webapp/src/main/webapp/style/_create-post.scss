@@ -52,6 +52,7 @@
 
       .cp__m__t__shortdescription {
         align-self: stretch;
+        color: $won-line-gray;
         @extend .dynamic-textarea;
       }
       .cp__m__t__charcount {
