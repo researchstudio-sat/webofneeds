@@ -5,6 +5,7 @@
 ;
 
 import angular from 'angular';
+import {broadcastEvent} from '../cstm-ng-utils';
 
 function genComponentConf() {
     /*
@@ -29,14 +30,15 @@ function genComponentConf() {
     `
 
     class Controller {
-        constructor($scope) {
+        constructor($scope, $element) {
             this.selectedIdx = undefined;
             this.selectedHelp = undefined;
             this.$scope = $scope;
+            this.$element = $element;
 
             //TODO debug; deleteme
             window.ptctrl = this;
-            console.log('posttype-select.js : in ctrl', this)
+            console.log('posttype-select.js : in ctrl', this, $element)
         }
         /*
          * sets selection to that item or entirely unsets it if type-select was already collapsed.
@@ -46,11 +48,11 @@ function genComponentConf() {
                 this.selectedIdx = idx;
                 this.selectedHelp = undefined;
                 this.onSelect({idx: idx});
-                this.$scope.$broadcast('selected-type', idx);
+                broadcastEvent(this, 'selected-type', { idx });
             } else {
                 this.selectedIdx = undefined;
                 this.onUnselect();
-                this.$scope.$broadcast('unselected-type');
+                broadcastEvent(this, 'unselected-type');
             }
             //TODO initialise from draft
         }
@@ -72,7 +74,7 @@ function genComponentConf() {
             return !isNaN(this.selectedHelp) && this.selectedHelp === idx;
         }
     }
-    Controller.$inject = ['$scope'/*injections as strings here*/];
+    Controller.$inject = ['$scope', '$element'/*injections as strings here*/];
 
     return {
         restrict: 'E',

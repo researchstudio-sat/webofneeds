@@ -29,12 +29,13 @@ let postTypeTexts = [
 ]
 
 class CreateNeedController {
-    constructor() {
+    constructor($scope) {
         this.postTypeTexts = postTypeTexts;
-
 
         //TODO debug; deleteme
         window.cnc = this;
+        console.log('create-need-controller: ', this);
+        console.log('create-need $scope: ', $scope);
     }
 
     selectType(idx) {
@@ -54,5 +55,5 @@ export default angular.module('won.owner.components.createNeed', [
         posttypeSelectModule,
         labelledHrModule
     ])
-    .controller('CreateNeedController', [/*dependency injections as strings here*/ CreateNeedController])
+    .controller('CreateNeedController', ['$q', /*dependency injections as strings here*/ CreateNeedController])
     .name;
