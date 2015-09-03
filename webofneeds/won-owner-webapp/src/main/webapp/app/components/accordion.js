@@ -5,9 +5,9 @@ import angular from 'angular';
 function genComponentConf() {
     let template = `
             <div class="accordion__element" ng-click="self.openElement($index)" ng-repeat="item in self.items">
-                <div class="question clickable">{{item.title}}</div>
+                <div class="header clickable">{{item.title}}</div>
                 <img class="arrow clickable" src="generated/icon-sprite.svg#ico16_arrow_down"/>
-                <div class="answer" ng-show="$index === self.selectedIdx">{{item.detail}}</div>
+                <div class="detail" ng-show="$index === self.selectedIdx">{{item.detail}}</div>
             </div>
     `;
 

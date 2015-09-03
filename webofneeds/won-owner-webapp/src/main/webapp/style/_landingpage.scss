@@ -65,10 +65,6 @@ $won-dark-gray: #303A43;
     font-weight: 300;
     border-top: 0.1rem solid $won-line-gray;
     padding: 1rem;
-
-    .title {
-
-    }
 }
 
 .faq {
@@ -77,29 +73,10 @@ $won-dark-gray: #303A43;
     padding: 1rem;
     background-color: $won-lighter-gray;
 
-     won-accordion {
+    won-accordion {
       display: block;
       max-width: 30rem;
       margin: 0 auto;
-
-      .accordion__element:first-of-type {
-        border: 0;
-      }
-
-      .accordion__element {
-        display: table;
-        border-spacing: 0.5rem;
-        border-top: 0.1rem solid $won-line-gray;
-
-        .question{
-          display: table-cell;
-          width: 100%;
-        }
-        .arrow {
-          display: table-cell;
-          width: 1rem;
-        }
-      }
     }
 }
 

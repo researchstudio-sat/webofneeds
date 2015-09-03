@@ -1,0 +1,29 @@
+@import 'won-config';
+
+won-accordion {
+  display: block;
+
+  .accordion__element:first-of-type {
+    border: 0;
+  }
+
+  .accordion__element {
+    display: table;
+    border-spacing: 0.5rem;
+    border-top: 0.1rem solid $won-line-gray;
+
+    .header{
+      display: table-cell;
+      width: 100%;
+    }
+
+    .detail{
+      display: table-row;
+    }
+
+    .arrow {
+      display: table-cell;
+      width: 1rem;
+    }
+  }
+}
