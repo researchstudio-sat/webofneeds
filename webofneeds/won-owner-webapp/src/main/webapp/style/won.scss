@@ -49,23 +49,40 @@ body {
 @import 'visitor-title-bar';
 @import 'settings-tab-bar';
 
+@mixin button-color($color, $bg_color) {
+  color: $color;
+  background: $bg_color;
+
+  &:active {
+    background: darken($bg_color, 15%);
+  }
+}
 
 /* style adapted from http://cssdeck.com/labs/beautiful-flat-buttons */
 .won-button--filled {
   //padding: 0.5em 1em;
   padding: 0.66em 2em;
   font-size: 1em;
-  color: white;
   text-align: center;
-  background: $won-red;
   border: 0;
   border-radius: 0.19rem;
   cursor: pointer;
 
-  &:active {
-    background: darken($won-red, 15%);
-    outline: none;
-  }
+  /*Button color definitions*/
+  &.red { @include button-color(white,$won-red); }
+  &.darkgray { @include button-color(white, $won-dark-gray);}
+}
+
+input[type=text] {
+  display: block;
+  padding: 0.66rem;
+  box-sizing: border-box;
+  border-radius: 0.19rem;
+  border: 0.1rem solid $won-line-gray;
+}
+
+.clickable {
+  cursor: pointer;
 }
 
 @import 'gallery';
@@ -81,3 +98,4 @@ body {
 @import 'labelledhr';
 @import 'landingpage';
 @import 'accordion';
+@import 'flexgrid';

@@ -20,7 +20,7 @@ function genComponentConf() {
                     </div>
                 </div>
                 <div class="vtb__inner__right">
-                    <button class="won-button--filled">Quit Contact</button>
+                    <button class="won-button--filled red">Quit Contact</button>
                     <ul class="vtb__tabs">
                         <li><a href="#">
                             Messages

@@ -2,27 +2,17 @@
 @import 'sizing-utils';
 @import 'fonts';
 
-
-// colors
-
-$won-blue: #00325A;
-$won-white: #FFFFFF;
-$won-light-blue: #673A68;
-$won-dark-gray: #303A43;
-
 .welcome {
     background-color: $won-blue;
-    color: $won-white;
+    color: white;
     width: 100%;
     font-family: $font-family-sans-serif;
     font-weight: 300;
     padding: 5rem 1rem 1rem 0;
 
-    .title{
-      color: $won-red;
-    }
+    .title{ color: $won-red; }
 
-    .welcome__description {
+    .w__description {
         margin: 0 auto;
         max-width: 30rem;
         text-align: center;
@@ -30,7 +20,7 @@ $won-dark-gray: #303A43;
         font-size: 0.75rem;
         font-weight: 500;
 
-        .welcome__description__title {
+        .wd__title {
           display: block;
           color: $won-red;
           font-size: 1rem;
@@ -40,20 +30,18 @@ $won-dark-gray: #303A43;
           margin: 0 auto;
         }
 
-        .welcome__description__text {
+        .wd__text {
           padding-top: 1rem;
           padding-bottom: 0.5rem;
           text-align: left;
-
-
           display: block;
         }
 
-        .welcome__description__more {
+        .wd__more {
           color: $won-red;
         }
 
-        .arrow {
+        .wd__arrow {
           display: block;
           margin: 0 auto;
           width: 1rem;
@@ -85,9 +73,7 @@ $won-dark-gray: #303A43;
     padding: 1rem;
     background-color: $won-red;
 
-    .title {
-      color: $won-white;
-    }
+    .title { color: white; }
 }
 
 .title {
@@ -96,120 +82,44 @@ $won-dark-gray: #303A43;
   padding-bottom: 2rem;
 }
 
-.flexgrid{
+
+.trygrid {
   display: flex;
   justify-content: center;
   align-items: stretch;
   flex-wrap: wrap;
 
-  input[type=text] {
-    margin: 1rem 0;
-  }
-
-  .flexgrid__item {
+  .tg__anonymous,
+  .tg__signup {
+    width: 18rem;
+    padding: 0 5rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 10rem;
-    padding: 1rem 2rem;
+  }
 
-    .block {
-      flex-direction: column;
-      justify-content: space-between;
-    }
+  .tg__signup {
+    border-right: 0.1rem solid $won-light-gray;
+  }
 
-    .welcome__face {
-      width: 7rem;
-      margin: 0 auto;
-      display: block;
-    }
-
-    .welcome__text {
-      padding-top: 2rem;
-      text-align: center;
-      display: block;
-    }
-
-    .arrow {
-      display: block;
-      margin: 0 auto;
-      width: 1rem;
-    }
-
-    .additionaltext {
-      padding-top: 1rem;
-      display: block;
-      align-self: flex-end;
+  .tg__anonymous {
+    .description {
+      color: white;
+      padding: 1rem 0;
     }
   }
-}
 
-.try {
-  .flexgrid {
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-    flex-wrap: wrap;
-
-    .anonymous,
-    .signup {
+  @media screen and (max-width: 20rem) {
+    .tg__anonymous,
+    .tg__signup {
       width: 18rem;
-      padding: 0 5rem;
-
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .signup {
-      border-right: 0.1rem solid $won-light-gray;
-    }
-
-    @media screen and (max-width: 20rem) {
-      .anonymous,
-      .signup {
-        width: 18rem;
-        padding: 0;
-        border: 0;
-      }
-    }
-
-    .button,
-    input {
-      width: 100%;
-    }
-
-    .anonymous {
-      .description {
-        color: $won-white;
-        padding: 1rem 0;
-      }
+      padding: 0;
+      border: 0;
     }
   }
-}
 
-.button {
-  display: block;
-  padding: 0.5rem;
-  margin: 1rem 0;
-  border-radius: 0.1rem;
-  border: 0;
-}
-
-input[type=text] {
-  display: block;
-  padding: 0.5rem;
-  box-sizing: border-box;
-  border-radius: 0.1rem;
-  border: 0.1rem solid $won-line-gray;
-}
-
-.clickable,
-.button {
-  cursor: pointer;
-}
-
-.darkgray.button {
-  background-color: $won-dark-gray;
-  color: $won-white;
+  input[type=text] {
+    margin: 1rem 0;
+    width: 100%;
+  }
 }
