@@ -1,11 +1,10 @@
 ;
 
 import angular from 'angular';
-import topNavModule from '../topnav';
+import topNavModule from '../landingpage-topnav';
 import overviewTitleBarModule from '../visitor-title-bar';
 import accordionModule from '../accordion';
 import flexGridModule from '../flexgrid';
-import labelledHrModule from '../labelled-hr';
 
 class LandingpageController {
     constructor() {
@@ -42,8 +41,7 @@ export default angular.module('won.owner.components.landingpage', [
     overviewTitleBarModule,
     accordionModule,
     topNavModule,
-    flexGridModule,
-    labelledHrModule
+    flexGridModule
 ])
     .controller('LandingpageController', LandingpageController)
     .name;

@@ -7,7 +7,7 @@
 @mixin default-font {
   font-family: 'Open Sans';
   font-weight: 400;
-  font-size: 1rem;
+  font-size: $normalFontSize;
   color: black;
 }
 

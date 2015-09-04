@@ -1,5 +1,5 @@
 <header>
-    <won-topnav></won-topnav>
+    <won-landingpage-topnav></won-landingpage-topnav>
 </header>
 <main>
     <div class="welcome">
@@ -28,11 +28,11 @@
             <div class="tg__signup">
                 <div class="block">
                     <div class="header">Sign up here.</div>
-                    <input type="text" required="true" placeholder="Email address"/>
-                    <input type="text" required="true" placeholder="Password"/>
-                    <input type="text" required="true" placeholder="Repeat Password"/>
+                    <input type="text" required="true" placeholder="Email address" ng-model="landingpage.email" required type="email"/>
+                    <input type="text" required="true" placeholder="Password" ng-model="landingpage.password" required type="password"/>
+                    <input type="text" required="true" placeholder="Repeat Password" ng-model="landingpage.repeatPassword" required type="password"/>
                 </div>
-                <button class="won-button--filled darkgray">That’s all we need. Let’s go!</button>
+                <button class="won-button--filled darkgray" ng-click="landingpage.register()">That’s all we need. Let’s go!</button>
             </div>
             <div class="tg__anonymous">
                 <div class="block">

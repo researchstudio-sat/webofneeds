@@ -1,7 +1,7 @@
 ;
 
 import angular from 'angular';
-//import labelledHrModule from 'labelled-hr';
+import labelledHrModule from 'app/components/labelled-hr';
 
 function genComponentConf() {
     let template = `
@@ -40,7 +40,7 @@ function genComponentConf() {
 }
 
 export default angular.module('won.owner.components.flexgrid', [
-    //labelledHrModule
+    labelledHrModule
 ])
     .directive('wonFlexGrid', genComponentConf)
     .name;

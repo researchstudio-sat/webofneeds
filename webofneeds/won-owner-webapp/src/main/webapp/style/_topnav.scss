@@ -70,6 +70,10 @@
     .topnav__button__icon {
       @include fixed-square($bigiconSize);
     }
+
+    &.open {
+      color: black;
+    }
   }
 
   & .topnav__list {

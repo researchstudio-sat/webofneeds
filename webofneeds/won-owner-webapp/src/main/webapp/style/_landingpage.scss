@@ -17,13 +17,13 @@
         max-width: 30rem;
         text-align: center;
         padding: 1rem;
-        font-size: 0.75rem;
+        font-size: $smallFontSize;
         font-weight: 500;
 
         .wd__title {
           display: block;
           color: $won-red;
-          font-size: 1rem;
+          font-size: $normalFontSize;
           border-top: 0.1rem solid $won-light-blue;
           padding-top: 0.5rem;
           max-width: 22rem;
@@ -70,56 +70,55 @@
 
 .try {
     font-weight: 300;
-    padding: 1rem;
+    padding: 1rem 1rem 2rem 1rem;
     background-color: $won-red;
 
     .title { color: white; }
+
+    .trygrid {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      flex-wrap: wrap;
+
+      .tg__anonymous,
+      .tg__signup {
+        width: 18rem;
+        padding: 0 5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .tg__signup {
+        border-right: 0.1rem solid $won-light-gray;
+      }
+
+      .tg__anonymous {
+        .description {
+          color: white;
+          padding: 1rem 0;
+        }
+      }
+
+      @media screen and (max-width: 20rem) {
+        .tg__anonymous,
+        .tg__signup {
+          width: 18rem;
+          padding: 0;
+          border: 0;
+        }
+      }
+
+      input[type=text] {
+        margin: 1rem 0;
+        width: 100%;
+      }
+    }
 }
 
 .title {
   text-align: center;
-  font-size: 2rem;
+  font-size: $bigFontSize;
   padding-bottom: 2rem;
-}
-
-
-.trygrid {
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  flex-wrap: wrap;
-
-  .tg__anonymous,
-  .tg__signup {
-    width: 18rem;
-    padding: 0 5rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
-  .tg__signup {
-    border-right: 0.1rem solid $won-light-gray;
-  }
-
-  .tg__anonymous {
-    .description {
-      color: white;
-      padding: 1rem 0;
-    }
-  }
-
-  @media screen and (max-width: 20rem) {
-    .tg__anonymous,
-    .tg__signup {
-      width: 18rem;
-      padding: 0;
-      border: 0;
-    }
-  }
-
-  input[type=text] {
-    margin: 1rem 0;
-    width: 100%;
-  }
 }

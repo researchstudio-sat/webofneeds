@@ -43,6 +43,7 @@ body {
 
 
 @import 'topnav';
+@import 'login';
 @import 'need-tab-bar';
 @import 'main-tab-bar';
 @import 'create-need-title-bar';
@@ -62,7 +63,7 @@ body {
 .won-button--filled {
   //padding: 0.5em 1em;
   padding: 0.66em 2em;
-  font-size: 1em;
+  font-size: $normalFontSize;
   text-align: center;
   border: 0;
   border-radius: 0.19rem;
@@ -70,7 +71,8 @@ body {
 
   /*Button color definitions*/
   &.red { @include button-color(white,$won-red); }
-  &.darkgray { @include button-color(white, $won-dark-gray);}
+  &.darkgray { @include button-color(white, $won-dark-gray); }
+  &.lighterblue { @include button-color(white, $won-lighter-blue); }
 }
 
 input[type=text] {
