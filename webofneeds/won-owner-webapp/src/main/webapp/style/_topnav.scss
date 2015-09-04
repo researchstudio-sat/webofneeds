@@ -52,19 +52,38 @@
     @include carretSized;
   }
 
+  .won-button--filled {
+    white-space: nowrap;
+
+    @media (max-width: $responsivenessBreakPoint) {
+      display: none;
+    }
+  }
+
   & .topnav__button {
     @include flex-row;
 
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
 
-    //TODO drop text (only use icons when there's no space)
     .topnav__button__caption {
       white-space: nowrap;
 
       @media (max-width: $responsivenessBreakPoint) {
         display: none;
       }
+    }
+
+    &.won-button--filled {
+      white-space: nowrap;
+
+      @media (max-width: $responsivenessBreakPoint) {
+        display: none;
+      }
+    }
+
+    .topnav__button__caption__always {
+      white-space: nowrap;
     }
 
     .topnav__button__icon {

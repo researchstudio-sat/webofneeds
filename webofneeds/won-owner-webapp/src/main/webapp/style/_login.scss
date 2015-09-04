@@ -3,16 +3,21 @@
 @import 'sizing-utils';
 
 won-login {
+  $responsivenessBreakPoint: 31rem;
+
   background: white;
   display: block;
-  padding: 1rem;
+  padding: 0 1rem 1rem 1rem;
+  top: -3rem;
+  position: relative;
+  border: 0.1rem solid $won-line-gray;
 
   button {
     width: 100%;
   }
 
   input[type=text] {
-    margin: 0 0 1rem 0;
+    margin: 1rem 0;
     width: 100%;
     background-color: $won-lighter-gray;
     box-shadow: inset 0 0 0.3rem 0rem $won-light-gray;
@@ -20,6 +25,7 @@ won-login {
 
   .wl__table{
     display: table;
+
     width: 100%;
     padding-bottom: 1rem;
     font-size: $smallFontSize;
@@ -47,6 +53,44 @@ won-login {
   & a {
     color: $won-red;
     text-decoration: none;
+  }
+
+  & .wl__button {
+    @include flex-row;
+    justify-content: flex-end;
+
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    //TODO drop text (only use icons when there's no space)
+    .wl__button__caption {
+      color: black;
+      white-space: nowrap;
+
+      /*@media (max-width: $responsivenessBreakPoint) {
+        display: none;
+      }*/
+    }
+
+    .wl__button__icon {
+      @include fixed-square($bigiconSize);
+
+    }
+
+    & .wl__button__carret {
+      /*
+      // without svg-included margins
+      @include fixed-height(0.5rem);
+      @include fixed-width(0.875rem);
+      */
+
+      // with svg-included margins
+      @include carretSized;
+    }
+
+    &.open {
+      color: black;
+    }
   }
 }
 

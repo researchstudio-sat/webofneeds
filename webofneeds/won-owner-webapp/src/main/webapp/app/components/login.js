@@ -5,7 +5,11 @@
 import angular from 'angular';
 
 function genLoginConf() {
-    let template = `<input type="text" required="true" placeholder="Email address" ng-model="self.email" required type="email"/>
+    let template = `<a href="#" class="wl__button" ng-click="self.open = !self.open">
+                        <span class="wl__button__caption">Sign in</span>
+                        <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" class="wl__button__carret">
+                    </a>
+                    <input type="text" required="true" placeholder="Email address" ng-model="self.email" required type="email"/>
                     <input type="text" required="true" placeholder="Password" ng-model="self.password" required type="password"/>
                     <div class="wl__table">
                         <div class="wlt__left">
@@ -26,7 +30,7 @@ function genLoginConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {items: '='},
+        scope: {open: '='},
         template: template
     }
 }

@@ -22,7 +22,7 @@ function genTopnavConf() {
                         </li>
                         <li>
                             <a href="#" class="topnav__button" ng-click="self.open = !self.open" ng-class="self.open? 'open' : ''">
-                                <span class="topnav__button__caption">Sign in</span>
+                                <span class="topnav__button__caption__always">Sign in</span>
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down" ng-show="!self.open" class="topnav__carret">
                                 <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" ng-show="self.open" class="topnav__carret">
                             </a>
@@ -31,10 +31,10 @@ function genTopnavConf() {
                 </div>
             </div>
         </nav>
-        <nav class="loginOverlay">
+        <nav class="loginOverlay" ng-show="self.open">
             <div class="lo__inner">
                 <div class="lo__inner__right">
-                    <won-login ng-animate="'animate'" ng-show="self.open"></won-login>
+                    <won-login open="self.open"></won-login>
                 </div>
             </div>
         </nav>
