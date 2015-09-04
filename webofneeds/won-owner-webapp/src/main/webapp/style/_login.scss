@@ -1,4 +1,6 @@
 @import 'won-config';
+@import 'flex-layout';
+@import 'sizing-utils';
 
 won-login {
   background: white;
@@ -48,18 +50,13 @@ won-login {
   }
 }
 
-@import 'tri-aligned';
-@import 'flex-layout';
-@import 'sizing-utils';
-
-.loginOverlay { //TODO split into single-purpose-classes
+.loginOverlay {
   width: 100%;
   @include max-content-width($maxContentWidthLoginOverlay, 0rem, 'lo');
   position: absolute;
   z-index: 100;
 
   > .lo__inner {
-    //@include tri-aligned('topnav__inner', 1rem);
     @include flex-row;
     justify-content: flex-end;
 
