@@ -3,6 +3,7 @@ import akka.actor.ActorSystem;
 import akka.actor.DeadLetter;
 import akka.actor.Props;
 import common.actor.DeadLetterActor;
+import common.spring.AppConfiguration;
 import common.spring.SpringExtension;
 import node.actor.WonNodeControllerActor;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -19,7 +20,7 @@ public class AkkaSystemMain
   public static void main(String[] args) throws IOException {
 
     AnnotationConfigApplicationContext ctx =
-      new AnnotationConfigApplicationContext(common.spring.AppConfiguration.class);
+      new AnnotationConfigApplicationContext(AppConfiguration.class);
     ActorSystem system = ctx.getBean(ActorSystem.class);
 
     // use the Spring Extension to create props for a named actor bean
@@ -27,7 +28,6 @@ public class AkkaSystemMain
       SpringExtension.SpringExtProvider.get(system).props(WonNodeControllerActor.class), "WonNodeControllerActor");
     ActorRef actor = system.actorOf(Props.create(DeadLetterActor.class), "DeadLetterActor");
     system.eventStream().subscribe(actor, DeadLetter.class);
-
   }
 
 }

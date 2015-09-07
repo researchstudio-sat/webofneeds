@@ -4,6 +4,8 @@ import akka.camel.CamelMessage;
 import akka.camel.javaapi.UntypedProducerActor;
 import common.event.HintEvent;
 import org.apache.jena.riot.Lang;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -19,6 +21,8 @@ import java.util.Map;
 /**
  * Created by hfriedrich on 27.08.2015.
  */
+@Component
+@Scope("prototype")
 public class HintProducerProtocolActor extends UntypedProducerActor
 {
   private String endpoint;

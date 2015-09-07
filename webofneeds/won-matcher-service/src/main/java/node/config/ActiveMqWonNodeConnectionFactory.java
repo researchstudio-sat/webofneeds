@@ -5,6 +5,7 @@ import akka.actor.Props;
 import akka.actor.UntypedActorContext;
 import akka.camel.Camel;
 import akka.camel.CamelExtension;
+import common.spring.SpringExtension;
 import node.actor.HintProducerProtocolActor;
 import node.actor.NeedConsumerProtocolActor;
 import node.pojo.WonNodeConnection;
@@ -57,16 +58,14 @@ public class ActiveMqWonNodeConnectionFactory
     camel.context().addComponent(componentName, JmsComponent.jmsComponent(connectionFactory));
 
     // create the actors that receive the messages (need events)
-    Props createdProps = Props.create(NeedConsumerProtocolActor.class,
-                                      componentName + ":topic:" + createdTopic +
-                                        "?testConnectionOnStartup=false");
+    Props createdProps = SpringExtension.SpringExtProvider.get(context.system()).props(
+      NeedConsumerProtocolActor.class, componentName + ":topic:" + createdTopic + "?testConnectionOnStartup=false");
     ActorRef created = context.actorOf(createdProps, "ActiveMqNeedCreatedConsumerProtocolActor-" + uuid);
 
     ActorRef activated = created;
     if (!activatedTopic.equals(createdTopic)) {
-      Props activatedProps = Props.create(NeedConsumerProtocolActor.class,
-                                          componentName + ":topic:" + activatedTopic
-                                          + "?testConnectionOnStartup=false");
+      Props activatedProps = SpringExtension.SpringExtProvider.get(context.system()).props(
+        NeedConsumerProtocolActor.class, componentName + ":topic:" + activatedTopic + "?testConnectionOnStartup=false");
       activated = context.actorOf(activatedProps, "ActiveMqNeedActivatedConsumerProtocolActor-" + uuid);
     }
 
@@ -76,15 +75,14 @@ public class ActiveMqWonNodeConnectionFactory
     } else if (deactivatedTopic.equals(activatedTopic)) {
       deactivated = activated;
     } else {
-      Props deactivatedProps = Props.create(NeedConsumerProtocolActor.class,
-                                            componentName + ":topic:" + deactivatedTopic +
-                                              "?testConnectionOnStartup=false");
+      Props deactivatedProps = SpringExtension.SpringExtProvider.get(context.system()).props(
+        NeedConsumerProtocolActor.class, componentName + ":topic:" + deactivatedTopic + "?testConnectionOnStartup=false");
       deactivated = context.actorOf(deactivatedProps, "ActiveMqNeedDeactivatedConsumerProtocolActor-" + uuid);
     }
 
     // create the actor that sends messages (hint events)
-    Props hintProps = Props.create(HintProducerProtocolActor.class,
-                                   componentName + ":queue:" + hintQueue, brokerUri);
+    Props hintProps = SpringExtension.SpringExtProvider.get(context.system()).props(
+      HintProducerProtocolActor.class, componentName + ":queue:" + hintQueue, brokerUri);
     ActorRef hintProducer = context.actorOf(hintProps, "ActiveMqHintProducerProtocolActor-" + uuid);
 
     // watch the created consumers from the context to get informed when they are terminated

@@ -3,12 +3,12 @@ package crawler.actor;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import common.config.CommonSettings;
-import common.config.CommonSettingsImpl;
-import crawler.config.CrawlSettings;
-import crawler.config.CrawlSettingsImpl;
+import crawler.config.CrawlConfig;
 import crawler.msg.CrawlUriMessage;
 import crawler.service.CrawlSparqlService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -23,26 +23,28 @@ import java.util.LinkedList;
  * User: hfriedrich
  * Date: 17.04.2015
  */
+@Component
+@Scope("prototype")
 public class UpdateMetadataActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-  private final CommonSettingsImpl commonSettings = CommonSettings.SettingsProvider.get(getContext().system());
-  private final CrawlSettingsImpl settings = CrawlSettings.SettingsProvider.get(getContext().system());
-  private CrawlSparqlService endpoint;
-  private Collection<CrawlUriMessage> bulkMessages;
+  private Collection<CrawlUriMessage> bulkMessages = new LinkedList<>();
   private static final String TICK = "tick";
 
-  public UpdateMetadataActor() {
-    endpoint = new CrawlSparqlService(commonSettings.SPARQL_ENDPOINT);
-    bulkMessages = new LinkedList<>();
-  }
+  @Autowired
+  private CrawlConfig config;
+
+  @Autowired
+  private CrawlSparqlService endpoint;
+
 
   @Override
   public void preStart() {
 
     // Execute the bulk update at least once a while even if not enough messages are there
-    getContext().system().scheduler().schedule(settings.METADATA_UPDATE_DURATION,
-      settings.METADATA_UPDATE_DURATION, getSelf(), TICK, getContext().dispatcher(), null);
+    getContext().system().scheduler().schedule(
+      config.getMetaDataUpdateMaxDuration(), config.getMetaDataUpdateMaxDuration(),
+      getSelf(), TICK, getContext().dispatcher(), null);
   }
 
   @Override
@@ -64,7 +66,7 @@ public class UpdateMetadataActor extends UntypedActor
       CrawlUriMessage uriMsg = (CrawlUriMessage) message;
       log.debug("Add message to bulk update list: {}", uriMsg);
       bulkMessages.add(uriMsg);
-      if (bulkMessages.size() >= settings.METADATA_UPDATE_MAX_BULK_SIZE) {
+      if (bulkMessages.size() >= config.getMetaDataUpdateMaxBulkSize()) {
         update();
       }
     } else if (message instanceof String) {

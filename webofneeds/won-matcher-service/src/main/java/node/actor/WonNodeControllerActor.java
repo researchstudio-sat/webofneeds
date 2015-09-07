@@ -1,7 +1,6 @@
 package node.actor;
 
 import akka.actor.ActorRef;
-import akka.actor.Props;
 import akka.actor.Terminated;
 import akka.actor.UntypedActor;
 import akka.cluster.pubsub.DistributedPubSub;
@@ -9,17 +8,15 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
-import common.config.CommonSettings;
-import common.config.CommonSettingsImpl;
 import common.event.BulkHintEvent;
 import common.event.HintEvent;
 import common.event.WonNodeEvent;
 import common.service.HttpRequestService;
+import common.spring.SpringExtension;
 import crawler.actor.MasterCrawlerActor;
 import crawler.msg.CrawlUriMessage;
 import node.config.ActiveMqWonNodeConnectionFactory;
-import node.config.WonNodeControllerSettings;
-import node.config.WonNodeControllerSettingsImpl;
+import node.config.WonNodeControllerConfig;
 import node.pojo.WonNodeConnection;
 import node.service.WonNodeSparqlService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,38 +43,32 @@ import java.util.*;
 public class WonNodeControllerActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-  private ActorRef crawler;
-  private HttpRequestService httpRequestService;
-  private Map<String, WonNodeConnection> crawlWonNodes;
-  private Set<String> skipWonNodeUris;
-  private Set<String> failedWonNodeUris;
-  private WonNodeSparqlService sparqlService;
-  private WonNodeControllerSettingsImpl settings;
-  private CommonSettingsImpl commonSettings;
-  private static final String TICK = "tick";
   private ActorRef pubSubMediator;
+  private ActorRef crawler;
+  private Map<String, WonNodeConnection> crawlWonNodes = new HashMap<>();
+  private Set<String> skipWonNodeUris = new HashSet<>();
+  private Set<String> failedWonNodeUris = new HashSet<>();
+  private static final String TICK = "tick";
+
+  @Autowired
+  private WonNodeSparqlService sparqlService;
+
+  @Autowired
+  private HttpRequestService httpRequestService;
+
+  @Autowired
+  private WonNodeControllerConfig config;
 
   @Autowired
   private WonNodeInformationService wonNodeInformationService;
 
-  public WonNodeControllerActor() {
-
-    settings = WonNodeControllerSettings.SettingsProvider.get(getContext().system());
-    commonSettings = CommonSettings.SettingsProvider.get(getContext().system());
-    httpRequestService = new HttpRequestService();
-    sparqlService = new WonNodeSparqlService(commonSettings.SPARQL_ENDPOINT);
-    crawlWonNodes = new HashMap<>();
-    skipWonNodeUris = new HashSet<>();
-    failedWonNodeUris = new HashSet<>();
-  }
 
   @Override
   public void preStart() {
 
     // Create a scheduler to execute the life check for each won node regularly
-    getContext().system().scheduler().schedule(settings.WON_NODE_LIFE_CHECK_DURATION,
-                                               settings.WON_NODE_LIFE_CHECK_DURATION, getSelf(), TICK,
-                                               getContext().dispatcher(), null);
+    getContext().system().scheduler().schedule(config.getLifeCheckDuration(), config.getLifeCheckDuration(),
+                                               getSelf(), TICK, getContext().dispatcher(), null);
 
     // Subscribe for won node events
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
@@ -88,7 +79,7 @@ public class WonNodeControllerActor extends UntypedActor
     pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(BulkHintEvent.class.getName(), getSelf()), getSelf());
 
     // set won nodes to skip by configuration
-    skipWonNodeUris.addAll(settings.WON_NODES_SKIP);
+    skipWonNodeUris.addAll(config.getSkipWonNodes());
 
     // get all known won node uris
     Set<WonNodeInfo> wonNodeInfo = sparqlService.retrieveAllWonNodeInfo();
@@ -98,7 +89,7 @@ public class WonNodeControllerActor extends UntypedActor
     }
 
     // initialize the won nodes to crawl
-    for (String nodeUri : settings.WON_NODES_CRAWL) {
+    for (String nodeUri : config.getCrawlWonNodes()) {
       if (!skipWonNodeUris.contains(nodeUri)) {
         if (!crawlWonNodes.containsKey(nodeUri)) {
           WonNodeEvent e = new WonNodeEvent(nodeUri, WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED);
@@ -108,8 +99,8 @@ public class WonNodeControllerActor extends UntypedActor
     }
 
     // initialize the crawler
-    crawler = getContext().system().actorOf(
-      Props.create(MasterCrawlerActor.class), "MasterCrawlerActor");
+    crawler = getContext().actorOf(SpringExtension.SpringExtProvider.get(
+      getContext().system()).props(MasterCrawlerActor.class), "MasterCrawlerActor");
   }
 
   /**

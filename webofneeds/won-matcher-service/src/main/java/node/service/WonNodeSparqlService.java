@@ -2,7 +2,11 @@ package node.service;
 
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import common.service.SparqlService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.util.WonRdfUtils;
@@ -18,9 +22,12 @@ import java.util.Set;
  * User: hfriedrich
  * Date: 04.05.2015
  */
+@Component
 public class WonNodeSparqlService extends SparqlService
 {
-  public WonNodeSparqlService(final String sparqlEndpoint) {
+
+  @Autowired
+  public WonNodeSparqlService(@Value("${uri.sparql.endpoint}") final String sparqlEndpoint) {
     super(sparqlEndpoint);
   }
 
@@ -43,10 +50,13 @@ public class WonNodeSparqlService extends SparqlService
     while (results.hasNext()) {
 
       QuerySolution qs = results.nextSolution();
-      String graphUri = qs.get("graphUri").asResource().getURI();
-      Dataset ds = retrieveDataset(graphUri);
-      WonNodeInfo nodeInfo = getWonNodeInfoFromDataset(ds);
-      wonNodeInfos.add(nodeInfo);
+      RDFNode rdfNode = qs.get("graphUri");
+      if (rdfNode != null) {
+        String graphUri = rdfNode.asResource().getURI();
+        Dataset ds = retrieveDataset(graphUri);
+        WonNodeInfo nodeInfo = getWonNodeInfoFromDataset(ds);
+        wonNodeInfos.add(nodeInfo);
+      }
     }
     qexec.close();
     return wonNodeInfos;
