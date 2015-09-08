@@ -1,4 +1,16 @@
 <header>
     <won-topnav></won-topnav>
-    <won-settings-title-bar></won-settings-title-bar>
+    <won-settings-title-bar selection="settings.selectedTab" avatarcount="settings.avatars.length"></won-settings-title-bar>
 </header>
+<main class="settingscontent">
+    <div class="ac__inner" ng-show="settings.selectedTab == 0">
+        <won-account-settings></won-account-settings>
+        <div class="flexrow">
+            <won-address-settings items="settings.addresses"></won-address-settings>
+            <won-notification-settings items="settings.notifications"></won-notification-settings>
+        </div>
+    </div>
+    <div class="ac__inner" ng-show="settings.selectedTab == 1">
+        <won-avatar-settings items="settings.avatars"></won-avatar-settings>
+    </div>
+</main>

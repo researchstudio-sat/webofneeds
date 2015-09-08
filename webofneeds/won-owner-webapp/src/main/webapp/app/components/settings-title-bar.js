@@ -15,13 +15,13 @@ function genComponentConf() {
                 <div class="astb__inner__center">
                     <h1 class="astb__title">Account Settings</h1>
                     <ul class="astb__tabs">
-                        <li class="astb__tabs__selected"><a href="#">
+                        <li ng-class="self.selection == 0? 'astb__tabs__selected' : ''" ng-click="self.selection = 0"><a href="#">
                             General Settings
                             <span class="astb__tabs__unread">5</span>
                         </a></li>
-                        <li><a href="#">
+                        <li ng-class="self.selection == 1? 'astb__tabs__selected' : ''" ng-click="self.selection = 1"><a href="#">
                             Manage Avatars
-                            <span class="astb__tabs__unread">5</span>
+                            <span class="astb__tabs__unread">{{self.avatarcount}}</span>
                         </a></li>
                     </ul>
                 </div>
@@ -30,7 +30,7 @@ function genComponentConf() {
     `;
 
     class Controller {
-        constructor() { }
+        constructor() {}
         back() { window.history.back() }
     }
 
@@ -39,7 +39,8 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {},
+        scope: {selection: "=",
+                avatarcount: "="},
         template: template
     }
 }

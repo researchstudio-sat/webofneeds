@@ -20,7 +20,7 @@ function genLoginConf() {
                         </div>
                     </div>
                     <button class="won-button--filled lighterblue">Sign in</button>
-                    <span class="wl__register">No Account yet? <a href="#">Register</a></span>`;
+                    <span class="wl__register">No Account yet? <a href="#">Sign up</a></span>`;
 
 
     class Controller {}
