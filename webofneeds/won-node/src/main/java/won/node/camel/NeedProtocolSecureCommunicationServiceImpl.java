@@ -17,24 +17,21 @@
 package won.node.camel;
 
 import org.apache.activemq.camel.component.ActiveMQComponent;
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
-import won.cryptography.service.*;
+import won.cryptography.service.CryptographyUtils;
+import won.cryptography.service.KeyStoreService;
+import won.cryptography.service.TrustStoreService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.*;
 
-import javax.net.ssl.*;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.net.URI;
-import java.security.*;
 import java.util.Arrays;
 
 /**
@@ -87,18 +84,15 @@ public class NeedProtocolSecureCommunicationServiceImpl implements NeedProtocolC
             resourceUri = wonNodeUri;
             brokerUri = remoteNodeBrokerUri;
 
-
-
-
-
-
             needProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
             // register with remote node in order to exchange certificates if necessary. IF the same trust strategy will
             // be used when doing GET on won resource, we probably don't need this separate register for node
             registerNodeAtRemoteNode(wonNodeUri.toString());
             // initialize key and trust managers and pass them to configuration
-            KeyManager km = initializeKeyManager();
-            TrustManager tm = initializeTrustManager(wonNodeUri.toString());
+            String keyAlias = keyStoreService.getDefaultAlias();
+            //TODO handle password
+            KeyManager km = CryptographyUtils.initializeKeyManager(keyStoreService, "temp", keyAlias);
+            TrustManager tm = CryptographyUtils.initializeTrustManager(trustStoreService, wonNodeUri.toString());
             String endpoint = needProtocolCamelConfigurator.configureCamelEndpointForNeedUri(resourceUri, brokerUri,
                                                                                              needProtocolQueueName,
                                                                                              km, tm);
@@ -111,37 +105,16 @@ public class NeedProtocolSecureCommunicationServiceImpl implements NeedProtocolC
         return camelConfiguration;
     }
 
-    //TODO refactor to make reusable also from owner
     private void registerNodeAtRemoteNode(String remoteNodeUri) throws Exception {
-        // make a call to register REST api in the SSL context with custom key and trust managers
-        //TODO do it correctly with spring bean config, this can be helpful:
-        //http://thespringway.info/spring-web/access-self-signed-ssl-certificate-with-resttemplate/
-        TOFUTrustStrategy trustStrategy = new TOFUTrustStrategy();
-        trustStrategy.setTrustStoreService(trustStoreService);
-        PredefinedAliasPrivateKeyStrategy keyStrategy = new PredefinedAliasPrivateKeyStrategy(keyStoreService.getDefaultAlias());
 
-        //TODO how to handle password?
-        SSLContext sslContext = new SSLContextBuilder().loadKeyMaterial(keyStoreService.getUnderlyingKeyStore(), "temp"
-          .toCharArray(), keyStrategy)
-                                                       .loadTrustMaterial(null, trustStrategy)
-                                                       .build();
-        // here in the constructor, also hostname verifier, protocol version, cipher suits, etc. can be specified
-        SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext);
+        // TODO handle password correctly
+        RestTemplate restTemplate = CryptographyUtils.createSslTofuRestTemplate(keyStoreService, "temp",
+                                                                                trustStoreService);
 
-        HttpClient httpClient = HttpClients.custom()//.useSystemProperties()
-          .setSSLSocketFactory(sslConnectionSocketFactory).build();
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-        requestFactory.setHttpClient(httpClient);
-
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN));
         HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-        //TODO change URI
-//        ResponseEntity<String> result = restTemplate.exchange("https://localhost:8443/won/register-node", HttpMethod
-//                                                                .POST,
-//                                                              entity,
-//                                                              String.class);
+        //TODO make URI configurable
         ResponseEntity<String> result = restTemplate.exchange(remoteNodeUri + "?register=node", HttpMethod
                                                                 .POST,
                                                               entity,
@@ -150,30 +123,6 @@ public class NeedProtocolSecureCommunicationServiceImpl implements NeedProtocolC
         if (!result.getStatusCode().is2xxSuccessful()) {
             throw new IOException("Registration by remote node " + remoteNodeUri + " failed: " + result.toString());
         }
-
-    }
-
-    //TODO make trust manager wrapper that only trusts certificate with brokerURI's (nodeURI's or its host)
-    // from the trust store, e.g. TrustManagerWrapperWithStrategy
-    private TrustManager initializeTrustManager(String trustedAlias) throws Exception {
-        KeyStore trustStore = trustStoreService.getUnderlyingKeyStore();
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
-        //TODO what about password???
-        tmf.init(trustStore);
-        TrustManager tm = tmf.getTrustManagers()[0];
-        return tm;
-    }
-
-    //TODO refactor to make reusable: the method could be static from e.g. KeyManagerWrapperWithStrategy
-    private KeyManager initializeKeyManager() throws Exception {
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-        //TODO the right way to handle password?
-        kmf.init(keyStoreService.getUnderlyingKeyStore(), "temp".toCharArray());
-        // TODO instead of this cast, iterate and select instance of X509KeyManager
-        X509KeyManager km = (X509KeyManager) kmf.getKeyManagers()[0];
-        // default alias of this key store should be this node's web-id
-        km = new KeyManagerWrapperWithStrategy(km, new PredefinedAliasPrivateKeyStrategy(keyStoreService.getDefaultAlias()));
-        return km;
     }
 
     @Override

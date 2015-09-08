@@ -18,6 +18,8 @@ package won.protocol.jms;
 
 import won.protocol.exception.CamelConfigurationFailedException;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
 import java.net.URI;
 import java.util.Set;
 
@@ -31,4 +33,7 @@ public interface MatcherProtocolCamelConfigurator extends NeedProtocolCamelConfi
   //TODO: more sophisticated approach for adding activemq components might be needed to enable more detailed jms
   // configuration
   public void addCamelComponentForWonNodeBrokerForTopics(URI brokerUri,String brokerComponentName);
+
+  public void addCamelComponentForWonNodeBrokerForTopics(URI brokerUri,String brokerComponentName, KeyManager km,
+                                                         TrustManager tm);
 }

@@ -17,8 +17,10 @@ public class KeyStoreService
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private static final String PROVIDER_BC = org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME;
-  private static final String KEY_STORE_TYPE = "UBER";
-  //private static final String KEY_STORE_TYPE = "PKCS12";
+  //private static final String KEY_STORE_TYPE = "UBER";
+  // 'UBER' is more secure, 'PKCS12' is supported by all tools, easier for debugging, e.g. when importing keys,
+  // therefore temporarily we can use 'PKCS12':
+  private static final String KEY_STORE_TYPE = "PKCS12";
 
   // ToDo: password should really not be here! (FS)
   private final String storePW = "temp";

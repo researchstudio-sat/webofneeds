@@ -1,4 +1,4 @@
-package won.owner.service.impl;
+package won.matcher.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,7 @@ import java.security.cert.Certificate;
  * Checks if the owner certificate is already present in the specified keystore
  * and creates it if this is not the case.
  */
-public class OwnerCertificateOnStartupCreator implements InitializingBean
+public class MatcherCertificateOnStartupCreator implements InitializingBean
 {
   private final Logger logger  = LoggerFactory.getLogger(getClass());
 
@@ -35,20 +35,20 @@ public class OwnerCertificateOnStartupCreator implements InitializingBean
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    logger.debug("checking if the owner certificate with alias {} is in the keystore", alias);
+    logger.debug("checking if the matcher certificate with alias {} is in the keystore", alias);
     Certificate cert = keyStoreService.getCertificate(alias);
     if (cert != null) {
-      logger.info("owner certificate with alias {} found in the keystore", alias);
+      logger.info("matcher certificate with alias {} found in the keystore", alias);
       return;
     }
     //no certificate, create it:
-    logger.info("owner certificate not found under alias {}, creating new one", alias);
+    logger.info("matcher certificate not found under alias {}, creating new one", alias);
     KeyPair pair = keyPairService.generateNewKeyPairInSecp384r1();
     BigInteger serialNumber = BigInteger.valueOf(1);
     cert = certificateService.createSelfSignedCertificate(serialNumber, pair, URI.create(alias).getAuthority(), null);
     keyStoreService.putKey(alias, pair.getPrivate(), new Certificate[]{cert});
 
-    logger.info("owner certificate created");
+    logger.info("matcher certificate created");
   }
 
   public void setAlias(String alias) {

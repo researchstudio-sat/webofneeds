@@ -1,36 +1,33 @@
-/*
- * Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package won.matcher.protocol.impl;
 
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
+import won.cryptography.service.CryptographyUtils;
+import won.cryptography.service.KeyStoreService;
+import won.cryptography.service.TrustStoreService;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.*;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
+import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Set;
 
 /**
- * User: LEIH-NB
- * Date: 10.03.14
+ * User: ypanchenko
+ * Date: 02.09.2015
  */
-public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolCommunicationService {
+public class MatcherProtocolSecureCommunicationServiceImpl implements MatcherProtocolCommunicationService {
+
+
+  private KeyStoreService keyStoreService;
+  private TrustStoreService trustStoreService;
 
   private MatcherProtocolCamelConfigurator matcherProtocolCamelConfigurator;
 
@@ -56,9 +53,20 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
       } else {
         matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,needBrokerUri);
         matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(nodeUri);
-        camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(nodeUri,
-                                                                                                         needBrokerUri,
-                                                                                                         matcherProtocolQueueName));
+
+        // register with remote node in order to exchange certificates if necessary. IF the same trust strategy will
+        // be used when doing GET on won resource, we probably don't need this separate register step
+        registerMatcherAtRemoteNode(nodeUri.toString());
+        // initialize key and trust managers and pass them to configuration
+        String keyAlias = keyStoreService.getDefaultAlias();
+        //TODO handle password
+        KeyManager km = CryptographyUtils.initializeKeyManager(keyStoreService, "temp", keyAlias);
+        TrustManager tm = CryptographyUtils.initializeTrustManager(trustStoreService, nodeUri.toString());
+        String endpoint = matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(nodeUri, needBrokerUri,
+                                                                                            matcherProtocolQueueName,
+                                                                                         km, tm);
+
+        camelConfiguration.setEndpoint(endpoint);
       }
       camelConfiguration.setBrokerComponentName(matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(needBrokerUri));
 
@@ -80,6 +88,25 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
     return camelConfiguration;
   }
 
+  private void registerMatcherAtRemoteNode(final String remoteNodeUri) throws Exception {
+    // TODO handle password correctly
+    RestTemplate restTemplate = CryptographyUtils.createSslTofuRestTemplate(keyStoreService, "temp",
+                                                                            trustStoreService);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN));
+    HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+    //TODO make URI configurable
+    ResponseEntity<String> result = restTemplate.exchange(remoteNodeUri + "?register=node", HttpMethod
+                                                            .POST,
+                                                          entity,
+                                                          String.class);
+    logger.info("Registration status: " +  result.getStatusCode());
+    if (!result.getStatusCode().is2xxSuccessful()) {
+      throw new IOException("Registration by remote node " + remoteNodeUri + " failed: " + result.toString());
+    }
+  }
+
   @Override
   public synchronized Set<String> getMatcherProtocolOutTopics(URI wonNodeURI) {
     Set<String> matcherProtocolTopics = ((MatcherActiveMQService)activeMQService)
@@ -94,7 +121,19 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
     String remoteComponentName = componentName+ remoteEndpoint.toString().replaceAll("[/:]","" );
     logger.debug("remoteComponentName: {}", remoteComponentName);
     matcherProtocolCamelConfigurator.addCamelComponentForWonNodeBrokerForTopics(remoteEndpoint,
-                                                                       remoteComponentName
+                                                                                remoteComponentName
+    );
+    matcherProtocolCamelConfigurator.addRemoteTopicListeners(endpoints, remoteEndpoint);
+  }
+
+  public synchronized void addRemoteTopicListeners(final Set<String> endpoints, final URI wonNodeUri, final
+  KeyManager km, final TrustManager tm)
+    throws CamelConfigurationFailedException {
+    URI remoteEndpoint = activeMQService.getBrokerEndpoint(wonNodeUri);
+    String remoteComponentName = componentName+ remoteEndpoint.toString().replaceAll("[/:]","" );
+    logger.debug("remoteComponentName: {}", remoteComponentName);
+    matcherProtocolCamelConfigurator.addCamelComponentForWonNodeBrokerForTopics(remoteEndpoint,
+                                                                                remoteComponentName, km, tm
     );
     matcherProtocolCamelConfigurator.addRemoteTopicListeners(endpoints, remoteEndpoint);
   }
@@ -130,5 +169,19 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
   }
 
 
+  public void setKeyStoreService(KeyStoreService keyStoreService) {
+    this.keyStoreService = keyStoreService;
+  }
 
+  public void setTrustStoreService(TrustStoreService trustStoreService) {
+    this.trustStoreService = trustStoreService;
+  }
+
+  public KeyStoreService getKeyStoreService() {
+    return keyStoreService;
+  }
+
+  public TrustStoreService getTrustStoreService() {
+    return trustStoreService;
+  }
 }

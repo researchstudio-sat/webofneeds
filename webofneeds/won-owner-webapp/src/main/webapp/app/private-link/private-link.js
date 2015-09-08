@@ -364,7 +364,7 @@ angular.module('won.owner')
         }
 
         $scope.addConnectionLastTextMessages = function(currentMessage){
-            linkedDataService.getConnectionTextMessages(currentMessage.connection.uri)
+            linkedDataService.getConnectionTextMessages(currentMessage.connection.uri, applicationStateService.getCurrentNeedURI())
                 .then(function(messages){
                     currentMessage.lastMessages = won.appendStrippingDuplicates(currentMessage.lastMessages, messages,
                     function(msg1, msg2) { return msg1.eventUri == msg2.eventUri ? 0 : 1; });

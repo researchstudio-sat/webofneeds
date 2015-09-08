@@ -252,7 +252,7 @@ angular.module('won.owner').factory('wonService', function (
                 linkedDataService.invalidateCacheForNeed(needURI)
                     .then(
                     function (value) {
-                        linkedDataService.ensureLoaded(eventUri)
+                        linkedDataService.ensureLoaded(eventUri, applicationStateService.getCurrentNeedURI())
                             .then(
                             function (value2) {
                                 linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);
@@ -328,7 +328,7 @@ angular.module('won.owner').factory('wonService', function (
                 linkedDataService.ensureLoaded(eventData.hasSender)
                     .then(
                     function (value) {
-                        linkedDataService.ensureLoaded(eventUri)
+                        linkedDataService.ensureLoaded(eventUri, applicationStateService.getCurrentNeedURI())
                             .then(
                             function(value2) {
                                 linkedDataService.invalidateCacheForNewMessage(eventData.hasSender);

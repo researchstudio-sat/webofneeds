@@ -27,6 +27,8 @@ import won.protocol.jms.MatcherProtocolCamelConfigurator;
 import won.protocol.jms.NeedBasedCamelConfiguratorImpl;
 import won.protocol.model.MessagingType;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
 import java.net.URI;
 import java.util.Set;
 
@@ -62,6 +64,24 @@ public class MatcherProtocolCamelConfiguratorImpl extends NeedBasedCamelConfigur
     if (getCamelContext().getComponent(brokerComponentName)==null){
       activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri,
                                                                                         MessagingType.Topic);
+      logger.info("adding activemqComponent for brokerUri {} with brokerComponentName {}",brokerUri, brokerComponentName);
+      getCamelContext().addComponent(brokerComponentName,activeMQComponent);
+      try {
+        activeMQComponent.start();
+      } catch (Exception e) {
+        logger.warn("could not start activemq", e);
+      }
+    }
+    brokerComponentMap.put(brokerUri,brokerComponentName);
+  }
+
+  public synchronized void addCamelComponentForWonNodeBrokerForTopics(URI brokerUri,String brokerComponentName, final
+  KeyManager km, final TrustManager tm){
+
+    ActiveMQComponent activeMQComponent;
+    if (getCamelContext().getComponent(brokerComponentName)==null){
+      activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri,
+                                                                                        MessagingType.Topic, km, tm);
       logger.info("adding activemqComponent for brokerUri {} with brokerComponentName {}",brokerUri, brokerComponentName);
       getCamelContext().addComponent(brokerComponentName,activeMQComponent);
       try {
