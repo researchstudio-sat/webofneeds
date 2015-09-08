@@ -9,6 +9,7 @@
   background: white;
 
   .title {
+    font-weight: 300;
     text-align: left;
 
     &.withoutPadding{
@@ -54,6 +55,7 @@
       }
 
       .title{
+        font-weight: 300;
         max-width: 30rem;
         text-align: center;
       }

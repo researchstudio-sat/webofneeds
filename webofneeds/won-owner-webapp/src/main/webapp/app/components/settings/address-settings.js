@@ -53,7 +53,7 @@ function genComponentConf() {
                 </a>
             </div>
             <div class="noaddresses" ng-show="!self.items">
-                <img class="noaddresses__icon" src="generated/icon-sprite.svg#ico36_person"/>
+                <img class="noaddresses__icon" src="generated/icon-sprite.svg#ico36_location_circle_grey"/>
                 <div class="title">You don't use any addresses yet</div>
                 <div class="description">You can specify your default adress to be at hand when posting needs. Adresses can be set individually on create posts page as well.</div>
                 <a class="ac__button clickable">

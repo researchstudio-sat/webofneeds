@@ -16,7 +16,7 @@ function genComponentConf() {
                 </a>
             </div>
 
-            <div class="flexbuttons top">
+            <div class="flexbuttons top" ng-show="self.items">
                 <a class="ac__button clickable">
                     <img src="generated/icon-sprite.svg#ico36_plus" class="ac__button__icon">
                     <span class="ac__button__caption">Create new Avatar</span>
@@ -72,7 +72,7 @@ function genComponentConf() {
                     </div>
                 </div>
             </div>
-            <div class="flexbuttons bottom">
+            <div class="flexbuttons bottom" ng-show="self.items">
                 <button class="won-button--filled red" ng-click="settings.saveAccount()">Save Settings</button>
             </div>`;
 

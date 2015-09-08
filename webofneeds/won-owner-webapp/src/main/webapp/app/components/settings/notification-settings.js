@@ -47,7 +47,7 @@ function genComponentConf() {
                 </a>
             </div>
             <div class="nonotifications" ng-show="!self.items">
-                <img class="nonotifications__icon" src="generated/icon-sprite.svg#ico36_person"/>
+                <img class="nonotifications__icon" src="generated/icon-sprite.svg#ico36_notification_circle_grey"/>
                 <div class="title">You don't use Notification settings yet</div>
                 <div class="description">You can specify your default Notifications to be at hand when posting needs. Notifications can be set individually on create posts page as well.</div>
                 <a class="ac__button clickable">
