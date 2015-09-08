@@ -16,18 +16,14 @@ import java.io.IOException;
  */
 public class AkkaSystemMain
 {
-
   public static void main(String[] args) throws IOException {
 
     AnnotationConfigApplicationContext ctx =
       new AnnotationConfigApplicationContext(AppConfiguration.class);
     ActorSystem system = ctx.getBean(ActorSystem.class);
-
-    // use the Spring Extension to create props for a named actor bean
     ActorRef wonNodeControllerActor = system.actorOf(
       SpringExtension.SpringExtProvider.get(system).props(WonNodeControllerActor.class), "WonNodeControllerActor");
     ActorRef actor = system.actorOf(Props.create(DeadLetterActor.class), "DeadLetterActor");
     system.eventStream().subscribe(actor, DeadLetter.class);
   }
-
 }

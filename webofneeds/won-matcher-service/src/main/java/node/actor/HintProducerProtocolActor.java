@@ -2,6 +2,8 @@ package node.actor;
 
 import akka.camel.CamelMessage;
 import akka.camel.javaapi.UntypedProducerActor;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import common.event.HintEvent;
 import org.apache.jena.riot.Lang;
 import org.springframework.context.annotation.Scope;
@@ -19,6 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Akka camel actor used to send out hints to won nodes
+ *
  * Created by hfriedrich on 27.08.2015.
  */
 @Component
@@ -27,6 +31,7 @@ public class HintProducerProtocolActor extends UntypedProducerActor
 {
   private String endpoint;
   private String localBrokerUri;
+  private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
   public HintProducerProtocolActor(String endpoint, String localBrokerUri) {
     this.endpoint = endpoint;
@@ -38,6 +43,12 @@ public class HintProducerProtocolActor extends UntypedProducerActor
     return endpoint;
   }
 
+  /**
+   * transform hint events to camel messages that can be sent to the won node
+   *
+   * @param message supposed to be a {@link HintEvent}
+   * @return
+   */
   @Override
   public Object onTransformOutgoingMessage(Object message) {
 
@@ -54,9 +65,17 @@ public class HintProducerProtocolActor extends UntypedProducerActor
     WonMessage wonMessage = createHintWonMessage(hint);
     Object body = WonMessageEncoder.encode(wonMessage, Lang.TRIG);
     CamelMessage camelMsg = new CamelMessage(body, headers);
+    log.debug("Send hint camel message {}", hint.getFromNeedUri());
     return camelMsg;
   }
 
+  /**
+   * create a won message out of an hint event
+   *
+   * @param hint
+   * @return
+   * @throws WonMessageBuilderException
+   */
   private WonMessage createHintWonMessage(HintEvent hint)
     throws WonMessageBuilderException {
 

@@ -89,4 +89,9 @@ public class NeedEvent implements Serializable
     return e;
   }
 
+  @Override
+  public String toString() {
+    return "NeedEvent: (" + getWonNodeUri() + ", " + getUri() + ")";
+  }
+
 }

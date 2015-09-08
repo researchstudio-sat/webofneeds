@@ -32,6 +32,7 @@
         <module>won-owner-webapp</module>
         <module>won-matcher</module>
         <module>won-matcher-solr</module>
+        <module>won-matcher-service</module>
         <module>won-matcher-siren</module>
         <module>won-matcher-webapp</module>
         <module>won-ontology-validator</module>

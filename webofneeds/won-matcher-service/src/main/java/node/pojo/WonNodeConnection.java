@@ -4,7 +4,7 @@ import akka.actor.ActorRef;
 import won.protocol.service.WonNodeInfo;
 
 /**
- * Class represents all data needed to connect with a won node and receive need updates
+ * Class represents all data needed to connect with a won node, receive need updates and send hints
  *
  * User: hfriedrich
  * Date: 18.05.2015

@@ -177,6 +177,11 @@ public class WonNodeControllerActor extends UntypedActor
     unhandled(message);
   }
 
+  /**
+   * Send hint event out to won node
+   *
+   * @param hint
+   */
   private void sendHint(HintEvent hint) {
 
     if (!crawlWonNodes.containsKey(hint.getFromWonNodeUri())) {
@@ -188,6 +193,7 @@ public class WonNodeControllerActor extends UntypedActor
     URI eventUri = wonNodeInformationService.generateEventURI(URI.create(hint.getFromWonNodeUri()));
     hint.setGeneratedEventUri(eventUri);
     WonNodeConnection fromWonNodeConnection = crawlWonNodes.get(hint.getFromWonNodeUri());
+    log.debug("Send hint {} to won node {}", hint, hint.getFromWonNodeUri());
     fromWonNodeConnection.getHintProducer().tell(hint, getSelf());
   }
 

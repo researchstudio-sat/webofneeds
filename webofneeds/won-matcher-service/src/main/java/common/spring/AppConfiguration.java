@@ -5,14 +5,14 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import common.config.ClusterConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 /**
- * The application configuration.
+ * The main application configuration.
  */
 @Configuration
 @ImportResource({"classpath:/spring/component/linkeddatasource/linkeddatasource.xml",
@@ -24,12 +24,11 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @ComponentScan({"node", "common", "crawler"})
 public class AppConfiguration
 {
-  @Value("${uri.sparql.endpoint}")
-  private String sparqlEndpointUri;
-
-  // the application context is needed to initialize the Akka Spring Extension
   @Autowired
   private ApplicationContext applicationContext;
+
+  @Autowired
+  private ClusterConfig clusterConfig;
 
   /**
    * Actor system singleton for this application.
@@ -38,13 +37,17 @@ public class AppConfiguration
   public ActorSystem actorSystem() {
 
     // load the Akka configuration
+    String seedNodes = "[\"akka.tcp://" + clusterConfig.getName() + "@" +
+      clusterConfig.getSeedHost() + ":" + clusterConfig.getSeedPort() + "\"]";
+
     final Config applicationConf = ConfigFactory.load();
-    final Config config = ConfigFactory.parseString("akka.remote.netty.tcp.port=" + 2551).
-      withFallback(ConfigFactory.parseString("akka.cluster.roles = [core]")).withFallback(
-      ConfigFactory.load(applicationConf));
+    final Config config = ConfigFactory.parseString("akka.cluster.seed-nodes=" + seedNodes).
+      withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + clusterConfig.getNodeHost())).
+      withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + clusterConfig.getSeedPort())).
+      withFallback(ConfigFactory.parseString("akka.cluster.roles=[core]")).
+      withFallback(ConfigFactory.load(applicationConf));
 
-    ActorSystem system = ActorSystem.create("ClusterSystem", config);
-
+    ActorSystem system = ActorSystem.create(clusterConfig.getName(), config);
     LoggingAdapter log = Logging.getLogger(system, this);
     log.info("Using Akka system settings: " + system.settings().toString());
 
@@ -52,18 +55,6 @@ public class AppConfiguration
     SpringExtension.SpringExtProvider.get(system).initialize(applicationContext);
     return system;
   }
-
-//  @Bean
-//  public CrawlSparqlService getCrawlSparqlService(){
-//    return new CrawlSparqlService(this.sparqlEndpointUri);
-//  }
-
-//  @Bean
-//  public HttpRequestService getHttpRequestService() {
-//    //TODO: add timeouts
-//    // httpRequestService = new HttpRequestService(crawlSettings.HTTP_READ_TIMEOUT, crawlSettings.HTTP_CONNECTION_TIMEOUT);
-//    return new HttpRequestService();
-//  }
 
   //To resolve ${} in @Value
   //found in http://www.mkyong.com/spring/spring-propertysources-example/

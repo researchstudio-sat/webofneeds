@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 /**
+ * Event can hold multiple {@link HintEvent} objects
+ *
  * User: hfriedrich
  * Date: 23.06.2015
  */

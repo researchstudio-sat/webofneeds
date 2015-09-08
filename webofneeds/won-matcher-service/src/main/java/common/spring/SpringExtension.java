@@ -49,10 +49,11 @@ public class SpringExtension extends
     }
 
     /**
-     * Create a Props for the specified actorClass using the
+     * Create a Props for the specified actorClass and additional parameters using the
      * SpringActorProducer class.
      *
      * @param actorClass  class of an actor
+     * @param params additional parameters for actor creation
      * @return a Props that will create the named actor bean using Spring
      */
     public Props props(final Class<? extends Actor> actorClass, Object... params) {

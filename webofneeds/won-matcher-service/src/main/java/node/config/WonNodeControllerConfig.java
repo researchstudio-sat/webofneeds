@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Configuration for the won node controller
+ *
  * Created by hfriedrich on 07.09.2015.
  */
 @Configuration

@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.net.URI;
 
 /**
+ * Event is used to generate hints inside the matcher-service
+ *
  * User: hfriedrich
  * Date: 23.06.2015
  */
@@ -74,5 +76,11 @@ public class HintEvent implements Serializable
     HintEvent e = new HintEvent(fromWonNodeUri, fromNeedUri, toWonNodeUri, toNeedUri, matcherUri, score);
     e.setGeneratedEventUri(this.getGeneratedEventUri());
     return e;
+  }
+
+  @Override
+  public String toString() {
+    return "HintEvent: (" + getFromWonNodeUri() + ", " + getFromNeedUri() + ", " + getToWonNodeUri() + getToNeedUri()
+      + ", " + getMatcherUri() + ", " + getScore() + ")";
   }
 }
