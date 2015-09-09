@@ -24,6 +24,7 @@ import matchesComponent from './components/matches/matches';
 import postVisitorComponent from './components/post-visitor/post-visitor';
 import {camel2Hyphen, hyphen2Camel} from './utils';
 import landingPageComponent from './components/landingpage/landingpage';
+import overviewPostsComponent from './components/overview-posts/overview-posts';
 
 let app = angular.module('won.owner', [
     'ngNewRouter',
@@ -34,7 +35,8 @@ let app = angular.module('won.owner', [
     overviewIncomingRequestsComponent,
     matchesComponent,
     postVisitorComponent,
-    landingPageComponent
+    landingPageComponent,
+    overviewPostsComponent
 ]);
 
 /*
@@ -74,7 +76,7 @@ class AppController {
                 path: '/settings',
                 component: 'settings'
             },
-            {   
+            {
                 path: '/landingpage', 
                 component: 'landingpage'},
             {
@@ -83,9 +85,12 @@ class AppController {
                 as: 'overviewIncomingRequests'
             },
             //{ path: '/overview/matches', component: 'matches'}, //TODO
-            //{ path: '/overview/posts', component: 'posts'}, //TODO
+            {
+                path: '/overview/posts',
+                component: 'overview-posts',
+                as: 'overviewPosts'
+            },
             //{ path: '/overview/feed', component: 'posts'}, //TODO
-
             //TODO database id needs to be send to the client after the create-msg acknowledgment
             { path: '/post/:id/visitor', component: 'post-visitor'},
             { path: '/post/:id/owner/matches', component: 'matches'}

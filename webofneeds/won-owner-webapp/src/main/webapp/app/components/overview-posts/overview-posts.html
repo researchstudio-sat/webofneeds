@@ -1,0 +1,15 @@
+<!-- TODO parametrize by selected tab -->
+<header>
+    <won-topnav></won-topnav>
+    <won-overview-title-bar selection="this['overview-posts'].selection"></won-overview-title-bar>
+</header>
+<main class="overviewpostscontent">
+    <div class="opc__inner">
+        <div class="title clickable">Active Posts<span class="title__counter">{{this['overview-posts'].activePosts.length}}</span></div>
+        <won-post-item-line item="item" ng-repeat="item in this['overview-posts'].activePosts"></won-post-item-line>
+        <div class="title clickable">Drafts<span class="title__counter">{{this['overview-posts'].drafts.length}}</span></div>
+        <won-post-item-line item="item" ng-repeat="item in this['overview-posts'].drafts"></won-post-item-line>
+        <div class="title clickable">Closed<span class="title__counter">{{this['overview-posts'].closedPosts.length}}</span></div>
+        <won-post-item-line item="item" ng-repeat="item in this['overview-posts'].closedPosts"></won-post-item-line>
+    </div>
+</main>

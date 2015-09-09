@@ -1,0 +1,28 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+@import 'flex-layout';
+
+.overviewpostscontent {
+  @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
+
+  .title {
+    font-weight: 300;
+    text-align: left;
+    padding: 0.5rem 0;
+    margin: 0.5rem 0;
+
+    &__counter {
+      padding: 0 0.5rem;
+      font-size: $normalFontSize;
+      color: $won-subtitle-gray;
+    }
+
+
+    &:hover {
+      background: white;
+    }
+  }
+}
+
+@import 'post-item-line';
