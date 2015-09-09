@@ -4,13 +4,17 @@
 @import 'flex-layout';
 
 .overviewpostscontent {
-  @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
+  @include max-content-width(50rem, $minContentPadding, 'opc');
 
   .title {
     font-weight: 300;
     text-align: left;
     padding: 0.5rem 0;
-    margin: 0.5rem 0;
+    margin: 2.5rem 0 0 0;
+
+    &:first-of-type {
+      margin: 0.5rem 0 0 0;
+    }
 
     &__counter {
       padding: 0 0.5rem;

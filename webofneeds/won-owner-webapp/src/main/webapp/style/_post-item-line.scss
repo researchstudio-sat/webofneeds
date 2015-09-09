@@ -1,0 +1,92 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+@import 'flex-layout';
+
+won-post-item-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-top: 0.1rem solid $won-line-gray;
+
+  a {
+    text-decoration: none;
+  }
+
+  .pil__image {
+    @include fixed-square(3rem);
+    margin-right: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &__noimage {
+      color: white;
+      font-size: $bigFontSize;
+    }
+  }
+
+  .pil__description {
+    color: black;
+    flex-grow: 1;
+    padding-right: 1rem;
+
+    &__topline{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+
+      &__title{
+        font-weight: 500;
+      }
+
+      &__creationdate {
+        color: $won-subtitle-gray;
+      }
+    }
+
+    &__subtitle {
+      color: $won-subtitle-gray;
+      display: flex;
+      flex-direction: row;
+
+      &__group {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+
+        &__dash {
+          padding: 0 0.25rem;
+        }
+
+        &__icon {
+          padding-right: 0.25rem;
+          @include carretSized;
+        }
+      }
+    }
+  }
+
+  .pil__indicators {
+    display: flex;
+    flex-direction: row;
+
+    &__item {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      padding-right: 1em;
+
+      &__icon {
+        @include fixed-square($bigiconSize);
+      }
+
+      &__caption {
+        padding-left: 0.5em;
+        min-width: 0.5rem;
+        color: black;
+      }
+    }
+  }
+}
