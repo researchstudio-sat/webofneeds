@@ -7,8 +7,9 @@ import angular from 'angular';
 import overviewTitleBarModule from '../overview-title-bar';
 
 class IncomingRequestsController {
-    constructor() {}
-
+    constructor() {
+        this.selection = 2;
+    }
 }
 
 IncomingRequestsController.$inject = [];
