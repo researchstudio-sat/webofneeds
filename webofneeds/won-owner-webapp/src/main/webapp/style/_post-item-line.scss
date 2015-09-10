@@ -7,7 +7,7 @@ won-post-item-line {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  padding: 1rem 0;
+  padding: 0.5rem 0;
   border-top: 0.1rem solid $won-line-gray;
 
   a {
@@ -15,7 +15,7 @@ won-post-item-line {
   }
 
   .pil__image {
-    @include fixed-square(3rem);
+    @include fixed-square($postIconSize);
     margin-right: 1rem;
     display: flex;
     align-items: center;
@@ -43,11 +43,13 @@ won-post-item-line {
 
       &__creationdate {
         color: $won-subtitle-gray;
+        font-size: $smallFontSize;
       }
     }
 
     &__subtitle {
       color: $won-subtitle-gray;
+      font-size: $smallFontSize;
       display: flex;
       flex-direction: row;
 
@@ -62,7 +64,7 @@ won-post-item-line {
 
         &__icon {
           padding-right: 0.25rem;
-          @include carretSized;
+          @include fixed-square(0.75rem);
         }
       }
     }
