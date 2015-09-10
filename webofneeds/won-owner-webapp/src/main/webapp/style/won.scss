@@ -73,6 +73,7 @@ body {
   &.red { @include button-color(white,$won-red); }
   &.darkgray { @include button-color(white, $won-dark-gray); }
   &.lighterblue { @include button-color(white, $won-lighter-blue); }
+  &.black { @include button-color(white, black); }
 }
 
 input[type=text] {
@@ -103,3 +104,4 @@ input[type=text] {
 @import 'flexgrid';
 @import 'settings';
 @import 'overview-posts';
+@import 'overview-incoming-requests';
