@@ -91,10 +91,10 @@ won-request-item-line {
       align-self: flex-end;
       margin: 0.25rem 0;
       padding: 0.25rem 0.25rem;
-      max-width: 32rem;
+      max-width: 33rem;
       width: 100%;
       position: relative;
-      left: 1.0rem;
+      left: 1rem;
 
       border: 0.1rem solid $won-lighter-gray; //this is necessary so that the view does not "jump" when selecting an item
 

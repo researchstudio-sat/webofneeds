@@ -90,6 +90,8 @@ won-open-request {
     }
 
     &__description {
+      padding-top: 0.25rem;
+
       &__location,
       &__text,
       &__datetime {
@@ -105,3 +107,5 @@ won-open-request {
     }
   }
 }
+
+@import 'extended-gallery';

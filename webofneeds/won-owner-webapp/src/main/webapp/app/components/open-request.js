@@ -1,7 +1,7 @@
 ;
 
 import angular from 'angular';
-import galleryModule from '../components/gallery';
+import extendedGalleryModule from '../components/extended-gallery';
 
 function genComponentConf() {
     let template = `
@@ -21,8 +21,8 @@ function genComponentConf() {
             </div>
         </div>
         <div class="or__content">
-            <div class="or__content__images">
-                <won-gallery></won-gallery>
+            <div class="or__content__images" ng-show="self.item.images">
+                <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.item.images" class="vertical"></won-extended-gallery>
             </div>
             <div class="or__content__description">
                 <div class="or__content__description__location">
@@ -49,7 +49,9 @@ function genComponentConf() {
     `;
 
     class Controller {
-        constructor() { }
+        constructor() {
+            this.maxThumbnails = 11;
+        }
 
         getType(type) {
             switch(type){
@@ -76,7 +78,7 @@ function genComponentConf() {
 }
 
 export default angular.module('won.owner.components.openRequest', [
-    galleryModule
+    extendedGalleryModule
 ])
     .directive('wonOpenRequest', genComponentConf)
     .name;
