@@ -1,3 +1,4 @@
+# This image is build and pushed to the dockerhub manually (webofneeds/bigdata)
 # The bigdata-1.5.2-bundled.jar file has to be copied manually to this folder
 
 # use java as a base image

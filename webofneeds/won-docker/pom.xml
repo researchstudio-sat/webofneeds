@@ -20,6 +20,28 @@
 
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>set-permissions-for-deploy-scripts</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <chmod file="deploy_int.sh" perm="777"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.6</version>
