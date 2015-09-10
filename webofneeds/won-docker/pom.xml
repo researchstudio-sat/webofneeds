@@ -167,6 +167,43 @@
                             </resources>
                         </configuration>
                     </execution>
+
+                    <!-- copy matcher siren resources -->
+                    <execution>
+                        <id>copy-matcher-siren-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>${project.basedir}/matcher-siren</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/won-matcher-siren/target</directory>
+                                    <includes>
+                                        <include>won-matcher-siren.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-matcher-siren-conf</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>${project.basedir}/matcher-siren/conf</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/conf</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

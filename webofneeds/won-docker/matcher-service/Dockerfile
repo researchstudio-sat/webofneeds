@@ -14,4 +14,4 @@ ADD ./conf ${WON_CONFIG_DIR}
 
 # start matcher service
 WORKDIR /usr/src/matcher-service/
-CMD java -Dconfig.file=${WON_CONFIG_DIR}/application.conf -DWON_CONFIG_DIR=${WON_CONFIG_DIR} -Dlogback.configurationFile=${WON_CONFIG_DIR}/${LOGBACK_CONFIG} -jar won-matcher-service.jar
+CMD java -Dconfig.file=${WON_CONFIG_DIR}/matcher-service/application.conf -DWON_CONFIG_DIR=${WON_CONFIG_DIR}/matcher-service/ -Dlogback.configurationFile=${WON_CONFIG_DIR}/${LOGBACK_CONFIG} -jar won-matcher-service.jar

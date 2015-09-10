@@ -5,13 +5,13 @@
 FROM java:8
 
 # add webofneeds default config env variables
-ENV WON_CONFIG_DIR=/usr/src/matcher-service/conf
+ENV WON_CONFIG_DIR=/usr/src/matcher-siren/conf
 ENV LOGBACK_CONFIG=logback_info.xml
 
 # add the jar and the conf directory
-ADD ./won-matcher-service.jar /usr/src/matcher-service/
+ADD ./won-matcher-siren.jar /usr/src/matcher-siren/
 ADD ./conf ${WON_CONFIG_DIR}
 
-# start matcher service
-WORKDIR /usr/src/matcher-service/
-CMD java -Dconfig.file=${WON_CONFIG_DIR}/application.conf -DWON_CONFIG_DIR=${WON_CONFIG_DIR} -Dlogback.configurationFile=${WON_CONFIG_DIR}/${LOGBACK_CONFIG} -jar won-matcher-siren.jar
+# start siren matcher
+WORKDIR /usr/src/matcher-siren/
+CMD java -Dconfig.file=${WON_CONFIG_DIR}/matcher-siren/application.conf -DWON_CONFIG_DIR=${WON_CONFIG_DIR}/matcher-siren -Dlogback.configurationFile=${WON_CONFIG_DIR}/${LOGBACK_CONFIG} -jar won-matcher-siren.jar

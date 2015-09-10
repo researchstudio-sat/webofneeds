@@ -1,15 +1,12 @@
-package main.java;
 
-import actor.DummyHintReceiverActor;
 import actor.SirenMatcherActor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import akka.actor.DeadLetter;
 import akka.actor.Props;
-import com.hp.hpl.jena.query.Dataset;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import common.event.NeedEvent;
-import common.service.HttpRequestService;
+import common.actor.DeadLetterActor;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import spring.MatcherSirenAppConfiguration;
 
 import java.io.IOException;
 
@@ -21,13 +18,11 @@ public class AkkaSirenMain
 
   public static void main(String[] args) throws IOException {
 
-    // init basic Akka
-    //Config config = ConfigFactory.load();
-    final Config config = ConfigFactory.parseString("akka.remote.netty.tcp.port=" + 0).
-      withFallback(ConfigFactory.parseString("akka.cluster.roles = [matcher]")).
-                                         withFallback(ConfigFactory.load());
-    ActorSystem system = ActorSystem.create("ClusterSystem", config);
+    AnnotationConfigApplicationContext ctx =
+      new AnnotationConfigApplicationContext(MatcherSirenAppConfiguration.class);
+    ActorSystem system = ctx.getBean(ActorSystem.class);
     ActorRef matcherActor = system.actorOf(Props.create(SirenMatcherActor.class), "SirenMatcherActor");
-
+    ActorRef actor = system.actorOf(Props.create(DeadLetterActor.class), "DeadLetterActor");
+    system.eventStream().subscribe(actor, DeadLetter.class);
   }
 }

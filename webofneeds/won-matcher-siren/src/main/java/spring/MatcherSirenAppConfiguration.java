@@ -1,4 +1,4 @@
-package common.spring;
+package spring;
 
 import akka.actor.ActorSystem;
 import akka.event.Logging;
@@ -6,23 +6,23 @@ import akka.event.LoggingAdapter;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import common.config.ClusterConfig;
+import common.spring.SpringExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 /**
  * The main application configuration.
  */
 @Configuration
-@ImportResource({"classpath:/spring/component/linkeddatasource/linkeddatasource.xml",
-  "classpath:/spring/component/wonNodeInformationService.xml",
-  "classpath:/spring/component/ehcache/spring-node-ehcache.xml",
-  "classpath:/spring/component/services/matcher-services.xml",
-                 "classpath:spring/component/camel/matcher-camel.xml"})
-@PropertySource("file:${WON_CONFIG_DIR}/matcher-service.properties")
-@ComponentScan({"node", "common", "crawler"})
-public class AppConfiguration
+@PropertySource({"file:${WON_CONFIG_DIR}/matcher-siren.properties",
+                 "file:${WON_CONFIG_DIR}/cluster-node.properties"})
+@ComponentScan({"spring", "common.config"})
+public class MatcherSirenAppConfiguration
 {
   @Autowired
   private ApplicationContext applicationContext;
@@ -42,9 +42,10 @@ public class AppConfiguration
 
     final Config applicationConf = ConfigFactory.load();
     final Config config = ConfigFactory.parseString("akka.cluster.seed-nodes=" + seedNodes).
+      withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.bind-port=" + clusterConfig.getLocalPort())).
       withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + clusterConfig.getNodeHost())).
-      withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + clusterConfig.getSeedPort())).
-      withFallback(ConfigFactory.parseString("akka.cluster.roles=[core]")).
+      withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + clusterConfig.getLocalPort())).
+      withFallback(ConfigFactory.parseString("akka.cluster.roles=[matcher]")).
       withFallback(ConfigFactory.load(applicationConf));
 
     ActorSystem system = ActorSystem.create(clusterConfig.getName(), config);

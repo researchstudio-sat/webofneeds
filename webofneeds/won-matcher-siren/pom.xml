@@ -26,32 +26,26 @@
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor_2.11</artifactId>
-            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-slf4j_2.11</artifactId>
-            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-camel_2.11</artifactId>
-            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-cluster_2.11</artifactId>
-            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-remote_2.11</artifactId>
-            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-cluster-tools_2.11</artifactId>
-            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
@@ -70,5 +64,44 @@
             <artifactId>logback-core</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <finalName>won-matcher-siren</finalName>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <artifactSet>
+                                <includes>
+                                    <include>*:*</include>
+                                </includes>
+                            </artifactSet>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>reference.conf</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>AkkaSirenMain</mainClass>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.handlers</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.schemas</resource>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

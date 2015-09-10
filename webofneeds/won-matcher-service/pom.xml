@@ -19,39 +19,28 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>webofneeds</groupId>
-            <artifactId>won-matcher</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor_2.11</artifactId>
-            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-slf4j_2.11</artifactId>
-            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-camel_2.11</artifactId>
-            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-cluster_2.11</artifactId>
-            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-remote_2.11</artifactId>
-            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-cluster-tools_2.11</artifactId>
-            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>

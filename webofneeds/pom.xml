@@ -653,6 +653,40 @@
                 <groupId>org.apache.solr</groupId>
                 <version>${solr.version}</version>
             </dependency>
+
+            <!--Akka-->
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-actor_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-slf4j_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-camel_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-cluster_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-remote_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-cluster-tools_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 
