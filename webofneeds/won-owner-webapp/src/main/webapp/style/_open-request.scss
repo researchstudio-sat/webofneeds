@@ -1,0 +1,107 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+@import 'flex-layout';
+
+won-open-request {
+  display: block;
+  width: 100%;
+
+  .or__header {
+    display: flex;
+    padding: 0.5rem;
+    border-bottom: 0.1rem solid $won-line-gray;
+
+    &__icon {
+      @include fixed-square($postIconSize);
+      padding-right: 0.5rem;
+    }
+
+    &__title {
+      color: black;
+      flex-grow: 1;
+      padding-right: 1rem;
+
+      &__topline{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+
+        &__title{
+          font-weight: 500;
+        }
+
+        &__date{
+          font-size: $smallFontSize;
+          color: $won-subtitle-gray;
+        }
+      }
+
+      &__subtitle {
+        color: $won-subtitle-gray;
+        display: flex;
+        flex-direction: row;
+        font-size: $smallFontSize;
+
+        &__group {
+          display: flex;
+          align-items: center;
+          flex-direction: row;
+
+          &__dash {
+            padding: 0 0.25rem;
+          }
+
+          &__icon {
+            padding-right: 0.25rem;
+            @include fixed-square(0.75rem);
+          }
+        }
+      }
+    }
+  }
+
+  .or__footer {
+    margin: 0 1rem;
+    padding: 1rem 0;
+    border-top: 0.1rem solid $won-line-gray;
+
+
+    input {
+      width: 100%;
+    }
+
+    .flexbuttons {
+      text-align: right;
+      padding-top: 1rem;
+
+      button {
+        margin-left: 0.5rem;
+      }
+    }
+  }
+
+  .or__content {
+    padding: 1rem;
+    font-size: $smallFontSize;
+
+    &__images {
+
+    }
+
+    &__description {
+      &__location,
+      &__text,
+      &__datetime {
+        display: flex;
+        flex-direction: row;
+        padding: 0.25rem 0;
+      }
+
+      &__indicator {
+        @include fixed-square(1rem);
+        padding-right: 0.5rem;
+      }
+    }
+  }
+}
