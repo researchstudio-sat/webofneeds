@@ -14,18 +14,7 @@ won-post-item-line {
     text-decoration: none;
   }
 
-  .pil__image {
-    @include fixed-square($postIconSize);
-    margin-right: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &__noimage {
-      color: white;
-      font-size: $bigFontSize;
-    }
-  }
+  @include square-image($postIconSize);
 
   .pil__description {
     color: black;

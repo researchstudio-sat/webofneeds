@@ -20,18 +20,8 @@ won-feed-item {
       text-decoration: none;
     }
 
-    &__image {
-      @include fixed-square($feedIconSize);
-      margin-right: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
 
-      &__noimage {
-        color: white;
-        font-size: $bigFontSize;
-      }
-    }
+    @include square-image($feedIconSize);
 
     &__description {
       color: black;
@@ -88,18 +78,7 @@ won-feed-item {
       padding: 0.5rem;
       max-width: 33rem;
 
-      &__image {
-        @include fixed-square($postIconSize);
-        margin-right: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        &__noimage {
-          color: white;
-          font-size: $bigFontSize;
-        }
-      }
+      @include square-image($postIconSize);
 
       &__description {
         color: black;

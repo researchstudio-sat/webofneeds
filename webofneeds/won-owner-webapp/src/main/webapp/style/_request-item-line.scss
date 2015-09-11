@@ -17,18 +17,7 @@ won-request-item-line {
       text-decoration: none;
     }
 
-    .ril__image {
-      @include fixed-square($postIconSize);
-      margin-right: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      &__noimage {
-        color: white;
-        font-size: $bigFontSize;
-      }
-    }
+    @include square-image($postIconSize);
 
     .ril__description {
       color: black;
@@ -107,18 +96,7 @@ won-request-item-line {
         border-right: 0.1rem solid $won-lighter-gray;
       }
 
-      &__image {
-        @include fixed-square($postIconSize);
-        margin-right: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        &__noimage {
-          color: white;
-          font-size: $bigFontSize;
-        }
-      }
+      @include square-image($postIconSize);
 
       &__description {
         color: black;
