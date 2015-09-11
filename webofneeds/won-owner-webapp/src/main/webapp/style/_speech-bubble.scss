@@ -10,10 +10,7 @@
  */
 @mixin speech-bubble-top($background-color, $border-color, $triangle-size, $hpos) {
   background-color: $background-color;
-  border: 1px solid $border-color;
   position: relative; // to allow positioning the triangle-parts as absolute
-
-  $triangleSize: 16px;
 
   &:before, &:after {
 
@@ -27,7 +24,7 @@
 
     border-style: solid;
     //background-color: maroon;
-    border-width: 0px $triangleSize $triangle-size;
+    border-width: 0 $triangle-size $triangle-size;
   }
   &:before {
     // border
