@@ -50,7 +50,7 @@ function genComponentConf() {
 
     class Controller {
         constructor() {
-            this.maxThumbnails = 11;
+            this.maxThumbnails = 9;
         }
 
         getType(type) {

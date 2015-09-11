@@ -17,16 +17,18 @@
 
 won-extended-gallery {
   &.vertical {
-    min-height: 12.5rem;
-    max-height: 19rem;
-
     display: flex;
     flex-direction: row;
+
+    .eg__selected {
+      max-height: 16rem;
+    }
 
     .eg__thumbs {
       flex-wrap: wrap;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      flex: 0 0 6.5rem;
 
       &__more,
       &__frame{
