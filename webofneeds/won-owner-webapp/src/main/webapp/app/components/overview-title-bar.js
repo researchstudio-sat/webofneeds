@@ -10,7 +10,7 @@ function genComponentConf() {
         <nav ng-cloak ng-show="{{true}}" class="main-tab-bar">
             <div class="mtb__inner">
                 <ul class="mtb__inner__center mtb__tabs">
-                    <li ng-class="self.selection == 0? 'mtb__tabs__selected' : ''"><a href="#">Feed</a></li>
+                    <li ng-class="self.selection == 0? 'mtb__tabs__selected' : ''"><a ng-link="feed">Feed</a></li>
                     <li ng-class="self.selection == 1? 'mtb__tabs__selected' : ''"><a ng-link="overviewPosts" href="#">Posts
                         <span class="mtb__tabs__unread">5</span>
                     </a></li>

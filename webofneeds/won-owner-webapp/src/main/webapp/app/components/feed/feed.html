@@ -1,0 +1,10 @@
+<header>
+    <won-topnav></won-topnav>
+    <won-overview-title-bar selection="feed.selection"></won-overview-title-bar>
+</header>
+<main class="feedcontent">
+    <div class="fc__inner">
+        <div class="title">Recent activities</div>
+        <won-feed-item item="item" ng-repeat="item in feed.items"></won-feed-item>
+    </div>
+</main>
