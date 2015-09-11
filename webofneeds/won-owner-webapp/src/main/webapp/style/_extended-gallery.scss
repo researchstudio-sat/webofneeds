@@ -14,14 +14,13 @@
   }
 }
 
-
 won-extended-gallery {
   &.vertical {
     display: flex;
     flex-direction: row;
 
     .eg__selected {
-      max-height: 16rem;
+      max-height: 15rem;
     }
 
     .eg__thumbs {
@@ -57,17 +56,14 @@ won-extended-gallery {
   }
 
   .eg__selected {
-    flex-grow: 32;
+    flex-grow: 1;
     @extend %won-extended-gallery__frame;
   }
 
   .eg__thumbs {
-    flex-grow: 5;
-
     &__frame {
       @extend %won-extended-gallery__frame;
 
-      //4 images, 3 gaps in between (ignoring the 1px borders for now)
       width: $postIconSize;
       height: $postIconSize;
     }
