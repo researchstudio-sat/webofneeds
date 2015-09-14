@@ -9,7 +9,7 @@ var svgSprite = require('gulp-svg-sprite');
 var sassImportOnce = require('node-sass-import-once');
 
 gulp.task('default', ['sass', 'iconsprite']);
-gulp.task('watch', function() {
+gulp.task('watch', ['sass', 'iconsprite'], function() {
     gulp.watch('./style/**/*.scss', ['sass']);
     gulp.watch('./style/**/_*.scss', ['sass']);
     gulp.watch('./images/won-icons/**/*.svg', ['iconsprite']);
