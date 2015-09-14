@@ -24,7 +24,8 @@ public class HttpRequestService
 {
   private final Logger log = LoggerFactory.getLogger(getClass());
   private RestTemplate restTemplate;
-  private HttpEntity entity;
+  private HttpEntity<Dataset> dataSetEntity;
+  private HttpHeaders jsonHeaders;
 
   public HttpRequestService() {
 
@@ -45,9 +46,12 @@ public class HttpRequestService
     HttpMessageConverter datasetConverter = new RdfDatasetConverter();
     restTemplate = new RestTemplate(factory);
     restTemplate.getMessageConverters().add(datasetConverter);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setAccept(datasetConverter.getSupportedMediaTypes());
-    entity = new HttpEntity(headers);
+    HttpHeaders dataSetHeaders = new HttpHeaders();
+    dataSetHeaders.setAccept(datasetConverter.getSupportedMediaTypes());
+    dataSetEntity = new HttpEntity(dataSetHeaders);
+    jsonHeaders = new HttpHeaders();
+    jsonHeaders.add("Content-Type", "application/json");
+    jsonHeaders.add("Accept", "*/*");
   }
 
   /**
@@ -61,7 +65,7 @@ public class HttpRequestService
 
     ResponseEntity<Dataset> response = null;
     log.debug("Request URI: {}", uri);
-    response = restTemplate.exchange(uri, HttpMethod.GET, entity, Dataset.class);
+    response = restTemplate.exchange(uri, HttpMethod.GET, dataSetEntity, Dataset.class);
 
     if (response.getStatusCode() != HttpStatus.OK) {
       log.warn("HTTP GET request returned status code: {}", response.getStatusCode());
@@ -69,5 +73,18 @@ public class HttpRequestService
     }
 
     return response.getBody();
+  }
+
+  public void postRequest(String uri, String body) {
+
+    ResponseEntity<String> response = null;
+    log.debug("POST URI: {}", uri);
+    HttpEntity<String> jsonEntity = new HttpEntity(body, jsonHeaders);
+    response = restTemplate.exchange(uri, HttpMethod.POST, jsonEntity, String.class);
+
+    if (response.getStatusCode() != HttpStatus.OK) {
+      log.warn("HTTP POST request returned status code: {}", response.getStatusCode());
+      throw new HttpClientErrorException(response.getStatusCode());
+    }
   }
 }
