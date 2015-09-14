@@ -29,6 +29,7 @@
       "angular-mocks": "github:angular/bower-angular-mocks@1.4.2",
       "angular-new-router": "npm:angular-new-router@^0.5.3",
       "angular-route": "github:angular/bower-angular-route@1.4.2",
+      "angular-sanitize": "github:angular/bower-angular-sanitize@^1.4.5",
       "angular-ui-utils": "github:angular-ui/ui-utils@2.0.0",
       "bootstrap": "github:twbs/bootstrap@3.3.5",
       "font-awesome": "bower:font-awesome@4.3.0",

@@ -10,17 +10,11 @@
  * @param eventData
  */
 export function broadcastEvent(scopeAndElem, eventName, eventData) {
+    const payload = {'detail': eventData};
     if(scopeAndElem.$scope) {
-        scopeAndElem.$scope.$broadcast(eventName, eventData);
-    }
-    if(scopeAndElem.$element && scopeAndElem.$element[0]) {
-        let event = undefined;
-        if(eventData) {
-            event = new CustomEvent(eventName, {'detail': eventData});
-        } else {
-            event = new Event(eventName);
-        }
-        scopeAndElem.$element[0].dispatchEvent( event );
+        //scopeAndElem.$scope.$broadcast(eventName, eventData);
+        scopeAndElem.$scope.$broadcast(eventName, payload);
 
+        console.log('broadcasting');
     }
 }

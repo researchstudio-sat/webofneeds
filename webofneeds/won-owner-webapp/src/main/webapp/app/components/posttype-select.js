@@ -5,7 +5,7 @@
 ;
 
 import angular from 'angular';
-import {broadcastEvent} from '../cstm-ng-utils';
+import { dispatchEvent, attach } from '../utils';
 
 function genComponentConf() {
     /*
@@ -29,16 +29,12 @@ function genComponentConf() {
         </dl>
     `
 
+    const serviceDependencies = ['$scope', '$element'/*injections as strings here*/];
     class Controller {
-        constructor($scope, $element) {
+        constructor(/* arguments <- serviceDependencies */) {
+            attach(this, serviceDependencies, arguments);
             this.selectedIdx = undefined;
             this.selectedHelp = undefined;
-            this.$scope = $scope;
-            this.$element = $element;
-
-            //TODO debug; deleteme
-            window.ptctrl = this;
-            console.log('posttype-select.js : in ctrl', this, $element)
         }
         /*
          * sets selection to that item or entirely unsets it if type-select was already collapsed.
@@ -48,11 +44,17 @@ function genComponentConf() {
                 this.selectedIdx = idx;
                 this.selectedHelp = undefined;
                 this.onSelect({idx: idx});
-                broadcastEvent(this, 'selected-type', { idx });
+
+                //this.$scope.$emit('select-type', { idx });
+                dispatchEvent(this.$element[0], 'select-type', { idx });
             } else {
+
                 this.selectedIdx = undefined;
                 this.onUnselect();
-                broadcastEvent(this, 'unselected-type');
+
+                //this.$scope.$emit('unselect-type');
+                dispatchEvent(this.$element[0], 'unselect-type');
+
             }
             //TODO initialise from draft
         }
@@ -74,7 +76,7 @@ function genComponentConf() {
             return !isNaN(this.selectedHelp) && this.selectedHelp === idx;
         }
     }
-    Controller.$inject = ['$scope', '$element'/*injections as strings here*/];
+    Controller.$inject = serviceDependencies;
 
     return {
         restrict: 'E',

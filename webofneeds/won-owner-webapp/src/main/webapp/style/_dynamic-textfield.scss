@@ -1,0 +1,33 @@
+won-dynamic-textfield {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  .wdt__text {
+    align-self: stretch;
+    border: 1px solid $won-line-gray;
+    border-radius: 0.1rem;
+    background-color: white;
+
+    $padding: 0.3rem;
+    padding: $padding;
+    $contentSize: 1rem;
+    font-size: $contentSize;
+    min-height: $contentSize + 2 * $padding;
+
+    &.wdt__text--invalid {
+      border-color: $won-red;
+    }
+    &.wdt__text--placeholder {
+      color: $won-line-gray;
+    }
+
+    &:focus {
+      color: black;
+    }
+  }
+  .wdt__charcount {
+    @include fine-print;
+    margin-top: $smallFontSize * 0.5;
+  }
+}

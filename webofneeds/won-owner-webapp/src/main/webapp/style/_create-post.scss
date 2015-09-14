@@ -1,5 +1,6 @@
 @import 'won-config';
 @import 'text';
+@import 'dynamic-textfield';
 .create-post {
   //@include flex-column;
   //max-width: 20rem;
@@ -42,34 +43,9 @@
       margin-right: $minContentPadding;
       margin-bottom: $minContentPadding;
     }
-    .cp__m__title {
+    won-dynamic-textfield {
       flex-grow: 1;
       flex-basis: 10rem;
-
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-
-      .cp__m__t__shortdescription {
-        align-self: stretch;
-        @extend .dynamic-textarea;
-      }
-      .cp__m__t__charcount {
-        @include fine-print;
-        margin-top: $smallFontSize * 0.5;
-      }
     }
-  }
-}
-
-.dynamic-textarea {
-  border: 1px solid $won-line-gray;
-  color: $won-line-gray;
-  border-radius: 0.1rem;
-  padding: 0.3rem;
-  background-color: white;
-
-  &:focus {
-    color: black;
   }
 }

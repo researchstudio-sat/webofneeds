@@ -21,6 +21,7 @@ System.config({
     "angular-mocks": "github:angular/bower-angular-mocks@1.4.2",
     "angular-new-router": "npm:angular-new-router@0.5.3",
     "angular-route": "github:angular/bower-angular-route@1.4.2",
+    "angular-sanitize": "github:angular/bower-angular-sanitize@1.4.5",
     "angular-ui-utils": "github:angular-ui/ui-utils@2.0.0",
     "babel": "npm:babel-core@5.6.15",
     "babel-runtime": "npm:babel-runtime@5.6.15",
@@ -51,6 +52,9 @@ System.config({
       "angular": "github:angular/bower-angular@1.4.2"
     },
     "github:angular/bower-angular-route@1.4.2": {
+      "angular": "github:angular/bower-angular@1.4.2"
+    },
+    "github:angular/bower-angular-sanitize@1.4.5": {
       "angular": "github:angular/bower-angular@1.4.2"
     },
     "github:jspm/nodelibs-assert@0.1.0": {
