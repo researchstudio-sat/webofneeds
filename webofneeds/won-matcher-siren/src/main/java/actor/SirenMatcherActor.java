@@ -9,6 +9,10 @@ import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
 import common.event.HintEvent;
 import common.event.NeedEvent;
+import config.SirenMatcherConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,20 +20,24 @@ import java.util.List;
 /**
  * Created by hfriedrich on 24.08.2015.
  */
+@Component
+@Scope("prototype")
 public class SirenMatcherActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private ActorRef pubSubMediator;
+  private List<NeedEvent> needs = new LinkedList<>();
 
-  private List<NeedEvent> needs;
+  @Autowired
+  private SirenMatcherConfig config;
 
-  public SirenMatcherActor() {
+
+  @Override
+  public void preStart() {
 
     // subscribe to need events
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
     pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(NeedEvent.class.getName(), getSelf()), getSelf());
-
-    needs = new LinkedList<>();
   }
 
   @Override
