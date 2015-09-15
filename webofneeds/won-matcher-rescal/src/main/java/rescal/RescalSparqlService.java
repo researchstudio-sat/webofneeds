@@ -43,9 +43,10 @@ public class RescalSparqlService extends CrawlSparqlService
 
     // retrieve relevant properties of all needs that match the conditions
     log.info("bulk load need data from sparql endpoint in crawlDate range: [{},{}]", fromCrawlDate, toCrawlDate);
-    String queryTemplate = "\nSELECT ?needUri ?type ?title ?desc ?tags WHERE { " +
+    String queryTemplate = "\nSELECT ?needUri ?type ?wonNodeUri ?title ?desc ?tags WHERE { " +
       " ?needUri <%s> <%s>. ?needUri <%s> '%s'. ?needUri <%s> ?date. " +
       " ?needUri <%s> <%s>. ?needUri <%s> ?type. ?needUri <%s> ?title." +
+      " ?needUri <%s> ?wonNodeUri." +
       " OPTIONAL {?needUri <%s> ?desc}. " + "OPTIONAL {?needUri <%s> ?tags}. " +
       " FILTER (?date >= %d && ?date < %d ) }\n";
 
@@ -53,6 +54,7 @@ public class RescalSparqlService extends CrawlSparqlService
       queryTemplate, RDF.type, WON.NEED, CrawlSparqlService.CRAWL_STATUS_PREDICATE, CrawlUriMessage.STATUS.DONE,
       CrawlSparqlService.CRAWL_DATE_PREDICATE, WON.IS_IN_STATE, WON.NEED_STATE_ACTIVE,
       WON.HAS_BASIC_NEED_TYPE, WON.HAS_CONTENT.toString() + ">/<" + DC.title.toString(),
+      WON.HAS_WON_NODE,
       WON.HAS_CONTENT.toString() + ">/<" + WON.HAS_TEXT_DESCRIPTION.toString(),
       WON.HAS_CONTENT.toString() + ">/<" + WON.HAS_TAG.toString(), fromCrawlDate, toCrawlDate);
 
@@ -70,27 +72,31 @@ public class RescalSparqlService extends CrawlSparqlService
       // add the needs with its attributes to the rescal matching data object
       numNeeds++;
       QuerySolution qs = results.nextSolution();
-      String uri = qs.get("needUri").asResource().getURI();
+      String needUri = qs.get("needUri").asResource().getURI();
       String type = qs.get("type").asResource().getURI();
 
       // need type
-      matchingData.addNeedType(uri, type);
+      matchingData.addNeedType(needUri, type);
       numAttributes++;
 
       // title
       String title = qs.get("title").asLiteral().getString();
       String[] titleTokens = preprocessing.extractWordTokens(title);
       for (String token : titleTokens) {
-        matchingData.addNeedAttribute(uri, token, RescalMatchingData.SliceType.TITLE);
+        matchingData.addNeedAttribute(needUri, token, RescalMatchingData.SliceType.TITLE);
         numAttributes++;
       }
+
+      // won node of need
+      String wonNodeUri = qs.get("wonNodeUri").asResource().getURI();
+      matchingData.setWonNodeOfNeed(needUri, wonNodeUri);
 
       // description
       if (qs.get("desc") != null) {
         String desc = qs.get("desc").asLiteral().getString();
         String[] descTokens = preprocessing.extractRelevantWordTokens(desc);
         for (String token : descTokens) {
-          matchingData.addNeedAttribute(uri, token, RescalMatchingData.SliceType.DESCRIPTION);
+          matchingData.addNeedAttribute(needUri, token, RescalMatchingData.SliceType.DESCRIPTION);
           numAttributes++;
         }
       }
@@ -100,7 +106,7 @@ public class RescalSparqlService extends CrawlSparqlService
         String tags = qs.get("tags").asLiteral().getString();
         String[] tagTokens = preprocessing.extractWordTokens(tags);
         for (String token : tagTokens) {
-          matchingData.addNeedAttribute(uri, token, RescalMatchingData.SliceType.TAG);
+          matchingData.addNeedAttribute(needUri, token, RescalMatchingData.SliceType.TAG);
           numAttributes++;
         }
       }

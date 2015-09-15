@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class HintReader
 {
 
-  public static BulkHintEvent readHints(String folder) throws IOException {
+  public static BulkHintEvent readHints(String folder, RescalMatchingData matchingData) throws IOException {
 
     // read the header file
     ArrayList<String> needHeaders = new ArrayList<>();
@@ -57,7 +57,7 @@ public class HintReader
     SparseMatrix hintMatrix = SparseMatrix.fromMatrixMarket(hintMatrixString);
 
     // create the hint events and return them in one bulk hint object
-    BulkHintEventMatrixProcedure hintProcedure = new BulkHintEventMatrixProcedure(needHeaders);
+    BulkHintEventMatrixProcedure hintProcedure = new BulkHintEventMatrixProcedure(needHeaders, matchingData);
     hintMatrix.eachNonZero(hintProcedure);
     return hintProcedure.getBulkHintEvent();
   }
@@ -66,10 +66,12 @@ public class HintReader
   {
     private BulkHintEvent hints;
     private ArrayList<String> needUris;
+    private RescalMatchingData matchingData;
 
-    public BulkHintEventMatrixProcedure(ArrayList<String> needUris) {
+    public BulkHintEventMatrixProcedure(ArrayList<String> needUris, RescalMatchingData matchingData) {
       hints = new BulkHintEvent();
       this.needUris = needUris;
+      this.matchingData = matchingData;
     }
 
     @Override
@@ -78,7 +80,11 @@ public class HintReader
       String needUri1 = needUris.get(i);
       String needUri2 = needUris.get(j);
       if (needUri1 != null && needUri2 != null) {
-        HintEvent hint = new HintEvent(needUri1, needUri2, value);
+
+        String fromWonNodeUri = matchingData.getWonNodeOfNeed(needUri1);
+        String toWonNodeUri = matchingData.getWonNodeOfNeed(needUri2);
+        HintEvent hint = new HintEvent(fromWonNodeUri, needUri1, toWonNodeUri,
+                                       needUri2, "http://rescalmatcher", value);
         hints.addHintEvent(hint);
       }
     }

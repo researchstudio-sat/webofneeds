@@ -1,13 +1,16 @@
 package actor;
 
+import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import common.config.CommonSettings;
-import common.config.CommonSettingsImpl;
 import common.event.BulkHintEvent;
-import config.RescalMatcherSettings;
-import config.RescalMatcherSettingsImpl;
+import config.RescalMatcherConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import rescal.HintReader;
 import rescal.RescalMatchingData;
 import rescal.RescalSparqlService;
@@ -25,31 +28,33 @@ import java.io.InputStreamReader;
  *
  * Created by hfriedrich on 02.07.2015.
  */
+@Component
+@Scope("prototype")
 public class RescalMatcherActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-  private long lastQueryDate;
+  private long lastQueryDate = Long.MIN_VALUE;
   private RescalSparqlService sparqlService;
-  private RescalMatchingData rescalInputData;
-  private CommonSettingsImpl settings;
-  private RescalMatcherSettingsImpl rescalSettings;
+  private RescalMatchingData rescalInputData = new RescalMatchingData();
   private static final String TICK = "tick";
+  private ActorRef pubSubMediator;
 
-  public RescalMatcherActor() throws IOException {
+  @Autowired
+  private RescalMatcherConfig config;
 
-    settings = CommonSettings.SettingsProvider.get(getContext().system());
-    rescalSettings = RescalMatcherSettings.SettingsProvider.get(getContext().system());
-    sparqlService = new RescalSparqlService(settings.SPARQL_ENDPOINT, rescalSettings.NLP_RESOURCE_DIRECTORY);
-    lastQueryDate = Long.MIN_VALUE;
-    rescalInputData = new RescalMatchingData();
-  }
 
   @Override
-  public void preStart() {
+  public void preStart() throws IOException {
+
+    // init sparql service
+    sparqlService = new RescalSparqlService(config.getSparqlEndpoint(), config.getNlpResourceDirectory());
+
+    // subscribe to need events
+    pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
 
     // Execute the rescal algorithm regularly
     getContext().system().scheduler().schedule(
-      FiniteDuration.Zero(), rescalSettings.EXECUTION_DURATION, getSelf(), TICK, getContext().dispatcher(), null);
+      FiniteDuration.Zero(), config.getExecutionDuration(), getSelf(), TICK, getContext().dispatcher(), null);
   }
 
   @Override
@@ -72,25 +77,20 @@ public class RescalMatcherActor extends UntypedActor
    */
   private void executeRescalAlgorithm() throws IOException, InterruptedException {
 
-    BulkHintEvent e = HintReader.readHints(rescalSettings.EXECUTION_DIRECTORY);
-    getContext().system().eventStream().publish(e);
-
-
-
     // load the needs and connections from the rdf store
     long queryDate = System.currentTimeMillis();
-    log.info("query needs and connections from rdf store '{}' from date '{}' to date '{}'", settings.SPARQL_ENDPOINT,
+    log.info("query needs and connections from rdf store '{}' from date '{}' to date '{}'", config.getSparqlEndpoint(),
              lastQueryDate, queryDate);
     sparqlService.updateMatchingDataWithActiveNeeds(rescalInputData, lastQueryDate, queryDate);
     sparqlService.updateMatchingDataWithConnections(rescalInputData, lastQueryDate, queryDate);
 
     // write the files for rescal algorithm
-    log.info("write rescal input data to folder: {}", rescalSettings.EXECUTION_DIRECTORY);
-    rescalInputData.writeCleanedOutputFiles(rescalSettings.EXECUTION_DIRECTORY);
+    log.info("write rescal input data to folder: {}", config.getExecutionDirectory());
+    rescalInputData.writeCleanedOutputFiles(config.getExecutionDirectory());
 
     // execute the rescal algorithm in python
-    String pythonCall = "python " + rescalSettings.PYTHON_SCRIPT_DIRECTORY + "/rescal-matcher.py -folder \"" +
-      rescalSettings.EXECUTION_DIRECTORY + "\" -rank " + rescalSettings.RANK + "-threshold " + rescalSettings.THRESHOLD;
+    String pythonCall = "python " + config.getPythonScriptDirectory() + "/rescal-matcher.py -folder \"" +
+      config.getExecutionDirectory() + "\" -rank " + config.getRescalRank() + " -threshold " + config.getRescalThreshold();
     log.info("execute python script: " + pythonCall);
     Process pythonProcess = Runtime.getRuntime().exec(pythonCall);
 
@@ -114,9 +114,9 @@ public class RescalMatcherActor extends UntypedActor
     }
 
     // load the predicted hints and send the to the event bus of the matching service
-    BulkHintEvent hintsEvent = HintReader.readHints(rescalSettings.EXECUTION_DIRECTORY);
+    BulkHintEvent hintsEvent = HintReader.readHints(config.getExecutionDirectory(), rescalInputData);
     log.info("loaded {} hints into bulk hint event and publish", hintsEvent.getHintEvents().size());
-    getContext().system().eventStream().publish(hintsEvent);
+    pubSubMediator.tell(new DistributedPubSubMediator.Publish(hintsEvent.getClass().getName(), hintsEvent), getSelf());
     lastQueryDate = queryDate;
   }
 }

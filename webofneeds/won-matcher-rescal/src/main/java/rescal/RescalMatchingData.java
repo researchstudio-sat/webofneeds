@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,7 +32,8 @@ public class RescalMatchingData
     NEED_TYPE("needtype"),
     TITLE("subject"),
     DESCRIPTION("content"),
-    TAG("tag");
+    TAG("tag"),
+    WON_NODE("wonnode");
     private String sliceFileName;
 
     private SliceType(String fileName) {
@@ -117,6 +119,36 @@ public class RescalMatchingData
     int x2 = addAttribute(attribute);
     int x3 = attrType.ordinal();
     tensor.setEntry(1.0d, x1, x2, x3);
+  }
+
+  public void setWonNodeOfNeed(String need, String wonNode) {
+
+    checkName(need);
+    checkName(wonNode);
+    int x1 = addNeed(need);
+
+    if (tensor.hasNonZeroEntryInRow(x1, SliceType.WON_NODE.ordinal())) {
+      throw new IllegalStateException("Need '" + need + "' is not allowed to be assigned to more than one won node!");
+    }
+
+    int x2 = addAttribute(wonNode);
+    int x3 = SliceType.WON_NODE.ordinal();
+    tensor.setEntry(1.0d, x1, x2, x3);
+  }
+
+  public String getWonNodeOfNeed(String need) {
+
+    int needIndex = needs.indexOf(need);
+    if (needIndex < 0) {
+      return null;
+    }
+
+    Iterator<Integer> iter = tensor.getNonZeroIndicesOfRow(needIndex, SliceType.WON_NODE.ordinal()).iterator();
+    if (iter.hasNext()) {
+      return attributes.get(iter.next());
+    }
+
+    return null;
   }
 
   /**
