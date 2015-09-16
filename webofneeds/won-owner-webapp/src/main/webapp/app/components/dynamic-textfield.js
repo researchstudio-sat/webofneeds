@@ -26,22 +26,27 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
 
             //TODO debug; deleteme
+            /*
             window.dtfCtrl = this;
+            window.tf = this.textField();
+            window.tf2 = this.$element.find('.wdt__text');
             console.log('dynamic-textfield.js : in ctrl', this, this.$element)
+            */
 
 
             this.displayingPlaceholder = true;
             this.value = '';
-            //this.addPlaceholderIfEmpty();
 
-            this.textField().addEventListener('focus', (e) => this.onFocus(e));
-            this.textField().addEventListener('blur', (e) => this.onBlur(e));
-            this.textField().addEventListener('keyup', () => this.input());
-            this.textField().addEventListener('drop', () => this.input());
-            this.textField().addEventListener('paste', () => this.input());
+            this.textFieldNg().bind('focus', (e) => this.onFocus(e))
+                              .bind('blur', (e) => this.onBlur(e))
+                              .bind('keyup drop paste', () => this.input())
+            //this.textField().addEventListener('keyup', () => this.input());
+            //this.textField().addEventListener('drop', () => this.input());
+            //this.textField().addEventListener('paste', () => this.input());
 
             //don't want the default input event to bubble and leak into this directives event-stream
-            this.textField().addEventListener('input', (e) => e.stopPropagation());
+                              .bind('input', (e) => e.stopPropagation());
+            //this.textField().addEventListener('input', (e) => e.stopPropagation());
 
             /*
             *   TODO
@@ -104,11 +109,14 @@ function genComponentConf() {
             this.displayingPlaceholder = flag;
             this.$scope.$digest();
         }
-        textField() {
+        textFieldNg() {
             if(!this._textField) {
-                this._textField = this.$element.find('.wdt__text')[0];
+                this._textField = this.$element.find('.wdt__text');
             }
             return this._textField;
+        }
+        textField() {
+            return this.textFieldNg()[0];
         }
         getText() {
             //sanitize input
