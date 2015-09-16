@@ -8,6 +8,9 @@ import createNeedTitleBarModule from '../create-need-title-bar';
 import posttypeSelectModule from '../posttype-select';
 import labelledHrModule from '../labelled-hr';
 import dynamicTextfieldModule from '../dynamic-textfield';
+import imageDropzoneModule from '../image-dropzone';
+
+import { attach } from '../../utils';
 
 
 let postTypeTexts = [
@@ -29,14 +32,23 @@ let postTypeTexts = [
     }
 ]
 
+//const serviceDependencies = ['$scope', '$element'/*injections as strings here*/];
+const serviceDependencies = ['$q'/*injections as strings here*/];
+
 class CreateNeedController {
-    constructor($scope) {
+    constructor(/* arguments <- serviceDependencies */) {
+        attach(this, serviceDependencies, arguments);
+
         this.postTypeTexts = postTypeTexts;
 
         //TODO debug; deleteme
         window.cnc = this;
         console.log('create-need-controller: ', this);
-        console.log('create-need $scope: ', $scope);
+        //console.log('create-need $scope: ', $scope);
+
+        //this.titlePicZoneNg().bind('click', e => 0);
+        //this.titlePicZone().addEventListener('click', e => 0);
+        //this.titlePicZone().addEventListener('drop', e => 0);
     }
 
     selectType(idx) {
@@ -45,17 +57,27 @@ class CreateNeedController {
     unselectType() {
         console.log('unselected type ');
     }
+    titlePicZoneNg() {
+        if(!this._titlePicZone) {
+            this._titlePicZone = this.$element.find('#titlePic');
+        }
+        return this._titlePicZone;
+    }
+    titlePicZone() {
+        return titlePicZoneNg[0];
+    }
 
 }
 
-//CreateNeedController.$inject = ['$scope'];
-CreateNeedController.$inject = [];
+//CreateNeedController.$inject = serviceDependencies;
 
 export default angular.module('won.owner.components.createNeed', [
         createNeedTitleBarModule,
         posttypeSelectModule,
         labelledHrModule,
         dynamicTextfieldModule,
+        imageDropzoneModule
     ])
-    .controller('CreateNeedController', ['$q', /*dependency injections as strings here*/ CreateNeedController])
+    //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
+    .controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
     .name;
