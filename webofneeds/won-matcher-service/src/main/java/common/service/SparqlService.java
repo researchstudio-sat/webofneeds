@@ -14,6 +14,9 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.StringWriter;
 import java.util.Iterator;
@@ -24,12 +27,14 @@ import java.util.Iterator;
  * User: hfriedrich
  * Date: 15.04.2015
  */
+@Component
 public class SparqlService
 {
   protected final Logger log = LoggerFactory.getLogger(getClass());
   protected String sparqlEndpoint;
 
-  public SparqlService(String sparqlEndpoint) {
+  @Autowired
+  public SparqlService(@Value("${uri.sparql.endpoint}")  String sparqlEndpoint) {
     this.sparqlEndpoint = sparqlEndpoint;
   }
 

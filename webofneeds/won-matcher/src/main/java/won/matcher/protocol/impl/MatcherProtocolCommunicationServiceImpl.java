@@ -50,9 +50,9 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
 
 
     if (matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(needBrokerUri)!=null){
-      if (matcherProtocolCamelConfigurator.getEndpoint(needBrokerUri)!=null)
+      if (matcherProtocolCamelConfigurator.getEndpoint(nodeUri)!=null)
       {
-        camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.getEndpoint(needBrokerUri));
+        camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.getEndpoint(nodeUri));
       } else {
         matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,needBrokerUri);
         matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(nodeUri);

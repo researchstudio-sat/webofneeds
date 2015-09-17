@@ -1,5 +1,5 @@
 # before docker build can be executed, the war file, the tomcat libs folder
-# and the conf directory have to be copied into this folder
+# and the conf directory have to be copied into this folder (done by maven build)
 FROM tomcat:8.0-jre8
 RUN apt-get update && apt-get install -y \
     vim \
