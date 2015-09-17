@@ -21,9 +21,6 @@ public class RescalMatcherConfig
   @Value("${matcher.rescal.executionDir}")
   private String executionDirectory;
 
-  @Value("${matcher.rescal.nlpResourceDir}")
-  private String nlpResourceDirectory;
-
   @Value("${matcher.rescal.pythonScriptDir}")
   private String pythonScriptDirectory;
 
@@ -50,14 +47,6 @@ public class RescalMatcherConfig
 
   public void setExecutionDirectory(final String executionDirectory) {
     this.executionDirectory = executionDirectory;
-  }
-
-  public String getNlpResourceDirectory() {
-    return nlpResourceDirectory;
-  }
-
-  public void setNlpResourceDirectory(final String nlpResourceDirectory) {
-    this.nlpResourceDirectory = nlpResourceDirectory;
   }
 
   public String getPythonScriptDirectory() {

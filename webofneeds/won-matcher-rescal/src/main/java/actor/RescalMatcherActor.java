@@ -47,7 +47,7 @@ public class RescalMatcherActor extends UntypedActor
   public void preStart() throws IOException {
 
     // init sparql service
-    sparqlService = new RescalSparqlService(config.getSparqlEndpoint(), config.getNlpResourceDirectory());
+    sparqlService = new RescalSparqlService(config.getSparqlEndpoint());
 
     // subscribe to need events
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();

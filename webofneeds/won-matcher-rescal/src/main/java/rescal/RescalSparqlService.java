@@ -26,9 +26,9 @@ public class RescalSparqlService extends CrawlSparqlService
   private static final Logger log = LoggerFactory.getLogger(RescalSparqlService.class);
   private OpenNlpTokenExtraction preprocessing;
 
-  public RescalSparqlService(final String sparqlEndpoint, String nlpResourceDir) throws IOException {
+  public RescalSparqlService(final String sparqlEndpoint) throws IOException {
     super(sparqlEndpoint);
-    preprocessing = new OpenNlpTokenExtraction(nlpResourceDir);
+    preprocessing = new OpenNlpTokenExtraction();
   }
 
   /**

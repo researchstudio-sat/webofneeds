@@ -5,7 +5,6 @@ import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.tokenize.Tokenizer;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -24,10 +23,9 @@ public class OpenNlpTokenExtraction
   Tokenizer tokenizer = SimpleTokenizer.INSTANCE;
   POSTaggerME posTagger = null;
 
-  public OpenNlpTokenExtraction(String resourceDir) throws IOException {
+  public OpenNlpTokenExtraction() throws IOException {
 
-    InputStream modelIn = null;
-    modelIn = new FileInputStream(resourceDir + "/en-pos-maxent.bin");
+    InputStream modelIn = this.getClass().getClassLoader().getResourceAsStream("en-pos-maxent.bin");
     POSModel model = new POSModel(modelIn);
     posTagger = new POSTaggerME(model);
   }
