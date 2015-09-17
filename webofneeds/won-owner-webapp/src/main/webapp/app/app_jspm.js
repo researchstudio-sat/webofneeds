@@ -26,6 +26,7 @@ import {camel2Hyphen, hyphen2Camel} from './utils';
 import landingPageComponent from './components/landingpage/landingpage';
 import overviewPostsComponent from './components/overview-posts/overview-posts';
 import feedComponent from './components/feed/feed';
+import overviewMatchesComponent from './components/overview-matches/overview-matches';
 
 let app = angular.module('won.owner', [
     'ngNewRouter',
@@ -38,7 +39,8 @@ let app = angular.module('won.owner', [
     postVisitorComponent,
     landingPageComponent,
     overviewPostsComponent,
-    feedComponent
+    feedComponent,
+    overviewMatchesComponent
 ]);
 
 /*
@@ -66,9 +68,8 @@ class AppController {
             //TODO should be landing page if not logged in or feed if logged in
             {
                 path: '/',
-                redirectTo: '/incoming-requests'
+                redirectTo: '/landingpage'
             },
-
             {
                 path: '/create-need',
                 component: 'create-need',
@@ -87,11 +88,15 @@ class AppController {
                 component: 'feed'
             },
             {
+                path: '/overview/matches',
+                component: 'overview-matches',
+                as: 'overviewMatches'
+            },
+            {
                 path: '/overview/incoming-requests',
                 component: 'overview-incoming-requests',
                 as: 'overviewIncomingRequests'
             },
-            //{ path: '/overview/matches', component: 'matches'}, //TODO
             {
                 path: '/overview/posts',
                 component: 'overview-posts',
