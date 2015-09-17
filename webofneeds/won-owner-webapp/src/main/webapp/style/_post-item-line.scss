@@ -14,7 +14,7 @@ won-post-item-line {
     text-decoration: none;
   }
 
-  @include square-image($postIconSize);
+  @include square-image($postIconSize, 0, 0.5rem, 0, 0);
 
   .pil__description {
     color: black;

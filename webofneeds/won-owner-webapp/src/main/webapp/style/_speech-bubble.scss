@@ -30,12 +30,42 @@
     // border
     border-color: $border-color transparent;
     top: -$triangle-size;
-    transform: translateX(-50%);
   }
   &:after {
     // triangle content
     border-color: $background-color transparent;
     top: -$triangle-size + 1.44px; //sqrt(2 * borderwidth^2)
-    transform: translateX(-50%);
+  }
+}
+
+@mixin speech-bubble-bottom($background-color, $border-color, $triangle-size, $hpos) {
+  background-color: $background-color;
+  position: relative; // to allow positioning the triangle-parts as absolute
+
+  &:before, &:after {
+
+    content: "";
+    display: block;
+
+    position: absolute; // might be problematic
+    right: auto;
+    left: $hpos;
+    bottom: auto;
+
+    border-style: solid;
+    //background-color: maroon;
+    border-width: 0 $triangle-size $triangle-size;
+  }
+  &:before {
+    // border
+    border-color: $border-color transparent;
+    bottom: -$triangle-size;
+    transform: rotate(180deg);
+  }
+  &:after {
+    // triangle content
+    border-color: $background-color transparent;
+    bottom: -$triangle-size + 1.44px; //sqrt(2 * borderwidth^2)
+    transform: rotate(180deg);
   }
 }

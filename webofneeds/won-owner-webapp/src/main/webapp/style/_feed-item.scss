@@ -21,7 +21,7 @@ won-feed-item {
     }
 
 
-    @include square-image($feedIconSize);
+    @include square-image($feedIconSize, 0, 0.5rem, 0, 0);
 
     &__description {
       color: black;
@@ -78,7 +78,7 @@ won-feed-item {
       padding: 0.5rem;
       max-width: 33rem;
 
-      @include square-image($postIconSize);
+      @include square-image($postIconSize, 0, 0.5rem, 0, 0);
 
       &__description {
         color: black;

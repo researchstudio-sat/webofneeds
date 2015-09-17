@@ -17,7 +17,7 @@ won-request-item-line {
       text-decoration: none;
     }
 
-    @include square-image($postIconSize);
+    @include square-image($postIconSize, 0, 0.5rem, 0, 0);
 
     .ril__description {
       color: black;
@@ -96,7 +96,7 @@ won-request-item-line {
         border-right: 0.1rem solid $won-lighter-gray;
       }
 
-      @include square-image($postIconSize);
+      @include square-image($postIconSize, 0, 0.5rem, 0, 0);
 
       &__description {
         color: black;
