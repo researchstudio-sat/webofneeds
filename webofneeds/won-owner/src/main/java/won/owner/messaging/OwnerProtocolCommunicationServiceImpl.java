@@ -55,7 +55,8 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
     @Override
-    public final synchronized CamelConfiguration configureCamelEndpoint(URI wonNodeUri) throws Exception {
+    public final synchronized CamelConfiguration configureCamelEndpoint(URI wonNodeUri, String ownerId) throws
+      Exception {
         CamelConfiguration camelConfiguration = new CamelConfiguration();
         URI brokerURI;
         String ownerProtocolQueueName;
@@ -63,8 +64,8 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
         //OwnerProtocolCamelConfigurator ownerProtocolCamelConfigurator = camelConfiguratorFactory.createCamelConfigurator(methodName);
         logger.debug("configuring camel endpoint");
         if (ownerProtocolCamelConfigurator.getBrokerComponent(wonNodeUri)!=null && ownerProtocolCamelConfigurator
-          .getEndpoint(wonNodeUri)!=null){
-            logger.debug("wonNode known");
+          .getEndpoint(wonNodeUri)!=null && !wonNodeList.isEmpty()){
+          logger.debug("wonNode known");
             WonNode wonNode = wonNodeList.get(0);
             brokerURI = wonNode.getBrokerURI();
             camelConfiguration.setEndpoint(wonNode.getOwnerProtocolEndpoint());
@@ -77,16 +78,19 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
         } else{  //if unknown wonNode
             logger.debug("wonNode unknown");
             brokerURI = activeMQService.getBrokerEndpoint(wonNodeUri);
-            camelConfiguration.setBrokerComponentName(ownerProtocolCamelConfigurator.addCamelComponentForWonNodeBroker(wonNodeUri,brokerURI,null));
+            camelConfiguration.setBrokerComponentName(ownerProtocolCamelConfigurator
+                                                        .addCamelComponentForWonNodeBroker(wonNodeUri,brokerURI, ownerId));
 
             //TODO: brokerURI gets the node information already. so requesting node information again for queuename would be duplicate
             ownerProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(wonNodeUri);
-            camelConfiguration.setEndpoint(ownerProtocolCamelConfigurator.configureCamelEndpointForNodeURI(wonNodeUri, brokerURI, ownerProtocolQueueName));
+            camelConfiguration.setEndpoint(ownerProtocolCamelConfigurator.configureCamelEndpointForNodeURI
+              (wonNodeUri, brokerURI, ownerProtocolQueueName));
             ownerProtocolCamelConfigurator.addRouteForEndpoint(null, wonNodeUri);
         }
 
         return camelConfiguration;
     }
+
     @Override
     public synchronized URI  getWonNodeUriWithConnectionUri(URI connectionUri) throws NoSuchConnectionException {
         //TODO: make this more efficient

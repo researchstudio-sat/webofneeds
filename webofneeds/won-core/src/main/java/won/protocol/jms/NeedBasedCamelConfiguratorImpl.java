@@ -49,14 +49,15 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public synchronized String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName){
+    public synchronized String configureCamelEndpointForNeedUri(URI wonNodeURI, URI brokerUri, String
+      needProtocolQueueName){
         String brokerComponentName = setupBrokerComponentName(brokerUri);
         if (!brokerComponentName.contains("brokerUri")){
           addCamelComponentForWonNodeBroker(brokerUri, brokerComponentName);
         }
         String endpoint = brokerComponentName+":queue:"+needProtocolQueueName;
-        endpointMap.put(brokerUri,endpoint);
-        logger.info("endpoint of wonNodeURI {} is {}",brokerUri,endpointMap.get(brokerUri));
+        endpointMap.put(wonNodeURI,endpoint);
+        logger.info("endpoint of wonNodeURI {} is {}", wonNodeURI, endpointMap.get(brokerUri));
         return endpoint;
     }
 
@@ -111,8 +112,8 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
 
 
     @Override
-    public String getEndpoint(URI brokerUri) {
-        return  endpointMap.get(brokerUri);
+    public String getEndpoint(URI nodeUri) {
+        return  endpointMap.get(nodeUri);
     }
     public void setComponentName(String componentName) {
         this.componentName = componentName;

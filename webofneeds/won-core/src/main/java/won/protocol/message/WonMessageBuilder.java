@@ -372,6 +372,7 @@ public class WonMessageBuilder
       .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.DEACTIVATE)
       .setSenderNeedURI(localNeed)
+      .setSenderNodeURI(localWonNode)
       .setReceiverNeedURI(localNeed)
       .setReceiverNodeURI(localWonNode)
       .setSentTimestampToNow();
@@ -415,9 +416,9 @@ public class WonMessageBuilder
       .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
       .setWonMessageType(WonMessageType.CREATE_NEED)
       .setSenderNeedURI(needURI)
+      .setSenderNodeURI(wonNodeURI)
       .setReceiverNodeURI(wonNodeURI)
       .setSentTimestampToNow();
-
     return this;
   }
 
@@ -595,11 +596,6 @@ public class WonMessageBuilder
         .setSenderNodeURI(originalMessage.getSenderNodeURI())
         .setSenderNeedURI(originalMessage.getSenderNeedURI())
         .setSenderURI(originalMessage.getSenderURI());
-      if (originalMessage.getSenderNodeURI() == null) {
-        // special case for e.g. create message where there is no sender node uri specified
-        // in this case it should be send to the receiver node uri
-        this.setSenderNodeURI(originalMessage.getReceiverNodeURI());
-      }
     }
     this
       .setReceiverNeedURI(originalMessage.getSenderNeedURI())

@@ -62,7 +62,7 @@ public class NeedProtocolCommunicationServiceImpl implements NeedProtocolCommuni
 
             needProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(resourceUri);
             camelConfiguration.setEndpoint(
-              needProtocolCamelConfigurator.configureCamelEndpointForNeedUri(brokerUri, needProtocolQueueName));
+              needProtocolCamelConfigurator.configureCamelEndpointForNeedUri(resourceUri, brokerUri, needProtocolQueueName));
             camelConfiguration.setBrokerComponentName(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
             ActiveMQComponent activeMQComponent = (ActiveMQComponent)needProtocolCamelConfigurator.getCamelContext().getComponent(needProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(brokerUri));
             logger.info("ActiveMQ Service Status : {}",activeMQComponent.getStatus().toString());

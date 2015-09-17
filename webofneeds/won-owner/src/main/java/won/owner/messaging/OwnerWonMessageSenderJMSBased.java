@@ -98,15 +98,19 @@ public class OwnerWonMessageSenderJMSBased
       // ToDo (FS): change it to won node URI and create method in the MessageEvent class
       URI wonNodeUri = wonMessage.getSenderNodeURI();
 
-      if (wonNodeUri == null)
-        wonNodeUri = defaultNodeURI;
+      if (wonNodeUri == null){
+        //obtain the sender won node from the sender need
+          throw new IllegalStateException("a message needs a SenderNodeUri otherwise we can't determine the won node " +
+                                            "via which to send it");
+      }
 
       List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
       String ownerApplicationId;
       /**
        * if owner application is not connected to any won node, register owner application to the node with wonNodeURI.
        */
-      CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeUri);
+      //CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint
+      //  (wonNodeUri, null);
       if (wonNodeList.size() == 0) {
         //todo: methods of ownerProtocolActiveMQService might have some concurrency issues. this problem will be resolved in the future, and this code here shall be revisited then.
         ownerApplicationId = register(wonNodeUri);
@@ -124,7 +128,8 @@ public class OwnerWonMessageSenderJMSBased
 
       Map<String, Object> headerMap = new HashMap<>();
       headerMap.put("ownerApplicationID", ownerApplicationId);
-      headerMap.put("remoteBrokerEndpoint",camelConfiguration.getEndpoint());
+      headerMap.put("remoteBrokerEndpoint", ownerProtocolCommunicationServiceImpl.getProtocolCamelConfigurator()
+                                                                                 .getEndpoint(wonNodeUri));
       messagingService
               .sendInOnlyMessage(null, headerMap, WonMessageEncoder.encode(wonMessage, Lang.TRIG), startingEndpoint);
 
@@ -166,7 +171,6 @@ public class OwnerWonMessageSenderJMSBased
               String ownerApplicationId = register(defaultNodeURI);
               configureRemoteEndpointsForOwnerApplication(ownerApplicationId, ownerProtocolCommunicationServiceImpl
                 .getProtocolCamelConfigurator().getEndpoint(defaultNodeURI));
-
             } catch (Exception e) {
               logger.warn("Could not register with default won node {}", defaultNodeURI, e);
             }
@@ -189,7 +193,8 @@ public class OwnerWonMessageSenderJMSBased
   public synchronized String register(URI wonNodeURI) throws Exception {
     logger.debug("WON NODE: " + wonNodeURI);
 
-    CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeURI);
+    CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeURI,
+                                                                                                         null);
 
     Map<String, Object> headerMap = new HashMap<>();
     headerMap.put("remoteBrokerEndpoint", camelConfiguration.getEndpoint());
@@ -198,12 +203,14 @@ public class OwnerWonMessageSenderJMSBased
 
     String ownerApplicationId = futureResults.get();
 
-    camelConfiguration.setBrokerComponentName(ownerProtocolCommunicationServiceImpl
-                                                .replaceComponentNameWithOwnerApplicationId(camelConfiguration,
-                                                                                            ownerApplicationId));
-    camelConfiguration.setEndpoint(ownerProtocolCommunicationServiceImpl
-                                     .replaceEndpointNameWithOwnerApplicationId(camelConfiguration,
-                                                                                ownerApplicationId));
+    camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint(wonNodeURI, ownerApplicationId);
+
+    //TODO: check if won node is already in the db
+    logger.debug("registered ownerappID: " + ownerApplicationId);
+    storeWonNode(ownerApplicationId, camelConfiguration, wonNodeURI);
+
+    configureRemoteEndpointsForOwnerApplication(ownerApplicationId, ownerProtocolCommunicationServiceImpl
+      .getProtocolCamelConfigurator().getEndpoint(wonNodeURI));
     //TODO: check if won node is already in the db
     logger.debug("registered ownerappID: " + ownerApplicationId);
     storeWonNode(ownerApplicationId, camelConfiguration, wonNodeURI);
