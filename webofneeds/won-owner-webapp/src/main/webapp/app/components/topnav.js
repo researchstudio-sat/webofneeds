@@ -15,7 +15,7 @@ function genTopnavConf() {
                     </a>
                 </div>
                 <div class="topnav__inner__center">
-                    <a ng-link="create-need" class="topnav__button">
+                    <a ng-link="createNeed" class="topnav__button">
                         <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon">
                         <span class="topnav__button__caption">New Need</span>
                     </a>
