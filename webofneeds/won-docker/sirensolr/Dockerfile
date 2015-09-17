@@ -10,7 +10,6 @@ ADD ./siren-solr-1.4-bin /usr/src/siren-solr
 # add the won core to the siren/solr instance
 ADD ./core/won /usr/src/siren-solr/example/solr/won
 
-# start siren/solr server
+# start siren/solr server on port 8983
 WORKDIR /usr/src/siren-solr/example
-EXPOSE 8983
 CMD java -jar start.jar
