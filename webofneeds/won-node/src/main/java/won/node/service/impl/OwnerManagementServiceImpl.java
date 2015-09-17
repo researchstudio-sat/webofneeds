@@ -31,7 +31,7 @@ public class OwnerManagementServiceImpl implements ApplicationManagementService 
     }
 
     @Override
-    public String  registerOwnerApplication(String ownerApplicationId) {
+    public String registerOwnerApplication(String ownerApplicationId) {
 
         logger.debug("ownerApplicationId: "+ownerApplicationId.toString() );
 
@@ -45,7 +45,8 @@ public class OwnerManagementServiceImpl implements ApplicationManagementService 
             ownerApplication = ownerApplicatonRepository.save(ownerApplication);
             return ownerApplicationId.toString();
         } else {
-            return registerOwnerApplication((Exchange)null);
+            logger.error("Registration failed: owner with id {} is already registered", ownerApplicationId);
+            return ownerApplicationId;
         }
 
     }

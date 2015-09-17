@@ -22,7 +22,6 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDFS;
-import org.apache.camel.Exchange;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -770,10 +769,10 @@ public class
 
 
     // If the alias is known but certificate differs, we have a fingerprint collision. We are not accounting
-    // for this case at the moment, we report an error:
+    // for this case at the moment, we just report an error:
     Certificate retrieved = trustStoreService.getCertificate(ownerSha1Fingerprint);
     if (retrieved != null) {
-      String msg = "Owner's fingerprint is already taken, cannot register - use another certificate.";
+      String msg = "Owner's fingerprint collision, cannot register - use another certificate!";
       logger.warn(msg);
       return new ResponseEntity<String>(msg, HttpStatus.BAD_REQUEST);
     }
@@ -781,8 +780,7 @@ public class
     // Register with fingerprint as owner id
     String ownerId = null;
     try {
-      //ownerId = ownerManagementService.registerOwnerApplication(ownerSha1Fingerprint);
-      ownerId = ownerManagementService.registerOwnerApplication((Exchange) null);
+      ownerId = ownerManagementService.registerOwnerApplication(ownerSha1Fingerprint);
     } catch (Exception e) {
       return new ResponseEntity<String>(e.toString(), HttpStatus.BAD_REQUEST);
     }

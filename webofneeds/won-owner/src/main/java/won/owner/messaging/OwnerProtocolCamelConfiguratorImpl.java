@@ -107,7 +107,11 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     @Override
     public synchronized void addRemoteQueueListeners(List<String> endpoints, URI remoteEndpoint) throws CamelConfigurationFailedException {
         logger.info("length of endpoints {}", endpoints.size());
-        OwnerApplicationListenerRouteBuilder ownerApplicationListenerRouteBuilder = new OwnerApplicationListenerRouteBuilder(camelContext, endpoints, remoteEndpoint);
+        List<String> customSchemeEndpoints = adjustSchemeToRemoteEndpoint(endpoints, remoteEndpoint);
+        logger.debug(
+          "Adding queue listeners for remoteEndpoint " + remoteEndpoint + " for: " + customSchemeEndpoints.toString());
+
+        OwnerApplicationListenerRouteBuilder ownerApplicationListenerRouteBuilder = new OwnerApplicationListenerRouteBuilder(camelContext, customSchemeEndpoints, remoteEndpoint);
         try {
             camelContext.addRoutes(ownerApplicationListenerRouteBuilder);
         } catch (Exception e) {
@@ -115,6 +119,27 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
             throw new CamelConfigurationFailedException("adding route to camel context failed",e);
         }
     }
+
+    /**
+     * Scheme of the remote endpoint for which camel component has already bean configured, should correspond to
+     * the scheme of the endpoints for which listeners are being added. In this case, our component name can contain
+     * part specific to a particular remote broker, so that they can connect to different brokers without overriding
+     * each other.
+     * @param endpoints
+     * @param remoteEndpoint
+     * @return
+     */
+    private List<String> adjustSchemeToRemoteEndpoint(final List<String> endpoints, final URI remoteEndpoint) {
+        String remoteScheme = remoteEndpoint.getScheme();
+        List<String> customSchemeEndpoints = new ArrayList<>(endpoints.size());
+        for (String ep : endpoints) {
+            String epScheme = URI.create(ep).getScheme();
+            ep = ep.replace(epScheme, remoteScheme);
+            customSchemeEndpoints.add(ep);
+        }
+        return customSchemeEndpoints;
+    }
+
     //todo: the method is activemq specific. refactor it to support other brokers.
     @Override
     public synchronized String addCamelComponentForWonNodeBroker(URI wonNodeURI, URI brokerURI, String ownerApplicationId){
@@ -146,13 +171,25 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
       ownerApplicationId, KeyManager km, TrustManager tm){
         String componentName;
 
-        if (ownerApplicationId==null){
-            if (!wonNodeURI.equals(URI.create(defaultNodeURI)))
-                componentName = this.componentName+brokerURI.toString().replaceAll("[/:]","");
-            else
-                componentName = this.componentName;
-        }else
-            componentName = this.componentName+ownerApplicationId;
+//        if (ownerApplicationId==null){
+//            if (!wonNodeURI.equals(URI.create(wonNodeURI)))
+//                componentName = this.componentName+brokerURI.toString().replaceAll("[/:]","");
+//            else
+//                componentName = this.componentName;
+//        }else
+//            componentName = this.componentName+ownerApplicationId;
+
+
+        //if (ownerApplicationId==null){
+        //    if (!wonNodeURI.equals(URI.create(defaultNodeURI)))
+        componentName = this.componentName +brokerURI.toString().replaceAll("[/:]","");
+
+        //    else
+        //        componentName = this.componentName;
+        //}else
+          //  componentName = this.componentName+ownerApplicationId;
+
+
         if(camelContext.getComponent(componentName,false)!=null){
             return componentName;
         }
