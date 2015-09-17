@@ -187,6 +187,10 @@
 
         </sslContext>
 
+        <messageAuthorizationPolicy>
+            <spring:bean class="won.cryptography.service.MessageOwnerConsumptionPolicy"></spring:bean>
+        </messageAuthorizationPolicy>
+
         <!--networkConnectors>
             <networkConnector uri="static:(tcp://localhost:61617)" ></networkConnector>
         </networkConnectors-->
