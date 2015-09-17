@@ -6,6 +6,7 @@
 
 import angular from 'angular';
 import { dispatchEvent, attach } from '../utils';
+import enterModule from '../directives/enter';
 
 function genComponentConf() {
     /*
@@ -17,7 +18,9 @@ function genComponentConf() {
         <ul ng-class="self.expanded() ? 'typeselect--expanded' : 'typeselect--collapsed'">
             <li ng-repeat="o in self.options"
                 ng-class="$index === self.selectedIdx? 'ts__option--selected' : 'ts__option'"
-                ng-click="self.unSelect($index)">
+                ng-click="self.unSelect($index)"
+                won-enter="self.unSelect($index)"
+                tabindex="0">
                     <span>{{o.text}}</span>
                     <img src="generated/icon-sprite.svg#ico36_help"
                          ng-click="self.unSelectHelpFor($index); $event.stopPropagation();"
@@ -104,6 +107,8 @@ function genComponentConf() {
     }
 }
 
-export default angular.module('won.owner.components.posttypeSelect', [])
+export default angular.module('won.owner.components.posttypeSelect', [
+        enterModule
+    ])
     .directive('wonPosttypeSelect', genComponentConf)
     .name;

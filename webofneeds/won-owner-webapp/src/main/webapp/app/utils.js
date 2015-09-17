@@ -37,3 +37,16 @@ export function dispatchEvent(elem, eventName, eventData) {
     elem.dispatchEvent(event);
     //console.log('dispatching');
 }
+
+export function readAsDataURL(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function() {
+            resolve(reader.result);
+        };
+        reader.onerror = function() {
+            reject(f);
+        };
+        reader.readAsDataURL(file);
+    });
+};
