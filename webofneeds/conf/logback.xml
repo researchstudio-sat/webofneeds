@@ -51,7 +51,7 @@
     <logger name="won.bot.impl.BAAtomicCCAdditionalParticipants" level="DEBUG" />
     <logger name="won.bot.impl.BAAtomicCCActiveExitingBot" level="DEBUG" />
 
-    <root level="debug">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

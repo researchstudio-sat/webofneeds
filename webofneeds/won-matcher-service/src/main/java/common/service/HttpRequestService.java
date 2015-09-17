@@ -7,6 +7,7 @@ import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -18,6 +19,7 @@ import won.protocol.rest.RdfDatasetConverter;
  * User: hfriedrich
  * Date: 04.05.2015
  */
+@Component
 public class HttpRequestService
 {
   private final Logger log = LoggerFactory.getLogger(getClass());

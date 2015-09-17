@@ -1,16 +1,20 @@
 package node.actor;
 
+import akka.actor.ActorRef;
 import akka.camel.CamelMessage;
 import akka.camel.javaapi.UntypedConsumerActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
-import common.config.CommonSettings;
-import common.config.CommonSettingsImpl;
-import common.service.SparqlService;
 import common.event.NeedEvent;
+import common.service.SparqlService;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFFormat;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import won.protocol.util.RdfUtils;
 
 import java.io.ByteArrayInputStream;
@@ -26,6 +30,8 @@ import java.nio.charset.StandardCharsets;
  * User: hfriedrich
  * Date: 28.04.2015
  */
+@Component
+@Scope("prototype")
 public class NeedConsumerProtocolActor extends UntypedConsumerActor
 {
   private static final String MSG_HEADER_METHODNAME = "methodName";
@@ -34,14 +40,16 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
   private static final String MSG_HEADER_METHODNAME_NEEDDEACTIVATED = "needDeactivated";
   private static final String MSG_HEADER_WON_NODE_URI = "wonNodeURI";
   private static final String MSG_HEADER_NEED_URI = "needUri";
-  private final CommonSettingsImpl settings = CommonSettings.SettingsProvider.get(getContext().system());
-  private SparqlService sparqlService;
   private final String endpoint;
+  private ActorRef pubSubMediator;
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+
+  @Autowired
+  private SparqlService sparqlService;
 
   public NeedConsumerProtocolActor(String endpoint) {
     this.endpoint = endpoint;
-    this.sparqlService = new SparqlService(settings.SPARQL_ENDPOINT);
+    pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
   }
 
   @Override
@@ -69,15 +77,15 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
           NeedEvent event = null;
           if (methodName.equals(MSG_HEADER_METHODNAME_NEEDCREATED)) {
             event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.CREATED, camelMsg.body().toString(), Lang.TRIG);
-            getContext().system().eventStream().publish(event);
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
             return;
           } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDACTIVATED)) {
             event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVATED, camelMsg.body().toString(), Lang.TRIG);
-            getContext().system().eventStream().publish(event);
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
             return;
           } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDDEACTIVATED)) {
             event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.DEACTIVATED, camelMsg.body().toString(), Lang.TRIG);
-            getContext().system().eventStream().publish(event);
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
             return;
           }
         }

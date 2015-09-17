@@ -1,16 +1,22 @@
 package crawler.actor;
 
-import akka.actor.*;
+import akka.actor.ActorRef;
+import akka.actor.OneForOneStrategy;
+import akka.actor.SupervisorStrategy;
+import akka.actor.UntypedActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
-import akka.routing.FromConfig;
-import crawler.config.CrawlSettings;
-import crawler.config.CrawlSettingsImpl;
+import common.event.WonNodeEvent;
+import common.spring.SpringExtension;
 import crawler.exception.CrawlWrapperException;
 import crawler.msg.CrawlUriMessage;
 import crawler.service.CrawlSparqlService;
-import common.event.WonNodeEvent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -35,42 +41,37 @@ import java.util.concurrent.TimeUnit;
  * User: hfriedrich
  * Date: 30.03.2015
  */
+@Component
+@Scope("prototype")
 public class MasterCrawlerActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-  private final CrawlSettingsImpl settings = CrawlSettings.SettingsProvider.get(getContext().system());
   private static final FiniteDuration RESCHEDULE_MESSAGE_DURATION = Duration.create(500, TimeUnit.MILLISECONDS);
-  private CrawlSparqlService sparqlService;
-  private Map<String, CrawlUriMessage> pendingMessages = null;
-  private Map<String, CrawlUriMessage> doneMessages = null;
-  private Map<String, CrawlUriMessage> failedMessages = null;
-  private Set<String> crawlWonNodeUris = null;
-  private Set<String> skipWonNodeUris = null;
+  private Map<String, CrawlUriMessage> pendingMessages = new HashMap<>();
+  private Map<String, CrawlUriMessage> doneMessages = new HashMap<>();
+  private Map<String, CrawlUriMessage> failedMessages = new HashMap<>();
+  private Set<String> crawlWonNodeUris = new HashSet<>();
+  private Set<String> skipWonNodeUris = new HashSet<>();
   private ActorRef crawlingWorker;
   private ActorRef updateMetaDataWorker;
+  private ActorRef pubSubMediator;
 
-  public MasterCrawlerActor() {
-    pendingMessages = new HashMap<>();
-    doneMessages = new HashMap<>();
-    failedMessages = new HashMap<>();
-    crawlWonNodeUris = new HashSet<>();
-    skipWonNodeUris = new HashSet<>();
-    sparqlService = new CrawlSparqlService(settings.METADATA_SPARQL_ENDPOINT);
-  }
+  @Autowired
+  private CrawlSparqlService sparqlService;
 
   @Override
   public void preStart() {
 
     // Create the router/pool with worker actors that do the actual crawling
-    Props workerProps = Props.create(WorkerCrawlerActor.class);
-    crawlingWorker = getContext().actorOf(new FromConfig().props(workerProps), "CrawlingRouter");
+    crawlingWorker = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).props(WorkerCrawlerActor.class), "CrawlingRouter");
 
     // create a single meta data update actor for all worker actors
-    updateMetaDataWorker = getContext().actorOf(Props.create(UpdateMetadataActor.class), "MetaDataUpdateWorker");
+    updateMetaDataWorker = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).props(UpdateMetadataActor.class), "MetaDataUpdateWorker");
     getContext().watch(updateMetaDataWorker);
 
     // subscribe for won node events
-    getContext().system().eventStream().subscribe(getSelf(), WonNodeEvent.class);
+    pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
+    pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(WonNodeEvent.class.getName(), getSelf()), getSelf());
 
     // load the unfinished uris and start crawling
     for (CrawlUriMessage msg : sparqlService.retrieveMessagesForCrawling(CrawlUriMessage.STATUS.PROCESS)) {
@@ -175,7 +176,8 @@ public class MasterCrawlerActor extends UntypedActor
       // we received an answer for the discovered won node event
       if (discoveredNewWonNode(msg.getWonNodeUri())) {
         log.debug("discovered new won node {}", msg.getWonNodeUri());
-        getContext().system().eventStream().publish(new WonNodeEvent(msg.getWonNodeUri(), WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED));
+        WonNodeEvent event = new WonNodeEvent(msg.getWonNodeUri(), WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED);
+        pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
         getContext().system().scheduler().scheduleOnce(
           RESCHEDULE_MESSAGE_DURATION, getSelf(), msg, getContext().dispatcher(), null);
       } else if (!skipWonNodeUris.contains(msg.getWonNodeUri())) {
