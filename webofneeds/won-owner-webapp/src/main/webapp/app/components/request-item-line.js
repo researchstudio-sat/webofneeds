@@ -60,12 +60,10 @@ function genComponentConf() {
         }
 
         toggleRequest() {
-            console.log("toggle the request");
             this.open = !this.open;
         }
 
         openMessage(request) {
-            console.log("opening the request");
             request.read = true;
             this.openRequest = request;
         }
