@@ -69,3 +69,69 @@
     transform: rotate(180deg);
   }
 }
+
+@mixin speech-bubble-left($background-color, $border-color, $triangle-size, $hpos) {
+  background-color: $background-color;
+  position: relative; // to allow positioning the triangle-parts as absolute
+
+  &:before, &:after {
+
+    content: "";
+    display: block;
+
+    position: absolute; // might be problematic
+    right: auto;
+    top: $hpos;
+    left: auto;
+    bottom: auto;
+
+    border-style: solid;
+    //background-color: maroon;
+    border-width: 0 $triangle-size $triangle-size;
+  }
+  &:before {
+    // border
+    border-color: $border-color transparent;
+    left: -$triangle-size - 3px;
+    transform: rotate(-90deg);
+  }
+  &:after {
+    // triangle content
+    border-color: $background-color transparent;
+    left: -$triangle-size - (1.56px); //sqrt(2 * borderwidth^2)
+    transform: rotate(-90deg);
+  }
+}
+
+@mixin speech-bubble-right($background-color, $border-color, $triangle-size, $hpos) {
+  background-color: $background-color;
+  position: relative; // to allow positioning the triangle-parts as absolute
+
+  &:before, &:after {
+
+    content: "";
+    display: block;
+
+    position: absolute; // might be problematic
+    right: auto;
+    left: auto;
+    top: $hpos;
+    bottom: auto;
+
+    border-style: solid;
+    //background-color: maroon;
+    border-width: 0 $triangle-size $triangle-size;
+  }
+  &:before {
+    // border
+    border-color: $border-color transparent;
+    right: -$triangle-size - (3px);
+    transform: rotate(90deg);
+  }
+  &:after {
+    // triangle content
+    border-color: $background-color transparent;
+    right: -$triangle-size - (1.56px); //sqrt(2 * borderwidth^2)
+    transform: rotate(90deg);
+  }
+}

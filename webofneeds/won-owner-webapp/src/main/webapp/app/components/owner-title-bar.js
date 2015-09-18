@@ -13,7 +13,7 @@ function genComponentConf() {
                     <a href="javascript:void(0)" ng-click="self.back()">
                         <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__icon">
                     </a>
-                    <img class="ntb__inner__left__image" src="images/someNeedTitlePic.png"></img>
+                    <won-square-image title="blabla" src="images/someNeedTitlePic.png"></won-square-image>
                     <div class="ntb__inner__left__titles">
                         <h1 class="ntb__title">New flat, need furniture</h1>
                         <div class="ntb__inner__left__titles__type">I want to have something</div>

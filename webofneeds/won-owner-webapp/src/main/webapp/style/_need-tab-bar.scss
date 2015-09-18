@@ -2,6 +2,7 @@
 @import 'flex-layout';
 @import 'title-bar';
 @import 'sizing-utils';
+@import 'square-image';
 
 @mixin need-tab-bar($prefix, $tabBarWidth) {
   @include title-bar($prefix);
@@ -18,12 +19,7 @@
     > .#{$prefix}__inner__left {
       @include flex-row;
 
-      .#{$prefix}__inner__left__image {
-        display: block;
-        @include fixed-square(4.7rem); //99px/21
-
-        margin: 1rem;
-      }
+      @include square-image(4.7rem, 0, 1rem, 0, 1rem);
 
       .#{$prefix}__inner__left__titles {
         @include flex-column;
