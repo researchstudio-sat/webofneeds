@@ -1,19 +1,34 @@
 # build won docker images and deploy to sat cluster
-echo Start Docker build and deployment:
+echo start docker build and deployment:
 
-# wonnode
+# wonnode 1
 docker -H satsrv04:2375 build -t webofneeds/wonnode:dev $WORKSPACE/webofneeds/won-docker/wonnode/
 docker -H satsrv04:2375 stop wonnode_dev || echo 'No docker container found to stop with name: wonnode_dev'
 docker -H satsrv04:2375 rm wonnode_dev || echo 'No docker container found to remove with name: wonnode_dev'
 docker -H satsrv04:2375 run --name=wonnode_dev -d -e "uri.host=satsrv04.researchstudio.at" \
 -e "http.port=8888" -e "activemq.broker.port=61616" -p 8888:8080 -p 61617:61617 webofneeds/wonnode:dev
 
-# owner
+# wonnode 2
+docker -H satsrv05:2375 build -t webofneeds/wonnode:dev $WORKSPACE/webofneeds/won-docker/wonnode/
+docker -H satsrv05:2375 stop wonnode_dev || echo 'No docker container found to stop with name: wonnode_dev'
+docker -H satsrv05:2375 rm wonnode_dev || echo 'No docker container found to remove with name: wonnode_dev'
+docker -H satsrv05:2375 run --name=wonnode_dev -d -e "uri.host=satsrv05.researchstudio.at" \
+-e "http.port=8888" -e "activemq.broker.port=61616" -p 8888:8080 -p 61617:61617 webofneeds/wonnode:dev
+
+sleep 20
+
+# owner 1
 docker -H satsrv04:2375 build -t webofneeds/owner:dev $WORKSPACE/webofneeds/won-docker/owner/
 docker -H satsrv04:2375 stop owner_dev || echo 'No docker container found to stop with name: owner_dev'
 docker -H satsrv04:2375 rm owner_dev || echo 'No docker container found to remove with name: owner_dev'
-sleep 20
 docker -H satsrv04:2375 run --name=owner_dev -d -e "node.default.host=satsrv04.researchstudio.at" \
+-e "node.default.http.port=8888" -p 8081:8080 webofneeds/owner:dev
+
+# owner 2
+docker -H satsrv05:2375 build -t webofneeds/owner:dev $WORKSPACE/webofneeds/won-docker/owner/
+docker -H satsrv05:2375 stop owner_dev || echo 'No docker container found to stop with name: owner_dev'
+docker -H satsrv05:2375 rm owner_dev || echo 'No docker container found to remove with name: owner_dev'
+docker -H satsrv05:2375 run --name=owner_dev -d -e "node.default.host=satsrv05.researchstudio.at" \
 -e "node.default.http.port=8888" -p 8081:8080 webofneeds/owner:dev
 
 # bigdata
@@ -28,7 +43,7 @@ docker -H satsrv06:2375 rm matcher_service_dev || echo 'No docker container foun
 docker -H satsrv06:2375 run --name=matcher_service_dev -d -e "node.host=satsrv06.researchstudio.at" \
 -e "cluster.seed.host=satsrv06.researchstudio.at" \
 -e "uri.sparql.endpoint=http://satsrv06.researchstudio.at:9999/bigdata/namespace/kb/sparql" \
--e "wonNodeController.wonNode.crawl=http://satsrv04.researchstudio.at:8888/won/resource" \
+-e "wonNodeController.wonNode.crawl=http://satsrv04.researchstudio.at:8888/won/resource,http://satsrv05.researchstudio.at:8888/won/resource" \
 -e "cluster.local.port=2551" -e "cluster.seed.port=2551" -p 2551:2551 webofneeds/matcher_service:dev
 
 # siren matcher
