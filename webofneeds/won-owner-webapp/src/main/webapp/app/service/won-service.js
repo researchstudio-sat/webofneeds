@@ -69,11 +69,12 @@ angular.module('won.owner').factory('wonService', function (
                 eventData.matchCounterpartURI = won.getSafeJsonLdValue(eventData.framedMessage[won.WON.hasMatchCounterpart]);
                 //add some properties to the eventData so as to make them easily accessible to consumers
                 //of the hint event
-                if (eventData.matchCounterpartURI != null) {
-                    //load the data of the need the hint is about, if required
-                    //linkedDataService.ensureLoaded(eventData.uri);
-                    linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
-                }
+            // below is commented as it seems to cause to hint event data loaded/displayed
+                //if (eventData.matchCounterpartURI != null) {
+                //    //load the data of the need the hint is about, if required
+                //    //linkedDataService.ensureLoaded(eventData.uri);
+                //    linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
+                //}
                 $log.debug("Broadcasting angular event " + eventData.eventType);
                 $rootScope.$broadcast(eventData.eventType, eventData);
             });
