@@ -11,12 +11,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
-/** This is an implementaion of SIREnQueryBuilderInterface that only uses a "need title" for making a SIREn matching
- * @author soheil
+/**
+ * This is an implementaion of SIREnQueryBuilderInterface that only uses a "need title" for making a SIREn matching
+ *
+ * @author soheilk
  * @date on 11.08.2015.
  */
-public class SIREnTitleBasedQueryBuilder  implements SIREnQueryBuilderInterface {
-
+public class SIREnTitleBasedQueryBuilder implements SIREnQueryBuilderInterface {
 
 
     public String sIRENQueryBuilder(NeedObject needObject) throws QueryNodeException, IOException {
@@ -38,8 +39,8 @@ public class SIREnTitleBasedQueryBuilder  implements SIREnQueryBuilderInterface 
                         .with(build.newNode("'http://purl.org/webofneeds/model#supply'").setAttribute("@id"));
                 break;
             case "http://purl.org/webofneeds/model#dotogether":
-                    twigBasicNeedType = build.newTwig("http://purl.org/webofneeds/model#hasBasicNeedType")
-                            .with(build.newNode("'http://purl.org/webofneeds/model#dotogether'").setAttribute("@id"));
+                twigBasicNeedType = build.newTwig("http://purl.org/webofneeds/model#hasBasicNeedType")
+                        .with(build.newNode("'http://purl.org/webofneeds/model#dotogether'").setAttribute("@id"));
                 break;
         }
 
@@ -52,14 +53,14 @@ public class SIREnTitleBasedQueryBuilder  implements SIREnQueryBuilderInterface 
 
         ArrayList<TwigQuery> twigTitleArrayList = new ArrayList<TwigQuery>();
 
-        for (int i=0; i<tokenizedTitlePhrase.length && i<Configuration.NUMBER_OF_CONSIDERED_TOKENS;i++) {
+        for (int i = 0; i < tokenizedTitlePhrase.length && i < Configuration.NUMBER_OF_CONSIDERED_TOKENS; i++) {
             twigTitleArrayList.add(build.newTwig("http://purl.org/webofneeds/model#hasContent")
                     .with(build.newNode(tokenizedTitlePhrase[i]).setAttribute("http://purl.org/dc/elements/1.1/title")));
         }
 
-        if(twigBasicNeedType!=null)
+        if (twigBasicNeedType != null)
             topTwig.with(twigBasicNeedType);
-        for(int j=0; j<twigTitleArrayList.size();j++) {
+        for (int j = 0; j < twigTitleArrayList.size(); j++) {
             topTwig.optional(twigTitleArrayList.get(j));
         }
 

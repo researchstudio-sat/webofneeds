@@ -39,9 +39,13 @@ public class NeedObject {
         return needLocation;
     }
 
-    public String getNeedResourceUri() {return needResourceUri; }
+    public String getNeedResourceUri() {
+        return needResourceUri;
+    }
 
-    public String getNeedDataUri() {return needDataUri; }
+    public String getNeedDataUri() {
+        return needDataUri;
+    }
 
     public void setBasicNeedType(String basicNeedType) {
         this.basicNeedType = basicNeedType;
@@ -67,9 +71,13 @@ public class NeedObject {
         this.needLocation = needLocation;
     }
 
-    public void setNeedResourceUri(String needResourceUri) {this.needResourceUri = needResourceUri; }
+    public void setNeedResourceUri(String needResourceUri) {
+        this.needResourceUri = needResourceUri;
+    }
 
-    public void setDataResourceUri(String needDataUri) {this.needDataUri = needDataUri; }
+    public void setDataResourceUri(String needDataUri) {
+        this.needDataUri = needDataUri;
+    }
 
 
 }

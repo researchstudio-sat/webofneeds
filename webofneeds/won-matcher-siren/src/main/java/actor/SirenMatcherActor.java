@@ -39,15 +39,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by hfriedrich on 24.08.2015.
+ * Created by Soheilk on 24.08.2015.
  */
-@Component
-@Scope("prototype")
 public class SirenMatcherActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-  private ActorRef pubSubMediator;
-  private List<NeedEvent> needs = new LinkedList<>();
 
      /*
         HttpSolrServer is thread-safe and if you are using the following constructor,
@@ -61,6 +57,7 @@ public class SirenMatcherActor extends UntypedActor
 
 
     @Override
+    public void onReceive(final Object o) throws Exception {
   @Autowired
   private SirenMatcherConfig config;
 
@@ -76,76 +73,90 @@ public class SirenMatcherActor extends UntypedActor
   @Override
   public void onReceive(final Object o) throws Exception {
 
-    if (o instanceof NeedEvent) {
-      NeedEvent needEvent = (NeedEvent) o;
-      log.info("NeedEvent received: " + needEvent.getUri());
-       processNeedEvent(needEvent);
-    } else {
-      unhandled(o);
-    }
-  }
-
-  private void processNeedEvent(NeedEvent needEvent) throws QueryNodeException, SolrServerException, IOException {
-/*
-    ThreadLocal<QueryNLPProcessor> processorThreadLocal = new ThreadLocal<QueryNLPProcessor>(){
-      @Override
-      protected QueryNLPProcessor initialValue() {
-        try {
-          return new QueryNLPProcessor();
-        } catch (IOException e) {
-          throw new RuntimeException("could not instantiate QueryNLPProcessor", e);
+        if (o instanceof NeedEvent) {
+            NeedEvent needEvent = (NeedEvent) o;
+            log.info("NeedEvent received: " + needEvent.getUri());
+            processNeedEvent(needEvent);
+        } else {
+            unhandled(o);
         }
-      }
-    };
-*/
-
-    //making a new instance of the SIREn Query Excutor
-    SIREnQueryExecutor sIREnQueryExecutor = new SIREnQueryExecutor();
-
-    String targetNeedUri = needEvent.getUri();
-
-    //Reading the need that has to be used for making queries
-    Dataset dataset = needEvent.deserializeNeedDataset();
-
-
-
-
-
-    WoNNeedReader woNNeedReader = new WoNNeedReader();
-    NeedObject needObject = woNNeedReader.readWoNNeedFromDeserializedNeedDataset(dataset, SOLR_SERVER);
-
-    ArrayList<SolrDocumentList> solrHintDocumentList = new ArrayList<SolrDocumentList>();
-
-    //Here we start to build and execute different SIREn Query Builders
-    if(Configuration.ACTIVATE_TITEL_BASED_QUERY_BUILDER ==true) {
-        SIREnTitleBasedQueryBuilder sTitleBQueryBuilder = new SIREnTitleBasedQueryBuilder();
-        String stringTitleBasedQuery = sTitleBQueryBuilder.sIRENQueryBuilder(needObject);
-        System.out.print("TITEL QUERY LENGHT: " + stringTitleBasedQuery.length()); //TODO JUST FOR TEST
-        SolrDocumentList docs = sIREnQueryExecutor.execute(stringTitleBasedQuery, SOLR_SERVER);
-        solrHintDocumentList.add(docs);
-        //System.out.println(docs); //TODO JUST FOR TEST
     }
 
-    if(Configuration.ACTIVATE_DESCRIPTION_BASED_QUERY_BUILDER ==true) {
-        SIREnDescriptionBasedQueryBuilder sDescriptionQueryBuilder = new SIREnDescriptionBasedQueryBuilder();
-        String stringDescriptionBasedQuery = sDescriptionQueryBuilder.sIRENQueryBuilder(needObject);
-        System.out.print("DESCRIPTION QUERY LENGHT: " + stringDescriptionBasedQuery.length()); //TODO JUST FOR TEST
-        SolrDocumentList docs = sIREnQueryExecutor.execute(stringDescriptionBasedQuery, SOLR_SERVER);
-        solrHintDocumentList.add(docs);
-        System.out.println(docs); //TODO JUST FOR TEST
+    private void processNeedEvent(NeedEvent needEvent) throws QueryNodeException, SolrServerException, IOException {
+        /*
+            ThreadLocal<QueryNLPProcessor> processorThreadLocal = new ThreadLocal<QueryNLPProcessor>(){
+              @Override
+              protected QueryNLPProcessor initialValue() {
+                try {
+                  return new QueryNLPProcessor();
+                } catch (IOException e) {
+                  throw new RuntimeException("could not instantiate QueryNLPProcessor", e);
+                }
+              }
+            };
+        */
+
+        //making a new instance of the SIREn Query Excutor
+        SIREnQueryExecutor sIREnQueryExecutor = new SIREnQueryExecutor();
+
+        String targetNeedUri = needEvent.getUri();
+
+        //Reading the need that has to be used for making queries
+        Dataset dataset = needEvent.deserializeNeedDataset();
+
+
+        WoNNeedReader woNNeedReader = new WoNNeedReader();
+        NeedObject needObject = woNNeedReader.readWoNNeedFromDeserializedNeedDataset(dataset, SOLR_SERVER);
+
+        ArrayList<SolrDocumentList> solrHintDocumentList = new ArrayList<SolrDocumentList>();
+
+        //Here we start to build and execute different SIREn Query Builders
+        if (Configuration.ACTIVATE_TITEL_BASED_QUERY_BUILDER == true) {
+            SIREnTitleBasedQueryBuilder sTitleBQueryBuilder = new SIREnTitleBasedQueryBuilder();
+            String stringTitleBasedQuery = sTitleBQueryBuilder.sIRENQueryBuilder(needObject);
+            //System.out.print("TITEL QUERY LENGHT: " + stringTitleBasedQuery.length()); // JUST FOR TEST
+            SolrDocumentList docs = sIREnQueryExecutor.execute(stringTitleBasedQuery, SOLR_SERVER);
+            solrHintDocumentList.add(docs);
+            //System.out.println(docs); // JUST FOR TEST
+        }
+
+        if (Configuration.ACTIVATE_DESCRIPTION_BASED_QUERY_BUILDER == true) {
+            SIREnDescriptionBasedQueryBuilder sDescriptionQueryBuilder = new SIREnDescriptionBasedQueryBuilder();
+            String stringDescriptionBasedQuery = sDescriptionQueryBuilder.sIRENQueryBuilder(needObject);
+            //System.out.print("DESCRIPTION QUERY LENGHT: " + stringDescriptionBasedQuery.length()); // JUST FOR TEST
+            SolrDocumentList docs = sIREnQueryExecutor.execute(stringDescriptionBasedQuery, SOLR_SERVER);
+            solrHintDocumentList.add(docs);
+            //System.out.println(docs); // JUST FOR TEST
+        }
+
+        if (Configuration.ACTIVATE_TITEL_AND_DESCRIPTION_BASED_QUERY_BUILDER == true) {
+            SIREnTitleAndDescriptionBasedQueryBuilder sDescriptionQueryBuilder = new SIREnTitleAndDescriptionBasedQueryBuilder();
+            String stringDescriptionBasedQuery = sDescriptionQueryBuilder.sIRENQueryBuilder(needObject);
+            //System.out.print("Title and DESCRIPTION QUERY LENGHT: " + stringDescriptionBasedQuery.length()); // JUST FOR TEST
+            SolrDocumentList docs = sIREnQueryExecutor.execute(stringDescriptionBasedQuery, SOLR_SERVER);
+            solrHintDocumentList.add(docs);
+            //System.out.println(docs); // JUST FOR TEST
+        }
+
+        HintsBuilder hintBuilder = new HintsBuilder();
+        ArrayList<HintEvent> hintArrayList = hintBuilder.produceFinalNormalizeHints(solrHintDocumentList, targetNeedUri);
+
+        //If you need you can also use this =>   HintEvent hintEvent1 = new HintEvent("uri1", "uri2", 0.0);
+        //If you need you can also use this => HintEvent hintEvent2 = new HintEvent("uri3", "uri4", 0.0);
+        //If you need you can also use this =>  getSender().tell(hintEvent1, getSelf());
+
+        BulkHintEvent bulkHintEvent = new BulkHintEvent();
+
+        for (int i = 0; i < hintArrayList.size(); i++) {
+            bulkHintEvent.addHintEvent(hintArrayList.get(i));
+        }
+
+        //If you need you can also use this => bulkHintEvent.addHintEvent(hintEvent1);
+        //If you need you can also use this => bulkHintEvent.addHintEvent(hintEvent2);
+        if (hintArrayList.size() != 0) {
+            getSender().tell(bulkHintEvent, getSelf());
+        }
     }
-
-      if(Configuration.ACTIVATE_TITEL_AND_DESCRIPTION_BASED_QUERY_BUILDER ==true) {
-          SIREnTitleAndDescriptionBasedQueryBuilder sDescriptionQueryBuilder = new SIREnTitleAndDescriptionBasedQueryBuilder();
-          String stringDescriptionBasedQuery = sDescriptionQueryBuilder.sIRENQueryBuilder(needObject);
-          System.out.print("Title and DESCRIPTION QUERY LENGHT: " + stringDescriptionBasedQuery.length()); //TODO JUST FOR TEST
-          SolrDocumentList docs = sIREnQueryExecutor.execute(stringDescriptionBasedQuery, SOLR_SERVER);
-          solrHintDocumentList.add(docs);
-          System.out.println(docs); //TODO JUST FOR TEST
-      }
-
-      HintsBuilder hintBuilder = new HintsBuilder();
-      ArrayList<HintEvent> hintArrayList = hintBuilder.produceFinalNormalizeHints(solrHintDocumentList, targetNeedUri);
   }
 
 

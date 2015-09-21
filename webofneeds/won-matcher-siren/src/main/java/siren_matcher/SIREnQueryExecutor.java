@@ -23,14 +23,14 @@ public class SIREnQueryExecutor {
 
         solrQuery.setRows(Configuration.NUMBER_OF_HINTS); //This specifies how many results should be produced by Solr
 
-        System.out.println("Query is: "+solrQuery);
+        // System.out.println("Query is: "+solrQuery); //For testing
 
         QueryResponse rsp = server.query(solrQuery);
-        System.out.println(rsp.toString()); //TODO for test
+        // System.out.println(rsp.toString()); //For testing
         SolrDocumentList docs = rsp.getResults();
 
-//        System.out.println("AAAAAAAAAAAAAAAAAAAA"+docs.get(1).getFieldValue("@graph.@id"));
+        // System.out.println(docs.get(1).getFieldValue("@graph.@id")); //For testing
 
-        return docs; //TODO THE METHOD HAS TO RETURN A BETTER DATA STRUCTURE BASED ON WHAT HAS TO BE RETURNED TO THE HIGHER LEVEL SYSTEMS
+        return docs;
     }
 }

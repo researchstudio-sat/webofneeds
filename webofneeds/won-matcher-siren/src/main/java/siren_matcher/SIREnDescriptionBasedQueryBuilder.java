@@ -8,12 +8,13 @@ import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/** This is an implementaion of SIREnQueryBuilderInterface that only uses a "need description" for making a SIREn matching
- * @author soheil
+/**
+ * This is an implementaion of SIREnQueryBuilderInterface that only uses a "need description" for making a SIREn matching
+ *
+ * @author soheilk
  * @date on 11.08.2015.
  */
 public class SIREnDescriptionBasedQueryBuilder implements SIREnQueryBuilderInterface {
-
 
 
     public String sIRENQueryBuilder(NeedObject needObject) throws QueryNodeException, IOException {
@@ -35,8 +36,8 @@ public class SIREnDescriptionBasedQueryBuilder implements SIREnQueryBuilderInter
                         .with(build.newNode("'http://purl.org/webofneeds/model#supply'").setAttribute("@id"));
                 break;
             case "http://purl.org/webofneeds/model#dotogether":
-                    twigBasicNeedType = build.newTwig("http://purl.org/webofneeds/model#hasBasicNeedType")
-                            .with(build.newNode("'http://purl.org/webofneeds/model#dotogether'").setAttribute("@id"));
+                twigBasicNeedType = build.newTwig("http://purl.org/webofneeds/model#hasBasicNeedType")
+                        .with(build.newNode("'http://purl.org/webofneeds/model#dotogether'").setAttribute("@id"));
                 break;
         }
 
@@ -48,14 +49,14 @@ public class SIREnDescriptionBasedQueryBuilder implements SIREnQueryBuilderInter
 
         ArrayList<TwigQuery> twigDescriptionArrayList = new ArrayList<TwigQuery>();
 
-        for (int i=0; i<tokenizedDescriptionPhrase.length && i<Configuration.NUMBER_OF_CONSIDERED_TOKENS;i++) {
+        for (int i = 0; i < tokenizedDescriptionPhrase.length && i < Configuration.NUMBER_OF_CONSIDERED_TOKENS; i++) {
             twigDescriptionArrayList.add(build.newTwig("http://purl.org/webofneeds/model#hasContent")
                     .with(build.newNode(tokenizedDescriptionPhrase[i]).setAttribute("http://purl.org/webofneeds/model#hasTextDescription")));
         }
 
-        if(twigBasicNeedType!=null)
+        if (twigBasicNeedType != null)
             topTwig.with(twigBasicNeedType);
-        for(int j=0; j<twigDescriptionArrayList.size();j++) {
+        for (int j = 0; j < twigDescriptionArrayList.size(); j++) {
             topTwig.optional(twigDescriptionArrayList.get(j));
         }
 

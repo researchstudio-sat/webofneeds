@@ -30,6 +30,7 @@ public class QueryNLPProcessor {
 
     /**
      * Extract tokens that are words and have length > 1 from a text
+     *
      * @param text
      * @return
      */
@@ -45,6 +46,7 @@ public class QueryNLPProcessor {
 
     /**
      * Extract tokens that are words of type nouns, adjectives or forgein words and have length > 1 from a text
+     *
      * @param text
      * @return
      */

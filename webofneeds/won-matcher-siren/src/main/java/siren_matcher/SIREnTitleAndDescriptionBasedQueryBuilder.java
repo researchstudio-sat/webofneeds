@@ -8,12 +8,13 @@ import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/** This is an implementaion of SIREnQueryBuilderInterface that only uses a "need title" for making a SIREn matching
- * @author soheil
+/**
+ * This is an implementaion of SIREnQueryBuilderInterface that only uses a "need title" for making a SIREn matching
+ *
+ * @author soheilk
  * @date on 11.08.2015.
  */
 public class SIREnTitleAndDescriptionBasedQueryBuilder implements SIREnQueryBuilderInterface {
-
 
 
     public String sIRENQueryBuilder(NeedObject needObject) throws QueryNodeException, IOException {
@@ -35,8 +36,8 @@ public class SIREnTitleAndDescriptionBasedQueryBuilder implements SIREnQueryBuil
                         .with(build.newNode("'http://purl.org/webofneeds/model#supply'").setAttribute("@id"));
                 break;
             case "http://purl.org/webofneeds/model#dotogether":
-                    twigBasicNeedType = build.newTwig("http://purl.org/webofneeds/model#hasBasicNeedType")
-                            .with(build.newNode("'http://purl.org/webofneeds/model#dotogether'").setAttribute("@id"));
+                twigBasicNeedType = build.newTwig("http://purl.org/webofneeds/model#hasBasicNeedType")
+                        .with(build.newNode("'http://purl.org/webofneeds/model#dotogether'").setAttribute("@id"));
                 break;
         }
 
@@ -49,7 +50,7 @@ public class SIREnTitleAndDescriptionBasedQueryBuilder implements SIREnQueryBuil
 
         ArrayList<TwigQuery> twigTitleArrayList = new ArrayList<TwigQuery>();
 
-        for (int i=0; i<tokenizedTitlePhrase.length && i<Configuration.NUMBER_OF_CONSIDERED_TOKENS/2;i++) {
+        for (int i = 0; i < tokenizedTitlePhrase.length && i < Configuration.NUMBER_OF_CONSIDERED_TOKENS / 2; i++) {
             twigTitleArrayList.add(build.newTwig("http://purl.org/webofneeds/model#hasContent")
                     .with(build.newNode(tokenizedTitlePhrase[i]).setAttribute("http://purl.org/dc/elements/1.1/title")));
         }
@@ -58,17 +59,17 @@ public class SIREnTitleAndDescriptionBasedQueryBuilder implements SIREnQueryBuil
 
         ArrayList<TwigQuery> twigDescriptionArrayList = new ArrayList<TwigQuery>();
 
-        for (int i=0; i<tokenizedDescriptionPhrase.length && i<Configuration.NUMBER_OF_CONSIDERED_TOKENS/2;i++) {
+        for (int i = 0; i < tokenizedDescriptionPhrase.length && i < Configuration.NUMBER_OF_CONSIDERED_TOKENS / 2; i++) {
             twigDescriptionArrayList.add(build.newTwig("http://purl.org/webofneeds/model#hasContent")
                     .with(build.newNode(tokenizedDescriptionPhrase[i]).setAttribute("http://purl.org/webofneeds/model#hasTextDescription")));
         }
 
-        if(twigBasicNeedType!=null)
+        if (twigBasicNeedType != null)
             topTwig.with(twigBasicNeedType);
-        for(int j=0; j<twigTitleArrayList.size();j++) {
+        for (int j = 0; j < twigTitleArrayList.size(); j++) {
             topTwig.optional(twigTitleArrayList.get(j));
         }
-        for(int k=0;k<twigDescriptionArrayList.size();k++){
+        for (int k = 0; k < twigDescriptionArrayList.size(); k++) {
             topTwig.optional(twigDescriptionArrayList.get(k));
         }
 
