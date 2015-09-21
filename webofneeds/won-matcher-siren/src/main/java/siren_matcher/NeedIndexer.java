@@ -44,7 +44,7 @@ public class NeedIndexer {
             Iterator<String> names = dataset.listNames();
             while (names.hasNext()) {
                 String name = names.next();
-                StringWriter sw = new StringWriter(); //TODO: delete
+                StringWriter sw = new StringWriter();
                 Model model = dataset.getNamedModel(name);
 
                 // Add this if you want to exclude one of the graphs, e.g. info graph  => !name.contains("info")&& <=
@@ -53,7 +53,7 @@ public class NeedIndexer {
                     // RDFDataMgr.write(System.out, dataset, Lang.TRIG); //For testing
                     RDFDataMgr.write(sw, dataset.getNamedModel(name), Lang.JSONLD);
                     //RDFDataMgr.write(System.out, dataset.getNamedModel(name), Lang.JSONLD); //For testing
-                    String jsonld = sw.toString(); //TODO: delete*/
+                    String jsonld = sw.toString();
                     // System.out.println("jsonld is "+jsonld); //For testing
                     Object jsonObject = JsonUtils.fromString(jsonld);
 
@@ -120,17 +120,16 @@ public class NeedIndexer {
             // System.out.println("Final JSON Framed NEED "+finalJSONFramedNeed); //For testing
             HttpRequestService httpService = new HttpRequestService();
             // String jsonData = sw.toString();
-            httpService.postRequest("http://localhost:8983/solr/won3/siren/add?commit=true", finalJSONFramedNeed);
+            httpService.postRequest(Configuration.sIREnUri+"siren/add?commit=true", finalJSONFramedNeed);
 
 
             // HttpRequestService httpService = new HttpRequestService();
             // httpService.requestSirenTest("http://localhost:8983/solr/WoN/siren/add", jsonCopiedFromYimOutput);
-        } catch (IOException e) { //TODO:
+        } catch (IOException e) {
             e.printStackTrace(); //TODO:
-        } catch (JsonLdError jsonLdError) { //TODO:
+        } catch (JsonLdError jsonLdError) {
             jsonLdError.printStackTrace(); //TODO:
         }
-
 
     }
 }
