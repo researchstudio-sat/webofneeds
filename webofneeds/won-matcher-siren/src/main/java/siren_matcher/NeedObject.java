@@ -11,7 +11,9 @@ public class NeedObject {
     public String needTag;
     public String needDate;
     public String needLocation;
-    public String wonUri;
+    public String needResourceUri;
+    public String needDataUri;
+
 
     public String getBasicNeedType() {
         return basicNeedType;
@@ -37,7 +39,9 @@ public class NeedObject {
         return needLocation;
     }
 
-    public String getWonUri() {return wonUri; }
+    public String getNeedResourceUri() {return needResourceUri; }
+
+    public String getNeedDataUri() {return needDataUri; }
 
     public void setBasicNeedType(String basicNeedType) {
         this.basicNeedType = basicNeedType;
@@ -63,6 +67,9 @@ public class NeedObject {
         this.needLocation = needLocation;
     }
 
-    public void setWonUri(String wonUri) {this.wonUri = wonUri; }
+    public void setNeedResourceUri(String needResourceUri) {this.needResourceUri = needResourceUri; }
+
+    public void setDataResourceUri(String needDataUri) {this.needDataUri = needDataUri; }
+
 
 }

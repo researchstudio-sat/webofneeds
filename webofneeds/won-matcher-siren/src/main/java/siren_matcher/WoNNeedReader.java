@@ -34,10 +34,17 @@ public class WoNNeedReader {
             LOGGER.info("Basic Need Type is: " + basicNeedType);
         needObject.setBasicNeedType(basicNeedType);
 
-        String needUri = WonRdfUtils.NeedUtils.getNeedURI(dataset).toString();
+        String needResourceUri = WonRdfUtils.NeedUtils.getNeedURI(dataset).toString();
         if(Configuration.ACTIVATE_DEBUGGING_LOGGS)
-            LOGGER.info("NeedUri is: " + needUri);
-        needObject.setWonUri(needUri);
+            LOGGER.info("needResourceUri is: " + needResourceUri);
+        needObject.setNeedResourceUri(needResourceUri);
+
+
+        String needDataUri = WonRdfUtils.NeedUtils.getNeedURI(dataset).toString();
+        if(Configuration.ACTIVATE_DEBUGGING_LOGGS)
+            LOGGER.info("needDataUri is: " + needDataUri);
+        needObject.setNeedResourceUri(needDataUri);
+
 
         NeedIndexer needIndexer = new NeedIndexer();
         //needIndexer.index(needObject, solrServer);

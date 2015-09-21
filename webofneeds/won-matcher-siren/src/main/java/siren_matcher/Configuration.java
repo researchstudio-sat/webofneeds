@@ -4,7 +4,7 @@ package siren_matcher;
  * Created by soheilk on 26.08.2015.
  */
 public class Configuration {
-    public static String sIREnUri = "http://localhost:8983/solr/WoN/siren";
+    public static String sIREnUri = "http://localhost:8983/solr/won3/";
     public static boolean ACTIVATE_DEBUGGING_LOGGS = true;
 
     //the following boolean variables can be used to switch different types of query builders off or on.
