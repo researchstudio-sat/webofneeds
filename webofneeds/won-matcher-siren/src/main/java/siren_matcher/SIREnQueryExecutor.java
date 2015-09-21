@@ -3,7 +3,6 @@ package siren_matcher;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 
@@ -23,7 +22,7 @@ public class SIREnQueryExecutor {
 
         solrQuery.setRows(Configuration.NUMBER_OF_HINTS); //This specifies how many results should be produced by Solr
 
-        // System.out.println("Query is: "+solrQuery); //For testing
+         //System.out.println("Query is: "+solrQuery); //For testing
 
         QueryResponse rsp = server.query(solrQuery);
         // System.out.println(rsp.toString()); //For testing

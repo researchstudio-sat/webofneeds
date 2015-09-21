@@ -1,5 +1,4 @@
 
-import actor.DummyHintReceiverActor;
 import actor.SirenMatcherActor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;

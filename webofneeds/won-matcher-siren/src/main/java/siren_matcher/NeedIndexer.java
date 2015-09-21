@@ -7,25 +7,14 @@ import com.github.jsonldjava.utils.JsonUtils;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.RDF;
-import common.event.NeedEvent;
+import common.service.HttpRequestService;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.request.UpdateRequest;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.client.solrj.response.UpdateResponse;
 import won.protocol.vocabulary.SFSIG;
 
-import javax.xml.crypto.Data;
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -106,18 +95,25 @@ public class NeedIndexer {
 
 
             String finalJSONFramedNeed = "{\"@graph\":[";
+            Boolean EscapeFlag = false;
             for (int i = 0; i < jsonObjectsList.size(); i++) {
+              if (jsonObjectsList.get(i).length()>5) {
+                if (i != 0 && EscapeFlag==false) {
+                  finalJSONFramedNeed = finalJSONFramedNeed + ",";
+                }
+                EscapeFlag = false;
                 String string = jsonObjectsList.get(i);
                 string = string.substring(1);
                 string = string.substring(0, string.length() - 1);
                 finalJSONFramedNeed = finalJSONFramedNeed + string;
-                if (i != jsonObjectsList.size() - 1) {
-                    finalJSONFramedNeed = finalJSONFramedNeed + ",";
-                }
+              }
+              else{
+                EscapeFlag = true;
+              }
             }
             finalJSONFramedNeed = finalJSONFramedNeed + "]}";
 
-            // System.out.println("Final JSON Framed NEED "+finalJSONFramedNeed); //For testing
+             System.out.println("Final JSON Framed NEED "+finalJSONFramedNeed); //For testing
             HttpRequestService httpService = new HttpRequestService();
             // String jsonData = sw.toString();
             httpService.postRequest(Configuration.sIREnUri+"siren/add?commit=true", finalJSONFramedNeed);

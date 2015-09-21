@@ -4,7 +4,7 @@ package siren_matcher;
  * Created by soheilk on 26.08.2015.
  */
 public class Configuration {
-    public static String sIREnUri = "http://localhost:8983/solr/won3/"; //take care of the core name
+    public static String sIREnUri = "http://localhost:8983/solr/won/"; //take care of the core name
 
     public static boolean ACTIVATE_DEBUGGING_LOGGS = true;
 

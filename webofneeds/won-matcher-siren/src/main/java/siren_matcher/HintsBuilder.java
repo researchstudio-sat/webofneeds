@@ -6,13 +6,11 @@ import org.apache.solr.common.SolrDocumentList;
 
 import java.util.ArrayList;
 
-import static jdk.nashorn.internal.objects.NativeNumber.valueOf;
-
 /**
  * Created by soheilk on 04.09.2015.
  */
 public class HintsBuilder {
-    public ArrayList<HintEvent> produceFinalNormalizeHints(ArrayList<SolrDocumentList> solrDocListArrayList, String targetNeedUri) {
+    public ArrayList<HintEvent> produceFinalNormalizeHints(ArrayList<SolrDocumentList> solrDocListArrayList, String targetNeedUri, String targetWonNode) {
         ArrayList<SolrDocumentList> normalizedSolrDocListArrayList = new ArrayList<SolrDocumentList>();
         for (int i = 0; i < solrDocListArrayList.size(); i++) {
             normalizedSolrDocListArrayList.add(normalizer(solrDocListArrayList.get(i)));
@@ -48,9 +46,14 @@ public class HintsBuilder {
         }
 
         ArrayList<HintEvent> hintEventLists = new ArrayList<HintEvent>();
-
         for (int o = 0; o < aggregatedSolrDocumentList.size(); o++) {
-            hintEventLists.add(new HintEvent(targetNeedUri, aggregatedSolrDocumentList.get(o).getFieldValue("@graph.@id").toString(), valueOf(aggregatedSolrDocumentList.get(o).getFieldValue("score"))));
+            String wonNodeUri = aggregatedSolrDocumentList.get(o).getFieldValue("@graph.http://purl.org/webofneeds/model#hasWonNode.@id").toString();
+            String needUri = aggregatedSolrDocumentList.get(o).getFieldValue("@graph.@id").toString();
+            double score = Double.valueOf(aggregatedSolrDocumentList.get(o).getFieldValue("score").toString());
+
+            //TODO Add the targetNeedWonNodeUri
+            hintEventLists.add(new HintEvent("TestTargetNeedWonNodeUri", targetNeedUri, wonNodeUri, needUri,
+                                             Configuration.sIREnUri, score));
         }
 
         return hintEventLists;
