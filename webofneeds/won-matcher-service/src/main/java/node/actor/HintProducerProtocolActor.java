@@ -14,7 +14,6 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.model.FacetType;
-import won.protocol.util.RdfUtils;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -58,7 +57,7 @@ public class HintProducerProtocolActor extends UntypedProducerActor
     headers.put("otherNeedURI", hint.getToNeedUri());
     headers.put("score", String.valueOf(hint.getScore()));
     headers.put("originator", hint.getMatcherUri());
-    headers.put("content", RdfUtils.toString(hint.deserializeExplanationModel()));
+    //headers.put("content", RdfUtils.toString(hint.deserializeExplanationModel()));
     headers.put("remoteBrokerEndpoint", localBrokerUri);
     headers.put("methodName", "hint");
 

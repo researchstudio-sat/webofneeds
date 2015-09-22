@@ -1,7 +1,7 @@
 package crawler.service;
 
 import com.hp.hpl.jena.query.*;
-import common.service.SparqlService;
+import common.service.sparql.SparqlService;
 import crawler.msg.CrawlUriMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

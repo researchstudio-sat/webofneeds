@@ -1,4 +1,4 @@
-package common.service;
+package common.service.sparql;
 
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;

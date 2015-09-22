@@ -9,7 +9,7 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
 import common.event.NeedEvent;
-import common.service.SparqlService;
+import common.service.sparql.SparqlService;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFFormat;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -15,10 +15,51 @@ public class SirenMatcherConfig
   private String solrServerUri;
 
   @Value("${matcher.siren.max.hints}")
-  private long maxHints;
+  private int maxHints;
 
-  @Value("${matcher.siren.nlpResourceDir}")
-  private String nlpResourceDirectory;
+  @Value("${matcher.siren.query.title}")
+  private boolean useTitleQuery;
+
+  @Value("${matcher.siren.query.description}")
+  private boolean useDescriptionQuery;
+
+  @Value("${matcher.siren.query.titleDescription}")
+  private boolean useTitleDescriptionQuery;
+
+  @Value("${matcher.siren.query.consideredTokens}")
+  private int consideredQueryTokens;
+
+  public int getConsideredQueryTokens() {
+    return consideredQueryTokens;
+  }
+
+  public void setConsideredQueryTokens(final int consideredQueryTokens) {
+    this.consideredQueryTokens = consideredQueryTokens;
+  }
+
+  public boolean isUseTitleQuery() {
+    return useTitleQuery;
+  }
+
+  public void setUseTitleQuery(final boolean useTitleQuery) {
+    this.useTitleQuery = useTitleQuery;
+  }
+
+  public boolean isUseDescriptionQuery() {
+    return useDescriptionQuery;
+  }
+
+  public void setUseDescriptionQuery(final boolean useDescriptionQuery) {
+    this.useDescriptionQuery = useDescriptionQuery;
+  }
+
+  public boolean isUseTitleDescriptionQuery() {
+    return useTitleDescriptionQuery;
+  }
+
+  public void setUseTitleDescriptionQuery(final boolean useTitleDescriptionQuery) {
+    this.useTitleDescriptionQuery = useTitleDescriptionQuery;
+  }
 
   public String getSolrServerUri() {
     return solrServerUri;
@@ -32,16 +73,8 @@ public class SirenMatcherConfig
     return maxHints;
   }
 
-  public void setMaxHints(final long maxHints) {
+  public void setMaxHints(final int maxHints) {
     this.maxHints = maxHints;
-  }
-
-  public String getNlpResourceDirectory() {
-    return nlpResourceDirectory;
-  }
-
-  public void setNlpResourceDirectory(final String nlpResourceDirectory) {
-    this.nlpResourceDirectory = nlpResourceDirectory;
   }
 
 }

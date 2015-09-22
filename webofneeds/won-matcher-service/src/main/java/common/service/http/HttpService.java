@@ -1,4 +1,4 @@
-package common.service;
+package common.service.http;
 
 import com.hp.hpl.jena.query.Dataset;
 import org.slf4j.Logger;
@@ -20,20 +20,20 @@ import won.protocol.rest.RdfDatasetConverter;
  * Date: 04.05.2015
  */
 @Component
-public class HttpRequestService
+public class HttpService
 {
   private final Logger log = LoggerFactory.getLogger(getClass());
   private RestTemplate restTemplate;
   private HttpEntity<Dataset> dataSetEntity;
   private HttpHeaders jsonHeaders;
 
-  public HttpRequestService() {
+  public HttpService() {
 
     HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
     init(factory);
   }
 
-  public HttpRequestService(int readTimeout, int connectionTimeout) {
+  public HttpService(int readTimeout, int connectionTimeout) {
 
     HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
     factory.setReadTimeout(readTimeout);
@@ -75,7 +75,7 @@ public class HttpRequestService
     return response.getBody();
   }
 
-  public void postRequest(String uri, String body) {
+  public void postJsonRequest(String uri, String body) {
 
     ResponseEntity<String> response = null;
     log.debug("POST URI: {}", uri);

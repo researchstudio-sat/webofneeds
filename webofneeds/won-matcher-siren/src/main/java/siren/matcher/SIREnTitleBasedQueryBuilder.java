@@ -1,21 +1,27 @@
-package siren_matcher;
+package siren.matcher;
 
 import com.sindicetech.siren.qparser.tree.dsl.ConciseQueryBuilder;
 import com.sindicetech.siren.qparser.tree.dsl.ConciseTwigQuery;
 import com.sindicetech.siren.qparser.tree.dsl.TwigQuery;
+import config.SirenMatcherConfig;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * This is an implementaion of SIREnQueryBuilderInterface that only uses a "need description" for making a SIREn matching
+ * This is an implementaion of SIREnQueryBuilderInterface that only uses a "need title" for making a SIREn matching
  *
  * @author soheilk
  * @date on 11.08.2015.
  */
-public class SIREnDescriptionBasedQueryBuilder implements SIREnQueryBuilderInterface {
+@Component
+public class SIREnTitleBasedQueryBuilder implements SIREnQueryBuilderInterface {
 
+    @Autowired
+    private SirenMatcherConfig config;
 
     public String sIRENQueryBuilder(NeedObject needObject) throws QueryNodeException, IOException {
 
@@ -41,23 +47,21 @@ public class SIREnDescriptionBasedQueryBuilder implements SIREnQueryBuilderInter
                 break;
         }
 
-        // processing the description and make some queries out of it
-
+        // processing the title and make some queries out of it
         QueryNLPProcessor qNLPP = new QueryNLPProcessor();
+        String[] tokenizedTitlePhrase = qNLPP.extractRelevantWordTokens(needObject.getNeedTitle());
 
-        String[] tokenizedDescriptionPhrase = qNLPP.extractRelevantWordTokens(needObject.getNeedDescription());
+        ArrayList<TwigQuery> twigTitleArrayList = new ArrayList<TwigQuery>();
 
-        ArrayList<TwigQuery> twigDescriptionArrayList = new ArrayList<TwigQuery>();
-
-        for (int i = 0; i < tokenizedDescriptionPhrase.length && i < Configuration.NUMBER_OF_CONSIDERED_TOKENS; i++) {
-            twigDescriptionArrayList.add(build.newTwig("http://purl.org/webofneeds/model#hasContent")
-                    .with(build.newNode(tokenizedDescriptionPhrase[i]).setAttribute("http://purl.org/webofneeds/model#hasTextDescription")));
+        for (int i = 0; i < tokenizedTitlePhrase.length && i < config.getConsideredQueryTokens(); i++) {
+            twigTitleArrayList.add(build.newTwig("http://purl.org/webofneeds/model#hasContent")
+                    .with(build.newNode(tokenizedTitlePhrase[i]).setAttribute("http://purl.org/dc/elements/1.1/title")));
         }
 
         if (twigBasicNeedType != null)
             topTwig.with(twigBasicNeedType);
-        for (int j = 0; j < twigDescriptionArrayList.size(); j++) {
-            topTwig.optional(twigDescriptionArrayList.get(j));
+        for (int j = 0; j < twigTitleArrayList.size(); j++) {
+            topTwig.optional(twigTitleArrayList.get(j));
         }
 
         return topTwig.toString();

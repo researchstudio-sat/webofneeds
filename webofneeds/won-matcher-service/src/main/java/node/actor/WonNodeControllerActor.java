@@ -11,7 +11,7 @@ import com.hp.hpl.jena.query.Dataset;
 import common.event.BulkHintEvent;
 import common.event.HintEvent;
 import common.event.WonNodeEvent;
-import common.service.HttpRequestService;
+import common.service.http.HttpService;
 import common.spring.SpringExtension;
 import crawler.actor.MasterCrawlerActor;
 import crawler.msg.CrawlUriMessage;
@@ -54,7 +54,7 @@ public class WonNodeControllerActor extends UntypedActor
   private WonNodeSparqlService sparqlService;
 
   @Autowired
-  private HttpRequestService httpRequestService;
+  private HttpService httpService;
 
   @Autowired
   private WonNodeControllerConfig config;
@@ -208,7 +208,7 @@ public class WonNodeControllerActor extends UntypedActor
     WonNodeConnection con = null;
     try {
       // request the resource and save the data
-      Dataset ds = httpRequestService.requestDataset(wonNodeUri);
+      Dataset ds = httpService.requestDataset(wonNodeUri);
       sparqlService.updateNamedGraphsOfDataset(ds);
       WonNodeInfo nodeInfo = sparqlService.getWonNodeInfoFromDataset(ds);
 

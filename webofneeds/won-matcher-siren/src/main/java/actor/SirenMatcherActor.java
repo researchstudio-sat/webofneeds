@@ -6,24 +6,25 @@ import akka.cluster.pubsub.DistributedPubSub;
 import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import com.github.jsonldjava.core.JsonLdError;
 import com.hp.hpl.jena.query.Dataset;
 import common.event.BulkHintEvent;
 import common.event.HintEvent;
 import common.event.NeedEvent;
+import config.SirenMatcherConfig;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrDocumentList;
-import siren_matcher.*;
-import config.SirenMatcherConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import siren.indexer.NeedIndexer;
+import siren.matcher.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,13 +44,31 @@ public class SirenMatcherActor extends UntypedActor
       static instance of HttpSolrServer per solr server url and share it for all requests.
       See https://issues.apache.org/jira/browse/SOLR-861 for more details
   */
-   public static SolrServer SOLR_SERVER = new HttpSolrServer(Configuration.sIREnUri);
+  private static SolrServer solrServer = null;
 
   private ActorRef pubSubMediator;
   private List<NeedEvent> needs = new LinkedList<>();
 
   @Autowired
   private SirenMatcherConfig config;
+
+  @Autowired
+  private HintsBuilder hintBuilder;
+
+  @Autowired
+  private SIREnQueryExecutor sIREnQueryExecutor;
+
+  @Autowired
+  private SIREnTitleBasedQueryBuilder titleQueryBuilder;
+
+  @Autowired
+  private SIREnDescriptionBasedQueryBuilder descriptionQueryBuilder;
+
+  @Autowired
+  private SIREnTitleAndDescriptionBasedQueryBuilder titleDescriptionQueryBuilder;
+
+  @Autowired
+  private NeedIndexer needIndexer;
 
 
   @Override
@@ -58,6 +77,13 @@ public class SirenMatcherActor extends UntypedActor
     // subscribe to need events
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
     pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(NeedEvent.class.getName(), getSelf()), getSelf());
+
+    // set solr server
+    if (solrServer == null) {
+      solrServer = new HttpSolrServer(config.getSolrServerUri());
+    } else {
+      log.warning("solr server uri already set by another instance!");
+    }
   }
 
   @Override
@@ -72,71 +98,51 @@ public class SirenMatcherActor extends UntypedActor
         }
     }
 
-  private void processNeedEvent(NeedEvent needEvent) throws QueryNodeException, SolrServerException, IOException {
-
-    //making a new instance of the SIREn Query Excutor
-    SIREnQueryExecutor sIREnQueryExecutor = new SIREnQueryExecutor();
-
-    String targetNeedUri = needEvent.getUri();
+  private void processNeedEvent(NeedEvent needEvent)
+    throws QueryNodeException, SolrServerException, IOException, JsonLdError {
 
     //Reading the need that has to be used for making queries
     Dataset dataset = needEvent.deserializeNeedDataset();
-
-
     WoNNeedReader woNNeedReader = new WoNNeedReader();
-    NeedObject needObject = woNNeedReader.readWoNNeedFromDeserializedNeedDataset(dataset, SOLR_SERVER);
+    NeedObject needObject = woNNeedReader.readWoNNeedFromDeserializedNeedDataset(dataset, solrServer);
 
     ArrayList<SolrDocumentList> solrHintDocumentList = new ArrayList<SolrDocumentList>();
 
     //Here we start to build and execute different SIREn Query Builders
-    if (Configuration.ACTIVATE_TITEL_BASED_QUERY_BUILDER == true) {
-      SIREnTitleBasedQueryBuilder sTitleBQueryBuilder = new SIREnTitleBasedQueryBuilder();
-      String stringTitleBasedQuery = sTitleBQueryBuilder.sIRENQueryBuilder(needObject);
-      //System.out.print("TITEL QUERY LENGHT: " + stringTitleBasedQuery.length()); // JUST FOR TEST
-      SolrDocumentList docs = sIREnQueryExecutor.execute(stringTitleBasedQuery, SOLR_SERVER);
+    if (config.isUseTitleQuery()) {
+      String stringTitleBasedQuery = titleQueryBuilder.sIRENQueryBuilder(needObject);
+      SolrDocumentList docs = sIREnQueryExecutor.execute(stringTitleBasedQuery, solrServer);
       solrHintDocumentList.add(docs);
-      //System.out.println(docs); // JUST FOR TEST
     }
 
-    if (Configuration.ACTIVATE_DESCRIPTION_BASED_QUERY_BUILDER == true) {
-      SIREnDescriptionBasedQueryBuilder sDescriptionQueryBuilder = new SIREnDescriptionBasedQueryBuilder();
-      String stringDescriptionBasedQuery = sDescriptionQueryBuilder.sIRENQueryBuilder(needObject);
-      //System.out.print("DESCRIPTION QUERY LENGHT: " + stringDescriptionBasedQuery.length()); // JUST FOR TEST
-      SolrDocumentList docs = sIREnQueryExecutor.execute(stringDescriptionBasedQuery, SOLR_SERVER);
+    if (config.isUseDescriptionQuery()) {
+      String stringDescriptionBasedQuery = descriptionQueryBuilder.sIRENQueryBuilder(needObject);
+      SolrDocumentList docs = sIREnQueryExecutor.execute(stringDescriptionBasedQuery, solrServer);
       solrHintDocumentList.add(docs);
-      //System.out.println(docs); // JUST FOR TEST
     }
 
-    if (Configuration.ACTIVATE_TITEL_AND_DESCRIPTION_BASED_QUERY_BUILDER == true) {
-      SIREnTitleAndDescriptionBasedQueryBuilder sDescriptionQueryBuilder = new SIREnTitleAndDescriptionBasedQueryBuilder();
-      String stringDescriptionBasedQuery = sDescriptionQueryBuilder.sIRENQueryBuilder(needObject);
-      //System.out.print("Title and DESCRIPTION QUERY LENGHT: " + stringDescriptionBasedQuery.length()); // JUST FOR TEST
-      SolrDocumentList docs = sIREnQueryExecutor.execute(stringDescriptionBasedQuery, SOLR_SERVER);
+    if (config.isUseTitleDescriptionQuery()) {
+      String stringDescriptionBasedQuery = titleDescriptionQueryBuilder.sIRENQueryBuilder(needObject);
+      SolrDocumentList docs = sIREnQueryExecutor.execute(stringDescriptionBasedQuery, solrServer);
       solrHintDocumentList.add(docs);
-      //System.out.println(docs); // JUST FOR TEST
     }
 
-    HintsBuilder hintBuilder = new HintsBuilder();
+    // create the hints
     ArrayList<HintEvent> hintArrayList = hintBuilder.produceFinalNormalizeHints(
-      solrHintDocumentList, targetNeedUri, needEvent.getWonNodeUri());
-
-    //If you need you can also use this =>   HintEvent hintEvent1 = new HintEvent("uri1", "uri2", 0.0);
-    //If you need you can also use this => HintEvent hintEvent2 = new HintEvent("uri3", "uri4", 0.0);
-    //If you need you can also use this =>  getSender().tell(hintEvent1, getSelf());
+      solrHintDocumentList, needEvent.getUri(), needEvent.getWonNodeUri());
 
     BulkHintEvent bulkHintEvent = new BulkHintEvent();
-
     for (int i = 0; i < hintArrayList.size(); i++) {
       bulkHintEvent.addHintEvent(hintArrayList.get(i));
     }
 
-    //If you need you can also use this => bulkHintEvent.addHintEvent(hintEvent1);
-    //If you need you can also use this => bulkHintEvent.addHintEvent(hintEvent2);
+    // publish the hints found
     if (hintArrayList.size() != 0) {
-      pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkHintEvent.getClass().getName(), bulkHintEvent),
-                          getSelf());
+      pubSubMediator.tell(new DistributedPubSubMediator.Publish(
+                            bulkHintEvent.getClass().getName(), bulkHintEvent), getSelf());
     }
+
+    // save the new need in the siren index
+    needIndexer.indexer_jsonld_format(dataset);
   }
-
-
 }

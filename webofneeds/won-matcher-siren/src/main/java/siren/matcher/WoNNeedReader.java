@@ -1,4 +1,4 @@
-package siren_matcher;
+package siren.matcher;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.vocabulary.DC;
@@ -21,35 +21,26 @@ public class WoNNeedReader {
         NeedObject needObject = new NeedObject();
 
         String title = RdfUtils.findOnePropertyFromResource(dataset, null, DC.title).asLiteral().toString();
-        if (Configuration.ACTIVATE_DEBUGGING_LOGGS)
-            log.debug("Need title: " + title);
+        log.debug("Need title: " + title);
         needObject.setNeedTitle(title);
 
         String textDescription = RdfUtils.findOnePropertyFromResource(dataset, null, WON.HAS_TEXT_DESCRIPTION).asLiteral
-                ().toString();
-        if (Configuration.ACTIVATE_DEBUGGING_LOGGS)
-            log.debug("Need Description: " + textDescription);
+          ().toString();
+        log.debug("Need Description: " + textDescription);
         needObject.setNeedDescription(textDescription);
 
         String basicNeedType = RdfUtils.findOnePropertyFromResource(dataset, null, WON.HAS_BASIC_NEED_TYPE).asResource().toString();
-        if (Configuration.ACTIVATE_DEBUGGING_LOGGS)
-            log.debug("Basic Need Type is: " + basicNeedType);
+        log.debug("Basic Need Type is: " + basicNeedType);
         needObject.setBasicNeedType(basicNeedType);
 
         String needResourceUri = WonRdfUtils.NeedUtils.getNeedURI(dataset).toString();
-        if (Configuration.ACTIVATE_DEBUGGING_LOGGS)
-            log.debug("needResourceUri is: " + needResourceUri);
+        log.debug("needResourceUri is: " + needResourceUri);
         needObject.setNeedResourceUri(needResourceUri);
 
 
         String needDataUri = WonRdfUtils.NeedUtils.getNeedURI(dataset).toString();
-        if (Configuration.ACTIVATE_DEBUGGING_LOGGS)
-            log.debug("needDataUri is: " + needDataUri.replace("resource","data"));
-        needObject.setNeedResourceUri(needDataUri.replace("resource","data"));
-
-
-        NeedIndexer needIndexer = new NeedIndexer();
-        needIndexer.indexer_jsonld_format(dataset);
+        log.debug("needDataUri is: " + needDataUri.replace("resource","data"));
+        needObject.setNeedResourceUri(needDataUri.replace("resource", "data"));
 
         return needObject;
     }

@@ -1,4 +1,4 @@
-package siren_matcher;
+package siren.matcher;
 
 /**
  * Created by soheilk on 25.08.2015.

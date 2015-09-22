@@ -22,6 +22,7 @@ public class HintEvent implements Serializable
   private double score;
 
   private URI generatedEventUri;
+
   private String serializedExplanationModel;
   private String serializationLangName;
   private String serializationLangContentType;
@@ -61,7 +62,7 @@ public class HintEvent implements Serializable
     return score;
   }
 
-  public Model deserializeExplanationModel() { return null; }
+  public Model deserializeExplanationModel() { throw new UnsupportedOperationException(); }
 
   public URI getGeneratedEventUri() {
     return generatedEventUri;
@@ -71,10 +72,25 @@ public class HintEvent implements Serializable
     this.generatedEventUri = generatedEventUri;
   }
 
+  public void setSerializedExplanationModel(final String serializedExplanationModel) {
+    this.serializedExplanationModel = serializedExplanationModel;
+  }
+
+  public void setSerializationLangName(final String serializationLangName) {
+    this.serializationLangName = serializationLangName;
+  }
+
+  public void setSerializationLangContentType(final String serializationLangContentType) {
+    this.serializationLangContentType = serializationLangContentType;
+  }
+
   @Override
   public HintEvent clone() {
     HintEvent e = new HintEvent(fromWonNodeUri, fromNeedUri, toWonNodeUri, toNeedUri, matcherUri, score);
     e.setGeneratedEventUri(this.getGeneratedEventUri());
+    e.setSerializationLangContentType(this.serializationLangContentType);
+    e.setSerializationLangName(this.serializationLangName);
+    e.setSerializedExplanationModel(this.serializedExplanationModel);
     return e;
   }
 
