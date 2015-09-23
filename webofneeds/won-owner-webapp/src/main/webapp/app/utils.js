@@ -50,3 +50,60 @@ export function readAsDataURL(file) {
         reader.readAsDataURL(file);
     });
 };
+
+/*
+ * Freezes an object recursively.
+ *
+ * Taken from:
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
+ */
+export function deepFreeze(obj) {
+
+    // Retrieve the property names defined on obj
+    var propNames = Object.getOwnPropertyNames(obj);
+
+    // Freeze properties before freezing self
+    propNames.forEach(function(name) {
+        var prop = obj[name];
+
+        // Freeze prop if it is an object
+        if (typeof prop == 'object' && !Object.isFrozen(prop))
+            deepFreeze(prop);
+    });
+
+    // Freeze self
+    return Object.freeze(obj);
+}
+
+
+/*
+ * @param o an object-tree.
+ *
+ * @param prefix add a custom prefix to all generated constants.
+ *
+ * @returns a tree using the same structure as `o` but with
+ *          all leaves being strings equal to their lookup path.
+ * e.g.:
+ * tree2constants({foo: null}) -> {foo: 'foo'}
+ * tree2constants{{foo: {bar: null}}) -> {foo: {bar: 'foo.bar'}}
+ * tree2constants{foo: null}, 'pfx') -> {foo: 'pfx.foo'}
+ */
+export function tree2constants(o, prefix = '') {
+    return deepFreeze(_tree2constants(o, prefix));
+}
+function _tree2constants(o, pathAcc = '') {
+    if(typeof o === 'object' && o !== null) {
+
+        if(pathAcc !== '')
+            pathAcc += '.';
+
+        const accObj = {};
+        for(let k of Object.keys(o)) {
+            accObj[k] = _tree2constants(o[k], pathAcc + k);
+        }
+        return accObj;
+
+    } else {
+        return pathAcc;
+    }
+}

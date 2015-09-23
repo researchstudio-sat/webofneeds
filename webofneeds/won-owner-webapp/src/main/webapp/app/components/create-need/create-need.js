@@ -9,8 +9,12 @@ import posttypeSelectModule from '../posttype-select';
 import labelledHrModule from '../labelled-hr';
 import dynamicTextfieldModule from '../dynamic-textfield';
 import imageDropzoneModule from '../image-dropzone';
-
+import draftStoreModule from '../../stores/draft-store';
 import { attach } from '../../utils';
+import actions from '../../actions';
+
+window.actions = actions;
+
 
 
 let postTypeTexts = [
@@ -76,7 +80,8 @@ export default angular.module('won.owner.components.createNeed', [
         posttypeSelectModule,
         labelledHrModule,
         dynamicTextfieldModule,
-        imageDropzoneModule
+        imageDropzoneModule,
+        draftStoreModule,
     ])
     //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
     .controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
