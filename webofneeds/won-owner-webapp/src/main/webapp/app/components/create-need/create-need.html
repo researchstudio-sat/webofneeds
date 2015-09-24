@@ -11,6 +11,10 @@
                 on-unselect="::this['create-need'].unselectType()">
         </won-posttype-select>
 
+        <button ng-click="this['create-need'].moreWub(1)">MOAR WUB!</button>
+        <button ng-click="this['create-need'].moreWub(3)">3 MOAR WUB!</button>
+        <p>{{ this['create-need'].wubs }}</p>
+
         <!--
         <select name="select" class="cp__typeselect2">
             <option value="value1">Value 1</option>

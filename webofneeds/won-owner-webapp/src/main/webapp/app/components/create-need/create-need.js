@@ -9,13 +9,9 @@ import posttypeSelectModule from '../posttype-select';
 import labelledHrModule from '../labelled-hr';
 import dynamicTextfieldModule from '../dynamic-textfield';
 import imageDropzoneModule from '../image-dropzone';
-import draftStoreModule from '../../stores/draft-store';
+//import draftStoreModule from '../../stores/draft-store';
 import { attach } from '../../utils';
-import actions from '../../actions';
-
-window.actions = actions;
-
-
+import { actionCreators }  from '../../actions';
 
 let postTypeTexts = [
     {
@@ -36,8 +32,8 @@ let postTypeTexts = [
     }
 ]
 
-//const serviceDependencies = ['$scope', '$element'/*injections as strings here*/];
-const serviceDependencies = ['$q'/*injections as strings here*/];
+//TODO can't inject $scope with the angular2-router, preventing redux-cleanup
+const serviceDependencies = ['$q', '$ngRedux' /*injections as strings here*/];
 
 class CreateNeedController {
     constructor(/* arguments <- serviceDependencies */) {
@@ -53,6 +49,15 @@ class CreateNeedController {
         //this.titlePicZoneNg().bind('click', e => 0);
         //this.titlePicZone().addEventListener('click', e => 0);
         //this.titlePicZone().addEventListener('drop', e => 0);
+
+        const selectFromState = (state) => ({
+            wubs: state.wubs
+        });
+
+        // Using actionCreators like this means that every action defined there is available in the template.
+        const unsubscribe = this.$ngRedux.connect(this.selectFromState, actionCreators)(this);
+        //this.$scope.$on('$destroy', unsubscribe); //can't inject $scope with angular2-router as it doesn't exist anymore in angular2
+
     }
 
     selectType(idx) {
@@ -81,7 +86,6 @@ export default angular.module('won.owner.components.createNeed', [
         labelledHrModule,
         dynamicTextfieldModule,
         imageDropzoneModule,
-        draftStoreModule,
     ])
     //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
     .controller('CreateNeedController', [...serviceDependencies, CreateNeedController])

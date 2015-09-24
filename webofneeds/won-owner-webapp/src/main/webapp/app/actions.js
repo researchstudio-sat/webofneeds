@@ -5,7 +5,7 @@
  */
 import { tree2constants } from './utils';
 
-export default tree2constants({
+export const actionTypes = tree2constants({
 
     /* actions received as responses or push notifications */
     received: {
@@ -31,7 +31,11 @@ export default tree2constants({
     },
     ownpost: {
         new: null,
-    }
-}, 'actions');
+    },
+    moreWub: null
+});
 
+export const actionCreators = {
+    moreWub : (howMuch) => ({type: actionTypes.moreWub, howMuch}),
+}
 

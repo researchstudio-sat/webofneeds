@@ -28,8 +28,13 @@ import overviewPostsComponent from './components/overview-posts/overview-posts';
 import feedComponent from './components/feed/feed';
 import overviewMatchesComponent from './components/overview-matches/overview-matches';
 
+import * as reducers from './reducers/reducers';
+import { combineReducers } from 'redux';
+import 'ng-redux';
+
 let app = angular.module('won.owner', [
     'ngNewRouter',
+    'ngRedux',
     appTag,
     topnav, //used in index.html
     createNeedComponent,
@@ -43,20 +48,38 @@ let app = angular.module('won.owner', [
     overviewMatchesComponent
 ]);
 
+app.config(['$componentLoaderProvider', '$ngReduxProvider',
+    ($componentLoaderProvider, $ngReduxProvider) => {
+        configComponentLoading($componentLoaderProvider);
+        configRedux($ngReduxProvider);
+    }
+]);
+
+function configRedux($ngReduxProvider) {
+    /* note that `combineReducers` is opinionated as a root reducer for the
+     * sake of convenience and ease of first use. It takes an object
+     * with seperate reducers and applies each to it's seperate part of the
+     * store/model. e.g.: an reducers object `{ drafts: function(state = [], action){...} }`
+     * would result in a store like `{ drafts: [...] }`
+     */
+    let reducer = combineReducers(reducers);
+    $ngReduxProvider.createStoreWith(reducer, [/* middlewares here, e.g. 'promiseMiddleware', loggingMiddleware */]);
+}
+
 /*
  * Taken from https://github.com/htdt/ng-es6-router/blob/master/app/app.js
  */
-app.config(['$componentLoaderProvider', setTemplatesPath]);
-function setTemplatesPath ($componentLoaderProvider){
+function configComponentLoading($componentLoaderProvider) {
     //the default wouldn't include 'app/'
     $componentLoaderProvider.setTemplateMapping(name => `app/components/${name}/${name}.html`);
     $componentLoaderProvider.setCtrlNameMapping(componentName =>
         hyphen2Camel(componentName) + 'Controller'
     )
     $componentLoaderProvider.setComponentFromCtrlMapping(ctrlName =>
-        camel2Hyphen(ctrlName.replace(/Controller$/, ''))
+            camel2Hyphen(ctrlName.replace(/Controller$/, ''))
     )
     window.loader = $componentLoaderProvider;
+
 }
 
 class AppController {
@@ -124,6 +147,4 @@ angular.bootstrap(document, ['won.owner'], {
 });
 
 console.log('app_jspm.js: ', angular);
-window.app = app; //TODO for debugging only. remove me.
-
 
