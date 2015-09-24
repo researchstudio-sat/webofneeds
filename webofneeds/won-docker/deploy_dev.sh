@@ -1,3 +1,6 @@
+# fail the whole script if one command fails
+set -e
+
 # build won docker images and deploy to sat cluster
 echo start docker build and deployment:
 
@@ -46,18 +49,18 @@ docker -H satsrv06:2375 run --name=matcher_service_dev -d -e "node.host=satsrv06
 -e "wonNodeController.wonNode.crawl=http://satsrv04.researchstudio.at:8888/won/resource,http://satsrv05.researchstudio.at:8888/won/resource" \
 -e "cluster.local.port=2551" -e "cluster.seed.port=2551" -p 2551:2551 webofneeds/matcher_service:dev
 
+# siren solr server
+docker -H satsrv05:2375 stop sirensolr_dev || echo 'No docker container found to stop with name: sirensolr_dev'
+docker -H satsrv05:2375 rm sirensolr_dev || echo 'No docker container found to remove with name: sirensolr_dev'
+docker -H satsrv05:2375 run --name=sirensolr_dev -d -p 8983:8983 webofneeds/sirensolr
+
 # siren matcher
 docker -H satsrv05:2375 build -t webofneeds/matcher_siren:dev $WORKSPACE/webofneeds/won-docker/matcher-siren/
 docker -H satsrv05:2375 stop matcher_siren_dev || echo 'No docker container found to stop with name: matcher_siren_dev'
 docker -H satsrv05:2375 rm matcher_siren_dev || echo 'No docker container found to remove with name: matcher_siren_dev'
 docker -H satsrv05:2375 run --name=matcher_siren_dev -d -e "node.host=satsrv05.researchstudio.at" \
 -e "cluster.seed.host=satsrv06.researchstudio.at" -e "cluster.seed.port=2551" -e "cluster.local.port=2552" \
--p 2552:2552 webofneeds/matcher_siren:dev
-
-# siren solr server
-docker -H satsrv05:2375 stop sirensolr_dev || echo 'No docker container found to stop with name: sirensolr_dev'
-docker -H satsrv05:2375 rm sirensolr_dev || echo 'No docker container found to remove with name: sirensolr_dev'
-docker -H satsrv05:2375 run --name=sirensolr_dev -d -p 8983:8983 webofneeds/sirensolr
+-e "matcher.siren.uri.solr.server=http://satsrv05.researchstudio.at:8983/solr/won/" -p 2552:2552 webofneeds/matcher_siren:dev
 
 # push the newly build images to the dockerhub
 docker -H localhost:2375 login -u heikofriedrich

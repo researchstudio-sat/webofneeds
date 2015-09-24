@@ -1,3 +1,6 @@
+# fail the whole script if one command fails
+set -e
+
 # build the won docker images on every server of the cluster so that everywhere is the latest version available
 echo start docker build of images:
 
@@ -68,14 +71,14 @@ docker -H satsrv06:2375 run --name=matcher_service_int -d -e "node.host=satsrv06
 -e "wonNodeController.wonNode.crawl=http://satsrv04.researchstudio.at:8889/won/resource,http://satsrv05.researchstudio.at:8889/won/resource" \
 -e "cluster.local.port=2561" -e "cluster.seed.port=2561" -p 2561:2561 webofneeds/matcher_service:int
 
+# siren solr server
+docker -H satsrv05:2375 stop sirensolr_int || echo 'No docker container found to stop with name: sirensolr_int'
+docker -H satsrv05:2375 rm sirensolr_int || echo 'No docker container found to remove with name: sirensolr_int'
+docker -H satsrv05:2375 run --name=sirensolr_int -d -p 8984:8983 webofneeds/sirensolr
+
 # siren matcher
 docker -H satsrv05:2375 stop matcher_siren_int || echo 'No docker container found to stop with name: matcher_siren_int'
 docker -H satsrv05:2375 rm matcher_siren_int || echo 'No docker container found to remove with name: matcher_siren_int'
 docker -H satsrv05:2375 run --name=matcher_siren_int -d -e "node.host=satsrv05.researchstudio.at" \
 -e "cluster.seed.host=satsrv06.researchstudio.at" -e "cluster.seed.port=2561" -e "cluster.local.port=2562" \
--p 2562:2562 webofneeds/matcher_siren:int
-
-# siren solr server
-docker -H satsrv05:2375 stop sirensolr_int || echo 'No docker container found to stop with name: sirensolr_int'
-docker -H satsrv05:2375 rm sirensolr_int || echo 'No docker container found to remove with name: sirensolr_int'
-docker -H satsrv05:2375 run --name=sirensolr_int -d -p 8984:8983 webofneeds/sirensolr
+-e "matcher.siren.uri.solr.server=http://satsrv05.researchstudio.at:8984/solr/won/" -p 2562:2562 webofneeds/matcher_siren:int

@@ -120,11 +120,6 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>resources</directory>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
