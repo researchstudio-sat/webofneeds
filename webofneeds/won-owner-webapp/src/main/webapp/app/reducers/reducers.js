@@ -8,8 +8,10 @@ export function wubs(state = [], action = {}) {
         switch(action.type) {
             case actionTypes.moreWub:
                 console.log('reducer ', action);
+                //let howMuch = action.howMuch;
+                const howMuch = action.payload;
                 let updatedWubs = state;
-                for(let i = 0; i < action.howMuch; i++) {
+                for(let i = 0; i < howMuch; i++) {
                     updatedWubs = updatedWubs.concat('wub');
                 }
                 return updatedWubs;

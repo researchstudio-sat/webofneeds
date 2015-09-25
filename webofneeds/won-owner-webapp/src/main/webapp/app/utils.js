@@ -77,7 +77,7 @@ export function deepFreeze(obj) {
 
 
 /*
- * @param o an object-tree.
+ * @param obj an object-tree.
  *
  * @param prefix add a custom prefix to all generated constants.
  *
@@ -88,22 +88,39 @@ export function deepFreeze(obj) {
  * tree2constants{{foo: {bar: null}}) -> {foo: {bar: 'foo.bar'}}
  * tree2constants{foo: null}, 'pfx') -> {foo: 'pfx.foo'}
  */
-export function tree2constants(o, prefix = '') {
-    return deepFreeze(_tree2constants(o, prefix));
-}
-function _tree2constants(o, pathAcc = '') {
-    if(typeof o === 'object' && o !== null) {
+export function tree2constants(obj, prefix = '') {
+    //wrap prefix in array
+    prefix = prefix === ''? [] : [prefix];
 
-        if(pathAcc !== '')
-            pathAcc += '.';
+    return deepFreeze(reduceAndMapTreeKeys(
+        (acc, k) => acc.concat(k),
+        (acc) => acc.join('.'),
+        prefix,
+        obj
+    ));
+}
+
+/**
+ * Traverses down an object, reducing the keys with the reducer
+ * and then applying the mapper once it reaches the leaves.
+ * The function doesn't modify the input-object.
+ * @param obj
+ * @param acc the initial accumulator
+ * @param reducer (acc, key) => newAcc
+ * @param mapper (acc) => newAcc
+ * @returns {*}
+ */
+
+export function reduceAndMapTreeKeys(reducer, mapper, acc, obj) {
+    if(typeof obj === 'object' && obj !== null) {
 
         const accObj = {};
-        for(let k of Object.keys(o)) {
-            accObj[k] = _tree2constants(o[k], pathAcc + k);
+        for(let k of Object.keys(obj)) {
+            accObj[k] = reduceAndMapTreeKeys(reducer, mapper,  reducer(acc, k), obj[k]);
         }
         return accObj;
 
     } else {
-        return pathAcc;
+        return mapper(acc);
     }
 }

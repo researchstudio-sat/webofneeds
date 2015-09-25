@@ -3,7 +3,8 @@
  *
  * Contains a list of actions to be used with the dispatcher and documentation for their expected payloads.
  */
-import { tree2constants } from './utils';
+import { tree2constants, deepFreeze, reduceAndMapTreeKeys } from './utils';
+import './service/won';
 
 export const actionTypes = tree2constants({
 
@@ -35,7 +36,39 @@ export const actionTypes = tree2constants({
     moreWub: null
 });
 
+/*
 export const actionCreators = {
     moreWub : (howMuch) => ({type: actionTypes.moreWub, howMuch}),
 }
+*/
 
+/**
+ * actionCreators are functions that take the payload and output
+ * an action object, thus prebinding the action-type.
+ *
+ * e.g.:
+ *
+ * ```javascript
+ * function newDraft(draft) {
+ *   return { type: 'draft.new', payload: draft }
+ * }
+ * ```
+ */
+export const actionCreators = tree2actionCreators(actionTypes);
+
+function tree2actionCreators(obj) {
+    return deepFreeze(reduceAndMapTreeKeys(
+        (acc, k) => acc.concat(k), //construct paths, e.g. ['draft', 'new']
+        (acc) => createActionCreator(won.lookup(actionTypes, acc)), //lookup constant at path
+        [], obj
+    ))
+}
+function createActionCreator(type) {
+    return (payload) => ({type, payload});
+}
+
+
+
+//TODO for debug; deleteme
+window.actionTypes = actionTypes;
+window.actionCreators = actionCreators;
