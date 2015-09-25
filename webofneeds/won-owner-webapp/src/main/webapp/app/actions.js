@@ -36,12 +36,6 @@ export const actionTypes = tree2constants({
     moreWub: null
 });
 
-/*
-export const actionCreators = {
-    moreWub : (howMuch) => ({type: actionTypes.moreWub, howMuch}),
-}
-*/
-
 /**
  * actionCreators are functions that take the payload and output
  * an action object, thus prebinding the action-type.
