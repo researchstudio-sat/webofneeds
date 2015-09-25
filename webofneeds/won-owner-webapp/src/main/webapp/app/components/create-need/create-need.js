@@ -3,7 +3,8 @@
  */
 ;
 
-import angular from 'angular';
+import angular from 'angular'
+import 'ng-redux';
 import createNeedTitleBarModule from '../create-need-title-bar';
 import posttypeSelectModule from '../posttype-select';
 import labelledHrModule from '../labelled-hr';
@@ -55,7 +56,7 @@ class CreateNeedController {
         });
 
         // Using actionCreators like this means that every action defined there is available in the template.
-        const unsubscribe = this.$ngRedux.connect(this.selectFromState, actionCreators)(this);
+        const unsubscribe = this.$ngRedux.connect(selectFromState, actionCreators)(this);
         //this.$scope.$on('$destroy', unsubscribe); //can't inject $scope with angular2-router as it doesn't exist anymore in angular2
 
     }
