@@ -66,8 +66,32 @@ function configRedux($ngReduxProvider) {
      * store/model. e.g.: an reducers object `{ drafts: function(state = [], action){...} }`
      * would result in a store like `{ drafts: [...] }`
      */
-    let reducer = combineReducers(Immutable.Map(reducers));
+    let reducer = combineReducersCstm(Immutable.Map(reducers));
     $ngReduxProvider.createStoreWith(reducer, [/* middlewares here, e.g. 'promiseMiddleware', loggingMiddleware */]);
+}
+
+function combineReducersCstm(mapOfReducers) {
+    return (state = Immutable.Map(), action = {}) => {
+        console.log('combinedreducer ', state.toJS(), action);
+        let hasChanged = false;
+        let updatedState = state;
+        mapOfReducers.forEach((reducer, domainName) => {
+            // the domain is the child-node the reducer is responsible for
+            const domain = state.get(domainName);
+
+            // update the domain. if the domain hasn't been created yet,
+            // let the reducer handle that.
+            //const nonEmptyDomain = domain ? domain : reducer();
+            //const updatedDomain = reducer(nonEmptyDomain, action);
+            const updatedDomain = domain? reducer(domain, action) : reducer();
+
+            // only change the state object,
+            if(domain !== updatedDomain)
+                updatedState = updatedState.set(domainName, updatedDomain);
+        });
+
+        return updatedState;
+    }
 }
 
 /*

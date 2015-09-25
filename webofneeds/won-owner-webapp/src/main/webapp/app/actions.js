@@ -50,6 +50,7 @@ export const actionTypes = tree2constants({
  */
 export const actionCreators = tree2actionCreators(actionTypes);
 window.actionCreators = actionCreators;
+window.actionTypes = actionTypes;
 
 function tree2actionCreators(obj) {
     return deepFreeze(reduceAndMapTreeKeys(
