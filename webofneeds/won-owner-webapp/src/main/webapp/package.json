@@ -33,6 +33,7 @@
       "angular-ui-utils": "github:angular-ui/ui-utils@2.0.0",
       "bootstrap": "github:twbs/bootstrap@3.3.5",
       "font-awesome": "bower:font-awesome@4.3.0",
+      "immutable": "npm:immutable@^3.7.5",
       "jquery": "github:components/jquery@2.1.4",
       "js-md5": "bower:js-md5@1.1.0",
       "ng-clip": "bower:ng-clip@0.2.6",
@@ -40,6 +41,7 @@
       "ng-scrollbar": "bower:ng-scrollbar@0.0.6",
       "ng-tags-input": "bower:ng-tags-input@2.3.0",
       "redux": "npm:redux@^3.0.0",
+      "redux-immutable": "npm:redux-immutable@^1.3.7",
       "sockjs": "bower:sockjs@0.3.4"
     },
     "devDependencies": {
