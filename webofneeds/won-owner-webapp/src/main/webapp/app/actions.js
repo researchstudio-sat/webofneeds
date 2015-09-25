@@ -60,9 +60,3 @@ function tree2actionCreators(obj) {
 function createActionCreator(type) {
     return (payload) => ({type, payload});
 }
-
-
-
-//TODO for debug; deleteme
-window.actionTypes = actionTypes;
-window.actionCreators = actionCreators;
