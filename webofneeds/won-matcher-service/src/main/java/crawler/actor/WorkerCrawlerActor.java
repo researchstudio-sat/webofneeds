@@ -4,7 +4,7 @@ import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
-import common.service.HttpRequestService;
+import common.service.HttpsRequestService;
 import crawler.config.CrawlConfig;
 import crawler.exception.CrawlWrapperException;
 import crawler.msg.CrawlUriMessage;
@@ -38,7 +38,7 @@ public class WorkerCrawlerActor extends UntypedActor
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
   @Autowired
-  private HttpRequestService httpRequestService;
+  private HttpsRequestService httpRequestService;
 
   @Autowired
   private CrawlSparqlService sparqlService;
@@ -125,7 +125,7 @@ public class WorkerCrawlerActor extends UntypedActor
     }
   }
 
-  public void setHttpRequestService(final HttpRequestService httpRequestService) {
+  public void setHttpRequestService(final HttpsRequestService httpRequestService) {
     this.httpRequestService = httpRequestService;
   }
 

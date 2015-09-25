@@ -42,32 +42,47 @@ public class CryptographyUtils {
     public static RestTemplate createSslTofuRestTemplate(KeyStoreService keyStoreService, String
       ksPass, TrustStoreService
       trustStoreService) throws Exception {
-        // make a call to register REST api in the SSL context with custom key and trust managers
-        //TODO do it correctly with spring bean config, this can be helpful:
-        //http://thespringway.info/spring-web/access-self-signed-ssl-certificate-with-resttemplate/
-        TOFUTrustStrategy trustStrategy = new TOFUTrustStrategy();
-        trustStrategy.setTrustStoreService(trustStoreService);
-        PredefinedAliasPrivateKeyStrategy keyStrategy = new PredefinedAliasPrivateKeyStrategy(keyStoreService.getDefaultAlias());
-
-        SSLContext sslContext = new SSLContextBuilder().loadKeyMaterial(keyStoreService.getUnderlyingKeyStore(),
-                                                                        ksPass.toCharArray(), keyStrategy)
-                                                       .loadTrustMaterial(null, trustStrategy)
-                                                       .build();
-        // here in the constructor, also hostname verifier, protocol version, cipher suits, etc. can be specified
-        SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext);
-
-        HttpClient httpClient = HttpClients.custom()//.useSystemProperties()
-          .setSSLSocketFactory(sslConnectionSocketFactory).build();
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-        requestFactory.setHttpClient(httpClient);
-
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
-
-        return restTemplate;
+        return createSslTofuRestTemplate(keyStoreService, ksPass, trustStoreService, null, null);
     }
 
-    //TODO make trust manager wrapper that only trusts certificate with brokerURI's (nodeURI's or its host)
-    // from the trust store, e.g. TrustManagerWrapperWithStrategy
+
+  public static RestTemplate createSslTofuRestTemplate(KeyStoreService keyStoreService, String
+    ksPass, TrustStoreService trustStoreService, Integer readTimeout, Integer connectionTimeout) throws Exception {
+    // make a call to register REST api in the SSL context with custom key and trust managers
+    //TODO do it correctly with spring bean config, this can be helpful:
+    //http://thespringway.info/spring-web/access-self-signed-ssl-certificate-with-resttemplate/
+    TOFUTrustStrategy trustStrategy = new TOFUTrustStrategy();
+    trustStrategy.setTrustStoreService(trustStoreService);
+    PredefinedAliasPrivateKeyStrategy keyStrategy = new PredefinedAliasPrivateKeyStrategy(keyStoreService.getDefaultAlias());
+
+    SSLContext sslContext = new SSLContextBuilder().loadKeyMaterial(keyStoreService.getUnderlyingKeyStore(),
+                                                                    ksPass.toCharArray(), keyStrategy)
+                                                   .loadTrustMaterial(null, trustStrategy)
+                                                   .build();
+    // here in the constructor, also hostname verifier, protocol version, cipher suits, etc. can be specified
+    SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext);
+
+    HttpClient httpClient = HttpClients.custom()//.useSystemProperties()
+      .setSSLSocketFactory(sslConnectionSocketFactory).build();
+    HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+    if (readTimeout != null) {
+      requestFactory.setReadTimeout(readTimeout.intValue());
+    }
+    if (connectionTimeout != null) {
+      requestFactory.setConnectTimeout(connectionTimeout.intValue());
+    }
+    requestFactory.setHttpClient(httpClient);
+
+    RestTemplate restTemplate = new RestTemplate(requestFactory);
+
+    return restTemplate;
+  }
+
+    //TODO 1) make trust manager wrapper that only trusts certificate with brokerURI's (nodeURI's or its host)
+    // from the trust store, e.g. TrustManagerWrapperWithStrategy - then it cannot be reused for connections to
+    // different brokers/nodes
+  // 2) return TrustManagerWrapperWithTrustService here - then it can be reused for connections to different nodes
+  // (this one would internally create new x509trustmanager based on dynamically retrieved key/trust-store)
     public static TrustManager initializeTrustManager(TrustStoreService trustStoreService, String trustedAlias) throws
       Exception {
         KeyStore trustStore = trustStoreService.getUnderlyingKeyStore();
