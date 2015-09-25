@@ -124,3 +124,16 @@ export function reduceAndMapTreeKeys(reducer, mapper, acc, obj) {
         return mapper(acc);
     }
 }
+
+/**
+ * Generates an array consisting of n times x. e.g.:
+ * ```javascript
+ * repeatVar('a', 3); // ['a', 'a', 'a']
+ * ```
+ * @param x
+ * @param n
+ * @returns {*}
+ */
+export function repeatVar(x, n) {
+   return Array.apply(null, Array(n)).map(() => x);
+}

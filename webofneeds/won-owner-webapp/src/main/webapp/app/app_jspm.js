@@ -29,7 +29,10 @@ import feedComponent from './components/feed/feed';
 import overviewMatchesComponent from './components/overview-matches/overview-matches';
 
 import * as reducers from './reducers/reducers';
+//import 'redux';
 import { combineReducers } from 'redux';
+//import { combineReducers } from 'redux-immutable';
+import Immutable from 'immutable';
 import 'ng-redux';
 
 let app = angular.module('won.owner', [
@@ -63,6 +66,7 @@ function configRedux($ngReduxProvider) {
      * would result in a store like `{ drafts: [...] }`
      */
     let reducer = combineReducers(reducers);
+    //let reducer = (s = {}, a = {}) => s;
     $ngReduxProvider.createStoreWith(reducer, [/* middlewares here, e.g. 'promiseMiddleware', loggingMiddleware */]);
 }
 

@@ -3,18 +3,17 @@
  */
 
 import { actionTypes } from '../actions';
+import { repeatVar } from '../utils';
+import Immutable from 'immutable';
 
-export function wubs(state = [], action = {}) {
+export function wubs(state = Immutable.List(), action = {}) {
         switch(action.type) {
             case actionTypes.moreWub:
                 console.log('reducer ', action);
                 //let howMuch = action.howMuch;
                 const howMuch = action.payload;
-                let updatedWubs = state;
-                for(let i = 0; i < howMuch; i++) {
-                    updatedWubs = updatedWubs.concat('wub');
-                }
-                return updatedWubs;
+                const additionalWubs = Immutable.fromJS(repeatVar('wub', howMuch));
+                return state.concat(additionalWubs);
 
             default:
                 return state;
