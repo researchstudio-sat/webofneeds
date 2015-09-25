@@ -29,9 +29,10 @@ import feedComponent from './components/feed/feed';
 import overviewMatchesComponent from './components/overview-matches/overview-matches';
 
 import * as reducers from './reducers/reducers';
-//import 'redux';
-import { combineReducers } from 'redux';
+import 'redux';
+//import { combineReducers } from 'redux';
 //import { combineReducers } from 'redux-immutable';
+import { combineReducers } from 'redux-immutablejs';
 import Immutable from 'immutable';
 import 'ng-redux';
 
@@ -65,8 +66,7 @@ function configRedux($ngReduxProvider) {
      * store/model. e.g.: an reducers object `{ drafts: function(state = [], action){...} }`
      * would result in a store like `{ drafts: [...] }`
      */
-    let reducer = combineReducers(reducers);
-    //let reducer = (s = {}, a = {}) => s;
+    let reducer = combineReducers(Immutable.Map(reducers));
     $ngReduxProvider.createStoreWith(reducer, [/* middlewares here, e.g. 'promiseMiddleware', loggingMiddleware */]);
 }
 

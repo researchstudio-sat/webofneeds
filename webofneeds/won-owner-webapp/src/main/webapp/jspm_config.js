@@ -36,7 +36,7 @@ System.config({
     "ng-scrollbar": "bower:ng-scrollbar@0.0.6",
     "ng-tags-input": "bower:ng-tags-input@2.3.0",
     "redux": "npm:redux@3.0.0",
-    "redux-immutable": "npm:redux-immutable@1.3.7",
+    "redux-immutablejs": "npm:redux-immutablejs@0.0.6",
     "sockjs": "bower:sockjs@0.3.4",
     "bower:font-awesome@4.3.0": {
       "css": "github:systemjs/plugin-css@0.1.13"
@@ -121,9 +121,6 @@ System.config({
       "base64-js": "npm:base64-js@0.0.8",
       "ieee754": "npm:ieee754@1.1.6",
       "is-array": "npm:is-array@1.0.1"
-    },
-    "npm:canonical-reducer-composition-validator@1.3.1": {
-      "lodash": "npm:lodash@3.10.1"
     },
     "npm:commander@2.8.1": {
       "child_process": "github:jspm/nodelibs-child_process@0.1.0",
@@ -229,10 +226,10 @@ System.config({
       "process": "github:jspm/nodelibs-process@0.1.1",
       "source-map": "npm:source-map@0.1.32"
     },
-    "npm:redux-immutable@1.3.7": {
-      "canonical-reducer-composition-validator": "npm:canonical-reducer-composition-validator@1.3.1",
+    "npm:redux-immutablejs@0.0.6": {
       "immutable": "npm:immutable@3.7.5",
-      "lodash": "npm:lodash@3.10.1"
+      "process": "github:jspm/nodelibs-process@0.1.1",
+      "redux": "npm:redux@3.0.0"
     },
     "npm:redux@3.0.0": {
       "process": "github:jspm/nodelibs-process@0.1.1"

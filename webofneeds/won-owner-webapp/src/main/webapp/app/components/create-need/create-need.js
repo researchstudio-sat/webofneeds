@@ -44,15 +44,13 @@ class CreateNeedController {
 
         //TODO debug; deleteme
         window.cnc = this;
-        console.log('create-need-controller: ', this);
-        //console.log('create-need $scope: ', $scope);
 
         //this.titlePicZoneNg().bind('click', e => 0);
         //this.titlePicZone().addEventListener('click', e => 0);
         //this.titlePicZone().addEventListener('drop', e => 0);
 
         const selectFromState = (state) => ({
-            wubs: state.wubs
+            wubs: state.get('wubs')
         });
 
         // Using actionCreators like this means that every action defined there is available in the template.

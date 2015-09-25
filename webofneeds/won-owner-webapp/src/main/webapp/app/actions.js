@@ -49,6 +49,7 @@ export const actionTypes = tree2constants({
  * ```
  */
 export const actionCreators = tree2actionCreators(actionTypes);
+window.actionCreators = actionCreators;
 
 function tree2actionCreators(obj) {
     return deepFreeze(reduceAndMapTreeKeys(
@@ -58,5 +59,8 @@ function tree2actionCreators(obj) {
     ))
 }
 function createActionCreator(type) {
-    return (payload) => ({type, payload});
+    return (payload) => {
+        console.log('creating instance of actionType ', type, ' with payload: ', payload);
+        return {type, payload};
+    };
 }
