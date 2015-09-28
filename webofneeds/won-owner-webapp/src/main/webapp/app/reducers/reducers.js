@@ -27,6 +27,7 @@ export const drafts = createReducer(
 
     //handlers
     {
+        //TODO init drafts from server
         //TODO isValidNeed function to check compliance to won-ontology (and throw errors early)
         [actionTypes.drafts.new]: (state, {payload:draft}) => {
             return state
