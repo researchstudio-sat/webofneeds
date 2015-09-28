@@ -1,5 +1,6 @@
 package siren.matcher;
 
+import common.event.BulkHintEvent;
 import common.event.HintEvent;
 import config.SirenMatcherConfig;
 import org.apache.solr.common.SolrDocument;
@@ -7,8 +8,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by soheilk on 04.09.2015.
@@ -19,111 +19,86 @@ public class HintsBuilder {
     @Autowired
     private SirenMatcherConfig config;
 
-    public ArrayList<HintEvent> produceFinalNormalizeHints(ArrayList<SolrDocumentList> solrDocListArrayList, String targetNeedUri, String targetWonNode) {
-        ArrayList<SolrDocumentList> normalizedSolrDocListArrayList = new ArrayList<SolrDocumentList>();
+    public BulkHintEvent produceFinalNormalizeHints(ArrayList<SolrDocumentList> solrDocListArrayList, String targetNeedUri, String targetWonNode) {
+
+        ArrayList<Map<String, SolrDocument>> normalizedSolrDocListArrayList = new ArrayList<Map<String, SolrDocument>>();
         for (int i = 0; i < solrDocListArrayList.size(); i++) {
-            normalizedSolrDocListArrayList.add(normalizer(solrDocListArrayList.get(i)));
+            normalizedSolrDocListArrayList.add(basicNormalizer(solrDocListArrayList.get(i), solrDocListArrayList.size()));
         }
+
+        Map<String, SolrDocument> aggregatedSolrDocumentsMap = normalizedSolrDocListArrayList.get(0); //put the results of the first query in the aggregatedSolrDocumentLis
+        for(int i=1 ; i<normalizedSolrDocListArrayList.size();i++) { //starts from the second one!
+            Map<String, SolrDocument> currenSolrDocumentsMap = normalizedSolrDocListArrayList.get(i);
+            //Iterate over each document in the map
+            for (Map.Entry<String, SolrDocument> entry : currenSolrDocumentsMap.entrySet())
+            {
+                if(aggregatedSolrDocumentsMap.containsKey(entry.getKey())){
+                    ((SolrDocument) aggregatedSolrDocumentsMap.get(entry.getKey())).setField("score",
+                            (float)((SolrDocument) aggregatedSolrDocumentsMap.get(entry.getKey())).getFieldValue("score")+
+                                    (float)entry.getValue().getFieldValue("score"));
+                }
+                else {
+                    aggregatedSolrDocumentsMap.put(entry.getKey(), entry.getValue());
+                }
+            }
+
+        }
+
+        //Inorder to be able to cut the result with based on a threshold, we need to sort the results based on the scores.
 
         SolrDocumentList aggregatedSolrDocumentList = new SolrDocumentList();
 
-        for (int j = 0; j < normalizedSolrDocListArrayList.get(0).getNumFound() && j < config.getMaxHints(); j++) {
-            aggregatedSolrDocumentList.add(j, normalizedSolrDocListArrayList.get(0).get(j)); //put the first query results in the aggregatedSolrDocumentList
+
+
+
+        for (Map.Entry<String, SolrDocument> entry : aggregatedSolrDocumentsMap.entrySet())
+        {
+            aggregatedSolrDocumentList.add((SolrDocument)entry);
         }
 
-        for (int k = 1; k < normalizedSolrDocListArrayList.size(); k++) { //now we consider other queries results; k starts from 1
-            SolrDocumentList currentSolrDocumentList = normalizedSolrDocListArrayList.get(k);
-            for (int l = 0; l < currentSolrDocumentList.getNumFound() && l < config.getMaxHints(); l++) {
-                boolean foundInTheAggregatedList = false;
-                SolrDocument currentDocuentInTheCurrentList = currentSolrDocumentList.get(l);
-                for (int m = 0; m < aggregatedSolrDocumentList.size(); m++) {
-                    SolrDocument currentDocumentInTheAggregatedSolrDocumentList = aggregatedSolrDocumentList.get(m);
-                    if (currentDocumentInTheAggregatedSolrDocumentList.getFieldValue("@graph.@id").equals(currentDocuentInTheCurrentList.getFieldValue("@graph.@id"))) {
-                        aggregatedSolrDocumentList.get(m).setField("score", (float) currentDocumentInTheAggregatedSolrDocumentList.getFieldValue("score") + (float) currentDocuentInTheCurrentList.getFieldValue("score"));
-                        foundInTheAggregatedList = true;
-                        break;
-                    }
-                }
-                if (foundInTheAggregatedList == false) { // does not exist in the aggregated list
-                    aggregatedSolrDocumentList.add(currentSolrDocumentList.get(l));
-                }
+        aggregatedSolrDocumentList.sort(new Comparator<SolrDocument>() {
+            @Override
+            public int compare(SolrDocument o1, SolrDocument o2) {
+                if((float)o1.getFieldValue("score")>(float)o2.getFieldValue("score"))
+                return -1;
+                else if((float)o1.getFieldValue("score")<(float)o2.getFieldValue("score"))
+                    return 1;
+                else
+                    return 0;
             }
-        }
+        });
 
-        for (int n = 0; n < aggregatedSolrDocumentList.size(); n++) {
-            aggregatedSolrDocumentList.get(n).setField("score", (float) aggregatedSolrDocumentList.get(n).getFieldValue("score") / normalizedSolrDocListArrayList.size());
-        }
+        BulkHintEvent bulkHintEvent = new BulkHintEvent();
 
-        ArrayList<HintEvent> hintEventLists = new ArrayList<HintEvent>();
-        for (int o = 0; o < aggregatedSolrDocumentList.size(); o++) {
-            String needUri = ((List)aggregatedSolrDocumentList.get(o).getFieldValue("@graph.@id")).get(0).toString();
-            String wonNodeUri = ((List)aggregatedSolrDocumentList.get(o).getFieldValue("@graph.http://purl.org/webofneeds/model#hasWonNode.@id")).get(0).toString();
-            double score = Double.valueOf(aggregatedSolrDocumentList.get(o).getFieldValue("score").toString());
 
+        for (int i = 0; i < aggregatedSolrDocumentList.size() && i < config.getConsideredQueryTokens(); i++) {
+            String needUri = ((List)aggregatedSolrDocumentList.get(i).getFieldValue("@graph.@id")).get(0).toString();
+            String wonNodeUri = ((List)aggregatedSolrDocumentList.get(i).getFieldValue("@graph.http://purl.org/webofneeds/model#hasWonNode.@id")).get(0).toString();
+            double score = Double.valueOf(aggregatedSolrDocumentList.get(i).getFieldValue("score").toString());
+            if (score < config.getScoreThreshold()) {
+                break;
+            }
             // since we cannot query the wonNodeUri of the document in solr at the same time as the needUri, we just
             // set the needUri in the hint event and let the matching service figure out to which won node it belongs
-            hintEventLists.add(new HintEvent(targetWonNode, targetNeedUri, wonNodeUri, needUri, config.getSolrServerUri(),
-                                             score));
-        }
-
-        return hintEventLists;
-    }
-
-    public ArrayList<HintEvent> produceFinalNormalizeHintsOptimized(ArrayList<SolrDocumentList> solrDocListArrayList, String targetNeedUri, String targetWonNode) {
-        ArrayList<SolrDocumentList> normalizedSolrDocListArrayList = new ArrayList<SolrDocumentList>();
-        for (int i = 0; i < solrDocListArrayList.size(); i++) {
-            normalizedSolrDocListArrayList.add(normalizer(solrDocListArrayList.get(i)));
-        }
-
-        SolrDocumentList aggregatedSolrDocumentList = new SolrDocumentList();
-
-        for (int j = 0; j < normalizedSolrDocListArrayList.get(0).getNumFound() && j < config.getMaxHints(); j++) {
-            aggregatedSolrDocumentList.add(j, normalizedSolrDocListArrayList.get(0).get(j)); //put the first query results in the aggregatedSolrDocumentList
-        }
-
-        for (int k = 1; k < normalizedSolrDocListArrayList.size(); k++) { //now we consider other queries results; k starts from 1
-            SolrDocumentList currentSolrDocumentList = normalizedSolrDocListArrayList.get(k);
-            for (int l = 0; l < currentSolrDocumentList.getNumFound() && l < config.getMaxHints(); l++) {
-                boolean foundInTheAggregatedList = false;
-                SolrDocument currentDocuentInTheCurrentList = currentSolrDocumentList.get(l);
-                for (int m = 0; m < aggregatedSolrDocumentList.size(); m++) {
-                    SolrDocument currentDocumentInTheAggregatedSolrDocumentList = aggregatedSolrDocumentList.get(m);
-                    if (currentDocumentInTheAggregatedSolrDocumentList.getFieldValue("@graph.@id").equals(currentDocuentInTheCurrentList.getFieldValue("@graph.@id"))) {
-                        aggregatedSolrDocumentList.get(m).setField("score", (float) currentDocumentInTheAggregatedSolrDocumentList.getFieldValue("score") + (float) currentDocuentInTheCurrentList.getFieldValue("score"));
-                        foundInTheAggregatedList = true;
-                        break;
-                    }
-                }
-                if (foundInTheAggregatedList == false) { // does not exist in the aggregated list
-                    aggregatedSolrDocumentList.add(currentSolrDocumentList.get(l));
-                }
-            }
-        }
-
-        for (int n = 0; n < aggregatedSolrDocumentList.size(); n++) {
-            aggregatedSolrDocumentList.get(n).setField("score", (float) aggregatedSolrDocumentList.get(n).getFieldValue("score") / normalizedSolrDocListArrayList.size());
-        }
-
-        ArrayList<HintEvent> hintEventLists = new ArrayList<HintEvent>();
-        for (int o = 0; o < aggregatedSolrDocumentList.size(); o++) {
-            String needUri = ((List)aggregatedSolrDocumentList.get(o).getFieldValue("@graph.@id")).get(0).toString();
-            String wonNodeUri = ((List)aggregatedSolrDocumentList.get(o).getFieldValue("@graph.http://purl.org/webofneeds/model#hasWonNode.@id")).get(0).toString();
-            double score = Double.valueOf(aggregatedSolrDocumentList.get(o).getFieldValue("score").toString());
-
-            // since we cannot query the wonNodeUri of the document in solr at the same time as the needUri, we just
-            // set the needUri in the hint event and let the matching service figure out to which won node it belongs
-            hintEventLists.add(new HintEvent(targetWonNode, targetNeedUri, wonNodeUri, needUri, config.getSolrServerUri(),
+            bulkHintEvent.addHintEvent(new HintEvent(targetWonNode, targetNeedUri, wonNodeUri, needUri, config.getSolrServerUri(),
                     score));
         }
 
-        return hintEventLists;
+        return bulkHintEvent;
     }
 
-    private SolrDocumentList normalizer(SolrDocumentList solrDocList) {
+    /*
+    This is a basic normalizer that sets the score of the most similar document to 1 and calculates scores of the other
+    documents based on it; it also weights the score based on the numberOfPerformedQueries
+    */
+    private Map<String, SolrDocument> basicNormalizer(SolrDocumentList solrDocList, int numberOfPerformedQueries) {
+        Map<String, SolrDocument> solrDocsMap = new HashMap<String, SolrDocument>();
         float maxScore = solrDocList.getMaxScore();
         for (int i = 0; i < solrDocList.getNumFound() && i < config.getMaxHints(); i++) {
-            solrDocList.get(i).setField("score", (float) solrDocList.get(i).getFieldValue("score") / maxScore);
+            solrDocList.get(i).setField("score", ((float) solrDocList.get(i).getFieldValue("score") / maxScore) / numberOfPerformedQueries);
+            SolrDocument currentSolrDocument = solrDocList.get(i);
+            solrDocsMap.put(currentSolrDocument.getFieldValue("@graph.@id").toString(), currentSolrDocument);
         }
-        return solrDocList;
+        return solrDocsMap;
     }
 }

@@ -128,16 +128,11 @@ public class SirenMatcherActor extends UntypedActor
     }
 
     // create the hints
-    ArrayList<HintEvent> hintArrayList = hintBuilder.produceFinalNormalizeHints(
+    BulkHintEvent bulkHintEvent = hintBuilder.produceFinalNormalizeHints(
       solrHintDocumentList, needEvent.getUri(), needEvent.getWonNodeUri());
 
-    BulkHintEvent bulkHintEvent = new BulkHintEvent();
-    for (int i = 0; i < hintArrayList.size(); i++) {
-      bulkHintEvent.addHintEvent(hintArrayList.get(i));
-    }
-
     // publish the hints found
-    if (hintArrayList.size() != 0) {
+    if (bulkHintEvent != null) { //ToDo it's better to be able to check the size of the buldHintEvent
       pubSubMediator.tell(new DistributedPubSubMediator.Publish(
                             bulkHintEvent.getClass().getName(), bulkHintEvent), getSelf());
     }

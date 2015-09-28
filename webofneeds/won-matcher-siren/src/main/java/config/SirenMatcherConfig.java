@@ -29,6 +29,17 @@ public class SirenMatcherConfig
   @Value("${matcher.siren.query.consideredTokens}")
   private int consideredQueryTokens;
 
+  @Value("${matcher.siren.query.scoreThreshold}")
+  private int scoreThreshold;
+
+  public int getScoreThreshold() {
+    return scoreThreshold;
+  }
+
+  public void setScoreThreshold(final int scoreThreshold) {
+    this.scoreThreshold = scoreThreshold;
+  }
+
   public int getConsideredQueryTokens() {
     return consideredQueryTokens;
   }
