@@ -41,6 +41,10 @@ export const actionTypes = tree2constants({
 /**
  * actionCreators are functions that take the payload and output
  * an action object, thus prebinding the action-type.
+ * This object follows the structure of the actionTypes-object,
+ * but is flattened for use with ng-redux. Thus calling
+ * `$ngRedux.dispatch(actionCreators.drafts__new(myDraft))` will trigger an action
+ * `{type: actionTypes.drafts.new, payload: myDraft}`
  *
  * e.g.:
  *
