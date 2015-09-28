@@ -1,5 +1,5 @@
 
-import actor.SirenMatcherActor;
+import actor.MatcherPubSubActor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.DeadLetter;
@@ -22,8 +22,8 @@ public class AkkaSirenMain
     AnnotationConfigApplicationContext ctx =
       new AnnotationConfigApplicationContext(MatcherSirenAppConfiguration.class);
     ActorSystem system = ctx.getBean(ActorSystem.class);
-    ActorRef wonNodeControllerActor = system.actorOf(
-      SpringExtension.SpringExtProvider.get(system).props(SirenMatcherActor.class), "SirenMatcherActor");
+    ActorRef matcherPubSubActor = system.actorOf(
+      SpringExtension.SpringExtProvider.get(system).props(MatcherPubSubActor.class), "MatcherPubSubActor");
     ActorRef actor = system.actorOf(Props.create(DeadLetterActor.class), "DeadLetterActor");
     system.eventStream().subscribe(actor, DeadLetter.class);
   }

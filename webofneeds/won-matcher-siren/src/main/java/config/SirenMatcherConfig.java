@@ -14,7 +14,10 @@ public class SirenMatcherConfig
   @Value("${matcher.siren.uri.solr.server}")
   private String solrServerUri;
 
-  @Value("${matcher.siren.max.hints}")
+  @Value("${matcher.siren.uri.solr.server.public}")
+  private String solrServerPublicUri;
+
+  @Value("${matcher.siren.query.maxHints}")
   private int maxHints;
 
   @Value("${matcher.siren.query.title}")
@@ -26,17 +29,20 @@ public class SirenMatcherConfig
   @Value("${matcher.siren.query.titleDescription}")
   private boolean useTitleDescriptionQuery;
 
+  @Value("${matcher.siren.query.titleDescriptionTag}")
+  private boolean useTitleDescriptionTagQuery;
+
   @Value("${matcher.siren.query.consideredTokens}")
   private int consideredQueryTokens;
 
   @Value("${matcher.siren.query.scoreThreshold}")
-  private int scoreThreshold;
+  private float scoreThreshold;
 
-  public int getScoreThreshold() {
+  public float getScoreThreshold() {
     return scoreThreshold;
   }
 
-  public void setScoreThreshold(final int scoreThreshold) {
+  public void setScoreThreshold(final float scoreThreshold) {
     this.scoreThreshold = scoreThreshold;
   }
 
@@ -72,6 +78,14 @@ public class SirenMatcherConfig
     this.useTitleDescriptionQuery = useTitleDescriptionQuery;
   }
 
+  public boolean isUseTitleDescriptionTagQuery() {
+    return useTitleDescriptionTagQuery;
+  }
+
+  public void setUseTitleDescriptionTagQuery(final boolean useTitleDescriptionTagQuery) {
+    this.useTitleDescriptionTagQuery = useTitleDescriptionTagQuery;
+  }
+
   public String getSolrServerUri() {
     return solrServerUri;
   }
@@ -87,5 +101,14 @@ public class SirenMatcherConfig
   public void setMaxHints(final int maxHints) {
     this.maxHints = maxHints;
   }
+
+  public String getSolrServerPublicUri() {
+    return solrServerPublicUri;
+  }
+
+  public void setSolrServerPublicUri(final String solrServerPublicUri) {
+    this.solrServerPublicUri = solrServerPublicUri;
+  }
+
 
 }

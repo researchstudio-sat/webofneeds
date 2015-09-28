@@ -33,6 +33,7 @@ public class SIREnTitleAndDescriptionBasedQueryBuilder implements SIREnQueryBuil
         TwigQuery twigBasicNeedType = null;
         //First of all, we have to cinsider the BasicNeedType
         switch (needObject.getBasicNeedType().toLowerCase()) { //Attention: lower-case
+            //TODO: replace the strings with WON. constants already there
             case "http://purl.org/webofneeds/model#supply": // Demands has to be matched
                 twigBasicNeedType = build.newTwig("http://purl.org/webofneeds/model#hasBasicNeedType")
                         .with(build.newNode("'http://purl.org/webofneeds/model#demand'").setAttribute("@id"));

@@ -92,7 +92,7 @@ public class ActiveMqWonNodeConnectionFactory
     // create the actor that sends messages (hint events)
     String hintComponent = componentName + ":queue:" + hintQueue;
     Props hintProps = SpringExtension.SpringExtProvider.get(context.system()).props(
-      HintProducerProtocolActor.class, hintComponent, brokerUri);
+      HintProducerProtocolActor.class, hintComponent, null);
     ActorRef hintProducer = context.actorOf(hintProps, "ActiveMqHintProducerProtocolActor-" + uuid);
     log.info("Create camel component JMS listener {} for won node {}", hintComponent, wonNodeInfo.getWonNodeURI());
 

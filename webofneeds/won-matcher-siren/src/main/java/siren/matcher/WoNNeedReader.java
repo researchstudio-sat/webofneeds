@@ -5,6 +5,7 @@ import com.hp.hpl.jena.vocabulary.DC;
 import org.apache.solr.client.solrj.SolrServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
@@ -20,14 +21,32 @@ public class WoNNeedReader {
     public NeedObject readWoNNeedFromDeserializedNeedDataset(Dataset dataset, SolrServer solrServer) {
         NeedObject needObject = new NeedObject();
 
-        String title = RdfUtils.findOnePropertyFromResource(dataset, null, DC.title).asLiteral().toString();
+        String title = "";
+        try {
+            title = RdfUtils.findOnePropertyFromResource(dataset, null, DC.title).asLiteral().toString();
+        } catch (IncorrectPropertyCountException e) {
+            log.warn("Title not found in RDF dataset: " + e.toString());
+        }
         log.debug("Need title: " + title);
         needObject.setNeedTitle(title);
 
-        String textDescription = RdfUtils.findOnePropertyFromResource(dataset, null, WON.HAS_TEXT_DESCRIPTION).asLiteral
-          ().toString();
+        String textDescription = "";
+        try {
+            textDescription = RdfUtils.findOnePropertyFromResource(dataset, null, WON.HAS_TEXT_DESCRIPTION).asLiteral().toString();
+        } catch (IncorrectPropertyCountException e) {
+            log.warn("Description not found in RDF dataset: " + e.toString());
+        }
         log.debug("Need Description: " + textDescription);
         needObject.setNeedDescription(textDescription);
+
+        String textTag = "";
+        try {
+            textTag = RdfUtils.findOnePropertyFromResource(dataset, null, WON.HAS_TAG).asLiteral().toString();
+        } catch (IncorrectPropertyCountException e) {
+            log.debug("Tag not found in RDF dataset: " + e.toString());
+        }
+        log.debug("Need Tag: " + textTag);
+        needObject.setNeedTag(textTag);
 
         String basicNeedType = RdfUtils.findOnePropertyFromResource(dataset, null, WON.HAS_BASIC_NEED_TYPE).asResource().toString();
         log.debug("Basic Need Type is: " + basicNeedType);

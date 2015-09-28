@@ -53,7 +53,7 @@ public class HintsBuilder {
 
         for (Map.Entry<String, SolrDocument> entry : aggregatedSolrDocumentsMap.entrySet())
         {
-            aggregatedSolrDocumentList.add((SolrDocument)entry);
+            aggregatedSolrDocumentList.add(entry.getValue());
         }
 
         aggregatedSolrDocumentList.sort(new Comparator<SolrDocument>() {
@@ -71,7 +71,7 @@ public class HintsBuilder {
         BulkHintEvent bulkHintEvent = new BulkHintEvent();
 
 
-        for (int i = 0; i < aggregatedSolrDocumentList.size() && i < config.getConsideredQueryTokens(); i++) {
+        for (int i = 0; i < aggregatedSolrDocumentList.size() && i < config.getMaxHints(); i++) {
             String needUri = ((List)aggregatedSolrDocumentList.get(i).getFieldValue("@graph.@id")).get(0).toString();
             String wonNodeUri = ((List)aggregatedSolrDocumentList.get(i).getFieldValue("@graph.http://purl.org/webofneeds/model#hasWonNode.@id")).get(0).toString();
             double score = Double.valueOf(aggregatedSolrDocumentList.get(i).getFieldValue("score").toString());
@@ -80,8 +80,8 @@ public class HintsBuilder {
             }
             // since we cannot query the wonNodeUri of the document in solr at the same time as the needUri, we just
             // set the needUri in the hint event and let the matching service figure out to which won node it belongs
-            bulkHintEvent.addHintEvent(new HintEvent(targetWonNode, targetNeedUri, wonNodeUri, needUri, config.getSolrServerUri(),
-                    score));
+            bulkHintEvent.addHintEvent(new HintEvent(targetWonNode, targetNeedUri, wonNodeUri, needUri,
+                                                     config.getSolrServerPublicUri(), score));
         }
 
         return bulkHintEvent;

@@ -33,6 +33,7 @@ public class SIREnTagBasedQueryBuilder implements SIREnQueryBuilderInterface {
         TwigQuery twigBasicNeedType = null;
         //First of all, we have to cinsider the BasicNeedType
         switch (needObject.getBasicNeedType().toLowerCase()) { //Attention: lower-case
+            //TODO: replace the strings with WON. constants already there
             case "http://purl.org/webofneeds/model#supply": // Demands has to be matched
                 twigBasicNeedType = build.newTwig("http://purl.org/webofneeds/model#hasBasicNeedType")
                         .with(build.newNode("'http://purl.org/webofneeds/model#demand'").setAttribute("@id"));
@@ -56,6 +57,7 @@ public class SIREnTagBasedQueryBuilder implements SIREnQueryBuilderInterface {
         ArrayList<TwigQuery> twigDescriptionArrayList = new ArrayList<TwigQuery>();
 
         for (int i = 0; i < tokenizedDescriptionPhrase.length && i < config.getConsideredQueryTokens(); i++) {
+            //TODO: replace the strings with WON. constants already there
             twigDescriptionArrayList.add(build.newTwig("http://purl.org/webofneeds/model#hasContent")
                     .with(build.newNode(tokenizedDescriptionPhrase[i]).setAttribute("http://purl.org/webofneeds/model#hasTag")));
         }

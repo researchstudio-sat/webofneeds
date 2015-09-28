@@ -1,5 +1,6 @@
 package siren.matcher;
 
+import com.hp.hpl.jena.vocabulary.DC;
 import com.sindicetech.siren.qparser.tree.dsl.ConciseQueryBuilder;
 import com.sindicetech.siren.qparser.tree.dsl.ConciseTwigQuery;
 import com.sindicetech.siren.qparser.tree.dsl.TwigQuery;
@@ -7,6 +8,7 @@ import config.SirenMatcherConfig;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ public class SIREnTitleAndDescriptionAndTagBasedQueryBuilder implements SIREnQue
         TwigQuery twigBasicNeedType = null;
         //First of all, we have to cinsider the BasicNeedType
         switch (needObject.getBasicNeedType().toLowerCase()) { //Attention: lower-case
+            //TODO: replace the strings with WON. constants already there
             case "http://purl.org/webofneeds/model#supply": // Demands has to be matched
                 twigBasicNeedType = build.newTwig("http://purl.org/webofneeds/model#hasBasicNeedType")
                         .with(build.newNode("'http://purl.org/webofneeds/model#demand'").setAttribute("@id"));
@@ -57,8 +60,8 @@ public class SIREnTitleAndDescriptionAndTagBasedQueryBuilder implements SIREnQue
         ArrayList<TwigQuery> twigTitleArrayList = new ArrayList<TwigQuery>();
 
         for (int i = 0; i < tokenizedTitlePhrase.length && i < config.getConsideredQueryTokens() / 2; i++) {
-            twigTitleArrayList.add(build.newTwig("http://purl.org/webofneeds/model#hasContent")
-                    .with(build.newNode(tokenizedTitlePhrase[i]).setAttribute("http://purl.org/dc/elements/1.1/title")));
+            twigTitleArrayList.add(build.newTwig(WON.HAS_CONTENT.toString())
+                    .with(build.newNode(tokenizedTitlePhrase[i]).setAttribute(DC.title.toString())));
         }
 
         String[] tokenizedDescriptionPhrase = qNLPP.extractRelevantWordTokens(needObject.getNeedDescription());
@@ -66,8 +69,8 @@ public class SIREnTitleAndDescriptionAndTagBasedQueryBuilder implements SIREnQue
         ArrayList<TwigQuery> twigDescriptionArrayList = new ArrayList<TwigQuery>();
 
         for (int i = 0; i < tokenizedDescriptionPhrase.length && i < config.getConsideredQueryTokens() / 2; i++) {
-            twigDescriptionArrayList.add(build.newTwig("http://purl.org/webofneeds/model#hasContent")
-                    .with(build.newNode(tokenizedDescriptionPhrase[i]).setAttribute("http://purl.org/webofneeds/model#hasTextDescription")));
+            twigDescriptionArrayList.add(build.newTwig(WON.HAS_CONTENT.toString())
+                    .with(build.newNode(tokenizedDescriptionPhrase[i]).setAttribute(WON.HAS_TEXT_DESCRIPTION.toString())));
         }
 
 
@@ -76,8 +79,8 @@ public class SIREnTitleAndDescriptionAndTagBasedQueryBuilder implements SIREnQue
         ArrayList<TwigQuery> twigTagArrayList = new ArrayList<TwigQuery>();
 
         for (int i = 0; i < tokenizedTagPhrase.length && i < config.getConsideredQueryTokens() / 2; i++) {
-            twigTagArrayList.add(build.newTwig("http://purl.org/webofneeds/model#hasContent")
-                    .with(build.newNode(tokenizedTagPhrase[i]).setAttribute("http://purl.org/webofneeds/model#hasTag")));
+            twigTagArrayList.add(build.newTwig(WON.HAS_CONTENT.toString())
+                    .with(build.newNode(tokenizedTagPhrase[i]).setAttribute(WON.HAS_TAG.toString())));
         }
 
 

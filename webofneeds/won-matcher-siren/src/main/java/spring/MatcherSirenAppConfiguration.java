@@ -7,6 +7,9 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import common.config.ClusterConfig;
 import common.spring.SpringExtension;
+import config.SirenMatcherConfig;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +32,9 @@ public class MatcherSirenAppConfiguration
 
   @Autowired
   private ClusterConfig clusterConfig;
+
+  @Autowired
+  private SirenMatcherConfig matcherConfig;
 
   /**
    * Actor system singleton for this application.
@@ -56,6 +62,20 @@ public class MatcherSirenAppConfiguration
     SpringExtension.SpringExtProvider.get(system).initialize(applicationContext);
     return system;
   }
+
+
+  /*
+     HttpSolrServer is thread-safe and if you are using the following constructor,
+     you *MUST* re-use the same instance for all requests.  If instances are created on
+     the fly, it can cause a connection leak. The recommended practice is to keep a
+     static instance of HttpSolrServer per solr server url and share it for all requests.
+     See https://issues.apache.org/jira/browse/SOLR-861 for more details
+ */
+  @Bean
+  public SolrServer getSolrServerInstance() {
+    return new HttpSolrServer(matcherConfig.getSolrServerUri());
+  }
+
 
   //To resolve ${} in @Value
   //found in http://www.mkyong.com/spring/spring-propertysources-example/

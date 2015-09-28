@@ -58,13 +58,13 @@ public class HintProducerProtocolActor extends UntypedProducerActor
     headers.put("score", String.valueOf(hint.getScore()));
     headers.put("originator", hint.getMatcherUri());
     //headers.put("content", RdfUtils.toString(hint.deserializeExplanationModel()));
-    headers.put("remoteBrokerEndpoint", localBrokerUri);
+    //headers.put("remoteBrokerEndpoint", localBrokerUri);
     headers.put("methodName", "hint");
 
     WonMessage wonMessage = createHintWonMessage(hint);
     Object body = WonMessageEncoder.encode(wonMessage, Lang.TRIG);
     CamelMessage camelMsg = new CamelMessage(body, headers);
-    log.debug("Send hint camel message {}", hint.getFromNeedUri());
+    log.debug("Send hint camel message {}", hint);
     return camelMsg;
   }
 

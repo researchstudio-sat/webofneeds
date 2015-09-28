@@ -8,10 +8,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import won.protocol.util.RdfUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -77,10 +74,12 @@ public class NeedEvent implements Serializable
     return format;
   }
 
-  public Dataset deserializeNeedDataset() {
+  public Dataset deserializeNeedDataset() throws IOException {
     InputStream is = new ByteArrayInputStream(serializedNeedResource.getBytes(StandardCharsets.UTF_8));
     Lang format = getSerializationFormat();
-    return RdfUtils.toDataset(is, new RDFFormat(format));
+    Dataset ds = RdfUtils.toDataset(is, new RDFFormat(format));
+    is.close();
+    return ds;
   }
 
   @Override
@@ -91,7 +90,7 @@ public class NeedEvent implements Serializable
 
   @Override
   public String toString() {
-    return "NeedEvent: (" + getWonNodeUri() + ", " + getUri() + ")";
+    return "NeedEvent: (" + getUri() + ")";
   }
 
 }
