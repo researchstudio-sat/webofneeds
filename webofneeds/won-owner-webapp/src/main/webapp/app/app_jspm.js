@@ -67,8 +67,18 @@ function configRedux($ngReduxProvider) {
      * store/model. e.g.: an reducers object `{ drafts: function(state = [], action){...} }`
      * would result in a store like `{ drafts: [...] }`
      */
-    let reducer = combineReducersStable(Immutable.Map(reducers));
-    $ngReduxProvider.createStoreWith(reducer, [/* middlewares here, e.g. 'promiseMiddleware', loggingMiddleware */]);
+    const reducer = combineReducersStable(Immutable.Map(reducers));
+    const loggingReducer = (state, action) => {
+        console.log('changing state from ',
+            state && state.toJS?
+                state.toJS() : state);
+        const updatedState = reducer(state, action);
+        console.log('changed state to ',
+            updatedState && updatedState.toJS?
+                updatedState.toJS() : updatedState);
+        return updatedState;
+    }
+    $ngReduxProvider.createStoreWith(loggingReducer, [/* middlewares here, e.g. 'promiseMiddleware', loggingMiddleware */]);
 }
 
 /*
