@@ -24,13 +24,13 @@ export const actionTypes = tree2constants({
         /*
          * A draft has changed. Pass along the draftURI and the respective data.
          */
-        changed: {
+        change: {
             type: null,
             title: null,
             thumbnail: null,
         },
-        deleted: null,
-        selected: null
+        delete: null,
+        select: null
     },
     ownpost: {
         new: null,
