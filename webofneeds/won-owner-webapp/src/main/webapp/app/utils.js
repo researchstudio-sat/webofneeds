@@ -137,3 +137,49 @@ export function reduceAndMapTreeKeys(reducer, mapper, acc, obj) {
 export function repeatVar(x, n) {
    return Array.apply(null, Array(n)).map(() => x);
 }
+
+/**
+ * Traverses an object-tree and produces an object
+ * that is just one level deep but concatenating the
+ * traversal path.
+ *
+ * ```
+ * flattenTree({
+ *   myInt: 1,
+ *   myObj: {
+ *      myProp: 2,
+ *      myStr: 'asdf',
+ *      foo: {
+ *        bar: 3
+ *      }
+ *   }
+ * });
+ * // result:
+ * // {
+ * //   'myInt': 1,
+ * //   'myObj__myProp' : 2,
+ * //   'myObj__myStr' : 'asdf',
+ * //   'myObj__foo__bar' : 3
+ * // }
+ * ```
+ *
+ * @param tree {object} the object-tree
+ * @param delimiter {string} will be used to join the path. by default `__`
+ * @returns {object} the flattened object
+ */
+export function flattenTree(tree, delimiter = '__') {
+    const accObj = {}; //the accumulator accObject
+    function _flattenTree(node, pathAcc = []) {
+        for(let k of Object.keys(node)) {
+            const pathAccUpd = pathAcc.concat(k);
+            if(typeof node[k] === 'object' && node[k] !== null) {
+                _flattenTree(node[k], pathAccUpd);
+            } else {
+                const propertyName = pathAccUpd.join(delimiter);
+                accObj[propertyName] = node[k];
+            }
+        }
+    }
+    _flattenTree(tree);
+    return accObj;
+}

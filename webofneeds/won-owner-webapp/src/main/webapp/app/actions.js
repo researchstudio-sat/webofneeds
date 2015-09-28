@@ -3,7 +3,7 @@
  *
  * Contains a list of actions to be used with the dispatcher and documentation for their expected payloads.
  */
-import { tree2constants, deepFreeze, reduceAndMapTreeKeys } from './utils';
+import { tree2constants, deepFreeze, reduceAndMapTreeKeys, flattenTree } from './utils';
 import './service/won';
 
 export const actionTypes = tree2constants({
@@ -16,7 +16,7 @@ export const actionTypes = tree2constants({
          */
         userData : null
     },
-    draft: {
+    drafts: {
         /*
          * A new draft was created (either through the view in this client or on another browser)
          */
@@ -28,7 +28,9 @@ export const actionTypes = tree2constants({
             type: null,
             title: null,
             thumbnail: null,
-        }
+        },
+        deleted: null,
+        selected: null
     },
     ownpost: {
         new: null,
@@ -48,20 +50,35 @@ export const actionTypes = tree2constants({
  * }
  * ```
  */
-export const actionCreators = tree2actionCreators(actionTypes);
-window.actionCreators = actionCreators;
-window.actionTypes = actionTypes;
+export const actionCreators = flattenTree(
+        reduceAndMapTreeKeys(
+            (acc, k) => acc.concat(k), //construct paths, e.g. ['draft', 'new']
+            (acc) => createActionCreator(won.lookup(actionTypes, acc)), //lookup constant at path
+            [], actionTypes
+        ),
+    '__');
 
-function tree2actionCreators(obj) {
-    return deepFreeze(reduceAndMapTreeKeys(
-        (acc, k) => acc.concat(k), //construct paths, e.g. ['draft', 'new']
-        (acc) => createActionCreator(won.lookup(actionTypes, acc)), //lookup constant at path
-        [], obj
-    ))
-}
 function createActionCreator(type) {
     return (payload) => {
         console.log('creating instance of actionType ', type, ' with payload: ', payload);
         return {type, payload};
     };
 }
+
+
+/*
+ * NOTE: Add any custom action-creators here!
+ */
+
+Object.freeze(actionCreators); //to make sure it's not modified elsewhere
+
+
+
+
+
+/*
+ * TODO deletme; for debugging
+ */
+window.actionCreators = actionCreators;
+window.actionTypes = actionTypes;
+
