@@ -35,6 +35,7 @@ import 'redux';
 //import { combineReducers } from 'redux-immutable';
 import { combineReducers } from 'redux-immutablejs';
 import Immutable from 'immutable';
+import thunk from 'redux-thunk';
 import 'ng-redux';
 
 let app = angular.module('won.owner', [
@@ -78,7 +79,8 @@ function configRedux($ngReduxProvider) {
                 updatedState.toJS() : updatedState);
         return updatedState;
     }
-    $ngReduxProvider.createStoreWith(loggingReducer, [/* middlewares here, e.g. 'promiseMiddleware', loggingMiddleware */]);
+    window.thunk = thunk;
+    $ngReduxProvider.createStoreWith(loggingReducer, [thunk,/* middlewares here, e.g. 'promiseMiddleware', loggingMiddleware */]);
 }
 
 /*

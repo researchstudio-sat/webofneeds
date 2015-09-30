@@ -37,6 +37,7 @@ System.config({
     "ng-tags-input": "bower:ng-tags-input@2.3.0",
     "redux": "npm:redux@3.0.0",
     "redux-immutablejs": "npm:redux-immutablejs@0.0.6",
+    "redux-thunk": "npm:redux-thunk@1.0.0",
     "sockjs": "bower:sockjs@0.3.4",
     "bower:font-awesome@4.3.0": {
       "css": "github:systemjs/plugin-css@0.1.13"

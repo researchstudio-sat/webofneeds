@@ -62,13 +62,31 @@ export const actionCreators = flattenTree(
         ),
     '__');
 
+/*
+ * This action creator uses thunk (https://github.com/gaearon/redux-thunk) which
+ * allows using it with a normal dispatch(actionCreator(payload)) even though
+ *  it does asynchronous calls. This is a requirement for using it with
+ *  $ngRedux.connect(..., actionCreators, ...)
+ */
+actionCreators.delayedWub = (nrOfWubs, milliseconds = 1000) => (dispatch) =>
+    delay(milliseconds).then(
+        args => dispatch(actionCreators.moreWub(nrOfWubs)),
+        error => console.err('actions.js: Error while delaying for delayed Wub.')
+    );
+
+window.delay = delay;
+function delay(milliseconds) {
+    return new Promise((resolve, reject) =>
+        window.setTimeout(() => resolve(), milliseconds)
+    );
+}
+
 function createActionCreator(type) {
     return (payload) => {
         console.log('creating instance of actionType ', type, ' with payload: ', payload);
         return {type, payload};
     };
 }
-
 
 /*
  * NOTE: Add any custom action-creators here!
