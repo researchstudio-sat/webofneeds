@@ -33,7 +33,7 @@ public class MatcherPubSubActor extends UntypedActor
 
     // create the querying and indexing actors that do the actual work
     matcherActor = getContext().actorOf(SpringExtension.SpringExtProvider.get(
-      getContext().system()).props(SirenMatcherActor.class), "SirenMatcherPool");
+      getContext().system()).fromConfigProps(SirenMatcherActor.class), "SirenMatcherPool");
   }
 
   @Override
