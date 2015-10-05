@@ -78,6 +78,15 @@ public class NeedIndexer {
         }
       }
       finalJSONFramedNeed = finalJSONFramedNeed + "]}";
-      httpService.postJsonRequest(config.getSolrServerUri() + "siren/add?commit=true", finalJSONFramedNeed);
+
+      String indexUri = config.getSolrServerUri();
+      if (!indexUri.endsWith("/")) {
+        indexUri += "/";
+      }
+      indexUri += "siren/add";
+      if (config.isCommitIndexedNeedImmediately()) {
+        indexUri += "?commit=true";
+      }
+      httpService.postJsonRequest(indexUri, finalJSONFramedNeed);
   }
 }

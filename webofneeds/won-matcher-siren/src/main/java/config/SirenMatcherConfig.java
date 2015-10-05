@@ -35,6 +35,9 @@ public class SirenMatcherConfig
   @Value("${matcher.siren.query.consideredTokens}")
   private int consideredQueryTokens;
 
+  @Value("${matcher.siren.index.commit}")
+  private boolean commitIndexedNeedImmediately;
+
   @Value("${matcher.siren.query.scoreThreshold}")
   private float scoreThreshold;
 
@@ -110,5 +113,12 @@ public class SirenMatcherConfig
     this.solrServerPublicUri = solrServerPublicUri;
   }
 
+  public boolean isCommitIndexedNeedImmediately() {
+    return commitIndexedNeedImmediately;
+  }
+
+  public void setCommitIndexedNeedImmediately(final boolean commitIndexedNeedImmediately) {
+    this.commitIndexedNeedImmediately = commitIndexedNeedImmediately;
+  }
 
 }

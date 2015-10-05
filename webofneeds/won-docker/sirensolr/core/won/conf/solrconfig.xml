@@ -37,7 +37,7 @@
     <!-- AutoCommit -->
      <autoCommit>
        <maxTime>${solr.autoCommit.maxTime:15000}</maxTime>
-       <openSearcher>false</openSearcher>
+       <openSearcher>true</openSearcher>
      </autoCommit>
 
     <!-- softAutoCommit -->
