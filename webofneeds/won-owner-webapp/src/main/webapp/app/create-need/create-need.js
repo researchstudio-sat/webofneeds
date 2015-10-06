@@ -321,6 +321,7 @@ angular.module('won.owner').controller('CreateNeedCtrlNew', function
             $scope.need.needURI = wonService.getDefaultWonNodeUri() + "/need/" + utilService.getRandomInt(1, 9223372036854775807);
             draftJson['@graph'][0]['@graph'][0]['@id'] = $scope.need.needURI;
         }
+        console.log('json draft: ', JSON.stringify(draftJson));
         var createDraftObject = {"draftURI": $scope.need.needURI, "draft": JSON.stringify(draftJson)};
 
         // save locally

@@ -110,8 +110,15 @@ class AppController {
                 path: '/',
                 redirectTo: '/landingpage'
             },
+                /*
             {
                 path: '/create-need',
+                component: 'create-need',
+                as: 'createNeed'
+            },
+            */
+            {
+                path: '/create-need/:draftId',
                 component: 'create-need',
                 as: 'createNeed'
             },

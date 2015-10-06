@@ -460,6 +460,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return check;
     }
     applicationStateService.addDraft = function(draft){
+        console.log('adding draft ', draft)
         var draftLd = JSON.parse(draft.draft);
         var draftBuilderObject = new window.won.DraftBuilder(draftLd).setContext();
         var menuposition = draftBuilderObject.getCurrentMenuposition();

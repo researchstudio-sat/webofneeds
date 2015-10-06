@@ -14,27 +14,31 @@ import imageDropzoneModule from '../image-dropzone';
 import { attach } from '../../utils';
 import { actionCreators }  from '../../actions';
 
-let postTypeTexts = [
+const postTypeTexts = [
     {
+        type: won.WON.BasicNeedTypeDemandCompacted,
         text: 'I want to have something',
-        helpText: 'Use this type in case (want) foo sam quam aspic temod et que in prendiae perovidel.'
+        helpText: 'Use this type in case (want) foo sam quam aspic temod et que in prendiae perovidel.',
     },
     {
+        type: won.WON.BasicNeedTypeSupplyCompacted,
         text: 'I offer something',
         helpText: 'Use this type in case (offer) case sam quam aspic temod et que in prendiae perovidel.'
     },
     {
+        type: won.WON.BasicNeedTypeDotogetherCompacted,
         text: 'I want to do something together',
         helpText: 'Use this type in case case (together) sam quam aspic temod et que in prendiae perovidel.'
     },
     {
+        type: won.WON.BasicNeedTypeCritiqueCompacted,
         text: 'I want to change something',
         helpText: 'Use this type in case (change) case sam quam aspic temod et que in prendiae perovidel.'
     }
 ]
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
-const serviceDependencies = ['$q', '$ngRedux' /*injections as strings here*/];
+const serviceDependencies = ['$q', '$ngRedux', /*'$routeParams' /*injections as strings here*/];
 
 class CreateNeedController {
     constructor(/* arguments <- serviceDependencies */) {
@@ -50,7 +54,8 @@ class CreateNeedController {
         //this.titlePicZone().addEventListener('drop', e => 0);
 
         const selectFromState = (state) => ({
-            wubs: state.get('wubs')
+            wubs: state.get('wubs'),
+            //drafts: state.get('drafts')
         });
 
         // Using actionCreators like this means that every action defined there is available in the template.
@@ -59,11 +64,15 @@ class CreateNeedController {
 
     }
 
-    selectType(idx) {
-        console.log('selected type ', idx);
+    selectType(typeIdx) {
+        console.log('selected type ', postTypeTexts[typeIdx].type);
+        const draftIdx = this.$ngRedux.getState().get('drafts').get('activeDraftIdx');
+        //const draftIdx = this.drafts.get('activeDraftIdx');
+        this.drafts__change__type({idx: draftIdx, type: postTypeTexts[typeIdx].type}); //TODO proper draft idx
     }
     unselectType() {
         console.log('unselected type ');
+        this.drafts__change__type({idx: draftIdx, type: undefined}); //TODO proper draft idx
     }
     titlePicZoneNg() {
         if(!this._titlePicZone) {

@@ -48,13 +48,9 @@ export const drafts = createReducer(
             if(idx < 0 || idx > state.get('draftList').size)
                 return state; //TODO throw error instead?
 
-            const draft = state.get('draftList').get(idx);
-
-            //TODO set draft-type
-            type;
-
+            const updatedDraft = state.get('draftList').get(idx).set('type', type);
             return state
-                .set('draftList', state.get('draftList').set(idx, draft))
+                .set('draftList', state.get('draftList').set(idx, updatedDraft))
                 .set('activeDraftIdx', idx);
         }
     }
