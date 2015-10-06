@@ -23,6 +23,8 @@ import java.util.ArrayList;
 
 /**
  * Created by Soheilk on 24.08.2015.
+ *
+ * Siren/Solr based matcher implementation for querying as well as indexing needs.
  */
 @Component
 @Scope("prototype")

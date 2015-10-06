@@ -15,6 +15,11 @@ import org.springframework.stereotype.Component;
 
 /**
  * Created by hfriedrich on 30.09.2015.
+ *
+ * Matcher actor that subscribes itself to the PubSub Topic to receive need events from the matching service
+ * and forwards them to the actual matcher implementation (e.g. SirenMatcherActor) for hint generation.
+ * Then gets back the hints from the matcher implementation and publishes them to the PubSub Topic of hints.
+ *
  */
 @Component
 @Scope("prototype")

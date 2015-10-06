@@ -9,14 +9,14 @@ docker -H satsrv04:2375 build -t webofneeds/wonnode:dev $WORKSPACE/webofneeds/wo
 docker -H satsrv04:2375 stop wonnode_dev || echo 'No docker container found to stop with name: wonnode_dev'
 docker -H satsrv04:2375 rm wonnode_dev || echo 'No docker container found to remove with name: wonnode_dev'
 docker -H satsrv04:2375 run --name=wonnode_dev -d -e "uri.host=satsrv04.researchstudio.at" \
--e "http.port=8888" -e "activemq.broker.port=61616" -p 8888:8080 -p 61617:61617 webofneeds/wonnode:dev
+-e "http.port=8888" -e "activemq.broker.port=61616" -p 8888:8080 -p 61616:61616 webofneeds/wonnode:dev
 
 # wonnode 2
 docker -H satsrv05:2375 build -t webofneeds/wonnode:dev $WORKSPACE/webofneeds/won-docker/wonnode/
 docker -H satsrv05:2375 stop wonnode_dev || echo 'No docker container found to stop with name: wonnode_dev'
 docker -H satsrv05:2375 rm wonnode_dev || echo 'No docker container found to remove with name: wonnode_dev'
 docker -H satsrv05:2375 run --name=wonnode_dev -d -e "uri.host=satsrv05.researchstudio.at" \
--e "http.port=8888" -e "activemq.broker.port=61616" -p 8888:8080 -p 61617:61617 webofneeds/wonnode:dev
+-e "http.port=8888" -e "activemq.broker.port=61616" -p 8888:8080 -p 61616:61616 webofneeds/wonnode:dev
 
 sleep 20
 
