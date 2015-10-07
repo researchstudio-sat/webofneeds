@@ -47,12 +47,14 @@ public class MatcherPubSubActor extends UntypedActor
     if (o instanceof NeedEvent) {
 
       NeedEvent needEvent = (NeedEvent) o;
+      log.info("MONITOR;{};{};{}", needEvent.getUri(), System.currentTimeMillis(), "MATCHER_SIREN_NEED");
       log.info("NeedEvent received: " + needEvent);
       matcherActor.tell(needEvent, getSelf());
 
     } else if (o instanceof HintEvent) {
 
       HintEvent hintEvent = (HintEvent) o;
+      log.info("MONITOR;{};{};{}", hintEvent.getFromNeedUri(), System.currentTimeMillis(), "MATCHER_SIREN_HINT");
       log.info("Publish hint event: " + hintEvent);
       pubSubMediator.tell(new DistributedPubSubMediator.Publish(
         hintEvent.getClass().getName(), hintEvent), getSelf());
@@ -60,6 +62,10 @@ public class MatcherPubSubActor extends UntypedActor
     } else if (o instanceof BulkHintEvent) {
 
       BulkHintEvent bulkHintEvent = (BulkHintEvent) o;
+
+      if (bulkHintEvent.getHintEvents().size() > 0) {
+        log.info("MONITOR;{};{};{}", bulkHintEvent.getHintEvents().iterator().next().getFromNeedUri(), System.currentTimeMillis(), "MATCHER_SIREN_HINT");
+      }
       log.info("Publish bulk hint event: " + bulkHintEvent);
       pubSubMediator.tell(new DistributedPubSubMediator.Publish(
         bulkHintEvent.getClass().getName(), bulkHintEvent), getSelf());

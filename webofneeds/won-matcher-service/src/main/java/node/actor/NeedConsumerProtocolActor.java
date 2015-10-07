@@ -67,6 +67,8 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
       if (needUri != null && wonNodeUri != null) {
         Object methodName = camelMsg.getHeaders().get(MSG_HEADER_METHODNAME);
         if (methodName != null) {
+
+          log.info("MONITOR;{};{};{}", needUri, System.currentTimeMillis(), "MATCHER_SERVICE_NEED");
           log.debug("Received event '{}' for needUri '{}' and wonNeedUri '{}'", methodName, needUri, wonNodeUri);
 
           // save the need
