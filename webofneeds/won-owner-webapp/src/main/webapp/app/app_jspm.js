@@ -21,13 +21,13 @@ import overviewIncomingRequestsComponent from './components/overview-incoming-re
 import matchesComponent from './components/matches/matches';
 import postVisitorComponent from './components/post-visitor/post-visitor';
 import {camel2Hyphen, hyphen2Camel} from './utils';
-import { combineReducersStable } from './redux-utils';
 import landingPageComponent from './components/landingpage/landingpage';
 import overviewPostsComponent from './components/overview-posts/overview-posts';
 import feedComponent from './components/feed/feed';
 import overviewMatchesComponent from './components/overview-matches/overview-matches';
 
-import * as reducers from './reducers/reducers';
+//import * as reducers from './reducers/reducers';
+import reducer from './reducers/reducers';
 import 'redux';
 //import { combineReducers } from 'redux';
 //import { combineReducers } from 'redux-immutable';
@@ -43,9 +43,15 @@ import {
     stateReload,
     stateTransitionTo
 } from 'redux-ui-router';
+ const routerActions = {
+ stateGo,
+ stateReload,
+ stateTransitionTo
+ };
 window.routerFooFoo = router;
 */
 
+import { actionCreators }  from './actions';
 
 import ngReduxRouterModule from 'redux-ui-router';
 import uiRouterModule from 'angular-ui-router';
@@ -78,13 +84,6 @@ app.config([
 ]);
 
 function configRedux($ngReduxProvider) {
-    /* note that `combineReducers` is opinionated as a root reducer for the
-     * sake of convenience and ease of first use. It takes an object
-     * with seperate reducers and applies each to it's seperate part of the
-     * store/model. e.g.: an reducers object `{ drafts: function(state = [], action){...} }`
-     * would result in a store like `{ drafts: [...] }`
-     */
-    const reducer = combineReducersStable(Immutable.Map(reducers));
     const loggingReducer = (state, action) => {
         console.log('changing state from ',
             state && state.toJS?
@@ -96,7 +95,7 @@ function configRedux($ngReduxProvider) {
         return updatedState;
     }
     window.thunk = thunk;
-    $ngReduxProvider.createStoreWith(loggingReducer, [thunk,/* middlewares here, e.g. 'promiseMiddleware', loggingMiddleware */]);
+    $ngReduxProvider.createStoreWith(loggingReducer, ['ngUiRouterMiddleware', thunk,/* middlewares here, e.g. 'promiseMiddleware', loggingMiddleware */]);
 }
 
 /*
@@ -135,6 +134,11 @@ function configRouting($urlRouterProvider, $stateProvider) {
             templateUrl: './app/components/create-need/create-need.html',
             controller: 'CreateNeedController'
         })
+        .state('routerDemo', {
+            url: '/routerDemo/:demoVar',
+            template: 'demoVar = {demoVar}',
+            controller: 'DemoController'
+        })
 
 
             /*
@@ -151,6 +155,21 @@ function configRouting($urlRouterProvider, $stateProvider) {
             */
 
 }
+
+
+import { attach } from './utils';
+const serviceDependencies = ['$scope','$ngRedux', /*'$routeParams' /*injections as strings here*/];
+class DemoController {
+    constructor(/* arguments <- serviceDependencies */) {
+        attach(this, serviceDependencies, arguments);
+
+        let disconnect = this.$ngRedux.connect((state) => ({state}), actionCreators)(this);
+        this.$scope.$on('$destroy', disconnect)
+        window.demoCtrl = this;
+    }
+}
+app.controller('DemoController', [...serviceDependencies, DemoController]);
+
 
 class AppController {
     constructor (){//($router) {

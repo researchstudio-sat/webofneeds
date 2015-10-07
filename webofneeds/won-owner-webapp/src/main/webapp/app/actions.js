@@ -74,6 +74,11 @@ actionCreators.delayedWub = (nrOfWubs, milliseconds = 1000) => (dispatch) =>
         error => console.err('actions.js: Error while delaying for delayed Wub.')
     );
 
+import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
+actionCreators.router__stateGo = stateGo;
+actionCreators.router__stateReload = stateReload;
+actionCreators.router__stateTransitionTo = stateTransitionTo;
+
 window.delay = delay;
 function delay(milliseconds) {
     return new Promise((resolve, reject) =>

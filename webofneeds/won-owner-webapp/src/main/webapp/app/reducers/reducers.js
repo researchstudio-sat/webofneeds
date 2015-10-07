@@ -6,8 +6,20 @@ import { actionTypes } from '../actions';
 import { repeatVar } from '../utils';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
+import { combineReducersStable } from '../redux-utils';
 
-export const wubs = createReducer(Immutable.List(), {
+
+/*
+ * this reducer attaches a 'router' object to our state that keeps the routing state.
+ */
+import { router } from 'redux-ui-router';
+//export router;
+/*
+import { router : reduxUiRouterReducer } from 'redux-ui-router';
+export const router = reduxUiRouterReducer;
+*/
+
+const wubs = createReducer(Immutable.List(), {
     [actionTypes.moreWub]: (state, action) => {
         const howMuch = action.payload;
         const additionalWubs = Immutable.fromJS(repeatVar('wub', howMuch));
@@ -15,7 +27,7 @@ export const wubs = createReducer(Immutable.List(), {
     }
 });
 
-export const drafts = createReducer(
+const drafts = createReducer(
     //initial state
     Immutable.fromJS({
         //list of draft objects
@@ -55,3 +67,11 @@ export const drafts = createReducer(
         }
     }
 );
+
+/* note that `combineReducers` is opinionated as a root reducer for the
+ * sake of convenience and ease of first use. It takes an object
+ * with seperate reducers and applies each to it's seperate part of the
+ * store/model. e.g.: an reducers object `{ drafts: function(state = [], action){...} }`
+ * would result in a store like `{ drafts: [...] }`
+ */
+export default combineReducersStable(Immutable.Map({/*router,*/ drafts, wubs}));
