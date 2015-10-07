@@ -20,7 +20,7 @@ import settingsComponent from './components/settings/settings';
 import overviewIncomingRequestsComponent from './components/overview-incoming-requests/overview-incoming-requests';
 import matchesComponent from './components/matches/matches';
 import postVisitorComponent from './components/post-visitor/post-visitor';
-import {camel2Hyphen, hyphen2Camel} from './utils';
+import { camel2Hyphen, hyphen2Camel, firstToLowerCase } from './utils';
 import landingPageComponent from './components/landingpage/landingpage';
 import overviewPostsComponent from './components/overview-posts/overview-posts';
 import feedComponent from './components/feed/feed';
@@ -123,38 +123,40 @@ function configComponentLoading($componentLoaderProvider) {
 function configRouting($urlRouterProvider, $stateProvider) {
     $urlRouterProvider.otherwise('/landingpage');
 
+    [
+        { path: '/landingpage', component: 'landingpage' },
+        { path: '/create-need/:draftId', component: 'create-need' },
+        { path: '/feed', component: 'feed' },
+        { path: '/settings', component: 'settings' },
+        { path: '/overview/matches', component: 'overview-matches', as: 'overviewMatches' },
+        { path: '/overview/incoming-requests', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
+        { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' }
+
+    ].forEach( ({path, component, as}) => {
+
+            const cmlComponent = hyphen2Camel(component);
+
+            if(!path) path = `/${component}`;
+            if(!as) as = firstToLowerCase(cmlComponent);
+
+            $stateProvider.state(as, {
+                url: path,
+                templateUrl: `./app/components/${component}/${component}.html`,
+                controller: `${cmlComponent}Controller`,
+                controllerAs: 'self'
+            });
+    })
+
     $stateProvider
-        .state('landingpage', {
-            url: '/landingpage',
-            templateUrl: './app/components/landingpage/landingpage.html',
-            controller: 'LandingpageController'
-        })
-        .state('createNeed', {
-            url: '/create-need/:draftId',
-            templateUrl: './app/components/create-need/create-need.html',
-            controller: 'CreateNeedController'
-        })
         .state('routerDemo', {
-            url: '/routerDemo/:demoVar',
-            template: 'demoVar = {demoVar}',
-            controller: 'DemoController'
+            url: '/router-demo/:demoVar',
+            template: "demoVar = {{self.state.getIn(['router', 'currentParams', 'demoVar'])}}",
+            controller: 'DemoController',
+            controllerAs: 'self'
         })
-
-
-            /*
-            views: {
-                wholeApp: {
-                    template: ` Root View `,
-                    controller: ($scope, $ngRedux) => {
-                        $scope.globalState = {};
-
-                        $ngRedux.connect( state => ({ globalState: state }) )($scope)
-                    }
-                }
-            }
-            */
-
 }
+
+
 
 
 import { attach } from './utils';
@@ -179,40 +181,6 @@ class AppController {
 
             //TODO should be landing page if not logged in or feed if logged in
             {
-                path: '/',
-                redirectTo: '/landingpage'
-            },
-            {
-                path: '/create-need/:draftId',
-                component: 'create-need',
-                as: 'createNeed'
-            },
-            {
-                path: '/settings',
-                component: 'settings'
-            },
-            {
-                path: '/landingpage', 
-                component: 'landingpage'
-            },
-            {
-                path: '/feed',
-                component: 'feed'
-            },
-            {
-                path: '/overview/matches',
-                component: 'overview-matches',
-                as: 'overviewMatches'
-            },
-            {
-                path: '/overview/incoming-requests',
-                component: 'overview-incoming-requests',
-                as: 'overviewIncomingRequests'
-            },
-            {
-                path: '/overview/posts',
-                component: 'overview-posts',
-                as: 'overviewPosts'
             },
             //TODO database id needs to be send to the client after the create-msg acknowledgment
             { path: '/post/:id/visitor', component: 'post-visitor'},

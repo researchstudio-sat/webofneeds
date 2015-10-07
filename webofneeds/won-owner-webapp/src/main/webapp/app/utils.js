@@ -8,11 +8,19 @@ export function hyphen2Camel(hyphened) {
         .replace(/-([a-z])/g, args => args[1].toUpperCase()) //hyphens to camel-case
 }
 
-export function camel2Hyphen(camelled) {
+export function camel2Hyphen(cammelled) {
     return cammelled
         .replace(/^([A-Z])/, args => args[0].toLowerCase()) //de-capitalize first letter
         .replace(/(.)([A-Z])/g, args => args[0] + '-' + args[1].toLowerCase()) // camel-case to hyphens
 }
+
+export function firstToLowerCase(str) {
+    return str.replace(/^([A-Z])/, args => args[0].toLowerCase()) //de-capitalize first letter
+}
+
+window.hyphen2Camel = hyphen2Camel;
+window.camel2Hyphen = camel2Hyphen;
+window.firstToLowerCase = firstToLowerCase;
 
 
 /**

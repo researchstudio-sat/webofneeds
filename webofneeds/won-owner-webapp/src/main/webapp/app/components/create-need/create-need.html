@@ -6,14 +6,14 @@
     <div class="cp__inner">
 
         <won-posttype-select
-                options="::this['create-need'].postTypeTexts"
-                on-select="::this['create-need'].selectType(idx)"
-                on-unselect="::this['create-need'].unselectType()">
+                options="::self.postTypeTexts"
+                on-select="::self.selectType(idx)"
+                on-unselect="::self.unselectType()">
         </won-posttype-select>
 
-        <button ng-click="this['create-need'].moreWub(1)">MOAR WUB!</button>
-        <button ng-click="this['create-need'].moreWub(3)">3 MOAR WUB!</button>
-        <p>{{ this['create-need'].wubs.toArray() }}</p>
+        <button ng-click="self.moreWub(1)">MOAR WUB!</button>
+        <button ng-click="self.moreWub(3)">3 MOAR WUB!</button>
+        <p>{{ self.wubs.toArray() }}</p>
 
         <!--
         <select name="select" class="cp__typeselect2">
