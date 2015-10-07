@@ -4,23 +4,23 @@
 <main>
     <div class="welcome">
         <div class="title">Welcome to the web of needs</div>
-        <won-flex-grid items="::landingpage.peopleGrid"></won-flex-grid>
+        <won-flex-grid items="::self.peopleGrid"></won-flex-grid>
         <div class="w__description">
             <span class="wd__title">What is a &laquo;need&raquo;?</span>
             <span class="wd__text">Short definition something together ut alitati busdam dipsunt pratem ipient rese expliquos et min rest re doluptatium hictotate vento eumquod.</span>
-            <span class="wd__more clickable" ng-click="landingpage.toggleMoreInfo()">Read more</span>
-            <img class="wd__arrow clickable" ng-click="landingpage.toggleMoreInfo()" ng-show="!landingpage.moreInfo" src="generated/icon-sprite.svg#ico16_arrow_down"/>
-            <img class="wd__arrow clickable" ng-click="landingpage.toggleMoreInfo()" ng-show="landingpage.moreInfo" src="generated/icon-sprite.svg#ico16_arrow_up"/>
-            <span class="wd__text"  ng-show="landingpage.moreInfo" >I am a longer definition of stuff i have no clue what i should write here but i will certainly be of good use once somebody gives me purpose. One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin. He lay on his armour-like back, and if he lifted his head a little he could see his brown belly, slightly domed and divided by arches into stiff sections. The bedding was hardly able to cover it and seemed ready to slide off any moment. His many legs, pitifully thin compared with the size of the rest of him, waved about helplessly as he looked. "What's happened to me?" he thought. It wasn't a dream. His room, a proper human room although a little too small, lay peacefully between its four familiar walls. A collection of textile samples lay spread out on the table - Samsa was a travelling salesman - and above it there hung a picture that he had recently cut out of an illustrated magazine and housed in a nice, gilded frame. It showed a lady fitted out with a fur hat and fur boa who sat upright, raising a heavy fur muff that covered the whole of her lower arm towards the viewer. Gregor then turned to look out the window at the dull weather. Drops</span>
+            <span class="wd__more clickable" ng-click="self.toggleMoreInfo()">Read more</span>
+            <img class="wd__arrow clickable" ng-click="self.toggleMoreInfo()" ng-show="!self.moreInfo" src="generated/icon-sprite.svg#ico16_arrow_down"/>
+            <img class="wd__arrow clickable" ng-click="self.toggleMoreInfo()" ng-show="self.moreInfo" src="generated/icon-sprite.svg#ico16_arrow_up"/>
+            <span class="wd__text"  ng-show="self.moreInfo" >I am a longer definition of stuff i have no clue what i should write here but i will certainly be of good use once somebody gives me purpose. One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin. He lay on his armour-like back, and if he lifted his head a little he could see his brown belly, slightly domed and divided by arches into stiff sections. The bedding was hardly able to cover it and seemed ready to slide off any moment. His many legs, pitifully thin compared with the size of the rest of him, waved about helplessly as he looked. "What's happened to me?" he thought. It wasn't a dream. His room, a proper human room although a little too small, lay peacefully between its four familiar walls. A collection of textile samples lay spread out on the table - Samsa was a travelling salesman - and above it there hung a picture that he had recently cut out of an illustrated magazine and housed in a nice, gilded frame. It showed a lady fitted out with a fur hat and fur boa who sat upright, raising a heavy fur muff that covered the whole of her lower arm towards the viewer. Gregor then turned to look out the window at the dull weather. Drops</span>
         </div>
     </div>
     <div class="howto">
         <div class="title">How it works</div>
-        <won-flex-grid items="::landingpage.workGrid"></won-flex-grid>
+        <won-flex-grid items="::self.workGrid"></won-flex-grid>
     </div>
     <div class="faq">
         <div class="title">FAQs</div>
-        <won-accordion items="::landingpage.questions"></won-accordion>
+        <won-accordion items="::self.questions"></won-accordion>
     </div>
     <div class="try">
         <div class="title">Try it yourself!</div>
@@ -28,11 +28,11 @@
             <div class="tg__signup">
                 <div class="block">
                     <div class="header">Sign up here.</div>
-                    <input type="text" required="true" placeholder="Email address" ng-model="landingpage.email" required type="email"/>
-                    <input type="text" required="true" placeholder="Password" ng-model="landingpage.password" required type="password"/>
-                    <input type="text" required="true" placeholder="Repeat Password" ng-model="landingpage.repeatPassword" required type="password"/>
+                    <input type="text" required="true" placeholder="Email address" ng-model="self.email" required type="email"/>
+                    <input type="text" required="true" placeholder="Password" ng-model="self.password" required type="password"/>
+                    <input type="text" required="true" placeholder="Repeat Password" ng-model="self.repeatPassword" required type="password"/>
                 </div>
-                <button class="won-button--filled darkgray" ng-click="landingpage.register()">That’s all we need. Let’s go!</button>
+                <button class="won-button--filled darkgray" ng-click="self.register()">That’s all we need. Let’s go!</button>
             </div>
             <div class="tg__anonymous">
                 <div class="block">

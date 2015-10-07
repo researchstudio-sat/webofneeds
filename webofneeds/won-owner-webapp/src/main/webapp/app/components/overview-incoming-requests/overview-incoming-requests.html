@@ -1,12 +1,12 @@
 <header>
     <won-topnav></won-topnav>
-    <won-overview-title-bar selection="this['overview-incoming-requests'].selection"></won-overview-title-bar>
+    <won-overview-title-bar selection="self.selection"></won-overview-title-bar>
 </header>
 <main class="overviewincomingrequestscontent">
     <div class="oir__requests">
-        <won-request-item-line open="false" open-request="this['overview-incoming-requests'].openRequest" item="item" ng-repeat="item in this['overview-incoming-requests'].requests"></won-request-item-line>
+        <won-request-item-line open="false" open-request="self.openRequest" item="item" ng-repeat="item in self.requests"></won-request-item-line>
     </div>
-    <div class="oir__openrequest" ng-show="this['overview-incoming-requests'].openRequest">
-        <won-open-request item="this['overview-incoming-requests'].openRequest"></won-open-request>
+    <div class="oir__openrequest" ng-show="self.openRequest">
+        <won-open-request item="self.openRequest"></won-open-request>
     </div>
 </main>

@@ -1,6 +1,6 @@
 <header>
     <won-topnav></won-topnav>
-    <won-overview-title-bar selection="this['overview-matches'].selection"></won-overview-title-bar>
+    <won-overview-title-bar selection="self.selection"></won-overview-title-bar>
 </header>
 <main class="overviewmatchescontent">
     <div class="omc__inner">
@@ -8,25 +8,25 @@
             <div class="dummy"></div>
             <div class="title">Matches to your needs</div>
             <div class="omc__header__viewtype">
-                <img ng-src="{{this['overview-matches'].viewType == 0 ? 'generated/icon-sprite.svg#ico-filter_tile_selected' : 'generated/icon-sprite.svg#ico-filter_tile'}}"
+                <img ng-src="{{self.viewType == 0 ? 'generated/icon-sprite.svg#ico-filter_tile_selected' : 'generated/icon-sprite.svg#ico-filter_tile'}}"
                      class="omc__header__viewtype__icon clickable"
-                     ng-click="this['overview-matches'].viewType = 0"/>
-                <img ng-src="{{this['overview-matches'].viewType == 1 ? 'generated/icon-sprite.svg#ico-filter_compact_selected' : 'generated/icon-sprite.svg#ico-filter_compact'}}"
+                     ng-click="self.viewType = 0"/>
+                <img ng-src="{{self.viewType == 1 ? 'generated/icon-sprite.svg#ico-filter_compact_selected' : 'generated/icon-sprite.svg#ico-filter_compact'}}"
                      class="omc__header__viewtype__icon clickable"
-                     ng-click="this['overview-matches'].viewType = 1"/>
-                <img ng-src="{{this['overview-matches'].viewType == 2 ? 'generated/icon-sprite.svg#ico-filter_list_selected' : 'generated/icon-sprite.svg#ico-filter_list'}}"
+                     ng-click="self.viewType = 1"/>
+                <img ng-src="{{self.viewType == 2 ? 'generated/icon-sprite.svg#ico-filter_list_selected' : 'generated/icon-sprite.svg#ico-filter_list'}}"
                      class="omc__header__viewtype__icon clickable"
-                     ng-click="this['overview-matches'].viewType = 2"/>
+                     ng-click="self.viewType = 2"/>
             </div>
         </div>
-        <div ng-show="this['overview-matches'].viewType == 0" class="omc__content__flow">
-            <won-matches-flow-item item="item" ng-repeat="item in this['overview-matches'].items"></won-matches-flow-item>
+        <div ng-show="self.viewType == 0" class="omc__content__flow">
+            <won-matches-flow-item item="item" ng-repeat="item in self.items"></won-matches-flow-item>
         </div>
-        <div ng-show="this['overview-matches'].viewType == 1" class="omc__content__grid">
-            <won-matches-grid-item item="item" ng-repeat="item in this['overview-matches'].items"></won-matches-grid-item>
+        <div ng-show="self.viewType == 1" class="omc__content__grid">
+            <won-matches-grid-item item="item" ng-repeat="item in self.items"></won-matches-grid-item>
         </div>
-        <div ng-show="this['overview-matches'].viewType == 2" class="omc__content__list">
-            <won-matches-list-item item="item" ng-repeat="item in this['overview-matches'].matches"></won-matches-list-item>
+        <div ng-show="self.viewType == 2" class="omc__content__list">
+            <won-matches-list-item item="item" ng-repeat="item in self.matches"></won-matches-list-item>
         </div>
     </div>
 </main>

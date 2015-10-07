@@ -144,6 +144,7 @@ function configRouting($urlRouterProvider, $stateProvider) {
             $stateProvider.state(as, {
                 url: path,
                 templateUrl: `./app/components/${component}/${component}.html`,
+                // template: `<${component}></${component>` TODO use directives instead of view+ctrl
                 controller: `${cmlComponent}Controller`,
                 controllerAs: 'self'
             });

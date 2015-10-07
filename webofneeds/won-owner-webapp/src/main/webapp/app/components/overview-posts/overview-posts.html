@@ -1,15 +1,15 @@
 <!-- TODO parametrize by selected tab -->
 <header>
     <won-topnav></won-topnav>
-    <won-overview-title-bar selection="this['overview-posts'].selection"></won-overview-title-bar>
+    <won-overview-title-bar selection="self.selection"></won-overview-title-bar>
 </header>
 <main class="overviewpostscontent">
     <div class="opc__inner">
-        <div class="title clickable" ng-click="this['overview-posts'].activePostsOpen = !this['overview-posts'].activePostsOpen">Active Posts<span class="title__counter">{{this['overview-posts'].activePosts.length}}</span></div>
-        <won-post-item-line ng-show="this['overview-posts'].activePostsOpen" item="item" ng-repeat="item in this['overview-posts'].activePosts"></won-post-item-line>
-        <div class="title clickable" ng-click="this['overview-posts'].draftsOpen = !this['overview-posts'].draftsOpen">Drafts<span class="title__counter">{{this['overview-posts'].drafts.length}}</span></div>
-        <won-post-item-line ng-show="this['overview-posts'].draftsOpen" item="item" ng-repeat="item in this['overview-posts'].drafts"></won-post-item-line>
-        <div class="title clickable" ng-click="this['overview-posts'].closedPostsOpen = !this['overview-posts'].closedPostsOpen">Closed<span class="title__counter">{{this['overview-posts'].closedPosts.length}}</span></div>
-        <won-post-item-line ng-show="this['overview-posts'].closedPostsOpen" item="item" ng-repeat="item in this['overview-posts'].closedPosts"></won-post-item-line>
+        <div class="title clickable" ng-click="self.activePostsOpen = !self.activePostsOpen">Active Posts<span class="title__counter">{{self.activePosts.length}}</span></div>
+        <won-post-item-line ng-show="self.activePostsOpen" item="item" ng-repeat="item in self.activePosts"></won-post-item-line>
+        <div class="title clickable" ng-click="self.draftsOpen = !self.draftsOpen">Drafts<span class="title__counter">{{self.drafts.length}}</span></div>
+        <won-post-item-line ng-show="self.draftsOpen" item="item" ng-repeat="item in self.drafts"></won-post-item-line>
+        <div class="title clickable" ng-click="self.closedPostsOpen = !self.closedPostsOpen">Closed<span class="title__counter">{{self.closedPosts.length}}</span></div>
+        <won-post-item-line ng-show="self.closedPostsOpen" item="item" ng-repeat="item in self.closedPosts"></won-post-item-line>
     </div>
 </main>
