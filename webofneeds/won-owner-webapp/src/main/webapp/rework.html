@@ -31,7 +31,8 @@
     <!--<body ng-app="won.owner" ng-controller="AppController as app">-->
     <body ng-controller="AppController">
         <!-- <won-app></won-app>-->
-        <section ng-viewport></section>
+        <!--<section ng-viewport></section>-->
+        <section ui-view></section>
 
         <!-- <debug-navigation> -->
         <div style="position: fixed;
@@ -39,6 +40,17 @@
                     background-color: lightgray;
                     border-top: 1px solid black;">
             debug navigation: |
+            <a ui-sref="landingpage">landingpage</a> |
+            <!--
+            <a ui-sref="createNeed[0]">create-need</a> |
+            <a ui-sref="settings">settings</a> |
+            <a ui-sref="feed">feed</a> |
+            <a ui-sref="overviewIncomingRequests">incoming-requests</a> |
+            <a ui-sref="overviewPosts">posts</a> |
+            <a ng-href="post/121337345/owner/matches">post matches</a> |
+            <a ng-href="post/121337345/visitor">visitor's</a> |
+            <a ui-sref="overviewMatches">matches</a>
+            <!--
             <a ng-link="createNeed">create-need</a> |
             <a ng-link="settings">settings</a> |
             <a ng-link="landingpage">landingpage</a> |
@@ -48,6 +60,7 @@
             <a ng-href="post/121337345/owner/matches">post matches</a> |
             <a ng-href="post/121337345/visitor">visitor's</a> |
             <a ng-link="overviewMatches">matches</a>
+            -->
         </div>
         <!-- </debug-navigation> -->
 

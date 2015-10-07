@@ -27,9 +27,9 @@
       "angular": "github:angular/bower-angular@1.4.2",
       "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.13.0",
       "angular-mocks": "github:angular/bower-angular-mocks@1.4.2",
-      "angular-new-router": "npm:angular-new-router@^0.5.3",
       "angular-route": "github:angular/bower-angular-route@1.4.2",
       "angular-sanitize": "github:angular/bower-angular-sanitize@^1.4.5",
+      "angular-ui-router": "npm:angular-ui-router@^0.2.15",
       "angular-ui-utils": "github:angular-ui/ui-utils@2.0.0",
       "bootstrap": "github:twbs/bootstrap@3.3.5",
       "font-awesome": "bower:font-awesome@4.3.0",
@@ -43,6 +43,7 @@
       "redux": "npm:redux@^3.0.0",
       "redux-immutablejs": "npm:redux-immutablejs@^0.0.6",
       "redux-thunk": "npm:redux-thunk@^1.0.0",
+      "redux-ui-router": "npm:redux-ui-router@^0.3.3",
       "sockjs": "bower:sockjs@0.3.4"
     },
     "devDependencies": {

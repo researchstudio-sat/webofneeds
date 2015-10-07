@@ -12,8 +12,6 @@ console.log('System.import working');
 import angular from 'angular';
 window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
 
-import newRouter from 'angular-new-router';
-
 // Components
 import appTag from './components/wonAppTag';
 import topnav from './components/topnav';
@@ -36,11 +34,26 @@ import 'redux';
 import { combineReducers } from 'redux-immutablejs';
 import Immutable from 'immutable';
 import thunk from 'redux-thunk';
-import 'ng-redux';
+import ngReduxModule from 'ng-redux';
+
+/*
+import {
+    router,
+    stateGo,
+    stateReload,
+    stateTransitionTo
+} from 'redux-ui-router';
+window.routerFooFoo = router;
+*/
+
+
+import ngReduxRouterModule from 'redux-ui-router';
+import uiRouterModule from 'angular-ui-router';
 
 let app = angular.module('won.owner', [
-    'ngNewRouter',
-    'ngRedux',
+    ngReduxModule,
+    uiRouterModule,
+    ngReduxRouterModule,
     appTag,
     topnav, //used in index.html
     createNeedComponent,
@@ -54,10 +67,13 @@ let app = angular.module('won.owner', [
     overviewMatchesComponent
 ]);
 
-app.config(['$componentLoaderProvider', '$ngReduxProvider',
-    ($componentLoaderProvider, $ngReduxProvider) => {
-        configComponentLoading($componentLoaderProvider);
+app.config([
+    /*'$componentLoaderProvider',*/ '$ngReduxProvider',
+    '$urlRouterProvider', '$stateProvider' /*of routerstate*/,
+    (/*$componentLoaderProvider,*/ $ngReduxProvider, $urlRouterProvider, $stateProvider) => {
+        //configComponentLoading($componentLoaderProvider);
         configRedux($ngReduxProvider);
+        configRouting($urlRouterProvider, $stateProvider);
     }
 ]);
 
@@ -99,10 +115,47 @@ function configComponentLoading($componentLoaderProvider) {
 
 }
 
+/**
+ * Adapted from https://github.com/neilff/redux-ui-router/blob/master/example/index.js
+ * @param $urlRouterProvider
+ * @param $stateProvider
+ */
+
+function configRouting($urlRouterProvider, $stateProvider) {
+    $urlRouterProvider.otherwise('/landingpage');
+
+    $stateProvider
+        .state('landingpage', {
+            url: '/landingpage',
+            templateUrl: './app/components/landingpage/landingpage.html',
+            controller: 'LandingpageController'
+        })
+        .state('createNeed', {
+            url: '/create-need/:draftId',
+            templateUrl: './app/components/create-need/create-need.html',
+            controller: 'CreateNeedController'
+        })
+
+
+            /*
+            views: {
+                wholeApp: {
+                    template: ` Root View `,
+                    controller: ($scope, $ngRedux) => {
+                        $scope.globalState = {};
+
+                        $ngRedux.connect( state => ({ globalState: state }) )($scope)
+                    }
+                }
+            }
+            */
+
+}
+
 class AppController {
-    constructor ($router) {
+    constructor (){//($router) {
         console.log('in appcontroller constructor');
-        window.routerfoo = $router;
+        /*
         $router.config([
 
             //TODO should be landing page if not logged in or feed if logged in
@@ -110,13 +163,6 @@ class AppController {
                 path: '/',
                 redirectTo: '/landingpage'
             },
-                /*
-            {
-                path: '/create-need',
-                component: 'create-need',
-                as: 'createNeed'
-            },
-            */
             {
                 path: '/create-need/:draftId',
                 component: 'create-need',
@@ -156,9 +202,10 @@ class AppController {
             //{ path: '/post/:id/owner/incoming-requests', component: 'need-incoming-requests'} //TODO
             //{ path: '/post/:id/owner/outgoing-requests', component: 'need-outgoing-requests'} //TODO
         ]);
+        */
     }
 }
-app.controller('AppController', ['$router', AppController]);
+app.controller('AppController', AppController);
 
 //let app = angular.module('won.owner',[...other modules...]);
 angular.bootstrap(document, ['won.owner'], {
