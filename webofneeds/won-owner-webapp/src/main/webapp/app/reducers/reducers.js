@@ -13,11 +13,6 @@ import { combineReducersStable } from '../redux-utils';
  * this reducer attaches a 'router' object to our state that keeps the routing state.
  */
 import { router } from 'redux-ui-router';
-//export router;
-/*
-import { router : reduxUiRouterReducer } from 'redux-ui-router';
-export const router = reduxUiRouterReducer;
-*/
 
 const wubs = createReducer(Immutable.List(), {
     [actionTypes.moreWub]: (state, action) => {
@@ -74,4 +69,6 @@ const drafts = createReducer(
  * store/model. e.g.: an reducers object `{ drafts: function(state = [], action){...} }`
  * would result in a store like `{ drafts: [...] }`
  */
-export default combineReducersStable(Immutable.Map({/*router,*/ drafts, wubs}));
+export default combineReducersStable(Immutable.Map({router, drafts, wubs}));
+
+window.ImmutableFoo = Immutable;

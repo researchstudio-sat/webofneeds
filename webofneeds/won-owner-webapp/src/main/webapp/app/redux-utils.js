@@ -64,9 +64,9 @@ export function combineReducersStable(mapOfReducers) {
 
             // update the domain. if the domain hasn't been created yet,
             // let the reducer handle that.
-            //const nonEmptyDomain = domain ? domain : reducer();
-            //const updatedDomain = reducer(nonEmptyDomain, action);
-            const updatedDomain = domain? reducer(domain, action) : reducer();
+            const actionCurriedReducer = (s) => reducer(s, action);
+            const updatedDomain = domain? actionCurriedReducer(domain) : actionCurriedReducer();
+
 
             // only change the state object,
             if(domain !== updatedDomain)
