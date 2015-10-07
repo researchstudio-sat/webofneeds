@@ -26,30 +26,12 @@ import overviewPostsComponent from './components/overview-posts/overview-posts';
 import feedComponent from './components/feed/feed';
 import overviewMatchesComponent from './components/overview-matches/overview-matches';
 
-//import * as reducers from './reducers/reducers';
 import reducer from './reducers/reducers';
 import 'redux';
-//import { combineReducers } from 'redux';
-//import { combineReducers } from 'redux-immutable';
 import { combineReducers } from 'redux-immutablejs';
 import Immutable from 'immutable';
 import thunk from 'redux-thunk';
 import ngReduxModule from 'ng-redux';
-
-/*
-import {
-    router,
-    stateGo,
-    stateReload,
-    stateTransitionTo
-} from 'redux-ui-router';
- const routerActions = {
- stateGo,
- stateReload,
- stateTransitionTo
- };
-window.routerFooFoo = router;
-*/
 
 import { actionCreators }  from './actions';
 
@@ -74,10 +56,9 @@ let app = angular.module('won.owner', [
 ]);
 
 app.config([
-    /*'$componentLoaderProvider',*/ '$ngReduxProvider',
+    '$ngReduxProvider',
     '$urlRouterProvider', '$stateProvider' /*of routerstate*/,
-    (/*$componentLoaderProvider,*/ $ngReduxProvider, $urlRouterProvider, $stateProvider) => {
-        //configComponentLoading($componentLoaderProvider);
+    ( $ngReduxProvider, $urlRouterProvider, $stateProvider) => {
         configRedux($ngReduxProvider);
         configRouting($urlRouterProvider, $stateProvider);
     }
@@ -96,22 +77,6 @@ function configRedux($ngReduxProvider) {
     }
     window.thunk = thunk;
     $ngReduxProvider.createStoreWith(loggingReducer, ['ngUiRouterMiddleware', thunk,/* middlewares here, e.g. 'promiseMiddleware', loggingMiddleware */]);
-}
-
-/*
- * Taken from https://github.com/htdt/ng-es6-router/blob/master/app/app.js
- */
-function configComponentLoading($componentLoaderProvider) {
-    //the default wouldn't include 'app/'
-    $componentLoaderProvider.setTemplateMapping(name => `app/components/${name}/${name}.html`);
-    $componentLoaderProvider.setCtrlNameMapping(componentName =>
-        hyphen2Camel(componentName) + 'Controller'
-    )
-    $componentLoaderProvider.setComponentFromCtrlMapping(ctrlName =>
-            camel2Hyphen(ctrlName.replace(/Controller$/, ''))
-    )
-    window.loader = $componentLoaderProvider;
-
 }
 
 /**
@@ -179,20 +144,6 @@ app.controller('DemoController', [...serviceDependencies, DemoController]);
 class AppController {
     constructor (){//($router) {
         console.log('in appcontroller constructor');
-        /*
-        $router.config([
-
-            //TODO should be landing page if not logged in or feed if logged in
-            {
-            },
-            //TODO database id needs to be send to the client after the create-msg acknowledgment
-            { path: '/post/:id/visitor', component: 'post-visitor'},
-            { path: '/post/:id/owner/matches', component: 'matches'}
-            //{ path: '/post/:id/owner/messages', component: 'need-messages'} //TODO
-            //{ path: '/post/:id/owner/incoming-requests', component: 'need-incoming-requests'} //TODO
-            //{ path: '/post/:id/owner/outgoing-requests', component: 'need-outgoing-requests'} //TODO
-        ]);
-        */
     }
 }
 app.controller('AppController', AppController);
