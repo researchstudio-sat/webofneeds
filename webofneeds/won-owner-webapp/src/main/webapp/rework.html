@@ -28,10 +28,7 @@
         <link rel="stylesheet" href="./generated/won.css" />
 
 	</head>
-    <!--<body ng-app="won.owner" ng-controller="AppController as app">-->
-    <body ng-controller="AppController">
-        <!-- <won-app></won-app>-->
-        <!--<section ng-viewport></section>-->
+    <body>
         <section ui-view></section>
 
         <!-- <debug-navigation> -->
@@ -54,11 +51,8 @@
         <!-- </debug-navigation> -->
 
         <!-- TODO make sure to only show the svgs once angular has finished rendering -->
-        <!-- start loading the svg so it's already in the cache once angular has finished loading its templates -->
 
-        <!--
-        <img src="generated/icon-sprite.svg#WON_ico_header"
-             style="height:100px; width:100px"> <!-- TODO inline styles :{ -->
+        <!-- start loading the svg so it's already in the cache once angular has finished loading its templates -->
         <img src="./generated/icon-sprite.svg" style="display:none">
 
 
