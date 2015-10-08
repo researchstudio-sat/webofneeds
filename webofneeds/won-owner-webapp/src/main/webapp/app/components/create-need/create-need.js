@@ -38,7 +38,7 @@ const postTypeTexts = [
 ]
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
-const serviceDependencies = ['$q', '$ngRedux', /*'$routeParams' /*injections as strings here*/];
+const serviceDependencies = ['$q', '$ngRedux', '$scope'/*'$routeParams' /*injections as strings here*/];
 
 class CreateNeedController {
     constructor(/* arguments <- serviceDependencies */) {
@@ -54,25 +54,25 @@ class CreateNeedController {
         //this.titlePicZone().addEventListener('drop', e => 0);
 
         const selectFromState = (state) => ({
+            draftId: state.getIn(['router','currentParams','draftId']),
+            drafts: state.get('drafts'),
             wubs: state.get('wubs'),
-            //drafts: state.get('drafts')
         });
 
         // Using actionCreators like this means that every action defined there is available in the template.
         const unsubscribe = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-        //this.$scope.$on('$destroy', unsubscribe); //can't inject $scope with angular2-router as it doesn't exist anymore in angular2
+        this.$scope.$on('$destroy', unsubscribe);
 
     }
 
     selectType(typeIdx) {
         console.log('selected type ', postTypeTexts[typeIdx].type);
-        const draftIdx = this.$ngRedux.getState().get('drafts').get('activeDraftIdx');
         //const draftIdx = this.drafts.get('activeDraftIdx');
-        this.drafts__change__type({idx: draftIdx, type: postTypeTexts[typeIdx].type}); //TODO proper draft idx
+        this.drafts__change__type({draftId: this.draftId, type: postTypeTexts[typeIdx].type}); //TODO proper draft idx
     }
     unselectType() {
         console.log('unselected type ');
-        this.drafts__change__type({idx: draftIdx, type: undefined}); //TODO proper draft idx
+        this.drafts__change__type({draftId: this.draftId, type: undefined}); //TODO proper draft idx
     }
     titlePicZoneNg() {
         if(!this._titlePicZone) {

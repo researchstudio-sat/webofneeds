@@ -24,42 +24,33 @@ const wubs = createReducer(Immutable.List(), {
 
 const drafts = createReducer(
     //initial state
-    Immutable.fromJS({
-        //list of draft objects
-        draftList: [],
-        // the index of the currently active draft (or undefined
-        // if the draft-list is empty)
-        activeDraftIdx: undefined
-    }),
+    Immutable.Map(),
 
     //handlers
     {
-        //TODO init drafts from server
-        //TODO isValidNeed function to check compliance to won-ontology (and throw errors early)
-        [actionTypes.drafts.new]: (state, {payload:draft}) => {
-            return state
-                    .set('draftList', state.get('draftList').push(draft))
-                    .set('activeDraftIdx', state.get('draftList').size);
-        },
+        '@@reduxUiRouter/$stateChangeSuccess': (state, {payload}) => {
+            console.log('statechange in draftreducer: ', payload);
+            const draftId = payload.currentParams.draftId;
+            //if draft doesn't exist yet, create it. or redirect to new random draft?
 
-        [actionTypes.drafts.select]: ( state, {payload:selectedIdx} ) => {
-            if(0 <= selectedIdx && selectedIdx < state.get('draftList').size) {
-                return state.set('activeDraftIdx', selectedIdx);
+            if (state.get(draftId)) {
+                // draft exists, we can display it
+                return state;
             } else {
-                return state; //TODO throw error instead?
+                /*
+                 * TODO as long as it's just an empty object, we can simply create it as soon as
+                 * data is added, to avoid creating empty drafts
+                 */
+                const defaultDraft = { draftId };
+                return state.set(draftId, Immutable.fromJS(defaultDraft));
             }
         },
+        [actionTypes.drafts.change.type]: (state, {payload:{draftId, type}}) =>
+            type ? state.setIn([draftId, 'type'], type) : state.deleteIn([draftId, 'type'])
 
-        [actionTypes.drafts.change.type]: ( state, {payload:{idx, type}} ) => {
-
-            if(idx < 0 || idx > state.get('draftList').size)
-                return state; //TODO throw error instead?
-
-            const updatedDraft = state.get('draftList').get(idx).set('type', type);
-            return state
-                .set('draftList', state.get('draftList').set(idx, updatedDraft))
-                .set('activeDraftIdx', idx);
-        }
+        //TODO init drafts from server
+        //TODO isValidNeed function to check compliance to won-ontology (and throw errors early)
+        //TODO go to new draft (change routing-state)
     }
 );
 

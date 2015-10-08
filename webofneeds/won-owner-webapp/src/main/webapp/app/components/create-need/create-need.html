@@ -5,6 +5,8 @@
 <main class="create-post">
     <div class="cp__inner">
 
+        <p>DBG Draft: {{self.drafts.get(self.draftId).toJS()}}</p>
+
         <won-posttype-select
                 options="::self.postTypeTexts"
                 on-select="::self.selectType(idx)"
