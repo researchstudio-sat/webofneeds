@@ -66,14 +66,8 @@ let app = angular.module('won.owner', [
     generalSettingsModule,
 ]);
 
-app.config([
-    '$ngReduxProvider',
-    '$urlRouterProvider', '$stateProvider' /*of routerstate*/,
-    ( $ngReduxProvider, $urlRouterProvider, $stateProvider) => {
-        configRedux($ngReduxProvider);
-        configRouting($urlRouterProvider, $stateProvider);
-    }
-]);
+app.config([ '$ngReduxProvider', configRedux ]);
+app.config([ '$urlRouterProvider', '$stateProvider', configRouting ]);
 
 
 import { attach } from './utils';
