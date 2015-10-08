@@ -64,8 +64,7 @@ public class HintProducerProtocolActor extends UntypedProducerActor
     WonMessage wonMessage = createHintWonMessage(hint);
     Object body = WonMessageEncoder.encode(wonMessage, Lang.TRIG);
     CamelMessage camelMsg = new CamelMessage(body, headers);
-    log.debug("Send hint camel message {}", hint);
-    log.info("MONITOR;{};{};{}", hint.getFromNeedUri(), System.currentTimeMillis(), "MATCHER_SERVICE_HINT");
+    log.debug("Send hint camel message {}", hint.getFromNeedUri());
     return camelMsg;
   }
 

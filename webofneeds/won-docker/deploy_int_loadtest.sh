@@ -98,4 +98,5 @@ docker -H satsrv06:2375 run --name=matcher_siren_int -d -e "node.host=satsrv06.r
 -e "cluster.seed.host=satsrv06.researchstudio.at" -e "cluster.seed.port=2561" -e "cluster.local.port=2562" \
 -e "matcher.siren.uri.solr.server=http://satsrv06.researchstudio.at:8984/solr/won/" \
 -e "matcher.siren.uri.solr.server.public=http://satsrv06.researchstudio.at:8984/solr/#/won/" \
+-e "matcher.siren.monitoring=true" \
 -p 2562:2562 webofneeds/matcher_siren:int

@@ -2,12 +2,14 @@ package config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.PropertySource;
 
 /**
  * Created by hfriedrich on 15.09.2015.
  */
 @Configuration
+@ImportResource({"classpath:/spring/component/monitoring/monitoring-recorder.xml", "classpath:/spring/component/scheduling/matcher-service-scheduling.xml"})
 @PropertySource("file:${WON_CONFIG_DIR}/matcher-siren.properties")
 public class SirenMatcherConfig
 {
@@ -29,11 +31,14 @@ public class SirenMatcherConfig
   @Value("${matcher.siren.query.titleDescription}")
   private boolean useTitleDescriptionQuery;
 
-  @Value("${matcher.siren.query.titleDescriptionTag}")
-  private boolean useTitleDescriptionTagQuery;
+  @Value("${matcher.siren.monitoring}")
+  private boolean monitoring;
 
   @Value("${matcher.siren.query.consideredTokens}")
   private int consideredQueryTokens;
+
+  @Value("${matcher.siren.query.titleDescriptionTag}")
+  private boolean useTitleDescriptionTagQuery;
 
   @Value("${matcher.siren.index.commit}")
   private boolean commitIndexedNeedImmediately;
@@ -105,6 +110,14 @@ public class SirenMatcherConfig
     this.maxHints = maxHints;
   }
 
+  public boolean isCommitIndexedNeedImmediately() {
+    return commitIndexedNeedImmediately;
+  }
+
+  public void setCommitIndexedNeedImmediately(final boolean commitIndexedNeedImmediately) {
+    this.commitIndexedNeedImmediately = commitIndexedNeedImmediately;
+  }
+
   public String getSolrServerPublicUri() {
     return solrServerPublicUri;
   }
@@ -113,12 +126,12 @@ public class SirenMatcherConfig
     this.solrServerPublicUri = solrServerPublicUri;
   }
 
-  public boolean isCommitIndexedNeedImmediately() {
-    return commitIndexedNeedImmediately;
+  public boolean isMonitoring() {
+    return monitoring;
   }
 
-  public void setCommitIndexedNeedImmediately(final boolean commitIndexedNeedImmediately) {
-    this.commitIndexedNeedImmediately = commitIndexedNeedImmediately;
+  public void setMonitoring(boolean monitoring) {
+    this.monitoring = monitoring;
   }
 
 }

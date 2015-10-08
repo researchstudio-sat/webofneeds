@@ -94,7 +94,7 @@ public class HintsBuilder {
     private Map<String, SolrDocument> basicNormalizer(SolrDocumentList solrDocList, int numberOfPerformedQueries) {
         Map<String, SolrDocument> solrDocsMap = new HashMap<String, SolrDocument>();
         float maxScore = solrDocList.getMaxScore();
-        for (int i = 0; i < solrDocList.getNumFound() && i < config.getMaxHints(); i++) {
+        for (int i = 0; i < solrDocList.size() && i < solrDocList.getNumFound() && i < config.getMaxHints(); i++) {
             solrDocList.get(i).setField("score", ((float) solrDocList.get(i).getFieldValue("score") / maxScore) / numberOfPerformedQueries);
             SolrDocument currentSolrDocument = solrDocList.get(i);
             solrDocsMap.put(currentSolrDocument.getFieldValue("@graph.@id").toString(), currentSolrDocument);

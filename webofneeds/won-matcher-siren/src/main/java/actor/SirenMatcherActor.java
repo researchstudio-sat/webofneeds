@@ -12,6 +12,9 @@ import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
+import org.javasimon.SimonManager;
+import org.javasimon.Split;
+import org.javasimon.Stopwatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -63,21 +66,37 @@ public class SirenMatcherActor extends UntypedActor
   public void onReceive(final Object o) throws Exception {
 
     if (o instanceof NeedEvent) {
+      if (!config.isMonitoring()){
 
-      NeedEvent needEvent = (NeedEvent) o;
-      queryNeedEvent(needEvent);
-      indexNeedEvent(needEvent);
-
+        NeedEvent needEvent = (NeedEvent) o;
+        Dataset dataset = needEvent.deserializeNeedDataset();
+        queryNeedEvent(needEvent, dataset);
+        indexNeedEvent(needEvent, dataset);
+      }
+      else {
+        NeedEvent needEvent = (NeedEvent) o;
+        String overallQueryingStopwatchName = "Querying-Overall";
+        Stopwatch overallQueryingStopwatch = SimonManager.getStopwatch(overallQueryingStopwatchName);
+        Split overallQueryingSplit = overallQueryingStopwatch.start();
+        Dataset dataset = needEvent.deserializeNeedDataset();
+        queryNeedEvent(needEvent, dataset);
+        overallQueryingSplit.stop();
+        String overallIndexingStopwatchName = "Indexing-Overall";
+        Stopwatch overallIndexingStopwatch = SimonManager.getStopwatch(overallIndexingStopwatchName);
+        Split overallIndexinggSplit = overallIndexingStopwatch.start();
+        indexNeedEvent(needEvent, dataset);
+        overallIndexinggSplit.stop();
+      }
     } else {
       unhandled(o);
     }
   }
 
-  private void queryNeedEvent(NeedEvent needEvent)
+  private void queryNeedEvent(NeedEvent needEvent, Dataset dataset)
     throws QueryNodeException, SolrServerException, IOException, JsonLdError {
 
-    //Reading the need that has to be used for making queries
-    Dataset dataset = needEvent.deserializeNeedDataset();
+    // Reading the need that has to be used for making queries
+
     WoNNeedReader woNNeedReader = new WoNNeedReader();
     NeedObject needObject = woNNeedReader.readWoNNeedFromDeserializedNeedDataset(dataset, solrServer);
 
@@ -120,9 +139,8 @@ public class SirenMatcherActor extends UntypedActor
     }
   }
 
-  private void indexNeedEvent(NeedEvent needEvent) throws IOException, JsonLdError {
+  private void indexNeedEvent(NeedEvent needEvent, Dataset dataset) throws IOException, JsonLdError {
 
-    Dataset dataset = needEvent.deserializeNeedDataset();
     log.info("Add need event content to solr index: " + needEvent);
     needIndexer.indexer_jsonld_format(dataset);
   }
