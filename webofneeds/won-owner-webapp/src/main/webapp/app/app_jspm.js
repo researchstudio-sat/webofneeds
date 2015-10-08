@@ -16,7 +16,6 @@ window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
 import appTag from './components/wonAppTag';
 import topnav from './components/topnav';
 import createNeedComponent from './components/create-need/create-need';
-import settingsComponent from './components/settings/settings';
 import overviewIncomingRequestsComponent from './components/overview-incoming-requests/overview-incoming-requests';
 import matchesComponent from './components/matches/matches';
 import postVisitorComponent from './components/post-visitor/post-visitor';
@@ -25,6 +24,13 @@ import landingPageComponent from './components/landingpage/landingpage';
 import overviewPostsComponent from './components/overview-posts/overview-posts';
 import feedComponent from './components/feed/feed';
 import overviewMatchesComponent from './components/overview-matches/overview-matches';
+
+
+//settings
+import settingsTitleBarModule from './components/settings-title-bar';
+import avatarSettingsModule from './components/settings/avatar-settings';
+import generalSettingsModule from './components/settings/general-settings';
+
 
 import reducer from './reducers/reducers';
 import 'redux';
@@ -45,14 +51,18 @@ let app = angular.module('won.owner', [
     appTag,
     topnav, //used in index.html
     createNeedComponent,
-    settingsComponent,
     overviewIncomingRequestsComponent,
     matchesComponent,
     postVisitorComponent,
     landingPageComponent,
     overviewPostsComponent,
     feedComponent,
-    overviewMatchesComponent
+    overviewMatchesComponent,
+
+    //settings
+    settingsTitleBarModule,
+    avatarSettingsModule,
+    generalSettingsModule,
 ]);
 
 app.config([
@@ -92,7 +102,7 @@ function configRouting($urlRouterProvider, $stateProvider) {
         { path: '/landingpage', component: 'landingpage' },
         { path: '/create-need/:draftId', component: 'create-need' },
         { path: '/feed', component: 'feed' },
-        { path: '/settings', component: 'settings' },
+        //{ path: '/settings', component: 'settings' },
         { path: '/overview/matches', component: 'overview-matches', as: 'overviewMatches' },
         { path: '/overview/incoming-requests', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
         { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' },
@@ -114,13 +124,42 @@ function configRouting($urlRouterProvider, $stateProvider) {
                 controllerAs: 'self'
             });
     })
+    $urlRouterProvider.when('/settings/', '/settings/general');
+    $stateProvider
+        .state('settings', {
+            url: '/settings',
+            templateUrl: './app/components/settings/settings.html'
+        })
+        .state('settings.avatars', {
+            url: '/avatars',
+            template: `<won-avatar-settings></won-avatar-settings>`
+        })
+        .state('settings.general', {
+            url: '/general',
+            template: `<won-general-settings></won-general-settings>`
+        })
 
     $stateProvider
         .state('routerDemo', {
             url: '/router-demo/:demoVar',
-            template: "demoVar = {{self.state.getIn(['router', 'currentParams', 'demoVar'])}}",
+            template: `
+                <p>demoVar = {{self.state.getIn(['router', 'currentParams', 'demoVar'])}}</p>
+                <div>
+                    <a ui-sref="routerDemo.childA">~A~</a> |
+                    <a ui-sref="routerDemo.childB">~B~</a>
+                </div>
+                <div ui-view></div>
+            `,
             controller: 'DemoController',
             controllerAs: 'self'
+        })
+        .state('routerDemo.childA', {
+            url: '/router-demo/:demoVar/childA',
+            template: ` <p>showing child A {{ self.avatars }}</p> `,
+        })
+        .state('routerDemo.childB', {
+            url: '/router-demo/:demoVar/childB',
+            template: ` <p>showing the other child (B)</p>`,
         })
 }
 

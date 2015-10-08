@@ -4,6 +4,7 @@
 ;
 
 import angular from 'angular';
+import { attach } from '../utils';
 
 function genComponentConf() {
     let template = `
@@ -15,13 +16,13 @@ function genComponentConf() {
                 <div class="astb__inner__center">
                     <h1 class="astb__title">Account Settings</h1>
                     <ul class="astb__tabs">
-                        <li ng-class="self.selection == 0? 'astb__tabs__selected' : ''" ng-click="self.select(0)"><a href="settings">
+                        <li ng-class="self.routerState === 'settings.general'? 'astb__tabs__selected' : ''"><a ui-sref="settings.general">
                             General Settings
-                            <span class="astb__tabs__unread">5</span>
+                            <!--<span class="astb__tabs__unread">5</span>-->
                         </a></li>
-                        <li ng-class="self.selection == 1? 'astb__tabs__selected' : ''" ng-click="self.select(1)"><a href="settings">
+                        <li ng-class="self.routerState === 'settings.avatars'? 'astb__tabs__selected' : ''"><a ui-sref="settings.avatars">
                             Manage Avatars
-                            <span class="astb__tabs__unread">{{self.avatarcount}}</span>
+                            <span class="astb__tabs__unread">8</span>
                         </a></li>
                     </ul>
                 </div>
@@ -29,8 +30,18 @@ function genComponentConf() {
         </nav>
     `;
 
+    const serviceDependencies = ['$ngRedux', '$scope'/*injections as strings here*/];
     class Controller {
-        constructor() {}
+        constructor() {
+            attach(this, serviceDependencies, arguments);
+
+            const selectFromState = (state) => ({
+                routerState: state.getIn(['router','currentState','name']),
+            });
+            const unsubscribe = this.$ngRedux.connect(selectFromState, actionCreators)(this);
+            this.$scope.$on('$destroy', unsubscribe);
+
+        }
         back() { window.history.back() }
 
         select(selectedTab) {
@@ -39,6 +50,7 @@ function genComponentConf() {
             console.log("selection: "+this.selection);
         }
     }
+    Controller.$inject = serviceDependencies;
 
     return {
         restrict: 'E',
@@ -50,6 +62,8 @@ function genComponentConf() {
         template: template
     }
 }
-export default angular.module('won.owner.components.settingsTitleBar', [])
+export default angular.module('won.owner.components.settingsTitleBar', [
+
+    ])
     .directive('wonSettingsTitleBar', genComponentConf)
     .name;
