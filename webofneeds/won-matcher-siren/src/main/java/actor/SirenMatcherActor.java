@@ -66,7 +66,7 @@ public class SirenMatcherActor extends UntypedActor
   public void onReceive(final Object o) throws Exception {
 
     if (o instanceof NeedEvent) {
-      if (!config.isMonitoring()){
+      if (!config.isMonitoringEnabled()){
 
         NeedEvent needEvent = (NeedEvent) o;
         Dataset dataset = needEvent.deserializeNeedDataset();

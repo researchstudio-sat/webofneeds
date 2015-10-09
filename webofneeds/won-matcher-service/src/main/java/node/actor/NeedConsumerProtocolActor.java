@@ -9,6 +9,7 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
 import common.event.NeedEvent;
+import common.service.monitoring.MonitoringService;
 import common.service.sparql.SparqlService;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFFormat;
@@ -45,6 +46,9 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
   @Autowired
+  private MonitoringService monitoringService;
+
+  @Autowired
   private SparqlService sparqlService;
 
   public NeedConsumerProtocolActor(String endpoint) {
@@ -64,6 +68,13 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
       CamelMessage camelMsg = (CamelMessage) message;
       String needUri = (String) camelMsg.getHeaders().get(MSG_HEADER_NEED_URI);
       String wonNodeUri = (String) camelMsg.getHeaders().get(MSG_HEADER_WON_NODE_URI);
+
+      // monitoring code
+      if (monitoringService.isMonitoringEnabled()) {
+        monitoringService.startClock(MonitoringService.NEED_HINT_STOPWATCH, needUri);
+      }
+
+      // process the incoming need event
       if (needUri != null && wonNodeUri != null) {
         Object methodName = camelMsg.getHeaders().get(MSG_HEADER_METHODNAME);
         if (methodName != null) {

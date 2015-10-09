@@ -8,6 +8,10 @@ FROM java:8
 ENV WON_CONFIG_DIR=/usr/src/matcher-service/conf
 ENV LOGBACK_CONFIG=logback_info.xml
 
+# add the default monitoring output directory
+RUN mkdir -p /usr/src/matcher-service/monitoring/logs
+ENV monitoring.output.dir=/usr/src/matcher-service/monitoring/logs
+
 # add the jar and the conf directory
 ADD ./won-matcher-service.jar /usr/src/matcher-service/
 ADD ./conf ${WON_CONFIG_DIR}

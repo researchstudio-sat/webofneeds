@@ -83,7 +83,8 @@ docker -H satsrv06:2375 run --name=matcher_service_int -d -e "node.host=satsrv06
 -e "cluster.seed.host=satsrv06.researchstudio.at" \
 -e "uri.sparql.endpoint=http://satsrv06.researchstudio.at:10000/bigdata/namespace/kb/sparql" \
 -e "wonNodeController.wonNode.crawl=http://satsrv04.researchstudio.at:8889/won/resource,http://satsrv04.researchstudio.at:8890/won/resource,http://satsrv05.researchstudio.at:8889/won/resource,http://satsrv05.researchstudio.at:8890/won/resource" \
--e "cluster.local.port=2561" -e "cluster.seed.port=2561" -p 2561:2561 webofneeds/matcher_service:int
+-e "cluster.local.port=2561" -e "cluster.seed.port=2561" -e "matcher.service.monitoring=true" \
+-p 2561:2561 webofneeds/matcher_service:int
 
 # siren solr server
 docker -H satsrv06:2375 pull webofneeds/sirensolr

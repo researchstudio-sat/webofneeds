@@ -32,7 +32,7 @@ public class SirenMatcherConfig
   private boolean useTitleDescriptionQuery;
 
   @Value("${matcher.siren.monitoring}")
-  private boolean monitoring;
+  private boolean monitoringEnabled;
 
   @Value("${matcher.siren.query.consideredTokens}")
   private int consideredQueryTokens;
@@ -50,88 +50,44 @@ public class SirenMatcherConfig
     return scoreThreshold;
   }
 
-  public void setScoreThreshold(final float scoreThreshold) {
-    this.scoreThreshold = scoreThreshold;
-  }
-
   public int getConsideredQueryTokens() {
     return consideredQueryTokens;
-  }
-
-  public void setConsideredQueryTokens(final int consideredQueryTokens) {
-    this.consideredQueryTokens = consideredQueryTokens;
   }
 
   public boolean isUseTitleQuery() {
     return useTitleQuery;
   }
 
-  public void setUseTitleQuery(final boolean useTitleQuery) {
-    this.useTitleQuery = useTitleQuery;
-  }
-
   public boolean isUseDescriptionQuery() {
     return useDescriptionQuery;
-  }
-
-  public void setUseDescriptionQuery(final boolean useDescriptionQuery) {
-    this.useDescriptionQuery = useDescriptionQuery;
   }
 
   public boolean isUseTitleDescriptionQuery() {
     return useTitleDescriptionQuery;
   }
 
-  public void setUseTitleDescriptionQuery(final boolean useTitleDescriptionQuery) {
-    this.useTitleDescriptionQuery = useTitleDescriptionQuery;
-  }
-
   public boolean isUseTitleDescriptionTagQuery() {
     return useTitleDescriptionTagQuery;
-  }
-
-  public void setUseTitleDescriptionTagQuery(final boolean useTitleDescriptionTagQuery) {
-    this.useTitleDescriptionTagQuery = useTitleDescriptionTagQuery;
   }
 
   public String getSolrServerUri() {
     return solrServerUri;
   }
 
-  public void setSolrServerUri(final String solrServerUri) {
-    this.solrServerUri = solrServerUri;
-  }
-
   public long getMaxHints() {
     return maxHints;
-  }
-
-  public void setMaxHints(final int maxHints) {
-    this.maxHints = maxHints;
   }
 
   public boolean isCommitIndexedNeedImmediately() {
     return commitIndexedNeedImmediately;
   }
 
-  public void setCommitIndexedNeedImmediately(final boolean commitIndexedNeedImmediately) {
-    this.commitIndexedNeedImmediately = commitIndexedNeedImmediately;
-  }
-
   public String getSolrServerPublicUri() {
     return solrServerPublicUri;
   }
 
-  public void setSolrServerPublicUri(final String solrServerPublicUri) {
-    this.solrServerPublicUri = solrServerPublicUri;
-  }
-
-  public boolean isMonitoring() {
-    return monitoring;
-  }
-
-  public void setMonitoring(boolean monitoring) {
-    this.monitoring = monitoring;
+  public boolean isMonitoringEnabled() {
+    return monitoringEnabled;
   }
 
 }

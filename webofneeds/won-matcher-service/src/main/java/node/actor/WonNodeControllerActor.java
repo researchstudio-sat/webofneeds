@@ -62,7 +62,6 @@ public class WonNodeControllerActor extends UntypedActor
   @Autowired
   private WonNodeInformationService wonNodeInformationService;
 
-
   @Override
   public void preStart() {
 
