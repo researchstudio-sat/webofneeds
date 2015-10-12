@@ -79,6 +79,8 @@ docker -H satsrv06:2375 stop sirensolr_int || echo 'No docker container found to
 docker -H satsrv06:2375 rm sirensolr_int || echo 'No docker container found to remove with name: sirensolr_int'
 docker -H satsrv06:2375 run --name=sirensolr_int -d -p 7071:8080 -p 8984:8983 webofneeds/sirensolr
 
+sleep 20
+
 # siren matcher
 docker -H satsrv06:2375 stop matcher_siren_int || echo 'No docker container found to stop with name: matcher_siren_int'
 docker -H satsrv06:2375 rm matcher_siren_int || echo 'No docker container found to remove with name: matcher_siren_int'

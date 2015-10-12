@@ -7,20 +7,12 @@ import akka.cluster.pubsub.DistributedPubSub;
 import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import com.hp.hpl.jena.query.Dataset;
 import common.event.NeedEvent;
 import common.service.monitoring.MonitoringService;
-import common.service.sparql.SparqlService;
 import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import won.protocol.util.RdfUtils;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Camel actor represents the need consumer protocol to a won node.
@@ -47,9 +39,6 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
 
   @Autowired
   private MonitoringService monitoringService;
-
-  @Autowired
-  private SparqlService sparqlService;
 
   public NeedConsumerProtocolActor(String endpoint) {
     this.endpoint = endpoint;
@@ -80,10 +69,6 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
         if (methodName != null) {
           log.debug("Received event '{}' for needUri '{}' and wonNeedUri '{}'", methodName, needUri, wonNodeUri);
 
-          // save the need
-          Dataset ds = convertBodyToDataset(camelMsg.body(), Lang.TRIG);
-          sparqlService.updateNamedGraphsOfDataset(ds);
-
           // publish an internal need event
           NeedEvent event = null;
           if (methodName.equals(MSG_HEADER_METHODNAME_NEEDCREATED)) {
@@ -105,11 +90,6 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
       System.out.print("some other message");
     }
     unhandled(message);
-  }
-
-  private Dataset convertBodyToDataset(Object body, Lang lang) {
-    InputStream is = new ByteArrayInputStream(body.toString().getBytes(StandardCharsets.UTF_8));
-    return RdfUtils.toDataset(is, new RDFFormat(lang));
   }
 
 }

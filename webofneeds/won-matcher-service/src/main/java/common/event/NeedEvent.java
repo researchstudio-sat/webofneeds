@@ -90,7 +90,7 @@ public class NeedEvent implements Serializable
 
   @Override
   public String toString() {
-    return "NeedEvent: (" + getUri() + ")";
+    return getUri();
   }
 
 }

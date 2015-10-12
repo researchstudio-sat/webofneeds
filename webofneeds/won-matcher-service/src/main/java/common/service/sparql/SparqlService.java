@@ -38,6 +38,10 @@ public class SparqlService
     this.sparqlEndpoint = sparqlEndpoint;
   }
 
+  public String getSparqlEndpoint() {
+    return sparqlEndpoint;
+  }
+
   /**
    * Update named graph by first deleting it and afterwards inserting the triples of the new model.
    *

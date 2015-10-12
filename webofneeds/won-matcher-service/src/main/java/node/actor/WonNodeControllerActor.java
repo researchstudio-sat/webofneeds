@@ -45,6 +45,7 @@ public class WonNodeControllerActor extends UntypedActor
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private ActorRef pubSubMediator;
   private ActorRef crawler;
+  private ActorRef saveNeedActor;
   private Map<String, WonNodeConnection> crawlWonNodes = new HashMap<>();
   private Set<String> skipWonNodeUris = new HashSet<>();
   private Set<String> failedWonNodeUris = new HashSet<>();
@@ -100,6 +101,10 @@ public class WonNodeControllerActor extends UntypedActor
     // initialize the crawler
     crawler = getContext().actorOf(SpringExtension.SpringExtProvider.get(
       getContext().system()).props(MasterCrawlerActor.class), "MasterCrawlerActor");
+
+    // initialize the need event save actor
+    saveNeedActor = getContext().actorOf(SpringExtension.SpringExtProvider.get(
+      getContext().system()).props(SaveNeedEventActor.class), "SaveNeedEventActor");
   }
 
   /**

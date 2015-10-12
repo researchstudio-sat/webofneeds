@@ -56,6 +56,8 @@ docker -H satsrv06:2375 stop sirensolr_dev || echo 'No docker container found to
 docker -H satsrv06:2375 rm sirensolr_dev || echo 'No docker container found to remove with name: sirensolr_dev'
 docker -H satsrv06:2375 run --name=sirensolr_dev -d -p 7070:8080 -p 8983:8983 webofneeds/sirensolr
 
+sleep 20
+
 # siren matcher
 docker -H satsrv06:2375 build -t webofneeds/matcher_siren:dev $WORKSPACE/webofneeds/won-docker/matcher-siren/
 docker -H satsrv06:2375 stop matcher_siren_dev || echo 'No docker container found to stop with name: matcher_siren_dev'
