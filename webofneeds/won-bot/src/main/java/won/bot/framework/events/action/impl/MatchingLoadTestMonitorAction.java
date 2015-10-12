@@ -6,18 +6,15 @@ import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.impl.HintFromMatcherEvent;
 import won.bot.framework.events.event.impl.NeedCreatedEvent;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hfriedrich on 02.10.2015.
  */
 public class MatchingLoadTestMonitorAction extends BaseEventBotAction
 {
-  Map<String, Long> needEventStartTime = new HashMap<>();
-  Map<String, List<Long>> hintEventReceivedTime = new HashMap<>();
+  Map<String, Long> needEventStartTime = Collections.synchronizedMap(new HashMap<>());
+  Map<String, List<Long>> hintEventReceivedTime = Collections.synchronizedMap(new HashMap<>());
 
   private long startTestTime = -1;
 
@@ -27,8 +24,6 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction
 
   @Override
   protected void doRun(final Event event) throws Exception {
-
-
 
 
     if (event instanceof NeedCreatedEvent) {

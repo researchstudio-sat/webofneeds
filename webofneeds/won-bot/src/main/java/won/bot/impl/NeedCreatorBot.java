@@ -76,7 +76,7 @@ public class NeedCreatorBot extends EventBot
         int unfinishedCount = creationUnfinishedCounter.getCount();
         int successCnt = needCreationSuccessfulCounter.getCount();
         int failedCnt = needCreationFailedCounter.getCount();
-        if (cnt - lastOutput >= 20) {
+        if (cnt - lastOutput >= 1) {
           logger.info("started creation of {} needs, creation not yet finished for {}. Successful: {}, failed: {}",
             new Object[]{cnt,
                          unfinishedCount,
