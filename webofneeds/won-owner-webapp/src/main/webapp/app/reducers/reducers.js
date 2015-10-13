@@ -28,31 +28,35 @@ const drafts = createReducer(
 
     //handlers
     {
-        '@@reduxUiRouter/$stateChangeSuccess': (state, {payload}) => {
-            console.log('statechange in draftreducer: ', payload);
-            const draftId = payload.currentParams.draftId;
-            //if draft doesn't exist yet, create it. or redirect to new random draft?
+        [actionTypes.drafts.change.type]: (state, {payload:{draftId, type}}) => {
+            const stateWithDraft = guaranteeDraftExistence(state, draftId);
+            return type ?
+                stateWithDraft.setIn([draftId, 'type'], type) :
+                stateWithDraft.deleteIn([draftId, 'type'])
 
-            if (state.get(draftId)) {
-                // draft exists, we can display it
-                return state;
-            } else {
-                /*
-                 * TODO as long as it's just an empty object, we can simply create it as soon as
-                 * data is added, to avoid creating empty drafts
-                 */
-                const defaultDraft = { draftId };
-                return state.set(draftId, Immutable.fromJS(defaultDraft));
-            }
-        },
-        [actionTypes.drafts.change.type]: (state, {payload:{draftId, type}}) =>
-            type ? state.setIn([draftId, 'type'], type) : state.deleteIn([draftId, 'type'])
+        }
 
+
+        //TODO delete draft once it's completely empty
         //TODO init drafts from server
         //TODO isValidNeed function to check compliance to won-ontology (and throw errors early)
-        //TODO go to new draft (change routing-state)
     }
 );
+
+/**
+ * Adds an empty draft to the state if it doesn't exist yet
+ * @param drafts
+ * @param draftId
+ * @returns {*}
+ */
+function guaranteeDraftExistence(drafts, draftId) {
+    if(drafts.get(draftId)) {
+        return drafts
+    } else {
+        const defaultDraft = Immutable.fromJS({ draftId });
+        return drafts.set(draftId, defaultDraft);
+    }
+}
 
 /* note that `combineReducers` is opinionated as a root reducer for the
  * sake of convenience and ease of first use. It takes an object
