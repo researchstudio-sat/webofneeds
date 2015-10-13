@@ -75,10 +75,18 @@ public class SirenMatcherActor extends UntypedActor
       }
       else {
         NeedEvent needEvent = (NeedEvent) o;
+
+        String matcherOverallName = "Siren-Matcher-Overall";
+        Stopwatch matcherOverallStopwatch = SimonManager.getStopwatch(matcherOverallName);
+        Split matcherOverallSplit = matcherOverallStopwatch.start();
+        String deserlializeStopwatchName = "Deserialization";
+        Stopwatch deserializeStopwatch = SimonManager.getStopwatch(deserlializeStopwatchName);
+        Split deserializeSplit = deserializeStopwatch.start();
+        Dataset dataset = needEvent.deserializeNeedDataset();
+        deserializeSplit.stop();
         String overallQueryingStopwatchName = "Querying-Overall";
         Stopwatch overallQueryingStopwatch = SimonManager.getStopwatch(overallQueryingStopwatchName);
         Split overallQueryingSplit = overallQueryingStopwatch.start();
-        Dataset dataset = needEvent.deserializeNeedDataset();
         queryNeedEvent(needEvent, dataset);
         overallQueryingSplit.stop();
         String overallIndexingStopwatchName = "Indexing-Overall";
@@ -86,6 +94,7 @@ public class SirenMatcherActor extends UntypedActor
         Split overallIndexinggSplit = overallIndexingStopwatch.start();
         indexNeedEvent(needEvent, dataset);
         overallIndexinggSplit.stop();
+        matcherOverallSplit.stop();
       }
     } else {
       unhandled(o);

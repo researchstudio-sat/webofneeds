@@ -1,5 +1,8 @@
 package won.bot.framework.events.action.impl;
 
+import org.javasimon.SimonManager;
+import org.javasimon.Split;
+import org.javasimon.Stopwatch;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.event.Event;
@@ -15,6 +18,7 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction
 {
   Map<String, Long> needEventStartTime = Collections.synchronizedMap(new HashMap<>());
   Map<String, List<Long>> hintEventReceivedTime = Collections.synchronizedMap(new HashMap<>());
+  Map<String, Split> needSplits = Collections.synchronizedMap(new HashMap<>());
 
   private long startTestTime = -1;
 
@@ -25,9 +29,11 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction
   @Override
   protected void doRun(final Event event) throws Exception {
 
-
+    Stopwatch stopwatch = SimonManager.getStopwatch("needHintFullRoundtrip");
     if (event instanceof NeedCreatedEvent) {
 
+      Split split = stopwatch.start();
+      needSplits.put(((NeedCreatedEvent) event).getNeedURI().toString(), split);
       logger.info("RECEIVED EVENT {} for uri {}", event, ((NeedCreatedEvent) event).getNeedURI().toString());
 
       long startTime = System.currentTimeMillis();
@@ -37,9 +43,9 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction
     } else if (event instanceof HintFromMatcherEvent) {
 
       logger.info("RECEIVED EVENT {} for uri {}", event, ((HintFromMatcherEvent) event).getMatch().getFromNeed().toString());
-
       long hintReceivedTime = System.currentTimeMillis();
       String needUri = ((HintFromMatcherEvent) event).getMatch().getFromNeed().toString();
+      needSplits.get(((HintFromMatcherEvent) event).getMatch().getFromNeed().toString()).stop();
 
       if (hintEventReceivedTime.get(needUri) == null) {
         hintEventReceivedTime.put(needUri, new LinkedList<Long>());
