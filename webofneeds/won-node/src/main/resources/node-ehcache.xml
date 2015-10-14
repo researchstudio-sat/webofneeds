@@ -613,7 +613,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
 
     The defaultCache has an implicit name "default" which is a reserved cache name.
     -->
-    <defaultCache maxEntriesLocalHeap="0" eternal="false" timeToIdleSeconds="1200" timeToLiveSeconds="1200" />
+    <defaultCache maxEntriesLocalHeap="100" eternal="false" timeToIdleSeconds="1200" timeToLiveSeconds="1200" />
 
     <!--
         Sample caches. Following are some example caches. Remove these before use.
@@ -628,7 +628,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
     defined on your system. On a standard Linux system this will be /tmp"
     -->
     <cache name="linkedDataCache" overflowToDisk="false" diskPersistent="false" eternal="false"
-           maxBytesLocalHeap="5000000" timeToIdleSeconds="300" timeToLiveSeconds="1200" memoryStoreEvictionPolicy="LFU"
+           maxBytesLocalHeap="50000" timeToIdleSeconds="300" timeToLiveSeconds="1200" memoryStoreEvictionPolicy="LFU"
            transactionalMode="off">
         <!--persistence strategy="localTempSwap"/--> <!-- we disable persistent cache until we find out how to serialize a model in ehcache -->
     </cache>
