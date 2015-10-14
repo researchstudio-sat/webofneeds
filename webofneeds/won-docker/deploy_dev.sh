@@ -4,19 +4,40 @@ set -e
 # build won docker images and deploy to sat cluster
 echo start docker build and deployment:
 
+# postgres db 1
+docker -H satsrv04:2375 pull webofneeds/postgres
+docker -H satsrv04:2375 stop postgres_dev  || echo 'No docker container found to stop with name: postgres_dev'
+docker -H satsrv04:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
+docker -H satsrv04:2375 run --name=postgres_dev -d -p 5432:5432 webofneeds/postgres
+
+# postgres db 2
+docker -H satsrv05:2375 stop postgres_dev || echo 'No docker container found to stop with name: postgres_dev'
+docker -H satsrv05:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
+docker -H satsrv05:2375 run --name=postgres_dev -d -p 5432:5432 webofneeds/postgres
+
+sleep 10
+
 # wonnode 1
 docker -H satsrv04:2375 build -t webofneeds/wonnode:dev $WORKSPACE/webofneeds/won-docker/wonnode/
 docker -H satsrv04:2375 stop wonnode_dev || echo 'No docker container found to stop with name: wonnode_dev'
 docker -H satsrv04:2375 rm wonnode_dev || echo 'No docker container found to remove with name: wonnode_dev'
 docker -H satsrv04:2375 run --name=wonnode_dev -d -e "uri.host=satsrv04.researchstudio.at" \
--e "http.port=8888" -e "activemq.broker.port=61616" -p 8888:8080 -p 61616:61616 webofneeds/wonnode:dev
+-e "http.port=8888" -e "activemq.broker.port=61616" \
+-e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5432/won_node" \
+-e "db.sql.user=won" -e "db.sql.password=won" \
+-p 8888:8080 -p 61616:61616 webofneeds/wonnode:dev
 
 # wonnode 2
 docker -H satsrv05:2375 build -t webofneeds/wonnode:dev $WORKSPACE/webofneeds/won-docker/wonnode/
 docker -H satsrv05:2375 stop wonnode_dev || echo 'No docker container found to stop with name: wonnode_dev'
 docker -H satsrv05:2375 rm wonnode_dev || echo 'No docker container found to remove with name: wonnode_dev'
 docker -H satsrv05:2375 run --name=wonnode_dev -d -e "uri.host=satsrv05.researchstudio.at" \
--e "http.port=8888" -e "activemq.broker.port=61616" -p 8888:8080 -p 61616:61616 webofneeds/wonnode:dev
+-e "http.port=8888" -e "activemq.broker.port=61616" \
+-e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5432/won_node" \
+-e "db.sql.user=won" -e "db.sql.password=won" \
+-p 8888:8080 -p 61616:61616 webofneeds/wonnode:dev
 
 sleep 20
 
@@ -25,14 +46,22 @@ docker -H satsrv04:2375 build -t webofneeds/owner:dev $WORKSPACE/webofneeds/won-
 docker -H satsrv04:2375 stop owner_dev || echo 'No docker container found to stop with name: owner_dev'
 docker -H satsrv04:2375 rm owner_dev || echo 'No docker container found to remove with name: owner_dev'
 docker -H satsrv04:2375 run --name=owner_dev -d -e "node.default.host=satsrv04.researchstudio.at" \
--e "node.default.http.port=8888" -p 8081:8080 webofneeds/owner:dev
+-e "node.default.http.port=8888" \
+-e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5432/won_owner" \
+-e "db.sql.user=won" -e "db.sql.password=won" \
+-p 8081:8080 webofneeds/owner:dev
 
 # owner 2
 docker -H satsrv05:2375 build -t webofneeds/owner:dev $WORKSPACE/webofneeds/won-docker/owner/
 docker -H satsrv05:2375 stop owner_dev || echo 'No docker container found to stop with name: owner_dev'
 docker -H satsrv05:2375 rm owner_dev || echo 'No docker container found to remove with name: owner_dev'
 docker -H satsrv05:2375 run --name=owner_dev -d -e "node.default.host=satsrv05.researchstudio.at" \
--e "node.default.http.port=8888" -p 8081:8080 webofneeds/owner:dev
+-e "node.default.http.port=8888" \
+-e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5432/won_owner" \
+-e "db.sql.user=won" -e "db.sql.password=won" \
+-p 8081:8080 webofneeds/owner:dev
 
 # bigdata
 docker -H satsrv06:2375 pull webofneeds/bigdata
@@ -56,7 +85,7 @@ docker -H satsrv06:2375 stop sirensolr_dev || echo 'No docker container found to
 docker -H satsrv06:2375 rm sirensolr_dev || echo 'No docker container found to remove with name: sirensolr_dev'
 docker -H satsrv06:2375 run --name=sirensolr_dev -d -p 7070:8080 -p 8983:8983 webofneeds/sirensolr
 
-sleep 20
+sleep 10
 
 # siren matcher
 docker -H satsrv06:2375 build -t webofneeds/matcher_siren:dev $WORKSPACE/webofneeds/won-docker/matcher-siren/

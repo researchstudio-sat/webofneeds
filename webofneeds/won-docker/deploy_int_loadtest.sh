@@ -32,28 +32,53 @@ docker -H satsrv07:2375 build -t webofneeds/matcher_siren:int $WORKSPACE/webofne
 # start the won containers on dedicated servers of the cluster
 echo run docker containers:
 
+# postgres db 1
+docker -H satsrv04:2375 pull webofneeds/postgres
+docker -H satsrv04:2375 stop postgres_int || echo 'No docker container found to stop with name: postgres_int'
+docker -H satsrv04:2375 rm postgres_int || echo 'No docker container found to remove with name: postgres_int'
+docker -H satsrv04:2375 run --name=postgres_int -d -p 5433:5432 webofneeds/postgres
+
+# postgres db 2
+docker -H satsrv05:2375 stop postgres_int || echo 'No docker container found to stop with name: postgres_int'
+docker -H satsrv05:2375 rm postgres_int || echo 'No docker container found to remove with name: postgres_int'
+docker -H satsrv05:2375 run --name=postgres_int -d -p 5433:5432 webofneeds/postgres
+
+sleep 10
+
 # wonnode 1
 docker -H satsrv04:2375 stop wonnode_int1 || echo 'No docker container found to stop with name: wonnode_int'
 docker -H satsrv04:2375 rm wonnode_int1 || echo 'No docker container found to remove with name: wonnode_int'
 docker -H satsrv04:2375 run --name=wonnode_int1 -d -e "uri.host=satsrv04.researchstudio.at" \
+-e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_node1" \
+-e "db.sql.user=won" -e "db.sql.password=won" \
 -e "http.port=8889" -e "activemq.broker.port=61617" -p 8889:8080 -p 61617:61617 webofneeds/wonnode:int
 
 # wonnode 2
 docker -H satsrv05:2375 stop wonnode_int2 || echo 'No docker container found to stop with name: wonnode_int'
 docker -H satsrv05:2375 rm wonnode_int2 || echo 'No docker container found to remove with name: wonnode_int'
 docker -H satsrv05:2375 run --name=wonnode_int2 -d -e "uri.host=satsrv05.researchstudio.at" \
+-e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_node2" \
+-e "db.sql.user=won" -e "db.sql.password=won" \
 -e "http.port=8889" -e "activemq.broker.port=61617" -p 8889:8080 -p 61617:61617 webofneeds/wonnode:int
 
 # wonnode 3
 docker -H satsrv04:2375 stop wonnode_int3 || echo 'No docker container found to stop with name: wonnode_int'
 docker -H satsrv04:2375 rm wonnode_int3 || echo 'No docker container found to remove with name: wonnode_int'
 docker -H satsrv04:2375 run --name=wonnode_int3 -d -e "uri.host=satsrv04.researchstudio.at" \
+-e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_node3" \
+-e "db.sql.user=won" -e "db.sql.password=won" \
 -e "http.port=8890" -e "activemq.broker.port=61618" -p 8890:8080 -p 61618:61618 webofneeds/wonnode:int
 
 # wonnode 4
 docker -H satsrv05:2375 stop wonnode_int4 || echo 'No docker container found to stop with name: wonnode_int'
 docker -H satsrv05:2375 rm wonnode_int4 || echo 'No docker container found to remove with name: wonnode_int'
 docker -H satsrv05:2375 run --name=wonnode_int4 -d -e "uri.host=satsrv05.researchstudio.at" \
+-e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_node4" \
+-e "db.sql.user=won" -e "db.sql.password=won" \
 -e "http.port=8890" -e "activemq.broker.port=61618" -p 8890:8080 -p 61618:61618 webofneeds/wonnode:int
 
 sleep 20
@@ -62,12 +87,18 @@ sleep 20
 docker -H satsrv04:2375 stop owner_int || echo 'No docker container found to stop with name: owner_int'
 docker -H satsrv04:2375 rm owner_int || echo 'No docker container found to remove with name: owner_int'
 docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.researchstudio.at" \
+-e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_owner1" \
+-e "db.sql.user=won" -e "db.sql.password=won" \
 -e "node.default.http.port=8889" -p 8082:8080 webofneeds/owner:int
 
 # owner 2
 docker -H satsrv05:2375 stop owner_int || echo 'No docker container found to stop with name: owner_int'
 docker -H satsrv05:2375 rm owner_int || echo 'No docker container found to remove with name: owner_int'
 docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv05.researchstudio.at" \
+-e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_owner2" \
+-e "db.sql.user=won" -e "db.sql.password=won" \
 -e "node.default.http.port=8889" -p 8082:8080 webofneeds/owner:int
 
 # bigdata

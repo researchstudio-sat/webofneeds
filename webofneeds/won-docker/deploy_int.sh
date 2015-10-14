@@ -32,17 +32,38 @@ docker -H satsrv07:2375 build -t webofneeds/matcher_siren:int $WORKSPACE/webofne
 # start the won containers on dedicated servers of the cluster
 echo run docker containers:
 
+# postgres db 1
+docker -H satsrv04:2375 pull webofneeds/postgres
+docker -H satsrv04:2375 stop postgres_int || echo 'No docker container found to stop with name: postgres_int'
+docker -H satsrv04:2375 rm postgres_int || echo 'No docker container found to remove with name: postgres_int'
+docker -H satsrv04:2375 run --name=postgres_int -d -p 5433:5432 webofneeds/postgres
+
+# postgres db 2
+docker -H satsrv05:2375 stop postgres_int || echo 'No docker container found to stop with name: postgres_int'
+docker -H satsrv05:2375 rm postgres_int || echo 'No docker container found to remove with name: postgres_int'
+docker -H satsrv05:2375 run --name=postgres_int -d -p 5433:5432 webofneeds/postgres
+
+sleep 10
+
 # wonnode 1
 docker -H satsrv04:2375 stop wonnode_int || echo 'No docker container found to stop with name: wonnode_int'
 docker -H satsrv04:2375 rm wonnode_int || echo 'No docker container found to remove with name: wonnode_int'
 docker -H satsrv04:2375 run --name=wonnode_int -d -e "uri.host=satsrv04.researchstudio.at" \
--e "http.port=8889" -e "activemq.broker.port=61617" -p 8889:8080 -p 61617:61617 webofneeds/wonnode:int
+-e "http.port=8889" -e "activemq.broker.port=61617" \
+-e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_node" \
+-e "db.sql.user=won" -e "db.sql.password=won" \
+-p 8889:8080 -p 61617:61617 webofneeds/wonnode:int
 
 # wonnode 2
 docker -H satsrv05:2375 stop wonnode_int || echo 'No docker container found to stop with name: wonnode_int'
 docker -H satsrv05:2375 rm wonnode_int || echo 'No docker container found to remove with name: wonnode_int'
 docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv05.researchstudio.at" \
--e "http.port=8889" -e "activemq.broker.port=61617" -p 8889:8080 -p 61617:61617 webofneeds/wonnode:int
+-e "http.port=8889" -e "activemq.broker.port=61617" \
+-e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_node" \
+-e "db.sql.user=won" -e "db.sql.password=won" \
+-p 8889:8080 -p 61617:61617 webofneeds/wonnode:int
 
 sleep 20
 
@@ -50,12 +71,19 @@ sleep 20
 docker -H satsrv04:2375 stop owner_int || echo 'No docker container found to stop with name: owner_int'
 docker -H satsrv04:2375 rm owner_int || echo 'No docker container found to remove with name: owner_int'
 docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.researchstudio.at" \
--e "node.default.http.port=8889" -p 8082:8080 webofneeds/owner:int
+-e "node.default.http.port=8889" \
+-e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_owner" \
+-e "db.sql.user=won" -e "db.sql.password=won" \
+-p 8082:8080 webofneeds/owner:int
 
 # owner 2
 docker -H satsrv05:2375 stop owner_int || echo 'No docker container found to stop with name: owner_int'
 docker -H satsrv05:2375 rm owner_int || echo 'No docker container found to remove with name: owner_int'
 docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv05.researchstudio.at" \
+-e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_owner" \
+-e "db.sql.user=won" -e "db.sql.password=won" \
 -e "node.default.http.port=8889" -p 8082:8080 webofneeds/owner:int
 
 # bigdata
@@ -79,7 +107,7 @@ docker -H satsrv06:2375 stop sirensolr_int || echo 'No docker container found to
 docker -H satsrv06:2375 rm sirensolr_int || echo 'No docker container found to remove with name: sirensolr_int'
 docker -H satsrv06:2375 run --name=sirensolr_int -d -p 7071:8080 -p 8984:8983 webofneeds/sirensolr
 
-sleep 20
+sleep 10
 
 # siren matcher
 docker -H satsrv06:2375 stop matcher_siren_int || echo 'No docker container found to stop with name: matcher_siren_int'
