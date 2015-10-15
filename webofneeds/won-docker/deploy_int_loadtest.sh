@@ -52,6 +52,8 @@ docker -H satsrv04:2375 run --name=wonnode_int1 -d -e "uri.host=satsrv04.researc
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_node1" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-e "monitoring.output.dir=/usr/local/tomcat/won" \
+-e "monitoring.interval.seconds=60" \
 -e "http.port=8889" -e "activemq.broker.port=61617" -p 8889:8080 -p 61617:61617 webofneeds/wonnode:int
 
 # wonnode 2
@@ -61,6 +63,8 @@ docker -H satsrv05:2375 run --name=wonnode_int2 -d -e "uri.host=satsrv05.researc
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_node2" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-e "monitoring.output.dir=/usr/local/tomcat/won" \
+-e "monitoring.interval.seconds=60" \
 -e "http.port=8889" -e "activemq.broker.port=61617" -p 8889:8080 -p 61617:61617 webofneeds/wonnode:int
 
 # wonnode 3
@@ -70,6 +74,8 @@ docker -H satsrv04:2375 run --name=wonnode_int3 -d -e "uri.host=satsrv04.researc
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_node3" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-e "monitoring.output.dir=/usr/local/tomcat/won" \
+-e "monitoring.interval.seconds=60" \
 -e "http.port=8890" -e "activemq.broker.port=61618" -p 8890:8080 -p 61618:61618 webofneeds/wonnode:int
 
 # wonnode 4
@@ -79,6 +85,8 @@ docker -H satsrv05:2375 run --name=wonnode_int4 -d -e "uri.host=satsrv05.researc
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_node4" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-e "monitoring.output.dir=/usr/local/tomcat/won" \
+-e "monitoring.interval.seconds=60" \
 -e "http.port=8890" -e "activemq.broker.port=61618" -p 8890:8080 -p 61618:61618 webofneeds/wonnode:int
 
 sleep 20
