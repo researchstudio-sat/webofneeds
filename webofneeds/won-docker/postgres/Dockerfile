@@ -12,3 +12,5 @@ ENV POSTGRES_USER=won
 ADD ./default_init.sql /docker-entrypoint-initdb.d/default_init.sql
 ADD ./test_init.sql /docker-entrypoint-initdb.d/test_init.sql
 
+# activate more logging
+CMD [ "postgres", "-c", "log_destination=stderr, syslog", "-c", "logging_collector=on", "-c", "log_statement=ddl"]
