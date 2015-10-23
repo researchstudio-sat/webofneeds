@@ -23,7 +23,7 @@ webofneeds/owner:int
 docker -H satsrv05:2375 build -t webofneeds/wonnode:int $WORKSPACE/webofneeds/won-docker/wonnode/
 docker -H satsrv05:2375 stop wonnode_int || echo 'No docker container found to stop with name: wonnode_int'
 docker -H satsrv05:2375 rm wonnode_int || echo 'No docker container found to remove with name: wonnode_int'
-docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv04.researchstudio.at" -e "http.port=8889" \
+docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv05.researchstudio.at" -e "http.port=8889" \
 -e "activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 \
 -v /home/install/won-certs:/usr/local/tomcat/conf/ssl/ \
 webofneeds/wonnode:int

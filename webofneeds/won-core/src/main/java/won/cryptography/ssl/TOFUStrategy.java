@@ -53,7 +53,7 @@ public class TOFUStrategy implements TrustStrategy
 
     try {
       trustStoreService.addCertificate(alias, cert, false);
-      logger.info("Certificate is added based on TOFU and from now on it is trusted!");
+      logger.info("Certificate for " + alias + " is added based on TOFU and from now on it is trusted!");
       return true;
     } catch (Exception e) {
       logger.warn("Certificate could not be added as trusted for TOFU for alias " + alias, e);
