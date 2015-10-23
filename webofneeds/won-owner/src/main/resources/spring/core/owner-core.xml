@@ -46,25 +46,26 @@
 
     <!-- private keys and their certificates for owner and needs,
      possibly certificates of other parties-->
-    <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService" init-method="init">
+    <!--bean id="clientKeyStoreService" class="won.cryptography.service.KeyStoreService" init-method="init">
         <constructor-arg type="java.lang.String" value="${keystore.location}" />
+        <constructor-arg type="java.lang.String" value="${keystore.password}" />
         <property name="defaultAlias" value="${uri.prefix.owner}" />
     </bean>
     <bean id="trustStoreService" class="won.cryptography.service.TrustStoreService" init-method="init">
         <constructor-arg type="java.lang.String" value="${truststore.location}" />
+        <constructor-arg type="java.lang.String" value="${truststore.password}" />
     </bean>
     <bean id="certificateService" class="won.cryptography.service.CertificateService">
-    </bean>
+    </bean-->
 
-    <bean id="cryptoService" class="won.cryptography.service.CryptographyService">
+    <!--bean id="cryptoService" class="won.cryptography.service.CryptographyService">
         <constructor-arg ref="keyStoreService" />
-    </bean>
+    </bean-->
 
-    <bean id="ownerCertificateOnStartupCreator"
+    <!--bean id="ownerCertificateOnStartupCreator"
           class="won.owner.service.impl.OwnerCertificateOnStartupCreator">
-        <property name="alias" value="${uri.prefix.owner}" />
-        <property name="keyStoreService" ref="keyStoreService" />
-    </bean>
+        <property name="keyStoreService" ref="clientKeyStoreService" />
+    </bean-->
 
     <!-- processor for checking signatures -->
     <bean name="signatureChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
@@ -74,14 +75,33 @@
     </bean>
     <!-- processor for signing messages -->
     <bean id="signatureAddingProcessor" class="won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor">
-        <constructor-arg type="java.lang.String" value="${uri.prefix.resource}" />
+        <property name="cryptographyService" ref="cryptographyService" />
     </bean>
     <bean name="signatureAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
         <constructor-arg ref="signatureAddingProcessor" />
     </bean>
     <!-- processor for generating and adding keys for just created needs -->
 
-    <bean name="needKeyGeneratorAndAdder" class="won.protocol.message.processor.impl.KeyForNewNeedAddingProcessor" />
+    <bean name="needKeyGeneratorAndAdder" class="won.protocol.message.processor.impl.KeyForNewNeedAddingProcessor">
+        <property name="cryptographyService" ref="cryptographyService" />
+
+    </bean>
+
+    <!-- server's key store at owner is not used in code, but used when tomcat connector is configured-->
+    <!--bean id="serverKeyStoreService" class="won.cryptography.service.KeyStoreService" init-method="init">
+        <constructor-arg type="java.lang.String" value="${tomcat.keystore}" />
+        <constructor-arg type="java.lang.String" value="${tomcat.keystore.password}" />
+        <property name="defaultAlias" value="${tomcat.keystore.alias}" />
+    </bean-->
+
+
+    <!--property name="serverKeyStoreService" ref="serverKeyStoreService" /-->
+    <!--bean id="wonSecurityConfig" class="won.cryptography.service.WonTlsSecurityConfig">
+        <property name="trustStoreService" ref="trustStoreService" />
+        <property name="clientKeyStoreService" ref="clientKeyStoreService" />
+    </bean-->
+
+
 
 
 </beans>

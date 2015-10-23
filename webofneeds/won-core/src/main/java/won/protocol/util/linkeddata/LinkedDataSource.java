@@ -34,9 +34,17 @@ public interface LinkedDataSource
      */
   public Dataset getDataForResource(URI resourceURI);
 
+  public Dataset getDataForResource(URI resourceURI, URI requesterWebID);
+
   public Dataset getDataForResource(final URI resourceURI, List<URI> properties,
     int maxRequest, int maxDepth);
 
+  public Dataset getDataForResource(final URI resourceURI, URI requesterWebID, List<URI> properties,
+                                    int maxRequest, int maxDepth);
+
   public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties, int maxRequest,
     int maxDepth, final boolean moveAllTriplesInDefaultGraph);
+
+  public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, URI requesterWebID, final List<Path>
+    properties, int maxRequest, int maxDepth, final boolean moveAllTriplesInDefaultGraph);
 }

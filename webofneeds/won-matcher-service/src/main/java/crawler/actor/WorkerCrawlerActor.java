@@ -4,7 +4,6 @@ import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
-import common.service.HttpsRequestService;
 import crawler.config.CrawlConfig;
 import crawler.exception.CrawlWrapperException;
 import crawler.msg.CrawlUriMessage;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -38,7 +38,7 @@ public class WorkerCrawlerActor extends UntypedActor
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
   @Autowired
-  private HttpsRequestService httpRequestService;
+  private LinkedDataSource linkedDataSource;
 
   @Autowired
   private CrawlSparqlService sparqlService;
@@ -70,7 +70,7 @@ public class WorkerCrawlerActor extends UntypedActor
     // start the crawling request
     Dataset ds = null;
     try {
-      ds = httpRequestService.requestDataset(uriMsg.getUri());
+      ds = linkedDataSource.getDataForResource(URI.create(uriMsg.getUri()));
     } catch (RestClientException e) {
       throw new CrawlWrapperException(e, uriMsg);
     }
@@ -123,10 +123,6 @@ public class WorkerCrawlerActor extends UntypedActor
     } catch (IncorrectPropertyCountException e) {
       return null;
     }
-  }
-
-  public void setHttpRequestService(final HttpsRequestService httpRequestService) {
-    this.httpRequestService = httpRequestService;
   }
 
   public void setSparqlService(final CrawlSparqlService sparqlService) {

@@ -5,17 +5,15 @@ import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.RestTemplate;
-import won.cryptography.service.CryptographyUtils;
-import won.cryptography.service.KeyStoreService;
-import won.cryptography.service.TrustStoreService;
 import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.service.impl.WONUserDetailService;
@@ -23,31 +21,28 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * User: ypanchenko
  * Date: 03.09.2015
+ *
+ * This controller at Owner server-side serves as a bridge for Owner client-side to obtain linked data from a Node:
+ * because the linked data on a Node can have restricted access based on WebID, only Owner server-side can provide the
+ * client's certificate as proof of having the private key from client's published WebID. Because of this, Owner
+ * client-side has to ask Owner-server side to query Node for it, instead of querying directly from Owner client-side.
  */
 @Controller
 @RequestMapping("/rest/linked-data")
 public class BridgeForLinkedDataController {
 
   @Autowired
-  private KeyStoreService keyStoreService;
-  @Autowired
-  private TrustStoreService trustStoreService;
-  @Autowired
   private WONUserDetailService wonUserDetailService;
   @Autowired
   private LinkedDataSource linkedDataSource;
 
   final Logger logger = LoggerFactory.getLogger(getClass());
-
-  public BridgeForLinkedDataController() {
-  }
 
   @ResponseBody
   @RequestMapping(
@@ -72,37 +67,28 @@ public class BridgeForLinkedDataController {
 
   }
 
+  /**
+   * Obtain linked data on behalf of the requester with given WebID. The request will include Certificate of the
+   * requester. This is necessary for obtaining linked data has restricted access based on WebID access control and
+   * verification.
+   *
+   * @param resourceUri
+   * @param requesterWebId
+   * @return
+   */
   private ResponseEntity<String> fetchResourceProvidingIdentity(final String resourceUri, final String requesterWebId) {
-    // TODO talk with flo if it makes sense to implement this via an implementation of LinkedDataSource. The problem
-    // with that is that internally it cannot reuse the httpclient anyway, because the alias/webid is different each
-    // time - for retrieving the different key each time, i.e. the httpclient has to be created each time inside the
-    // getresource, which is different from the current concept...
-    try {
-      //todo password handling
-      RestTemplate restTemplate = CryptographyUtils.createRestTemplateWithSslContext(keyStoreService
-                                                                                       .getUnderlyingKeyStore(),
-                                                                                     "temp",
-                                                                                     requesterWebId,
-                                                                                     trustStoreService
-                                                                                       .getUnderlyingKeyStore());
-
-      HttpHeaders headers = new HttpHeaders();
-      headers.setAccept(Collections.singletonList(new MediaType("application", "ld+json")));
-      HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-      ResponseEntity<String> fetchedResult = restTemplate.exchange(resourceUri, HttpMethod.GET, entity, String.class);
-
-      if (!fetchedResult.getStatusCode().is2xxSuccessful()) {
-        logger.warn("Error getting resource " + resourceUri + " for " + requesterWebId + ": " + fetchedResult.toString());
-        return new ResponseEntity("Could not get " + resourceUri + " for requester " + requesterWebId + ": " +
-                                    fetchedResult.toString(), HttpStatus.BAD_REQUEST);
-      }
-      return new ResponseEntity(fetchedResult.getBody(), HttpStatus.OK);
-    } catch (Exception e) {
-      logger.warn("Could not get " + resourceUri + " for requester " + requesterWebId, e);
-      return new ResponseEntity("Could not get " + resourceUri + " for requester " + requesterWebId, HttpStatus.BAD_REQUEST);
-    }
+    Dataset dataset = linkedDataSource.getDataForResource(URI.create(resourceUri), URI.create(requesterWebId));
+    String result = RdfUtils.writeDatasetToString(dataset, Lang.JSONLD);
+    return new ResponseEntity(result, HttpStatus.OK);
   }
 
+  /**
+   * Obtain linked data without providing Certificate/WebID - will work for linked data that does not have restricted
+   * access.
+   *
+   * @param resourceUri
+   * @return
+   */
   private ResponseEntity<String> fetchResourceWithoutProvidingIdentity(final String resourceUri) {
     Dataset dataset = linkedDataSource.getDataForResource(URI.create(resourceUri));
     String result = RdfUtils.writeDatasetToString(dataset, Lang.JSONLD);

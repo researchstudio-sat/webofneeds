@@ -17,9 +17,8 @@
 package won.protocol.jms;
 
 import org.apache.camel.CamelContext;
+import won.cryptography.ssl.MessagingContext;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.TrustManager;
 import java.net.URI;
 
 /**
@@ -28,19 +27,18 @@ import java.net.URI;
  */
 public interface NeedProtocolCamelConfigurator extends CamelConfigurator {
 
-    public String configureCamelEndpointForNeedUri(URI wonNodeUri, URI brokerUri, String needProtocolQueueName);
-    public String configureCamelEndpointForNeedUri(URI wonNodeUri, URI brokerUri, String needProtocolQueueName, 
-                                                   KeyManager km, TrustManager tm);
+    String configureCamelEndpointForNeedUri(URI wonNodeUri, URI brokerUri, String needProtocolQueueName);
 
-    public void addCamelComponentForWonNodeBroker(URI brokerUri,String brokerComponentName);
-
+    void addCamelComponentForWonNodeBroker(URI brokerUri,String brokerComponentName);
 
     void setCamelContext(CamelContext camelContext);
+
+    void setMessagingContext(MessagingContext messagingContext);
 
     @Override
     CamelContext getCamelContext();
 
     String getEndpoint(URI wonNodeUri);
 
-    public String getBrokerComponentNameWithBrokerUri(URI brokerUri);
+    String getBrokerComponentNameWithBrokerUri(URI brokerUri);
 }

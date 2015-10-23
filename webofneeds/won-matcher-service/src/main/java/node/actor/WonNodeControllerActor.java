@@ -11,7 +11,6 @@ import com.hp.hpl.jena.query.Dataset;
 import common.event.BulkHintEvent;
 import common.event.HintEvent;
 import common.event.WonNodeEvent;
-import common.service.HttpsRequestService;
 import common.spring.SpringExtension;
 import crawler.actor.MasterCrawlerActor;
 import crawler.msg.CrawlUriMessage;
@@ -21,19 +20,14 @@ import node.pojo.WonNodeConnection;
 import node.service.WonNodeSparqlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import won.cryptography.service.CryptographyUtils;
-import won.cryptography.service.KeyStoreService;
-import won.cryptography.service.TrustStoreService;
+import won.cryptography.ssl.MessagingContext;
+import won.cryptography.service.RegistrationRestClientHttps;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.linkeddata.LinkedDataSource;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.TrustManager;
-import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
@@ -62,27 +56,22 @@ public class WonNodeControllerActor extends UntypedActor
   private WonNodeSparqlService sparqlService;
 
   @Autowired
-  private HttpsRequestService httpRequestService;
-
-  @Autowired
   private WonNodeControllerConfig config;
 
   @Autowired
   private WonNodeInformationService wonNodeInformationService;
 
   @Autowired
-  private KeyStoreService keyStoreService;
+  private RegistrationRestClientHttps registrationClient;
   @Autowired
-  private TrustStoreService trustStoreService;
+  LinkedDataSource linkedDataSource;
+  @Autowired
+  private MessagingContext messagingContext;
 
 
 
   @Override
   public void preStart() {
-//
-//    httpRequestService = new HttpsRequestService();
-//    httpRequestService.setKeyStoreService(keyStoreService);
-//    httpRequestService.setTrustStoreService(trustStoreService);
 
     // Create a scheduler to execute the life check for each won node regularly
     getContext().system().scheduler().schedule(config.getLifeCheckDuration(), config.getLifeCheckDuration(),
@@ -102,29 +91,14 @@ public class WonNodeControllerActor extends UntypedActor
     // get all known won node uris
     Set<WonNodeInfo> wonNodeInfo = sparqlService.retrieveAllWonNodeInfo();
     for (WonNodeInfo nodeInfo : wonNodeInfo) {
-      //WonNodeConnection con = subscribeNeedUpdates(nodeInfo);
-      //TODO the correct way would be not to register here and assume we have already exchanged the keys, but since
-      // in development the key/trust store can change from run to run, we reregister here - think of a better way!
       try {
-        registerMatcherAtRemoteNode(nodeInfo.getWonNodeURI(), keyStoreService, trustStoreService);
+        // TODO the correct way would be not to register here and assume we have already exchanged the keys, but since
+        // in development the key/trust store can change from run to run, we re-register here - think of a better way
+        registrationClient.register(nodeInfo.getWonNodeURI());
       } catch (Exception e) {
         throw new IllegalArgumentException("Registration repeat at node " + nodeInfo.getWonNodeURI() + " failed", e);
       }
-      KeyManager km = null;
-      TrustManager tm = null;
-      try {
-        //TODO the same code is used after registration.... refactor
-        // initialize key and trust managers and pass them to configuration
-        String keyAlias = keyStoreService.getDefaultAlias();
-        //TODO handle password
-        km = CryptographyUtils.initializeKeyManager(keyStoreService, "temp", keyAlias);
-        tm = CryptographyUtils.initializeTrustManager(trustStoreService, nodeInfo.getWonNodeURI());
-
-      } catch (Exception e) {
-        throw new IllegalArgumentException("Key/Trust manager initialization failed for node " + nodeInfo.getWonNodeURI
-          (), e);
-      }
-      WonNodeConnection con = subscribeNeedUpdatesWithHttpsNode(nodeInfo, km, tm);
+      WonNodeConnection con = subscribeNeedUpdates(nodeInfo);
       crawlWonNodes.put(nodeInfo.getWonNodeURI(), con);
     }
 
@@ -185,7 +159,7 @@ public class WonNodeControllerActor extends UntypedActor
         }
 
         // try the connect to won node
-        WonNodeConnection con = addHttpsWonNodeForCrawling(event.getWonNodeUri());
+        WonNodeConnection con = addWonNodeForCrawling(event.getWonNodeUri());
 
         // connection failed ?
         if (failedWonNodeUris.contains(event.getWonNodeUri())) {
@@ -248,8 +222,8 @@ public class WonNodeControllerActor extends UntypedActor
 
     WonNodeConnection con = null;
     try {
-      // request the resource and save the data
-      Dataset ds = httpRequestService.requestDataset(wonNodeUri);
+      registrationClient.register(wonNodeUri);
+      Dataset ds = linkedDataSource.getDataForResource(URI.create(wonNodeUri));
       sparqlService.updateNamedGraphsOfDataset(ds);
       WonNodeInfo nodeInfo = sparqlService.getWonNodeInfoFromDataset(ds);
 
@@ -261,51 +235,8 @@ public class WonNodeControllerActor extends UntypedActor
     } catch (RestClientException e) {
       log.warning("Error requesting won node information from {}, exception is {}", wonNodeUri, e);
       addFailedWonNode(wonNodeUri, con);
-    }
-
-    return con;
-  }
-
-  /**
-   * Try to add a won node for crawling
-   *
-   * @param wonNodeUri URI of the won node meta data resource
-   * @return won node connection if successfully connected, otherwise null
-   */
-  private WonNodeConnection addHttpsWonNodeForCrawling(String wonNodeUri) {
-
-    // register with remote node in order to exchange certificates if necessary. IF the same trust strategy will
-    // be used when doing GET on won resource, we probably don't need this separate register step
-
-    KeyManager km = null;
-    TrustManager tm = null;
-    try {
-      registerMatcherAtRemoteNode(wonNodeUri, keyStoreService, trustStoreService);
-      // initialize key and trust managers and pass them to configuration
-      String keyAlias = keyStoreService.getDefaultAlias();
-      //TODO handle password
-      km = CryptographyUtils.initializeKeyManager(keyStoreService, "temp", keyAlias);
-      tm = CryptographyUtils.initializeTrustManager(trustStoreService, wonNodeUri);
-
     } catch (Exception e) {
       throw new IllegalArgumentException("Registration at node " + wonNodeUri + " failed", e);
-    }
-
-    WonNodeConnection con = null;
-    try {
-      // request the resource and save the data
-      Dataset ds = httpRequestService.requestDataset(wonNodeUri);
-      sparqlService.updateNamedGraphsOfDataset(ds);
-      WonNodeInfo nodeInfo = sparqlService.getWonNodeInfoFromDataset(ds);
-
-      // subscribe for need updates
-      con = subscribeNeedUpdatesWithHttpsNode(nodeInfo, km, tm);
-      crawlWonNodes.put(nodeInfo.getWonNodeURI(), con);
-      failedWonNodeUris.remove(nodeInfo.getWonNodeURI());
-
-    } catch (RestClientException e) {
-      log.warning("Error requesting won node information from {}, exception is {}", wonNodeUri, e);
-      addFailedWonNode(wonNodeUri, con);
     }
 
     return con;
@@ -341,7 +272,7 @@ public class WonNodeControllerActor extends UntypedActor
       String uri = iter.next();
 
       // if won node becomes available start crawling the node
-      WonNodeConnection con = addHttpsWonNodeForCrawling(uri);
+      WonNodeConnection con = addWonNodeForCrawling(uri);
       if (con != null) {
         startCrawling(con.getWonNodeInfo());
       }
@@ -367,35 +298,7 @@ public class WonNodeControllerActor extends UntypedActor
   }
 
   private WonNodeConnection subscribeNeedUpdates(WonNodeInfo wonNodeInfo) {
-    return ActiveMqWonNodeConnectionFactory.createWonNodeConnection(getContext(), wonNodeInfo);
-  }
-
-  private WonNodeConnection subscribeNeedUpdatesWithHttpsNode(WonNodeInfo wonNodeInfo, KeyManager keyManager,
-    TrustManager trustManager) {
-    return ActiveMqWonNodeConnectionFactory.createWonNodeConnection(getContext(), wonNodeInfo, keyManager, trustManager);
-  }
-
-  //TODO can this be made a reusable method for both node, matcher and owner for registration? with registration uri
-  // taken somewhere from properties?
-  private void registerMatcherAtRemoteNode(final String remoteNodeUri, KeyStoreService keyStoreService,
-                                           TrustStoreService trustStoreService) throws
-    Exception {
-    // TODO handle password correctly
-    RestTemplate restTemplate = CryptographyUtils.createSslTofuRestTemplate(keyStoreService, "temp",
-                                                                            trustStoreService);
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN));
-    HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-    //TODO make URI configurable
-    ResponseEntity<String> result = restTemplate.exchange(remoteNodeUri + "?register=node", HttpMethod
-                                                            .POST,
-                                                          entity,
-                                                          String.class);
-    log.info("Matcher registration status at node " + remoteNodeUri + ": " + result.getStatusCode());
-    if (!result.getStatusCode().is2xxSuccessful()) {
-      throw new IOException("Registration by remote node " + remoteNodeUri + " failed: " + result.toString());
-    }
+    return ActiveMqWonNodeConnectionFactory.createWonNodeConnection(getContext(), wonNodeInfo, messagingContext);
   }
 
   /**
@@ -423,24 +326,6 @@ public class WonNodeControllerActor extends UntypedActor
       }
     }
   }
-
-
-//  public void setKeyStoreService(KeyStoreService keyStoreService) {
-//    this.keyStoreService = keyStoreService;
-//  }
-//
-//  public void setTrustStoreService(TrustStoreService trustStoreService) {
-//    this.trustStoreService = trustStoreService;
-//  }
-//
-//  public KeyStoreService getKeyStoreService() {
-//    return keyStoreService;
-//  }
-//
-//  public TrustStoreService getTrustStoreService() {
-//    return trustStoreService;
-//  }
-
 
 }
 

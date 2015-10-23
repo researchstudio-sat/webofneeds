@@ -36,29 +36,18 @@
         <property name="matcherProtocolCamelConfigurator" ref="matcherProtocolCamelConfigurator"/>
         <property name="componentName" value="activemq"></property>
     </bean-->
-    <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService" init-method="init">
-        <constructor-arg type="java.lang.String" value="${keystore.location}" />
-        <property name="defaultAlias" value="${matcher.uri}" />
-    </bean>
-    <bean id="trustStoreService" class="won.cryptography.service.TrustStoreService" init-method="init">
-        <constructor-arg type="java.lang.String" value="${truststore.location}" />
-    </bean>
-    <bean id="matcherCertificateOnStartupCreator"
-          class="won.matcher.service.MatcherCertificateOnStartupCreator">
-        <property name="alias" value="${matcher.uri}" />
-        <property name="keyStoreService" ref="keyStoreService" />
-    </bean>
+
+
     <bean id="matcherProtocolCommunicationService"
-          class="won.matcher.protocol.impl.MatcherProtocolSecureCommunicationServiceImpl">
+          class="won.matcher.protocol.impl.MatcherProtocolCommunicationServiceImpl">
         <property name="activeMQService" ref="matcherActiveMQService"/>
         <property name="matcherProtocolCamelConfigurator" ref="matcherProtocolCamelConfigurator"/>
-        <property name="componentName" value="activemq"></property>
-        <property name="keyStoreService" ref="keyStoreService" />
-        <property name="trustStoreService" ref="trustStoreService" />
+        <property name="registrationClient" ref="registrationClient" />
     </bean>
 
     <!--bean id="needProtocolCamelConfigurator" class="won.matcher.messaging.MatcherProtocolCamelConfiguratorImpl"/-->
     <bean id="matcherActiveMQService" class="won.protocol.jms.MatcherActiveMQServiceImpl">
         <constructor-arg name="type" value="MatcherProtocol"/>
     </bean>
+
 </beans>

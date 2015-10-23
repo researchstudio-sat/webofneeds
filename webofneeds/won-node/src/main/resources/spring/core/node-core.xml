@@ -33,9 +33,9 @@
 
     <!-- REST stuff -->
     <!-- required so our linked data client can convert strings into jena models -->
-    <context:component-scan base-package="won.protocol.rest">
+    <!--context:component-scan base-package="won.protocol.rest">
         <context:include-filter type="regex" expression="won.protocol.rest.*"/>
-    </context:component-scan>
+    </context:component-scan-->
 
     <bean id="uriService" class="won.node.service.impl.URIService">
         <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
@@ -98,7 +98,7 @@
     <!--bean id="QueueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/-->
 
     <!--- DataAccessService -->
-    <bean id="dataServiceRef" class="won.node.service.impl.DataAccessServiceImpl" >
+    <bean id="dataServiceRef" class="won.node.service.impl.DataAccessServiceImpl" depends-on="linkedDataService">
         <property name="URIService" ref="uriService" />
         <property name="rdfStorageService" ref="rdfStorageRef" />
     </bean>

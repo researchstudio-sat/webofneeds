@@ -43,10 +43,7 @@ import won.protocol.util.RdfUtils;
 
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * LinkedDataSource implementation that uses an ehcache for caching.
@@ -98,6 +95,26 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
   }
 
   @Override
+  public Dataset getDataForResource(final URI resource, final URI requesterWebID) {
+    assert resource != null : "resource must not be null";
+    Element element = null;
+    List<URI> key = Arrays.asList(new URI[]{resource, requesterWebID});
+
+    try {
+      element = cache.get(key);
+    }catch(CacheException e){
+      logger.debug(String.format("Couldn't fetch resource %s",resource),e);
+      return DatasetFactory.createMem();
+    }
+
+    Object dataset = element.getObjectValue();
+    if (dataset instanceof Dataset) return (Dataset) dataset;
+    throw new IllegalStateException(
+      new MessageFormat("The underlying linkedDataCache should only contain Datasets, but we got a {0} for URI {1}")
+        .format(new Object[]{dataset.getClass(), resource}));
+  }
+
+  @Override
   public com.hp.hpl.jena.query.Dataset getDataForResource(final URI resourceURI, List<URI> properties,
     int maxRequest, int maxDepth) {
     Set<URI> crawledURIs = new HashSet<URI>();
@@ -114,6 +131,36 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
       for (URI currentURI: urisToCrawl) {
         //add all models from urisToCrawl
         Dataset currentModel =  getDataForResource(currentURI);
+        RdfUtils.addDatasetToDataset(dataset, currentModel);
+        newlyDiscoveredURIs.addAll(getURIsToCrawl(currentModel, crawledURIs, properties));
+        crawledURIs.add(currentURI);
+        requests++;
+        logger.debug("current Request: "+requests);
+        if (requests >= maxRequest) break OUTER;
+
+      }
+      depth++;
+      logger.debug("current Depth: "+depth);
+    }
+    return dataset;
+  }
+
+  @Override
+  public Dataset getDataForResource(final URI resourceURI, final URI requesterWebID, final List<URI> properties, final int maxRequest, final int maxDepth) {
+    Set<URI> crawledURIs = new HashSet<URI>();
+    Set<URI> newlyDiscoveredURIs = new HashSet<URI>();
+    Set<URI> urisToCrawl = null;
+    newlyDiscoveredURIs.add(resourceURI);
+    int depth = 0;
+    int requests = 0;
+
+    Dataset dataset = makeDataset();
+    OUTER: while (newlyDiscoveredURIs.size() > 0 && depth < maxDepth && requests < maxRequest){
+      urisToCrawl = newlyDiscoveredURIs;
+      newlyDiscoveredURIs = new HashSet<URI>();
+      for (URI currentURI: urisToCrawl) {
+        //add all models from urisToCrawl
+        Dataset currentModel =  getDataForResource(currentURI, requesterWebID);
         RdfUtils.addDatasetToDataset(dataset, currentModel);
         newlyDiscoveredURIs.addAll(getURIsToCrawl(currentModel, crawledURIs, properties));
         crawledURIs.add(currentURI);
@@ -166,6 +213,43 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
     }
     return resultDataset;
 
+  }
+
+  @Override
+  public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final URI requesterWebID, final List<Path> properties, final int maxRequest, final int maxDepth, final boolean moveAllTriplesInDefaultGraph) {
+    Set<URI> crawledURIs = new HashSet<URI>();
+    Set<URI> newlyDiscoveredURIs = new HashSet<URI>();
+    Set<URI> urisToCrawl = null;
+    newlyDiscoveredURIs.add(resourceURI);
+    int depth = 0;
+    int requests = 0;
+
+    Dataset resultDataset = makeDataset();
+
+    OUTER: while (newlyDiscoveredURIs.size() > 0 && depth < maxDepth && requests < maxRequest){
+      urisToCrawl = newlyDiscoveredURIs;
+      newlyDiscoveredURIs = new HashSet<URI>();
+      for (URI currentURI: urisToCrawl) {
+        //add all models from urisToCrawl
+
+        Dataset currentDataset =  getDataForResource(currentURI, requesterWebID);
+        //logger.debug("current dataset: {} "+RdfUtils.toString(currentModel));
+        if (moveAllTriplesInDefaultGraph){
+          RdfUtils.copyDatasetTriplesToModel(currentDataset, resultDataset.getDefaultModel());
+        } else {
+          RdfUtils.addDatasetToDataset(resultDataset, currentDataset);
+        }
+        newlyDiscoveredURIs.addAll(getURIsToCrawlWithPropertyPath(resultDataset, resourceURI, crawledURIs, properties));
+        crawledURIs.add(currentURI);
+        requests++;
+        logger.debug("current Request: "+requests);
+        if (requests >= maxRequest) break OUTER;
+
+      }
+      depth++;
+      logger.debug("current Depth: "+depth);
+    }
+    return resultDataset;
   }
 
   /**
@@ -256,26 +340,38 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
     }
 
   private class LinkedDataCacheEntryFactory implements CacheEntryFactory {
-      private LinkedDataCacheEntryFactory() {
-      }
+    private LinkedDataCacheEntryFactory() {
+    }
 
-      @Override
-      public Object createEntry(final Object key) throws Exception {
-          if (key instanceof URI) {
-              logger.debug("fetching linked data for URI {}", key);
-              Dataset dataset = linkedDataRestClient.readResourceData((URI) key);
-              if (crawlerCallback != null){
-                try {
-                  crawlerCallback.onDatasetCrawled((URI) key, dataset);
-                } catch (Exception e ){
-                  logger.info(String.format("error during callback execution for dataset %s", key.toString()), e);
-                }
-              }
-              return dataset;
-          } else {
-              throw new IllegalArgumentException("this cache only resolves URIs to Models");
+    @Override
+    public Object createEntry(final Object key) throws Exception {
+      if (key instanceof URI) {
+        logger.debug("fetching linked data for URI {}", key);
+        Dataset dataset = linkedDataRestClient.readResourceData((URI) key);
+        if (crawlerCallback != null){
+          try {
+            crawlerCallback.onDatasetCrawled((URI) key, dataset);
+          } catch (Exception e ){
+            logger.info(String.format("error during callback execution for dataset %s", key.toString()), e);
           }
+        }
+        return dataset;
+      } else if (key instanceof List && ((List)key).size() == 2 && ((List)key).get(0) instanceof URI && ((List)key)
+        .get(1) instanceof URI){
+        logger.debug("fetching linked data for URI {} for requester {}", ((List) key).get(0), ((List) key).get(1));
+        Dataset dataset = linkedDataRestClient.readResourceData((URI) ((List) key).get(0), (URI) ((List) key).get(1));
+        if (crawlerCallback != null){
+          try {
+            crawlerCallback.onDatasetCrawled((URI) key, dataset);
+          } catch (Exception e ){
+            logger.info(String.format("error during callback execution for dataset %s", key.toString()), e);
+          }
+        }
+        return dataset;
+      } else {
+        throw new IllegalArgumentException("this cache only resolves URIs and URIs with requester WebIDs to Models");
       }
+    }
   }
 
   @Autowired(required = false)

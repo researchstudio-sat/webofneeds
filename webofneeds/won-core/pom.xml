@@ -224,5 +224,27 @@
             <version>4.3.5</version>
         </dependency>
 
+        <!-- tools -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+
+
+        <!-- security stuff -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 </project>

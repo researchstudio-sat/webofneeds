@@ -27,7 +27,7 @@ public class SignatureTest
 
     //load public  keys:
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    KeyStoreService storeService = new KeyStoreService(keysFile);
+    KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
     needPublicKey = storeService.getCertificate(TestSigningUtils.needCertUri).getPublicKey();
     ownerPublicKey = storeService.getCertificate(TestSigningUtils.ownerCertUri).getPublicKey();
     nodePublicKey = storeService.getCertificate(TestSigningUtils.nodeCertUri).getPublicKey();

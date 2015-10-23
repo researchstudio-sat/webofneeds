@@ -30,7 +30,7 @@ public class TestingDataSource implements LinkedDataSource
 
     //load public  keys:
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    KeyStoreService storeService = new KeyStoreService(keysFile);
+    KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
 
     pubKeysMap.put(TestSigningUtils.needCertUri, storeService.getCertificate(TestSigningUtils.needCertUri).getPublicKey());
     pubKeysMap.put(TestSigningUtils.ownerCertUri, storeService.getCertificate(TestSigningUtils.ownerCertUri).getPublicKey());
@@ -54,12 +54,27 @@ public class TestingDataSource implements LinkedDataSource
   }
 
   @Override
+  public Dataset getDataForResource(final URI resourceURI, final URI requesterWebID) {
+    throw new NotImplementedException();
+  }
+
+  @Override
   public Dataset getDataForResource(final URI resourceURI, final List<URI> properties, final int maxRequest, final int maxDepth) {
     throw new NotImplementedException();
   }
 
   @Override
+  public Dataset getDataForResource(final URI resourceURI, final URI requesterWebID, final List<URI> properties, final int maxRequest, final int maxDepth) {
+    throw new NotImplementedException();
+  }
+
+  @Override
   public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties, final int maxRequest, final int maxDepth, final boolean moveAllTriplesInDefaultGraph) {
+    throw new NotImplementedException();
+  }
+
+  @Override
+  public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final URI requesterWebID, final List<Path> properties, final int maxRequest, final int maxDepth, final boolean moveAllTriplesInDefaultGraph) {
     throw new NotImplementedException();
   }
 }

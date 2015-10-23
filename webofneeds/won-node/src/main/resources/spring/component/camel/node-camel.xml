@@ -28,10 +28,7 @@
         <camel:template id="producerTemplate" defaultEndpoint="direct:JMS"/>
     </camel:camelContext>
 
-    <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
-        <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
-        <property name="sessionCacheSize" value="10"></property>
-    </bean>
+
 
 
     <!--bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
@@ -47,17 +44,27 @@
         <property name="brokerURL" value="tcp://localhost:${activemq.broker.port}"/>
     </bean>
     -->
-    <!-- This is used for the connections from internal node client to embedded (internal) node broker. In order to trust
-     my own internal connections, it can be configured with predefined key/trust stores that only contain this
-     node-server's private/public certificate. TODO: It would be correct though, to use here vm connection without any ssl stuff-->
-    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQSslConnectionFactory"
-          depends-on="embeddedBroker" >
-        <property name="brokerURL" 
+
+    <!--TODO get from won security config... -->
+    <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory"
+    depends-on="embeddedBroker">
+        <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
+        <property name="sessionCacheSize" value="10"></property>
+    </bean>
+
+    <!--bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQSslConnectionFactory"
+            >
+        <property name="brokerURL"
                   value="${activemq.broker.scheme}://localhost:${activemq.broker.port}"/>
         <property name="keyStore" value="${activemq.broker.keystore}"/>
         <property name="keyStorePassword" value="${activemq.broker.keystore.password}"/>
         <property name="trustStore" value="${activemq.broker.truststore}"/>
         <property name="trustStorePassword" value="${activemq.broker.truststore.password}"/>
+    </bean-->
+    <!-- This is used for the connections from internal clients to embedded (internal) node broker. Since in this case
+    establishing ssl connection is overkill, vm connection is used instead -->
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="vm://localhost"/>
     </bean>
 
     <!-- Configuring Broker -->
@@ -69,6 +76,7 @@
         <property name="config" value="classpath:spring/component/broker/activemq.xml"/>
         <property name="start" value="true"/>
     </bean>
+
     <bean id="activeMQService" class="won.protocol.jms.ActiveMQServiceImpl">
         <constructor-arg name="type" value="NeedProtocol"/>
     </bean>
@@ -82,9 +90,8 @@
         <property name="connectionFactory" ref="cachedConnectionFactory"/>
     </bean-->
     <!--bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl"-->
-    <bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolSecureCommunicationServiceImpl">
-        <property name="keyStoreService" ref="keyStoreService" />
-        <property name="trustStoreService" ref="trustStoreService" />
+    <bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl">
+        <property name="registrationClient" ref="registrationClient" />
     </bean>
 
     <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.general.OwnerProtocolOutgoingMessagesProcessor">
@@ -93,7 +100,13 @@
 
     <bean name="needProtocolCamelConfigurator" class="won.node.camel.NeedProtocolCamelConfiguratorImpl">
         <property name="componentName" value="activemq"/>
+        <property name="messagingContext" ref="messagingContext"/>
     </bean>
+
+    <bean id="messagingContext" factory-bean="wonTransmissionService" factory-method="getClientMessagingContext">
+    </bean>
+
+
 
     <bean id="needProtocolOutgoingMessagesProcessor"
           class="won.node.camel.processor.general.NeedProtocolOutgoingMessagesProcessor" />
@@ -166,7 +179,7 @@
   </bean>
     <!-- signing messages -->
     <bean id="signatureAddingProcessor" class="won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor">
-        <constructor-arg type="java.lang.String" value="${uri.prefix.resource}" />
+        <property name="cryptographyService" ref="cryptographyService" />
     </bean>
     <bean name="signatureAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
         <constructor-arg ref="signatureAddingProcessor" />

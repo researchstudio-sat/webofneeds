@@ -27,7 +27,7 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/bot.properties" ignore-unresolvable="true"/>
 
 
-    <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml" />
+    <!--import resource="classpath:/spring/component/linkeddatasource/owner-linkeddatasource.xml" /-->
     <import resource="classpath:/spring/component/scheduling/scheduling.xml" />
     <import resource="classpath:/spring/component/ownerCallback/ownerCallback.xml" />
     <import resource="classpath:/spring/component/matcherProtocolMatcherServiceHandler/matcherProtocolMatcherServiceHandler.xml"/>
@@ -43,7 +43,19 @@
     <import resource="classpath:/spring/component/monitoring/bot-monitoring.xml" />
     -->
     <import resource="classpath:/spring/component/monitoring/monitoring-recorder.xml" />
-    <import resource="classpath:/spring/matcher-jmsonly.xml"/>
-    <import resource="classpath:/spring/component/wonNodeInformationService.xml"/>
+
+    <!--import resource="classpath:/spring/component/wonNodeInformationService.xml"/-->
+
+    <!--import resource="classpath:/spring/matcher-jmsonly.xml"/-->
+
+    <import resource="classpath:/spring/component/matcherProtocolNeedServiceClient/matcherProtocolNeedServiceClient-jms.xml" />
+    <import resource="classpath:/spring/component/MatcherProtocolMatcherService/matcherProtocolMatcherService-jms.xml"/>
+    <import resource="classpath:/spring/component/camel/matcher-camel.xml" />
+    <import resource="classpath:/spring/core/matcher-core.xml" />
+    <import resource="classpath:/spring/component/storage/storage.xml" />
+    <import resource="classpath:/spring/component/services/matcher-services.xml"/>
+    <import resource="classpath:/spring/component/linkeddatasource/matcher-linkeddatasource.xml" />
+    <import resource="classpath:/spring/component/ehcache/spring-matcher-ehcache.xml" />
+    <import resource="classpath:/spring/component/nodeurisource/matcher-nodeurisource-all.xml" />
 
 </beans>

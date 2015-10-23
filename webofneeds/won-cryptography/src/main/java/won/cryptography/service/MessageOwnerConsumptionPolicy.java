@@ -12,6 +12,7 @@ import java.security.cert.X509Certificate;
  * User: ypanchenko
  * Date: 17.09.2015
  */
+//TODO make extractable froms won transmission config if server-side configurations are there as well
 public class MessageOwnerConsumptionPolicy implements MessageAuthorizationPolicy
 {
   private static final String OWNER_OUT_DESTINATION_NAME_START = "OwnerProtocol.Out.";

@@ -22,7 +22,6 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDFS;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +36,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.HandlerMapping;
-import sun.security.x509.X500Name;
-import won.cryptography.service.TrustStoreService;
-import won.node.service.impl.OwnerManagementServiceImpl;
+import won.cryptography.service.RegistrationServer;
 import won.node.service.impl.URIService;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.WonProtocolException;
 import won.protocol.service.LinkedDataService;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.CNT;
@@ -54,9 +52,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -121,11 +116,7 @@ public class
   private LinkedDataService linkedDataService;
 
   @Autowired
-  private TrustStoreService trustStoreService;
-  @Autowired
-  //private OwnerApplicationRepository ownerApplicatonRepository;
-  private OwnerManagementServiceImpl ownerManagementService;
-
+  private RegistrationServer registrationServer;
 
   //date format for Expires header (rfc 1123)
   private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyy HH:mm:ss z";
@@ -133,6 +124,8 @@ public class
 
   @Autowired
   private URIService uriService;
+
+
 
   @RequestMapping(value="/", method = RequestMethod.GET)
   public String showIndexPage(){
@@ -693,6 +686,10 @@ public class
     this.linkedDataService = linkedDataService;
   }
 
+  public void setRegistrationServer(final RegistrationServer registrationServer) {
+    this.registrationServer = registrationServer;
+  }
+
   public void setUriService(final URIService uriService)
   {
     this.uriService = uriService;
@@ -735,138 +732,39 @@ public class
     this.connectionResourceURIPath = connectionResourceURIPath;
   }
 
-
-
-
-  private ResponseEntity<String> registerOwner(HttpServletRequest request) {
-
-    // Registration for owner without certificate is not supported:
-    if (request.getAttribute("javax.servlet.request.X509Certificate") == null) {
-      return new ResponseEntity<String>("Certificate not provided - cannot register owner" , HttpStatus.NOT_FOUND);
-    }
-
-    // Prepare certificate and calculated from it owner-id:
-    X509Certificate ownerCert = ((X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate"))
-      [0];
-    String ownerSha1Fingerprint = null;
-    try {
-      ownerSha1Fingerprint = DigestUtils.shaHex(ownerCert.getEncoded());
-    } catch (CertificateEncodingException e) {
-      return new ResponseEntity<String>(e.toString(), HttpStatus.BAD_REQUEST);
-    }
-
-    // Check the trust store, if already exists, return the existing id:
-    if (trustStoreService.isCertKnown(ownerCert)) {
-      logger.info("Cannot register - owner with this certificate is already known!");
-      return new ResponseEntity<String>(ownerSha1Fingerprint, HttpStatus.ALREADY_REPORTED);
-    }
-
-    // TODO the case when its the same physical owner with another certificate we probably cannot detect - we will
-    // just register it with new id. But we could at least check that the owner with the same web-id is not
-    // registered with different certificate already - in that case we should reject registration. For that we
-    // should require that owner certificate contains web-id in alternative names - and this it its turn would
-    // only make sense if owner itself is required to be published as a need.
-
-
-    // If the alias is known but certificate differs, we have a fingerprint collision. We are not accounting
-    // for this case at the moment, we just report an error:
-    Certificate retrieved = trustStoreService.getCertificate(ownerSha1Fingerprint);
-    if (retrieved != null) {
-      String msg = "Owner's fingerprint collision, cannot register - use another certificate!";
-      logger.warn(msg);
-      return new ResponseEntity<String>(msg, HttpStatus.BAD_REQUEST);
-    }
-
-    // Register with fingerprint as owner id
-    String ownerId = null;
-    try {
-      ownerId = ownerManagementService.registerOwnerApplication(ownerSha1Fingerprint);
-    } catch (Exception e) {
-      return new ResponseEntity<String>(e.toString(), HttpStatus.BAD_REQUEST);
-    }
-
-    // Add to the trust store
-    trustStoreService.addCertificate(ownerId, ownerCert);
-    // Return owner id
-    logger.info("Registered owner with id " + ownerId);
-    return new ResponseEntity<String>(ownerId, HttpStatus.OK);
-
-  }
-
-
-  private ResponseEntity<String> registerNode(HttpServletRequest request) {
-
-    // Registration for owner without certificate is not supported:
-    if (request.getAttribute("javax.servlet.request.X509Certificate") == null) {
-      return new ResponseEntity<String>("Certificate not provided - cannot register owner" , HttpStatus.NOT_FOUND);
-    }
-
-    // Prepare certificate
-    X509Certificate nodeCert = ((X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate"))
-      [0];
-
-    // Check the trust store, if already exists, return
-    if (trustStoreService.isCertKnown(nodeCert)) {
-      logger.info("Cannot register - this certificate is already trusted!");
-      return new ResponseEntity<String>(HttpStatus.ALREADY_REPORTED);
-    }
-
-    String alias;
-    try {
-      X500Name dnName = new X500Name(nodeCert.getSubjectDN().getName());
-      alias = dnName.getCommonName();
-      // TODO for web-id do in special call a method smth like...
-      //alias = nodeCert.getSubjectAlternativeNames()...
-    } catch (IOException e) {
-      return new ResponseEntity<String>("No CN or Web-ID name provided in certificate", HttpStatus.BAD_REQUEST);
-    }
-
-    // TODO the case when its the same physical node with another certificate we probably cannot detect
-    // But we could at least check that the node with the same web-id is not
-    // registered with different certificate already - in that case we should return an error.
-    // we should also in this case do the web-id verification check
-    // for now - as we take alias from common name - we check against that, i.e:
-    // If the alias is known but certificate differs, we report an error:
-    Certificate retrieved = trustStoreService.getCertificate(alias);
-    if (retrieved != null) {
-      String msg = "Node is already known under different certificate, cannot trust!";
-      logger.warn(msg);
-      return new ResponseEntity<String>(msg, HttpStatus.BAD_REQUEST);
-    }
-
-    // Add as trusted
-    trustStoreService.addCertificate(alias, nodeCert);
-    // Return owner id
-    logger.info("Added as trusted: " + alias);
-    return new ResponseEntity<String>(alias, HttpStatus.OK);
-
-  }
-
-  //TODO this can be moved into the filter that should be applied on the particular request uri
   @RequestMapping(
     value="${uri.path.resource}",
     method = RequestMethod.POST,
     produces={"text/plain"})
-  public ResponseEntity<String> registerNodeTest(@RequestParam("register") String registeredType, HttpServletRequest
+  public ResponseEntity<String> register(@RequestParam("register") String registeredType, HttpServletRequest
     request) {
 
     logger.info("REGISTER " + registeredType);
-
     String supportedTypesMsg = "Request parameter error; supported 'register' parameter values: 'owner', 'node'";
 
-    if (registeredType == null || registeredType.isEmpty()) {
+    if (registeredType == null) {
       logger.warn(supportedTypesMsg);
       return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
     }
 
-    if (registeredType.equals("owner")) {
-      return registerOwner(request);
+    Object certificateChainObj = request.getAttribute("javax.servlet.request.X509Certificate");
+
+    try {
+      if (registeredType.equals("owner")) {
+        String result = registrationServer.registerOwner(certificateChainObj);
+        return new ResponseEntity<String>(result, HttpStatus.OK);
+      }
+      if (registeredType.equals("node")) {
+        String result = registrationServer.registerNode(certificateChainObj);
+        return new ResponseEntity<String>(result, HttpStatus.OK);
+      } else {
+        logger.warn(supportedTypesMsg);
+        return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
+      }
+    } catch (WonProtocolException e) {
+      logger.warn("Could not register " + registeredType, e);
+      return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    if (registeredType.equals("node")) {
-      return registerNode(request);
-    }
-
-    return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
   }
 }

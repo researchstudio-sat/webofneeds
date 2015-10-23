@@ -28,9 +28,9 @@
          they are searched in other property configurers defined in the context
     -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
-    <import resource="classpath:/spring/component/wonNodeInformationService.xml" />
-    <import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml"/>
-    <import resource="classpath:/spring/component/ehcache/spring-node-ehcache.xml" />
+    <!--import resource="classpath:/spring/component/wonNodeInformationService.xml" /-->
+    <!--import resource="classpath:/spring/component/linkeddatasource/linkeddatasource.xml"/-->
+    <!--import resource="classpath:/spring/component/ehcache/spring-node-ehcache.xml"/-->
 
     <!-- find all message processors -->
     <context:component-scan base-package="won.node.camel.processor.fixed"/>

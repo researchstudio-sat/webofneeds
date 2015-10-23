@@ -17,7 +17,6 @@ import won.cryptography.service.KeyStoreService;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.net.URISyntaxException;
 import java.security.KeyPair;
 import java.security.Security;
 import java.security.cert.Certificate;
@@ -109,7 +108,7 @@ public class TestSigningUtils {
   }
 
 
-  public void generateTestKeystore() throws URISyntaxException, IOException {
+  public void generateTestKeystore() throws Exception {
     Security.addProvider(new BouncyCastleProvider());
     //URL keyUrl = TestSigningUtils.class.getResource(KEYS_FILE);
     File keysFile = null;
@@ -119,7 +118,7 @@ public class TestSigningUtils {
     //  keysFile = new File(TestSigningUtils.class.getResource(KEYS_FILE).getFile());
     //}
 
-    KeyStoreService storeService = new KeyStoreService(keysFile);
+    KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
     storeService.init();
 
     KeyPairService keyPairService = new KeyPairService();
@@ -132,11 +131,11 @@ public class TestSigningUtils {
   }
 
   @Test
-  public void generateKeystoreForNodeAndOwner() throws URISyntaxException, IOException {
+  public void generateKeystoreForNodeAndOwner() throws Exception {
 
     Security.addProvider(new BouncyCastleProvider());
     //KeyStoreService storeServiceOnNode = new KeyStoreService(new File("node-keys.jks"));
-    KeyStoreService storeServiceOnOwner = new KeyStoreService(new File("owner-keys.jks"));
+    KeyStoreService storeServiceOnOwner = new KeyStoreService(new File("owner-keys.jks"), "temp");
     storeServiceOnOwner.init();
     //KeyStoreService storeServiceOnMatcher = new KeyStoreService(new File("matcher-keys.jks"));
     KeyPairService keyPairService = new KeyPairService();
@@ -163,7 +162,7 @@ public class TestSigningUtils {
   public void writeCert() throws IOException, CertificateException {
     //load public  keys:
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    KeyStoreService storeService = new KeyStoreService(keysFile);
+    KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
 
     writeCerificate(storeService, needCertUri, needCertUri);
     writeCerificate(storeService, ownerCertUri, ownerCertUri);
@@ -202,7 +201,7 @@ public class TestSigningUtils {
     KeyPair keyPair = keyPairService.generateNewKeyPairInBrainpoolp384r1();
     BigInteger serialNumber = BigInteger.valueOf(1);
     Certificate cert = certificateService.createSelfSignedCertificate(serialNumber, keyPair, certUri, certUri);
-    storeService.putKey(certUri, keyPair.getPrivate(), new Certificate[]{cert});
+    storeService.putKey(certUri, keyPair.getPrivate(), new Certificate[]{cert}, false);
 
     System.out.println(cert);
     //KeyInformationExtractorBouncyCastle extractor = new KeyInformationExtractorBouncyCastle();
@@ -215,7 +214,7 @@ public class TestSigningUtils {
     BigInteger serialNumber = BigInteger.valueOf(1);
     for (String aliasUri : aliasUris) {
       Certificate cert = certificateService.createSelfSignedCertificate(serialNumber, keyPair, aliasUri, aliasUri);
-      storeService.putKey(aliasUri, keyPair.getPrivate(), new Certificate[]{cert});
+      storeService.putKey(aliasUri, keyPair.getPrivate(), new Certificate[]{cert}, false);
     }
   }
 

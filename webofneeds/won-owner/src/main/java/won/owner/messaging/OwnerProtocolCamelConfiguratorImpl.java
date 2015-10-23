@@ -20,10 +20,11 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
-import org.apache.camel.Endpoint;
+import org.apache.camel.RoutesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.cryptography.ssl.MessagingContext;
 import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
 import won.protocol.exception.CamelConfigurationFailedException;
@@ -33,8 +34,6 @@ import won.protocol.model.MessagingType;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.NeedRepository;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.TrustManager;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,10 +44,13 @@ import java.util.Map;
  * User: LEIH-NB
  * Date: 28.01.14
  */
-public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelConfigurator {
+public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelConfigurator
+{
 
 
     private CamelContext camelContext;
+
+    private MessagingContext messagingContext;
 
     @Autowired
     private NeedRepository needRepository;
@@ -71,14 +73,19 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
 
     }
 
+    //TODO duplicate - see if can be mergerd with needbased - very similar code...
     @Override
     public synchronized final String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI, String ownerProtocolQueueName) throws CamelConfigurationFailedException {
         //TODO: the linked data description of the won node must be at [NODE-URI]/resource
         // according to this code. This should be explicitly defined somewhere
 
-        String tempComponentName = addCamelComponentForWonNodeBroker(wonNodeURI,brokerURI,null);
+        String brokerComponentName = setupBrokerComponentName(brokerURI);
+
+        //addCamelComponentForWonNodeBroker(wonNodeURI,brokerURI,null);
+        addCamelComponentForWonNodeBroker(brokerURI, brokerComponentName);
+
         //TODO: make this configurable
-        String endpoint = tempComponentName+":queue:"+ownerProtocolQueueName;
+        String endpoint = brokerComponentName + ":queue:"+ownerProtocolQueueName;
         endpointMap.put(wonNodeURI,endpoint);
         List<String> endpointList = new ArrayList<>();
         endpointList.add(endpoint);
@@ -87,22 +94,6 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
 
     }
 
-    @Override
-    public synchronized final String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI, String
-      ownerProtocolQueueName, KeyManager km, TrustManager tm) throws CamelConfigurationFailedException {
-        //TODO: the linked data description of the won node must be at [NODE-URI]/resource
-        // according to this code. This should be explicitly defined somewhere
-
-        String tempComponentName = addCamelComponentForWonNodeBroker(wonNodeURI,brokerURI,null, km, tm);
-        //TODO: make this configurable
-        String endpoint = tempComponentName+":queue:"+ownerProtocolQueueName;
-        endpointMap.put(wonNodeURI,endpoint);
-        List<String> endpointList = new ArrayList<>();
-        endpointList.add(endpoint);
-        logger.info("endpoint of wonNodeURI {} is {}",wonNodeURI,endpointMap.get(wonNodeURI));
-        return endpointList.get(0);
-
-    }
 
     @Override
     public synchronized void addRemoteQueueListeners(List<String> endpoints, URI remoteEndpoint) throws CamelConfigurationFailedException {
@@ -140,69 +131,21 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
         return customSchemeEndpoints;
     }
 
-    //todo: the method is activemq specific. refactor it to support other brokers.
-    @Override
-    public synchronized String addCamelComponentForWonNodeBroker(URI wonNodeURI, URI brokerURI, String ownerApplicationId){
-        String componentName;
+    // todo: the method is activemq specific. refactor it to support other brokers.
+    // TODO some duplicate code between here and NeedBasedCamelConfiguratorImpl (setup broker name) - i.e.
+    // this method can probably be shared and owner's configurator can probably extend needbased...
+    public synchronized void addCamelComponentForWonNodeBroker(URI brokerURI, String brokerComponentName){
 
-        if (ownerApplicationId==null){
-            if (!wonNodeURI.equals(URI.create(defaultNodeURI)))
-                componentName = this.componentName+brokerURI.toString().replaceAll("[/:]","");
-            else
-                componentName = this.componentName;
-        }else
-            componentName = this.componentName+ownerApplicationId;
-        if(camelContext.getComponent(componentName,false)!=null){
-            return componentName;
+        if(camelContext.getComponent(brokerComponentName,false)==null){
+            ActiveMQComponent activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent
+              (brokerURI, MessagingType.Queue, messagingContext);
+
+            camelContext.addComponent(brokerComponentName, activeMQComponent);
+
+            logger.info("adding component with component name {}",brokerComponentName);
+            if (!brokerComponentMap.containsKey(brokerURI))
+                brokerComponentMap.put(brokerURI, brokerComponentName);
         }
-
-        ActiveMQComponent activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent
-          (brokerURI, MessagingType.Queue);
-
-        camelContext.addComponent(componentName,activeMQComponent);
-
-        logger.info("adding component with component name {}",componentName);
-        if (!brokerComponentMap.containsKey(wonNodeURI))
-            brokerComponentMap.put(wonNodeURI,componentName);
-        return componentName;
-    }
-
-    public synchronized String addCamelComponentForWonNodeBroker(URI wonNodeURI, URI brokerURI, String
-      ownerApplicationId, KeyManager km, TrustManager tm){
-        String componentName;
-
-//        if (ownerApplicationId==null){
-//            if (!wonNodeURI.equals(URI.create(wonNodeURI)))
-//                componentName = this.componentName+brokerURI.toString().replaceAll("[/:]","");
-//            else
-//                componentName = this.componentName;
-//        }else
-//            componentName = this.componentName+ownerApplicationId;
-
-
-        //if (ownerApplicationId==null){
-        //    if (!wonNodeURI.equals(URI.create(defaultNodeURI)))
-        componentName = this.componentName +brokerURI.toString().replaceAll("[/:]","");
-
-        //    else
-        //        componentName = this.componentName;
-        //}else
-          //  componentName = this.componentName+ownerApplicationId;
-
-
-        if(camelContext.getComponent(componentName,false)!=null){
-            return componentName;
-        }
-
-        ActiveMQComponent activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent
-          (brokerURI, MessagingType.Queue, km, tm);
-
-        camelContext.addComponent(componentName,activeMQComponent);
-
-        logger.info("adding component with component name {}",componentName);
-        if (!brokerComponentMap.containsKey(wonNodeURI))
-            brokerComponentMap.put(wonNodeURI,componentName);
-        return componentName;
     }
 
     @Override
@@ -217,7 +160,8 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
         setStartingEndpoint(wonNodeURI, tempStartingComponentName);
 
         if (camelContext.getComponent(tempStartingComponentName)==null||camelContext.getRoute(endpointMap.get(wonNodeURI))==null){
-            OwnerProtocolDynamicRoutes ownerProtocolRouteBuilder = new OwnerProtocolDynamicRoutes(camelContext, tempStartingComponentName);
+            //OwnerProtocolDynamicRoutes ownerProtocolRouteBuilder = new OwnerProtocolDynamicRoutes(camelContext, tempStartingComponentName);
+            RoutesBuilder ownerProtocolRouteBuilder =  createRoutesBuilder(tempStartingComponentName, wonNodeURI);
             try {
                 camelContext.addRoutes(ownerProtocolRouteBuilder);
             } catch (Exception e) {
@@ -226,6 +170,12 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
         }
 
     }
+
+
+    protected RoutesBuilder createRoutesBuilder(final String startingComponent, final URI brokerUri) {
+        return new OwnerProtocolDynamicRoutes(camelContext, startingComponent);
+    }
+
     @Override
     public String getStartingEndpoint(URI wonNodeURI){
         return startingComponentMap.get(wonNodeURI);
@@ -234,33 +184,6 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     public void setStartingEndpoint(URI wonNodeURI, String startingEndpoint) {
         startingComponentMap.put(wonNodeURI,startingEndpoint);
 
-    }
-
-    public synchronized String replaceEndpointNameWithOwnerApplicationId(String endpointName, String ownerApplicationId) throws Exception {
-        Endpoint ep = camelContext.getEndpoint(endpointName);
-        URI wonNodeUri = endpointMap.inverse().get(endpointName);
-
-        camelContext.removeEndpoints(endpointName);
-        String[] endpointSplit = endpointName.split(":");
-        endpointSplit[0] = endpointSplit[0]+ownerApplicationId;
-        endpointName = endpointSplit[0]+":"+endpointSplit[1]+":"+endpointSplit[2];
-
-        //  endpointName = endpointName.replaceFirst(endpointName,endpointName+ownerApplicationId);
-        camelContext.addEndpoint(endpointName, ep);
-        endpointMap.put(wonNodeUri,endpointName);
-        return endpointName;
-    }
-
-    public synchronized String replaceComponentNameWithOwnerApplicationId(String componentName, String ownerApplicationId){
-        ActiveMQComponent activeMQComponent = (ActiveMQComponent)camelContext.getComponent(componentName);
-        URI wonNodeUri = brokerComponentMap.inverse().get(componentName);
-
-        camelContext.removeComponent(componentName);
-        componentName = this.componentName+ownerApplicationId;
-        camelContext.addComponent(componentName, activeMQComponent);
-        logger.info("component name: "+componentName);
-        brokerComponentMap.put(wonNodeUri, componentName);
-        return componentName;
     }
 
     @Override
@@ -274,14 +197,20 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     }
 
     @Override
+    public void setMessagingContext(MessagingContext messagingContext) {
+        this.messagingContext = messagingContext;
+    }
+
+
+    @Override
     public String getEndpoint(URI wonNodeUri){
        return endpointMap.get(wonNodeUri);
     }
 
-    //TODO: not implemented yet
+    //TODO: duplicate with needbasedcamelconfigimpl...
     @Override
     public String setupBrokerComponentName(URI brokerUri) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return this.componentName+brokerUri.toString().replaceAll("[/:]","");
     }
 
 
@@ -291,8 +220,8 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     }
 
     @Override
-    public String getBrokerComponent(URI resourceUri) {
-        return brokerComponentMap.get(resourceUri);
+    public String getBrokerComponentName(URI brokerUri) {
+        return brokerComponentMap.get(brokerUri);
     }
 
     @Override
