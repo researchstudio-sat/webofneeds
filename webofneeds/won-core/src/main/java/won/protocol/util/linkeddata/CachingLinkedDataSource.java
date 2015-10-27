@@ -66,9 +66,16 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
    * specified URI from the cache
    * @param resource
    */
-  public void removeElement(URI resource) {
+  public void invalidate(URI resource) {
     assert resource != null : "resource must not be null";
     cache.remove(resource);
+  }
+
+  public void invalidate(URI resource, URI requesterWebID) {
+    assert (resource != null && requesterWebID != null) : "resource and requester must not be null";
+    cache.remove(resource);
+    List<URI> key = Arrays.asList(new URI[]{resource, requesterWebID});
+    cache.remove(key);
   }
   
   public void clear(){
@@ -96,15 +103,25 @@ public class CachingLinkedDataSource implements LinkedDataSource, InitializingBe
 
   @Override
   public Dataset getDataForResource(final URI resource, final URI requesterWebID) {
-    assert resource != null : "resource must not be null";
+    assert (resource != null && requesterWebID != null) : "resource and requester must not be null";
     Element element = null;
-    List<URI> key = Arrays.asList(new URI[]{resource, requesterWebID});
 
+    // first try without providing webid - can be a public resource
     try {
-      element = cache.get(key);
+      element = cache.get(resource);
     }catch(CacheException e){
-      logger.debug(String.format("Couldn't fetch resource %s",resource),e);
-      return DatasetFactory.createMem();
+      element = null;
+    }
+
+    // if doesn't work - provide webid
+    if (element == null) {
+      List<URI> key = Arrays.asList(new URI[]{resource, requesterWebID});
+      try {
+        element = cache.get(key);
+      }catch(CacheException e){
+        logger.debug(String.format("Couldn't fetch resource %s",resource),e);
+        return DatasetFactory.createMem();
+      }
     }
 
     Object dataset = element.getObjectValue();

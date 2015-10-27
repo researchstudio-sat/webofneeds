@@ -46,7 +46,6 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
    */
   @Override
   public WonMessage process(final WonMessage wonMessage){
-    //todo: check signatures
     return messageProcessorDelegate.process(wonMessage);
   }
 
