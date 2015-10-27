@@ -93,7 +93,7 @@ public class OwnerWonMessageSenderJMSBased
                                             "via which to send it");
       }
 
-      ownerProtocolCommunicationServiceImpl.register(defaultNodeURI, messagingService);
+      ownerProtocolCommunicationServiceImpl.register(wonNodeUri, messagingService);
 
       List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
       String ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
