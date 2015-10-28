@@ -23,20 +23,11 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
-    <!-- REST stuff
 
-    <context:component-scan base-package="won.protocol.rest">
-        <context:include-filter type="regex" expression="won.protocol.rest.*"/>
-    </context:component-scan>-->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher-service.properties"
                                   ignore-unresolvable="true"/>
 
-    <!--bean id="matcherProtocolCommunicationService"
-    class="won.matcher.protocol.impl.MatcherProtocolCommunicationServiceImpl">
-        <property name="activeMQService" ref="matcherActiveMQService"/>
-        <property name="matcherProtocolCamelConfigurator" ref="matcherProtocolCamelConfigurator"/>
-        <property name="componentName" value="activemq"></property>
-    </bean-->
+
     <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService" init-method="init">
         <constructor-arg type="java.lang.String" value="${keystore.location}" />
         <constructor-arg type="java.lang.String" value="${keystore.password}" />
@@ -46,14 +37,8 @@
         <constructor-arg type="java.lang.String" value="${truststore.location}" />
         <constructor-arg type="java.lang.String" value="${truststore.password}" />
     </bean>
-    <!--bean id="matcherCertificateOnStartupCreator"
-          class="common.service.MatcherCertificateOnStartupCreatorDepr">
-        <property name="cryptographyService" ref="cryptographyService" />
-    </bean-->
-    <bean id="cryptographyService" factory-bean="wonTransmissionService" factory-method="getClientCryptographyService">
-    </bean>
-
-
+    <!-- the service from which one should get all the necessary interfaces to do transmission over network in WON,
+    such as accessing the linked data, registering with Node, signing data for transmission, sending messages with JMS-->
     <bean id="wonTransmissionService" class="won.cryptography.service.DefaultSecurityWonTransmissionService">
         <!-- no server config for matcher -->
         <!--property name="serverKeyStoreService" ref="serverKeyStoreService" /-->
@@ -62,6 +47,16 @@
         <property name="registrationQuery" value="?register=node"></property>
     </bean>
 
+
+    <bean id="cryptographyService" factory-bean="wonTransmissionService" factory-method="getClientCryptographyService">
+    </bean>
+    <bean id="linkedDataSource" class="won.protocol.util.linkeddata.LinkedDataSourceBase" >
+        <property name="linkedDataRestClient">
+            <bean factory-bean="wonTransmissionService" factory-method="getLinkedDataClient"></bean>
+        </property>
+    </bean>
+    <bean id="registrationClient" factory-bean="wonTransmissionService" factory-method="getRegistrationClient">
+    </bean>
     <bean id="messagingContext" factory-bean="wonTransmissionService" factory-method="getClientMessagingContext">
     </bean>
 
