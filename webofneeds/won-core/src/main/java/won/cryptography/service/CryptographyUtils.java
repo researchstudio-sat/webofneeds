@@ -8,8 +8,6 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
-import won.cryptography.depr.WonKeyMaterialDepr;
-import won.cryptography.depr.WonTrustMaterialDepr;
 
 import javax.crypto.Cipher;
 import javax.net.ssl.*;
@@ -19,7 +17,6 @@ import java.security.KeyStore;
  * User: fsalcher
  * Date: 12.06.2014
  */
-//TODO move back to crypto-module?
 public class CryptographyUtils {
 
     public static boolean checkForUnlimitedSecurityPolicy() {
@@ -33,48 +30,6 @@ public class CryptographyUtils {
             return false;
         }
     }
-
-
-  public static RestTemplate createSslRestTemplate(final WonKeyMaterialDepr wonKeyMaterial, final String
-    privateKeyAlias, final WonTrustMaterialDepr
-    wonTrustMaterial, final Integer readTimeout, final Integer connectionTimeout)  throws Exception  {
-    SSLContext sslContext = new SSLContextBuilder().loadKeyMaterial(wonKeyMaterial.getKeyStore(),
-                                                                    wonKeyMaterial.getStorePass().toCharArray(),
-                                                                    wonKeyMaterial.getPrivateKeyStrategy(privateKeyAlias))
-                                                   .loadTrustMaterial(wonTrustMaterial.getTrustStore(), // if
-                                                   // trustStore is null, default CAs trust store is used
-                                                                      wonTrustMaterial.getTrustStrategy())
-                                                   .build();
-    // here in the constructor, also hostname verifier, protocol version, cipher suits, etc. can be specified
-    SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext);
-
-    HttpClient httpClient = HttpClients.custom()//.useSystemProperties()
-      .setSSLSocketFactory(sslConnectionSocketFactory).build();
-    HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-    if (readTimeout != null) {
-      requestFactory.setReadTimeout(readTimeout.intValue());
-    }
-    if (connectionTimeout != null) {
-      requestFactory.setConnectTimeout(connectionTimeout.intValue());
-    }
-    requestFactory.setHttpClient(httpClient);
-
-    RestTemplate restTemplate = new RestTemplate(requestFactory);
-
-    return restTemplate;
-  }
-
-  public static RestTemplate createSslRestTemplate(final WonKeyMaterialDepr wonKeyMaterial, final WonTrustMaterialDepr
-                                                     wonTrustMaterial, final Integer readTimeout, final Integer connectionTimeout)  throws Exception  {
-
-    return createSslRestTemplate(
-      wonKeyMaterial.getKeyStore(),
-      wonKeyMaterial.getStorePass(),
-      wonKeyMaterial.getPrivateKeyStrategy(),
-      wonTrustMaterial.getTrustStore(), // if trustStore is null, default CAs trust store is used
-      wonTrustMaterial.getTrustStrategy(),
-      readTimeout, connectionTimeout);
-  }
 
 
   public static RestTemplate createSslRestTemplate(final KeyStore keyStore, final String ksPass, final
