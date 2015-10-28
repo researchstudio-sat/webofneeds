@@ -43,11 +43,15 @@ public class RoundRobinCompositeNeedProducer extends AbstractCompositeNeedProduc
       lastFactory = factoryIterator.next();
       return lastFactory;
     } else {
+      //iterate until we reach the last used factory
       while (factoryIterator.hasNext() && factoryIterator.next() != lastFactory){}
+      //then, if the iterator has more factories
       if (factoryIterator.hasNext()){
+        //choose the next one after the one we returned last
         this.lastFactory = factoryIterator.next();
         return lastFactory;
       } else {
+        // else choose take the first factory returned by the iteraor (we were at the end of the iterators)
         this.lastFactory = factories.iterator().next();
         return this.lastFactory;
       }

@@ -7,19 +7,12 @@ import akka.cluster.pubsub.DistributedPubSub;
 import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import com.hp.hpl.jena.query.Dataset;
 import common.event.NeedEvent;
-import common.service.SparqlService;
+import common.service.monitoring.MonitoringService;
 import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import won.protocol.util.RdfUtils;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Camel actor represents the need consumer protocol to a won node.
@@ -45,7 +38,7 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
   @Autowired
-  private SparqlService sparqlService;
+  private MonitoringService monitoringService;
 
   public NeedConsumerProtocolActor(String endpoint) {
     this.endpoint = endpoint;
@@ -64,14 +57,17 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
       CamelMessage camelMsg = (CamelMessage) message;
       String needUri = (String) camelMsg.getHeaders().get(MSG_HEADER_NEED_URI);
       String wonNodeUri = (String) camelMsg.getHeaders().get(MSG_HEADER_WON_NODE_URI);
+
+      // monitoring code
+      if (monitoringService.isMonitoringEnabled()) {
+        monitoringService.startClock(MonitoringService.NEED_HINT_STOPWATCH, needUri);
+      }
+
+      // process the incoming need event
       if (needUri != null && wonNodeUri != null) {
         Object methodName = camelMsg.getHeaders().get(MSG_HEADER_METHODNAME);
         if (methodName != null) {
           log.debug("Received event '{}' for needUri '{}' and wonNeedUri '{}'", methodName, needUri, wonNodeUri);
-
-          // save the need
-          Dataset ds = convertBodyToDataset(camelMsg.body(), Lang.TRIG);
-          sparqlService.updateNamedGraphsOfDataset(ds);
 
           // publish an internal need event
           NeedEvent event = null;
@@ -94,11 +90,6 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
       System.out.print("some other message");
     }
     unhandled(message);
-  }
-
-  private Dataset convertBodyToDataset(Object body, Lang lang) {
-    InputStream is = new ByteArrayInputStream(body.toString().getBytes(StandardCharsets.UTF_8));
-    return RdfUtils.toDataset(is, new RDFFormat(lang));
   }
 
 }

@@ -13,7 +13,7 @@ import javax.persistence.*;
 import java.net.URI;
 
 @Entity
-@Table(name = "facet")
+@Table(name = "facet", indexes = { @Index(name = "IDX_FACET_NEEEDURI_TYPEURI", columnList = "needURI, typeURI")})
 public class Facet {
     @Id
     @GeneratedValue

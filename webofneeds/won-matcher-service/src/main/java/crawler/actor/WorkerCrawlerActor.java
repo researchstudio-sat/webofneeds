@@ -4,6 +4,7 @@ import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
+import common.service.http.HttpService;
 import crawler.config.CrawlConfig;
 import crawler.exception.CrawlWrapperException;
 import crawler.msg.CrawlUriMessage;

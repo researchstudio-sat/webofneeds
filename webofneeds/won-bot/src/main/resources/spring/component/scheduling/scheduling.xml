@@ -25,7 +25,7 @@
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
     <bean id="taskScheduler" class="org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler" destroy-method="destroy" >
-        <property name="poolSize" value="15" />
-    </bean>
+    <property name="poolSize" value="15" />
+</bean>
 
 </beans>

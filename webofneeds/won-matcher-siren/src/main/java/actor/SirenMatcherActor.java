@@ -1,76 +1,157 @@
 package actor;
 
-import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
-import akka.cluster.pubsub.DistributedPubSub;
-import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import com.github.jsonldjava.core.JsonLdError;
 import com.hp.hpl.jena.query.Dataset;
-import common.event.HintEvent;
+import common.event.BulkHintEvent;
 import common.event.NeedEvent;
+import config.SirenMatcherConfig;
+import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrDocumentList;
+import org.javasimon.SimonManager;
+import org.javasimon.Split;
+import org.javasimon.Stopwatch;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import siren.indexer.NeedIndexer;
+import siren.matcher.*;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
- * Created by hfriedrich on 24.08.2015.
+ * Created by Soheilk on 24.08.2015.
+ *
+ * Siren/Solr based matcher implementation for querying as well as indexing needs.
  */
+@Component
+@Scope("prototype")
 public class SirenMatcherActor extends UntypedActor
 {
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-  private ActorRef pubSubMediator;
 
-  private List<NeedEvent> needs;
+  @Autowired
+  private SolrServer solrServer;
 
-  public SirenMatcherActor() {
+  @Autowired
+  private SirenMatcherConfig config;
 
-    // subscribe to need events
-    pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
-    pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(NeedEvent.class.getName(), getSelf()), getSelf());
+  @Autowired
+  private HintsBuilder hintBuilder;
 
-    needs = new LinkedList<>();
-  }
+  @Autowired
+  private SIREnQueryExecutor sIREnQueryExecutor;
+
+  @Autowired
+  private SIREnTitleBasedQueryBuilder titleQueryBuilder;
+
+  @Autowired
+  private SIREnDescriptionBasedQueryBuilder descriptionQueryBuilder;
+
+  @Autowired
+  private SIREnTitleAndDescriptionBasedQueryBuilder titleDescriptionQueryBuilder;
+
+  @Autowired
+  private SIREnTitleAndDescriptionAndTagBasedQueryBuilder titleDescriptionTagQueryBuilder;
+
+  @Autowired
+  private NeedIndexer needIndexer;
 
   @Override
   public void onReceive(final Object o) throws Exception {
 
     if (o instanceof NeedEvent) {
-      NeedEvent needEvent = (NeedEvent) o;
-      log.info("NeedEvent received: " + needEvent.getUri());
-      processNeedEvent(needEvent);
+      if (!config.isMonitoringEnabled()){
+
+        NeedEvent needEvent = (NeedEvent) o;
+        Dataset dataset = needEvent.deserializeNeedDataset();
+        queryNeedEvent(needEvent, dataset);
+        indexNeedEvent(needEvent, dataset);
+      }
+      else {
+        NeedEvent needEvent = (NeedEvent) o;
+
+        String matcherOverallName = "Siren-Matcher-Overall";
+        Stopwatch matcherOverallStopwatch = SimonManager.getStopwatch(matcherOverallName);
+        Split matcherOverallSplit = matcherOverallStopwatch.start();
+        String deserlializeStopwatchName = "Deserialization";
+        Stopwatch deserializeStopwatch = SimonManager.getStopwatch(deserlializeStopwatchName);
+        Split deserializeSplit = deserializeStopwatch.start();
+        Dataset dataset = needEvent.deserializeNeedDataset();
+        deserializeSplit.stop();
+        String overallQueryingStopwatchName = "Querying-Overall";
+        Stopwatch overallQueryingStopwatch = SimonManager.getStopwatch(overallQueryingStopwatchName);
+        Split overallQueryingSplit = overallQueryingStopwatch.start();
+        queryNeedEvent(needEvent, dataset);
+        overallQueryingSplit.stop();
+        String overallIndexingStopwatchName = "Indexing-Overall";
+        Stopwatch overallIndexingStopwatch = SimonManager.getStopwatch(overallIndexingStopwatchName);
+        Split overallIndexinggSplit = overallIndexingStopwatch.start();
+        indexNeedEvent(needEvent, dataset);
+        overallIndexinggSplit.stop();
+        matcherOverallSplit.stop();
+      }
     } else {
       unhandled(o);
     }
   }
 
-  private void processNeedEvent(NeedEvent needEvent) {
+  private void queryNeedEvent(NeedEvent needEvent, Dataset dataset)
+    throws QueryNodeException, SolrServerException, IOException, JsonLdError {
 
-    // TODO: put Siren matching code here and create HintEvent or BulkHintEvent objects
-    // ...
-    Dataset ds = needEvent.deserializeNeedDataset();
+    // Reading the need that has to be used for making queries
 
-    if (!needs.isEmpty()) {
-      NeedEvent matchNeed = needs.get(needs.size()-1);
-      HintEvent hintEvent1 = new HintEvent(needEvent.getWonNodeUri(), needEvent.getUri(), matchNeed.getWonNodeUri(),
-                                           matchNeed.getUri(), "http://sirenmatcher", 0.1122);
-      pubSubMediator.tell(new DistributedPubSubMediator.Publish(hintEvent1.getClass().getName(), hintEvent1), getSelf());
+    WoNNeedReader woNNeedReader = new WoNNeedReader();
+    NeedObject needObject = woNNeedReader.readWoNNeedFromDeserializedNeedDataset(dataset, solrServer);
+
+    ArrayList<SolrDocumentList> solrHintDocumentList = new ArrayList<SolrDocumentList>();
+
+    //Here we start to build and execute different SIREn Query Builders
+    if (config.isUseTitleQuery()) {
+      String solrQuery = titleQueryBuilder.sIRENQueryBuilder(needObject);
+      SolrDocumentList docs = sIREnQueryExecutor.execute(solrQuery, solrServer);
+      solrHintDocumentList.add(docs);
     }
 
-    needs.add(needEvent.clone());
+    if (config.isUseDescriptionQuery()) {
+      String solrQuery = descriptionQueryBuilder.sIRENQueryBuilder(needObject);
+      SolrDocumentList docs = sIREnQueryExecutor.execute(solrQuery, solrServer);
+      solrHintDocumentList.add(docs);
+    }
 
-//    // TODO: then send these hints back to sender
-//    // dummy code
-//    HintEvent hintEvent1 = new HintEvent("uri1", "uri2", "uri3", "uri4", "uri5", 0.0);
-//    HintEvent hintEvent2 = new HintEvent("uri11", "uri22", "uri33", "uri44", "uri55", 0.8);
-//    log.info("Publish hint: " + hintEvent1);
-//    pubSubMediator.tell(new DistributedPubSubMediator.Publish(hintEvent1.getClass().getName(), hintEvent1), getSelf());
-//
-//    BulkHintEvent bulkHintEvent = new BulkHintEvent();
-//    bulkHintEvent.addHintEvent(hintEvent1.clone());
-//    bulkHintEvent.addHintEvent(hintEvent2.clone());
-//    log.info("Publish bulk hint event: " + bulkHintEvent);
-//    pubSubMediator.tell(new DistributedPubSubMediator.Publish(bulkHintEvent.getClass().getName(), bulkHintEvent), getSelf());
+    if (config.isUseTitleDescriptionQuery()) {
+      String solrQuery = titleDescriptionQueryBuilder.sIRENQueryBuilder(needObject);
+      SolrDocumentList docs = sIREnQueryExecutor.execute(solrQuery, solrServer);
+      solrHintDocumentList.add(docs);
+    }
+
+    if (config.isUseTitleDescriptionTagQuery()) {
+      String solrQuery = titleDescriptionTagQueryBuilder.sIRENQueryBuilder(needObject);
+      SolrDocumentList docs = sIREnQueryExecutor.execute(solrQuery, solrServer);
+      solrHintDocumentList.add(docs);
+    }
+
+    // create the hints
+    BulkHintEvent bulkHintEvent = hintBuilder.produceFinalNormalizeHints(
+      solrHintDocumentList, needEvent.getUri(), needEvent.getWonNodeUri());
+
+    // publish the hints found
+    log.info("Create {} hints for need {}", bulkHintEvent.getHintEvents().size(), needEvent);
+    if (bulkHintEvent.getHintEvents().size() != 0) {
+      log.debug("Publish bulk hint event: " + bulkHintEvent);
+      getSender().tell(bulkHintEvent, getSelf());
+    }
+  }
+
+  private void indexNeedEvent(NeedEvent needEvent, Dataset dataset) throws IOException, JsonLdError {
+
+    log.info("Add need event content to solr index: " + needEvent);
+    needIndexer.indexer_jsonld_format(dataset);
   }
 
 }

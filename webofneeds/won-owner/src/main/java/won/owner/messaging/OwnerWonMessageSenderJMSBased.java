@@ -93,10 +93,7 @@ public class OwnerWonMessageSenderJMSBased
                                             "via which to send it");
       }
 
-      ownerProtocolCommunicationServiceImpl.register(wonNodeUri, messagingService);
-
-      List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
-      String ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
+      String ownerApplicationId = getOwnerApplicationIdAndRegisterIfNecessary(wonNodeUri);
 
 
       //String ep = camelConfiguration.getEndpoint()
@@ -112,6 +109,13 @@ public class OwnerWonMessageSenderJMSBased
     } catch (Exception e){
       throw new RuntimeException("could not send message", e);
     }
+  }
+
+  private String getOwnerApplicationIdAndRegisterIfNecessary(final URI wonNodeUri) throws Exception {
+    ownerProtocolCommunicationServiceImpl.register(wonNodeUri, messagingService);
+    List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
+    String ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
+    return ownerApplicationId;
   }
 
   //TODO: adding public keys and signing can be removed when it happens in the browser

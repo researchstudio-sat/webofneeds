@@ -22,8 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
+import won.cryptography.service.RegistrationClient;
 import won.cryptography.ssl.MessagingContext;
-import won.cryptography.service.RegistrationRestClientHttps;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -47,6 +47,7 @@ public class WonNodeControllerActor extends UntypedActor
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private ActorRef pubSubMediator;
   private ActorRef crawler;
+  private ActorRef saveNeedActor;
   private Map<String, WonNodeConnection> crawlWonNodes = new HashMap<>();
   private Set<String> skipWonNodeUris = new HashSet<>();
   private Set<String> failedWonNodeUris = new HashSet<>();
@@ -62,7 +63,7 @@ public class WonNodeControllerActor extends UntypedActor
   private WonNodeInformationService wonNodeInformationService;
 
   @Autowired
-  private RegistrationRestClientHttps registrationClient;
+  private RegistrationClient registrationClient;
   @Autowired
   LinkedDataSource linkedDataSource;
   @Autowired
@@ -115,6 +116,10 @@ public class WonNodeControllerActor extends UntypedActor
     // initialize the crawler
     crawler = getContext().actorOf(SpringExtension.SpringExtProvider.get(
       getContext().system()).props(MasterCrawlerActor.class), "MasterCrawlerActor");
+
+    // initialize the need event save actor
+    saveNeedActor = getContext().actorOf(SpringExtension.SpringExtProvider.get(
+      getContext().system()).props(SaveNeedEventActor.class), "SaveNeedEventActor");
   }
 
   /**

@@ -304,12 +304,16 @@
         won.toCompacted = function(longValue) {
             var propertyPath = won.clone(won.constantsReverseLookupTable[longValue]);
             propertyPath[propertyPath.length - 1] += 'Compacted';
+            //console.log('toCompacted ', longValue, propertyPath, won.lookup(won, propertyPath));
             return won.lookup(won, propertyPath);
         }
 
 
         won.clone = function(obj){
-            return JSON.parse(JSON.stringify(obj));
+            if(obj === undefined)
+                return undefined;
+            else
+                return JSON.parse(JSON.stringify(obj));
         }
 
 

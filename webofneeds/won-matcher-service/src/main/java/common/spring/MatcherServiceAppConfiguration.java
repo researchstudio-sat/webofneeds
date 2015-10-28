@@ -16,6 +16,8 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  */
 @Configuration
 @ImportResource({"classpath:/spring/component/matcher-service/ehcache/spring-node-ehcache.xml",
+                 "classpath:/spring/component/monitoring/monitoring-recorder.xml",
+                 "classpath:/spring/component/scheduling/matcher-service-scheduling.xml",
                  "classpath:/spring/component/matcher-service/transmission/matcher-security.xml",
                  "classpath:/spring/component/cryptographyServices.xml",
                  "classpath:/spring/component/wonNodeInformationService.xml"})
