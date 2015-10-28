@@ -48,7 +48,7 @@ docker -H satsrv06:2375 rm matcher_service_int || echo 'No docker container foun
 docker -H satsrv06:2375 run --name=matcher_service_int -d -e "node.host=satsrv06.researchstudio.at" \
 -e "cluster.seed.host=satsrv06.researchstudio.at" \
 -e "uri.sparql.endpoint=http://satsrv06.researchstudio.at:9999/bigdata/namespace/kb/sparql" \
--e "wonNodeController.wonNode.crawl=http://satsrv04.researchstudio.at:8889/won/resource" \
+-e "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8889/won/resource" \
 -p 2551:2551 webofneeds/matcher_service:int
 
 # siren matcher
