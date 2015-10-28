@@ -61,5 +61,31 @@ public class CryptographyUtils {
     return restTemplate;
   }
 
+  public static RestTemplate createSslRestTemplate(TrustStrategy trustStrategy, final Integer readTimeout,
+                                                   final Integer connectionTimeout)  throws Exception  {
+    SSLContext sslContext = new SSLContextBuilder()
+                                                   .loadTrustMaterial(null, // if
+                                                                      // trustStore is null, default CAs trust store is used
+                                                                      trustStrategy)
+                                                   .build();
+    // here in the constructor, also hostname verifier, protocol version, cipher suits, etc. can be specified
+    SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext);
+
+    HttpClient httpClient = HttpClients.custom()//.useSystemProperties()
+      .setSSLSocketFactory(sslConnectionSocketFactory).build();
+    HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+    if (readTimeout != null) {
+      requestFactory.setReadTimeout(readTimeout.intValue());
+    }
+    if (connectionTimeout != null) {
+      requestFactory.setConnectTimeout(connectionTimeout.intValue());
+    }
+    requestFactory.setHttpClient(httpClient);
+
+    RestTemplate restTemplate = new RestTemplate(requestFactory);
+
+    return restTemplate;
+  }
+
 
 }

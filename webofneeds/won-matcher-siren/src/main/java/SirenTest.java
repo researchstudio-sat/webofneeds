@@ -6,12 +6,15 @@ import akka.actor.Props;
 import com.hp.hpl.jena.query.Dataset;
 import common.actor.DeadLetterActor;
 import common.event.NeedEvent;
-import common.service.http.HttpService;
 import common.spring.SpringExtension;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import spring.MatcherSirenAppConfiguration;
+import won.cryptography.ssl.TrustAnyCertificateStrategy;
+import won.protocol.rest.LinkedDataRestClientHttpsServerOnly;
+import won.protocol.util.linkeddata.LinkedDataSourceBase;
 
 import java.io.IOException;
+import java.net.URI;
 
 /**
  * Created by hfriedrich on 11.09.2015.
@@ -34,8 +37,15 @@ public class SirenTest
     String wonUri = args[0]; // e.g. "http://satsrv07.researchstudio.at:8889/won/resource";
     String testUri = args[1]; // e.g. "http://satsrv07.researchstudio.at:8889/won/resource/need/lwxlqr555dsewtuyx2io";
 
-    HttpService httpRequestService = new HttpService();
-    Dataset ds = httpRequestService.requestDataset(testUri);
+    // if https is used, use https URIs and HTTPS rest client:
+    //String wonUri = "https://satsrv05.researchstudio.at:8889/won/resource";
+    //String testUri = "https://satsrv05.researchstudio.at:8889/won/resource/need/xbuwdvqk7nkheydlfzwp";
+    LinkedDataSourceBase linkedDataSource = new LinkedDataSourceBase();
+    LinkedDataRestClientHttpsServerOnly restClient = new LinkedDataRestClientHttpsServerOnly(new TrustAnyCertificateStrategy());
+    restClient.initialize();
+    linkedDataSource.setLinkedDataRestClient(restClient);
+
+    Dataset ds = linkedDataSource.getDataForResource(URI.create(testUri));
     NeedEvent needEvent = new NeedEvent(testUri, wonUri, NeedEvent.TYPE.CREATED, ds);
 
     // send event to matcher implementation
