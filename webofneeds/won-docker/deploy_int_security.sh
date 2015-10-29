@@ -51,6 +51,7 @@ docker -H satsrv04:2375 rm wonnode_int || echo 'No docker container found to rem
 docker -H satsrv04:2375 run --name=wonnode_int -d -e "uri.host=satsrv04.researchstudio.at" -e "http.port=8889" -e \
 "activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 \
 -v /home/install/won-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/volumes/wonnode_int:/usr/local/tomcat/won/conf/keys/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
@@ -62,6 +63,7 @@ docker -H satsrv05:2375 rm wonnode_int || echo 'No docker container found to rem
 docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv05.researchstudio.at" -e "http.port=8889" \
 -e "activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 \
 -v /home/install/won-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/volumes/wonnode_int:/usr/local/tomcat/won/conf/keys/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
@@ -74,6 +76,7 @@ docker -H satsrv04:2375 rm owner_int || echo 'No docker container found to remov
 docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.researchstudio.at" \
 -e "node.default.http.port=8889" -p 8082:8443 \
 -v /home/install/won-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/volumes/owner_int:/usr/local/tomcat/won/conf/keys/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
@@ -85,6 +88,7 @@ docker -H satsrv05:2375 rm owner_int || echo 'No docker container found to remov
 docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv05.researchstudio.at" \
 -e "node.default.http.port=8889" -p 8082:8443 \
 -v /home/install/won-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/volumes/owner_int:/usr/local/tomcat/won/conf/keys/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
@@ -103,7 +107,9 @@ docker -H satsrv06:2375 run --name=matcher_service_int -d -e "node.host=satsrv06
 -e "cluster.seed.host=satsrv06.researchstudio.at" \
 -e "uri.sparql.endpoint=http://satsrv06.researchstudio.at:10000/bigdata/namespace/kb/sparql" \
 -e "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8889/won/resource,https://satsrv05.researchstudio.at:8889/won/resource" \
--e "cluster.local.port=2561" -e "cluster.seed.port=2561" -p 2561:2561 webofneeds/matcher_service:int
+-e "cluster.local.port=2561" -e "cluster.seed.port=2561" -p 2561:2561 \
+-v /home/install/volumes/matcher_service_int:/usr/src/matcher-service/conf/keys \
+webofneeds/matcher_service:int
 
 # siren solr server
 docker -H satsrv06:2375 pull webofneeds/sirensolr
