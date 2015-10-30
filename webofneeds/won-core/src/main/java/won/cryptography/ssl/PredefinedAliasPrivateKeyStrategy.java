@@ -30,7 +30,7 @@ public class PredefinedAliasPrivateKeyStrategy implements PrivateKeyStrategy
   }
 
   public String chooseAlias(final Map<String, PrivateKeyDetails> map, final Socket socket) {
-    logger.info("Choosen alias: " + alias);
+    logger.debug("Choosen alias: " + alias);
     return alias;
   }
 }
