@@ -10,6 +10,8 @@ import common.event.BulkHintEvent;
 import common.event.HintEvent;
 import common.event.NeedEvent;
 import common.spring.SpringExtension;
+import config.SirenMatcherConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +31,9 @@ public class MatcherPubSubActor extends UntypedActor
   private ActorRef pubSubMediator;
   private ActorRef matcherActor;
 
+  @Autowired
+  private SirenMatcherConfig config;
+
   @Override
   public void preStart() {
 
@@ -37,8 +42,13 @@ public class MatcherPubSubActor extends UntypedActor
     pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(NeedEvent.class.getName(), getSelf()), getSelf());
 
     // create the querying and indexing actors that do the actual work
-    matcherActor = getContext().actorOf(SpringExtension.SpringExtProvider.get(
-      getContext().system()).fromConfigProps(SirenMatcherActor.class), "SirenMatcherPool");
+    if (config.isMonitoringEnabled()) {
+      matcherActor = getContext().actorOf(SpringExtension.SpringExtProvider.get(
+        getContext().system()).fromConfigProps(SirenMonitoringMatcherActor.class), "SirenMatcherPool");
+    } else {
+      matcherActor = getContext().actorOf(SpringExtension.SpringExtProvider.get(
+        getContext().system()).fromConfigProps(SirenMatcherActor.class), "SirenMatcherPool");
+    }
   }
 
   @Override

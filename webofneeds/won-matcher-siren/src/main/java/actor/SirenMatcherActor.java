@@ -12,9 +12,6 @@ import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
-import org.javasimon.SimonManager;
-import org.javasimon.Split;
-import org.javasimon.Stopwatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -66,81 +63,68 @@ public class SirenMatcherActor extends UntypedActor
   public void onReceive(final Object o) throws Exception {
 
     if (o instanceof NeedEvent) {
-      if (!config.isMonitoringEnabled()){
-
         NeedEvent needEvent = (NeedEvent) o;
-        Dataset dataset = needEvent.deserializeNeedDataset();
-        queryNeedEvent(needEvent, dataset);
-        indexNeedEvent(needEvent, dataset);
-      }
-      else {
-        NeedEvent needEvent = (NeedEvent) o;
-
-        String matcherOverallName = "Siren-Matcher-Overall";
-        Stopwatch matcherOverallStopwatch = SimonManager.getStopwatch(matcherOverallName);
-        Split matcherOverallSplit = matcherOverallStopwatch.start();
-        String deserlializeStopwatchName = "Deserialization";
-        Stopwatch deserializeStopwatch = SimonManager.getStopwatch(deserlializeStopwatchName);
-        Split deserializeSplit = deserializeStopwatch.start();
-        Dataset dataset = needEvent.deserializeNeedDataset();
-        deserializeSplit.stop();
-        String overallQueryingStopwatchName = "Querying-Overall";
-        Stopwatch overallQueryingStopwatch = SimonManager.getStopwatch(overallQueryingStopwatchName);
-        Split overallQueryingSplit = overallQueryingStopwatch.start();
-        queryNeedEvent(needEvent, dataset);
-        overallQueryingSplit.stop();
-        String overallIndexingStopwatchName = "Indexing-Overall";
-        Stopwatch overallIndexingStopwatch = SimonManager.getStopwatch(overallIndexingStopwatchName);
-        Split overallIndexinggSplit = overallIndexingStopwatch.start();
-        indexNeedEvent(needEvent, dataset);
-        overallIndexinggSplit.stop();
-        matcherOverallSplit.stop();
-      }
+        processNeedEvent(needEvent);
     } else {
       unhandled(o);
     }
   }
 
-  private void queryNeedEvent(NeedEvent needEvent, Dataset dataset)
-    throws QueryNodeException, SolrServerException, IOException, JsonLdError {
+  protected void processNeedEvent(NeedEvent needEvent)
+    throws IOException, QueryNodeException, SolrServerException, JsonLdError {
 
-    // Reading the need that has to be used for making queries
+    Dataset dataset = deserializeNeed(needEvent);
+    NeedObject needObject = buildNeedObject(dataset);
+    String query = buildSirenQuery(needObject);
+    SolrDocumentList docs = executeSirenQuery(query);
+    BulkHintEvent hints = produceHints(docs, needEvent);
+    publishHints(hints, needEvent);
+    indexNeedEvent(needEvent, dataset);
+  }
+
+  protected Dataset deserializeNeed(NeedEvent needEvent) throws IOException {
+    Dataset dataset = needEvent.deserializeNeedDataset();
+    return dataset;
+  }
+
+  protected NeedObject buildNeedObject(Dataset dataset) {
 
     WoNNeedReader woNNeedReader = new WoNNeedReader();
     NeedObject needObject = woNNeedReader.readWoNNeedFromDeserializedNeedDataset(dataset, solrServer);
+    return needObject;
+  }
+
+  protected String buildSirenQuery(NeedObject needObject) throws IOException, QueryNodeException {
+
+    String solrQuery = null;
+    if (config.isUseTitleQuery()) {
+      solrQuery = titleQueryBuilder.sIRENQueryBuilder(needObject);
+    } else if (config.isUseDescriptionQuery()) {
+      solrQuery = descriptionQueryBuilder.sIRENQueryBuilder(needObject);
+    } else if (config.isUseTitleDescriptionQuery()) {
+      solrQuery = titleDescriptionQueryBuilder.sIRENQueryBuilder(needObject);
+    } else if (config.isUseTitleDescriptionTagQuery()) {
+      solrQuery = titleDescriptionTagQueryBuilder.sIRENQueryBuilder(needObject);
+    }
+
+    return solrQuery;
+  }
+
+  protected SolrDocumentList executeSirenQuery(String query) throws SolrServerException {
+    return sIREnQueryExecutor.execute(query, solrServer);
+  }
+
+  protected BulkHintEvent produceHints(SolrDocumentList docs, NeedEvent needEvent) {
 
     ArrayList<SolrDocumentList> solrHintDocumentList = new ArrayList<SolrDocumentList>();
-
-    //Here we start to build and execute different SIREn Query Builders
-    if (config.isUseTitleQuery()) {
-      String solrQuery = titleQueryBuilder.sIRENQueryBuilder(needObject);
-      SolrDocumentList docs = sIREnQueryExecutor.execute(solrQuery, solrServer);
-      solrHintDocumentList.add(docs);
-    }
-
-    if (config.isUseDescriptionQuery()) {
-      String solrQuery = descriptionQueryBuilder.sIRENQueryBuilder(needObject);
-      SolrDocumentList docs = sIREnQueryExecutor.execute(solrQuery, solrServer);
-      solrHintDocumentList.add(docs);
-    }
-
-    if (config.isUseTitleDescriptionQuery()) {
-      String solrQuery = titleDescriptionQueryBuilder.sIRENQueryBuilder(needObject);
-      SolrDocumentList docs = sIREnQueryExecutor.execute(solrQuery, solrServer);
-      solrHintDocumentList.add(docs);
-    }
-
-    if (config.isUseTitleDescriptionTagQuery()) {
-      String solrQuery = titleDescriptionTagQueryBuilder.sIRENQueryBuilder(needObject);
-      SolrDocumentList docs = sIREnQueryExecutor.execute(solrQuery, solrServer);
-      solrHintDocumentList.add(docs);
-    }
-
-    // create the hints
+    solrHintDocumentList.add(docs);
     BulkHintEvent bulkHintEvent = hintBuilder.produceFinalNormalizeHints(
       solrHintDocumentList, needEvent.getUri(), needEvent.getWonNodeUri());
+    return bulkHintEvent;
+  }
 
-    // publish the hints found
+  protected void publishHints(BulkHintEvent bulkHintEvent, NeedEvent needEvent) {
+
     log.info("Create {} hints for need {}", bulkHintEvent.getHintEvents().size(), needEvent);
     if (bulkHintEvent.getHintEvents().size() != 0) {
       log.debug("Publish bulk hint event: " + bulkHintEvent);
@@ -148,7 +132,7 @@ public class SirenMatcherActor extends UntypedActor
     }
   }
 
-  private void indexNeedEvent(NeedEvent needEvent, Dataset dataset) throws IOException, JsonLdError {
+  protected void indexNeedEvent(NeedEvent needEvent, Dataset dataset) throws IOException, JsonLdError {
 
     log.info("Add need event content to solr index: " + needEvent);
     needIndexer.indexer_jsonld_format(dataset);

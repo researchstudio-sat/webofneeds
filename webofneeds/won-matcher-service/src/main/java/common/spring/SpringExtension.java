@@ -50,6 +50,18 @@ public class SpringExtension extends
     }
 
     /**
+     * Create a Props for the specified actorClass and additional parameters using the
+     * SpringActorProducer class.
+     *
+     * @param actorClass  class of an actor
+     * @param params additional parameters for actor creation
+     * @return a Props that will create the named actor bean using Spring
+     */
+    public Props props(final Class<? extends Actor> actorClass, Object... params) {
+      return Props.create(SpringActorProducer.class, applicationContext, actorClass, params);
+    }
+
+    /**
      * Create Props from the configuration file for the specified actorClass using the
      * SpringActorProducer class.
      *
@@ -69,19 +81,8 @@ public class SpringExtension extends
      * @return a Props that will create the named actor bean using Spring
      */
     public Props fromConfigProps(final Class<? extends Actor> actorClass, Object... params) {
-      return FromConfig.getInstance().props(Props.create(SpringActorProducer.class, applicationContext, actorClass));
-    }
-
-    /**
-     * Create a Props for the specified actorClass and additional parameters using the
-     * SpringActorProducer class.
-     *
-     * @param actorClass  class of an actor
-     * @param params additional parameters for actor creation
-     * @return a Props that will create the named actor bean using Spring
-     */
-    public Props props(final Class<? extends Actor> actorClass, Object... params) {
-      return Props.create(SpringActorProducer.class, applicationContext, actorClass, params);
+      return FromConfig.getInstance().props(
+        Props.create(SpringActorProducer.class, applicationContext, actorClass, params));
     }
   }
 }
