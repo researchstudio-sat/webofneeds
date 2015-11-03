@@ -30,10 +30,9 @@ export const actionTypes = tree2constants({
             thumbnail: null,
         },
         delete: null,
-        select: null
-    },
-    ownpost: {
-        new: null,
+        select: null,
+        publish: null,
+        notifyOfSuccessfulPublish: null //triggered by server
     },
     moreWub: null
 });

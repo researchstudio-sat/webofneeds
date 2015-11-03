@@ -60,8 +60,27 @@ const drafts = createReducer(
             const stateWithDraft = guaranteeDraftExistence(state, draftId);
             console.log('changed thumbnail ', image);
             return stateWithDraft.setIn([draftId, 'thumbnail'], Immutable.fromJS(image));
-        }
+        },
 
+        /**
+         * @param {*} draftId : the draft to be published
+         */
+        [actionTypes.drafts.change.publish]: (state, {payload:{draftId}}) => {
+            //TODO use json-ld for state
+            let d = state.get(draftId);
+            if(!d) {
+                return state;
+            } else {
+                return state.setIn([draftId, 'publishState'], 'awaitingSending'); //TODO codify message-states
+            }
+        },
+        /**
+         * @param {*} draftId : the draft that has been published
+         */
+        [actionTypes.drafts.notifyOfSuccessfulPublish]: (state, {payload:{draftId}}) => {
+            console.log('reducers.js: received successful-publish action from app-server');
+            return state.remove(draftId);
+        }
 
         //TODO delete draft once it's completely empty
         //TODO init drafts from server
@@ -83,6 +102,40 @@ function guaranteeDraftExistence(drafts, draftId) {
         return drafts.set(draftId, defaultDraft);
     }
 }
+/*
+const ownposts = createReducer(
+    //initial state
+    Immutable.Map(),
+
+    //handlers
+    {
+        [actionTypes.drafts.notifyOfSuccessfulPublish]: (state, {payload:{draftId}}) => {
+            return state;
+        }
+    }
+);
+*/
+
+/**
+ * This is a convenience reducer/part of the state that holds a
+ * list [( msgRendererFunction, pathToArgs )]
+ */
+    /*
+const pendingMessages = createReducer(
+    //initial state
+    Immutable.List(),
+
+    //handlers
+    {
+        [actionTypes.ownposts.new]: (state, payload) => {
+            const {type, title, thumbnail} = payload;
+
+
+        }
+    }
+);
+*/
+
 
 /* note that `combineReducers` is opinionated as a root reducer for the
  * sake of convenience and ease of first use. It takes an object
