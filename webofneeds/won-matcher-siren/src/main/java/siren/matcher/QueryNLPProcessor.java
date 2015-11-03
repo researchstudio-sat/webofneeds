@@ -4,6 +4,7 @@ import opennlp.tools.postag.POSModel;
 import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.tokenize.Tokenizer;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +16,7 @@ import java.util.regex.Pattern;
 /**
  * Created by soheilk on 01.09.2015.
  */
+@Component
 public class QueryNLPProcessor {
     Tokenizer tokenizer = SimpleTokenizer.INSTANCE;
     POSTaggerME posTagger = null;
@@ -43,7 +45,8 @@ public class QueryNLPProcessor {
     }
 
     /**
-     * Extract tokens that are words of type nouns, adjectives or forgein words and have length > 1 from a text
+     * Extract tokens that are words of type nouns, adjectives or forgein words and have length > 1 from a text.
+     * NOTE: This method uses pos-tagger and is supposed to be slower than the extractWordTokens()
      *
      * @param text
      * @return

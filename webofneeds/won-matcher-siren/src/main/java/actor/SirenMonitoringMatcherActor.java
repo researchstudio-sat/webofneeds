@@ -60,12 +60,23 @@ public class SirenMonitoringMatcherActor extends SirenMatcherActor
     return needObject;
   }
 
-  protected String buildSirenQuery(NeedObject needObject) throws IOException, QueryNodeException {
+  protected void extractTerms(NeedObject needObject) {
+
+    Stopwatch stopwatch = SimonManager.getStopwatch("extractTerms");
+    Split split = stopwatch.start();
+
+    super.extractTerms(needObject);
+
+    split.stop();
+  }
+
+  protected String buildSirenQuery(NeedObject needObject, String[] titleTerms,
+                                   String[] descriptionTerms, String[] tagTerms) throws QueryNodeException, IOException {
 
     Stopwatch stopwatch = SimonManager.getStopwatch("buildSirenQuery");
     Split split = stopwatch.start();
 
-    String query = super.buildSirenQuery(needObject);
+    String query = super.buildSirenQuery(needObject, titleTerms, descriptionTerms, tagTerms);
 
     split.stop();
     return query;

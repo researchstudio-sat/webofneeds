@@ -45,19 +45,14 @@ public class SirenMatcherActor extends UntypedActor
   private SIREnQueryExecutor sIREnQueryExecutor;
 
   @Autowired
-  private SIREnTitleBasedQueryBuilder titleQueryBuilder;
-
-  @Autowired
-  private SIREnDescriptionBasedQueryBuilder descriptionQueryBuilder;
-
-  @Autowired
-  private SIREnTitleAndDescriptionBasedQueryBuilder titleDescriptionQueryBuilder;
-
-  @Autowired
-  private SIREnTitleAndDescriptionAndTagBasedQueryBuilder titleDescriptionTagQueryBuilder;
-
-  @Autowired
   private NeedIndexer needIndexer;
+
+  protected String[] titleTerms;
+  protected String[] descriptionTerms;
+  protected String[] tagTerms;
+
+  @Autowired
+  QueryNLPProcessor qNLPP;
 
   @Override
   public void onReceive(final Object o) throws Exception {
@@ -75,10 +70,15 @@ public class SirenMatcherActor extends UntypedActor
 
     Dataset dataset = deserializeNeed(needEvent);
     NeedObject needObject = buildNeedObject(dataset);
-    String query = buildSirenQuery(needObject);
+    extractTerms(needObject);
+    String query = buildSirenQuery(needObject, titleTerms, descriptionTerms, tagTerms);
     SolrDocumentList docs = executeSirenQuery(query);
-    BulkHintEvent hints = produceHints(docs, needEvent);
-    publishHints(hints, needEvent);
+
+    if (docs != null) {
+      BulkHintEvent hints = produceHints(docs, needEvent);
+      publishHints(hints, needEvent);
+    }
+
     indexNeedEvent(needEvent, dataset);
   }
 
@@ -94,17 +94,38 @@ public class SirenMatcherActor extends UntypedActor
     return needObject;
   }
 
-  protected String buildSirenQuery(NeedObject needObject) throws IOException, QueryNodeException {
+  protected void extractTerms(NeedObject needObject) {
 
+    titleTerms = new String[0];
+    descriptionTerms = new String[0];
+    tagTerms = new String[0];
+    titleTerms = qNLPP.extractWordTokens(needObject.getNeedTitle());
+    descriptionTerms = qNLPP.extractWordTokens(needObject.getNeedDescription());
+    tagTerms = qNLPP.extractWordTokens(needObject.getNeedTag());
+  }
+
+  protected String buildSirenQuery(NeedObject needObject, String[] titleTerms,
+                                   String[] descriptionTerms, String[] tagTerms)
+    throws IOException, QueryNodeException {
+
+    SirenQueryBuilder queryBuilder = new SirenQueryBuilder(needObject, config.getConsideredQueryTokens());
     String solrQuery = null;
+
     if (config.isUseTitleQuery()) {
-      solrQuery = titleQueryBuilder.sIRENQueryBuilder(needObject);
+      queryBuilder.addTitleTerms(titleTerms);
+      solrQuery = queryBuilder.build();
     } else if (config.isUseDescriptionQuery()) {
-      solrQuery = descriptionQueryBuilder.sIRENQueryBuilder(needObject);
+      queryBuilder.addDescriptionTerms(descriptionTerms);
+      solrQuery = queryBuilder.build();
     } else if (config.isUseTitleDescriptionQuery()) {
-      solrQuery = titleDescriptionQueryBuilder.sIRENQueryBuilder(needObject);
+      queryBuilder.addTitleTerms(titleTerms);
+      queryBuilder.addDescriptionTerms(descriptionTerms);
+      solrQuery = queryBuilder.build();
     } else if (config.isUseTitleDescriptionTagQuery()) {
-      solrQuery = titleDescriptionTagQueryBuilder.sIRENQueryBuilder(needObject);
+      queryBuilder.addTitleTerms(titleTerms);
+      queryBuilder.addTagTerms(tagTerms);
+      queryBuilder.addDescriptionTerms(descriptionTerms);
+      solrQuery = queryBuilder.build();
     }
 
     return solrQuery;
