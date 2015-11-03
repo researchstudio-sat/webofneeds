@@ -1,6 +1,6 @@
 @import 'math';
 
-@mixin _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $hpos) {
+@mixin _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $pos) {
   background-color: $background-color;
   position: relative; // to allow positioning the triangle-parts as absolute
 
@@ -26,86 +26,89 @@
   }
 }
 
+
+@function sizeOfSquare($triangle-height) {
+  $sizeSq: stripUnit(2 * $triangle-height * $triangle-height);
+  @return sqrt($sizeSq) * extractUnit($triangle-height);
+}
+
 /**
- * a hacky solution to the speech-bubble-triangle using :before and :after
- * based on:
- * * http://nicolasgallagher.com/pure-css-speech-bubbles/
- * * http://ilikepixels.co.uk/drop/bubbler/
- *
- * @param $triangleSize: needs to be an absolute value (that can be added to the 1px border-width)
- * @param $hpos: a %-value determining where on the top edge the triangle is placed.
+ * @param $triangleSize: the height of the the speech-bubble-triangle
+ * @param $pos: a %-value determining where on the top edge the triangle is placed.
  */
-@mixin speech-bubble-top($background-color, $border-color, $triangle-height, $border-width: 1px, $hpos: 50%) {
-  @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $hpos);
+@mixin speech-bubble-top($background-color, $border-color, $triangle-height, $border-width: 1px, $pos: 50%) {
+  @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $pos);
 
   &:after {
-    left: $hpos;
+    left: $pos;
     transform: rotate(45deg);
 
-    $sizeSq: stripUnit(2 * $triangle-height * $triangle-height);
-    $size: sqrt($sizeSq) * extractUnit($triangle-height);
-
     /*
     it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
     sure the center's at the upper edge of the container.
     */
-    top: -$size/2;
+    top: - sizeOfSquare($triangle-height)/2;
   }
 }
 
-@mixin speech-bubble-bottom($background-color, $border-color, $triangle-height, $border-width: 1px, $hpos: 50%) {
-  @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $hpos);
+/**
+ * @param $triangleSize: the height of the the speech-bubble-triangle
+ * @param $pos: a %-value determining where on the edge the bottom edge triangle is placed.
+ */
+@mixin speech-bubble-bottom($background-color, $border-color, $triangle-height, $border-width: 1px, $pos: 50%) {
+  @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $pos);
 
   &:after {
-    left: $hpos;
+    left: $pos;
     transform: rotate(225deg);
 
-    $sizeSq: stripUnit(2 * $triangle-height * $triangle-height);
-    $size: sqrt($sizeSq) * extractUnit($triangle-height);
-
     /*
     it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
     sure the center's at the upper edge of the container.
     */
-    bottom: -$size/2;
+    bottom: - sizeOfSquare($triangle-height)/2;
   }
 }
-@mixin speech-bubble-left($background-color, $border-color, $triangle-height, $border-width: 1px, $hpos: 50%) {
-  @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $hpos);
+
+/**
+ * @param $triangleSize: the height of the the speech-bubble-triangle
+ * @param $pos: a %-value determining where on the edge the left edge triangle is placed.
+ */
+@mixin speech-bubble-left($background-color, $border-color, $triangle-height, $border-width: 1px, $pos: 50%) {
+  @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $pos);
 
   &:after {
-    top: $hpos;
+    top: $pos;
     transform: rotate(-45deg);
 
-    $sizeSq: stripUnit(2 * $triangle-height * $triangle-height);
-    $size: sqrt($sizeSq) * extractUnit($triangle-height);
-
     /*
     it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
     sure the center's at the upper edge of the container.
     */
-    left: -$size/2;
+    left: - sizeOfSquare($triangle-height)/2;
   }
 }
-@mixin speech-bubble-right($background-color, $border-color, $triangle-height, $border-width: 1px, $hpos: 50%) {
-  @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $hpos);
+
+/**
+ * @param $triangleSize: the height of the the speech-bubble-triangle
+ * @param $pos: a %-value determining where on the edge the right edge triangle is placed.
+ */
+@mixin speech-bubble-right($background-color, $border-color, $triangle-height, $border-width: 1px, $pos: 50%) {
+  @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $pos);
 
   &:after {
-    top: $hpos;
+    top: $pos;
     transform: rotate(135deg);
-
-    $sizeSq: stripUnit(2 * $triangle-height * $triangle-height);
-    $size: sqrt($sizeSq) * extractUnit($triangle-height);
 
     /*
     it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
     sure the center's at the upper edge of the container.
     */
-    right: -$size/2;
+    right: - sizeOfSquare($triangle-height)/2;
   }
 }
 
