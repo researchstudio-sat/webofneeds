@@ -28,12 +28,38 @@ const drafts = createReducer(
 
     //handlers
     {
+        /**
+         * @param {*} draftId : the draft that's type has changed
+         * @param {string} type : the short-hand won-type (e.g. `'won:Demand'`)
+         */
         [actionTypes.drafts.change.type]: (state, {payload:{draftId, type}}) => {
+            //TODO use json-ld for state
             const stateWithDraft = guaranteeDraftExistence(state, draftId);
             return type ?
                 stateWithDraft.setIn([draftId, 'type'], type) :
                 stateWithDraft.deleteIn([draftId, 'type'])
 
+        },
+        /**
+         * @param {*} draftId : the draft that's title has changed
+         * @param {string} title : any user-entered text, e.g. `'I am moving and need a new couch.'`
+         */
+        [actionTypes.drafts.change.title]: (state, {payload:{draftId, title}}) => {
+            //TODO use json-ld for state
+            const stateWithDraft = guaranteeDraftExistence(state, draftId);
+            return title ?
+                stateWithDraft.setIn([draftId, 'title'], title) :
+                stateWithDraft.deleteIn([draftId, 'title'])
+        },
+        /**
+         * @param {*} draftId : the draft that's thumbnail has changed
+         * @param {object} image : e.g. `{ name: 'somepic.png', type: 'image/png', data: 'iVBORw0...gAAI1=' }`
+         */
+        [actionTypes.drafts.change.thumbnail]: (state, {payload:{draftId, image}}) => {
+            //TODO use json-ld for state
+            const stateWithDraft = guaranteeDraftExistence(state, draftId);
+            console.log('changed thumbnail ', image);
+            return stateWithDraft.setIn([draftId, 'thumbnail'], Immutable.fromJS(image));
         }
 
 

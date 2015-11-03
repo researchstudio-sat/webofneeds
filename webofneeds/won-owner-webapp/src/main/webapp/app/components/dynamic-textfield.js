@@ -146,12 +146,12 @@ function genComponentConf() {
             maxChars: '=',
             /*
              * Usage:
-             *  on-input="myCallback(value)"
+             *  on-input="myCallback(value, valid)"
              */
             onInput: '&',
             /*
              * Usage:
-             *  on-input="myCallback(value)"
+             *  on-input="myCallback(value, valid)"
              */
             onChange: '&',
         },

@@ -45,6 +45,7 @@ class CreateNeedController {
         attach(this, serviceDependencies, arguments);
 
         this.postTypeTexts = postTypeTexts;
+        this.characterLimit = 140; //TODO move to conf
 
         //TODO debug; deleteme
         window.cnc = this;
@@ -55,24 +56,39 @@ class CreateNeedController {
 
         const selectFromState = (state) => ({
             draftId: state.getIn(['router','currentParams','draftId']),
+
+            //TODO for debugging; deletme
             drafts: state.get('drafts'),
             wubs: state.get('wubs'),
         });
 
+        /*
+        TODO does selectFromState make sure to foregoe updates when the
+        data that is selected hasn't changed?. Otherwise we need to access
+        the state directy (as it's an immutablejs structure)
+        */
         // Using actionCreators like this means that every action defined there is available in the template.
         const unsubscribe = this.$ngRedux.connect(selectFromState, actionCreators)(this);
         this.$scope.$on('$destroy', unsubscribe);
+    }
+    isValid(){
+        const draft = this.$ngRedux.getState().getIn(['drafts', this.draftId]);
+        if(!draft) return false;
 
+        const type = draft.get('type');
+        const title = draft.get('title');
+
+        return type && title && title.length < this.characterLimit;
     }
 
     selectType(typeIdx) {
         console.log('selected type ', postTypeTexts[typeIdx].type);
         //const draftIdx = this.drafts.get('activeDraftIdx');
-        this.drafts__change__type({draftId: this.draftId, type: postTypeTexts[typeIdx].type}); //TODO proper draft idx
+        this.drafts__change__type({draftId: this.draftId, type: postTypeTexts[typeIdx].type}); //TODO proper draft idx in URL
     }
     unselectType() {
         console.log('unselected type ');
-        this.drafts__change__type({draftId: this.draftId, type: undefined}); //TODO proper draft idx
+        this.drafts__change__type({draftId: this.draftId, type: undefined}); //TODO proper draft idx in URL
     }
     titlePicZoneNg() {
         if(!this._titlePicZone) {

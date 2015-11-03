@@ -5,6 +5,9 @@
 <main class="create-post">
     <div class="cp__inner">
 
+        <button ng-click="self.moreWub(1)">MOAR WUB!</button>
+        <button ng-click="self.moreWub(3)">3 MOAR WUB!</button>
+        <p>{{ self.wubs.toArray() }}</p>
         <p>DBG Draft: {{self.drafts.get(self.draftId).toJS()}}</p>
 
         <won-posttype-select
@@ -13,30 +16,16 @@
                 on-unselect="::self.unselectType()">
         </won-posttype-select>
 
-        <button ng-click="self.moreWub(1)">MOAR WUB!</button>
-        <button ng-click="self.moreWub(3)">3 MOAR WUB!</button>
-        <p>{{ self.wubs.toArray() }}</p>
-
-        <!--
-        <select name="select" class="cp__typeselect2">
-            <option value="value1">Value 1</option>
-            <option value="value2" selected>Value 2</option>
-            <option value="value3">Value 3</option>
-        </select>
-        -->
-
         <div class="cp__mandatory-rest">
-            <won-image-dropzone></won-image-dropzone>
-            <won-dynamic-textfield placeholder="::'What'" max-chars="::140"></won-dynamic-textfield>
-            <!--
-            <div class="cp__m__title">
-                <div class="cp__m__t__shortdescription" contenteditable ng-click="">What</div>
-                <span class="cp__m__t__charcount">140 Chars left</span>
-            </div>
-            -->
+            <won-image-dropzone
+                    on-image-picked="::self.drafts__change__thumbnail({draftId: self.draftId, image: image})">
+            </won-image-dropzone>
+            <won-dynamic-textfield
+                    placeholder="::'What'"
+                    max-chars="::self.characterLimit"
+                    on-input="::self.drafts__change__title({draftId: self.draftId, title: value})">
+            </won-dynamic-textfield>
         </div>
-
-
 
         <!--
         <div>
@@ -93,7 +82,7 @@
         <won-labelled-hr label="::'or'"></won-labelled-hr>
         -->
 
-        <button type="submit" class="won-button--filled red">Publish</button>
+        <button type="submit" class="won-button--filled red" ng-show="self.isValid()">Publish</button>
 
     </div>
 </main>
