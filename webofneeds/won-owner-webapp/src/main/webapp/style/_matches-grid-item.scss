@@ -100,7 +100,7 @@ won-matches-grid-item {
       }
     }
 
-    @include speech-bubble-bottom($won-light-gray, $won-line-gray, 10px, 50%);
+    @include speech-bubble-bottom($won-light-gray, $won-line-gray, 10px, 1px, 50%);
   }
 
   .mgi__match {
