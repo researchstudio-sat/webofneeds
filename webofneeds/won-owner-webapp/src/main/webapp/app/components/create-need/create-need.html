@@ -5,7 +5,7 @@
 <main class="create-post">
     <div class="cp__inner">
 
-        <button ng-click="self.moreWub(1)">MOAR WUB!</button>
+        <button ng-click="self.moreWub(1);self.delayedWub(1, 1000);">1+1 MOAR WUB!</button>
         <button ng-click="self.moreWub(3)">3 MOAR WUB!</button>
         <p>{{ self.wubs.toArray() }}</p>
         <p>DBG Draft: {{self.drafts.get(self.draftId).toJS()}}</p>
