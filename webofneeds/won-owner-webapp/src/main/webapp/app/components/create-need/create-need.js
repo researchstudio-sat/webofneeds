@@ -62,7 +62,7 @@ class CreateNeedController {
             state: state,
 
             //TODO for debugging; deletme
-            drafts: state.get('drafts'),
+            //drafts: state.get('drafts'),
             wubs: state.get('wubs'),
         });
 
@@ -80,6 +80,9 @@ class CreateNeedController {
 
          //@select:: doublewubs: state.get('wubs').concat(state.get('wubs'))
          //this.$scope.$watch(() => this.doublewubs, () => console.log('cnc doublewubs watch ', this.doublewubs.toJS()));
+
+         UPDATE: we can use the memoized selectors provides by the reselect-library
+         http://rackt.org/redux/docs/recipes/ComputingDerivedData.html
          */
     }
     isValid(){

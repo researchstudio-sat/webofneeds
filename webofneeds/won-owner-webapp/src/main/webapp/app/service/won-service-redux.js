@@ -16,22 +16,44 @@ import { attach } from '../utils';
 //import './message-service'; //TODO still uses es5
 
 const serviceDependencies = ['$ngRedux', /*injections as strings here*/];
-class Service {
+class AgentService {
     static factory (/* arguments <- serviceDependencies */) {
-      return new Service(arguments);
+      return new AgentService(...arguments);
     }
     constructor(/* arguments <- serviceDependencies */) {
         attach(this, serviceDependencies, arguments);
 
+        window.as = this; //TODO deletme; for debugging
+
+        const selectFromState = (state) => ({
+            //draftId: state.getIn(['router','currentParams','draftId']),
+
+            //filter for drafts that need to be published and only send diff?
+            // or use the referential message-que? list: [[msgtransformer, argselectors...]]
+
+        });
+
+
+        //const unsubscribe = this.$ngRedux.connect(selectFromState, actionCreators)(this);
+
+        const unsubscribe = this.$ngRedux.subscribe(() => {
+            const state = selectFromState(this.$ngRedux.getState());
+            console.log('won-service-redux - updated draft?');
+
+        });
+
+        //function to put watches on interesting parts of the tree
+        //watch(state, ['path','to','property'], callbackFunction)
+        //watch(() => watcheObject, callbackFunction)
     }
 
 
 }
-Service.factory.$inject = serviceDependencies;
+AgentService.factory.$inject = serviceDependencies;
 
 
 
-export default angular.module('won.owner.service.wonserviceredux', [
+export default angular.module('won.owner.wonservice', [
     ])
-    .factory('wonServiceRedux', Service.factory)
+    .factory('wonServiceRedux', AgentService.factory)
     .name
