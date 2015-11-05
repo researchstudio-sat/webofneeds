@@ -13,6 +13,7 @@
  */
 
 import { attach } from '../utils';
+//import './message-service'; //TODO still uses es5
 
 const serviceDependencies = ['$ngRedux', /*injections as strings here*/];
 class Service {
@@ -30,6 +31,7 @@ Service.factory.$inject = serviceDependencies;
 
 
 
-export default angular.module('won.owner.service.messageserviceredux', [])//.factory('messageService', function ($http, $q,$log, $rootScope, $interval, $location) {
-    .factory('messageServiceRedux', Service.factory)
+export default angular.module('won.owner.service.wonserviceredux', [
+    ])
+    .factory('wonServiceRedux', Service.factory)
     .name
