@@ -14,6 +14,8 @@ import imageDropzoneModule from '../image-dropzone';
 import { attach } from '../../utils';
 import { actionCreators }  from '../../actions';
 
+import messageServiceReduxModule from '../../service/message-service-redux';
+
 const postTypeTexts = [
     {
         type: won.WON.BasicNeedTypeDemandCompacted,
@@ -38,7 +40,7 @@ const postTypeTexts = [
 ]
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
-const serviceDependencies = ['$q', '$ngRedux', '$scope'/*'$routeParams' /*injections as strings here*/];
+const serviceDependencies = ['$q', '$ngRedux', '$scope', 'messageServiceRedux'/*'$routeParams' /*injections as strings here*/];
 
 class CreateNeedController {
     constructor(/* arguments <- serviceDependencies */) {
@@ -110,6 +112,7 @@ export default angular.module('won.owner.components.createNeed', [
         labelledHrModule,
         dynamicTextfieldModule,
         imageDropzoneModule,
+        messageServiceReduxModule,
     ])
     //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
     .controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
