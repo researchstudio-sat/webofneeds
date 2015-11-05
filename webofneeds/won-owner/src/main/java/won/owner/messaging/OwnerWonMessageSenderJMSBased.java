@@ -104,27 +104,7 @@ public class OwnerWonMessageSenderJMSBased
                                             "via which to send it");
       }
 
-      List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
-      String ownerApplicationId;
-      /**
-       * if owner application is not connected to any won node, register owner application to the node with wonNodeURI.
-       */
-      //CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint
-      //  (wonNodeUri, null);
-      if (wonNodeList.size() == 0) {
-        //todo: methods of ownerProtocolActiveMQService might have some concurrency issues. this problem will be resolved in the future, and this code here shall be revisited then.
-        ownerApplicationId = register(wonNodeUri);
-        configureRemoteEndpointsForOwnerApplication(ownerApplicationId,
-                ownerProtocolCommunicationServiceImpl.getProtocolCamelConfigurator()
-                        .getEndpoint(wonNodeUri));
-        logger.debug("registered ownerappID: " + ownerApplicationId);
-        wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
-      } else {
-        //todo refactor with register()
-        //TODO what happens with persistent WonNodeRepository? shouldn't camel configured again?
-        //camelContext.getComponent()
-        ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
-      }
+      String ownerApplicationId = getOwnerApplicationIdAndRegisterIfNecessary(wonNodeUri);
 
       Map<String, Object> headerMap = new HashMap<>();
       headerMap.put("ownerApplicationID", ownerApplicationId);
@@ -137,6 +117,31 @@ public class OwnerWonMessageSenderJMSBased
     } catch (Exception e){
       throw new RuntimeException("could not send message", e);
     }
+  }
+
+  private synchronized String getOwnerApplicationIdAndRegisterIfNecessary(final URI wonNodeUri) throws Exception {
+    List<WonNode> wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
+    String ownerApplicationId;
+    /**
+     * if owner application is not connected to any won node, register owner application to the node with wonNodeURI.
+     */
+    //CamelConfiguration camelConfiguration = ownerProtocolCommunicationServiceImpl.configureCamelEndpoint
+    //  (wonNodeUri, null);
+    if (wonNodeList.size() == 0) {
+      //todo: methods of ownerProtocolActiveMQService might have some concurrency issues. this problem will be resolved in the future, and this code here shall be revisited then.
+      ownerApplicationId = register(wonNodeUri);
+      configureRemoteEndpointsForOwnerApplication(ownerApplicationId,
+              ownerProtocolCommunicationServiceImpl.getProtocolCamelConfigurator()
+                      .getEndpoint(wonNodeUri));
+      logger.debug("registered ownerappID: " + ownerApplicationId);
+      wonNodeList = wonNodeRepository.findByWonNodeURI(wonNodeUri);
+    } else {
+      //todo refactor with register()
+      //TODO what happens with persistent WonNodeRepository? shouldn't camel configured again?
+      //camelContext.getComponent()
+      ownerApplicationId = wonNodeList.get(0).getOwnerApplicationID();
+    }
+    return ownerApplicationId;
   }
 
   //TODO: adding public keys and signing can be removed when it happens in the browser

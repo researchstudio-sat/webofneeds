@@ -11,7 +11,7 @@ import com.hp.hpl.jena.query.Dataset;
 import common.event.BulkHintEvent;
 import common.event.HintEvent;
 import common.event.WonNodeEvent;
-import common.service.HttpRequestService;
+import common.service.http.HttpService;
 import common.spring.SpringExtension;
 import crawler.actor.MasterCrawlerActor;
 import crawler.msg.CrawlUriMessage;
@@ -45,6 +45,7 @@ public class WonNodeControllerActor extends UntypedActor
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private ActorRef pubSubMediator;
   private ActorRef crawler;
+  private ActorRef saveNeedActor;
   private Map<String, WonNodeConnection> crawlWonNodes = new HashMap<>();
   private Set<String> skipWonNodeUris = new HashSet<>();
   private Set<String> failedWonNodeUris = new HashSet<>();
@@ -54,14 +55,13 @@ public class WonNodeControllerActor extends UntypedActor
   private WonNodeSparqlService sparqlService;
 
   @Autowired
-  private HttpRequestService httpRequestService;
+  private HttpService httpService;
 
   @Autowired
   private WonNodeControllerConfig config;
 
   @Autowired
   private WonNodeInformationService wonNodeInformationService;
-
 
   @Override
   public void preStart() {
@@ -101,6 +101,10 @@ public class WonNodeControllerActor extends UntypedActor
     // initialize the crawler
     crawler = getContext().actorOf(SpringExtension.SpringExtProvider.get(
       getContext().system()).props(MasterCrawlerActor.class), "MasterCrawlerActor");
+
+    // initialize the need event save actor
+    saveNeedActor = getContext().actorOf(SpringExtension.SpringExtProvider.get(
+      getContext().system()).props(SaveNeedEventActor.class), "SaveNeedEventActor");
   }
 
   /**
@@ -208,7 +212,7 @@ public class WonNodeControllerActor extends UntypedActor
     WonNodeConnection con = null;
     try {
       // request the resource and save the data
-      Dataset ds = httpRequestService.requestDataset(wonNodeUri);
+      Dataset ds = httpService.requestDataset(wonNodeUri);
       sparqlService.updateNamedGraphsOfDataset(ds);
       WonNodeInfo nodeInfo = sparqlService.getWonNodeInfoFromDataset(ds);
 

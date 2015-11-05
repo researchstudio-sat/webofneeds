@@ -38,6 +38,7 @@ public class TriggeredBot extends ScheduledActionBot
       public void run()
       {
         try {
+          logger.info("=>>> TRIGGER FIRE");
           TriggeredBot.this.act();
         } catch (Exception e) {
           logger.warn("caught exception during triggered execution of act()", e);
@@ -51,6 +52,8 @@ public class TriggeredBot extends ScheduledActionBot
    * @return
    */
   protected boolean isTriggerDone(){
+
+    logger.info("TRIGGER STOPPED1");
     return this.scheduledExecution.isDone();
   }
 
@@ -62,6 +65,7 @@ public class TriggeredBot extends ScheduledActionBot
   @Override
   protected void doShutdown()
   {
+    logger.info("TRIGGER STOPPED2");
     this.scheduledExecution.cancel(true);
     doShutdownCustom();
   }
@@ -69,7 +73,9 @@ public class TriggeredBot extends ScheduledActionBot
   /**
    * Override this method to do shutdown work.
    */
-  protected void doShutdownCustom() {};
+  protected void doShutdownCustom() {
+    logger.info("TRIGGER STOPPED5");
+  };
 
   /**
    * Overrides the inherited method so as to also cancel the trigger when
@@ -78,12 +84,14 @@ public class TriggeredBot extends ScheduledActionBot
   @Override
   protected void workIsDone()
   {
+    logger.info("TRIGGER STOPPED3");
     this.cancelTrigger();
     super.workIsDone();
   }
 
   protected void cancelTrigger()
   {
+    logger.info("TRIGGER STOPPED4");
     scheduledExecution.cancel(true);
   }
 

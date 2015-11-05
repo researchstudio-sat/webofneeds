@@ -253,12 +253,12 @@ public class WonRdfUtils
      * @return a match object or null if the message is not a hint message.
      */
     public static Match toMatch(final WonMessage wonMessage) {
-      if (!WONMSG.TYPE_HINT.equals(wonMessage.getMessageType())){
+      if (!WONMSG.TYPE_HINT.equals(wonMessage.getMessageType().getResource())){
         return null;
       }
       Match match = new Match();
       match.setFromNeed(wonMessage.getReceiverNeedURI());
-      match.setToNeed(wonMessage.getSenderURI());
+
       Dataset messageContent = wonMessage.getMessageContent();
 
       RDFNode score = RdfUtils.findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
@@ -269,7 +269,7 @@ public class WonRdfUtils
       RDFNode counterpart = RdfUtils.findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
         WON.HAS_MATCH_COUNTERPART);
       if (!counterpart.isResource()) return null;
-      match.setToNeed(URI.create(score.asResource().getURI()));
+      match.setToNeed(URI.create(counterpart.asResource().getURI()));
       return match;
     }
 

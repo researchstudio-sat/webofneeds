@@ -71,28 +71,26 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
 
     //TODO: create a proper exception if a facet is not supported by a need
     if(facetRepository.findByNeedURIAndTypeURI(needURI, facetURI).isEmpty()) throw new RuntimeException("Facet is not supported by Need: " + facetURI);
-
-    List<Connection> connections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
-    Connection con = getConnection(connections, facetURI, connectionEventType);
-
-    if (con == null) {
-      /* Create connection */
-      con = new Connection();
-      //create and set new uri
-      con.setConnectionURI(wonNodeInformationService.generateConnectionURI(
-        wonNodeInformationService.getWonNodeUri(needURI)));
-    }
-
+  /* Create connection */
+    Connection con = new Connection();
+    //create and set new uri
+    con.setConnectionURI(wonNodeInformationService.generateConnectionURI(
+      wonNodeInformationService.getWonNodeUri(needURI)));
     con.setNeedURI(needURI);
-    if(con.getState()!=null){
-      con.setState(con.getState().transit(connectionEventType));
-    }else{
-      con.setState(connectionState);
-    }
+    con.setState(connectionState);
     con.setRemoteNeedURI(otherNeedURI);
     con.setRemoteConnectionURI(otherConnectionURI);
     con.setTypeURI(facetURI);
-    con = connectionRepository.save(con);
+    try {
+      con = connectionRepository.save(con);
+    } catch (Exception e){
+      //we assume the unique key constraint on needURI, remoteNeedURI, typeURI was violated: we have to perform an
+      // update, not an insert
+      logger.warn("caught exception, assuming unique key constraint on needURI, remoteNeedURI, typeURI was violated" +
+                    ". Throwing a ConnectionAlreadyExistsException. TODO: think about handling this exception " +
+                    "separately", e);
+      throw new ConnectionAlreadyExistsException(con.getConnectionURI(),needURI, otherNeedURI);
+    }
     return con;
   }
 

@@ -63,7 +63,7 @@ public class MasterCrawlerActor extends UntypedActor
   public void preStart() {
 
     // Create the router/pool with worker actors that do the actual crawling
-    crawlingWorker = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).props(WorkerCrawlerActor.class), "CrawlingRouter");
+    crawlingWorker = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).fromConfigProps(WorkerCrawlerActor.class), "CrawlingRouter");
 
     // create a single meta data update actor for all worker actors
     updateMetaDataWorker = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).props(UpdateMetadataActor.class), "MetaDataUpdateWorker");

@@ -42,7 +42,7 @@ public class SignalWorkDoneAction extends BaseEventBotAction
   @Override
   protected void doRun(Event event) throws Exception
   {
-    logger.debug("signaling that the bot's work is done");
+    logger.info("signaling that the bot's work is done");
     getEventListenerContext().workIsDone();
     getEventListenerContext().getEventBus().publish(new WorkDoneEvent(this.bot));
   }

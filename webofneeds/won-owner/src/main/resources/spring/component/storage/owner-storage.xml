@@ -70,6 +70,20 @@
         <property name="packagesToScan" value="won.owner.model, won.protocol.model" />
     </bean>
 
+    <!-- Session factory -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="hibernateProperties">
+            <props>
+                <!-- set a custom hibernate postgres dialect to create indices for foreign keys automatically -->
+                <prop key="hibernate.dialect">won.protocol.util.hibernate.Postgres9WithFKIndicesDialect</prop>
+
+                <prop key="hbm2ddl.auto">create</prop>
+                <prop key="hibernate.show_sql">true</prop>
+            </props>
+        </property>
+    </bean>
+
     <!-- Configure transaction management -->
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory" />
