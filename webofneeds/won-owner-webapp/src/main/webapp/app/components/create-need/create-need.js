@@ -16,6 +16,7 @@ import { actionCreators }  from '../../actions';
 
 import wonServiceReduxModule from '../../service/won-service-redux';
 
+
 const postTypeTexts = [
     {
         type: won.WON.BasicNeedTypeDemandCompacted,
@@ -58,20 +59,28 @@ class CreateNeedController {
 
         const selectFromState = (state) => ({
             draftId: state.getIn(['router','currentParams','draftId']),
+            state: state,
 
             //TODO for debugging; deletme
             drafts: state.get('drafts'),
             wubs: state.get('wubs'),
         });
 
-        /*
-        TODO does selectFromState make sure to foregoe updates when the
-        data that is selected hasn't changed?. Otherwise we need to access
-        the state directy (as it's an immutablejs structure)
-        */
         // Using actionCreators like this means that every action defined there is available in the template.
         const unsubscribe = this.$ngRedux.connect(selectFromState, actionCreators)(this);
         this.$scope.$on('$destroy', unsubscribe);
+
+        /*
+         does selectFromState make sure to foregoe updates when the
+         data that is selected hasn't changed?. Otherwise we need to access
+         the state directy (as it's an immutablejs structure)
+         -> *nope* -> only use get operations in the selection above (so the
+         object reference isn't changed and $watch doesn't trigger) -> just
+         pass whole state and select in the template to avoid the boilderplate?
+
+         //@select:: doublewubs: state.get('wubs').concat(state.get('wubs'))
+         //this.$scope.$watch(() => this.doublewubs, () => console.log('cnc doublewubs watch ', this.doublewubs.toJS()));
+         */
     }
     isValid(){
         const draft = this.$ngRedux.getState().getIn(['drafts', this.draftId]);
