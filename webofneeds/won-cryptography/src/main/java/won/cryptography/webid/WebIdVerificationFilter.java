@@ -112,7 +112,7 @@ public class WebIdVerificationFilter implements Filter
   X509Certificate[] certChain) throws IOException {
     boolean presented = false;
     if (certChain != null && certChain.length > 0) {
-      logger.info("" + certChain[0].toString());
+      logger.debug("" + certChain[0].toString());
       presented = true;
     } else {
       logger.warn("No cerificate provided! Access denied");

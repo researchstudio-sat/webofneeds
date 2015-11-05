@@ -28,6 +28,12 @@ docker -H satsrv05:2375 build -t webofneeds/matcher_siren:int $WORKSPACE/webofne
 docker -H satsrv06:2375 build -t webofneeds/matcher_siren:int $WORKSPACE/webofneeds/won-docker/matcher-siren/
 docker -H satsrv07:2375 build -t webofneeds/matcher_siren:int $WORKSPACE/webofneeds/won-docker/matcher-siren/
 
+# wonnode/owner server certificate generator
+docker -H satsrv04:2375 build -t webofneeds/gencert:int $WORKSPACE/webofneeds/won-docker/gencert/
+docker -H satsrv05:2375 build -t webofneeds/gencert:int $WORKSPACE/webofneeds/won-docker/gencert/
+docker -H satsrv06:2375 build -t webofneeds/gencert:int $WORKSPACE/webofneeds/won-docker/gencert/
+docker -H satsrv07:2375 build -t webofneeds/gencert:int $WORKSPACE/webofneeds/won-docker/gencert/
+
 
 # start the won containers on dedicated servers of the cluster
 echo run docker containers:
@@ -45,13 +51,33 @@ docker -H satsrv05:2375 run --name=postgres_int -d -p 5433:5432 webofneeds/postg
 
 sleep 10
 
+# wonnode/owner server certificate generator
+# Please note that value of PASS should be the same used in your server.xml for SSLPassword on wonnode and owner,
+# and the same as activemq.broker.keystore.password used in your wonnode activemq spring configurations for broker
+docker -H satsrv04:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
+docker -H satsrv04:2375 run --name=gencert_int -e CN="satsrv04.researchstudio.at" -e "PASS=changeit" \
+-v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert
+docker -H satsrv05:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
+docker -H satsrv05:2375 run --name=gencert_int -e CN="satsrv05.researchstudio.at" -e "PASS=changeit" \
+-v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert
+docker -H satsrv06:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
+docker -H satsrv06:2375 run --name=gencert_int -e CN="satsrv06.researchstudio.at" -e "PASS=changeit" \
+-v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert
+docker -H satsrv07:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
+docker -H satsrv07:2375 run --name=gencert_int -e CN="satsrv07.researchstudio.at" -e "PASS=changeit" \
+-v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert
+
+
+sleep 5
+
+
 # wonnode 1
 docker -H satsrv04:2375 stop wonnode_int || echo 'No docker container found to stop with name: wonnode_int'
 docker -H satsrv04:2375 rm wonnode_int || echo 'No docker container found to remove with name: wonnode_int'
 docker -H satsrv04:2375 run --name=wonnode_int -d -e "uri.host=satsrv04.researchstudio.at" -e "http.port=8889" -e \
 "activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 \
--v /home/install/won-certs:/usr/local/tomcat/conf/ssl/ \
--v /home/install/volumes/wonnode_int:/usr/local/tomcat/won/conf/keys/ \
+-v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/won-client-certs/wonnode_int:/usr/local/tomcat/won/conf/keys/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
@@ -62,8 +88,8 @@ docker -H satsrv05:2375 stop wonnode_int || echo 'No docker container found to s
 docker -H satsrv05:2375 rm wonnode_int || echo 'No docker container found to remove with name: wonnode_int'
 docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv05.researchstudio.at" -e "http.port=8889" \
 -e "activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 \
--v /home/install/won-certs:/usr/local/tomcat/conf/ssl/ \
--v /home/install/volumes/wonnode_int:/usr/local/tomcat/won/conf/keys/ \
+-v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/won-client-certs/wonnode_int:/usr/local/tomcat/won/conf/keys/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
@@ -75,8 +101,8 @@ docker -H satsrv04:2375 stop owner_int || echo 'No docker container found to sto
 docker -H satsrv04:2375 rm owner_int || echo 'No docker container found to remove with name: owner_int'
 docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.researchstudio.at" \
 -e "node.default.http.port=8889" -p 8082:8443 \
--v /home/install/won-certs:/usr/local/tomcat/conf/ssl/ \
--v /home/install/volumes/owner_int:/usr/local/tomcat/won/conf/keys/ \
+-v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/won-client-certs/owner_int:/usr/local/tomcat/won/conf/keys/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
@@ -87,8 +113,8 @@ docker -H satsrv05:2375 stop owner_int || echo 'No docker container found to sto
 docker -H satsrv05:2375 rm owner_int || echo 'No docker container found to remove with name: owner_int'
 docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv05.researchstudio.at" \
 -e "node.default.http.port=8889" -p 8082:8443 \
--v /home/install/won-certs:/usr/local/tomcat/conf/ssl/ \
--v /home/install/volumes/owner_int:/usr/local/tomcat/won/conf/keys/ \
+-v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/won-client-certs/owner_int:/usr/local/tomcat/won/conf/keys/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
@@ -108,7 +134,7 @@ docker -H satsrv06:2375 run --name=matcher_service_int -d -e "node.host=satsrv06
 -e "uri.sparql.endpoint=http://satsrv06.researchstudio.at:10000/bigdata/namespace/kb/sparql" \
 -e "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8889/won/resource,https://satsrv05.researchstudio.at:8889/won/resource" \
 -e "cluster.local.port=2561" -e "cluster.seed.port=2561" -p 2561:2561 \
--v /home/install/volumes/matcher_service_int:/usr/src/matcher-service/conf/keys \
+-v /home/install/won-client-certs/matcher_service_int:/usr/src/matcher-service/conf/keys \
 webofneeds/matcher_service:int
 
 # siren solr server

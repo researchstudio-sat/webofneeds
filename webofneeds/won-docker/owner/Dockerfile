@@ -38,8 +38,6 @@ ADD ./setenv.sh /usr/local/tomcat/bin/
 
 # configure tomcat for ssl
 ADD ./ssl/server.xml /usr/local/tomcat/conf/
-ADD ./ssl/t-cert.pem /usr/local/tomcat/conf/ssl/
-ADD ./ssl/t-key.pem /usr/local/tomcat/conf/ssl/
 
 RUN mkdir -p /usr/local/tomcat/won/conf/keys/
 
