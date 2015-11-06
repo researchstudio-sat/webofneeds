@@ -55,6 +55,28 @@ const actionHierarchy = {
         )
 }
 
+
+/*
+const setLoading = createAction('SET_LOADING')
+const setUser = createAction('SET_USER')
+const unsetLoading = createAction('UNSET_LOADING')
+
+function login(credentials) {
+    return function(dispatch) {
+        dispatch(loggingIn());
+
+        authenticate(credentials)
+            .then(user => {
+                dispatch(batchActions([
+                    setUser(user),
+                    unsetLoading()
+                ]))
+            })
+    })
+}
+}
+*/
+
 //as string constans, e.g. actionTypes.drafts.change.type === "drafts.change.type"
 export const actionTypes = tree2constants(actionHierarchy);
 
@@ -94,7 +116,7 @@ export const actionCreators = Object.freeze(flattenTree(
 
 function createActionCreator(type) {
     return (payload) => {
-        console.log('creating instance of actionType ', type, ' with payload: ', payload);
+        console.debug('creating instance of actionType ', type, ' with payload: ', payload);
         return {type, payload};
     };
 }
