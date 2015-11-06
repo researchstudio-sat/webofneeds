@@ -108,6 +108,6 @@ function delay(milliseconds) {
 /*
  * TODO deletme; for debugging
  */
-window.actionCreators = actionCreators;
-window.actionTypes = actionTypes;
+window.actionCreators4Dbg = actionCreators;
+window.actionTypes4Dbg = actionTypes;
 
