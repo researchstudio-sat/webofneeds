@@ -58,7 +58,7 @@
         <property name="transmissionConfig" ref="wonSecurityConfig"/>
     </bean-->
 
-    <bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" >
+    <bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingAllButListsLinkedDataSource" >
         <property name="linkedDataRestClient">
             <bean factory-bean="wonTransmissionService" factory-method="getLinkedDataClient"></bean>
         </property>
