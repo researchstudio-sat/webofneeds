@@ -34,6 +34,8 @@ class AgentService {
         });
 
 
+        //https://github.com/tshelburne/redux-batched-actions snippet for 'pending' state
+
         //const unsubscribe = this.$ngRedux.connect(selectFromState, actionCreators)(this);
 
         const unsubscribe = this.$ngRedux.subscribe(() => {

@@ -32,9 +32,15 @@ const actionHierarchy = {
             thumbnail: injDefault,
         },
         delete: injDefault,
-        select: injDefault,
-        publish: injDefault,
-        notifyOfSuccessfulPublish: injDefault //triggered by server
+
+        // use this action creator (drafts__publish__call) to initiate the process
+        publish: publishDraft,
+        setPublish: {
+            // the following three are triggered (a)synchronously to cause state-updates
+            pending: injDefault, //triggered by `publish`-action creator
+            successful: injDefault, //triggered by server-callback
+            failed: injDefault, //triggered by server-callback
+        }
     },
     router: {
         stateGo,
@@ -56,26 +62,51 @@ const actionHierarchy = {
 }
 
 
-/*
-const setLoading = createAction('SET_LOADING')
-const setUser = createAction('SET_USER')
-const unsetLoading = createAction('UNSET_LOADING')
+/* WORK IN PROGRESS */
+//import wonServiceFoo from './service/won-service';//testfile';//won-service';
+//window.wonServiceFoo = wonServiceFoo;
+function publishDraft(draftId)  {
+    return (dispatch) => { //using the thunk-middleware for asynchronity
 
-function login(credentials) {
-    return function(dispatch) {
-        dispatch(loggingIn());
+        /*
+         * TODO: get access to state? (or pass whole draft info along with draftId?)
+         */
 
-        authenticate(credentials)
-            .then(user => {
-                dispatch(batchActions([
-                    setUser(user),
-                    unsetLoading()
-                ]))
-            })
-    })
+        /*
+         *  TODO get access to services required for asyncPublish
+         *
+         *  - remove angular dependencies from message & linked data service (or move most
+         *  of their stuff to a seperate file and only retain a thin shell for compatibility
+         *  with the old app)
+         *   -> merge first with yanas work!!!
+         *
+         *  - publish the basic angular services globally (thus introducing a tight
+         *  coupling of angular into the new code)
+         *  - republish the service methods / make service publish itself (thus only
+         *  introducing a single point of coupling)
+         *
+         *  - wrap actions.js and reducers.js in angular-services
+         *
+         *  - use commonjs/amd export -> doesn't work due to jspm loading everything
+         *    when 'won.owner' isn't yet defined.
+         *
+         *  - have reexport.js that loads angular and all services and exports them
+         *    -> probably will have same problem
+         */
+
+        const PLACEHOLDER = {};
+
+
+        //dispatch({type: actionTypes.drafts.publish, payload: undefined})
+        dispatch(actionCreators.drafts__setPublish__pending(PLACEHOLDER));
+
+        const draft = PLACEHOLDER.get(draftId);
+        asyncPublish(draft).then(
+                args => dispatch(actionCreators.drafts__setPublish__successful(args[PLACEHOLDER])),
+                args => dispatch(actionCreators.drafts__setPublish__failed(args[PLACEHOLDER]))
+        )
+    }
 }
-}
-*/
 
 //as string constans, e.g. actionTypes.drafts.change.type === "drafts.change.type"
 export const actionTypes = tree2constants(actionHierarchy);
