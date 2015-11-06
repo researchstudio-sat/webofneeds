@@ -56,16 +56,16 @@ sleep 10
 # and the same as activemq.broker.keystore.password used in your wonnode activemq spring configurations for broker
 docker -H satsrv04:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
 docker -H satsrv04:2375 run --name=gencert_int -e CN="satsrv04.researchstudio.at" -e "PASS=changeit" \
--v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert
+-v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
 docker -H satsrv05:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
 docker -H satsrv05:2375 run --name=gencert_int -e CN="satsrv05.researchstudio.at" -e "PASS=changeit" \
--v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert
+-v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
 docker -H satsrv06:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
 docker -H satsrv06:2375 run --name=gencert_int -e CN="satsrv06.researchstudio.at" -e "PASS=changeit" \
--v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert
+-v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
 docker -H satsrv07:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
 docker -H satsrv07:2375 run --name=gencert_int -e CN="satsrv07.researchstudio.at" -e "PASS=changeit" \
--v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert
+-v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
 
 
 sleep 5
