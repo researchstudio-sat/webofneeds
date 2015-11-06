@@ -18,7 +18,7 @@ public class CachingAllButListsLinkedDataSource extends CachingLinkedDataSource
 
   //TODO actually the connection itself should also not be cached - i.e. status can be updated
 
-  private Pattern pattern_connections_list_uri = Pattern.compile("(.+)/resource/connection(/)+");
+  private Pattern pattern_connections_list_uri = Pattern.compile("(.+)/connections(/)?");
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -45,12 +45,16 @@ public class CachingAllButListsLinkedDataSource extends CachingLinkedDataSource
     }
   }
 
-  private boolean isCachingAllowed(final URI resource) {
-    Matcher matcher = pattern_connections_list_uri.matcher(resource.toString());
+  private boolean isCachingAllowed(final Pattern noCachePattern, final URI resource) {
+    Matcher matcher = noCachePattern.matcher(resource.toString());
     if (matcher.matches()) {
       return false;
     }
     return true;
+  }
+
+  private boolean isCachingAllowed(final URI resource) {
+    return isCachingAllowed(pattern_connections_list_uri, resource);
   }
 
 }
