@@ -36,10 +36,16 @@ ADD ./setenv.sh /usr/local/tomcat/bin/
 # uncomment the following line to access tomcat manager with admin user
 #ADD ./tomcat-users.xml /usr/local/tomcat/conf/
 
-# configure tomcat for ssl
+# configure tomcat for ssl - this server.xml contains connector with special configuration for ssl:
 ADD ./ssl/server.xml /usr/local/tomcat/conf/
+
+# prepare folder for server certificates - this path should be the same as the folder containing
+# SSLCertificateFile/Key configured in server.xml:
 RUN mkdir -p /usr/local/tomcat/conf/ssl/
-RUN mkdir -p /usr/local/tomcat/won/conf/keys/
+
+# prepare folder for client certificates - this path should be the same as configured for client key/trust stores in
+# application's corresponding conf/*.properties file
+RUN mkdir -p /usr/local/tomcat/won/client-certs/
 
 # convert Windows/Mac text file to Linux text file
 RUN dos2unix /usr/local/tomcat/bin/setenv.sh
