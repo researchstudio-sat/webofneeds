@@ -70,6 +70,16 @@ docker -H satsrv07:2375 run --name=gencert_int -e CN="satsrv07.researchstudio.at
 
 sleep 5
 
+#stop wonnode_int1/2/3/4 instances
+docker -H satsrv04:2375 stop wonnode_int1 || echo 'No docker container found to stop with name: wonnode_int'
+docker -H satsrv04:2375 rm wonnode_int1 || echo 'No docker container found to remove with name: wonnode_int'
+docker -H satsrv04:2375 stop wonnode_int3 || echo 'No docker container found to stop with name: wonnode_int'
+docker -H satsrv04:2375 rm wonnode_int3 || echo 'No docker container found to remove with name: wonnode_int'
+docker -H satsrv05:2375 stop wonnode_int2 || echo 'No docker container found to stop with name: wonnode_int'
+docker -H satsrv05:2375 rm wonnode_int2 || echo 'No docker container found to remove with name: wonnode_int'
+docker -H satsrv05:2375 stop wonnode_int4 || echo 'No docker container found to stop with name: wonnode_int'
+docker -H satsrv05:2375 rm wonnode_int4 || echo 'No docker container found to remove with name: wonnode_int'
+
 
 # wonnode 1
 docker -H satsrv04:2375 stop wonnode_int || echo 'No docker container found to stop with name: wonnode_int'
