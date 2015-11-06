@@ -365,6 +365,8 @@ public class EventBot extends TriggeredBot
             logger.warn("saw an ErrorEvent, stopping the bot by publishing a WorkDoneEvent", ((ErrorEvent) event).getThrowable());
             getEventListenerContext().getEventBus().publish(new WorkDoneEvent(EventBot.this));
           }
+          Throwable t = ((ErrorEvent) event).getThrowable();
+          logger.info("ErrorEvent contained this throwable:", t);
           setDoneAndUnsubscribe();
         }
         if (event instanceof WorkDoneEvent) {

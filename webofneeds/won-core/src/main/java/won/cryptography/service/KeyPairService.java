@@ -9,10 +9,7 @@ import won.cryptography.exception.KeyNotSupportedException;
 import won.cryptography.key.KeyInformationExtractor;
 import won.cryptography.model.WONCryptographyModel;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PublicKey;
-import java.security.SecureRandom;
+import java.security.*;
 import java.security.spec.ECGenParameterSpec;
 
 /**
@@ -34,23 +31,6 @@ public class KeyPairService {
     private KeyInformationExtractor keyInformationExtractor;
 
     public KeyPairService() {}
-
-    public KeyPair generateNewKeyPair() {
-        KeyPair pair = null;
-
-        try {
-
-            // use the predefined curves
-            ECGenParameterSpec ecGenSpec = new ECGenParameterSpec("brainpoolp384r1");
-            keyPairGenerator.initialize(ecGenSpec, new SecureRandom());
-            pair = keyPairGenerator.generateKeyPair();
-
-        } catch (Exception e) {
-            logger.warn("An error occurred!", e);
-        }
-
-        return pair;
-    }
 
     /**
      * produces RDF out of the public key of the key pair and adds it to the
@@ -94,9 +74,41 @@ public class KeyPairService {
                 keyInformationExtractor.getQX(publicKey));
 
         blankNode.addProperty(WONCryptographyModel.CRYPT_ecc_qy_Property,
-                keyInformationExtractor.getQY(publicKey));
+                              keyInformationExtractor.getQY(publicKey));
 
 
     }
 
+    //TODO make better api for curve support, and ideally also add RSA support...
+    public KeyPair generateNewKeyPairInSecp384r1() {
+        ECGenParameterSpec ecGenSpec = new ECGenParameterSpec("secp384r1");
+        org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi keyPairGenerator = new org.bouncycastle
+          .jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi.ECDSA();
+        try {
+            keyPairGenerator.initialize(ecGenSpec, new SecureRandom());
+        } catch (InvalidAlgorithmParameterException e) {
+            logger.error("Could not initialize bouncycastle key pair generator for ECDSA secp384r1");
+            throw new IllegalArgumentException(e);
+        }
+        KeyPair pair = keyPairGenerator.generateKeyPair();
+        return pair;
+    }
+
+
+    public KeyPair generateNewKeyPairInBrainpoolp384r1() {
+        KeyPair pair = null;
+
+        try {
+
+            // use the predefined curves
+            ECGenParameterSpec ecGenSpec = new ECGenParameterSpec("brainpoolp384r1");
+            keyPairGenerator.initialize(ecGenSpec, new SecureRandom());
+            pair = keyPairGenerator.generateKeyPair();
+
+        } catch (Exception e) {
+            logger.warn("An error occurred!", e);
+        }
+
+        return pair;
+    }
 }

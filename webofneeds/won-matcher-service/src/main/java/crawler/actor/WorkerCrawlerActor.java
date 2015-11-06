@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -38,7 +39,7 @@ public class WorkerCrawlerActor extends UntypedActor
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
   @Autowired
-  private HttpService httpService;
+  private LinkedDataSource linkedDataSource;
 
   @Autowired
   private CrawlSparqlService sparqlService;
@@ -70,7 +71,7 @@ public class WorkerCrawlerActor extends UntypedActor
     // start the crawling request
     Dataset ds = null;
     try {
-      ds = httpService.requestDataset(uriMsg.getUri());
+      ds = linkedDataSource.getDataForResource(URI.create(uriMsg.getUri()));
     } catch (RestClientException e) {
       throw new CrawlWrapperException(e, uriMsg);
     }
@@ -123,10 +124,6 @@ public class WorkerCrawlerActor extends UntypedActor
     } catch (IncorrectPropertyCountException e) {
       return null;
     }
-  }
-
-  public void setHttpService(final HttpService httpService) {
-    this.httpService = httpService;
   }
 
   public void setSparqlService(final CrawlSparqlService sparqlService) {

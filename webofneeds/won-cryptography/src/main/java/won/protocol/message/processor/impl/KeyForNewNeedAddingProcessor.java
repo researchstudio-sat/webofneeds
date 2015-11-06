@@ -4,7 +4,6 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.CryptographyService;
 import won.protocol.message.WonMessage;
@@ -29,10 +28,13 @@ import java.security.PublicKey;
 public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
   private static final Logger logger = LoggerFactory.getLogger(KeyForNewNeedAddingProcessor.class);
 
-  @Autowired
-  private CryptographyService cryptoService;
+  private CryptographyService cryptographyService;
 
   public KeyForNewNeedAddingProcessor() {
+  }
+
+  public void setCryptographyService(final CryptographyService cryptoService) {
+    this.cryptographyService = cryptoService;
   }
 
   @Override
@@ -43,17 +45,17 @@ public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
       Dataset msgDataset =  WonMessageEncoder.encodeAsDataset(message);
       if (message.getMessageType() == WonMessageType.CREATE_NEED) {
         // generate and add need's public key to the need content
-        if (cryptoService.getPrivateKey(needUri) == null) {
-          cryptoService.createNewKeyPair(needUri);
+        if (cryptographyService.getPrivateKey(needUri) == null) {
+          cryptographyService.createNewKeyPair(needUri, needUri);
         }
-        PublicKey pubKey = cryptoService.getPublicKey(needUri);
+        PublicKey pubKey = cryptographyService.getPublicKey(needUri);
         WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();
         String contentName = message.getContentGraphURIs().get(0);
         Model contentModel = msgDataset.getNamedModel(contentName);
         keyWriter.writeToModel(contentModel, contentModel.createResource(needUri), pubKey);
       }
     } catch (Exception e) {
-      logger.error(e.getMessage());
+      logger.error("Failed to add key", e);
       throw new WonMessageProcessingException("Failed to add key for need in message " + message.getMessageURI().toString());
     }
     return message;

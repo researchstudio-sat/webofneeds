@@ -16,8 +16,9 @@
 -->
 <!-- START SNIPPET: example -->
 
-<beans
-        xmlns="http://www.springframework.org/schema/beans"
+<spring:beans
+        xmlns="http://activemq.apache.org/schema/core"
+        xmlns:spring="http://www.springframework.org/schema/beans"
         xmlns:context="http://www.springframework.org/schema/context"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -151,9 +152,66 @@
             <!-- DOS protection, limit concurrent connections to 1000 and frame size to 100MB -->
             <!--transportConnector name="openwire" uri="tcp://localhost:62616?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600"/-->
             <!--transportConnector name="amqp" uri="amqp://localhost:5672?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600"/-->
-            <transportConnector name="tcp"
-                                uri="tcp://0.0.0.0:${activemq.broker.port}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600" />
+            <!--transportConnector name="tcp"
+            uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600" /-->
+            <!--transportConnector name="ssl"
+                                uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;trace=true" /-->
+
+            <transportConnector name="${activemq.broker.scheme}"
+                                uri="${activemq.broker.scheme}://0.0.0.0:${activemq.broker.port}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true" />
+
+            <!--transportConnector name="ssl"
+                                uri="${uri.protocol.activemq}?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600&amp;needClientAuth=true&amp;transport.enabledProtocols=TLSv1.2" /-->
+            <!-- &amp;transport.enabledProtocols=TLSv1.2-->
+            <transportConnector name="vm" uri="vm://localhost?marshal=false&amp;broker.persistent=false" />
+
         </transportConnectors>
+        <sslContext>
+            <!--sslContext
+                    keyStore="${activemq.broker.keystore}"
+                    keyStorePassword="${activemq.broker.keystore.password}"
+                    trustStore="${activemq.broker.truststore}"
+                    trustStorePassword="${activemq.broker.truststore.password}"-->
+                <!-- broker's private key is the same as server's private key, and his trust is defined by the custom trust manager-->
+                <sslContext
+                        keyStore="${activemq.broker.keystore}"
+                        keyStorePassword="${activemq.broker.keystore.password}"
+                        >
+                    <trustManagers>
+                        <spring:bean class="won.cryptography.ssl.TrustManagerWrapperWithTrustService">
+                            <spring:constructor-arg ref="trustStoreService" />
+                        </spring:bean>
+                    </trustManagers>
+
+            <!--TODO problems with key loading and keystore format, and trusting own key -->
+                    <!-- Trust/Key managers should correspond to the security/tls config, TODO find a way to impose it, i.e. config should be an argument to the trust/key-manager -->
+                    <!--sslContext
+                            >
+
+                        <trustManagers>
+                            <spring:bean class="won.cryptography.service.WonConfigBasedTrustManagerWrapper">
+                                <spring:constructor-arg ref="wonSecurityConfig" />
+                                <spring:constructor-arg>
+                                    <spring:value type="won.cryptography.service.WonCommunicatingParty">MESSAGING_SERVER</spring:value>
+                                </spring:constructor-arg>
+                            </spring:bean>
+                        </trustManagers>
+                        <keyManagers>
+                            <spring:bean class="won.cryptography.service.WonConfigBasedKeyManagerWrapper">
+                                <spring:constructor-arg ref="wonSecurityConfig" />
+                                <spring:constructor-arg>
+                                    <spring:value type="won.cryptography.service.WonCommunicatingParty">MESSAGING_SERVER</spring:value>
+                                </spring:constructor-arg>
+                            </spring:bean>
+                        </keyManagers-->
+                </sslContext>
+
+        </sslContext>
+
+        <messageAuthorizationPolicy>
+            <spring:bean class="won.cryptography.service.MessageOwnerConsumptionPolicy"></spring:bean>
+        </messageAuthorizationPolicy>
+
         <!--networkConnectors>
             <networkConnector uri="static:(tcp://localhost:61617)" ></networkConnector>
         </networkConnectors-->
@@ -172,5 +230,5 @@
     -->
     <!-- <import resource="jetty.xml"/>       -->
 
-</beans>
+</spring:beans>
 <!-- END SNIPPET: example -->

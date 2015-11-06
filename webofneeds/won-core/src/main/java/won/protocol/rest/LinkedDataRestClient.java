@@ -19,11 +19,10 @@ package won.protocol.rest;
 import com.hp.hpl.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -31,42 +30,11 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.text.MessageFormat;
 
-/**
- * User: fkleedorfer
- * Date: 28.11.12
- */
-public class LinkedDataRestClient
+public abstract class LinkedDataRestClient
 {
+
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private RestTemplate restTemplate;
-  private HttpEntity entity;
-
-  public LinkedDataRestClient() {
-      this(10000,10000); //DEF. TIMEOUT IS 10sec
-  }
-
-  public LinkedDataRestClient(int connectTimeout, int readTimeout) {
-      HttpMessageConverter datasetConverter = new RdfDatasetConverter();
-
-      restTemplate = new RestTemplate();
-      ClientHttpRequestFactory requestFactory = restTemplate.getRequestFactory();
-
-      if (requestFactory instanceof SimpleClientHttpRequestFactory) {
-          if(connectTimeout>0){((SimpleClientHttpRequestFactory) requestFactory).setConnectTimeout(connectTimeout);}
-          if(readTimeout>0){((SimpleClientHttpRequestFactory) requestFactory).setReadTimeout(readTimeout);}
-      } else if (requestFactory instanceof HttpComponentsClientHttpRequestFactory) {
-          if(connectTimeout>0){((HttpComponentsClientHttpRequestFactory) requestFactory).setConnectTimeout(connectTimeout);}
-          if(readTimeout>0){((HttpComponentsClientHttpRequestFactory) requestFactory).setReadTimeout(readTimeout);}
-      }
-
-      restTemplate.getMessageConverters().add(datasetConverter);
-
-      HttpHeaders headers = new HttpHeaders();
-      headers.setAccept(datasetConverter.getSupportedMediaTypes());
-
-      entity = new HttpEntity(headers);
-  }
 
   /**
    * Retrieves RDF for the specified resource URI.
@@ -76,7 +44,21 @@ public class LinkedDataRestClient
    * @param resourceURI
    * @return
    */
-  public Dataset readResourceData(URI resourceURI){
+  public abstract Dataset readResourceData(URI resourceURI);
+
+  /**
+   * Retrieves RDF for the specified resource URI for the entity with provided WebID.
+   * Expects that the resource URI will lead to a 303 response, redirecting to the URI where RDF can be downloaded.
+   * Paging is not supported.
+   *
+   * @param resourceURI
+   * @param requesterWebID
+   * @return
+   */
+  public abstract Dataset readResourceData(URI resourceURI, URI requesterWebID);
+
+
+  protected Dataset readResourceData(URI resourceURI, RestTemplate restTemplate, HttpEntity entity) {
     assert resourceURI != null : "resource URI must not be null";
     logger.debug("fetching linked data resource: {}", resourceURI);
 
@@ -84,30 +66,29 @@ public class LinkedDataRestClient
     //it was probably the wrong resourceURI
     Dataset result;
     try {
-        ResponseEntity<Dataset> response = restTemplate.exchange(resourceURI, HttpMethod.GET, entity, Dataset.class);
-        //RestTemplate will automatically follow redirects on HttpGet calls
+      ResponseEntity<Dataset> response = restTemplate.exchange(resourceURI, HttpMethod.GET, entity, Dataset.class);
+      //RestTemplate will automatically follow redirects on HttpGet calls
 
-        if(response.getStatusCode()!=HttpStatus.OK){
-            throw new HttpClientErrorException(response.getStatusCode());
-        }
-        result = response.getBody();
+      if(response.getStatusCode()!= HttpStatus.OK){
+        throw new HttpClientErrorException(response.getStatusCode());
+      }
+      result = response.getBody();
     } catch (RestClientException e) {
       if(e instanceof HttpClientErrorException){
-          throw e;
+        throw e;
       }
       throw new IllegalArgumentException(
         MessageFormat.format(
-        "caught a clientHandler exception, " +
-        "which may indicate that the URI that was accessed isn''t a" +
-        " linked data URI, please check {0}", resourceURI), e);
+          "caught a clientHandler exception, " +
+            "which may indicate that the URI that was accessed isn''t a" +
+            " linked data URI, please check {0}", resourceURI), e);
     }
     if (logger.isDebugEnabled()) {
       logger.debug("fetched model with {} statements in default model for resource {}",result.getDefaultModel().size(),
-        resourceURI);
+                   resourceURI);
     }
     return result;
   }
-
 
 
 }

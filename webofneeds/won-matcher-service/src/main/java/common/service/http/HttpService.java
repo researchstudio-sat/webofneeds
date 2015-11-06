@@ -24,7 +24,6 @@ public class HttpService
 {
   private final Logger log = LoggerFactory.getLogger(getClass());
   private RestTemplate restTemplate;
-  private HttpEntity<Dataset> dataSetEntity;
   private HttpHeaders jsonHeaders;
 
   public HttpService() {
@@ -42,37 +41,10 @@ public class HttpService
   }
 
   private void init(ClientHttpRequestFactory factory) {
-
-    HttpMessageConverter datasetConverter = new RdfDatasetConverter();
     restTemplate = new RestTemplate(factory);
-    restTemplate.getMessageConverters().add(datasetConverter);
-    HttpHeaders dataSetHeaders = new HttpHeaders();
-    dataSetHeaders.setAccept(datasetConverter.getSupportedMediaTypes());
-    dataSetEntity = new HttpEntity(dataSetHeaders);
     jsonHeaders = new HttpHeaders();
     jsonHeaders.add("Content-Type", "application/json");
     jsonHeaders.add("Accept", "*/*");
-  }
-
-  /**
-   * Request RDF resource and return as dataset
-   *
-   * @param uri request resource for uri
-   * @return dataset object that represents resource
-   * @throws RestClientException
-   */
-  public Dataset requestDataset(String uri) throws RestClientException {
-
-    ResponseEntity<Dataset> response = null;
-    log.debug("Request URI: {}", uri);
-    response = restTemplate.exchange(uri, HttpMethod.GET, dataSetEntity, Dataset.class);
-
-    if (response.getStatusCode() != HttpStatus.OK) {
-      log.warn("HTTP GET request returned status code: {}", response.getStatusCode());
-      throw new HttpClientErrorException(response.getStatusCode());
-    }
-
-    return response.getBody();
   }
 
   public void postJsonRequest(String uri, String body) {

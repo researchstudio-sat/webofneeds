@@ -1,5 +1,5 @@
 <Context reloadable="true">
-    <Resource auth="Container"
+    <!--Resource auth="Container"
               name="jms/ConnectionFactory"
               type="org.apache.activemq.ActiveMQConnectionFactory"
               description="JMS Connection Factory"
@@ -19,5 +19,5 @@
               type="org.apache.activemq.command.ActiveMQTopic"
               description="JMS topic"
               factory="org.apache.activemq.jndi.JNDIReferenceFactory"
-              physicalName="FOO.TOPIC"/>
+              physicalName="FOO.TOPIC"/-->
 </Context>

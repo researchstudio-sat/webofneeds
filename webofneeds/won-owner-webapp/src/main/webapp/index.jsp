@@ -57,6 +57,8 @@
 	</head>
 	<body ng-controller="MainCtrl">
 		<span ng-init=""></span>
+		<script type="text/javascript"
+                src="https://maps.google.com/maps/api/js?sensor=false&callback=onGoogleReady"></script>
 		<nav class="navbar navbar-default" role="navigation" ng-controller="HeaderCtrl">
 			<div class="container" style="padding:0">
 

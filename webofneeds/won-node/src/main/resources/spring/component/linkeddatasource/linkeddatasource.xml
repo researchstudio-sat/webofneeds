@@ -26,14 +26,42 @@
 
     <!-- REST stuff -->
     <!-- required so our linked data client can convert http responses into jena models -->
-    <context:component-scan base-package="won.protocol.rest">
+    <!--context:component-scan base-package="won.protocol.rest">
         <context:include-filter type="regex" expression="won.protocol.rest.*"/>
-    </context:component-scan>
+    </context:component-scan-->
 
     <!-- requires ehcache -->
+    <!--<bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" >
+        <property name="linkedDataRestClient">
+            <bean class="won.protocol.rest.LinkedDataRestClientHttp" />
+        </property>
+    </bean>-->
+
+    <!--bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClientHttpsDepr">
+        <property name="wonKeyMaterial" ref="keyMaterial"/>
+        <property name="wonTrustMaterial" ref="trustMaterial"/>
+    </bean>
+    <bean id="keyMaterial" class="won.cryptography.service.WonKeyMaterial">
+        <property name="keyStoreService" ref="keyStoreService"/>
+    </bean>
+    <bean id="trustMaterial" class="won.cryptography.service.WonTrustMaterial">
+        <property name="trustStrategy" ref="trustAllSelfSignedStrategy"/>
+    </bean>
+    <bean id="trustAllSelfSignedStrategy" class="org.apache.http.conn.ssl.TrustSelfSignedStrategy"/-->
+
+    <!--bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" >
+        <property name="linkedDataRestClient" ref="linkedDataRestClient"/>
+    </bean>
+    <bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClientHttps">
+        <property name="transmissionConfig" ref="wonSecurityConfig"/>
+    </bean-->
+
     <bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" >
         <property name="linkedDataRestClient">
-            <bean class="won.protocol.rest.LinkedDataRestClient" />
+            <bean factory-bean="wonTransmissionService" factory-method="getLinkedDataClient"></bean>
         </property>
     </bean>
+    <!--bean id="linkedDataSource" factory-bean="wonSecurityConfig" factory-method="getLinkedDataSource">
+    </bean-->
+
 </beans>

@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
-import won.cryptography.service.KeyStoreService;
+import won.cryptography.service.CryptographyService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
@@ -83,7 +83,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private ConnectionModelMapper connectionModelMapper;
 
   @Autowired
-  private KeyStoreService keyStoreService;
+  private CryptographyService cryptographyService;
 
   private String needProtocolEndpoint;
   private String matcherProtocolEndpoint;
@@ -216,7 +216,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private void addPublicKey(Model model, Resource res) {
     WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();
     try {
-      keyWriter.writeToModel(model, res, keyStoreService.getPublicKey(res.getURI()));
+      keyWriter.writeToModel(model, res, cryptographyService.getPublicKey(res.getURI()));
     } catch (Exception e) {
       logger.warn("No public key could be added to RDF for " + res.getURI());
     }

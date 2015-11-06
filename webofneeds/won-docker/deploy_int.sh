@@ -4,13 +4,13 @@ set -e
 # build the won docker images on every server of the cluster so that everywhere is the latest version available
 echo start docker build of images:
 
-# wonnode
+# wonnode 1
 docker -H satsrv04:2375 build -t webofneeds/wonnode:int $WORKSPACE/webofneeds/won-docker/wonnode/
 docker -H satsrv05:2375 build -t webofneeds/wonnode:int $WORKSPACE/webofneeds/won-docker/wonnode/
 docker -H satsrv06:2375 build -t webofneeds/wonnode:int $WORKSPACE/webofneeds/won-docker/wonnode/
 docker -H satsrv07:2375 build -t webofneeds/wonnode:int $WORKSPACE/webofneeds/won-docker/wonnode/
 
-# owner
+# owner 1
 docker -H satsrv04:2375 build -t webofneeds/owner:int $WORKSPACE/webofneeds/won-docker/owner/
 docker -H satsrv05:2375 build -t webofneeds/owner:int $WORKSPACE/webofneeds/won-docker/owner/
 docker -H satsrv06:2375 build -t webofneeds/owner:int $WORKSPACE/webofneeds/won-docker/owner/
@@ -65,6 +65,8 @@ docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv05.research
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -p 8889:8080 -p 61617:61617 webofneeds/wonnode:int
 
+
+
 sleep 20
 
 # owner 1
@@ -85,6 +87,7 @@ docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv05.r
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -e "node.default.http.port=8889" -p 8082:8080 webofneeds/owner:int
+
 
 # bigdata
 docker -H satsrv06:2375 pull webofneeds/bigdata

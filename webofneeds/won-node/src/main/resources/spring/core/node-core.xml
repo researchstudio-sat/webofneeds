@@ -23,6 +23,8 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <!--import resource="classpath:/spring/component/security/key-services.xml" /-->
     <!--
          Load properties but ignore unresolvable properties so that
          they are searched in other property configurers defined in the context
@@ -31,9 +33,9 @@
 
     <!-- REST stuff -->
     <!-- required so our linked data client can convert strings into jena models -->
-    <context:component-scan base-package="won.protocol.rest">
+    <!--context:component-scan base-package="won.protocol.rest">
         <context:include-filter type="regex" expression="won.protocol.rest.*"/>
-    </context:component-scan>
+    </context:component-scan-->
 
     <bean id="uriService" class="won.node.service.impl.URIService">
         <property name="resourceURIPrefix" value="${uri.prefix.resource}" />
@@ -96,7 +98,7 @@
     <!--bean id="QueueManagementService" class="won.node.service.impl.QueueManagementServiceImpl"/-->
 
     <!--- DataAccessService -->
-    <bean id="dataServiceRef" class="won.node.service.impl.DataAccessServiceImpl" >
+    <bean id="dataServiceRef" class="won.node.service.impl.DataAccessServiceImpl" depends-on="linkedDataService">
         <property name="URIService" ref="uriService" />
         <property name="rdfStorageService" ref="rdfStorageRef" />
     </bean>
@@ -109,18 +111,21 @@
 
     <bean id="ownerManagementService" class="won.node.service.impl.OwnerManagementServiceImpl"/>
 
-    <!-- private keys and their certificates for node,
-         possibly certificates of other parties-->
+    <!--
     <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService" init-method="init">
         <constructor-arg type="java.lang.String" value="${keystore.location}" />
     </bean>
+    <bean id="trustStoreService" class="won.cryptography.service.TrustStoreService" init-method="init">
+        <constructor-arg type="java.lang.String" value="${truststore.location}" />
+    </bean>
+
     <bean id="cryptoService" class="won.cryptography.service.CryptographyService">
         <constructor-arg ref="keyStoreService" />
     </bean>
 
     <bean id="nodeCertificateOnStartupCreator"
           class="won.node.service.impl.NodeCertificateOnStartupCreator"
-          autowire="byType" />
-
+          autowire="byType"/>
+-->
 
 </beans>

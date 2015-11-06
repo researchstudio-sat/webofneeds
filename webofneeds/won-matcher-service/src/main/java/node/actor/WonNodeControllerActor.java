@@ -11,7 +11,6 @@ import com.hp.hpl.jena.query.Dataset;
 import common.event.BulkHintEvent;
 import common.event.HintEvent;
 import common.event.WonNodeEvent;
-import common.service.http.HttpService;
 import common.spring.SpringExtension;
 import crawler.actor.MasterCrawlerActor;
 import crawler.msg.CrawlUriMessage;
@@ -23,8 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
+import won.cryptography.service.RegistrationClient;
+import won.cryptography.ssl.MessagingContext;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.linkeddata.LinkedDataSource;
 
 import java.net.URI;
 import java.util.*;
@@ -55,13 +57,19 @@ public class WonNodeControllerActor extends UntypedActor
   private WonNodeSparqlService sparqlService;
 
   @Autowired
-  private HttpService httpService;
-
-  @Autowired
   private WonNodeControllerConfig config;
 
   @Autowired
   private WonNodeInformationService wonNodeInformationService;
+
+  @Autowired
+  private RegistrationClient registrationClient;
+  @Autowired
+  LinkedDataSource linkedDataSource;
+  @Autowired
+  private MessagingContext messagingContext;
+
+
 
   @Override
   public void preStart() {
@@ -84,6 +92,13 @@ public class WonNodeControllerActor extends UntypedActor
     // get all known won node uris
     Set<WonNodeInfo> wonNodeInfo = sparqlService.retrieveAllWonNodeInfo();
     for (WonNodeInfo nodeInfo : wonNodeInfo) {
+      try {
+        // TODO the correct way would be not to register here and assume we have already exchanged the keys, but since
+        // in development the key/trust store can change from run to run, we re-register here - think of a better way
+        registrationClient.register(nodeInfo.getWonNodeURI());
+      } catch (Exception e) {
+        throw new IllegalArgumentException("Registration repeat at node " + nodeInfo.getWonNodeURI() + " failed", e);
+      }
       WonNodeConnection con = subscribeNeedUpdates(nodeInfo);
       crawlWonNodes.put(nodeInfo.getWonNodeURI(), con);
     }
@@ -189,7 +204,8 @@ public class WonNodeControllerActor extends UntypedActor
   private void sendHint(HintEvent hint) {
 
     if (!crawlWonNodes.containsKey(hint.getFromWonNodeUri())) {
-      log.warning("cannot send hint to won node {}! Is registered with the won node controller?", hint.getFromWonNodeUri());
+      log.warning("cannot send hint to won node {}! Is registered with the won node controller?",
+                  hint.getFromWonNodeUri());
       return;
     }
 
@@ -211,8 +227,8 @@ public class WonNodeControllerActor extends UntypedActor
 
     WonNodeConnection con = null;
     try {
-      // request the resource and save the data
-      Dataset ds = httpService.requestDataset(wonNodeUri);
+      registrationClient.register(wonNodeUri);
+      Dataset ds = linkedDataSource.getDataForResource(URI.create(wonNodeUri));
       sparqlService.updateNamedGraphsOfDataset(ds);
       WonNodeInfo nodeInfo = sparqlService.getWonNodeInfoFromDataset(ds);
 
@@ -224,6 +240,8 @@ public class WonNodeControllerActor extends UntypedActor
     } catch (RestClientException e) {
       log.warning("Error requesting won node information from {}, exception is {}", wonNodeUri, e);
       addFailedWonNode(wonNodeUri, con);
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Registration at node " + wonNodeUri + " failed", e);
     }
 
     return con;
@@ -285,7 +303,7 @@ public class WonNodeControllerActor extends UntypedActor
   }
 
   private WonNodeConnection subscribeNeedUpdates(WonNodeInfo wonNodeInfo) {
-    return ActiveMqWonNodeConnectionFactory.createWonNodeConnection(getContext(), wonNodeInfo);
+    return ActiveMqWonNodeConnectionFactory.createWonNodeConnection(getContext(), wonNodeInfo, messagingContext);
   }
 
   /**
@@ -313,7 +331,6 @@ public class WonNodeControllerActor extends UntypedActor
       }
     }
   }
-
 
 }
 

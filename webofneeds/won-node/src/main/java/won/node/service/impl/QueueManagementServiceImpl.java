@@ -55,7 +55,10 @@ public class QueueManagementServiceImpl implements QueueManagementService {
 
         logger.debug(ownerApplication.getOwnerApplicationId());
         List<String> queueNames = new ArrayList<>();
-        queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol.Out."+ownerApplication.getOwnerApplicationId());
+        //queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol.Out" +
+        //                  "."+ownerApplication.getOwnerApplicationId());
+      queueNames.add("activemq"+":queue:OwnerProtocol.Out."+ownerApplication.getOwnerApplicationId());
+
 
         /*queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"connect"+".Out."+ownerApplication.getOwnerApplicationId());
         queueNames.add("activemq"+ownerApplication.getOwnerApplicationId()+":queue:OwnerProtocol."+"hint"+".Out."+ownerApplication.getOwnerApplicationId());
@@ -76,19 +79,11 @@ public class QueueManagementServiceImpl implements QueueManagementService {
         List<String> queueNames = ownerApplication.getQueueNames();
         String endpoint="";
         for (int i = 0; i< queueNames.size();i++){
+          endpoint=queueNames.get(i);
             if (queueNames.get(i).contains(methodName)){
-
-                endpoint=queueNames.get(i);
-                endpoint = endpoint.replaceFirst(ownerApplicationID,"");
                 break;
             }
         }
-        if (endpoint.equals("")&&queueNames.size()==1){
-            endpoint=queueNames.get(0);
-            endpoint = endpoint.replaceFirst(ownerApplicationID,"");
-        }
-
-
         return  endpoint;
     }
 

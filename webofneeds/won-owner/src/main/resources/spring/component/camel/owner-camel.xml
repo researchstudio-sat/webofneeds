@@ -35,14 +35,15 @@
 
     </bean-->
 
-    <bean id = "jmsConfig" class="org.apache.camel.component.jms.JmsConfiguration">
+    <!--bean id = "jmsConfig" class="org.apache.camel.component.jms.JmsConfiguration">
         <property name="connectionFactory" ref="cachedConnectionFactory"/>
         <property name="concurrentConsumers" value="10"/>
     </bean>
 
-    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" >
-        <property name="brokerURL" value="tcp://localhost:61616"/>
-    </bean>
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" -->
+    <!--property name="brokerURL" value="tcp://localhost:61616"/-->
+    <!--property name="brokerURL" value="amqp://localhost:5672"/-->
+    <!--/bean>
 
 
     <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory" >
@@ -50,41 +51,65 @@
 
         <property name="sessionCacheSize" value="10"></property>
 
-    </bean>
+    </bean-->
 
     <!-- Activate Annotation based configuration -->
-    <context:annotation-config />
+    <context:annotation-config/>
 
     <!-- Defines where to search for annotated components -->
-    <context:component-scan base-package="won.protocol.exception" />
-    <context:component-scan base-package="won.protocol.matcher" />
-    <context:component-scan base-package="won.protocol.model" />
-    <context:component-scan base-package="won.protocol.need" />
-    <context:component-scan base-package="won.protocol.owner" />
-    <context:component-scan base-package="won.protocol.repository" />
-    <context:component-scan base-package="won.protocol.service" />
-    <context:component-scan base-package="won.protocol.util" />
+    <context:component-scan base-package="won.protocol.exception"/>
+    <context:component-scan base-package="won.protocol.matcher"/>
+    <context:component-scan base-package="won.protocol.model"/>
+    <context:component-scan base-package="won.protocol.need"/>
+    <context:component-scan base-package="won.protocol.owner"/>
+    <context:component-scan base-package="won.protocol.repository"/>
+    <context:component-scan base-package="won.protocol.service"/>
+    <context:component-scan base-package="won.protocol.util"/>
 
-  <!-- won-specific processors -->
-  <!-- start of the pipeline -->
-  <bean name="wonMessageIntoCamelProcessor" class="won.protocol.message.processor.camel.WonMessageIntoCamelProcessor" />
-  <!-- processor for checking well-formedness of messages -->
-  <bean name="wellformednessChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-    <constructor-arg>
-      <bean class="won.protocol.message.processor.impl.WellformednessCheckingWonMessageProcessor" />
-    </constructor-arg>
-  </bean>
-  <!-- processor for checking signatures -->
-  <bean name="signatureChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-    <constructor-arg>
-      <bean class="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor" />
-    </constructor-arg>
-  </bean>
-  <!-- uri related well-formedness of messages -->
-  <bean name="uriNodePathChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
-    <constructor-arg>
-        <bean class="won.protocol.message.processor.impl.UriConsistencyCheckingWonMessageProcessor" />
-    </constructor-arg>
-  </bean>
+    <!-- won-specific processors -->
+    <!-- start of the pipeline -->
+    <bean name="wonMessageIntoCamelProcessor"
+          class="won.protocol.message.processor.camel.WonMessageIntoCamelProcessor"/>
+
+    <!-- processor for checking well-formedness of messages -->
+    <bean name="wellformednessChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg>
+            <bean class="won.protocol.message.processor.impl.WellformednessCheckingWonMessageProcessor"/>
+        </constructor-arg>
+    </bean>
+    <!-- uri related well-formedness of messages -->
+    <bean name="uriNodePathChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg>
+            <bean class="won.protocol.message.processor.impl.UriConsistencyCheckingWonMessageProcessor"/>
+        </constructor-arg>
+    </bean>
+    <!-- processor for checking signatures -->
+    <bean name="signatureChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg>
+            <bean class="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor"/>
+        </constructor-arg>
+    </bean>
+    <!-- processor for signing messages -->
+    <bean id="signatureAddingProcessor" class="won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor">
+        <property name="cryptographyService" ref="cryptographyService"/>
+    </bean>
+    <bean name="signatureAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg ref="signatureAddingProcessor"/>
+    </bean>
+    <!-- processor for generating and adding keys for just created needs -->
+    <bean name="needKeyGeneratorAndAdder" class="won.protocol.message.processor.impl.KeyForNewNeedAddingProcessor">
+        <property name="cryptographyService" ref="cryptographyService"/>
+    </bean>
+
+    <!-- necessary when linked data source is a caching data source -->
+    <bean name="linkedDataCacheInvalidator"
+          class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg ref="ldCacheInvalidatingProcessor"/>
+    </bean>
+    <bean name="ldCacheInvalidatingProcessor"
+          class="won.owner.protocol.message.LinkedDataCacheInvalidator">
+        <!--property name="wonUserDetailService" ref="wonUserDetailService" /-->
+        <property name="linkedDataSource" ref="linkedDataSource"/>
+    </bean>
 
 </beans>

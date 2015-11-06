@@ -24,6 +24,7 @@ import org.apache.camel.RoutesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.cryptography.ssl.MessagingContext;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.model.MessagingType;
 
@@ -43,6 +44,7 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
     private final String localComponentName = "seda";
     private String vmComponentName;
     private CamelContext camelContext;
+    private MessagingContext messagingContext;
 
     @Autowired
     protected BrokerComponentFactory brokerComponentFactory;
@@ -57,7 +59,7 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
         }
         String endpoint = brokerComponentName+":queue:"+needProtocolQueueName;
         endpointMap.put(wonNodeURI,endpoint);
-        logger.info("endpoint of wonNodeURI {} is {}", wonNodeURI, endpointMap.get(brokerUri));
+        logger.info("endpoint of wonNodeURI {} is {}", wonNodeURI, endpointMap.get(wonNodeURI));
         return endpoint;
     }
 
@@ -75,7 +77,8 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
 
         ActiveMQComponent activeMQComponent;
         if (camelContext.getComponent(brokerComponentName)==null){
-            activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri, MessagingType.Queue);
+            activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri,
+                                                                                              MessagingType.Queue, messagingContext);
             logger.info("adding activemqComponent for brokerUri {}",brokerUri);
             camelContext.addComponent(brokerComponentName,activeMQComponent);
           try {
@@ -105,7 +108,16 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
         this.camelContext=camelContext;
     }
 
-    @Override
+  @Override
+  public void setMessagingContext(MessagingContext messagingContext) {
+    this.messagingContext = messagingContext;
+  }
+
+  public MessagingContext getMessagingContext() {
+    return messagingContext;
+  }
+
+  @Override
     public CamelContext getCamelContext() {
         return this.camelContext;
     }
@@ -127,9 +139,6 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
     public String getBrokerComponentNameWithBrokerUri(URI brokerUri){
         return brokerComponentMap.get(brokerUri);
     }
-
-
-
 
 
 }

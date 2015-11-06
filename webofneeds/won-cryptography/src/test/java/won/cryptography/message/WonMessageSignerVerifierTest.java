@@ -53,7 +53,7 @@ public class WonMessageSignerVerifierTest
   public void init() {
     //load public  keys:
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    KeyStoreService storeService = new KeyStoreService(keysFile);
+    KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
 
     pubKeysMap.put(TestSigningUtils.needCertUri, storeService.getCertificate(TestSigningUtils.needCertUri).getPublicKey());
     pubKeysMap.put(TestSigningUtils.ownerCertUri, storeService.getCertificate(TestSigningUtils.ownerCertUri).getPublicKey());

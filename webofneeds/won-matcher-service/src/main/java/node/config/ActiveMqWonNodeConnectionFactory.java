@@ -10,13 +10,17 @@ import node.actor.HintProducerProtocolActor;
 import node.actor.NeedConsumerProtocolActor;
 import node.pojo.WonNodeConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQSslConnectionFactory;
 import org.apache.camel.FailedToCreateConsumerException;
 import org.apache.camel.component.jms.JmsComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.cryptography.ssl.MessagingContext;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.vocabulary.WON;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
 import java.util.UUID;
 
 /**
@@ -25,6 +29,7 @@ import java.util.UUID;
  * User: hfriedrich
  * Date: 18.05.2015
  */
+//TODO reuse BrokerComponentFactory
 public class ActiveMqWonNodeConnectionFactory
 {
   protected static final Logger log = LoggerFactory.getLogger(ActiveMqWonNodeConnectionFactory.class);
@@ -38,7 +43,8 @@ public class ActiveMqWonNodeConnectionFactory
    * @throws FailedToCreateConsumerException
    */
   public static WonNodeConnection createWonNodeConnection(UntypedActorContext context,
-                                                          WonNodeInfo wonNodeInfo) {
+                                                          WonNodeInfo wonNodeInfo, MessagingContext messagingContext) {
+
     // read won node info
     String activeMq = WON.WON_OVER_ACTIVE_MQ.toString();
     String brokerUri = wonNodeInfo.getSupportedProtocolImplParamValue(
@@ -55,7 +61,7 @@ public class ActiveMqWonNodeConnectionFactory
     // create the activemq component for this won node
     String uuid = UUID.randomUUID().toString();
     String componentName = "activemq-" + uuid;
-    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerUri);
+    ActiveMQConnectionFactory connectionFactory = createConnectionFactory(brokerUri, messagingContext);
     // connectionFactory.setExceptionListener( ... )
     Camel camel = CamelExtension.get(context.system());
     camel.context().addComponent(componentName, JmsComponent.jmsComponent(connectionFactory));
@@ -106,4 +112,38 @@ public class ActiveMqWonNodeConnectionFactory
     WonNodeConnection jmsConnection = new WonNodeConnection(wonNodeInfo, created, activated, deactivated, hintProducer);
     return jmsConnection;
   }
+
+  private static ActiveMQConnectionFactory createConnectionFactory(final String brokerUri, final MessagingContext messagingContext) {
+
+    if (messagingContext == null) {
+      return createConnectionFactory(brokerUri);
+    }
+
+    KeyManager keyManager = null;
+    TrustManager trustManager = null;
+    try {
+      keyManager = messagingContext.getClientKeyManager();
+      trustManager = messagingContext.getClientTrustManager();
+    } catch (Exception e) {
+      log.error("Key- or Trust- manager initialization problem", e);
+    }
+
+    if (keyManager == null || trustManager == null) {
+      return createConnectionFactory(brokerUri);
+    } else {
+      return createConnectionFactory(brokerUri, keyManager, trustManager);
+    }
+  }
+
+  private static ActiveMQConnectionFactory createConnectionFactory(final String brokerUri) {
+    return new ActiveMQConnectionFactory(brokerUri);
+  }
+
+  private static ActiveMQConnectionFactory createConnectionFactory(final String brokerUri, final KeyManager keyManager, final TrustManager trustManager) {
+    ActiveMQSslConnectionFactory connectionFactory = new ActiveMQSslConnectionFactory(brokerUri);
+    connectionFactory.setKeyAndTrustManagers(new KeyManager[]{keyManager}, new TrustManager[]{trustManager},
+                                             null);
+    return connectionFactory;
+  }
+
 }
