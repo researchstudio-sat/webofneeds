@@ -16,7 +16,7 @@ ENV monitoring.output.dir=/usr/src/matcher-service/monitoring/logs
 ADD ./won-matcher-service.jar /usr/src/matcher-service/
 ADD ./conf ${WON_CONFIG_DIR}
 
-RUN mkdir -p /usr/src/matcher-service/conf/keys
+RUN mkdir -p /usr/src/matcher-service/client-certs/
 
 # start matcher service
 WORKDIR /usr/src/matcher-service/
