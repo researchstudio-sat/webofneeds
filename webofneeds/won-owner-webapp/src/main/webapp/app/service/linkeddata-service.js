@@ -140,6 +140,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 //updates are already in progress or are waiting. block.
                 $log.debug("rul:read:block:  " + this.uri + " " + this.getLockStatusString());
                 this.blockedReaders.push(deferred);
+                this.grantLockToUpdaters();
             } else {
                 //nobody wishes to update the resource, the caller may read it
                 //add the deferred execution to the blocked list, just in case
