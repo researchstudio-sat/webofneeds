@@ -28,7 +28,7 @@
     <!-- required so our linked data client can convert http responses into jena models -->
     <context:annotation-config />
 
-    <bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingAllButListsLinkedDataSource" >
+    <bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" >
         <property name="linkedDataRestClient">
             <bean factory-bean="wonTransmissionService" factory-method="getLinkedDataClient"></bean>
         </property>
