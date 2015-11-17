@@ -15,6 +15,23 @@ docker -H satsrv05:2375 stop postgres_dev || echo 'No docker container found to 
 docker -H satsrv05:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
 docker -H satsrv05:2375 run --name=postgres_dev -d -p 5432:5432 webofneeds/postgres
 
+
+# wonnode/owner server certificate generator
+# Please note that value of PASS should be the same used in your server.xml for SSLPassword on wonnode and owner,
+# and the same as activemq.broker.keystore.password used in your wonnode activemq spring configurations for broker
+docker -H satsrv04:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
+docker -H satsrv04:2375 run --name=gencert_dev -e CN="satsrv04.researchstudio.at" -e "PASS=changeit" \
+-v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
+docker -H satsrv05:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
+docker -H satsrv05:2375 run --name=gencert_dev -e CN="satsrv05.researchstudio.at" -e "PASS=changeit" \
+-v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
+docker -H satsrv06:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
+docker -H satsrv06:2375 run --name=gencert_dev -e CN="satsrv06.researchstudio.at" -e "PASS=changeit" \
+-v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
+docker -H satsrv07:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
+docker -H satsrv07:2375 run --name=gencert_dev -e CN="satsrv07.researchstudio.at" -e "PASS=changeit" \
+-v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
+
 sleep 10
 
 # wonnode 1
@@ -26,7 +43,8 @@ docker -H satsrv04:2375 run --name=wonnode_dev -d -e "uri.host=satsrv04.research
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5432/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
--v /home/install/won-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/won-client-certs/wonnode_dev:/usr/local/tomcat/won/client-certs/ \
 -p 8888:8443 -p 61616:61616 webofneeds/wonnode:dev
 
 
@@ -39,7 +57,8 @@ docker -H satsrv05:2375 run --name=wonnode_dev -d -e "uri.host=satsrv05.research
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5432/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
--v /home/install/won-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/won-client-certs/wonnode_dev:/usr/local/tomcat/won/client-certs/ \
 -p 8888:8443 -p 61616:61616 webofneeds/wonnode:dev
 
 sleep 20
@@ -53,7 +72,8 @@ docker -H satsrv04:2375 run --name=owner_dev -d -e "node.default.host=satsrv04.r
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5432/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
--v /home/install/won-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/won-client-certs/owner_dev:/usr/local/tomcat/won/client-certs/ \
 -p 8081:8443 webofneeds/owner:dev
 
 # owner 2
@@ -65,7 +85,8 @@ docker -H satsrv05:2375 run --name=owner_dev -d -e "node.default.host=satsrv05.r
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5432/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
--v /home/install/won-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v /home/install/won-client-certs/owner_dev:/usr/local/tomcat/won/client-certs/ \
 -p 8081:8443 webofneeds/owner:dev
 
 # bigdata
@@ -82,6 +103,7 @@ docker -H satsrv06:2375 run --name=matcher_service_dev -d -e "node.host=satsrv06
 -e "cluster.seed.host=satsrv06.researchstudio.at" \
 -e "uri.sparql.endpoint=http://satsrv06.researchstudio.at:9999/bigdata/namespace/kb/sparql" \
 -e "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8888/won/resource,https://satsrv05.researchstudio.at:8888/won/resource" \
+-v /home/install/won-client-certs/matcher_service_int:/usr/src/matcher-service/client-certs/ \
 -e "cluster.local.port=2551" -e "cluster.seed.port=2551" -p 2551:2551 webofneeds/matcher_service:dev
 
 # siren solr server
