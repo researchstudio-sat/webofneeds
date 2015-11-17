@@ -64,7 +64,7 @@ docker -H satcluster01:2375 run --name=owner_ma -d -e "node.default.host=satclus
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/owner_ma:/usr/local/tomcat/won/client-certs/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
--e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_owner" \
+-e "db.sql.jdbcUrl=jdbc:postgresql://satcluster01:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
 webofneeds/owner:master
 
