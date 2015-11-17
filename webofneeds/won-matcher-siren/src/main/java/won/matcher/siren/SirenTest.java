@@ -1,22 +1,22 @@
 package won.matcher.siren;
 
-import won.matcher.siren.actor.SirenMatcherActor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.DeadLetter;
 import akka.actor.Props;
 import com.hp.hpl.jena.query.Dataset;
-import won.matcher.service.common.actor.DeadLetterActor;
-import won.matcher.service.common.event.NeedEvent;
-import won.matcher.service.common.service.http.HttpService;
-import won.matcher.service.common.spring.SpringExtension;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import won.cryptography.ssl.TrustAnyCertificateStrategy;
+import won.matcher.service.common.actor.DeadLetterActor;
+import won.matcher.service.common.event.NeedEvent;
+import won.matcher.service.common.spring.SpringExtension;
+import won.matcher.siren.actor.SirenMatcherActor;
+import won.matcher.siren.spring.MatcherSirenAppConfiguration;
 import won.protocol.rest.LinkedDataRestClientHttpsServerOnly;
 import won.protocol.util.linkeddata.LinkedDataSourceBase;
-import won.matcher.siren.spring.MatcherSirenAppConfiguration;
 
 import java.io.IOException;
+import java.net.URI;
 
 /**
  * Created by hfriedrich on 11.09.2015.
