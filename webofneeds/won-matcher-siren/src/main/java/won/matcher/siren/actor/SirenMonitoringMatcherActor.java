@@ -23,7 +23,7 @@ import java.io.IOException;
  */
 @Component
 @Scope("prototype")
-public class SirenMonitoringMatcherActor extends SirenMatcherActor
+public class SirenMonitoringMatcherActor extends AbstractSirenMatcherActor
 {
 
   @Override
