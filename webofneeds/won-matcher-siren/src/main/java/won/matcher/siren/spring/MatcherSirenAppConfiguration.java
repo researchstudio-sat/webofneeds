@@ -24,8 +24,9 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @Configuration
 @PropertySource({"file:${WON_CONFIG_DIR}/matcher-siren.properties",
                  "file:${WON_CONFIG_DIR}/cluster-node.properties"})
-@ComponentScan({"spring", "won.matcher.service.common.config", "won.matcher.service.common.service.http",
-                "won.matcher.siren.actor", "won.matcher.siren.config", "siren"})
+@ComponentScan({"won.matcher.siren.spring", "won.matcher.service.common.config", "won.matcher.service.common.service.http",
+                "won.matcher.siren.actor", "won.matcher.siren.config", "won.matcher.siren.indexer", "won.matcher" +
+                  ".siren.matcher"})
 public class MatcherSirenAppConfiguration
 {
   @Autowired
