@@ -844,7 +844,7 @@
         <commons-fileupload.version>1.2.2</commons-fileupload.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
         <commons-io.version>2.4</commons-io.version>
-        <de.uni_koblenz.aggrimm.icp.version>1.0</de.uni_koblenz.aggrimm.icp.version>
+        <de.uni_koblenz.aggrimm.icp.version>1.0.1</de.uni_koblenz.aggrimm.icp.version>
         <solr.version>3.5.0</solr.version>
         <camel.version>2.12.1</camel.version>
         <qpid.version>0.24</qpid.version>
