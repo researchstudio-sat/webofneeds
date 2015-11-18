@@ -19,15 +19,19 @@ docker -H satsrv05:2375 run --name=postgres_dev -d -p 5432:5432 webofneeds/postg
 # wonnode/owner server certificate generator
 # Please note that value of PASS should be the same used in your server.xml for SSLPassword on wonnode and owner,
 # and the same as activemq.broker.keystore.password used in your wonnode activemq spring configurations for broker
+docker -H satsrv04:2375 build -t webofneeds/gencert:dev $WORKSPACE/webofneeds/won-docker/gencert/
 docker -H satsrv04:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
 docker -H satsrv04:2375 run --name=gencert_dev -e CN="satsrv04.researchstudio.at" -e "PASS=changeit" \
 -v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
+docker -H satsrv05:2375 build -t webofneeds/gencert:dev $WORKSPACE/webofneeds/won-docker/gencert/
 docker -H satsrv05:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
 docker -H satsrv05:2375 run --name=gencert_dev -e CN="satsrv05.researchstudio.at" -e "PASS=changeit" \
 -v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
+docker -H satsrv06:2375 build -t webofneeds/gencert:dev $WORKSPACE/webofneeds/won-docker/gencert/
 docker -H satsrv06:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
 docker -H satsrv06:2375 run --name=gencert_dev -e CN="satsrv06.researchstudio.at" -e "PASS=changeit" \
 -v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
+docker -H satsrv07:2375 build -t webofneeds/gencert:dev $WORKSPACE/webofneeds/won-docker/gencert/
 docker -H satsrv07:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
 docker -H satsrv07:2375 run --name=gencert_dev -e CN="satsrv07.researchstudio.at" -e "PASS=changeit" \
 -v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
