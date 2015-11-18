@@ -128,8 +128,18 @@ docker -H satsrv06:2375 run --name=matcher_siren_dev -d -e "node.host=satsrv06.r
 -e "matcher.siren.uri.solr.server.public=http://satsrv06.researchstudio.at:8983/solr/#/won/" \
 -p 2552:2552 webofneeds/matcher_siren:dev
 
-# push the newly build images to the dockerhub
+
+
+# if everything works up to this point - build :dev images locally and push these local images into the dockerhub:
+# build:
+docker -H localhost:2375 build -t webofneeds/gencert:dev $WORKSPACE/webofneeds/won-docker/gencert/
+docker -H localhost:2375 build -t webofneeds/wonnode:dev $WORKSPACE/webofneeds/won-docker/wonnode/
+docker -H localhost:2375 build -t webofneeds/owner:dev $WORKSPACE/webofneeds/won-docker/owner/
+docker -H localhost:2375 build -t webofneeds/matcher_service:dev $WORKSPACE/webofneeds/won-docker/matcher-service/
+docker -H localhost:2375 build -t webofneeds/matcher_siren:dev $WORKSPACE/webofneeds/won-docker/matcher-siren/
+# push:
 docker -H localhost:2375 login -u heikofriedrich
+docker -H localhost:2375 push webofneeds/gencert:dev
 docker -H localhost:2375 push webofneeds/wonnode:dev
 docker -H localhost:2375 push webofneeds/owner:dev
 docker -H localhost:2375 push webofneeds/matcher_service:dev
