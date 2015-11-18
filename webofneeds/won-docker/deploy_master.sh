@@ -102,3 +102,19 @@ docker -H satcluster01:2375 run --name=matcher_siren_ma -d -e "node.host=satclus
 -e "matcher.siren.uri.solr.server=http://satcluster01.researchstudio.at:8984/solr/won/" \
 -e "matcher.siren.uri.solr.server.public=http://satcluster01.researchstudio.at:8984/solr/#/won/" \
 -p 2562:2562 webofneeds/matcher_siren:master
+
+
+# if everything works up to this point - build :master images locally and push these local images into the dockerhub:
+# build:
+docker -H localhost:2375 build -t webofneeds/gencert:master $WORKSPACE/webofneeds/won-docker/gencert/
+docker -H localhost:2375 build -t webofneeds/wonnode:master $WORKSPACE/webofneeds/won-docker/wonnode/
+docker -H localhost:2375 build -t webofneeds/owner:master $WORKSPACE/webofneeds/won-docker/owner/
+docker -H localhost:2375 build -t webofneeds/matcher_service:master $WORKSPACE/webofneeds/won-docker/matcher-service/
+docker -H localhost:2375 build -t webofneeds/matcher_siren:master $WORKSPACE/webofneeds/won-docker/matcher-siren/
+# push:
+docker -H localhost:2375 login -u heikofriedrich
+docker -H localhost:2375 push webofneeds/gencert:master
+docker -H localhost:2375 push webofneeds/wonnode:master
+docker -H localhost:2375 push webofneeds/owner:master
+docker -H localhost:2375 push webofneeds/matcher_service:master
+docker -H localhost:2375 push webofneeds/matcher_siren:master
