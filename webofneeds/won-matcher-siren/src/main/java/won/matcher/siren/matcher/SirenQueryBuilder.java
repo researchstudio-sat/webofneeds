@@ -16,6 +16,11 @@ public class SirenQueryBuilder
   private ConciseQueryBuilder builder;
   private int consideredQueryTokens;
 
+  private static final String DEMAND = WON.BASIC_NEED_TYPE_DEMAND.toString().toLowerCase();
+  private static final String SUPPLY = WON.BASIC_NEED_TYPE_SUPPLY.toString().toLowerCase();
+  private static final String DOTOGETHER = WON.BASIC_NEED_TYPE_DO_TOGETHER.toString().toLowerCase();
+  private static final String CRITIQUE = WON.BASIC_NEED_TYPE_CRITIQUE.toString().toLowerCase();
+
   public SirenQueryBuilder(NeedObject needObject, int consideredQueryTokens) throws QueryNodeException {
 
     this.consideredQueryTokens = consideredQueryTokens;
@@ -25,22 +30,21 @@ public class SirenQueryBuilder
     TwigQuery twigBasicNeedType = null;
 
     //First of all, we have to consider the BasicNeedType
-    switch (needObject.getBasicNeedType().toLowerCase()) { //Attention: lower-case
-      case "http://purl.org/webofneeds/model#supply": // Demands has to be matched
-        twigBasicNeedType = builder.newTwig("http://purl.org/webofneeds/model#hasBasicNeedType").with(
-          builder.newNode("'http://purl.org/webofneeds/model#demand'").setAttribute("@id"));
-        break;
-      case "http://purl.org/webofneeds/model#demand":
-        twigBasicNeedType = builder.newTwig("http://purl.org/webofneeds/model#hasBasicNeedType").with(
-          builder.newNode("'http://purl.org/webofneeds/model#supply'").setAttribute("@id"));
-        break;
-      case "http://purl.org/webofneeds/model#dotogether":
-        twigBasicNeedType = builder.newTwig("http://purl.org/webofneeds/model#hasBasicNeedType").with(
-          builder.newNode("'http://purl.org/webofneeds/model#dotogether'").setAttribute("@id"));
-        break;
+    String matchNeedType = null;
+    if (DEMAND.equals(needObject.getBasicNeedType().toLowerCase())) {
+      matchNeedType = SUPPLY;
+    } else if (SUPPLY.equals(needObject.getBasicNeedType().toLowerCase())) {
+      matchNeedType = DEMAND;
+    } else if (DOTOGETHER.equals(needObject.getBasicNeedType().toLowerCase())) {
+      matchNeedType = DOTOGETHER;
+    } else if (CRITIQUE.equals(needObject.getBasicNeedType().toLowerCase())) {
+      matchNeedType = CRITIQUE;
     }
 
-    if (twigBasicNeedType != null) {
+    if (matchNeedType != null) {
+      twigBasicNeedType = builder.newTwig(WON.HAS_BASIC_NEED_TYPE.toString()).with(
+        builder.newNode("'" + matchNeedType + "'").setAttribute("@id"));
+      
       topTwig.with(twigBasicNeedType);
     }
   }
