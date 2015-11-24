@@ -36,10 +36,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.HandlerMapping;
+import won.cryptography.service.RegistrationServer;
 import won.node.service.impl.URIService;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.WonProtocolException;
 import won.protocol.service.LinkedDataService;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.CNT;
@@ -51,10 +53,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * TODO: check the working draft here and see to conformance:
@@ -116,12 +115,17 @@ public class
   @Autowired
   private LinkedDataService linkedDataService;
 
+  @Autowired
+  private RegistrationServer registrationServer;
+
   //date format for Expires header (rfc 1123)
   private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyy HH:mm:ss z";
 
 
   @Autowired
   private URIService uriService;
+
+
 
   @RequestMapping(value="/", method = RequestMethod.GET)
   public String showIndexPage(){
@@ -312,8 +316,17 @@ public class
     headers = addExpiresHeadersBasedOnRequestURI(headers, requestUri);
     //headers.setLocation(URI.create(redirectToURI));
     addCORSHeader(headers);
-    response.sendRedirect(redirectToURI);
+      setResponseHeaders(response, headers);
+      response.sendRedirect(redirectToURI);
     return null;
+  }
+
+  public void setResponseHeaders(final HttpServletResponse response, final HttpHeaders headers) {
+    for(Map.Entry<String, List<String>> entry : headers.entrySet()){
+      for (String value : entry.getValue()) {
+        response.setHeader(entry.getKey(), value);
+      }
+    }
   }
 
   private String getRequestUriWithQueryString(final HttpServletRequest request) {
@@ -354,6 +367,7 @@ public class
     addCORSHeader(headers);
     //add a location header
     //headers.add("Location",redirectToURI);
+    setResponseHeaders(response, headers);
     response.sendRedirect(redirectToURI);
     return null;
   }
@@ -409,7 +423,9 @@ public class
       @RequestParam(value="page", defaultValue="-1") int page) {
     logger.debug("listNeedURIs() called");
     Dataset model = linkedDataService.listConnectionURIs(page);
-    HttpHeaders headers = addAlreadyExpiredHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), URI.create(this.connectionResourceURIPrefix)));
+    HttpHeaders headers = addAlreadyExpiredHeaders(
+      addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()),
+                                   URI.create(this.connectionResourceURIPrefix)));
     addCORSHeader(headers);
     return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
   }
@@ -649,7 +665,7 @@ public class
   private Date getNeverExpiresDate(){
     Calendar cal = Calendar.getInstance();
     cal.setTime(new Date());
-    cal.set(Calendar.YEAR,cal.get(Calendar.YEAR)+1);
+    cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 1);
     return cal.getTime();
   }
 
@@ -668,6 +684,10 @@ public class
   public void setLinkedDataService(final LinkedDataService linkedDataService)
   {
     this.linkedDataService = linkedDataService;
+  }
+
+  public void setRegistrationServer(final RegistrationServer registrationServer) {
+    this.registrationServer = registrationServer;
   }
 
   public void setUriService(final URIService uriService)
@@ -710,5 +730,41 @@ public class
 
   public void setConnectionResourceURIPath(final String connectionResourceURIPath) {
     this.connectionResourceURIPath = connectionResourceURIPath;
+  }
+
+  @RequestMapping(
+    value="${uri.path.resource}",
+    method = RequestMethod.POST,
+    produces={"text/plain"})
+  public ResponseEntity<String> register(@RequestParam("register") String registeredType, HttpServletRequest
+    request) {
+
+    logger.info("REGISTER " + registeredType);
+    String supportedTypesMsg = "Request parameter error; supported 'register' parameter values: 'owner', 'node'";
+
+    if (registeredType == null) {
+      logger.warn(supportedTypesMsg);
+      return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
+    }
+
+    Object certificateChainObj = request.getAttribute("javax.servlet.request.X509Certificate");
+
+    try {
+      if (registeredType.equals("owner")) {
+        String result = registrationServer.registerOwner(certificateChainObj);
+        return new ResponseEntity<String>(result, HttpStatus.OK);
+      }
+      if (registeredType.equals("node")) {
+        String result = registrationServer.registerNode(certificateChainObj);
+        return new ResponseEntity<String>(result, HttpStatus.OK);
+      } else {
+        logger.warn(supportedTypesMsg);
+        return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
+      }
+    } catch (WonProtocolException e) {
+      logger.warn("Could not register " + registeredType, e);
+      return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
   }
 }

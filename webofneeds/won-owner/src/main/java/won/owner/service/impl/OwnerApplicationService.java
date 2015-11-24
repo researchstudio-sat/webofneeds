@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import won.cryptography.service.CryptographyService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.sender.WonMessageSender;
@@ -21,10 +20,6 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
   @Autowired
   @Qualifier("default")
   private WonMessageSender wonMessageSenderDelegate;
-
-  @Autowired
-  //private KeyStoreService keyStoreService;
-  private CryptographyService cryptoService;
 
   //when the callback is a bean in a child context, it sets itself as a dependency here
   //we don't do autowiring.
@@ -51,7 +46,6 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
    */
   @Override
   public WonMessage process(final WonMessage wonMessage){
-    //todo: check signatures
     return messageProcessorDelegate.process(wonMessage);
   }
 

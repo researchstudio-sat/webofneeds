@@ -13,15 +13,21 @@
             org.springframework.web.context.ContextLoaderListener
         </listener-class>
     </listener>
-
-    <context-param>
+    <!--context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>classpath:/spring/owner-jmsonly.xml
 	        classpath:/spring/owner-security.xml
             classpath:/spring/owner-context.xml
             classpath:/spring/owner-mailer.xml
         </param-value>
+    </context-param-->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            classpath:/spring/owner-context.xml
+        </param-value>
     </context-param>
+
     <filter>
         <filter-name>CorsFilter</filter-name>
         <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>

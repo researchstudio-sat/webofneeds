@@ -1,12 +1,14 @@
 package crawler.msg;
 
+import java.io.Serializable;
+
 /**
  * Message class used to crawl URIs relative to base URIs from certain won nodes
  *
  * User: hfriedrich
  * Date: 30.03.2015
  */
-public class CrawlUriMessage
+public class CrawlUriMessage implements Serializable
 {
   public static enum STATUS
   {

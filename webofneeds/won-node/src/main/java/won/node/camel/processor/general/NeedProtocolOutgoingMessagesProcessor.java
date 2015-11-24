@@ -53,7 +53,11 @@ public class NeedProtocolOutgoingMessagesProcessor implements Processor {
       //add a camel endpoint for the remote won node
       needProtocolCommunicationService.configureCamelEndpoint(wonMessage.getReceiverNodeURI());
       //send the message to that endpoint
-      messageService.sendInOnlyMessage(null, null, wonMessage, wonMessage.getReceiverNodeURI().toString());
+      String ep = needProtocolCommunicationService.getProtocolCamelConfigurator().getEndpoint(wonMessage
+                                                                                              .getReceiverNodeURI());
+      //messageService.sendInOnlyMessage(null, null, wonMessage, wonMessage.getReceiverNodeURI().toString());
+      String msgBody = RdfUtils.writeDatasetToString(wonMessage.getCompleteDataset(), WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE);
+      messageService.sendInOnlyMessage(null, null, msgBody, ep);
     }
 
 }

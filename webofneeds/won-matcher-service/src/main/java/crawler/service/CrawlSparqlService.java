@@ -1,8 +1,11 @@
 package crawler.service;
 
 import com.hp.hpl.jena.query.*;
-import common.service.SparqlService;
+import common.service.sparql.SparqlService;
 import crawler.msg.CrawlUriMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import won.protocol.vocabulary.WON;
 
 import java.util.Collection;
@@ -16,6 +19,7 @@ import java.util.Set;
  * User: hfriedrich
  * Date: 04.05.2015
  */
+@Component
 public class CrawlSparqlService extends SparqlService
 {
   private static final String METADATA_GRAPH = WON.BASE_URI + "crawlMetadata";
@@ -24,7 +28,8 @@ public class CrawlSparqlService extends SparqlService
   private static final String CRAWL_BASE_URI_PREDICATE = WON.BASE_URI + "crawlBaseUri";
   private static final String CRAWL_WON_NODE_URI_PREDICATE = WON.BASE_URI + "wonNodeUri";
 
-  public CrawlSparqlService(final String sparqlEndpoint) {
+  @Autowired
+  public CrawlSparqlService(@Value("${uri.sparql.endpoint}") final String sparqlEndpoint) {
     super(sparqlEndpoint);
   }
 

@@ -362,9 +362,11 @@ public class EventBot extends TriggeredBot
           //only react to an ErrorEvent
           if (! done) {
             //make sure we send only one WorkDoneEvent
-            logger.warn("saw an ErrorEvent, stopping the bot by publishing a WorkDoneEvent");
+            logger.warn("saw an ErrorEvent, stopping the bot by publishing a WorkDoneEvent", ((ErrorEvent) event).getThrowable());
             getEventListenerContext().getEventBus().publish(new WorkDoneEvent(EventBot.this));
           }
+          Throwable t = ((ErrorEvent) event).getThrowable();
+          logger.info("ErrorEvent contained this throwable:", t);
           setDoneAndUnsubscribe();
         }
         if (event instanceof WorkDoneEvent) {

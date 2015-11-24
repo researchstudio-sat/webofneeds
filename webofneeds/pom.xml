@@ -32,6 +32,8 @@
         <module>won-owner-webapp</module>
         <module>won-matcher</module>
         <module>won-matcher-solr</module>
+        <module>won-matcher-service</module>
+        <module>won-matcher-siren</module>
         <module>won-matcher-webapp</module>
         <module>won-ontology-validator</module>
         <module>won-bot</module>
@@ -39,6 +41,7 @@
         <module>won-cryptography</module>
         <module>won-utils</module>
         <module>won-vocab</module>
+        <module>won-docker</module>
     </modules>
 
     <dependencyManagement>
@@ -650,6 +653,40 @@
                 <groupId>org.apache.solr</groupId>
                 <version>${solr.version}</version>
             </dependency>
+
+            <!--Akka-->
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-actor_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-slf4j_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-camel_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-cluster_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-remote_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-cluster-tools_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 
@@ -848,6 +885,7 @@
         <wagon.version>1.0-beta-3</wagon.version>
         <assembly.version>2.2</assembly.version>
         <net.sf.supercsv.version>2.1.0</net.sf.supercsv.version>
+        <akka.version>2.4.0</akka.version>
     </properties>
 
     <profiles>

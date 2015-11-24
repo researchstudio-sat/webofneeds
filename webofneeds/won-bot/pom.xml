@@ -56,6 +56,11 @@
           <artifactId>won-matcher-solr</artifactId>
           <version>${project.version}</version>
       </dependency>
+      <dependency>
+          <groupId>webofneeds</groupId>
+          <artifactId>won-cryptography</artifactId>
+          <version>${project.version}</version>
+      </dependency>
       <!-- RDF -->
       <dependency>
           <groupId>org.apache.jena</groupId>

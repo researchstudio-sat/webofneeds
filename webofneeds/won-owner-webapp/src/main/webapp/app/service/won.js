@@ -46,8 +46,9 @@
         won.WON = {};
         won.WON.baseUri = "http://purl.org/webofneeds/model#";
         //won.WON.matcherURI = "http://localhost:8080/matcher/search/"
-        won.WON.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
-        //privateData.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
+        won.WON.matcherURI = "https://localhost:8443/matcher/search/";
+        //won.WON.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
+        //won.WON.matcherURI = "https://sat001.researchstudio.at:8443/matcher/search/";
 
         won.WON.prefix = "won";
         won.WON.hasWonNode = won.WON.baseUri+"hasWonNode";
@@ -301,14 +302,18 @@
          * @param longValue
          */
         won.toCompacted = function(longValue) {
-            var propertyPath = won.constantsReverseLookupTable[longValue];
+            var propertyPath = won.clone(won.constantsReverseLookupTable[longValue]);
             propertyPath[propertyPath.length - 1] += 'Compacted';
+            //console.log('toCompacted ', longValue, propertyPath, won.lookup(won, propertyPath));
             return won.lookup(won, propertyPath);
         }
 
 
         won.clone = function(obj){
-            return JSON.parse(JSON.stringify(obj));
+            if(obj === undefined)
+                return undefined;
+            else
+                return JSON.parse(JSON.stringify(obj));
         }
 
 

@@ -25,34 +25,70 @@
         <camel:template id="producerTemplate" defaultEndpoint="direct:JMS"/>
     </camel:camelContext>
 
-    <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+
+
+
+    <!--bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
+           depends-on="embeddedBroker" -->
+        <!-- note: this URI does not need to be configurable via the
+        config file, it will be the same on any system -->
+        <!--property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
+    </bean-->
+
+    
+    <!--
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker" >
+        <property name="brokerURL" value="tcp://localhost:${activemq.broker.port}"/>
+    </bean>
+    -->
+
+    <!--TODO get from won security config... -->
+    <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory"
+    depends-on="embeddedBroker">
         <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
         <property name="sessionCacheSize" value="10"></property>
     </bean>
 
-    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" depends-on="embeddedBroker" >
-        <!-- note: this URI does not need to be configurable via the
-        config file, it will be the same on any system -->
-        <property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
+    <!--bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQSslConnectionFactory"
+            >
+        <property name="brokerURL"
+                  value="${activemq.broker.scheme}://localhost:${activemq.broker.port}"/>
+        <property name="keyStore" value="${activemq.broker.keystore}"/>
+        <property name="keyStorePassword" value="${activemq.broker.keystore.password}"/>
+        <property name="trustStore" value="${activemq.broker.truststore}"/>
+        <property name="trustStorePassword" value="${activemq.broker.truststore.password}"/>
+    </bean-->
+    <!-- This is used for the connections from internal clients to embedded (internal) node broker. Since in this case
+    establishing ssl connection is overkill, vm connection is used instead -->
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="vm://localhost"/>
     </bean>
+
     <!-- Configuring Broker -->
-    <bean id="embeddedBroker" class="org.apache.activemq.xbean.PooledBrokerFactoryBean">
+    <!-- we used to have the o.a.a.x.PooledBrokerFactoryBean here, but it does not set the main spring
+         context as its parent context in its onPropertiesSet() method, so we can't use any of our beans
+         inside the broker's spring context - but we need to use the same trustStoreService bean inside and
+         outside the broker, so we changed to use the o.a.a.x.BrokerFactoryBean instead -->
+    <bean id="embeddedBroker" class="org.apache.activemq.xbean.BrokerFactoryBean">
         <property name="config" value="classpath:spring/component/broker/activemq.xml"/>
         <property name="start" value="true"/>
     </bean>
+
     <bean id="activeMQService" class="won.protocol.jms.ActiveMQServiceImpl">
         <constructor-arg name="type" value="NeedProtocol"/>
     </bean>
     <bean id="brokerComponentFactory" class="won.protocol.jms.BrokerComponentFactory"/>
 
-    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent" >
+    <!--bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent"-->
         <!-- note: this URI does not need to be configurable via the
         config file, it will be the same on any system -->
-        <property name="brokerURL" value="${uri.protocol.activemq}?useLocalHost=false"/>
-        <property name="connectionFactory" ref="cachedConnectionFactory"/>
-    </bean>
-    <bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl">
 
+        <!--property name="brokerURL" value="tcp://localhost:${activemq.broker.port}"/>
+        <property name="connectionFactory" ref="cachedConnectionFactory"/>
+    </bean-->
+    <!--bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl"-->
+    <bean id="needProtocolCommunicationService" class="won.node.camel.NeedProtocolCommunicationServiceImpl">
+        <property name="registrationClient" ref="registrationClient" />
     </bean>
 
     <bean id="ownerProtocolOutgoingMessagesProcessor" class="won.node.camel.processor.general.OwnerProtocolOutgoingMessagesProcessor">
@@ -61,7 +97,13 @@
 
     <bean name="needProtocolCamelConfigurator" class="won.node.camel.NeedProtocolCamelConfiguratorImpl">
         <property name="componentName" value="activemq"/>
+        <property name="messagingContext" ref="messagingContext"/>
     </bean>
+
+    <bean id="messagingContext" factory-bean="wonTransmissionService" factory-method="getClientMessagingContext">
+    </bean>
+
+
 
     <bean id="needProtocolOutgoingMessagesProcessor"
           class="won.node.camel.processor.general.NeedProtocolOutgoingMessagesProcessor" />
@@ -134,7 +176,7 @@
   </bean>
     <!-- signing messages -->
     <bean id="signatureAddingProcessor" class="won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor">
-        <constructor-arg type="java.lang.String" value="${uri.prefix.resource}" />
+        <property name="cryptographyService" ref="cryptographyService" />
     </bean>
     <bean name="signatureAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
         <constructor-arg ref="signatureAddingProcessor" />

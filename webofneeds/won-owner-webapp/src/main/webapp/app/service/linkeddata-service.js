@@ -18,7 +18,7 @@
  * Created by fkleedorfer on 05.09.2014.
  */
 
-angular.module('won.owner').factory('linkedDataService', function ($q, $rootScope,$log, utilService) {
+angular.module('won.owner').factory('linkedDataService', function ($q, $rootScope,$log, utilService, $http) {
     linkedDataService = {};
 
     var privateData = {};
@@ -536,7 +536,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @param uri
      * @return a promise to a boolean which indicates success
      */
-    linkedDataService.fetch = function(uri) {
+    linkedDataService.fetch = function(uri, requesterWebId) {
         var tempUri = uri+'?prev='+new Date().getTime();
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "fetch: uri must not be null"};
@@ -545,46 +545,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         var lock = getReadUpdateLockPerUri(uri);
         return lock.acquireUpdateLock().then(
                 function() {
-                    var deferred = $q.defer();
-                    $log.debug("updating:        " + uri);
-                    try {
-                        /*
-                        TODO: uncommenting the delete block is experimental. Using it is not exactly safe, either, as we risk to delete triples that the subsequent fetch will not restore.
-
-
-                        $log.debug("deleting :       " + uri);
-                        var query = "delete where {<" + uri + "> ?anyP ?anyO}";
-                        var failed = {};
-                        privateData.store.execute(query, function (success, graph) {
-                            if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
-                                failed.failed = true;
-                                return;
-                            }
-                            $log.debug("deleted:         " + uri)
-                        });
-                        if (failed.failed) {
-                            return deferred.promise;
-                        }                   */
-                        //the execute call above is not asynchronous, so we can safely continue outside the callback.
-                        $log.debug("fetching:        " + uri);
-                        privateData.store.load('remote', uri, function (success, results) {
-                            $rootScope.$apply(function () {
-                                if (success) {
-                                    $log.debug("fetched:         " + uri)
-                                    cacheItemInsertOrOverwrite(uri);
-                                    deferred.resolve(uri);
-                                } else {
-                                    deferred.reject("failed to load " + uri);
-                                }
-                            });
-                        });
-                    } catch (e) {
-                        $rootScope.$apply(function () {
-                            deferred.reject("failed to load " + uri + ". Reason: " + e);
-                        });
-                    }
-                    var promise = deferred.promise;
-                    return promise;
+                    // We can use loadFromURI() when we are able to supply our web-id with the call to linked data uri:
+                    // return loadFromURI(uri);
+                    // In the meanwhile, we use our owner-server as an intermediary that can access remote linked data
+                    // on behalf of the need with its web-id, because it has the private key of that need identity:
+                    return loadFromOwnServer(uri, requesterWebId);
                 }
         )
         //make sure we only release the lock when our main promise resolves
@@ -593,13 +558,129 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         });
     }
 
+    var loadFromOwnServer = function(uri, requesterWebId) {
+
+        var deferred = $q.defer();
+        $log.debug("updating:        " + uri);
+        try {
+            /*
+             TODO: uncommenting the delete block is experimental. Using it is not exactly safe, either, as we risk to delete triples that the subsequent fetch will not restore.
+
+             $log.debug("deleting :       " + uri);
+             var query = "delete where {<" + uri + "> ?anyP ?anyO}";
+             var failed = {};
+             privateData.store.execute(query, function (success, graph) {
+             if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
+             failed.failed = true;
+             return;
+             }
+             $log.debug("deleted:         " + uri)
+             });
+             if (failed.failed) {
+             return deferred.promise;
+             }                   */
+            //the execute call above is not asynchronous, so we can safely continue outside the callback.
+            $log.debug("fetching:        " + uri);
+            fetchLinkedDataFromOwnServer(uri, requesterWebId).then(
+                function success(dataset) {
+                    if (Object.keys(dataset).length === 0 ) {
+                        deferred.reject("failed to load " + uri);
+                    } else {
+                        $log.debug("fetched:         " + uri)
+                        linkedDataService.addJsonLdData(uri, dataset);
+                        deferred.resolve(uri);
+                    }
+                },
+                function failure(data) {
+                    deferred.reject("failed to load " + uri);
+                }
+            );
+        } catch (e) {
+            $rootScope.$apply(function () {
+                deferred.reject("failed to load " + uri + ". Reason: " + e);
+            });
+        }
+        var promise = deferred.promise;
+        return promise;
+    }
+
+    var fetchLinkedDataFromOwnServer = function(dataUri, requesterWebId) {
+        //var requestUri = '/owner/rest/linked-data/?uri=' + encodeURIComponent(dataUri);
+        //if (requesterWebId != null) {
+        //    requestUri = requestUri + "&requester=" + encodeURIComponent(requesterWebId);
+        //}
+        var requestUri = '/owner/rest/linked-data/';
+        var params = {uri: dataUri};
+        if (typeof requesterWebId != 'undefined' && requesterWebId != null) {
+            params.requester = requesterWebId;
+        }
+
+        return $http.get(
+            requestUri,
+            {
+                params: params
+            }
+
+        ).then(
+            function success(response) {
+                return response.data;
+            },
+            function failure(response) {
+                $log.error("ERROR: could not fetched linked data " + dataUri + " for need " + requesterWebId);
+                return {};
+            }
+        )
+    }
+
+    var loadFromURI = function(uri) {
+        var deferred = $q.defer();
+        $log.debug("updating:        " + uri);
+        try {
+            /*
+             TODO: uncommenting the delete block is experimental. Using it is not exactly safe, either, as we risk to delete triples that the subsequent fetch will not restore.
+
+             $log.debug("deleting :       " + uri);
+             var query = "delete where {<" + uri + "> ?anyP ?anyO}";
+             var failed = {};
+             privateData.store.execute(query, function (success, graph) {
+             if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
+             failed.failed = true;
+             return;
+             }
+             $log.debug("deleted:         " + uri)
+             });
+             if (failed.failed) {
+             return deferred.promise;
+             }                   */
+            //the execute call above is not asynchronous, so we can safely continue outside the callback.
+            $log.debug("fetching:        " + uri);
+            privateData.store.load('remote', uri, function (success, results) {
+                $rootScope.$apply(function () {
+                    if (success) {
+                        $log.debug("fetched:         " + uri)
+                        cacheItemInsertOrOverwrite(uri);
+                        deferred.resolve(uri);
+                    } else {
+                        deferred.reject("failed to load " + uri);
+                    }
+                });
+            });
+        } catch (e) {
+            $rootScope.$apply(function () {
+                deferred.reject("failed to load " + uri + ". Reason: " + e);
+            });
+        }
+        var promise = deferred.promise;
+        return promise;
+    }
+
     /**
      * Fetches the linked data for the specified URI and saves it in the local triplestore if necessary.
      * Note: this method does not grant the caller any locks. This has to be done by the caller after calling this method.
      * @param uri
      * @return a promise to a boolean which indicates success
      */
-    linkedDataService.ensureLoaded = function(uri) {
+    linkedDataService.ensureLoaded = function(uri, requesterWebId) {
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "ensureLoaded: uri must not be null"};
         }
@@ -614,7 +695,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         }
         //uri isn't loaded or needs to be refrehed. fetch it.
         cacheItemMarkFetching(uri);
-        return linkedDataService.fetch(uri)
+        return linkedDataService.fetch(uri, requesterWebId)
             .then(
                 function(x){
                     cacheItemMarkAccessed(uri);
@@ -656,39 +737,43 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                            var query =
                                "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
                                "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-                               "prefix " + "dc" + ":<" + "http://purl.org/dc/elements/1.1/>\n" +
-                               "prefix " + "geo" + ":<" + "http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
+                               "prefix " + "dc" + ": <" + "http://purl.org/dc/elements/1.1/>\n" +
+                               "prefix " + "geo" + ": <" + "http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
+                               "prefix " + "rdfs" + ": <" + "http://www.w3.org/2000/01/rdf-schema#>\n" +
                                "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime ?state where { " +
                                //TODO: add as soon as named graphs are handled by the rdf store
                                //
                                //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
                                //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
                                //                "GRAPH ?coreURI {"+,
-                               "<" + uri + ">" + won.WON.isInStateCompacted + " ?state ." +
-                               "<" + uri + ">" + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType ." +
-                               "<" + uri + ">" + won.WON.hasContentCompacted + " ?content ." +
-                               "?content dc:title ?title ." +
-                               "OPTIONAL {?content " + won.WON.hasTagCompacted + " ?tags .}" +
-                               "OPTIONAL {?content " + "geo:latitude" + " ?latitude .}" +
-                               "OPTIONAL {?content " + "geo:longitude" + " ?longitude .}" +
-                               "OPTIONAL {?content " + won.WON.hasEndTimeCompacted + " ?endTime .}" +
-                               "OPTIONAL {?content " + won.WON.hasRecurInfiniteTimesCompacted + " ?recurInfinite .}" +
-                               "OPTIONAL {?content " + won.WON.hasRecursInCompacted + " ?recursIn .}" +
-                               "OPTIONAL {?content " + won.WON.hasStartTimeCompacted + " ?startTime .}" +
-                               "OPTIONAL {?content " + won.WON.hasTagCompacted + " ?tags .}" +
-                               "OPTIONAL {?content " + won.WON.hasTextDescriptionCompacted + " ?textDescription ." +
+                               "<" + uri + "> " + won.WON.isInStateCompacted + " ?state .\n" +
+                               "<" + uri + "> " + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType .\n" +
+                               "<" + uri + "> " + won.WON.hasContentCompacted + " ?content .\n" +
+                               "?content dc:title ?title .\n" +
+                               "OPTIONAL {?content " + won.WON.hasTagCompacted + " ?tags .}\n" +
+                               "OPTIONAL {?content " + "geo:latitude" + " ?latitude .}\n" +
+                               "OPTIONAL {?content " + "geo:longitude" + " ?longitude .}\n" +
+                               "OPTIONAL {?content " + won.WON.hasEndTimeCompacted + " ?endTime .}\n" +
+                               "OPTIONAL {?content " + won.WON.hasRecurInfiniteTimesCompacted + " ?recurInfinite .}\n" +
+                               "OPTIONAL {?content " + won.WON.hasRecursInCompacted + " ?recursIn .}\n" +
+                               "OPTIONAL {?content " + won.WON.hasStartTimeCompacted + " ?startTime .}\n" +
+                               "OPTIONAL {?content " + won.WON.hasTextDescriptionCompacted + " ?textDescription .}\n" +
                                //TODO: add as soon as named graphs are handled by the rdf store
                                //                "}" +
                                //                "GRAPH ?metaURI {" +
-                               "<" + uri + ">" + " <" + "http://purl.org/dc/terms/created" + "> " + "?creationDate ." +
-                               "<" + uri + ">" + won.WON.hasConnectionsCompacted + " ?connections ." +
-                               "<" + uri + ">" + won.WON.hasWonNodeCompacted + " ?wonNode ." +
-                               "<" + uri + ">" + won.WON.isInStateCompacted + " ?state ." +
-                               "OPTIONAL {<" + uri + "> " + won.WON.hasEventContainerCompacted + " ?eventContainer .}" +
-                               "OPTIONAL {?eventContainer " + "rdfs:member" + " ?event .}" +
+                               "<" + uri + "> " + " <" + "http://purl.org/dc/terms/created" + "> " + "?creationDate" +
+                               " .\n" +
+                               "<" + uri + "> " + won.WON.hasConnectionsCompacted + " ?connections .\n" +
+                               "<" + uri + "> " + won.WON.hasWonNodeCompacted + " ?wonNode .\n" +
+                               "OPTIONAL {<" + uri + "> " + won.WON.hasEventContainerCompacted + " ?eventContainer" +
+                               " .}\n" +
+                               // if the triple below is used, we get > 1 result items, because usually here will be
+                               // at least 2 events - need created and success response - therefore, it can be removed
+                               // since we don't select ?event anyway here in this query:
+                               //"OPTIONAL {?eventContainer " + "rdfs:member" + " ?event .}\n" +
                                //TODO: add as soon as named graphs are handled by the rdf store
                                //                "}" +
-                               "}}";
+                               "}";
                            resultObject = {};
                            privateData.store.execute(query, [], [], function (success, results) {
                                if (rejectIfFailed(success, results, {message: "Could not load need " + uri + ".", allowNone: false, allowMultiple: false})) {
@@ -1194,9 +1279,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     }
 
 
-    linkedDataService.getLastEventOfEachConnectionOfNeed = function(needUri) {
+    linkedDataService.getLastEventOfEachConnectionOfNeed = function(needUri, requesterWebId) {
         //fetch all connection uris of the need
-        var allConnectionsPromise = linkedDataService.executeCrawlableQuery(queries["getAllConnectionUrisOfNeed"], needUri);
+        var allConnectionsPromise = linkedDataService.executeCrawlableQuery(queries["getAllConnectionUrisOfNeed"], needUri, requesterWebId);
         return allConnectionsPromise.then(
             function getLastEventForConnections(connectionsData){
                 return somePromises(
@@ -1205,10 +1290,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                         function(conData){
                             return linkedDataService.executeCrawlableQuery(
                                         queries["getLastEventUriOfConnection"],
-                                        conData.connection.value
+                                        conData.connection.value,
+                                        requesterWebId
                                 ).then(function(eventUriResult){
                                             return $q.all(
-                                                [linkedDataService.getNodeWithAttributes(eventUriResult[0].eventUri.value),
+                                                [linkedDataService.getNodeWithAttributes(eventUriResult[0].eventUri.value, requesterWebId),
                                                  linkedDataService.getNodeWithAttributes(conData.connection.value),
                                                  linkedDataService.getNeed(conData.remoteNeed.value)
                                                 ]
@@ -1228,8 +1314,8 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             });
     }
 
-     linkedDataService.getConnectionTextMessages = function(connectionUri) {
-        var queryResultPromise = linkedDataService.executeCrawlableQuery(queries["getConnectionTextMessages"], connectionUri);
+     linkedDataService.getConnectionTextMessages = function(connectionUri, requesterWebId) {
+        var queryResultPromise = linkedDataService.executeCrawlableQuery(queries["getConnectionTextMessages"], connectionUri, requesterWebId);
         return queryResultPromise.then(
                 function processConnectionTextMessages(results){
                         var textMessages = [];
@@ -1329,11 +1415,11 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * The URI is added as property 'uri'.
      * @param eventUri
      */
-    linkedDataService.getNodeWithAttributes = function(uri){
+    linkedDataService.getNodeWithAttributes = function(uri, requesterWebId){
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "getNodeWithAttributes: uri must not be null"};
         }
-        return linkedDataService.ensureLoaded(uri).then(
+        return linkedDataService.ensureLoaded(uri, requesterWebId).then(
             function(){
                 var lock = getReadUpdateLockPerUri(uri);
                 return lock.acquireReadLock().then(
@@ -1421,7 +1507,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * Executes the specified crawlableQuery, returns a promise to its results, which may become available
      * after downloading the required content.
      */
-    linkedDataService.executeCrawlableQuery = function (crawlableQuery, baseUri) {
+    linkedDataService.executeCrawlableQuery = function (crawlableQuery, baseUri, requesterWebId) {
         var relevantResources = [];
         var recursionData = {};
         var MAX_RECURSIONS = 10;
@@ -1502,7 +1588,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             } else {
                 $log.debug("crawlableQuery:resolveOrExecute resolving property paths ...");
                 Array.prototype.push.apply(relevantResources, resolvedUris);
-                var loadedPromises = relevantResources.map(function(x){ return linkedDataService.ensureLoaded(x)});
+                var loadedPromises = relevantResources.map(function(x){ return linkedDataService.ensureLoaded(x, requesterWebId)});
                 return $q.all(loadedPromises)
                     .then(
                         function (x) {

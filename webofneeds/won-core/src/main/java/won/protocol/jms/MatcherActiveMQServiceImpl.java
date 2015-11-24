@@ -21,12 +21,10 @@ import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.PathParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import won.protocol.model.ProtocolType;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -52,8 +50,6 @@ public class MatcherActiveMQServiceImpl extends ActiveMQServiceImpl implements M
     .HAS_ACTIVEMQ_MATCHER_PROTOCOL_OUT_MATCHER_REGISTERED_TOPIC_NAME+">";
   private static final String PATH_MATCHER_PROTOCOL_QUEUE_NAME = "<" + WON.SUPPORTS_WON_PROTOCOL_IMPL + ">/<" + WON.HAS_ACTIVEMQ_MATCHER_PROTOCOL_QUEUE_NAME + ">";
 
-  @Autowired
-    private LinkedDataSource linkedDataSource;
 
     public MatcherActiveMQServiceImpl(ProtocolType type) {
       super(type);

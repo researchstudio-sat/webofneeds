@@ -527,7 +527,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             deferred.reject("Cannot get latest events of current need: no need is currently selected");
             return deferred.promise;
         }
-        linkedDataService.getLastEventOfEachConnectionOfNeed(applicationStateService.getCurrentNeedURI())
+        linkedDataService.getLastEventOfEachConnectionOfNeed(applicationStateService.getCurrentNeedURI(), privateData.currentNeedURI)
             .then(function(events){
                 privateData.lastEventOfEachConnectionOfCurrentNeed = [];
                 var index;

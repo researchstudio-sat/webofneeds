@@ -199,7 +199,7 @@ public class BATestScriptListener extends AbstractFinishingListener
 
     LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
     if (linkedDataSource instanceof CachingLinkedDataSource) {
-      ((CachingLinkedDataSource)linkedDataSource).removeElement(fromCon);
+      ((CachingLinkedDataSource)linkedDataSource).invalidate(fromCon);
     }
     logger.debug("fromCon {}, stateOfSenderBeforeSending{}", fromCon, action.getStateOfSenderBeforeSending());
     Dataset dataModel = linkedDataSource.getDataForResource(fromCon);

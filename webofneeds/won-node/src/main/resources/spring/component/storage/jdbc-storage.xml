@@ -50,6 +50,8 @@
         <property name="generateDdl" value="true" /> <!-- Automatically create tables for the entity classes. Don't do this in production! -->
     </bean>
 
+
+
     <!-- Entity manager -->
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource" />
@@ -64,6 +66,7 @@
            </bean>
         </property>
         -->
+
         <property name="jpaPropertyMap">
             <map>
                 <!-- here's the right place to configure query caching and 2nd level cache -->
@@ -72,14 +75,21 @@
             </map>
         </property>
     </bean>
-    <!--
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+
+
+    <!-- Session factory -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource" />
-        <property name="exposeTransactionAwareSessionFactory" value="true" />
-        <property name="useTransactionAwareDataSource" value="true"/>
-        <property name="jtaTransactionManager" ref="transactionManager" />
+        <property name="hibernateProperties">
+            <props>
+                <!-- set a custom hibernate postgres dialect to create indices for foreign keys automatically -->
+                <prop key="hibernate.dialect">won.protocol.util.hibernate.Postgres9WithFKIndicesDialect</prop>
+
+                <prop key="hbm2ddl.auto">create</prop>
+                <prop key="hibernate.show_sql">true</prop>
+            </props>
+        </property>
     </bean>
-    -->
 
     <!-- Configure transaction management -->
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager" />

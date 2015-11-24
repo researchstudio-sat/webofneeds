@@ -5,8 +5,8 @@ import org.apache.jena.riot.Lang;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import won.cryptography.service.CryptographyService;
 import won.cryptography.service.KeyStoreService;
+import won.cryptography.service.DefaultSecurityWonTransmissionService;
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingDataSource;
 import won.protocol.message.WonMessage;
@@ -58,14 +58,16 @@ public class VerifyAndSignExamples
     // initialize signature adding and signature checking processors:
 
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    KeyStoreService storeService = new KeyStoreService(keysFile);
-    CryptographyService cryptoService = new CryptographyService(storeService);
+    KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
+    //CryptographyService cryptoService = new CryptographyService(storeService);
+    DefaultSecurityWonTransmissionService config = new DefaultSecurityWonTransmissionService();
+    config.setClientKeyStoreService(storeService);
 
-    nodeAddingProcessor = new SignatureAddingWonMessageProcessor(TestSigningUtils.nodeCertUri);
-    nodeAddingProcessor.setCryptoService(cryptoService);
+    nodeAddingProcessor = new SignatureAddingWonMessageProcessor();
+    nodeAddingProcessor.setCryptographyService(config.getClientCryptographyService());
 
-    ownerAddingProcessor = new SignatureAddingWonMessageProcessor(TestSigningUtils.ownerCertUri);
-    ownerAddingProcessor.setCryptoService(cryptoService);
+    ownerAddingProcessor = new SignatureAddingWonMessageProcessor();
+    ownerAddingProcessor.setCryptographyService(config.getClientCryptographyService());
 
     checkingProcessor = new SignatureCheckingWonMessageProcessor();
     checkingProcessor.setLinkedDataSource(new TestingDataSource());

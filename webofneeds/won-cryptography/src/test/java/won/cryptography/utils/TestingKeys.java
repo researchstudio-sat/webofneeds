@@ -23,7 +23,7 @@ public class TestingKeys
 
     //load keys:
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
-    KeyStoreService storeService = new KeyStoreService(keysFile);
+    KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
 
     privateKeys.put(TestSigningUtils.needCertUri, storeService.getPrivateKey(TestSigningUtils.needCertUri));
     privateKeys.put(TestSigningUtils.ownerCertUri, storeService.getPrivateKey(TestSigningUtils.ownerCertUri));

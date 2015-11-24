@@ -8,5 +8,6 @@ import org.apache.camel.Exchange;
  */
 public interface ApplicationManagementService {
     public String registerOwnerApplication(Exchange exchange);
+    public String registerOwnerApplication(String ownerId);
 
 }

@@ -4,17 +4,18 @@ import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
-import common.config.CommonSettings;
-import common.config.CommonSettingsImpl;
-import common.service.HttpRequestService;
-import crawler.config.CrawlSettings;
-import crawler.config.CrawlSettingsImpl;
+import common.service.http.HttpService;
+import crawler.config.CrawlConfig;
 import crawler.exception.CrawlWrapperException;
 import crawler.msg.CrawlUriMessage;
 import crawler.service.CrawlSparqlService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -31,18 +32,20 @@ import java.util.Set;
  * User: hfriedrich
  * Date: 07.04.2015
  */
+@Component
+@Scope("prototype")
 public class WorkerCrawlerActor extends UntypedActor
 {
-  private final CrawlSettingsImpl crawlSettings = CrawlSettings.SettingsProvider.get(getContext().system());
-  private final CommonSettingsImpl commonSettings = CommonSettings.SettingsProvider.get(getContext().system());
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-  private HttpRequestService httpRequestService;
+
+  @Autowired
+  private LinkedDataSource linkedDataSource;
+
+  @Autowired
   private CrawlSparqlService sparqlService;
 
-  public WorkerCrawlerActor() {
-    httpRequestService = new HttpRequestService(crawlSettings.HTTP_READ_TIMEOUT, crawlSettings.HTTP_CONNECTION_TIMEOUT);
-    sparqlService = new CrawlSparqlService(commonSettings.SPARQL_ENDPOINT);
-  }
+  @Autowired
+  private CrawlConfig config;
 
   /**
    * Receives messages with an URI and processes them by requesting the resource,
@@ -68,7 +71,7 @@ public class WorkerCrawlerActor extends UntypedActor
     // start the crawling request
     Dataset ds = null;
     try {
-      ds = httpRequestService.requestDataset(uriMsg.getUri());
+      ds = linkedDataSource.getDataForResource(URI.create(uriMsg.getUri()));
     } catch (RestClientException e) {
       throw new CrawlWrapperException(e, uriMsg);
     }
@@ -83,7 +86,7 @@ public class WorkerCrawlerActor extends UntypedActor
     // send extracted non-base URIs back to sender and save meta data about crawling the URI
     log.debug("Extract non-base URIs from message {}", uriMsg);
     Set<String> extractedURIs = sparqlService.extractURIs(
-      uriMsg.getUri(), uriMsg.getBaseUri(), crawlSettings.PROPERTYPATHS_NONBASE);
+      uriMsg.getUri(), uriMsg.getBaseUri(), config.getCrawlNonBasePropertyPaths());
     for (String extractedURI : extractedURIs) {
       CrawlUriMessage newUriMsg = new CrawlUriMessage(
         extractedURI, uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.PROCESS);
@@ -92,7 +95,7 @@ public class WorkerCrawlerActor extends UntypedActor
 
     // send extracted base URIs back to sender and save meta data about crawling the URI
     log.debug("Extract base URIs from message {}", uriMsg);
-    extractedURIs = sparqlService.extractURIs(uriMsg.getUri(), uriMsg.getBaseUri(), crawlSettings.PROPERTYPATHS_BASE);
+    extractedURIs = sparqlService.extractURIs(uriMsg.getUri(), uriMsg.getBaseUri(), config.getCrawlBasePropertyPaths());
     for (String extractedURI : extractedURIs) {
       CrawlUriMessage newUriMsg = new CrawlUriMessage(
         extractedURI, extractedURI, wonNodeUri, CrawlUriMessage.STATUS.PROCESS);
@@ -123,4 +126,7 @@ public class WorkerCrawlerActor extends UntypedActor
     }
   }
 
+  public void setSparqlService(final CrawlSparqlService sparqlService) {
+    this.sparqlService = sparqlService;
+  }
 }

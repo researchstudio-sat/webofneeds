@@ -1,21 +1,18 @@
 package node.actor;
 
+import akka.actor.ActorRef;
 import akka.camel.CamelMessage;
 import akka.camel.javaapi.UntypedConsumerActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import com.hp.hpl.jena.query.Dataset;
-import common.config.CommonSettings;
-import common.config.CommonSettingsImpl;
-import common.service.SparqlService;
 import common.event.NeedEvent;
+import common.service.monitoring.MonitoringService;
 import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFFormat;
-import won.protocol.util.RdfUtils;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * Camel actor represents the need consumer protocol to a won node.
@@ -26,6 +23,8 @@ import java.nio.charset.StandardCharsets;
  * User: hfriedrich
  * Date: 28.04.2015
  */
+@Component
+@Scope("prototype")
 public class NeedConsumerProtocolActor extends UntypedConsumerActor
 {
   private static final String MSG_HEADER_METHODNAME = "methodName";
@@ -34,14 +33,16 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
   private static final String MSG_HEADER_METHODNAME_NEEDDEACTIVATED = "needDeactivated";
   private static final String MSG_HEADER_WON_NODE_URI = "wonNodeURI";
   private static final String MSG_HEADER_NEED_URI = "needUri";
-  private final CommonSettingsImpl settings = CommonSettings.SettingsProvider.get(getContext().system());
-  private SparqlService sparqlService;
   private final String endpoint;
+  private ActorRef pubSubMediator;
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+
+  @Autowired
+  private MonitoringService monitoringService;
 
   public NeedConsumerProtocolActor(String endpoint) {
     this.endpoint = endpoint;
-    this.sparqlService = new SparqlService(settings.SPARQL_ENDPOINT);
+    pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
   }
 
   @Override
@@ -56,28 +57,31 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
       CamelMessage camelMsg = (CamelMessage) message;
       String needUri = (String) camelMsg.getHeaders().get(MSG_HEADER_NEED_URI);
       String wonNodeUri = (String) camelMsg.getHeaders().get(MSG_HEADER_WON_NODE_URI);
+
+      // monitoring code
+      if (monitoringService.isMonitoringEnabled()) {
+        monitoringService.startClock(MonitoringService.NEED_HINT_STOPWATCH, needUri);
+      }
+
+      // process the incoming need event
       if (needUri != null && wonNodeUri != null) {
         Object methodName = camelMsg.getHeaders().get(MSG_HEADER_METHODNAME);
         if (methodName != null) {
           log.debug("Received event '{}' for needUri '{}' and wonNeedUri '{}'", methodName, needUri, wonNodeUri);
 
-          // save the need
-          Dataset ds = convertBodyToDataset(camelMsg.body(), Lang.TRIG);
-          sparqlService.updateNamedGraphsOfDataset(ds);
-
           // publish an internal need event
           NeedEvent event = null;
           if (methodName.equals(MSG_HEADER_METHODNAME_NEEDCREATED)) {
             event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.CREATED, camelMsg.body().toString(), Lang.TRIG);
-            getContext().system().eventStream().publish(event);
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
             return;
           } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDACTIVATED)) {
             event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVATED, camelMsg.body().toString(), Lang.TRIG);
-            getContext().system().eventStream().publish(event);
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
             return;
           } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDDEACTIVATED)) {
             event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.DEACTIVATED, camelMsg.body().toString(), Lang.TRIG);
-            getContext().system().eventStream().publish(event);
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
             return;
           }
         }
@@ -86,11 +90,6 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
       System.out.print("some other message");
     }
     unhandled(message);
-  }
-
-  private Dataset convertBodyToDataset(Object body, Lang lang) {
-    InputStream is = new ByteArrayInputStream(body.toString().getBytes(StandardCharsets.UTF_8));
-    return RdfUtils.toDataset(is, new RDFFormat(lang));
   }
 
 }

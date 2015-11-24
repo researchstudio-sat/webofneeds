@@ -65,7 +65,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
     }
 
     @Autowired
-    private LinkedDataSource linkedDataSource;
+    protected LinkedDataSource linkedDataSource;
 
     @Override
     public final String getProtocolQueueNameWithResource(URI resourceUri){
