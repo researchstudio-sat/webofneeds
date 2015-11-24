@@ -18,7 +18,6 @@ RUN apt-get install oracle-java8-set-default
 # compile APR library to use for tomcat ssl connector
 RUN cd /usr/local/tomcat/bin/
 RUN tar -xf /usr/local/tomcat/bin/tomcat-native.tar.gz -C /usr/local/tomcat/bin/
-RUN ls -l /usr/local/tomcat/bin/
 RUN  apt-get update && apt-get install libapr1-dev libssl-dev gcc make -y
 RUN cd /usr/local/tomcat/bin/tomcat-native-1.1.33-src/jni/native/ && ./configure --with-apr=/usr --with-java-home=/usr/lib/jvm/java-8-oracle && make && make install
 
@@ -38,9 +37,7 @@ ADD ./setenv.sh /usr/local/tomcat/bin/
 
 # configure tomcat for ssl
 ADD ./ssl/server.xml /usr/local/tomcat/conf/
-ADD ./ssl/t-cert.pem /usr/local/tomcat/conf/ssl/
-ADD ./ssl/t-key.pem /usr/local/tomcat/conf/ssl/
 
-RUN mkdir -p /usr/local/tomcat/won/conf/keys/
+RUN mkdir -p /usr/local/tomcat/won/client-certs/
 
 RUN dos2unix /usr/local/tomcat/bin/setenv.sh

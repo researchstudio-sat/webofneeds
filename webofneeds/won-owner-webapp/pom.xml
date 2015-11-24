@@ -237,31 +237,6 @@
                 </executions>
             </plugin>
 
-            <!--
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.4.0</version>
-                <configuration>
-                    <workingDirectory>src/main/webapp</workingDirectory>
-                    <executable>jspm install</executable>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>JSPM install</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${basedir}/src/main/webapp/node_modules/jspm/jspm.js</executable>
-                            <arguments>install</arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-                -->
-
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>

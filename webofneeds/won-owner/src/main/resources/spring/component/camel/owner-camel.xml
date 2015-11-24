@@ -30,28 +30,6 @@
         <camel:endpoint id="needMessageQueue" uri="activemq:WON.MSG" pattern="InOut"></camel:endpoint>
     </camel:camelContext>
 
-    <!--bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
-          <property name="configuration" ref="jmsConfig"></property>
-
-    </bean-->
-
-    <!--bean id = "jmsConfig" class="org.apache.camel.component.jms.JmsConfiguration">
-        <property name="connectionFactory" ref="cachedConnectionFactory"/>
-        <property name="concurrentConsumers" value="10"/>
-    </bean>
-
-    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory" -->
-    <!--property name="brokerURL" value="tcp://localhost:61616"/-->
-    <!--property name="brokerURL" value="amqp://localhost:5672"/-->
-    <!--/bean>
-
-
-    <bean id="cachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory" >
-        <property name="targetConnectionFactory" ref="activemqConnectionFactory"></property>
-
-        <property name="sessionCacheSize" value="10"></property>
-
-    </bean-->
 
     <!-- Activate Annotation based configuration -->
     <context:annotation-config/>
