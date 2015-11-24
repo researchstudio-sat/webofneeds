@@ -67,8 +67,8 @@ class CreateNeedController {
         });
 
         // Using actionCreators like this means that every action defined there is available in the template.
-        const unsubscribe = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-        this.$scope.$on('$destroy', unsubscribe);
+        const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
+        this.$scope.$on('$destroy', disconnect);
 
         /*
          does selectFromState make sure to foregoe updates when the
