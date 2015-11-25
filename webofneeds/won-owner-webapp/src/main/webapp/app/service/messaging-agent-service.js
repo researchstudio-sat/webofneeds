@@ -68,6 +68,16 @@ class AgentService {
             )
             //ws.on('receive',...)
             ws.onReceived = (msg) => {
+
+                /* TODO this is only for demo purposes. In practice, more
+                 * fragmented actions should be called here. Introducing
+                 * an in-queue would require another agent/more agents in
+                 * the system that works through the queue and dispatches
+                 * actions, resulting in the same unpredictability that
+                 * the pure angular approach had. For modularization handling
+                 * should be broken down into layered functions in
+                 * multiple files.
+                 */
                 this.messages__receive({msg});
             }
         /*});*/
