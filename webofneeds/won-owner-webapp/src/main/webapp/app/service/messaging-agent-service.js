@@ -19,9 +19,15 @@
 
 import { attach } from '../utils';
 //import './message-service'; //TODO still uses es5
+import { actionCreators }  from '../actions';
 
+function delay2(milliseconds) {
+    return new Promise((resolve, reject) =>
+            window.setTimeout(() => resolve(), milliseconds)
+    );
+}
 
-const serviceDependencies = ['$ngRedux', /*injections as strings here*/];
+const serviceDependencies = ['$ngRedux', '$rootScope', /*injections as strings here*/];
 class AgentService {
     static factory (/* arguments <- serviceDependencies */) {
       return new AgentService(...arguments);
@@ -29,36 +35,63 @@ class AgentService {
     constructor(/* arguments <- serviceDependencies */) {
         attach(this, serviceDependencies, arguments);
 
-        window.as = this; //TODO deletme; for debugging
+        window.mas4Dbg = this; //TODO deletme; for debugging
 
-        const selectFromState = (state) => ({
-            //draftId: state.getIn(['router','currentParams','draftId']),
-
-            //filter for drafts that need to be published and only send diff?
-            // or use the referential message-que? list: [[msgtransformer, argselectors...]]
-
-        });
+        const selectFromState = (state) => ({ state });
 
 
-        //https://github.com/tshelburne/redux-batched-actions snippet for 'pending' state
-
-        //const unsubscribe = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-
+        /*
         const unsubscribe = this.$ngRedux.subscribe(() => {
             const state = selectFromState(this.$ngRedux.getState());
 
         });
+        */
+        const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
+        this.$rootScope.$on('$destroy', disconnect);
+
+        const ws = openWebSocket()
+        /*.then( (ws) => {*/
+            this.$rootScope.$watch(
+                //not sure that this will be always called when the state changes. might require $applies sometimes
+                (scope) => this.state.get('enqueuedMessages'),
+                (newMq, oldMq) => {
+                    console.log('old mq length: ', oldMq.size);
+                    console.log('new mq length: ', newMq.size);
+                    if (newMq.size > 0) {
+                        // a new msg was enqueued
+                        const msg = newMq.first();
+                        console.log('about to send ', msg);
+                        ws.send(msg);
+                        this.messages__markAsSent({msg}); //might be necessary to do this async (with `delay(...,0)`)
+                    }
+                }
+            )
+            //ws.on('receive',...)
+            ws.onReceived = (msg) => {
+                this.messages__receive({msg});
+            }
+        /*});*/
+
 
         //function to put watches on interesting parts of the tree
         //watch(state, ['path','to','property'], callbackFunction)
         //watch(() => watcheObject, callbackFunction)
     }
-
-
 }
 AgentService.factory.$inject = serviceDependencies;
 
-
+let dummyWs = null;
+class DummyWs {
+    send(msg) {
+        console.log('"Sending to server": ', msg);
+        delay2(1500).then(() => {
+            if(this.onReceived) {
+                this.onReceived(msg);
+            }
+        });
+    }
+}
+function openWebSocket() { return dummyWs? dummyWs : new DummyWs() }
 
 export default angular.module('won.owner.wonservice', [
     ])

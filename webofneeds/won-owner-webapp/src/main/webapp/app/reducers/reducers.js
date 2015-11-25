@@ -126,7 +126,7 @@ const pendingMessages = createReducer(
      * approach to asynchronity (Remove it or the thunk-based
      * solution afterwards)
      */
-    enqueued_messages: createReducer(
+    enqueuedMessages: createReducer(
         //initial state
         Immutable.List(),
 
@@ -142,8 +142,8 @@ const pendingMessages = createReducer(
                  * don't remove more than just the one message that has been
                  * sent (assuming there's multiple identical messages in the queue)
                  */
-                if(state.last() === msg)
-                    return state.pop();
+                if(state.first() === msg)
+                    return state.slice(1);
                 else
                     return state;
             }
@@ -153,15 +153,33 @@ const pendingMessages = createReducer(
      * approach to asynchronity (Remove it or the thunk-based
      * solution afterwards)
      */
-    sent_messages: createReducer(
+    sentMessages: createReducer(
         //initial state
         Immutable.List(),
 
         //handlers
         {
-            [actionTypes.messages.markAsSent]: (state, {payload:{msg}}) => {
-                return state.push(msg);
+            [actionTypes.messages.markAsSent]: (state, {payload:{msg}}) => state.push(msg),
+            [actionTypes.messages.receive]: (state, {payload:{msg}}) =>  {
+                if(state.first() === msg/*use msgIds instead*/) {
+                    return state.slice(1)
+                } else {
+                    return state;
+                }
             }
+        }
+    ),
+    /* TODO this fragment is part of an attempt to sketch a different
+     * approach to asynchronity (Remove it or the thunk-based
+     * solution afterwards)
+     */
+    receivedMessages: createReducer(
+        //initial state
+        Immutable.List(),
+
+        //handlers
+        {
+            [actionTypes.messages.receive]: (state, {payload:{msg}}) =>  state.push(msg)
         }
     )
 }

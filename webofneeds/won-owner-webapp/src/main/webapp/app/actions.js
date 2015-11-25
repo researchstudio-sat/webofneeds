@@ -58,6 +58,7 @@ const actionHierarchy = {
          */
         enqueue: INJ_DEFAULT,
         markAsSent: INJ_DEFAULT,
+        receive: INJ_DEFAULT,
     },
 
 
