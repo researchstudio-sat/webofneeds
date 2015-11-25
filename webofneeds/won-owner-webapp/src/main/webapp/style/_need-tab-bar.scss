@@ -1,0 +1,59 @@
+@import 'won-config';
+@import 'flex-layout';
+@import 'title-bar';
+@import 'sizing-utils';
+@import 'square-image';
+
+@mixin need-tab-bar($prefix, $tabBarWidth) {
+  @include title-bar($prefix);
+
+  > .#{$prefix}__inner {
+
+    // #{$prefix} isn't using the tri-aligned that it inherits
+    // via the `@include title-bar` as there's no
+    // centered element
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    > .#{$prefix}__inner__left {
+      @include flex-row;
+
+      @include square-image(4.7rem, 0, 1rem, 0, 1rem);
+
+      .#{$prefix}__inner__left__titles {
+        @include flex-column;
+        align-items: flex-start;
+
+        margin: 1rem 0;
+
+        .#{$prefix}__inner__left__titles__type {
+          color: #A7A7A7;
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    > .#{$prefix}__inner__right {
+      //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
+      // or make won-tabs a parametrized mixin?
+      flex-basis: $tabBarWidth;
+      max-width: $tabBarWidth;
+
+      @include flex-column-spaced;
+      align-items: flex-end;
+
+      padding-top: 1rem;
+
+      .#{$prefix}__tabs {
+        //TODO bad style. not bem.
+        align-self: stretch;
+        height: 100%;
+      }
+    }
+  }
+}
+
+.need-tab-bar {
+  @include need-tab-bar('ntb', 35rem);
+}

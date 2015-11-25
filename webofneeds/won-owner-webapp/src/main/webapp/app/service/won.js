@@ -267,7 +267,7 @@
         won.EVENT.WEBSOCKET_CLOSED_UNEXPECTED = "WebSocketClosedUnexpected";
 
         won.COMMUNUCATION_STATE = {};
-        won.COMMUNUCATION_STATE.NOT_CONNECTED = "NoConnectionEvent";
+        won.COMMUNUCATION_STATE.NOT_CONNECTED = "NoConnectionEvent"; //own node not reachable
         won.COMMUNUCATION_STATE.NOT_TRANSMITTED = "NotTransmittedEvent";
         won.COMMUNUCATION_STATE.PENDING = "Pending";
         won.COMMUNUCATION_STATE.ACCEPTED = "Accepted";

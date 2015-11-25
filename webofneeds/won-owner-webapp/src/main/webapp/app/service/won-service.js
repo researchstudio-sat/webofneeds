@@ -525,7 +525,7 @@ angular.module('won.owner').factory('wonService', function (
                         deferred.reject(reason);
                     }, null
                 );
-                this.done = true;
+                this.done = true; //removes listener
             });
         callback.done = false;
         callback.msgURI = eventUri;

@@ -1,0 +1,98 @@
+@import 'won-config';
+@import 'text';
+@import 'dynamic-textfield';
+.create-post {
+  //@include flex-column;
+  //max-width: 20rem;
+  width: 100%;
+
+  //$createPostMaxContentWidth: 46.25rem;
+  $createPostMaxContentWidth: 35rem;
+  @include max-content-width($createPostMaxContentWidth, $minContentPadding, 'cp');
+
+  > .cp__inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+
+    padding: $minContentPadding;
+  }
+
+  .cp__icon {
+    @include fixed-square($bigiconSize);
+  }
+
+
+
+  won-posttype-select {
+    margin-bottom: $minContentPadding;
+  }
+
+  .cp__mandatory-rest {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    won-image-dropzone {
+      margin-right: $minContentPadding;
+      margin-bottom: $minContentPadding;
+    }
+    won-dynamic-textfield {
+      flex-grow: 1;
+      flex-basis: 10rem;
+    }
+  }
+}
+
+won-image-dropzone {
+  $borderSize: 6.7rem;
+  $padding: 1rem;
+  @include fixed-square($borderSize);
+  display: block;
+
+  .wid__dropzone {
+    background-size: contain;
+
+    box-sizing: border-box;;
+    height: 100%;
+    width: 100%;
+
+    position: relative; //to allow children to use pos:absolute
+
+    input {
+      filter: alpha(opacity=0);
+      opacity: 0;
+      height: 100%;
+      width: 100%;
+      position: absolute;
+    }
+
+    &.wid__dropzone--empty {
+      background: url('./icon-sprite.svg#illu_drag_here');
+
+      background-size: $borderSize - 2 * $padding;
+      background-repeat: no-repeat;
+      background-position: center;
+
+      border: 3px dashed $won-line-gray;
+      border-radius: 3px;
+
+      img { /* the preview img */
+        display: none;
+      }
+    }
+    &.wid__dropzone--filled {
+      border: 1px solid $won-line-gray;
+
+      img { /* the preview img */
+
+        @extend %center--absolute;
+        pointer-events: none;
+
+        // the -0.Xrem accomodate for the border
+        @include max-square($borderSize - 0.2rem);
+      }
+    }
+  }
+}

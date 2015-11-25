@@ -8,6 +8,8 @@ import com.hp.hpl.jena.tdb.TDB;
 import com.hp.hpl.jena.update.GraphStore;
 import com.hp.hpl.jena.update.GraphStoreFactory;
 import com.hp.hpl.jena.update.UpdateAction;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,10 @@ public class CLRunnerBean implements CommandLineRunner {
             logger.info("Getting Data from uri: " + uri);
             RdfUtils.addDatasetToDataset(needDataset, linkedDataSource.getDataForResourceWithPropertyPath(uri, configurePropertyPaths(), 10000, 5, false), true);
         }
+
+        logger.info("PRINTING DATASET");
+        RDFDataMgr.write(System.out, needDataset, Lang.TRIG);
+        logger.info("PRINTED DATASET");
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String line;

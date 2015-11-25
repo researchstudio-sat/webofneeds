@@ -13,11 +13,11 @@
      * Builds the dataset that makes up the message. The set consists of several named
      * graphs (usually `args.msgUri + '#nameOfSubgraph'`), that contain the payload-
      * and meta-data.
-     * @param needRdf
+     * @param contentRdf
      * @param args
      * @returns {{@graph: Array, @context}}
      */
-    won.buildMessageRdf = function (needRdf, args) {
+    won.buildMessageRdf = function (contentRdf, args) {
         var needGraphId = args.msgUri + '#need';
         var msgDataUri = args.msgUri + '#envelope';
         var msgGraph = [];
@@ -28,7 +28,7 @@
         msgGraph.push({
             // content
             '@id': needGraphId,
-            '@graph': needRdf['@graph']
+            '@graph': contentRdf['@graph']
         });
 
         args.attachments.forEach(function(attachment, i) {
@@ -98,7 +98,7 @@
             '@graph': msgGraph,
             '@context': won.merge(
                 won.defaultContext,
-                needRdf['@context'],
+                contentRdf['@context'],
                 getTypesForContext()
             )
         }

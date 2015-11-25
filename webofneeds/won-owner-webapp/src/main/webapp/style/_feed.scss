@@ -1,0 +1,17 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+@import 'flex-layout';
+
+.feedcontent {
+  @include max-content-width(32rem, $minContentPadding, 'fc');
+
+  .title {
+    font-weight: 300;
+    text-align: center;
+    padding: 0.5rem 0;
+    margin: 1rem 0;
+  }
+}
+
+@import 'feed-item';
