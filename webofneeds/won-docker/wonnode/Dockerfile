@@ -18,7 +18,6 @@ RUN apt-get install oracle-java8-set-default
 # compile APR library to use for tomcat ssl connector
 RUN cd /usr/local/tomcat/bin/
 RUN tar -xf /usr/local/tomcat/bin/tomcat-native.tar.gz -C /usr/local/tomcat/bin/
-RUN ls -l /usr/local/tomcat/bin/
 RUN apt-get update && apt-get install libapr1-dev libssl-dev gcc make -y
 RUN cd /usr/local/tomcat/bin/tomcat-native-1.1.33-src/jni/native/ && ./configure --with-apr=/usr --with-java-home=/usr/lib/jvm/java-8-oracle && make && make install
 
@@ -36,13 +35,16 @@ ADD ./setenv.sh /usr/local/tomcat/bin/
 # uncomment the following line to access tomcat manager with admin user
 #ADD ./tomcat-users.xml /usr/local/tomcat/conf/
 
-# configure tomcat for ssl
+# configure tomcat for ssl - this server.xml contains connector with special configuration for ssl:
 ADD ./ssl/server.xml /usr/local/tomcat/conf/
-ADD ./ssl/t-cert.pem /usr/local/tomcat/conf/ssl/
-ADD ./ssl/t-key.pem /usr/local/tomcat/conf/ssl/
-ADD ./ssl/t-truststore.jks /usr/local/tomcat/conf/ssl/
-ADD ./ssl/t-keystore.jks /usr/local/tomcat/conf/ssl/
 
-RUN mkdir -p /usr/local/tomcat/won/conf/keys/
+# prepare folder for server certificates - this path should be the same as the folder containing
+# SSLCertificateFile/Key configured in server.xml:
+RUN mkdir -p /usr/local/tomcat/conf/ssl/
 
+# prepare folder for client certificates - this path should be the same as configured for client key/trust stores in
+# application's corresponding conf/*.properties file
+RUN mkdir -p /usr/local/tomcat/won/client-certs/
+
+# convert Windows/Mac text file to Linux text file
 RUN dos2unix /usr/local/tomcat/bin/setenv.sh

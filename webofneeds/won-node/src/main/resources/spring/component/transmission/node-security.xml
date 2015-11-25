@@ -52,12 +52,6 @@
     <bean id="cryptographyService" factory-bean="wonTransmissionService" factory-method="getClientCryptographyService">
     </bean>
 
-    <!--bean id="nodeCertificateOnStartupCreator"
-          class="won.node.service.impl.NodeCertificateOnStartupCreator"-->
-        <!--property name="keyStoreService" ref="clientKeyStoreService" /-->
-        <!--property name="cryptographyService" ref="cryptographyService" />
-    </bean-->
-
     <bean id="wonTransmissionService" class="won.cryptography.service.DefaultSecurityWonTransmissionService">
         <!--property name="serverKeyStoreService" ref="serverKeyStoreService" /-->
         <property name="trustStoreService" ref="trustStoreService" />
@@ -65,23 +59,12 @@
         <property name="registrationQuery" value="?register=node"></property>
     </bean>
 
-    <!-- TODO take registrationQuery value from properties file -->
-    <!--bean id="registrationClient" class="won.cryptography.service.RegistrationRestClientHttps">
-        <property name="registrationQuery" value="?register=node"></property>
-        <property name="transmissionConfig" ref="wonSecurityConfig" />
-    </bean-->
     <!-- TODO can be moved to messaging config -->
     <bean id="registrationClient" factory-bean="wonTransmissionService" factory-method="getRegistrationClient">
     </bean>
 
     <bean id="registrationServer" factory-bean="wonTransmissionService" factory-method="getRegistrationServer">
     </bean>
-
-    <!-- TODO also change to obtaing via factory method -->
-    <!--bean id="registrationServer" class="won.cryptography.service.RegistrationServer">
-        <property name="transmissionConfig" ref="wonSecurityConfig" />
-    </bean-->
-
 
 
 </beans>

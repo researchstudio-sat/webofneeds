@@ -40,7 +40,7 @@ public class WonDefaultAccessControlRules implements AccessControlRules
       return true;
     }
     Collection<String> requesterPermittedWebIDs = CollectionUtils.intersection(permittedWebIDs, requesterWebIDs);
-    logger.info("found requester WebIDs permitted to access {}: {}", resourceURI, requesterPermittedWebIDs.toString
+    logger.debug("found requester WebIDs permitted to access {}: {}", resourceURI, requesterPermittedWebIDs.toString
       ());
     return requesterPermittedWebIDs.size() > 0;
   }

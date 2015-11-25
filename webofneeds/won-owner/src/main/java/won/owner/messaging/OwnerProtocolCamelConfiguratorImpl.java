@@ -156,7 +156,6 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
         //todo: using replaceAll might result in security issues. change this.
         String tempStartingComponentName = startingComponent;
         tempStartingComponentName = tempStartingComponentName + endpointMap.get(wonNodeURI).replaceAll(":","_");
-        //todo: make
         setStartingEndpoint(wonNodeURI, tempStartingComponentName);
 
         if (camelContext.getComponent(tempStartingComponentName)==null||camelContext.getRoute(endpointMap.get(wonNodeURI))==null){
