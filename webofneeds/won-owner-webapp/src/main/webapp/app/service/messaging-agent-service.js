@@ -17,15 +17,9 @@
 * messages to the server via the service.
  */
 
-import { attach } from '../utils';
+import { attach, delay } from '../utils';
 //import './message-service'; //TODO still uses es5
 import { actionCreators }  from '../actions';
-
-function delay2(milliseconds) {
-    return new Promise((resolve, reject) =>
-            window.setTimeout(() => resolve(), milliseconds)
-    );
-}
 
 const serviceDependencies = ['$ngRedux', '$rootScope', /*injections as strings here*/];
 class AgentService {
@@ -94,7 +88,7 @@ let dummyWs = null;
 class DummyWs {
     send(msg) {
         console.log('"Sending to server": ', msg);
-        delay2(1500).then(() => {
+        delay(1500).then(() => {
             if(this.onReceived) {
                 this.onReceived(msg);
             }

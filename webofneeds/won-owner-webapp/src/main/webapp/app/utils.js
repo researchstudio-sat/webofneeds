@@ -191,3 +191,9 @@ export function flattenTree(tree, delimiter = '__') {
     _flattenTree(tree);
     return accObj;
 }
+
+export function delay(milliseconds) {
+    return new Promise((resolve, reject) =>
+            window.setTimeout(() => resolve(), milliseconds)
+    );
+}
