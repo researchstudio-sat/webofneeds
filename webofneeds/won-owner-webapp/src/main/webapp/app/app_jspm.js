@@ -64,25 +64,17 @@ let app = angular.module('won.owner', [
     settingsTitleBarModule,
     avatarSettingsModule,
     generalSettingsModule,
+
+    /* TODO this fragment is part of an attempt to sketch a different
+     * approach to asynchronity (Remove it or the thunk-based
+     * solution afterwards)
+     */
+    messagingAgentServiceModule,
+
 ]);
 
 app.config([ '$ngReduxProvider', configRedux ]);
 app.config([ '$urlRouterProvider', '$stateProvider', configRouting ]);
-
-
-import { attach } from './utils';
-const serviceDependencies = ['$scope','$ngRedux', /*'$routeParams' /*injections as strings here*/];
-class DemoController {
-    constructor(/* arguments <- serviceDependencies */) {
-        attach(this, serviceDependencies, arguments);
-
-        let disconnect = this.$ngRedux.connect((state) => ({state}), actionCreators)(this);
-        this.$scope.$on('$destroy', disconnect)
-        window.demoCtrl = this;
-    }
-}
-app.controller('DemoController', [...serviceDependencies, DemoController]);
-
 
 //let app = angular.module('won.owner',[...other modules...]);
 angular.bootstrap(document, ['won.owner'], {
