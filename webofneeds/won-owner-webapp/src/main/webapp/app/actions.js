@@ -8,7 +8,9 @@ import './service/won';
 
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 
-const injDefault = 'INJECT_DEFAULT_ACTION_CREATOR';
+//all values equal to this string will be replaced by action-creatos that simply
+// passes it's argument on as payload on to the reducers
+const INJ_DEFAULT = 'INJECT_DEFAULT_ACTION_CREATOR';
 const actionHierarchy = {
     /* actions received as responses or push notifications */
     received: {
@@ -16,30 +18,30 @@ const actionHierarchy = {
          * drafts, messages,...
          * This action will likely be caused as a consequence of signing in.
          */
-        userData : injDefault
+        userData : INJ_DEFAULT
     },
     drafts: {
         /*
          * A new draft was created (either through the view in this client or on another browser)
          */
-        new: injDefault,
+        new: INJ_DEFAULT,
         /*
          * A draft has changed. Pass along the draftURI and the respective data.
          */
         change: {
-            type: injDefault,
-            title: injDefault,
-            thumbnail: injDefault,
+            type: INJ_DEFAULT,
+            title: INJ_DEFAULT,
+            thumbnail: INJ_DEFAULT,
         },
-        delete: injDefault,
+        delete: INJ_DEFAULT,
 
         // use this action creator (drafts__publish__call) to initiate the process
         publish: publishDraft,
         setPublish: {
             // the following three are triggered (a)synchronously to cause state-updates
-            pending: injDefault, //triggered by `publish`-action creator
-            successful: injDefault, //triggered by server-callback
-            failed: injDefault, //triggered by server-callback
+            pending: INJ_DEFAULT, //triggered by `publish`-action creator
+            successful: INJ_DEFAULT, //triggered by server-callback
+            failed: INJ_DEFAULT, //triggered by server-callback
         }
     },
     router: {
@@ -47,7 +49,19 @@ const actionHierarchy = {
         stateReload,
         stateTransitionTo
     },
-    moreWub: injDefault,
+
+
+    messages: {
+        /* TODO this fragment is part of an attempt to sketch a different
+         * approach to asynchronity (Remove it or the thunk-based
+         * solution afterwards)
+         */
+        enqueue: INJ_DEFAULT,
+        markAsSent: INJ_DEFAULT,
+    },
+
+
+    moreWub: INJ_DEFAULT,
     /*
      * This action creator uses thunk (https://github.com/gaearon/redux-thunk) which
      * allows using it with a normal dispatch(actionCreator(payload)) even though

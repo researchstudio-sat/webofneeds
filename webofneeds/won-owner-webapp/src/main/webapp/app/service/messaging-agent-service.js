@@ -3,6 +3,11 @@
  */
 
 
+/* TODO this fragment is part of an attempt to sketch a different
+ * approach to asynchronity (Remove it or the thunk-based
+ * solution afterwards)
+ */
+
 /*
 * This redux wrapper for the old message-service consists of:
 *
@@ -14,6 +19,7 @@
 
 import { attach } from '../utils';
 //import './message-service'; //TODO still uses es5
+
 
 const serviceDependencies = ['$ngRedux', /*injections as strings here*/];
 class AgentService {
@@ -40,7 +46,6 @@ class AgentService {
 
         const unsubscribe = this.$ngRedux.subscribe(() => {
             const state = selectFromState(this.$ngRedux.getState());
-            console.log('won-service-redux - updated draft?');
 
         });
 
@@ -57,5 +62,7 @@ AgentService.factory.$inject = serviceDependencies;
 
 export default angular.module('won.owner.wonservice', [
     ])
-    .factory('wonServiceRedux', AgentService.factory)
+    //TODO needs more expressive name (something like 'connector'? 'messagingAgent'?
+    .factory('messagingAgentService', AgentService.factory)
+    .run(['messagingAgentService', (messagingAgentService) => {}]) //make sure the service is initialized
     .name

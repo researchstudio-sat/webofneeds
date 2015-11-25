@@ -28,6 +28,13 @@ import configRouting from './configRouting';
 import configRedux from './configRedux';
 
 
+/* TODO this fragment is part of an attempt to sketch a different
+ * approach to asynchronity (Remove it or the thunk-based
+ * solution afterwards)
+ */
+import messagingAgentServiceModule from './service/messaging-agent-service';
+
+
 //settings
 import settingsTitleBarModule from './components/settings-title-bar';
 import avatarSettingsModule from './components/settings/avatar-settings';
