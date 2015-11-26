@@ -27,6 +27,7 @@ System.config({
     "babel-runtime": "npm:babel-runtime@5.6.15",
     "bootstrap": "github:twbs/bootstrap@3.3.5",
     "core-js": "npm:core-js@0.9.18",
+    "fetch": "github:github/fetch@0.10.1",
     "font-awesome": "bower:font-awesome@4.3.0",
     "immutable": "npm:immutable@3.7.5",
     "jquery": "github:components/jquery@2.1.4",
