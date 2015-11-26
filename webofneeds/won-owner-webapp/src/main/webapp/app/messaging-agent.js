@@ -17,9 +17,9 @@
 * messages to the server via the service.
  */
 
-import { attach, delay, watchImmutableRdxState} from '../utils';
+import { attach, delay, watchImmutableRdxState} from './utils';
 //import './message-service'; //TODO still uses es5
-import { actionCreators }  from '../actions';
+import { actionCreators }  from './actions';
 
 export function runMessagingAgent(redux) {
 

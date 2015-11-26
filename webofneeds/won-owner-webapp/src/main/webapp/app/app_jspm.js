@@ -32,7 +32,7 @@ import configRedux from './configRedux';
  * approach to asynchronity (Remove it or the thunk-based
  * solution afterwards)
  */
-import { runMessagingAgent } from './service/messaging-agent-service';
+import { runMessagingAgent } from './messaging-agent';
 
 
 //settings
