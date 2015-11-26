@@ -180,5 +180,5 @@ docker -H satsrv06:2375 run --name=matcher_siren_int -d -e "node.host=satsrv06.r
 -e "matcher.siren.uri.solr.server.public=http://satsrv06.researchstudio.at:8984/solr/#/won/" \
 -p 9011:9011 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
--m 400m -v /home/install/hdumps/matcher-service-int:/usr/local/temp/ \
+-m 400m -v /home/install/hdumps/matcher-siren-int:/usr/local/temp/ \
 -p 2562:2562 webofneeds/matcher_siren:int
