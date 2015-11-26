@@ -2,7 +2,7 @@
  * Created by ksinger on 24.09.2015.
  */
 
-import { actionTypes } from '../actions';
+import { actionTypes } from '../actions/actions';
 import { repeatVar } from '../utils';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'

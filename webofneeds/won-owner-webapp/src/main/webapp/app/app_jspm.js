@@ -45,7 +45,7 @@ import generalSettingsModule from './components/settings/general-settings';
 import 'redux';
 import ngReduxModule from 'ng-redux';
 
-import { actionCreators }  from './actions';
+import { actionCreators }  from './actions/actions';
 
 import ngReduxRouterModule from 'redux-ui-router';
 import uiRouterModule from 'angular-ui-router';

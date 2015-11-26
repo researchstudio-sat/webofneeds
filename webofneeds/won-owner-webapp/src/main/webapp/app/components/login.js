@@ -4,7 +4,7 @@
 ;
 import angular from 'angular';
 import { attach } from '../utils';
-import { actionCreators }  from '../actions';
+import { actionCreators }  from '../actions/actions';
 
 /*import messagingAgentServiceModule from '../service/messaging-agent-service';*/
 

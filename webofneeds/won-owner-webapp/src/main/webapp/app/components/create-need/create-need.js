@@ -12,7 +12,7 @@ import dynamicTextfieldModule from '../dynamic-textfield';
 import imageDropzoneModule from '../image-dropzone';
 //import draftStoreModule from '../../stores/draft-store';
 import { attach } from '../../utils';
-import { actionCreators }  from '../../actions';
+import { actionCreators }  from '../../actions/actions';
 
 const postTypeTexts = [
     {

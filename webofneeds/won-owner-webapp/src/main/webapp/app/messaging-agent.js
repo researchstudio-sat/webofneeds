@@ -19,7 +19,7 @@
 
 import { attach, delay, watchImmutableRdxState} from './utils';
 //import './message-service'; //TODO still uses es5
-import { actionCreators }  from './actions';
+import { actionCreators }  from './actions/actions';
 
 export function runMessagingAgent(redux) {
 

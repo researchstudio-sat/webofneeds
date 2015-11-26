@@ -3,8 +3,8 @@
  *
  * Contains a list of actions to be used with the dispatcher and documentation for their expected payloads.
  */
-import { tree2constants, deepFreeze, reduceAndMapTreeKeys, flattenTree, delay } from './utils';
-import './service/won';
+import { tree2constants, deepFreeze, reduceAndMapTreeKeys, flattenTree, delay } from '../utils';
+import '../service/won';
 
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 
