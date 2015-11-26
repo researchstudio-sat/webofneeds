@@ -89,6 +89,18 @@ const reducers = {
             //TODO isValidNeed function to check compliance to won-ontology (and throw errors early)
         }
     ),
+    user: createReducer(
+        //initial state
+        Immutable.Map(),
+
+        //handlers
+        {
+            [actionTypes.user.receive]: (state, {payload: {username, password}}) => {
+                console.log('reducers.js: received successful-login action from app-server');
+                return Immutable.fromJS(payload);
+            }
+        }
+    ),
 /*
 const ownposts = createReducer(
     //initial state

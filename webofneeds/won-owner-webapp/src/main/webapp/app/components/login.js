@@ -10,11 +10,11 @@ import { actionCreators }  from '../actions';
 
 function genLoginConf() {
     let template = `<a href="#" class="wl__button" ng-click="self.open = !self.open">
-                        <span class="wl__button__caption">Sign in {{self.wubs.toArray()}}</span>
+                        <span class="wl__button__caption">Sign in {{self.user.toJS()}}</span>
                         <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" class="wl__button__carret">
                     </a>
-                    <input type="text" required="true" placeholder="Email address" ng-model="self.email" required type="email"/>
-                    <input type="text" required="true" placeholder="Password" ng-model="self.password" required type="password"/>
+                    <input required="true" placeholder="Email address" ng-model="self.email" type="email" required />
+                    <input required="true" placeholder="Password" ng-model="self.password" type="password" required />
                     <div class="wl__table">
                         <div class="wlt__left">
                             <input type="checkbox" ng-model="self.rememberMe" id="rememberMe"/><label for="rememberMe">Remember me</label>
@@ -38,7 +38,8 @@ function genLoginConf() {
             this.password = "";
 
             const login = (state) => ({
-                wubs: state.get('wubs')
+                wubs: state.get('wubs'),
+                user: state.get('user')
             });
 
             const disconnect = this.$ngRedux.connect(login, actionCreators)(this);

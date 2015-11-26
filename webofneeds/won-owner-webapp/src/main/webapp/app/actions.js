@@ -18,7 +18,7 @@ const actionHierarchy = {
          * drafts, messages,...
          * This action will likely be caused as a consequence of signing in.
          */
-        received: INJ_DEFAULT
+        receive: INJ_DEFAULT
     },
     drafts: {
         /*
@@ -77,9 +77,17 @@ const actionHierarchy = {
 
     login: (username, password) => (dispatch) =>
         fetch('/owner/rest/users/signin', {
-            method: 'post'
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({username: username, password: password})
         }).then(
-            data => console.log(data)
+            data => dispatch(actionCreators.user__receive({username, password}))
+        ).catch(
+            error => console.log("ERROR:"+error)
         )
 }
 
