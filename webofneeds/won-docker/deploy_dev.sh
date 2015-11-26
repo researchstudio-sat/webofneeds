@@ -50,7 +50,7 @@ docker -H satsrv04:2375 run --name=wonnode_dev -d -e "uri.host=satsrv04.research
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/wonnode_dev:/usr/local/tomcat/won/client-certs/ \
--p 8888:8443 -p 61616:61616 webofneeds/wonnode:dev
+-p 8888:8443 -p 61616:61616 -m 500m webofneeds/wonnode:dev
 
 
 # wonnode 2
@@ -64,7 +64,7 @@ docker -H satsrv05:2375 run --name=wonnode_dev -d -e "uri.host=satsrv05.research
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/wonnode_dev:/usr/local/tomcat/won/client-certs/ \
--p 8888:8443 -p 61616:61616 webofneeds/wonnode:dev
+-p 8888:8443 -p 61616:61616 -m 500m webofneeds/wonnode:dev
 
 sleep 20
 
@@ -79,7 +79,7 @@ docker -H satsrv04:2375 run --name=owner_dev -d -e "node.default.host=satsrv04.r
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/owner_dev:/usr/local/tomcat/won/client-certs/ \
--p 8081:8443 webofneeds/owner:dev
+-p 8081:8443 -m 500m webofneeds/owner:dev
 
 # owner 2
 docker -H satsrv05:2375 build -t webofneeds/owner:dev $WORKSPACE/webofneeds/won-docker/owner/
@@ -92,7 +92,7 @@ docker -H satsrv05:2375 run --name=owner_dev -d -e "node.default.host=satsrv05.r
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/owner_dev:/usr/local/tomcat/won/client-certs/ \
--p 8081:8443 webofneeds/owner:dev
+-p 8081:8443 -m 500m webofneeds/owner:dev
 
 # bigdata
 docker -H satsrv06:2375 pull webofneeds/bigdata
@@ -109,7 +109,7 @@ docker -H satsrv06:2375 run --name=matcher_service_dev -d -e "node.host=satsrv06
 -e "uri.sparql.endpoint=http://satsrv06.researchstudio.at:9999/bigdata/namespace/kb/sparql" \
 -e "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8888/won/resource,https://satsrv05.researchstudio.at:8888/won/resource" \
 -v /home/install/won-client-certs/matcher_service_int:/usr/src/matcher-service/client-certs/ \
--e "cluster.local.port=2551" -e "cluster.seed.port=2551" -p 2551:2551 webofneeds/matcher_service:dev
+-e "cluster.local.port=2551" -e "cluster.seed.port=2551" -p 2551:2551 -m 500m webofneeds/matcher_service:dev
 
 # siren solr server
 docker -H satsrv06:2375 pull webofneeds/sirensolr
@@ -127,7 +127,7 @@ docker -H satsrv06:2375 run --name=matcher_siren_dev -d -e "node.host=satsrv06.r
 -e "cluster.seed.host=satsrv06.researchstudio.at" -e "cluster.seed.port=2551" -e "cluster.local.port=2552" \
 -e "matcher.siren.uri.solr.server=http://satsrv06.researchstudio.at:8983/solr/won/" \
 -e "matcher.siren.uri.solr.server.public=http://satsrv06.researchstudio.at:8983/solr/#/won/" \
--p 2552:2552 webofneeds/matcher_siren:dev
+-p 2552:2552 -m 500m webofneeds/matcher_siren:dev
 
 
 
