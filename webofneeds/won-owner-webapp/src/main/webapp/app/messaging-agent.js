@@ -20,11 +20,14 @@
 import { attach, delay, watchImmutableRdxState} from './utils';
 //import './message-service'; //TODO still uses es5
 import { actionCreators }  from './actions/actions';
+import SockJS from 'sockjs';
 
 export function runMessagingAgent(redux) {
 
-    const ws = openWebSocket()
-    //.then( (ws) => {
+    //const ws = new SockJS('owner/msg', null, {debug: true});
+    const ws = openWebSocket();
+    ws.onopen = () => {
+        /* Set up message-queue watch */
         const unsubscribeWatch = watchImmutableRdxState(
             redux, ['enqueuedMessages'],
             (newMq, oldMq) => {
@@ -39,30 +42,43 @@ export function runMessagingAgent(redux) {
                 }
             }
         );
-        //ws.on('receive',...)
-        ws.onReceived = (msg) => {
 
-            /* TODO this is only for demo purposes. In practice, more
-             * fragmented actions should be called here. Introducing
-             * an in-queue would require another agent/more agents in
-             * the system that works through the queue and dispatches
-             * actions, resulting in the same unpredictability that
-             * the pure angular approach had. For modularization handling
-             * should be broken down into layered functions in
-             * multiple files.
-             */
-            redux.dispatch(actionCreators.messages__receive({msg}));
-        }
-    //});
+    };
+    ws.onmessage = (msg) => {
+        /* TODO this is only for demo purposes. In practice, more
+         * fragmented actions should be called here. Introducing
+         * an in-queue would require another agent/more agents in
+         * the system that works through the queue and dispatches
+         * actions, resulting in the same unpredictability that
+         * the pure angular approach had. For modularization handling
+         * should be broken down into layered functions in
+         * multiple files.
+         */
+        console.log('got message via websocket: ', msg);
+        redux.dispatch(actionCreators.messages__receive({msg}));
+    };
+    ws.onerror = () => {
+    };
+    ws.onclose = () => {
+    };
+
+    window.ws4dbg = ws;//TODO deletme
 }
 
 let dummyWs = null;
 class DummyWs {
+    constructor(){
+        delay(2000).then(() => {
+            if(this.onopen) {
+                this.onopen()
+            }
+        });
+    }
     send(msg) {
         console.log('"Sending to server": ', msg);
         delay(1500).then(() => {
-            if(this.onReceived) {
-                this.onReceived(msg);
+            if(this.onmessage) {
+                this.onmessage(msg);
             }
         });
     }
