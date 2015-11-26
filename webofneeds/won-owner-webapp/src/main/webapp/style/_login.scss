@@ -16,7 +16,9 @@ won-login {
     width: 100%;
   }
 
-  input[type=text] {
+  input[type=text],
+  input[type=password],
+  input[type=email] {
     margin: 1rem 0;
     width: 100%;
     background-color: $won-lighter-gray;
