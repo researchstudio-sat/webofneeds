@@ -8,13 +8,13 @@ echo start docker build and deployment:
 docker -H satsrv04:2375 pull webofneeds/postgres
 docker -H satsrv04:2375 stop postgres_dev  || echo 'No docker container found to stop with name: postgres_dev'
 docker -H satsrv04:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
-docker -H satsrv04:2375 run --name=postgres_dev -d -p 5432:5432 webofneeds/postgres
+docker -H satsrv04:2375 run --name=postgres_dev -d -p 5432:5432 -m 300m webofneeds/postgres
 
 # postgres db 2
 docker -H satsrv05:2375 pull webofneeds/postgres
 docker -H satsrv05:2375 stop postgres_dev || echo 'No docker container found to stop with name: postgres_dev'
 docker -H satsrv05:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
-docker -H satsrv05:2375 run --name=postgres_dev -d -p 5432:5432 webofneeds/postgres
+docker -H satsrv05:2375 run --name=postgres_dev -d -p 5432:5432 -m 300m webofneeds/postgres
 
 
 # wonnode/owner server certificate generator
