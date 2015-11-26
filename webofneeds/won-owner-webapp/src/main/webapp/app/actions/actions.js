@@ -4,6 +4,7 @@
  * Contains a list of actions to be used with the dispatcher and documentation for their expected payloads.
  */
 import { tree2constants, deepFreeze, reduceAndMapTreeKeys, flattenTree, delay } from '../utils';
+import { hierarchy2Creators } from './action-utils';
 import '../service/won';
 
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
@@ -157,30 +158,8 @@ export const actionTypes = tree2constants(actionHierarchy);
  * }
  * ```
  */
-export const actionCreators = Object.freeze(flattenTree(
-        reduceAndMapTreeKeys(
-            (path, k) => path.concat(k), //construct paths, e.g. ['draft', 'new']
-            (path) => {
-                /* leaf can either be a defined creator or a
-                 * placeholder asking to generate one.
-                 */
-                const potentialCreator = won.lookup(actionHierarchy, path);
-                if(typeof potentialCreator === 'function') {
-                    return potentialCreator; //already a defined creator. hopefully.
-                } else {
-                    const type = won.lookup(actionTypes, path);
-                    return createActionCreator(type);
-                }
-            }, [], actionHierarchy
-        ),
-    '__'));
+export const actionCreators = hierarchy2Creators(actionHierarchy);
 
-function createActionCreator(type) {
-    return (payload) => {
-        console.debug('creating instance of actionType ', type, ' with payload: ', payload);
-        return {type, payload};
-    };
-}
 
 /*
  * TODO deletme; for debugging
