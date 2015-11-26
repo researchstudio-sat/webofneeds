@@ -18,4 +18,9 @@ ADD ./conf ${WON_CONFIG_DIR}
 
 # start siren matcher
 WORKDIR /usr/src/matcher-siren/
-CMD java -Dconfig.file=${WON_CONFIG_DIR}/matcher-siren/application.conf -DWON_CONFIG_DIR=${WON_CONFIG_DIR}/matcher-siren -Dlogback.configurationFile=${WON_CONFIG_DIR}/${LOGBACK_CONFIG} -jar won-matcher-siren.jar
+CMD java -Dconfig.file=${WON_CONFIG_DIR}/matcher-siren/application.conf \
+-DWON_CONFIG_DIR=${WON_CONFIG_DIR}/matcher-siren \
+-Dlogback.configurationFile=${WON_CONFIG_DIR}/${LOGBACK_CONFIG} \
+-Xmx250m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/ \
+${JMX_OPTS} \
+-jar won-matcher-siren.jar

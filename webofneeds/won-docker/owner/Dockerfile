@@ -40,7 +40,4 @@ ADD ./ssl/server.xml /usr/local/tomcat/conf/
 
 RUN mkdir -p /usr/local/tomcat/won/client-certs/
 
-# folder for storing heap dumps
-RUN mkdir -p /usr/local/tomcat/won/hdumps/
-
 RUN dos2unix /usr/local/tomcat/bin/setenv.sh

@@ -94,7 +94,7 @@ docker -H satsrv04:2375 run --name=wonnode_int -d -e "uri.host=satsrv04.research
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -p 9010:9010 \
 -e "CATALINA_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
--m 400m \
+-m 400m -v /home/install/hdumps/node-int:/usr/local/tomcat/temp/ \
 webofneeds/wonnode:int
 
 # wonnode 2
@@ -107,6 +107,9 @@ docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv05.research
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-p 9010:9010 \
+-e "CATALINA_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
+-m 400m -v /home/install/hdumps/node-int:/usr/local/tomcat/temp/ \
 webofneeds/wonnode:int
 
 
@@ -122,7 +125,7 @@ docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.r
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -p 9011:9011 \
 -e "CATALINA_OPTS=-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
--m 400m -v /home/install/hdumps/owner-int:/usr/local/tomcat/won/hdumps/ \
+-m 400m -v /home/install/hdumps/owner-int:/usr/local/tomcat/temp/ \
 webofneeds/owner:int
 
 # owner 2
@@ -135,6 +138,9 @@ docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv05.r
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-p 9011:9011 \
+-e "CATALINA_OPTS=-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
+-m 400m -v /home/install/hdumps/owner-int:/usr/local/tomcat/temp/ \
 webofneeds/owner:int
 
 # bigdata
@@ -152,6 +158,9 @@ docker -H satsrv06:2375 run --name=matcher_service_int -d -e "node.host=satsrv06
 -e "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8889/won/resource,https://satsrv05.researchstudio.at:8889/won/resource" \
 -e "cluster.local.port=2561" -e "cluster.seed.port=2561" -p 2561:2561 \
 -v /home/install/won-client-certs/matcher_service_int:/usr/src/matcher-service/client-certs/ \
+-p 9010:9010 \
+-e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
+-m 400m -v /home/install/hdumps/matcher-service-int:/usr/local/temp/ \
 webofneeds/matcher_service:int
 
 # siren solr server
@@ -169,4 +178,7 @@ docker -H satsrv06:2375 run --name=matcher_siren_int -d -e "node.host=satsrv06.r
 -e "cluster.seed.host=satsrv06.researchstudio.at" -e "cluster.seed.port=2561" -e "cluster.local.port=2562" \
 -e "matcher.siren.uri.solr.server=http://satsrv06.researchstudio.at:8984/solr/won/" \
 -e "matcher.siren.uri.solr.server.public=http://satsrv06.researchstudio.at:8984/solr/#/won/" \
+-p 9011:9011 \
+-e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
+-m 400m -v /home/install/hdumps/matcher-service-int:/usr/local/temp/ \
 -p 2562:2562 webofneeds/matcher_siren:int
