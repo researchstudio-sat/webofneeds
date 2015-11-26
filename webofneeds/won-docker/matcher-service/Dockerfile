@@ -23,6 +23,6 @@ WORKDIR /usr/src/matcher-service/
 CMD java -Dconfig.file=${WON_CONFIG_DIR}/matcher-service/application.conf \
 -DWON_CONFIG_DIR=${WON_CONFIG_DIR}/matcher-service/ \
 -Dlogback.configurationFile=${WON_CONFIG_DIR}/${LOGBACK_CONFIG} \
--Xmx250m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/ \
+${JMEM_OPTS} \
 ${JMX_OPTS} \
 -jar won-matcher-service.jar
