@@ -17,72 +17,44 @@
 * messages to the server via the service.
  */
 
-import { attach, delay } from '../utils';
+import { attach, delay, watchImmutableRdxState} from '../utils';
 //import './message-service'; //TODO still uses es5
 import { actionCreators }  from '../actions';
 
-const serviceDependencies = ['$ngRedux', '$rootScope', /*injections as strings here*/];
-class AgentService {
-    static factory (/* arguments <- serviceDependencies */) {
-      return new AgentService(...arguments);
-    }
-    constructor(/* arguments <- serviceDependencies */) {
-        attach(this, serviceDependencies, arguments);
+export function runMessagingAgent(redux) {
 
-        window.mas4Dbg = this; //TODO deletme; for debugging
-
-        const selectFromState = (state) => ({ state });
-
-
-        /*
-        const unsubscribe = this.$ngRedux.subscribe(() => {
-            const state = selectFromState(this.$ngRedux.getState());
-
-        });
-        */
-        const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-        this.$rootScope.$on('$destroy', disconnect);
-
-        const ws = openWebSocket()
-        /*.then( (ws) => {*/
-            this.$rootScope.$watch(
-                //not sure that this will be always called when the state changes. might require $applies sometimes
-                (scope) => this.state.get('enqueuedMessages'),
-                (newMq, oldMq) => {
-                    console.log('old mq length: ', oldMq.size);
-                    console.log('new mq length: ', newMq.size);
-                    if (newMq.size > 0) {
-                        // a new msg was enqueued
-                        const msg = newMq.first();
-                        console.log('about to send ', msg);
-                        ws.send(msg);
-                        this.messages__markAsSent({msg}); //might be necessary to do this async (with `delay(...,0)`)
-                    }
+    const ws = openWebSocket()
+    //.then( (ws) => {
+        const unsubscribeWatch = watchImmutableRdxState(
+            redux, ['enqueuedMessages'],
+            (newMq, oldMq) => {
+                console.log('old mq length: ', oldMq.size);
+                console.log('new mq length: ', newMq.size);
+                if (newMq.size > 0) {
+                    // a new msg was enqueued
+                    const msg = newMq.first();
+                    console.log('about to send ', msg);
+                    ws.send(msg);
+                    redux.dispatch(actionCreators.messages__markAsSent({msg})); //might be necessary to do this async (with `delay(...,0)`)
                 }
-            )
-            //ws.on('receive',...)
-            ws.onReceived = (msg) => {
-
-                /* TODO this is only for demo purposes. In practice, more
-                 * fragmented actions should be called here. Introducing
-                 * an in-queue would require another agent/more agents in
-                 * the system that works through the queue and dispatches
-                 * actions, resulting in the same unpredictability that
-                 * the pure angular approach had. For modularization handling
-                 * should be broken down into layered functions in
-                 * multiple files.
-                 */
-                this.messages__receive({msg});
             }
-        /*});*/
+        );
+        //ws.on('receive',...)
+        ws.onReceived = (msg) => {
 
-
-        //function to put watches on interesting parts of the tree
-        //watch(state, ['path','to','property'], callbackFunction)
-        //watch(() => watcheObject, callbackFunction)
-    }
+            /* TODO this is only for demo purposes. In practice, more
+             * fragmented actions should be called here. Introducing
+             * an in-queue would require another agent/more agents in
+             * the system that works through the queue and dispatches
+             * actions, resulting in the same unpredictability that
+             * the pure angular approach had. For modularization handling
+             * should be broken down into layered functions in
+             * multiple files.
+             */
+            redux.dispatch(actionCreators.messages__receive({msg}));
+        }
+    //});
 }
-AgentService.factory.$inject = serviceDependencies;
 
 let dummyWs = null;
 class DummyWs {
@@ -96,10 +68,3 @@ class DummyWs {
     }
 }
 function openWebSocket() { return dummyWs? dummyWs : new DummyWs() }
-
-export default angular.module('won.owner.wonservice', [
-    ])
-    //TODO needs more expressive name (something like 'connector'? 'messagingAgent'?
-    .factory('messagingAgentService', AgentService.factory)
-    .run(['messagingAgentService', (messagingAgentService) => {}]) //make sure the service is initialized
-    .name

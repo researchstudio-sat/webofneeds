@@ -32,7 +32,7 @@ import configRedux from './configRedux';
  * approach to asynchronity (Remove it or the thunk-based
  * solution afterwards)
  */
-import messagingAgentServiceModule from './service/messaging-agent-service';
+import { runMessagingAgent } from './service/messaging-agent-service';
 
 
 //settings
@@ -72,16 +72,12 @@ let app = angular.module('won.owner', [
     avatarSettingsModule,
     generalSettingsModule,
 
-    /* TODO this fragment is part of an attempt to sketch a different
-     * approach to asynchronity (Remove it or the thunk-based
-     * solution afterwards)
-     */
-    messagingAgentServiceModule,
-
 ]);
 
 app.config([ '$ngReduxProvider', configRedux ]);
 app.config([ '$urlRouterProvider', '$stateProvider', configRouting ]);
+//app.config([ '$ngRedux', $ngRedux => runMessagingAgent($ngRedux) ]);
+app.run([ '$ngRedux', $ngRedux => runMessagingAgent($ngRedux) ]);
 
 //let app = angular.module('won.owner',[...other modules...]);
 angular.bootstrap(document, ['won.owner'], {
