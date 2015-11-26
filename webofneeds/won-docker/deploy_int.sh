@@ -42,13 +42,13 @@ echo run docker containers:
 docker -H satsrv04:2375 pull webofneeds/postgres
 docker -H satsrv04:2375 stop postgres_int || echo 'No docker container found to stop with name: postgres_int'
 docker -H satsrv04:2375 rm postgres_int || echo 'No docker container found to remove with name: postgres_int'
-docker -H satsrv04:2375 run --name=postgres_int -d -p 5433:5432 webofneeds/postgres
+docker -H satsrv04:2375 run --name=postgres_int -d -p 5433:5432 -m 300m webofneeds/postgres
 
 # postgres db 2
 docker -H satsrv05:2375 pull webofneeds/postgres
 docker -H satsrv05:2375 stop postgres_int || echo 'No docker container found to stop with name: postgres_int'
 docker -H satsrv05:2375 rm postgres_int || echo 'No docker container found to remove with name: postgres_int'
-docker -H satsrv05:2375 run --name=postgres_int -d -p 5433:5432 webofneeds/postgres
+docker -H satsrv05:2375 run --name=postgres_int -d -p 5433:5432 -m 300m webofneeds/postgres
 
 sleep 10
 
@@ -147,7 +147,7 @@ webofneeds/owner:int
 docker -H satsrv06:2375 pull webofneeds/bigdata
 docker -H satsrv06:2375 stop bigdata_int || echo 'No docker container found to stop with name: bigdata_int'
 docker -H satsrv06:2375 rm bigdata_int || echo 'No docker container found to remove with name: bigdata_int'
-docker -H satsrv06:2375 run --name=bigdata_int -d -p 10000:9999 webofneeds/bigdata
+docker -H satsrv06:2375 run --name=bigdata_int -d -p 10000:9999 -m 350m webofneeds/bigdata
 
 # matcher service
 docker -H satsrv06:2375 stop matcher_service_int || echo 'No docker container found to stop with name: matcher_service_int'
@@ -167,7 +167,7 @@ webofneeds/matcher_service:int
 docker -H satsrv06:2375 pull webofneeds/sirensolr
 docker -H satsrv06:2375 stop sirensolr_int || echo 'No docker container found to stop with name: sirensolr_int'
 docker -H satsrv06:2375 rm sirensolr_int || echo 'No docker container found to remove with name: sirensolr_int'
-docker -H satsrv06:2375 run --name=sirensolr_int -d -p 7071:8080 -p 8984:8983 webofneeds/sirensolr
+docker -H satsrv06:2375 run --name=sirensolr_int -d -p 7071:8080 -p 8984:8983 -m 350m webofneeds/sirensolr
 
 sleep 10
 
