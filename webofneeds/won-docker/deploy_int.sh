@@ -112,6 +112,7 @@ docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv05.research
 -m 500m -v /home/install/hdumps/node-int:/usr/local/tomcat/temp/ \
 webofneeds/wonnode:int
 
+sleep 20
 
 # owner 1
 docker -H satsrv04:2375 stop owner_int || echo 'No docker container found to stop with name: owner_int'
