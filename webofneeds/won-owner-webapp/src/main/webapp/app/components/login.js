@@ -3,10 +3,14 @@
  */
 ;
 import angular from 'angular';
+import { attach } from '../utils';
+import { actionCreators }  from '../actions';
+
+/*import messagingAgentServiceModule from '../service/messaging-agent-service';*/
 
 function genLoginConf() {
     let template = `<a href="#" class="wl__button" ng-click="self.open = !self.open">
-                        <span class="wl__button__caption">Sign in</span>
+                        <span class="wl__button__caption">Sign in {{self.wubs.toArray()}}</span>
                         <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" class="wl__button__carret">
                     </a>
                     <input type="text" required="true" placeholder="Email address" ng-model="self.email" required type="email"/>
@@ -19,11 +23,29 @@ function genLoginConf() {
                             <a href="#">Forgot Password?</a>
                         </div>
                     </div>
-                    <button class="won-button--filled lighterblue">Sign in</button>
+                    <button class="won-button--filled lighterblue" ng-click="::self.login(self.email, self.password)">Sign in</button>
                     <span class="wl__register">No Account yet? <a href="#">Sign up</a></span>`;
 
 
-    class Controller {}
+
+    const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'messagingAgentServiceModule'*//*'$routeParams' /*injections as strings here*/];
+
+    class Controller {
+        constructor(/* arguments <- serviceDependencies */){
+            attach(this, serviceDependencies, arguments);
+
+            this.email = "";
+            this.password = "";
+
+            const login = (state) => ({
+                wubs: state.get('wubs')
+            });
+
+            const disconnect = this.$ngRedux.connect(login, actionCreators)(this);
+            this.$scope.$on('$destroy',disconnect);
+        }
+    }
+    Controller.$inject = serviceDependencies;
 
     return {
         restrict: 'E',
@@ -35,7 +57,9 @@ function genLoginConf() {
     }
 }
 
-export default angular.module('won.owner.components.login', [])
+export default angular.module('won.owner.components.login', [
+    /*messagingAgentServiceModule*/
+])
     .directive('wonLogin', genLoginConf)
     .name;
 

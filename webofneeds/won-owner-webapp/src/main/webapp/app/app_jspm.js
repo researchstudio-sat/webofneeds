@@ -34,6 +34,7 @@ import configRedux from './configRedux';
  */
 import messagingAgentServiceModule from './service/messaging-agent-service';
 
+import 'fetch';
 
 //settings
 import settingsTitleBarModule from './components/settings-title-bar';

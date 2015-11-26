@@ -13,12 +13,12 @@ import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 const INJ_DEFAULT = 'INJECT_DEFAULT_ACTION_CREATOR';
 const actionHierarchy = {
     /* actions received as responses or push notifications */
-    received: {
+    user: {
         /* contains all user-bound data, e.g. ownedPosts,
          * drafts, messages,...
          * This action will likely be caused as a consequence of signing in.
          */
-        userData : INJ_DEFAULT
+        received: INJ_DEFAULT
     },
     drafts: {
         /*
@@ -73,6 +73,13 @@ const actionHierarchy = {
         delay(milliseconds).then(
                 args => dispatch(actionCreators.moreWub(nrOfWubs)),
                 error => console.err('actions.js: Error while delaying for delayed Wub.')
+        ),
+
+    login: (username, password) => (dispatch) =>
+        fetch('/owner/rest/users/signin', {
+            method: 'post'
+        }).then(
+            data => console.log(data)
         )
 }
 
