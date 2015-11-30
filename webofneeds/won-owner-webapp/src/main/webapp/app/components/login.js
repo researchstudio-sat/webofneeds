@@ -9,7 +9,6 @@ import { actionCreators }  from '../actions/actions';
 function genLoginConf() {
     let template = `<a href="#" class="wl__button" ng-click="self.open = !self.open">
                         <span class="wl__button__caption">Sign in</span>
-                        <span class="wl__button__caption" ng-show="self.loggedIn">Signed in</span>
                         <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" class="wl__button__carret">
                     </a>
                     <input required="true" placeholder="Email address" ng-model="self.email" type="email" required />

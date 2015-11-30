@@ -4,6 +4,7 @@
 ;
 import angular from 'angular';
 import loginComponent from 'app/components/login';
+import logoutComponent from 'app/components/logout';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 
@@ -35,7 +36,7 @@ function genTopnavConf() {
                                 <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" ng-show="self.open" class="topnav__carret">
                             </a>
                         </li>
-                        <li ng-show="self.loggedIn" ng-click="::self.logout()">
+                        <li ng-show="self.loggedIn" ng-click="self.open = !self.open">
                             <a href="#" class="topnav__button">
                                 <span class="topnav__button__caption">{{self.email}}</span>
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__carret">
@@ -50,6 +51,13 @@ function genTopnavConf() {
             <div class="lo__inner">
                 <div class="lo__inner__right">
                     <won-login open="self.open"></won-login>
+                </div>
+            </div>
+        </nav>
+        <nav class="loginOverlay" ng-show="self.open && self.loggedIn">
+            <div class="lo__inner">
+                <div class="lo__inner__right">
+                    <won-logout open="self.open"></won-logout>
                 </div>
             </div>
         </nav>
@@ -85,7 +93,8 @@ function genTopnavConf() {
 }
 
 export default angular.module('won.owner.components.topnav', [
-    loginComponent
+    loginComponent,
+    logoutComponent
 ])
     .directive('wonTopnav', genTopnavConf)
     .name;
