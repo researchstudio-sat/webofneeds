@@ -92,7 +92,7 @@ const actionHierarchy = {
         }).then(
             data => dispatch(actionCreators.user__receive({loggedIn: true, email: username}))
         ).catch(
-            //TODO: PRINT ERROR MESSAGE ACCORDINGLY
+            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
             error => dispatch(actionCreators.user__receive({loggedIn : false}))
         ),
     logout: () => (dispatch) =>
@@ -110,8 +110,26 @@ const actionHierarchy = {
         }).then(
             data => dispatch(actionCreators.user__receive({loggedIn: false}))
         ).catch(
-            //TODO: PRINT ERROR MESSAGE ACCORDINGLY
+            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
             error => dispatch(actionCreators.user__receive({loggedIn : true}))
+        ),
+    register: (username, password, passwordAgain) => (dispatch) =>
+        fetch('/owner/rest/users/', {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({username: username, password: password, passwordAgain: passwordAgain})
+        }).then(checkStatus)
+            .then( response => {
+                return response.json()
+            }).then(
+                data => dispatch(actionCreators.user__receive({loggedIn: true, email: username}))
+        ).catch(
+            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
+                error => dispatch(actionCreators.user__receive({loggedIn : false}))
         )
 }
 

@@ -30,9 +30,9 @@
                     <div class="header">Sign up here.</div>
                     <input type="text" required="true" placeholder="Email address" ng-model="self.email" required type="email"/>
                     <input type="text" required="true" placeholder="Password" ng-model="self.password" required type="password"/>
-                    <input type="text" required="true" placeholder="Repeat Password" ng-model="self.repeatPassword" required type="password"/>
+                    <input type="text" required="true" placeholder="Repeat Password" ng-model="self.passwordAgain" required type="password"/>
                 </div>
-                <button class="won-button--filled darkgray" ng-click="self.register()">That’s all we need. Let’s go!</button>
+                <button class="won-button--filled darkgray" ng-click="::self.register(self.email, self.password, self.passwordAgain)">That’s all we need. Let’s go!</button>
             </div>
             <div class="tg__anonymous">
                 <div class="block">
