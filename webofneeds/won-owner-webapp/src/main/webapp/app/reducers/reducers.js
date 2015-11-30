@@ -33,9 +33,14 @@ const reducers = {
 
         //handlers
         {
-            [actionTypes.user.receive]: (state, {payload: {username, password}}) => {
-                console.log('reducers.js: received successful-login action from app-server');
-                return Immutable.fromJS(payload);
+            [actionTypes.user.receive]: (state, {payload: {loggedIn, email}}) => {
+                if(loggedIn == true){
+                    console.log('reducers.js: received successful-login action from app-server');
+                    return Immutable.fromJS({loggedIn: true, email: email});
+                }else{
+                    console.log('reducers.js: received UNsuccessful-login action from app-server');
+                    return Immutable.fromJS({loggedIn: false});
+                }
             }
         }
     ),

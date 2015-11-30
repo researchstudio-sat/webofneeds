@@ -1,7 +1,7 @@
 ;
 
 import angular from 'angular';
-import topNavModule from '../landingpage-topnav';
+import topNavModule from '../topnav';
 import overviewTitleBarModule from '../visitor-title-bar';
 import accordionModule from '../accordion';
 import flexGridModule from '../flexgrid';
@@ -31,6 +31,7 @@ class LandingpageController {
     }
 
     toggleMoreInfo(){
+        console.log("TOGGLE");
         this.moreInfo = !this.moreInfo;
     }
 }

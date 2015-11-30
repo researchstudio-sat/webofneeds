@@ -6,11 +6,10 @@ import angular from 'angular';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 
-/*import messagingAgentServiceModule from '../service/messaging-agent-service';*/
-
 function genLoginConf() {
     let template = `<a href="#" class="wl__button" ng-click="self.open = !self.open">
-                        <span class="wl__button__caption">Sign in {{self.user.toJS()}}</span>
+                        <span class="wl__button__caption">Sign in</span>
+                        <span class="wl__button__caption" ng-show="self.loggedIn">Signed in</span>
                         <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" class="wl__button__carret">
                     </a>
                     <input required="true" placeholder="Email address" ng-model="self.email" type="email" required />
@@ -26,9 +25,7 @@ function genLoginConf() {
                     <button class="won-button--filled lighterblue" ng-click="::self.login(self.email, self.password)">Sign in</button>
                     <span class="wl__register">No Account yet? <a href="#">Sign up</a></span>`;
 
-
-
-    const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'messagingAgentServiceModule'*//*'$routeParams' /*injections as strings here*/];
+    const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */){
@@ -38,8 +35,7 @@ function genLoginConf() {
             this.password = "";
 
             const login = (state) => ({
-                wubs: state.get('wubs'),
-                user: state.get('user')
+                loggedIn: state.get('user').toJS().loggedIn
             });
 
             const disconnect = this.$ngRedux.connect(login, actionCreators)(this);
@@ -58,9 +54,7 @@ function genLoginConf() {
     }
 }
 
-export default angular.module('won.owner.components.login', [
-    /*messagingAgentServiceModule*/
-])
+export default angular.module('won.owner.components.login', [])
     .directive('wonLogin', genLoginConf)
     .name;
 

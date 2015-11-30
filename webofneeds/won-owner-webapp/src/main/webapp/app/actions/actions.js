@@ -19,7 +19,8 @@ const actionHierarchy = {
          * drafts, messages,...
          * This action will likely be caused as a consequence of signing in.
          */
-        receive: INJ_DEFAULT
+        receive: INJ_DEFAULT,
+        failed: INJ_DEFAULT
     },
     drafts: {
         /*
@@ -85,11 +86,44 @@ const actionHierarchy = {
             },
             credentials: 'include',
             body: JSON.stringify({username: username, password: password})
+        }).then(checkStatus)
+        .then( response => {
+            return response.json()
         }).then(
-            data => dispatch(actionCreators.user__receive({username, password}))
+            data => dispatch(actionCreators.user__receive({loggedIn: true, email: username}))
         ).catch(
-            error => console.log("ERROR:"+error)
+            //TODO: PRINT ERROR MESSAGE ACCORDINGLY
+            error => dispatch(actionCreators.user__receive({loggedIn : false}))
+        ),
+    logout: () => (dispatch) =>
+        fetch('/owner/rest/users/signout', {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({})
+        }).then(checkStatus)
+        .then( response => {
+            return response.json()
+        }).then(
+            data => dispatch(actionCreators.user__receive({loggedIn: false}))
+        ).catch(
+            //TODO: PRINT ERROR MESSAGE ACCORDINGLY
+            error => dispatch(actionCreators.user__receive({loggedIn : true}))
         )
+}
+
+//TODO: MOVE THIS TO SOME SERVICE, in fact move the whole "fetch stuff to a service of some sorts
+function checkStatus(response) {
+    if (response.status >= 200 && response.status < 300) {
+        return response
+    } else {
+        var error = new Error(response.statusText)
+        error.response = response
+        throw error
+    }
 }
 
 
