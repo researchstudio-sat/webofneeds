@@ -175,7 +175,7 @@ docker -H satsrv06:2375 pull webofneeds/sirensolr
 docker -H satsrv06:2375 stop sirensolr_int || echo 'No docker container found to stop with name: sirensolr_int'
 docker -H satsrv06:2375 rm sirensolr_int || echo 'No docker container found to remove with name: sirensolr_int'
 docker -H satsrv06:2375 run --name=sirensolr_int -d -p 7071:8080 -p 8984:8983 \
--e CATALINA_OPTS="-Xmx200m  -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof -Dcom.sun.management.jmxremote.port=9012 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9012 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
+-e CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof -Dcom.sun.management.jmxremote.port=9012 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9012 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
 -m 350m webofneeds/sirensolr
 
 sleep 10

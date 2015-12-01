@@ -127,7 +127,7 @@ docker -H satsrv06:2375 pull webofneeds/sirensolr
 docker -H satsrv06:2375 stop sirensolr_dev || echo 'No docker container found to stop with name: sirensolr_dev'
 docker -H satsrv06:2375 rm sirensolr_dev || echo 'No docker container found to remove with name: sirensolr_dev'
 docker -H satsrv06:2375 run --name=sirensolr_dev -d -p 7070:8080 -p 8983:8983 \
---env CATALINA_OPTS="-Xmx200m  -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof" \
+--env CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof" \
 -m 350m webofneeds/sirensolr
 
 sleep 10
