@@ -17,6 +17,9 @@ ENV MAIN_BOT=won.bot.app.EchoBotApp
 ADD ./bots.jar /usr/src/bots/
 ADD ./conf ${WON_CONFIG_DIR}
 
+# add certificates directory
+RUN mkdir -p /usr/src/bots/client-certs
+
 # start echo bot
 WORKDIR /usr/src/bots/
 CMD java -DWON_CONFIG_DIR=${WON_CONFIG_DIR}/ \
