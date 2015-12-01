@@ -5,6 +5,7 @@
 
 import angular from 'angular';
 import { attach } from '../utils';
+import { actionCreators } from '../actions/actions';
 
 function genComponentConf() {
     let template = `
