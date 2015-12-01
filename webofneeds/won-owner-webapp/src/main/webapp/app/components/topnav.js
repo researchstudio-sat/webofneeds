@@ -19,7 +19,7 @@ function genTopnavConf() {
                     </a>
                 </div>
                 <div class="topnav__inner__center" ng-show="self.loggedIn">
-                    <a ng-link="createNeed" class="topnav__button">
+                    <a ui-sref="createNeed" class="topnav__button">
                         <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon">
                         <span class="topnav__button__caption">New Need</span>
                     </a>
@@ -68,9 +68,6 @@ function genTopnavConf() {
     class Controller {
         constructor(/* arguments <- serviceDependencies */){
             attach(this, serviceDependencies, arguments);
-
-            this.email = "";
-            this.password = "";
 
             const login = (state) => ({
                 loggedIn: state.get('user').toJS().loggedIn,

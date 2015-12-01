@@ -10,14 +10,14 @@ function genComponentConf() {
         <nav ng-cloak ng-show="{{true}}" class="main-tab-bar">
             <div class="mtb__inner">
                 <ul class="mtb__inner__center mtb__tabs">
-                    <li ng-class="self.selection == 0? 'mtb__tabs__selected' : ''"><a ng-link="feed">Feed</a></li>
-                    <li ng-class="self.selection == 1? 'mtb__tabs__selected' : ''"><a ng-link="overviewPosts">Posts
+                    <li ng-class="self.selection == 0? 'mtb__tabs__selected' : ''"><a ui-sref="feed">Feed</a></li>
+                    <li ng-class="self.selection == 1? 'mtb__tabs__selected' : ''"><a ui-sref="overviewPosts">Posts
                         <span class="mtb__tabs__unread">5</span>
                     </a></li>
-                    <li ng-class="self.selection == 2? 'mtb__tabs__selected' : ''"><a ng-link="overviewIncomingRequests">Incoming Requests
+                    <li ng-class="self.selection == 2? 'mtb__tabs__selected' : ''"><a ui-sref="overviewIncomingRequests">Incoming Requests
                         <span class="mtb__tabs__unread">5</span>
                     </a></li>
-                    <li ng-class="self.selection == 3? 'mtb__tabs__selected' : ''"><a ng-link="overviewMatches">Matches
+                    <li ng-class="self.selection == 3? 'mtb__tabs__selected' : ''"><a ui-sref="overviewMatches">Matches
                         <span class="mtb__tabs__unread">18</span>
                     </a></li>
                 </ul>
