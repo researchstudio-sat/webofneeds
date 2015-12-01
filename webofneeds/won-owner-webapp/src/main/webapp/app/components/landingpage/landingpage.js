@@ -34,15 +34,7 @@ class LandingpageController {
         attach(this, serviceDependencies, arguments);
 
         const signup = (state) => ({
-            loggedIn: state.get('user').toJS().loggedIn,
-            questions: [{title: "What about my personal data", detail: "1blablabla"},
-                {title: "Who can view my posts", detail: "2blablabla"},
-                {title: "Do I need to register?", detail: "3blablabla"},
-                {title: "What about my personal data", detail: "4blablabla"},
-                {title: "Who can view my posts", detail: "5blablabla"},
-                {title: "Do I need to register?", detail: "5blablabla"},
-                {title: "What about my personal data", detail: "5blablabla"},
-                {title: "Who can view my posts", detail: "5blablabla"}]
+            loggedIn: state.get('user').toJS().loggedIn
         });
 
         const disconnect = this.$ngRedux.connect(signup, actionCreators)(this);
