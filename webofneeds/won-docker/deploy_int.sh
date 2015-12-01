@@ -35,6 +35,13 @@ docker -H satsrv06:2375 build -t webofneeds/gencert:int $WORKSPACE/webofneeds/wo
 docker -H satsrv07:2375 build -t webofneeds/gencert:int $WORKSPACE/webofneeds/won-docker/gencert/
 
 
+# bots
+docker -H satsrv04:2375 build -t webofneeds/bots:int $WORKSPACE/webofneeds/won-docker/bots/
+docker -H satsrv05:2375 build -t webofneeds/bots:int $WORKSPACE/webofneeds/won-docker/bots/
+docker -H satsrv06:2375 build -t webofneeds/bots:int $WORKSPACE/webofneeds/won-docker/bots/
+docker -H satsrv07:2375 build -t webofneeds/bots:int $WORKSPACE/webofneeds/won-docker/bots/
+
+
 # start the won containers on dedicated servers of the cluster
 echo run docker containers:
 
@@ -175,6 +182,7 @@ docker -H satsrv06:2375 pull webofneeds/sirensolr
 docker -H satsrv06:2375 stop sirensolr_int || echo 'No docker container found to stop with name: sirensolr_int'
 docker -H satsrv06:2375 rm sirensolr_int || echo 'No docker container found to remove with name: sirensolr_int'
 docker -H satsrv06:2375 run --name=sirensolr_int -d -p 7071:8080 -p 8984:8983 \
+-p 9012:9012 \
 -e CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof -Dcom.sun.management.jmxremote.port=9012 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9012 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
 -m 350m webofneeds/sirensolr
 
@@ -192,3 +200,16 @@ docker -H satsrv06:2375 run --name=matcher_siren_int -d -e "node.host=satsrv06.r
 -e "JMEM_OPTS=-Xmx150m  -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof" \
 -m 350m -v /home/install/hdumps/matcher-siren-int:/usr/local/temp/ \
 -p 2562:2562 webofneeds/matcher_siren:int
+
+
+sleep 20
+docker -H satsrv06:2375 stop echo_bot_int || echo 'No docker container found to stop with name: echo_bot_int'
+docker -H satsrv06:2375 rm echo_bot_int || echo 'No docker container found to remove with name: echo_bot_int'
+docker -H satsrv06:2375 run --name=echo_bot_int -d \
+-e "node.default.host=satsrv04.researchstudio.at" -e "node.default.http.port=8889" \
+-e "won.node.uris=https://satsrv04.researchstudio.at:8889/won/resource https://satsrv05.researchstudio.at:8889/won/resource" \
+-p 9013:9013 \
+-e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9013 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9013 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
+-e "JMEM_OPTS=-Xmx150m  -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof" \
+-m 300m -v /home/install/hdumps/echo-bot-int:/usr/local/temp/ \
+webofneeds/bots:int
