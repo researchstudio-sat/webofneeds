@@ -196,3 +196,20 @@ docker -H satsrv06:2375 run --name=matcher_siren_int -d -e "node.host=satsrv06.r
 -e "matcher.siren.uri.solr.server.public=http://satsrv06.researchstudio.at:8984/solr/#/won/" \
 -e "matcher.siren.monitoring=true" \
 -p 2562:2562 webofneeds/matcher_siren:int
+
+
+sleep 20
+docker -H satsrv06:2375 stop need_creator_bot_int || echo 'No docker container found to stop with name: need_creator_bot_int'
+docker -H satsrv06:2375 rm need_creator_bot_int || echo 'No docker container found to remove with name: need_creator_bot_int'
+docker -H satsrv06:2375 run --name=need_creator_bot_int -d \
+-e "node.default.host=satsrv04.researchstudio.at" -e "node.default.http.port=8889" \
+-e "won.node.uris=https://satsrv04.researchstudio.at:8889/won/resource https://satsrv05.researchstudio.at:8889/won/resource https://satsrv04.researchstudio.at:8890/won/resource https://satsrv05.researchstudio.at:8890/won/resource" \
+-e "mail.directory.supply=R:/02 projekte aktuell/1305-USS WON-COIN/03 work/Scalability and Matching/corpora/freecycle-nyc-0414.sorted/supply"
+-e "mail.directory.demand=R:/02 projekte aktuell/1305-USS WON-COIN/03 work/Scalability and Matching/corpora/freecycle-nyc-0414.sorted/demand"
+-p 9013:9013 \
+-e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9013 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9013 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
+-e "JMEM_OPTS=-Xmx150m  -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof" \
+-e "MAIN_BOT=won.bot.app.NeedCreatorBotApp" \
+-v /home/install/freecycle:/usr/src/mails/ \
+-m 300m -v /home/install/hdumps/need-creator-bot-int:/usr/local/temp/ \
+webofneeds/bots:int
