@@ -115,7 +115,7 @@ docker -H satsrv05:2375 run --name=wonnode_int2 -d -e "uri.host=satsrv05.researc
 -e "monitoring.output.dir=/usr/local/tomcat/won" \
 -e "monitoring.interval.seconds=60" \
 -p 9010:9010 \
--e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
+-e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx150m  -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/" \
 -m 350m -v /home/install/hdumps/node-int:/usr/local/tomcat/temp/ \
 webofneeds/wonnode:int
@@ -246,9 +246,8 @@ docker -H satsrv06:2375 rm need_creator_bot_int || echo 'No docker container fou
 docker -H satsrv06:2375 run --name=need_creator_bot_int -d \
 -e "node.default.host=satsrv04.researchstudio.at" -e "node.default.http.port=8889" \
 -e "won.node.uris=https://satsrv04.researchstudio.at:8889/won/resource https://satsrv05.researchstudio.at:8889/won/resource https://satsrv04.researchstudio.at:8890/won/resource https://satsrv05.researchstudio.at:8890/won/resource" \
--e "mail.directory.supply=R:/02 projekte aktuell/1305-USS WON-COIN/03 work/Scalability and Matching/corpora/freecycle-nyc-0414.sorted/supply"
--e "mail.directory.demand=R:/02 projekte aktuell/1305-USS WON-COIN/03 work/Scalability and Matching/corpora/freecycle-nyc-0414.sorted/demand"
--e "matcher.siren.monitoring=true" \
+-e "mail.directory.supply=/usr/src/mails/supply" \
+-e "mail.directory.demand=/usr/src/mails/demand" \
 -p 9013:9013 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9013 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9013 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx150m  -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof" \
