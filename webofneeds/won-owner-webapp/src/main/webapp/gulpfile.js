@@ -8,7 +8,9 @@ var autoprefixer = require('gulp-autoprefixer');
 var svgSprite = require('gulp-svg-sprite');
 var sassImportOnce = require('node-sass-import-once');
 
-gulp.task('default', ['sass', 'iconsprite']);
+
+gulp.task('default', ['build']);
+gulp.task('build', ['sass', 'iconsprite']);
 gulp.task('watch', ['sass', 'iconsprite'], function() {
     gulp.watch('./style/**/*.scss', ['sass']);
     gulp.watch('./style/**/_*.scss', ['sass']);
