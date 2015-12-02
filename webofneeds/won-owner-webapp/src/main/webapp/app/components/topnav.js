@@ -94,9 +94,9 @@ function genTopnavConf() {
 }
 
 export default angular.module('won.owner.components.topnav', [
-    loginComponent,
-    logoutComponent
-])
+        loginComponent,
+        logoutComponent
+    ])
     .directive('wonTopnav', genTopnavConf)
     .name;
 

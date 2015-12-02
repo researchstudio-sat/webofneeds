@@ -34,11 +34,12 @@ class LandingpageController {
         attach(this, serviceDependencies, arguments);
 
         const signup = (state) => ({
-            loggedIn: state.get('user').toJS().loggedIn
+            loggedIn: state.get('user').toJS().loggedIn,
         });
 
         const disconnect = this.$ngRedux.connect(signup, actionCreators)(this);
         this.$scope.$on('$destroy',disconnect);
+
         this.questions = questions;
         this.peopleGrid = peopleGrid;
         this.workGrid = workGrid;
