@@ -17,6 +17,7 @@ import { enqueuedMessagesReducer, sentMessagesReducer, receivedMessagesReducer }
 import { router } from 'redux-ui-router';
 
 const reducers = {
+    router,
 
     wubs: createReducer(Immutable.List(), {
         [actionTypes.moreWub]: (state, action) => {
