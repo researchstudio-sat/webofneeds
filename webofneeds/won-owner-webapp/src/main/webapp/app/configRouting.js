@@ -52,33 +52,6 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
             template: `<won-general-settings></won-general-settings>`
         })
 
-    $stateProvider
-        .state('routerDemo', {
-            url: '/router-demo/:demoVar',
-            template: `
-                <p>demoVar = {{self.state.getIn(['router', 'currentParams', 'demoVar'])}}</p>
-                <div>
-                    <a ui-sref="routerDemo.childA">~A~</a> |
-                    <a ui-sref="routerDemo.childB">~B~</a>
-                </div>
-                <div ui-view></div>
-            `,
-            controller: ['$ngRedux', '$scope', function($ngRedux, $scope) {
-                this.$ngRedux = $ngRedux;
-                this.$scope = $scope;
-                const disconnect = this.$ngRedux.connect((state) => ({state}), {})(this);
-                this.$scope.$on('$destroy',disconnect);
-            }],
-            controllerAs: 'self'
-        })
-        .state('routerDemo.childA', {
-            url: '/router-demo/:demoVar/childA',
-            template: ` <p>showing child A</p> `,
-        })
-        .state('routerDemo.childB', {
-            url: '/router-demo/:demoVar/childB',
-            template: ` <p>showing the other child (B)</p>`,
-        })
 }
 
 
