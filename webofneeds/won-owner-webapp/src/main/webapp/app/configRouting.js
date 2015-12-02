@@ -63,12 +63,17 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
                 </div>
                 <div ui-view></div>
             `,
-            controller: 'DemoController',
+            controller: ['$ngRedux', '$scope', function($ngRedux, $scope) {
+                this.$ngRedux = $ngRedux;
+                this.$scope = $scope;
+                const disconnect = this.$ngRedux.connect((state) => ({state}), {})(this);
+                this.$scope.$on('$destroy',disconnect);
+            }],
             controllerAs: 'self'
         })
         .state('routerDemo.childA', {
             url: '/router-demo/:demoVar/childA',
-            template: ` <p>showing child A {{ self.avatars }}</p> `,
+            template: ` <p>showing child A</p> `,
         })
         .state('routerDemo.childB', {
             url: '/router-demo/:demoVar/childB',
