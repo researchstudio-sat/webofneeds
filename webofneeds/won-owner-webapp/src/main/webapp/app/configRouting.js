@@ -33,7 +33,8 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
                 templateUrl: `./app/components/${component}/${component}.html`,
                 // template: `<${component}></${component>` TODO use directives instead of view+ctrl
                 controller: `${cmlComponent}Controller`,
-                controllerAs: 'self'
+                controllerAs: 'self',
+                scope: {}
             });
         })
 
