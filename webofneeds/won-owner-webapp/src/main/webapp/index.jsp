@@ -190,7 +190,7 @@
         <script src="scripts/jquery.10.2.js"></script>
         <script src="scripts/jquery.fs.scroller.min.js"></script>
 
-        <script type="text/javascript" src="jspm_packages/bower/angular@1.4.2/angular.js"></script>
+        <script type="text/javascript" src="jspm_packages/bower/angular@1.5.0-beta.2/angular.js"></script>
         <script type="text/javascript" src="jspm_packages/github/twbs/bootstrap@3.3.5/js/bootstrap.js"></script>
         <script type="text/javascript" src="jspm_packages/github/angular/bower-angular-route@1.4.2/angular-route.js"></script>
         <script type="text/javascript" src="jspm_packages/github/angular/bower-angular-mocks@1.4.2/angular-mocks.js"></script>
