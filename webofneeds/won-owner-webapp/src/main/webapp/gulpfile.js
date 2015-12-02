@@ -87,28 +87,29 @@ gulp.task('iconsprite', function(done) {
 
 
 
-var dgeni = require('gulp-dgeni');
-var ngdoc = require('dgeni-packages/ngdoc');
-
-gulp.task('docs-dgeni', function () {
-    return gulp.src(['docs/**/*.ngdoc'])
-        .pipe(dgeni({packages: [ngdoc]}))
-        .pipe(gulp.dest('./generated/dgeni'));
-});
-
-var jsdoc = require("gulp-jsdoc");
-
-gulp.task('docs-jsdoc', function () {
-    return gulp.src('./app/**/*.js')
-        .pipe(jsdoc.parser({plugins: ['plugins/commentsOnly']}))
-        .pipe(jsdoc.generator('./generated/jsdoc'));
-
-});
-
-var esdoc = require("gulp-esdoc");
-
-gulp.task('docs-esdoc', function () {
-    return gulp.src('./app/components')
-        .pipe(esdoc({ destination: "./generated/esdoc" }));
-});
+//npm install --save-dev "gulp-dgeni" "gulp-esdoc" "gulp-jsdoc" "dgeni" "dgeni-packages"
+//var dgeni = require('gulp-dgeni');
+//var ngdoc = require('dgeni-packages/ngdoc');
+//
+//gulp.task('docs-dgeni', function () {
+//    return gulp.src(['docs/**/*.ngdoc'])
+//        .pipe(dgeni({packages: [ngdoc]}))
+//        .pipe(gulp.dest('./generated/dgeni'));
+//});
+//
+//var jsdoc = require("gulp-jsdoc");
+//
+//gulp.task('docs-jsdoc', function () {
+//    return gulp.src('./app/**/*.js')
+//        .pipe(jsdoc.parser({plugins: ['plugins/commentsOnly']}))
+//        .pipe(jsdoc.generator('./generated/jsdoc'));
+//
+//});
+//
+//var esdoc = require("gulp-esdoc");
+//
+//gulp.task('docs-esdoc', function () {
+//    return gulp.src('./app/components')
+//        .pipe(esdoc({ destination: "./generated/esdoc" }));
+//});
 
