@@ -62,17 +62,3 @@ window.ImmutableFoo = Immutable;
 
 
 
-/**
- * Adds an empty draft to the state if it doesn't exist yet
- * @param drafts
- * @param draftId
- * @returns {*}
- */
-function guaranteeDraftExistence(drafts, draftId) {
-    if(drafts.get(draftId)) {
-        return drafts
-    } else {
-        const defaultDraft = Immutable.fromJS({ draftId });
-        return drafts.set(draftId, defaultDraft);
-    }
-}

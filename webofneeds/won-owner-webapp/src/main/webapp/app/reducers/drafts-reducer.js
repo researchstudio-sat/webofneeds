@@ -73,3 +73,18 @@ export default createReducer(
         //TODO isValidNeed function to check compliance to won-ontology (and throw errors early)
     }
 )
+
+/**
+ * Adds an empty draft to the state if it doesn't exist yet
+ * @param drafts
+ * @param draftId
+ * @returns {*}
+ */
+function guaranteeDraftExistence(drafts, draftId) {
+    if(drafts.get(draftId)) {
+        return drafts
+    } else {
+        const defaultDraft = Immutable.fromJS({ draftId });
+        return drafts.set(draftId, defaultDraft);
+    }
+}
