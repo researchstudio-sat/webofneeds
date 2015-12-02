@@ -3,6 +3,7 @@
   "version": "0.2.0",
   "dependencies": {},
   "scripts": {
+    "postinstall": "npm run build",
     "build": "gulp build",
     "watch": "gulp watch"
   },
