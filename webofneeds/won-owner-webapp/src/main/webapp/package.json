@@ -3,7 +3,8 @@
   "version": "0.2.0",
   "dependencies": {},
   "scripts": {
-    "build": "gulp build"
+    "build": "gulp build",
+    "watch": "gulp watch"
   },
   "devDependencies": {
     "gulp": "^3.9.0",
