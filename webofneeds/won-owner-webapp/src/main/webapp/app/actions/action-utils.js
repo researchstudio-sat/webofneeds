@@ -4,6 +4,8 @@
 
 import { reduceAndMapTreeKeys, flattenTree, tree2constants } from '../utils';
 
+import won from '../won-es6';
+
 export function hierarchy2Creators(actionHierarchy) {
     const actionTypes = tree2constants(actionHierarchy);
     return Object.freeze(flattenTree(

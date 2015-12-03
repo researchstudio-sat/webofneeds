@@ -5,7 +5,6 @@
  */
 import { tree2constants, deepFreeze, reduceAndMapTreeKeys, flattenTree, delay } from '../utils';
 import { hierarchy2Creators } from './action-utils';
-import '../service/won';
 
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 
