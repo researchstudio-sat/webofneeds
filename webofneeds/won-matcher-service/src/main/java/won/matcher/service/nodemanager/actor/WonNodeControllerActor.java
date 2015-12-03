@@ -8,10 +8,15 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
+import won.cryptography.service.RegistrationClient;
+import won.cryptography.ssl.MessagingContext;
 import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.WonNodeEvent;
-import won.matcher.service.common.service.http.HttpService;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.service.crawler.actor.MasterCrawlerActor;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
@@ -19,12 +24,6 @@ import won.matcher.service.nodemanager.config.ActiveMqWonNodeConnectionFactory;
 import won.matcher.service.nodemanager.config.WonNodeControllerConfig;
 import won.matcher.service.nodemanager.pojo.WonNodeConnection;
 import won.matcher.service.nodemanager.service.WonNodeSparqlService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientException;
-import won.cryptography.service.RegistrationClient;
-import won.cryptography.ssl.MessagingContext;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -98,7 +97,8 @@ public class WonNodeControllerActor extends UntypedActor
         // in development the key/trust store can change from run to run, we re-register here - think of a better way
         registrationClient.register(nodeInfo.getWonNodeURI());
       } catch (Exception e) {
-        throw new IllegalArgumentException("Registration repeat at node " + nodeInfo.getWonNodeURI() + " failed", e);
+        //throw new IllegalArgumentException("Registration repeat at node " + nodeInfo.getWonNodeURI() + " failed", e);
+        log.error("Registration repeat at node " + nodeInfo.getWonNodeURI() + " failed", e);
       }
       WonNodeConnection con = subscribeNeedUpdates(nodeInfo);
       crawlWonNodes.put(nodeInfo.getWonNodeURI(), con);
