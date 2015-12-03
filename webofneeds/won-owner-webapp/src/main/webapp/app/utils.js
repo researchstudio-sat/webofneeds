@@ -289,3 +289,19 @@ export function concatTags(tags) {
         return concTags;
     }
 }
+
+
+/**
+ * Throws an error if this isn't a good http-response
+ * @param response
+ * @returns {*}
+ */
+export function checkHttpStatus(response) {
+    if (response.status >= 200 && response.status < 300) {
+        return response
+    } else {
+        var error = new Error(response.statusText)
+        error.response = response
+        throw error
+    }
+}

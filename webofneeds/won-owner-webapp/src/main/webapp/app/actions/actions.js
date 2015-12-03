@@ -3,7 +3,15 @@
  *
  * Contains a list of actions to be used with the dispatcher and documentation for their expected payloads.
  */
-import { tree2constants, deepFreeze, reduceAndMapTreeKeys, flattenTree, delay } from '../utils';
+import {
+    tree2constants,
+    deepFreeze,
+    reduceAndMapTreeKeys,
+    flattenTree,
+    delay,
+    checkHttpStatus
+} from '../utils';
+
 import { hierarchy2Creators } from './action-utils';
 
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
@@ -62,6 +70,19 @@ const actionHierarchy = {
         receive: INJ_DEFAULT,
     },
 
+    /*
+    runMessagingAgent: () => (dispatch) => {
+        //TODO  move here?
+        // would require to make sendmsg an actionCreator as well
+        // con: aren't stateless functions (then again: the other async-creators aren't either)
+        //        - need to share reference to websocket for the send-method
+        //        - need to keep internal mq
+        // pro: everything that can create actions is listed here
+        createWs
+        ws.onmessage = parse && dispatch(...)^n
+    },
+    send = dispatch("pending")
+    */
 
     moreWub: INJ_DEFAULT,
     /*
@@ -121,7 +142,7 @@ const actionHierarchy = {
             },
             credentials: 'include',
             body: JSON.stringify({username: username, password: password, passwordAgain: passwordAgain})
-        }).then(checkStatus)
+        }).then(checkHttpStatus)
             .then( response => {
                 return response.json()
             }).then(
@@ -131,18 +152,6 @@ const actionHierarchy = {
                 error => dispatch(actionCreators.user__receive({loggedIn : false}))
         )
 }
-
-//TODO: MOVE THIS TO SOME SERVICE, in fact move the whole "fetch stuff to a service of some sorts
-function checkStatus(response) {
-    if (response.status >= 200 && response.status < 300) {
-        return response
-    } else {
-        var error = new Error(response.statusText)
-        error.response = response
-        throw error
-    }
-}
-
 
 /* WORK IN PROGRESS */
 //import wonServiceFoo from './service/won-service';//testfile';//won-service';

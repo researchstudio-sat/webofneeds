@@ -78,6 +78,7 @@ let app = angular.module('won.owner', [
 app.config([ '$ngReduxProvider', configRedux ]);
 app.config([ '$urlRouterProvider', '$stateProvider', configRouting ]);
 app.run([ '$ngRedux', $ngRedux => runMessagingAgent($ngRedux) ]);
+//app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.runMessagingAgent()) ]);
 
 //let app = angular.module('won.owner',[...other modules...]);
 angular.bootstrap(document, ['won.owner'], {

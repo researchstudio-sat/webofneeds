@@ -20,9 +20,12 @@
 import { attach, delay, watchImmutableRdxState} from './utils';
 //import './message-service'; //TODO still uses es5
 import { actionCreators }  from './actions/actions';
+import {} from './won-message-utils';
 import SockJS from 'sockjs';
 
 export function runMessagingAgent(redux) {
+
+    console.log('Starting messaging agent.');
 
     /* TODOs
      * + heartbeat? -> NOPE
@@ -35,6 +38,7 @@ export function runMessagingAgent(redux) {
      *           + make this a signal/observable
      * + framing -> NOPE
      * + reconnecting
+     * + lazy socket initialisation
      */
 
 
