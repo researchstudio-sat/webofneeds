@@ -243,3 +243,49 @@ export function watchImmutableRdxState(redux, path, callback) {
         callback
     );
 }
+
+export function removeAllProperties(obj){
+    Object.keys(obj).forEach(function(element,index,array){
+        delete obj[element];
+    })
+}
+export function getKeySize(obj) {
+    return Object.keys(obj).length;
+}
+export function getRandomPosInt() {
+    return getRandomInt(1,9223372036854775807);
+}
+export function getRandomInt(min, max){
+    return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+export function isString(o) {
+    return typeof o == "string" || (typeof o == "object" && o.constructor === String);
+}
+
+export function readAsDataURL(file) {
+    var deferred = $q.defer();
+
+    var reader = new FileReader();
+
+    reader.onload = () => deferred.resolve(reader.result);
+    reader.onerror = () => deferred.reject(f);
+
+    reader.readAsDataURL(file);
+
+    return deferred.promise;
+}
+
+export function concatTags(tags) {
+    if(tags.length>0){
+        var concTags ='';
+        for(var i = 0; i < tags.length; i++){
+            if(i==0){
+                concTags = tags[i].text;
+            }else{
+                concTags = concTags + ','+ tags[i].text;
+            }
+        }
+        return concTags;
+    }
+}
