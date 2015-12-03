@@ -248,6 +248,7 @@ docker -H satsrv06:2375 run --name=need_creator_bot_int -d \
 -e "won.node.uris=https://satsrv04.researchstudio.at:8889/won/resource https://satsrv05.researchstudio.at:8889/won/resource https://satsrv04.researchstudio.at:8890/won/resource https://satsrv05.researchstudio.at:8890/won/resource" \
 -e "mail.directory.supply=/usr/src/mails/supply" \
 -e "mail.directory.demand=/usr/src/mails/demand" \
+-e "needCreatorBot.period=500" \
 -p 9013:9013 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9013 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9013 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx150m  -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof" \
