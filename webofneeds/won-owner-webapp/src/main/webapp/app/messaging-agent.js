@@ -24,6 +24,20 @@ import SockJS from 'sockjs';
 
 export function runMessagingAgent(redux) {
 
+    /* TODOs
+     * + heartbeat? -> NOPE
+     * + make it generic?
+     *      + make the url a parameter?
+     *      + extract the watch? / make the path a parameter?
+     *      + registering a processor for the incoming messages (that
+     *        can trigger actions but lets the messaging agent stay generic)
+     *           + pass a callback
+     *           + make this a signal/observable
+     * + framing -> NOPE
+     * + reconnecting
+     */
+
+
     //const ws = new SockJS('owner/msg', null, {debug: true});
     const ws = openWebSocket();
     ws.onopen = () => {
