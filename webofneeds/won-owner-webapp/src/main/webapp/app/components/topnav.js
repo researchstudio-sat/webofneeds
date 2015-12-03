@@ -69,16 +69,16 @@ function genTopnavConf() {
         constructor(/* arguments <- serviceDependencies */){
             attach(this, serviceDependencies, arguments);
 
-            const login = (state) => ({});
-            /*
+
+
             const login = (state) => ({
                 loggedIn: state.get('user').toJS().loggedIn,
                 email: state.get('user').toJS().email
             });
-            */
+
 
             const disconnect = this.$ngRedux.connect(login, actionCreators)(this);
-          //  this.$scope.$on('$destroy',disconnect);
+            this.$scope.$on('$destroy',disconnect);
         }
     }
     Controller.$inject = serviceDependencies;
