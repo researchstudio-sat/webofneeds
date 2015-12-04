@@ -128,9 +128,9 @@
         </systemUsage>
         -->
           <systemUsage>
-            <systemUsage>
+            <systemUsage sendFailIfNoSpaceAfterTimeout="3000">
                 <memoryUsage>
-                    <memoryUsage limit="64 mb"/>
+                    <memoryUsage limit="32 mb"/>
                 </memoryUsage>
                 <storeUsage>
                     <storeUsage limit="100 gb"/>
