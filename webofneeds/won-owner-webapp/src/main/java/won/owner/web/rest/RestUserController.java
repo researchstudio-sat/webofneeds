@@ -422,41 +422,4 @@ public class RestUserController
     cookieClearingLogoutHandler.logout(request, response, null);
     securityContextLogoutHandler.logout(request, response, null);
   }
-
-
-  /**
-   * Provides a possibility to ping the app. A temporary solution
-   * for the client to avoid session timeout when the user is not
-   * making http requests to the app but is still active (i.e. gui
-   * events or chatting over web-socket) is to call this method.
-   *
-   * @return 'pong' as answer to ping
-   */
-  @ResponseBody
-  @RequestMapping(
-    value = "/ping",
-    produces = MediaType.APPLICATION_JSON_VALUE,
-    method = RequestMethod.GET
-  )
-  public String doPing() {
-    if (SecurityContextHolder.getContext().getAuthentication() == null) {
-      logger.info("ping from a user with auth null");
-    } else {
-      if (SecurityContextHolder.getContext()
-                               .getAuthentication().getDetails() == null) {
-
-        logger.info("ping from a user "
-                      + SecurityContextHolder.getContext().getAuthentication().getName());
-      } else {
-        logger.info("ping from a user "
-                      + SecurityContextHolder.getContext().getAuthentication().getName()
-                      + " with session id "
-                      + ((WebAuthenticationDetails) SecurityContextHolder.getContext()
-                                                                         .getAuthentication().getDetails())
-          .getSessionId());
-      }
-    }
-    return "pong";
-  }
-
 }

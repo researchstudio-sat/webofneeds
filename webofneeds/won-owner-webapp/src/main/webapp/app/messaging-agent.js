@@ -20,9 +20,27 @@
 import { attach, delay, watchImmutableRdxState} from './utils';
 //import './message-service'; //TODO still uses es5
 import { actionCreators }  from './actions/actions';
+import {} from './won-message-utils';
 import SockJS from 'sockjs';
 
 export function runMessagingAgent(redux) {
+
+    console.log('Starting messaging agent.');
+
+    /* TODOs
+     * + heartbeat? -> NOPE
+     * + make it generic?
+     *      + make the url a parameter?
+     *      + extract the watch? / make the path a parameter?
+     *      + registering a processor for the incoming messages (that
+     *        can trigger actions but lets the messaging agent stay generic)
+     *           + pass a callback
+     *           + make this a signal/observable
+     * + framing -> NOPE
+     * + reconnecting
+     * + lazy socket initialisation
+     */
+
 
     //const ws = new SockJS('owner/msg', null, {debug: true});
     const ws = openWebSocket();
