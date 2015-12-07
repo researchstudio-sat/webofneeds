@@ -79,6 +79,9 @@ app.config([ '$ngReduxProvider', configRedux ]);
 app.config([ '$urlRouterProvider', '$stateProvider', configRouting ]);
 app.run([ '$ngRedux', $ngRedux => runMessagingAgent($ngRedux) ]);
 
+//check login status. TODO: this should actually be baked-in data (to avoid the extra roundtrip)
+app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]);
+
 //let app = angular.module('won.owner',[...other modules...]);
 angular.bootstrap(document, ['won.owner'], {
     // make sure dependency injection works after minification (or

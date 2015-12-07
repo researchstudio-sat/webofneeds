@@ -77,6 +77,27 @@ const actionHierarchy = {
                 error => console.err('actions.js: Error while delaying for delayed Wub.')
         ),
 
+    verifyLogin: () => dispatch => {
+        fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
+            .then(checkStatus)
+            .then(resp => resp.json())
+            /* handle data, dispatch actions */
+            .then(data =>
+                dispatch(actionCreators.user__receive({
+                    loggedIn: true,
+                    email: data.username
+                }))
+            )
+            /* handle: not-logged-in */
+            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
+            .catch(error =>
+                dispatch(actionCreators.user__receive({
+                    loggedIn: false
+                }))
+            );
+        ;
+    },
+
     login: (username, password) => (dispatch) =>
         fetch('/owner/rest/users/signin', {
             method: 'post',
