@@ -89,7 +89,6 @@ const actionHierarchy = {
                 }))
             )
             /* handle: not-logged-in */
-            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
             .catch(error =>
                 dispatch(actionCreators.user__receive({
                     loggedIn: false
@@ -113,8 +112,7 @@ const actionHierarchy = {
         }).then(
             data => dispatch(actionCreators.user__receive({loggedIn: true, email: username}))
         ).catch(
-            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
-            error => dispatch(actionCreators.user__receive({loggedIn : false}))
+            error => dispatch(actionCreators.user__failed({error: "No such username/password combination registered."}))
         ),
     logout: () => (dispatch) =>
         fetch('/owner/rest/users/signout', {
@@ -149,8 +147,7 @@ const actionHierarchy = {
             }).then(
                 data => dispatch(actionCreators.user__receive({loggedIn: true, email: username}))
         ).catch(
-            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
-                error => dispatch(actionCreators.user__receive({loggedIn : false}))
+                error => dispatch(actionCreators.user__receive({error: "No such username/password combination registered."}))
         )
 }
 

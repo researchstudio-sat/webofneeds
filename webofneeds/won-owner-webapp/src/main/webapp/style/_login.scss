@@ -25,6 +25,11 @@ won-login {
     box-shadow: inset 0 0 0.3rem 0rem $won-light-gray;
   }
 
+  .wl__errormsg {
+    font-size: $smallFontSize;
+    color: $won-red;
+  }
+
   .wl__table{
     display: table;
 

@@ -39,9 +39,13 @@ const reducers = {
                     console.log('reducers.js: received successful-login action from app-server');
                     return Immutable.fromJS({loggedIn: true, email: email});
                 }else{
-                    console.log('reducers.js: received UNsuccessful-login action from app-server');
+                    console.log('reducers.js: received notlogged in action from app-server');
                     return Immutable.fromJS({loggedIn: false});
                 }
+            },
+            [actionTypes.user.failed]: (state, {payload: {error}}) => {
+                console.log('reducers.js: received UNsuccessful-login action from app-server');
+                return Immutable.fromJS({error: error});
             }
         }
     ),
