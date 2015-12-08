@@ -51,6 +51,10 @@ public class BrokerComponentFactory {
     //TODO: make this configurable for different broker implementations.
     logger.info("establishing activemq ssl connection for brokerUri {}", brokerURI);
     ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory(brokerURI);
+    // for non-persistent messages setting this makes it slow, but ensures that a producer is immediately informed
+    // about the memory issues on broker (is blocked or gets exception depending on <systemUsage> config)
+    // see more info http://activemq.apache.org/producer-flow-control.html
+    activeMQConnectionFactory.setAlwaysSyncSend(true);
 
     activeMQConnectionFactory.setKeyAndTrustManagers(new KeyManager[]{keyManager}, new TrustManager[]{trustManager},
                                                      null);
