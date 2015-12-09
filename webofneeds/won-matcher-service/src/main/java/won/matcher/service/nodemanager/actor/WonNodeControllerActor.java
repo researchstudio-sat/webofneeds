@@ -1,17 +1,17 @@
 package won.matcher.service.nodemanager.actor;
 
-import akka.actor.ActorRef;
-import akka.actor.Terminated;
-import akka.actor.UntypedActor;
+import akka.actor.*;
 import akka.cluster.pubsub.DistributedPubSub;
 import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import akka.japi.Function;
 import com.hp.hpl.jena.query.Dataset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
+import scala.concurrent.duration.Duration;
 import won.cryptography.service.RegistrationClient;
 import won.cryptography.ssl.MessagingContext;
 import won.matcher.service.common.event.BulkHintEvent;
@@ -334,6 +334,26 @@ public class WonNodeControllerActor extends UntypedActor
   }
 
 
+
+
+  @Override
+  public SupervisorStrategy supervisorStrategy() {
+
+    SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
+      0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>()
+    {
+
+      @Override
+      public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+
+        log.warning("Actor encountered error: {}", t);
+        // default behaviour
+        return SupervisorStrategy.escalate();
+      }
+    });
+
+    return supervisorStrategy;
+  }
 }
 
 

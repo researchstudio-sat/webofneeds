@@ -99,6 +99,7 @@ public class MasterCrawlerActor extends UntypedActor
       @Override
       public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
 
+        log.warning("Actor encountered error: {}", t);
         // save the failed status of a crawlingWorker during crawling
         if (t instanceof CrawlWrapperException) {
           CrawlWrapperException e = (CrawlWrapperException) t;
