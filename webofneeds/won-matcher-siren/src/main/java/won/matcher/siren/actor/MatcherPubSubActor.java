@@ -1,19 +1,23 @@
 package won.matcher.siren.actor;
 
 import akka.actor.ActorRef;
+import akka.actor.OneForOneStrategy;
+import akka.actor.SupervisorStrategy;
 import akka.actor.UntypedActor;
 import akka.cluster.pubsub.DistributedPubSub;
 import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import akka.japi.Function;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.siren.config.SirenMatcherConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * Created by hfriedrich on 30.09.2015.
@@ -77,5 +81,24 @@ public class MatcherPubSubActor extends UntypedActor
     } else {
       unhandled(o);
     }
+  }
+
+  @Override
+  public SupervisorStrategy supervisorStrategy() {
+
+    SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
+      0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>()
+    {
+
+      @Override
+      public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+
+        log.warning("Actor encountered error: {}", t);
+        // default behaviour
+        return SupervisorStrategy.escalate();
+      }
+    });
+
+    return supervisorStrategy;
   }
 }
