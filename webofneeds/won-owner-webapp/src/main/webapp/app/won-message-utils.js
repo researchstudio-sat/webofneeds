@@ -7,22 +7,6 @@ import { getRandomPosInt, checkHttpStatus } from './utils';
 import won from './won-es6';
 
 
-/*
-const relativePathToConfig = 'appConfig/getDefaultWonNodeUri';
-fetch(relativePathToConfig).then(checkHttpStatus)
-    .then(resp => resp.json())
-    .catch(err => {
-        const defaultNodeUri = `${location.protocol}://${location.host}/won/resource`;
-        console.info(
-            'Failed to fetch default node uri at the relative path `',
-            relativePathToConfig,
-            '` (is the API endpoint there up and reachable?) -> falling back to the default of ',
-            defaultNodeUri
-        );
-        return defaultNodeUri
-    });
-
-*/
 
 /*
     fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
@@ -37,7 +21,7 @@ fetch(relativePathToConfig).then(checkHttpStatus)
 */
 //TODO cached/memoized promise?
 /*
-var ret = buildCreateMessage(need, wonService.getDefaultWonNodeUri());
+var ret = buildCreateMessage(need, state.getIn['config', 'defaultNodeUri']);
 var message = ret[0];
 var eventUri = ret[1];
 
@@ -75,12 +59,12 @@ messageService.sendMessage = function(msg) {
 
 
 
-function buildCreateMessage(need, wonNodeUri) {
+export function buildCreateMessage(need, wonNodeUri) {
 
-    var publishedContentUri = wonNodeUri + '/need/' + getRandomPosInt();
+    const publishedContentUri = wonNodeUri + '/need/' + getRandomPosInt();
 
-    var imgs = need.images;
-    var attachmentUris = []
+    const imgs = need.images;
+    let attachmentUris = []
     if(imgs) {
         imgs.forEach(function(img) { img.uri = wonNodeUri + '/attachment/' + getRandomPosInt(); })
         attachmentUris = imgs.map(function(img) { return img.uri });
@@ -88,19 +72,16 @@ function buildCreateMessage(need, wonNodeUri) {
 
     //if type === create -> use needBuilder as well
 
-    // TODO pull random generating into build-function?
-    //      this would break idempotency unless a seed is passed as well (!)
-
-    var contentRdf = won.buildNeedRdf({
-        type : won.toCompacted(need.basicNeedType), //mandatory
+    const contentRdf = won.buildNeedRdf({
+        type : won.toCompacted(need.type), //mandatory
         title: need.title, //mandatory
-        description: need.textDescription, //mandatory
+        description: need.textDescription,
         publishedContentUri: publishedContentUri, //mandatory
-        tags: need.tags.map(function(t) {return t.text}).join(','),
+        tags: need.tags? need.tags.map(function(t) {return t.text}).join(',') : undefined,
         attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
     });
-    var msgUri = wonNodeUri + '/event/' + getRandomPosInt(); //mandatory
-    var msgJson = won.buildMessageRdf(contentRdf, {
+    const msgUri = wonNodeUri + '/event/' + getRandomPosInt(); //mandatory
+    const msgJson = won.buildMessageRdf(contentRdf, {
         receiverNode : wonNodeUri, //mandatory
         senderNode : wonNodeUri, //mandatory
         msgType : won.WONMSG.createMessage, //mandatory

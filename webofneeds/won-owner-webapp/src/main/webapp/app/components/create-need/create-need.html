@@ -85,7 +85,11 @@
         <won-labelled-hr label="::'or'"></won-labelled-hr>
         -->
 
-        <button type="submit" class="won-button--filled red" ng-show="self.isValid()">Publish</button>
+        <button type="submit" class="won-button--filled red"
+                ng-show="self.isValid()"
+                ng-click="::self.publish()">
+            Publish
+        </button>
 
     </div>
 </main>

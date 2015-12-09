@@ -7,6 +7,7 @@ import { repeatVar } from '../utils';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
 import { combineReducersStable } from '../redux-utils';
+import { buildCreateMessage } from '../won-message-utils';
 
 /* TODO this fragment is part of an attempt to sketch a different
  * approach to asynchronity (Remove it or the thunk-based
@@ -18,6 +19,15 @@ export const enqueuedMessagesReducer =  createReducer(
 
     //handlers
     {
+        [actionTypes.drafts.publish]: (state, { payload: { need, nodeUri } }) => {
+            console.log('about to publish ', need, ' on ', nodeUri);
+            const ret = buildCreateMessage(need, nodeUri);
+            const message = ret[0];
+            const eventUri = ret[1];
+
+            console.log('enqueued publish-msg: ', message);
+            return state.push(message);
+        },
         [actionTypes.messages.enqueue]: (state, {payload:{msg}}) => {
             console.log('enqueued ', msg);
             return state.push(msg);

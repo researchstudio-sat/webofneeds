@@ -9,6 +9,8 @@
  */
 
 import './service/won';
+import './service/need-builder';
+import './service/message-builder';
 export default window.won;
 
 
