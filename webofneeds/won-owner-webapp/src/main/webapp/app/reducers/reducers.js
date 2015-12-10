@@ -60,6 +60,24 @@ const reducers = {
             }
         }
     ),
+    needs: createReducer(
+        Immutable.Map(),
+
+        {
+            [actionTypes.needs.receive]: (state, {payload: {needs}}) => {
+                console.log('reducers.js: received needlist from app-server');
+                return Immutable.fromJS({needs: needs});
+            },
+            [actionTypes.needs.failed]: (state, {payload: {error}}) => {
+                console.log('reducers.js: failed to receive needlist from app-server');
+                return Immutable.fromJS({error: error});
+            },
+            [actionTypes.needs.clear]: (state, {payload: {}}) => {
+                console.log('reducers.js: clearing needlist');
+                return Immutable.fromJS({});
+            }
+        }
+    ),
     enqueuedMessages: enqueuedMessagesReducer,
     sentMessages: sentMessagesReducer,
     receivedMessages: receivedMessagesReducer,
