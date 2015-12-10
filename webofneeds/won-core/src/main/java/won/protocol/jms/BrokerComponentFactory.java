@@ -50,7 +50,9 @@ public class BrokerComponentFactory {
                                                    TrustManager trustManager){
     //TODO: make this configurable for different broker implementations.
     logger.info("establishing activemq ssl connection for brokerUri {}", brokerURI);
-    ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory(brokerURI);
+    // jms.prefetchPolicy parameter is added to prevent matcher-consumer death due to overflowing with messages,
+    // see http://activemq.apache.org/what-is-the-prefetch-limit-for.html
+    ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory(brokerURI + "?jms.prefetchPolicy.all=50");
     // for non-persistent messages setting this makes it slow, but ensures that a producer is immediately informed
     // about the memory issues on broker (is blocked or gets exception depending on <systemUsage> config)
     // see more info http://activemq.apache.org/producer-flow-control.html
