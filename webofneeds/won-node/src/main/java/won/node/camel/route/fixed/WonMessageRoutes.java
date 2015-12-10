@@ -33,7 +33,7 @@ public class WonMessageRoutes  extends RouteBuilder
     /**
      * owner protocol, incoming
      */
-    from("activemq:queue:OwnerProtocol.in?concurrentConsumers=5")
+    from("activemq:queue:OwnerProtocol.in?concurrentConsumers=2")
       .routeId("WonMessageOwnerRoute")
       .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_OWNER_STRING)))
         .choice()
@@ -53,7 +53,7 @@ public class WonMessageRoutes  extends RouteBuilder
     /**
      * Owner protocol, outgoing
      */
-    from("seda:OwnerProtocolOut?concurrentConsumers=5")
+    from("seda:OwnerProtocolOut?concurrentConsumers=2")
       .routeId("Node2OwnerRoute")
       .to("bean:ownerProtocolOutgoingMessagesProcessor")
       .recipientList(header("ownerApplicationIDs"));
@@ -61,7 +61,7 @@ public class WonMessageRoutes  extends RouteBuilder
     /**
      * System-to-remote messages: treated almost as incoming from owner.
      */
-    from("seda:SystemMessageToRemoteNode?concurrentConsumers=5")
+    from("seda:SystemMessageToRemoteNode?concurrentConsumers=2")
       .routeId("SystemMessageToRemoteNode")
       .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
       .to("bean:wonMessageIntoCamelProcessor")
@@ -73,7 +73,7 @@ public class WonMessageRoutes  extends RouteBuilder
     /**
      * System-to-owner messages: treated almost as incoming from remote node.
      */
-    from("seda:SystemMessageToOwner?concurrentConsumers=5")
+    from("seda:SystemMessageToOwner?concurrentConsumers=2")
             .routeId("SystemMessageToOwner")
             .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
             .to("bean:wonMessageIntoCamelProcessor")
@@ -88,7 +88,7 @@ public class WonMessageRoutes  extends RouteBuilder
     /**
      * Owner protocol logic: expects messages from OwnerProtocolIn and SystemIntoOwnerProtocol routes.
      */
-    from("seda:OwnerProtocolLogic?concurrentConsumers=5")
+    from("seda:OwnerProtocolLogic?concurrentConsumers=2")
         //call the default implementation, which may alter the message.
         // Also, it puts any outbound message in the respective header
       .routingSlip(method("messageTypeSlip"))
@@ -132,7 +132,7 @@ public class WonMessageRoutes  extends RouteBuilder
     /** .to("bean:toNodeSender")
      * Need protocol, incoming
      */
-    from("activemq:queue:NeedProtocol.in?concurrentConsumers=5")
+    from("activemq:queue:NeedProtocol.in?concurrentConsumers=2")
        .routeId("WonMessageNodeRoute")
        .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_EXTERNAL.getURI())))
        .choice()
@@ -174,14 +174,14 @@ public class WonMessageRoutes  extends RouteBuilder
     /**
      * Need protocol, outgoing
      */
-    from("seda:NeedProtocolOut?concurrentConsumers=5").routeId("Node2NodeRoute")
+    from("seda:NeedProtocolOut?concurrentConsumers=2").routeId("Node2NodeRoute")
             .to("bean:signatureAdder")
             .to("bean:needProtocolOutgoingMessagesProcessor");
 
     /**
      * Matcher protocol, incoming
      */
-    from("activemq:queue:MatcherProtocol.in?concurrentConsumers=5")
+    from("activemq:queue:MatcherProtocol.in?concurrentConsumers=2")
       .routeId("WonMessageMatcherRoute")
       .to("bean:wonMessageIntoCamelProcessor")
       .choice()
@@ -201,7 +201,7 @@ public class WonMessageRoutes  extends RouteBuilder
     /**
      * Matcher protocol, outgoing
      */
-    from("seda:MatcherProtocolOut?concurrentConsumers=5")
+    from("seda:MatcherProtocolOut?concurrentConsumers=2")
       .routeId("Node2MatcherRoute")
       .to("activemq:topic:MatcherProtocol.Out.Need");
 
