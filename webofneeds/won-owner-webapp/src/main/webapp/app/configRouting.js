@@ -18,8 +18,13 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
         { path: '/overview/matches', component: 'overview-matches', as: 'overviewMatches' },
         { path: '/overview/incoming-requests', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
         { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' },
+<<<<<<< Updated upstream
         { path: '/post/:postId/owner/matches', component: 'landingpage', as: 'postMatches' }, //TODO implement view
         { path: '/post/:postId/visitor', component: 'landingpage', as: 'postVisitor' }, //TODO implement view
+=======
+        { path: '/post/:postId/owner/matches', component: 'create-need', as: 'postMatches' }, //TODO implement view
+        { path: '/post/:postId/visitor', component: 'post-visitor', as: 'postVisitor' }, //TODO implement view
+>>>>>>> Stashed changes
 
     ].forEach( ({path, component, as}) => {
 
