@@ -100,7 +100,7 @@ const actionHierarchy = {
 
     verifyLogin: () => dispatch => {
         fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
-            .then(checkStatus)
+            .then(checkHttpStatus)
             .then(resp => resp.json())
             /* handle data, dispatch actions */
             .then(data =>
@@ -127,7 +127,7 @@ const actionHierarchy = {
             },
             credentials: 'include',
             body: JSON.stringify({username: username, password: password})
-        }).then(checkStatus)
+        }).then(checkHttpStatus)
         .then( response => {
             return response.json()
         }).then(
@@ -144,7 +144,7 @@ const actionHierarchy = {
             },
             credentials: 'include',
             body: JSON.stringify({})
-        }).then(checkStatus)
+        }).then(checkHttpStatus)
         .then( response => {
             return response.json()
         }).then(
