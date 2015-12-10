@@ -34,7 +34,7 @@ import configRedux from './configRedux';
  */
 import { runMessagingAgent } from './messaging-agent';
 
-import 'fetch';
+import 'fetch'; //polyfill for window.fetch (for backward-compatibility with older browsers)
 
 //settings
 import settingsTitleBarModule from './components/settings-title-bar';
@@ -80,8 +80,15 @@ app.config([ '$urlRouterProvider', '$stateProvider', configRouting ]);
 app.run([ '$ngRedux', $ngRedux => runMessagingAgent($ngRedux) ]);
 //app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.runMessagingAgent()) ]);
 
+
+
+app.run([ '$ngRedux', $ngRedux =>
+    $ngRedux.dispatch(actionCreators.config__init())
+]);
+
+
 //check login status. TODO: this should actually be baked-in data (to avoid the extra roundtrip)
-app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]);
+//app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]);
 
 //let app = angular.module('won.owner',[...other modules...]);
 angular.bootstrap(document, ['won.owner'], {

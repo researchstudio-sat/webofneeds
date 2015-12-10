@@ -19,6 +19,17 @@ import { router } from 'redux-ui-router';
 const reducers = {
     router,
 
+    /**
+    simplereducer: (state = initialState, action) => {
+        switch(action.type) {
+            case actionTypes.moreWub:
+                return state.setIn(...);
+            default:
+                return state;
+        }
+    },
+    */
+
     wubs: createReducer(Immutable.List(), {
         [actionTypes.moreWub]: (state, action) => {
             const howMuch = action.payload;
@@ -52,6 +63,22 @@ const reducers = {
     enqueuedMessages: enqueuedMessagesReducer,
     sentMessages: sentMessagesReducer,
     receivedMessages: receivedMessagesReducer,
+    config: createReducer(
+        //initial state
+        Immutable.Map(),
+
+        //handlers
+        {
+            [actionTypes.config.update]: (state, { payload }) =>
+                /*
+                 * `.merge` assumes a flat config-object. should the config
+                 * become nested, use `mergeDeep` instead or use a
+                 * custom merging-function (or more fine-grained actions)
+                 */
+                state.merge(payload)
+        }
+
+    ),
 }
 
 /* note that `combineReducers` is opinionated as a root reducer for the

@@ -45,7 +45,8 @@ const actionHierarchy = {
         delete: INJ_DEFAULT,
 
         // use this action creator (drafts__publish__call) to initiate the process
-        publish: publishDraft,
+        //publish: publishDraft, //async dispatch
+        publish: INJ_DEFAULT,
         setPublish: {
             // the following three are triggered (a)synchronously to cause state-updates
             pending: INJ_DEFAULT, //triggered by `publish`-action creator
@@ -167,8 +168,38 @@ const actionHierarchy = {
             }).then(
                 data => dispatch(actionCreators.user__receive({loggedIn: true, email: username}))
         ).catch(
+            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
                 error => dispatch(actionCreators.user__failed({error: "Passwords do not match"}))
-        )
+        ),
+
+    config: {
+        /**
+         * Anything that is load-once, read-only, global app-config
+         * should be initialized in this action. Ideally all of this
+         * should be baked-in/prerendered when shipping the code, in
+         * future versions => TODO
+         */
+        init: () => (dispatch) =>
+            /* this allows the owner-app-server to dynamically switch default nodes. */
+            fetch(/*relativePathToConfig=*/'appConfig/getDefaultWonNodeUri')
+                .then(checkHttpStatus)
+                .then(resp => resp.json())
+                .catch(err => {
+                        const defaultNodeUri = `${location.protocol}://${location.host}/won/resource`;
+                        console.info(
+                            'Failed to fetch default node uri at the relative path `',
+                            relativePathToConfig,
+                            '` (is the API endpoint there up and reachable?) -> falling back to the default ',
+                            defaultNodeUri
+                        );
+                        return defaultNodeUri;
+                })
+                .then(defaultNodeUri =>
+                    dispatch(actionCreators.config__update({ defaultNodeUri }))
+                ),
+
+        update: INJ_DEFAULT,
+    }
 }
 
 /* WORK IN PROGRESS */

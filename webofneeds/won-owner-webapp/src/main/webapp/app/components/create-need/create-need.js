@@ -55,13 +55,14 @@ class CreateNeedController {
         //this.titlePicZone().addEventListener('drop', e => 0);
 
         const selectFromState = (state) => ({
-            draftId: state.getIn(['router','currentParams','draftId']),
-            state: state,
+            draftId: state.getIn(['router', 'currentParams', 'draftId']),
 
             //TODO for debugging; deletme
+            state: state,
             //drafts: state.get('drafts'),
             wubs: state.get('wubs'),
         });
+
 
         // Using actionCreators like this means that every action defined there is available in the template.
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
@@ -109,6 +110,14 @@ class CreateNeedController {
     }
     titlePicZone() {
         return titlePicZoneNg[0];
+    }
+    publish() {
+        this.drafts__publish({
+            need: this.$ngRedux.getState().getIn(['drafts', this.draftId]).toJS(),
+            nodeUri: this.$ngRedux.getState().getIn(['config', 'defaultNodeUri']),
+        });
+
+        //on-image-picked="::self.drafts__change__thumbnail({draftId: self.draftId, image: image})">
     }
 
 }
