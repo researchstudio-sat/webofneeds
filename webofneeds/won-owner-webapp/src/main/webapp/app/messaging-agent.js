@@ -42,8 +42,8 @@ export function runMessagingAgent(redux) {
      */
 
 
-    //const ws = new SockJS('owner/msg', null, {debug: true});
-    const ws = openWebSocket();
+    const ws = new SockJS('/owner/msg', null, {debug: true});
+    //const ws = openWebSocket();
     ws.onopen = () => {
         /* Set up message-queue watch */
         const unsubscribeWatch = watchImmutableRdxState(
