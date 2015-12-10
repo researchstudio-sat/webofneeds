@@ -147,7 +147,7 @@ const actionHierarchy = {
             }).then(
                 data => dispatch(actionCreators.user__receive({loggedIn: true, email: username}))
         ).catch(
-                error => dispatch(actionCreators.user__receive({error: "No such username/password combination registered."}))
+                error => dispatch(actionCreators.user__failed({error: "Passwords do not match"}))
         )
 }
 

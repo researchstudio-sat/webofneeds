@@ -35,6 +35,7 @@ class LandingpageController {
 
         const signup = (state) => ({
             loggedIn: state.get('user').toJS().loggedIn,
+            error: state.get('user').toJS().error
         });
 
         const disconnect = this.$ngRedux.connect(signup, actionCreators)(this);
