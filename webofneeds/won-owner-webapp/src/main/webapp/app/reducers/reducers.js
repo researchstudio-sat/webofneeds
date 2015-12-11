@@ -50,9 +50,31 @@ const reducers = {
                     console.log('reducers.js: received successful-login action from app-server');
                     return Immutable.fromJS({loggedIn: true, email: email});
                 }else{
-                    console.log('reducers.js: received UNsuccessful-login action from app-server');
+                    console.log('reducers.js: received notlogged in action from app-server');
                     return Immutable.fromJS({loggedIn: false});
                 }
+            },
+            [actionTypes.user.failed]: (state, {payload: {error}}) => {
+                console.log('reducers.js: received UNsuccessful-login action from app-server');
+                return Immutable.fromJS({error: error});
+            }
+        }
+    ),
+    needs: createReducer(
+        Immutable.Map(),
+
+        {
+            [actionTypes.needs.receive]: (state, {payload: {needs}}) => {
+                console.log('reducers.js: received needlist from app-server');
+                return Immutable.fromJS({needs: needs});
+            },
+            [actionTypes.needs.failed]: (state, {payload: {error}}) => {
+                console.log('reducers.js: failed to receive needlist from app-server');
+                return Immutable.fromJS({error: error});
+            },
+            [actionTypes.needs.clear]: (state, {payload: {}}) => {
+                console.log('reducers.js: clearing needlist');
+                return Immutable.fromJS({});
             }
         }
     ),

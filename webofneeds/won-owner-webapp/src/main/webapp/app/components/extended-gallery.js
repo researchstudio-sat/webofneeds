@@ -12,7 +12,7 @@ function genComponentConf() {
         </div>
         <div class="eg__thumbs" ng-show="self.items && self.items.length > 1">
             <div class="eg__thumbs__frame clickable" ng-repeat="item in self.items track by $index" ng-click="self.showImage(item.src)" ng-show="$index < self.maxThumbnails">
-                <img src="{{item.src}}" alt="a combination of shelfs"/>
+                <img ng-src="{{item.src}}" alt="a combination of shelfs"/>
             </div>
             <div class="eg__thumbs__more clickable" ng-click="self.maxThumbnails = self.items.length" ng-show="self.items.length > self.maxThumbnails">
                 <span>+{{self.items.length-self.maxThumbnails}}</span>

@@ -13,7 +13,7 @@ function genComponentConf() {
         <div class="wid__dropzone"
             ng-class="self.imageDataUrl? 'wid__dropzone--filled' : 'wid__dropzone--empty'">
                 <input type="file" accept="image/*" />
-                <img src="{{self.imageDataUrl}}" ng-show="self.imageDataUrl">
+                <img ng-src="{{self.imageDataUrl}}" ng-show="self.imageDataUrl">
         </div>
     `;
 

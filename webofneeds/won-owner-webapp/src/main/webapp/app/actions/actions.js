@@ -29,6 +29,11 @@ const actionHierarchy = {
         receive: INJ_DEFAULT,
         failed: INJ_DEFAULT
     },
+    needs: {
+        receive: INJ_DEFAULT,
+        failed: INJ_DEFAULT,
+        clear: INJ_DEFAULT
+    },
     drafts: {
         /*
          * A new draft was created (either through the view in this client or on another browser)
@@ -98,6 +103,26 @@ const actionHierarchy = {
                 error => console.err('actions.js: Error while delaying for delayed Wub.')
         ),
 
+    verifyLogin: () => dispatch => {
+        fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
+            .then(checkHttpStatus)
+            .then(resp => resp.json())
+            /* handle data, dispatch actions */
+            .then(data =>
+                dispatch(actionCreators.user__receive({
+                    loggedIn: true,
+                    email: data.username
+                }))
+            )
+            /* handle: not-logged-in */
+            .catch(error =>
+                dispatch(actionCreators.user__receive({
+                    loggedIn: false
+                }))
+            );
+        ;
+    },
+
     login: (username, password) => (dispatch) =>
         fetch('/owner/rest/users/signin', {
             method: 'post',
@@ -107,14 +132,17 @@ const actionHierarchy = {
             },
             credentials: 'include',
             body: JSON.stringify({username: username, password: password})
-        }).then(checkStatus)
+        }).then(checkHttpStatus)
         .then( response => {
             return response.json()
         }).then(
-            data => dispatch(actionCreators.user__receive({loggedIn: true, email: username}))
+            data => {
+                dispatch(actionCreators.user__receive({loggedIn: true, email: username}));
+                dispatch(actionCreators.retrieveNeedUris({username: username, password: password}));
+                //retrieveNeedUris(username, password, dispatch);
+            }
         ).catch(
-            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
-            error => dispatch(actionCreators.user__receive({loggedIn : false}))
+            error => dispatch(actionCreators.user__failed({error: "No such username/password combination registered."}))
         ),
     logout: () => (dispatch) =>
         fetch('/owner/rest/users/signout', {
@@ -125,11 +153,14 @@ const actionHierarchy = {
             },
             credentials: 'include',
             body: JSON.stringify({})
-        }).then(checkStatus)
+        }).then(checkHttpStatus)
         .then( response => {
             return response.json()
         }).then(
-            data => dispatch(actionCreators.user__receive({loggedIn: false}))
+            data => {
+                dispatch(actionCreators.user__receive({loggedIn: false}));
+                dispatch(actionCreators.needs__clear({}));
+            }
         ).catch(
             //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
             error => dispatch(actionCreators.user__receive({loggedIn : true}))
@@ -150,9 +181,10 @@ const actionHierarchy = {
                 data => dispatch(actionCreators.user__receive({loggedIn: true, email: username}))
         ).catch(
             //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
-                error => dispatch(actionCreators.user__receive({loggedIn : false}))
+                error => dispatch(actionCreators.user__failed({error: "Passwords do not match"}))
         ),
-
+    retrieveNeedUris: (username, password) => (dispatch) =>
+        retrieveNeedUris(username, password, dispatch),
     config: {
         /**
          * Anything that is load-once, read-only, global app-config
@@ -181,6 +213,27 @@ const actionHierarchy = {
 
         update: INJ_DEFAULT,
     }
+}
+
+function retrieveNeedUris(username, password, dispatch) {
+    fetch('/owner/rest/needs/', {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+    }).then(checkHttpStatus)
+        .then(response => {
+            return response.json()
+        }).then(
+            needs => dispatch(actionCreators.needs__receive({needs: needs}))
+    ).catch(
+            error => {
+                console.log(error);
+                dispatch(actionCreators.needs__failed({error: "user needlist retrieval failed"}))
+            }
+    )
 }
 
 /* WORK IN PROGRESS */
