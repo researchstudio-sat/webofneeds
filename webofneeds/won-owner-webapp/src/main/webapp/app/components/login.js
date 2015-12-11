@@ -13,7 +13,7 @@ function genLoginConf() {
                     </a>
                     <input required="true" placeholder="Email address" ng-model="self.email" type="email" required />
                     <input required="true" placeholder="Password" ng-model="self.password" type="password" required />
-                    <div class="wl__errormsg">{{self.error}}</div>
+                    <div class="wl__errormsg">{{self.loginError}}</div>
                     <div class="wl__table">
                         <div class="wlt__left">
                             <input type="checkbox" ng-model="self.rememberMe" id="rememberMe"/><label for="rememberMe">Remember me</label>
@@ -36,7 +36,7 @@ function genLoginConf() {
 
             const login = (state) => ({
                 loggedIn: state.get('user').toJS().loggedIn,
-                error: state.get('user').toJS().error
+                loginError: state.get('user').toJS().loginError
             });
 
             const disconnect = this.$ngRedux.connect(login, actionCreators)(this);

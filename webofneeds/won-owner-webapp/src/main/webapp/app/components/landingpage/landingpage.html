@@ -23,7 +23,7 @@
         <won-accordion items="::self.questions"></won-accordion>
     </div>
     <div class="try">
-        <div class="title">Try it yourself! {{self.needs}}</div>
+        <div class="title">Try it yourself!</div>
         <div class="trygrid">
             <div class="tg__signup">
                 <div class="block">
@@ -32,7 +32,7 @@
                     <input required="true" placeholder="Password" ng-model="self.password" required type="password"/>
                     <input required="true" placeholder="Repeat Password" ng-model="self.passwordAgain" required type="password"/>
                 </div>
-                <div class="tg__errormsg">{{self.error}}</div>
+                <div class="tg__errormsg">{{self.registerError}}</div>
                 <button class="won-button--filled darkgray" ng-click="::self.register(self.email, self.password, self.passwordAgain)">That’s all we need. Let’s go!</button>
             </div>
             <div class="tg__anonymous">
