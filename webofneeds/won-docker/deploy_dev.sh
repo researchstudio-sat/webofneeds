@@ -51,7 +51,7 @@ docker -H satsrv04:2375 run --name=wonnode_dev -d -e "uri.host=satsrv04.research
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/wonnode_dev:/usr/local/tomcat/won/client-certs/ \
 -p 8888:8443 -p 61616:61616 \
--e "JMEM_OPTS=-Xmx190m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/mem-err.hprof" \
+-e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/wonnode:dev
 
 
@@ -67,7 +67,7 @@ docker -H satsrv05:2375 run --name=wonnode_dev -d -e "uri.host=satsrv05.research
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/wonnode_dev:/usr/local/tomcat/won/client-certs/ \
 -p 8888:8443 -p 61616:61616 \
--e "JMEM_OPTS=-Xmx190m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/mem-err.hprof" \
+-e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/wonnode:dev
 
 sleep 20
@@ -84,7 +84,7 @@ docker -H satsrv04:2375 run --name=owner_dev -d -e "node.default.host=satsrv04.r
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/owner_dev:/usr/local/tomcat/won/client-certs/ \
 -p 8081:8443 \
--e "JMEM_OPTS=-Xmx190m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/mem-err.hprof" \
+-e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/owner:dev
 
 # owner 2
@@ -99,7 +99,7 @@ docker -H satsrv05:2375 run --name=owner_dev -d -e "node.default.host=satsrv05.r
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/owner_dev:/usr/local/tomcat/won/client-certs/ \
 -p 8081:8443 \
--e "JMEM_OPTS=-Xmx190m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/mem-err.hprof" \
+-e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/owner:dev
 
 # bigdata
@@ -119,7 +119,7 @@ docker -H satsrv06:2375 run --name=matcher_service_dev -d -e "node.host=satsrv06
 -e "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8888/won/resource,https://satsrv05.researchstudio.at:8888/won/resource" \
 -v /home/install/won-client-certs/matcher_service_int:/usr/src/matcher-service/client-certs/ \
 -e "cluster.local.port=2551" -e "cluster.seed.port=2551" -p 2551:2551 \
--e "JMEM_OPTS=-Xmx190m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof" \
+-e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/matcher_service:dev
 
 # siren solr server
@@ -127,7 +127,7 @@ docker -H satsrv06:2375 pull webofneeds/sirensolr
 docker -H satsrv06:2375 stop sirensolr_dev || echo 'No docker container found to stop with name: sirensolr_dev'
 docker -H satsrv06:2375 rm sirensolr_dev || echo 'No docker container found to remove with name: sirensolr_dev'
 docker -H satsrv06:2375 run --name=sirensolr_dev -d -p 7070:8080 -p 8983:8983 \
---env CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof" \
+--env CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/sirensolr
 
 sleep 10
@@ -141,7 +141,7 @@ docker -H satsrv06:2375 run --name=matcher_siren_dev -d -e "node.host=satsrv06.r
 -e "matcher.siren.uri.solr.server=http://satsrv06.researchstudio.at:8983/solr/won/" \
 -e "matcher.siren.uri.solr.server.public=http://satsrv06.researchstudio.at:8983/solr/#/won/" \
 -p 2552:2552 \
--e "JMEM_OPTS=-Xmx200m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/" \
+-e "JMEM_OPTS=-Xmx200m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/matcher_siren:dev
 
 

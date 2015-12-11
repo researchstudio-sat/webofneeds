@@ -98,7 +98,7 @@ docker -H satsrv04:2375 run --name=wonnode_int1 -d -e "uri.host=satsrv04.researc
 -e "monitoring.interval.seconds=60" \
 -p 9010:9010 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
--e "JMEM_OPTS=-Xmx190m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/" \
+-e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/mem-err-`date`.hprof" \
 -m 350m -v /home/install/hdumps/node-int1:/usr/local/tomcat/temp/ \
 webofneeds/wonnode:int
 
@@ -116,7 +116,7 @@ docker -H satsrv05:2375 run --name=wonnode_int2 -d -e "uri.host=satsrv05.researc
 -e "monitoring.interval.seconds=60" \
 -p 9010:9010 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
--e "JMEM_OPTS=-Xmx190m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/" \
+-e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/mem-err-`date`.hprof" \
 -m 350m -v /home/install/hdumps/node-int:/usr/local/tomcat/temp/ \
 webofneeds/wonnode:int
 
@@ -134,7 +134,7 @@ docker -H satsrv04:2375 run --name=wonnode_int3 -d -e "uri.host=satsrv04.researc
 -e "monitoring.interval.seconds=60" \
 -p 9012:9012 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9012 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9012 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
--e "JMEM_OPTS=-Xmx190m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/" \
+-e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/mem-err-`date`.hprof" \
 -m 350m -v /home/install/hdumps/node-int3:/usr/local/tomcat/temp/ \
 webofneeds/wonnode:int
 
@@ -152,7 +152,7 @@ docker -H satsrv05:2375 run --name=wonnode_int4 -d -e "uri.host=satsrv05.researc
 -e "monitoring.interval.seconds=60" \
 -p 9012:9012 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9012 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9012 -Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
--e "JMEM_OPTS=-Xmx190m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/" \
+-e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/mem-err-`date`.hprof" \
 -m 350m -v /home/install/hdumps/node-int4:/usr/local/tomcat/temp/ \
 webofneeds/wonnode:int
 
@@ -171,7 +171,7 @@ docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.r
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -p 9011:9011 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
--e "JMEM_OPTS=-Xmx190m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/mem-err.hprof" \
+-e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/mem-err-`date`.hprof" \
 -m 350m -v /home/install/hdumps/owner-int:/usr/local/tomcat/temp/ \
 webofneeds/owner:int
 
@@ -187,7 +187,7 @@ docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv05.r
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -p 9011:9011 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
--e "JMEM_OPTS=-Xmx190m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/mem-err.hprof" \
+-e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/tomcat/temp/mem-err-`date`.hprof" \
 -m 350m -v /home/install/hdumps/owner-int:/usr/local/tomcat/temp/ \
 webofneeds/owner:int
 
@@ -210,7 +210,7 @@ docker -H satsrv06:2375 run --name=matcher_service_int -d -e "node.host=satsrv06
 -p 2561:2561 \
 -p 9010:9010 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
--e "JMEM_OPTS=-Xmx190m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof" \
+-e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err-`date`.hprof" \
 -m 350m -v /home/install/hdumps/matcher-service-int:/usr/local/temp/ \
 webofneeds/matcher_service:int
 
@@ -220,7 +220,7 @@ docker -H satsrv06:2375 stop sirensolr_int || echo 'No docker container found to
 docker -H satsrv06:2375 rm sirensolr_int || echo 'No docker container found to remove with name: sirensolr_int'
 docker -H satsrv06:2375 run --name=sirensolr_int -d -p 7071:8080 -p 8984:8983 \
 -p 9012:9012 \
--e CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof -Dcom.sun.management.jmxremote.port=9012 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9012 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
+-e CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err-`date`.hprof -Dcom.sun.management.jmxremote.port=9012 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9012 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
 -m 350m webofneeds/sirensolr
 
 sleep 20
@@ -234,7 +234,7 @@ docker -H satsrv06:2375 run --name=matcher_siren_int -d -e "node.host=satsrv06.r
 -e "matcher.siren.uri.solr.server.public=http://satsrv06.researchstudio.at:8984/solr/#/won/" \
 -p 9011:9011 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
--e "JMEM_OPTS=-Xmx190m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof" \
+-e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err-`date`.hprof" \
 -m 350m -v /home/install/hdumps/matcher-siren-int:/usr/local/temp/ \
 -p 2562:2562 webofneeds/matcher_siren:int
 
@@ -251,7 +251,7 @@ docker -H satsrv06:2375 run --name=need_creator_bot_int -d \
 -e "needCreatorBot.period=500" \
 -p 9013:9013 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9013 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9013 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
--e "JMEM_OPTS=-Xmx150m  -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err.hprof" \
+-e "JMEM_OPTS=-Xmx150m  -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/usr/local/temp/mem-err-`date`.hprof" \
 -e "MAIN_BOT=won.bot.app.NeedCreatorBotApp" \
 -v /home/install/freecycle:/usr/src/mails/ \
 -m 300m -v /home/install/hdumps/need-creator-bot-int:/usr/local/temp/ \
