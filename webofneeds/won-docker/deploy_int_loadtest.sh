@@ -48,13 +48,13 @@ echo run docker containers:
 docker -H satsrv04:2375 pull webofneeds/postgres
 docker -H satsrv04:2375 stop postgres_int || echo 'No docker container found to stop with name: postgres_int'
 docker -H satsrv04:2375 rm postgres_int || echo 'No docker container found to remove with name: postgres_int'
-docker -H satsrv04:2375 run --name=postgres_int -d -p 5433:5432 webofneeds/postgres
+docker -H satsrv04:2375 run --name=postgres_int -d -p 5433:5432 -m 256m webofneeds/postgres
 
 # postgres db 2
 docker -H satsrv05:2375 pull webofneeds/postgres
 docker -H satsrv05:2375 stop postgres_int || echo 'No docker container found to stop with name: postgres_int'
 docker -H satsrv05:2375 rm postgres_int || echo 'No docker container found to remove with name: postgres_int'
-docker -H satsrv05:2375 run --name=postgres_int -d -p 5433:5432 webofneeds/postgres
+docker -H satsrv05:2375 run --name=postgres_int -d -p 5433:5432 -m 256m webofneeds/postgres
 
 sleep 10
 
