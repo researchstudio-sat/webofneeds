@@ -241,6 +241,8 @@ docker -H satsrv06:2375 run --name=matcher_siren_int -d -e "node.host=satsrv06.r
 
 sleep 20
 
+docker -H satsrv06:2375 stop echo_bot_int || echo 'No docker container found to stop with name: echo_bot_int'
+docker -H satsrv06:2375 rm echo_bot_int || echo 'No docker container found to remove with name: echo_bot_int'
 docker -H satsrv06:2375 stop need_creator_bot_int || echo 'No docker container found to stop with name: need_creator_bot_int'
 docker -H satsrv06:2375 rm need_creator_bot_int || echo 'No docker container found to remove with name: need_creator_bot_int'
 docker -H satsrv06:2375 run --name=need_creator_bot_int -d \
