@@ -136,7 +136,6 @@ docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.r
 -p 9011:9011 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx1000m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
--m 750m \
 webofneeds/owner:int
 
 # owner 2

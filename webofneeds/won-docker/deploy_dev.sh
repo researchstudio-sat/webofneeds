@@ -100,7 +100,7 @@ docker -H satsrv05:2375 run --name=owner_dev -d -e "node.default.host=satsrv05.r
 -v /home/install/won-client-certs/owner_dev:/usr/local/tomcat/won/client-certs/ \
 -p 8081:8443 \
 -e "JMEM_OPTS=-Xmx1000m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
--m 350m webofneeds/owner:dev
+webofneeds/owner:dev
 
 # bigdata
 docker -H satsrv06:2375 pull webofneeds/bigdata
