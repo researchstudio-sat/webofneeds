@@ -59,8 +59,12 @@ const actionHierarchy = {
         stateReload,
         stateTransitionTo
     },
-
-
+    posts:{
+        load:INJ_DEFAULT
+    },
+    posts_overview:{
+        openPostsView:INJ_DEFAULT
+    },
     messages: {
         /* TODO this fragment is part of an attempt to sketch a different
          * approach to asynchronity (Remove it or the thunk-based
@@ -132,6 +136,7 @@ const actionHierarchy = {
             return response.json()
         }).then(
             data => dispatch(actionCreators.user__receive({loggedIn: true, email: username}))
+
         ).catch(
             error => dispatch(actionCreators.user__failed({error: "No such username/password combination registered."}))
         ),
@@ -166,7 +171,8 @@ const actionHierarchy = {
             .then( response => {
                 return response.json()
             }).then(
-                data => dispatch(actionCreators.user__receive({loggedIn: true, email: username}))
+                data => dispatch(actionCreators.user__receive({loggedIn: true, email: username})),
+                posts => dispatch(actionCreators.posts__load())
         ).catch(
             //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
                 error => dispatch(actionCreators.user__failed({error: "Passwords do not match"}))

@@ -8,6 +8,7 @@ import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
 import { combineReducersStable } from '../redux-utils';
 import draftsReducer from './drafts-reducer';
+import postsReducer from './posts-reducer'
 import { enqueuedMessagesReducer, sentMessagesReducer, receivedMessagesReducer } from './message-reducers'
 
 
@@ -60,6 +61,7 @@ const reducers = {
             }
         }
     ),
+    postOverview:postsReducer,
     enqueuedMessages: enqueuedMessagesReducer,
     sentMessages: sentMessagesReducer,
     receivedMessages: receivedMessagesReducer,

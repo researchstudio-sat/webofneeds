@@ -76,6 +76,18 @@ let app = angular.module('won.owner', [
 ]);
 
 app.config([ '$ngReduxProvider', configRedux ]);
+app.filter('filterByNeedState', function(){
+    return function(needs,state){
+        var filtered =[];
+        angular.forEach(needs,function(need){
+            if(need.state == state){
+                filtered.push(need);
+            }
+        })
+
+        return filtered;
+    }
+})
 app.config([ '$urlRouterProvider', '$stateProvider', configRouting ]);
 app.run([ '$ngRedux', $ngRedux => runMessagingAgent($ngRedux) ]);
 //app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.runMessagingAgent()) ]);
