@@ -28,6 +28,14 @@ import configRouting from './configRouting';
 import configRedux from './configRedux';
 
 
+/* TODO this fragment is part of an attempt to sketch a different
+ * approach to asynchronity (Remove it or the thunk-based
+ * solution afterwards)
+ */
+import { runMessagingAgent } from './messaging-agent';
+
+import 'fetch'; //polyfill for window.fetch (for backward-compatibility with older browsers)
+
 //settings
 import settingsTitleBarModule from './components/settings-title-bar';
 import avatarSettingsModule from './components/settings/avatar-settings';
@@ -37,7 +45,7 @@ import generalSettingsModule from './components/settings/general-settings';
 import 'redux';
 import ngReduxModule from 'ng-redux';
 
-import { actionCreators }  from './actions';
+import { actionCreators }  from './actions/actions';
 
 import ngReduxRouterModule from 'redux-ui-router';
 import uiRouterModule from 'angular-ui-router';
@@ -65,16 +73,33 @@ let app = angular.module('won.owner', [
     avatarSettingsModule,
     generalSettingsModule,
 
-    /* TODO this fragment is part of an attempt to sketch a different
-     * approach to asynchronity (Remove it or the thunk-based
-     * solution afterwards)
-     */
-    messagingAgentServiceModule,
-
 ]);
 
 app.config([ '$ngReduxProvider', configRedux ]);
+app.filter('filterByNeedState', function(){
+    return function(needs,state){
+        var filtered =[];
+        angular.forEach(needs,function(need){
+            if(need.state == state){
+                filtered.push(need);
+            }
+        })
+
+        return filtered;
+    }
+})
 app.config([ '$urlRouterProvider', '$stateProvider', configRouting ]);
+app.run([ '$ngRedux', $ngRedux => runMessagingAgent($ngRedux) ]);
+//app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.runMessagingAgent()) ]);
+
+
+
+app.run([ '$ngRedux', $ngRedux =>
+    $ngRedux.dispatch(actionCreators.config__init())
+]);
+
+//check login status. TODO: this should actually be baked-in data (to avoid the extra roundtrip)
+app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]);
 
 //let app = angular.module('won.owner',[...other modules...]);
 angular.bootstrap(document, ['won.owner'], {

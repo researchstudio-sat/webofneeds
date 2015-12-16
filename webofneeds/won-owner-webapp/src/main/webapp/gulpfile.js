@@ -8,7 +8,9 @@ var autoprefixer = require('gulp-autoprefixer');
 var svgSprite = require('gulp-svg-sprite');
 var sassImportOnce = require('node-sass-import-once');
 
-gulp.task('default', ['sass', 'iconsprite']);
+
+gulp.task('default', ['build']);
+gulp.task('build', ['sass', 'iconsprite']);
 gulp.task('watch', ['sass', 'iconsprite'], function() {
     gulp.watch('./style/**/*.scss', ['sass']);
     gulp.watch('./style/**/_*.scss', ['sass']);
@@ -85,30 +87,36 @@ gulp.task('iconsprite', function(done) {
         .on('end', done);
 });
 
-
-
-var dgeni = require('gulp-dgeni');
-var ngdoc = require('dgeni-packages/ngdoc');
-
-gulp.task('docs-dgeni', function () {
-    return gulp.src(['docs/**/*.ngdoc'])
-        .pipe(dgeni({packages: [ngdoc]}))
-        .pipe(gulp.dest('./generated/dgeni'));
+var rimraf = require('rimraf'); // rimraf directly
+gulp.task('clean', function () {
+    //(['generated', 'jspm_packages', 'node_modules'])
+    //.forEach((folder) => rimraf(`./${folder}`, ()=>{}));
+    rimraf('./generated', function(){});
 });
 
-var jsdoc = require("gulp-jsdoc");
-
-gulp.task('docs-jsdoc', function () {
-    return gulp.src('./app/**/*.js')
-        .pipe(jsdoc.parser({plugins: ['plugins/commentsOnly']}))
-        .pipe(jsdoc.generator('./generated/jsdoc'));
-
-});
-
-var esdoc = require("gulp-esdoc");
-
-gulp.task('docs-esdoc', function () {
-    return gulp.src('./app/components')
-        .pipe(esdoc({ destination: "./generated/esdoc" }));
-});
+//npm install --save-dev "gulp-dgeni" "gulp-esdoc" "gulp-jsdoc" "dgeni" "dgeni-packages"
+//var dgeni = require('gulp-dgeni');A
+//var ngdoc = require('dgeni-packages/ngdoc');
+//
+//gulp.task('docs-dgeni', function () {
+//    return gulp.src(['docs/**/*.ngdoc'])
+//        .pipe(dgeni({packages: [ngdoc]}))
+//        .pipe(gulp.dest('./generated/dgeni'));
+//});
+//
+//var jsdoc = require("gulp-jsdoc");
+//
+//gulp.task('docs-jsdoc', function () {
+//    return gulp.src('./app/**/*.js')
+//        .pipe(jsdoc.parser({plugins: ['plugins/commentsOnly']}))
+//        .pipe(jsdoc.generator('./generated/jsdoc'));
+//
+//});
+//
+//var esdoc = require("gulp-esdoc");
+//
+//gulp.task('docs-esdoc', function () {
+//    return gulp.src('./app/components')
+//        .pipe(esdoc({ destination: "./generated/esdoc" }));
+//});
 

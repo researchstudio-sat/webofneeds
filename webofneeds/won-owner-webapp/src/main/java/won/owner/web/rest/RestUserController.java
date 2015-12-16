@@ -42,11 +42,14 @@ import won.owner.web.WonOwnerMailSender;
 import won.owner.web.validator.UserRegisterValidator;
 import won.protocol.util.CheapInsecureRandomString;
 
+import javax.print.DocFlavor;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: t.kozel
@@ -324,8 +327,10 @@ public class RestUserController
   //* @param response
   //* @return
   //
+  @ResponseBody
   @RequestMapping(
     value = "/isSignedIn",
+    produces = MediaType.APPLICATION_JSON_VALUE,
     method = RequestMethod.GET
   )
   //TODO: move transactionality annotation into the service layer
@@ -341,7 +346,14 @@ public class RestUserController
     } else if ("anonymousUser".equals(context.getAuthentication().getPrincipal())) {
       return new ResponseEntity("\"User not signed in.\"", HttpStatus.UNAUTHORIZED);
     } else {
-      return new ResponseEntity("\"Current session is still valid.\"", HttpStatus.OK);
+
+      User user = (User) context.getAuthentication().getPrincipal();
+      Map values = new HashMap<String, String>();
+      values.put("username", user.getUsername());
+      values.put("authorities", user.getAuthorities());
+      values.put("role", user.getRole());
+
+      return new ResponseEntity<Map>(values, HttpStatus.OK);
     }
   }
 
@@ -410,41 +422,4 @@ public class RestUserController
     cookieClearingLogoutHandler.logout(request, response, null);
     securityContextLogoutHandler.logout(request, response, null);
   }
-
-
-  /**
-   * Provides a possibility to ping the app. A temporary solution
-   * for the client to avoid session timeout when the user is not
-   * making http requests to the app but is still active (i.e. gui
-   * events or chatting over web-socket) is to call this method.
-   *
-   * @return 'pong' as answer to ping
-   */
-  @ResponseBody
-  @RequestMapping(
-    value = "/ping",
-    produces = MediaType.APPLICATION_JSON_VALUE,
-    method = RequestMethod.GET
-  )
-  public String doPing() {
-    if (SecurityContextHolder.getContext().getAuthentication() == null) {
-      logger.info("ping from a user with auth null");
-    } else {
-      if (SecurityContextHolder.getContext()
-                               .getAuthentication().getDetails() == null) {
-
-        logger.info("ping from a user "
-                      + SecurityContextHolder.getContext().getAuthentication().getName());
-      } else {
-        logger.info("ping from a user "
-                      + SecurityContextHolder.getContext().getAuthentication().getName()
-                      + " with session id "
-                      + ((WebAuthenticationDetails) SecurityContextHolder.getContext()
-                                                                         .getAuthentication().getDetails())
-          .getSessionId());
-      }
-    }
-    return "pong";
-  }
-
 }

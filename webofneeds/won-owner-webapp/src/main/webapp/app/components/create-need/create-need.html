@@ -9,6 +9,9 @@
         <button ng-click="self.moreWub(3)">3 MOAR WUB!</button>
         <p>{{ self.wubs.toArray() }}</p>
         <p>DBG Draft: {{self.state.get('drafts').get(self.draftId).toJS()}}</p>
+        <p>enq'd msgs: {{self.state.get('enqueuedMessages').toJS()}}</p>
+        <p>sent msgs: {{self.state.get('sentMessages').toJS()}}</p>
+        <p>received-msgs-q (echo atm): {{self.state.get('receivedMessages').toJS()}}</p>
 
         <won-posttype-select
                 options="::self.postTypeTexts"
@@ -82,7 +85,11 @@
         <won-labelled-hr label="::'or'"></won-labelled-hr>
         -->
 
-        <button type="submit" class="won-button--filled red" ng-show="self.isValid()">Publish</button>
+        <button type="submit" class="won-button--filled red"
+                ng-show="self.isValid()"
+                ng-click="::self.publish()">
+            Publish
+        </button>
 
     </div>
 </main>

@@ -18,13 +18,8 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
         { path: '/overview/matches', component: 'overview-matches', as: 'overviewMatches' },
         { path: '/overview/incoming-requests', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
         { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' },
-<<<<<<< Updated upstream
         { path: '/post/:postId/owner/matches', component: 'landingpage', as: 'postMatches' }, //TODO implement view
-        { path: '/post/:postId/visitor', component: 'landingpage', as: 'postVisitor' }, //TODO implement view
-=======
-        { path: '/post/:postId/owner/matches', component: 'create-need', as: 'postMatches' }, //TODO implement view
         { path: '/post/:postId/visitor', component: 'post-visitor', as: 'postVisitor' }, //TODO implement view
->>>>>>> Stashed changes
 
     ].forEach( ({path, component, as}) => {
 
@@ -38,7 +33,8 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
                 templateUrl: `./app/components/${component}/${component}.html`,
                 // template: `<${component}></${component>` TODO use directives instead of view+ctrl
                 controller: `${cmlComponent}Controller`,
-                controllerAs: 'self'
+                controllerAs: 'self',
+                scope: {}
             });
         })
 
@@ -57,28 +53,6 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
             template: `<won-general-settings></won-general-settings>`
         })
 
-    $stateProvider
-        .state('routerDemo', {
-            url: '/router-demo/:demoVar',
-            template: `
-                <p>demoVar = {{self.state.getIn(['router', 'currentParams', 'demoVar'])}}</p>
-                <div>
-                    <a ui-sref="routerDemo.childA">~A~</a> |
-                    <a ui-sref="routerDemo.childB">~B~</a>
-                </div>
-                <div ui-view></div>
-            `,
-            controller: 'DemoController',
-            controllerAs: 'self'
-        })
-        .state('routerDemo.childA', {
-            url: '/router-demo/:demoVar/childA',
-            template: ` <p>showing child A {{ self.avatars }}</p> `,
-        })
-        .state('routerDemo.childB', {
-            url: '/router-demo/:demoVar/childB',
-            template: ` <p>showing the other child (B)</p>`,
-        })
 }
 
 

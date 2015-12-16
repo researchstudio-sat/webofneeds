@@ -90,6 +90,11 @@
         justify-content: space-between;
       }
 
+      .tg__errormsg {
+        font-size: $smallFontSize;
+        color: white;
+      }
+
       .tg__signup {
         border-right: 0.1rem solid $won-light-gray;
       }
@@ -110,7 +115,9 @@
         }
       }
 
-      input[type=text] {
+      input[type=text],
+      input[type=password],
+      input[type=email] {
         margin: 1rem 0;
         width: 100%;
       }

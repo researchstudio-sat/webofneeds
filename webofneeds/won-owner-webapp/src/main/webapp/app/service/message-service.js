@@ -24,34 +24,6 @@ angular.module('won.owner').factory('messageService', function ($http, $q,$log, 
     //private data of the service
     var privateData = {};
 
-    //until this is no longer an issue: https://github.com/rstoyanchev/spring-websocket-portfolio/issues/42
-    //we'll send http requests in regular intervals to keep the server's http session open
-    privateData.HTTP_HEARTBEAT_INTERVAL = 25 * 1000;
-    privateData.HTTP_HEARTBEAT_URL = "rest/users/ping/";
-    //set to true while waiting for the response to the heartbeat request
-    privateData.httpHeartbeatPending = false;
-
-    var sendHeartbeat = function(){
-        if (!privateData.httpHeartbeatPending) {
-            privateData.httpHeartbeatPending = true;
-            $http.get(privateData.HTTP_HEARTBEAT_URL)
-                .success(
-                function (data, status, headers, config) {
-                    privateData.httpHeartbeatPending = false;
-                    if (status != 200){
-                        $log.debug("warn: successful http heartbeat returned status " + status);
-                    }
-                })
-                .error(
-                function(data, status, headers, config){
-                    privateData.httpHeartbeatPending = false;
-                    console.error("warn: failed http heartbeat returned status " + status);
-                });
-        }
-    }
-
-    //$interval(sendHeartbeat,privateData.HTTP_HEARTBEAT_INTERVAL);
-
     //currently registered callbacks
     privateData.callbacks = [];
 
@@ -167,7 +139,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q,$log, 
         };
 
         newsocket.onclose = function (e) {
-            $log.debug("SockJS connection closed");
+            $log.debug("SockJS connection closed ", e);
             //TODO: reconnect when connection is lost?
             if (e.code === 1011) { // unexpected server condition - happens when the user's session times out
                 $rootScope.$apply(function () {

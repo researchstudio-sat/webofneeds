@@ -3,14 +3,17 @@
  */
 ;
 import angular from 'angular';
+import { attach } from '../utils';
+import { actionCreators }  from '../actions/actions';
 
 function genLoginConf() {
     let template = `<a href="#" class="wl__button" ng-click="self.open = !self.open">
                         <span class="wl__button__caption">Sign in</span>
                         <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" class="wl__button__carret">
                     </a>
-                    <input type="text" required="true" placeholder="Email address" ng-model="self.email" required type="email"/>
-                    <input type="text" required="true" placeholder="Password" ng-model="self.password" required type="password"/>
+                    <input required="true" placeholder="Email address" ng-model="self.email" type="email" required />
+                    <input required="true" placeholder="Password" ng-model="self.password" type="password" required />
+                    <div class="wl__errormsg">{{self.loginError}}</div>
                     <div class="wl__table">
                         <div class="wlt__left">
                             <input type="checkbox" ng-model="self.rememberMe" id="rememberMe"/><label for="rememberMe">Remember me</label>
@@ -19,11 +22,28 @@ function genLoginConf() {
                             <a href="#">Forgot Password?</a>
                         </div>
                     </div>
-                    <button class="won-button--filled lighterblue">Sign in</button>
+                    <button class="won-button--filled lighterblue" ng-click="::self.login(self.email, self.password)">Sign in</button>
                     <span class="wl__register">No Account yet? <a href="#">Sign up</a></span>`;
 
+    const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
-    class Controller {}
+    class Controller {
+        constructor(/* arguments <- serviceDependencies */){
+            attach(this, serviceDependencies, arguments);
+
+            this.email = "";
+            this.password = "";
+
+            const login = (state) => ({
+                loggedIn: state.get('user').toJS().loggedIn,
+                loginError: state.get('user').toJS().loginError
+            });
+
+            const disconnect = this.$ngRedux.connect(login, actionCreators)(this);
+            this.$scope.$on('$destroy',disconnect);
+        }
+    }
+    Controller.$inject = serviceDependencies;
 
     return {
         restrict: 'E',

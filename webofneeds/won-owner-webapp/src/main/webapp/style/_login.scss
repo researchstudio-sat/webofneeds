@@ -16,11 +16,18 @@ won-login {
     width: 100%;
   }
 
-  input[type=text] {
+  input[type=text],
+  input[type=password],
+  input[type=email] {
     margin: 1rem 0;
     width: 100%;
     background-color: $won-lighter-gray;
     box-shadow: inset 0 0 0.3rem 0rem $won-light-gray;
+  }
+
+  .wl__errormsg {
+    font-size: $smallFontSize;
+    color: $won-red;
   }
 
   .wl__table{

@@ -12,10 +12,7 @@ import dynamicTextfieldModule from '../dynamic-textfield';
 import imageDropzoneModule from '../image-dropzone';
 //import draftStoreModule from '../../stores/draft-store';
 import { attach } from '../../utils';
-import { actionCreators }  from '../../actions';
-
-import wonServiceReduxModule from '../../service/won-service-redux';
-
+import { actionCreators }  from '../../actions/actions';
 
 const postTypeTexts = [
     {
@@ -41,7 +38,7 @@ const postTypeTexts = [
 ]
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
-const serviceDependencies = ['$q', '$ngRedux', '$scope', 'wonServiceRedux'/*'$routeParams' /*injections as strings here*/];
+const serviceDependencies = ['$q', '$ngRedux', '$scope'/*'$routeParams' /*injections as strings here*/];
 
 class CreateNeedController {
     constructor(/* arguments <- serviceDependencies */) {
@@ -58,13 +55,14 @@ class CreateNeedController {
         //this.titlePicZone().addEventListener('drop', e => 0);
 
         const selectFromState = (state) => ({
-            draftId: state.getIn(['router','currentParams','draftId']),
-            state: state,
+            draftId: state.getIn(['router', 'currentParams', 'draftId']),
 
             //TODO for debugging; deletme
+            state: state,
             //drafts: state.get('drafts'),
             wubs: state.get('wubs'),
         });
+
 
         // Using actionCreators like this means that every action defined there is available in the template.
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
@@ -113,6 +111,14 @@ class CreateNeedController {
     titlePicZone() {
         return titlePicZoneNg[0];
     }
+    publish() {
+        this.drafts__publish({
+            need: this.$ngRedux.getState().getIn(['drafts', this.draftId]).toJS(),
+            nodeUri: this.$ngRedux.getState().getIn(['config', 'defaultNodeUri']),
+        });
+
+        //on-image-picked="::self.drafts__change__thumbnail({draftId: self.draftId, image: image})">
+    }
 
 }
 
@@ -124,7 +130,6 @@ export default angular.module('won.owner.components.createNeed', [
         labelledHrModule,
         dynamicTextfieldModule,
         imageDropzoneModule,
-        wonServiceReduxModule,
     ])
     //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
     .controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
