@@ -7,6 +7,7 @@ import { getRandomPosInt, checkHttpStatus } from './utils';
 import won from './won-es6';
 
 import jsonld from 'jsonld';
+window.jsonld4Dbg = jsonld;
 
 /*
     fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
@@ -105,22 +106,23 @@ export function getEventData(json) {
         },
         "@type": "msg:FromOwner"
     }
+    jsonld.promises.frame(json, frame).then(framed => console.log('framed: ', framed))
 
     //copy data from the framed message to the event object
-    let framedMessage = jsonld.frame(json, frame);
+    let framedMessage = jsonld.frame(json, frame, {}, (args) => console.log('jsonld.frame: ', args));
 
     if (framedMessage == null){
         //not FromSystem? maybe it's FromSystem?
         frame['@type'] = "msg:FromSystem";
         //copy data from the framed message to the event object
-        framedMessage = jsonld.frame(json, frame);
+        framedMessage = jsonld.frame(json, frame, {}, (args) => console.log('jsonld.frame: ', args));
     }
 
     if (framedMessage == null){
         //not FromSystem? maybe it's FromExternal?
         frame['@type'] = "msg:FromExternal";
         //copy data from the framed message to the event object
-        framedMessage = jsonld.frame(json, frame);
+        framedMessage = jsonld.frame(json, frame, {}, (args) => console.log('jsonld.frame: ', args));
     }
 
     for (key in framedMessage){
