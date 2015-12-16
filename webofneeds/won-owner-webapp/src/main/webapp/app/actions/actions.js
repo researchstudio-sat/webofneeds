@@ -65,7 +65,8 @@ const actionHierarchy = {
         stateTransitionTo
     },
     posts:{
-        load:INJ_DEFAULT
+        load:INJ_DEFAULT,
+        clean:INJ_DEFAULT
     },
     posts_overview:{
         openPostsView:INJ_DEFAULT
@@ -139,8 +140,8 @@ const actionHierarchy = {
             data => {
                 dispatch(actionCreators.user__receive({loggedIn: true, email: username}));
                 dispatch(actionCreators.retrieveNeedUris());
-            },
-            posts => dispatch(actionCreators.posts__load())
+                dispatch(actionCreators.posts__load());
+            }
         ).catch(
             error => dispatch(actionCreators.user__loginFailed({loginError: "No such username/password combination registered."}))
         ),
@@ -160,6 +161,7 @@ const actionHierarchy = {
             data => {
                 dispatch(actionCreators.user__receive({loggedIn: false}));
                 dispatch(actionCreators.needs__receive({needs: {}}));
+                dispatch(actionCreators.posts__clean({}))
             }
         ).catch(
             //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
