@@ -17,9 +17,7 @@
 package won.node.service.impl;
 
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
-import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
 
@@ -38,10 +36,8 @@ public class URIService
   private String connectionResourceURIPrefix;
   //prefix of an event resource
   private String eventResourceURIPrefix;
-  //prefix of a messageEvent resource
-  private String messageEventResourceURIInfix;
-  //need meta information suffix
-  private String needMetaInformationURISuffix;
+  //prefix of an attachment resource
+  private String attachmentResourceURIPrefix;
   //prefix for URISs of RDF data
   private String dataURIPrefix;
   //prefix for URIs referring to real-world things
@@ -121,6 +117,10 @@ public class URIService
     return URI.create(eventResourceURIPrefix.toString() + "/"   + id);
   }
 
+  public URI createAttachmentURIForId(String id) {
+    return URI.create(attachmentResourceURIPrefix.toString() + "/"   + id);
+  }
+
   public URI createNeedURI(Need need)
   {
     return URI.create(needResourceURIPrefix.toString() + "/" + need.getId());
@@ -146,12 +146,8 @@ public class URIService
     this.eventResourceURIPrefix = eventResourceURIPrefix;
   }
 
-  public void setMessageEventResourceURIInfix(final String messageEventResourceURIInfix) {
-    this.messageEventResourceURIInfix = messageEventResourceURIInfix;
-  }
-
-  public void setNeedMetaInformationURISuffix(final String needMetaInformationURISuffix) {
-    this.needMetaInformationURISuffix = needMetaInformationURISuffix;
+  public void setAttachmentResourceURIPrefix(String attachmentResourceURIPrefix) {
+    this.attachmentResourceURIPrefix = attachmentResourceURIPrefix;
   }
 
   public void setDataURIPrefix(final String dataURIPrefix)
@@ -174,13 +170,10 @@ public class URIService
     this.generalURIPrefix = generalURIPrefix;
   }
 
-  public URI createEventURI(final Connection con, final ConnectionEvent event)
-  {
-    return createEventURIForId(event.getId().toString());
-  }
-
-  public URI createNeedMetaInformationURI(final URI needURI) {
-    return URI.create(needURI.toString() + needMetaInformationURISuffix + WonRdfUtils.NAMED_GRAPH_SUFFIX);
+  public URI createNeedSysInfoGraphURI(final URI needURI) {
+    //TODO: [SECURITY] it's possible to submit need data that clashes with this name,
+    // which may lead to undefined behavior
+    return URI.create(needURI.toString() + "#sysinfo");
   }
 
   /**

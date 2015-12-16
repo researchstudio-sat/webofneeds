@@ -1,5 +1,7 @@
 package won.bot.framework.events.event;
 
+import won.protocol.message.WonMessage;
+
 /**
  * Tagging interface that indicates that the event was created when an
  * actual protocol message was received.
@@ -7,4 +9,5 @@ package won.bot.framework.events.event;
  */
 public interface MessageEvent
 {
+  public WonMessage getWonMessage();
 }

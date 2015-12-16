@@ -1,0 +1,114 @@
+//span the following over the whole scss to win specificity battles
+//#body-id {
+
+
+@import 'fonts';
+@import 'flex-layout';
+@import 'sizing-utils';
+@import 'positioning-utils';
+@import 'speech-bubble';
+@import 'square-image';
+@import 'tri-aligned';
+
+@import 'reset';
+
+@import 'won-config';
+
+@import 'text';
+
+// global styling
+
+
+/*
+ * form elements don't inherit the font-family so we
+ * need to set it manually here
+ */
+button, input, textarea {
+  font-family: inherit;
+  font-weight: inherit;
+}
+
+body {
+
+  //this font will be inherited down the cascade
+  @include default-font;
+
+  background-color: $won-lighter-gray;
+
+  @extend %fixed-fill;
+
+  @include flex-column;
+  align-items: stretch; //TODO this is bad style! it overwrites flex-col's align-items
+  & > .contentArea { flex-grow: 1; }
+}
+
+
+@import 'topnav';
+@import 'login';
+@import 'logout';
+@import 'need-tab-bar';
+@import 'main-tab-bar';
+@import 'create-need-title-bar';
+@import 'visitor-title-bar';
+@import 'settings-tab-bar';
+
+@mixin button-color($color, $bg_color) {
+  color: $color;
+  background: $bg_color;
+
+  &:active {
+    background: darken($bg_color, 15%);
+  }
+}
+
+/* style adapted from http://cssdeck.com/labs/beautiful-flat-buttons */
+.won-button--filled {
+  //padding: 0.5em 1em;
+  padding: 0.66em 2em;
+  font-size: $normalFontSize;
+  text-align: center;
+  border: 0;
+  border-radius: 0.19rem;
+  cursor: pointer;
+
+  /*Button color definitions*/
+  &.red { @include button-color(white,$won-red); }
+  &.darkgray { @include button-color(white, $won-dark-gray); }
+  &.lighterblue { @include button-color(white, $won-lighter-blue); }
+  &.black { @include button-color(white, black); }
+}
+
+input[type=text],
+input[type=password],
+input[type=email] {
+  display: block;
+  padding: 0.66rem;
+  box-sizing: border-box;
+  border-radius: 0.19rem;
+  border: 0.1rem solid $won-line-gray;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+@import 'gallery';
+@import 'post-info';
+@import 'post-messages';
+@import 'create-post';
+
+//TODO in topnav, make create-button black when the dialog is open
+//TODO the :hover isn't usable on touch displays (require alternate path to get to the help text) - dog-ears + peel-slide?
+//TODO enable keyboard selection. add aria-information
+
+@import 'typeselect';
+
+@import 'labelledhr';
+@import 'landingpage';
+@import 'accordion';
+@import 'flexgrid';
+@import 'settings';
+@import 'overview-posts';
+@import 'overview-incoming-requests';
+@import 'feed';
+@import 'overview-matches';

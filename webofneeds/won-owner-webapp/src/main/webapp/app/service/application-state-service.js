@@ -26,13 +26,19 @@
  // * managing events (as an event-queue)
  // * managing information about the currently viewed need (that's what we've got a browser/routing for)
  // * holding information about the loaded needs/drafts (we got a user object elsewhere for that)
-angular.module('won.owner').factory('applicationStateService', function (linkedDataService,utilService, $rootScope, $q,$log) {
+angular.module('won.owner').factory('applicationStateService', function (linkedDataService,utilService, $rootScope, $q,$log, $location) {
 
     //the service
     var applicationStateService = {}
 
     //private data only used inside the service
     var privateData = {};
+
+    // base url of the application (with # added, e.g. http://localhost:8080/owner/#)
+    var baseUrl = $location.absUrl().substring(0, $location.absUrl().length - $location.url().length);
+    if (baseUrl.indexOf('#', baseUrl.length - 1) == -1) {
+        baseUrl = baseUrl + '#';
+    }
 
     //filter for event types - used by the 'myfilter' method
     //the filter is a dictionary that is compared with elements of an array
@@ -54,6 +60,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
      * @param needURIs any needs from previous sessions, fetched from the server
      */
     applicationStateService.reset = function() {
+        linkedDataService.reset();
         //if we have a current need, that's its URI
         privateData.currentNeedURI = null;
         privateData.currentEvent = null;
@@ -68,13 +75,10 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     }
     applicationStateService.init = function(){
         privateData.allNeeds = {}
-        privateData.allDrafts = {};
 
-        privateData.allClosed = [
-            {type:'Want', title:'Playing soccer together', datetime: new Date('2014-08-23')},
-            {type:'Change', title:'Looking for a flatscreen TV', datetime: new Date('2014-08-20')},
-            {type:'Together', title:'Go to the cinema', datetime: new Date('2014-07-14')}
-        ];
+        privateData.allDrafts = {};
+        privateData.searchResults = [];
+        //privateData.matcherURI = "http://sat001.researchstudio.at:8080/matcher/search/";
         privateData.currentNeedURI = null;
         privateData.currentEvent = null;
 
@@ -98,14 +102,22 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     applicationStateService.setCurrentConnectionURI= function (connectionURI){
         privateData.currentEvent = connectionURI;
     }
+    applicationStateService.getMatcherURI = function getMatcherURI(){
+        return privateData.matcherURI;
+    }
     applicationStateService.getCurrentConnectionURI = function(){
         return privateData.currentEvent;
     }
     applicationStateService.processEventAndUpdateUnreadEventObjects = function(eventData){
-        var eventType = eventData.eventType;
-        var needURI = eventData.hasReceiverNeed;
-        updateUnreadEventsByNeedByType(needURI, eventType, eventData);
-        updateUnreadEventsByTypeByNeed(needURI, eventType, eventData);
+        if (eventData.matchCounterpartURI in privateData.allNeeds || eventData.hasSenderNeed in privateData.allNeeds) {
+            // ignore events of connections that connect to my own need
+            return;
+        } else {
+            var eventType = eventData.eventType;
+            var needURI = eventData.hasReceiverNeed;
+            updateUnreadEventsByNeedByType(needURI, eventType, eventData);
+            updateUnreadEventsByTypeByNeed(needURI, eventType, eventData);
+        }
     };
 
     // now just updates the counters,
@@ -404,9 +416,7 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
     applicationStateService.getAllDrafts = function(){
         return privateData.allDrafts;
     }
-    applicationStateService.getAllClosed = function(){
-        return privateData.allClosed;
-    }
+
     /**
      * Adds a need.
      * @param need
@@ -415,7 +425,42 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         updateUnreadEventsByNeedByType(need.uri);
         privateData.allNeeds[need.uri] = need;
     }
+    applicationStateService.updateNeed = function(need){
+        privateData.allNeeds[need.uri] = need;
+    }
+    applicationStateService.checkIfThereIsClosedNeed = function(){
+        var check = false;
+        for(var need in privateData.allNeeds){
+            if(privateData.allNeeds[need].state == won.WON.Inactive){
+                check = true;
+                break;
+            }
+        }
+        return check;
+    }
+    applicationStateService.checkIfNeedIsInactive = function(need){
+        if(need.state==won.WON.Inactive){
+            return true;
+        }else return false;
+    }
+    applicationStateService.checkIfThereIsNeedInInbox = function(){
+        var check = false;
+        if(Object.keys(privateData.allNeeds).length==0) {
+            return false;
+        }else {
+            for(var need in privateData.allNeeds){
+                if(privateData.allNeeds[need].state == won.WON.Active){
+                    check = true;
+                    break;
+                }
+
+            }
+        }
+
+        return check;
+    }
     applicationStateService.addDraft = function(draft){
+        console.log('adding draft ', draft)
         var draftLd = JSON.parse(draft.draft);
         var draftBuilderObject = new window.won.DraftBuilder(draftLd).setContext();
         var menuposition = draftBuilderObject.getCurrentMenuposition();
@@ -438,18 +483,22 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             var needURI = needs.data[i];
             needURIPromises.push(linkedDataService.getNeed(needURI).then(
                 function(need){
-                   applicationStateService.addNeed(need)
+
+                       applicationStateService.addNeed(need)
+
+
                    return need;
                 })
             )
         }
-        $q.all(needURIPromises);
+        return $q.all(needURIPromises);
     }
     applicationStateService.addDrafts = function(drafts){
         for(var i = 0; i<drafts.data.length;i++){
             applicationStateService.addDraft(drafts.data[i]);
         }
     }
+
     applicationStateService.getAllNeedsCount = function(){
         return utilService.getKeySize(privateData.allNeeds);
     }
@@ -478,9 +527,17 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
             deferred.reject("Cannot get latest events of current need: no need is currently selected");
             return deferred.promise;
         }
-        linkedDataService.getLastEventOfEachConnectionOfNeed(applicationStateService.getCurrentNeedURI())
+        linkedDataService.getLastEventOfEachConnectionOfNeed(applicationStateService.getCurrentNeedURI(), privateData.currentNeedURI)
             .then(function(events){
-                privateData.lastEventOfEachConnectionOfCurrentNeed = events;
+                privateData.lastEventOfEachConnectionOfCurrentNeed = [];
+                var index;
+                for	(index = 0; index < events.length; index++) {
+                    if (events[index].connection.hasRemoteNeed in privateData.allNeeds) {
+                        // ignore events of connections that connect to my own need
+                    } else {
+                        privateData.lastEventOfEachConnectionOfCurrentNeed.push(events[index]);
+                    }
+                }
                 deferred.resolve(privateData.lastEventOfEachConnectionOfCurrentNeed)
             }, function(reason){
                 deferred.reject(reason);
@@ -488,5 +545,31 @@ angular.module('won.owner').factory('applicationStateService', function (linkedD
         return deferred.promise;
     }
 
+    applicationStateService.getBaseUrl = function(){
+        return baseUrl;
+    }
+
+    applicationStateService.getPublicLink = function(needUri){
+        return applicationStateService.getBaseUrl() + '/post-detail?need=' + encodeURIComponent(needUri);
+    }
+
+    applicationStateService.getPrivateLink = function(needLink){
+        return applicationStateService.getBaseUrl() + '/private-link?id=' + needLink;
+    }
+
+    applicationStateService.addSearchResults = function(searchResults,promises){
+        var deferred = $q.defer();
+        $q.all(promises).then(function(searchResults){
+            angular.forEach(searchResults,function(result){
+                result.data = linkedDataService.getNeed(result['matchURI']);
+            })
+        })
+        privateData.searchResults = searchResults;
+        deferred.resolve(privateData.searchResults);
+        return deferred.promise;
+    }
+    applicationStateService.getSearchResults = function(){
+        return privateData.searchResults;
+    }
     return applicationStateService;
 });

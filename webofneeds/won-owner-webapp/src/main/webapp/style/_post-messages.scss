@@ -1,0 +1,92 @@
+@import 'sizing-utils';
+@import 'square-image';
+@import 'speech-bubble';
+@import 'dynamic-textfield';
+
+.post-messages {
+
+  @include max-content-width(35rem, $minContentPadding, 'post-messages');
+  padding-top: 2rem;
+
+
+
+  .post-messages__inner {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  won-post-messages{
+    display: block;
+    width: 100%;
+
+    .pm__header {
+      font-size: $normalFontSize;
+      text-align: left;
+      width: 100%;
+    }
+
+    .pm__footer {
+      display: flex;
+
+      won-dynamic-textfield {
+        margin-right: 0.5rem;
+        flex-grow: 1;
+      }
+
+      .won-button--filled {
+        padding: 0 2rem;
+      }
+
+      margin-bottom: 5rem;
+    }
+
+    .pm__content {
+      padding: 1rem;
+      margin: 1rem 0;
+      background: white;
+      border: 0.1rem solid $won-line-gray;
+      max-height: 30rem;
+      overflow: auto;
+
+      &__message {
+        margin: 0.5rem 0;
+        @include square-image($postIconSize, 0, 0.5rem, 0, 0);
+        display: flex;
+
+        &.left{
+          justify-content: flex-start;
+
+          & .pm__content__message__content__text {
+            @include speech-bubble-left($won-light-gray, $won-line-gray, 5px, 1px, 0.5rem);
+          }
+        }
+        &.right{
+          justify-content: flex-end;
+
+          & .pm__content__message__content__text {
+            @include speech-bubble-right($won-light-gray, $won-line-gray, 5px, 1px, 0.5rem);
+          }
+        }
+
+        &__content {
+          margin: 0 0.5rem;
+          font-size: $smallFontSize;
+
+          &__text{
+            padding: 0.5rem;
+            border: 0.1rem solid $won-line-gray;
+            background: $won-light-gray;
+          }
+
+          &__time {
+            color: $won-line-gray;
+          }
+        }
+      }
+    }
+  }
+}
+
+

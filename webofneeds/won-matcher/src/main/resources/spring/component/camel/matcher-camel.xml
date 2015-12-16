@@ -43,6 +43,10 @@
     <bean id="matcherProtocolCamelConfigurator" class="won.matcher.messaging.MatcherProtocolCamelConfiguratorImpl">
         <property name="componentName" value="activemq"/>
         <property name="camelContext" ref = "wonMatcherCamel"/>
+        <property name="messagingContext" ref="messagingContext"/>
+    </bean>
+
+    <bean id="messagingContext" factory-bean="wonTransmissionService" factory-method="getClientMessagingContext">
     </bean>
 
 

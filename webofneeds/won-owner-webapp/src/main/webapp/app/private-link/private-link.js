@@ -7,7 +7,16 @@
  */
 
 angular.module('won.owner')
-    .controller('PrivateLinkCtrl', function ($scope, $location, userService, $rootScope, $log,applicationStateService, linkedDataService, wonService) {
+    .controller('PrivateLinkCtrl', function ($scope
+        , $location
+        , userService
+        , $rootScope
+        , $log
+        , $routeParams
+        , applicationStateService
+        , applicationControlService
+        , linkedDataService
+        , wonService) {
 
     // all types of messages will be shown when the page is loaded
      var msgFilterCriteria = [1, 2, 3];
@@ -47,24 +56,73 @@ angular.module('won.owner')
      won.WONMSG.hintMessage,
      won.WONMSG.closeMessage];
 
-
+    $rootScope.postClosed=false;
     //$scope.title = 'New Flat, Need Furniture';
+        $scope.need = applicationStateService.getCurrentNeed().then(function(need){
+            $rootScope.postClosed =  applicationStateService.checkIfNeedIsInactive(need);
+        });
+
     $scope.img_path = '/owner/images/thumbnail_demo.jpg';
-    $rootScope.postClosed = false;
+
+
+
+
     $rootScope.postShouldBeClosed = false;
     $rootScope.postShouldBeReopened = false;
 
 
     //settings
-    $scope.privateLink = 'https://won.com/la3f#private'; //todo set value normaly
-    $scope.publicLink = 'http://www.webofneeds.org/'; //todo set value normaly;
+
+    if ($routeParams.id != null) {
+
+        userService.setUpRegistrationForUserWithPrivateLink($routeParams.id).then(
+            function success() {
+                // calling replace() removes it from the browser history when clicking back button,
+                // i.e. if I enter a private link A and then change the session (time-out, log-in with
+                // other user account or create a new private link B) clicking 'back' in the browser won't
+                // display my private link A. This is a big plus, but still needs some work: at least in
+                // Chrome, I can still see my private link in the browser history page.
+                // TODO bug: sometimes, when entering the private link page (try 4-10 times in a raw)
+                // connections are not loaded...
+                $location.url('/private-link').replace();
+            }
+            //TODO error
+        );
+        return;
+    }
+
+    if (userService.isPrivateUser()) {
+        $scope.privateLink = applicationStateService.getPrivateLink(userService.getUserName());
+    }
+
+    $scope.publicLink = applicationStateService.getPublicLink(applicationStateService.getCurrentNeedURI());
+
+        // default settings for all users
     $scope.notificationEmail = '';
-    $scope.notificationEmailValide = false;
+    $scope.emailChange = false;
     $scope.notificationChecks = {
         val1: false,
         val2: false,
-        val3: false
+        val3: false,
+        changed: false
     };
+    // ask back-end for current need of the user settings
+        //TODO or load need settings in main when loading current need?
+    userService.getSettingsForNeed(applicationStateService.getCurrentNeedURI()).then(
+        function success(settingsData) {
+            $scope.notificationEmail = settingsData.email;
+            if ($scope.notificationEmail == null) {
+                $scope.emailChange = true;
+            } else {
+                $scope.emailChange = false;
+            }
+            $scope.notificationChecks.val1 = settingsData.notifyConversations;
+            $scope.notificationChecks.val2 = settingsData.notifyRequests;
+            $scope.notificationChecks.val3 = settingsData.notifyMatches;
+            $scope.notificationChecks.changed = false;
+        }
+        //TODO error
+    );
 
     $scope.prevMessageId = null;
 
@@ -85,22 +143,48 @@ angular.module('won.owner')
         return userService.isAuth();
     };
 
-    $scope.copyLinkToClipboard = function() {
-        //todo maybe we can use http://zeroclipboard.org/
+    $scope.showPrivateUser = function() {
+        return userService.isPrivateUser();
     };
-
 
     $scope.settingsCollapseClick= function() {
         $scope.settingsCollapsed = !$scope.settingsCollapsed;
     };
 
     $scope.notifyMe = function() {
-        $scope.notificationEmailValide = !$scope.notificationEmailValide;
-        //todo send ro backend
+        $scope.emailChange = false;
+        $scope.notificationChecks.changed = false;
+
+        //send to backend:
+
+        var setting = {
+            email: $scope.notificationEmail,
+            notifyConversations: $scope.notificationChecks.val1,
+            notifyRequests: $scope.notificationChecks.val2,
+            notifyMatches : $scope.notificationChecks.val3,
+            needUri: applicationStateService.getCurrentNeedURI(),
+            username: userService.getUnescapeUserName()
+        };
+
+        userService.setSettingsForNeed(setting).then(
+            function success(settingsData) {
+                // this is expected, do nothing
+            },
+            function error(settingsData) {
+                $scope.emailChange = true;
+                $scope.notificationChecks.changed = true;
+                //TODO error notification
+            }
+        );
+
     };
     $scope.changeEmailAddress = function() {
-        $scope.notificationEmailValide = !$scope.notificationEmailValide;
+        $scope.emailChange = true;
     };
+
+    $scope.notificationChecksChanged = function() {
+        $scope.notificationChecks.changed = true;
+    }
 
     //Post Options
     $scope.newMessage = '';
@@ -280,10 +364,10 @@ angular.module('won.owner')
         }
 
         $scope.addConnectionLastTextMessages = function(currentMessage){
-            linkedDataService.getConnectionTextMessages(currentMessage.connection.uri)
+            linkedDataService.getConnectionTextMessages(currentMessage.connection.uri, applicationStateService.getCurrentNeedURI())
                 .then(function(messages){
-                    currentMessage.lastMessages = messages;
-                    return;
+                    currentMessage.lastMessages = won.appendStrippingDuplicates(currentMessage.lastMessages, messages,
+                    function(msg1, msg2) { return msg1.eventUri == msg2.eventUri ? 0 : 1; });
                 });
         }
 
@@ -452,6 +536,10 @@ angular.module('won.owner')
         return false;
     }
 
+    $scope.clickOnPostDetail = function(needUri) {
+        applicationControlService.goToNeedDetailView(needUri);
+    }
+
     $scope.$on(won.EVENT.CONNECTION_MESSAGE_RECEIVED, function(ngEvent, eventData) {
             $scope.addConnectionLastTextMessages($scope.chosenMessage);
     });
@@ -461,7 +549,7 @@ angular.module('won.owner')
 
 })
 
-angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scope,$route,$window,$location,userService, $rootScope) {
+angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scope,$route,$window,$location,userService,applicationStateService, $rootScope,wonService) {
 
     $scope.close = false;
     $scope.reopen = false;
@@ -478,6 +566,17 @@ angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scop
         }
     }     */
 
+    $scope.$on(won.EVENT.CLOSE_NEED_SENT, function(ngEvent, eventData) {
+        linkedDataService.getNeed(eventData.hasSenderNeed).then(function(need){
+            $rootScope.postClosed = applicationStateService.checkIfNeedIsInactive(need);
+        });
+    });
+    $scope.$on(won.EVENT.ACTIVATE_NEED_SENT, function(ngEvent, eventData) {
+        linkedDataService.getNeed(eventData.hasSenderNeed).then(function(need){
+            $rootScope.postClosed = applicationStateService.checkIfNeedIsInactive(need);
+        });
+    });
+
     $scope.onClickYes = function () {
         $scope.error = '';
 
@@ -486,14 +585,14 @@ angular.module('won.owner').controller('CloseAndReopenPostCtrl', function ($scop
             //TODO logic
             $scope.close = true;
             $rootScope.postShouldBeClosed = false;
-            $rootScope.postClosed = true;
+            wonService.closeNeed($scope.currentNeed.uri);
         }
 
         //TODO logic
         if($rootScope.postShouldBeReopened){
             $scope.reopen = true;
             $rootScope.postShouldBeReopened = false;
-            $rootScope.postClosed = false;
+            wonService.activateNeed($scope.currentNeed.uri);
         }
     }
 

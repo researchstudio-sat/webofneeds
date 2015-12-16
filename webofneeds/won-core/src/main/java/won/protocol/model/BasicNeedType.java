@@ -44,8 +44,20 @@ public enum BasicNeedType
     for (BasicNeedType state : values())
       if (state.name.equals(fragment))
         return state;
+    return null;
+  }
 
-    logger.warn("No enum could be matched for: {}", fragment);
+  /**
+   * Tries to match the given URI against all enum values.
+   *
+   * @param uri URI to match
+   * @return matched enum, null otherwise
+   */
+  public static BasicNeedType fromURI(final URI uri)
+  {
+    for (BasicNeedType state : values())
+      if (state.getURI().equals(uri))
+        return state;
     return null;
   }
 

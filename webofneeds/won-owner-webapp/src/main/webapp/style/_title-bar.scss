@@ -1,0 +1,36 @@
+@import 'won-config';
+@import 'underlined-tabs';
+@import 'sizing-utils';
+
+@mixin title-bar($prefix) {
+  background-color: $won-light-gray;
+  border-top: 1px solid $won-line-gray;
+  border-bottom: 1px solid $won-line-gray;
+
+  @include max-content-width($maxContentWidth, $minContentPadding, $prefix);
+
+  > .#{$prefix}__inner {
+    @include tri-aligned($prefix + '__inner', 1rem);
+  }
+
+  .#{$prefix}__icon {
+    @include fixed-height(1.8rem);
+    // assuming there's no icons that are wider than tall.
+    // this assumption has to be made, to prevent chrome
+    // from showing immensly wide svg-snippets (id-selected
+    // viewports reaching to the right edge of the svg-sprite)
+    max-width: 1.8rem;
+    width: auto;
+  }
+
+  .#{$prefix}__title {
+    font-size: $mediumFontSize;
+    font-weight: 300;
+  }
+
+  .#{$prefix}__tabs {
+    @include underlined-tabs($won-red);
+  }
+  .#{$prefix}__tabs__selected { @extend %tabs__selected }
+  .#{$prefix}__tabs__unread { @extend %tabs__unread }
+}

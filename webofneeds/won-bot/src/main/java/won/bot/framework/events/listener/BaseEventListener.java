@@ -86,7 +86,7 @@ public abstract class BaseEventListener implements EventListener
       if (unsubscribeOnException) {
         context.getEventBus().unsubscribe(this);
       }
-      context.getEventBus().publish(new ErrorEvent(this,e));
+      context.getEventBus().publish(new ErrorEvent(e));
       countThrowable(e);
     } finally {
       noteTimeExecuting(startTime);

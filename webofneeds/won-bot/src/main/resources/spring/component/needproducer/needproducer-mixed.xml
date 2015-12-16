@@ -44,7 +44,7 @@
                         <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
                             <property name="directory" value="${mail.directory.supply}"/>
                             <property name="filenameFilterRegex" value=".*eml"/>
-                            <property name="repeat" value="false"/>
+                            <property name="repeat" value="true"/>
                             <property name="fileBasedNeedProducer">
                                 <bean class="won.bot.framework.component.needproducer.impl.MailFileNeedProducer"/>
                             </property>
@@ -58,7 +58,7 @@
                         <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
                             <property name="directory" value="${mail.directory.demand}"/>
                             <property name="filenameFilterRegex" value=".*eml"/>
-                            <property name="repeat" value="false"/>
+                            <property name="repeat" value="true"/>
                             <property name="fileBasedNeedProducer">
                                 <bean class="won.bot.framework.component.needproducer.impl.MailFileNeedProducer"/>
                             </property>

@@ -1,0 +1,50 @@
+// contains colors and other global variables
+
+
+// colors
+
+$won-red: #F04646;
+$won-light-gray: #F0F2F4; //used for headings
+$won-lighter-gray: #F8F9F9; //used for background
+$won-line-gray: #CBD2D1; //use for lines
+$won-subtitle-gray: #808080;
+$won-helpbox-yellow: #FFFCE5;
+$won-blue: #00325A;
+$won-light-blue: #673A68;
+$won-lighter-blue: #468CDC;
+$won-dark-gray: #303A43;
+
+
+// sizes
+$hugeiconSize: 5rem;
+$bigiconSize: 2.25rem;
+$iconSize: 1.8rem;
+
+$postIconSize: 2.5rem;
+$feedIconSize: 3rem;
+
+$bigFontSize: 2rem;
+$mediumFontSize: 1.5rem;
+$normalFontSize: 1rem;
+$smallFontSize: 0.75rem;
+
+@mixin carretSized { //the small down-arrow
+  /*
+  // without svg-included margins
+  @include fixed-height(0.5rem);
+  @include fixed-width(0.875rem);
+  */
+
+  // with svg-included margins
+  @include fixed-square(1rem);
+
+}
+
+// should be used as max-width on all root-elements so the app has some
+// whitespace to the sides where it can be afforded
+$maxContentWidth: 70rem;
+
+$maxContentWidthLoginOverlay: 72rem;
+
+// use this to leave a consistent amount of space towards the edge of the viewport
+$minContentPadding: 1rem;

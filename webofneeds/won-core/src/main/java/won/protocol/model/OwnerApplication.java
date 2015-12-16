@@ -55,13 +55,13 @@ public class OwnerApplication {
         this.ownerApplicationId = ownerApplicationId;
     }
 
-    public List<Need> getNeeds() {
-        return needs;
-    }
-
-    public void setNeeds(List<Need> needs) {
-        this.needs = needs;
-    }
+//    public List<Need> getNeeds() {
+//        return needs;
+//    }
+//
+//    public void setNeeds(List<Need> needs) {
+//        this.needs = needs;
+//    }
 
     public List<String> getQueueNames() {
         return queueNames;

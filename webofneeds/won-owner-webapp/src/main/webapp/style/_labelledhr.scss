@@ -1,0 +1,25 @@
+@import 'won-config';
+
+won-labelled-hr {
+  display: block;
+  border-top: 1px solid $won-line-gray;
+  width: 100%;
+  height: 0;
+  position: relative;
+
+  $fontSize: $smallFontSize;
+
+  margin: $fontSize 0;
+
+  .wlh__label {
+    display: inline-block;
+    @extend %center--absolute;
+    margin-top: -0.133 * $fontSize;
+
+    text-align: center;
+    vertical-align: middle;
+    background: $won-lighter-gray;
+    @include fine-print;
+    padding: 0 0.3rem;
+  }
+}

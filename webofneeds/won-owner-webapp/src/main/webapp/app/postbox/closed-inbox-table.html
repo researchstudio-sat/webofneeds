@@ -43,14 +43,16 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-show="items.length>0" ng-repeat="item in items | filter: search">
+        <tr ng-show="hasItems()" ng-repeat="item in items | filter: search |filterByNeedState:'Inactive'">
             <td class="col-lg-1">
-                <span style="display: none;">{{item.type}}</span>
-                <img application-control ng-src="{{getTypePicURI(item.type)}}"
-                     tooltip="{{item.type}} (click to filter)"/>
+                <span style="display: none;">{{item.basicNeedType}}</span>
+                <img  application-control ng-src="{{getTypePicURI(item.basicNeedType)}}"
+                      tooltip="{{item.basicNeedType}} (click to filter)"/>
             </td>
-            <td>{{item.title}}</a></td>
-            <td>{{item.datetime | date}}</td>
+            <td class="col-lg-7"><a style="font-weight:bold;" href
+                                    ng-click="clickOn(item)">{{item
+                .title}}</a></td>
+            <td class="col-lg-2">{{item.creationDate | date}}</td>
         </tr>
         <tr ng-show="items.length<1">
             <td class="col-lg-1">
