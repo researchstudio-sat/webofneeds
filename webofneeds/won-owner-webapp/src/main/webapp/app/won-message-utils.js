@@ -93,48 +93,72 @@ export function buildCreateMessage(need, wonNodeUri) {
     return [msgJson, msgUri];
 }
 
-export function getEventData(json) {
+export function getEventData(msgJson) {
     console.log('getting data from jsonld message');
 
     const eventData = {};
     //call handler if there is one - it may modify the event object
     //frame the incoming jsonld to get the data that interest us
-    const frame = {
-        "@context" : {
-            "won":"http://purl.org/webofneeds/model#",
-            "msg":"http://purl.org/webofneeds/message#"
-        },
-        "@type": "msg:FromOwner"
-    }
-    jsonld.promises.frame(json, frame).then(framed => console.log('framed: ', framed))
 
-    //copy data from the framed message to the event object
-    let framedMessage = jsonld.frame(json, frame, {}, (args) => console.log('jsonld.frame: ', args));
+    const acceptedSources = [ 'msg:FromOwner', 'msg:FromSystem', 'msg:FromExternal' ];
 
-    if (framedMessage == null){
-        //not FromSystem? maybe it's FromSystem?
-        frame['@type'] = "msg:FromSystem";
-        //copy data from the framed message to the event object
-        framedMessage = jsonld.frame(json, frame, {}, (args) => console.log('jsonld.frame: ', args));
-    }
+    const framingAttempts = acceptedSources.map(source =>
+        jsonld.promises.frame(msgJson, {
+            '@context': {
+                'won': 'http://purl.org/webofneeds/model#',
+                'msg': 'http://purl.org/webofneeds/message#'
+            },
+            '@type': source
+        }));
 
-    if (framedMessage == null){
-        //not FromSystem? maybe it's FromExternal?
-        frame['@type'] = "msg:FromExternal";
-        //copy data from the framed message to the event object
-        framedMessage = jsonld.frame(json, frame, {}, (args) => console.log('jsonld.frame: ', args));
-    }
+    const maybeFramedMsg = Promise.all(framingAttempts)
+        .then(framedMessages =>
+            //filter out failed framing attempts
+            framedMessages.filter(msg => msg['@graph'].length > 0)
+        )
+        .then(msgFramings => {
+            /* check framing results for failures */
+            if(msgFramings.length < 1) {
+                /* Not a valid type */
+                const e = new Error('Tried to jsond-ld-frame the message ', msgJson,
+                    ' but it\'s type was neither of the following, accepted types: ',
+                    acceptedSources );
+                e.msgJson = msgJson;
+                e.acceptedSources = acceptedSources;
+                e.framedMessages = msgFramings;
+                throw e;
+            } else if(msgFramings.length > 1) {
+                /* Multiple type declarations -> not valid json-ld */
+                const e = new Error('The framing found ' + msgFramings.length +
+                    'message types. Either the message wasn\'t valid json-ld or the ' +
+                    'framing has a bug. Please open a github issue at ' +
+                    'https://github.com/researchstudio-sat/webofneeds/issues/ in that ' +
+                    'case with all message. \n message before framing: ' + msgJson,
+                    '\nmessage after framing: ' + msgFramings
+                    );
+                e.msgJson = msgJson;
+                e.acceptedSources = acceptedSources;
+                e.framedMessages = msgFramings;
+                throw e;
+            } else {
+                return msgFramings[0];
+            }
+        });
 
-    for (key in framedMessage){
-        const propName = won.getLocalName(key);
-        if (propName != null && ! won.isJsonLdKeyword(propName)) {
-            eventData[propName] = won.getSafeJsonLdValue(framedMessage[key]);
+    return maybeFramedMsg.then(framedMessage => {
+        const framedSimplifiedMessage = Object.assign(
+            { '@context': framedMessage['@context'] }, //keep context
+            framedMessage['@graph'][0] //use first node - the graph should only consist of one node at this point
+        );
+        let eventData = {};
+        for (key in framedSimplifiedMessage){
+            const propName = won.getLocalName(key);
+            if (propName != null && ! won.isJsonLdKeyword(propName)) {
+                eventData[propName] = won.getSafeJsonLdValue(framedSimplifiedMessage[key]);
+            }
         }
-    }
-    eventData.uri = won.getSafeJsonLdValue(framedMessage);
-    eventData.framedMessage = framedMessage;
-    console.log('done copying the data to the event object, returning the result');
-
-    return eventData;
+        eventData.uri = won.getSafeJsonLdValue(framedSimplifiedMessage);
+        eventData.framedMessage = framedSimplifiedMessage;
+        return eventData;
+    }) ;
 }
-
