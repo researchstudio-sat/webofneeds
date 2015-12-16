@@ -27,6 +27,11 @@ const actionHierarchy = {
          * This action will likely be caused as a consequence of signing in.
          */
         receive: INJ_DEFAULT,
+        loginFailed: INJ_DEFAULT,
+        registerFailed: INJ_DEFAULT
+    },
+    needs: {
+        receive: INJ_DEFAULT,
         failed: INJ_DEFAULT
     },
     drafts: {
@@ -107,17 +112,13 @@ const actionHierarchy = {
             .then(checkHttpStatus)
             .then(resp => resp.json())
             /* handle data, dispatch actions */
-            .then(data =>
-                dispatch(actionCreators.user__receive({
-                    loggedIn: true,
-                    email: data.username
-                }))
-            )
+            .then(data => {
+                dispatch(actionCreators.user__receive({loggedIn: true, email: data.username }));
+                dispatch(actionCreators.retrieveNeedUris());
+            })
             /* handle: not-logged-in */
             .catch(error =>
-                dispatch(actionCreators.user__receive({
-                    loggedIn: false
-                }))
+                dispatch(actionCreators.user__receive({loggedIn: false}))
             );
         ;
     },
@@ -135,10 +136,13 @@ const actionHierarchy = {
         .then( response => {
             return response.json()
         }).then(
-            data => dispatch(actionCreators.user__receive({loggedIn: true, email: username}))
-
+            data => {
+                dispatch(actionCreators.user__receive({loggedIn: true, email: username}));
+                dispatch(actionCreators.retrieveNeedUris());
+            },
+            posts => dispatch(actionCreators.posts__load())
         ).catch(
-            error => dispatch(actionCreators.user__failed({error: "No such username/password combination registered."}))
+            error => dispatch(actionCreators.user__loginFailed({loginError: "No such username/password combination registered."}))
         ),
     logout: () => (dispatch) =>
         fetch('/owner/rest/users/signout', {
@@ -153,10 +157,16 @@ const actionHierarchy = {
         .then( response => {
             return response.json()
         }).then(
-            data => dispatch(actionCreators.user__receive({loggedIn: false}))
+            data => {
+                dispatch(actionCreators.user__receive({loggedIn: false}));
+                dispatch(actionCreators.needs__receive({needs: {}}));
+            }
         ).catch(
             //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
-            error => dispatch(actionCreators.user__receive({loggedIn : true}))
+            error => {
+                console.log(error);
+                dispatch(actionCreators.user__receive({loggedIn : true}))
+            }
         ),
     register: (username, password, passwordAgain) => (dispatch) =>
         fetch('/owner/rest/users/', {
@@ -171,13 +181,27 @@ const actionHierarchy = {
             .then( response => {
                 return response.json()
             }).then(
-                data => dispatch(actionCreators.user__receive({loggedIn: true, email: username})),
-                posts => dispatch(actionCreators.posts__load())
+                data => dispatch(actionCreators.login(username, password))
         ).catch(
-            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
-                error => dispatch(actionCreators.user__failed({error: "Passwords do not match"}))
+            //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
+            error => dispatch(actionCreators.user__registerFailed({registerError: "Registration failed"}))
         ),
-
+    retrieveNeedUris: () => (dispatch) => {
+        fetch('/owner/rest/needs/', {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        }).then(checkHttpStatus)
+            .then(response => {
+                return response.json()
+            }).then(
+                needs => dispatch(actionCreators.needs__receive({needs: needs}))
+        ).catch(
+                error => dispatch(actionCreators.needs__failed({error: "user needlist retrieval failed"}))
+        )},
     config: {
         /**
          * Anything that is load-once, read-only, global app-config

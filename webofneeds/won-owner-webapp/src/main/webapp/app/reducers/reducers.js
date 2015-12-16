@@ -55,8 +55,26 @@ const reducers = {
                     return Immutable.fromJS({loggedIn: false});
                 }
             },
-            [actionTypes.user.failed]: (state, {payload: {error}}) => {
+            [actionTypes.user.loginFailed]: (state, {payload: {loginError}}) => {
                 console.log('reducers.js: received UNsuccessful-login action from app-server');
+                return Immutable.fromJS({loginError: loginError});
+            },
+            [actionTypes.user.registerFailed]: (state, {payload: {registerError}}) => {
+                console.log('reducers.js: received UNsuccessful-login action from app-server');
+                return Immutable.fromJS({registerError: registerError});
+            }
+        }
+    ),
+    needs: createReducer(
+        Immutable.Map(),
+
+        {
+            [actionTypes.needs.receive]: (state, {payload: {needs}}) => {
+                console.log('reducers.js: received needlist action');
+                return Immutable.fromJS(needs);
+            },
+            [actionTypes.needs.failed]: (state, {payload: {error}}) => {
+                console.log('reducers.js: failed receive needlist action');
                 return Immutable.fromJS({error: error});
             }
         }

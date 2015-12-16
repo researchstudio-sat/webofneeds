@@ -23,6 +23,15 @@ import { actionCreators }  from './actions/actions';
 import {} from './won-message-utils';
 import SockJS from 'sockjs';
 
+/*
+class WONSocket extends SockJS {
+    constructor() {
+        super('/owner/msg', null, {debug: true});
+    }
+
+}
+*/
+
 export function runMessagingAgent(redux) {
 
     console.log('Starting messaging agent.');
@@ -41,12 +50,14 @@ export function runMessagingAgent(redux) {
      * + lazy socket initialisation
      */
 
+    let newSock = () => new SockJS('/owner/msg', null, {debug: true});
+    let ws = newSock();
+    let unsubscribeWatch = null;
 
-    //const ws = new SockJS('owner/msg', null, {debug: true});
-    const ws = openWebSocket();
+    //const ws = openWebSocket();
     ws.onopen = () => {
         /* Set up message-queue watch */
-        const unsubscribeWatch = watchImmutableRdxState(
+        unsubscribeWatch = watchImmutableRdxState(
             redux, ['enqueuedMessages'],
             (newMq, oldMq) => {
                 console.log('old mq length: ', oldMq.size);
@@ -73,11 +84,24 @@ export function runMessagingAgent(redux) {
          * multiple files.
          */
         console.log('got message via websocket: ', msg);
-        redux.dispatch(actionCreators.messages__receive({msg}));
+        //redux.dispatch(actionCreators.messages__receive({msg}));
     };
-    ws.onerror = () => {
+    ws.onerror = (e) => {
+        console.error('websocket error: ', e);
+        this.close();
     };
-    ws.onclose = () => {
+    ws.onclose = (e) => {
+        console.error('websocket closed: ', e);
+        if(unsubscribeWatch && typeof unsubscribeWatch === 'function')
+            unsubscribeWatch();
+
+
+        if (e.code !== 1011) { // 1011 -> unexpected server condition - happens when the user's session times out
+            // posting anonymously creates a new session for each post
+            // thus we need to reconnect here
+            // TODO reconnect only on next message instead of straight away
+            ws = newSock();
+        }
     };
 
     window.ws4dbg = ws;//TODO deletme

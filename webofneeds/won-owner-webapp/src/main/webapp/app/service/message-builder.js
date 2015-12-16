@@ -22,7 +22,10 @@
         var msgDataUri = args.msgUri + '#envelope';
         var msgGraph = [];
 
-        var attachmentGraphIds = args.attachments.map(function(a, i){ return args.msgUri + '#attachment-' + i })
+        var attachments = args.attachments? args.attachments : [];
+
+
+        var attachmentGraphIds = attachments.map(function(a, i){ return args.msgUri + '#attachment-' + i })
         var nonEnvelopeGraphIds = Array.prototype.concat([needGraphId], attachmentGraphIds);
 
         msgGraph.push({
@@ -31,7 +34,7 @@
             '@graph': contentRdf['@graph']
         });
 
-        args.attachments.forEach(function(attachment, i) {
+        attachments.forEach(function(attachment, i) {
             msgGraph.push({
                 '@id' : attachmentGraphIds[i],
                 '@graph' : [
@@ -53,7 +56,7 @@
             });
         });
 
-        var attachmentBlankNodes = args.attachments.map(function(a, i) {
+        var attachmentBlankNodes = attachments.map(function(a, i) {
             return {
                 '@id': '_:attachment-' + i,
                 'msg:hasDestinationUri': {'@id' : a.uri},

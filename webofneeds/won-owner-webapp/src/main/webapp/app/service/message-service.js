@@ -139,7 +139,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q,$log, 
         };
 
         newsocket.onclose = function (e) {
-            $log.debug("SockJS connection closed");
+            $log.debug("SockJS connection closed ", e);
             //TODO: reconnect when connection is lost?
             if (e.code === 1011) { // unexpected server condition - happens when the user's session times out
                 $rootScope.$apply(function () {
