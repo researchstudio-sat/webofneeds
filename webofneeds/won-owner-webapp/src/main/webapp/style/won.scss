@@ -59,6 +59,12 @@ body {
   &:active {
     background: darken($bg_color, 15%);
   }
+  &:disabled {
+    /*Default disabled colors, can be changed or extracted will be used
+    by every button that is set to disabled*/
+    color: white;
+    background: lightgrey;
+  }
 }
 
 /* style adapted from http://cssdeck.com/labs/beautiful-flat-buttons */

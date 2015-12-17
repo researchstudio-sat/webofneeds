@@ -3,6 +3,7 @@
 import angular from 'angular';
 import topNavModule from '../topnav';
 import overviewTitleBarModule from '../visitor-title-bar';
+import compareToModule from '../../directives/compareTo';
 import accordionModule from '../accordion';
 import flexGridModule from '../flexgrid';
 import { attach } from '../../utils';
@@ -56,7 +57,8 @@ export default angular.module('won.owner.components.landingpage', [
     overviewTitleBarModule,
     accordionModule,
     topNavModule,
-    flexGridModule
+    flexGridModule,
+    compareToModule
 ])
     .controller('LandingpageController', [...serviceDependencies, LandingpageController])
     .name;
