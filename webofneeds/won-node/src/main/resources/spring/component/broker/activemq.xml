@@ -65,19 +65,19 @@
 
                     -->
                   <pendingMessageLimitStrategy>
-                    <constantPendingMessageLimitStrategy limit="1000"/>
+                    <constantPendingMessageLimitStrategy limit="50"/>
                   </pendingMessageLimitStrategy>
                 </policyEntry>
-                <policyEntry queue=">" producerFlowControl="true" memoryLimit="50mb">
+                <policyEntry queue=">" producerFlowControl="true" memoryLimit="10mb">
                   <!-- Use VM cursor for better latency
                        For more information, see:
 
                        http://activemq.apache.org/message-cursors.html
-
+                   -->
                   <pendingQueuePolicy>
                     <vmQueueCursor/>
                   </pendingQueuePolicy>
-                  -->
+
                 </policyEntry>
               </policyEntries>
             </policyMap>
@@ -128,8 +128,11 @@
         </systemUsage>
         -->
           <systemUsage>
-            <systemUsage>
+          <!--sendFailIfNoSpace="true" or sendFailIfNoSpaceAfterTimeout results in ResourceAllocationException if no space on
+          broker is available, we can react to this exception on Client side, e.g. an owner can connect to another node -->
+            <systemUsage sendFailIfNoSpaceAfterTimeout="3000">
                 <memoryUsage>
+                    <!-- overall memory for messages on all queues/topics -->
                     <memoryUsage limit="64 mb"/>
                 </memoryUsage>
                 <storeUsage>

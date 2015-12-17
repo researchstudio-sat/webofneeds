@@ -49,7 +49,7 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
     @Override
     public void configure() throws Exception {
                for (int i = 0; i<endpoints.size();i++){
-                   from(endpoints.get(i)+"?concurrentConsumers=5").routeId("Node2OwnerRoute"+brokerUri)
+                   from(endpoints.get(i)+"?concurrentConsumers=2").routeId("Node2OwnerRoute"+brokerUri)
                            .wireTap("bean:messagingService?method=inspectMessage")
                             .to("bean:wonMessageIntoCamelProcessor")
                             .to("bean:wellformednessChecker")
