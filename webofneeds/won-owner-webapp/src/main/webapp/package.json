@@ -36,6 +36,7 @@
       "immutable": "npm:immutable@^3.7.5",
       "jquery": "github:components/jquery@2.1.4",
       "js-md5": "bower:js-md5@1.1.0",
+      "jsonld": "npm:jsonld@^0.4.2",
       "ng-clip": "bower:ng-clip@0.2.6",
       "ng-redux": "npm:ng-redux@^3.0.1",
       "ng-scrollbar": "bower:ng-scrollbar@0.0.6",

@@ -6,7 +6,7 @@
 import { getRandomPosInt, checkHttpStatus } from './utils';
 import won from './won-es6';
 
-
+import jsonld from 'jsonld';
 
 /*
     fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
@@ -92,162 +92,47 @@ export function buildCreateMessage(need, wonNodeUri) {
     return [msgJson, msgUri];
 }
 
-    /*
-let sampleResponse.data =
-{
-    "@graph":[
-    {
-        "@graph":[
-            {
-                "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h",
-                "@type":"http://purl.org/webofneeds/message#FromSystem",
-                "http://purl.org/webofneeds/message#hasMessageType":{
-                    "@id":"http://purl.org/webofneeds/message#SuccessResponse"
-                },
-                "http://purl.org/webofneeds/message#hasReceiverNeed":{
-                    "@id":"https://192.168.124.53:8443/won/resource/need/996323569610784800"
-                },
-                "http://purl.org/webofneeds/message#hasReceiverNode":{
-                    "@id":"https://192.168.124.53:8443/won/resource"
-                },
-                "http://purl.org/webofneeds/message#hasSenderNeed":{
-                    "@id":"https://192.168.124.53:8443/won/resource/need/996323569610784800"
-                },
-                "http://purl.org/webofneeds/message#hasSenderNode":{
-                    "@id":"https://192.168.124.53:8443/won/resource"
-                },
-                "http://purl.org/webofneeds/message#isResponseTo":{
-                    "@id":"https://192.168.124.53:8443/won/resource/event/6093195174983238000"
-                },
-                "http://purl.org/webofneeds/message#isResponseToMessageType":{
-                    "@id":"http://purl.org/webofneeds/message#CreateMessage"
-                }
-            },
-            {
-                "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h#envelope-2jtl",
-                "@type":"http://purl.org/webofneeds/message#EnvelopeGraph",
-                "http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf":{
-                    "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h"
-                }
-            }
-        ],
-        "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h#envelope-2jtl"
-    },
-    {
-        "@graph":[
-            {
-                "@id":"_:b2",
-                "@type":"signature:GraphSigningMethod",
-                "signature:hasDigestMethod":{
-                    "@id":"signature:dm-sha-256"
-                },
-                "signature:hasGraphCanonicalizationMethod":{
-                    "@id":"signature:gcm-fisteus-2010"
-                },
-                "signature:hasGraphDigestMethod":{
-                    "@id":"signature:gdm-fisteus-2010"
-                },
-                "signature:hasGraphSerializationMethod":{
-                    "@id":"signature:gsm-trig"
-                },
-                "signature:hasSignatureMethod":{
-                    "@id":"signature:sm-ecdsa"
-                }
-            },
-            {
-                "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h#envelope-2jtl-sig",
-                "@type":"signature:Signature",
-                "signature:hasGraphSigningMethod":{
-                    "@id":"_:b2"
-                },
-                "signature:hasSignatureValue":"MGUCMFvVzFK+j7Frxs3r+qmqmErYrwIeQBjx1N5FzpTaIBS/rSL/MC8WEuyPDO0VrbxigAIxAIX+k4FT6h/6CYNo7mGsOwXElgstJLUpjtdWY3B9aNGCneCdgXJtYlxuS9oAETCbKQ==",
-                "signature:hasVerificationCertificate":{
-                    "@id":"https://192.168.124.53:8443/won/resource"
-                },
-                "http://purl.org/webofneeds/message#hasSignedGraph":{
-                    "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h#envelope-2jtl"
-                }
-            }
-        ],
-        "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h#envelope-2jtl-sig"
-    },
-    {
-        "@graph":[
-            {
-                "@id":"_:b0",
-                "http://purl.org/webofneeds/message#hasSignatureGraph":{
-                    "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h#envelope-2jtl-sig"
-                },
-                "http://purl.org/webofneeds/message#hasSignatureValue":"MGUCMFvVzFK+j7Frxs3r+qmqmErYrwIeQBjx1N5FzpTaIBS/rSL/MC8WEuyPDO0VrbxigAIxAIX+k4FT6h/6CYNo7mGsOwXElgstJLUpjtdWY3B9aNGCneCdgXJtYlxuS9oAETCbKQ==",
-                "http://purl.org/webofneeds/message#hasSignedGraph":{
-                    "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h#envelope-2jtl"
-                }
-            },
-            {
-                "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h",
-                "@type":"http://purl.org/webofneeds/message#FromSystem",
-                "http://purl.org/webofneeds/message#hasReceivedTimestamp":{
-                    "@type":"http://www.w3.org/2001/XMLSchema#long",
-                    "@value":"1449156395673"
-                },
-                "http://purl.org/webofneeds/message#referencesSignature":{
-                    "@id":"_:b0"
-                }
-            },
-            {
-                "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h#envelope-p1il",
-                "@type":"http://purl.org/webofneeds/message#EnvelopeGraph",
-                "http://purl.org/webofneeds/message#containsEnvelope":{
-                    "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h#envelope-2jtl"
-                },
-                "http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf":{
-                    "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h"
-                }
-            }
-        ],
-        "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h#envelope-p1il"
-    },
-    {
-        "@graph":[
-            {
-                "@id":"_:b1",
-                "@type":"signature:GraphSigningMethod",
-                "signature:hasDigestMethod":{
-                    "@id":"signature:dm-sha-256"
-                },
-                "signature:hasGraphCanonicalizationMethod":{
-                    "@id":"signature:gcm-fisteus-2010"
-                },
-                "signature:hasGraphDigestMethod":{
-                    "@id":"signature:gdm-fisteus-2010"
-                },
-                "signature:hasGraphSerializationMethod":{
-                    "@id":"signature:gsm-trig"
-                },
-                "signature:hasSignatureMethod":{
-                    "@id":"signature:sm-ecdsa"
-                }
-            },
-            {
-                "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h#envelope-p1il-sig",
-                "@type":"signature:Signature",
-                "signature:hasGraphSigningMethod":{
-                    "@id":"_:b1"
-                },
-                "signature:hasSignatureValue":"MGUCMGmJsZR5S63LavXe6WCJq4DKeYuztmEYH89KSIU7aDYGFk5NXC6XP4X9ShE++WExoAIxAKNWyrEBR75cFohBj8hmiumYdtWNIEOBcrTh/KW1I1aCs/ijDiGm2c3bMD9h/meJKA==",
-                "signature:hasVerificationCertificate":{
-                    "@id":"https://192.168.124.53:8443/won/resource"
-                },
-                "http://purl.org/webofneeds/message#hasSignedGraph":{
-                    "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h#envelope-p1il"
-                }
-            }
-        ],
-        "@id":"https://192.168.124.53:8443/won/resource/event/udpmqjxg8y16aelxnh7h#envelope-p1il-sig"
+export function getEventData(json) {
+    console.log('getting data from jsonld message');
+
+    const eventData = {};
+    //call handler if there is one - it may modify the event object
+    //frame the incoming jsonld to get the data that interest us
+    const frame = {
+        "@context" : {
+            "won":"http://purl.org/webofneeds/model#",
+            "msg":"http://purl.org/webofneeds/message#"
+        },
+        "@type": "msg:FromOwner"
     }
-],
-    "@context":{
-    "signature":"http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#"
+
+    //copy data from the framed message to the event object
+    let framedMessage = jsonld.frame(json, frame);
+
+    if (framedMessage == null){
+        //not FromSystem? maybe it's FromSystem?
+        frame['@type'] = "msg:FromSystem";
+        //copy data from the framed message to the event object
+        framedMessage = jsonld.frame(json, frame);
+    }
+
+    if (framedMessage == null){
+        //not FromSystem? maybe it's FromExternal?
+        frame['@type'] = "msg:FromExternal";
+        //copy data from the framed message to the event object
+        framedMessage = jsonld.frame(json, frame);
+    }
+
+    for (key in framedMessage){
+        const propName = won.getLocalName(key);
+        if (propName != null && ! won.isJsonLdKeyword(propName)) {
+            eventData[propName] = won.getSafeJsonLdValue(framedMessage[key]);
+        }
+    }
+    eventData.uri = won.getSafeJsonLdValue(framedMessage);
+    eventData.framedMessage = framedMessage;
+    console.log('done copying the data to the event object, returning the result');
+
+    return eventData;
 }
-}
-        */
+
