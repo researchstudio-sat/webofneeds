@@ -170,7 +170,7 @@ const actionHierarchy = {
                 dispatch(actionCreators.user__receive({loggedIn : true}))
             }
         ),
-    register: (username, password, passwordAgain) => (dispatch) =>
+    register: (username, password) => (dispatch) =>
         fetch('/owner/rest/users/', {
             method: 'post',
             headers: {
@@ -178,7 +178,7 @@ const actionHierarchy = {
                 'Content-Type': 'application/json'
             },
             credentials: 'include',
-            body: JSON.stringify({username: username, password: password, passwordAgain: passwordAgain})
+            body: JSON.stringify({username: username, password: password})
         }).then(checkHttpStatus)
             .then( response => {
                 return response.json()

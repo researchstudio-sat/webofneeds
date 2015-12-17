@@ -42,8 +42,8 @@ public class UserRegisterValidator implements Validator {
 
 		validator.validate(target, errors);
 
-		if (!user.getPassword().equals(user.getPasswordAgain())) {
-			errors.rejectValue("passwordAgain", "passwordsArentSame", "Passwords don't match");
+		if (user.getPassword().length() < 6) {
+			errors.rejectValue("password", "passwordTooShort", "Password needs to be at least 6 Characters long");
 		}
 
 		if(errors.getFieldError("username") != null) {

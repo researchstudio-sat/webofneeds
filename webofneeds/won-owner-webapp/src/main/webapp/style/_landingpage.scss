@@ -81,6 +81,10 @@
       align-items: stretch;
       flex-wrap: wrap;
 
+      .block{
+        padding-bottom: 1rem;
+      }
+
       .tg__anonymous,
       .tg__signup {
         width: 18rem;
@@ -120,6 +124,10 @@
       input[type=email] {
         margin: 1rem 0;
         width: 100%;
+      }
+
+      input.ng-invalid {
+        margin: 1rem 0 0 0;
       }
     }
 }
