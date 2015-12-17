@@ -22,7 +22,7 @@
         <div class="title">FAQs</div>
         <won-accordion items="::self.questions"></won-accordion>
     </div>
-    <div class="try">
+    <div class="try" ng-show="!self.loggedIn">
         <div class="title">Try it yourself!</div>
         <div class="trygrid">
             <div class="tg__signup">
