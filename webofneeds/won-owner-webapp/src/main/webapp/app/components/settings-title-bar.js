@@ -11,7 +11,7 @@ function genComponentConf() {
     let template = `
         <nav class="settings-tab-bar" ng-cloak ng-show="{{true}}">
             <div class="astb__inner">
-                <a class="astb__inner__left" href="javascript:void(0)" ng-click="self.back()">
+                <a class="astb__inner__left" ng-click="self.back()">
                     <img src="generated/icon-sprite.svg#ico36_backarrow" class="astb__icon">
                 </a>
                 <div class="astb__inner__center">

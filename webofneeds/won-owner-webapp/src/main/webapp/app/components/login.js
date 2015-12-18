@@ -7,12 +7,12 @@ import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 
 function genLoginConf() {
-    let template = `<a href="#" class="wl__button" ng-click="self.open = !self.open">
+    let template = `<a class="wl__button" ng-click="self.open = !self.open">
                         <span class="wl__button__caption">Sign in</span>
                         <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" class="wl__button__carret">
                     </a>
                     <div ng-form="loginForm">
-                        <input id="loginEmail" placeholder="Email address" ng-model="self.email" type="email" required />
+                        <input id="loginEmail" placeholder="Email address" ng-model="self.email" type="email" required autofocus/>
                         <span class="wl__errormsg">{{self.loginError}}</span>
                         <input placeholder="Password" ng-model="self.password" type="password" required />
                     </div>
