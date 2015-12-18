@@ -12,20 +12,20 @@ function genLoginConf() {
                         <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" class="wl__button__carret">
                     </a>
                     <div ng-form="loginForm">
-                        <input placeholder="Email address" ng-model="self.email" type="email" required />
+                        <input id="loginEmail" placeholder="Email address" ng-model="self.email" type="email" required />
                         <span class="wl__errormsg">{{self.loginError}}</span>
                         <input placeholder="Password" ng-model="self.password" type="password" required />
                     </div>
-                    <div class="wl__table">
+                    <!-- TODO: Implement remember me and forgot password --><!--div class="wl__table">
                         <div class="wlt__left">
                             <input type="checkbox" ng-model="self.rememberMe" id="rememberMe"/><label for="rememberMe">Remember me</label>
                         </div>
                         <div class="wlt__right">
                             <a href="#">Forgot Password?</a>
                         </div>
-                    </div>
+                    </div>-->
                     <button class="won-button--filled lighterblue" ng-disabled="loginForm.$invalid" ng-click="::self.login(self.email, self.password)">Sign in</button>
-                    <span class="wl__register">No Account yet? <a href="#">Sign up</a></span>`;
+                    <span class="wl__register">No Account yet? <a ui-sref="landingpage({focusSignup: true})">Sign up</a></span>`;
 
     const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
