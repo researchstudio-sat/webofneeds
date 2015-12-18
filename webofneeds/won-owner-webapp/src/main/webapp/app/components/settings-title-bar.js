@@ -17,11 +17,11 @@ function genComponentConf() {
                 <div class="astb__inner__center">
                     <h1 class="astb__title">Account Settings</h1>
                     <ul class="astb__tabs">
-                        <li ng-class="self.routerState === 'settings.general'? 'astb__tabs__selected' : ''"><a ui-sref="settings.general">
+                        <li ng-class="{'astb__tabs__selected' : self.routerState === 'settings.general'}"><a ui-sref="settings.general">
                             General Settings
                             <!--<span class="astb__tabs__unread">5</span>-->
                         </a></li>
-                        <li ng-class="self.routerState === 'settings.avatars'? 'astb__tabs__selected' : ''"><a ui-sref="settings.avatars">
+                        <li ng-class="{'astb__tabs__selected' : self.routerState === 'settings.avatars'}"><a ui-sref="settings.avatars">
                             Manage Avatars
                             <span class="astb__tabs__unread">8</span>
                         </a></li>

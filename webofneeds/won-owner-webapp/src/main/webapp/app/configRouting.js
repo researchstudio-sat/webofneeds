@@ -12,7 +12,7 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
     $urlRouterProvider.otherwise('/landingpage');
 
     [
-        { path: '/landingpage', component: 'landingpage' },
+        { path: '/landingpage?:focusSignup', component: 'landingpage' },
         { path: '/create-need/:draftId', component: 'create-need' },
         { path: '/feed', component: 'feed' },
         { path: '/overview/matches', component: 'overview-matches', as: 'overviewMatches' },

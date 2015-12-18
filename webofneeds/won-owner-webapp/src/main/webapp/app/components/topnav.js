@@ -27,10 +27,10 @@ function genTopnavConf() {
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
                         <li ng-show="!self.loggedIn">
-                            <button class="topnav__button won-button--filled lighterblue" ng-show="!self.open">Sign up</button>
+                            <button ui-sref="landingpage({focusSignup: true})" class="topnav__button won-button--filled lighterblue" ng-show="!self.open">Sign up</button>
                         </li>
                         <li ng-show="!self.loggedIn">
-                            <a href="#" class="topnav__button" ng-click="self.open = !self.open" ng-class="self.open? 'open' : ''">
+                            <a href="#" class="topnav__button" ng-click="self.open = !self.open" ng-class="{'open' : self.open}">
                                 <span class="topnav__button__caption__always">Sign in</span>
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down" ng-show="!self.open" class="topnav__carret">
                                 <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" ng-show="self.open" class="topnav__carret">
