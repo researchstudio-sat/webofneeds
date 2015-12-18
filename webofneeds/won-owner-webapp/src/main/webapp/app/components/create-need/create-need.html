@@ -9,9 +9,8 @@
         <button ng-click="self.moreWub(3)">3 MOAR WUB!</button>
         <p>{{ self.wubs.toArray() }}</p>
         <p>DBG Draft: {{self.state.get('drafts').get(self.draftId).toJS()}}</p>
-        <p>enq'd msgs: {{self.state.get('enqueuedMessages').toJS()}}</p>
-        <p>sent msgs: {{self.state.get('sentMessages').toJS()}}</p>
-        <p>received-msgs-q (echo atm): {{self.state.get('receivedMessages').toJS()}}</p>
+        <p>enq'd msgs: {{self.state.getIn(['messages', 'enqueued']).toJS()}}</p>
+        <p>pending answer: {{self.state.getIn(['messages', 'sent']).toJS()}}</p>
 
         <won-posttype-select
                 options="::self.postTypeTexts"

@@ -67,13 +67,8 @@ const actionHierarchy = {
 
 
     messages: {
-        /* TODO this fragment is part of an attempt to sketch a different
-         * approach to asynchronity (Remove it or the thunk-based
-         * solution afterwards)
-         */
-        enqueue: INJ_DEFAULT,
         markAsSent: INJ_DEFAULT,
-        receive: INJ_DEFAULT,
+        markAsSuccess: INJ_DEFAULT,
     },
 
     /*

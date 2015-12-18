@@ -8,7 +8,7 @@ import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
 import { combineReducersStable } from '../redux-utils';
 import draftsReducer from './drafts-reducer';
-import { enqueuedMessagesReducer, sentMessagesReducer, receivedMessagesReducer } from './message-reducers'
+import { messagesReducer } from './message-reducers'
 
 
 /*
@@ -78,9 +78,7 @@ const reducers = {
             }
         }
     ),
-    enqueuedMessages: enqueuedMessagesReducer,
-    sentMessages: sentMessagesReducer,
-    receivedMessages: receivedMessagesReducer,
+    messages: messagesReducer,
     config: createReducer(
         //initial state
         Immutable.Map(),

@@ -19,7 +19,7 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
         { path: '/overview/incoming-requests', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
         { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' },
         { path: '/post/:postId/owner/matches', component: 'create-need', as: 'postMatches' }, //TODO implement view
-        { path: '/post/:postId/visitor', component: 'create-need', as: 'postVisitor' }, //TODO implement view
+        { path: '/post/:postId/visitor', component: 'post-visitor', as: 'postVisitor' }, //TODO implement view
 
     ].forEach( ({path, component, as}) => {
 

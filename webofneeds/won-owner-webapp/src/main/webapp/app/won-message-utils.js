@@ -90,7 +90,10 @@ export function buildCreateMessage(need, wonNodeUri) {
         msgUri: msgUri,
         attachments: imgs //optional, should be same as in `attachmentUris` above
     });
-    return [msgJson, msgUri];
+    return {
+        message: msgJson,
+        eventUri: msgUri
+    };
 }
 
 export function getEventData(msgJson) {
