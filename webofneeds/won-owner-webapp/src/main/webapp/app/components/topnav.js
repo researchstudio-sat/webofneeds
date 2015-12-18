@@ -13,7 +13,7 @@ function genTopnavConf() {
         <nav class="topnav">
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
-                    <a href="#" class="topnav__button">
+                    <a class="topnav__button">
                         <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__button__icon">
                         <span class="topnav__page-title topnav__button__caption">Web of Needs</span>
                     </a>
@@ -30,14 +30,14 @@ function genTopnavConf() {
                             <button ui-sref="landingpage({focusSignup: true})" class="topnav__button won-button--filled lighterblue" ng-show="!self.open">Sign up</button>
                         </li>
                         <li ng-show="!self.loggedIn">
-                            <a href="#" class="topnav__button" ng-click="self.open = !self.open" ng-class="{'open' : self.open}">
+                            <a class="topnav__button" ng-click="self.open = !self.open" ng-class="{'open' : self.open}">
                                 <span class="topnav__button__caption__always">Sign in</span>
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down" ng-show="!self.open" class="topnav__carret">
                                 <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" ng-show="self.open" class="topnav__carret">
                             </a>
                         </li>
                         <li ng-show="self.loggedIn" ng-click="self.open = !self.open">
-                            <a href="#" class="topnav__button">
+                            <a class="topnav__button">
                                 <span class="topnav__button__caption">{{self.email}}</span>
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__carret">
                                 <img src="generated/icon-sprite.svg#ico36_person" class="topnav__button__icon">
