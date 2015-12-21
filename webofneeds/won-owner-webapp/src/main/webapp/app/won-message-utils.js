@@ -61,6 +61,8 @@ messageService.sendMessage = function(msg) {
 
 
 export function buildCreateMessage(need, wonNodeUri) {
+    if(!need.type || !need.title)
+        throw new Error('Tried to create post without type or title. ', need);
 
     const publishedContentUri = wonNodeUri + '/need/' + getRandomPosInt();
 
