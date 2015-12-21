@@ -52,12 +52,12 @@ const actionHierarchy = {
 
         delete: INJ_DEFAULT,
 
-        publish: (draft, nodeUri) => (dispatch) => {
+        publish: (draft, nodeUri) => {
             const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
-            dispatch({
+            return {
                 type: actionTypes.drafts.publish,
                 payload: { eventUri, message, needUri, draftId: draft.draftId }
-            });
+            };
         },
     },
     router: {
