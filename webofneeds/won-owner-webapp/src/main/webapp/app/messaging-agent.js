@@ -76,6 +76,7 @@ export function runMessagingAgent(redux) {
             // redux.dispatch(actionCreators.messages__receive(event))
             window.event4dbg = event;
 
+            //TODO everything below should be in a seperate function or even moved to an actioncreator
             if(event.hasMessageType === won.WONMSG.successResponseCompacted) {
                 redux.dispatch(actionCreators.messages__markAsSuccess({
                     eventUri: event.isResponseTo
