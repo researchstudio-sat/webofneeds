@@ -92,7 +92,8 @@ export function buildCreateMessage(need, wonNodeUri) {
     });
     return {
         message: msgJson,
-        eventUri: msgUri
+        eventUri: msgUri,
+        needUri: publishedContentUri,
     };
 }
 

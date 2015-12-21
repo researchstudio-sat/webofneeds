@@ -88,6 +88,7 @@ export function runMessagingAgent(redux) {
                     // linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
 
                     // get draftID (via event.isResponseTo?)
+                    //??redux.getState().getIn(['messages', 'sent', event.isResponseToMessage, 'draftUri']);
                     // dispatch 'mark draft as successfully published'
 
                     // get needId

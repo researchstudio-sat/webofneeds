@@ -15,6 +15,7 @@ import {
 import { hierarchy2Creators } from './action-utils';
 
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
+import { buildCreateMessage } from '../won-message-utils';
 
 //all values equal to this string will be replaced by action-creatos that simply
 // passes it's argument on as payload on to the reducers
@@ -39,6 +40,7 @@ const actionHierarchy = {
          * A new draft was created (either through the view in this client or on another browser)
          */
         new: INJ_DEFAULT,
+
         /*
          * A draft has changed. Pass along the draftURI and the respective data.
          */
@@ -47,11 +49,16 @@ const actionHierarchy = {
             title: INJ_DEFAULT,
             thumbnail: INJ_DEFAULT,
         },
+
         delete: INJ_DEFAULT,
 
-        // use this action creator (drafts__publish__call) to initiate the process
-        //publish: publishDraft, //async dispatch
-        publish: INJ_DEFAULT,
+        publish: (draft, nodeUri) => (dispatch) => {
+            const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
+            dispatch({
+                type: actionTypes.drafts.publish,
+                payload: { eventUri, message, needUri, draftId: draft.draftId }
+            });
+        },
     },
     router: {
         stateGo,

@@ -8,7 +8,7 @@ import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
 import { combineReducersStable } from '../redux-utils';
 
-export default createReducer(
+export const draftsReducer = createReducer(
     //initial state
     Immutable.Map(),
 
@@ -47,6 +47,10 @@ export default createReducer(
             console.log('changed thumbnail ', image);
             return stateWithDraft.setIn([draftId, 'thumbnail'], Immutable.fromJS(image));
         },
+
+        [actionTypes.drafts.publish]: (drafts, {payload:{draftId, needUri}}) =>
+            guaranteeDraftExistence(drafts, draftId)
+                .setIn([draftId, 'pendingPublishAs'], needUri)
 
         //TODO delete draft once it's completely empty
         //TODO init drafts from server

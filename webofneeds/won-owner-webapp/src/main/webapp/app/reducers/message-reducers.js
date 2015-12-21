@@ -22,20 +22,9 @@ export const messagesReducer =  createReducer(
 
     //handlers
     {
-        [actionTypes.drafts.publish]: (state, { payload: { need, nodeUri } }) => {
-            console.log('about to publish ', need, ' on ', nodeUri);
-            const { message, eventUri } = buildCreateMessage(need, nodeUri);
 
-            console.log('enqueued publish-msg: ', message);
-            /*
-             * NOTE: messages aren't made immutable, as they are
-             * intended to be send as-is and switching to
-             * ImmutableJS-structures and back would incur
-             * a runtime-overhead.
-             */
-            return state.setIn(['enqueued', eventUri], message);
-        },
-
+        [actionTypes.drafts.publish]: (messages, {payload:{eventUri, message}}) =>
+            messages.setIn(['enqueued', eventUri], message),
         [actionTypes.messages.markAsSent]: (state, {payload:{ eventUri }}) => {
             const msg = state.getIn(['enqueued', eventUri]);
             return state
