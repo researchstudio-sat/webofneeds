@@ -48,26 +48,6 @@ export default createReducer(
             return stateWithDraft.setIn([draftId, 'thumbnail'], Immutable.fromJS(image));
         },
 
-        /**
-         * @param {*} draftId : the draft to be published
-         */
-        [actionTypes.drafts.change.publish]: (state, {payload:{draftId}}) => {
-            //TODO use json-ld for state
-            let d = state.get(draftId);
-            if(!d) {
-                return state;
-            } else {
-                return state.setIn([draftId, 'publishState'], 'awaitingSending'); //TODO codify message-states
-            }
-        },
-        /**
-         * @param {*} draftId : the draft that has been published
-         */
-        [actionTypes.drafts.notifyOfSuccessfulPublish]: (state, {payload:{draftId}}) => {
-            console.log('reducers.js: received successful-publish action from app-server');
-            return state.remove(draftId);
-        }
-
         //TODO delete draft once it's completely empty
         //TODO init drafts from server
         //TODO isValidNeed function to check compliance to won-ontology (and throw errors early)
