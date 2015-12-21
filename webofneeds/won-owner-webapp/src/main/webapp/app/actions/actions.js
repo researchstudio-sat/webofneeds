@@ -1,7 +1,38 @@
 /**
  * Created by ksinger on 23.09.2015.
  *
- * Contains a list of actions to be used with the dispatcher and documentation for their expected payloads.
+ * Contains a list of actions to be used with the dispatcher and documentation
+ * for their expected payloads.
+ *
+ * # Redux Primer - Actions
+ *
+ * Actions are small objects like:
+ *
+ * `{type: 'someaction', payload: {...}}`
+ *
+ * that are usually created via action-creators (ACs), e.g.:
+ *
+ * `function someaction(args) { return { type: 'someaction', payload: args }}`
+ *
+ * and then passed on to the reducer via `redux.dispatch(action)`.
+ *
+ * *Note:* The calls to `$ngRedux.connect` wrap the ACs in this call to `dispatch`
+ *
+ * # Best Practices
+ *
+ * Even though it's possible to have ACs trigger multiple ACs (which is
+ * necessary asynchronous actions), try avoiding that. All actions are
+ * broadcasted to all reducers anyway.  Mostly it's a symptom of actions
+ * that aren't high-level enough. (high-level: `publish`,
+ * low-level: `inDraftSetPublishPending`).
+ *
+ * ACs function is to do simple data-processing that is needed by multiple
+ * reducers (e.g. creating the post-publish messages that are needed by
+ * the drafts-reducer as well) and dealing with side-effects (e.g. routing,
+ * http-calls)
+ *
+ * As a rule of thumb the lion's share of all processing should happen
+ * in the reducers.
  */
 import {
     tree2constants,
@@ -17,8 +48,10 @@ import { hierarchy2Creators } from './action-utils';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 import { buildCreateMessage } from '../won-message-utils';
 
-//all values equal to this string will be replaced by action-creatos that simply
-// passes it's argument on as payload on to the reducers
+/**
+ * all values equal to this string will be replaced by action-creators that simply
+ * passes it's argument on as payload on to the reducers
+ */
 const INJ_DEFAULT = 'INJECT_DEFAULT_ACTION_CREATOR';
 const actionHierarchy = {
     /* actions received as responses or push notifications */
