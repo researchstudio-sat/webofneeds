@@ -25,14 +25,18 @@ export const messagesReducer =  createReducer(
 
         [actionTypes.drafts.publish]: (messages, {payload:{eventUri, message}}) =>
             messages.setIn(['enqueued', eventUri], message),
-        [actionTypes.messages.markAsSent]: (state, {payload:{ eventUri }}) => {
-            const msg = state.getIn(['enqueued', eventUri]);
-            return state
+
+        [actionTypes.messages.markAsSent]: (messages, {payload:{ eventUri }}) => {
+            const msg = messages.getIn(['enqueued', eventUri]);
+            return messages
                 .removeIn(['enqueued', eventUri])
                 .setIn(['sent', eventUri], msg)
 
         },
-        [actionTypes.messages.markAsSuccess]: (state, {payload:{ eventUri }}) =>
-            state.removeIn(['sent', eventUri])
+
+        [actionTypes.messages.markAsSuccess]: (messages, {payload:{ eventUri }}) =>
+            messages.removeIn(['sent', eventUri]),
+
     }
 );
+
