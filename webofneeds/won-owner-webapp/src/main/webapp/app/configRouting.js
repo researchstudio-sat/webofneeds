@@ -19,10 +19,7 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
         { path: '/overview/incoming-requests', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
         { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' },
         { path: '/post/:postId/owner/matches', component: 'create-need', as: 'postMatches' }, //TODO implement view
-        { path: '/post/:postId/visitor', component: 'post-visitor', as: 'postVisitor' }, //TODO implement view
-        // /post/:mypostId/owner/matches/:matchpostid <- can't be shared
-        // /post/:postId/visitor?matchedTo=:mypostId <- better but still has a full url inside it's url :|
-        // /post/visitor?postId=:postId&matchedTo=:myPostId
+        { path: '/post/visitor/?postId?matchedTo', component: 'post-visitor', as: 'postVisitor' }, //TODO implement view
 
     ].forEach( ({path, component, as}) => {
 
