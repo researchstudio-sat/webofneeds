@@ -66,7 +66,7 @@ const actionHierarchy = {
     },
 
 
-    messages: {
+    messages: { /* websocket messages, e.g. post-creation, chatting */
         markAsSent: INJ_DEFAULT,
         markAsSuccess: INJ_DEFAULT,
     },
