@@ -91,9 +91,10 @@ export function runMessagingAgent(redux) {
                     // dispatch 'mark draft as successfully published'
 
                     // get needId
+                    // > event.hasSenderNeed
                     // dispatch 'created need'
                     // dispatch routing change
-                    redux.dispatch(actionCreators.router__stateGo('postVisitor', {postId: 1234 /* published posts id */}));
+                    // > redux.dispatch(actionCreators.router__stateGo('postVisitor', {postId: 1234 /* published posts id */}));
 
                 }
 
