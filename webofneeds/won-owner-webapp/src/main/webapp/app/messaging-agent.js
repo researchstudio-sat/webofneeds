@@ -90,6 +90,7 @@ export function runMessagingAgent(redux) {
                     }));
 
                     // dispatch routing change
+                    //TODO back-button doesn't work for returning to the draft
                     redux.dispatch(actionCreators.router__stateGo('postVisitor', {postId: 1234 /* published posts id */}));
 
                     //TODO add to own needs
