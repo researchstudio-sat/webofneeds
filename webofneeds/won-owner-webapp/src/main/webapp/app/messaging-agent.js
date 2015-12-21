@@ -78,37 +78,25 @@ export function runMessagingAgent(redux) {
 
             //TODO everything below should be in a seperate function or even moved to an actioncreator
             if(event.hasMessageType === won.WONMSG.successResponseCompacted) {
-                redux.dispatch(actionCreators.messages__markAsSuccess({
-                    eventUri: event.isResponseTo
-                }));
 
                 console.log('received response to ', event.isResponseTo, ' of ', event);
 
                 //TODO do all of this in actions.js?
                 if (event.isResponseToMessageType === won.WONMSG.createMessageCompacted) {
-                    // linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
 
-                    // get draftID (via event.isResponseTo?)
-                    //??redux.getState().getIn(['messages', 'sent', event.isResponseToMessage, 'draftUri']);
-                    // dispatch 'mark draft as successfully published'
+                    redux.dispatch(actionCreators.drafts__publishSuccessful({
+                        publishEventUri: event.isResponseTo,
+                        needUri: event.hasSenderNeed,
+                    }));
 
-                    // get needId
-                    // > event.hasSenderNeed
-                    // dispatch 'created need'
                     // dispatch routing change
-                    // > redux.dispatch(actionCreators.router__stateGo('postVisitor', {postId: 1234 /* published posts id */}));
+                    redux.dispatch(actionCreators.router__stateGo('postVisitor', {postId: 1234 /* published posts id */}));
+
+                    //TODO add to own needs
+                    //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
 
                 }
-
-
-                /*
-                 if it's a 'successfully published that need message'
-                 dispatch 'mark as successfully created'
-                 else if it's a chat-msg
-                 dispatch chat msg received
-                 ....
-
-                 */
+                // TODO else if (event.isResponseToMessageType === ... chat...) { }
             }
         });
     };

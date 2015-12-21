@@ -34,8 +34,8 @@ export const messagesReducer =  createReducer(
 
         },
 
-        [actionTypes.messages.markAsSuccess]: (messages, {payload:{ eventUri }}) =>
-            messages.removeIn(['sent', eventUri]),
+        [actionTypes.drafts.publishSuccessful]: (messages, {payload:{ publishEventUri }}) =>
+            messages.removeIn(['sent', publishEventUri]),
 
     }
 );

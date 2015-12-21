@@ -59,6 +59,7 @@ const actionHierarchy = {
                 payload: { eventUri, message, needUri, draftId: draft.draftId }
             };
         },
+        publishSuccessful: INJ_DEFAULT
     },
     router: {
         stateGo,
@@ -69,7 +70,6 @@ const actionHierarchy = {
 
     messages: { /* websocket messages, e.g. post-creation, chatting */
         markAsSent: INJ_DEFAULT,
-        markAsSuccess: INJ_DEFAULT,
     },
 
     /*

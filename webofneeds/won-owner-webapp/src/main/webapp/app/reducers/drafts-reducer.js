@@ -50,7 +50,15 @@ export const draftsReducer = createReducer(
 
         [actionTypes.drafts.publish]: (drafts, {payload:{draftId, needUri}}) =>
             guaranteeDraftExistence(drafts, draftId)
-                .setIn([draftId, 'pendingPublishAs'], needUri)
+                .setIn([draftId, 'pendingPublishingAs'], needUri),
+
+        [actionTypes.drafts.publishSuccessful]: (drafts, {payload:{ needUri }}) => {
+            const draftId = drafts
+                .filter(draft => draft.get('pendingPublishingAs') === needUri)
+                .map(draft => draft.get('draftId'))
+                .first();
+            return drafts.remove(draftId);
+        }
 
         //TODO delete draft once it's completely empty
         //TODO init drafts from server
