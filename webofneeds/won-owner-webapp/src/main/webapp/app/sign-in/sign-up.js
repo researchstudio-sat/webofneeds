@@ -24,8 +24,7 @@ angular.module('won.owner').controller('SignUpModalInstanceCtrl',
 
                 var credentials = {
                     username : name,
-                    password : pw,
-                    passwordAgain : pwRepeated
+                    password : pw
                 }
 
                 $scope.processing = true;

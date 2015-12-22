@@ -8,9 +8,9 @@ import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
 import { combineReducersStable } from '../redux-utils';
 import { draftsReducer } from './drafts-reducer';
-import { messagesReducer } from './message-reducers';
+import { messagesReducer } from './message-reducers'
 import reduceReducers from 'reduce-reducers';
-
+import postsReducer from './posts-reducer'
 
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -79,6 +79,7 @@ const reducers = {
             }
         }
     ),
+    postOverview:postsReducer,
     messages: messagesReducer,
     config: createReducer(
         //initial state

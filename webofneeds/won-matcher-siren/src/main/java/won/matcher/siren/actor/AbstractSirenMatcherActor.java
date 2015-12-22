@@ -1,8 +1,11 @@
 package won.matcher.siren.actor;
 
+import akka.actor.OneForOneStrategy;
+import akka.actor.SupervisorStrategy;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import akka.japi.Function;
 import com.github.jsonldjava.core.JsonLdError;
 import com.hp.hpl.jena.query.Dataset;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
@@ -12,6 +15,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.siren.config.SirenMatcherConfig;
@@ -157,6 +161,26 @@ public abstract class AbstractSirenMatcherActor extends UntypedActor
 
     log.info("Add need event content to solr index: " + needEvent);
     needIndexer.indexer_jsonld_format(dataset);
+  }
+
+
+  @Override
+  public SupervisorStrategy supervisorStrategy() {
+
+    SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
+      0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>()
+    {
+
+      @Override
+      public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+
+        log.warning("Actor encountered error: {}", t);
+        // default behaviour
+        return SupervisorStrategy.escalate();
+      }
+    });
+
+    return supervisorStrategy;
   }
 
 }

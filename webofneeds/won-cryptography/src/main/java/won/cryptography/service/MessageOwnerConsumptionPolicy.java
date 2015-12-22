@@ -19,7 +19,6 @@ public class MessageOwnerConsumptionPolicy implements MessageAuthorizationPolicy
 
   @Override
   public boolean isAllowedToConsume(final ConnectionContext context, final Message message) {
-    System.out.println(context.toString());
     if (isForSpecificOwner(message)) {
       return isOwnerAllowedToConsume(context, message);
     }

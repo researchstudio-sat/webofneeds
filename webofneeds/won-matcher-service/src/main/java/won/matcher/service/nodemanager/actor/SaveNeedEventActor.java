@@ -1,12 +1,16 @@
 package won.matcher.service.nodemanager.actor;
 
 import akka.actor.ActorRef;
+import akka.actor.OneForOneStrategy;
+import akka.actor.SupervisorStrategy;
 import akka.actor.UntypedActor;
 import akka.cluster.pubsub.DistributedPubSub;
 import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import akka.japi.Function;
 import com.hp.hpl.jena.query.Dataset;
+import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.service.sparql.SparqlService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +55,26 @@ public class SaveNeedEventActor extends UntypedActor
     } else {
       unhandled(o);
     }
+  }
+
+
+  @Override
+  public SupervisorStrategy supervisorStrategy() {
+
+    SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
+      0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>()
+    {
+
+      @Override
+      public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+
+        log.warning("Actor encountered error: {}", t);
+        // default behaviour
+        return SupervisorStrategy.escalate();
+      }
+    });
+
+    return supervisorStrategy;
   }
 
 }

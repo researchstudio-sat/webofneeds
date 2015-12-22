@@ -35,6 +35,12 @@ sleep 10
 # wonnode/owner server certificate generator
 # PLEASE NOTE that value of PASS should be the same used in your server.xml for SSLPassword on wonnode and owner,
 # and the same as activemq.broker.keystore.password used in your wonnode activemq spring configurations for broker
+# this image creates a keypair and a certificate based on it and stores the respective files as in the specified
+# folder (see parameter of option '-v'). If different certificates are to be created for different images
+# (e.g. owner and node), they should be put in different folders and these images should mount those different
+# folders where needed (e.g. for tomcat, that folder is '/usr/local/tomcat/conf/ssl/', as used e.g. in the run
+# command of the wonnode). Note that the filename of the certificate is also used in the tomcat config, (see
+# owner/ssl/server.xml) so be careful when changing it.
 docker -H satcluster01:2375 rm gencert_ma || echo 'No docker container found to remove with name: gencert_ma'
 docker -H satcluster01:2375 run --name=gencert_ma -e CN="satcluster01.researchstudio.at" -e "PASS=changeit" \
 -v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:master

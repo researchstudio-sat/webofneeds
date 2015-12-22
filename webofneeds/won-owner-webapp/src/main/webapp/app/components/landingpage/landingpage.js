@@ -3,9 +3,10 @@
 import angular from 'angular';
 import topNavModule from '../topnav';
 import overviewTitleBarModule from '../visitor-title-bar';
+import compareToModule from '../../directives/compareTo';
 import accordionModule from '../accordion';
 import flexGridModule from '../flexgrid';
-import { attach } from '../../utils';
+import { attach, scrollTo } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
@@ -32,14 +33,24 @@ const questions = [{title: "What about my personal data", detail: "1blablabla"},
 class LandingpageController {
     constructor(/* arguments <- serviceDependencies */){
         attach(this, serviceDependencies, arguments);
+        const self = this;
 
         const signup = (state) => ({
+            focusSignup: state.getIn(['router', 'currentParams', 'focusSignup']) === "true",
             loggedIn: state.get('user').toJS().loggedIn,
             registerError: state.get('user').toJS().registerError
         });
 
         const disconnect = this.$ngRedux.connect(signup, actionCreators)(this);
+
         this.$scope.$on('$destroy',disconnect);
+        this.$scope.$on('$viewContentLoaded', function(){
+            const focusSignup = self.$ngRedux.getState().getIn(['router', 'currentParams', 'focusSignup']) === "true";
+            if(focusSignup){
+                scrollTo("signup");
+                angular.element('input#registerEmail').trigger('focus');
+            }
+        });
 
         this.questions = questions;
         this.peopleGrid = peopleGrid;
@@ -56,7 +67,8 @@ export default angular.module('won.owner.components.landingpage', [
     overviewTitleBarModule,
     accordionModule,
     topNavModule,
-    flexGridModule
+    flexGridModule,
+    compareToModule
 ])
     .controller('LandingpageController', [...serviceDependencies, LandingpageController])
     .name;

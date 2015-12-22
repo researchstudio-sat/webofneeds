@@ -739,7 +739,7 @@ public class
   public ResponseEntity<String> register(@RequestParam("register") String registeredType, HttpServletRequest
     request) {
 
-    logger.info("REGISTER " + registeredType);
+    logger.debug("REGISTERING " + registeredType);
     String supportedTypesMsg = "Request parameter error; supported 'register' parameter values: 'owner', 'node'";
 
     if (registeredType == null) {

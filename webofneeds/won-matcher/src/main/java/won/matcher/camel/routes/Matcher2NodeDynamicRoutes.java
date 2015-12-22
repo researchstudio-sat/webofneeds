@@ -38,7 +38,7 @@ public class Matcher2NodeDynamicRoutes extends RouteBuilder{
   }
     @Override
     public void configure(){
-        from("seda:MatcherProtocol.Out.Hint?concurrentConsumers=5").routeId("Matcher2NodeRoute")
+        from("seda:MatcherProtocol.Out.Hint?concurrentConsumers=2").routeId("Matcher2NodeRoute")
                 .wireTap("bean:matcherMessagingService?method=inspectMessage")
                 .recipientList(header("remoteBrokerEndpoint"));
 

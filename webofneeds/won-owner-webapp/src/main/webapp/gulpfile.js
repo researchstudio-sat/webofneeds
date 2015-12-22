@@ -88,11 +88,10 @@ gulp.task('iconsprite', function(done) {
 });
 
 var rimraf = require('rimraf'); // rimraf directly
-//gulp.task('clean', function (done) {
 gulp.task('clean', function () {
     //(['generated', 'jspm_packages', 'node_modules'])
     //.forEach((folder) => rimraf(`./${folder}`, ()=>{}));
-    rimraf('./generated', ()=>{});
+    rimraf('./generated', function(){});
 });
 
 //npm install --save-dev "gulp-dgeni" "gulp-esdoc" "gulp-jsdoc" "dgeni" "dgeni-packages"

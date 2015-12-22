@@ -99,7 +99,13 @@ const actionHierarchy = {
         stateReload,
         stateTransitionTo
     },
-
+    posts:{
+        load:INJ_DEFAULT,
+        clean:INJ_DEFAULT
+    },
+    posts_overview:{
+        openPostsView:INJ_DEFAULT
+    },
 
     messages: { /* websocket messages, e.g. post-creation, chatting */
         markAsSent: INJ_DEFAULT,
@@ -164,6 +170,8 @@ const actionHierarchy = {
             data => {
                 dispatch(actionCreators.user__receive({loggedIn: true, email: username}));
                 dispatch(actionCreators.retrieveNeedUris());
+                dispatch(actionCreators.posts__load());
+                dispatch(actionCreators.router__stateGo("feed"));
             }
         ).catch(
             error => dispatch(actionCreators.user__loginFailed({loginError: "No such username/password combination registered."}))
@@ -184,6 +192,8 @@ const actionHierarchy = {
             data => {
                 dispatch(actionCreators.user__receive({loggedIn: false}));
                 dispatch(actionCreators.needs__receive({needs: {}}));
+                dispatch(actionCreators.posts__clean({}));
+                dispatch(actionCreators.router__stateGo("landingpage"));
             }
         ).catch(
             //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
@@ -192,7 +202,7 @@ const actionHierarchy = {
                 dispatch(actionCreators.user__receive({loggedIn : true}))
             }
         ),
-    register: (username, password, passwordAgain) => (dispatch) =>
+    register: (username, password) => (dispatch) =>
         fetch('/owner/rest/users/', {
             method: 'post',
             headers: {
@@ -200,12 +210,15 @@ const actionHierarchy = {
                 'Content-Type': 'application/json'
             },
             credentials: 'include',
-            body: JSON.stringify({username: username, password: password, passwordAgain: passwordAgain})
+            body: JSON.stringify({username: username, password: password})
         }).then(checkHttpStatus)
             .then( response => {
                 return response.json()
             }).then(
-                data => dispatch(actionCreators.login(username, password))
+                data => {
+                    dispatch(actionCreators.user__receive({loggedIn: true, email: username}));
+                    dispatch(actionCreators.router__stateGo("createNeed"));
+                }
         ).catch(
             //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
             error => dispatch(actionCreators.user__registerFailed({registerError: "Registration failed"}))

@@ -136,11 +136,17 @@ public class ActiveMqWonNodeConnectionFactory
   }
 
   private static ActiveMQConnectionFactory createConnectionFactory(final String brokerUri) {
-    return new ActiveMQConnectionFactory(brokerUri);
+    // jms.prefetchPolicy parameter is added to prevent matcher-consumer death due to overflowing with messages,
+    // see http://activemq.apache.org/what-is-the-prefetch-limit-for.html
+    return new ActiveMQConnectionFactory(brokerUri + "?jms.prefetchPolicy.all=50");
   }
 
   private static ActiveMQConnectionFactory createConnectionFactory(final String brokerUri, final KeyManager keyManager, final TrustManager trustManager) {
     ActiveMQSslConnectionFactory connectionFactory = new ActiveMQSslConnectionFactory(brokerUri);
+    // for non-persistent messages setting this makes it slow, but ensures that a producer is immediately informed
+    // about the memory issues on broker (is blocked or gets exception depending on <systemUsage> config)
+    // see more info http://activemq.apache.org/producer-flow-control.html
+    connectionFactory.setAlwaysSyncSend(true);
     connectionFactory.setKeyAndTrustManagers(new KeyManager[]{keyManager}, new TrustManager[]{trustManager},
                                              null);
     return connectionFactory;
