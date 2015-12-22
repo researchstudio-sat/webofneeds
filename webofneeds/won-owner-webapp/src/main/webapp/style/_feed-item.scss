@@ -1,0 +1,146 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+@import 'flex-layout';
+
+won-feed-item {
+  display: block;
+  border: 0.1rem solid $won-line-gray;
+  margin-bottom: 1rem;
+
+  .fi {
+    background: $won-light-gray;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0.5rem;
+    border-bottom: 0.1rem solid $won-line-gray;
+
+    a {
+      text-decoration: none;
+    }
+
+
+    @include square-image($feedIconSize, 0, 0.5rem, 0, 0);
+
+    &__description {
+      color: black;
+      flex-grow: 1;
+
+      &__topline{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+
+        &__title{
+          font-weight: 500;
+        }
+
+        &__date {
+          color: $won-subtitle-gray;
+          font-size: $smallFontSize;
+        }
+      }
+
+      &__subtitle {
+        color: $won-subtitle-gray;
+        display: flex;
+        flex-direction: row;
+        font-size: $smallFontSize;
+
+        &__group {
+          display: flex;
+          align-items: center;
+          flex-direction: row;
+
+          &__dash {
+            padding: 0 0.25rem;
+          }
+
+          &__icon {
+            padding-right: 0.25rem;
+            @include fixed-square(0.75rem);
+          }
+        }
+      }
+    }
+  }
+  .fmil {
+    background: white;
+    display: flex;
+    flex-direction: column;
+
+    &__item {
+      display: flex;
+      flex-grow: 1;
+      justify-content: space-between;
+      align-self: flex-end;
+      padding: 0.5rem;
+      max-width: 33rem;
+
+      @include square-image($postIconSize, 0, 0.5rem, 0, 0);
+
+      &__description {
+        color: black;
+        flex-grow: 1;
+
+        &__topline{
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          font-size: $smallFontSize;
+
+          &__title{
+            font-weight: 700;
+          }
+        }
+
+        &__message {
+          font-size: $smallFontSize;
+        }
+      }
+    }
+
+    &__more {
+      font-size: $smallFontSize;
+      color: $won-red;
+      margin: 0.5rem 0.5rem 0.5rem (1.5rem + $postIconSize);
+    }
+
+    @include speech-bubble-top(white, $won-line-gray, 10px, 1px, 5rem);
+  }
+
+  .fi__footer {
+    background: white;
+    padding: 0.5rem;
+    border-top: 0.1rem solid $won-line-gray;
+    font-size: $smallFontSize;
+
+    a {
+      text-decoration: none;
+    }
+
+
+    &__indicators {
+      display: flex;
+      flex-direction: row;
+
+      &__item {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        padding-right: 1em;
+
+        &__icon {
+          @include fixed-square($bigiconSize);
+        }
+
+        &__caption {
+          padding-left: 1.25rem;
+          padding-right: 1.25rem; //TODO: CAPTION PADDING COULD LEAD TO PROBLEMS WHEN RESIZING WINDOW
+          color: $won-red;
+        }
+      }
+    }
+  }
+}

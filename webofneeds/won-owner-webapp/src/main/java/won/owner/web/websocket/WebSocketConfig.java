@@ -45,8 +45,9 @@ public class WebSocketConfig   implements WebSocketConfigurer//extends AbstractW
   public ServletServerContainerFactoryBean createWebSocketContainer() {
     ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
     //set config options here
-    container.setMaxTextMessageBufferSize(8192);
-    container.setMaxBinaryMessageBufferSize(8192);
+    int maxSize = 100 * 1024 * 1024; //100MB
+    container.setMaxTextMessageBufferSize(maxSize);
+    container.setMaxBinaryMessageBufferSize(maxSize);
     return container;
   }
 

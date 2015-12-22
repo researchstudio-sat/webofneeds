@@ -20,10 +20,10 @@
     <parent>
         <groupId>webofneeds</groupId>
         <artifactId>webofneeds</artifactId>
-        <version>1.0</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
     <artifactId>won-core</artifactId>
-    <version>1.0</version>
+    <version>0.2-SNAPSHOT</version>
     <name>Core</name>
 
     <dependencies>
@@ -57,11 +57,6 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-        </dependency>
-        <!-- REST stuff -->
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
         </dependency>
 
         <!-- SPRING STUFF -->
@@ -222,12 +217,34 @@
             <artifactId>super-csv</artifactId>
         </dependency>
 
-        <!-- jena uses this to read/write Json-Ld -->
+        <!-- we use this when making http requests with ssl context -->
         <dependency>
-            <groupId>com.github.jsonld-java</groupId>
-            <artifactId>jsonld-java</artifactId>
-            <version>0.5.0</version>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.5</version>
         </dependency>
-        
+
+        <!-- tools -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+
+
+        <!-- security stuff -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 </project>

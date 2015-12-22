@@ -14,138 +14,28 @@
   ~    limitations under the License.
   -->
 
-<div style="padding-top: 40px;padding-bottom: 8em;">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="row">
-                <div class="inline" ><star-favourite show-public="showPublic()"></star-favourite></div>
-                <div class="inline"><img ng-src="{{getTypePicURI(need.basicNeedType)}}" tooltip="need type"/></div>
-                <div class="inline" style="font-size: 1.8em;" ng-bind="need.title" ></div>
-            </div>
-            <div class="row">
-                <div class="inline" style="font-size: 1.8em;" ng-bind="need.creationDate | date:'yy/MM/dd HH:mm'"></div>
-                <div id="copyImg" ng-show="showPublic()" class="inline pull-right">
-                    <span   ng-click="clickOnCopy()" class="fa fa-copy fa-lg" tooltip="{{hoverCopyToolTip}}"
-                            tooltip-trigger="mouseenter">
-                    </span>
+<!--
+Directive-Content:
+    * Type
+    * ((state of activity)) TODO
+    * Title
+    * ((posted on)) TODO
+    * (Pics)
+    * Tagged With {{tags}}
+    * Description
+    * (Location) TODO
+    * (Date) TODO
+    * Interested in this post? Contact
+-->
 
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div id="bigImageArea" class="text-center">
-                        <a id="bigImage" data-lightbox="roadtrip">
-                            <img id="obr" alt="Big picture" />
-                        </a>
-                    </div>
-                </div>
-                <div class="col-md-8">
-                    <div class="row">
-                        <div>
-                            <p class="gallery">
-
-                            </p>
-                            <p class="pager "></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <h4>Tagged with:</h4>
-                <span style="margin-right:5px;cursor:pointer;"
-                      class="label label-primary btnTag"
-                      ng-repeat="tag in need.tags.split(', ')"
-                      ng-bind="need.tags.split(',')[$index]">
-                </span>
-            </div>
-
-            <div class="row">
-                <p class="text-justify" ng-bind="need.textDescription">
-
-                </p>
-            </div>
-
-
-            <div class="row">
-                <div id="locationInfoCollapsed" class="well div-table col-lg-12">
-                    <div class="div-table-row">
-                        <div class="col-lg-8 div-table centered-text additional-info-title">{{location}}</div>
-                        <div class="col-lg-1 div-table-cell centered-text pull-right">
-                            <span ng-show="locationOutputFieldCollapsed">
-                                <a href="" class="glyphicon glyphicon-chevron-right" ng-click="outputLocationCollapseClick()"></a>
-                            </span>
-                            <span ng-show="!locationOutputFieldCollapsed">
-                                <a href="" class="glyphicon glyphicon-chevron-down" ng-click="outputLocationCollapseClick()"></a>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="locationInfoOutputFields" ng-show="!locationOutputFieldCollapsed"
-                     class="div-table col-lg-12">
-
-                    <div class="div-table-row">
-                        <section id="map" class="col-lg-8 col-lg-offset-2">
-                            <!--
-                            <div ui-map="myMap" ui-options="mapOptions" class="map-canvas"
-                                 ui-event="{'map-click' : 'onClickMap($event, $params, $myMap)'}"></div>
-                            -->
-                        </section>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div id="timeInfoCollapsed" class="well div-table col-lg-12">
-                    <div class="div-table-row">
-                        <div class="col-lg-8 div-table centered-text additional-info-title">{{need.startDate}} -
-                            {{need.endDate}}</div>
-                        <div class="col-lg-1 div-table-cell centered-text pull-right">
-                            <span ng-show="timeInputFieldCollapsed">
-                                <a href="" class="glyphicon glyphicon-chevron-right" ng-click="timeInputFieldCollapsedClick()"></a>
-                            </span>
-                            <span ng-show="!timeInputFieldCollapsed">
-                                <a href="" class="glyphicon glyphicon-chevron-down" ng-click="timeInputFieldCollapsedClick()"></a>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="timeInputFields" ng-show="!timeInputFieldCollapsed" class="div-table col-lg-12">
-                    <div class="div-table-row">
-                        TODO
-                        <div id="time_from"
-                             class="col-lg-4 col-lg-offset-2"></div>
-                        <div id="time_to" class="col-lg-4"></div>
-                    </div>
-                </div>
-            </div>
-
-
-            <!--<div class="row">
-                              <div class="text-center">
-                                  <div class="btn-group btn-group-lg">
-                                      <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-arrow-up"></span>&nbsp;Connect with existing post</button>
-                                      <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;Create new post</button>
-                                      <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-arrow-down"></span>&nbsp;Just connect</button>
-                                  </div>
-                              </div>
-                          </div> -->
-            <div class="div-table-row pull-right">
-                <div class="pull-left" style="font-size: 1.6em;">
-                    Interested in this post?&nbsp;
-                </div>
-                <div class="pull-right">
-                    <button type="button" ng-disabled="previewRegime" class="btn btn-default" ng-click="clickOnContact()">Contact</button>
-                </div>
-            </div>
-
-            <div class="div-table-row pull-right" ng-show="contactFormActiv">
-                <won-contact need="need" allNeeds="allNeeds"/>
-            </div>
-
-        </div>
-    </div>
-</div>
-
+<!--
+<p>NEED: {{need}}</p>
+<p>TYPE: {{need.basicNeedType}}<p/>
+<p>URL: {{getTypePicURI(need.basicNeedType)}}<p/>
+<p>TypeHR: {{humanReadableType(need.basicNeedType)}}<p/>
+<p>startDate: {{need.startDate}}</p>
+<p>startTime: {{need.startTime}}</p>
+<p>endDate: {{need.endDate}}</p>
+<p>endTime: {{need.endTime}}</p>
+-->
+<won-Post-Detail need="need"> </won-Post-Detail>

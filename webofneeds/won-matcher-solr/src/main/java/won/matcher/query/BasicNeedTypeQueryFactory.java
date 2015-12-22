@@ -17,26 +17,36 @@ import java.io.IOException;
 public class BasicNeedTypeQueryFactory extends AbstractQueryFactory
 {
   private final String needTypeField;
+  private final boolean search;
 
-  public BasicNeedTypeQueryFactory(BooleanClause.Occur occur, float boost, String needTypeField)
+  public BasicNeedTypeQueryFactory(BooleanClause.Occur occur, float boost, String needTypeField, boolean search)
   {
     super(occur, boost);
     this.needTypeField = needTypeField;
+    this.search = search;
   }
 
-  public BasicNeedTypeQueryFactory(final BooleanClause.Occur occur, final String needTypeField)
+  public BasicNeedTypeQueryFactory(final BooleanClause.Occur occur, final String needTypeField, final boolean search)
   {
     super(occur);
     this.needTypeField = needTypeField;
+    this.search = search;
   }
+
 
   @Override
   public Query createQuery(final SolrIndexSearcher indexSearcher, final SolrInputDocument inputDocument) throws IOException
   {
+    String matchingNeedType;
     if (!inputDocument.containsKey(needTypeField))
       return null;
 
-    String matchingNeedType = getMatchingNeedType(inputDocument.getFieldValue(needTypeField).toString());
+    if(!search){
+      matchingNeedType = getMatchingNeedType(inputDocument.getFieldValue(needTypeField).toString());
+    }else{
+      matchingNeedType = inputDocument.getFieldValue(needTypeField).toString();
+    }
+
     if (matchingNeedType == null)
       return null;
 

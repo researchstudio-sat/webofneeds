@@ -31,4 +31,5 @@ public interface MatcherProtocolCamelConfigurator extends NeedProtocolCamelConfi
   //TODO: more sophisticated approach for adding activemq components might be needed to enable more detailed jms
   // configuration
   public void addCamelComponentForWonNodeBrokerForTopics(URI brokerUri,String brokerComponentName);
+
 }

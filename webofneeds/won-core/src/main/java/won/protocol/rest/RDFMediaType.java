@@ -16,7 +16,7 @@
 
 package won.protocol.rest;
 
-import javax.ws.rs.core.MediaType;
+import org.springframework.http.MediaType;
 
 /**
  * User: fkleedorfer
@@ -30,5 +30,6 @@ public class RDFMediaType
   public static final MediaType TEXT_RDF_N3 = new MediaType("text","rdf+n3");
   public static final MediaType APPLICATION_JSON = new MediaType("application","json");
   public static final MediaType APPLICATION_TRIG = new MediaType("application", "trig");
-
+  public static final MediaType APPLICATION_JSONLD = new MediaType("application", "ld+json");
+  public static final MediaType APPLICATION_NQUADS = new MediaType("application", "n-quads");
 }

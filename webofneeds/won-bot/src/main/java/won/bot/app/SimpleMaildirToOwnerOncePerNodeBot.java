@@ -35,6 +35,7 @@ public class SimpleMaildirToOwnerOncePerNodeBot implements CommandLineRunner
     SpringApplication app = new SpringApplication(
         new Object[]{"classpath:/spring/app/readMailsFromFolder-emulateOwner-oncePerNode-testBot.xml"}
     );
+    app.setWebEnvironment(false);
     app.run(args);
   }
 

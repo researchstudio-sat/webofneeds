@@ -1,0 +1,94 @@
+<header>
+    <won-topnav></won-topnav>
+    <won-create-need-title-bar></won-create-need-title-bar>
+</header>
+<main class="create-post">
+    <div class="cp__inner">
+
+        <button ng-click="self.moreWub(1);self.delayedWub(1, 1000);">1+1 MOAR WUB!</button>
+        <button ng-click="self.moreWub(3)">3 MOAR WUB!</button>
+        <p>{{ self.wubs.toArray() }}</p>
+        <p>DBG Draft: {{self.state.get('drafts').get(self.draftId).toJS()}}</p>
+        <p>enq'd msgs: {{self.state.getIn(['messages', 'enqueued']).toJS()}}</p>
+        <p>pending answer: {{self.state.getIn(['messages', 'sent']).toJS()}}</p>
+
+        <won-posttype-select
+                options="::self.postTypeTexts"
+                on-select="::self.selectType(idx)"
+                on-unselect="::self.unselectType()">
+        </won-posttype-select>
+
+        <div class="cp__mandatory-rest">
+            <won-image-dropzone
+                    on-image-picked="::self.drafts__change__thumbnail({draftId: self.draftId, image: image})">
+            </won-image-dropzone>
+            <won-dynamic-textfield
+                    placeholder="::'What'"
+                    max-chars="::self.characterLimit"
+                    on-input="::self.drafts__change__title({draftId: self.draftId, title: value})">
+            </won-dynamic-textfield>
+        </div>
+
+        <!--
+        <div>
+            <p>{First time} Roughly, what are you looking for? This will shop up as title. </p>
+            <a href="javascript:void(0)">Don't show again</a>
+        </div>
+
+        <div class="cp__hr"></div>
+
+        <div class="cp__more-detail">
+            <img src="generated/icon-sprite.svg#ico36_plus_circle" class="cp__icon">
+            <a href="javascript:void(0)">Add more Detail</a>
+        </div>
+
+        <won-labelled-hr label="::undefined"></won-labelled-hr>
+
+        <div class="cp__more-detail--folded-out">
+            <div class="cp__more-detail__item">
+                <img src="generated/icon-sprite.svg#ico36_plus_circle_hi" class="cp__icon">
+                <a href="javascript:void(0)">Add more Detail</a>
+            </div>
+            <ul>
+                <li>
+                    <img src="generated/icon-sprite.svg#ico36_description_circle" class="cp__icon">
+                    <a href="javascript:void(0)">Description</a>
+                </li>
+                <li>
+                    <img src="generated/icon-sprite.svg#ico36_tags_circle" class="cp__icon">
+                    <a href="javascript:void(0)">Tags</a>
+                </li>
+                <li>
+                    <img src="generated/icon-sprite.svg#ico36_media_circle" class="cp__icon">
+                    <a href="javascript:void(0)">Image or Media</a>
+                </li>
+                <li>
+                    <img src="generated/icon-sprite.svg#ico36_location_circle" class="cp__icon">
+                    <a href="javascript:void(0)">Address or Location</a>
+                </li>
+                <li>
+                    <img src="generated/icon-sprite.svg#ico36_area_circle" class="cp__icon">
+                    <a href="javascript:void(0)">Area or Radius</a>
+                </li>
+                <li>
+                    <img src="generated/icon-sprite.svg#ico36_time_circle" class="cp__icon">
+                    <a href="javascript:void(0)">Deadline or Timeframe</a>
+                </li>
+                <li>
+                    <img src="generated/icon-sprite.svg#ico36_notification_circle" class="cp__icon">
+                    <a href="javascript:void(0)">Manage Notifications</a>
+                </li>
+            </ul>
+        </div>
+
+        <won-labelled-hr label="::'or'"></won-labelled-hr>
+        -->
+
+        <button type="submit" class="won-button--filled red"
+                ng-show="self.isValid()"
+                ng-click="::self.publish()">
+            Publish
+        </button>
+
+    </div>
+</main>

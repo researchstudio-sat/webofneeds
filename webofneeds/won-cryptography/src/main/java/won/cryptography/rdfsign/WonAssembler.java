@@ -4,6 +4,9 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.*;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.ontology.Ontology;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.WONMSG;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -11,34 +14,34 @@ import java.util.LinkedList;
 /**
  * Created by ypanchenko on 08.07.2014.
  * <p/>
- * The class with methods to assemble a signature of the graph data and the graph data itself into
- * one graph.
- * The idea is borrowed from de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.generic.Assembler
- * But the implementation differ in that the data to be signed is assumed to be in one named graph
- * and resulting signature is placed separately as triples (basically in the default unnamed graph)
- * inside of the GraphCollection containing the corresponding NamedGraph with signed data.
+ * A utility class for assembling the calculated signature inside the GraphCollection
+ * into the original Dataset; for removing signature graphs from a Dataset.
  */
 public class WonAssembler
 {
 
-  private static final String SIG_GRAPH_NAME_TEMP = ":SIG-GRAPH-PLACEHOLDER-TEMP";
+  private static final String SIG_GRAPH_NAME_TEMP = "<http://localhost:8080/won/SIG-GRAPH-PLACEHOLDER-TEMP>";
   private static final String SIG_BNODE_NAME = "_:sig-1";
 
 
   /**
    * Assumes that namedSignedGraph is GraphCollection containing exactly one named graph
-   * with the name graphName, and that for this namedSignedGraph the signature is already
-   * calculated internally (i.e. an Algorithm methods canonicalize(namedSignedGraph),
-   * postCanonicalize(namedSignedGraph), hash(namedSignedGraph, envHashAlgorithm),
-   * postHash(namedSignedGraph), sign(namedSignedGraph, privateKey, "\"cert\"") have
-   * already been applied.
+   * that is part of the Dataset graphOrigin, and that for this named graph the signature
+   * is already calculated inside the GraphCollection internally (i.e. an Algorithm's
+   * methods canonicalize(namedSignedGraph), postCanonicalize(namedSignedGraph),
+   * hash(namedSignedGraph, envHashAlgorithm), postHash(namedSignedGraph),
+   * sign(namedSignedGraph, privateKey) have already been applied.
    *
-   * @param namedSignedGraph
-   * @param graphOrigin
+   * The method assembles the signature from provided GraphCollection into the origin Dataset
+   * by putting signature triples inside the default graph of the Dataset. Intended for the
+   * use by WonSigner.
+   *
+   * @param namedSignedGraph GraphCollection containing one named graph with its calculated signature
+   * @param graphOrigin Dataset that contains the graph that has was used to construct the namedSignedGraph
    * @throws Exception
    */
+  @Deprecated
   public static void assemble(GraphCollection namedSignedGraph,
-                              //String graphName,
                               Dataset graphOrigin)
     throws Exception {
 
@@ -48,17 +51,50 @@ public class WonAssembler
 
   }
 
-//  public static void assemble(GraphCollection namedSignedGraph,
-//                              //String graphName,
-//                              Dataset graphOrigin,
-//                              String sigGraphName)
-//    throws Exception {
-//
-//    Ontology o = prepareSignatureOntology(namedSignedGraph);
-//    verifyGraphCollectionContainsExactlyOneNamedGraph(namedSignedGraph);
-//    addSignatureAsNamedGraphToOrigin(namedSignedGraph, o, graphOrigin, sigGraphName);
-//
-//  }
+  /**
+   * Assumes that namedSignedGraph is GraphCollection containing exactly one named graph
+   * that is part of the Dataset graphOrigin, and that for this named graph the signature
+   * is already calculated inside the GraphCollection internally (i.e. an Algorithm's
+   * methods canonicalize(namedSignedGraph), postCanonicalize(namedSignedGraph),
+   * hash(namedSignedGraph, envHashAlgorithm), postHash(namedSignedGraph),
+   * sign(namedSignedGraph, privateKey) have already been applied.
+   *
+   * The method assembles the signature from provided GraphCollection into the origin Dataset
+   * by putting signature triples inside the named graph of the Dataset. Intended for the
+   * use by WonSigner.
+   *
+   * @param namedSignedGraph GraphCollection containing one named graph with its calculated signature
+   * @param graphOrigin Dataset that contains the graph that has was used to construct the namedSignedGraph
+   * @param sigGraphURI the name (URI) of the graph that should be assigned to the signature graph
+   * @throws Exception
+   */
+  public static void assemble(GraphCollection namedSignedGraph,
+                              Dataset graphOrigin,
+                              String sigGraphURI)
+    throws Exception {
+
+    Ontology o = prepareSignatureOntology(namedSignedGraph);
+    verifyGraphCollectionContainsExactlyOneNamedGraph(namedSignedGraph);
+    addSignatureAsNamedGraphToOrigin(namedSignedGraph, o, graphOrigin, sigGraphURI);
+
+  }
+
+  /**
+   * Removes signature graphs from the Dataset. Can be useful to use after
+   * verification is done, when the signatures are no longer required for
+   * further actions on the signed data of the Dataset.
+   *
+   * @param dataset from which graphs representing signatures have to be removed
+   */
+  public static void removeSignatureGraphs(Dataset dataset) {
+
+    for (String name : RdfUtils.getModelNames(dataset)) {
+      if (WonRdfUtils.SignatureUtils.isSignatureGraph(name, dataset.getNamedModel(name))) {
+        dataset.removeNamedModel(name);
+      }
+    }
+
+  }
 
   private static void verifyGraphCollectionContainsExactlyOneNamedGraph(GraphCollection gc) {
     LinkedList<NamedGraph> graphs = gc.getGraphs();
@@ -115,7 +151,6 @@ public class WonAssembler
   private static NamedGraph getSignatureAsGraph(GraphCollection gc, Ontology o) {
 
     gc.addPrefix(new Prefix(o.getSigPrefix() + ":", "<" + Ontology.getSigIri() + ">"));
-    //namedSignedGraph.applyPrefixes();
 
     String name = gc.getGraphs().get(0).getName();
     if (name.isEmpty()) {
@@ -123,12 +158,36 @@ public class WonAssembler
     }
 
     NamedGraph sigGraph = new NamedGraph(SIG_GRAPH_NAME_TEMP, 0, null);
-    //sigGraph.applyPrefixes(gc.getPrefixes());
     ArrayList<Triple> sigGraphTriples = sigGraph.getTriples();
+    // this graph is signed by the signature
+    sigGraphTriples.add(new Triple(SIG_BNODE_NAME, "<" + WONMSG.HAS_SIGNED_GRAPH_PROPERTY + ">", name));
+    for (Triple t : o.getTriples()) {
+      String subj = t.getSubject();
+      sigGraphTriples.add(new Triple(subj, t.getPredicate(), t.getObject()));
+    }
+    gc.addGraph(sigGraph);
+    return sigGraph;
+  }
+
+  private static NamedGraph getSignatureAsGraph(GraphCollection gc, String sigGraphURI, Ontology o) {
+
+    gc.addPrefix(new Prefix(o.getSigPrefix() + ":", "<" + Ontology.getSigIri() + ">"));
+
+    // the signed graph
+    String name = gc.getGraphs().get(0).getName();
+    if (name.isEmpty()) {
+      name = gc.getGraphs().get(1).getName();
+    }
+
+    NamedGraph sigGraph = new NamedGraph(SIG_GRAPH_NAME_TEMP, 0, null);
+    ArrayList<Triple> sigGraphTriples = sigGraph.getTriples();
+    // this graph is signed by the signature
+    sigGraphTriples.add(new Triple("<" + sigGraphURI + ">", "<" + WONMSG.HAS_SIGNED_GRAPH_PROPERTY + ">", name));
     for (Triple t : o.getTriples()) {
       String subj = t.getSubject();
       if (subj.equals(SIG_BNODE_NAME)) {
-        subj = name;
+        // this graph represents the signature and contains the signature triples
+        subj = "<" + sigGraphURI + ">";
       }
       sigGraphTriples.add(new Triple(subj, t.getPredicate(), t.getObject()));
     }
@@ -138,10 +197,9 @@ public class WonAssembler
 
   private static void addSignatureAsNamedGraphToOrigin(
     GraphCollection namedSignedGraph, Ontology o,
-    //String graphName,
     Dataset graphOrigin, String sigGraphURI) throws Exception {
 
-    NamedGraph signatureAsGraph = getSignatureAsGraph(namedSignedGraph, o);
+    NamedGraph signatureAsGraph = getSignatureAsGraph(namedSignedGraph, sigGraphURI, o);
     Model signatureAsModel = ModelConverter.namedGraphToModel(signatureAsGraph.getName(), namedSignedGraph);
     graphOrigin.addNamedModel(sigGraphURI, signatureAsModel);
     addPrefixesToDefaultGraph(signatureAsModel, graphOrigin);
@@ -150,7 +208,6 @@ public class WonAssembler
 
   private static void addSignatureTriplesToOrigin(
     GraphCollection namedSignedGraph, Ontology o,
-    //String graphName,
     Dataset graphOrigin) throws Exception {
 
     NamedGraph signatureAsGraph = getSignatureAsGraph(namedSignedGraph, o);

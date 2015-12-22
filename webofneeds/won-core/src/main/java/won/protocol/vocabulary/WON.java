@@ -30,7 +30,6 @@ import won.protocol.model.NeedState;
 public class WON
 {
   public static final String BASE_URI = "http://purl.org/webofneeds/model#";
-
   private static Model m = ModelFactory.createDefaultModel();
 
 
@@ -53,6 +52,7 @@ public class WON
   public static final Property HAS_CONNECTION_URI_PREFIX = m.createProperty(BASE_URI, "hasConnectionUriPrefix");
   public static final Property HAS_EVENT_URI_PREFIX = m.createProperty(BASE_URI, "hasEventUriPrefix");
 
+  public static final Property HAS_NEED_LIST = m.createProperty(BASE_URI, "hasNeedList");
 
   public static final Property EMBED_SPIN_ASK = m.createProperty(BASE_URI, "embedSpinAsk");
 
@@ -157,10 +157,15 @@ public class WON
   public static final Property HAS_GRAPH = m.createProperty(BASE_URI,"hasGraph");
 
   //search result model
+  public static final Resource Match = m.createResource(BASE_URI + "Match");
   public static final Property SEARCH_RESULT_URI = m.createProperty(BASE_URI,"uri");
   public static final Property SEARCH_RESULT_PREVIEW = m.createProperty(BASE_URI, "preview");
 
+  public static final String PRIVATE_DATA_GRAPH_URI= BASE_URI + "privateDataGraph";
 
+
+  public static final String GROUP_FACET_STRING = BASE_URI+"GroupFacet";
+  public static final String OWNER_FACET_STRING = BASE_URI+"OwnerFacet";
   /**
    * Returns the base URI for this schema.
    *

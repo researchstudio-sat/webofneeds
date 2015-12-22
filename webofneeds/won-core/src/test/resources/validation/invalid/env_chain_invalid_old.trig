@@ -1,0 +1,49 @@
+@prefix need:  <http://localhost:8080/won/resource/need/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix conn:  <http://localhost:8080/won/resource/connection/> .
+@prefix event: <http://localhost:8080/won/resource/event/> .
+@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix local: <http://localhost:8080/won/resource/> .
+@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix signature: <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+
+
+
+<http://localhost:8080/won/resource/event/2100661890849016800#data> {
+    event:2100661890849016800
+            msg:hasReceiverNode      <http://localhost:8080/won/resource> ;
+            msg:hasSenderNeed        need:7680710295659487000 .
+
+    <http://localhost:8080/won/resource/event/2100661890849016800#data>
+            a       msg:EnvelopeGraph ;
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    event:2100661890849016800 .
+}
+
+<http://localhost:8080/won/resource/event/2100661890849016800#envelope-c2l9> {
+    event:2100661890849016800
+            a                         msg:FromOwner .
+
+    <http://localhost:8080/won/resource/event/2100661890849016800#envelope-c2l9>
+            a                     msg:EnvelopeGraph ;
+            msg:containsEnvelope  <http://localhost:8080/won/resource/event/2100661890849016800#envelope-3> ;
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    event:2100661890849016800 .
+}
+
+<http://localhost:8080/won/resource/event/2100661890849016800#envelope-3> {
+
+    <http://localhost:8080/won/resource/event/2100661890849016800#envelope-3>
+            a                     msg:EnvelopeGraph ;
+            msg:containsEnvelope  <http://localhost:8080/won/resource/event/2100661890849016800#envelope-c2l9> ;
+            msg:containsEnvelope  <http://localhost:8080/won/resource/event/2100661890849016800#envelope-c220> ;
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    event:2100661890849016800 .
+}
+

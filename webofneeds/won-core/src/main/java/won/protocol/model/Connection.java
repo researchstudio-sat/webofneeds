@@ -24,7 +24,8 @@ import java.net.URI;
  * Date: 30.10.12
  */
 @Entity
-@Table(name = "connection")
+@Table(name = "connection", indexes = { @Index(name = "IDX_CONNECTION_NEEDURI_REMOTENEEDURI", columnList = "needURI, " +
+  "remoteNeedURI")}, uniqueConstraints = {@UniqueConstraint(name="IDX_UNIQUE_CONNECTION", columnNames = {"needURI", "remoteNeedURI", "typeURI"})})
 public class Connection
 {
   @Id

@@ -35,12 +35,14 @@ import java.util.Date;
 /**
  * Listener that responds to open and message events with automatic messages.
  * Can be configured to apply a timeout (non-blocking) before sending messages.
- * Can be configured to send a fixed number of messages and then unsubscribe from events.
  */
 public class RespondToMessageAction extends BaseEventBotAction
 {
-  private long millisTimeoutBeforeReply = 1000;
-  private int count = 0;
+  private long millisTimeoutBeforeReply = 0;
+
+  public RespondToMessageAction(EventListenerContext eventListenerContext) {
+    super(eventListenerContext);
+  }
 
   public RespondToMessageAction(final EventListenerContext eventListenerContext, final long millisTimeoutBeforeReply) {
     super(eventListenerContext);
@@ -66,8 +68,7 @@ public class RespondToMessageAction extends BaseEventBotAction
         URI connectionUri = messageEvent.getConnectionURI();
         logger.debug("sending message " + message);
         try {
-          getEventListenerContext().getOwnerService().sendConnectionMessage(
-            connectionUri, messageContent, createWonMessage(connectionUri, messageContent));
+          getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionUri, messageContent));
         } catch (Exception e) {
           logger.warn("could not send message via connection {}", connectionUri, e);
         }

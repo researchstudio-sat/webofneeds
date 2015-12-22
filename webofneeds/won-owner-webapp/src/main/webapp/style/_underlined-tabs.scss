@@ -1,0 +1,48 @@
+@import 'flex-layout';
+@import 'sizing-utils';
+
+@mixin underlined-tabs($underlineColor) {
+  @include flex-row-spaced;
+  align-items: stretch;
+  list-style: none;
+
+  $verticalPadding: 1rem;
+  $horizontalSpace: 1rem;
+  $selectedBorderWidth: 0.25rem;
+
+  %tabs__selected {
+    border-bottom: $selectedBorderWidth solid $underlineColor;
+  }
+  %tabs__unread {
+    color: $underlineColor;
+  }
+  li a {
+    color: black;
+    text-decoration: none;
+    display: block;
+  }
+
+
+  // vertical white-space
+  li a {
+    padding-bottom: $verticalPadding;
+    padding-top: $verticalPadding;
+  }
+  li%tabs__selected a {
+    padding-bottom: $verticalPadding - $selectedBorderWidth;
+    padding-top: $verticalPadding;
+  }
+
+
+  // horizontal white-space
+  li {
+    text-align: center;
+    @include flex-bottom-center;
+    margin-left: $horizontalSpace;
+    margin-right: $horizontalSpace;
+  }
+  li:first-of-type { margin-left: 0; }
+  li:last-of-type { margin-right: 0; }
+
+
+}

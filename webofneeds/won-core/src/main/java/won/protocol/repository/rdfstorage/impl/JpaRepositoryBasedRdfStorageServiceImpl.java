@@ -22,7 +22,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import won.protocol.model.ConnectionEvent;
 import won.protocol.model.DatasetHolder;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
@@ -38,17 +37,6 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
   @Autowired
   private DatasetHolderRepository datasetHolderRepository;
 
-  @Transactional(propagation = Propagation.SUPPORTS)
-  @Override
-  public void storeModel(final ConnectionEvent event, final Model graph) {
-    storeModel(createEventURI(event), graph);
-  }
-
-  @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-  @Override
-  public Model loadModel(final ConnectionEvent event) {
-    return loadModel(createEventURI(event));
-  }
 
   @Transactional(propagation = Propagation.REQUIRED)
   @Override
@@ -97,12 +85,4 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
     return true;
   }
 
-  /**
-   * Helper method that creates a URI for the specified ConnectionEvent.
-   * TODO: replace by more principled approach for generating event URIs. Do they get a publicly dereferencable URI?
-   *
-   */
-  private URI createEventURI(ConnectionEvent event) {
-    return URI.create(event.getConnectionURI().toString() + "/event/" + event.getId());
-  }
 }

@@ -1,0 +1,170 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+@import 'flex-layout';
+
+won-matches-list-item {
+  margin: 0 auto;
+  max-width: 35rem;
+  display: block;
+
+  .mli {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 0.1rem solid $won-line-gray;
+
+    a {
+      text-decoration: none;
+    }
+
+    @include square-image($postIconSize, 0, 0.5rem, 0, 0);
+
+    won-square-image .image{
+      border: 0.1rem solid $won-light-gray;
+    }
+
+    .mli__description {
+      color: black;
+      flex-grow: 1;
+      padding-right: 1rem;
+
+      &__topline{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+
+        &__title{
+          font-weight: 500;
+        }
+
+        &__matchcount {
+          color: $won-red;
+          padding: 0 0.25rem;
+        }
+      }
+
+      &__subtitle {
+        color: $won-subtitle-gray;
+        display: flex;
+        flex-direction: row;
+        font-size: $smallFontSize;
+
+        &__group {
+          display: flex;
+          align-items: center;
+          flex-direction: row;
+
+          &__dash {
+            padding: 0 0.25rem;
+          }
+
+          &__icon {
+            padding-right: 0.25rem;
+            @include fixed-square(0.75rem);
+          }
+        }
+      }
+    }
+
+    .mli__carret {
+      .mli__arrow {
+        @include carretSized;
+
+      }
+    }
+  }
+  .smli {
+    display: flex;
+    flex-direction: column;
+
+    &__item {
+      max-width: 33rem;
+      align-self: flex-end;
+      margin: 0.25rem 0;
+      padding: 0.25rem 0.25rem;
+      border: 0.1rem solid $won-lighter-gray; //this is necessary so that the view does not "jump" when selecting an item
+
+      &:hover {
+        background-color: white;
+        border: 0.1rem solid $won-line-gray;
+      }
+
+      &__content {
+        font-size: $smallFontSize;
+        padding-top: 0.25rem;
+        padding-left: 1rem;
+
+        &__location,
+        &__text,
+        &__datetime {
+          display: flex;
+          flex-direction: row;
+          padding: 0.25rem 0;
+        }
+
+        &__indicator {
+          @include fixed-square(1rem);
+          padding-right: 1.1rem;
+        }
+      }
+
+      &__header {
+        display: flex;
+        flex-grow: 1;
+        justify-content: space-between;
+        width: 100%;
+
+        @include square-image($postIconSize, 0, 0.5rem, 0, 0);
+
+        won-square-image .image {
+          border: 0.1rem solid $won-light-gray;
+        }
+
+        &__text {
+          color: black;
+          flex-grow: 1;
+          padding-right: 1rem;
+
+          &__topline {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+
+            &__title {
+              font-weight: 500;
+            }
+
+            &__date {
+              font-size: $smallFontSize;
+              color: $won-subtitle-gray;
+            }
+          }
+
+          &__subtitle {
+            font-size: $smallFontSize;
+            color: $won-subtitle-gray;
+            display: flex;
+            flex-direction: row;
+
+            &__group {
+              display: flex;
+              align-items: center;
+              flex-direction: row;
+
+              &__dash {
+                padding: 0 0.25rem;
+              }
+
+              &__icon {
+                padding-right: 0.25rem;
+                @include fixed-square(0.75rem);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

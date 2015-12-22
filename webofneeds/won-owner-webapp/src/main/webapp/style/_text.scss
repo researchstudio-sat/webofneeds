@@ -1,0 +1,19 @@
+/**
+ * Any styles purely defining different typographic classes
+ */
+
+@import 'won-config';
+
+@mixin default-font {
+  font-family: 'Open Sans';
+  font-weight: 400;
+  font-size: $normalFontSize;
+  color: black;
+}
+
+@mixin fine-print {
+  font-family: 'Open Sans';
+  font-weight: 400;
+  font-size: $smallFontSize;
+  color: darken($won-line-gray, 10%);
+}
