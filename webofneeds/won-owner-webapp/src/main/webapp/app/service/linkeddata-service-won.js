@@ -17,7 +17,7 @@
 /**
  * Created by fkleedorfer on 05.09.2014.
  */
-
+import * as q from 'q';
 (function(){
     if(!won) won = {};
 
@@ -82,7 +82,7 @@
                 if (failures + successes >= numPromises) deferred.resolve(results);
             }, function(reason) {
                 failures ++;
-                $log.error("warning: promise failed. Reason " + JSON.stringify(reason));
+                console.log("warning: promise failed. Reason " + JSON.stringify(reason));
                 if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
                 results[key] = null;
                 handler(key, reason);
@@ -152,26 +152,21 @@
             return deferred.promise;
         },
         acquireUpdateLock: function(){
-
-            var promise =  new Promise(
-                function(resolve, reject){
-
-                    resolve(1)
-                });
+            var deferred = q.defer();
 
             if (this.activeReaderCount > 0 ) {
                 //readers are present, we have to wait till they are done
                 console.log("rul:updt:block:  " + this.uri + " " + this.getLockStatusString());
-                this.blockedUpdaters.push(promise);
+                this.blockedUpdaters.push(deferred);
             } else {
                 console.log("rul:updt:grant:  " + this.uri + " " + this.getLockStatusString());
                 //add the deferred update to the list of blocked updates just
                 //in case there are more, then grant the lock to all of them
-                this.blockedUpdaters.push(promise);
+                this.blockedUpdaters.push(deferred);
                 this.grantLockToUpdaters();
             }
 
-            return promise;
+            return deferred.promise;
         },
         releaseReadLock: function(){
             console.log("rul:read:release:" + this.uri + " " + this.getLockStatusString());
@@ -202,7 +197,7 @@
                 for (var i = 0; i < this.blockedUpdaters.length; i++) {
                     var deferredUpdate = this.blockedUpdaters[i];
                     this.activeUpdaterCount ++;
-                    deferredUpdate.constructor.resolve();
+                    deferredUpdate.resolve();
                     this.blockedUpdaters.splice(i, 1);
                     i--;
                 }
@@ -374,14 +369,14 @@
         if (connectionUri != null) {
             cacheItemMarkDirty(connectionUri);
         }
-        return $q.when(true); //return a promise for chaining
+        return q.when(true); //return a promise for chaining
     }
     won.invalidateCacheForNeed = function(needUri){
         if (needUri != null) {
             cacheItemMarkDirty(needUri);
             cacheItemMarkDirty(needUri+'/connections/')
         }
-        return $q.when(true); //return a promise for chaining
+        return q.when(true); //return a promise for chaining
     }
 
 
@@ -424,7 +419,7 @@
 
     /**
      * Checks the query results (success, data) as returned by store.execute or store.node
-     * and assuming that we are inside a deferred execution, calls $q.reject if the
+     * and assuming that we are inside a deferred execution, calls q.reject if the
      * query failed.
      * returns: true if a reject happened, false otherwise
      * options: object with the following keys:
@@ -450,9 +445,9 @@
         if (errorMessage != null) {
             // observation: the error happens for #hasRemoteConnection property of suggested connection, but this
             // property is really not there (and should not be), so in that case it's not an error...
-            $log.error(options.message + " " + errorMessage);
-            // TODO: this $q.reject seems to have no effect
-            $q.reject(options.message + " " + errorMessage);
+            console.log(options.message + " " + errorMessage);
+            // TODO: this q.reject seems to have no effect
+            q.reject(options.message + " " + errorMessage);
             return true;
         }
         return false;
@@ -638,7 +633,7 @@
     }
 
     var loadFromURI = function(uri) {
-        var deferred = $q.defer();
+        var deferred = q.defer();
         console.log("updating:        " + uri);
         try {
             /*
@@ -693,7 +688,7 @@
         //we also allow unresolvable resources, so as to avoid re-fetching them.
         //we also allow resources that are currently being fetched.
         if (cacheItemIsOkOrUnresolvableOrFetching(uri)){
-            var deferred = $q.defer();
+            var deferred = q.defer();
             cacheItemMarkAccessed(uri);
             deferred.resolve(uri);
             return deferred.promise;
@@ -795,7 +790,7 @@
                            });
                            return resultObject;
                        } catch (e) {
-                           return $q.reject("could not load need " + uri + ". Reason: " + e);
+                           return q.reject("could not load need " + uri + ". Reason: " + e);
                        } finally {
                            //we don't need to release after a promise resolves because
                            //this function isn't deferred.
@@ -838,13 +833,13 @@
                             });
                             return resultData.result;
                         } catch (e) {
-                            return $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI + ". Reason: " + e);
+                            return q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI + ". Reason: " + e);
                         } finally {
                             //we don't need to release after a promise resolves because
                             //this function isn't deferred.
                             lock.releaseReadLock();
                         }
-                        return $q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI);
+                        return q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI);
                     }
                 );
             })
@@ -857,7 +852,7 @@
         return won.getUniqueObjectOfProperty(needUri, won.WON.hasWonNode)
             .then(
                 function(result){return result;},
-                function(reason) { return $q.reject("could not get WonNodeUri of Need " + needUri + ". Reason: " + reason)});
+                function(reason) { return q.reject("could not get WonNodeUri of Need " + needUri + ". Reason: " + reason)});
     }
 
     won.getNeedUriOfConnection = function(connectionUri){
@@ -870,7 +865,7 @@
                     return result;
                 },
                 function(reason) {
-                    return $q.reject("could not get need uri of connection " + connectionUri + ". Reason: " + reason)
+                    return q.reject("could not get need uri of connection " + connectionUri + ". Reason: " + reason)
                 });
     }
 
@@ -881,7 +876,7 @@
         return won.getUniqueObjectOfProperty(connectionUri, won.WON.hasRemoteConnection)
             .then(
                 function(result){return result;},
-                function(reason) { return $q.reject("could not get remote connection uri of connection " + connectionUri + ". Reason: " + reason)});
+                function(reason) { return q.reject("could not get remote connection uri of connection " + connectionUri + ". Reason: " + reason)});
     }
 
     won.getRemoteneedUriOfConnection = function(connectionUri){
@@ -891,7 +886,7 @@
         return won.getUniqueObjectOfProperty(connectionUri, won.WON.hasRemoteNeed)
             .then(
                 function(result){return result;},
-                function(reason) { return $q.reject("could not get remote need uri of connection " + connectionUri + ". Reason: " + reason)});
+                function(reason) { return q.reject("could not get remote need uri of connection " + connectionUri + ". Reason: " + reason)});
     }
 
     won.getEnvelopeDataForNeed=function(needUri){
@@ -910,7 +905,7 @@
 
             },function(reason) {
                 //no connection found
-                var deferred = $q.defer();
+                var deferred = q.defer();
                 var ret = {};
                 ret[won.WONMSG.hasSenderNeed] = needUri;
                 ret[won.WONMSG.hasReceiverNeed] = needUri;
@@ -954,7 +949,7 @@
                                                 return ret;
                                             },function(reason) {
                                                 //no connection found
-                                                var deferred = $q.defer();
+                                                var deferred = q.defer();
                                                 var ret = {};
                                                 ret[won.WONMSG.hasSender] = connectionUri;
                                                 ret[won.WONMSG.hasSenderNeed] = needUri;
@@ -989,7 +984,7 @@
                         return won.deleteWhereNull(val)
                     });
                 } catch (e) {
-                    return $q.reject("could not get last event of connection " + uri + ". Reason: " + e);
+                    return q.reject("could not get last event of connection " + uri + ". Reason: " + e);
                 }
             }
         );
@@ -1011,7 +1006,7 @@
                                     return {connection: connection, remoteNeed: need, event: event}
                                 },function(reason){
                                     //remote need's won node may be offline - don't let that kill us
-                                    var deferred = $q.defer();
+                                    var deferred = q.defer();
                                     deferred.resolve(
                                         {connection: connection, remoteNeed: {'title': '[could not load]'}, event: event}
                                     );
@@ -1033,9 +1028,9 @@
                     for (var evtKey in eventUris) {
                         eventPromises.push(won.getConnectionEvent(eventUris[evtKey]));
                     }
-                    return $q.all(eventPromises)
+                    return q.all(eventPromises)
                 } catch (e) {
-                    return $q.reject("could not get all connection events for connection " + connectionUri + ". Reason: " + e);
+                    return q.reject("could not get all connection events for connection " + connectionUri + ". Reason: " + e);
                 }
             });
     }
@@ -1090,7 +1085,7 @@
                                     }
                                 }
                             });
-                            return $q.all(connectionsPromises)
+                            return q.all(connectionsPromises)
                                 .then(function (listOfLists) {
                                     //for each hasConnections triple (should only be one, but hey) we get a list of connections.
                                     //now flatten the list.
@@ -1099,7 +1094,7 @@
                                     return merged;
                                 });
                         } catch (e) {
-                            $q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
+                            q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
                         } finally {
                             lock.releaseReadLock();
                         }
@@ -1130,7 +1125,7 @@
                             });
                             return result.result;
                         } catch (e) {
-                            return $q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
+                            return q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
                         } finally {
                             //we don't need to release after a promise resolves because
                             //this function isn't deferred.
@@ -1192,7 +1187,7 @@
                            });
                            return eventUris;
                        } catch (e) {
-                           return $q.reject("Could not get all connection event URIs for connection " + connectionUri +". Reason: " + e);
+                           return q.reject("Could not get all connection event URIs for connection " + connectionUri +". Reason: " + e);
                        } finally {
                            //we don't need to release after a promise resolves because
                            //this function isn't deferred.
@@ -1215,7 +1210,7 @@
                         for (key in uris){
                             eventPromises.push(won.ensureLoaded(uris[key]));
                         }
-                        return $q.all(eventPromises);
+                        return q.all(eventPromises);
                     }
                 );
             }
@@ -1271,7 +1266,7 @@
                             });
                             return resultObject.eventUri;
                         } catch (e) {
-                            return $q.reject("Could not get last connection event URI for connection " + connectionUri + ". Reason: " + e);
+                            return q.reject("Could not get last connection event URI for connection " + connectionUri + ". Reason: " + e);
                         } finally {
                             //we don't need to release after a promise resolves because
                             //this function isn't deferred.
@@ -1298,7 +1293,7 @@
                                         conData.connection.value,
                                         requesterWebId
                                 ).then(function(eventUriResult){
-                                            return $q.all(
+                                            return q.all(
                                                 [won.getNodeWithAttributes(eventUriResult[0].eventUri.value, requesterWebId),
                                                  won.getNodeWithAttributes(conData.connection.value),
                                                  won.getNeed(conData.remoteNeed.value)
@@ -1401,7 +1396,7 @@
                             });
                             return lastEventTypeBeforeTime;
                         } catch (e) {
-                            return $q.reject("Could not get connection event type before time " + connectionUri + ". Reason: " + e);
+                            return q.reject("Could not get connection event type before time " + connectionUri + ". Reason: " + e);
                         } finally {
                             //we don't need to release after a promise resolves because
                             //this function isn't deferred.
@@ -1434,7 +1429,7 @@
                             var node = {};
                             privateData.store.node(uri, function (success, graph) {
                                 if (graph.length == 0) {
-                                    $log.error("warn: could not load any attributes for node with uri: " + uri);
+                                    console.log("warn: could not load any attributes for node with uri: " + uri);
                                 }
                                 if (rejectIfFailed(success, graph,{message : "Error loading node with attributes for URI " + uri+".", allowNone : false, allowMultiple: true})){
                                     return;
@@ -1447,7 +1442,7 @@
                             node.uri = uri;
                             return node;
                         } catch (e) {
-                            return $q.reject("could not get node " + uri + "with attributes: " + e);
+                            return q.reject("could not get node " + uri + "with attributes: " + e);
                         } finally {
                             //we don't need to release after a promise resolves because
                             //this function isn't deferred.
@@ -1467,7 +1462,7 @@
             throw {message : "deleteNode: uri must not be null"};
         }
         console.log("deleting node:   " + uri);
-        var deferred = $q.defer();
+        var deferred = q.defer();
         var query = "delete where {<"+uri+"> ?anyP ?anyO}";
         //var query = "select ?anyO where {<"+uri+"> ?anyP ?anyO}";
         privateData.store.execute(query, function (success, graph) {
@@ -1522,7 +1517,7 @@
             console.log("executing query: \n"+query);
             var locks = getReadUpdateLocksPerUris(relevantResources);
             var promises = acquireReadLocks(locks);
-            return $q.all(promises).then(
+            return q.all(promises).then(
                 function () {
                     var resultObject = {};
                     try {
@@ -1534,8 +1529,8 @@
                         });
                         return resultObject.results;
                     } catch (e) {
-                        $log.warn("Could not execute query. Reason: " + e);
-                        return $q.reject("Could not execute query. Reason: " + e);
+                        console.log("Could not execute query. Reason: " + e);
+                        return q.reject("Could not execute query. Reason: " + e);
                     } finally {
                         //release the read locks
                         locks.map(
@@ -1552,7 +1547,7 @@
             console.log("resolving " + propertyPaths.length + " property paths on baseUri " + baseUri);
             var locks = getReadUpdateLocksPerUris(relevantResources);
             var promises = acquireReadLocks(locks);
-            return $q.all(promises).then(
+            return q.all(promises).then(
                 function () {
                     try {
                         var resolvedUris = [];
@@ -1594,7 +1589,7 @@
                 console.log("crawlableQuery:resolveOrExecute resolving property paths ...");
                 Array.prototype.push.apply(relevantResources, resolvedUris);
                 var loadedPromises = relevantResources.map(function(x){ return won.ensureLoaded(x, requesterWebId)});
-                return $q.all(loadedPromises)
+                return q.all(loadedPromises)
                     .then(
                         function (x) {
                             return resolvePropertyPathsFromBaseUri(crawlableQuery.propertyPaths, baseUri, relevantResources);
