@@ -1,7 +1,38 @@
 /**
  * Created by ksinger on 23.09.2015.
  *
- * Contains a list of actions to be used with the dispatcher and documentation for their expected payloads.
+ * Contains a list of actions to be used with the dispatcher and documentation
+ * for their expected payloads.
+ *
+ * # Redux Primer - Actions
+ *
+ * Actions are small objects like:
+ *
+ * `{type: 'someaction', payload: {...}}`
+ *
+ * that are usually created via action-creators (ACs), e.g.:
+ *
+ * `function someaction(args) { return { type: 'someaction', payload: args }}`
+ *
+ * and then passed on to the reducer via `redux.dispatch(action)`.
+ *
+ * *Note:* The calls to `$ngRedux.connect` wrap the ACs in this call to `dispatch`
+ *
+ * # Best Practices
+ *
+ * Even though it's possible to have ACs trigger multiple ACs (which is
+ * necessary asynchronous actions), try avoiding that. All actions are
+ * broadcasted to all reducers anyway.  Mostly it's a symptom of actions
+ * that aren't high-level enough. (high-level: `publish`,
+ * low-level: `inDraftSetPublishPending`).
+ *
+ * ACs function is to do simple data-processing that is needed by multiple
+ * reducers (e.g. creating the post-publish messages that are needed by
+ * the drafts-reducer as well) and dealing with side-effects (e.g. routing,
+ * http-calls)
+ *
+ * As a rule of thumb the lion's share of all processing should happen
+ * in the reducers.
  */
 import {
     tree2constants,
@@ -15,9 +46,12 @@ import {
 import { hierarchy2Creators } from './action-utils';
 
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
+import { buildCreateMessage } from '../won-message-utils';
 
-//all values equal to this string will be replaced by action-creatos that simply
-// passes it's argument on as payload on to the reducers
+/**
+ * all values equal to this string will be replaced by action-creators that simply
+ * passes it's argument on as payload on to the reducers
+ */
 const INJ_DEFAULT = 'INJECT_DEFAULT_ACTION_CREATOR';
 const actionHierarchy = {
     /* actions received as responses or push notifications */
@@ -39,6 +73,7 @@ const actionHierarchy = {
          * A new draft was created (either through the view in this client or on another browser)
          */
         new: INJ_DEFAULT,
+
         /*
          * A draft has changed. Pass along the draftURI and the respective data.
          */
@@ -47,17 +82,17 @@ const actionHierarchy = {
             title: INJ_DEFAULT,
             thumbnail: INJ_DEFAULT,
         },
+
         delete: INJ_DEFAULT,
 
-        // use this action creator (drafts__publish__call) to initiate the process
-        //publish: publishDraft, //async dispatch
-        publish: INJ_DEFAULT,
-        setPublish: {
-            // the following three are triggered (a)synchronously to cause state-updates
-            pending: INJ_DEFAULT, //triggered by `publish`-action creator
-            successful: INJ_DEFAULT, //triggered by server-callback
-            failed: INJ_DEFAULT, //triggered by server-callback
-        }
+        publish: (draft, nodeUri) => {
+            const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
+            return {
+                type: actionTypes.drafts.publish,
+                payload: { eventUri, message, needUri, draftId: draft.draftId }
+            };
+        },
+        publishSuccessful: INJ_DEFAULT
     },
     router: {
         stateGo,
@@ -71,14 +106,9 @@ const actionHierarchy = {
     posts_overview:{
         openPostsView:INJ_DEFAULT
     },
-    messages: {
-        /* TODO this fragment is part of an attempt to sketch a different
-         * approach to asynchronity (Remove it or the thunk-based
-         * solution afterwards)
-         */
-        enqueue: INJ_DEFAULT,
+
+    messages: { /* websocket messages, e.g. post-creation, chatting */
         markAsSent: INJ_DEFAULT,
-        receive: INJ_DEFAULT,
     },
 
     /*
@@ -236,52 +266,6 @@ const actionHierarchy = {
                 ),
 
         update: INJ_DEFAULT,
-    }
-}
-
-/* WORK IN PROGRESS */
-//import wonServiceFoo from './service/won-service';//testfile';//won-service';
-//window.wonServiceFoo = wonServiceFoo;
-function publishDraft(draftId)  {
-    return (dispatch) => { //using the thunk-middleware for asynchronity
-
-        /*
-         * TODO: get access to state? (or pass whole draft info along with draftId?)
-         */
-
-        /*
-         *  TODO get access to services required for asyncPublish
-         *
-         *  - remove angular dependencies from message & linked data service (or move most
-         *  of their stuff to a seperate file and only retain a thin shell for compatibility
-         *  with the old app)
-         *   -> merge first with yanas work!!!
-         *
-         *  - publish the basic angular services globally (thus introducing a tight
-         *  coupling of angular into the new code)
-         *  - republish the service methods / make service publish itself (thus only
-         *  introducing a single point of coupling)
-         *
-         *  - wrap actions.js and reducers.js in angular-services
-         *
-         *  - use commonjs/amd export -> doesn't work due to jspm loading everything
-         *    when 'won.owner' isn't yet defined.
-         *
-         *  - have reexport.js that loads angular and all services and exports them
-         *    -> probably will have same problem
-         */
-
-        const PLACEHOLDER = {};
-
-
-        //dispatch({type: actionTypes.drafts.publish, payload: undefined})
-        dispatch(actionCreators.drafts__setPublish__pending(PLACEHOLDER));
-
-        const draft = PLACEHOLDER.get(draftId);
-        asyncPublish(draft).then(
-                args => dispatch(actionCreators.drafts__setPublish__successful(args[PLACEHOLDER])),
-                args => dispatch(actionCreators.drafts__setPublish__failed(args[PLACEHOLDER]))
-        )
     }
 }
 
