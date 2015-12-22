@@ -19,6 +19,11 @@ class FeedController {
             {id: "121337345", title: "tutu", type: 3, group: "sat lunch group" , requests: [this.r1, this.r2, this.r3, this.r4]},
             {id: "121337345", title: "Local Artistry", type: 2, titleImgSrc: "images/someNeedTitlePic.png", requests: [this.r1, this.r2]},
             {id: "121337345", title: "Cycling Tour de France", type: 3, requests: [this.r1, this.r2]}];
+
+        const selectFromState = (state) =>({
+            items : state.getIn([]).toJS()
+        })
+        const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this)
     }
 }
 

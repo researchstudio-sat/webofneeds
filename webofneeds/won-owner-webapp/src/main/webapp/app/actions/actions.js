@@ -32,6 +32,7 @@ const actionHierarchy = {
     },
     needs: {
         receive: INJ_DEFAULT,
+        clean:INJ_DEFAULT,
         failed: INJ_DEFAULT
     },
     drafts: {
@@ -140,7 +141,6 @@ const actionHierarchy = {
             data => {
                 dispatch(actionCreators.user__receive({loggedIn: true, email: username}));
                 dispatch(actionCreators.retrieveNeedUris());
-                dispatch(actionCreators.posts__load());
             }
         ).catch(
             error => dispatch(actionCreators.user__loginFailed({loginError: "No such username/password combination registered."}))
@@ -160,8 +160,7 @@ const actionHierarchy = {
         }).then(
             data => {
                 dispatch(actionCreators.user__receive({loggedIn: false}));
-                dispatch(actionCreators.needs__receive({needs: {}}));
-                dispatch(actionCreators.posts__clean({}))
+                dispatch(actionCreators.needs__clean({}))
             }
         ).catch(
             //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY

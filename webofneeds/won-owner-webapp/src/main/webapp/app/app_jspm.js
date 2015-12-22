@@ -90,6 +90,7 @@ app.filter('filterByNeedState', function(){
 })
 app.config([ '$urlRouterProvider', '$stateProvider', configRouting ]);
 app.run([ '$ngRedux', $ngRedux => runMessagingAgent($ngRedux) ]);
+
 //app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.runMessagingAgent()) ]);
 
 

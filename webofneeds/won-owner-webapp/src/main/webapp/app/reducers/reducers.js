@@ -9,6 +9,7 @@ import { createReducer } from 'redux-immutablejs'
 import { combineReducersStable } from '../redux-utils';
 import draftsReducer from './drafts-reducer';
 import postsReducer from './posts-reducer'
+import needReducer from './need-reducer'
 import { enqueuedMessagesReducer, sentMessagesReducer, receivedMessagesReducer } from './message-reducers'
 
 
@@ -65,7 +66,7 @@ const reducers = {
             }
         }
     ),
-    needs: createReducer(
+/*    needs: createReducer(
         Immutable.Map(),
 
         {
@@ -78,7 +79,8 @@ const reducers = {
                 return Immutable.fromJS({error: error});
             }
         }
-    ),
+    ),*/
+    needs:needReducer,
     postOverview:postsReducer,
     enqueuedMessages: enqueuedMessagesReducer,
     sentMessages: sentMessagesReducer,

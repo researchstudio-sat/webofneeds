@@ -6156,6 +6156,7 @@ RDFLoader.RDFLoader.prototype.load = function(uri, graph, callback) {
         }});
 };
 
+/*
 RDFLoader.RDFLoader.prototype.loadFromFile = function(parser, graph, uri, callback) {
     try {
         var that = this;
@@ -6169,6 +6170,7 @@ RDFLoader.RDFLoader.prototype.loadFromFile = function(parser, graph, uri, callba
         callback(false, e);
     }
 };
+*/
 
 RDFLoader.RDFLoader.prototype.tryToParse = function(parser, graph, input, options, callback) {
     // console.log("TRYING TO PARSE");

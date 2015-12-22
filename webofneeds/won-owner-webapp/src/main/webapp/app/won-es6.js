@@ -11,6 +11,7 @@
 import './service/won';
 import './service/need-builder';
 import './service/message-builder';
+import './service/linkeddata-service-won';
 export default window.won;
 
 

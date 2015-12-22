@@ -7,24 +7,24 @@ import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
 import { combineReducersStable } from '../redux-utils';
 import { buildCreateMessage } from '../won-message-utils';
+import won from '../won-es6';
+
 const initialState = Immutable.fromJS({
-        activePostsView: true,
-        closedPostsView: true,
-        posts: []
+    posts: []
 
 })
 export default createReducer(
     initialState,
     {
-        [actionTypes.posts_overview.openPostsView]:(state, {payload: {activePostsOpen}})=> {
-            if (state === 'undefined') {
-                return initialState
-            }else{
-                return !Immutable.fromJS(initialState.openPostsView)
-            }
-        },
-        [actionTypes.posts.load]: (state, {}) => {
-            //TODO use json-ld for state
+        [actionTypes.needs.receive]: (state, {payload:{needs}}) => {
+            let uri = 'https://satsrv04.researchstudio.at:8888/won/resource/need/139322635933712380'
+            won.fetch(uri).then(function(result){
+                console.log("need fetched")
+            })
+/*            needs.forEach((elem,index,array)=>{
+
+            })*/
+
             const dummy=[{id: "121337345", title: "New ffdsalat, need furniture", creationDate: "20.11.2015", type: 1, group: "ux barcamp stuff",state:"active", requests: [{},{},{}], matches: [{},{},{}],messages: [{},{},{}], titleImgSrc: "images/someNeedTitlePic.png"},
                 {id: "121337345", title: "Clean park 1020 Vienna", creationDate: "20.11.1998", type: 4, group: "gaming",state:"active",requests: [{},{},{}], matches: [{},{},{}], messages: [{},{},{}]},
                 {id: "121337345", title: "Car sharing 1020 Vienna", creationDate: "2.3.2001", type: 2, state:"active",requests: [{},{},{}],matches: [{},{},{}],messages: [{},{},{}], titleImgSrc: "images/someNeedTitlePic.png"},
@@ -35,7 +35,7 @@ export default createReducer(
 
             return  state.set('posts', Immutable.fromJS(dummy));
         },
-        [actionTypes.posts.clean]:(state,{})=>{
+        [actionTypes.needs.clean]:(state,{})=>{
             return Immutable.fromJS(initialState);
         }
     }
