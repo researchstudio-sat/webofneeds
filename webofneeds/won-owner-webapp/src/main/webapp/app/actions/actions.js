@@ -26,12 +26,21 @@ const actionHierarchy = {
          * drafts, messages,...
          * This action will likely be caused as a consequence of signing in.
          */
-        receive: INJ_DEFAULT,
+        loggedIn: INJ_DEFAULT,
         loginFailed: INJ_DEFAULT,
         registerFailed: INJ_DEFAULT
     },
     needs: {
-        receive: INJ_DEFAULT,
+
+        fetch: (data) => dispatch => {
+            data.needs.forEach((uri,index,array)=>{
+                console.log(uri);
+                won.getNeed(uri).then(function(need){
+                        console.log("linked data fetched for need: "+uri );
+                        dispatch(actionCreators.needs__received(need))
+                    })})
+        },
+        received: INJ_DEFAULT,
         clean:INJ_DEFAULT,
         failed: INJ_DEFAULT
     },
@@ -115,12 +124,12 @@ const actionHierarchy = {
             .then(resp => resp.json())
             /* handle data, dispatch actions */
             .then(data => {
-                dispatch(actionCreators.user__receive({loggedIn: true, email: data.username }));
+                dispatch(actionCreators.user__loggedIn({loggedIn: true, email: data.username }));
                 dispatch(actionCreators.retrieveNeedUris());
             })
             /* handle: not-logged-in */
             .catch(error =>
-                dispatch(actionCreators.user__receive({loggedIn: false}))
+                dispatch(actionCreators.user__loggedIn({loggedIn: false}))
             );
         ;
     },
@@ -139,7 +148,7 @@ const actionHierarchy = {
             return response.json()
         }).then(
             data => {
-                dispatch(actionCreators.user__receive({loggedIn: true, email: username}));
+                dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
                 dispatch(actionCreators.retrieveNeedUris());
             }
         ).catch(
@@ -159,14 +168,14 @@ const actionHierarchy = {
             return response.json()
         }).then(
             data => {
-                dispatch(actionCreators.user__receive({loggedIn: false}));
+                dispatch(actionCreators.user__loggedIn({loggedIn: false}));
                 dispatch(actionCreators.needs__clean({}))
             }
         ).catch(
             //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
             error => {
                 console.log(error);
-                dispatch(actionCreators.user__receive({loggedIn : true}))
+                dispatch(actionCreators.user__loggedIn({loggedIn : true}))
             }
         ),
     register: (username, password, passwordAgain) => (dispatch) =>
@@ -199,7 +208,7 @@ const actionHierarchy = {
             .then(response => {
                 return response.json()
             }).then(
-                needs => dispatch(actionCreators.needs__receive({needs: needs}))
+                needs => dispatch(actionCreators.needs__fetch({needs: needs}))
         ).catch(
                 error => dispatch(actionCreators.needs__failed({error: "user needlist retrieval failed"}))
         )},

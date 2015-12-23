@@ -17,6 +17,9 @@
 /**
  * Created by fkleedorfer on 05.09.2014.
  */
+import {
+    checkHttpStatus
+} from '../utils';
 import * as q from 'q';
 (function(){
     if(!won) won = {};
@@ -54,7 +57,7 @@ import * as q from 'q';
     }
 
     /**
-     * Similar to $q.all, takes an array of promises and returns a promise.
+     * Similar to q.all, takes an array of promises and returns a promise.
      * That promise will resolve if at least one of the promises succeeds.
      * The value with which it resolves it is an array of equal length as the input
      * containing either the resolve value of the promise or null if rejected.
@@ -63,7 +66,7 @@ import * as q from 'q';
      * @param promises
      */
     var somePromises = function(promises, errorHandler){
-        var deferred = $q.defer(),
+        var deferred = q.defer(),
             numPromises = promises.length,
             successes = 0,
             failures = 0,
@@ -135,7 +138,7 @@ import * as q from 'q';
                 + "]";
         },
         acquireReadLock: function(){
-            var deferred = $q.defer();
+            var deferred = q.defer();
             if (this.updateInProgress || this.blockedUpdaters.length > 0){
                 //updates are already in progress or are waiting. block.
                 console.log("rul:read:block:  " + this.uri + " " + this.getLockStatusString());
@@ -565,7 +568,7 @@ import * as q from 'q';
     }
 
     var loadFromOwnServer = function(uri, requesterWebId) {
-        var promise = new Promise(function(resolve,reject){});
+        var deferred = q.defer();
 
         console.log("updating:        " + uri);
         try {
@@ -587,26 +590,28 @@ import * as q from 'q';
              }                   */
             //the execute call above is not asynchronous, so we can safely continue outside the callback.
             console.log("fetching:        " + uri);
-            fetchLinkedDataFromOwnServer(uri, requesterWebId).then(
+            fetchLinkedDataFromOwnServer(uri, requesterWebId).then(function(dataset){
+                return dataset.json()
+            }).then(
                 function success(dataset) {
                     if (Object.keys(dataset).length === 0 ) {
-                        promise.reject("failed to load " + uri);
+                        deferred.reject("failed to load " + uri);
                     } else {
                         console.log("fetched:         " + uri)
                         won.addJsonLdData(uri, dataset);
-                        promise.resolve(uri);
+                        deferred.resolve(uri);
                     }
                 },
                 function failure(data) {
-                    promise.reject("failed to load " + uri);
+                    deferred.reject("failed to load " + uri);
                 }
             );
         } catch (e) {
             $rootScope.$apply(function () {
-                promise.reject("failed to load " + uri + ". Reason: " + e);
+                deferred.reject("failed to load " + uri + ". Reason: " + e);
             });
         }
-        return promise;
+        return deferred.promise;
     }
 
     var fetchLinkedDataFromOwnServer = function(dataUri, requesterWebId) {
@@ -624,18 +629,20 @@ import * as q from 'q';
 
 
         requestUri = requestUri.replace(re,':')
-        return fetch(requestUri, {
+        var promise = fetch(requestUri, {
             method: 'get',
             credentials: 'include'
-        }).then(
+        })
+/*        promise.then(checkHttpStatus(response)).then(
             function success(response){
-                return response.data;
+                return response.json();
             },
             function failure(response){
                 console.log("ERROR: could not fetched linked data " + dataUri + " for need " + requesterWebId)
                 return {};
             }
-        )
+        )*/
+        return promise
     }
 
     var loadFromURI = function(uri) {
