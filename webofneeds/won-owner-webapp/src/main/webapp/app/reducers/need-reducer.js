@@ -18,12 +18,12 @@ export default createReducer(
     {
         [actionTypes.needs.receive]: (state, {payload:{needs}}) => {
             let uri = 'https://satsrv04.researchstudio.at:8888/won/resource/need/139322635933712380'
-            won.fetch(uri).then(function(result){
-                console.log("need fetched")
+            needs.forEach((elem,index,array)=>{
+                let uri = elem;
+                won.fetch(uri).then(function(result){
+                    console.log("linked data fetched for need: "+uri );
+                })
             })
-/*            needs.forEach((elem,index,array)=>{
-
-            })*/
 
             const dummy=[{id: "121337345", title: "New ffdsalat, need furniture", creationDate: "20.11.2015", type: 1, group: "ux barcamp stuff",state:"active", requests: [{},{},{}], matches: [{},{},{}],messages: [{},{},{}], titleImgSrc: "images/someNeedTitlePic.png"},
                 {id: "121337345", title: "Clean park 1020 Vienna", creationDate: "20.11.1998", type: 4, group: "gaming",state:"active",requests: [{},{},{}], matches: [{},{},{}], messages: [{},{},{}]},

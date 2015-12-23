@@ -610,17 +610,23 @@ import * as q from 'q';
     }
 
     var fetchLinkedDataFromOwnServer = function(dataUri, requesterWebId) {
-        //var requestUri = '/owner/rest/linked-data/?uri=' + encodeURIComponent(dataUri);
+        var requestUri = '/owner/rest/linked-data/?uri=' + encodeURIComponent(dataUri);
         //if (requesterWebId != null) {
         //    requestUri = requestUri + "&requester=" + encodeURIComponent(requesterWebId);
-        //}
-        var requestUri = '/owner/rest/linked-data/';
-        var params = {uri: dataUri};
+        //}#var requestUri = '/owner/rest/linked-data/
+       // var requestUrl = new URL('/owner/rest/linked-data/')
+        //var params = {uri:dataUri}
         if (typeof requesterWebId != 'undefined' && requesterWebId != null) {
-            params.requester = requesterWebId;
+            requestUri = requestUri + "&reqeuster="+encodeURIComponent(requesterWebId);
         }
-        return fetch(requestUri,{
-            params:params
+        var find = '%3A';
+        var re = new RegExp(find, 'g');
+
+
+        requestUri = requestUri.replace(re,':')
+        return fetch(requestUri, {
+            method: 'get',
+            credentials: 'include'
         }).then(
             function success(response){
                 return response.data;
