@@ -29,7 +29,10 @@
     }
     > .topnav__inner__right {
       margin-left: 1rem;
-      .topnav__button { margin-left: 0.5rem; }
+      .topnav__button {
+        margin-left: 0.5rem;
+        cursor: pointer;
+      }
     }
   }
   & a {
