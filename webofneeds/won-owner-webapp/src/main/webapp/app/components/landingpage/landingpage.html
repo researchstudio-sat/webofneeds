@@ -29,12 +29,12 @@
             <div class="tg__signup">
                 <div class="block" ng-form name="registerForm">
                     <div class="header">Sign up here.</div>
-                    <input id="registerEmail" name="email" placeholder="Email address" ng-model="self.email" ng-class="{'ng-invalid': self.registerError}" required type="email"/>
+                    <input id="registerEmail" name="email" placeholder="Email address" ng-model="self.email" ng-class="{'ng-invalid': self.registerError}" required type="email" ng-keyup="$event.keyCode == 13 && self.register(self.email, self.password)"/>
                     <span class="tg__errormsg" ng-show="registerForm.email.$error.email">Not a valid E-Mail address</span>
                     <span class="tg__errormsg" ng-show="self.registerError">E-Mail already in use</span>
-                    <input name="password" placeholder="Password" ng-minlength="6" ng-model="self.password" required type="password"/>
+                    <input name="password" placeholder="Password" ng-minlength="6" ng-model="self.password" required type="password" ng-keyup="$event.keyCode == 13 && self.register(self.email, self.password)"/>
                     <span class="tg__errormsg" ng-show="registerForm.password.$error.minlength">Password too short, must be at least 6 Characters</span>
-                    <input name="password_repeat" placeholder="Repeat Password" ng-minlength="6" ng-model="self.passwordAgain" required type="password" compare-to="self.password"/>
+                    <input name="password_repeat" placeholder="Repeat Password" ng-minlength="6" ng-model="self.passwordAgain" required type="password" compare-to="self.password" ng-keyup="$event.keyCode == 13 && self.register(self.email, self.password)"/>
                     <span class="tg__errormsg" ng-show="registerForm.password_repeat.$error.compareTo">Password is not equal</span>
                 </div>
                 <button id="signup" class="won-button--filled darkgray" ng-disabled="registerForm.$invalid" ng-click="::self.register(self.email, self.password)">That’s all we need. Let’s go!</button>

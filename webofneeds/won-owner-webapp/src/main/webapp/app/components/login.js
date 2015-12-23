@@ -12,9 +12,9 @@ function genLoginConf() {
                         <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" class="wl__button__carret">
                     </a>
                     <div ng-form="loginForm">
-                        <input id="loginEmail" placeholder="Email address" ng-model="self.email" type="email" required autofocus/>
+                        <input id="loginEmail" placeholder="Email address" ng-model="self.email" type="email" required autofocus ng-keyup="$event.keyCode == 13 && self.login(self.email, self.password)"/>
                         <span class="wl__errormsg">{{self.loginError}}</span>
-                        <input placeholder="Password" ng-model="self.password" type="password" required />
+                        <input placeholder="Password" ng-model="self.password" type="password" required ng-keyup="$event.keyCode == 13 && self.login(self.email, self.password)"/>
                     </div>
                     <!-- TODO: Implement remember me and forgot password --><!--div class="wl__table">
                         <div class="wlt__left">
