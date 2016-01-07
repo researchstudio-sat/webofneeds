@@ -264,16 +264,14 @@ export function isString(o) {
 }
 
 export function readAsDataURL(file) {
-    var deferred = $q.defer(); //TODO no access to $q here. use built-in promises.
+    return new Promise((resolve, reject) => {
+        var reader = new FileReader();
 
-    var reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(f);
 
-    reader.onload = () => deferred.resolve(reader.result);
-    reader.onerror = () => deferred.reject(f);
-
-    reader.readAsDataURL(file);
-
-    return deferred.promise;
+        reader.readAsDataURL(file);
+    });
 }
 
 export function concatTags(tags) {
