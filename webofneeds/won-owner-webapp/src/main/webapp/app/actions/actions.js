@@ -30,6 +30,22 @@ const actionHierarchy = {
         loginFailed: INJ_DEFAULT,
         registerFailed: INJ_DEFAULT
     },
+    events:{
+      fetch:(data)=>dispatch=>{
+
+      }  
+    },
+    connections:{
+      fetch:(data)=>dispatch=>{
+
+              var allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], data.needUri);
+              allConnectionsPromise.then(function(connections){
+                  console.log("fetching connections")
+                  dispatch(actionCreators.needs__connectionsReceived({needUri:data.needUri,connections:connections}))
+
+              })
+          }
+    },
     needs: {
 
         fetch: (data) => dispatch => {
@@ -38,9 +54,11 @@ const actionHierarchy = {
                 won.getNeed(uri).then(function(need){
                         console.log("linked data fetched for need: "+uri );
                         dispatch(actionCreators.needs__received(need))
+                        dispatch(actionCreators.connections__fetch({needUri:need.uri}))
                     })})
         },
         received: INJ_DEFAULT,
+        connectionsReceived:INJ_DEFAULT,
         clean:INJ_DEFAULT,
         failed: INJ_DEFAULT
     },

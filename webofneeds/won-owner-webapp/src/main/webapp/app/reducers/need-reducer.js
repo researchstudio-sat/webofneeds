@@ -12,15 +12,17 @@ import won from '../won-es6';
 const initialState = Immutable.fromJS({
     isFetching: false,
     didInvalidate: false,
-    needs: []
+    needs: {}
 
 })
 export default createReducer(
     initialState,
     {
         [actionTypes.needs.received]:(state,action)=>{
-
-            return state.get('needs').push(Immutable.fromJS(action.payload))
+            return state.setIn(['needs',action.payload.uri],Immutable.fromJS(action.payload))
+        },
+        [actionTypes.needs.connectionsReceived]:(state,action)=>{
+            return state.setIn(['needs',action.payload.needUri,'connectionUris'],action.payload.connections)
         },
         [actionTypes.needs.clean]:(state,{})=>{
             return Immutable.fromJS(initialState);

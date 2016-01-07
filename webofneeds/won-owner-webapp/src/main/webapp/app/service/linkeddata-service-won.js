@@ -394,7 +394,7 @@ import * as q from 'q';
     }
 
     var getReadUpdateLocksPerUris = function(uris){
-        locks = [];
+        var locks = [];
         uris.map(
             function(uri){
                 locks.push(getReadUpdateLockPerUri(uri));
@@ -409,7 +409,7 @@ import * as q from 'q';
      * @returns {Array|*}
      */
     var acquireReadLocks = function acquireReadLocks(locks){
-        acquiredLocks = [];
+        var acquiredLocks = [];
         locks.map(
             function(lock){
                 var promise = lock.acquireReadLock();
@@ -528,9 +528,9 @@ import * as q from 'q';
         var resultObject = {};
         privateData.store.execute(query, [], [], function (success, results) {
             resultObject.result = [];
-            for (key in results) {
-                resultObject.result.push(results[key].target.value);
-            }
+            results.forEach(function(elem){
+                resultObject.result.push(elem.target.value);
+            })
         });
         return resultObject.result;
     }
@@ -1567,8 +1567,7 @@ import * as q from 'q';
                         propertyPaths.map(
                             function(propertyPath){
                                 console.log("resolving property path: " + propertyPath.propertyPath);
-                                var foundUris = linkedDataService
-                                    .resolvePropertyPathFromBaseUri(
+                                var foundUris = won.resolvePropertyPathFromBaseUri(
                                         baseUri,
                                         propertyPath.propertyPath,
                                         propertyPath.prefixes);
@@ -1578,6 +1577,8 @@ import * as q from 'q';
                                 console.log("resolved to " + foundUris.length + " resources (total " + resolvedUris.length+")");
                         });
                         return resolvedUris;
+                    }catch(e){
+                        console.log(e)
                     } finally {
                         //release the read locks
                         locks.map(
@@ -1627,7 +1628,7 @@ import * as q from 'q';
      *
      * @type {{connectionMessages: {query: string, propertyPaths: *[]}}}
      */
-    var queries = {
+    won.queries = {
         "getConnectionTextMessages" : {
             propertyPaths : [
                 { prefixes :
