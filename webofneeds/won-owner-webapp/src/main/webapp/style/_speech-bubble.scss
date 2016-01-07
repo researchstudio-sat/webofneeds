@@ -36,7 +36,7 @@
  * @param $triangleSize: the height of the the speech-bubble-triangle
  * @param $pos: a %-value determining where on the top edge the triangle is placed.
  */
-@mixin speech-bubble-top($background-color, $border-color, $triangle-height, $border-width: 1px, $pos: 50%) {
+@mixin speech-bubble-top($background-color, $border-color, $triangle-height, $border-width: $thinBorder, $pos: 50%) {
   @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $pos);
 
   &:after {
@@ -56,7 +56,7 @@
  * @param $triangleSize: the height of the the speech-bubble-triangle
  * @param $pos: a %-value determining where on the edge the bottom edge triangle is placed.
  */
-@mixin speech-bubble-bottom($background-color, $border-color, $triangle-height, $border-width: 1px, $pos: 50%) {
+@mixin speech-bubble-bottom($background-color, $border-color, $triangle-height, $border-width: $thinBorder, $pos: 50%) {
   @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $pos);
 
   &:after {
@@ -76,7 +76,7 @@
  * @param $triangleSize: the height of the the speech-bubble-triangle
  * @param $pos: a %-value determining where on the edge the left edge triangle is placed.
  */
-@mixin speech-bubble-left($background-color, $border-color, $triangle-height, $border-width: 1px, $pos: 50%) {
+@mixin speech-bubble-left($background-color, $border-color, $triangle-height, $border-width: $thinBorder, $pos: 50%) {
   @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $pos);
 
   &:after {
@@ -96,7 +96,7 @@
  * @param $triangleSize: the height of the the speech-bubble-triangle
  * @param $pos: a %-value determining where on the edge the right edge triangle is placed.
  */
-@mixin speech-bubble-right($background-color, $border-color, $triangle-height, $border-width: 1px, $pos: 50%) {
+@mixin speech-bubble-right($background-color, $border-color, $triangle-height, $border-width: $thinBorder, $pos: 50%) {
   @include _speech-bubble($background-color, $border-color, $triangle-height, $border-width, $pos);
 
   &:after {

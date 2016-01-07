@@ -107,7 +107,7 @@ won-feed-item {
       margin: 0.5rem 0.5rem 0.5rem (1.5rem + $postIconSize);
     }
 
-    @include speech-bubble-top(white, $won-line-gray, 10px, 1px, 5rem);
+    @include speech-bubble-top(white, $won-line-gray, 0.625rem, $thinBorder, 5rem);
   }
 
   .fi__footer {
