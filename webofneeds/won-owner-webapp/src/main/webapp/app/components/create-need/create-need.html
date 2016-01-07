@@ -20,7 +20,7 @@
                 on-unselect="::self.unselectType()">
         </won-posttype-select>
 
-        <div class="cp__mandatory-rest">
+        <div class="cp__mandatory-rest" ng-show="self.userHasSelectedType">
             <won-image-dropzone
                     on-image-picked="::self.drafts__change__thumbnail({draftId: self.draftId, image: image})">
             </won-image-dropzone>
