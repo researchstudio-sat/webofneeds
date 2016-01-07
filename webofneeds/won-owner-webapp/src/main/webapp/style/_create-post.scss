@@ -52,13 +52,20 @@ won-image-dropzone {
   display: block;
 
   %wid__dropzone {
-    background-size: contain;
 
     box-sizing: border-box;;
     height: 100%;
     width: 100%;
 
     position: relative; //to allow children to use pos:absolute
+
+    overflow: hidden; // to crop the `fill`ing image
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    /* the preview is set via js:
+     * background-image: url({{self.imageDataUrl}});
+     */
 
     input {
       filter: alpha(opacity=0);
@@ -84,9 +91,6 @@ won-image-dropzone {
 
     background-color: white;
 
-    .wid__dropzone__preview-img {
-      display: none;
-    }
     .wid__dropzone__default-bg {
       @include max-square($borderSize - 2 * $padding - 2 * $borderWidth);
     }
@@ -95,14 +99,9 @@ won-image-dropzone {
   .wid__dropzone--filled {
     @extend %wid__dropzone;
 
-    background-color: white;
-
     $borderWidth: 0.062rem; /* 1px @ 100% */
     border: $borderWidth solid $won-line-gray;
 
-    .wid__dropzone__preview-img {
-      @include max-square($borderSize - 4 * $borderWidth);
-    }
     .wid__dropzone__default-bg {
       display: none;
     }

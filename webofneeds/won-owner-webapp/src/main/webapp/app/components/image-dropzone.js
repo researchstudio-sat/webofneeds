@@ -10,12 +10,16 @@ import { dispatchEvent, attach, readAsDataURL } from '../utils';
 
 function genComponentConf() {
     let template = `
-        <div ng-class="self.imageDataUrl? 'wid__dropzone--filled' : 'wid__dropzone--empty'">
+        <div ng-class="self.imageDataUrl? 'wid__dropzone--filled' : 'wid__dropzone--empty'"
+             style="background-image: url({{self.imageDataUrl}})">
                 <input type="file" accept="image/*" />
                 <img src="generated/icon-sprite.svg#illu_drag_here"
                      class="wid__dropzone__default-bg">
+                     <!--
                 <img ng-src="{{self.imageDataUrl}}"
+
                      class="wid__dropzone__preview-img">
+                     -->
         </div>
     `;
 
