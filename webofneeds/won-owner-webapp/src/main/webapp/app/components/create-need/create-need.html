@@ -5,12 +5,14 @@
 <main class="create-post">
     <div class="cp__inner">
 
+        <!--
         <button ng-click="self.moreWub(1);self.delayedWub(1, 1000);">1+1 MOAR WUB!</button>
         <button ng-click="self.moreWub(3)">3 MOAR WUB!</button>
         <p>{{ self.wubs.toArray() }}</p>
         <p>DBG Draft: {{self.state.get('drafts').get(self.draftId).toJS()}}</p>
         <p>enq'd msgs: {{self.state.getIn(['messages', 'enqueued']).toJS()}}</p>
         <p>pending answer: {{self.state.getIn(['messages', 'sent']).toJS()}}</p>
+        -->
 
         <won-posttype-select
                 options="::self.postTypeTexts"
