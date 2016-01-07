@@ -11,6 +11,7 @@ $minHeight: $iconSize + $verticalPadding * 2;
   background-color: white;
   padding: 0.5rem;
   min-height: $formInputHeight;
+  box-sizing: border-box;
 
   & .ts__option, & .ts__option--selected {
     padding: $verticalPadding $horizontalPadding;
