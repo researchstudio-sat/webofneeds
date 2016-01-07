@@ -10,10 +10,12 @@ import { dispatchEvent, attach, readAsDataURL } from '../utils';
 
 function genComponentConf() {
     let template = `
-        <div class="wid__dropzone"
-            ng-class="self.imageDataUrl? 'wid__dropzone--filled' : 'wid__dropzone--empty'">
+        <div ng-class="self.imageDataUrl? 'wid__dropzone--filled' : 'wid__dropzone--empty'">
                 <input type="file" accept="image/*" />
-                <img ng-src="{{self.imageDataUrl}}" ng-show="self.imageDataUrl">
+                <img src="generated/icon-sprite.svg#illu_drag_here"
+                     class="wid__dropzone__default-bg">
+                <img ng-src="{{self.imageDataUrl}}"
+                     class="wid__dropzone__preview-img">
         </div>
     `;
 
@@ -23,12 +25,15 @@ function genComponentConf() {
         constructor(/* arguments <- serviceDependencies */) {
             attach(this, serviceDependencies, arguments);
 
-            window.idc = this;
+            window.idc4dbg = this;
+
+            this.imageDataUrl = undefined;
 
             this.$element.find('input[type="file"]').bind('change', (e) =>
                 this.fileDropped(e.target.files[0])
             );
         }
+
         fileDropped(f) {
             if(/^image\//.test(f.type)) {
                 readAsDataURL(f).then(dataUrl => {

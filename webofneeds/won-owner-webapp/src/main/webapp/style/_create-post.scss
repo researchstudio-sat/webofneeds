@@ -51,7 +51,7 @@ won-image-dropzone {
   @include fixed-square($borderSize);
   display: block;
 
-  .wid__dropzone {
+  %wid__dropzone {
     background-size: contain;
 
     box-sizing: border-box;;
@@ -68,31 +68,43 @@ won-image-dropzone {
       position: absolute;
     }
 
-    &.wid__dropzone--empty {
-      background: url('./icon-sprite.svg#illu_drag_here');
-
-      background-size: $borderSize - 2 * $padding;
-      background-repeat: no-repeat;
-      background-position: center;
-
-      border: 3px dashed $won-line-gray;
-      border-radius: 3px;
-
-      img { /* the preview img */
-        display: none;
-      }
+    & .wid__dropzone__default-bg,
+    & .wid__dropzone__preview-img {
+      @extend %center--absolute;
+      pointer-events: none;
     }
-    &.wid__dropzone--filled {
-      border: 1px solid $won-line-gray;
+  }
 
-      img { /* the preview img */
+  .wid__dropzone--empty {
+    @extend %wid__dropzone;
 
-        @extend %center--absolute;
-        pointer-events: none;
+    $borderWidth: 0.188rem; /* 3px @ 100% */
+    border: $borderWidth dashed $won-line-gray;
+    border-radius: $borderWidth;
 
-        // the -0.Xrem accomodate for the border
-        @include max-square($borderSize - 0.2rem);
-      }
+    background-color: white;
+
+    .wid__dropzone__preview-img {
+      display: none;
+    }
+    .wid__dropzone__default-bg {
+      @include max-square($borderSize - 2 * $padding - 2 * $borderWidth);
+    }
+  }
+
+  .wid__dropzone--filled {
+    @extend %wid__dropzone;
+
+    background-color: white;
+
+    $borderWidth: 0.062rem; /* 1px @ 100% */
+    border: $borderWidth solid $won-line-gray;
+
+    .wid__dropzone__preview-img {
+      @include max-square($borderSize - 4 * $borderWidth);
+    }
+    .wid__dropzone__default-bg {
+      display: none;
     }
   }
 }
