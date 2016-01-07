@@ -89,7 +89,12 @@
         <button type="submit" class="won-button--filled red"
                 ng-show="self.isValid()"
                 ng-click="::self.publish()">
-            Publish
+            <span ng-show="!self.pendingPublishing">
+                Publish
+            </span>
+            <span ng-show="self.pendingPublishing">
+                Publishing...
+            </span>
         </button>
 
     </div>

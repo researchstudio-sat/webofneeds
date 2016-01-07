@@ -54,14 +54,18 @@ class CreateNeedController {
         //this.titlePicZone().addEventListener('click', e => 0);
         //this.titlePicZone().addEventListener('drop', e => 0);
 
-        const selectFromState = (state) => ({
-            draftId: state.getIn(['router', 'currentParams', 'draftId']),
+        const selectFromState = (state) => {
+            const draftId = state.getIn(['router', 'currentParams', 'draftId']);
+            return {
+                draftId,
+                pendingPublishing: !!state.getIn(['drafts', draftId, 'pendingPublishingAs']),
 
-            //TODO for debugging; deletme
-            state: state,
-            //drafts: state.get('drafts'),
-            wubs: state.get('wubs'),
-        });
+                //TODO for debugging; deletme
+                state: state,
+                //drafts: state.get('drafts'),
+                wubs: state.get('wubs'),
+            }
+        };
 
 
         // Using actionCreators like this means that every action defined there is available in the template.
