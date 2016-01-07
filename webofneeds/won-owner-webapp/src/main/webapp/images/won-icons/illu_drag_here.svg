@@ -1,9 +1,107 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 15.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="56px" height="55.95px" viewBox="0 0 56 55.95" enable-background="new 0 0 56 55.95" xml:space="preserve">
-<polygon fill="#CCD6DE" points="43.244,49.09 47.053,47.513 50.548,55.95 54.688,54.236 51.191,45.797 55,44.22 42.636,31 "/>
-<path fill="#CCD6DE" d="M18.07,8.033c2.36,0,4.272,1.932,4.272,4.314s-1.912,4.311-4.272,4.311c-2.359,0-4.272-1.929-4.272-4.311
-	S15.711,8.033,18.07,8.033 M25.925,27.763l9.435,3.697l9.71-9.169l6.137,6.563L56,31.944V0H0v43.556h8.355L25.925,27.763z"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   id="svg4362"
+   viewBox="0 0 35.967867 35.935752"
+   height="35.935753"
+   width="35.967869">
+  <defs
+     id="defs4364">
+    <clipPath
+       id="clipPath708"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         id="path710"
+         d="m 0,0 1440,0 0,900 L 0,900 0,0 Z" />
+    </clipPath>
+    <clipPath
+       id="clipPath720"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         id="path722"
+         d="m 944.383,652.172 c 0,-34.969 28.357,-63.328 63.335,-63.328 l 0,0 c 34.979,0 63.335,28.359 63.335,63.328 l 0,0 c 0,34.984 -28.356,63.343 -63.335,63.343 l 0,0 c -34.978,0 -63.335,-28.359 -63.335,-63.343" />
+    </clipPath>
+    <clipPath
+       id="clipPath732"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         id="path734"
+         d="m 0,0 1440,0 0,900 L 0,900 0,0 Z" />
+    </clipPath>
+    <clipPath
+       id="clipPath212"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         id="path214"
+         d="m 606.85,488 c 0,-9.942 8.059,-18 18,-18 l 0,0 c 9.942,0 18,8.058 18,18 l 0,0 c 0,9.941 -8.058,18 -18,18 l 0,0 c -9.941,0 -18,-8.059 -18,-18" />
+    </clipPath>
+    <clipPath
+       id="clipPath708-2"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         id="path710-7"
+         d="m 0,0 1440,0 0,900 L 0,900 0,0 Z" />
+    </clipPath>
+    <clipPath
+       id="clipPath720-7"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         id="path722-4"
+         d="m 944.383,652.172 c 0,-34.969 28.357,-63.328 63.335,-63.328 l 0,0 c 34.979,0 63.335,28.359 63.335,63.328 l 0,0 c 0,34.984 -28.356,63.343 -63.335,63.343 l 0,0 c -34.978,0 -63.335,-28.359 -63.335,-63.343" />
+    </clipPath>
+    <clipPath
+       id="clipPath732-4"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         id="path734-6"
+         d="m 0,0 1440,0 0,900 L 0,900 0,0 Z" />
+    </clipPath>
+    <clipPath
+       id="clipPath212-8"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         id="path214-5"
+         d="m 606.85,488 c 0,-9.942 8.059,-18 18,-18 l 0,0 c 9.942,0 18,8.058 18,18 l 0,0 c 0,9.941 -8.058,18 -18,18 l 0,0 c -9.941,0 -18,-8.059 -18,-18" />
+    </clipPath>
+    <clipPath
+       id="clipPath212-8-8"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         id="path214-5-1"
+         d="m 606.85,488 c 0,-9.942 8.059,-18 18,-18 l 0,0 c 9.942,0 18,8.058 18,18 l 0,0 c 0,9.941 -8.058,18 -18,18 l 0,0 c -9.941,0 -18,-8.059 -18,-18" />
+    </clipPath>
+    <clipPath
+       id="clipPath212-8-8-5"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         id="path214-5-1-7"
+         d="m 606.85,488 c 0,-9.942 8.059,-18 18,-18 l 0,0 c 9.942,0 18,8.058 18,18 l 0,0 c 0,9.941 -8.058,18 -18,18 l 0,0 c -9.941,0 -18,-8.059 -18,-18" />
+    </clipPath>
+  </defs>
+  <metadata
+     id="metadata4367">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <polygon
+     transform="scale(0.64228335,0.64228335)"
+     points="55,44.22 42.636,31 43.244,49.09 47.053,47.513 50.548,55.95 54.688,54.236 51.191,45.797 "
+     id="polygon3"
+     style="fill:#ccd6de" />
+  <path
+     d="m 11.60606,5.1594624 c 1.515788,0 2.743834,1.2408914 2.743834,2.7708103 0,1.529919 -1.228046,2.7688833 -2.743834,2.7688833 -1.515146,0 -2.7438343,-1.2389643 -2.7438343,-2.7688833 0,-1.5299189 1.2286883,-2.7708103 2.7438343,-2.7708103 m 5.045136,12.6722506 6.059943,2.374521 6.236572,-5.889096 3.941693,4.215306 3.078464,1.984655 L 35.967868,0 0,0 l 0,27.975293 5.3662774,0 11.2849186,-10.14358 z"
+     id="path5"
+     style="fill:#ccd6de" />
 </svg>
