@@ -1704,7 +1704,8 @@ import * as q from 'q';
                 "           won:hasConnections ?connections.\n" +
                 "  ?connections rdfs:member ?connection. \n" +
                 "  ?connection won:belongsToNeed ?need; \n" +
-                "              won:hasRemoteNeed ?remoteNeed. \n"+
+                "              won:hasRemoteNeed ?remoteNeed; \n"+
+            "                  won:hasConnectionState ?connectionState. \n"+
                 "} \n"
 
         },

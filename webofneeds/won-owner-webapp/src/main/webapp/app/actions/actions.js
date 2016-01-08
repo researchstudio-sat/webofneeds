@@ -32,8 +32,15 @@ const actionHierarchy = {
     },
     events:{
       fetch:(data)=>dispatch=>{
+          data.connectionUris.forEach(function(connection){
+              console.log("fetch events of connection: "+connectdionUri)
+              won.getAllConnectionEvents(connection.connection).then(function(events){
+                  console.log(events)
+              })
+          })
 
-      }  
+      }
+
     },
     connections:{
       fetch:(data)=>dispatch=>{
@@ -42,7 +49,7 @@ const actionHierarchy = {
               allConnectionsPromise.then(function(connections){
                   console.log("fetching connections")
                   dispatch(actionCreators.needs__connectionsReceived({needUri:data.needUri,connections:connections}))
-
+                  dispatch(actionCreators.events__fetch({connectionUris:connections}))
               })
           }
     },
