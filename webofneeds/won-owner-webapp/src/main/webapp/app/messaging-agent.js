@@ -20,17 +20,8 @@
 import { attach, delay, watchImmutableRdxState} from './utils';
 //import './message-service'; //TODO still uses es5
 import { actionCreators }  from './actions/actions';
-import {} from './won-message-utils';
+import { getEventData } from './won-message-utils';
 import SockJS from 'sockjs';
-
-/*
-class WONSocket extends SockJS {
-    constructor() {
-        super('/owner/msg', null, {debug: true});
-    }
-
-}
-*/
 
 export function runMessagingAgent(redux) {
 
@@ -50,79 +41,83 @@ export function runMessagingAgent(redux) {
      * + lazy socket initialisation
      */
 
-    let newSock = () => new SockJS('/owner/msg', null, {debug: true});
     let ws = newSock();
+    window.ws4dbg = ws;//TODO deletme
     let unsubscribeWatch = null;
 
-    //const ws = openWebSocket();
-    ws.onopen = () => {
+    function newSock() {
+        const ws = new SockJS('/owner/msg', null, {debug: true});
+        ws.onopen = onOpen;
+        ws.onmessage = onMessage;
+        ws.onerror = onError;
+        ws.onclose = onClose;
+        return ws;
+    };
+    function onOpen() {
         /* Set up message-queue watch */
         unsubscribeWatch = watchImmutableRdxState(
-            redux, ['enqueuedMessages'],
-            (newMq, oldMq) => {
-                console.log('old mq length: ', oldMq.size);
-                console.log('new mq length: ', newMq.size);
-                if (newMq.size > 0) {
-                    // a new msg was enqueued
-                    const msg = newMq.first();
-                    console.log('about to send ', msg);
-                    ws.send(msg);
-                    redux.dispatch(actionCreators.messages__markAsSent({msg})); //might be necessary to do this async (with `delay(...,0)`)
+            redux, ['messages', 'enqueued'],
+            (newMsgBuffer, oldMsgBuffer) => {
+                if(newMsgBuffer) {
+                    const firstEntry = newMsgBuffer.entries().next().value;
+                    if(firstEntry) { //undefined if queue is empty
+                        const [eventUri, msg] = firstEntry;
+                        ws.send(JSON.stringify(msg));
+                        redux.dispatch(actionCreators.messages__markAsSent({ eventUri, msg }));
+                    }
                 }
             }
         );
 
     };
-    ws.onmessage = (msg) => {
-        /* TODO this is only for demo purposes. In practice, more
-         * fragmented actions should be called here. Introducing
-         * an in-queue would require another agent/more agents in
-         * the system that works through the queue and dispatches
-         * actions, resulting in the same unpredictability that
-         * the pure angular approach had. For modularization handling
-         * should be broken down into layered functions in
-         * multiple files.
-         */
-        console.log('got message via websocket: ', msg);
-        //redux.dispatch(actionCreators.messages__receive({msg}));
+    function onMessage(receivedMsg) {
+        const parsedMsg = JSON.parse(receivedMsg.data);
+        getEventData(parsedMsg).then(event => {
+            // redux.dispatch(actionCreators.messages__receive(event))
+            window.event4dbg = event;
+
+            //TODO everything below should be in a seperate function or even moved to an actioncreator
+            if(event.hasMessageType === won.WONMSG.successResponseCompacted) {
+
+                console.log('received response to ', event.isResponseTo, ' of ', event);
+
+                //TODO do all of this in actions.js?
+                if (event.isResponseToMessageType === won.WONMSG.createMessageCompacted) {
+
+                    redux.dispatch(actionCreators.drafts__publishSuccessful({
+                        publishEventUri: event.isResponseTo,
+                        needUri: event.hasSenderNeed,
+                    }));
+
+                    // dispatch routing change
+                    //TODO back-button doesn't work for returning to the draft
+                    redux.dispatch(actionCreators.router__stateGo('postVisitor', {postId: event.hasSenderNeed /* published posts id */}));
+
+                    //TODO add to own needs
+                    //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
+
+                }
+                // TODO else if (event.isResponseToMessageType === ... chat...) { }
+            }
+        });
     };
-    ws.onerror = (e) => {
+    function onError(e) {
         console.error('websocket error: ', e);
         this.close();
     };
-    ws.onclose = (e) => {
-        console.error('websocket closed: ', e);
+    function onClose(e) {
         if(unsubscribeWatch && typeof unsubscribeWatch === 'function')
             unsubscribeWatch();
 
-
-        if (e.code !== 1011) { // 1011 -> unexpected server condition - happens when the user's session times out
+        if (e.code === 1011) {
+            console.log('either your session timed out or you encountered an unexpected server condition.');
+        } else {
             // posting anonymously creates a new session for each post
             // thus we need to reconnect here
             // TODO reconnect only on next message instead of straight away
+            console.log('reconnecting websocket');
             ws = newSock();
         }
     };
-
-    window.ws4dbg = ws;//TODO deletme
 }
 
-let dummyWs = null;
-class DummyWs {
-    constructor(){
-        delay(2000).then(() => {
-            if(this.onopen) {
-                this.onopen()
-            }
-        });
-    }
-    send(msg) {
-        console.log('"Sending to server": ', msg);
-        delay(1500).then(() => {
-            if(this.onmessage) {
-                this.onmessage(msg);
-            }
-        });
-    }
-}
-function openWebSocket() { return dummyWs? dummyWs : new DummyWs() }

@@ -242,7 +242,6 @@ angular.module('won.owner').factory('userService', function ($window
         var user = {};
         user.username = 'temp';
         user.password = 'dummy';
-        user.passwordAgain = 'dummy';
         return $http.post(
             '/owner/rest/users/private',
             user

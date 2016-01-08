@@ -2,7 +2,7 @@
 @import 'positioning-utils';
 
 %won-gallery__frame {
-  border: 1px solid $won-line-gray;
+  border: $thinBorder solid $won-line-gray;
   position: relative;
   > img {
     //99% so they don't overlap the borders in Chrome

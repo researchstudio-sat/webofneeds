@@ -2,6 +2,17 @@
 @import 'sizing-utils';
 @import 'fonts';
 
+.curtain {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  opacity: 0.5;
+  z-index: 100;
+}
+
 .welcome {
     background-color: $won-blue;
     color: white;
@@ -70,10 +81,14 @@
 
 .try {
     font-weight: 300;
-    padding: 1rem 1rem 2rem 1rem;
+    padding: 1rem;
     background-color: $won-red;
 
-    .title { color: white; }
+    .title {
+      position: relative;
+      z-index: 101;
+      color: white;
+    }
 
     .trygrid {
       display: flex;
@@ -81,10 +96,21 @@
       align-items: stretch;
       flex-wrap: wrap;
 
+      .block{
+        padding-bottom: 1rem;
+      }
+
+      .tg__signup {
+        position: relative;
+        z-index: 101;
+        background-color: $won-red;
+        padding: 1rem 4rem;
+        margin: 0rem 1rem;
+      }
+
       .tg__anonymous,
       .tg__signup {
         width: 18rem;
-        padding: 0 5rem;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -95,8 +121,9 @@
         color: white;
       }
 
-      .tg__signup {
-        border-right: 0.1rem solid $won-light-gray;
+      .tg__anonymous {
+        padding: 1rem 5rem;
+        border-left: 0.1rem solid $won-light-gray;
       }
 
       .tg__anonymous {
@@ -120,6 +147,10 @@
       input[type=email] {
         margin: 1rem 0;
         width: 100%;
+      }
+
+      input.ng-invalid {
+        margin: 1rem 0 0 0;
       }
     }
 }

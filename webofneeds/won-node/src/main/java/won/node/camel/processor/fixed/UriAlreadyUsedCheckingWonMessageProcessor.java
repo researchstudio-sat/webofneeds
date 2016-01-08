@@ -49,7 +49,6 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
 
   @Override
   public WonMessage process(final WonMessage message) throws UriAlreadyInUseException {
-    logger.warn("uri in use check not yet completely implemented!");
     checkEventURI(message);
     checkNeedURI(message);
     return message;

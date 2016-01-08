@@ -5,13 +5,14 @@
 <main class="create-post">
     <div class="cp__inner">
 
+        <!--
         <button ng-click="self.moreWub(1);self.delayedWub(1, 1000);">1+1 MOAR WUB!</button>
         <button ng-click="self.moreWub(3)">3 MOAR WUB!</button>
         <p>{{ self.wubs.toArray() }}</p>
         <p>DBG Draft: {{self.state.get('drafts').get(self.draftId).toJS()}}</p>
-        <p>enq'd msgs: {{self.state.get('enqueuedMessages').toJS()}}</p>
-        <p>sent msgs: {{self.state.get('sentMessages').toJS()}}</p>
-        <p>received-msgs-q (echo atm): {{self.state.get('receivedMessages').toJS()}}</p>
+        <p>enq'd msgs: {{self.state.getIn(['messages', 'enqueued']).toJS()}}</p>
+        <p>pending answer: {{self.state.getIn(['messages', 'sent']).toJS()}}</p>
+        -->
 
         <won-posttype-select
                 options="::self.postTypeTexts"
@@ -19,7 +20,7 @@
                 on-unselect="::self.unselectType()">
         </won-posttype-select>
 
-        <div class="cp__mandatory-rest">
+        <div class="cp__mandatory-rest" ng-show="self.userHasSelectedType">
             <won-image-dropzone
                     on-image-picked="::self.drafts__change__thumbnail({draftId: self.draftId, image: image})">
             </won-image-dropzone>
@@ -88,7 +89,12 @@
         <button type="submit" class="won-button--filled red"
                 ng-show="self.isValid()"
                 ng-click="::self.publish()">
-            Publish
+            <span ng-show="!self.pendingPublishing">
+                Publish
+            </span>
+            <span ng-show="self.pendingPublishing">
+                Publishing...
+            </span>
         </button>
 
     </div>

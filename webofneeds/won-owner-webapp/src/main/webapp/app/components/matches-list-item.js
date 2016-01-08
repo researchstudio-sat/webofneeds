@@ -25,7 +25,7 @@ function genComponentConf() {
                 </div>
             </div>
             <div class="smli" ng-show="self.open">
-                <div class="smli__item clickable" ng-class="self.openRequest === match? 'selected' : ''" ng-repeat="match in self.item.matches">
+                <div class="smli__item clickable" ng-class="{'selected' : self.openRequest === match}" ng-repeat="match in self.item.matches">
                     <div class="smli__item__header">
                         <won-square-image src="match.images[0].src" title="match.title"></won-square-image>
                         <div class="smli__item__header__text">

@@ -10,7 +10,7 @@ function genComponentConf() {
         <nav class="need-tab-bar" ng-cloak ng-show="{{true}}">
             <div class="ntb__inner">
                 <div class="ntb__inner__left">
-                    <a href="javascript:void(0)" ng-click="self.back()">
+                    <a ng-click="self.back()">
                         <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__icon">
                     </a>
                     <won-square-image title="blabla" src="images/someNeedTitlePic.png"></won-square-image>

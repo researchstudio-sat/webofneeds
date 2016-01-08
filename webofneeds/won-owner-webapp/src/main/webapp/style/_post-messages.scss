@@ -59,14 +59,14 @@
           justify-content: flex-start;
 
           & .pm__content__message__content__text {
-            @include speech-bubble-left($won-light-gray, $won-line-gray, 5px, 1px, 0.5rem);
+            @include speech-bubble-left($won-light-gray, $won-line-gray, 0.3125rem, $thinBorder, 0.5rem);
           }
         }
         &.right{
           justify-content: flex-end;
 
           & .pm__content__message__content__text {
-            @include speech-bubble-right($won-light-gray, $won-line-gray, 5px, 1px, 0.5rem);
+            @include speech-bubble-right($won-light-gray, $won-line-gray, 0.3125rem, $thinBorder, 0.5rem);
           }
         }
 

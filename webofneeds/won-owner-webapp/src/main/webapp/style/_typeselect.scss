@@ -7,9 +7,11 @@ $minHeight: $iconSize + $verticalPadding * 2;
 %typeselect {
   cursor: default;
   list-style: none;
-  border: 1px solid $won-line-gray;
+  border: $thinBorder solid $won-line-gray;
   background-color: white;
   padding: 0.5rem;
+  min-height: $formInputHeight;
+  box-sizing: border-box;
 
   & .ts__option, & .ts__option--selected {
     padding: $verticalPadding $horizontalPadding;
@@ -34,7 +36,7 @@ $minHeight: $iconSize + $verticalPadding * 2;
       @extend %vcenter--absolute;
       left: 100%;
 
-      border: 1px solid $won-line-gray;
+      border: $thinBorder solid $won-line-gray;
 
       width: 20rem;
       padding: 1rem;

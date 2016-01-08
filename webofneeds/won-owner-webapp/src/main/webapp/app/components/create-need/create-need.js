@@ -54,14 +54,18 @@ class CreateNeedController {
         //this.titlePicZone().addEventListener('click', e => 0);
         //this.titlePicZone().addEventListener('drop', e => 0);
 
-        const selectFromState = (state) => ({
-            draftId: state.getIn(['router', 'currentParams', 'draftId']),
+        const selectFromState = (state) => {
+            const draftId = state.getIn(['router', 'currentParams', 'draftId']);
+            return {
+                draftId,
+                pendingPublishing: state.hasIn(['drafts', draftId, 'pendingPublishingAs']),
+                userHasSelectedType: state.hasIn(['drafts', draftId, 'type']),
 
-            //TODO for debugging; deletme
-            state: state,
-            //drafts: state.get('drafts'),
-            wubs: state.get('wubs'),
-        });
+                //TODO for debugging; deletme
+                state: state,
+                wubs: state.get('wubs'),
+            }
+        };
 
 
         // Using actionCreators like this means that every action defined there is available in the template.
@@ -112,10 +116,10 @@ class CreateNeedController {
         return titlePicZoneNg[0];
     }
     publish() {
-        this.drafts__publish({
-            need: this.$ngRedux.getState().getIn(['drafts', this.draftId]).toJS(),
-            nodeUri: this.$ngRedux.getState().getIn(['config', 'defaultNodeUri']),
-        });
+        this.drafts__publish(
+            this.$ngRedux.getState().getIn(['drafts', this.draftId]).toJS(),
+            this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
+        );
 
         //on-image-picked="::self.drafts__change__thumbnail({draftId: self.draftId, image: image})">
     }

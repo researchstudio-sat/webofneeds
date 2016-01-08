@@ -1,11 +1,15 @@
 package won.matcher.service.nodemanager.actor;
 
 import akka.actor.ActorRef;
+import akka.actor.OneForOneStrategy;
+import akka.actor.SupervisorStrategy;
 import akka.camel.CamelMessage;
 import akka.camel.javaapi.UntypedProducerActor;
 import akka.cluster.pubsub.DistributedPubSub;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import akka.japi.Function;
+import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.service.monitoring.MonitoringService;
 import org.apache.jena.riot.Lang;
@@ -107,6 +111,26 @@ public class HintProducerProtocolActor extends UntypedProducerActor
         hint.getScore())
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
       .build();
+  }
+
+
+  @Override
+  public SupervisorStrategy supervisorStrategy() {
+
+    SupervisorStrategy supervisorStrategy = new OneForOneStrategy(
+      0, Duration.Zero(), new Function<Throwable, SupervisorStrategy.Directive>()
+    {
+
+      @Override
+      public SupervisorStrategy.Directive apply(Throwable t) throws Exception {
+
+        log.warning("Actor encountered error: {}", t);
+        // default behaviour
+        return SupervisorStrategy.escalate();
+      }
+    });
+
+    return supervisorStrategy;
   }
 
 }

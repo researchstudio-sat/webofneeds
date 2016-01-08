@@ -2,6 +2,11 @@
 //#body-id {
 
 
+
+@import 'reset';
+
+@import 'won-config';
+
 @import 'fonts';
 @import 'flex-layout';
 @import 'sizing-utils';
@@ -9,10 +14,6 @@
 @import 'speech-bubble';
 @import 'square-image';
 @import 'tri-aligned';
-
-@import 'reset';
-
-@import 'won-config';
 
 @import 'text';
 
@@ -58,6 +59,12 @@ body {
 
   &:active {
     background: darken($bg_color, 15%);
+  }
+  &:disabled {
+    /*Default disabled colors, can be changed or extracted will be used
+    by every button that is set to disabled*/
+    color: white;
+    background: lightgrey;
   }
 }
 

@@ -61,7 +61,7 @@
     <!-- This is used for the connections from internal clients to embedded (internal) node broker. Since in this case
     establishing ssl connection is overkill, vm connection is used instead -->
     <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="vm://localhost"/>
+        <property name="brokerURL" value="vm://wonBroker"/>
     </bean>
 
     <!-- Configuring Broker -->

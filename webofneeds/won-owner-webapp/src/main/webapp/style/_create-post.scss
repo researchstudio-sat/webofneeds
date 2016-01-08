@@ -46,19 +46,26 @@
 }
 
 won-image-dropzone {
-  $borderSize: 6.7rem;
+  $borderSize: 5.66rem;
   $padding: 1rem;
   @include fixed-square($borderSize);
   display: block;
 
-  .wid__dropzone {
-    background-size: contain;
+  %wid__dropzone {
 
     box-sizing: border-box;;
     height: 100%;
     width: 100%;
 
     position: relative; //to allow children to use pos:absolute
+
+    overflow: hidden; // to crop the `fill`ing image
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    /* the preview is set via js:
+     * background-image: url({{self.imageDataUrl}});
+     */
 
     input {
       filter: alpha(opacity=0);
@@ -68,31 +75,33 @@ won-image-dropzone {
       position: absolute;
     }
 
-    &.wid__dropzone--empty {
-      background: url('./icon-sprite.svg#illu_drag_here');
-
-      background-size: $borderSize - 2 * $padding;
-      background-repeat: no-repeat;
-      background-position: center;
-
-      border: 3px dashed $won-line-gray;
-      border-radius: 3px;
-
-      img { /* the preview img */
-        display: none;
-      }
+    & .wid__dropzone__default-bg,
+    & .wid__dropzone__preview-img {
+      @extend %center--absolute;
+      pointer-events: none;
     }
-    &.wid__dropzone--filled {
-      border: 1px solid $won-line-gray;
+  }
 
-      img { /* the preview img */
+  .wid__dropzone--empty {
+    @extend %wid__dropzone;
 
-        @extend %center--absolute;
-        pointer-events: none;
+    border: $boldBorder dashed $won-line-gray;
+    border-radius: $boldBorder;
 
-        // the -0.Xrem accomodate for the border
-        @include max-square($borderSize - 0.2rem);
-      }
+    background-color: white;
+
+    .wid__dropzone__default-bg {
+      @include max-square($borderSize - 2 * $padding - 2 * $boldBorder);
+    }
+  }
+
+  .wid__dropzone--filled {
+    @extend %wid__dropzone;
+
+    border: $thinBorder solid $won-line-gray;
+
+    .wid__dropzone__default-bg {
+      display: none;
     }
   }
 }

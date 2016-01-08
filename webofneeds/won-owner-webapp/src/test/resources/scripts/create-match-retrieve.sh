@@ -4,7 +4,7 @@ USER1=`cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 5 | head -n 1`
 USER2=`cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 5 | head -n 1`
 SERVER=http://localhost:8080/owner
 
-JSON_CREATE_USER='{"username":"<NAME>", "password":"abc", "passwordAgain":"abc"}'
+JSON_CREATE_USER='{"username":"<NAME>", "password":"abc"}'
 JSON_SIGN_IN='{"username":"<NAME>", "password":"abc"}'
 JSON_NEED_DEMAND_A='{"title":"couch", "textDescription":"I need a couch", "basicNeedType":"DEMAND"}'
 JSON_NEED_SUPPLY_A='{"title":"couch", "textDescription":"I need a couch", "basicNeedType":"SUPPLY"}'
