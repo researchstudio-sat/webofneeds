@@ -20,7 +20,7 @@
 import { attach, delay, watchImmutableRdxState} from './utils';
 //import './message-service'; //TODO still uses es5
 import { actionCreators }  from './actions/actions';
-import { getEventData } from './won-message-utils';
+import { getEventData,setCommStateFromResponseForLocalNeedMessage } from './won-message-utils';
 import SockJS from 'sockjs';
 
 export function runMessagingAgent(redux) {
@@ -83,11 +83,33 @@ export function runMessagingAgent(redux) {
 
                 //TODO do all of this in actions.js?
                 if (event.isResponseToMessageType === won.WONMSG.createMessageCompacted) {
+                    console.log("got response for CREATE: " + event.hasMessageType);
+                    //TODO: if negative, use alternative need URI and send again
+                    //fetch need data and store in local RDF store
+                    //get URI of newly created need from message
 
-                    redux.dispatch(actionCreators.drafts__publishSuccessful({
-                        publishEventUri: event.isResponseTo,
-                        needUri: event.hasSenderNeed,
-                    }));
+                    //load the data into the local rdf store and publish NeedCreatedEvent when done
+                    var needURI = event.hasReceiverNeed;
+                    won.ensureLoaded(needURI)
+                        .then(
+                        function (value) {
+                            var eventData = won.clone(event);
+                            eventData.eventType = won.EVENT.NEED_CREATED;
+                            setCommStateFromResponseForLocalNeedMessage(eventData);
+                            eventData.needURI = needURI;
+                            won.getNeed(needURI)
+                                .then(function(need){
+
+                                    console.log("Dispatching action " + won.EVENT.NEED_CREATED);
+                                    redux.dispatch(actionCreators.drafts__publishSuccessful({
+                                        publishEventUri: event.isResponseTo,
+                                        needUri: event.hasSenderNeed,
+                                        eventData:eventData
+                                    }));
+                                    redux.dispatch(actionCreators.needs__received(need))
+                                    //deferred.resolve(needURI);
+                                });
+                        })
 
                     // dispatch routing change
                     //TODO back-button doesn't work for returning to the draft

@@ -98,7 +98,16 @@ export function buildCreateMessage(need, wonNodeUri) {
         needUri: publishedContentUri,
     };
 }
-
+export  function setCommStateFromResponseForLocalNeedMessage(event) {
+    if (isSuccessMessage(event)){
+        event.commState = won.COMMUNUCATION_STATE.ACCEPTED;
+    } else {
+        event.commState = won.COMMUNUCATION_STATE.NOT_TRANSMITTED;
+    }
+}
+var isSuccessMessage = function isSuccessMessage(event) {
+    return event.hasMessageType === won.WONMSG.successResponseCompacted;
+}
 export function getEventData(msgJson) {
     console.log('getting data from jsonld message');
 

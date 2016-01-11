@@ -18,6 +18,10 @@ const initialState = Immutable.fromJS({
 export default createReducer(
     initialState,
     {
+        [actionTypes.needs.failed]: (state, {payload: {error}}) => {
+            console.log('reducers.js: failed receive needlist action');
+            return Immutable.fromJS({error: error});
+        },
         [actionTypes.needs.received]:(state,action)=>{
             return state.setIn(['needs',action.payload.uri],Immutable.fromJS(action.payload))
         },

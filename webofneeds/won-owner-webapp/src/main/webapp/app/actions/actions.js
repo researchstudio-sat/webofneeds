@@ -204,7 +204,7 @@ const actionHierarchy = {
             data => {
                 dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
                 dispatch(actionCreators.retrieveNeedUris());
-                dispatch(actionCreators.posts__load());
+                //dispatch(actionCreators.posts__load());
                 dispatch(actionCreators.router__stateGo("feed"));
             }
         ).catch(
@@ -225,7 +225,7 @@ const actionHierarchy = {
         }).then(
             data => {
                 dispatch(actionCreators.user__loggedIn({loggedIn: false}));
-                dispatch(actionCreators.needs__receive({needs: {}}));
+                dispatch(actionCreators.needs__received({needs: {}}));
                 dispatch(actionCreators.posts__clean({}));
                 dispatch(actionCreators.router__stateGo("landingpage"));
             }
@@ -250,7 +250,7 @@ const actionHierarchy = {
                 return response.json()
             }).then(
                 data => {
-                    dispatch(actionCreators.user__receive({loggedIn: true, email: username}));
+                    dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
                     dispatch(actionCreators.router__stateGo("createNeed"));
                 }
         ).catch(

@@ -12,7 +12,6 @@ import { messagesReducer } from './message-reducers'
 import reduceReducers from 'reduce-reducers';
 import postsReducer from './posts-reducer'
 import needReducer from './need-reducer'
-import { enqueuedMessagesReducer, sentMessagesReducer, receivedMessagesReducer } from './message-reducers'
 
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -67,20 +66,6 @@ const reducers = {
             }
         }
     ),
-    needs: createReducer(
-        Immutable.Map(),
-
-        {
-            [actionTypes.needs.receive]: (state, {payload: {needs}}) => {
-                console.log('reducers.js: received needlist action');
-                return Immutable.fromJS(needs);
-            },
-            [actionTypes.needs.failed]: (state, {payload: {error}}) => {
-                console.log('reducers.js: failed receive needlist action');
-                return Immutable.fromJS({error: error});
-            }
-        }
-    ),*/
     needs:needReducer,
     postOverview:postsReducer,
     messages: messagesReducer,
