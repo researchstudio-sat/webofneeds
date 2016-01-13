@@ -43,11 +43,12 @@
             <a ui-sref="createNeed({draftId: 0})">create-need</a> |
             <a ui-sref="feed">feed</a> |
             <a ui-sref="settings.general">settings</a> |
-            <a ui-sref="overviewMatches">matches</a>
+            <a ui-sref="overviewMatches">matches</a> |
             <a ui-sref="overviewIncomingRequests">incoming-requests</a> |
             <a ui-sref="overviewPosts">posts</a> |
-            <a ui-sref="postMatches({postId: 121337345})">post matches</a> |
-            <a ui-sref="postVisitor({postId: 121337345})">visitor's</a>
+            <a ui-sref="postMatches({postId: 'http://example.org/121337345'})">post matches</a> |
+            <a ui-sref="postVisitor({postId: 'http://example.org/121337345'})">visitor-info</a> |
+            <a ui-sref="postVisitorMsgs({postId: 'http://example.org/121337345'})">visitor-convo</a>
         </div>
         <!-- </debug-navigation> -->
 
