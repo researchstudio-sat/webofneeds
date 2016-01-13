@@ -19,7 +19,10 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
         { path: '/overview/incoming-requests', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
         { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' },
         { path: '/post/:postId/owner/matches', component: 'create-need', as: 'postMatches' }, //TODO implement view
-        { path: '/post/visitor/?postId?matchedTo', component: 'post-visitor', as: 'postVisitor' }, //TODO implement view
+        { path: '/post/visitor/info/?postId?matchedTo', component: 'post-visitor', as: 'postVisitor' }, //TODO implement view
+        { path: '/post/visitor/messages/?postId?matchedTo', component: 'post-visitor-msgs', as: 'postVisitorMsgs' }, //TODO implement view
+        //{ path: '/post/visitor/info/?postId?matchedTo', component: 'post-visitor', as: 'postVisitor.information' }, //TODO implement view
+        //{ path: '/post/visitor/conversation/?postId?matchedTo', component: 'post-visitor', as: 'postVisitor.conversation' }, //TODO implement view
 
     ].forEach( ({path, component, as}) => {
 
