@@ -22,14 +22,14 @@ function genComponentConf() {
             </a>
             <div class="pil__indicators">
                 <a class="pil__indicators__item clickable" ng-href="post/{{self.item.id}}/owner/messages">
-                    <img src="generated/icon-sprite.svg#ico36_message" ng-show="self.item.messages" class="pil__indicators__item__icon">
-                    <img src="generated/icon-sprite.svg#ico36_message_grey" ng-show="!self.item.messages" class="pil__indicators__item__icon">
+                    <img src="generated/icon-sprite.svg#ico36_message" ng-show="self.unreadMatchEventsOfNeed.get(self.item.uri)" class="pil__indicators__item__icon">
+                    <img src="generated/icon-sprite.svg#ico36_message_grey" ng-show="!self.unreadMatchEventsOfNeed.get(self.item.uri)" class="pil__indicators__item__icon">
                     <span class="pil__indicators__item__caption">{{self.item.messages.length}}</span>
                 </a>
                 <a class="pil__indicators__item clickable" ng-href="post/{{self.item.id}}/owner/requests">
-                    <img src="generated/icon-sprite.svg#ico36_incoming" ng-show="self.item.requests"  class="pil__indicators__item__icon">
-                    <img src="generated/icon-sprite.svg#ico36_incoming_grey"  ng-show="!self.item.requests" class="pil__indicators__item__icon">
-                    <span class="pil__indicators__item__caption">{{self.item.requests.length}}</span>
+                    <img src="generated/icon-sprite.svg#ico36_incoming" ng-show="self.unreadMatchEventsOfNeed.get(self.item.uri)"  class="pil__indicators__item__icon">
+                    <img src="generated/icon-sprite.svg#ico36_incoming_grey"  ng-show="!self.unreadMatchEventsOfNeed.get(self.item.uri)" class="pil__indicators__item__icon">
+                    <span class="pil__indicators__item__caption">{{self.unreadMatchEventsOfNeed.get(self.item.uri)}}</span>
                 </a>
                 <a class="pil__indicators__item clickable" ng-href="post/{{self.item.id}}/owner/matches">
                     <img src="generated/icon-sprite.svg#ico36_match" ng-show="self.unreadMatchEventsOfNeed.get(self.item.uri)" class="pil__indicators__item__icon">

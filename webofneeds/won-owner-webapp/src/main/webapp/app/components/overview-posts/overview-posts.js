@@ -17,14 +17,17 @@ class OverviewPostsController {
         const selectFromState = (state) => {
             const unreadEvents = state.getIn(["events", "unreadEventUris"]);
             const receivedHintEvents = unreadEvents.filter(e=>e.get('eventType')===won.EVENT.HINT_RECEIVED);
-            const unreadCounts = Immutable.Map();
+            let unreadCounts = Immutable.Map();
             receivedHintEvents.forEach(e => {
                 const receiverNeed = e.get('hasReceiverNeed');
-                const count = unreadCounts.get(receiverNeed);
-                if(!count)
-                    unreadCounts.set(receiverNeed, 1);
-                else
-                    unreadCounts.set(receiverNeed, count + 1);
+                let count = unreadCounts.get(receiverNeed);
+                if(!count){
+                    unreadCounts = unreadCounts.set(receiverNeed, 1);
+                }
+                else{
+                    unreadCounts =unreadCounts.set(receiverNeed, count + 1);
+                }
+
             });
             return {
                 posts: state.getIn(["needs", "needs"]).toJS(),
@@ -36,6 +39,7 @@ class OverviewPostsController {
                 closedPostsOpen: state.getIn(["postOverview", "closedPostsView"])
             }
         }
+        window.opc = this;
 /*        this.$scope.getMatches = function(uri){
             this.$filter('filterEventByType')(this.$scope.unreadEvents,uri,won.EVENT.HINT_RECEIVED)
         }*/
