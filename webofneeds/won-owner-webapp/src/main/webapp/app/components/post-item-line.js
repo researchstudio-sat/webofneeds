@@ -32,9 +32,9 @@ function genComponentConf() {
                     <span class="pil__indicators__item__caption">{{self.item.requests.length}}</span>
                 </a>
                 <a class="pil__indicators__item clickable" ng-href="post/{{self.item.id}}/owner/matches">
-                    <img src="generated/icon-sprite.svg#ico36_match" ng-show="self.item.matches" class="pil__indicators__item__icon">
-                    <img src="generated/icon-sprite.svg#ico36_match_grey" ng-show="!self.item.matches" class="pil__indicators__item__icon">
-                    <span class="pil__indicators__item__caption">{{self.item.matches.length}}</span>
+                    <img src="generated/icon-sprite.svg#ico36_match" ng-show="self.unreadMatchEventsOfNeed.get(self.item.uri)" class="pil__indicators__item__icon">
+                    <img src="generated/icon-sprite.svg#ico36_match_grey" ng-show="!self.unreadMatchEventsOfNeed.get(self.item.uri)" class="pil__indicators__item__icon">
+                    <span class="pil__indicators__item__caption">{{self.unreadMatchEventsOfNeed.get(self.item.uri)}}</span>
                 </a>
             </div>
     `;
@@ -58,7 +58,7 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {item: "="},
+        scope: {item: "=",unreadMatchEventsOfNeed:"="},
         template: template
     }
 }

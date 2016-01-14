@@ -88,6 +88,18 @@ app.filter('filterByNeedState', function(){
         return filtered;
     }
 })
+    .filter('filterEventByType', function(){
+        return function(events,uri,type){
+            var filtered =[];
+            angular.forEach(events,function(event){
+                if(event.hasReceiverNeed == uri && event.eventType == type){
+                    filtered.push(event);
+                }
+            })
+
+            return filtered;
+        }
+    })
 app.config([ '$urlRouterProvider', '$stateProvider', configRouting ]);
 app.run([ '$ngRedux', $ngRedux => runMessagingAgent($ngRedux) ]);
 

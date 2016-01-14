@@ -120,6 +120,10 @@ export function runMessagingAgent(redux) {
 
                 }
                 // TODO else if (event.isResponseToMessageType === ... chat...) { }
+            }else if(event.hasMessageType === won.WONMSG.hintMessageCompacted){
+                console.log("got hint message")
+
+                redux.dispatch(actionCreators.messages__hintMessageReceived(event))
             }
         });
     };
