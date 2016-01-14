@@ -11,6 +11,7 @@ import { draftsReducer } from './drafts-reducer';
 import { messagesReducer } from './message-reducers'
 import reduceReducers from 'reduce-reducers';
 import postsReducer from './posts-reducer'
+import needReducer from './need-reducer'
 
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -46,7 +47,7 @@ const reducers = {
 
         //handlers
         {
-            [actionTypes.user.receive]: (state, {payload: {loggedIn, email}}) => {
+            [actionTypes.user.loggedIn]: (state, {payload: {loggedIn, email}}) => {
                 if(loggedIn == true){
                     console.log('reducers.js: received successful-login action from app-server');
                     return Immutable.fromJS({loggedIn: true, email: email});
@@ -65,20 +66,7 @@ const reducers = {
             }
         }
     ),
-    needs: createReducer(
-        Immutable.Map(),
-
-        {
-            [actionTypes.needs.receive]: (state, {payload: {needs}}) => {
-                console.log('reducers.js: received needlist action');
-                return Immutable.fromJS(needs);
-            },
-            [actionTypes.needs.failed]: (state, {payload: {error}}) => {
-                console.log('reducers.js: failed receive needlist action');
-                return Immutable.fromJS({error: error});
-            }
-        }
-    ),
+    needs:needReducer,
     postOverview:postsReducer,
     messages: messagesReducer,
     config: createReducer(

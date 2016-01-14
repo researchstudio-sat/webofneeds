@@ -17,7 +17,7 @@ function genComponentConf() {
                     <span class="pil__description__subtitle__group" ng-show="self.item.group">
                         <img src="generated/icon-sprite.svg#ico36_group" class="pil__description__subtitle__group__icon">{{self.item.group}}<span class="pil__description__subtitle__group__dash"> &ndash; </span>
                     </span>
-                    <span class="pil__description__subtitle__type">{{self.getType(self.item.type)}}</span>
+                    <span class="pil__description__subtitle__type">{{self.getType(self.item.basicNeedType)}}</span>
                 </div>
             </a>
             <div class="pil__indicators">

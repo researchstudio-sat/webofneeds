@@ -7,7 +7,6 @@ import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
 import { combineReducersStable } from '../redux-utils';
 import { buildCreateMessage } from '../won-message-utils';
-
 const initialState = Immutable.fromJS({
         activePostsView: true,
         closedPostsView: true,

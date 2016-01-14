@@ -60,12 +60,47 @@ const actionHierarchy = {
          * drafts, messages,...
          * This action will likely be caused as a consequence of signing in.
          */
-        receive: INJ_DEFAULT,
+        loggedIn: INJ_DEFAULT,
         loginFailed: INJ_DEFAULT,
         registerFailed: INJ_DEFAULT
     },
+    events:{
+      fetch:(data)=>dispatch=>{
+          data.connectionUris.forEach(function(connection){
+              console.log("fetch events of connection: "+connectdionUri)
+              won.getAllConnectionEvents(connection.connection).then(function(events){
+                  console.log(events)
+              })
+          })
+
+      }
+
+    },
+    connections:{
+      fetch:(data)=>dispatch=>{
+
+              var allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], data.needUri);
+              allConnectionsPromise.then(function(connections){
+                  console.log("fetching connections")
+                  dispatch(actionCreators.needs__connectionsReceived({needUri:data.needUri,connections:connections}))
+                  dispatch(actionCreators.events__fetch({connectionUris:connections}))
+              })
+          }
+    },
     needs: {
-        receive: INJ_DEFAULT,
+
+        fetch: (data) => dispatch => {
+            data.needs.forEach((uri,index,array)=>{
+                console.log(uri);
+                won.getNeed(uri).then(function(need){
+                        console.log("linked data fetched for need: "+uri );
+                        dispatch(actionCreators.needs__received(need))
+                        dispatch(actionCreators.connections__fetch({needUri:need.uri}))
+                    })})
+        },
+        received: INJ_DEFAULT,
+        connectionsReceived:INJ_DEFAULT,
+        clean:INJ_DEFAULT,
         failed: INJ_DEFAULT
     },
     drafts: {
@@ -73,7 +108,6 @@ const actionHierarchy = {
          * A new draft was created (either through the view in this client or on another browser)
          */
         new: INJ_DEFAULT,
-
         /*
          * A draft has changed. Pass along the draftURI and the respective data.
          */
@@ -144,12 +178,12 @@ const actionHierarchy = {
             .then(resp => resp.json())
             /* handle data, dispatch actions */
             .then(data => {
-                dispatch(actionCreators.user__receive({loggedIn: true, email: data.username }));
+                dispatch(actionCreators.user__loggedIn({loggedIn: true, email: data.username }));
                 dispatch(actionCreators.retrieveNeedUris());
             })
             /* handle: not-logged-in */
             .catch(error =>
-                dispatch(actionCreators.user__receive({loggedIn: false}))
+                dispatch(actionCreators.user__loggedIn({loggedIn: false}))
             );
         ;
     },
@@ -168,9 +202,9 @@ const actionHierarchy = {
             return response.json()
         }).then(
             data => {
-                dispatch(actionCreators.user__receive({loggedIn: true, email: username}));
+                dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
                 dispatch(actionCreators.retrieveNeedUris());
-                dispatch(actionCreators.posts__load());
+                //dispatch(actionCreators.posts__load());
                 dispatch(actionCreators.router__stateGo("feed"));
             }
         ).catch(
@@ -190,8 +224,8 @@ const actionHierarchy = {
             return response.json()
         }).then(
             data => {
-                dispatch(actionCreators.user__receive({loggedIn: false}));
-                dispatch(actionCreators.needs__receive({needs: {}}));
+                dispatch(actionCreators.user__loggedIn({loggedIn: false}));
+                dispatch(actionCreators.needs__received({needs: {}}));
                 dispatch(actionCreators.posts__clean({}));
                 dispatch(actionCreators.router__stateGo("landingpage"));
             }
@@ -199,7 +233,7 @@ const actionHierarchy = {
             //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
             error => {
                 console.log(error);
-                dispatch(actionCreators.user__receive({loggedIn : true}))
+                dispatch(actionCreators.user__loggedIn({loggedIn : true}))
             }
         ),
     register: (username, password) => (dispatch) =>
@@ -216,7 +250,7 @@ const actionHierarchy = {
                 return response.json()
             }).then(
                 data => {
-                    dispatch(actionCreators.user__receive({loggedIn: true, email: username}));
+                    dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
                     dispatch(actionCreators.router__stateGo("createNeed"));
                 }
         ).catch(
@@ -235,7 +269,7 @@ const actionHierarchy = {
             .then(response => {
                 return response.json()
             }).then(
-                needs => dispatch(actionCreators.needs__receive({needs: needs}))
+                needs => dispatch(actionCreators.needs__fetch({needs: needs}))
         ).catch(
                 error => dispatch(actionCreators.needs__failed({error: "user needlist retrieval failed"}))
         )},

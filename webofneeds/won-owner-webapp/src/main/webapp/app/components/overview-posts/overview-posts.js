@@ -15,7 +15,7 @@ class OverviewPostsController {
         this.selection = 1;
 
         const selectFromState = (state) => ({
-            posts : state.getIn(["postOverview", "posts"]).toJS(),
+            posts : state.getIn(["needs","needs"]).toJS(),
             drafts : null,
             activePostsOpen : state.getIn(["postOverview","activePostsView"]),
             draftsOpen : false,

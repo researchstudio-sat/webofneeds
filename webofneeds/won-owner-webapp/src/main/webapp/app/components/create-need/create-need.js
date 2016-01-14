@@ -16,22 +16,22 @@ import { actionCreators }  from '../../actions/actions';
 
 const postTypeTexts = [
     {
-        type: won.WON.BasicNeedTypeDemandCompacted,
+        type: won.WON.BasicNeedTypeDemand,
         text: 'I want to have something',
         helpText: 'Use this type in case (want) foo sam quam aspic temod et que in prendiae perovidel.',
     },
     {
-        type: won.WON.BasicNeedTypeSupplyCompacted,
+        type: won.WON.BasicNeedTypeSupply,
         text: 'I offer something',
         helpText: 'Use this type in case (offer) case sam quam aspic temod et que in prendiae perovidel.'
     },
     {
-        type: won.WON.BasicNeedTypeDotogetherCompacted,
+        type: won.WON.BasicNeedTypeDotogether,
         text: 'I want to do something together',
         helpText: 'Use this type in case case (together) sam quam aspic temod et que in prendiae perovidel.'
     },
     {
-        type: won.WON.BasicNeedTypeCritiqueCompacted,
+        type: won.WON.BasicNeedTypeCritique,
         text: 'I want to change something',
         helpText: 'Use this type in case (change) case sam quam aspic temod et que in prendiae perovidel.'
     }
