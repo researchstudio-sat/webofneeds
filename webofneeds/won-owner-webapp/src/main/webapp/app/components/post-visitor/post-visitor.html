@@ -1,0 +1,25 @@
+<!-- TODO parametrize by selected tab -->
+<header>
+    <won-topnav></won-topnav>
+    <won-visitor-title-bar selection="self.selection" item="self.post"></won-visitor-title-bar>
+</header>
+<main class="post-info" ng-show="self.selection == 1">
+    <div class="post-info__inner">
+        <won-gallery class="post-info__inner__left"></won-gallery>
+
+        <div class="post-info__inner__right">
+            <h2 class="post-info__heading">Needed</h2>
+            <p class="post-info__details">{{self.post.creationDate}}</p>
+
+            <h2 class="post-info__heading">Description</h2>
+            <p class="post-info__details">{{self.post.description}}</p>
+            <h2 class="post-info__heading">Location</h2>
+            <p class="post-info__details">{{self.post.location}}</p>
+        </div>
+    </div>
+</main>
+<main class="post-messages" ng-show="self.selection == 0">
+    <div class="post-messages__inner">
+        <won-post-messages item="self.post"></won-post-messages>
+    </div>
+</main>

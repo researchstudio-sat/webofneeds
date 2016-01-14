@@ -1,10 +1,9 @@
 package won.protocol.message;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.sparql.lib.DatasetLib;
+import com.hp.hpl.jena.sparql.util.IsoMatcher;
 import org.apache.jena.riot.Lang;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import won.protocol.util.RdfUtils;
 
@@ -22,7 +21,7 @@ public class ReadWriteTest
 
 
   @Test
-  @Ignore
+  //@Ignore
   public void testTrigRoundTrip() throws Exception {
 
     Dataset datasetIn = Utils.createTestDataset(RESOURCE_FILE);
@@ -38,6 +37,6 @@ public class ReadWriteTest
     System.out.println("TRIG OUT");
     System.out.println(datasetOutString);
 
-    Assert.assertTrue(DatasetLib.isomorphic(datasetIn, datasetOut));
+    Assert.assertTrue(IsoMatcher.isomorphic(datasetIn.asDatasetGraph(), datasetOut.asDatasetGraph()));
   }
 }

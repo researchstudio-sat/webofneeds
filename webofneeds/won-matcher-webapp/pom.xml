@@ -24,7 +24,7 @@
     <parent>
         <groupId>webofneeds</groupId>
         <artifactId>webofneeds</artifactId>
-        <version>1.0</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -35,7 +35,12 @@
             <version>${project.version}</version>
             <scope>${dependencies.scope}</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-catalina</artifactId>
+            <version>7.0.55</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- SIREn-->
         <!-- Careful! Special case:
            Siren libs cannot be in the parent classloader of the solr webapp, so we have to include them everywhere
@@ -44,7 +49,7 @@
         <dependency>
             <groupId>org.sindice.siren</groupId>
             <artifactId>siren-solr</artifactId>
-            <scope>${dependencies.scope}</scope>
+            <scope>compile</scope>
         </dependency>
 
         <!-- spring dependencies -->
@@ -88,8 +93,7 @@
         <!-- servlet & web layer dependencies -->
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>${dependencies.scope}</scope>
+            <artifactId>javax.servlet-api</artifactId>
         </dependency>
 
         <dependency>

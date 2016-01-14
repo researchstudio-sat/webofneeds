@@ -1,0 +1,38 @@
+won-dynamic-textfield {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  .wdt__text {
+    align-self: stretch;
+    border: $thinBorder solid $won-line-gray;
+    border-radius: 0.1rem;
+    background-color: white;
+
+    //$padding: 0.3rem;
+    //padding: $padding;
+    font-size: $normalFontSize;
+    min-height: $formInputHeight;
+
+    $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
+    $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorder;
+    padding: $verticalPadding 0.438rem;
+
+    box-sizing: border-box;
+
+    &.wdt__text--invalid {
+      border-color: $won-red;
+    }
+    &.wdt__text--placeholder {
+      color: $won-line-gray;
+    }
+
+    &:focus {
+      color: black;
+    }
+  }
+  .wdt__charcount {
+    @include fine-print;
+    margin-top: $smallFontSize * 0.5;
+  }
+}

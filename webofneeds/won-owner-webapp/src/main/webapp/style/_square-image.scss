@@ -1,0 +1,17 @@
+@import 'sizing-utils';
+
+@mixin square-image($size, $margin-top, $margin-right, $margin-bottom, $margin-left) {
+  won-square-image .image {
+    @include fixed-square($size);
+
+    margin: $margin-top $margin-right $margin-bottom $margin-left;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &__noimage {
+      color: white;
+      font-size: $size - 0.5rem;
+    }
+  }
+}

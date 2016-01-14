@@ -1,0 +1,3 @@
+#TODO: check required properties and required graph/chain structure for each message type: create, hint, connenct, etc.
+#TODO: make independent checks for each type of sender-receiver at the receiver point?:
+#node from node, node from owner, owner from node?... also depends on my node's uri... in uri check?

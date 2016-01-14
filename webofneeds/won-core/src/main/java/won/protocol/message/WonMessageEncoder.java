@@ -29,7 +29,7 @@ public class WonMessageEncoder
     if (message == null)
       return "";
     StringWriter sw = new StringWriter();
-    RDFDataMgr.write(sw, encodeAsDataset(message), lang);
+    RDFDataMgr.write(sw, message.getCompleteDataset(), lang);
     return sw.toString();
   }
 

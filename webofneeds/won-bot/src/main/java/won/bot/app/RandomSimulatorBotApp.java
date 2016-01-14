@@ -28,6 +28,7 @@ public class RandomSimulatorBotApp implements CommandLineRunner
     SpringApplication app = new SpringApplication(
         new Object[]{"classpath:/spring/app/randomSimulatorBotApp.xml"}
     );
+    app.setWebEnvironment(false);
     app.run(args);
   }
 

@@ -28,7 +28,7 @@
         <property name="nodeURISource" ref="nodeUriSourceRandom" />
         <property name="matcherNodeURISource" ref="matcherNodeURISource"/>
         <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->
-        <property name="ownerService" ref="ownerProtocolNeedServiceClient" />
+        <property name="wonMessageSender" ref="ownerProtocolNeedServiceClient" />
         <property name="matcherProtocolNeedServiceClient" ref="matcherProtocolNeedServiceClient"/>
         <property name="matcherProtocolMatcherService" ref="matcherProtocolMatcherServiceJMSBased"/>
         <property name="trigger">

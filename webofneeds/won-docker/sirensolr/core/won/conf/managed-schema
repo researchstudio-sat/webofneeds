@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Solr managed schema - automatically generated - DO NOT EDIT -->
+<schema name="example" version="1.5">
+  <uniqueKey>id</uniqueKey>
+  <similarity class="com.sindicetech.siren.similarity.SirenSimilarity"/>
+  <fieldType name="concise" class="com.sindicetech.siren.solr.schema.ConciseJsonField" omitNorms="true" attributeWildcard="true" stored="false" datatypeConfig="datatypes.xml"/>
+  <fieldType name="facet" class="solr.StrField" omitNorms="true" omitTermFreqAndPositions="true" indexed="true" stored="true" sortMissingLast="true" multiValued="true"/>
+  <fieldType name="long" class="solr.TrieLongField" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="mv-long" class="solr.TrieLongField" stored="true" positionIncrementGap="0" multiValued="true" precisionStep="0"/>
+  <fieldType name="string" class="solr.StrField" omitNorms="true" sortMissingLast="true"/>
+  <fieldType name="text" class="solr.TextField" stored="true" multiValued="true">
+    <analyzer type="index">
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+  </fieldType>
+  <field name="@context.cert" type="text"/>
+  <field name="@context.conn" type="text"/>
+  <field name="@context.dc" type="text"/>
+  <field name="@context.event" type="text"/>
+  <field name="@context.geo" type="text"/>
+  <field name="@context.ldp" type="text"/>
+  <field name="@context.local" type="text"/>
+  <field name="@context.msg" type="text"/>
+  <field name="@context.need" type="text"/>
+  <field name="@context.rdf" type="text"/>
+  <field name="@context.rdfs" type="text"/>
+  <field name="@context.signature" type="text"/>
+  <field name="@context.sioc" type="text"/>
+  <field name="@context.won" type="text"/>
+  <field name="@context.woncrypt" type="text"/>
+  <field name="@context.xsd" type="text"/>
+  <field name="@graph.@graph.@id" type="text"/>
+  <field name="@graph.@graph.@type" type="text"/>
+  <field name="@graph.@graph.cert:PublicKey.@id" type="text"/>
+  <field name="@graph.@graph.cert:key.@id" type="text"/>
+  <field name="@graph.@graph.dc:title" type="text"/>
+  <field name="@graph.@graph.http://purl.org/dc/terms/created.@type" type="text"/>
+  <field name="@graph.@graph.http://purl.org/dc/terms/created.@value" type="text"/>
+  <field name="@graph.@graph.msg:hasSignedGraph.@id" type="text"/>
+  <field name="@graph.@graph.rdfs:member.@id" type="text"/>
+  <field name="@graph.@graph.signature:hasDigestMethod.@id" type="text"/>
+  <field name="@graph.@graph.signature:hasGraphCanonicalizationMethod.@id" type="text"/>
+  <field name="@graph.@graph.signature:hasGraphDigestMethod.@id" type="text"/>
+  <field name="@graph.@graph.signature:hasGraphSerializationMethod.@id" type="text"/>
+  <field name="@graph.@graph.signature:hasGraphSigningMethod.@id" type="text"/>
+  <field name="@graph.@graph.signature:hasSignatureMethod.@id" type="text"/>
+  <field name="@graph.@graph.signature:hasSignatureValue" type="text"/>
+  <field name="@graph.@graph.signature:hasVerificationCertificate.@id" type="text"/>
+  <field name="@graph.@graph.won:hasConnections.@id" type="text"/>
+  <field name="@graph.@graph.won:hasContent.@id" type="text"/>
+  <field name="@graph.@graph.won:hasEventContainer.@id" type="text"/>
+  <field name="@graph.@graph.won:hasFacet.@id" type="text"/>
+  <field name="@graph.@graph.won:hasTag" type="text"/>
+  <field name="@graph.@graph.won:hasTextDescription" type="text"/>
+  <field name="@graph.@graph.won:hasWonNode.@id" type="text"/>
+  <field name="@graph.@graph.won:isInState.@id" type="text"/>
+  <field name="@graph.@graph.woncrypt:ecc_algorithm" type="text"/>
+  <field name="@graph.@graph.woncrypt:ecc_curveId" type="text"/>
+  <field name="@graph.@graph.woncrypt:ecc_qx" type="text"/>
+  <field name="@graph.@graph.woncrypt:ecc_qy" type="text"/>
+  <field name="@graph.@id" type="text"/>
+  <field name="_json_" type="concise"/>
+  <field name="_version_" type="long" indexed="true" stored="true"/>
+  <field name="id" type="string" indexed="true" stored="true"/>
+</schema>

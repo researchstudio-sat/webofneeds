@@ -65,8 +65,7 @@ public class SendMessageAction extends BaseEventBotAction
     URI connectionUri = messageEvent.getConnectionURI();
     logger.debug("sending message ");
     try {
-      getEventListenerContext().getOwnerService().sendConnectionMessage(
-        connectionUri, getMessageContent(), createWonMessage(connectionUri, getMessageContent()));
+      getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionUri, getMessageContent()));
     } catch (Exception e) {
       logger.warn("could not send message via connection {}", connectionUri, e);
     }

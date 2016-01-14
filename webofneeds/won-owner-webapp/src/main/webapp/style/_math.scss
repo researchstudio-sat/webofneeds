@@ -1,0 +1,31 @@
+/*
+Strips the unit from a variable, e.g. 2.5rem -> 2.5
+taken from http://stackoverflow.com/questions/12328259/how-do-you-strip-the-unit-from-any-number-in-sass
+*/
+@function stripUnit($number) {
+  @return $number / ($number * 0 + 1);
+}
+
+/*
+Extracts the unit from a variable and returns 1 in that unit.
+Use the result to multiply onto any number to add this unit-type.
+e.g. 2.5rem -> 1rem
+*/
+
+@function extractUnit($number) {
+  @return $number / stripUnit($number);
+}
+
+
+/* adapted from http://www.antimath.info/css/sass-sqrt-function/ */
+@function sqrt($r) {
+  $x0: 1;
+  $x1: $x0;
+
+  @for $i from 1 through 10 {
+    $x1: $x0 - ($x0 * $x0 - abs($r)) / (2 * $x0);
+    $x0: $x1;
+  }
+
+  @return $x1;
+}

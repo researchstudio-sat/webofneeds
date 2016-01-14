@@ -3,12 +3,17 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="staticMethod" value="java.security.Security.addProvider"/>
+        <property name="arguments">
+            <list>
+                <bean class="org.bouncycastle.jce.provider.BouncyCastleProvider"/>
+            </list>
+        </property>
+    </bean>
     <bean id="keyInformationExtractorBouncyCastle"
           class="won.cryptography.key.KeyInformationExtractorBouncyCastle"/>
     <bean id="keyPairService" class="won.cryptography.service.KeyPairService" >
         <constructor-arg name="keyInformationExtractor" ref="keyInformationExtractorBouncyCastle"/>
     </bean>
-
-
 </beans>

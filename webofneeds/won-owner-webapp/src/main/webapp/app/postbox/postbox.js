@@ -22,6 +22,13 @@
  * To change this template use File | Settings | File Templates.
  */
 angular.module('won.owner').controller('PostBoxCtrl', function ($scope,$interval, $location, userService, applicationStateService, applicationControlService) {
+
+    //TODO better put redirection in routing?
+    if (userService.isPrivateUser()) {
+       $location.url("/private-link");
+        return;
+    }
+
     $scope.countOfAllUnreadMatchEvents = 0;
     // TODO if we want to remember the last sortedField selected by the user,
     // we should store it in e.g. applicationStateService
@@ -176,17 +183,15 @@ angular.module('won.owner').controller("ClosedInboxCtrl",function($scope,$locati
     $scope.closedData = {};
 
     $scope.templateUrl = 'app/postbox/closed-inbox-table.html';
-    $scope.allClosed = applicationStateService.getAllClosed();
     $scope.clickOnClosed = function(){
-        $scope.closedData.chosenPost = $scope.allClosed[$scope.closedData.uri];
+        //$scope.closedData.chosenPost = $scope.allClosed[$scope.closedData.uri];
         applicationStateService.setCurrentNeedURI($scope.closedData.uri);
         $location.url("/private-link");
-        $scope.hasClosed = function(){
-            return applicationStateService.getAllClosedCount()>0;
-
-        }
-
     }
+    $scope.hasClosed = function(){
+        return applicationStateService.checkIfThereIsClosedNeed();
+    }
+
 })
 angular.module('won.owner').controller("PostInboxCtrl", function($scope,$location, applicationStateService, applicationControlService, userService) {
     $scope.postData = {};
@@ -206,7 +211,7 @@ angular.module('won.owner').controller("PostInboxCtrl", function($scope,$locatio
     }
 
     $scope.hasPosts = function () {
-        return applicationStateService.getAllNeedsCount() > 0;
+        return applicationStateService.checkIfThereIsNeedInInbox();
     }
 
 })

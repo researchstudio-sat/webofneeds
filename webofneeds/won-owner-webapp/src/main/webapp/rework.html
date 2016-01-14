@@ -1,0 +1,74 @@
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<!DOCTYPE HTML>
+<html>
+	<head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- see http://getbootstrap.com/css/#overview-mobile -->
+		<title ng-bind="'Web Of Needs - '+$root.title">Web Of Needs</title>
+
+        <!--leaflet.js provides us with a map-widget which can display map material from different sources-->
+        <script type="text/javascript" src="./resources/leaflet-0.7.3/leaflet.js"></script>
+        <script type="text/javascript" src="./scripts/rdfstore-js/rdf_store.js"></script>
+        <script type="text/javascript" src="./scripts/rdfstore-js/rdf_store.js"></script>
+        <link rel="stylesheet" href="./resources/leaflet-0.7.3/leaflet.css"/>
+
+        <link rel="stylesheet" href="./generated/won.css" />
+
+	</head>
+    <body>
+        <section ui-view></section>
+
+        <!-- <debug-navigation> -->
+        <div style="position: fixed;
+                    z-index: 200;
+                    bottom: 0px; left: 0px; right: 0px;
+                    background-color: lightgray;
+                    border-top: 1px solid black;">
+            debug navigation: |
+            <a ui-sref="landingpage">landingpage</a> |
+            <a ui-sref="createNeed({draftId: 0})">create-need</a> |
+            <a ui-sref="feed">feed</a> |
+            <a ui-sref="settings.general">settings</a> |
+            <a ui-sref="overviewMatches">matches</a>
+            <a ui-sref="overviewIncomingRequests">incoming-requests</a> |
+            <a ui-sref="overviewPosts">posts</a> |
+            <a ui-sref="postMatches({postId: 121337345})">post matches</a> |
+            <a ui-sref="postVisitor({postId: 121337345})">visitor's</a>
+        </div>
+        <!-- </debug-navigation> -->
+
+        <!-- TODO make sure to only show the svgs once angular has finished rendering -->
+
+        <!-- start loading the svg so it's already in the cache once angular has finished loading its templates -->
+        <img src="./generated/icon-sprite.svg" style="display:none">
+
+
+        <script src="./scripts/jquery.10.2.js"></script>
+        <script src="./scripts/jquery.fs.scroller.min.js"></script>
+
+        <script src="./jspm_packages/system.js"></script>
+        <script src="./jspm_config.js"></script>
+        <script>
+            //console.log(System);
+            //System.import('app/app')
+            System.import('./app/app_jspm')
+                    .catch(console.error.bind(console));
+        </script>
+	</body>
+</html>

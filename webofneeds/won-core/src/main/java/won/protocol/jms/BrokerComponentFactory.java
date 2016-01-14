@@ -17,14 +17,18 @@
 package won.protocol.jms;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQSslConnectionFactory;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
+import won.cryptography.ssl.MessagingContext;
 import won.protocol.model.MessagingType;
 
 import javax.jms.ConnectionFactory;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
 import java.net.URI;
 
 /**
@@ -34,31 +38,75 @@ import java.net.URI;
 public class BrokerComponentFactory {
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
+  public synchronized Component getBrokerComponent(URI brokerURI,MessagingType type){
+    //TODO: make this configurable for different broker implementations.
+    logger.info("establishing activemq connection for brokerUri {}", brokerURI);
+    ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(brokerURI);
+    return getBrokerComponent(type, activeMQConnectionFactory);
 
-    public synchronized Component getBrokerComponent(URI brokerURI,MessagingType type){
-      //TODO: make this configurable for different broker implementations.
-      logger.info("establishing activemq connection for brokerUri {}",brokerURI);
-      ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(brokerURI);
+  }
 
-      CachingConnectionFactory cachingConnectionFactory = (CachingConnectionFactory) configureCachingConnectionFactory
-        (activeMQConnectionFactory);
+  public synchronized Component getBrokerComponent(URI brokerURI,MessagingType type, KeyManager keyManager,
+                                                   TrustManager trustManager){
+    //TODO: make this configurable for different broker implementations.
+    logger.info("establishing activemq ssl connection for brokerUri {}", brokerURI);
+    // jms.prefetchPolicy parameter is added to prevent matcher-consumer death due to overflowing with messages,
+    // see http://activemq.apache.org/what-is-the-prefetch-limit-for.html
+    ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory(brokerURI + "?jms.prefetchPolicy.all=50");
+    // for non-persistent messages setting this makes it slow, but ensures that a producer is immediately informed
+    // about the memory issues on broker (is blocked or gets exception depending on <systemUsage> config)
+    // see more info http://activemq.apache.org/producer-flow-control.html
+    activeMQConnectionFactory.setAlwaysSyncSend(true);
 
-      WonJmsConfiguration jmsConfiguration = new WonJmsConfiguration(cachingConnectionFactory);
+    activeMQConnectionFactory.setKeyAndTrustManagers(new KeyManager[]{keyManager}, new TrustManager[]{trustManager},
+                                                     null);
 
-      switch (type){
-        case Queue:
-          jmsConfiguration.configureJmsConfigurationForQueues();
-        case Topic:
-          jmsConfiguration.configureJmsConfigurationForTopics();
-      }
+    return getBrokerComponent(type, activeMQConnectionFactory);
 
-      ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent();
+  }
 
-      activeMQComponent.setConfiguration(jmsConfiguration);
-
-      return activeMQComponent;
-
+  public synchronized Component getBrokerComponent(URI brokerURI,MessagingType type, MessagingContext messagingContext){
+    //TODO: make this configurable for different broker implementations.
+    logger.info("establishing activemq connection for brokerUri {}",brokerURI);
+    KeyManager keyManager = null;
+    TrustManager trustManager = null;
+    try {
+      keyManager = messagingContext.getClientKeyManager();
+      trustManager = messagingContext.getClientTrustManager();
+    } catch (Exception e) {
+      logger.error("Key- or Trust- manager initialization problem");
     }
+
+    if (keyManager == null || trustManager == null) {
+      return getBrokerComponent(brokerURI, type);
+    } else {
+      return getBrokerComponent(brokerURI, type, keyManager, trustManager);
+    }
+  }
+
+  private synchronized Component getBrokerComponent(MessagingType type, ActiveMQConnectionFactory connectionFactory){
+
+    CachingConnectionFactory cachingConnectionFactory = (CachingConnectionFactory) configureCachingConnectionFactory
+      (connectionFactory);
+
+    WonJmsConfiguration jmsConfiguration = new WonJmsConfiguration(cachingConnectionFactory);
+
+    switch (type){
+      case Queue:
+        jmsConfiguration.configureJmsConfigurationForQueues();
+        break;
+      case Topic:
+        jmsConfiguration.configureJmsConfigurationForTopics();
+        break;
+    }
+
+    ActiveMQComponent activeMQComponent = ActiveMQComponent.activeMQComponent();
+
+    activeMQComponent.setConfiguration(jmsConfiguration);
+
+    return activeMQComponent;
+
+  }
 
   public synchronized ConnectionFactory configureCachingConnectionFactory(ConnectionFactory connectionFactory){
     CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(connectionFactory);

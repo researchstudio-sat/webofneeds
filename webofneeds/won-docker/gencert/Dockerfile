@@ -1,0 +1,40 @@
+FROM ubuntu
+RUN apt-get update && apt-get install -y \
+    vim \
+    less \
+	dos2unix
+
+# install oracle jre 8 latest version
+RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | tee /etc/apt/sources.list.d/webupd8team-java.list
+RUN "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
+RUN apt-get update -y
+RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
+RUN apt-get install oracle-java8-installer -y
+RUN apt-get install oracle-java8-set-default
+
+
+#keytool path, used by certificate generation script for creating jks
+ENV KEYTOOL /usr/lib/jvm/java-8-oracle/bin/keytool
+
+#specify your password when run via -e "PASS=your_password"
+ENV DEFAULT_PASS changeit
+
+#specify your certificate host when run via -e "CN=your_host"
+ENV DEFAULT_CN localhost
+
+#path to generated certificates/keys/stores
+ENV out_folder /usr/local/certs/out
+ENV key_pem_file="${out_folder}/t-key.pem"
+ENV cert_pem_file="${out_folder}/t-cert.pem"
+ENV pfx_store_file="${out_folder}/t-key-cert.pfx"
+ENV jks_store_file="${out_folder}/t-keystore.jks"
+
+#add certificate generation script and set it up to be able to run it
+ADD ./generate-cert.sh /usr/local/certs/
+RUN chmod +x /usr/local/certs/generate-cert.sh
+RUN dos2unix /usr/local/certs/generate-cert.sh
+
+#run certificate generation script
+RUN mkdir -p ${out_folder}
+CMD /usr/local/certs/generate-cert.sh

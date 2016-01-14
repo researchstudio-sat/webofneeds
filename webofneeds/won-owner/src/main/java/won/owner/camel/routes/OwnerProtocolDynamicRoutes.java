@@ -53,7 +53,6 @@ public class OwnerProtocolDynamicRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         from(from).routeId(from)
-                .wireTap("bean:messagingService?method=inspectMessage")
                 .to("log:Dynamic Route FROM Owner")
                 .recipientList(header("remoteBrokerEndpoint"));
 

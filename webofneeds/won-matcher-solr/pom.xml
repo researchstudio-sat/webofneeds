@@ -3,7 +3,7 @@
     <parent>
         <artifactId>webofneeds</artifactId>
         <groupId>webofneeds</groupId>
-        <version>1.0</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
@@ -68,8 +68,7 @@
         <!-- START: used for testing solr -->
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>test</scope>
+            <artifactId>javax.servlet-api</artifactId>
         </dependency>
 
 
@@ -132,54 +131,7 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>com.github.goldin</groupId>
-                <artifactId>copy-maven-plugin</artifactId>
-                <executions>
-                    <!-- Copy Solr configuration file when compile phase is executed -->
-                    <execution>
-                        <id>copy-solr-config</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <!--
-                                    Copies the complete siren folder to the target dir
-                                -->
-                                <resource>
-                                    <!-- TODO: the solr war file is corrupted through filtering! exclude and copy without filtering-->
-                                    <directory>${project.basedir}/siren</directory>
-                                    <preservePath>true</preservePath>
-                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/siren</targetPath>
-                                </resource>
-                                <resource>
-                                    <directory>${project.build.directory}</directory>
-                                    <include>${project.build.finalName}.jar</include>
-                                    <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</targetPath>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>upload-to-server</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <targetPath>${solr.upload.dest}</targetPath>
-                                    <directory>${project.build.directory}/${project.artifactId}-${project.version}</directory>
-                                    <preservePath>true</preservePath>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -231,4 +183,68 @@
              -->
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <!-- activate this to build the Solr/SIREn webapp directory needed for the first version of the
+             SIREn based matcher. Only works with maven version <= 3.0.5 because of the maven-copy-plugin.
+             Deactivated as the original matcher service will be removed from the project and other plugins
+             (maven-frontend-plugin) requires maven version >= 3.1.0
+             tl;dr: To use this, you need maven 3.0.5, and it will build the matcher
+            -->
+            <id>generate-siren-webapp-dirs</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.goldin</groupId>
+                        <artifactId>copy-maven-plugin</artifactId>
+                        <executions>
+                            <!-- Copy Solr configuration file when compile phase is executed -->
+                            <execution>
+                                <id>copy-solr-config</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <resources>
+                                        <!--
+                                            Copies the complete siren folder to the target dir
+                                        -->
+                                        <resource>
+                                            <!-- TODO: the solr war file is corrupted through filtering! exclude and copy without filtering-->
+                                            <directory>${project.basedir}/siren</directory>
+                                            <preservePath>true</preservePath>
+                                            <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/siren</targetPath>
+                                        </resource>
+                                        <resource>
+                                            <directory>${project.build.directory}</directory>
+                                            <include>${project.build.finalName}.jar</include>
+                                            <targetPath>${project.build.directory}/${project.artifactId}-${project.version}/siren/won-matcher-solr/</targetPath>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>upload-to-server</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <resources>
+                                        <resource>
+                                            <targetPath>${solr.upload.dest}</targetPath>
+                                            <directory>${project.build.directory}/${project.artifactId}-${project.version}</directory>
+                                            <preservePath>true</preservePath>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

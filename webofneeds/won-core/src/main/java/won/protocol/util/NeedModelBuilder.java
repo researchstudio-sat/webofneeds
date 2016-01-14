@@ -263,10 +263,12 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     Resource needResource = needModel.createResource(getNeedURIString(), WON.NEED);
     // need type
     addResourceIfPresent(needResource, WON.HAS_BASIC_NEED_TYPE, getBasicNeedTypeURI());
-    addResourceIfPresent(needResource, WON.HAS_NEED_PROTOCOL_ENDPOINT, getNeedProtocolEndpointURI());
-    addResourceIfPresent(needResource, WON.HAS_OWNER_PROTOCOL_ENDPOINT, getOwnerProtocolEndpointURI());
-    addResourceIfPresent(needResource, WON.HAS_MATCHER_PROTOCOL_ENDPOINT, getMatcherProtocolEndpointURI());
-    addResourceIfPresent(needResource, WON.IS_IN_STATE, getStateURI());
+    //facets
+    if (this.getFacetTypes() != null){
+      for (URI facetType: this.getFacetTypes()){
+        needResource.addProperty(WON.HAS_FACET, needModel.getResource(facetType.toString()));
+      }
+    }
     addLiteralValueIfPresent(needModel, needResource, DCTerms.created, DateTimeUtils.toLiteral(getCreationDate(), needModel));
     // need content
     addNeedContent(needModel, needResource);

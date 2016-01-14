@@ -27,6 +27,11 @@ http://www.springframework.org/schema/context/spring-context-3.0.xsd http://www.
 http://www.springframework.org/schema/websocket
 http://www.springframework.org/schema/websocket/spring-websocket-4.0.xsd">
 
+    <!--import resource="classpath:/spring/owner-jmsonly.xml"/>
+    <import resource="classpath:/spring/owner-context.xml"/>
+    <import resource="classpath:/spring/owner-mailer.xml"/>
+    <import resource="classpath:/spring/owner-security.xml"/-->
+
 	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
 	<context:component-scan base-package="won.owner.web"/>

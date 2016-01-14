@@ -16,16 +16,23 @@
 
 package won.bot.framework.events.action.impl;
 
-import won.bot.framework.events.event.Event;
-import won.bot.framework.events.action.BaseEventBotAction;
-import won.bot.framework.events.event.impl.WorkDoneEvent;
+import won.bot.framework.bot.Bot;
 import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.action.BaseEventBotAction;
+import won.bot.framework.events.event.Event;
+import won.bot.framework.events.event.impl.WorkDoneEvent;
 
 /**
  * BaseEventBotAction telling the framework that the bot's work  is done.
  */
 public class SignalWorkDoneAction extends BaseEventBotAction
 {
+  private Bot bot;
+
+  public SignalWorkDoneAction(EventListenerContext eventListenerContext, Bot bot) {
+    super(eventListenerContext);
+    this.bot = bot;
+  }
 
   public SignalWorkDoneAction(final EventListenerContext eventListenerContext)
   {
@@ -35,8 +42,8 @@ public class SignalWorkDoneAction extends BaseEventBotAction
   @Override
   protected void doRun(Event event) throws Exception
   {
-    logger.debug("signaling that the bot's work is done");
+    logger.info("signaling that the bot's work is done");
     getEventListenerContext().workIsDone();
-    getEventListenerContext().getEventBus().publish(new WorkDoneEvent());
+    getEventListenerContext().getEventBus().publish(new WorkDoneEvent(this.bot));
   }
 }
