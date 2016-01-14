@@ -7,7 +7,7 @@ import { actionCreators }  from '../../actions/actions';
 import { attach } from '../../utils';
 import won from '../../won-es6';
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope','$filter', /*'$routeParams' /*injections as strings here*/];
+const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 class OverviewPostsController {
 
     constructor() {
