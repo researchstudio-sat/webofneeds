@@ -72,12 +72,43 @@ const actionHierarchy = {
                   console.log(events)
               })
           })
+      },
+        addUnreadEventUri:INJ_DEFAULT,
 
+        addUnreadEventsByNeedByType:(data)=>(dispatch,getState)=>{
+            const state = getState();
+            let needUri = data.hasReceiverNeed;
+            data.needUri = needUri
+            let need = state.getIn(['needs','needs',data.needUri]);
+            if(!state.get(['events','unreadEventsByNeedByType',needUri]) ){
+                dispatch(actionCreators.events__addNeedToUnreadEventsByNeedByType({need:need,data}))
+            }
+            if(data.eventType!=undefined && data.eventType!=undefined){
+                dispatch(actionCreators.events__addEventToUnreadEventsByNeedByType({need:need,data}))
+            }
+        },
+        addUnreadEventsByTypeByNeed:(data)=>(dispatch,getState)=>{
+            const state=getState();
+
+        },
+        addNeedToUnreadEventsByNeedByType:INJ_DEFAULT,
+        addEventToUnreadEventsByNeedByType:INJ_DEFAULT
+
+
+    },
+    matches: {
+      load:(data)=>dispatch=> {
+          data.needs.forEach(function(need) {
+              won.getLastEventOfEachConnectionOfNeed(need.uri).then(function (events) {
+                  console.log(events);
+              })
+
+          })
       }
-
     },
     connections:{
       fetch:(data)=>dispatch=>{
+
 
               var allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], data.needUri);
               allConnectionsPromise.then(function(connections){
@@ -95,7 +126,7 @@ const actionHierarchy = {
                 won.getNeed(uri).then(function(need){
                         console.log("linked data fetched for need: "+uri );
                         dispatch(actionCreators.needs__received(need))
-                        dispatch(actionCreators.connections__fetch({needUri:need.uri}))
+                        //dispatch(actionCreators.connections__fetch({needUri:need.uri}))
                     })})
         },
         received: INJ_DEFAULT,
@@ -143,6 +174,41 @@ const actionHierarchy = {
 
     messages: { /* websocket messages, e.g. post-creation, chatting */
         markAsSent: INJ_DEFAULT,
+        messageReceived:(data)=>dispatch=>{
+            //TODO not completed. handle all incoming messages here.
+            var configForEvent = messageTypeToEventType[event.hasMessageType];
+            if (configForEvent.eventType != null) {
+                event.eventType = configForEvent.eventType;
+                event.sentTimestamp = new Date().getTime();
+
+            } else {
+                $log.warn("Not handling message of type " + event.hasMessageType + " in incomingMessageHandler");
+            }
+        },
+        hintMessageReceived:(data)=>dispatch=>{
+            data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
+            won.invalidateCacheForNewConnection(data.hasReceiver,data.hasReceiverNeed)
+                ['finally'](function(){
+                    let needUri = data.hasReceiverNeed;
+                    data.unreadUri = data.hasReceiver;
+                    data.matchScore = data.framedMessage[won.WON.hasMatchScoreCompacted];
+                    data.matchCounterpartURI = won.getSafeJsonLdValue(data.framedMessage[won.WON.hasMatchCounterpart]);
+                    dispatch(actionCreators.events__addUnreadEventsByNeedByType(data))
+                    dispatch(actionCreators.events__addUnreadEventsByTypeByNeed(data))
+                    dispatch(actionCreators.events__addUnreadEventUri(data))
+
+                // /add some properties to the eventData so as to make them easily accessible to consumers
+                //of the hint event
+                // below is commented as it seems to cause to hint event data loaded/displayed
+                //if (eventData.matchCounterpartURI != null) {
+                //    //load the data of the need the hint is about, if required
+                //    //linkedDataService.ensureLoaded(eventData.uri);
+                //    linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
+                //}
+
+                console.log("handling hint message")
+            });
+        }
     },
 
     /*
@@ -250,8 +316,9 @@ const actionHierarchy = {
                 return response.json()
             }).then(
                 data => {
-                    dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
-                    dispatch(actionCreators.router__stateGo("createNeed"));
+                    dispatch(actionCreators.login(username,password))
+/*                    dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
+                    dispatch(actionCreators.router__stateGo("createNeed"));*/
                 }
         ).catch(
             //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
@@ -302,7 +369,16 @@ const actionHierarchy = {
         update: INJ_DEFAULT,
     }
 }
-
+var messageTypeToEventType = {};
+messageTypeToEventType[won.WONMSG.hintMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED};
+messageTypeToEventType[won.WONMSG.connectMessageCompacted] = {eventType: won.EVENT.CONNECT_RECEIVED};
+messageTypeToEventType[won.WONMSG.connectSentMessageCompacted] = {eventType: won.EVENT.CONNECT_SENT}
+messageTypeToEventType[won.WONMSG.openMessageCompacted] = {eventType: won.EVENT.OPEN_RECEIVED};
+messageTypeToEventType[won.WONMSG.closeMessageCompacted] = {eventType: won.EVENT.CLOSE_RECEIVED};
+messageTypeToEventType[won.WONMSG.closeNeedMessageCompacted] = {eventType: won.EVENT.CLOSE_NEED_RECEIVED};
+messageTypeToEventType[won.WONMSG.connectionMessageCompacted] = {eventType: won.EVENT.CONNECTION_MESSAGE_RECEIVED};
+messageTypeToEventType[won.WONMSG.needStateMessageCompacted] = {eventType: won.EVENT.NEED_STATE_MESSAGE_RECEIVED};
+messageTypeToEventType[won.WONMSG.errorMessageCompacted] = {eventType: won.EVENT.NOT_TRANSMITTED }
 //as string constans, e.g. actionTypes.drafts.change.type === "drafts.change.type"
 export const actionTypes = tree2constants(actionHierarchy);
 

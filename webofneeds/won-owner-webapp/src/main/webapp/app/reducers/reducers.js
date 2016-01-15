@@ -12,6 +12,7 @@ import { messagesReducer } from './message-reducers'
 import reduceReducers from 'reduce-reducers';
 import postsReducer from './posts-reducer'
 import needReducer from './need-reducer'
+import eventReducer from './event-reducer'
 
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -38,9 +39,11 @@ const reducers = {
             const additionalWubs = Immutable.fromJS(repeatVar('wub', howMuch));
             return state.concat(additionalWubs);
         }
+
     }),
 
     drafts: draftsReducer,
+    events: eventReducer,
     user: createReducer(
         //initial state
         Immutable.Map(),

@@ -1,8 +1,6 @@
-;
-
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
-
+import won from '../won-es6';
 function genComponentConf() {
     let template = `
             <div class="fi clickable">
@@ -46,8 +44,9 @@ function genComponentConf() {
             </div>`;
 
     class Controller {
-        constructor() {}
+        constructor() {
 
+        }
         expandActivities() {
             this.open = true;
         }
