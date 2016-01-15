@@ -22,11 +22,13 @@ function genComponentConf() {
                 <div class="vtb__inner__right">
                     <button class="won-button--filled red">Quit Contact</button>
                     <ul class="vtb__tabs">
-                        <li ng-class="self.selection == 0? 'vtb__tabs__selected' : ''" ng-click="self.selection = 0"><a ng-href="post/121337245/visitor">
+                        <li ng-class="self.selection == 0? 'vtb__tabs__selected' : ''" ng-click="self.selection = 0">
+                        <a ui-sref="postVisitorMsgs({postId: 'http://example.org/121337345'})">
                             Messages
                             <span class="vtb__tabs__unread">{{self.item.messages.length}}</span>
                         </a></li>
-                        <li ng-class="self.selection == 1? 'vtb__tabs__selected' : ''" ng-click="self.selection = 1"><a ng-href="post/121337245/visitor">
+                        <li ng-class="self.selection == 1? 'vtb__tabs__selected' : ''" ng-click="self.selection = 1">
+                        <a ui-sref="postVisitor({postId: 'http://example.org/121337345'})">
                             Post Info
                         </a></li>
                     </ul>
