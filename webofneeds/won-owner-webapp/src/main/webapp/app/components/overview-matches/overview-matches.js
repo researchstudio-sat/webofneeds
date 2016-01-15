@@ -5,9 +5,16 @@ import overviewTitleBarModule from '../overview-title-bar';
 import matchesFlowItemModule from '../matches-flow-item';
 import matchesGridItemModule from '../matches-grid-item';
 import matchesListItemModule from '../matches-list-item';
+import { attach } from '../../utils';
+import { actionCreators }  from '../../actions/actions';
 
+const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 class OverviewMatchesController {
     constructor() {
+        attach(this, serviceDependencies, arguments);
+
+        window.omc=this;
+
         this.selection = 3;
 
         this.r1 = {timeStamp: "yesterday 12:05", match: {type: 2, title: "i am the match to that", titleImgSrc: "images/furniture3.png"}, id: "123213213", title: "I am the request one",  group: "User XP", type: 1, message: "To whoom it may concern. We are a group of peole in the Lestis et eaquuntiore dolluptaspid quatur quisinia aspe sus voloreiusa plis", images: [{src: "images/furniture2.png"}]};
@@ -31,8 +38,22 @@ class OverviewMatchesController {
             {type: 1, title: "i am the matchsafdsdf", titleImgSrc: "images/furniture2.png", matches: [this.r10, this.r11, this.r12]}];
 
         this.viewType = 0;
+
+        const selectFromState = (state)=>{
+
+
+        }
+        this.matches = loadMatches();
+        const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
+        this.$scope.$on('$destroy', disconnect);
+    }
+    loadMatches(){
+        this.matches__load(
+            this.$ngRedux.getState().getIn(['needs','needs']).toJS()
+        )
     }
 }
+
 
 export default angular.module('won.owner.components.overviewMatches', [
     overviewTitleBarModule,
@@ -40,6 +61,6 @@ export default angular.module('won.owner.components.overviewMatches', [
     matchesGridItemModule,
     matchesListItemModule
 ])
-    .controller('OverviewMatchesController', OverviewMatchesController)
+    .controller('OverviewMatchesController', [...serviceDependencies,OverviewMatchesController])
     .name;
 

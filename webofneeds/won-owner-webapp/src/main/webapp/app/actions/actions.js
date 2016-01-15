@@ -96,6 +96,16 @@ const actionHierarchy = {
 
 
     },
+    matches: {
+      load:(data)=>dispatch=> {
+          data.needs.forEach(function(need) {
+              won.getLastEventOfEachConnectionOfNeed(need.uri).then(function (events) {
+                  console.log(events);
+              })
+
+          })
+      }
+    },
     connections:{
       fetch:(data)=>dispatch=>{
 
@@ -306,8 +316,9 @@ const actionHierarchy = {
                 return response.json()
             }).then(
                 data => {
-                    dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
-                    dispatch(actionCreators.router__stateGo("createNeed"));
+                    dispatch(actionCreators.login(username,password))
+/*                    dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
+                    dispatch(actionCreators.router__stateGo("createNeed"));*/
                 }
         ).catch(
             //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
