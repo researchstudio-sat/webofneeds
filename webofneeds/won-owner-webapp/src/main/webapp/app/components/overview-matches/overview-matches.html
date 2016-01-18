@@ -20,10 +20,10 @@
             </div>
         </div>
         <div ng-show="self.viewType == 0" class="omc__content__flow">
-            <won-matches-flow-item item="item" ng-repeat="item in self.items"></won-matches-flow-item>
+            <won-matches-flow-item item="item" ng-repeat="item in self.matches"></won-matches-flow-item>
         </div>
         <div ng-show="self.viewType == 1" class="omc__content__grid">
-            <won-matches-grid-item item="item" ng-repeat="item in self.items"></won-matches-grid-item>
+            <won-matches-grid-item item="item" ng-repeat="item in self.matches"></won-matches-grid-item>
         </div>
         <div ng-show="self.viewType == 2" class="omc__content__list">
             <won-matches-list-item item="item" ng-repeat="item in self.matches"></won-matches-list-item>

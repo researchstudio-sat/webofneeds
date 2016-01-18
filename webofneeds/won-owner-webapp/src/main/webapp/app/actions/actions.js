@@ -97,10 +97,12 @@ const actionHierarchy = {
 
     },
     matches: {
-      load:(data)=>dispatch=> {
+      load:(data)=>(dispatch,getState)=> {
+          const state=getState();
           for(let need in data){
               won.getConnectionInStateForNeedWithRemoteNeed(need,"won:Suggested").then(function(results){
-                  let data = {ownNeed:need, connections:results }
+                  let needData = state.getIn(['needs','needs',need]).toJS();
+                  let data = {ownNeed:needData, connections:results }
                   dispatch(actionCreators.matches__hintsOfNeedRetrieved(data))
               })
           }

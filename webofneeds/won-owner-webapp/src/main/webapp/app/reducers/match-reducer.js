@@ -12,14 +12,16 @@ import won from '../won-es6';
 const initialState = Immutable.fromJS({
     isFetching: false,
     didInvalidate: false,
-    matches: new Map()
+    matches: []
 
 })
 export default createReducer(
     initialState,
     {
         [actionTypes.matches.hintsOfNeedRetrieved]:(state,action)=>{
-            return state.setIn(['matches',action.payload.ownNeed],Immutable.fromJS(action.payload.connections))
+
+            let match = {"ownNeedData":action.payload.ownNeed,"connections":action.payload.connections}
+            return state.setIn(['matches'],action.payload.connections)
         }
     }
 

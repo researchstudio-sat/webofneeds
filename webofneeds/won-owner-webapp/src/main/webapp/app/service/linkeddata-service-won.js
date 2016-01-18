@@ -1513,7 +1513,6 @@ import * as q from 'q';
                 promises.push(data.promise)
                 won.getConnection(connection).then(function(connectionData){
                     resultObject.connection = connectionData;
-                    let connections =[];
                     let query="prefix msg: <http://purl.org/webofneeds/message#> \n"+
                         "prefix won: <http://purl.org/webofneeds/model#> \n" +
                         "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
@@ -1529,10 +1528,18 @@ import * as q from 'q';
                         if (rejectIfFailed(success, results, {message: "Error loading connection for need " + uri + "in state"+connectionState+".", allowNone: true, allowMultiple: true})) {
                             return;
                         }
-                        won.getNeed(results[0].remoteNeed.value).then(function(remoteNeedData){
-                            resultObject.remoteNeed = remoteNeedData
+                        let needs = []
+                        let ownNeedPromise = won.getNeed(uri);
+                        needs.push(ownNeedPromise);
+                        let remoteNeedPromise = won.getNeed(results[0].remoteNeed.value)
+                         needs.push(remoteNeedPromise)
+                        Q.all(needs).then(function(needData){
+                            resultObject.ownNeed = needData[0]
+                            resultObject.remoteNeed=needData[1]
                             return data.resolve(resultObject );
                         })
+
+
 
                     })
                 })
