@@ -1294,7 +1294,7 @@ import * as q from 'q';
 
     won.getLastEventOfEachConnectionOfNeed = function(needUri, requesterWebId) {
         //fetch all connection uris of the need
-        var allConnectionsPromise = won.executeCrawlableQuery(queries["getAllConnectionUrisOfNeed"], needUri, requesterWebId);
+        var allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri, requesterWebId);
         return allConnectionsPromise.then(
             function getLastEventForConnections(connectionsData){
                 return somePromises(
@@ -1302,7 +1302,7 @@ import * as q from 'q';
                     connectionsData.map(
                         function(conData){
                             return won.executeCrawlableQuery(
-                                        queries["getLastEventUriOfConnection"],
+                                        won.queries["getLastEventUriOfConnection"],
                                         conData.connection.value,
                                         requesterWebId
                                 ).then(function(eventUriResult){
@@ -1328,7 +1328,7 @@ import * as q from 'q';
     }
 
      won.getConnectionTextMessages = function(connectionUri, requesterWebId) {
-        var queryResultPromise = won.executeCrawlableQuery(queries["getConnectionTextMessages"], connectionUri, requesterWebId);
+        var queryResultPromise = won.executeCrawlableQuery(won.queries["getConnectionTextMessages"], connectionUri, requesterWebId);
         return queryResultPromise.then(
                 function processConnectionTextMessages(results){
                         var textMessages = [];
@@ -1503,9 +1503,45 @@ import * as q from 'q';
      * Loads the hints for the need with the specified URI into an array of js objects.
      * @return the array or null if no data is found for that URI in the local datastore
      */
-    won.getHintsForNeed = function(uri) {
-        //TODO: SPARQL query that returns an array of hints
+    won.getConnectionInStateForNeedWithRemoteNeed = function(uri,connectionState) {
+
+        return won.getconnectionUrisOfNeed(uri).then(function(connectionUris){
+            let promises=[];
+            connectionUris.forEach(function(connection){
+                let resultObject = {}
+                let data = Q.defer()
+                promises.push(data.promise)
+                won.getConnection(connection).then(function(connectionData){
+                    resultObject.connection = connectionData;
+                    let connections =[];
+                    let query="prefix msg: <http://purl.org/webofneeds/message#> \n"+
+                        "prefix won: <http://purl.org/webofneeds/model#> \n" +
+                        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
+                        "select ?remoteNeed \n" +
+                        " where { \n" +
+                        "<"+connectionData.uri+"> a won:Connection; \n" +
+                        "              won:belongsToNeed <" +uri +"> ; \n" +
+                        "              won:hasRemoteNeed ?remoteNeed; \n"+
+                        "              won:hasConnectionState "+ connectionState +". \n"+
+                        "} \n"
+
+                    privateData.store.execute(query,[],[],function(success,results){
+                        if (rejectIfFailed(success, results, {message: "Error loading connection for need " + uri + "in state"+connectionState+".", allowNone: true, allowMultiple: true})) {
+                            return;
+                        }
+                        won.getNeed(results[0].remoteNeed.value).then(function(remoteNeedData){
+                            resultObject.remoteNeed = remoteNeedData
+                            return data.resolve(resultObject );
+                        })
+
+                    })
+                })
+            })
+            return Q.all(promises)
+        })
+
     }
+
 
     /**
      * Loads the connections for the need with the specified URI into an array of js objects.
@@ -1677,7 +1713,6 @@ import * as q from 'q';
                 "}\n" +
                 "order by desc(?receivedTimestamp)"
         },
-
         // get each connection of the specified need
         "getAllConnectionUrisOfNeed" : {
             propertyPaths : [
@@ -1698,7 +1733,7 @@ import * as q from 'q';
                 "prefix msg: <http://purl.org/webofneeds/message#> \n"+
                 "prefix won: <http://purl.org/webofneeds/model#> \n" +
                 "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
-                "select ?connection ?need ?remoteNeed  \n" +
+                "select ?connection ?need ?remoteNeed ?connectionState  \n" +
                 " where { \n" +
                 " <::baseUri::> a won:Need; \n" +
                 "           won:hasConnections ?connections.\n" +

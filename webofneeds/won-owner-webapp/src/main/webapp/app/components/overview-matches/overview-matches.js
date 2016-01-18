@@ -41,10 +41,14 @@ class OverviewMatchesController {
 
         const selectFromState = (state)=>{
 
+            return {
+                matches: state.getIn(['matches','matches'])
+            };
 
         }
-        this.matches = loadMatches();
+
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
+        this.loadMatches();
         this.$scope.$on('$destroy', disconnect);
     }
     loadMatches(){

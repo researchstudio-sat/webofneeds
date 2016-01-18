@@ -13,6 +13,7 @@ import reduceReducers from 'reduce-reducers';
 import postsReducer from './posts-reducer'
 import needReducer from './need-reducer'
 import eventReducer from './event-reducer'
+import matchReducer from './match-reducer'
 
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -70,6 +71,7 @@ const reducers = {
         }
     ),
     needs:needReducer,
+    matches: matchReducer,
     postOverview:postsReducer,
     messages: messagesReducer,
     config: createReducer(

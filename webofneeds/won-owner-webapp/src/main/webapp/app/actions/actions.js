@@ -98,13 +98,14 @@ const actionHierarchy = {
     },
     matches: {
       load:(data)=>dispatch=> {
-          data.needs.forEach(function(need) {
-              won.getLastEventOfEachConnectionOfNeed(need.uri).then(function (events) {
-                  console.log(events);
+          for(let need in data){
+              won.getConnectionInStateForNeedWithRemoteNeed(need,"won:Suggested").then(function(results){
+                  let data = {ownNeed:need, connections:results }
+                  dispatch(actionCreators.matches__hintsOfNeedRetrieved(data))
               })
-
-          })
-      }
+          }
+      },
+        hintsOfNeedRetrieved:INJ_DEFAULT
     },
     connections:{
       fetch:(data)=>dispatch=>{
