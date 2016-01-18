@@ -23,11 +23,12 @@ docker -H satcluster01:2375 build -t webofneeds/gencert:master $WORKSPACE/webofn
 # start the won containers on dedicated servers of the cluster
 echo run docker containers:
 
+# NOTE: do not redeploy the postgres database for won node and owner to keep the data after deployments
 # postgres db
-docker -H satcluster01:2375 pull webofneeds/postgres
-docker -H satcluster01:2375 stop postgres_ma || echo 'No docker container found to stop with name: postgres_ma'
-docker -H satcluster01:2375 rm postgres_ma || echo 'No docker container found to remove with name: postgres_ma'
-docker -H satcluster01:2375 run --name=postgres_ma -d -p 5433:5432 webofneeds/postgres
+#docker -H satcluster01:2375 pull webofneeds/postgres
+#docker -H satcluster01:2375 stop postgres_ma || echo 'No docker container found to stop with name: postgres_ma'
+#docker -H satcluster01:2375 rm postgres_ma || echo 'No docker container found to remove with name: postgres_ma'
+docker -H satcluster01:2375 run --name=postgres_ma -d -p 5433:5432 webofneeds/postgres || 'Error starting postgres_ma'
 
 
 sleep 10

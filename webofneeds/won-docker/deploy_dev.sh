@@ -4,17 +4,18 @@ set -e
 # build won docker images and deploy to sat cluster
 echo start docker build and deployment:
 
+# NOTE: do not redeploy the postgres database for won node and owner to keep the data after deployments
 # postgres db 1
-docker -H satsrv04:2375 pull webofneeds/postgres
-docker -H satsrv04:2375 stop postgres_dev  || echo 'No docker container found to stop with name: postgres_dev'
-docker -H satsrv04:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
-docker -H satsrv04:2375 run --name=postgres_dev -d -p 5432:5432 -m 256m webofneeds/postgres
+#docker -H satsrv04:2375 pull webofneeds/postgres
+#docker -H satsrv04:2375 stop postgres_dev  || echo 'No docker container found to stop with name: postgres_dev'
+#docker -H satsrv04:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
+docker -H satsrv04:2375 run --name=postgres_dev -d -p 5432:5432 -m 256m webofneeds/postgres || 'Error starting postgres_dev on satsrv04'
 
 # postgres db 2
-docker -H satsrv05:2375 pull webofneeds/postgres
-docker -H satsrv05:2375 stop postgres_dev || echo 'No docker container found to stop with name: postgres_dev'
-docker -H satsrv05:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
-docker -H satsrv05:2375 run --name=postgres_dev -d -p 5432:5432 -m 256m webofneeds/postgres
+#docker -H satsrv05:2375 pull webofneeds/postgres
+#docker -H satsrv05:2375 stop postgres_dev || echo 'No docker container found to stop with name: postgres_dev'
+#docker -H satsrv05:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
+docker -H satsrv05:2375 run --name=postgres_dev -d -p 5432:5432 -m 256m webofneeds/postgres || 'Error starting postgres_dev on satsrv05'
 
 
 # wonnode/owner server certificate generator
