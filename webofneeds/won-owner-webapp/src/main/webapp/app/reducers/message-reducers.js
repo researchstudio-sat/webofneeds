@@ -17,7 +17,12 @@ export const messagesReducer =  createReducer(
     //initial state
     Immutable.fromJS({
         enqueued: {},
-        sent: {}
+        sent: {},
+        /**
+         * TODO this field is part of the session-upgrade hack documented in:
+         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
+         */
+        resetWsRequested_Hack: false,
     }),
 
     //handlers
@@ -36,6 +41,13 @@ export const messagesReducer =  createReducer(
 
         [actionTypes.drafts.publishSuccessful]: (messages, {payload:{ publishEventUri }}) =>
             messages.removeIn(['sent', publishEventUri]),
+
+        /**
+         * TODO this sub-reducer is part of the session-upgrade hack documented in:
+         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
+         */
+        [actionTypes.messages.requestWsReset_Hack]: (messages, { payload = true}) =>
+            messages.set('resetWsRequested_Hack', payload),
 
     }
 );
