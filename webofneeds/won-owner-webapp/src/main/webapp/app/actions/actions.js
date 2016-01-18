@@ -181,6 +181,11 @@ const actionHierarchy = {
 
     messages: { /* websocket messages, e.g. post-creation, chatting */
         markAsSent: INJ_DEFAULT,
+        /**
+         * TODO this action is part of the session-upgrade hack documented in:
+         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
+         */
+        requestWsReset_Hack: INJ_DEFAULT,
         messageReceived:(data)=>dispatch=>{
             //TODO not completed. handle all incoming messages here.
             var configForEvent = messageTypeToEventType[event.hasMessageType];

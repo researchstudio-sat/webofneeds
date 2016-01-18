@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "dependencies": {},
   "scripts": {
-    "postinstall": "jspm install && npm run build",
+    "postinstall": "npm rebuild node-sass && jspm registry create bower jspm-bower-endpoint -y && jspm install && npm run build",
     "build": "gulp build",
     "watch": "gulp watch",
     "clean": "gulp clean"
