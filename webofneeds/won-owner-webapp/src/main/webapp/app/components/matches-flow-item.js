@@ -36,16 +36,26 @@ function genComponentConf() {
                 <div class="mfi__match__description__title">{{self.item.remoteNeed.title}}</div>
                 <div class="mfi__match__description__type">{{self.getType(self.item.remoteNeed.basicNeedType)}}</div>
             </div>
-            <won-square-image src="self.item.match.titleImgSrc" title="self.item.remoteNeed.title"></won-square-image>
+            <won-square-image src="self.getRandomImage()" title="self.item.remoteNeed.title"></won-square-image>
         </div>
     `;
 
     class Controller {
         constructor() {
             this.maxThumbnails = 4;
+            this.images=[
+                "images/furniture1.png",
+                "images/furniture2.png",
+                "images/furniture3.png",
+                "images/furniture4.png",
+            ]
         }
 
 
+        getRandomImage(){
+            let i = Math.floor((Math.random()*4))
+            return images[i];
+        }
         getType(type) {
             switch(type){
                 case won.WON.BasicNeedTypeDemand: return 'I want to have something';

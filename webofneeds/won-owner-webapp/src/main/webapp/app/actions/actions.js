@@ -107,6 +107,10 @@ const actionHierarchy = {
               })
           }
       },
+        add:(data)=>(dispatch,getState)=>{
+            const state = getState();
+            dispatch(actionCreators.matches__add(data))
+        },
         hintsOfNeedRetrieved:INJ_DEFAULT
     },
     connections:{

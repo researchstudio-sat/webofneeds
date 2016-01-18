@@ -22,7 +22,11 @@ export default createReducer(
 
             let match = {"ownNeedData":action.payload.ownNeed,"connections":action.payload.connections}
             return state.setIn(['matches'],action.payload.connections)
+        },
+        [actionTypes.matches.add]:(state,action)=>{
+            console.log(action)
         }
+
     }
 
 )

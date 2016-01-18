@@ -6,17 +6,17 @@ import squareImageModule from './square-image';
 function genComponentConf() {
     let template = `
         <div class="mli clickable" ng-click="self.toggleMatches()">
-                <won-square-image src="self.item.titleImgSrc" title="self.item.title"></won-square-image>
+                <won-square-image src="self.item.titleImgSrc" title="self.item.ownNeed.title"></won-square-image>
                 <div class="mli__description">
                     <div class="mli__description__topline">
-                        <div class="mli__description__topline__title">{{self.item.title}}</div>
+                        <div class="mli__description__topline__title">{{self.item.ownNeed.title}}</div>
                         <div class="mli__description__topline__matchcount">{{self.item.matches.length}}</div>
                     </div>
                     <div class="mli__description__subtitle">
                         <span class="mli__description__subtitle__group" ng-show="self.item.group">
                             <img src="generated/icon-sprite.svg#ico36_group" class="mli__description__subtitle__group__icon">{{self.item.group}}<span class="mli__description__subtitle__group__dash"> &ndash; </span>
                         </span>
-                        <span class="mli__description__subtitle__type">{{self.getType(self.item.type)}}</span>
+                        <span class="mli__description__subtitle__type">{{self.getType(self.item.ownNeed.basicNeedType)}}</span>
                     </div>
                 </div>
                 <div class="mli__carret">
