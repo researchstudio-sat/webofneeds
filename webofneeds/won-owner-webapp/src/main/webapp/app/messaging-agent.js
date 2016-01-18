@@ -68,6 +68,20 @@ export function runMessagingAgent(redux) {
                 }
             }
         );
+        /**
+         * TODO this watch is part of the session-upgrade hack documented in:
+         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
+         */
+        unsubscribeWatch = watchImmutableRdxState(
+            redux, ['messages', 'resetWsRequested_Hack'],
+            (newRequestState, oldRequestState) => {
+                if(newRequestState) {
+                    ws.close();
+                    // a new ws-connection should be opened automatically in onClose
+                    redux.dispatch(actionCreators.messages__requestWsReset_Hack(false));
+                }
+            }
+        );
 
     };
     function onMessage(receivedMsg) {
@@ -132,16 +146,21 @@ export function runMessagingAgent(redux) {
         this.close();
     };
     function onClose(e) {
+        if(e.wasClean){
+            console.log('websocket closed.');
+        } else {
+            console.error('websocket closed.')
+        }
         if(unsubscribeWatch && typeof unsubscribeWatch === 'function')
             unsubscribeWatch();
 
         if (e.code === 1011) {
-            console.log('either your session timed out or you encountered an unexpected server condition.');
+            console.log('either your session timed out or you encountered an unexpected server condition. \n', e.reason);
         } else {
             // posting anonymously creates a new session for each post
             // thus we need to reconnect here
-            // TODO reconnect only on next message instead of straight away
-            console.log('reconnecting websocket');
+            // TODO reconnect only on next message instead of straight away <-- bad idea, prevents push notifications
+            // TODO add a delay if first reconnect fails
             ws = newSock();
         }
     };
