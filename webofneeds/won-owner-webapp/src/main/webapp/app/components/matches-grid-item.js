@@ -10,14 +10,14 @@ function genComponentConf() {
                 <!--won-square-image src="self.getRandomImage()" title="self.item.ownNeed.title"></won-square-image-->
                 <div class="mgi__description__post__text">
                     <div class="mgi__description__post__text__topline">
-                        <div class="mgi__description__post__text__topline__title">{{self.item.ownNeed.title}}</div>
-                        <div class="mgi__description__post__text__topline__date">{{self.item.ownNeed.creationDate}}</div>
+                        <div class="mgi__description__post__text__topline__title">{{self.item.remoteNeed.title}}</div>
+                        <div class="mgi__description__post__text__topline__date">{{self.item.remoteNeed.creationDate}}</div>
                     </div>
                     <div class="mgi__description__post__text__subtitle">
                         <span class="mgi__description__post__text__subtitle__group" ng-show="self.item.group">
                             <img src="generated/icon-sprite.svg#ico36_group" class="mgi__description__post__text__subtitle__group__icon">{{self.item.group}}<span class="mgi__description__post__text__subtitle__group__dash"> &ndash; </span>
                         </span>
-                        <span class="mgi__description__post__text__subtitle__type">{{self.getType(self.item.ownNeed.basicNeedType)}}</span>
+                        <span class="mgi__description__post__text__subtitle__type">{{self.getType(self.item.remoteNeed.basicNeedType)}}</span>
                     </div>
                 </div>
             </div>
@@ -34,10 +34,10 @@ function genComponentConf() {
         </div>
         <div class="mgi__match clickable">
             <div class="mgi__match__description">
-                <div class="mgi__match__description__title">{{self.item.remoteNeed.title}}</div>
-                <div class="mgi__match__description__type">{{self.getType(self.item.remoteNeed.basicNeedType)}}</div>
+                <div class="mgi__match__description__title">{{self.item.ownNeed.title}}</div>
+                <div class="mgi__match__description__type">{{self.getType(self.item.ownNeed.basicNeedType)}}</div>
             </div>
-            <won-square-image src="self.getRandomImage()" title="self.item.remoteNeed.title"></won-square-image>
+            <won-square-image src="self.getRandomImage()" title="self.item.ownNeed.title"></won-square-image>
         </div>
     `;
 

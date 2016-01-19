@@ -103,14 +103,14 @@ const actionHierarchy = {
               won.getConnectionInStateForNeedWithRemoteNeed(need,"won:Suggested").then(function(results){
                   let needData = state.getIn(['needs','needs',need]).toJS();
                   let data = {ownNeed:needData, connections:results }
-                  dispatch(actionCreators.matches__hintsOfNeedRetrieved(data))
+                  results.forEach(function(entry){
+                      dispatch(actionCreators.matches__add(entry))
+                  })
+
               })
           }
       },
-        add:(data)=>(dispatch,getState)=>{
-            const state = getState();
-            dispatch(actionCreators.matches__add(data))
-        },
+        add:INJ_DEFAULT,
         hintsOfNeedRetrieved:INJ_DEFAULT
     },
     connections:{
@@ -202,12 +202,28 @@ const actionHierarchy = {
             won.invalidateCacheForNewConnection(data.hasReceiver,data.hasReceiverNeed)
                 ['finally'](function(){
                     let needUri = data.hasReceiverNeed;
+                    let match = {}
+                    let promises = []
                     data.unreadUri = data.hasReceiver;
                     data.matchScore = data.framedMessage[won.WON.hasMatchScoreCompacted];
                     data.matchCounterpartURI = won.getSafeJsonLdValue(data.framedMessage[won.WON.hasMatchCounterpart]);
+
+                    let remoteNeed= won.getNeed(data.hasMatchCounterpart)
+                    let ownNeed=won.getNeed(needUri)
+                    let connection=won.getConnection(data.hasReceiver)
+                    promises.push(remoteNeed,ownNeed,connection)
+
                     dispatch(actionCreators.events__addUnreadEventsByNeedByType(data))
                     dispatch(actionCreators.events__addUnreadEventsByTypeByNeed(data))
                     dispatch(actionCreators.events__addUnreadEventUri(data))
+
+                    Q.all(promises).then(function(promiseResults){
+                        match.remoteNeed=promiseResults[0]
+                        match.ownNeed = promiseResults[1]
+                        match.connection = promiseResults[2]
+                        dispatch(actionCreators.matches__add(match))
+                    })
+
 
                 // /add some properties to the eventData so as to make them easily accessible to consumers
                 //of the hint event
@@ -281,6 +297,7 @@ const actionHierarchy = {
         }).then(
             data => {
                 dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
+                dispatch(actionCreators.messages__requestWsReset_Hack());
                 dispatch(actionCreators.retrieveNeedUris());
                 //dispatch(actionCreators.posts__load());
                 dispatch(actionCreators.router__stateGo("feed"));
@@ -302,6 +319,7 @@ const actionHierarchy = {
             return response.json()
         }).then(
             data => {
+                dispatch(actionCreators.messages__requestWsReset_Hack());
                 dispatch(actionCreators.user__loggedIn({loggedIn: false}));
                 dispatch(actionCreators.needs__received({needs: {}}));
                 dispatch(actionCreators.posts__clean({}));

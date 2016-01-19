@@ -11,14 +11,14 @@ function genComponentConf() {
         </div>
         <div class="mfi__description">
             <div class="mfi__description__topline">
-                <div class="mfi__description__topline__title clickable">{{self.item.ownNeed.title}}</div>
-                <div class="mfi__description__topline__date">{{self.item.ownNeed.creationDate}}</div>
+                <div class="mfi__description__topline__title clickable">{{self.item.remoteNeed.title}}</div>
+                <div class="mfi__description__topline__date">{{self.item.remoteNeed.creationDate}}</div>
             </div>
             <div class="mfi__description__subtitle">
                 <span class="mfi__description__subtitle__group" ng-show="self.item.group">
                     <img src="generated/icon-sprite.svg#ico36_group" class="mfi__description__subtitle__group__icon">{{self.item.group}}<span class="mfi__description__subtitle__group__dash"> &ndash; </span>
                 </span>
-                <span class="mfi__description__subtitle__type">{{self.getType(self.item.ownNeed.basicNeedType)}}</span>
+                <span class="mfi__description__subtitle__type">{{self.getType(self.item.remoteNeed.basicNeedType)}}</span>
             </div>
             <div class="mfi__description__content">
                 <div class="mfi__description__content__location">
@@ -33,10 +33,10 @@ function genComponentConf() {
         </div>
         <div class="mfi__match clickable">
             <div class="mfi__match__description">
-                <div class="mfi__match__description__title">{{self.item.remoteNeed.title}}</div>
-                <div class="mfi__match__description__type">{{self.getType(self.item.remoteNeed.basicNeedType)}}</div>
+                <div class="mfi__match__description__title">{{self.item.ownNeed.title}}</div>
+                <div class="mfi__match__description__type">{{self.getType(self.item.ownNeed.basicNeedType)}}</div>
             </div>
-            <won-square-image src="self.getRandomImage()" title="self.item.remoteNeed.title"></won-square-image>
+            <won-square-image src="self.getRandomImage()" title="self.item.ownNeed.title"></won-square-image>
         </div>
     `;
 

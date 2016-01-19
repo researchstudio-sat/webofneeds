@@ -42,7 +42,7 @@ class OverviewMatchesController {
         const selectFromState = (state)=>{
 
             return {
-                matches: state.getIn(['matches','matches'])
+                matches: state.getIn(['matches','matches']).toJS()
             };
 
         }

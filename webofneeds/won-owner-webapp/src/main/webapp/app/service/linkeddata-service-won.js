@@ -1503,6 +1503,7 @@ import * as q from 'q';
      * Loads the hints for the need with the specified URI into an array of js objects.
      * @return the array or null if no data is found for that URI in the local datastore
      */
+    //TODO refactor this method.
     won.getConnectionInStateForNeedWithRemoteNeed = function(uri,connectionState) {
 
         return won.getconnectionUrisOfNeed(uri).then(function(connectionUris){
