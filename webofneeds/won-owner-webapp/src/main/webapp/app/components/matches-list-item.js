@@ -9,14 +9,14 @@ function genComponentConf() {
                 <won-square-image src="self.item.titleImgSrc" title="self.item.ownNeed.title"></won-square-image>
                 <div class="mli__description">
                     <div class="mli__description__topline">
-                        <div class="mli__description__topline__title">{{self.item.ownNeed.title}}</div>
-                        <div class="mli__description__topline__matchcount">{{self.item.matches.length}}</div>
+                        <div class="mli__description__topline__title">{{self.item[0].ownNeed.title}}</div>
+                        <div class="mli__description__topline__matchcount">{{self.item.length}}</div>
                     </div>
                     <div class="mli__description__subtitle">
                         <span class="mli__description__subtitle__group" ng-show="self.item.group">
                             <img src="generated/icon-sprite.svg#ico36_group" class="mli__description__subtitle__group__icon">{{self.item.group}}<span class="mli__description__subtitle__group__dash"> &ndash; </span>
                         </span>
-                        <span class="mli__description__subtitle__type">{{self.getType(self.item.ownNeed.basicNeedType)}}</span>
+                        <span class="mli__description__subtitle__type">{{self.getType(self.item[0].ownNeed.basicNeedType)}}</span>
                     </div>
                 </div>
                 <div class="mli__carret">
@@ -25,19 +25,19 @@ function genComponentConf() {
                 </div>
             </div>
             <div class="smli" ng-show="self.open">
-                <div class="smli__item clickable" ng-class="{'selected' : self.openRequest === match}" ng-repeat="match in self.item.matches">
+                <div class="smli__item clickable" ng-class="{'selected' : self.openRequest === match}" ng-repeat="match in self.item">
                     <div class="smli__item__header">
-                        <won-square-image src="match.images[0].src" title="match.title"></won-square-image>
+                        <won-square-image src="match.images[0].src" title="match.remoteNeed.title"></won-square-image>
                         <div class="smli__item__header__text">
                             <div class="smli__item__header__text__topline">
-                                <div class="smli__item__header__text__topline__title">{{match.title}}</div>
-                                <div class="smli__item__header__text__topline__date">{{match.timeStamp}}</div>
+                                <div class="smli__item__header__text__topline__title">{{match.remoteNeed.title}}</div>
+                                <div class="smli__item__header__text__topline__date">{{match.remoteNeed.timeStamp}}</div>
                             </div>
                             <div class="smli__item__header__text__subtitle">
                                 <span class="smli__item__header__text__subtitle__group" ng-show="request.group">
                                     <img src="generated/icon-sprite.svg#ico36_group" class="smli__item__header__text__subtitle__group__icon">{{match.group}}<span class="smli__item__header__text__subtitle__group__dash"> &ndash; </span>
                                 </span>
-                                <span class="smli__item__header__text__subtitle__type">{{self.getType(match.type)}}</span>
+                                <span class="smli__item__header__text__subtitle__type">{{self.getType(match.remoteNeed.basicNeedType)}}</span>
                             </div>
                         </div>
                     </div>
