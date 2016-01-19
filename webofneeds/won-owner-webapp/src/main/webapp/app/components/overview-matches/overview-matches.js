@@ -23,9 +23,8 @@ class OverviewMatchesController {
 
             return {
                 matches: state.getIn(['matches','matches']).toJS(),
-                matchesOfNeed:this.mapToMatches(this.matches)
+                matchesOfNeed:this.mapToMatches(state.getIn(['matches','matches']).toJS())
             };
-
         }
 
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
@@ -39,15 +38,15 @@ class OverviewMatchesController {
     }
     mapToMatches(connections){
         let needMap = {}
-        if(this.matches){
+        if(connections){
 
-            Object.keys(this.matches).forEach(function(key){
+            Object.keys(connections).forEach(function(key){
 
-                if(!needMap[this.matches[key].ownNeed.uri]){
-                    let connections = [this.matches[key]]
-                    needMap[this.matches[key].ownNeed.uri]=connections
+                if(!needMap[connections[key].ownNeed.uri]){
+                    let connectionsArr = [connections[key]]
+                    needMap[connections[key].ownNeed.uri]=connectionsArr
                 }else{
-                    needMap[this.matches[key].ownNeed.uri].push(this.matches[key])
+                    needMap[connections[key].ownNeed.uri].push(connections[key])
                 }
             }.bind(this))
         }

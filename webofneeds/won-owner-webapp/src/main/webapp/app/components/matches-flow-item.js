@@ -49,7 +49,6 @@ function genComponentConf() {
                 "images/furniture3.png",
                 "images/furniture4.png",
             ]
-            console.log(this.item)
         }
 
 

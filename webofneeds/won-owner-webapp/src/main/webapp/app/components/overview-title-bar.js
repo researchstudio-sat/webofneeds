@@ -4,7 +4,9 @@
 ;
 
 import angular from 'angular';
-
+import { attach } from '../utils';
+import { actionCreators }  from '../actions/actions';
+const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
         <nav ng-cloak ng-show="{{true}}" class="main-tab-bar">
@@ -18,7 +20,7 @@ function genComponentConf() {
                         <span class="mtb__tabs__unread">5</span>
                     </a></li>
                     <li ng-class="{'mtb__tabs__selected' : self.selection == 3}"><a ui-sref="overviewMatches">Matches
-                        <span class="mtb__tabs__unread">18</span>
+                        <span class="mtb__tabs__unread">{{self.matchesCount.length}}</span>
                     </a></li>
                 </ul>
                 <div class="mtb__inner__right">
@@ -31,8 +33,31 @@ function genComponentConf() {
     `;
 
     class Controller {
-        constructor() { }
+        constructor() {
+            attach(this, serviceDependencies, arguments);
+
+            window.otb = this;
+
+            const selectFromState = (state)=>{
+
+                return {
+                    matchesCount: Object.keys(state.getIn(['events','unreadEventUris']).toJS())
+                        .map(key=>state.getIn(['events','unreadEventUris'])
+                            .toJS()[key])
+                        .filter(event =>{
+                            if(event.eventType===won.EVENT.HINT_RECEIVED){
+                                return true
+                            }
+                         }),
+                };
+            }
+
+            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
+            //  this.loadMatches();
+            this.$scope.$on('$destroy', disconnect);
+        }
     }
+    Controller.$inject = serviceDependencies;
 
     return {
         restrict: 'E',

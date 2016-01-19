@@ -44,8 +44,28 @@ function genComponentConf() {
         </nav>
     `;
 
+    const serviceDependencies = ['$q', '$ngRedux', '$scope'];
     class Controller {
-        constructor() { }
+        constructor() {
+            attach(this, serviceDependencies, arguments);
+
+
+            const selectFromState = (state)=>{
+
+                return {
+                    matchesCount: Object.keys(state.getIn(['events','unreadEventUris']).toJS()).filter(event =>{
+                        if(event.eventType===won.EVENT.HINT_RECEIVED){
+                            return true
+                        }
+                    }),
+                    matchesOfNeed:this.mapToMatches(state.getIn(['matches','matches']).toJS())
+                };
+            }
+
+            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
+            //  this.loadMatches();
+            this.$scope.$on('$destroy', disconnect);
+        }
         back() { window.history.back() }
     }
 
