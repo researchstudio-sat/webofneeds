@@ -14,9 +14,12 @@ function genComponentConf() {
 
         generateHexColor(title) {
             var hash = 0;
-            for (var i = 0; i < title.length; i++) {
-                hash = title.charCodeAt(i) + ((hash << 5) - hash);
+            if(title){
+                for (var i = 0; i < title.length; i++) {
+                    hash = title.charCodeAt(i) + ((hash << 5) - hash);
+                }
             }
+
 
             var c = (hash & 0x00FFFFFF)
                 .toString(16);

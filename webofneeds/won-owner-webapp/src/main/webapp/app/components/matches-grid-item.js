@@ -62,7 +62,7 @@ function genComponentConf() {
 
         getRandomImage(){
             let i = Math.floor((Math.random()*4))
-            return images[i];
+            return this.images[0];
         }
     }
 

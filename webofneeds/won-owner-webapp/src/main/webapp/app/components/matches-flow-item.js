@@ -49,12 +49,13 @@ function genComponentConf() {
                 "images/furniture3.png",
                 "images/furniture4.png",
             ]
+            console.log(this.item)
         }
 
 
         getRandomImage(){
             let i = Math.floor((Math.random()*4))
-            return images[i];
+            return this.images[2];
         }
         getType(type) {
             switch(type){
