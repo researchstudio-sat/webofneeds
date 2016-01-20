@@ -11,14 +11,14 @@ function genComponentConf() {
         </div>
         <div class="mfi__description">
             <div class="mfi__description__topline">
-                <div class="mfi__description__topline__title clickable">{{self.item.title}}</div>
-                <div class="mfi__description__topline__date">Today 15:30</div>
+                <div class="mfi__description__topline__title clickable">{{self.item.remoteNeed.title}}</div>
+                <div class="mfi__description__topline__date">{{self.item.remoteNeed.creationDate}}</div>
             </div>
             <div class="mfi__description__subtitle">
                 <span class="mfi__description__subtitle__group" ng-show="self.item.group">
                     <img src="generated/icon-sprite.svg#ico36_group" class="mfi__description__subtitle__group__icon">{{self.item.group}}<span class="mfi__description__subtitle__group__dash"> &ndash; </span>
                 </span>
-                <span class="mfi__description__subtitle__type">{{self.getType(self.item.type)}}</span>
+                <span class="mfi__description__subtitle__type">{{self.getType(self.item.remoteNeed.basicNeedType)}}</span>
             </div>
             <div class="mfi__description__content">
                 <div class="mfi__description__content__location">
@@ -33,25 +33,36 @@ function genComponentConf() {
         </div>
         <div class="mfi__match clickable">
             <div class="mfi__match__description">
-                <div class="mfi__match__description__title">{{self.item.match.title}}</div>
-                <div class="mfi__match__description__type">{{self.getType(self.item.match.type)}}</div>
+                <div class="mfi__match__description__title">{{self.item.ownNeed.title}}</div>
+                <div class="mfi__match__description__type">{{self.getType(self.item.ownNeed.basicNeedType)}}</div>
             </div>
-            <won-square-image src="self.item.match.titleImgSrc" title="self.item.match.title"></won-square-image>
+            <won-square-image src="self.getRandomImage()" title="self.item.ownNeed.title"></won-square-image>
         </div>
     `;
 
     class Controller {
         constructor() {
             this.maxThumbnails = 4;
+            this.images=[
+                "images/furniture1.png",
+                "images/furniture2.png",
+                "images/furniture3.png",
+                "images/furniture4.png",
+            ]
+            console.log(this.item)
         }
 
 
+        getRandomImage(){
+            let i = Math.floor((Math.random()*4))
+            return this.images[2];
+        }
         getType(type) {
             switch(type){
-                case 1: return 'I want to have something';
-                case 2: return 'I offer something';
-                case 3: return 'I want to do something together';
-                case 4: return 'I want to change something';
+                case won.WON.BasicNeedTypeDemand: return 'I want to have something';
+                case won.WON.BasicNeedTypeSupply: return 'I offer something';
+                case won.WON.BasicNeedTypeDotogether: return 'I want to do something together';
+                case won.WON.BasicNeedTypeCritique: return 'I want to change something';
             }
         }
     }
