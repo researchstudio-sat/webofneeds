@@ -44,7 +44,7 @@ import {
 } from '../utils';
 
 import { hierarchy2Creators } from './action-utils';
-
+import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 import { buildCreateMessage } from '../won-message-utils';
 
@@ -113,10 +113,23 @@ const actionHierarchy = {
         add:INJ_DEFAULT,
         hintsOfNeedRetrieved:INJ_DEFAULT
     },
+    requests:{
+      incomingReceived:(data)=>(dispatch,getState)=>{
+          const state = getState();
+          Object.keys(unreadEvents.getIn(['events','unreadEventUris']).toJS())
+                .map(key=>state.getIn(['events','unreadEventUris']).toJS()[key])
+                .filter(event =>{
+                    if(event.eventType === won.EVENT.CONNECT_RECEIVED){
+                        return true
+                    }
+                })
+                .forEach((incomingRequest)=>{
+                  console.log(incomingRequest)
+                })
+      }
+    },
     connections:{
       fetch:(data)=>dispatch=>{
-
-
               var allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], data.needUri);
               allConnectionsPromise.then(function(connections){
                   console.log("fetching connections")
@@ -126,7 +139,6 @@ const actionHierarchy = {
           }
     },
     needs: {
-
         fetch: (data) => dispatch => {
             data.needs.forEach((uri,index,array)=>{
                 console.log(uri);
@@ -186,16 +198,80 @@ const actionHierarchy = {
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
          */
         requestWsReset_Hack: INJ_DEFAULT,
-        messageReceived:(data)=>dispatch=>{
-            //TODO not completed. handle all incoming messages here.
-            var configForEvent = messageTypeToEventType[event.hasMessageType];
-            if (configForEvent.eventType != null) {
-                event.eventType = configForEvent.eventType;
-                event.sentTimestamp = new Date().getTime();
+        messageReceived:(data)=>dispatch=> {
+            getEventData(data).then(event=>{
+                window.event4dbg = event;
+                if(event.hasMessageType === won.WONMSG.successResponseCompacted) {
+                    dispatch(actionCreators.messages__successResponseMessageReceived(event))
+                }else if(event.hasMessageType === won.WONMSG.hintMessageCompacted){
+                    console.log("got hint message")
+                    dispatch(actionCreators.messages__hintMessageReceived(event))
+                }
+                else if(event.hasMessageType === won.WONMSG.connectMessageCompacted){
+                    dispatch(actionCreators.messages__connectMessageReceived(event))
+                }
+            })
 
-            } else {
-                $log.warn("Not handling message of type " + event.hasMessageType + " in incomingMessageHandler");
+        },
+        successResponseMessageReceived :(event)=>dispatch=>{
+            console.log('received response to ', event.isResponseTo, ' of ', event);
+
+            //TODO do all of this in actions.js?
+            if (event.isResponseToMessageType === won.WONMSG.createMessageCompacted) {
+                console.log("got response for CREATE: " + event.hasMessageType);
+                //TODO: if negative, use alternative need URI and send again
+                //fetch need data and store in local RDF store
+                //get URI of newly created need from message
+
+                //load the data into the local rdf store and publish NeedCreatedEvent when done
+                var needURI = event.hasReceiverNeed;
+                won.ensureLoaded(needURI)
+                    .then(
+                    function (value) {
+                        var eventData = won.clone(event);
+                        eventData.eventType = won.EVENT.NEED_CREATED;
+                        setCommStateFromResponseForLocalNeedMessage(eventData);
+                        eventData.needURI = needURI;
+                        won.getNeed(needURI)
+                            .then(function(need){
+
+                                console.log("Dispatching action " + won.EVENT.NEED_CREATED);
+                                redux.dispatch(actionCreators.drafts__publishSuccessful({
+                                    publishEventUri: event.isResponseTo,
+                                    needUri: event.hasSenderNeed,
+                                    eventData:eventData
+                                }));
+                                dispatch(actionCreators.needs__received(need))
+                                //deferred.resolve(needURI);
+                            });
+                    })
+
+                // dispatch routing change
+                //TODO back-button doesn't work for returning to the draft
+                dispatch(actionCreators.router__stateGo('postVisitor', {postId: event.hasSenderNeed /* published posts id */}));
+
+                //TODO add to own needs
+                //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
+
             }
+        },
+        connectMessageReceived:(data)=>dispatch=>{
+            data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
+            won.invalidateCacheForNewConnection(data.hasReceiver,data.hasReceiverNeed)
+                ['finally'](function(){
+
+                    data.unreadUri = data.hasReceiver;
+                    dispatch(actionCreators.events__addUnreadEventUri(data)).then((dispatch,getState)=>{
+                        dispatch(actionCreators.requests__incomingReceived(match))
+                    })
+
+                getConnectionRelatedData(needUri,data.hasMatchCounterpart,data.hasReceiver).then((results)=>{
+                    match.remoteNeed=results[1]
+                    match.ownNeed = results[0]
+                    match.connection = results[2]
+
+                })
+            })
         },
         hintMessageReceived:(data)=>dispatch=>{
             data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
@@ -203,26 +279,19 @@ const actionHierarchy = {
                 ['finally'](function(){
                     let needUri = data.hasReceiverNeed;
                     let match = {}
-                    let promises = []
+
                     data.unreadUri = data.hasReceiver;
                     data.matchScore = data.framedMessage[won.WON.hasMatchScoreCompacted];
                     data.matchCounterpartURI = won.getSafeJsonLdValue(data.framedMessage[won.WON.hasMatchCounterpart]);
 
-                    let remoteNeed= won.getNeed(data.hasMatchCounterpart)
-                    let ownNeed=won.getNeed(needUri)
-                    let connection=won.getConnection(data.hasReceiver)
-                    promises.push(remoteNeed,ownNeed,connection)
-
-                    dispatch(actionCreators.events__addUnreadEventsByNeedByType(data))
-                    dispatch(actionCreators.events__addUnreadEventsByTypeByNeed(data))
                     dispatch(actionCreators.events__addUnreadEventUri(data))
-
-                    Q.all(promises).then(function(promiseResults){
-                        match.remoteNeed=promiseResults[0]
-                        match.ownNeed = promiseResults[1]
-                        match.connection = promiseResults[2]
+                    getConnectionRelatedData(needUri,data.hasMatchCounterpart,data.hasReceiver).then((results)=>{
+                        match.remoteNeed=results[1]
+                        match.ownNeed = results[0]
+                        match.connection = results[2]
                         dispatch(actionCreators.matches__add(match))
                     })
+
 
 
                 // /add some properties to the eventData so as to make them easily accessible to consumers
@@ -253,18 +322,7 @@ const actionHierarchy = {
     send = dispatch("pending")
     */
 
-    moreWub: INJ_DEFAULT,
-    /*
-     * This action creator uses thunk (https://github.com/gaearon/redux-thunk) which
-     * allows using it with a normal dispatch(actionCreator(payload)) even though
-     *  it does asynchronous calls. This is a requirement for using it with
-     *  $ngRedux.connect(..., actionCreators, ...)
-     */
-    delayedWub : (nrOfWubs, milliseconds = 1000) => (dispatch) =>
-        delay(milliseconds).then(
-                args => dispatch(actionCreators.moreWub(nrOfWubs)),
-                error => console.err('actions.js: Error while delaying for delayed Wub.')
-        ),
+
 
     verifyLogin: () => dispatch => {
         fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
@@ -398,6 +456,17 @@ const actionHierarchy = {
 
         update: INJ_DEFAULT,
     }
+}
+var getConnectionRelatedData=(needUri,remoteNeedUri,connectionUri)=>{
+    var promises=[]
+    let remoteNeed= won.getNeed(remoteNeedUri)
+    let ownNeed=won.getNeed(needUri)
+    let connection=won.getConnection(connectionUri)
+    promises.push(remoteNeed,ownNeed,connection)
+
+
+
+    return Q.all(promises)
 }
 var messageTypeToEventType = {};
 messageTypeToEventType[won.WONMSG.hintMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED};
