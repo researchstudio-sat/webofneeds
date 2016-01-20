@@ -46,6 +46,7 @@ public class NeedSolrInputDocumentBuilder extends NeedBuilderBase<SolrInputDocum
     String location = (getAvailableAtLocationLatitude() != null && getAvailableAtLocationLongitude() != null)?
         getAvailableAtLocationLatitude()+","+getAvailableAtLocationLongitude():null;
     SolrInputDocument doc = new SolrInputDocument();
+
     addFieldIfPresent(doc, SolrFields.URL, getURI());
     addFieldIfPresent(doc, SolrFields.BASIC_NEED_TYPE, getBasicNeedTypeURI());
     addFieldIfPresent(doc, SolrFields.DESCRIPTION, getDescription());

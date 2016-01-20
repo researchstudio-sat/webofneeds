@@ -25,7 +25,7 @@ import won.bot.framework.events.event.Event;
  */
 public class LogAction extends BaseEventBotAction
 {
-  private String message;
+  protected String message;
 
   public LogAction(final EventListenerContext eventListenerContext)
   {

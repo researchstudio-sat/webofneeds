@@ -36,7 +36,7 @@ public class CryptographyServiceTest {
     public void generateKeyPair() {
 
         KeyPairService keyPairService = context.getBean("keyPairService", KeyPairService.class);
-        KeyPair keypair = keyPairService.generateNewKeyPair();
+        KeyPair keypair = keyPairService.generateNewKeyPairInBrainpoolp384r1();
         System.out.println(keypair);
     }
 
@@ -44,7 +44,7 @@ public class CryptographyServiceTest {
     public void getParametersOfKeyPair() {
 
         KeyPairService keyPairService = context.getBean("keyPairService", KeyPairService.class);
-        KeyPair keypair = keyPairService.generateNewKeyPair();
+        KeyPair keypair = keyPairService.generateNewKeyPairInBrainpoolp384r1();
 
         KeyInformationExtractorBouncyCastle extractor = new KeyInformationExtractorBouncyCastle();
 
@@ -63,7 +63,7 @@ public class CryptographyServiceTest {
     public void getRDFFromKeyParameters() {
 
         KeyPairService keyPairService = context.getBean("keyPairService", KeyPairService.class);
-        KeyPair keypair = keyPairService.generateNewKeyPair();
+        KeyPair keypair = keyPairService.generateNewKeyPairInBrainpoolp384r1();
 
 
         try {

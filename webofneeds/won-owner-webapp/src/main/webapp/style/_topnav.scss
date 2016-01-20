@@ -1,0 +1,107 @@
+@import 'won-config';
+@import 'tri-aligned';
+@import 'flex-layout';
+@import 'sizing-utils';
+
+.topnav { //TODO split into single-purpose-classes
+
+  background-color: white;
+
+  $responsivenessBreakPoint: 31rem;
+
+  @include max-content-width($maxContentWidth, $minContentPadding, 'topnav');
+
+  > .topnav__inner {
+    //@include tri-aligned('topnav__inner', 1rem);
+    @include flex-row-spaced;
+
+    position: relative; //to allow absolute on *__center
+
+    > .topnav__inner__left {
+      margin-right: 1rem;
+      .topnav__button__icon { margin-right: 0.5rem; }
+
+    }
+    > .topnav__inner__center {
+      // so the create-need-speechbubble-triangle centers correctly
+      // on the icon (when the caption isn't visible)
+      @extend  %center--absolute;
+    }
+    > .topnav__inner__right {
+      margin-left: 1rem;
+      .topnav__button {
+        margin-left: 0.5rem;
+        cursor: pointer;
+      }
+    }
+  }
+  & a {
+    color: $won-red;
+    text-decoration: none;
+  }
+
+  & .topnav__page-title {
+    font-weight: 700;
+  }
+
+  & .topnav__carret {
+    /*
+    // without svg-included margins
+    @include fixed-height(0.5rem);
+    @include fixed-width(0.875rem);
+    */
+
+    // with svg-included margins
+    @include carretSized;
+  }
+
+  .won-button--filled {
+    white-space: nowrap;
+
+    @media (max-width: $responsivenessBreakPoint) {
+      display: none;
+    }
+  }
+
+  & .topnav__button {
+    @include flex-row;
+
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    .topnav__button__caption {
+      white-space: nowrap;
+
+      @media (max-width: $responsivenessBreakPoint) {
+        display: none;
+      }
+    }
+
+    &.won-button--filled {
+      white-space: nowrap;
+
+      @media (max-width: $responsivenessBreakPoint) {
+        display: none;
+      }
+    }
+
+    .topnav__button__caption__always {
+      white-space: nowrap;
+    }
+
+    .topnav__button__icon {
+      @include fixed-square($bigiconSize);
+    }
+
+    &.open {
+      color: black;
+    }
+  }
+
+  & .topnav__list {
+    @include flex-row;
+    list-style: none;
+  }
+}
+
+

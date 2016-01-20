@@ -36,34 +36,12 @@
         <property name="ownerProtocolOwnerURI" value="${uri.prefix.owner}"/>
     </bean>
 
-    <bean id="dataReloadService" class="won.owner.service.impl.DataReloadService">
-        <property name="ownerService" ref="ownerProtocolNeedReadService" />
-    </bean>
-
     <!-- Model Mapper for RDF -->
     <bean id="needModelMapper" class="won.protocol.util.NeedModelMapper"/>
     <bean id="connectionModelMapper" class="won.protocol.util.ConnectionModelMapper"/>
 
-    <bean id="ownerProtocolOwnerService" class="won.owner.service.impl.OwnerProtocolOwnerServiceImpl" />
-
-    <bean id="ownerProtocolOwnerServiceJMSBased" class="won.owner.messaging.OwnerProtocolOwnerServiceImplJMSBased"></bean>
-
     <bean id="executor" class="org.springframework.scheduling.concurrent.ConcurrentTaskExecutor" />
 
-    <bean id="ownerProtocolNeedServiceClient" class="won.owner.protocol.impl.OwnerProtocolNeedServiceClient">
-        <!-- used to distinguish different implementations when auto-wiring -->
-        <!-- see http://docs.spring.io/spring/docs/3.0.0.M3/reference/html/ch04s11.html -->
-        <qualifier value="default" />
-
-        <!-- expects a bean named "ownerProtocolNeedServiceClientDelegate" in the context.
-             That bean may be used to make clever decisions regarding the transport or just be hard-wired to
-             use eg jms
-         -->
-        <property name="delegate" ref="ownerProtocolNeedServiceClientJMSBased" />
-    </bean>
-
-    <bean id="ownerProtocolNeedReadService" class="won.owner.protocol.impl.OwnerProtocolNeedReadServiceImpl">
-    </bean>
-
 	<bean id="wonUserDetailService" class="won.owner.service.impl.WONUserDetailService" />
+
 </beans>

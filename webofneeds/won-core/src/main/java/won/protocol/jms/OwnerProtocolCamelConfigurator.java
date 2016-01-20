@@ -16,6 +16,7 @@
 
 package won.protocol.jms;
 
+import won.cryptography.ssl.MessagingContext;
 import won.protocol.exception.CamelConfigurationFailedException;
 
 import java.net.URI;
@@ -25,6 +26,7 @@ import java.util.List;
  * User: LEIH-NB
  * Date: 24.02.14
  */
+//TODO maybe can extend needconfigurator...
 public interface OwnerProtocolCamelConfigurator extends CamelConfigurator {
     String configureCamelEndpointForNodeURI(URI wonNodeURI, URI brokerURI, String ownerProtocolQueueName) throws CamelConfigurationFailedException;
 
@@ -37,12 +39,15 @@ public interface OwnerProtocolCamelConfigurator extends CamelConfigurator {
     void setStartingEndpoint(URI wonNodeURI, String startingEndpoint);
 
     void setStartingComponent(String startingComponent);
-    public String getBrokerComponent(URI resourceUri);
+
+    String getBrokerComponentName(URI resourceUri);
+
     void setDefaultNodeURI(String defaultNodeURI);
-    public String replaceEndpointNameWithOwnerApplicationId(String endpointName, String ownerApplicationId) throws Exception;
-    public String replaceComponentNameWithOwnerApplicationId(String componentName, String ownerApplicationId);
 
     void setComponentName(String componentName);
-    String addCamelComponentForWonNodeBroker(URI wonNodeURI, URI brokerURI, String ownerApplicationId);
+
+    void addCamelComponentForWonNodeBroker(URI wonNodeURI, String brokerComponentName);
+
+    void setMessagingContext(MessagingContext messagingContext);
 
 }

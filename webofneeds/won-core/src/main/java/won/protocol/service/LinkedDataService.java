@@ -76,6 +76,6 @@ public interface LinkedDataService
    * returns a dataset of the (message) event with the specified URI
    * @param eventURI
    */
-  public Dataset getEventDataset(final URI eventURI);
+  public Dataset getDatasetForUri(final URI eventURI);
 
 }

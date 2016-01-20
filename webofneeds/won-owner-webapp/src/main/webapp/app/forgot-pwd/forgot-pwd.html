@@ -27,7 +27,8 @@
                             <input type="email" class="form-control" name="rememberEmail" id="rememberEmail" ng-model="user.email"
                                    placeholder="Email" required>
                             <!--TODO put in reg form in login form crosses in input fields from http://getbootstrap.com/css/-->
-                            <span class="label label-warning" ng-show="rememberPwdForm.rememberEmail.$invalid">Please write valid email address</span>
+                            <span class="label label-warning"
+                                  ng-show="rememberPwdForm.rememberEmail.$dirty && rememberPwdForm.rememberEmail.$invalid">Please write valid email address</span>
                             <!--<span class="label label-warning" ng-show="error.length > 0">{{error}}</span> -->
                         </div>
                     </div>

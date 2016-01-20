@@ -54,21 +54,93 @@ angular.module('won.owner')
             }
         }
     });
-angular.module('won.owner').controller('PostDetailCtrl', function ($scope,$log, $location, mapService, $compile, $routeParams,applicationControlService, applicationStateService, userService) {
+
+angular.module('won.owner')
+    .directive('wonPostDetail',
+    function postDetailFactory($log, applicationControlService,userService) {
+
+    var directive =  {
+        scope:{
+            need: '=need'
+        },
+        restrict:'AE',
+        templateUrl:"app/post-detail/post-detail-content.html",
+        link: function(scope, element, attrs){
+            $log.debug("wonPostDetail");
+            scope.getTypePicURI = applicationControlService.getTypePicURI
+            scope.humanReadableType = applicationControlService.humanReadableType
+        },//,
+        controller: function($scope,applicationStateService){
+            $scope.contactFormActiv = false;
+            $scope.$watch('need', function (newVal, oldVal) {
+                if (newVal == null || (oldVal != null && newVal.uri != oldVal.uri)) {
+                    $scope.contactFormActiv = false;
+                }
+            });
+            $scope.showPublic = function(){
+                return userService.isAuth();
+            }
+            $scope.canBeContacted = function(){
+
+                if ($scope.need == null) { // can happen when e.g. a server with that need is down and its linked data cannot be loaded
+                    return false;
+                }
+
+                // if it is own need, cannot be contacted
+                if (applicationStateService.getAllNeeds()[$scope.need.uri]) {
+                    return false;
+                }
+                // if it's own draft, cannot be contacted
+                if (applicationStateService.getAllDrafts()[$scope.need.uri]) {
+                    return false;
+                }
+                // TODO check with storyboard people:
+                // if it is another need, but communication already established,
+                // probably also should not be contacted?
+
+                return true;
+            }
+            $scope.clickOnContact = function(){
+                $log.debug('contact clicked');
+                $scope.contactFormActiv = !$scope.contactFormActiv;
+            }
+
+        }
+
+        //scope:{},
+   }
+
+    return directive
+});
+angular.module('won.owner').controller('PostDetailCtrl',
+    function
+        ( $scope
+        , $log
+        , $location
+        , $compile
+        , $routeParams
+        , applicationControlService
+        , applicationStateService
+        , userService
+        , utilService
+        )
+    {
+
     //$scope.postId = $routeParams.phoneId;
     //alert($routeParams.postId);
-    $scope.showPublic = function(){
-        return userService.isAuth();
-    }
+
     $scope.clickOnCopy = function(){
         $location.url("create-need/1/"+applicationControlService.getMenuPositionForNeedType($scope.need.basicNeedType));
     }
+
 
     $scope.hoverCopyToolTip ="I want this too";
     //$scope.need = $scope.$parent.need;
     $scope.need = {};
 
-    linkedDataService.getNeed(applicationStateService.getCurrentNeedURI()).then(function(need){
+    //linkedDataService.getNeed(applicationStateService.getCurrentNeedURI()).then(function(need){
+    linkedDataService.getNeed($routeParams.need).then(function(need){
+        $scope.need = need;
         $scope.need.uri = need['uri'];
         $scope.need.title = need['title'];
         $scope.need.tags = need['tags'];
@@ -83,6 +155,7 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope,$log, 
         $scope.need.startTime = need['startTime'];
     });
 
+    //TODO move these to a service
 
     //TODO: location, date, needCreated date
 
@@ -165,21 +238,6 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope,$log, 
     $scope.createPaginatedGallery(imagesPerPage);
 
     // TODO fix start and end date
-    /*
-    $('#time_from').datepicker({
-        format:'dd.mm.yyyy',
-        todayHighlight:true,
-        changeMonth:true,
-        changeYear:true,
-        startDate: $scope.need.startDate
-    });
-    $('#time_to').datepicker({
-        format:'dd.mm.yyyy',
-        changeMonth:true,
-        changeYear:true,
-        endDate:$scope.need.endDate
-    }); */
-
     // TODO fix when date is empty
     $scope.toDateString = function(date) {
         var d = date.split('-');
@@ -202,51 +260,9 @@ angular.module('won.owner').controller('PostDetailCtrl', function ($scope,$log, 
         $scope.timeInputFieldCollapsed = !$scope.timeInputFieldCollapsed;
     };
 
-    /*
-    $scope.getMapOptions = function(){
-
-        return {
-            center:mapService.getGeolocation(),
-            zoom:15,
-            mapTypeId:google.maps.MapTypeId.ROADMAP
-        };
-    }
-    $scope.mapOptions = $scope.getMapOptions();
-
-    $scope.onClickMap = function($event, $params) {
-        if (this.marker == null) {
-            this.marker = new google.maps.Marker({
-                position : $params[0].latLng,
-                map : this.myMap
-            });
-        } else {
-            this.marker.setPosition($params[0].latLng);
-        }
-        $scope.need.latitude = $params[0].latLng.lat();
-        $scope.need.longitude = $params[0].latLng.lng();
-    };
-    */
-
-    $scope.contactFormActiv = false;
-    $scope.clickOnContact = function(){
-        $log.debug('contact clicked');
-        $scope.contactFormActiv = !$scope.contactFormActiv;
-    }
 
 
-    /*$scope.mapOptions = $scope.getMapOptions()
-     $scope.onClickMap = function($event, $params) {
-     if (this.marker == null) {
-     this.marker = new google.maps.Marker({
-     position : $params[0].latLng,
-     map : this.myMap
-     });
-     } else {
-     this.marker.setPosition($params[0].latLng);
-     }
-     $scope.need.latitude = $params[0].latLng.lat();
-     $scope.need.longitude = $params[0].latLng.lng();
-     };      */
+
 
     $scope.previewRegime = false;
     $scope.previewRegimeOn = function(){
@@ -261,7 +277,8 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
         scope: {
             need : '='
         },
-        controller : function($scope, applicationStateService){
+        controller : function($scope, applicationStateService, $log){
+
             $scope.message = '';
             $scope.sendStatus = false; //todo refresh this var each time when we click on show contact form
             $scope.email = '';
@@ -270,14 +287,42 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
             $scope.dummyUri = '';
             $scope.post = null;//the post that is selected to connect with the current post. if no post is selected, a dummy post will be created
             $scope.allNeeds = applicationStateService.getAllNeeds();
-            $scope.dropdownText = 'Select your post'
+            $scope.dropdownText = 'Select your post';
+
+            $scope.$watch('need', function (newVal, oldVal) {
+                if (newVal == null || (oldVal != null && newVal.uri != oldVal.uri)) {
+                    // TODO move into separate init function
+                    $scope.message = '';
+                    $scope.sendStatus = false;
+                    $scope.email = '';
+                    $scope.postTitle = '';
+                    $scope.privateLink = '';
+                    $scope.dummyUri = '';
+                    $scope.post = null;//the post that is selected to connect with the current post. if no post is selected, a dummy post will be created
+                }
+            });
+
             $scope.clickOnPost = function(post){
                 $scope.dropdownText = post.title;
                 $scope.post = $scope.allNeeds[post.uri];
             }
+
+            // after the request need is created with generated private link account and contact
+            // request has been sent, sign-out that private link account, so that the user is not confused...
+            $scope.$on(won.EVENT.CONNECT_SENT, function(ngEvent, eventData) {
+                if (userService.isPrivateUser()) {
+                    userService.logOutAndSetUpApplicationState();
+                }
+            });
+
+            // locks in order to prevent connecting/creating request need > 1 time if user clicks > 1
+            var createAndConnectLock = false;
+            var connectLock = false;
             $scope.sendMessage = function() {
-                var needBuilderObject = new window.won.NeedBuilder().setContext();
-                if($scope.post == undefined){
+
+                if ($scope.post == undefined) { // a special request need has to be created and then connected from
+
+                    var needBuilderObject = new window.won.NeedBuilder().setContext();
                     if ($scope.need.basicNeedType == won.WON.BasicNeedTypeDemand) {
                         needBuilderObject.supply();
                     } else if ($scope.need.basicNeedType == won.WON.BasicNeedTypeSupply) {
@@ -287,57 +332,76 @@ angular.module('won.owner').directive('wonContact',function factory(userService,
                     } else {
                         needBuilderObject.critique();
                     }
-                    needBuilderObject.title('Request for converstion to '+$scope.need.title)
+                    needBuilderObject.title('Request for converstion to ' + $scope.need.title)
                         .ownerFacet()               // mandatory
                         .description('')
                         .hasTag('')
                         .hasContentDescription('')    // mandatory
                         //.hasPriceSpecification("EUR",5.0,10.0)
-                        .active()                   // mandatory: active or inactive
+
+                    // building need as JSON object
+                    var needJson = needBuilderObject.build();
+
+                    if (createAndConnectLock == false) {
+                        createAndConnectLock = true;
+                        // make sure the user is registered (either with account or private link),
+                        // then publish the need, so that it is under that account
+                        var newNeedUriPromise = userService.setUpRegistrationForUserPublishingNeed().then(
+                            function () {
+                                return wonService.createNeed(needJson);
+                            }
+                        );
+                        newNeedUriPromise.then(function (uri) {
+                            userService.sendEmail("PRIVATE_LINK", $scope.email);
+                            $scope.privateLink = applicationStateService.getPrivateLink(userService.getUserName());
+                            wonService.connect(uri, $scope.need.uri, $scope.message);
+                        }).then(function () {
+                            $scope.sendStatus = true;
+                        });
+                        newNeedUriPromise['finally'](function () {
+                            createAndConnectLock = false;
+                        });
+                    }
+                } else { // an existing need has to be connected from
+                    if (connectLock == false) {
+                        connectLock = true;
+                        var newConnectionPromise = wonService.connect($scope.post.uri, $scope.need.uri, $scope.message).then(function () {
+                            $scope.sendStatus = true;
+                        });
+                        newConnectionPromise['finally'](function () {
+                            connectLock = false;
+                        });
+                    }
                 }
-                //TODO Put here logic
-                // creating need object
 
-
-
-
-                // building need as JSON object
-                var needJson = needBuilderObject.build();
-
-                if($scope.post == undefined){
-                    var newNeedUriPromise = wonService.createNeed(needJson);
-
-                    newNeedUriPromise.then(function(uri){
-                        wonService.connect(uri, $scope.need.uri, $scope.message);
-                    }).then(function(){
-                        $scope.sendStatus= true;
-                    })
-                } else{
-                    wonService.connect($scope.post.uri, $scope.need.uri, $scope.message).then(function(){
-                        $scope.sendStatus = true;
-                    });
-                }
-
-
-
-
-                //$scope.need = $scope.getCleanNeed();      TODO decide what to do
+                // TODO errors
                 $scope.successShow = true;
-              //  if(!$scope.sendStatus)$scope.sendStatus = true;
+                //  if(!$scope.sendStatus)$scope.sendStatus = true;
+
             };
 
-            $scope.clickHandler = function(e){
-                e.target.dispatchEvent(new DataTrans("copy"));
-            }
+//            $scope.clickHandler = function(e){
+//                e.target.dispatchEvent(new DataTrans("copy"));
+//            }
+//
+//            $scope.copyHandler = function(e) {
+//                e.clipboardData.setData("text/plain",$scope.privateLink);
+//                //todo maybe we can use http://zeroclipboard.org/
+//            };
 
-            $scope.copyHandler = function(e) {
-                e.clipboardData.setData("text/plain",$scope.privateLink);
-                //todo maybe we can use http://zeroclipboard.org/
+            // TODO the 2 functions below duplicate those defined in main.js,
+            // how to reuse those without complicating the directive usage?
+            $scope.logClipCopied = function() {
+                $log.debug("clip-click works!");
             };
-            $scope.showPublic = function() {
-                return userService.isAuth();
+            $scope.fallbackForClipCopy = function(copy) {
+                window.prompt('Press cmd+c to confirm copy the link.', copy);
             };
 
+
+            $scope.showAccountUser = function() {
+                return userService.isAccountUser();
+            };
 
         } ,
         link: function(scope, element, attrs){
