@@ -1,0 +1,56 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+@import 'flex-layout';
+
+won-feedback-grid {
+  display: flex;
+
+  .feedback {
+    display: flex;
+    cursor: pointer;
+    flex-grow: 1;
+    background: white;
+    padding: 0.25rem;
+    flex-direction: column;
+
+    &__icon {
+      flex-grow: 1;
+      align-self: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      background-size: 1.5rem;
+
+      &.selected {
+        display: none;
+      }
+      &.unselected {
+        display: block;
+      }
+    }
+
+    &__text {
+      font-size: $smallFontSize;
+      color: black;
+      align-self: center;
+      text-align: center;
+    }
+
+    &:hover {
+
+      .feedback__text {
+        color: white;
+      }
+
+      .feedback__icon.selected {
+        display: block;
+      }
+      .feedback__icon.unselected {
+        display: none;
+      }
+      
+      background: $won-red;
+    }
+  }
+}
+

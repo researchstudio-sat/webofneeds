@@ -2,6 +2,7 @@
 
 import angular from 'angular';
 import squareImageModule from './square-image';
+import feedbackGridModule from './feedback-grid';
 
 function genComponentConf() {
     let template = `
@@ -32,13 +33,14 @@ function genComponentConf() {
                 </div>
             </div>
         </div>
-        <div class="mgi__match clickable">
+        <div class="mgi__match clickable" ng-if="!self.feedbackVisible" ng-click="self.showFeedback()">
             <div class="mgi__match__description">
                 <div class="mgi__match__description__title">{{self.item.ownNeed.title}}</div>
                 <div class="mgi__match__description__type">{{self.getType(self.item.ownNeed.basicNeedType)}}</div>
             </div>
             <won-square-image src="self.getRandomImage()" title="self.item.ownNeed.title"></won-square-image>
         </div>
+        <won-feedback-grid ng-if="self.feedbackVisible"/>
     `;
 
     class Controller {
@@ -48,7 +50,20 @@ function genComponentConf() {
                 "images/furniture2.png",
                 "images/furniture3.png",
                 "images/furniture4.png"
-            ]
+            ];
+            this.feedbackVisible = false;
+        }
+
+        showFeedback() {
+            this.feedbackVisible = true;
+        }
+
+        hideFeedback() {
+            this.feedbackVisible = false;
+        }
+
+        toggleFeedback(){
+            this.feedbackVisible = !this.feedbackVisible;
         }
 
         getType(type) {
@@ -77,7 +92,8 @@ function genComponentConf() {
 }
 
 export default angular.module('won.owner.components.matchesGridItem', [
-    squareImageModule
+    squareImageModule,
+    feedbackGridModule
 ])
     .directive('wonMatchesGridItem', genComponentConf)
     .name;

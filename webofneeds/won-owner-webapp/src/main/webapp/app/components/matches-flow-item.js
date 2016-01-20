@@ -3,13 +3,14 @@
 import angular from 'angular';
 import squareImageModule from './square-image';
 import extendedGalleryModule from './extended-gallery';
+import feedbackGridModule from './feedback-grid';
 
 function genComponentConf() {
     let template = `
         <div ng-show="self.item.images" class="mfi__gallery">
             <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.item.images" class="horizontal"></won-extended-gallery>
         </div>
-        <div class="mfi__description">
+        <div class="mfi__description clickable">
             <div class="mfi__description__topline">
                 <div class="mfi__description__topline__title clickable">{{self.item.remoteNeed.title}}</div>
                 <div class="mfi__description__topline__date">{{self.item.remoteNeed.creationDate}}</div>
@@ -31,17 +32,19 @@ function genComponentConf() {
                 </div>
             </div>
         </div>
-        <div class="mfi__match clickable">
+        <div class="mfi__match" ng-if="!self.feedbackVisible" ng-click="self.showFeedback()" >
             <div class="mfi__match__description">
                 <div class="mfi__match__description__title">{{self.item.ownNeed.title}}</div>
                 <div class="mfi__match__description__type">{{self.getType(self.item.ownNeed.basicNeedType)}}</div>
             </div>
             <won-square-image src="self.getRandomImage()" title="self.item.ownNeed.title"></won-square-image>
         </div>
+        <won-feedback-grid ng-if="self.feedbackVisible"/>
     `;
 
     class Controller {
         constructor() {
+            this.feedbackVisible = false;
             this.maxThumbnails = 4;
             this.images=[
                 "images/furniture1.png",
@@ -52,6 +55,17 @@ function genComponentConf() {
             console.log(this.item)
         }
 
+        showFeedback() {
+            this.feedbackVisible = true;
+        }
+
+        hideFeedback() {
+            this.feedbackVisible = false;
+        }
+
+        toggleFeedback(){
+            this.feedbackVisible = !this.feedbackVisible;
+        }
 
         getRandomImage(){
             let i = Math.floor((Math.random()*4))
@@ -79,7 +93,8 @@ function genComponentConf() {
 
 export default angular.module('won.owner.components.matchesFlowItem', [
     squareImageModule,
-    extendedGalleryModule
+    extendedGalleryModule,
+    feedbackGridModule
 ])
     .directive('wonMatchesFlowItem', genComponentConf)
     .name;
