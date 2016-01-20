@@ -40,14 +40,14 @@ import {
     reduceAndMapTreeKeys,
     flattenTree,
     delay,
-    checkHttpStatus
+    checkHttpStatus,
+    watchImmutableRdxState
 } from '../utils';
 
 import { hierarchy2Creators } from './action-utils';
 import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 import { buildCreateMessage } from '../won-message-utils';
-
 /**
  * all values equal to this string will be replaced by action-creators that simply
  * passes it's argument on as payload on to the reducers
@@ -116,7 +116,8 @@ const actionHierarchy = {
     requests:{
       incomingReceived:(data)=>(dispatch,getState)=>{
           const state = getState();
-          Object.keys(unreadEvents.getIn(['events','unreadEventUris']).toJS())
+          state.getIn(['events','unreadEventUris',data.hasReceiver]).toJS()
+          Object.keys(state.getIn(['events','unreadEventUris']).toJS())
                 .map(key=>state.getIn(['events','unreadEventUris']).toJS()[key])
                 .filter(event =>{
                     if(event.eventType === won.EVENT.CONNECT_RECEIVED){
@@ -125,7 +126,16 @@ const actionHierarchy = {
                 })
                 .forEach((incomingRequest)=>{
                   console.log(incomingRequest)
+                  getConnectionRelatedData(needUri,data.hasMatchCounterpart,data.hasReceiver).then((results)=>{
+                      match.remoteNeed=results[1]
+                      match.ownNeed = results[0]
+                      match.connection = results[2]
+
+                  })
                 })
+      },
+      incomingAdd:(data)=>(dispatch,getState)=>{
+
       }
     },
     connections:{
@@ -136,7 +146,8 @@ const actionHierarchy = {
                   dispatch(actionCreators.needs__connectionsReceived({needUri:data.needUri,connections:connections}))
                   dispatch(actionCreators.events__fetch({connectionUris:connections}))
               })
-          }
+          },
+      add:INJ_DEFAULT
     },
     needs: {
         fetch: (data) => dispatch => {
@@ -203,7 +214,8 @@ const actionHierarchy = {
                 window.event4dbg = event;
                 if(event.hasMessageType === won.WONMSG.successResponseCompacted) {
                     dispatch(actionCreators.messages__successResponseMessageReceived(event))
-                }else if(event.hasMessageType === won.WONMSG.hintMessageCompacted){
+                }
+                else if(event.hasMessageType === won.WONMSG.hintMessageCompacted){
                     console.log("got hint message")
                     dispatch(actionCreators.messages__hintMessageReceived(event))
                 }
@@ -261,16 +273,13 @@ const actionHierarchy = {
                 ['finally'](function(){
 
                     data.unreadUri = data.hasReceiver;
-                    dispatch(actionCreators.events__addUnreadEventUri(data)).then((dispatch,getState)=>{
-                        dispatch(actionCreators.requests__incomingReceived(match))
+                    dispatch(actionCreators.events__addUnreadEventUri(data))
+                   // dispatch(actionCreators.requests__incomingReceived(data))
+
+                    won.getConnectionWithOwnAndRemoteNeed(data.hasReceiverNeed,data.hasSenderNeed).then(connectionData=>{
+                        getConnectionRelatedDataAndDispatch(data.hasReceiverNeed,data.hasSenderNeed,connectionData.uri,dispatch)
                     })
 
-                getConnectionRelatedData(needUri,data.hasMatchCounterpart,data.hasReceiver).then((results)=>{
-                    match.remoteNeed=results[1]
-                    match.ownNeed = results[0]
-                    match.connection = results[2]
-
-                })
             })
         },
         hintMessageReceived:(data)=>dispatch=>{
@@ -285,12 +294,7 @@ const actionHierarchy = {
                     data.matchCounterpartURI = won.getSafeJsonLdValue(data.framedMessage[won.WON.hasMatchCounterpart]);
 
                     dispatch(actionCreators.events__addUnreadEventUri(data))
-                    getConnectionRelatedData(needUri,data.hasMatchCounterpart,data.hasReceiver).then((results)=>{
-                        match.remoteNeed=results[1]
-                        match.ownNeed = results[0]
-                        match.connection = results[2]
-                        dispatch(actionCreators.matches__add(match))
-                    })
+                    getConnectionRelatedDataAndDispatch(needUri,data.hasMatchCounterpart,data.hasReceiver,dispatch)
 
 
 
@@ -457,16 +461,22 @@ const actionHierarchy = {
         update: INJ_DEFAULT,
     }
 }
-var getConnectionRelatedData=(needUri,remoteNeedUri,connectionUri)=>{
+var getConnectionRelatedDataAndDispatch=(needUri,remoteNeedUri,connectionUri,dispatch)=>{
     var promises=[]
     let remoteNeed= won.getNeed(remoteNeedUri)
     let ownNeed=won.getNeed(needUri)
     let connection=won.getConnection(connectionUri)
     promises.push(remoteNeed,ownNeed,connection)
 
+    Q.all(promises).then(results=>{
+        let resultObject={}
+        resultObject.remoteNeed=results[0]
+        resultObject.ownNeed = results[1]
+        resultObject.connection = results[2]
+        dispatch(actionCreators.connections__add(resultObject))
 
+    })
 
-    return Q.all(promises)
 }
 var messageTypeToEventType = {};
 messageTypeToEventType[won.WONMSG.hintMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED};

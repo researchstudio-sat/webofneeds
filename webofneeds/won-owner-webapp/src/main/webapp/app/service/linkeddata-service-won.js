@@ -1499,6 +1499,40 @@ import * as q from 'q';
         //TODO: SPARQL query that returns the common message properties
     }
 
+    won.getConnectionWithOwnAndRemoteNeed= function(ownNeedUri,remoteNeedUri){
+        return won.getconnectionUrisOfNeed(ownNeedUri).then(connectionUris=>{
+            let data = Q.defer()
+            connectionUris.forEach(connection=>{
+                let resultObject = {}
+
+                won.getConnection(connection).then(function(connectionData){
+                    resultObject.connection = connectionData;
+                    let query="prefix msg: <http://purl.org/webofneeds/message#> \n"+
+                        "prefix won: <http://purl.org/webofneeds/model#> \n" +
+                        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
+                        "select ?connection \n" +
+                        " where { \n" +
+                        "?connection a won:Connection; \n" +
+                        "              won:belongsToNeed <" +ownNeedUri +"> ; \n" +
+                        "              won:hasRemoteNeed <" +remoteNeedUri +"> ."+
+                        "} \n"
+
+                    privateData.store.execute(query,[],[],function(success,results){
+                        if (rejectIfFailed(success, results, {message: "Error loading connection for need " + ownNeedUri, allowNone: true, allowMultiple: true})) {
+                            return;
+                        }
+                        if(results.length ===1){
+                            let connection = null;
+                            won.getConnection(results[0].connection.value).then(connectionData=>{
+                                return data.resolve(connectionData)
+                            })
+                        }
+                    })
+                })
+            })
+            return data.promise;
+        })
+    }
     /**
      * Loads the hints for the need with the specified URI into an array of js objects.
      * @return the array or null if no data is found for that URI in the local datastore

@@ -22,8 +22,8 @@ class OverviewMatchesController {
         const selectFromState = (state)=>{
 
             return {
-                matches: state.getIn(['matches','matches']).toJS(),
-                matchesOfNeed:this.mapToMatches(state.getIn(['matches','matches']).toJS())
+                matches: Object.keys(state.getIn(['connections','connections']).toJS()).map(key=>state.getIn(['connections','connections']).toJS()[key]).filter(conn=>{if(conn.connection.hasConnectionState===won.WON.Suggested){return true}}),
+                matchesOfNeed:this.mapToMatches(state.getIn(['connections','connections']).toJS())
             };
         }
 
