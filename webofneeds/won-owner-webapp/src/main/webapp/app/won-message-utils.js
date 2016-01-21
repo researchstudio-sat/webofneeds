@@ -142,8 +142,10 @@ export function getEventData(msgJson) {
                 e.acceptedSources = acceptedSources;
                 e.framedMessages = msgFramings;
                 throw e;
-            } else if(msgFramings.length > 1) {
-                /* Multiple type declarations -> not valid json-ld */
+            }
+/*            else if(msgFramings.length > 1) {
+
+                /!* Multiple type declarations -> not valid json-ld *!/
                 const e = new Error('The framing found ' + msgFramings.length +
                     'message types. Either the message wasn\'t valid json-ld or the ' +
                     'framing has a bug. Please open a github issue at ' +
@@ -155,7 +157,8 @@ export function getEventData(msgJson) {
                 e.acceptedSources = acceptedSources;
                 e.framedMessages = msgFramings;
                 throw e;
-            } else {
+            } */
+            else {
                 return msgFramings[0];
             }
         });

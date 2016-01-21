@@ -29,7 +29,7 @@ export default createReducer(
             return state.setIn(['needs',action.payload.needUri,'connectionUris'],action.payload.connections)
         },
         [actionTypes.needs.clean]:(state,{})=>{
-            return Immutable.fromJS(initialState);
+            return initialState
         }
     }
 

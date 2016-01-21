@@ -191,7 +191,14 @@ export function flattenTree(tree, delimiter = '__') {
     _flattenTree(tree);
     return accObj;
 }
-
+export function         getType(type) {
+    switch(type){
+        case won.WON.BasicNeedTypeDemand: return 'I want to have something';
+        case won.WON.BasicNeedTypeSupply: return 'I offer something';
+        case won.WON.BasicNeedTypeDotogether: return 'I want to do something together';
+        case won.WON.BasicNeedTypeCritique: return 'I want to change something';
+    }
+}
 export function delay(milliseconds) {
     return new Promise((resolve, reject) =>
             window.setTimeout(() => resolve(), milliseconds)
@@ -243,7 +250,23 @@ export function watchImmutableRdxState(redux, path, callback) {
         callback
     );
 }
+export function mapToMatches(connections){
+    let needMap = {}
+    if(connections){
 
+        Object.keys(connections).forEach(function(key){
+
+            if(!needMap[connections[key].ownNeed.uri]){
+                let connectionsArr = [connections[key]]
+                needMap[connections[key].ownNeed.uri]=connectionsArr
+            }else{
+                needMap[connections[key].ownNeed.uri].push(connections[key])
+            }
+        }.bind(this))
+    }
+    return needMap;
+
+}
 export function removeAllProperties(obj){
     Object.keys(obj).forEach(function(element,index,array){
         delete obj[element];

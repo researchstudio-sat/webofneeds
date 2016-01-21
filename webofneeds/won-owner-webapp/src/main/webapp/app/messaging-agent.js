@@ -86,60 +86,10 @@ export function runMessagingAgent(redux) {
     };
     function onMessage(receivedMsg) {
         const parsedMsg = JSON.parse(receivedMsg.data);
-        getEventData(parsedMsg).then(event => {
-            // redux.dispatch(actionCreators.messages__receive(event))
-            window.event4dbg = event;
 
-            //TODO everything below should be in a seperate function or even moved to an actioncreator
-            if(event.hasMessageType === won.WONMSG.successResponseCompacted) {
+        redux.dispatch(actionCreators.messages__messageReceived(parsedMsg))
 
-                console.log('received response to ', event.isResponseTo, ' of ', event);
 
-                //TODO do all of this in actions.js?
-                if (event.isResponseToMessageType === won.WONMSG.createMessageCompacted) {
-                    console.log("got response for CREATE: " + event.hasMessageType);
-                    //TODO: if negative, use alternative need URI and send again
-                    //fetch need data and store in local RDF store
-                    //get URI of newly created need from message
-
-                    //load the data into the local rdf store and publish NeedCreatedEvent when done
-                    var needURI = event.hasReceiverNeed;
-                    won.ensureLoaded(needURI)
-                        .then(
-                        function (value) {
-                            var eventData = won.clone(event);
-                            eventData.eventType = won.EVENT.NEED_CREATED;
-                            setCommStateFromResponseForLocalNeedMessage(eventData);
-                            eventData.needURI = needURI;
-                            won.getNeed(needURI)
-                                .then(function(need){
-
-                                    console.log("Dispatching action " + won.EVENT.NEED_CREATED);
-                                    redux.dispatch(actionCreators.drafts__publishSuccessful({
-                                        publishEventUri: event.isResponseTo,
-                                        needUri: event.hasSenderNeed,
-                                        eventData:eventData
-                                    }));
-                                    redux.dispatch(actionCreators.needs__received(need))
-                                    //deferred.resolve(needURI);
-                                });
-                        })
-
-                    // dispatch routing change
-                    //TODO back-button doesn't work for returning to the draft
-                    redux.dispatch(actionCreators.router__stateGo('postVisitor', {postId: event.hasSenderNeed /* published posts id */}));
-
-                    //TODO add to own needs
-                    //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
-
-                }
-                // TODO else if (event.isResponseToMessageType === ... chat...) { }
-            }else if(event.hasMessageType === won.WONMSG.hintMessageCompacted){
-                console.log("got hint message")
-
-                redux.dispatch(actionCreators.messages__hintMessageReceived(event))
-            }
-        });
     };
     function onError(e) {
         console.error('websocket error: ', e);

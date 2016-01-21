@@ -3,7 +3,7 @@
 import angular from 'angular';
 import squareImageModule from './square-image';
 import extendedGalleryModule from './extended-gallery';
-
+import getType from '../utils.js';
 function genComponentConf() {
     let template = `
         <div ng-show="self.images" class="mfi__gallery">
@@ -56,14 +56,7 @@ function genComponentConf() {
             let i = Math.floor((Math.random()*4))
             return this.images[2];
         }
-        getType(type) {
-            switch(type){
-                case won.WON.BasicNeedTypeDemand: return 'I want to have something';
-                case won.WON.BasicNeedTypeSupply: return 'I offer something';
-                case won.WON.BasicNeedTypeDotogether: return 'I want to do something together';
-                case won.WON.BasicNeedTypeCritique: return 'I want to change something';
-            }
-        }
+
     }
 
     return {
