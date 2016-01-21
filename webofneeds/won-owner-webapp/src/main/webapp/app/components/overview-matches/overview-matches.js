@@ -5,6 +5,8 @@ import overviewTitleBarModule from '../overview-title-bar';
 import matchesFlowItemModule from '../matches-flow-item';
 import matchesGridItemModule from '../matches-grid-item';
 import matchesListItemModule from '../matches-list-item';
+import sendRequestModule from '../send-request';
+
 import { attach } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
 
@@ -31,6 +33,7 @@ class OverviewMatchesController {
       //  this.loadMatches();
         this.$scope.$on('$destroy', disconnect);
     }
+
     loadMatches(){
         this.matches__load(
             this.$ngRedux.getState().getIn(['needs','needs']).toJS()
@@ -60,7 +63,8 @@ export default angular.module('won.owner.components.overviewMatches', [
     overviewTitleBarModule,
     matchesFlowItemModule,
     matchesGridItemModule,
-    matchesListItemModule
+    matchesListItemModule,
+    sendRequestModule
 ])
     .controller('OverviewMatchesController', [...serviceDependencies,OverviewMatchesController])
     .name;

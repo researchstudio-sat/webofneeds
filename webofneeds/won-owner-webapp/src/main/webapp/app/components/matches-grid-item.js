@@ -40,7 +40,7 @@ function genComponentConf() {
             </div>
             <won-square-image src="self.getRandomImage()" title="self.item.ownNeed.title"></won-square-image>
         </div>
-        <won-feedback-grid ng-if="self.feedbackVisible"/>
+        <won-feedback-grid item="self.item" request-item="self.requestItem" ng-if="self.feedbackVisible"/>
     `;
 
     class Controller {
@@ -86,7 +86,8 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {item: "="},
+        scope: {item: "=",
+                requestItem: "="},
         template: template
     }
 }
