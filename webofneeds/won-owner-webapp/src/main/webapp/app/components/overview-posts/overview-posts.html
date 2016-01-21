@@ -11,7 +11,7 @@
         </div>
         <won-post-item-line ng-show="self.activePostsOpen"
                             item="item"
-                            unread-match-events-of-need="self.unreadMatchEventsOfNeed"
+                            unread-match-events-of-need="self.unreadMatchEventsOfNeed.get(item.uri)"
                             ng-repeat="item in self.posts |filterByNeedState: 'http://purl.org/webofneeds/model#Active'">
         </won-post-item-line>
         <div class="title clickable"
@@ -21,8 +21,9 @@
         </div>
         <won-post-item-line ng-show="self.draftsOpen"
                             item="item"
-                            unread-match-events-of-need="self.unreadMatchEventsOfNeed"
+                            unread-match-events-of-need="self.unreadMatchEventsOfNeed.get(item.uri)"
                             ng-repeat="item in self.drafts">
+            <!--unread-match-events-of-need="self.unreadMatchEventsOfNeed"-->
         </won-post-item-line>
         <div class="title clickable"
              ng-click="self.closedPostsOpen = !self.closedPostsOpen">
@@ -31,7 +32,7 @@
         </div>
         <won-post-item-line ng-show="self.closedPostsOpen"
                             item="item"
-                            unread-match-events-of-need="self.unreadMatchEventsOfNeed"
+                            unread-match-events-of-need="self.unreadMatchEventsOfNeed.get(item.uri)"
                             ng-repeat="item in self.posts |filterByNeedState:'inactive'">
         </won-post-item-line>
     </div>
