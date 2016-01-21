@@ -5,11 +5,34 @@
 </header>
 <main class="overviewpostscontent">
     <div class="opc__inner">
-        <div class="title clickable" ng-click="self.activePostsOpen = !self.activePostsOpen">Active Posts<span class="title__counter">{{self.posts.size}}</span></div>
-        <won-post-item-line ng-show="self.activePostsOpen" item="item" unread-match-events-of-need="self.unreadMatchEventsOfNeed" ng-repeat="item in self.posts |filterByNeedState: 'http://purl.org/webofneeds/model#Active'"></won-post-item-line>
-        <div class="title clickable" ng-click="self.draftsOpen = !self.draftsOpen">Drafts<span class="title__counter">{{self.drafts.length}}</span></div>
-        <won-post-item-line ng-show="self.draftsOpen" item="item" unread-match-events-of-need="self.unreadMatchEventsOfNeed" ng-repeat="item in self.drafts"></won-post-item-line>
-        <div class="title clickable" ng-click="self.closedPostsOpen = !self.closedPostsOpen">Closed<span class="title__counter">{{self.closedPosts.length}}</span></div>
-        <won-post-item-line ng-show="self.closedPostsOpen" item="item" unread-match-events-of-need="self.unreadMatchEventsOfNeed" ng-repeat="item in self.posts |filterByNeedState:'inactive'"></won-post-item-line>
+        <div class="title clickable" ng-click="self.activePostsOpen = !self.activePostsOpen">
+            Active Posts
+            <span class="title__counter">{{self.posts.size}}</span>
+        </div>
+        <won-post-item-line ng-show="self.activePostsOpen"
+                            item="item"
+                            unread-match-events-of-need="self.unreadMatchEventsOfNeed"
+                            ng-repeat="item in self.posts |filterByNeedState: 'http://purl.org/webofneeds/model#Active'">
+        </won-post-item-line>
+        <div class="title clickable"
+             ng-click="self.draftsOpen = !self.draftsOpen">
+            Drafts
+            <span class="title__counter">{{self.drafts.length}}</span>
+        </div>
+        <won-post-item-line ng-show="self.draftsOpen"
+                            item="item"
+                            unread-match-events-of-need="self.unreadMatchEventsOfNeed"
+                            ng-repeat="item in self.drafts">
+        </won-post-item-line>
+        <div class="title clickable"
+             ng-click="self.closedPostsOpen = !self.closedPostsOpen">
+            Closed
+            <span class="title__counter">{{self.closedPosts.length}}</span>
+        </div>
+        <won-post-item-line ng-show="self.closedPostsOpen"
+                            item="item"
+                            unread-match-events-of-need="self.unreadMatchEventsOfNeed"
+                            ng-repeat="item in self.posts |filterByNeedState:'inactive'">
+        </won-post-item-line>
     </div>
 </main>
