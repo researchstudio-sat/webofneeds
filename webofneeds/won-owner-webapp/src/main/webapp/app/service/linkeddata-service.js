@@ -459,7 +459,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     linkedDataService.addJsonLdData = function(uri, data) {
         $log.debug("storing jsonld data for uri: " + uri);
         privateData.store.load("application/ld+json", data, function (success, results) {
-            $log.debug("added jsonld data to rdf store, success: " + success);
+            $log.debug("added jsonld data to rdf store, success: " + success + " for " + uri);
             if (success) {
                 cacheItemMarkAccessed(uri);
             }
@@ -1476,8 +1476,8 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         });
         return deferred.promise;
     }
-    
-    
+
+
 
     /**
      * Loads the default data of the need with the specified URI into a js object.
@@ -1565,6 +1565,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                                 Array.prototype.push.apply(resolvedUris, foundUris);
                                 $log.debug("resolved to " + foundUris.length + " resources (total " + resolvedUris.length+")");
                         });
+                        won.deleteWhereNull(resolvedUris);
                         return resolvedUris;
                     } finally {
                         //release the read locks

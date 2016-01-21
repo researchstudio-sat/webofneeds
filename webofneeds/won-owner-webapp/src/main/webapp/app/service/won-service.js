@@ -172,7 +172,7 @@ angular.module('won.owner').factory('wonService', function (
         var incomingMessageHandler = new messageService.MessageCallback(
             function (event, msg) {
                 $log.debug("processing incoming message");
-                linkedDataService.addJsonLdData(event.uri, msg);
+                //linkedDataService.addJsonLdData(event.uri, msg);
                 var configForEvent = messageTypeToEventType[event.hasMessageType];
                 //only do something if a type/handler combination is registered
                 if (configForEvent.eventType != null) {
@@ -246,7 +246,7 @@ angular.module('won.owner').factory('wonService', function (
         var callback = new messageService.MessageCallback(
             function(event,msg){
                 $log.debug("got response for " + eventType +": " + event.hasMessageType);
-                linkedDataService.addJsonLdData(event.uri, msg);
+                //linkedDataService.addJsonLdData(event.uri, msg);
                 var eventData = won.clone(event);
                 setCommStateFromResponseForLocalNeedMessage(eventData);
                 eventData.eventType = eventType;
@@ -306,7 +306,7 @@ angular.module('won.owner').factory('wonService', function (
         var callback = new messageService.MessageCallback(
             function (event, msg) {
                 $log.debug("got response for " + eventType +": " + event.hasMessageType);
-                linkedDataService.addJsonLdData(event.uri, msg);
+                //linkedDataService.addJsonLdData(event.uri, msg);
                 var eventData = won.clone(event);
                 eventData.eventType = eventType;
                 var isRemoteResponse = false;
@@ -367,7 +367,7 @@ angular.module('won.owner').factory('wonService', function (
     var sendAndStoreMessageAndBroadcastAngularEvent = function sendAndStoreMessage(callback, message, eventUri, eventType) {
         messageService.addMessageCallback(callback);
         try {
-            linkedDataService.addJsonLdData(eventUri, message);
+            //linkedDataService.addJsonLdData(eventUri, message);
             messageService.sendMessage(message);
             var eventData = {}
             eventData.eventType = eventType;
