@@ -18,17 +18,10 @@
     <div ng-show="results.length > 0">
         <div class="row">
             <p style="font-size: 1.8em;">
-                <strong>What others offer:</strong> {{searching.title}}
+                <strong>What others offer:</strong> {{search.title}}
             </p>
         </div>
-
-        <div class="row">
-            <h4 class="inline">Related Tags:</h4>
-            <span style="margin-right:5px;cursor:pointer;"
-                  class="label label-primary btnTag"
-                  ng-repeat="tag in relatedTags">{{tag}}
-            </span>
-        </div>
+        <related-searches terms = "getRelatedSearches()" click-on-item = "newSearch(term)"></related-searches>
 
         <div class="row">
             <div class="pull-left">
@@ -37,7 +30,7 @@
         </div>
 
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <div class="pull-left">
                     Location:
                 </div>
@@ -57,9 +50,9 @@
                     </ul>
                 </div>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-6">
                 <div class="pull-left">
-                    <button type="button" ng-click="createNewPost()" class="btn btn-primary button-top-margin">Matches are better!</button>
+                    <button type="button" ng-click="redirectToCreatePost()" class="btn btn-primary button-top-margin">Matches are better!</button>
                 </div>
                 <div class="pull-left">
                     <a href="" tooltip="Creating a post will bring you alerts if matches were found: 24/7 and from all connected servers">Why
@@ -67,95 +60,24 @@
                 </div>
             </div>
         </div>
-        <!--
-            <div class="col-md-12">
-                <div class="col-md-4 pull-left">
-                    <div class="row">
-                        <div class="pull-left">
-                            Searching result on this server?
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="pull-left">
-                            Location:
-                        </div>
-                        <div class="pull-left">
-                            <button type="button" class="btn dropdown-toggle" id="newPostSearchMenu"
-                                    data-toggle="dropdown">
-                                Select your location
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                                <li role="presentation">
-                                    <a role="menuitem" tabindex="0" href="#">Searching by address, zip, county, etc</a>
-                                </li>
-                                <li role="presentation">
-                                    <a role="menuitem" tabindex="1" href="#">Current location</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="row col-md-8">
-                    <div class="pull-left">
-                        <button type="button" ng-click="createNewPost()" class="btn btn-primary button-top-margin">Matches are better!</button>
-                    </div>
-                    <div class="pull-left">
-                        <a href="" tooltip="Creating a post will bring you alerts if matches were found: 24/7 and from all connected servers">Why
-                            ?</a>
-                    </div>
-                </div>
-            </div>
-        -->
 
-        <div class="container col-md-12">
-            <div class="well col-md-4">
-                <div class="row">
-                    <div class="pull-left">
-                        <a href="#/search/1" class="thumbnail">
-                            <img src="/owner/images/thumbnail_demo.jpg"
-                                 alt="Generic placeholder thumbnail">
-                        </a>
-                    </div>
-                    <div class="pull-right">
-                        <a href="#/search/1" class="thumbnail">
-                            <img src="/owner/images/thumbnail_demo.jpg"
-                                 alt="Generic placeholder thumbnail">
-                        </a>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="pull-left">
-                        <a href="#/search/1" class="thumbnail">
-                            <img src="/owner/images/thumbnail_demo.jpg"
-                                 alt="Generic placeholder thumbnail">
-                        </a>
-                    </div>
-                    <div class="pull-right">
-                        <a href="#/search/1" class="thumbnail">
-                            <img src="/owner/images/thumbnail_demo.jpg"
-                                 alt="Generic placeholder thumbnail">
-                        </a>
-                    </div>
-                </div>
-            </div>
+        <search-result results="results" column-num="2" >
 
-            <won-Post-Detail class="col-md-8" ng-controller="PostDetailCtrl"></won-Post-Detail>
-
-        </div>
+        </search-result>
     </div>
-    <div ng-show="results.length == 0">
-        <div>
-            What {{searching.type}}. {{searching.title}}
+    <div ng-show="results.length == 0" >
+        <div application-control>
+            What others <span ng-bind="humanReadableType(getNeedType(search.type))"></span>:
+            <span ng-bind="search.title"></span>
         </div>
         <div>
             Sorry, we didn’t find results with this term
         </div>
         <div>
-            But <a href="" ng-click="createNewPost()">create a new post</a> and get matches and notifications!
+            But <a href="" ng-click="redirectToCreatePost()">create a new post</a> and get matches and notifications!
         </div>
         <div>
-            <button type="submit" ng-click="createNewPost()" class="btn btn-primary button-top-margin">Create Post</button>
+            <button type="submit" ng-click="redirectToCreatePost()" class="btn btn-primary button-top-margin">Create Post</button>
         </div>
     </div>
 </div>

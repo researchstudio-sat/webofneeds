@@ -22,7 +22,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.repository.rdfstorage.RDFStorageService;
-import won.protocol.model.ConnectionEvent;
 import won.protocol.util.RdfUtils;
 
 import java.net.URI;
@@ -43,17 +42,6 @@ public abstract class AbstractDatasetBasedRdfStorageService implements RDFStorag
   protected abstract Dataset getDataset();
 
 
-  @Override
-  public void storeModel(final ConnectionEvent event, final Model graph)
-  {
-    storeModel(createEventURI(event), graph);
-  }
-
-  @Override
-  public Model loadModel(final ConnectionEvent event)
-  {
-    return loadModel(createEventURI(event));
-  }
 
   @Override
   public void storeModel(final URI resourceURI, final Model model) {
@@ -105,12 +93,5 @@ public abstract class AbstractDatasetBasedRdfStorageService implements RDFStorag
     }
   }
 
-  /**
-   * Helper method that creates a URI for the specified ConnectionEvent.
-   * TODO: replace by more principled approach for generating event URIs. Do they get a publicly dereferencable URI?
-   *
-   */
-  private URI createEventURI(ConnectionEvent event) {
-    return URI.create(event.getConnectionURI().toString() + "/event/" + event.getId());
-  }
+
 }

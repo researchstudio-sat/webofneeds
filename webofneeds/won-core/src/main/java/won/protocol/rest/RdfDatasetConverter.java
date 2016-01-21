@@ -13,6 +13,8 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import won.protocol.util.RdfUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * User: fsalcher
@@ -20,14 +22,12 @@ import java.io.IOException;
  */
 public class RdfDatasetConverter extends AbstractHttpMessageConverter<Dataset>
 {
-
   private static final Logger logger = LoggerFactory.getLogger(RdfDatasetConverter.class);
 
-
   private static final MediaType[] supportedMediaTypes =  {
-    new MediaType("application", "trig"),
-    new MediaType("application", "ld+json"),
-    new MediaType("application", "n-quads")
+    RDFMediaType.APPLICATION_TRIG,
+    RDFMediaType.APPLICATION_JSONLD,
+    RDFMediaType.APPLICATION_NQUADS
   };
 
   public RdfDatasetConverter() {
@@ -69,4 +69,7 @@ public class RdfDatasetConverter extends AbstractHttpMessageConverter<Dataset>
     return lang;
   }
 
+  public List<MediaType> getSupportedMediaTypes(){
+      return Arrays.asList(supportedMediaTypes);
+  }
 }

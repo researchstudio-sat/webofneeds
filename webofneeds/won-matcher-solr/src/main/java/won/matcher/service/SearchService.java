@@ -30,10 +30,11 @@ import org.apache.solr.search.SolrIndexSearcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import won.matcher.Matcher;
+import won.matcher.query.BasicNeedTypeQueryFactory;
 import won.matcher.solr.NeedSolrInputDocumentBuilder;
 import won.protocol.solr.SolrFields;
 import won.protocol.util.NeedModelBuilder;
+import won.protocol.vocabulary.WON;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
@@ -41,6 +42,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * User: fkleedorfer
@@ -49,10 +51,13 @@ import java.util.List;
 public class SearchService
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
-  private SolrIndexSearcher solrIndexSearcher;
-  private Matcher matcher;
+  private CoreContainer coreContainer;
+  private String coreName;
   private ScoreTransformer scoreTransformer;
-
+  private long indexReloadInterval;
+  private SolrIndexSearcher solrIndexSearcher;
+  private long lastIndexReloadTime;
+  private AtomicBoolean isReloadingIndex = new AtomicBoolean(false);
 
 
   /**
@@ -72,37 +77,89 @@ public class SearchService
    * @throws SAXException
    * @throws ParserConfigurationException
    */
-  public SearchService(File solrHome, File solrConfigFile, String coreName, final ScoreTransformer scoreTransformer, final URI originatorURI) throws IOException, SAXException, ParserConfigurationException
+  public SearchService(File solrHome, File solrConfigFile, String coreName, final ScoreTransformer scoreTransformer,
+                       final URI originatorURI, final long indexReloadInterval) throws IOException, SAXException,
+    ParserConfigurationException
   {
-    CoreContainer coreContainer = new CoreContainer();
-    coreContainer.load(solrHome.getAbsolutePath(), solrConfigFile);
-    this.solrIndexSearcher = coreContainer.getCore(coreName).newSearcher(coreName);
-    this.matcher = new Matcher(this.solrIndexSearcher, scoreTransformer, originatorURI);
+    this.coreContainer = new CoreContainer();
+    this.coreName = coreName;
+    this.coreContainer.load(solrHome.getAbsolutePath(), solrConfigFile);
     this.originatorURI = originatorURI;
     this.scoreTransformer = scoreTransformer;
+    this.indexReloadInterval = indexReloadInterval;
+    this.solrIndexSearcher = getSolrIndexSearcher();
+    this.lastIndexReloadTime = System.currentTimeMillis();
+  }
+
+  /**
+   * Fetches a solrIndexSearcher and reloads the solr index if the last reload
+   * happened more than indexReloadInterval milliseconds ago.
+   * @return
+   */
+  private SolrIndexSearcher getSolrIndexSearcher(){
+    try {
+      if (this.solrIndexSearcher == null || System.currentTimeMillis() - lastIndexReloadTime > this.indexReloadInterval) {
+        if (this.isReloadingIndex.compareAndSet(false, true)) {
+          this.coreContainer.reload(coreName);
+          this.solrIndexSearcher = coreContainer.getCore(coreName).newSearcher(null, true);
+          this.lastIndexReloadTime = System.currentTimeMillis();
+          this.isReloadingIndex.set(false);
+        }
+      }
+      return this.solrIndexSearcher;
+    } catch (Exception e) {
+      logger.info("could not obtain solr index searcher", e);
+    }
+    return null;
   }
 
   public SearchResult search(String keywords, int numResults){
-   return search(keywords, null, numResults);
+   return search(keywords, null, numResults, null);
   }
-
-  public SearchResult search(String keywords, Model needModel, int numResults){
+  public SearchResult search(String keywords, int numResults, String type){
+    return search(keywords, null, numResults, type);
+  }
+  public SearchResult search(String keywords, Model needModel, int numResults, String type){
+    SolrIndexSearcher solrIndexSearcher = getSolrIndexSearcher();
     try {
       BooleanQuery combinedQuery = new BooleanQuery();
       if (keywords != null && keywords.length() > 0) {
-        combinedQuery.add(createKeywordQuery(keywords), BooleanClause.Occur.MUST);
+
+        combinedQuery.add(createQuery(solrIndexSearcher, SolrFields.KEYWORD_SEARCH, keywords), BooleanClause.Occur
+          .MUST);
+      }
+      if(type !=null&&type.length()>0){
+        NeedSolrInputDocumentBuilder builder = new NeedSolrInputDocumentBuilder();
+        NeedModelBuilder needModelBuilder = new NeedModelBuilder();
+        needModelBuilder.setBasicNeedType(type);
+        needModelBuilder.setUri(WON.BASE_URI);
+        needModelBuilder.build();
+
+
+
+        needModelBuilder.copyValuesToBuilder(builder);
+        builder.setUri(WON.BASE_URI);
+        SolrInputDocument solrDoc = builder.build();
+        BasicNeedTypeQueryFactory basicNeedTypeQueryFactory = new BasicNeedTypeQueryFactory(BooleanClause.Occur.MUST,
+                                                                                            "basicNeedType",
+                                                                                            true);
+        Query basicNeedTypeQuery = basicNeedTypeQueryFactory.createQuery(solrIndexSearcher, solrDoc);
+        combinedQuery.add(basicNeedTypeQuery,BooleanClause.Occur.MUST);
       }
       if (needModel != null && needModel.size() > 0) {
         NeedSolrInputDocumentBuilder builder = new NeedSolrInputDocumentBuilder();
         NeedModelBuilder needModelBuilder = new NeedModelBuilder();
+        needModelBuilder.setBasicNeedType(type);
         needModelBuilder.copyValuesFromProduct(needModel);
         needModelBuilder.copyValuesToBuilder(builder);
-        SolrInputDocument solrDoc = builder.build();
 
+        SolrInputDocument solrDoc = builder.build();
       }
       if (combinedQuery.getClauses().length > 0) {
-        return createSearchResult(this.solrIndexSearcher.search(combinedQuery, numResults), this.originatorURI);
+        return createSearchResult(solrIndexSearcher, solrIndexSearcher.search(combinedQuery, numResults), this
+          .originatorURI);
       }
+
     } catch (Throwable t) {
       logger.info("could not perform keyword search", t);
     }
@@ -110,22 +167,34 @@ public class SearchService
   }
 
   public SearchResult search(Model needModel, int numResults){
-    return search(null, needModel, numResults);
+    return search(null, needModel, numResults,null);
   }
 
 
 
-  private Query createKeywordQuery(final String keywords) throws ParseException
+  private Query createQuery(SolrIndexSearcher solrIndexSearcher, String solrFieldName, String queryString) throws
+    ParseException {
+    Analyzer analyzer = solrIndexSearcher.getSchema().getField(solrFieldName).getType().getQueryAnalyzer();
+    QueryParser parser = new QueryParser(Version.LUCENE_35,solrFieldName,analyzer);
+    return parser.parse(queryString);
+  }
+  /*
+  private Query createTitleQuery(SolrIndexSearcher solrIndexSearcher, final String title) throws ParseException{
+    Analyzer analyzer = solrIndexSearcher.getSchema().getField(SolrFields.TITLE).getType().getQueryAnalyzer();
+    QueryParser parser = new QueryParser(Version.LUCENE_35,SolrFields.TITLE,analyzer);
+    return parser.parse(title);
+  }
+  private Query createKeywordQuery(SolrIndexSearcher solrIndexSearcher, final String keywords) throws ParseException
   {
-    Analyzer analyzer = this.solrIndexSearcher.getSchema().getField(SolrFields.KEYWORD_SEARCH).getType().getQueryAnalyzer();
+    Analyzer analyzer = solrIndexSearcher.getSchema().getField(SolrFields.KEYWORD_SEARCH).getType().getQueryAnalyzer();
     QueryParser parser = new QueryParser(Version.LUCENE_35, SolrFields.KEYWORD_SEARCH, analyzer);
     return parser.parse(keywords);
   }
-
-  private SearchResult createSearchResult(TopDocs topDocs, URI originatorURI){
+*/
+  private SearchResult createSearchResult(SolrIndexSearcher solrIndexSearcher, TopDocs topDocs, URI originatorURI){
     List<SearchResultItem> items = new ArrayList();
     try {
-      IndexReader indexReader = this.solrIndexSearcher.getIndexReader();
+      IndexReader indexReader = solrIndexSearcher.getIndexReader();
       if (topDocs.totalHits == 0) return new SearchResult(this.originatorURI, items);
       logger.debug("search yields {} results", topDocs.totalHits);
       for (int i = 0; i < topDocs.totalHits; i++){
@@ -136,8 +205,11 @@ public class SearchService
           logger.debug("score {} transformed to {}", scoreDoc.score, transformedScore);
           Document doc = indexReader.document(scoreDoc.doc);
           Model resultContent = createSearchResultModel(doc);
-          SearchResultItem item = new SearchResultItem(scoreTransformer.transform(scoreDoc.score),resultContent,URI.create(doc.get(SolrFields.URL)),  null);
-          items.add(item);
+
+              SearchResultItem item = new SearchResultItem(scoreTransformer.transform(scoreDoc.score),resultContent,URI.create(doc.get(SolrFields.URL)),  null);
+              items.add(item);
+
+
         }
       }
     } catch (Throwable t) {

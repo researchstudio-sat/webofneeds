@@ -17,11 +17,12 @@
 package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.impl.*;
+import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.event.impl.*;
-import won.bot.framework.events.listener.*;
+import won.bot.framework.events.listener.BaseEventListener;
+import won.bot.framework.events.listener.EventListener;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
 import won.bot.framework.events.listener.impl.AutomaticMessageResponderListener;
@@ -77,7 +78,6 @@ public class ConversationBot extends EventBot
     // * connect events - so it responds with open
     // * open events - so it responds with open (if the open received was the first open, and we still need to accept the connection)
     this.autoOpener = new ActionOnEventListener(ctx, new OpenConnectionAction(ctx));
-    bus.subscribe(OpenFromOtherNeedEvent.class, this.autoOpener);
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
     //add a listener that auto-responds to messages by a message
@@ -95,6 +95,9 @@ public class ConversationBot extends EventBot
         NO_OF_MESSAGES, new CloseConnectionAction(ctx)
     );
     bus.subscribe( MessageFromOtherNeedEvent.class, this.connectionCloser);
+    //add a listener that closes the connection when a failureEvent occurs
+    EventListener onFailureConnectionCloser = new ActionOnEventListener(ctx, new CloseConnectionAction(ctx));
+    bus.subscribe(FailureResponseEvent.class, onFailureConnectionCloser);
 
     //add a listener that auto-responds to a close message with a deactivation of both needs.
     //subscribe it to:

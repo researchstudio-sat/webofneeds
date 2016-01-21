@@ -35,6 +35,7 @@ public class SimpleMaildirToOwnerBot implements CommandLineRunner
     SpringApplication app = new SpringApplication(
         new Object[]{"classpath:/spring/app/readMailsFromFolder-emulateOwner-testBot.xml"}
     );
+    app.setWebEnvironment(false);
     app.run(args);
   }
 

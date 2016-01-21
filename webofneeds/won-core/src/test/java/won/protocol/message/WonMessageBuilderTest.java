@@ -179,14 +179,15 @@ public class WonMessageBuilderTest
   }
 
   public void check_get_content_in_message_with_content(final WonMessage msg) {
-    Dataset content = msg.getMessageContent();
+    Dataset actualContentDataset = msg.getMessageContent();
     Assert.assertTrue("messageContent dataset of message with content has non-empty default graph",
-      content.getDefaultModel().isEmpty());
+      actualContentDataset.getDefaultModel().isEmpty());
     Assert.assertTrue("messageContent dataset of message with content has no named graphs",
-      content.listNames().hasNext());
+      actualContentDataset.listNames().hasNext());
     Set<String> names = new HashSet<String>();
-    Iterators.addAll(names, content.listNames());
+    Iterators.addAll(names, actualContentDataset.listNames());
     Assert.assertEquals("incorrect number of named graphs", names.size(), 1);
+    Assert.assertTrue("content different from the expected content", findContentGraphInMessage(msg, createContent()));
   }
 
   @Test
@@ -202,57 +203,83 @@ public class WonMessageBuilderTest
     check_get_content_in_message_with_two_content_graphs(msg);
   }
 
+
   @Test
-  public void test_copyInboundWonMessageForLocalStorage(){
-    WonMessageBuilder msg = this.createMessageWithContent();
-    WonMessage msg2 = WonMessageBuilder.copyInboundWonMessageForLocalStorage(MSG_URI_2, CONNECTION_URI_2, msg.build());
+  public void test_envelope_type_exists(){
+    WonMessageBuilder msgbuilder = this.createMessageWithEnvelopeType();
+    WonMessage msg =  msgbuilder.build();
+    Assert.assertEquals(WonMessageDirection.FROM_EXTERNAL, msg.getEnvelopeType());
 
   }
 
   public void check_get_content_in_message_with_two_content_graphs(final WonMessage msg) {
-    Dataset content = msg.getMessageContent();
+    Dataset actualContentDataset = msg.getMessageContent();
     Assert.assertTrue("messageContent dataset of message with content has non-empty default graph",
-      content.getDefaultModel().isEmpty());
+      actualContentDataset.getDefaultModel().isEmpty());
     Set<String> names = new HashSet<String>();
-    Iterators.addAll(names, content.listNames());
-
+    Iterators.addAll(names, actualContentDataset.listNames());
     Assert.assertEquals("incorrect number of named graphs", names.size(), 2);
+    Assert.assertTrue("content different from the expected content", findContentGraphInMessage(msg, createContent()));
+    Assert.assertTrue("content different from the expected 'different' content", findContentGraphInMessage(msg,
+      createDifferentContent()));
+
   }
 
+  public boolean findContentGraphInMessage(final WonMessage msg, final Model expectedContent) {
+    Dataset actualContentDataset = msg.getMessageContent();
+    boolean foundIt = false;
+    for (Iterator<String> nameit = actualContentDataset.listNames(); nameit.hasNext();) {
+      foundIt = expectedContent.isIsomorphicWith(
+        actualContentDataset.getNamedModel(nameit.next()));
+      if (foundIt) break;
+    }
+    return foundIt;
+  }
+
+  private WonMessageBuilder createMessageWithEnvelopeType(){
+    return new WonMessageBuilder()
+      .setMessageURI(MSG_URI_1)
+      .setWonMessageType(WonMessageType.CLOSE)
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
+  }
   private WonMessageBuilder createMessageWithoutContent(){
     return new WonMessageBuilder()
       .setMessageURI(MSG_URI_1)
-      .setWonMessageType(WonMessageType.HINT_MESSAGE);
+      .setWonMessageType(WonMessageType.HINT_MESSAGE)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
   }
 
 
   private WonMessageBuilder addContent(WonMessageBuilder builder) {
-    return builder.addContent(CONTENT_GRAPH_URI_1, createDifferentContent(), null);
+    return builder.addContent(createDifferentContent(), null);
   }
 
   private WonMessageBuilder addContentWithDifferentURI(WonMessageBuilder builder) {
-    return builder.addContent(CONTENT_GRAPH_URI_2, createDifferentContent(), null);
+    return builder.addContent(createDifferentContent(), null);
   }
 
   private WonMessageBuilder wrapMessage(final WonMessage msg1) {
     return new WonMessageBuilder()
       .wrap(msg1)
-      .setReceiverURI(CONNECTION_URI_1);
+      .setReceiverURI(CONNECTION_URI_1)
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
   }
 
   private WonMessageBuilder createMessageWithContent(){
       return new WonMessageBuilder()
         .setMessageURI(MSG_URI_1)
-        .addContent(CONTENT_GRAPH_URI_1, createContent(), null)
-        .setWonMessageType(WonMessageType.HINT_MESSAGE);
+        .addContent(createContent(), null)
+        .setWonMessageType(WonMessageType.HINT_MESSAGE)
+        .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
   }
 
   private WonMessageBuilder createMessageWithTwoContentGraphs(){
     return new WonMessageBuilder()
       .setMessageURI(MSG_URI_1)
-      .addContent(CONTENT_GRAPH_URI_1, createContent(), null)
-      .addContent(CONTENT_GRAPH_URI_2, createDifferentContent(), null)
-      .setWonMessageType(WonMessageType.HINT_MESSAGE);
+      .addContent(createContent(), null)
+      .addContent(createDifferentContent(), null)
+      .setWonMessageType(WonMessageType.HINT_MESSAGE)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
   }
 
   private WonMessageBuilder copyEnvelopeAndContent(WonMessage msg) {
@@ -261,7 +288,8 @@ public class WonMessageBuilderTest
       .copyEnvelopeFromWonMessage(msg)
       .copyContentFromMessageReplacingMessageURI(msg)
       .setReceiverURI(CONNECTION_URI_1)
-      .addContent(CONTENT_GRAPH_URI_1, createDifferentContent(), null);
+      .addContent(createDifferentContent(), null)
+      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
   }
 
   private Model createContent(){

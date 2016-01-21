@@ -6,10 +6,10 @@
     <parent>
         <artifactId>webofneeds</artifactId>
         <groupId>webofneeds</groupId>
-        <version>1.0</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
     <artifactId>won-matcher</artifactId>
-    <version>1.0</version>
+    <version>0.2-SNAPSHOT</version>
     <name>Matcher Client</name>
 
     <properties>
@@ -28,6 +28,12 @@
             <artifactId>won-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>webofneeds</groupId>
+            <artifactId>won-cryptography</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-cli</artifactId>

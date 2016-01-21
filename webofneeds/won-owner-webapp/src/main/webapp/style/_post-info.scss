@@ -1,0 +1,33 @@
+@import 'sizing-utils';
+
+.post-info {
+
+  @include max-content-width($maxContentWidth, $minContentPadding, 'post-info');
+  padding-top: 2rem;
+
+  .post-info__heading {
+    font-size: $normalFontSize;
+    font-weight: 700;
+  }
+  .post-info__details {
+    margin-bottom: 1rem;
+  }
+  .post-info__inner {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: flex-start;
+
+    .post-info__inner__left {
+      //TODO drop margin on break (so it's centered on slim screens
+      margin-right: 4rem;
+      margin-bottom: 2rem;
+    }
+    .post-info__inner__right {
+      flex-grow: 1;
+      flex-basis: 15rem;
+    }
+  }
+}
+
+

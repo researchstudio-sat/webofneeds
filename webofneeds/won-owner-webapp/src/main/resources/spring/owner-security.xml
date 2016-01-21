@@ -16,11 +16,18 @@
 	<http auto-config="true" use-expressions="true" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint">
         <intercept-url pattern="/msg" access="isAnonymous()"/>
         <intercept-url pattern="/rest/users/" access="isAnonymous()"/>
+        <intercept-url pattern="/rest/users/private" access="isAnonymous()"/>
         <intercept-url pattern="/rest/users/ping/" access="permitAll()"/>
 		<intercept-url pattern="/rest/users/signout" access="isAuthenticated()"/>
         <intercept-url pattern="/rest/users/isSignedIn" access="permitAll()"/>
+        <intercept-url pattern="/rest/users/isSignedInRole" access="permitAll()"/>
         <intercept-url pattern="/rest/users/signin" access="isAnonymous()"/>
+        <intercept-url pattern="/rest/users/email" access="isAuthenticated()"/>
+        <intercept-url pattern="/rest/users/settings" access="isAuthenticated()"/>
+        <intercept-url pattern="/rest/needs/drafts/*" access="hasRole('ROLE_ACCOUNT')"/>
+        <intercept-url pattern="/rest/linked-data/**" access="isAuthenticated()"/>
         <intercept-url pattern="/rest/**" access="isAuthenticated()"/>
+        <intercept-url pattern="/**"  requires-channel="https"/>
 		<!--intercept-url pattern="/rest/**" access="isAuthenticated()" /-->
         <!--
             added for integrating spring-session, which we added to synchronize

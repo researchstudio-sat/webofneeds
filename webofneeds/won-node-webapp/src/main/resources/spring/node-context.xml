@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<beans xmlns:sec="http://www.springframework.org/schema/security"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns="http://www.springframework.org/schema/beans" xmlns:benas="http://www.springframework.org/schema/beans"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+								 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+
+    <!-- all the beans necessary for node's functioning -->
+    <import resource="classpath:/spring/node.xml"/>
+
+
+    <!-- servlet filters -->
+    <bean id="filterChainProxy" class="org.springframework.security.web.FilterChainProxy">
+        <sec:filter-chain-map path-type="regex">
+            <!-- webID verification filter for all message (event) resources -->
+            <sec:filter-chain pattern="^/(resource|data|page)/event/.+" filters="
+            webIdVerificationFilter"/>
+        </sec:filter-chain-map>
+    </bean>
+    <bean id="webIdVerificationFilter" class="won.cryptography.webid.WebIdVerificationFilter"/>
+    <bean id="webIdVerificationAgent" class="won.cryptography.webid.WebIDVerificationAgent">
+        <property name="linkedDataSource" ref="linkedDataSource" />
+    </bean>
+    <bean id="acl" class="won.cryptography.webid.WonDefaultAccessControlRules"/>
+
+
+</beans>

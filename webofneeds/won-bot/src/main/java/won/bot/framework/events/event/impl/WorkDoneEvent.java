@@ -16,6 +16,7 @@
 
 package won.bot.framework.events.event.impl;
 
+import won.bot.framework.bot.Bot;
 import won.bot.framework.events.event.BaseEvent;
 
 /**
@@ -26,4 +27,15 @@ import won.bot.framework.events.event.BaseEvent;
  */
 public class WorkDoneEvent extends BaseEvent
 {
+  private Bot bot;
+
+  public Bot getBot() {
+    return bot;
+  }
+
+  public WorkDoneEvent(Bot bot) {
+    this.bot = bot;
+  }
+
+
 }

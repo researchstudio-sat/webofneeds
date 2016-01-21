@@ -23,7 +23,7 @@ import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
-import won.protocol.owner.OwnerProtocolNeedServiceClientSide;
+import won.protocol.message.sender.WonMessageSender;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
@@ -38,7 +38,7 @@ public abstract class BasicServiceBot extends BaseBot
   private MatcherNodeURISource matcherNodeURISource;
   private URI solrServerURI;
   private NeedProducer needProducer;
-  private OwnerProtocolNeedServiceClientSide ownerService;
+  private WonMessageSender wonMessageSender;
   private MatcherProtocolNeedServiceClientSide matcherProtocolNeedServiceClient;
   private MatcherProtocolMatcherServiceImplJMSBased matcherProtocolMatcherService;
 
@@ -69,9 +69,9 @@ public abstract class BasicServiceBot extends BaseBot
     this.nodeURISource = nodeURISource;
   }
 
-  protected OwnerProtocolNeedServiceClientSide getOwnerService()
+  protected WonMessageSender getWonMessageSender()
   {
-    return ownerService;
+    return wonMessageSender;
   }
 
   protected MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient(){
@@ -92,9 +92,9 @@ public abstract class BasicServiceBot extends BaseBot
 
   @Qualifier("default")
   @Autowired(required = true)
-  public void setOwnerService(final OwnerProtocolNeedServiceClientSide ownerService)
+  public void setWonMessageSender(final WonMessageSender wonMessageSender)
   {
-    this.ownerService = ownerService;
+    this.wonMessageSender = wonMessageSender;
   }
 
   @Qualifier("default")

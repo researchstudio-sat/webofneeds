@@ -1,0 +1,93 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+@import 'flex-layout';
+
+.overviewmatchescontent {
+  @include max-content-width($maxContentWidth, $minContentPadding, 'omc');
+
+  .omc__sendrequest {
+    position: absolute;
+    z-index: 101;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    won-send-request {
+      background: white;
+      margin: 0 auto;
+      top: 15rem;
+      max-width: 35rem;
+      position: relative;
+    }
+  }
+
+  .omc__header {
+    display: flex;
+    padding: 0.5rem 0;
+    margin: 1rem 0;
+    justify-content: space-between;
+
+    .title {
+      width: 100%;
+      font-weight: 300;
+      padding: 0;
+    }
+
+    .dummy {
+      width: $iconSize * 3;
+    }
+
+    &__viewtype {
+      display: flex;
+      align-items: center;
+      &__icon {
+        @include fixed-square($iconSize);
+      }
+    }
+  }
+
+  .omc__content__flow {
+    column-count: 4;
+    column-gap: 0.5rem;
+    column-fill: auto;
+    padding-bottom: 5rem;
+
+    @media (max-width: 70rem){
+      column-count: 3;
+    }
+
+    @media (max-width: 50rem){
+      column-count: 2;
+    }
+
+    @media (max-width: 40rem){
+      column-count: 1;
+    }
+  }
+
+  .omc__content__grid {
+    column-count: 3;
+    column-gap: 0.5rem;
+    column-fill: auto;
+    padding-bottom: 5rem;
+
+    @media (max-width: 70rem){
+      column-count: 2;
+    }
+
+    @media (max-width: 50rem){
+      column-count: 1;
+    }
+  }
+
+  .omc__content__list {
+    display: block;
+    padding-bottom: 5rem;
+  }
+}
+
+@import 'matches-flow-item';
+@import 'matches-grid-item';
+@import 'matches-list-item';

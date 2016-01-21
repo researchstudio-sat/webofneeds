@@ -1,0 +1,69 @@
+@mixin fixed-height($h) {
+  height: $h;
+  min-height: $h;
+  max-height: $h;
+}
+@mixin fixed-width($w) {
+  width: $w;
+  min-width: $w;
+  max-width: $w;
+}
+
+@mixin fixed-square($size) {
+  @include fixed-width($size);
+  @include fixed-height($size);
+}
+
+%fill {
+  height: 100%;
+  width: 100%;
+}
+%fixed-fill {
+  @include fixed-height(100%);
+  @include fixed-width(100%);
+}
+%fullscreen {
+  height: 100vh;
+  width: 100vw;
+}
+%fixed-fullscreen {
+  @include fixed-height(100vh);
+  @include fixed-width(100vw);
+}
+%fillwidth {
+  min-width: 100%;
+  height: auto;
+}
+
+%fillheight {
+  min-height: 100%;
+  width: auto;
+}
+
+@mixin max-square($maxSize) {
+  max-width: $maxSize;
+  max-height: $maxSize;
+  width: auto;
+  height: auto;
+}
+
+/**
+ * Use this mixin on root-elements to limit the maximal width
+ * of the content (which needs to be placed in an $prefix__inner
+ * element. Also handles a minimum remaining margin (for when the
+ * viewport becomes small)
+ */
+@mixin max-content-width($maxCntWidth, $cntMargin, $prefix) {
+  // to center the sole child
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  flex-direction: row;
+
+  > .#{$prefix}__inner {
+    max-width: $maxCntWidth;
+    width: 100%; // take as much space as possible without exceeding the maxContentWidth
+    margin: 0 $cntMargin;
+  }
+}

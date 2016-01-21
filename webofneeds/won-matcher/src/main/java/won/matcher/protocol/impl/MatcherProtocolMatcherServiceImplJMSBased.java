@@ -16,6 +16,7 @@
 
 package won.matcher.protocol.impl;
 
+import org.apache.camel.Body;
 import org.apache.camel.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,13 +51,14 @@ public class MatcherProtocolMatcherServiceImplJMSBased
   @Autowired
   MatcherProtocolMatcherService delegate;
 
-  private MatcherProtocolCommunicationService matcherProtocolCommunicationService;
+  private MatcherProtocolCommunicationServiceImpl matcherProtocolCommunicationService;
 
 
+    //TODO: [msg-refactoring] process only WonMessage, don't send additional headers
 
     public void needCreated(@Header("wonNodeURI") final String wonNodeURI,
                             @Header("needURI") final String needURI,
-                            @Header("wonMessage") final String content) {
+                            @Body final String content) {
         logger.debug("new need received: {} with content {}", needURI, content);
 
         delegate.onNewNeed(URI.create(wonNodeURI), URI.create(needURI), RdfUtils.toDataset(content));
@@ -65,21 +67,23 @@ public class MatcherProtocolMatcherServiceImplJMSBased
                               @Header("needURI") final String needURI) {
       logger.debug("need activated message received: {}", needURI);
 
-      delegate.onNeedActivated(URI.create(wonNodeURI), URI.create(needURI) );
+      delegate.onNeedActivated(URI.create(wonNodeURI), URI.create(needURI));
     }
     public void needDeactivated(@Header("wonNodeURI") final String wonNodeURI,
                                 @Header("needURI") final String needURI) {
       logger.debug("need deactivated message received: {}", needURI);
 
-      delegate.onNeedDeactivated(URI.create(wonNodeURI), URI.create(needURI) );
+      delegate.onNeedDeactivated(URI.create(wonNodeURI), URI.create(needURI));
     }
 
-  private Set<String> configureMatcherProtocolOutTopics(URI wonNodeUri) throws CamelConfigurationFailedException {
-    Set<String> remoteTopics = matcherProtocolCommunicationService.getMatcherProtocolOutTopics (wonNodeUri);
-    matcherProtocolCommunicationService.addRemoteTopicListeners(remoteTopics,wonNodeUri);
-    delegate.onMatcherRegistration(wonNodeUri);
+  private Set<String> configureMatcherProtocolOutTopics(URI nodeUri) throws CamelConfigurationFailedException {
+
+    Set<String> remoteTopics = matcherProtocolCommunicationService.getMatcherProtocolOutTopics (nodeUri);
+    matcherProtocolCommunicationService.addRemoteTopicListeners(remoteTopics, nodeUri);
+    delegate.onMatcherRegistration(nodeUri);
     return remoteTopics;
   }
+
 
 
   public void register(final URI wonNodeURI) {
@@ -88,7 +92,7 @@ public class MatcherProtocolMatcherServiceImplJMSBased
           @Override
           public void run() {
             try {
-                configureMatcherProtocolOutTopics(wonNodeURI);
+                 configureMatcherProtocolOutTopics(wonNodeURI);
             } catch (Exception e) {
               logger.warn("Could not get topic lists from won node {}", wonNodeURI,e);
             }
@@ -125,7 +129,8 @@ public class MatcherProtocolMatcherServiceImplJMSBased
     return matcherProtocolCommunicationService;
   }
 
-  public void setMatcherProtocolCommunicationService(final MatcherProtocolCommunicationService matcherProtocolCommunicationService) {
+  public void setMatcherProtocolCommunicationService(final MatcherProtocolCommunicationServiceImpl
+                                                       matcherProtocolCommunicationService) {
     this.matcherProtocolCommunicationService = matcherProtocolCommunicationService;
   }
 

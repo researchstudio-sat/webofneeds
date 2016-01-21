@@ -17,24 +17,24 @@
 package won.protocol.rest;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.text.MessageFormat;
 
-/**
- * User: fkleedorfer
- * Date: 28.11.12
- */
-public class LinkedDataRestClient
+public abstract class LinkedDataRestClient
 {
+
   private final Logger logger = LoggerFactory.getLogger(getClass());
+
 
   /**
    * Retrieves RDF for the specified resource URI.
@@ -44,35 +44,51 @@ public class LinkedDataRestClient
    * @param resourceURI
    * @return
    */
-  public Dataset readResourceData(URI resourceURI){
+  public abstract Dataset readResourceData(URI resourceURI);
+
+  /**
+   * Retrieves RDF for the specified resource URI for the entity with provided WebID.
+   * Expects that the resource URI will lead to a 303 response, redirecting to the URI where RDF can be downloaded.
+   * Paging is not supported.
+   *
+   * @param resourceURI
+   * @param requesterWebID
+   * @return
+   */
+  public abstract Dataset readResourceData(URI resourceURI, URI requesterWebID);
+
+
+  protected Dataset readResourceData(URI resourceURI, RestTemplate restTemplate, HttpEntity entity) {
     assert resourceURI != null : "resource URI must not be null";
     logger.debug("fetching linked data resource: {}", resourceURI);
-    ClientConfig cc = new DefaultClientConfig();
-    cc.getProperties().put(
-        ClientConfig.PROPERTY_FOLLOW_REDIRECTS, true);
-    cc.getClasses().add(DatasetReaderWriter.class);
-    Client c = Client.create(cc);
-    WebResource r = c.resource(resourceURI);
-    //TODO: improve error handling
-    //If a ClientHandlerException is thrown here complaining that it can't read a Model with MIME media type text/html,
+
+    //If a RestClientException is thrown here complaining that it can't read a Model with MIME media type text/html,
     //it was probably the wrong resourceURI
     Dataset result;
     try {
-       result = r.accept(RDFMediaType.APPLICATION_TRIG).get(Dataset.class);
-    } catch (ClientHandlerException e) {
+      ResponseEntity<Dataset> response = restTemplate.exchange(resourceURI, HttpMethod.GET, entity, Dataset.class);
+      //RestTemplate will automatically follow redirects on HttpGet calls
+
+      if(response.getStatusCode()!= HttpStatus.OK){
+        throw new HttpClientErrorException(response.getStatusCode());
+      }
+      result = response.getBody();
+    } catch (RestClientException e) {
+      if(e instanceof HttpClientErrorException){
+        throw e;
+      }
       throw new IllegalArgumentException(
         MessageFormat.format(
-        "caught a clientHandler exception, " +
-        "which may indicate that the URI that was accessed isn''t a" +
-        " linked data URI, please check {0}", resourceURI), e);
+          "caught a clientHandler exception, " +
+            "which may indicate that the URI that was accessed isn''t a" +
+            " linked data URI, please check {0}", resourceURI), e);
     }
     if (logger.isDebugEnabled()) {
       logger.debug("fetched model with {} statements in default model for resource {}",result.getDefaultModel().size(),
-        resourceURI);
+                   resourceURI);
     }
     return result;
   }
-
 
 
 }

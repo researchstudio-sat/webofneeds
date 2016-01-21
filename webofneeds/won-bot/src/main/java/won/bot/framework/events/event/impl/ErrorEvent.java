@@ -17,27 +17,16 @@
 package won.bot.framework.events.event.impl;
 
 import won.bot.framework.events.event.BaseEvent;
-import won.bot.framework.events.listener.EventListener;
 
 /**
  * Event to be published when an error occurs.
  */
 public class ErrorEvent extends BaseEvent
 {
-  private EventListener listenerInError;
   private Throwable throwable;
 
-  public ErrorEvent(final EventListener listenerInError, final Throwable throwable) {
-    this.listenerInError = listenerInError;
+  public ErrorEvent(final Throwable throwable) {
     this.throwable = throwable;
-  }
-
-  public EventListener getListenerInError() {
-    return listenerInError;
-  }
-
-  public void setListenerInError(final EventListener listenerInError) {
-    this.listenerInError = listenerInError;
   }
 
   public Throwable getThrowable() {

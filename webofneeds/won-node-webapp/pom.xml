@@ -4,14 +4,13 @@
     <parent>
         <groupId>webofneeds</groupId>
         <artifactId>webofneeds</artifactId>
-        <version>1.0</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
     <groupId>webofneeds</groupId>
     <artifactId>won-node-webapp</artifactId>
-    <version>1.0</version>
+    <version>0.2-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Node Webapp</name>
-    <url>http://www.springframework.org/spring-ws</url>
 
     <dependencies>
         <!--
@@ -27,18 +26,6 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
-        <!-- JAX-WS (webservices)-->
-        <dependency>
-            <groupId>com.sun.xml.ws</groupId>
-            <artifactId>jaxws-rt</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.ws</groupId>
-            <artifactId>jaxws-tools</artifactId>
-            <scope>${dependencies.scope}</scope>
-        </dependency>
-
         <!-- spring stuff -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -46,16 +33,19 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
             <scope>${dependencies.scope}</scope>
         </dependency>
 
         <!-- servlet stuff -->
-        <dependency> <!-- tomcat always complains about this.. should we omit it? -->
+        <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>provided</scope>
+            <artifactId>javax.servlet-api</artifactId>
         </dependency>
 
     </dependencies>
@@ -82,7 +72,7 @@
                 <artifactId>cargo-maven2-plugin</artifactId>
                 <version>${cargo.version}</version>
                 <configuration>
-                    <skip>true</skip>
+                    <skip>false</skip>
                     <container>
                         <containerId>tomcat7x</containerId>
                         <type>remote</type>
@@ -106,7 +96,7 @@
                         </deployable>
                     </deployables>
                 </configuration>
-                <executions>
+                <!--<executions>
                     <execution>
                         <id>deploy-node-tomcat</id>
                         <phase>deploy</phase>
@@ -114,7 +104,7 @@
                             <goal>deployer-redeploy</goal>
                         </goals>
                     </execution>
-                </executions>
+                </executions>-->
             </plugin>
 
             <plugin>
