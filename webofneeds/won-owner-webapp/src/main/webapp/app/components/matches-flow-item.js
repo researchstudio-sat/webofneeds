@@ -7,12 +7,12 @@ import feedbackGridModule from './feedback-grid';
 
 function genComponentConf() {
     let template = `
-        <div ng-show="self.item.images" class="mfi__gallery">
-            <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.item.images" class="horizontal"></won-extended-gallery>
+        <div ng-show="self.images" class="mfi__gallery">
+            <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.images" class="horizontal"></won-extended-gallery>
         </div>
         <div class="mfi__description clickable">
             <div class="mfi__description__topline">
-                <div class="mfi__description__topline__title clickable">{{self.item.remoteNeed.title}}</div>
+                <div class="mfi__description__topline__title clickable"><b>{{self.item.remoteNeed.title}}</b></div>
                 <div class="mfi__description__topline__date">{{self.item.remoteNeed.creationDate}}</div>
             </div>
             <div class="mfi__description__subtitle">
@@ -52,7 +52,6 @@ function genComponentConf() {
                 "images/furniture3.png",
                 "images/furniture4.png",
             ]
-            console.log(this.item)
         }
 
         showFeedback() {
