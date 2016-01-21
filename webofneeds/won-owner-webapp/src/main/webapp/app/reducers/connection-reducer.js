@@ -25,6 +25,9 @@ export default createReducer(
         },
         [actionTypes.connections.add]:(state,action)=>{
             return state.setIn(['connections',action.payload.connection.uri],action.payload)
+        },
+        [actionTypes.connections.reset]:(state,action)=>{
+            return initialState;
         }
 
     }

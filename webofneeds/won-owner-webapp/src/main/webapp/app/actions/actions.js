@@ -147,7 +147,9 @@ const actionHierarchy = {
                   dispatch(actionCreators.events__fetch({connectionUris:connections}))
               })
           },
-      add:INJ_DEFAULT
+      add:INJ_DEFAULT,
+      reset:INJ_DEFAULT,
+      reset:INJ_DEFAULT
     },
     needs: {
         fetch: (data) => dispatch => {
@@ -248,7 +250,7 @@ const actionHierarchy = {
                             .then(function(need){
 
                                 console.log("Dispatching action " + won.EVENT.NEED_CREATED);
-                                redux.dispatch(actionCreators.drafts__publishSuccessful({
+                                dispatch(actionCreators.drafts__publishSuccessful({
                                     publishEventUri: event.isResponseTo,
                                     needUri: event.hasSenderNeed,
                                     eventData:eventData
@@ -383,8 +385,9 @@ const actionHierarchy = {
             data => {
                 dispatch(actionCreators.messages__requestWsReset_Hack());
                 dispatch(actionCreators.user__loggedIn({loggedIn: false}));
-                dispatch(actionCreators.needs__received({needs: {}}));
+                dispatch(actionCreators.needs__clean({needs: {}}));
                 dispatch(actionCreators.posts__clean({}));
+                dispatch(actionCreators.connections__reset({}))
                 dispatch(actionCreators.router__stateGo("landingpage"));
             }
         ).catch(
