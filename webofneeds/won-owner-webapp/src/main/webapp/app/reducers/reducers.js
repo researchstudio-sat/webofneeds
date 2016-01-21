@@ -14,6 +14,7 @@ import postsReducer from './posts-reducer'
 import needReducer from './need-reducer'
 import eventReducer from './event-reducer'
 import matchReducer from './match-reducer'
+import connectionReducer from './connection-reducer'
 
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -34,15 +35,8 @@ const reducers = {
     },
     */
 
-    wubs: createReducer(Immutable.List(), {
-        [actionTypes.moreWub]: (state, action) => {
-            const howMuch = action.payload;
-            const additionalWubs = Immutable.fromJS(repeatVar('wub', howMuch));
-            return state.concat(additionalWubs);
-        }
 
-    }),
-
+    connections:connectionReducer,
     drafts: draftsReducer,
     events: eventReducer,
     user: createReducer(
