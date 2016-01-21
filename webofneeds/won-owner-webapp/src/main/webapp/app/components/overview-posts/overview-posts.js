@@ -17,22 +17,22 @@ class OverviewPostsController {
         const selectFromState = (state) => {
             const unreadEvents = state.getIn(["events", "unreadEventUris"]);
             const receivedHintEvents = unreadEvents.filter(e=>e.get('eventType')===won.EVENT.HINT_RECEIVED);
-            let unreadCounts = Immutable.Map();
+            let unseenMatchesCounts = Immutable.Map();
             receivedHintEvents.forEach(e => {
                 const receiverNeed = e.get('hasReceiverNeed');
-                let count = unreadCounts.get(receiverNeed);
+                let count = unseenMatchesCounts.get(receiverNeed);
                 if(!count){
-                    unreadCounts = unreadCounts.set(receiverNeed, 1);
+                    unseenMatchesCounts = unseenMatchesCounts.set(receiverNeed, 1);
                 }
                 else{
-                    unreadCounts =unreadCounts.set(receiverNeed, count + 1);
+                    unseenMatchesCounts =unseenMatchesCounts.set(receiverNeed, count + 1);
                 }
 
             });
             return {
                 posts: state.getIn(["needs", "needs"]).toJS(),
                 unreadEvents,
-                unreadMatchEventsOfNeed: unreadCounts,
+                unreadMatchEventsOfNeed: unseenMatchesCounts,
                 drafts: null,
                 activePostsOpen: state.getIn(["postOverview", "activePostsView"]),
                 draftsOpen: false,
