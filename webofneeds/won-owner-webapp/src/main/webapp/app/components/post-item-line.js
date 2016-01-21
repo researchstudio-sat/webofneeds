@@ -28,10 +28,10 @@ function genComponentConf() {
             <div class="pil__indicators">
                 <a class="pil__indicators__item clickable" ng-href="post/{{self.item.id}}/owner/messages">
                     <img src="generated/icon-sprite.svg#ico36_message"
-                         ng-show="self.unreadMatchEventsOfNeed"
+                         ng-show="self.item.messages.length"
                          class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_message_grey"
-                         ng-show="!self.unreadMatchEventsOfNeed"
+                         ng-show="!self.item.messages.length"
                          class="pil__indicators__item__icon">
                     <span class="pil__indicators__item__caption">
                         {{self.item.messages.length}}
