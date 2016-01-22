@@ -46,7 +46,7 @@ function genComponentConf() {
             <input type="text" placeholder="Reply Message (optional)"/>
             <div class="flexbuttons">
                 <button class="won-button--filled black" ng-click="self.closeRequest()">Cancel</button>
-                <button class="won-button--filled red">Request Contact</button>
+                <button class="won-button--filled red" ng-click="self.closeRequest()">Request Contact</button>
             </div>
         </div>
     `;
