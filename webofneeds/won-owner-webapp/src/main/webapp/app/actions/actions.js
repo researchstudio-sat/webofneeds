@@ -73,28 +73,8 @@ const actionHierarchy = {
               })
           })
       },
+
         addUnreadEventUri:INJ_DEFAULT,
-
-        addUnreadEventsByNeedByType:(data)=>(dispatch,getState)=>{
-            const state = getState();
-            let needUri = data.hasReceiverNeed;
-            data.needUri = needUri
-            let need = state.getIn(['needs','needs',data.needUri]);
-            if(!state.get(['events','unreadEventsByNeedByType',needUri]) ){
-                dispatch(actionCreators.events__addNeedToUnreadEventsByNeedByType({need:need,data}))
-            }
-            if(data.eventType!=undefined && data.eventType!=undefined){
-                dispatch(actionCreators.events__addEventToUnreadEventsByNeedByType({need:need,data}))
-            }
-        },
-        addUnreadEventsByTypeByNeed:(data)=>(dispatch,getState)=>{
-            const state=getState();
-
-        },
-        addNeedToUnreadEventsByNeedByType:INJ_DEFAULT,
-        addEventToUnreadEventsByNeedByType:INJ_DEFAULT
-
-
     },
     matches: {
       load:(data)=>(dispatch,getState)=> {
@@ -147,7 +127,9 @@ const actionHierarchy = {
                   dispatch(actionCreators.events__fetch({connectionUris:connections}))
               })
           },
-      add:INJ_DEFAULT
+      add:INJ_DEFAULT,
+      reset:INJ_DEFAULT,
+      reset:INJ_DEFAULT
     },
     needs: {
         fetch: (data) => dispatch => {
@@ -248,7 +230,7 @@ const actionHierarchy = {
                             .then(function(need){
 
                                 console.log("Dispatching action " + won.EVENT.NEED_CREATED);
-                                redux.dispatch(actionCreators.drafts__publishSuccessful({
+                                dispatch(actionCreators.drafts__publishSuccessful({
                                     publishEventUri: event.isResponseTo,
                                     needUri: event.hasSenderNeed,
                                     eventData:eventData
@@ -272,11 +254,10 @@ const actionHierarchy = {
             won.invalidateCacheForNewConnection(data.hasReceiver,data.hasReceiverNeed)
                 ['finally'](function(){
 
-                    data.unreadUri = data.hasReceiver;
-                    dispatch(actionCreators.events__addUnreadEventUri(data))
-                   // dispatch(actionCreators.requests__incomingReceived(data))
-
                     won.getConnectionWithOwnAndRemoteNeed(data.hasReceiverNeed,data.hasSenderNeed).then(connectionData=>{
+                        //TODO refactor
+                        data.unreadUri = connectionData.uri;
+                        dispatch(actionCreators.events__addUnreadEventUri(data));
                         getConnectionRelatedDataAndDispatch(data.hasReceiverNeed,data.hasSenderNeed,connectionData.uri,dispatch)
                     })
 
@@ -383,8 +364,9 @@ const actionHierarchy = {
             data => {
                 dispatch(actionCreators.messages__requestWsReset_Hack());
                 dispatch(actionCreators.user__loggedIn({loggedIn: false}));
-                dispatch(actionCreators.needs__received({needs: {}}));
+                dispatch(actionCreators.needs__clean({needs: {}}));
                 dispatch(actionCreators.posts__clean({}));
+                dispatch(actionCreators.connections__reset({}))
                 dispatch(actionCreators.router__stateGo("landingpage"));
             }
         ).catch(
