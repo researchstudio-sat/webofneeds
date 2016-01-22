@@ -56,6 +56,14 @@
     won.WON.hasRemoteConnection = won.WON.baseUri+"hasRemoteConnection";
     won.WON.hasRemoteConnectionCompacted = won.WON.prefix+":hasRemoteConnection";
 
+    won.WON.hasConnectionState = won.WON.baseUri+"hasConnectionState"
+    won.WON.hasConnectionState = won.WON.prefix+":hasConnectionState"
+    won.WON.Suggested = won.WON.baseUri+"Suggested"
+    won.WON.SuggestedCompacted = won.WON.baseUri+":Suggested"
+    won.WON.RequestReceived = won.WON.baseUri+"RequestReceived"
+    won.WON.RequestReceivedCompacted = won.WON.baseUri+":RequestReceived"
+
+
     //EVENT TYPES
     won.WON.OwnerClose = won.WON.baseUri + "OwnerClose";
     won.WON.OwnerCloseCompacted = won.WON.prefix + ":OwnerClose";

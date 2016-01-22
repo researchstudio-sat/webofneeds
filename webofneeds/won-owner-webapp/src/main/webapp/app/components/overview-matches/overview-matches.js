@@ -7,7 +7,7 @@ import matchesGridItemModule from '../matches-grid-item';
 import matchesListItemModule from '../matches-list-item';
 import sendRequestModule from '../send-request';
 
-import { attach } from '../../utils';
+import { attach,mapToMatches,getType } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
@@ -24,8 +24,20 @@ class OverviewMatchesController {
         const selectFromState = (state)=>{
 
             return {
-                matches: state.getIn(['matches','matches']).toJS(),
-                matchesOfNeed:this.mapToMatches(state.getIn(['matches','matches']).toJS())
+                matches: Object.keys(state.getIn(['connections','connections']).toJS())
+                    .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                    .filter(conn=>{
+                        if(conn.connection.hasConnectionState===won.WON.Suggested){
+                            return true
+                        }
+                    }),
+                matchesOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connections']).toJS())
+                    .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                    .filter(conn=>{
+                        if(conn.connection.hasConnectionState===won.WON.Suggested){
+                            return true
+                        }
+                    }))
             };
         }
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
@@ -38,23 +50,7 @@ class OverviewMatchesController {
             this.$ngRedux.getState().getIn(['needs','needs']).toJS()
         )
     }
-    mapToMatches(connections){
-        let needMap = {}
-        if(connections){
 
-            Object.keys(connections).forEach(function(key){
-
-                if(!needMap[connections[key].ownNeed.uri]){
-                    let connectionsArr = [connections[key]]
-                    needMap[connections[key].ownNeed.uri]=connectionsArr
-                }else{
-                    needMap[connections[key].ownNeed.uri].push(connections[key])
-                }
-            }.bind(this))
-        }
-        return needMap;
-
-    }
 }
 
 
