@@ -40,6 +40,7 @@ System.config({
     "redux-immutablejs": "npm:redux-immutablejs@0.0.6",
     "redux-thunk": "npm:redux-thunk@1.0.0",
     "redux-ui-router": "npm:redux-ui-router@0.3.3",
+    "reselect": "npm:reselect@2.0.2",
     "sockjs": "bower:sockjs@0.3.4",
     "bower:font-awesome@4.3.0": {
       "css": "github:systemjs/plugin-css@0.1.20"
