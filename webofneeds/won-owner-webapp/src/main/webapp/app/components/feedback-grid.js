@@ -25,6 +25,7 @@ function genComponentConf() {
         constructor() {}
 
         openRequestDialog(item){
+            //TODO: SEND FEEDBACK MESSAGE OVER WS
             console.log("SELECTING ITEM: "+item);
             this.requestItem = item;
         }
