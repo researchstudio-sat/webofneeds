@@ -33,7 +33,7 @@ function genComponentConf() {
                 </div>
             </div>
         </div>
-        <div class="mfi__match" ng-if="!self.feedbackVisible" ng-click="self.showFeedback()" >
+        <div class="mfi__match clickable" ng-if="!self.feedbackVisible" ng-click="self.showFeedback()" >
             <div class="mfi__match__description">
                 <div class="mfi__match__description__title">{{self.item.ownNeed.title}}</div>
                 <div class="mfi__match__description__type">{{self.getType(self.item.ownNeed.basicNeedType)}}</div>
