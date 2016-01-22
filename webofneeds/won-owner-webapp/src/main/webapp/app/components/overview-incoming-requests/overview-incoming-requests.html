@@ -4,7 +4,7 @@
 </header>
 <main class="overviewincomingrequestscontent">
     <div class="oir__requests">
-        <won-request-item-line open="false" item="item" ng-repeat="(key,item) in self.incomingRequestsOfNeed"></won-request-item-line>
+        <won-request-item-line open="false" open-request="self.openRequest" item="item" ng-repeat="(key,item) in self.incomingRequestsOfNeed"></won-request-item-line>
     </div>
     <div class="oir__openrequest" ng-show="self.openRequest">
         <won-open-request item="self.openRequest"></won-open-request>
