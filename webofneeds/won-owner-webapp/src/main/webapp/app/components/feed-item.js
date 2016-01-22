@@ -1,6 +1,8 @@
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
 import won from '../won-es6';
+import labels from '../won-label-utils';
+
 function genComponentConf() {
     let template = `
             <div class="fi clickable">
@@ -14,7 +16,7 @@ function genComponentConf() {
                         <span class="fi__description__subtitle__group" ng-show="self.item.group">
                             <img src="generated/icon-sprite.svg#ico36_group" class="fi__description__subtitle__group__icon">{{self.item.group}}<span class="fi__description__subtitle__group__dash"> &ndash; </span>
                         </span>
-                        <span class="fi__description__subtitle__type">{{self.getType(self.item.type)}}</span>
+                        <span class="fi__description__subtitle__type">{{self.labels.type[self.item.type]}}</span>
                     </div>
                 </div>
             </div>
@@ -45,19 +47,10 @@ function genComponentConf() {
 
     class Controller {
         constructor() {
-
+            this.labels = labels;
         }
         expandActivities() {
             this.open = true;
-        }
-
-        getType(type) {
-            switch(type){
-                case 1: return 'I want to have something';
-                case 2: return 'I offer something';
-                case 3: return 'I want to do something together';
-                case 4: return 'I want to change something';
-            }
         }
     }
 

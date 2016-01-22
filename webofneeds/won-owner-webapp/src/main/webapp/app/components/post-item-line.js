@@ -2,6 +2,7 @@
 
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
+import { labels } from '../won-label-utils';
 
 function genComponentConf() {
     let template = `
@@ -17,7 +18,7 @@ function genComponentConf() {
                     <span class="pil__description__subtitle__group" ng-show="self.item.group">
                         <img src="generated/icon-sprite.svg#ico36_group" class="pil__description__subtitle__group__icon">{{self.item.group}}<span class="pil__description__subtitle__group__dash"> &ndash; </span>
                     </span>
-                    <span class="pil__description__subtitle__type">{{self.getType(self.item.basicNeedType)}}</span>
+                    <span class="pil__description__subtitle__type">{{self.labels.type[self.item.basicNeedType]}}</span>
                 </div>
             </a>
             <div class="pil__indicators">
@@ -40,16 +41,8 @@ function genComponentConf() {
     `;
 
     class Controller {
-        constructor() { }
-
-
-        getType(type) {
-            switch(type){
-                case 1: return 'I want to have something';
-                case 2: return 'I offer something';
-                case 3: return 'I want to do something together';
-                case 4: return 'I want to change something';
-            }
+        constructor() {
+            this.labels = labels;
         }
     }
 
