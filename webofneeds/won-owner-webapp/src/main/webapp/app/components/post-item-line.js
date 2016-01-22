@@ -40,18 +40,26 @@ function genComponentConf() {
     `;
 
     class Controller {
-        constructor() { }
-
+        constructor() {
+            window.postitemline = this;
+        }
 
         getType(type) {
-            switch(type){
-                case 1: return 'I want to have something';
-                case 2: return 'I offer something';
-                case 3: return 'I want to do something together';
-                case 4: return 'I want to change something';
+            switch (type) {
+                case 1:
+                    return 'I want to have something';
+                case 2:
+                    return 'I offer something';
+                case 3:
+                    return 'I want to do something together';
+                case 4:
+                    return 'I want to change something';
             }
         }
     }
+
+
+
 
     return {
         restrict: 'E',
@@ -61,6 +69,7 @@ function genComponentConf() {
         scope: {item: "=",unreadMatchEventsOfNeed:"="},
         template: template
     }
+
 }
 
 export default angular.module('won.owner.components.postItemLine', [

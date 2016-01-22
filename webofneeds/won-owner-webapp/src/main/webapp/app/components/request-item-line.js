@@ -31,14 +31,14 @@ function genComponentConf() {
                     <won-square-image src="request.titleImgSrc" title="request.title"></won-square-image>
                     <div class="mil__item__description">
                         <div class="mil__item__description__topline">
-                            <div class="mil__item__description__topline__title">{{self.item[0].remoteNeed.title}}</div>
+                            <div class="mil__item__description__topline__title">{{request.remoteNeed.title}}</div>
                             <div class="mil__item__description__topline__date">{{request.timeStamp}}</div>
                         </div>
                         <div class="mil__item__description__subtitle">
                             <span class="mil__item__description__subtitle__group" ng-show="request.group">
                                 <img src="generated/icon-sprite.svg#ico36_group" class="mil__item__description__subtitle__group__icon">{{request.group}}<span class="mil__item__description__subtitle__group__dash"> &ndash; </span>
                             </span>
-                            <span class="mil__item__description__subtitle__type">{{self.getType(self.item[0].remoteNeed.basicNeedType)}}</span>
+                            <span class="mil__item__description__subtitle__type">{{self.getType(request.remoteNeed.basicNeedType)}}</span>
                         </div>
                         <div class="mil__item__description__message">
                             <span class="mil__item__description__message__indicator" ng-show="!self.read(request)"/>{{request.message}}
@@ -52,7 +52,7 @@ function genComponentConf() {
         constructor() {
             attach(this, serviceDependencies, arguments);
             console.log(this.item)
-
+            window.reqitemline = this;
             const selectFromState = (state)=>{
 
                 return {

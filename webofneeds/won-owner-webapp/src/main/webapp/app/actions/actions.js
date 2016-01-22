@@ -75,6 +75,7 @@ const actionHierarchy = {
       },
 
         addUnreadEventUri:INJ_DEFAULT,
+        read:INJ_DEFAULT
     },
     matches: {
       load:(data)=>(dispatch,getState)=> {
