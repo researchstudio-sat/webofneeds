@@ -2,8 +2,10 @@
 
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
-import {attach,getType} from '../utils.js';
+import { wonLabels } from '../won-label-utils';
+import {attach} from '../utils.js';
 import { actionCreators }  from '../actions/actions';
+
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
@@ -18,7 +20,7 @@ function genComponentConf() {
                         <span class="ril__description__subtitle__group" ng-show="self.item.group">
                             <img src="generated/icon-sprite.svg#ico36_group" class="ril__description__subtitle__group__icon">{{self.item.group}}<span class="ril__description__subtitle__group__dash"> &ndash; </span>
                         </span>
-                        <span class="ril__description__subtitle__type">{{self.getType(self.item[0].ownNeed.basicNeedType)}}</span>
+                        <span class="ril__description__subtitle__type">{{self.wonLabels.type[self.item[0].ownNeed.basicNeedType]}}</span>
                     </div>
                 </div>
                 <div class="ril__carret">
@@ -38,7 +40,7 @@ function genComponentConf() {
                             <span class="mil__item__description__subtitle__group" ng-show="request.group">
                                 <img src="generated/icon-sprite.svg#ico36_group" class="mil__item__description__subtitle__group__icon">{{request.group}}<span class="mil__item__description__subtitle__group__dash"> &ndash; </span>
                             </span>
-                            <span class="mil__item__description__subtitle__type">{{self.getType(request.remoteNeed.basicNeedType)}}</span>
+                            <span class="mil__item__description__subtitle__type">{{self.wonLabels.type[self.item[0].remoteNeed.basicNeedType]}}</span>
                         </div>
                         <div class="mil__item__description__message">
                             <span class="mil__item__description__message__indicator" ng-show="!self.read(request)"/>{{request.message}}
@@ -59,6 +61,9 @@ function genComponentConf() {
                     unreadUris: state.getIn(['events','unreadEventUris'])
                 };
             }
+            console.log(this.item);
+            this.wonLabels = wonLabels;
+        
 
             const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this);
             //  this.loadMatches();
@@ -79,6 +84,7 @@ function genComponentConf() {
             this.events__read(request.connection.uri)
             this.openRequest = request;
         }
+    
 
     }
     Controller.$inject = serviceDependencies;

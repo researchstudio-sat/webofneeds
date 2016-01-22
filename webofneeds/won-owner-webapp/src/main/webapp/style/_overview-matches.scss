@@ -6,6 +6,23 @@
 .overviewmatchescontent {
   @include max-content-width($maxContentWidth, $minContentPadding, 'omc');
 
+  .omc__sendrequest {
+    position: absolute;
+    z-index: 101;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    won-send-request {
+      background: white;
+      margin: 0 auto;
+      top: 15rem;
+      max-width: 35rem;
+      position: relative;
+    }
+  }
+
   .omc__header {
     display: flex;
     padding: 0.5rem 0;
