@@ -29,7 +29,7 @@ docker -H satcluster01:2375 pull webofneeds/postgres
 #docker -H satcluster01:2375 stop postgres_ma || echo 'No docker container found to stop with name: postgres_ma'
 #docker -H satcluster01:2375 rm postgres_ma || echo 'No docker container found to remove with name: postgres_ma'
 if ! docker -H satcluster01:2375 run --name=postgres_ma -d -p 5433:5432 webofneeds/postgres; then
-  docker -H satcluster01:2375 restart postgres_dev
+  docker -H satcluster01:2375 restart postgres_ma
 fi
 
 sleep 10
