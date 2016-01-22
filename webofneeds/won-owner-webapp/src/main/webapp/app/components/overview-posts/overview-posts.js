@@ -44,48 +44,6 @@ class OverviewPostsController {
             //won.EVENT.WON_MESSAGE_RECEIVED -> convoMessages (!= convos with new messages <- we want this)
             //won.EVENT.CONNECT_RECEIVED -> incomingRequests
 
-            /*
-
-            ///-------------
-            function groupByNeed(unreadEvents) {
-                let need2events = Immutable.Map();
-                unreadEvents.forEach(e => {
-                    const receiverNeed = e.get('hasReceiverNeed');
-                    need2events
-                    //....
-                });
-            }
-
-            //-----------
-            let unseenCounts = {};
-            unreadEvents.forEach(e => {
-                const receiverNeed = e.get('hasReceiverNeed');
-                const prevCounts = unseenCounts[receiverNeed];
-                {}
-
-                unseenCounts[receiverNeed] = unseenCounts[receiverNeed]? unseenCounts[receiverNeed] : {};
-t
-                switch(e.get('eventType')) {
-                    case won.EVENT.HINT_RECEIVED:
-                        const count = unseenCounts[receiverNeed].matches? unseenCounts[receiverNeed].matchesObje
-                        this._unseenCounts[receiverNeed].matches += 1;
-                    break;
-                    case won.EVENT.WON_MESSAGE_RECEIVED:
-                        //TODO count unique convos
-                        this._unseenCounts[receiverNeed].conversations += 1;
-                    break;
-                    case won.EVENT.CONNECTION_MESSAGE_RECEIVED:
-                        //TODO v--^ which of these two?
-                    case won.EVENT.CONNECT_RECEIVED:
-                        this._unseenCounts[receiverNeed].incomingRequests += 1;
-                    break;
-
-                        if(!this._unseenCounts[receiverNeed]) this._unseenCounts[receiverNeed] = {};
-                }
-
-            });
-            */
-
             //goal: unseenCounts = { <uri> : { matches: 11, conversations: 0, incomingRequests: 2 }, <uri>:...}
             //TODO use memoized selector to avoid running this calculation on every tick
 
