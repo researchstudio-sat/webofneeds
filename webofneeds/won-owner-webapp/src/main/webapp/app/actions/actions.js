@@ -92,7 +92,9 @@ const actionHierarchy = {
 
         },
         addNeedToUnreadEventsByNeedByType:INJ_DEFAULT,
-        addEventToUnreadEventsByNeedByType:INJ_DEFAULT
+        addEventToUnreadEventsByNeedByType:INJ_DEFAULT,
+        read:INJ_DEFAULT
+
 
 
     },
@@ -156,6 +158,9 @@ const actionHierarchy = {
               })
           })
       },
+        open: (connection,message)=>dispatch =>{
+
+        },
         add:INJ_DEFAULT,
       reset:INJ_DEFAULT,
     },

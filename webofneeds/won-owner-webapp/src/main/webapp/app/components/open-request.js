@@ -2,7 +2,9 @@
 
 import angular from 'angular';
 import extendedGalleryModule from '../components/extended-gallery';
-
+import {attach, getType} from '../utils.js'
+import { actionCreators }  from '../actions/actions';
+const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
         <div class="or__header">
@@ -40,33 +42,32 @@ function genComponentConf() {
             </div>
         </div>
         <div class="or__footer">
-            <input type="text" placeholder="Reply Message (optional, in case of acceptance)"/>
+            <input type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
             <div class="flexbuttons">
                 <button class="won-button--filled black">Decline</button>
-                <button class="won-button--filled red">Accept</button>
+                <button class="won-button--filled red" ng-click="openRequest()">Accept</button>
             </div>
         </div>
     `;
 
     class Controller {
         constructor() {
+            attach(this, serviceDependencies, arguments);
+            window.openreq = this;
+            this.message='';
             this.maxThumbnails = 9;
         }
 
-        getType(type) {
-            switch(type){
-                case 1: return 'I want to have something';
-                case 2: return 'I offer something';
-                case 3: return 'I want to do something together';
-                case 4: return 'I want to change something';
-            }
-        }
 
+        openRequest(message){
+            this.connections__open(this.item,message);
+        }
         closeRequest(){
+            this.message='';
             this.item = undefined;
         }
     }
-
+    Controller.$inject = serviceDependencies;
     return {
         restrict: 'E',
         controller: Controller,

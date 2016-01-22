@@ -2,7 +2,9 @@
 
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
-import getType from '../utils.js';
+import {attach,getType} from '../utils.js';
+import { actionCreators }  from '../actions/actions';
+const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
             <div class="ril clickable" ng-click="self.toggleRequest()">
@@ -39,7 +41,7 @@ function genComponentConf() {
                             <span class="mil__item__description__subtitle__type">{{self.getType(self.item[0].remoteNeed.basicNeedType)}}</span>
                         </div>
                         <div class="mil__item__description__message">
-                            <span class="mil__item__description__message__indicator" ng-show="!request.read"/>{{request.message}}
+                            <span class="mil__item__description__message__indicator" ng-show="!self.read(request)"/>{{request.message}}
                         </div>
                     </div>
                 </div>
@@ -48,20 +50,38 @@ function genComponentConf() {
 
     class Controller {
         constructor() {
+            attach(this, serviceDependencies, arguments);
             console.log(this.item)
+
+            const selectFromState = (state)=>{
+
+                return {
+                    unreadUris: state.getIn(['events','unreadEventUris'])
+                };
+            }
+
+            const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this);
+            //  this.loadMatches();
+            this.$scope.$on('$destroy', disconnect);
         }
 
-
+        read(request){
+            if(!this.unreadUris.has(request.connection.uri)){
+                return true
+            }
+            return false;
+        }
         toggleRequest() {
             this.open = !this.open;
         }
 
         openMessage(request) {
-            request.read = true;
+            this.events__read(request.connection.uri)
             this.openRequest = request;
         }
-    }
 
+    }
+    Controller.$inject = serviceDependencies;
     return {
         restrict: 'E',
         controller: Controller,
@@ -72,6 +92,7 @@ function genComponentConf() {
                 openRequest: "="},
         template: template
     }
+
 }
 
 export default angular.module('won.owner.components.requestItemLine', [])

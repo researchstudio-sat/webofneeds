@@ -26,7 +26,11 @@ export default createReducer(
         [actionTypes.events.addUnreadEventUri]:(state,action)=>{
             return state.setIn(['unreadEventUris',action.payload.unreadUri],Immutable.fromJS(action.payload))
         },
-
+        [actionTypes.events.read]:(state,action)=>{
+            let events = state.getIn(['unreadEventUris'])
+            events =  events.delete(action.payload)
+            return state.setIn(['unreadEventUris'],events)
+        },
         [actionTypes.events.addNeedToUnreadEventsByNeedByType]: (state, action) => {
             let needUri = action.payload.data.hasReceiverNeed;
             let need = state.getIn(['needs','needs',needUri]);
