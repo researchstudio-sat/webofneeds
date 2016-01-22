@@ -53,7 +53,7 @@ class OverviewPostsController {
                 posts: state.getIn(["needs", "needs"]).toJS(),
                 unreadEvents,
                 unreadCounts: unreadCountsSelector(state),
-                unreadMatchEventsOfNeed: unseenMatchesCounts,
+                //unreadMatchEventsOfNeed: unseenMatchesCounts,
                 //nrOfPostsWithNotifications: unseenMatchesCounts.length
                 drafts: null,
                 activePostsOpen: state.getIn(["postOverview", "activePostsView"]),

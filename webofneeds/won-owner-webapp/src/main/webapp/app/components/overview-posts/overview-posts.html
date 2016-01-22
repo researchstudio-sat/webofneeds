@@ -22,7 +22,6 @@
         </div>
         <won-post-item-line ng-show="self.draftsOpen"
                             item="item"
-                            unread-match-events-of-need="self.unreadMatchEventsOfNeed.get(item.uri)"
                             unread-counts="self.unreadCounts.get(item.uri)"
                             ng-repeat="item in self.drafts">
             <!--unread-match-events-of-need="self.unreadMatchEventsOfNeed"-->
@@ -34,7 +33,6 @@
         </div>
         <won-post-item-line ng-show="self.closedPostsOpen"
                             item="item"
-                            unread-match-events-of-need="self.unreadMatchEventsOfNeed.get(item.uri)"
                             unread-counts="self.unreadCounts.get(item.uri)"
                             ng-repeat="item in self.posts |filterByNeedState:'inactive'">
         </won-post-item-line>

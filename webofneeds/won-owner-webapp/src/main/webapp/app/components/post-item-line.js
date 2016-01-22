@@ -2,6 +2,7 @@
 
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
+import won from '../won-es6';
 
 function genComponentConf() {
     let template = `
@@ -28,42 +29,52 @@ function genComponentConf() {
             <div class="pil__indicators">
                 <a class="pil__indicators__item clickable" ng-href="post/{{self.item.id}}/owner/messages">
                     <img src="generated/icon-sprite.svg#ico36_message"
-                         ng-show="self.item.messages.length"
+                         ng-show="self.unreadConversationsCount()"
                          class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_message_grey"
-                         ng-show="!self.item.messages.length"
+                         ng-show="!self.unreadConversationsCount()"
                          class="pil__indicators__item__icon">
                     <span class="pil__indicators__item__caption">
-                        {{self.item.messages.length}}
+                        {{ self.unreadConversationsCount() }}
                     </span>
                 </a>
                 <a class="pil__indicators__item clickable" ng-href="post/{{self.item.id}}/owner/requests">
                     <img src="generated/icon-sprite.svg#ico36_incoming"
-                         ng-show="self.unreadMatchEventsOfNeed"
+                         ng-show="self.unreadRequestsCount()"
                          class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_incoming_grey"
-                         ng-show="!self.unreadMatchEventsOfNeed"
+                         ng-show="!self.unreadRequestsCount()"
                          class="pil__indicators__item__icon">
                     <span class="pil__indicators__item__caption">
-                        {{self.unreadMatchEventsOfNeed}}
+                        {{ self.unreadRequestsCount() }}
                     </span>
                 </a>
                 <a class="pil__indicators__item clickable" ng-href="post/{{self.item.id}}/owner/matches">
                     <img src="generated/icon-sprite.svg#ico36_match"
-                         ng-show="self.unreadMatchEventsOfNeed"
+                         ng-show="self.unreadMatchesCount()"
                          class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_match_grey"
-                         ng-show="!self.unreadMatchEventsOfNeed"
+                         ng-show="!self.unreadMatchesCount()"
                          class="pil__indicators__item__icon">
                     <span class="pil__indicators__item__caption">
-                        {{self.unreadMatchEventsOfNeed}}
+                        {{ self.unreadMatchesCount() }}
                     </span>
                 </a>
             </div>
     `;
 
     class Controller {
-        constructor() { }
+        constructor() {
+            window.pil4dbg = this; //TODO deletme
+            //this.EVENT = won.EVENT;
+        }
+
+        unreadXCount(type) {return !this.unreadCounts? undefined : //ensure existence of count object
+            this.unreadCounts.get(type)
+        }
+        unreadMatchesCount() { return this.unreadXCount(won.EVENT.HINT_RECEIVED) }
+        unreadRequestsCount() { return this.unreadXCount(won.EVENT.CONNECT_RECEIVED) }
+        unreadConversationsCount() { return this.unreadXCount(won.EVENT.WON_MESSAGE_RECEIVED) }
 
 
         getType(type) {
@@ -81,7 +92,10 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {item: "=",unreadMatchEventsOfNeed:"="},
+        scope: {
+            item: "=",
+            unreadCounts: "="
+        },
         template: template
     }
 }
