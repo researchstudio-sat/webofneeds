@@ -3,7 +3,10 @@
 import angular from 'angular';
 import extendedGalleryModule from '../components/extended-gallery';
 import { labels } from '../won-label-utils';
+import {attach} from '../utils.js'
+import { actionCreators }  from '../actions/actions';
 
+const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
         <div class="or__header">
@@ -41,25 +44,31 @@ function genComponentConf() {
             </div>
         </div>
         <div class="or__footer">
-            <input type="text" placeholder="Reply Message (optional, in case of acceptance)"/>
+            <input type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
             <div class="flexbuttons">
                 <button class="won-button--filled black">Decline</button>
-                <button class="won-button--filled red">Accept</button>
+                <button class="won-button--filled red" ng-click="openRequest()">Accept</button>
             </div>
         </div>
     `;
 
     class Controller {
         constructor() {
-            this.maxThumbnails = 9;
+            attach(this, serviceDependencies, arguments);
+            window.openreq = this;
+            this.message='';
             this.labels = labels;
         }
 
+        openRequest(message){
+            this.connections__open(this.item,message);
+        }
         closeRequest(){
+            this.message='';
             this.item = undefined;
         }
     }
-
+    Controller.$inject = serviceDependencies;
     return {
         restrict: 'E',
         controller: Controller,
