@@ -4,7 +4,7 @@ import angular from 'angular';
 import squareImageModule from './square-image';
 import extendedGalleryModule from './extended-gallery';
 import feedbackGridModule from './feedback-grid';
-import getType from '../utils.js';
+import { labels } from '../won-label-utils';
 
 function genComponentConf() {
     let template = `
@@ -20,7 +20,7 @@ function genComponentConf() {
                 <span class="mfi__description__subtitle__group" ng-show="self.item.group">
                     <img src="generated/icon-sprite.svg#ico36_group" class="mfi__description__subtitle__group__icon">{{self.item.group}}<span class="mfi__description__subtitle__group__dash"> &ndash; </span>
                 </span>
-                <span class="mfi__description__subtitle__type">{{self.getType(self.item.remoteNeed.basicNeedType)}}</span>
+                <span class="mfi__description__subtitle__type">{{self.labels.type[self.item.remoteNeed.basicNeedType]}}</span>
             </div>
             <div class="mfi__description__content">
                 <div class="mfi__description__content__location">
@@ -36,7 +36,7 @@ function genComponentConf() {
         <div class="mfi__match clickable" ng-if="!self.feedbackVisible" ng-click="self.showFeedback()" >
             <div class="mfi__match__description">
                 <div class="mfi__match__description__title">{{self.item.ownNeed.title}}</div>
-                <div class="mfi__match__description__type">{{self.getType(self.item.ownNeed.basicNeedType)}}</div>
+                <div class="mfi__match__description__type">{{self.labels.type[self.item.ownNeed.basicNeedType]}}</div>
             </div>
             <won-square-image src="self.getRandomImage()" title="self.item.ownNeed.title"></won-square-image>
         </div>
@@ -45,6 +45,7 @@ function genComponentConf() {
 
     class Controller {
         constructor() {
+            this.labels = labels;
             this.feedbackVisible = false;
             this.maxThumbnails = 4;
             this.images=[

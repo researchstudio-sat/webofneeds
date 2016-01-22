@@ -7,7 +7,8 @@ import matchesGridItemModule from '../matches-grid-item';
 import matchesListItemModule from '../matches-list-item';
 import sendRequestModule from '../send-request';
 
-import { attach,mapToMatches,getType } from '../../utils';
+import { attach,mapToMatches} from '../../utils';
+import { labels } from '../../won-label-utils';
 import { actionCreators }  from '../../actions/actions';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
@@ -17,7 +18,8 @@ class OverviewMatchesController {
 
         window.omc=this;
 
-        this.selection = 3;
+        this.selection = 3
+        this.labels = labels;
 
         this.viewType = 0;
 

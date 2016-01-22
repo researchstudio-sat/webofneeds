@@ -3,6 +3,7 @@
 import angular from 'angular';
 import squareImageModule from './square-image';
 import feedbackGridModule from './feedback-grid';
+import { labels } from '../won-label-utils';
 
 function genComponentConf() {
     let template = `
@@ -18,7 +19,7 @@ function genComponentConf() {
                         <span class="mgi__description__post__text__subtitle__group" ng-show="self.item.group">
                             <img src="generated/icon-sprite.svg#ico36_group" class="mgi__description__post__text__subtitle__group__icon">{{self.item.group}}<span class="mgi__description__post__text__subtitle__group__dash"> &ndash; </span>
                         </span>
-                        <span class="mgi__description__post__text__subtitle__type">{{self.getType(self.item.remoteNeed.basicNeedType)}}</span>
+                        <span class="mgi__description__post__text__subtitle__type">{{self.labels.type[self.item.remoteNeed.basicNeedType]}}</span>
                     </div>
                 </div>
             </div>
@@ -36,7 +37,7 @@ function genComponentConf() {
         <div class="mgi__match clickable" ng-if="!self.feedbackVisible" ng-click="self.showFeedback()">
             <div class="mgi__match__description">
                 <div class="mgi__match__description__title">{{self.item.ownNeed.title}}</div>
-                <div class="mgi__match__description__type">{{self.getType(self.item.ownNeed.basicNeedType)}}</div>
+                <div class="mgi__match__description__type">{{self.labels.type[self.item.ownNeed.basicNeedType]}}</div>
             </div>
             <won-square-image src="self.getRandomImage()" title="self.item.ownNeed.title"></won-square-image>
         </div>
@@ -52,6 +53,7 @@ function genComponentConf() {
                 "images/furniture4.png"
             ];
             this.feedbackVisible = false;
+            this.labels = labels;
         }
 
         showFeedback() {
@@ -64,15 +66,6 @@ function genComponentConf() {
 
         toggleFeedback(){
             this.feedbackVisible = !this.feedbackVisible;
-        }
-
-        getType(type) {
-            switch(type){
-                case 1: return 'I want to have something';
-                case 2: return 'I offer something';
-                case 3: return 'I want to do something together';
-                case 4: return 'I want to change something';
-            }
         }
 
         getRandomImage(){
