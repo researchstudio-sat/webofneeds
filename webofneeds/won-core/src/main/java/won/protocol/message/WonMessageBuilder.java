@@ -453,6 +453,32 @@ public class WonMessageBuilder
     return this;
   }
 
+  public WonMessageBuilder setMessagePropertiesForHintFeedback(
+    URI messageURI,
+    URI connectionURI,
+    URI needURI,
+    URI wonNodeURI,
+    boolean booleanFeedbackValue) {
+
+    Model contentModel = WonRdfUtils.MessageUtils.binaryFeedbackMessage(connectionURI, booleanFeedbackValue);
+    Resource msgResource = contentModel.createResource(messageURI.toString());
+    RdfUtils.replaceBaseResource(contentModel, msgResource);
+
+    this
+      .setMessageURI(messageURI)
+      .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
+      .setWonMessageType(WonMessageType.HINT_FEEDBACK_MESSAGE)
+      .setReceiverNodeURI(wonNodeURI)
+      .setReceiverURI(connectionURI)
+      .setReceiverNeedURI(needURI)
+      .setSenderNodeURI(wonNodeURI)
+      .setSenderNeedURI(needURI)
+      .setSenderURI(connectionURI)
+      .setSentTimestampToNow()
+      .addContent(contentModel, null);
+    return this;
+  }
+
   public WonMessageBuilder setMessagePropertiesForHintNotification(
     URI messageURI,
     URI needURI,
