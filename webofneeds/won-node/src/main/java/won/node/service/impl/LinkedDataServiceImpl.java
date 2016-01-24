@@ -267,13 +267,12 @@ public class LinkedDataServiceImpl implements LinkedDataService
     // add WON node link
     connectionResource.addProperty(WON.HAS_WON_NODE, model.createResource(this.resourceURIPrefix));
 
-    if (includeEventData) {
-      //create event container and attach it to the member
-      Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events", WON.EVENT_CONTAINER);
-      connectionResource.addProperty(WON.HAS_EVENT_CONTAINER, eventContainer);
-      connectionResource.addProperty(WON.HAS_REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));
-      addAdditionalData(model, connection.getConnectionURI(), connectionResource);
+    //create event container and attach it to the member
+    Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events", WON.EVENT_CONTAINER);
+    connectionResource.addProperty(WON.HAS_EVENT_CONTAINER, eventContainer);
+    connectionResource.addProperty(WON.HAS_REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));
 
+    if (includeEventData) {
       // add the events with the new format (only the URI, no content)
       List<MessageEventPlaceholder> connectionEvents = messageEventRepository.findByParentURI(connectionUri);
       for (MessageEventPlaceholder event : connectionEvents) {
