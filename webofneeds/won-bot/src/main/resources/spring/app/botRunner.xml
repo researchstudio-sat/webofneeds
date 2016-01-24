@@ -32,8 +32,6 @@
     <import resource="classpath:/spring/component/ownerCallback/ownerCallback.xml" />
     <import resource="classpath:/spring/component/matcherProtocolMatcherServiceHandler/matcherProtocolMatcherServiceHandler.xml"/>
     <import resource="classpath:/spring/component/botManager/botManager.xml" />
-    <!--<import resource="classpath:/spring/component/needproducer/needproducer-mails.xml" />-->
-    <!--<import resource="classpath:/spring/component/needproducer/needproducer-trig.xml" />-->
     <import resource="classpath:/spring/component/needproducer/needproducer-mixed.xml" />
     <import resource="classpath:/spring/component/nodeurisource/nodeurisource-roundrobin.xml" />
     <import resource="classpath:/spring/owner-jmsonly.xml" />
