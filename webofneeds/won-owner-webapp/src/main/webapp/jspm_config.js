@@ -536,13 +536,9 @@ System.config({
       "path": "github:jspm/nodelibs-path@0.1.0"
     },
     "npm:fsevents@1.0.5": {
-      "events": "github:jspm/nodelibs-events@0.1.1",
-      "fs": "github:jspm/nodelibs-fs@0.1.2",
       "nan": "npm:nan@2.1.0",
       "node-pre-gyp": "npm:node-pre-gyp@0.6.17",
-      "path": "github:jspm/nodelibs-path@0.1.0",
-      "process": "github:jspm/nodelibs-process@0.1.2",
-      "util": "github:jspm/nodelibs-util@0.1.0"
+      "path": "github:jspm/nodelibs-path@0.1.0"
     },
     "npm:fstream-ignore@1.0.3": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
@@ -862,7 +858,6 @@ System.config({
       "request": "npm:request@2.67.0",
       "rimraf": "npm:rimraf@2.4.4",
       "semver": "npm:semver@5.1.0",
-      "systemjs-json": "github:systemjs/plugin-json@0.1.0",
       "tar": "npm:tar@2.2.1",
       "tar-pack": "npm:tar-pack@3.1.2",
       "url": "github:jspm/nodelibs-url@0.1.0",
