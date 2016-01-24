@@ -20,6 +20,7 @@ public enum WonMessageType
   OPEN(WONMSG.TYPE_OPEN),
   CONNECTION_MESSAGE(WONMSG.TYPE_CONNECTION_MESSAGE),
   HINT_MESSAGE(WONMSG.TYPE_HINT),
+  HINT_FEEDBACK_MESSAGE(WONMSG.TYPE_HINT_FEEDBACK),
 
   // notification messages
   HINT_NOTIFICATION(WONMSG.TYPE_HINT_NOTIFICATION),
@@ -74,6 +75,8 @@ public enum WonMessageType
       return CONNECTION_MESSAGE;
     if (WONMSG.TYPE_HINT.equals(resource))
       return HINT_MESSAGE;
+    if (WONMSG.TYPE_HINT_FEEDBACK.equals(resource))
+      return HINT_FEEDBACK_MESSAGE;
 
     // response classes
     if (WONMSG.TYPE_SUCCESS_RESPONSE.equals(resource))
