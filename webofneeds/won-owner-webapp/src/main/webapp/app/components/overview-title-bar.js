@@ -6,6 +6,10 @@
 import angular from 'angular';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
+import { selectUnreadCountsByType, selectUnreadEventsByNeed } from '../selectors';
+import won from '../won-es6';
+
+
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
@@ -14,13 +18,13 @@ function genComponentConf() {
                 <ul class="mtb__inner__center mtb__tabs">
                     <li ng-class="{'mtb__tabs__selected' : self.selection == 0}"><a ui-sref="feed">Feed</a></li>
                     <li ng-class="{'mtb__tabs__selected' : self.selection == 1}"><a ui-sref="overviewPosts">Posts
-                        <span class="mtb__tabs__unread">5</span>
+                        <span class="mtb__tabs__unread">{{ self.nrOfNeedsWithUnreadEvents }}</span>
                     </a></li>
                     <li ng-class="{'mtb__tabs__selected' : self.selection == 2}"><a ui-sref="overviewIncomingRequests">Incoming Requests
-                        <span class="mtb__tabs__unread">5</span>
+                        <span class="mtb__tabs__unread">{{ self.unreadRequests }}</span>
                     </a></li>
                     <li ng-class="{'mtb__tabs__selected' : self.selection == 3}"><a ui-sref="overviewMatches">Matches
-                        <span class="mtb__tabs__unread">{{self.matchesCount.length}}</span>
+                        <span class="mtb__tabs__unread">{{ self.unreadMatches }}</span>
                     </a></li>
                 </ul>
                 <div class="mtb__inner__right">
@@ -38,19 +42,16 @@ function genComponentConf() {
 
             window.otb = this;
 
-            const selectFromState = (state)=>{
+            const selectFromState = (state) => {
+                const unreadCounts = selectUnreadCountsByType(state);
+                const nrOfNeedsWithUnread = selectUnreadEventsByNeed(state).size;
 
                 return {
-                    matchesCount: Object.keys(state.getIn(['events','unreadEventUris']).toJS())
-                        .map(key=>state.getIn(['events','unreadEventUris'])
-                            .toJS()[key])
-                        .filter(event =>{
-                            if(event.eventType===won.EVENT.HINT_RECEIVED){
-                                return true
-                            }
-                         }),
+                    unreadRequests: unreadCounts.get(won.EVENT.CONNECT_RECEIVED),
+                    unreadMatches: unreadCounts.get(won.EVENT.HINT_RECEIVED),
+                    nrOfNeedsWithUnreadEvents: nrOfNeedsWithUnread > 0? nrOfNeedsWithUnread : undefined,
                 };
-            }
+            };
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             //  this.loadMatches();

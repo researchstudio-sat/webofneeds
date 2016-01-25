@@ -41,7 +41,7 @@ import {
     flattenTree,
     delay,
     checkHttpStatus,
-    watchImmutableRdxState
+    watchImmutableRdxState,
 } from '../utils';
 
 import { hierarchy2Creators } from './action-utils';

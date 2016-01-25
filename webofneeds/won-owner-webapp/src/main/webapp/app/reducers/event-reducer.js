@@ -11,7 +11,7 @@ import won from '../won-es6';
 const initialState = Immutable.fromJS({
         /*
     unreadEventsByNeedByType: {},
-    unreadEventsByTypeByNeed:{
+    unreadEventsByTypeByNeed:{ <needUri>:
         'hint': {count: 0, timestamp: new Date().getTime() },
         'connect': {count: 0, timestamp: new Date().getTime()},
         'message': {count: 0, timestamp: new Date().getTime()},
