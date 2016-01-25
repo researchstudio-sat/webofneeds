@@ -9,6 +9,18 @@ import Immutable from 'immutable';
 const selectUnreadEvents = state => state.getIn(['events', 'unreadEventUris']);
 
 /**
+ * @param {object} state
+ * @return {object} events grouped by need.
+ *      `unreadEventsByNeed.get(needUri)`, e.g.:
+ *      `unreadEventsByNeed.get('http://example.org/won/resource/need/1234')`
+ */
+export const selectUnreadEventsByNeed = createSelector(
+    selectUnreadEvents,
+    // group by need, resulting in:  `{ <needUri>: { <cnctUri>: e1, <cnctUri>: e2, ...}, <needUri>: ...}`
+    unreadEvents => unreadEvents.groupBy(e => e.get('hasReceiverNeed'))
+)
+
+/**
  * from: state.events.unreadEventUris  of "type" ~Map<connection,latestevent>
  * to: ~Map<receiverneeduri, Map<connection,latestevent>>, e.g.:
  *     { <needUri>: { <eventType> : { <cnctUri>: e1, <cnctUri>: e2, ...}, <eventType> :... }, <needUri>: ...}
@@ -19,25 +31,17 @@ const selectUnreadEvents = state => state.getIn(['events', 'unreadEventUris']);
  * @return {object} events grouped primarily by need and secondarily by type
  */
 export const selectUnreadEventsByNeedAndType = createSelector(
-    selectUnreadEvents,
-    unreadEvents => {
-        /*
-         * group by need, resulting in:
-         * `{ <needUri>: { <cnctUri>: e1, <cnctUri>: e2, ...}, <needUri>: ...}`
-        */
-        const eventsGroupedByNeed = unreadEvents
-            .groupBy(e => e.get('hasReceiverNeed'));
-
-        // further group by event-type
-        return eventsGroupedByNeed.map(cnctsOfNeed => cnctsOfNeed.groupBy(e => e.get('eventType')))
-    }
+    selectUnreadEventsByNeed,
+    eventsGroupedByNeed =>
+        // group by event-type
+        eventsGroupedByNeed.map(cnctsOfNeed => cnctsOfNeed.groupBy(e => e.get('eventType')))
 );
 
 /**
  * @param {object} state
  * @return {object} event counts for each need. access via
  *      `unreadCounts.getIn([needUri, eventType])`, e.g.:
- *      `unreadCounts.getIn(['http://example.org/won/resource/need/1234' won.EVENT.HINT_RECEIVED])`
+ *      `unreadCounts.getIn(['http://example.org/won/resource/need/1234', won.EVENT.HINT_RECEIVED])`
  */
 export const selectUnreadCountsByNeedAndType = createSelector(
     selectUnreadEventsByNeedAndType,
@@ -47,3 +51,16 @@ export const selectUnreadCountsByNeedAndType = createSelector(
         )
 
 );
+
+/**
+ * @param {object} state
+ * @return {object} event counts for each event type. access via
+ *      `unreadCountsByType.get(eventType)`, e.g.:
+ *      `unreadCountsByType.getIn(won.EVENT.HINT_RECEIVED)`
+ */
+export const selectUnreadCountsByType = createSelector(
+    selectUnreadEvents,
+    unreadEvents => unreadEvents
+        .groupBy(e => e.get('eventType'))
+        .map(eventsOfType => eventsOfType.size)
+)
