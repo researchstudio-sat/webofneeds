@@ -2,6 +2,7 @@
 
 import angular from 'angular';
 import squareImageModule from './square-image';
+import { labels } from '../won-label-utils';
 
 function genComponentConf() {
     let template = `
@@ -16,7 +17,7 @@ function genComponentConf() {
                         <span class="mli__description__subtitle__group" ng-show="self.item.group">
                             <img src="generated/icon-sprite.svg#ico36_group" class="mli__description__subtitle__group__icon">{{self.item.group}}<span class="mli__description__subtitle__group__dash"> &ndash; </span>
                         </span>
-                        <span class="mli__description__subtitle__type">{{self.getType(self.item[0].ownNeed.basicNeedType)}}</span>
+                        <span class="mli__description__subtitle__type">{{self.labels.type[self.item[0].ownNeed.basicNeedType]}}</span>
                     </div>
                 </div>
                 <div class="mli__carret">
@@ -25,7 +26,7 @@ function genComponentConf() {
                 </div>
             </div>
             <div class="smli" ng-show="self.open">
-                <div class="smli__item clickable" ng-class="{'selected' : self.openRequest === match}" ng-repeat="match in self.item">
+                <div class="smli__item clickable" ng-class="{'selected' : self.openRequest === match}" ng-repeat="match in self.item" ng-mouseenter="self.showFeedback()" ng-mouseleave="self.hideFeedback()">
                     <div class="smli__item__header">
                         <won-square-image src="match.images[0].src" title="match.remoteNeed.title"></won-square-image>
                         <div class="smli__item__header__text">
@@ -37,7 +38,7 @@ function genComponentConf() {
                                 <span class="smli__item__header__text__subtitle__group" ng-show="request.group">
                                     <img src="generated/icon-sprite.svg#ico36_group" class="smli__item__header__text__subtitle__group__icon">{{match.group}}<span class="smli__item__header__text__subtitle__group__dash"> &ndash; </span>
                                 </span>
-                                <span class="smli__item__header__text__subtitle__type">{{self.getType(match.remoteNeed.basicNeedType)}}</span>
+                                <span class="smli__item__header__text__subtitle__type">{{self.labels.type[match.remoteNeed.basicNeedType]}}</span>
                             </div>
                         </div>
                     </div>
@@ -62,16 +63,7 @@ function genComponentConf() {
     class Controller {
         constructor() {
             this.maxThumbnails = 4;
-        }
-
-
-        getType(type) {
-            switch(type){
-                case 1: return 'I want to have something';
-                case 2: return 'I offer something';
-                case 3: return 'I want to do something together';
-                case 4: return 'I want to change something';
-            }
+            this.labels = labels;
         }
 
         toggleMatches() {
@@ -84,7 +76,8 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {item: "="},
+        scope: {item: "=",
+                requestItem: "="},
         template: template
     }
 }

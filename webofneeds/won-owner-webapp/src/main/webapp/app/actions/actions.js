@@ -75,6 +75,7 @@ const actionHierarchy = {
       },
 
         addUnreadEventUri:INJ_DEFAULT,
+        read:INJ_DEFAULT
     },
     matches: {
       load:(data)=>(dispatch,getState)=> {
@@ -127,9 +128,20 @@ const actionHierarchy = {
                   dispatch(actionCreators.events__fetch({connectionUris:connections}))
               })
           },
-      add:INJ_DEFAULT,
+      load : (need)=>dispatch =>{
+          var allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], need.uri);
+          allConnectionsPromise.then(function(connections){
+              console.log("fetching connections")
+              connections.forEach(connection=>{
+                  getConnectionRelatedDataAndDispatch(connection.need.value,connection.remoteNeed.value,connection.connection.value,dispatch)
+              })
+          })
+      },
+        open: (connection,message)=>dispatch =>{
+
+        },
+        add:INJ_DEFAULT,
       reset:INJ_DEFAULT,
-      reset:INJ_DEFAULT
     },
     needs: {
         fetch: (data) => dispatch => {
@@ -138,6 +150,7 @@ const actionHierarchy = {
                 won.getNeed(uri).then(function(need){
                         console.log("linked data fetched for need: "+uri );
                         dispatch(actionCreators.needs__received(need))
+                        dispatch(actionCreators.connections__load(need))
                         //dispatch(actionCreators.connections__fetch({needUri:need.uri}))
                     })})
         },

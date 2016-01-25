@@ -4,6 +4,7 @@
 ;
 
 import angular from 'angular';
+import { labels } from '../won-label-utils';
 
 function genComponentConf() {
     let template = `
@@ -16,7 +17,7 @@ function genComponentConf() {
                     <won-square-image title="self.item.title" src="self.item.titleImgSrc"></won-square-image>
                     <div class="vtb__inner__left__titles">
                         <h1 class="vtb__title">{{self.item.title}}</h1>
-                        <div class="vtb__inner__left__titles__type">{{self.getType(self.item.type)}}, {{self.item.creationDate}} </div>
+                        <div class="vtb__inner__left__titles__type">{{self.labels.type[self.item.type]}}, {{self.item.creationDate}} </div>
                     </div>
                 </div>
                 <div class="vtb__inner__right">
@@ -38,17 +39,10 @@ function genComponentConf() {
     `;
 
     class Controller {
-        constructor() { }
-        back() { window.history.back() }
-
-        getType(type) {
-            switch(type){
-                case 1: return 'I want to have something';
-                case 2: return 'I offer something';
-                case 3: return 'I want to do something together';
-                case 4: return 'I want to change something';
-            }
+        constructor() {
+            this.labels = labels;
         }
+        back() { window.history.back() }
     }
 
     return {

@@ -3,6 +3,7 @@
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
 import won from '../won-es6';
+import { labels } from '../won-label-utils';
 
 function genComponentConf() {
     let template = `
@@ -22,7 +23,7 @@ function genComponentConf() {
                          <span class="pil__description__subtitle__group__dash"> &ndash; </span>
                     </span>
                     <span class="pil__description__subtitle__type">
-                        {{self.getType(self.item.basicNeedType)}}
+                         {{self.labels.type[self.item.basicNeedType]}}
                     </span>
                 </div>
             </a>
@@ -66,6 +67,7 @@ function genComponentConf() {
     class Controller {
         constructor() {
             window.pil4dbg = this; //TODO deletme
+            this.labels = labels;
             //this.EVENT = won.EVENT;
         }
 
@@ -76,15 +78,6 @@ function genComponentConf() {
         unreadRequestsCount() { return this.unreadXCount(won.EVENT.CONNECT_RECEIVED) }
         unreadConversationsCount() { return this.unreadXCount(won.EVENT.WON_MESSAGE_RECEIVED) }
 
-
-        getType(type) {
-            switch(type){
-                case 1: return 'I want to have something';
-                case 2: return 'I offer something';
-                case 3: return 'I want to do something together';
-                case 4: return 'I want to change something';
-            }
-        }
     }
 
     return {

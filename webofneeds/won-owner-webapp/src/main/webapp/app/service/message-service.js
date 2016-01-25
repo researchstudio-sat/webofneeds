@@ -177,12 +177,6 @@ angular.module('won.owner').factory('messageService', function ($http, $q,$log, 
         attachListenersToSocket(privateData.socket);
     }
 
-
-
-
-
-
-
     messageService.closeConnection = function () {
         if (privateData.socket != null && ! isClosingOrClosed()) {
             $log.debug("closing Websocket via messageService.closeConnection()");
