@@ -50,17 +50,6 @@ function genComponentConf() {
                     unreadRequests: unreadCounts.get(won.EVENT.CONNECT_RECEIVED),
                     unreadMatches: unreadCounts.get(won.EVENT.HINT_RECEIVED),
                     nrOfNeedsWithUnreadEvents: nrOfNeedsWithUnread > 0? nrOfNeedsWithUnread : undefined,
-
-                    /*
-                    matchesCount: Object.keys(state.getIn(['events','unreadEventUris']).toJS())
-                        .map(key=>state.getIn(['events','unreadEventUris'])
-                            .toJS()[key])
-                        .filter(event =>{
-                            if(event.eventType===won.EVENT.HINT_RECEIVED){
-                                return true
-                            }
-                         }),
-                         */
                 };
             };
 
