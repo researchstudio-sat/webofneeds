@@ -6,7 +6,7 @@ import { createSelector } from 'reselect';
 import Immutable from 'immutable';
 
 
-const unreadEventsSelector = state => state.getIn(['events', 'unreadEventUris']);
+const selectUnreadEvents = state => state.getIn(['events', 'unreadEventUris']);
 
 /**
  * from: state.events.unreadEventUris  of "type" ~Map<connection,latestevent>
@@ -18,8 +18,8 @@ const unreadEventsSelector = state => state.getIn(['events', 'unreadEventUris'])
  * @param {object} state
  * @return {object} events grouped primarily by need and secondarily by type
  */
-export const unreadEventsByNeedAndTypeSelector = createSelector(
-    unreadEventsSelector,
+export const selectUnreadEventsByNeedAndType = createSelector(
+    selectUnreadEvents,
     unreadEvents => {
         /*
          * group by need, resulting in:
@@ -39,8 +39,8 @@ export const unreadEventsByNeedAndTypeSelector = createSelector(
  *      `unreadCounts.getIn([needUri, eventType])`, e.g.:
  *      `unreadCounts.getIn(['http://example.org/won/resource/need/1234' won.EVENT.HINT_RECEIVED])`
  */
-export const unreadCountsSelector = createSelector(
-    unreadEventsByNeedAndTypeSelector,
+export const selectUnreadCountsByNeedAndType = createSelector(
+    selectUnreadEventsByNeedAndType,
     unreadEventsByNeedAndType =>
         unreadEventsByNeedAndType.map(eventsByType => //looking at single need's events grouped by type
             eventsByType.map(evnts => evnts.size) // looking at specific need and type -> just count now

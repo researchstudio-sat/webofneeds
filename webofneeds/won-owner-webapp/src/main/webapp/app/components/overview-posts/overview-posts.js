@@ -5,7 +5,7 @@ import overviewTitleBarModule from '../overview-title-bar';
 import postItemLineModule from '../post-item-line';
 import { actionCreators }  from '../../actions/actions';
 import { attach } from '../../utils';
-import { unreadCountsSelector } from '../../selectors';
+import { selectUnreadCountsByNeedAndType } from '../../selectors';
 import won from '../../won-es6';
 
 const ZERO_UNSEEN = Object.freeze({
@@ -52,7 +52,7 @@ class OverviewPostsController {
             return {
                 posts: state.getIn(["needs", "needs"]).toJS(),
                 unreadEvents,
-                unreadCounts: unreadCountsSelector(state),
+                unreadCounts: selectUnreadCountsByNeedAndType(state),
                 //unreadMatchEventsOfNeed: unseenMatchesCounts,
                 //nrOfPostsWithNotifications: unseenMatchesCounts.length
                 drafts: null,
