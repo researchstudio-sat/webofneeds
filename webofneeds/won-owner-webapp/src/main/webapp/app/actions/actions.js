@@ -255,7 +255,7 @@ const actionHierarchy = {
 
                 // dispatch routing change
                 //TODO back-button doesn't work for returning to the draft
-                dispatch(actionCreators.router__stateGo('postVisitor', {postId: event.hasSenderNeed /* published posts id */}));
+                dispatch(actionCreators.router__stateGo('postVisitor', {myUri: event.hasSenderNeed /* published posts id */}));
 
                 //TODO add to own needs
                 //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?

@@ -48,9 +48,13 @@
             <a ui-sref="overviewMatches">matches</a> |
             <a ui-sref="overviewIncomingRequests">incoming-requests</a> |
             <a ui-sref="overviewPosts">posts</a> |
-            <a ui-sref="postMatches({postId: 'http://example.org/121337345'})">post matches</a> |
-            <a ui-sref="postVisitor({postId: 'http://example.org/121337345'})">visitor-info</a> |
-            <a ui-sref="postVisitorMsgs({postId: 'http://example.org/121337345'})">visitor-convo</a>
+            <a ui-sref="postMatches({myUri: 'http://example.org/121337345'})">post matches</a> |
+            <a ui-sref="postVisitor({myUri: 'http://example.org/121337345', theirUri: 'http://example.org/97172311'})">visitor-info</a> |
+            <a ui-sref="postVisitorMsgs({myUri: 'http://example.org/121337345', theirUri: 'http://example.org/97172311'})">visitor-convo</a> |
+            <a ui-sref="postInfo({myUri: 'http://example.org/121337345'})">owner-info</a> |
+            <a ui-sref="postMatches({myUri: 'http://example.org/121337345'})">owner-matches</a> |
+            <a ui-sref="postRequests({myUri: 'http://example.org/121337345'})">owner-requests</a> |
+            <a ui-sref="postConversations({myUri: 'http://example.org/121337345'})">visitor-convos</a>
         </div>
         <!-- </debug-navigation> -->
 
