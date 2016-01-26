@@ -7,7 +7,7 @@ import { labels } from '../won-label-utils';
 
 function genComponentConf() {
     let template = `
-            <a ng-href="post/{{self.item.id}}">
+            <a ui-sref="postInfo({myUri: self.item.uri})">
                 <won-square-image src="self.item.titleImgSrc" title="self.item.title"></won-square-image>
             </a>
             <a class="pil__description clickable" ui-sref="postInfo({myUri: self.item.uri})">
