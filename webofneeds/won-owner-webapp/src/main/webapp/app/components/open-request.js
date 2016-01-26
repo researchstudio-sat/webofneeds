@@ -46,8 +46,8 @@ function genComponentConf() {
         <div class="or__footer">
             <input type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
             <div class="flexbuttons">
-                <button class="won-button--filled black">Decline</button>
-                <button class="won-button--filled red" ng-click="openRequest()">Accept</button>
+                <button class="won-button--filled black"ng-click="self.closeRequest">Decline</button>
+                <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Accept</button>
             </div>
         </div>
     `;
@@ -58,6 +58,10 @@ function genComponentConf() {
             window.openreq = this;
             this.message='';
             this.labels = labels;
+
+            const disconnect = this.$ngRedux.connect(null, actionCreators)(this);
+            //  this.loadMatches();
+            this.$scope.$on('$destroy', disconnect);
         }
 
         openRequest(message){

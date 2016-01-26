@@ -47,7 +47,7 @@ import {
 import { hierarchy2Creators } from './action-utils';
 import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
-import { buildCreateMessage } from '../won-message-utils';
+import { buildCreateMessage,buildOpenMessage } from '../won-message-utils';
 /**
  * all values equal to this string will be replaced by action-creators that simply
  * passes it's argument on as payload on to the reducers
@@ -114,10 +114,8 @@ const actionHierarchy = {
 
                   })
                 })
-      },
-      incomingAdd:(data)=>(dispatch,getState)=>{
-
       }
+
     },
     connections:{
       fetch:(data)=>dispatch=>{
@@ -137,9 +135,22 @@ const actionHierarchy = {
               })
           })
       },
-        open: (connection,message)=>dispatch =>{
-
+        open: (connectionData,message)=>(dispatch,getState) =>{
+            const state = getState();
+            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
+            let messageData = null;
+            let deferred = Q.defer()
+            won.getConnection(eventData.connection.uri).then(connection=>{
+                let msgToOpenFor = {event:eventData,connection:connection}
+                buildOpenMessage(msgToOpenFor,message).then(messageData=>{
+                    deferred.resolve(messageData);
+                })
+            })
+            deferred.promise.then((action)=>{
+                dispatch(actionCreators.messages__send(action))
+            })
         },
+        sendOpen:INJ_DEFAULT,
         add:INJ_DEFAULT,
       reset:INJ_DEFAULT,
     },
@@ -198,6 +209,7 @@ const actionHierarchy = {
     },
 
     messages: { /* websocket messages, e.g. post-creation, chatting */
+        send:INJ_DEFAULT,
         markAsSent: INJ_DEFAULT,
         /**
          * TODO this action is part of the session-upgrade hack documented in:
@@ -260,6 +272,8 @@ const actionHierarchy = {
                 //TODO add to own needs
                 //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
 
+            } else if(event.isResponseToMessageType === won.WONMSG.openMessageCompacted){
+                console.log("got response for OPEN: "+event.hasMessageType)
             }
         },
         connectMessageReceived:(data)=>dispatch=>{
@@ -461,6 +475,11 @@ var getConnectionRelatedDataAndDispatch=(needUri,remoteNeedUri,connectionUri,dis
     let remoteNeed= won.getNeed(remoteNeedUri)
     let ownNeed=won.getNeed(needUri)
     let connection=won.getConnection(connectionUri)
+    //TODO: the code below doesnt work atm. meke it work later
+/*    let lastEvent =won.executeCrawlableQuery(
+        won.queries["getLastEventUriOfConnection"],
+        connectionUri
+    )*/
     promises.push(remoteNeed,ownNeed,connection)
 
     Q.all(promises).then(results=>{
@@ -468,6 +487,7 @@ var getConnectionRelatedDataAndDispatch=(needUri,remoteNeedUri,connectionUri,dis
         resultObject.remoteNeed=results[0]
         resultObject.ownNeed = results[1]
         resultObject.connection = results[2]
+        //resultObject.lastEvent = results[3]
         dispatch(actionCreators.connections__add(resultObject))
 
     })

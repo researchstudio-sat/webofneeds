@@ -38,7 +38,9 @@ export const messagesReducer =  createReducer(
                 .setIn(['sent', eventUri], msg)
 
         },
-
+        [actionTypes.messages.send]:(messages,action)=>
+            messages.setIn(['enqueued',action.payload.eventUri],action.payload.message)
+        ,
         [actionTypes.drafts.publishSuccessful]: (messages, {payload:{ publishEventUri }}) =>
             messages.removeIn(['sent', publishEventUri]),
 

@@ -7,7 +7,7 @@ import { labels } from '../won-label-utils';
 function genComponentConf() {
     let template = `
         <div class="mli clickable" ng-click="self.toggleMatches()">
-                <won-square-image src="self.item.titleImgSrc" title="self.item.ownNeed.title"></won-square-image>
+                <won-square-image src="self.item.titleImgSrc" title="self.item[0].ownNeed.title"></won-square-image>
                 <div class="mli__description">
                     <div class="mli__description__topline">
                         <div class="mli__description__topline__title">{{self.item[0].ownNeed.title}}</div>
