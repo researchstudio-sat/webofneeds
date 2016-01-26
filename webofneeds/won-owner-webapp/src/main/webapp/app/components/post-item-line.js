@@ -3,9 +3,11 @@
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
 import won from '../won-es6';
-import { labels, relativeTime  } from '../won-label-utils';
+import { attach } from '../utils';
+import { labels, relativeTime, updateRelativeTimestamps   } from '../won-label-utils';
 import { createSelector } from 'reselect';
 
+const serviceDependencies = ['$scope', '$interval'];
 function genComponentConf() {
     let template = `
             <a ui-sref="postInfo({myUri: self.item.uri})">
@@ -14,7 +16,7 @@ function genComponentConf() {
             <a class="pil__description clickable" ui-sref="postInfo({myUri: self.item.uri})">
                 <div class="pil__description__topline">
                     <div class="pil__description__topline__title">{{self.item.title}}</div>
-                    <div class="pil__description__topline__creationdate">{{self.creationDate()}}</div>
+                    <div class="pil__description__topline__creationdate">{{self.creationDate}}</div>
                 </div>
                 <div class="pil__description__subtitle">
                     <span class="pil__description__subtitle__group" ng-show="self.item.group">
@@ -67,13 +69,17 @@ function genComponentConf() {
 
     class Controller {
         constructor() {
+            attach(this, serviceDependencies, arguments);
             window.pil4dbg = this; //TODO deletme
             this.labels = labels;
             //this.EVENT = won.EVENT;
-        }
 
-        creationDate() {
-            return relativeTime(Date.now(), this.item.creationDate);
+            updateRelativeTimestamps(
+                this.$scope,
+                this.$interval,
+                this.item.creationDate,
+                t => this.creationDate = t);
+
         }
 
         unreadXCount(type) {
@@ -92,6 +98,7 @@ function genComponentConf() {
         }
 
     }
+    Controller.$inject = serviceDependencies;
 
     return {
         restrict: 'E',
