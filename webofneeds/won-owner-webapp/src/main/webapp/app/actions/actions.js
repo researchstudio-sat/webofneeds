@@ -254,10 +254,8 @@ const actionHierarchy = {
                     })
 
                 // dispatch routing change
-                /*TODO do this without leaving context (thus: return to the exact view/state that was open before
-                going to create post (speech bubble suggests that; also it lowers the barrier for a quick post)
-                */
-                dispatch(actionCreators.router__stateGo('feed'));
+                //TODO back-button doesn't work for returning to the draft
+                dispatch(actionCreators.router__stateGo('postVisitor', {myUri: event.hasSenderNeed /* published posts id */}));
 
                 //TODO add to own needs
                 //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?

@@ -10,7 +10,7 @@ function genComponentConf() {
             <a ng-href="post/{{self.item.id}}">
                 <won-square-image src="self.item.titleImgSrc" title="self.item.title"></won-square-image>
             </a>
-            <a class="pil__description clickable" ng-href="post/{{self.item.id}}">
+            <a class="pil__description clickable" ui-sref="postInfo({myUri: self.item.uri})">
                 <div class="pil__description__topline">
                     <div class="pil__description__topline__title">{{self.item.title}}</div>
                     <div class="pil__description__topline__creationdate">{{self.item.creationDate}}</div>
@@ -28,7 +28,7 @@ function genComponentConf() {
                 </div>
             </a>
             <div class="pil__indicators">
-                <a class="pil__indicators__item clickable" ng-href="post/{{self.item.id}}/owner/messages">
+                <a class="pil__indicators__item clickable" ui-sref="postConversations({myUri: self.item.uri})">
                     <img src="generated/icon-sprite.svg#ico36_message"
                          ng-show="self.unreadConversationsCount()"
                          class="pil__indicators__item__icon">
@@ -39,7 +39,7 @@ function genComponentConf() {
                         {{ self.unreadConversationsCount() }}
                     </span>
                 </a>
-                <a class="pil__indicators__item clickable" ng-href="post/{{self.item.id}}/owner/requests">
+                <a class="pil__indicators__item clickable"  ui-sref="postRequests({myUri: self.item.uri})">
                     <img src="generated/icon-sprite.svg#ico36_incoming"
                          ng-show="self.unreadRequestsCount()"
                          class="pil__indicators__item__icon">
@@ -50,7 +50,7 @@ function genComponentConf() {
                         {{ self.unreadRequestsCount() }}
                     </span>
                 </a>
-                <a class="pil__indicators__item clickable" ng-href="post/{{self.item.id}}/owner/matches">
+                <a class="pil__indicators__item clickable" ui-sref="postMatches({myUri: self.item.uri})">
                     <img src="generated/icon-sprite.svg#ico36_match"
                          ng-show="self.unreadMatchesCount()"
                          class="pil__indicators__item__icon">
