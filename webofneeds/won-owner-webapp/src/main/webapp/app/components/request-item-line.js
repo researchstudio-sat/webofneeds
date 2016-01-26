@@ -53,7 +53,6 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
-            console.log(this.item)
             window.reqitemline = this;
             const selectFromState = (state)=>{
 
@@ -61,7 +60,6 @@ function genComponentConf() {
                     unreadUris: state.getIn(['events','unreadEventUris'])
                 };
             }
-            console.log(this.item);
             this.wonLabels = labels;
         
 
