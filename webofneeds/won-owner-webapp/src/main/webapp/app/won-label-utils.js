@@ -36,7 +36,7 @@ export function relativeTime(now, previous) {
     }
 
     if (elapsed < msPerMinute) {
-        return '< 1 minute ago';
+        return 'Just now';
     } else if (elapsed < msPerHour) {
         return labelGen(msPerMinute, 'minute');
     } else if (elapsed < msPerDay ) {
