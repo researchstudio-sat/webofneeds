@@ -11,7 +11,7 @@ import won from '../won-es6';
 const initialState = Immutable.fromJS({
         /*
     unreadEventsByNeedByType: {},
-    unreadEventsByTypeByNeed:{
+    unreadEventsByTypeByNeed:{ <needUri>:
         'hint': {count: 0, timestamp: new Date().getTime() },
         'connect': {count: 0, timestamp: new Date().getTime()},
         'message': {count: 0, timestamp: new Date().getTime()},
@@ -28,11 +28,7 @@ export default createReducer(
         [actionTypes.events.addUnreadEventUri]:(state,action)=>{
             return state.setIn(['unreadEventUris',action.payload.unreadUri],Immutable.fromJS(action.payload))
         },
-        [actionTypes.events.read]:(state,action)=>{
-            let events = state.getIn(['unreadEventUris'])
-            events =  events.delete(action.payload)
-            return state.setIn(['unreadEventUris'],events)
-        }
+        [actionTypes.events.read]:(state,action) => state.deleteIn(['unreadEventUris', action.payload])
     }
 )
 var createOrUpdateUnreadEntry = function(needURI, eventData, unreadEntry){
