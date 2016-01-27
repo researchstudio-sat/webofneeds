@@ -130,7 +130,6 @@ function genComponentConf() {
         getText() {
             //sanitize input
             return this.$sanitize(this.textField().innerHTML)
-                .replace(/<br\/?>/g, '\n')
                 .replace(/<(?:.|\n)*?>/gm, '') //strip html tags
                 .trim();
         }
