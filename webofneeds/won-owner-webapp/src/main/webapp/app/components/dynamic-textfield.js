@@ -37,7 +37,8 @@ function genComponentConf() {
             this.displayingPlaceholder = true;
             this.value = '';
 
-            this.textFieldNg().bind('focus', (e) => this.onFocus(e))
+            this.textFieldNg().bind('keydown',e => this.onKeydown(e))
+                              .bind('focus', (e) => this.onFocus(e))
                               .bind('blur', (e) => this.onBlur(e))
                               .bind('keyup drop paste', () => this.input())
             //this.textField().addEventListener('keyup', () => this.input());
@@ -54,6 +55,12 @@ function genComponentConf() {
             *    * force line-breaks on very long words
             *    * maxchars
             */
+        }
+        onKeydown(e) {
+            // prevent typing enter as it causes `<div>`s in the value
+            if(e.keyCode === 13) {
+                return false;
+            }
         }
         onFocus(e) {
             this.preEditValue = this.value;
@@ -74,6 +81,8 @@ function genComponentConf() {
         input () {
             if(!this.displayingPlaceholder) {
                 const newVal = this.getText();
+                //make sure the text field contains the sanitized text (so user sees what they're posting)
+                this.setText(newVal);
 
                 //compare with previous value, if different
                 if(this.value !== newVal) {
@@ -122,6 +131,7 @@ function genComponentConf() {
             //sanitize input
             return this.$sanitize(this.textField().innerHTML)
                 .replace(/<br\/?>/g, '\n')
+                .replace(/<(?:.|\n)*?>/gm, '') //strip html tags
                 .trim();
         }
         setText(txt) {
