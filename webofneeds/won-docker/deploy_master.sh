@@ -128,8 +128,8 @@ docker -H localhost:2375 build -t webofneeds/matcher_service:master $WORKSPACE/w
 docker -H localhost:2375 build -t webofneeds/matcher_siren:master $WORKSPACE/webofneeds/won-docker/matcher-siren/
 # push:
 docker -H localhost:2375 login -u heikofriedrich
-#docker -H localhost:2375 push webofneeds/gencert:master
-#docker -H localhost:2375 push webofneeds/wonnode:master
-#docker -H localhost:2375 push webofneeds/owner:master
-#docker -H localhost:2375 push webofneeds/matcher_service:master
-#docker -H localhost:2375 push webofneeds/matcher_siren:master
+docker -H localhost:2375 push webofneeds/gencert:master
+docker -H localhost:2375 push webofneeds/wonnode:master
+docker -H localhost:2375 push webofneeds/owner:master
+docker -H localhost:2375 push webofneeds/matcher_service:master
+docker -H localhost:2375 push webofneeds/matcher_siren:master
