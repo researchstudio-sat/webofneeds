@@ -4,6 +4,7 @@
 ;
 
 import angular from 'angular';
+import { labels } from '../won-label-utils';
 
 function genComponentConf() {
     let template = `
@@ -16,19 +17,19 @@ function genComponentConf() {
                     <won-square-image title="self.item.title" src="self.item.titleImgSrc"></won-square-image>
                     <div class="vtb__inner__left__titles">
                         <h1 class="vtb__title">{{self.item.title}}</h1>
-                        <div class="vtb__inner__left__titles__type">{{self.getType(self.item.type)}}, {{self.item.creationDate}} </div>
+                        <div class="vtb__inner__left__titles__type">{{self.labels.type[self.item.type]}}, {{self.item.creationDate}} </div>
                     </div>
                 </div>
                 <div class="vtb__inner__right">
                     <button class="won-button--filled red">Quit Contact</button>
                     <ul class="vtb__tabs">
                         <li ng-class="self.selection == 0? 'vtb__tabs__selected' : ''" ng-click="self.selection = 0">
-                        <a ui-sref="postVisitorMsgs({postId: 'http://example.org/121337345'})">
+                        <a ui-sref="postVisitorMsgs({myUri: 'http://example.org/121337345'})">
                             Messages
                             <span class="vtb__tabs__unread">{{self.item.messages.length}}</span>
                         </a></li>
                         <li ng-class="self.selection == 1? 'vtb__tabs__selected' : ''" ng-click="self.selection = 1">
-                        <a ui-sref="postVisitor({postId: 'http://example.org/121337345'})">
+                        <a ui-sref="postVisitor({myUri: 'http://example.org/121337345'})">
                             Post Info
                         </a></li>
                     </ul>
@@ -38,17 +39,10 @@ function genComponentConf() {
     `;
 
     class Controller {
-        constructor() { }
-        back() { window.history.back() }
-
-        getType(type) {
-            switch(type){
-                case 1: return 'I want to have something';
-                case 2: return 'I offer something';
-                case 3: return 'I want to do something together';
-                case 4: return 'I want to change something';
-            }
+        constructor() {
+            this.labels = labels;
         }
+        back() { window.history.back() }
     }
 
     return {

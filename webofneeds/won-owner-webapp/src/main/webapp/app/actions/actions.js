@@ -41,7 +41,7 @@ import {
     flattenTree,
     delay,
     checkHttpStatus,
-    watchImmutableRdxState
+    watchImmutableRdxState,
 } from '../utils';
 
 import { hierarchy2Creators } from './action-utils';
@@ -73,28 +73,9 @@ const actionHierarchy = {
               })
           })
       },
+
         addUnreadEventUri:INJ_DEFAULT,
-
-        addUnreadEventsByNeedByType:(data)=>(dispatch,getState)=>{
-            const state = getState();
-            let needUri = data.hasReceiverNeed;
-            data.needUri = needUri
-            let need = state.getIn(['needs','needs',data.needUri]);
-            if(!state.get(['events','unreadEventsByNeedByType',needUri]) ){
-                dispatch(actionCreators.events__addNeedToUnreadEventsByNeedByType({need:need,data}))
-            }
-            if(data.eventType!=undefined && data.eventType!=undefined){
-                dispatch(actionCreators.events__addEventToUnreadEventsByNeedByType({need:need,data}))
-            }
-        },
-        addUnreadEventsByTypeByNeed:(data)=>(dispatch,getState)=>{
-            const state=getState();
-
-        },
-        addNeedToUnreadEventsByNeedByType:INJ_DEFAULT,
-        addEventToUnreadEventsByNeedByType:INJ_DEFAULT
-
-
+        read:INJ_DEFAULT
     },
     matches: {
       load:(data)=>(dispatch,getState)=> {
@@ -147,9 +128,20 @@ const actionHierarchy = {
                   dispatch(actionCreators.events__fetch({connectionUris:connections}))
               })
           },
-      add:INJ_DEFAULT,
+      load : (need)=>dispatch =>{
+          var allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], need.uri);
+          allConnectionsPromise.then(function(connections){
+              console.log("fetching connections")
+              connections.forEach(connection=>{
+                  getConnectionRelatedDataAndDispatch(connection.need.value,connection.remoteNeed.value,connection.connection.value,dispatch)
+              })
+          })
+      },
+        open: (connection,message)=>dispatch =>{
+
+        },
+        add:INJ_DEFAULT,
       reset:INJ_DEFAULT,
-      reset:INJ_DEFAULT
     },
     needs: {
         fetch: (data) => dispatch => {
@@ -158,6 +150,7 @@ const actionHierarchy = {
                 won.getNeed(uri).then(function(need){
                         console.log("linked data fetched for need: "+uri );
                         dispatch(actionCreators.needs__received(need))
+                        dispatch(actionCreators.connections__load(need))
                         //dispatch(actionCreators.connections__fetch({needUri:need.uri}))
                     })})
         },
@@ -262,7 +255,8 @@ const actionHierarchy = {
 
                 // dispatch routing change
                 //TODO back-button doesn't work for returning to the draft
-                dispatch(actionCreators.router__stateGo('postVisitor', {postId: event.hasSenderNeed /* published posts id */}));
+                //TODO instead of going to the feed, this should go back to where the user was before starting the creation process.
+                dispatch(actionCreators.router__stateGo('feed'));
 
                 //TODO add to own needs
                 //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
@@ -274,11 +268,10 @@ const actionHierarchy = {
             won.invalidateCacheForNewConnection(data.hasReceiver,data.hasReceiverNeed)
                 ['finally'](function(){
 
-                    data.unreadUri = data.hasReceiver;
-                    dispatch(actionCreators.events__addUnreadEventUri(data))
-                   // dispatch(actionCreators.requests__incomingReceived(data))
-
                     won.getConnectionWithOwnAndRemoteNeed(data.hasReceiverNeed,data.hasSenderNeed).then(connectionData=>{
+                        //TODO refactor
+                        data.unreadUri = connectionData.uri;
+                        dispatch(actionCreators.events__addUnreadEventUri(data));
                         getConnectionRelatedDataAndDispatch(data.hasReceiverNeed,data.hasSenderNeed,connectionData.uri,dispatch)
                     })
 

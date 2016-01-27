@@ -191,14 +191,7 @@ export function flattenTree(tree, delimiter = '__') {
     _flattenTree(tree);
     return accObj;
 }
-export function         getType(type) {
-    switch(type){
-        case won.WON.BasicNeedTypeDemand: return 'I want to have something';
-        case won.WON.BasicNeedTypeSupply: return 'I offer something';
-        case won.WON.BasicNeedTypeDotogether: return 'I want to do something together';
-        case won.WON.BasicNeedTypeCritique: return 'I want to change something';
-    }
-}
+
 export function delay(milliseconds) {
     return new Promise((resolve, reject) =>
             window.setTimeout(() => resolve(), milliseconds)
@@ -378,4 +371,26 @@ export function checkHttpStatus(response) {
         error.response = response
         throw error
     }
+}
+
+/**
+ *
+ * e.g.
+ * ```
+ * withDefaults({a: 1}, {a: 4, b: 8}) // {a: 1, b: 8}
+ * withDefaults({a: 1, b: 2, c: 3}, {a: 4, b: 8}) // {a: 1, b: 2}
+ * withDefaults(undefined, {a: 4, b: 8}) // {a: 4, b: 8}
+ * ```
+ * @param defaults
+ * @param obj
+ * @returns {object} an object with the fields from defaults
+ *                   overwritten by the ones in obj where they exist.
+ *                   always returns an object as long as `defaults` is one
+ */
+export function withDefaults(obj, defaults) {
+    const ret = {};
+    for(var k in defaults) {
+        ret[k] = obj && obj[k]? obj[k] : defaults[k];
+    }
+    return ret;
 }

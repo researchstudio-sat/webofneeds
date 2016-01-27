@@ -60,7 +60,7 @@ won-image-dropzone {
     position: relative; //to allow children to use pos:absolute
 
     overflow: hidden; // to crop the `fill`ing image
-    background-size: cover;
+    background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     /* the preview is set via js:

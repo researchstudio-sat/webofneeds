@@ -2,63 +2,113 @@
 
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
+import won from '../won-es6';
+import { attach } from '../utils';
+import { labels, relativeTime, updateRelativeTimestamps   } from '../won-label-utils';
+import { createSelector } from 'reselect';
 
+const serviceDependencies = ['$scope', '$interval'];
 function genComponentConf() {
     let template = `
-            <a ng-href="post/{{self.item.id}}">
+            <a ui-sref="postInfo({myUri: self.item.uri})">
                 <won-square-image src="self.item.titleImgSrc" title="self.item.title"></won-square-image>
             </a>
-            <a class="pil__description clickable" ng-href="post/{{self.item.id}}">
+            <a class="pil__description clickable" ui-sref="postInfo({myUri: self.item.uri})">
                 <div class="pil__description__topline">
                     <div class="pil__description__topline__title">{{self.item.title}}</div>
-                    <div class="pil__description__topline__creationdate">{{self.item.creationDate}}</div>
+                    <div class="pil__description__topline__creationdate">{{self.creationDate}}</div>
                 </div>
                 <div class="pil__description__subtitle">
                     <span class="pil__description__subtitle__group" ng-show="self.item.group">
-                        <img src="generated/icon-sprite.svg#ico36_group" class="pil__description__subtitle__group__icon">{{self.item.group}}<span class="pil__description__subtitle__group__dash"> &ndash; </span>
+                        <img src="generated/icon-sprite.svg#ico36_group"
+                             class="pil__description__subtitle__group__icon">
+                         {{self.item.group}}
+                         <span class="pil__description__subtitle__group__dash"> &ndash; </span>
                     </span>
-                    <span class="pil__description__subtitle__type">{{self.getType(self.item.basicNeedType)}}</span>
+                    <span class="pil__description__subtitle__type">
+                         {{self.labels.type[self.item.basicNeedType]}}
+                    </span>
                 </div>
             </a>
             <div class="pil__indicators">
-                <a class="pil__indicators__item clickable" ng-href="post/{{self.item.id}}/owner/messages">
-                    <img src="generated/icon-sprite.svg#ico36_message" ng-show="self.unreadMatchEventsOfNeed.get(self.item.uri)" class="pil__indicators__item__icon">
-                    <img src="generated/icon-sprite.svg#ico36_message_grey" ng-show="!self.unreadMatchEventsOfNeed.get(self.item.uri)" class="pil__indicators__item__icon">
-                    <span class="pil__indicators__item__caption">{{self.item.messages.length}}</span>
+                <a class="pil__indicators__item clickable" ui-sref="postConversations({myUri: self.item.uri})">
+                    <img src="generated/icon-sprite.svg#ico36_message"
+                         ng-show="self.unreadConversationsCount()"
+                         class="pil__indicators__item__icon">
+                    <img src="generated/icon-sprite.svg#ico36_message_grey"
+                         ng-show="!self.unreadConversationsCount()"
+                         class="pil__indicators__item__icon">
+                    <span class="pil__indicators__item__caption">
+                        {{ self.unreadConversationsCount() }}
+                    </span>
                 </a>
-                <a class="pil__indicators__item clickable" ng-href="post/{{self.item.id}}/owner/requests">
-                    <img src="generated/icon-sprite.svg#ico36_incoming" ng-show="self.unreadMatchEventsOfNeed.get(self.item.uri)"  class="pil__indicators__item__icon">
-                    <img src="generated/icon-sprite.svg#ico36_incoming_grey"  ng-show="!self.unreadMatchEventsOfNeed.get(self.item.uri)" class="pil__indicators__item__icon">
-                    <span class="pil__indicators__item__caption">{{self.unreadMatchEventsOfNeed.get(self.item.uri)}}</span>
+                <a class="pil__indicators__item clickable"  ui-sref="postRequests({myUri: self.item.uri})">
+                    <img src="generated/icon-sprite.svg#ico36_incoming"
+                         ng-show="self.unreadRequestsCount()"
+                         class="pil__indicators__item__icon">
+                    <img src="generated/icon-sprite.svg#ico36_incoming_grey"
+                         ng-show="!self.unreadRequestsCount()"
+                         class="pil__indicators__item__icon">
+                    <span class="pil__indicators__item__caption">
+                        {{ self.unreadRequestsCount() }}
+                    </span>
                 </a>
-                <a class="pil__indicators__item clickable" ng-href="post/{{self.item.id}}/owner/matches">
-                    <img src="generated/icon-sprite.svg#ico36_match" ng-show="self.unreadMatchEventsOfNeed.get(self.item.uri)" class="pil__indicators__item__icon">
-                    <img src="generated/icon-sprite.svg#ico36_match_grey" ng-show="!self.unreadMatchEventsOfNeed.get(self.item.uri)" class="pil__indicators__item__icon">
-                    <span class="pil__indicators__item__caption">{{self.unreadMatchEventsOfNeed.get(self.item.uri)}}</span>
+                <a class="pil__indicators__item clickable" ui-sref="postMatches({myUri: self.item.uri})">
+                    <img src="generated/icon-sprite.svg#ico36_match"
+                         ng-show="self.unreadMatchesCount()"
+                         class="pil__indicators__item__icon">
+                    <img src="generated/icon-sprite.svg#ico36_match_grey"
+                         ng-show="!self.unreadMatchesCount()"
+                         class="pil__indicators__item__icon">
+                    <span class="pil__indicators__item__caption">
+                        {{ self.unreadMatchesCount() }}
+                    </span>
                 </a>
             </div>
     `;
 
     class Controller {
-        constructor() { }
+        constructor() {
+            attach(this, serviceDependencies, arguments);
+            window.pil4dbg = this; //TODO deletme
+            this.labels = labels;
+            //this.EVENT = won.EVENT;
 
+            updateRelativeTimestamps(
+                this.$scope,
+                this.$interval,
+                this.item.creationDate,
+                t => this.creationDate = t);
 
-        getType(type) {
-            switch(type){
-                case 1: return 'I want to have something';
-                case 2: return 'I offer something';
-                case 3: return 'I want to do something together';
-                case 4: return 'I want to change something';
-            }
         }
+
+        unreadXCount(type) {
+            return !this.unreadCounts?
+                undefined : //ensure existence of count object
+                this.unreadCounts.get(type)
+        }
+        unreadMatchesCount() {
+            return this.unreadXCount(won.EVENT.HINT_RECEIVED)
+        }
+        unreadRequestsCount() {
+            return this.unreadXCount(won.EVENT.CONNECT_RECEIVED)
+        }
+        unreadConversationsCount() {
+            return this.unreadXCount(won.EVENT.WON_MESSAGE_RECEIVED)
+        }
+
     }
+    Controller.$inject = serviceDependencies;
 
     return {
         restrict: 'E',
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {item: "=",unreadMatchEventsOfNeed:"="},
+        scope: {
+            item: "=",
+            unreadCounts: "="
+        },
         template: template
     }
 }

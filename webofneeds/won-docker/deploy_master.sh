@@ -28,7 +28,9 @@ echo run docker containers:
 docker -H satcluster01:2375 pull webofneeds/postgres
 #docker -H satcluster01:2375 stop postgres_ma || echo 'No docker container found to stop with name: postgres_ma'
 #docker -H satcluster01:2375 rm postgres_ma || echo 'No docker container found to remove with name: postgres_ma'
+echo try to start new postgres container
 if ! docker -H satcluster01:2375 run --name=postgres_ma -d -p 5433:5432 webofneeds/postgres; then
+  echo postgres container already available, restart old container
   docker -H satcluster01:2375 restart postgres_ma
 fi
 
@@ -99,11 +101,13 @@ webofneeds/matcher_service:master
 
 # siren solr server
 docker -H satcluster01:2375 pull webofneeds/sirensolr
-docker -H satcluster01:2375 stop sirensolr_ma || echo 'No docker container found to stop with name: sirensolr_ma'
-docker -H satcluster01:2375 rm sirensolr_ma || echo 'No docker container found to remove with name: sirensolr_ma'
-docker -H satcluster01:2375 run --name=sirensolr_ma -d -p 7071:8080 -p 8984:8983 \
---env CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" \
-webofneeds/sirensolr
+#docker -H satcluster01:2375 stop sirensolr_ma || echo 'No docker container found to stop with name: sirensolr_ma'
+#docker -H satcluster01:2375 rm sirensolr_ma || echo 'No docker container found to remove with name: sirensolr_ma'
+echo try to start new solr server container
+if ! docker -H satcluster01:2375 run --name=sirensolr_ma -d -p 7071:8080 -p 8984:8983 --env CATALINA_OPTS="-Xmx200m -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" webofneeds/sirensolr; then
+  echo solr server container already available, restart old container
+  docker -H satcluster01:2375 restart sirensolr_ma
+fi
 
 sleep 10
 

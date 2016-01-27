@@ -1532,6 +1532,53 @@ import * as q from 'q';
             return data.promise;
         })
     }
+    won.getConnectionsWithOwnNeed= function(ownNeedUri){
+        return won.getconnectionUrisOfNeed(ownNeedUri).then(connectionUris=>{
+            let promises=[]
+
+            connectionUris.forEach(connection=>{
+                let resultObject = {}
+                let data = Q.defer()
+
+                promises.push(won.ensureLoaded(connection))
+
+                let query="prefix msg: <http://purl.org/webofneeds/message#> \n"+
+                    "prefix won: <http://purl.org/webofneeds/model#> \n" +
+                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
+                    "select ?connection ?remoteNeed \n" +
+                    " where { \n" +
+                    "?connection a won:Connection; \n" +
+                    "              won:belongsToNeed <" +ownNeedUri +"> ; \n" +
+                    "              won:hasRemoteNeed ?remoteNeed ."+
+                    "} \n"
+
+                privateData.store.execute(query,[],[],function(success,results){
+                    if (rejectIfFailed(success, results, {message: "Error loading connection for need " + ownNeedUri, allowNone: true, allowMultiple: true})) {
+                        return;
+                    }
+                    if(results.length ===1){
+                        let connection = null;
+                        won.getConnection(results[0].connection.value).then(connectionData=>{
+                            return data.resolve(connectionData)
+                        })
+                    }
+
+                    let needs = []
+                    let ownNeedPromise = won.getNeed(uri);
+                    needs.push(ownNeedPromise);
+                    let remoteNeedPromise = won.getNeed(results[0].remoteNeed.value)
+                    needs.push(remoteNeedPromise)
+                    Q.all(needs).then(function(needData){
+                        resultObject.ownNeed = needData[0]
+                        resultObject.remoteNeed=needData[1]
+                        return data.resolve(resultObject );
+                    })
+                })
+            })
+
+            return Q.all(promises)
+        })
+    }
     /**
      * Loads the hints for the need with the specified URI into an array of js objects.
      * @return the array or null if no data is found for that URI in the local datastore
