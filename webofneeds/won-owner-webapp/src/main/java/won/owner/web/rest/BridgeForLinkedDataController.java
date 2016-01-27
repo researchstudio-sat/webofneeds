@@ -49,10 +49,9 @@ public class BridgeForLinkedDataController {
     value = "/",
     method = RequestMethod.GET,
     produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> fetchResource(@RequestParam("uri") String resourceUri, @RequestParam(value =
-    "requester", required = false)
-  String
-    requesterWebId) {
+  public ResponseEntity<String> fetchResource(@RequestParam("uri") String resourceUri,
+                                @RequestParam(value ="requester", required = false) String requesterWebId,
+                                @RequestParam(value="p",defaultValue = "-1") int page) {
 
     if (requesterWebId != null) {
       // verify that the current user has the requester webid among his identities

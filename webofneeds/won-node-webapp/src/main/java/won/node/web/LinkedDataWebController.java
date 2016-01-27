@@ -205,7 +205,7 @@ public class
   //webmvc controller method
   @RequestMapping("${uri.path.page.need}")
   public String showNeedURIListPage(
-      @RequestParam(defaultValue="-1") int page,
+      @RequestParam(value="p",defaultValue = "-1") int page,
       HttpServletRequest request,
       Model model,
       HttpServletResponse response) {
@@ -233,7 +233,7 @@ public class
     //webmvc controller method
   @RequestMapping("${uri.path.page.connection}")
   public String showConnectionURIListPage(
-      @RequestParam(defaultValue="-1") int page,
+      @RequestParam(value="p",defaultValue = "-1") int page,
       HttpServletRequest request,
       Model model,
       HttpServletResponse response) {
@@ -248,7 +248,7 @@ public class
   @RequestMapping("${uri.path.page.need}/{identifier}/connections/")
   public String showConnectionURIListPage(
       @PathVariable String identifier,
-      @RequestParam(defaultValue="-1") int page,
+      @RequestParam(value="p",defaultValue = "-1") int page,
       @RequestParam(value="deep",defaultValue = "false") boolean deep,
       HttpServletRequest request,
       Model webmvcModel,
@@ -402,7 +402,7 @@ public class
               "application/n-quads"})
   public ResponseEntity<Dataset> listNeedURIs(
       HttpServletRequest request,
-      @RequestParam(value="page",defaultValue = "-1") int page) {
+      @RequestParam(value="p",defaultValue = "-1") int page) {
     logger.debug("listNeedURIs() called");
     Dataset model = linkedDataService.listNeedURIs(page);
     HttpHeaders headers = addAlreadyExpiredHeaders(
@@ -420,7 +420,7 @@ public class
               "application/n-quads"})
   public ResponseEntity<Dataset> listConnectionURIs(
       HttpServletRequest request,
-      @RequestParam(value="page", defaultValue="-1") int page) {
+      @RequestParam(value="p", defaultValue="-1") int page) {
     logger.debug("listNeedURIs() called");
     Dataset model = linkedDataService.listConnectionURIs(page);
     HttpHeaders headers = addAlreadyExpiredHeaders(
@@ -585,7 +585,7 @@ public class
   public ResponseEntity<Dataset> readConnectionsOfNeed(
       HttpServletRequest request,
       @PathVariable(value="identifier") String identifier,
-      @RequestParam(value="page",defaultValue = "-1") int page,
+      @RequestParam(value="p",defaultValue = "-1") int page,
       @RequestParam(value="deep",defaultValue = "false") boolean deep) {
     logger.debug("readConnectionsOfNeed() called");
     URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
