@@ -210,7 +210,10 @@ const actionHierarchy = {
 
     messages: { /* websocket messages, e.g. post-creation, chatting */
         send:INJ_DEFAULT,
-        markAsSent: INJ_DEFAULT,
+        waitingForAnswer: INJ_DEFAULT,
+        remoteResponseReceived:INJ_DEFAULT,
+        openResponseReceived:INJ_DEFAULT,
+        ownResponseReceived:INJ_DEFAULT,
         /**
          * TODO this action is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
@@ -232,7 +235,8 @@ const actionHierarchy = {
             })
 
         },
-        successResponseMessageReceived :(event)=>dispatch=>{
+        successResponseMessageReceived :(event)=>(dispatch,getState) =>{
+            const state = getState()
             console.log('received response to ', event.isResponseTo, ' of ', event);
 
             //TODO do all of this in actions.js?
@@ -274,6 +278,31 @@ const actionHierarchy = {
 
             } else if(event.isResponseToMessageType === won.WONMSG.openMessageCompacted){
                 console.log("got response for OPEN: "+event.hasMessageType)
+                let eventUri = null;
+                let isRemoteResponse = false;
+                //TODO maybe refactor these response message handling
+                if (state.getIn(['messages','waitingForAnswer', event.isRemoteResponseTo])){
+                    eventUri = event.isRemoteResponseTo
+                    dispatch(actionCreators.messages__remoteResponseReceived(event.isRemoteResponseTo))
+
+                    //TODO: handle these cases
+                    //this.gotResponseFromRemoteNode = true;
+                } else if (state.getIn(['messages','waitingForAnswer', event.isResponseTo])) {
+                    dispatch(actionCreators.messages__ownResponseReceived(event.isResponseTo))
+                    eventUri = event.isResponseTo
+                    //TODO: handle these cases
+                    //this.gotResponseFromOwnNode = true;
+                }
+                if (!isSuccessMessage(event)){
+                    console.log(event)
+                }
+                if(state.getIn(['messages','waitingForAnswer', eventUri]).ownResponse===true && state.getIn(['messages','waitingForAnswer', eventUri]).remoteResponse===true){
+                    dispatch(actionCreators.messages__openResponseReceived({eventUri}))
+                }
+/*                won.ensureLoaded(eventData.hasSender)
+                    .then(function(value){
+                        won.ensureLoaded(eventUri)
+                    })*/
             }
         },
         connectMessageReceived:(data)=>dispatch=>{
@@ -492,6 +521,11 @@ var getConnectionRelatedDataAndDispatch=(needUri,remoteNeedUri,connectionUri,dis
 
     })
 
+}
+
+
+var isSuccessMessage = function isSuccessMessage(event) {
+    return event.hasMessageType === won.WONMSG.successResponseCompacted;
 }
 var messageTypeToEventType = {};
 messageTypeToEventType[won.WONMSG.hintMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED};
