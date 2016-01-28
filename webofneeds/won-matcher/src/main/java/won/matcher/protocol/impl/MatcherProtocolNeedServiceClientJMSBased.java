@@ -52,7 +52,7 @@ public class MatcherProtocolNeedServiceClientJMSBased implements MatcherProtocol
                 "with score {} from originator {}.", new Object[]{needURI, otherNeed, score, originator});
 
 
-        CamelConfiguration camelConfiguration = matcherProtocolCommunicationService.configureCamelEndpoint(needURI,startingEndpoint);
+        CamelConfiguration camelConfiguration = matcherProtocolCommunicationService.configureCamelEndpoint(wonMessage.getReceiverNodeURI(),startingEndpoint);
         String endpoint = camelConfiguration.getEndpoint();
 
         Map<String, String> headerMap = new HashMap<>();

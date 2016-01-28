@@ -58,7 +58,7 @@ public class WON
 
   public static final Property SUPPORTS_WON_PROTOCOL_IMPL = m.createProperty(BASE_URI + "supportsWonProtocolImpl");
   public static final Resource WON_OVER_ACTIVE_MQ = m.createResource(BASE_URI + "WonOverActiveMq");
-  public static final Property HAS_BROKER_URI = m.createProperty(BASE_URI,"hasBrokerUri");
+  public static final Property HAS_BROKER_URI = m.createProperty(BASE_URI, "hasBrokerUri");
   public static final Resource WON_OVER_SOAP_WS = m.createResource(BASE_URI + "WonOverSoapWs");
   public static final Property IS_IN_STATE = m.createProperty(BASE_URI, "isInState");
 
@@ -71,6 +71,7 @@ public class WON
   public static final Property HAS_TEXT_MESSAGE = m.createProperty(BASE_URI + "hasTextMessage");
   public static final Resource MESSAGE = m.createResource(BASE_URI + "Message");
   public static final Property HAS_FEEDBACK = m.createProperty(BASE_URI, "hasFeedback");
+  public static final Property HAS_FEEDBACK_EVENT = m.createProperty(BASE_URI, "hasFeedbackEvent");
   //used to express which URI the feedback relates to
   public static final Property FOR_RESOURCE = m.createProperty(BASE_URI, "forResource");
   public static final Property HAS_BINARY_RATING = m.createProperty(BASE_URI, "hasBinaryRating");

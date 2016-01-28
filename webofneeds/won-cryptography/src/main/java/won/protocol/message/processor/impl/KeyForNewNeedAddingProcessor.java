@@ -41,9 +41,9 @@ public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
   public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
 
     try {
-      String needUri = message.getSenderNeedURI().toString();
-      Dataset msgDataset =  WonMessageEncoder.encodeAsDataset(message);
       if (message.getMessageType() == WonMessageType.CREATE_NEED) {
+        String needUri = message.getSenderNeedURI().toString();
+        Dataset msgDataset =  WonMessageEncoder.encodeAsDataset(message);
         // generate and add need's public key to the need content
         if (cryptographyService.getPrivateKey(needUri) == null) {
           cryptographyService.createNewKeyPair(needUri, needUri);

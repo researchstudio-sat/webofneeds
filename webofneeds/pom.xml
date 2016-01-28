@@ -803,10 +803,6 @@
         </pluginManagement>
     </build>
     <repositories>
-        <repository>
-            <id>org.topbraid</id>
-            <url>http://www.topquadrant.com/repository/spin/</url>
-        </repository>
         <!-- jboss repo used for javax.jms -->
         <repository>
             <id>repository.jboss.org-public</id>

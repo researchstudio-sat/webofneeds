@@ -81,7 +81,7 @@ public abstract class LinkedDataRestClient
         MessageFormat.format(
           "caught a clientHandler exception, " +
             "which may indicate that the URI that was accessed isn''t a" +
-            " linked data URI, please check {0}", resourceURI), e);
+            " linked data URI, please check {0}. Underlying error message is: {1}", resourceURI, e.getMessage()), e);
     }
     if (logger.isDebugEnabled()) {
       logger.debug("fetched model with {} statements in default model for resource {}",result.getDefaultModel().size(),

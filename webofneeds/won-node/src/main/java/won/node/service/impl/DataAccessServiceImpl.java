@@ -154,16 +154,15 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     logger.debug("adding feedback to resource {}", forResource);
     Model model = rdfStorageService.loadModel(forResource);
     if (model == null) {
-      logger.debug("could not add feedback to resource {}: no such resource found", forResource );
-      return false;
+      //if no model is found, we create one.
+      model = ModelFactory.createDefaultModel();
     }
     Resource mainRes = model.getResource(forResource.toString());
     if (mainRes == null){
-      logger.debug("could not add feedback to resource {}: resource not found in model");
+      logger.debug("could not add feedback to resource {}: resource not found/created in model");
       return false;
     }
-
-    mainRes.addProperty(WON.HAS_FEEDBACK, feedback);
+    mainRes.addProperty(WON.HAS_FEEDBACK_EVENT, feedback);
     ModelExtract extract = new ModelExtract(new StatementTripleBoundary(TripleBoundary.stopNowhere));
     model.add(extract.extract(feedback, feedback.getModel()));
     logger.debug("done adding feedback for resource {}, storing...", forResource);

@@ -32,7 +32,6 @@
     
 
     <bean id="needProducerFromMails" class="won.bot.framework.component.needproducer.impl.RoundRobinCompositeNeedProducer">
-        <qualifier value="default" />
         <property name="needFactories">
             <set>
                 <bean id="supplyNeedProducer" class="won.bot.framework.component.needproducer.impl.TemplateBasedNeedProducer" >

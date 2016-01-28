@@ -40,9 +40,10 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
 
 
     if (matcherProtocolCamelConfigurator.getBrokerComponentNameWithBrokerUri(needBrokerUri)!=null){
-      if (matcherProtocolCamelConfigurator.getEndpoint(needBrokerUri)!=null)
+      String endpoint = matcherProtocolCamelConfigurator.getEndpoint(nodeUri);
+      if (endpoint!=null)
       {
-        camelConfiguration.setEndpoint(matcherProtocolCamelConfigurator.getEndpoint(needBrokerUri));
+        camelConfiguration.setEndpoint(endpoint);
       } else {
         matcherProtocolCamelConfigurator.addRouteForEndpoint(startingEndpoint,needBrokerUri);
         matcherProtocolQueueName = activeMQService.getProtocolQueueNameWithResource(nodeUri);
@@ -50,7 +51,7 @@ public class MatcherProtocolCommunicationServiceImpl implements MatcherProtocolC
         // register with remote node. If at some point the same trust strategy will
         // be used when doing GET on won resource, we don't need this separate register step for node
         registrationClient.register(nodeUri.toString());
-        String endpoint = matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(nodeUri, needBrokerUri,
+        endpoint = matcherProtocolCamelConfigurator.configureCamelEndpointForNeedUri(nodeUri, needBrokerUri,
                                                                                             matcherProtocolQueueName);
         camelConfiguration.setEndpoint(endpoint);
       }
