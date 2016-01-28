@@ -36,7 +36,11 @@ angular.module('won.owner')
                 }
             },
             template: '<div ng-attr-id="id" class="row col-lg-12" ng-include="getContentUrl()"></div>',
-            controller : function($scope){
+            controller : function($scope, applicationStateService){
+
+                applicationStateService.getCurrentNeed().then(function(need){
+                    $scope.needTitle = need.title;
+                });
 
                 $scope.getImageForMessage = function(message) {
                     if(message.senderNeed == $scope.chosenMessage.connection.belongsToNeed){

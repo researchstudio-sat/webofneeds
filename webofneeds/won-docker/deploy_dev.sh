@@ -166,9 +166,9 @@ docker -H localhost:2375 build -t webofneeds/owner:dev $WORKSPACE/webofneeds/won
 docker -H localhost:2375 build -t webofneeds/matcher_service:dev $WORKSPACE/webofneeds/won-docker/matcher-service/
 docker -H localhost:2375 build -t webofneeds/matcher_siren:dev $WORKSPACE/webofneeds/won-docker/matcher-siren/
 # push:
-#docker -H localhost:2375 login -u heikofriedrich
-#docker -H localhost:2375 push webofneeds/gencert:dev
-#docker -H localhost:2375 push webofneeds/wonnode:dev
-#docker -H localhost:2375 push webofneeds/owner:dev
-#docker -H localhost:2375 push webofneeds/matcher_service:dev
-#docker -H localhost:2375 push webofneeds/matcher_siren:dev
+docker -H localhost:2375 login -u heikofriedrich
+docker -H localhost:2375 push webofneeds/gencert:dev
+docker -H localhost:2375 push webofneeds/wonnode:dev
+docker -H localhost:2375 push webofneeds/owner:dev
+docker -H localhost:2375 push webofneeds/matcher_service:dev
+docker -H localhost:2375 push webofneeds/matcher_siren:dev

@@ -63,6 +63,7 @@ docker -H satcluster01:2375 run --name=wonnode_ma -d -e "uri.host=satcluster01.r
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satcluster01:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-e "JMEM_OPTS=-Xmx400m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/wonnode:master
 
 
@@ -83,7 +84,8 @@ webofneeds/owner:master
 docker -H satcluster01:2375 pull webofneeds/bigdata
 docker -H satcluster01:2375 stop bigdata_ma || echo 'No docker container found to stop with name: bigdata_ma'
 docker -H satcluster01:2375 rm bigdata_ma || echo 'No docker container found to remove with name: bigdata_ma'
-docker -H satcluster01:2375 run --name=bigdata_ma -d -p 10000:9999 webofneeds/bigdata
+docker -H satcluster01:2375 run --name=bigdata_ma -d -p 10000:9999 \
+-m 400m webofneeds/bigdata
 
 # matcher service
 docker -H satcluster01:2375 stop matcher_service_ma || echo 'No docker container found to stop with name: matcher_service_ma'
@@ -94,6 +96,7 @@ docker -H satcluster01:2375 run --name=matcher_service_ma -d -e "node.host=satcl
 -e "wonNodeController.wonNode.crawl=https://satcluster01.researchstudio.at:8889/won/resource" \
 -e "cluster.local.port=2561" -e "cluster.seed.port=2561" -p 2561:2561 \
 -v /home/install/won-client-certs/matcher_service_ma:/usr/src/matcher-service/client-certs/ \
+-e "JMEM_OPTS=-Xmx250m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/matcher_service:master
 
 # siren solr server
@@ -101,7 +104,7 @@ docker -H satcluster01:2375 pull webofneeds/sirensolr
 #docker -H satcluster01:2375 stop sirensolr_ma || echo 'No docker container found to stop with name: sirensolr_ma'
 #docker -H satcluster01:2375 rm sirensolr_ma || echo 'No docker container found to remove with name: sirensolr_ma'
 echo try to start new solr server container
-if ! docker -H satcluster01:2375 run --name=sirensolr_ma -d -p 7071:8080 -p 8984:8983 webofneeds/sirensolr; then
+if ! docker -H satcluster01:2375 run --name=sirensolr_ma -d -p 7071:8080 -p 8984:8983 --env CATALINA_OPTS="-Xmx200m -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" webofneeds/sirensolr; then
   echo solr server container already available, restart old container
   docker -H satcluster01:2375 restart sirensolr_ma
 fi
@@ -115,7 +118,9 @@ docker -H satcluster01:2375 run --name=matcher_siren_ma -d -e "node.host=satclus
 -e "cluster.seed.host=satcluster01.researchstudio.at" -e "cluster.seed.port=2561" -e "cluster.local.port=2562" \
 -e "matcher.siren.uri.solr.server=http://satcluster01.researchstudio.at:8984/solr/won/" \
 -e "matcher.siren.uri.solr.server.public=http://satcluster01.researchstudio.at:8984/solr/#/won/" \
--p 2562:2562 webofneeds/matcher_siren:master
+-p 2562:2562 \
+-e "JMEM_OPTS=-Xmx250m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
+webofneeds/matcher_siren:master
 
 
 # if everything works up to this point - build :master images locally and push these local images into the dockerhub:
