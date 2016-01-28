@@ -28,6 +28,9 @@ export default createReducer(
         },
         [actionTypes.connections.reset]:(state,action)=>{
             return initialState;
+        },
+        [actionTypes.messages.openResponseReceived]:(state,{payload:{eventUri,connectionData}})=>{
+            return state.setIn(['connections',connectionData.connection.uri],connectionData)
         }
 
     }

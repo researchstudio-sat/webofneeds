@@ -57,8 +57,34 @@ messageService.sendMessage = function(msg) {
 */
 
 
+export function buildOpenMessage(msgToOpenFor, textMessage){
+    let deferred = Q.defer();
+    var buildMessage = function(envelopeData, eventToOpenFor) {
+        //TODO: use event URI pattern specified by WoN node
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+        var message = new won.MessageBuilder(won.WONMSG.openMessage)
+            .eventURI(eventUri)
+            .forEnvelopeData(envelopeData)
+            .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
+            .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
+            .hasTextMessage(textMessage)
+            .hasOwnerDirection()
+            .hasSentTimestamp(new Date().getTime())
+            .build();
+        //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.OPEN_SENT);
+        return {eventUri:eventUri,message:message};
+    }
 
+    //fetch all data needed
+    won.getEnvelopeDataforConnection(msgToOpenFor.connection.uri)
+        .then(function(envelopeData){
+            deferred.resolve(buildMessage(envelopeData, msgToOpenFor.event));
+        },
+        won.reportError("cannot open connection " + msgToOpenFor.connection.uri)
+    );
+    return deferred.promise;
 
+}
 
 export function buildCreateMessage(need, wonNodeUri) {
     if(!need.type || !need.title)

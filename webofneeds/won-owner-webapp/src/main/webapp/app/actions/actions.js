@@ -47,7 +47,7 @@ import {
 import { hierarchy2Creators } from './action-utils';
 import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
-import { buildCreateMessage } from '../won-message-utils';
+import { buildCreateMessage,buildOpenMessage } from '../won-message-utils';
 /**
  * all values equal to this string will be replaced by action-creators that simply
  * passes it's argument on as payload on to the reducers
@@ -114,10 +114,8 @@ const actionHierarchy = {
 
                   })
                 })
-      },
-      incomingAdd:(data)=>(dispatch,getState)=>{
-
       }
+
     },
     connections:{
       fetch:(data)=>dispatch=>{
@@ -137,9 +135,22 @@ const actionHierarchy = {
               })
           })
       },
-        open: (connection,message)=>dispatch =>{
-
+        open: (connectionData,message)=>(dispatch,getState) =>{
+            const state = getState();
+            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
+            let messageData = null;
+            let deferred = Q.defer()
+            won.getConnection(eventData.connection.uri).then(connection=>{
+                let msgToOpenFor = {event:eventData,connection:connection}
+                buildOpenMessage(msgToOpenFor,message).then(messageData=>{
+                    deferred.resolve(messageData);
+                })
+            })
+            deferred.promise.then((action)=>{
+                dispatch(actionCreators.messages__send(action))
+            })
         },
+        sendOpen:INJ_DEFAULT,
         add:INJ_DEFAULT,
       reset:INJ_DEFAULT,
     },
@@ -198,7 +209,11 @@ const actionHierarchy = {
     },
 
     messages: { /* websocket messages, e.g. post-creation, chatting */
-        markAsSent: INJ_DEFAULT,
+        send:INJ_DEFAULT,
+        waitingForAnswer: INJ_DEFAULT,
+        remoteResponseReceived:INJ_DEFAULT,
+        openResponseReceived:INJ_DEFAULT,
+        ownResponseReceived:INJ_DEFAULT,
         /**
          * TODO this action is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
@@ -220,7 +235,8 @@ const actionHierarchy = {
             })
 
         },
-        successResponseMessageReceived :(event)=>dispatch=>{
+        successResponseMessageReceived :(event)=>(dispatch,getState) =>{
+            const state = getState()
             console.log('received response to ', event.isResponseTo, ' of ', event);
 
             //TODO do all of this in actions.js?
@@ -261,6 +277,47 @@ const actionHierarchy = {
                 //TODO add to own needs
                 //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
 
+            } else if(event.isResponseToMessageType === won.WONMSG.openMessageCompacted){
+                console.log("got response for OPEN: "+event.hasMessageType)
+                let eventUri = null;
+                let isRemoteResponse = false;
+                //TODO maybe refactor these response message handling
+                if (state.getIn(['messages','waitingForAnswer', event.isRemoteResponseTo])){
+                    eventUri = event.isRemoteResponseTo
+                    dispatch(actionCreators.messages__remoteResponseReceived(event.isRemoteResponseTo))
+
+                    //TODO: handle these cases
+                    //this.gotResponseFromRemoteNode = true;
+                } else if (state.getIn(['messages','waitingForAnswer', event.isResponseTo])) {
+                    dispatch(actionCreators.messages__ownResponseReceived(event.isResponseTo))
+                    eventUri = event.isResponseTo
+                    //TODO: handle these cases
+                    //this.gotResponseFromOwnNode = true;
+                }
+                if (!isSuccessMessage(event)){
+                    console.log(event)
+                }
+
+                if(state.getIn(['messages','waitingForAnswer', eventUri]).ownResponse===true && state.getIn(['messages','waitingForAnswer', eventUri]).remoteResponse===true){
+                    won.invalidateCacheForNewMessage(event.hasReceiver).then(()=>{
+                        getConnectionRelatedDataAndDispatch(event.hasReceiverNeed,event.hasSenderNeed,event.hasReceiver,dispatch).then(connectionData=>{
+                            won.executeCrawlableQuery(
+                                won.queries["getLastEventUriOfConnection"],
+                                event.hasReceiver
+                            ).then(lastEvent=>{
+                                    connectionData.lastEvent = lastEvent;
+                                    dispatch(actionCreators.messages__openResponseReceived({eventUri,connectionData}))
+                                })
+
+                        })
+                    })
+
+
+                }
+/*                won.ensureLoaded(eventData.hasSender)
+                    .then(function(value){
+                        won.ensureLoaded(eventUri)
+                    })*/
             }
         },
         connectMessageReceived:(data)=>dispatch=>{
@@ -272,7 +329,9 @@ const actionHierarchy = {
                         //TODO refactor
                         data.unreadUri = connectionData.uri;
                         dispatch(actionCreators.events__addUnreadEventUri(data));
-                        getConnectionRelatedDataAndDispatch(data.hasReceiverNeed,data.hasSenderNeed,connectionData.uri,dispatch)
+                        getConnectionRelatedDataAndDispatch(data.hasReceiverNeed,data.hasSenderNeed,connectionData.uri,dispatch).then(connectionData=>{
+                            dispatch(actionCreators.connections__add(connectionData))
+                        })
                     })
 
             })
@@ -289,7 +348,9 @@ const actionHierarchy = {
                     data.matchCounterpartURI = won.getSafeJsonLdValue(data.framedMessage[won.WON.hasMatchCounterpart]);
 
                     dispatch(actionCreators.events__addUnreadEventUri(data))
-                    getConnectionRelatedDataAndDispatch(needUri,data.hasMatchCounterpart,data.hasReceiver,dispatch)
+                    getConnectionRelatedDataAndDispatch(needUri,data.hasMatchCounterpart,data.hasReceiver,dispatch).then(connectionData=>{
+                        dispatch(actionCreators.connections__add(connectionData))
+                    })
 
 
 
@@ -462,17 +523,26 @@ var getConnectionRelatedDataAndDispatch=(needUri,remoteNeedUri,connectionUri,dis
     let remoteNeed= won.getNeed(remoteNeedUri)
     let ownNeed=won.getNeed(needUri)
     let connection=won.getConnection(connectionUri)
-    promises.push(remoteNeed,ownNeed,connection)
+    let lastEvent = won.executeCrawlableQuery(
+        won.queries["getLastEventUriOfConnection"],
+        connectionUri
+    )
+    //TODO: the code below doesnt work atm. meke it work later
+
+    promises.push(remoteNeed,ownNeed,connection,lastEvent)
 
     Q.all(promises).then(results=>{
         let resultObject={}
         resultObject.remoteNeed=results[0]
         resultObject.ownNeed = results[1]
         resultObject.connection = results[2]
-        dispatch(actionCreators.connections__add(resultObject))
-
+        resultObject.lastEvent = results[3]
     })
+}
 
+
+var isSuccessMessage = function isSuccessMessage(event) {
+    return event.hasMessageType === won.WONMSG.successResponseCompacted;
 }
 var messageTypeToEventType = {};
 messageTypeToEventType[won.WONMSG.hintMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED};
