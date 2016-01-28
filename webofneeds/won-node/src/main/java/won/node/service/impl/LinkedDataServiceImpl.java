@@ -100,7 +100,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private String activeMqMatcherProtocolTopicNameNeedActivated;
   private String activeMqMatcherProtocolTopicNameNeedDeactivated;
 
-    public Dataset listNeedURIs(final int pageNum)
+    public Dataset listNeedURIsOld(final int pageNum)
   {
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
@@ -121,6 +121,42 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Dataset ret = newDatasetWithNamedModel(createDataGraphUri(needListPageResource), model);
     addBaseUriAndDefaultPrefixes(ret);
     return ret;
+  }
+
+  public Dataset listNeedURIs()
+  {
+    Model model = ModelFactory.createDefaultModel();
+    setNsPrefixes(model);
+    Resource needListPageResource = null;
+    Collection<URI> uris = null;
+    uris = needInformationService.listNeedURIs();
+    needListPageResource = model.createResource(this.needResourceURIPrefix+"/");
+
+    for (URI needURI : uris) {
+      model.add(model.createStatement(needListPageResource, RDFS.member, model.createResource(needURI.toString())));
+    }
+    Dataset ret = newDatasetWithNamedModel(createDataGraphUri(needListPageResource), model);
+    addBaseUriAndDefaultPrefixes(ret);
+    return ret;
+  }
+
+
+  public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int pageNum)
+  {
+    Model model = ModelFactory.createDefaultModel();
+    setNsPrefixes(model);
+    Resource needListPageResource = null;
+    Collection<URI> uris = null;
+    NeedInformationService.Page page = needInformationService.listNeedURIs(pageNum);
+    needListPageResource = model.createResource(this.needResourceURIPrefix + "/");
+    uris = page.getContent();
+    for (URI needURI : uris) {
+      model.add(model.createStatement(needListPageResource, RDFS.member, model.createResource(needURI.toString())));
+    }
+    Dataset dataset = newDatasetWithNamedModel(createDataGraphUri(needListPageResource), model);
+    addBaseUriAndDefaultPrefixes(dataset);
+    NeedInformationService.PagedResource<Dataset> containerPage = new NeedInformationService.PagedResource(dataset, page.hasNext());
+    return containerPage;
   }
 
   private String createDataGraphUri(Resource needListPageResource) {
@@ -465,4 +501,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
   public void setActiveMqMatcherProtocolTopicNameNeedDeactivated(final String activeMqMatcherProtocolTopicNameNeedDeactivated) {
     this.activeMqMatcherProtocolTopicNameNeedDeactivated = activeMqMatcherProtocolTopicNameNeedDeactivated;
   }
+
+
 }

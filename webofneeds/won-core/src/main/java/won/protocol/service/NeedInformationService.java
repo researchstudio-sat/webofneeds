@@ -139,4 +139,22 @@ public interface NeedInformationService {
       return hasNext;
     }
   }
+
+  public static class PagedResource<T>{
+    private T content;
+    private boolean hasNext;
+
+    public PagedResource(final T content, final boolean hasNext) {
+      this.content = content;
+      this.hasNext = hasNext;
+    }
+
+    public T getContent() {
+      return content;
+    }
+
+    public boolean hasNext() {
+      return hasNext;
+    }
+  }
 }

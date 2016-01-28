@@ -43,6 +43,7 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.service.LinkedDataService;
+import won.protocol.service.NeedInformationService;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.CNT;
 import won.protocol.vocabulary.HTTP;
@@ -58,6 +59,7 @@ import java.util.*;
 /**
  * TODO: check the working draft here and see to conformance:
  * http://www.w3.org/TR/ldp/
+ * TODO: edit according to the latest version of the spec
  * Not met yet:
  *
  * 4.1.13 LDPR server responses must contain accurate response ETag header values.
@@ -209,7 +211,7 @@ public class
       HttpServletRequest request,
       Model model,
       HttpServletResponse response) {
-      Dataset rdfDataset = linkedDataService.listNeedURIs(page);
+      Dataset rdfDataset = linkedDataService.listNeedURIs(page).getContent();
       model.addAttribute("rdfDataset", rdfDataset);
       model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
       model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
@@ -255,7 +257,7 @@ public class
       HttpServletResponse response) {
     URI needURI = uriService.createNeedURIForId(identifier);
     try{
-      Dataset dataset = linkedDataService.listConnectionURIs(page,needURI);
+      Dataset dataset = linkedDataService.listConnectionURIs(page, needURI);
         if (deep){
             addDeepConnectionData(needURI.toString(), dataset);
         }
@@ -267,7 +269,8 @@ public class
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return "notFoundView";
     } catch (NoSuchConnectionException e) {
-        logger.warn("did not find connection that should be connected to need. connection:{}",e.getUnknownConnectionURI());
+        logger.warn("did not find connection that should be connected to need. connection:{}",
+                    e.getUnknownConnectionURI());
         return "notFoundView"; //TODO: should display an error view
     }
   }
@@ -338,6 +341,17 @@ public class
     return requestUri;
   }
 
+  private String getRequestUriWithAddedQuery(final HttpServletRequest request, String query) {
+    String requestUri = request.getRequestURI();
+    String queryString = request.getQueryString();
+    if (queryString == null || queryString.length() <= 2) {
+      requestUri += "?" + query;
+    } else {
+      requestUri += "?" + queryString + "&" + query;
+    }
+    return requestUri;
+  }
+
 
   /**
      * If the HTTP 'Accept' header is 'text/html'
@@ -395,22 +409,35 @@ public class
   }
 
   @RequestMapping(
-      value="${uri.path.data.need}",
-      method = RequestMethod.GET,
+    value="${uri.path.data.need}",
+    method = RequestMethod.GET,
     produces={"application/ld+json",
               "application/trig",
               "application/n-quads"})
-  public ResponseEntity<Dataset> listNeedURIs(
-      HttpServletRequest request,
-      @RequestParam(value="p",defaultValue = "-1") int page) {
-    logger.debug("listNeedURIs() called");
-    Dataset model = linkedDataService.listNeedURIs(page);
+  public ResponseEntity<Dataset> listNeedURIs(HttpServletRequest request, HttpServletResponse response,
+    @RequestParam(value="p", required=false) Integer page) throws IOException {
+    logger.debug("listNeedURIs() for page " + page + " called");
+
+    if (page == null) {
+      //by default we redirect to the first page
+      //TODO although for us it would make sense to redirect to the last one, as matcher, owner gui, etc. would be
+      // interested mostly in the latest needs/events... How to do it?
+      // (so that we in accordance with the specification https://www.w3.org/TR/ldp-paging/)
+      String redirectToURI = getRequestUriWithAddedQuery(request, "p=1");
+      response.sendRedirect(redirectToURI);
+      return null;
+    }
+
+    //Dataset model = linkedDataService.listNeedURIs(page);
+    NeedInformationService.PagedResource<Dataset> resource = linkedDataService.listNeedURIs(page);
     HttpHeaders headers = addAlreadyExpiredHeaders(
       addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()),
                                    URI.create(this.needResourceURIPrefix)));
+    addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), page, resource.hasNext());
     addCORSHeader(headers);
-    return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
+    return new ResponseEntity<Dataset>(resource.getContent(), headers, HttpStatus.OK);
   }
+
 
   @RequestMapping(
       value="${uri.path.data.connection}",
@@ -630,6 +657,36 @@ public class
       headers.add(HTTP.HEADER_LOCATION, canonicalURI.toString());
     }
     return headers;
+  }
+
+
+  /**
+   * Adds headers describing the paged resource according to https://www.w3.org/TR/ldp-paging/
+   * (here implemented version is http://www.w3.org/TR/2015/NOTE-ldp-paging-20150630/)
+   * that inform the client about the following properties of the pages resource:
+   *
+   * Link: <uri>; rel="canonical"; etag="tag" - which resource it is a page of, and current tag of the resource
+   * Link: <http://www.w3.org/ns/ldp#Page>; rel="type" - that this is one in-sequence page resource
+   * Link: <http://www.w3.org/ns/ldp#Resource>; rel="type" - that this is a LDP Resource (should be Container in our case?)
+   * Link: <uri?p=x>; rel="next" - that the next in-sequence page resource exists and is retrievable at the given uri
+   *
+   * @param headers headers to which paged resource headers should be added
+   * @param canonicalURI uri of the LDP Resource
+   * @param page page of the Paged LDP Resource
+   * @param hasNext whether more pages exist
+   * @return the headers map with added header values
+   */
+  private void addPagedResourceInSequenceHeader(final HttpHeaders headers, final URI canonicalURI, final int page,
+                                                final boolean hasNext) {
+
+    headers.add("Link", "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
+    //Link: <http://example.org/customer-relations?p=2>; rel="next"
+    if (hasNext) {
+      int nextPage = page + 1;
+      headers.add("Link", "<" + canonicalURI.toString() + "?p=" + nextPage + ">; rel=\"next\"");
+    }
+    headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
+
   }
 
   /**

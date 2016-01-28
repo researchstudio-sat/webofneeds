@@ -34,7 +34,9 @@ public interface LinkedDataService
    * @param page
    * @return
    */
-  public Dataset listNeedURIs(final int page);
+  public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int page);
+
+  public Dataset listNeedURIsOld(final int page);
 
   /**
    * Returns a model containing all connection URIs.
