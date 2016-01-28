@@ -47,7 +47,11 @@ import {
 import { hierarchy2Creators } from './action-utils';
 import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
-import { buildCreateMessage,buildOpenMessage } from '../won-message-utils';
+import { buildCreateMessage,
+         buildOpenMessage,
+         buildCloseMessage,
+         buildRateMessage,
+         buildConnectMessage } from '../won-message-utils';
 /**
  * all values equal to this string will be replaced by action-creators that simply
  * passes it's argument on as payload on to the reducers
@@ -143,6 +147,54 @@ const actionHierarchy = {
             won.getConnection(eventData.connection.uri).then(connection=>{
                 let msgToOpenFor = {event:eventData,connection:connection}
                 buildOpenMessage(msgToOpenFor,message).then(messageData=>{
+                    deferred.resolve(messageData);
+                })
+            })
+            deferred.promise.then((action)=>{
+                dispatch(actionCreators.messages__send(action))
+            })
+        },
+        connect: (connectionData,message)=>(dispatch,getState) =>{
+            const state = getState();
+            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
+            let messageData = null;
+            let deferred = Q.defer()
+            won.getConnection(eventData.connection.uri).then(connection=>{
+                let msgToOpenFor = {event:eventData,connection:connection}
+                buildConnectMessage(msgToOpenFor,message).then(messageData=>{
+                    deferred.resolve(messageData);
+                })
+            })
+            deferred.promise.then((action)=>{
+                dispatch(actionCreators.messages__send(action))
+            })
+        },
+        close: (connectionData)=>(dispatch,getState) =>{
+            const state = getState();
+            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
+            let messageData = null;
+            let deferred = Q.defer()
+            won.getConnection(eventData.connection.uri).then(connection=>{
+                let msgToOpenFor = {event:eventData,connection:connection}
+                buildCloseMessage(msgToOpenFor).then(messageData=>{
+                    deferred.resolve(messageData);
+                })
+            })
+            deferred.promise.then((action)=>{
+                dispatch(actionCreators.messages__send(action))
+            })
+        },
+        rate: (connectionData,rating) => (dispatch,getState) =>{
+            console.log(connectionData);
+            console.log(rating);
+
+            const state = getState();
+            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
+            let messageData = null;
+            let deferred = Q.defer()
+            won.getConnection(eventData.connection.uri).then(connection=>{
+                let msgToOpenFor = {event:eventData, connection: connection}
+                buildRateMessage(msgToOpenFor,rating).then(messageData=>{
                     deferred.resolve(messageData);
                 })
             })
@@ -329,9 +381,7 @@ const actionHierarchy = {
                         //TODO refactor
                         data.unreadUri = connectionData.uri;
                         dispatch(actionCreators.events__addUnreadEventUri(data));
-                        getConnectionRelatedDataAndDispatch(data.hasReceiverNeed,data.hasSenderNeed,connectionData.uri,dispatch).then(connectionData=>{
-                            dispatch(actionCreators.connections__add(connectionData))
-                        })
+                        getConnectionRelatedDataAndDispatch(data.hasReceiverNeed,data.hasSenderNeed,connectionData.uri,dispatch)
                     })
 
             })
@@ -348,9 +398,7 @@ const actionHierarchy = {
                     data.matchCounterpartURI = won.getSafeJsonLdValue(data.framedMessage[won.WON.hasMatchCounterpart]);
 
                     dispatch(actionCreators.events__addUnreadEventUri(data))
-                    getConnectionRelatedDataAndDispatch(needUri,data.hasMatchCounterpart,data.hasReceiver,dispatch).then(connectionData=>{
-                        dispatch(actionCreators.connections__add(connectionData))
-                    })
+                    getConnectionRelatedDataAndDispatch(needUri,data.hasMatchCounterpart,data.hasReceiver,dispatch)
 
 
 
@@ -523,20 +571,21 @@ var getConnectionRelatedDataAndDispatch=(needUri,remoteNeedUri,connectionUri,dis
     let remoteNeed= won.getNeed(remoteNeedUri)
     let ownNeed=won.getNeed(needUri)
     let connection=won.getConnection(connectionUri)
-    let lastEvent = won.executeCrawlableQuery(
+    /*let lastEvent = won.executeCrawlableQuery(
         won.queries["getLastEventUriOfConnection"],
         connectionUri
-    )
+    )*/
     //TODO: the code below doesnt work atm. meke it work later
 
-    promises.push(remoteNeed,ownNeed,connection,lastEvent)
+    promises.push(remoteNeed,ownNeed,connection)//,lastEvent)
 
     Q.all(promises).then(results=>{
         let resultObject={}
         resultObject.remoteNeed=results[0]
         resultObject.ownNeed = results[1]
         resultObject.connection = results[2]
-        resultObject.lastEvent = results[3]
+        //resultObject.lastEvent = results[3]
+        dispatch(actionCreators.connections__add(resultObject))
     })
 }
 
