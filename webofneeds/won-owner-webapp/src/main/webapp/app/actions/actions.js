@@ -296,8 +296,22 @@ const actionHierarchy = {
                 if (!isSuccessMessage(event)){
                     console.log(event)
                 }
+
                 if(state.getIn(['messages','waitingForAnswer', eventUri]).ownResponse===true && state.getIn(['messages','waitingForAnswer', eventUri]).remoteResponse===true){
-                    dispatch(actionCreators.messages__openResponseReceived({eventUri}))
+                    won.invalidateCacheForNewMessage(event.hasReceiver).then(()=>{
+                        getConnectionRelatedDataAndDispatch(event.hasReceiverNeed,event.hasSenderNeed,event.hasReceiver,dispatch).then(connectionData=>{
+                            won.executeCrawlableQuery(
+                                won.queries["getLastEventUriOfConnection"],
+                                event.hasReceiver
+                            ).then(lastEvent=>{
+                                    connectionData.lastEvent = lastEvent;
+                                    dispatch(actionCreators.messages__openResponseReceived({eventUri,connectionData}))
+                                })
+
+                        })
+                    })
+
+
                 }
 /*                won.ensureLoaded(eventData.hasSender)
                     .then(function(value){
@@ -314,7 +328,9 @@ const actionHierarchy = {
                         //TODO refactor
                         data.unreadUri = connectionData.uri;
                         dispatch(actionCreators.events__addUnreadEventUri(data));
-                        getConnectionRelatedDataAndDispatch(data.hasReceiverNeed,data.hasSenderNeed,connectionData.uri,dispatch)
+                        getConnectionRelatedDataAndDispatch(data.hasReceiverNeed,data.hasSenderNeed,connectionData.uri,dispatch).then(connectionData=>{
+                            dispatch(actionCreators.connections__add(connectionData))
+                        })
                     })
 
             })
@@ -331,7 +347,9 @@ const actionHierarchy = {
                     data.matchCounterpartURI = won.getSafeJsonLdValue(data.framedMessage[won.WON.hasMatchCounterpart]);
 
                     dispatch(actionCreators.events__addUnreadEventUri(data))
-                    getConnectionRelatedDataAndDispatch(needUri,data.hasMatchCounterpart,data.hasReceiver,dispatch)
+                    getConnectionRelatedDataAndDispatch(needUri,data.hasMatchCounterpart,data.hasReceiver,dispatch).then(connectionData=>{
+                        dispatch(actionCreators.connections__add(connectionData))
+                    })
 
 
 
@@ -504,23 +522,21 @@ var getConnectionRelatedDataAndDispatch=(needUri,remoteNeedUri,connectionUri,dis
     let remoteNeed= won.getNeed(remoteNeedUri)
     let ownNeed=won.getNeed(needUri)
     let connection=won.getConnection(connectionUri)
-    //TODO: the code below doesnt work atm. meke it work later
-/*    let lastEvent =won.executeCrawlableQuery(
+    let lastEvent = won.executeCrawlableQuery(
         won.queries["getLastEventUriOfConnection"],
         connectionUri
-    )*/
-    promises.push(remoteNeed,ownNeed,connection)
+    )
+    //TODO: the code below doesnt work atm. meke it work later
+
+    promises.push(remoteNeed,ownNeed,connection,lastEvent)
 
     Q.all(promises).then(results=>{
         let resultObject={}
         resultObject.remoteNeed=results[0]
         resultObject.ownNeed = results[1]
         resultObject.connection = results[2]
-        //resultObject.lastEvent = results[3]
-        dispatch(actionCreators.connections__add(resultObject))
-
+        resultObject.lastEvent = results[3]
     })
-
 }
 
 
