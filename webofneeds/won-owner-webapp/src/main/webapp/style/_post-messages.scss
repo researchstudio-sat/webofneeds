@@ -2,9 +2,15 @@
 @import 'square-image';
 @import 'speech-bubble';
 @import 'dynamic-textfield';
+@import 'won-config';
 
 .post-messages {
-
+  background: white;
+  border: 0.1rem solid $won-line-gray;
+  flex-grow:1;
+  width: 100%;
+  max-width: 35rem;
+  margin: 0.5rem;
   @include max-content-width(35rem, $minContentPadding, 'post-messages');
   padding-top: 2rem;
 
@@ -15,6 +21,7 @@
     justify-content: center;
     flex-wrap: wrap;
     align-items: flex-start;
+
   }
 
   won-post-messages{
@@ -22,9 +29,33 @@
     width: 100%;
 
     .pm__header {
+      display:flex;
       font-size: $normalFontSize;
       text-align: left;
       width: 100%;
+
+      &__title{
+        flex-grow:2
+      }
+      &__icon {
+        flex-grow:1;
+        padding-right: 0.25rem;
+        @include fixed-square(1rem);
+      }
+
+      &__options {
+        color: $won-red;
+
+        &__icon{
+          flex-grow:1;
+          height:1em;
+          min-height:1em;
+          max-height:1em;
+          width:auto;
+          padding-right: 0.25rem;
+          @include fixed-square(1rem);
+        }
+      }
     }
 
     .pm__footer {

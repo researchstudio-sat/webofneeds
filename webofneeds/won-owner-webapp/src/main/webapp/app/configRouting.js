@@ -18,10 +18,10 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
         { path: '/overview/matches', component: 'overview-matches', as: 'overviewMatches' },
         { path: '/overview/incoming-requests', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
         { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' },
-        { path: '/post/owner/matches?myUri', component: 'landingpage', as: 'postMatches' }, //TODO implement view
-        { path: '/post/owner/conversations?myUri', component: 'landingpage', as: 'postConversations' }, //TODO implement view
-        { path: '/post/owner/requests?myUri', component: 'landingpage', as: 'postRequests' }, //TODO implement view
-        { path: '/post/owner/info?myUri', component: 'landingpage', as: 'postInfo' }, //TODO implement view
+        { path: '/post/owner/matches?myUri', component: 'post-owner', as: 'postMatches' }, //TODO implement view
+        { path: '/post/owner/conversations?myUri', component: 'post-owner-messages', as: 'postConversations' }, //TODO implement view
+        { path: '/post/owner/requests?myUri', component: 'post-owner', as: 'postRequests' }, //TODO implement view
+        { path: '/post/owner/info?myUri', component: 'post-owner', as: 'postInfo' }, //TODO implement view
         { path: '/post/visitor/info/?myUri?theirUri', component: 'post-visitor', as: 'postVisitor' },
         { path: '/post/visitor/messages/?myUri?theirUri', component: 'post-visitor-msgs', as: 'postVisitorMsgs' },
 

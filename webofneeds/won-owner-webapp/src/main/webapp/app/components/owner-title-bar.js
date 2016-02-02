@@ -4,7 +4,11 @@
 ;
 
 import angular from 'angular';
+import { attach,mapToMatches } from '../utils';
+import won from '../won-es6';
+import { actionCreators }  from '../actions/actions';
 
+const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
         <nav class="need-tab-bar" ng-cloak ng-show="{{true}}">
@@ -13,7 +17,7 @@ function genComponentConf() {
                     <a ng-click="self.back()">
                         <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__icon">
                     </a>
-                    <won-square-image title="blabla" src="images/someNeedTitlePic.png"></won-square-image>
+                    <won-square-image title="blabla" src="images/need.jpg"></won-square-image>
                     <div class="ntb__inner__left__titles">
                         <h1 class="ntb__title">New flat, need furniture</h1>
                         <div class="ntb__inner__left__titles__type">I want to have something</div>
@@ -22,19 +26,19 @@ function genComponentConf() {
                 <div class="ntb__inner__right">
                     <img class="ntb__icon" src="generated/icon-sprite.svg#ico_settings">
                     <ul class="ntb__tabs">
-                        <li><a href="#">
+                        <li ng-class="{'mtb__tabs__selected' : self.selection == 0}"><a ui-sref="postConversations({myUri: 'http://example.org/121337345'})">
                             Messages
                             <span class="ntb__tabs__unread">5</span>
                         </a></li>
-                        <li class="ntb__tabs__selected"><a href="#">
+                        <li ng-class="{'mtb__tabs__selected' : self.selection == 1}"><a href="#">
                             Matches
                             <span class="ntb__tabs__unread">5</span>
                         </a></li>
-                        <li><a href="#">
+                        <li ng-class="{'mtb__tabs__selected' : self.selection == 2}"><a href="#">
                              Requests
                             <span class="ntb__tabs__unread">18</span>
                         </a></li>
-                        <li><a href="#">
+                        <li ng-class="{'mtb__tabs__selected' : self.selection == 3}"><a href="#">
                              Sent Requests
                             <span class="ntb__tabs__unread">18</span>
                         </a></li>
@@ -44,11 +48,10 @@ function genComponentConf() {
         </nav>
     `;
 
-    const serviceDependencies = ['$q', '$ngRedux', '$scope'];
+
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
-
 
             const selectFromState = (state)=>{
 
@@ -58,7 +61,7 @@ function genComponentConf() {
                             return true
                         }
                     }),
-                    matchesOfNeed:this.mapToMatches(state.getIn(['matches','matches']).toJS())
+                    matchesOfNeed:mapToMatches(state.getIn(['matches','matches']).toJS())
                 };
             }
 
@@ -68,12 +71,13 @@ function genComponentConf() {
         }
         back() { window.history.back() }
     }
-
+    Controller.$inject = serviceDependencies;
     return {
         restrict: 'E',
         controller: Controller,
         controllerAs: 'self',
-        template: template
+        template: template,
+        scope: {selection: "="}
     }
 }
 
