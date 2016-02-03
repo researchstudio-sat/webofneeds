@@ -207,10 +207,21 @@ public class
   //webmvc controller method
   @RequestMapping("${uri.path.page.need}")
   public String showNeedURIListPage(
-      @RequestParam(value="p",defaultValue = "-1") int page,
+      @RequestParam(value="p", required=false) Integer page,
       HttpServletRequest request,
       Model model,
-      HttpServletResponse response) {
+      HttpServletResponse response)  throws IOException {
+
+      // TODO keep consistent with linked data paged resource behavior when no page is specified
+      if (page == null) {
+        String redirectToURI = getRequestUriWithAddedQuery(request, "p=1");
+        response.sendRedirect(redirectToURI);
+        return null;
+      }
+
+    // TODO probably at least the Link to the next/previous page should be added to the headers, as in the case of RDF
+    // returned resource
+
       Dataset rdfDataset = linkedDataService.listNeedURIs(page).getContent();
       model.addAttribute("rdfDataset", rdfDataset);
       model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
