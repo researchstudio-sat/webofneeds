@@ -10,7 +10,7 @@ function genComponentConf() {
             <img class="pm__header__icon clickable" src="generated/icon-sprite.svg#ico36_close" ng-click="self.closeConversation()"/>
             <div class="pm__header__title">Conversation about "{{self.item.ownNeed.title}}"</div>
             <div class="pm__header__options">Options  </div>
-            <img class="pm__header__icon clickable" src="generated/icon-sprite.svg#ico_settings" ng-click="self.openConversationOption()"/>
+            <img class="pm__header__options__icon clickable" src="generated/icon-sprite.svg#ico_settings" ng-click="self.openConversationOption()"/>
         </div>
         <div class="pm__content">
             <div class="pm__content__message" ng-repeat="message in self.item.messages" ng-class="message.ownMessage? 'right' : 'left'">
