@@ -36,7 +36,7 @@ public interface LinkedDataService
    */
   public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int page);
 
-  public Dataset listNeedURIsOld(final int page);
+  public Dataset listNeedURIs();
 
   /**
    * Returns a model containing all connection URIs.

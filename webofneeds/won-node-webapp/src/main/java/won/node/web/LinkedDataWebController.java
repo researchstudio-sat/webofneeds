@@ -212,21 +212,28 @@ public class
       Model model,
       HttpServletResponse response)  throws IOException {
 
-      // TODO keep consistent with linked data paged resource behavior when no page is specified
+    Dataset rdfDataset = null;
+
+    // TODO keep consistent with linked data paged resource behavior when no page is specified
       if (page == null) {
-        String redirectToURI = getRequestUriWithAddedQuery(request, "p=1");
-        response.sendRedirect(redirectToURI);
-        return null;
+        //String redirectToURI = getRequestUriWithAddedQuery(request, "p=1");
+        //response.sendRedirect(redirectToURI);
+        //return null;
+        // temporarily leave the behavior of returning all the need uris - for compatibility with matcher crawler
+        rdfDataset = linkedDataService.listNeedURIs();
+      } else {
+        // TODO probably at least the Link to the next/previous page should be added to the headers, as in the case of RDF
+        // returned resource
+
+        rdfDataset = linkedDataService.listNeedURIs(page).getContent();
+
       }
 
-    // TODO probably at least the Link to the next/previous page should be added to the headers, as in the case of RDF
-    // returned resource
+    model.addAttribute("rdfDataset", rdfDataset);
+    model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
+    model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
+    return "rdfDatasetView";
 
-      Dataset rdfDataset = linkedDataService.listNeedURIs(page).getContent();
-      model.addAttribute("rdfDataset", rdfDataset);
-      model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
-      model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
-      return "rdfDatasetView";
   }
 
     @RequestMapping("${uri.path.page}")
@@ -429,24 +436,31 @@ public class
     @RequestParam(value="p", required=false) Integer page) throws IOException {
     logger.debug("listNeedURIs() for page " + page + " called");
 
+    Dataset rdfDataset = null;
+    HttpHeaders headers = new HttpHeaders();
     if (page == null) {
       //by default we redirect to the first page
       //TODO although for us it would make sense to redirect to the last one, as matcher, owner gui, etc. would be
       // interested mostly in the latest needs/events... How to do it?
       // (so that we in accordance with the specification https://www.w3.org/TR/ldp-paging/)
-      String redirectToURI = getRequestUriWithAddedQuery(request, "p=1");
-      response.sendRedirect(redirectToURI);
-      return null;
+      //String redirectToURI = getRequestUriWithAddedQuery(request, "p=1");
+      //response.sendRedirect(redirectToURI);
+      //return null;
+      // temporarily leave the behavior of returning all the need uris - for compatibility with matcher crawler:
+      rdfDataset = linkedDataService.listNeedURIs();
+    } else {
+      //Dataset model = linkedDataService.listNeedURIs(page);
+      NeedInformationService.PagedResource<Dataset> resource = linkedDataService.listNeedURIs(page);
+      rdfDataset = resource.getContent();
+      addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), page, resource.hasNext());
     }
-
-    //Dataset model = linkedDataService.listNeedURIs(page);
-    NeedInformationService.PagedResource<Dataset> resource = linkedDataService.listNeedURIs(page);
-    HttpHeaders headers = addAlreadyExpiredHeaders(
-      addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()),
+    headers = addAlreadyExpiredHeaders(
+      addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
                                    URI.create(this.needResourceURIPrefix)));
-    addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), page, resource.hasNext());
     addCORSHeader(headers);
-    return new ResponseEntity<Dataset>(resource.getContent(), headers, HttpStatus.OK);
+
+    return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
+
   }
 
 

@@ -100,7 +100,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private String activeMqMatcherProtocolTopicNameNeedActivated;
   private String activeMqMatcherProtocolTopicNameNeedDeactivated;
 
-    public Dataset listNeedURIsOld(final int pageNum)
+  @Deprecated
+  public Dataset listNeedURIsOld(final int pageNum)
   {
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
