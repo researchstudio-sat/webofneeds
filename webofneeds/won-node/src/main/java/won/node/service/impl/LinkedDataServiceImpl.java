@@ -147,7 +147,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
     setNsPrefixes(model);
     Resource needListPageResource = null;
     Collection<URI> uris = null;
-    NeedInformationService.Page page = needInformationService.listNeedURIs(pageNum);
+    int infoServicePageNum = pageNum - 1;
+    NeedInformationService.Page page = needInformationService.listNeedURIs(infoServicePageNum);
     needListPageResource = model.createResource(this.needResourceURIPrefix + "/");
     uris = page.getContent();
     for (URI needURI : uris) {
