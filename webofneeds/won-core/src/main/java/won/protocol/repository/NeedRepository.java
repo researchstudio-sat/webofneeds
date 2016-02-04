@@ -21,7 +21,7 @@ public interface NeedRepository extends WonRepository<Need> {
   @Query("select needURI from Need")
   List<URI> getAllNeedURIs();
 
-  @Query("select needURI from Need")
+  @Query("select needURI from Need need")
   Slice<URI> getAllNeedURIs(Pageable pageable);
 
   Need findOneByNeedURI(URI needURI);

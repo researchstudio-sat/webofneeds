@@ -20,6 +20,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
@@ -65,7 +66,8 @@ public class NeedInformationServiceImpl implements NeedInformationService
   @Override
   public Page<URI> listNeedURIs(int page)
   {
-    Slice slice = needRepository.getAllNeedURIs(new PageRequest(page, this.pageSize));
+    //Slice slice = needRepository.getAllNeedURIs(new PageRequest(page, this.pageSize));
+    Slice slice = needRepository.getAllNeedURIs(new PageRequest(page, this.pageSize, Sort.Direction.DESC, "creationDate"));
     return new Page(slice.getContent(), slice.hasNext());
   }
 
