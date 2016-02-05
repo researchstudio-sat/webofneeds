@@ -286,7 +286,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
       blankNodeUriSpec.addProperty(WON.HAS_EVENT_URI_PREFIX, model.createLiteral(this.eventResourceURIPrefix));
   }
 
-  public Dataset getConnectionDataset(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException
+  public Dataset getConnectionDataset(final URI connectionUri, final boolean includeEventData) throws NoSuchConnectionException
   {
     Connection connection = needInformationService.readConnection(connectionUri);
 
@@ -307,24 +307,33 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     if (includeEventData) {
       //create event container and attach it to the member
-      Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events", WON.EVENT_CONTAINER);
+      Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events");
       connectionResource.addProperty(WON.HAS_EVENT_CONTAINER, eventContainer);
       connectionResource.addProperty(WON.HAS_REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));
       addAdditionalData(model, connection.getConnectionURI(), connectionResource);
-
-      // add the events with the new format (only the URI, no content)
-      List<MessageEventPlaceholder> connectionEvents = messageEventRepository.findByParentURI(connectionUri);
-      for (MessageEventPlaceholder event : connectionEvents) {
-        model.add(model.createStatement(eventContainer,
-                                        RDFS.member,
-                                        model.getResource(event.getMessageURI().toString())));
-      }
     }
 
     return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUri(connectionResource), model));
   }
 
+  public Dataset listConnectionEventURIs(final URI connectionUri) throws
+    NoSuchConnectionException
+  {
 
+    Model model = ModelFactory.createDefaultModel();
+    setNsPrefixes(model);
+
+    Connection connection = needInformationService.readConnection(connectionUri);
+    Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events", WON.EVENT_CONTAINER);
+    // add the events with the new format (only the URI, no content)
+    List<MessageEventPlaceholder> connectionEvents = messageEventRepository.findByParentURI(connectionUri);
+    for (MessageEventPlaceholder event : connectionEvents) {
+      model.add(model.createStatement(eventContainer,
+                                      RDFS.member,
+                                      model.getResource(event.getMessageURI().toString())));
+    }
+    return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUri(eventContainer), model));
+  }
 
   public Dataset getDatasetForUri(URI datasetUri) {
     Dataset result = rdfStorage.loadDataset(datasetUri);

@@ -62,6 +62,14 @@ public interface LinkedDataService
    */
   public Dataset getConnectionDataset(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException;
 
+  /**
+   * Returns a dataset containing all event uris belonging to the specified connection.
+   * @param connectionUri
+   * @return
+   * @throws NoSuchConnectionException
+   */
+  public Dataset listConnectionEventURIs(final URI connectionUri) throws NoSuchConnectionException;
+
   public Dataset getNodeDataset();
 
   /**

@@ -169,6 +169,24 @@ public class
   }
 
   //webmvc controller method
+  @RequestMapping("${uri.path.page.connection}/{identifier}/events")
+  public String showConnectionEventsPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
+
+    try {
+      URI connectionURI = uriService.createConnectionURIForId(identifier);
+      String eventsURI = connectionURI.toString() + "/events";
+      Dataset rdfDataset = linkedDataService.listConnectionEventURIs(connectionURI);
+      model.addAttribute("rdfDataset", rdfDataset);
+      model.addAttribute("resourceURI", eventsURI);
+      model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(eventsURI)).toString());
+      return "rdfDatasetView";
+    } catch (NoSuchConnectionException e) {
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return "notFoundView";
+    }
+  }
+
+  //webmvc controller method
   @RequestMapping("${uri.path.page.event}/{identifier}")
   public String showEventPage(@PathVariable(value = "identifier") String identifier,
                               Model model,
@@ -546,6 +564,32 @@ public class
       return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
     }
   }
+
+
+  @RequestMapping(
+    value="${uri.path.data.connection}/{identifier}/events",
+    method = RequestMethod.GET,
+    produces={"application/ld+json",
+              "application/trig",
+              "application/n-quads"})
+  public ResponseEntity<Dataset> readConnectionEvents(
+    HttpServletRequest request,
+    @PathVariable(value="identifier") String identifier) {
+    logger.debug("readConnection() called");
+    URI connectionUri = URI.create(this.connectionResourceURIPrefix + "/" + identifier);
+    try {
+      Dataset dataset = linkedDataService.listConnectionEventURIs(connectionUri);
+      //TODO: events list information does change over time, unless the connection is closed and cannot be reopened.
+      // The events list of immutable connection information should never expire, the mutable should
+      HttpHeaders headers =new HttpHeaders();
+      addCORSHeader(headers);
+      return new ResponseEntity<Dataset>(dataset, headers, HttpStatus.OK);
+
+    } catch (NoSuchConnectionException e) {
+      return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+    }
+  }
+
 
   @RequestMapping(
     value="${uri.path.data.event}/{identifier}",
