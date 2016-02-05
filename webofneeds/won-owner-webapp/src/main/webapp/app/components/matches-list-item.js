@@ -76,8 +76,10 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {item: "=",
-                requestItem: "="},
+        scope: {
+            item: '=',
+            requestItem: '=',
+        },
         template: template
     }
 }
