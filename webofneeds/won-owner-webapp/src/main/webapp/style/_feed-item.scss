@@ -93,6 +93,10 @@ won-feed-item {
           &__title{
             font-weight: 700;
           }
+          &__date {
+            color: $won-subtitle-gray;
+            font-size: $smallFontSize;
+          }
         }
 
         &__message {
