@@ -26,19 +26,33 @@ function genComponentConf() {
             </div>
             <div class="fmil">
                 <div class="fmil__item clickable" ng-repeat="cnct in self.connections.toArray() track by $index" ng-show="$index < self.maxNrOfItemsShown">
-                    <won-square-image src="cnct.get('titleImg')" title="cnct.getIn(['remoteNeed','title'])"></won-square-image>
+                    <won-square-image
+                        src="cnct.get('titleImg')"
+                        title="cnct.getIn(['remoteNeed','title'])">
+                    </won-square-image>
                     <div class="fmil__item__description">
                         <div class="fmil__item__description__topline">
-                            <div class="fmil__item__description__topline__title">{{cnct.getIn(['remoteNeed','title'])}}</div>
+                            <div class="fmil__item__description__topline__title">
+                                {{cnct.getIn(['remoteNeed','title'])}}
+                            </div>
+                            <div class="fmil__item__description__topline__date">
+                                <!-- TODO only show this when this is a group's thread -->
+                              Today, 15:03
+                            </div>
                         </div>
 
                         <div class="fmil__item__description__message">Placeholder. This is a {{ cnct.getIn(['connection', 'hasConnectionState']) }}</div>
                     </div>
                 </div>
                 <div class="fmil__more clickable"
-                     ng-show="self.connections.size > self.maxNrOfItemsShown"
+                     ng-show="self.connections.size === self.maxNrOfItemsShown + 1"
                      ng-click="self.showMore()">
-                        {{self.connections.size - self.maxNrOfItemsShown}} more activitie(s)
+                        1 more activity
+                </div>
+                <div class="fmil__more clickable"
+                     ng-show="self.connections.size > self.maxNrOfItemsShown + 1"
+                     ng-click="self.showMore()">
+                        {{self.connections.size - self.maxNrOfItemsShown}} more activities
                 </div>
             </div>
 
