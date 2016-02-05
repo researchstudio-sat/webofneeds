@@ -52,8 +52,16 @@ public class SirenQueryBuilder
   public void addTitleTerms(String[] terms) throws QueryNodeException {
 
     for (int i = 0; i < terms.length && i < consideredQueryTokens; i++) {
+
+      // TODO: make the boosts configurable
+
+      // search title terms in title
       topTwig.optional(builder.newTwig(WON.HAS_CONTENT.toString()).with(
-        builder.newNode(terms[i]).setAttribute(DC.title.toString())));
+        builder.newNode(terms[i]).setAttribute(DC.title.toString()).setBoost(3)));
+
+      // search title terms also in description (tags will be search also, see addTagTerms())
+      topTwig.optional(builder.newTwig(WON.HAS_CONTENT.toString()).with(
+        builder.newNode(terms[i]).setAttribute(WON.HAS_TEXT_DESCRIPTION.toString())));
     }
   }
 
@@ -68,8 +76,16 @@ public class SirenQueryBuilder
   public void addTagTerms(String[] terms) throws QueryNodeException {
 
     for (int i = 0; i < terms.length && i < consideredQueryTokens; i++) {
+
+      // TODO: make the boosts configurable
+
+      // search tag terms in tags
       topTwig.optional(builder.newTwig(WON.HAS_CONTENT.toString()).with(
-        builder.newNode(terms[i]).setAttribute(WON.HAS_TAG.toString())));
+        builder.newNode(terms[i]).setAttribute(WON.HAS_TAG.toString()).setBoost(3)));
+
+      // search tag terms also in title and description
+      topTwig.optional(builder.newTwig(WON.HAS_CONTENT.toString()).with(
+        builder.newNode(terms[i]).setAttribute(DC.title.toString()).setBoost(2)));
     }
   }
 
