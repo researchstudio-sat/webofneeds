@@ -34,6 +34,7 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
+import won.protocol.model.NeedState;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.LinkedDataService;
@@ -144,21 +145,60 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int pageNum)
   {
+    return listNeedURIs(pageNum, null, null);
+  }
+
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsBefore(final URI need)
+  {
+    return listNeedURIsBefore(need, null, null);
+  }
+
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsAfter(final URI need)
+  {
+    return listNeedURIsAfter(need, null, null);
+  }
+
+  private NeedInformationService.PagedResource<Dataset> toContainerPage(String containerUri, Collection<URI>
+    uris) {
+
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
     Resource needListPageResource = null;
-    Collection<URI> uris = null;
-    int infoServicePageNum = pageNum - 1;
-    NeedInformationService.Page page = needInformationService.listNeedURIs(infoServicePageNum);
-    needListPageResource = model.createResource(this.needResourceURIPrefix + "/");
-    uris = page.getContent();
+
+    needListPageResource = model.createResource(containerUri);
+
     for (URI needURI : uris) {
       model.add(model.createStatement(needListPageResource, RDFS.member, model.createResource(needURI.toString())));
     }
     Dataset dataset = newDatasetWithNamedModel(createDataGraphUri(needListPageResource), model);
     addBaseUriAndDefaultPrefixes(dataset);
-    NeedInformationService.PagedResource<Dataset> containerPage = new NeedInformationService.PagedResource(dataset, page.hasNext());
+    //TODO prev/next link info
+    NeedInformationService.PagedResource<Dataset> containerPage = new NeedInformationService.PagedResource(dataset,
+                                                                                                           true);
     return containerPage;
+  }
+
+  public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int pageNum, final Integer preferedSize,
+                                                                    NeedState needState) {
+
+    int infoServicePageNum = pageNum - 1;
+    NeedInformationService.Page page = needInformationService.listNeedURIs(infoServicePageNum, preferedSize, needState);
+    return toContainerPage(this.needResourceURIPrefix + "/", page.getContent());
+
+  }
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsBefore(final URI need, final Integer preferedSize,
+                                                                          NeedState needState) {
+
+    NeedInformationService.Page<URI> page = needInformationService.listNeedURIsBefore(need, preferedSize, needState);
+    return toContainerPage(this.needResourceURIPrefix + "/", page.getContent());
+
+  }
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsAfter(final URI need, final Integer preferedSize,
+                                                                         NeedState needState) {
+
+    NeedInformationService.Page<URI> page = needInformationService.listNeedURIsAfter(need, preferedSize, needState);
+    return toContainerPage(this.needResourceURIPrefix + "/", page.getContent());
+
   }
 
   private String createDataGraphUri(Resource needListPageResource) {

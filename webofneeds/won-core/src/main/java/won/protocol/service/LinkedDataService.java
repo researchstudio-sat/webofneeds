@@ -19,6 +19,7 @@ package won.protocol.service;
 import com.hp.hpl.jena.query.Dataset;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.model.NeedState;
 
 import java.net.URI;
 
@@ -35,6 +36,13 @@ public interface LinkedDataService
    * @return
    */
   public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int page);
+
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsBefore(final URI need);
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsAfter(final URI need);
+
+  public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int page, final Integer preferedSize, NeedState needState);
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsBefore(final URI need, final Integer preferedSize, NeedState needState);
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsAfter(final URI need, final Integer preferedSize, NeedState needState);
 
   public Dataset listNeedURIs();
 

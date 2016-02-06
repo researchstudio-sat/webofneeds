@@ -42,6 +42,7 @@ import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonProtocolException;
+import won.protocol.model.NeedState;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.util.RdfUtils;
@@ -55,6 +56,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * TODO: check the working draft here and see to conformance:
@@ -451,27 +454,59 @@ public class
               "application/trig",
               "application/n-quads"})
   public ResponseEntity<Dataset> listNeedURIs(HttpServletRequest request, HttpServletResponse response,
-    @RequestParam(value="p", required=false) Integer page) throws IOException {
+    @RequestParam(value="p", required=false) Integer page,
+    @RequestParam(value="resumebefore", required=false) String beforeId,
+    @RequestParam(value="resumeafter", required=false) String afterId,
+    @RequestParam(value="state", required=false) String state) throws IOException {
     logger.debug("listNeedURIs() for page " + page + " called");
 
     Dataset rdfDataset = null;
     HttpHeaders headers = new HttpHeaders();
-    if (page == null) {
-      //by default we redirect to the first page
-      //TODO although for us it would make sense to redirect to the last one, as matcher, owner gui, etc. would be
-      // interested mostly in the latest needs/events... How to do it?
-      // (so that we in accordance with the specification https://www.w3.org/TR/ldp-paging/)
+    Integer preferedSize = getPreferredSize(request);
+
+    if (page == null && beforeId == null && afterId == null) {
+
+      //by default we redirect to the first page which displays the latest needs:
       //String redirectToURI = getRequestUriWithAddedQuery(request, "p=1");
       //response.sendRedirect(redirectToURI);
       //return null;
-      // temporarily leave the behavior of returning all the need uris - for compatibility with matcher crawler:
+
+      //temporarily leave the behavior of returning all the need uris - for compatibility with matcher crawler:
       rdfDataset = linkedDataService.listNeedURIs();
-    } else {
-      //Dataset model = linkedDataService.listNeedURIs(page);
-      NeedInformationService.PagedResource<Dataset> resource = linkedDataService.listNeedURIs(page);
+
+    } else if (page != null) {
+
+      NeedInformationService.PagedResource<Dataset> resource = linkedDataService.listNeedURIs(page, preferedSize,
+                                                                                              NeedState.parseString(
+                                                                                                state));
       rdfDataset = resource.getContent();
       addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), page, resource.hasNext());
+
+    } else if (beforeId != null) {
+
+      URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + beforeId);
+      NeedInformationService.PagedResource<Dataset> resource = linkedDataService.listNeedURIsBefore(referenceNeed,
+                                                                                                    preferedSize,
+                                                                                                    NeedState.parseString(
+                                                                                                      state));
+      rdfDataset = resource.getContent();
+      //TODO a header Link for the next/prev:
+      // <...?resumeafter=oldest-in-page-need-id> rel=next
+      // <...?resumebefore=youngest-in-page-need-id> rel=prev
+      //addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), page, resource.hasNext());
+    } else {
+
+      URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + afterId);
+      NeedInformationService.PagedResource<Dataset> resource = linkedDataService.listNeedURIsAfter(referenceNeed,
+                                                                                                   preferedSize, NeedState.parseString(
+        state));
+      rdfDataset = resource.getContent();
+      //TODO a header Link for the next/prev:
+      // <...?resumeafter=oldest-in-page-need-id> rel=next
+      // <...?resumebefore=youngest-in-page-need-id> rel=prev
+      //addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), page, resource.hasNext());
     }
+
     headers = addAlreadyExpiredHeaders(
       addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
                                    URI.create(this.needResourceURIPrefix)));
@@ -479,6 +514,25 @@ public class
 
     return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
 
+  }
+
+  private Integer getPreferredSize(final HttpServletRequest request) {
+
+    Integer preferedSize = null;
+    Enumeration<String> preferValue = request.getHeaders("Prefer");
+    if (preferValue != null) {
+      //TODO share prefer pattern between methods, check the supported syntax according to HTTP protocol, and take
+      // into account that client preference can also include max-triple-count and max-kbyte-count:
+      Pattern pattern = Pattern.compile("(return=representation; max-member-count=)(\"?)([0-9]+)(\"?)");
+      while (preferValue.hasMoreElements() && preferedSize == null) {
+        String value = preferValue.nextElement();
+        Matcher matcher = pattern.matcher(value);
+        if (matcher.find()) {
+          preferedSize = Integer.valueOf(matcher.group(3));
+        }
+      }
+    }
+    return preferedSize;
   }
 
 
@@ -532,7 +586,7 @@ public class
                 "application/trig",
                 "application/n-quads"})
     public ResponseEntity<Dataset> readNode(
-            HttpServletRequest request) {
+      HttpServletRequest request) {
         logger.debug("readNode() called");
         URI nodeUri = URI.create(this.nodeResourceURIPrefix);
         Dataset model = linkedDataService.getNodeDataset();
@@ -549,7 +603,7 @@ public class
               "application/trig",
               "application/n-quads"})
   public ResponseEntity<Dataset> readConnection(
-      HttpServletRequest request,
+    HttpServletRequest request,
       @PathVariable(value="identifier") String identifier) {
     logger.debug("readConnection() called");
     URI connectionUri = URI.create(this.connectionResourceURIPrefix + "/" + identifier);
