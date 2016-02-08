@@ -6,15 +6,25 @@
 // enable es6 in jshint:
 /* jshint esnext: true */
 
-console.log('System.import working');
-
-
+//---- app.js-Dependencies ----
 import angular from 'angular';
 window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
 
+import 'fetch'; //polyfill for window.fetch (for backward-compatibility with older browsers)
+
+import 'redux';
+import ngReduxModule from 'ng-redux';
+import ngReduxRouterModule from 'redux-ui-router';
+import uiRouterModule from 'angular-ui-router';
+
+//---------- Config -----------
+import configRouting from './configRouting';
+import configRedux from './configRedux';
+
+//--------- Actions -----------
 import { actionCreators }  from './actions/actions';
 
-// Components
+//-------- Components ---------
 import topnav from './components/topnav';
 import createNeedComponent from './components/create-need/create-need';
 import overviewIncomingRequestsComponent from './components/overview-incoming-requests/overview-incoming-requests';
@@ -29,27 +39,17 @@ import overviewPostsComponent from './components/overview-posts/overview-posts';
 import feedComponent from './components/feed/feed';
 import overviewMatchesComponent from './components/overview-matches/overview-matches';
 
-/* TODO this fragment is part of an attempt to sketch a different
- * approach to asynchronity (Remove it or the thunk-based
- * solution afterwards)
- */
-import { runMessagingAgent } from './messaging-agent';
-
 //settings
 import settingsTitleBarModule from './components/settings-title-bar';
 import avatarSettingsModule from './components/settings/avatar-settings';
 import generalSettingsModule from './components/settings/general-settings';
 
-import 'fetch'; //polyfill for window.fetch (for backward-compatibility with older browsers)
 
-import 'redux';
-import ngReduxModule from 'ng-redux';
-
-import configRouting from './configRouting';
-import configRedux from './configRedux';
-
-import ngReduxRouterModule from 'redux-ui-router';
-import uiRouterModule from 'angular-ui-router';
+/* TODO this fragment is part of an attempt to sketch a different
+ * approach to asynchronity (Remove it or the thunk-based
+ * solution afterwards)
+ */
+import { runMessagingAgent } from './messaging-agent';
 
 let app = angular.module('won.owner', [
     ngReduxModule,
