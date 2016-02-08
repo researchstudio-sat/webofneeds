@@ -80,19 +80,25 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
   public synchronized void register(URI wonNodeURI, MessagingService messagingService) throws Exception {
     logger.debug("WON NODE: " + wonNodeURI);
 
+    CamelConfiguration camelConfiguration = null;
+
     if (isRegistered(wonNodeURI)) {
-      return;
+
+      WonNode wonNode = DataAccessUtils.loadWonNode(wonNodeRepository, wonNodeURI);
+      String ownerApplicationId = wonNode.getOwnerApplicationID();
+      configureCamelEndpoint(wonNodeURI, ownerApplicationId);
+      configureRemoteEndpointsForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
+        (wonNodeURI), messagingService);
+
+    } else {
+
+      String ownerApplicationId = registrationClient.register(wonNodeURI.toString());
+      logger.debug("registered ownerappID: " + ownerApplicationId);
+      camelConfiguration = configureCamelEndpoint(wonNodeURI, ownerApplicationId);
+      storeWonNode(ownerApplicationId, camelConfiguration, wonNodeURI);
+      configureRemoteEndpointsForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
+        (wonNodeURI), messagingService);
     }
-
-    String ownerApplicationId = registrationClient.register(wonNodeURI.toString());
-    CamelConfiguration camelConfiguration = configureCamelEndpoint(wonNodeURI, ownerApplicationId);
-
-    //TODO: check if won node is already in the db
-    logger.debug("registered ownerappID: " + ownerApplicationId);
-    storeWonNode(ownerApplicationId, camelConfiguration, wonNodeURI);
-
-    configureRemoteEndpointsForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
-      (wonNodeURI), messagingService);
 
   }
 
