@@ -205,13 +205,15 @@ const actionHierarchy = {
          */
         requestWsReset_Hack: INJ_DEFAULT,
         messageReceived:(data)=>dispatch=> {
+            //TODO probably dead code
+            console.log('received message ', data);
             getEventData(data).then(event=>{
                 window.event4dbg = event;
+                console.log('received message has type ', event.hasMessageType);
                 if(event.hasMessageType === won.WONMSG.successResponseCompacted) {
                     dispatch(actionCreators.messages__successResponseMessageReceived(event))
                 }
                 else if(event.hasMessageType === won.WONMSG.hintMessageCompacted){
-                    console.log("got hint message")
                     dispatch(actionCreators.messages__hintMessageReceived(event))
                 }
                 else if(event.hasMessageType === won.WONMSG.connectMessageCompacted){
