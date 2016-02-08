@@ -183,6 +183,12 @@
              -->
         </plugins>
     </build>
+    <repositories>
+        <repository>
+            <id>org.topbraid</id>
+            <url>http://www.topquadrant.com/repository/spin/</url>
+        </repository>
+    </repositories>
 
     <profiles>
         <profile>

@@ -552,6 +552,4 @@ public class LinkedDataServiceImpl implements LinkedDataService
   public void setActiveMqMatcherProtocolTopicNameNeedDeactivated(final String activeMqMatcherProtocolTopicNameNeedDeactivated) {
     this.activeMqMatcherProtocolTopicNameNeedDeactivated = activeMqMatcherProtocolTopicNameNeedDeactivated;
   }
-
-
 }

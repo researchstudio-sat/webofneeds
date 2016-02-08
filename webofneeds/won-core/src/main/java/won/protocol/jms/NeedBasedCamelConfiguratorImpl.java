@@ -33,8 +33,9 @@ import java.net.URI;
 //import won.node.camel.routes.NeedProtocolDynamicRoutes;
 
 /**
- * User: LEIH-NB
- * Date: 26.02.14
+ * This class is responsible for creating an activemq broker to communicate with
+ * a won node and for adding a route to this broker in the camel context that can
+ * in the future be used to direct messages to the WoN node.
  */
 public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCamelConfigurator {
 

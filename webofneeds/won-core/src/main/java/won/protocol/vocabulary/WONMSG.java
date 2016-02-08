@@ -42,6 +42,7 @@ public class WONMSG
   public static final String TYPE_CLOSE_STRING =BASE_URI + "CloseMessage";
   public static final String TYPE_CONNECTION_MESSAGE_STRING =BASE_URI + "ConnectionMessage";
   public static final String TYPE_HINT_STRING =BASE_URI + "HintMessage";
+  public static final String TYPE_HINT_FEEDBACK_STRING =BASE_URI + "HintFeedbackMessage";
   public static final String TYPE_FAILURE_RESPONSE_STRING = BASE_URI+"FailureResponse";
   public static final String TYPE_SUCCESS_RESPONSE_STRING = BASE_URI+"SuccessResponse";
   // main types
@@ -53,6 +54,7 @@ public class WONMSG
   public static final Resource TYPE_CLOSE = m.createResource(TYPE_CLOSE_STRING);
   public static final Resource TYPE_CONNECTION_MESSAGE = m.createResource(TYPE_CONNECTION_MESSAGE_STRING);
   public static final Resource TYPE_HINT = m.createResource(TYPE_HINT_STRING);
+  public static final Resource TYPE_HINT_FEEDBACK = m.createResource(TYPE_HINT_FEEDBACK_STRING);
 
   public static final Resource TYPE_SUCCESS_RESPONSE = m.createResource(TYPE_SUCCESS_RESPONSE_STRING);
   public static final Resource TYPE_FAILURE_RESPONSE = m.createResource(TYPE_FAILURE_RESPONSE_STRING);

@@ -123,9 +123,12 @@ public class RandomSimulatorBot extends EventBot
     bus.subscribe(HintFromMatcherEvent.class,
       new ActionOnEventListener(ctx, "hint-reactor",
         new RandomDelayedAction(ctx,MIN_RECATION_TIMEOUT_MILLIS, MAX_REACTION_TIMEOUT_MILLIS, (long) this.hashCode(),
-          new ProbabilisticSelectionAction(ctx, PROB_OPEN_ON_HINT, (long) this.hashCode(),
-            new OpenConnectionAction(ctx),
-            new CloseConnectionAction(ctx)))));
+          new MultipleActions(ctx,
+            new SendFeedbackForHintAction(ctx),
+            new ProbabilisticSelectionAction(ctx, PROB_OPEN_ON_HINT, (long) this.hashCode(),
+              new OpenConnectionAction(ctx),
+              new CloseConnectionAction(ctx)))
+          )));
 
     //when an open or connect is received, send message or close randomly after a random timeout
     EventListener opener =
