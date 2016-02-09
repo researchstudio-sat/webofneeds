@@ -134,13 +134,9 @@ docker -H satsrv06:2375 run --name=matcher_service_dev -d -e "node.host=satsrv06
 
 # siren solr server
 docker -H satsrv06:2375 pull webofneeds/sirensolr
-#docker -H satsrv06:2375 stop sirensolr_dev || echo 'No docker container found to stop with name: sirensolr_dev'
-#docker -H satsrv06:2375 rm sirensolr_dev || echo 'No docker container found to remove with name: sirensolr_dev'
-echo try to start new solr server container
-if ! docker -H satsrv06:2375 run --name=sirensolr_dev -d -p 7070:8080 -p 8983:8983 --env CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" -m 350m webofneeds/sirensolr; then
-  echo solr server container already available, restart old container
-  docker -H satsrv06:2375 restart sirensolr_dev
-fi
+docker -H satsrv06:2375 stop sirensolr_dev || echo 'No docker container found to stop with name: sirensolr_dev'
+docker -H satsrv06:2375 rm sirensolr_dev || echo 'No docker container found to remove with name: sirensolr_dev'
+docker -H satsrv06:2375 run --name=sirensolr_dev -d -p 7070:8080 -p 8983:8983 --env CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" -m 350m webofneeds/sirensolr
 
 sleep 10
 

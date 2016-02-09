@@ -1,0 +1,26 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+@import 'flex-layout';
+
+
+.ownerpostcontent {
+  @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
+  align-items: flex-start;
+
+  .oir__openrequest,
+  .owner__messages{
+    flex-grow: 1;
+    max-width: 35rem;
+    margin: 0.5rem;
+  }
+
+  .owner__openconversation{
+    background: white;
+    border: 0.1rem solid $won-line-gray;
+  }
+}
+
+
+@import 'connection-message-item-line';
+@import 'open-conversation';

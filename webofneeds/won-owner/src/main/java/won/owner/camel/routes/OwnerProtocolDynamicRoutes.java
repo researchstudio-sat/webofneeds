@@ -17,6 +17,7 @@
 package won.owner.camel.routes;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 
 import java.util.List;
@@ -54,7 +55,12 @@ public class OwnerProtocolDynamicRoutes extends RouteBuilder {
     public void configure() throws Exception {
         from(from).routeId(from)
                 .to("log:Dynamic Route FROM Owner")
-                .recipientList(header("remoteBrokerEndpoint"));
+                .choice()
+                    .when(header("remoteBrokerEndpoint").isNull())
+                        .log(LoggingLevel.ERROR, "could not route message: remoteBrokerEndpoint is null")
+                        .throwException(new IllegalArgumentException("could not route message: remoteBrokerEndpoint is null"))
+                    .otherwise()
+                        .recipientList(header("remoteBrokerEndpoint"));
 
     }
 }
