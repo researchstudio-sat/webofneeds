@@ -18,10 +18,7 @@ package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.impl.ConnectWithAssociatedNeedAction;
-import won.bot.framework.events.action.impl.CreateEchoNeedWithFacetsAction;
-import won.bot.framework.events.action.impl.RegisterMatcherAction;
-import won.bot.framework.events.action.impl.RespondWithEchoToMessageAction;
+import won.bot.framework.events.action.impl.*;
 import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.event.impl.*;
 import won.bot.framework.events.filter.impl.NeedUriInNamedListFilter;
@@ -73,7 +70,8 @@ public class EchoBot extends EventBot
             new ActionOnEventListener(
                     ctx,
                     "needConnector",
-                    new ConnectWithAssociatedNeedAction(ctx,FacetType.OwnerFacet.getURI(),FacetType.OwnerFacet.getURI()));
+                    new RandomDelayedAction(ctx, 5000,5000,1,
+                        new ConnectWithAssociatedNeedAction(ctx,FacetType.OwnerFacet.getURI(),FacetType.OwnerFacet.getURI())));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
 

@@ -20,6 +20,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
@@ -34,6 +35,7 @@ import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  * User: fkleedorfer
@@ -65,7 +67,76 @@ public class NeedInformationServiceImpl implements NeedInformationService
   @Override
   public Page<URI> listNeedURIs(int page)
   {
-    Slice slice = needRepository.getAllNeedURIs(new PageRequest(page, this.pageSize));
+    return listNeedURIs(page, null, null);
+  }
+
+  @Override
+  public Page<URI> listNeedURIs(int page, Integer preferedPageSize, NeedState needState)
+  {
+    int pageSize = this.pageSize;
+    if (preferedPageSize != null && preferedPageSize < this.pageSize) {
+      pageSize = preferedPageSize;
+    }
+    Slice slice = null;
+    if (needState == null) {
+      slice = needRepository.getAllNeedURIs(new PageRequest(page, pageSize, Sort.Direction.DESC, "creationDate"));
+    } else {
+      slice = needRepository.getAllNeedURIs(needState, new PageRequest(page, pageSize, Sort.Direction.DESC,
+                                                                      "creationDate"));
+    }
+    return new Page(slice.getContent(), slice.hasNext());
+  }
+
+  @Override
+  public Page<URI> listNeedURIsBefore(URI needURI)
+  {
+    return listNeedURIsBefore(needURI, null, null);
+
+  }
+
+  @Override
+  public Page<URI> listNeedURIsBefore(URI needURI, Integer preferedPageSize, NeedState needState)
+  {
+    Need referenceNeed = needRepository.findOneByNeedURI(needURI);
+    Date referenceDate = referenceNeed.getCreationDate();
+    int pageSize = this.pageSize;
+    if (preferedPageSize != null && preferedPageSize < this.pageSize) {
+      pageSize = preferedPageSize;
+    }
+    Slice slice = null;
+    if (needState == null) {
+      slice = needRepository.getNeedURIsBefore(referenceDate, new PageRequest(0, pageSize, Sort
+        .Direction.DESC, "creationDate"));
+    } else {
+      slice = needRepository.getNeedURIsBefore(referenceDate, needState, new PageRequest(0, pageSize, Sort
+        .Direction.DESC, "creationDate"));
+    }
+    return new Page(slice.getContent(), slice.hasNext());
+  }
+
+  @Override
+  public Page<URI> listNeedURIsAfter(URI needURI)
+  {
+    return listNeedURIsAfter(needURI, null, null);
+  }
+
+  @Override
+  public Page<URI> listNeedURIsAfter(URI needURI, Integer preferedPageSize, NeedState needState)
+  {
+    Need referenceNeed = needRepository.findOneByNeedURI(needURI);
+    Date referenceDate = referenceNeed.getCreationDate();
+    int pageSize = this.pageSize;
+    if (preferedPageSize != null && preferedPageSize < this.pageSize) {
+      pageSize = preferedPageSize;
+    }
+    Slice slice = null;
+    if (needState == null) {
+      slice = needRepository.getNeedURIsAfter(referenceDate, new PageRequest(0, pageSize, Sort.Direction.ASC,
+                                                                             "creationDate"));
+    } else {
+      slice = needRepository.getNeedURIsAfter(referenceDate, needState, new PageRequest(0, pageSize, Sort.Direction.ASC,
+                                                                             "creationDate"));
+    }
     return new Page(slice.getContent(), slice.hasNext());
   }
 

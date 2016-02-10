@@ -21,6 +21,7 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
+import won.protocol.model.NeedState;
 
 import java.net.URI;
 import java.util.Collection;
@@ -44,6 +45,54 @@ public interface NeedInformationService {
      * @return a collection of all need URIs.
      */
     public Page<URI> listNeedURIs(int page);
+
+  /**
+   * Retrieves a page of the list of needs on the needserver that have a given state
+   * with number of need uris per page preference.
+   *
+   * @param page the page number
+   * @param preferredSize preferred number of members per page, null => use default
+   * @param needState Active/Inactive, null => all states
+   * @return a collection of all need URIs.
+   */
+    public Page<URI> listNeedURIs(int page, Integer preferredSize, NeedState needState);
+
+
+  /**
+   * Retrieves list of needs on the needserver that where created earlier than the given need.
+   * @param need
+   * @return
+   */
+    public Page<URI> listNeedURIsBefore(URI need);
+
+  /**
+   * Retrieves list of needs on the needserver that where created earlier than the given need
+   * that have a given state with number of need uris per page preference.
+   *
+   * @param need
+   * @param preferredSize preferred number of members per page, null => use default
+   * @param needState Active/Inactive, null => all states
+   * @return a collection of all need URIs.
+   */
+    public Page<URI> listNeedURIsBefore(URI need, Integer preferredSize, NeedState needState);
+
+  /**
+   * Retrieves list of needs on the needserver that where created later than the given need.
+   * @param need
+   * @return
+   */
+    public Page<URI> listNeedURIsAfter(URI need);
+
+  /**
+   * Retrieves list of needs on the needserver that where created later than the given need
+   * that have a given state with number of need uris per page preference.
+   *
+   * @param need
+   * @param preferredSize preferred number of members per page, null => use default
+   * @param needState Active/Inactive, null => all states
+   * @return a collection of all need URIs.
+   */
+    public Page<URI> listNeedURIsAfter(URI need, Integer preferredSize, NeedState needState);
 
     /**
      * Retrieves all connection URIs (regardless of state) for the specified local need URI.
@@ -132,6 +181,24 @@ public interface NeedInformationService {
     }
 
     public Collection<T> getContent() {
+      return content;
+    }
+
+    public boolean hasNext() {
+      return hasNext;
+    }
+  }
+
+  public static class PagedResource<T>{
+    private T content;
+    private boolean hasNext;
+
+    public PagedResource(final T content, final boolean hasNext) {
+      this.content = content;
+      this.hasNext = hasNext;
+    }
+
+    public T getContent() {
       return content;
     }
 

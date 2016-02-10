@@ -205,7 +205,10 @@ const actionHierarchy = {
          */
         requestWsReset_Hack: INJ_DEFAULT,
         messageReceived:(data)=>dispatch=> {
+            //TODO move this switch-case to the messaging agent
+            console.log('messages__messageReceived: ', data)
             getEventData(data).then(event=>{
+                console.log('messages__messageReceived: event.hasMessageType === ', event.hasMessageType)
                 window.event4dbg = event;
                 if(event.hasMessageType === won.WONMSG.successResponseCompacted) {
                     dispatch(actionCreators.messages__successResponseMessageReceived(event))
@@ -232,8 +235,7 @@ const actionHierarchy = {
 
                 //load the data into the local rdf store and publish NeedCreatedEvent when done
                 var needURI = event.hasReceiverNeed;
-                won.ensureLoaded(needURI)
-                    .then(
+                won.ensureLoaded(needURI).then(
                     function (value) {
                         var eventData = won.clone(event);
                         eventData.eventType = won.EVENT.NEED_CREATED;
@@ -248,10 +250,10 @@ const actionHierarchy = {
                                     needUri: event.hasSenderNeed,
                                     eventData:eventData
                                 }));
-                                dispatch(actionCreators.needs__received(need))
+                                dispatch(actionCreators.needs__received(need));
                                 //deferred.resolve(needURI);
                             });
-                    })
+                    });
 
                 // dispatch routing change
                 //TODO back-button doesn't work for returning to the draft
