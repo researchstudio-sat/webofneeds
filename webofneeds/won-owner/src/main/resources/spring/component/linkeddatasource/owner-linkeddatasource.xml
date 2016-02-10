@@ -34,4 +34,7 @@
         </property>
     </bean>
 
+    <bean id="linkedDataRestBridge" factory-bean="wonTransmissionService" factory-method="getLinkedDataRestBridge">
+    </bean>
+
 </beans>

@@ -5,6 +5,7 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.cryptography.ssl.*;
+import won.protocol.rest.LinkedDataRestBridge;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.rest.LinkedDataRestClientHttps;
 
@@ -20,6 +21,7 @@ public class DefaultSecurityWonTransmissionService implements WonTransmissionSer
   private final Logger logger  = LoggerFactory.getLogger(getClass());
 
   private LinkedDataRestClient linkedDataClient;
+  private LinkedDataRestBridge linkedDataRestBridge;
 
   private String registrationQuery;
   private RegistrationClient registrationClient;
@@ -91,6 +93,12 @@ public class DefaultSecurityWonTransmissionService implements WonTransmissionSer
     this.linkedDataClient = new LinkedDataRestClientHttps(clientKeyStoreService, new PrivateKeyStrategyGenerator(),
                                                           trustStoreService, linkedDataClientStrategy);
 
+
+    // temporary client to access response of linked data resources of node -
+    // here uses the same key/trust setting as linkedDataClient
+    this.linkedDataRestBridge = new LinkedDataRestBridge(clientKeyStoreService, new
+      PrivateKeyStrategyGenerator(), trustStoreService, linkedDataClientStrategy);
+
     // LINKED DATA server-side:
     // Server-side is configured via Filters that do access control and WebID verification in spring/node-context.xml
     // at Node (won-node-webapp). Because of such WebID-based access restrictions to some of the linked data resources,
@@ -157,6 +165,11 @@ public class DefaultSecurityWonTransmissionService implements WonTransmissionSer
   @Override
   public LinkedDataRestClient getLinkedDataClient() {
     return linkedDataClient;
+  }
+
+  @Override
+  public LinkedDataRestBridge getLinkedDataRestBridge() {
+    return linkedDataRestBridge;
   }
 
   @Override

@@ -1,26 +1,30 @@
 package won.owner.web.rest;
 
-import com.hp.hpl.jena.query.Dataset;
-import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.client.ClientHttpRequest;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestTemplate;
 import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.service.impl.WONUserDetailService;
-import won.protocol.util.RdfUtils;
-import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.rest.LinkedDataRestBridge;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.net.URI;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,60 +43,126 @@ public class BridgeForLinkedDataController {
 
   @Autowired
   private WONUserDetailService wonUserDetailService;
+
   @Autowired
-  private LinkedDataSource linkedDataSource;
+  private LinkedDataRestBridge linkedDataRestBridge;
 
   final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @ResponseBody
+  /* //for some reason this cannot be used as parameter in restTemplate.execute()
+  private final ResponseExtractor httpResponseResponseExtractor = new ResponseExtractor<ClientHttpResponse>()
+  {
+    @Override
+    public ClientHttpResponse extractData(final ClientHttpResponse response)
+    throws IOException {
+      return response;
+    }
+  };*/
+
+
+
   @RequestMapping(
     value = "/",
     method = RequestMethod.GET,
-    produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> fetchResource(@RequestParam("uri") String resourceUri, @RequestParam(value =
-    "requester", required = false)
-  String
-    requesterWebId) {
+    produces={"*/*"}
+  )
+  public void fetchResource(
+    @RequestParam("uri") String resourceUri,
+    @RequestParam(value ="requester", required = false) String requesterWebId,
+    final HttpServletResponse response, final HttpServletRequest request) throws IOException {
 
-    if (requesterWebId != null) {
-      // verify that the current user has the requester webid among his identities
-      if (!currentUserHasIdentity(requesterWebId)) {
-        logger.warn("Current user does not have claimed identity " + requesterWebId);
-        return new ResponseEntity("Could not get " + resourceUri + " for requester " + requesterWebId, HttpStatus.BAD_REQUEST);
-      }
-      return fetchResourceProvidingIdentity(resourceUri, requesterWebId);
+
+    // prepare restTestmplate that can deal with webID certificate
+    RestTemplate restTemplate = null;
+    if (requesterWebId == null || !currentUserHasIdentity(requesterWebId)) {
+      restTemplate = linkedDataRestBridge.getRestTemplate();
     } else {
-      return fetchResourceWithoutProvidingIdentity(resourceUri);
+      restTemplate = linkedDataRestBridge.getRestTemplate(requesterWebId);
     }
 
+    // prepare headers to be passed in request for linked data resource
+    final HttpHeaders requestHeaders = extractLinkedDataRequestRelevantHeaders(request);
+
+    restTemplate.execute(
+      URI.create(resourceUri),
+      HttpMethod.valueOf(request.getMethod()),
+       new RequestCallback()
+       {
+         @Override
+         public void doWithRequest(final ClientHttpRequest request)
+           throws IOException {
+           request.getHeaders()
+                  .setAll(requestHeaders.toSingleValueMap());
+         }
+       },
+      new ResponseExtractor<Object>()
+      {
+        @Override
+        public ClientHttpResponse extractData(final ClientHttpResponse originalResponse)
+          throws IOException {
+          prepareBridgeResponseOutputStream(originalResponse, response);
+          //we don't really need to return anything, so we don't
+          return null;
+        }
+      });
+
+    // by this point, the response is constructed and is ready to be returned to the client
+  }
+
+  private void prepareBridgeResponseOutputStream(final ClientHttpResponse originalResponse, final HttpServletResponse response)
+    throws IOException {
+    // create response headers
+    copyLinkedDataResponseRelevantHeaders(originalResponse.getHeaders(), response);
+    response.setStatus(originalResponse.getRawStatusCode());
+    // create response body
+    copyResponseBody(originalResponse, response);
+    // close response output stream
+    response.getOutputStream().flush();
+    response.getOutputStream().close();
+  }
+
+  private void copyResponseBody(final ClientHttpResponse fromResponse, final HttpServletResponse toResponse)
+    throws IOException {
+    org.apache.commons.io.IOUtils.copy(fromResponse.getBody(), toResponse.getOutputStream());
+  }
+
+
+  /**
+   * Currently copies all the headers from the given headers to the headers of the response.
+   * TODO check with spec if any headers should not be copied (e.g , it seems Transfer-Encoding should not be
+   * copied by proxies)
+   *
+   * @param fromHeaders
+   * @param toResponse
+   */
+  private void copyLinkedDataResponseRelevantHeaders(final HttpHeaders fromHeaders, final HttpServletResponse toResponse) {
+    for (String headerName : fromHeaders.keySet()) {
+      for (String headerValue : fromHeaders.get(headerName)) {
+        toResponse.addHeader(headerName, headerValue);
+      }
+    }
   }
 
   /**
-   * Obtain linked data on behalf of the requester with given WebID. The request will include Certificate of the
-   * requester. This is necessary for obtaining linked data has restricted access based on WebID access control and
-   * verification.
-   *
-   * @param resourceUri
-   * @param requesterWebId
+   * Extract all headers that are relevant in a request for linked data resource
+   * @param request
    * @return
    */
-  private ResponseEntity<String> fetchResourceProvidingIdentity(final String resourceUri, final String requesterWebId) {
-    Dataset dataset = linkedDataSource.getDataForResource(URI.create(resourceUri), URI.create(requesterWebId));
-    String result = RdfUtils.writeDatasetToString(dataset, Lang.JSONLD);
-    return new ResponseEntity(result, HttpStatus.OK);
+  private HttpHeaders extractLinkedDataRequestRelevantHeaders(final HttpServletRequest request) {
+    HttpHeaders headers = new HttpHeaders();
+    copyHeader(HttpHeaders.ACCEPT, request, headers);
+    copyHeader("Prefer", request, headers);
+    copyHeader(HttpHeaders.ACCEPT_LANGUAGE, request, headers);
+    copyHeader(HttpHeaders.ACCEPT_ENCODING, request, headers);
+    copyHeader(HttpHeaders.USER_AGENT, request, headers);
+    return headers;
   }
 
-  /**
-   * Obtain linked data without providing Certificate/WebID - will work for linked data that does not have restricted
-   * access.
-   *
-   * @param resourceUri
-   * @return
-   */
-  private ResponseEntity<String> fetchResourceWithoutProvidingIdentity(final String resourceUri) {
-    Dataset dataset = linkedDataSource.getDataForResource(URI.create(resourceUri));
-    String result = RdfUtils.writeDatasetToString(dataset, Lang.JSONLD);
-    return new ResponseEntity(result, HttpStatus.OK);
+  private void copyHeader(final String headerName, final HttpServletRequest fromRequest, final HttpHeaders toHeaders) {
+    Enumeration<String> values = fromRequest.getHeaders(headerName);
+    while (values.hasMoreElements()) {
+      toHeaders.add(headerName, values.nextElement());
+    }
   }
 
 
