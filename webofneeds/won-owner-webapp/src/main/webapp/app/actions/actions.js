@@ -205,7 +205,10 @@ const actionHierarchy = {
          */
         requestWsReset_Hack: INJ_DEFAULT,
         messageReceived:(data)=>dispatch=> {
+            //TODO move this switch-case to the messaging agent
+            console.log('messages__messageReceived: ', data)
             getEventData(data).then(event=>{
+                console.log('messages__messageReceived: event.hasMessageType === ', event.hasMessageType)
                 window.event4dbg = event;
                 if(event.hasMessageType === won.WONMSG.successResponseCompacted) {
                     dispatch(actionCreators.messages__successResponseMessageReceived(event))
