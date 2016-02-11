@@ -1022,11 +1022,11 @@ import * as q from 'q';
             });
     }
 
-    won.getLastConnectionEvent = function(connectionUri) {
+    won.getLastConnectionEvent = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastConnectionEvent: connectionUri must not be null"};
         }
-        return won.getLastConnectioneventUri(connectionUri)
+        return won.getLastConnectioneventUri(connectionUri, requesterWebId)
             .then(function (eventUri) {
                     return won.getConnectionEvent(eventUri);
             })
@@ -1141,11 +1141,11 @@ import * as q from 'q';
 
 
 
-    won.getAllConnectioneventUris = function(connectionUri) {
+    won.getAllConnectioneventUris = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getAllConnectioneventUris: connectionUri must not be null"};
         }
-        return won.ensureLoaded(connectionUri).then(
+        return won.ensureLoaded(connectionUri, requesterWebId).then(
             function(){
                var lock = getReadUpdateLockPerUri(connectionUri);
                return lock.acquireReadLock().then(
@@ -1185,13 +1185,13 @@ import * as q from 'q';
             });
     }
 
-    won.crawlConnectionData = function(connectionUri){
+    won.crawlConnectionData = function(connectionUri, requesterWebId){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "crawlConnectionData: connectionUri must not be null"};
         }
-        return won.ensureLoaded(connectionUri).then(
+        return won.ensureLoaded(connectionUri, requesterWebId).then(
             function(){
-                return won.getAllConnectioneventUris(connectionUri).then(
+                return won.getAllConnectioneventUris(connectionUri, requesterWebId).then(
                     function(uris){
                         var eventPromises = [];
                         for (key in uris){
@@ -1205,11 +1205,11 @@ import * as q from 'q';
 
     }
 
-    won.getLastConnectioneventUri = function(connectionUri) {
+    won.getLastConnectioneventUri = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastConnectioneventUri: connectionUri must not be null"};
         }
-        return won.crawlConnectionData(connectionUri).then(
+        return won.crawlConnectionData(connectionUri, requesterWebId).then(
             function() {
                 var lock = getReadUpdateLockPerUri(connectionUri);
                 return lock.acquireReadLock().then(
