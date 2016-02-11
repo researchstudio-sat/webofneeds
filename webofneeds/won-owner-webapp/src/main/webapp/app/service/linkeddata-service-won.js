@@ -979,32 +979,6 @@ import * as q from 'q';
             });
     }
 
-/*
-    won.getLastEventOfEachConnectionOfNeed = function(uri) {
-        if (typeof uri === 'undefined' || uri == null  ){
-            throw {message : "getLastEventOfEachConnectionOfNeed: uri must not be null"};
-        }
-        return won.getconnectionUrisOfNeed(uri)
-            .then(function(conUris) {
-                try {
-                    var promises = [];
-                    for (var conKey in conUris) {
-                        promises.push(won.getLastEventOfConnection(conUris[conKey]));
-                    }
-                    return somePromises(promises, function(key, reason){
-                        won.reportError("could not fetch last event of connection " + conUris[key], reason);
-                    }).then(function(val) {
-                        return won.deleteWhereNull(val)
-                    });
-                } catch (e) {
-                    return q.reject("could not get last event of connection " + uri + ". Reason: " + e);
-                }
-            }
-        );
-    }
-  */
-
-
     won.getLastEventOfConnection = function(connectionUri) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastEventOfConnection: connectionUri must not be null"};
