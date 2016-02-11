@@ -1400,6 +1400,10 @@ import * as q from 'q';
      * Fetches the triples where URI is subject and add objects of those triples to the
      * resulting structure by the localname of the predicate.
      * The URI is added as property 'uri'.
+     *
+     * NOTE: multiple objects with the same predicates will overwrite each other. It also
+     * ignores prefixes.
+     *
      * @param eventUri
      */
     won.getNodeWithAttributes = function(uri, requesterWebId){
