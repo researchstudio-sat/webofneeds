@@ -23,6 +23,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     var privateData = {};
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.reset = function() {
         privateData = {};
         //create an rdfstore-js based store as a cache for rdf data.
@@ -41,10 +45,18 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     linkedDataService.reset();
 
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var createNameNodeInStore = function(uri){
         return privateData.store.rdf.createNamedNode(privateData.store.rdf.resolve(uri));
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var getSafeValue = function(dataItem) {
         if (typeof dataItem === 'undefined') return null;
         if (dataItem == null) return null;
@@ -61,6 +73,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * If an errorHandler is specified, it is called with ([array key], [reject value]) of
      * each rejected promise.
      * @param promises
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     var somePromises = function(promises, errorHandler){
         var deferred = $q.defer(),
@@ -108,6 +123,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * critical section is finished, including all promises that were created in them.
      *
      * @constructor
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     var ReadUpdateLock = function(uri){
         //arrays holding deferred objects until they may proceeed
@@ -219,6 +237,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
 
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var cacheItemInsertOrOverwrite = function(uri){
         $log.debug("add to cache:    " + uri);
         privateData.cacheStatus[uri] = {
@@ -227,6 +249,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         };
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var cacheItemIsInState = function cacheItemIsInState(uri, state, nameOfState){
         var entry = privateData.cacheStatus[uri];
         var ret = false;
@@ -240,6 +266,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return ret;
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var cacheItemIsOkOrUnresolvableOrFetching = function cacheItemIsOkOrUnresolvableOrFetching(uri){
         var entry = privateData.cacheStatus[uri];
         var ret = false;
@@ -257,6 +287,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * Returns true iff the uri is loaded and marked as dirty.
      * @param uri
      * @returns {boolean}
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     var cacheItemIsDirty = function cacheItemIsDirty(uri){
         return cacheItemIsInState(uri, CACHE_ITEM_STATE.DIRTY, "dirty");
@@ -266,6 +299,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * Returns true iff the uri is loaded and marked ok.
      * @param uri
      * @returns {boolean}
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     var cacheItemIsOk = function cacheItemIsOk(uri){
         return cacheItemIsInState(uri, CACHE_ITEM_STATE.OK, "loaded");
@@ -275,11 +311,18 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * Returns true iff the uri is loaded and marked unresolvable.
      * @param uri
      * @returns {boolean}
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     var cacheItemIsUnresolvable = function cacheItemIsUnresolvable(uri){
         return cacheItemIsInState(uri, CACHE_ITEM_STATE.UNRESOLVABLE, "unresolvable");
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var cacheItemMarkAccessed = function cacheItemMarkAccessed(uri){
         var entry = privateData.cacheStatus[uri];
         if (typeof entry === 'undefined') {
@@ -291,6 +334,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         privateData.cacheStatus[uri].timestamp = new Date().getTime();
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var cacheItemMarkDirty = function cacheItemMarkDirty(uri){
         var entry = privateData.cacheStatus[uri];
         if (typeof entry === 'undefined') {
@@ -300,16 +347,28 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         privateData.cacheStatus[uri].state = CACHE_ITEM_STATE.DIRTY;
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var cacheItemMarkUnresolvable = function cacheItemMarkUnresolvable(uri){
         $log.debug("mark unres:      " + uri);
         privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.UNRESOLVABLE};
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var cacheItemMarkFetching = function cacheItemMarkFetching(uri){
         $log.debug("mark fetching:   " + uri);
         privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.FETCHING};
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var cacheItemRemove = function cacheItemRemove(uri){
         delete privateData.cacheStatus[uri];
     }
@@ -317,6 +376,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     /**
      * Method used for debugging pending locks.
+     */
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.getUnreleasedLocks = function(){
         var unreleasedLocks = [];
@@ -340,6 +403,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @param needUri - the uri of the need that now has a new connection
      * @return a promise so the caller can chain promises after this one
      */
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.invalidateCacheForNewConnection = function(connectionUri, needUri){
         if (connectionUri != null) {
             cacheItemMarkDirty(connectionUri);
@@ -362,6 +429,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      *
      * @param connectionUri - the uri of the connection
      * @return a promise so that the caller can chain another promise
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.invalidateCacheForNewMessage = function(connectionUri){
         if (connectionUri != null) {
@@ -369,6 +439,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         }
         return $q.when(true); //return a promise for chaining
     }
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.invalidateCacheForNeed = function(needUri){
         if (needUri != null) {
             cacheItemMarkDirty(needUri);
@@ -379,6 +453,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
 
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var getReadUpdateLockPerUri = function(uri){
         var lock = privateData.readUpdateLocksPerUri[uri];
         if (typeof lock === 'undefined' || lock == null) {
@@ -388,6 +466,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return lock;
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var getReadUpdateLocksPerUris = function(uris){
         locks = [];
         uris.map(
@@ -402,6 +484,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * Acquires all locks, returns an array of promises.
      * @param locks
      * @returns {Array|*}
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     var acquireReadLocks = function acquireReadLocks(locks){
         acquiredLocks = [];
@@ -424,6 +509,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * * allowNone: boolean - if false, empty data is an error
      * * allowMultiple: boolean - if false, more than one result in data is an error
      * * message: string - if set, the message is prepended to the generic error message (with 1 whitespace in between)
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     var rejectIfFailed = function(success, data, options){
         var errorMessage = null;
@@ -455,6 +543,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     /**
      * Adds the specified JSON-LD dataset to the store, identified by the specified uri.
      * The uri is used for cache control.
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.addJsonLdData = function(uri, data) {
         $log.debug("storing jsonld data for uri: " + uri);
@@ -474,6 +565,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @param propertyPath
      * @param optionalSparqlPrefixes
      * @returns {*}
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.canResolvePropertyPathFromBaseUri = function canResolvePropertyPath(baseUri, propertyPath, optionalSparqlPrefixes){
         var query = "";
@@ -504,6 +598,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @param propertyPath
      * @param optionalSparqlPrefixes
      * @returns {*}
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.resolvePropertyPathFromBaseUri = function resolvePropertyPath(baseUri, propertyPath, optionalSparqlPrefixes){
         var query = "";
@@ -536,6 +633,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * in the local triplestore.
      * @param uri
      * @return a promise to a boolean which indicates success
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.fetch = function(uri, requesterWebId) {
         var tempUri = uri+'?prev='+new Date().getTime();
@@ -559,6 +659,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         });
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var loadFromOwnServer = function(uri, requesterWebId) {
 
         var deferred = $q.defer();
@@ -605,6 +709,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return promise;
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var fetchLinkedDataFromOwnServer = function(dataUri, requesterWebId) {
         //var requestUri = '/owner/rest/linked-data/?uri=' + encodeURIComponent(dataUri);
         //if (requesterWebId != null) {
@@ -633,6 +741,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         )
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     var loadFromURI = function(uri) {
         var deferred = $q.defer();
         $log.debug("updating:        " + uri);
@@ -680,6 +792,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * Note: this method does not grant the caller any locks. This has to be done by the caller after calling this method.
      * @param uri
      * @return a promise to a boolean which indicates success
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.ensureLoaded = function(uri, requesterWebId) {
         if (typeof uri === 'undefined' || uri == null  ){
@@ -712,6 +827,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * Saves the specified jsonld structure in the triple store with the specified default graph URI.
      * @param graphURI used if no graph URI is specified in the jsonld
      * @param jsonld the data
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.storeJsonLdGraph = function(graphURI, jsonld) {
         if (typeof graphURI === 'undefined' || graphURI == null  ){
@@ -723,6 +841,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     /**
      * Loads the default data of the need with the specified URI into a js object.
      * @return the object or null if no data is found for that URI in the local datastore
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.getNeed = function(uri) {
         if (typeof uri === 'undefined' || uri == null  ){
@@ -807,6 +928,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @param resourceURI
      * @param propertyURI
      * @returns {*}
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.getUniqueObjectOfProperty = function(resourceURI, propertyURI){
         if (typeof resourceURI === 'undefined' || resourceURI == null  ){
@@ -846,6 +970,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             })
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.getWonNodeUriOfNeed = function(needUri){
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getWonNodeUriOfNeed: needUri must not be null"};
@@ -856,6 +984,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 function(reason) { return $q.reject("could not get WonNodeUri of Need " + needUri + ". Reason: " + reason)});
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.getNeedUriOfConnection = function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getNeedUriOfConnection: connectionUri must not be null"};
@@ -870,6 +1002,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 });
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.getRemoteConnectionUriOfConnection = function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getRemoteConnectionUriOfConnection: connectionUri must not be null"};
@@ -880,6 +1016,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 function(reason) { return $q.reject("could not get remote connection uri of connection " + connectionUri + ". Reason: " + reason)});
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.getRemoteneedUriOfConnection = function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getRemoteneedUriOfConnection: connectionUri must not be null"};
@@ -920,6 +1060,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * to send a message via the specified connectionUri (that is interpreted as a local connection.
      * @param connectionUri
      * @returns a promise to the data
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.getEnvelopeDataforConnection = function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
@@ -967,7 +1110,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             });
     }
 
-/*
+ /**
+ * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+ * syntax and is actively maintained.
     linkedDataService.getLastEventOfEachConnectionOfNeed = function(uri) {
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "getLastEventOfEachConnectionOfNeed: uri must not be null"};
@@ -993,6 +1138,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
   */
 
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.getLastEventOfConnection = function(connectionUri) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastEventOfConnection: connectionUri must not be null"};
@@ -1018,6 +1167,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     }
 
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.getAllConnectionEvents = function(connectionUri) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getAllConnectionEvents: connectionUri must not be null"};
@@ -1036,6 +1189,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             });
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.getLastConnectionEvent = function(connectionUri) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastConnectionEvent: connectionUri must not be null"};
@@ -1049,6 +1206,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     /**
      * Loads all URIs of a need's connections.
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.getconnectionUrisOfNeed = function(uri) {
         if (typeof uri === 'undefined' || uri == null  ){
@@ -1105,6 +1265,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.getNeedConnectionsUri = function(needUri) {
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getConnectionsUri: needUri must not be null"};
@@ -1136,9 +1300,13 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 )
             });
     }
-    
-    
 
+
+
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.getConnection = function(connectionUri) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getConnection: connectionUri must not be null"};
@@ -1146,6 +1314,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         return linkedDataService.getNodeWithAttributes(connectionUri);
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.getConnectionEvent = function(eventUri) {
         if (typeof eventUri === 'undefined' || eventUri == null  ){
             throw {message : "getConnectionEvent: eventUri must not be null"};
@@ -1155,6 +1327,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
 
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.getAllConnectioneventUris = function(connectionUri) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getAllConnectioneventUris: connectionUri must not be null"};
@@ -1199,6 +1375,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             });
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.crawlConnectionData = function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "crawlConnectionData: connectionUri must not be null"};
@@ -1219,6 +1399,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
 
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.getLastConnectioneventUri = function(connectionUri) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastConnectioneventUri: connectionUri must not be null"};
@@ -1280,6 +1464,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     }
 
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.getLastEventOfEachConnectionOfNeed = function(needUri, requesterWebId) {
         //fetch all connection uris of the need
         var allConnectionsPromise = linkedDataService.executeCrawlableQuery(queries["getAllConnectionUrisOfNeed"], needUri, requesterWebId);
@@ -1315,6 +1503,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             });
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
      linkedDataService.getConnectionTextMessages = function(connectionUri, requesterWebId) {
         var queryResultPromise = linkedDataService.executeCrawlableQuery(queries["getConnectionTextMessages"], connectionUri, requesterWebId);
         return queryResultPromise.then(
@@ -1356,6 +1548,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                     });
     }
 
+    /**
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
+     */
     linkedDataService.getLastEventTypeBeforeTime = function(connectionUri, beforeTimestamp) {
         return linkedDataService.crawlConnectionData(connectionUri).then(
             function queryLastEventBeforeTime() {
@@ -1415,6 +1611,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * resulting structure by the localname of the predicate.
      * The URI is added as property 'uri'.
      * @param eventUri
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.getNodeWithAttributes = function(uri, requesterWebId){
         if (typeof uri === 'undefined' || uri == null  ){
@@ -1457,6 +1656,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     /**
      * Deletes all triples where the specified uri is the subect. May have side effects on concurrent
      * reads on the rdf store if called without a read lock.
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.deleteNode = function(uri){
         if (typeof uri === 'undefined' || uri == null  ){
@@ -1482,6 +1684,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     /**
      * Loads the default data of the need with the specified URI into a js object.
      * @return the object or null if no data is found for that URI in the local datastore
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.getMessage = function(uri) {
         //TODO: SPARQL query that returns the common message properties
@@ -1490,6 +1695,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     /**
      * Loads the hints for the need with the specified URI into an array of js objects.
      * @return the array or null if no data is found for that URI in the local datastore
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.getHintsForNeed = function(uri) {
         //TODO: SPARQL query that returns an array of hints
@@ -1498,6 +1706,9 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     /**
      * Loads the connections for the need with the specified URI into an array of js objects.
      * @return the array or null if no data is found for that URI in the local datastore
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.getConnections = function(uri) {
         //TODO: SPARQL query that returns an array of connections
@@ -1507,12 +1718,19 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
     /**
      * Executes the specified crawlableQuery, returns a promise to its results, which may become available
      * after downloading the required content.
+     *
+     * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+     * syntax and is actively maintained.
      */
     linkedDataService.executeCrawlableQuery = function (crawlableQuery, baseUri, requesterWebId) {
         var relevantResources = [];
         var recursionData = {};
         var MAX_RECURSIONS = 10;
 
+        /**
+         * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+         * syntax and is actively maintained.
+         */
         var executeQuery = function executeQuery(query, baseUri, relevantResources){
             query = query.replace(/\:\:baseUri\:\:/g, baseUri);
             $log.debug("executing query: \n"+query);
@@ -1544,6 +1762,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
             )
         }
 
+        /**
+         * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+         * syntax and is actively maintained.
+         */
         var resolvePropertyPathsFromBaseUri = function resolvePropertyPathsFromBaseUri(propertyPaths, baseUri, relevantResources){
             $log.debug("resolving " + propertyPaths.length + " property paths on baseUri " + baseUri);
             var locks = getReadUpdateLocksPerUris(relevantResources);
@@ -1578,6 +1800,10 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
                 });
         }
 
+        /**
+         * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
+         * syntax and is actively maintained.
+         */
         var resolveOrExecuteQuery = function resolveOrExecuteQuery(resolvedUris){
             if (won.isNull(recursionData.depth)){
                 recursionData.depth = 0;
