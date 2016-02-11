@@ -628,7 +628,7 @@ const rdfstore = window.rdfstore;
        // var requestUrl = new URL('/owner/rest/linked-data/')
         //var params = {uri:dataUri}
         if (typeof requesterWebId != 'undefined' && requesterWebId != null) {
-            requestUri = requestUri + "&reqeuster="+encodeURIComponent(requesterWebId);
+            requestUri = requestUri + "&requester="+encodeURIComponent(requesterWebId);
         }
         var find = '%3A';
         var re = new RegExp(find, 'g');
