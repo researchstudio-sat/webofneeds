@@ -140,7 +140,7 @@ const actionHierarchy = {
         open: (connection,message)=>dispatch =>{
 
         },
-        add:INJ_DEFAULT,
+      add:INJ_DEFAULT,
       reset:INJ_DEFAULT,
     },
     needs: {
@@ -459,17 +459,17 @@ const actionHierarchy = {
     }
 }
 var getConnectionRelatedDataAndDispatch=(needUri,remoteNeedUri,connectionUri,dispatch)=>{
-    var promises=[]
-    let remoteNeed= won.getNeed(remoteNeedUri)
-    let ownNeed=won.getNeed(needUri)
-    let connection=won.getConnection(connectionUri)
-    promises.push(remoteNeed,ownNeed,connection)
+    const promises =[];
+    const remoteNeed = won.getNeed(remoteNeedUri);
+    const ownNeed = won.getNeed(needUri);
+    const connection = won.getConnection(connectionUri);
+    promises.push(remoteNeed,ownNeed,connection);
 
     Q.all(promises).then(results=>{
-        let resultObject={}
-        resultObject.remoteNeed=results[0]
-        resultObject.ownNeed = results[1]
-        resultObject.connection = results[2]
+        const resultObject = {};
+        resultObject.remoteNeed = results[0];
+        resultObject.ownNeed = results[1];
+        resultObject.connection = results[2];
         dispatch(actionCreators.connections__add(resultObject))
 
     })
