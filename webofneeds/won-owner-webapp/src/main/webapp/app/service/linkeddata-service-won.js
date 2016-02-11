@@ -21,7 +21,12 @@ import {
     checkHttpStatus
 } from '../utils';
 import * as q from 'q';
-(function(){
+
+import '../../scripts/rdfstore-js/rdf_store';
+const rdfstore = window.rdfstore;
+
+
+    (function(){
     if(!won) won = {};
 
     var privateData = {};
@@ -30,6 +35,7 @@ import * as q from 'q';
         privateData = {};
         //create an rdfstore-js based store as a cache for rdf data.
         privateData.store =  rdfstore.create();
+        window.store4dbg = privateData.store; //TODO deletme
         privateData.store.setPrefix("msg","http://purl.org/webofneeds/message#");
         privateData.store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         privateData.store.setPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
