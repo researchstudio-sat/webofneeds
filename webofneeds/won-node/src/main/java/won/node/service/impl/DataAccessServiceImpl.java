@@ -1,7 +1,6 @@
 package won.node.service.impl;
 
 import com.hp.hpl.jena.graph.TripleBoundary;
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,14 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.model.*;
 import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.EventRepository;
 import won.protocol.repository.FacetRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
-import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -39,8 +35,6 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   @Autowired
   private ConnectionRepository connectionRepository;
   @Autowired
-  private EventRepository eventRepository;
-  @Autowired
   private FacetRepository facetRepository;
   @Autowired
   private WonNodeInformationService wonNodeInformationService;
@@ -48,7 +42,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
 
 
   /**
-   * Creates a new Connection object. Excepts facet URI.
+   * Creates a new Connection object or returns an existing one.
    * @param needURI
    * @param otherNeedURI
    * @param otherConnectionURI
@@ -77,24 +71,26 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
 
     //TODO: create a proper exception if a facet is not supported by a need
     if(facetRepository.findByNeedURIAndTypeURI(needURI, facetURI).isEmpty()) throw new RuntimeException("Facet is not supported by Need: " + facetURI);
-
-    List<Connection> connections = connectionRepository.findByNeedURIAndRemoteNeedURI(needURI, otherNeedURI);
-    Connection con = getConnection(connections, facetURI, connectionEventType);
-
-    if (con == null) {
-      /* Create connection */
-      con = new Connection();
-      //create and set new uri
-      con.setConnectionURI(wonNodeInformationService.generateConnectionURI(
-        wonNodeInformationService.getWonNodeUri(needURI)));
-    }
-
+  /* Create connection */
+    Connection con = new Connection();
+    //create and set new uri
+    con.setConnectionURI(wonNodeInformationService.generateConnectionURI(
+      wonNodeInformationService.getWonNodeUri(needURI)));
     con.setNeedURI(needURI);
     con.setState(connectionState);
     con.setRemoteNeedURI(otherNeedURI);
     con.setRemoteConnectionURI(otherConnectionURI);
     con.setTypeURI(facetURI);
-    con = connectionRepository.save(con);
+    try {
+      con = connectionRepository.save(con);
+    } catch (Exception e){
+      //we assume the unique key constraint on needURI, remoteNeedURI, typeURI was violated: we have to perform an
+      // update, not an insert
+      logger.warn("caught exception, assuming unique key constraint on needURI, remoteNeedURI, typeURI was violated" +
+                    ". Throwing a ConnectionAlreadyExistsException. TODO: think about handling this exception " +
+                    "separately", e);
+      throw new ConnectionAlreadyExistsException(con.getConnectionURI(),needURI, otherNeedURI);
+    }
     return con;
   }
 
@@ -116,82 +112,19 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     return ret;
   }
 
-  /**
-   * Returns the first facet found in the model, attached to the null relative URI '<>'.
-   * Returns null if there is no such facet.
-   * @param content
-   * @return
-   */
-  @Override
-  public URI getFacet(Model content) {
-    return WonRdfUtils.FacetUtils.getFacet(content);
-  }
-
-  public URI getFacet(Dataset content) {
-    return WonRdfUtils.FacetUtils.getFacet(content);
-  }
-
-  /**
-   * Adds a triple to the model of the form <> won:hasFacet [facetURI].
-   * @param content
-   * @param facetURI
-   */
-  @Override
-  public void addFacet(final Model content, final URI facetURI)
-  {
-    WonRdfUtils.FacetUtils.addFacet(content, facetURI);
-  }
 
   @Override
   public Connection getConnection(List<Connection> connections, URI facetURI, ConnectionEventType eventType)
       throws ConnectionAlreadyExistsException {
     Connection con = null;
-
     for(Connection c : connections) {
-      //TODO: check remote need type as well or create GroupMemberFacet
+      //TODO: check remote need type as well
       if (facetURI.equals(c.getTypeURI()))
         con = c;
     }
-
-    /**
-     * check if there already exists a connection between those two
-     * we have multiple options:
-     * a) no connection exists -> create new
-     * b) a connection exists in state CONNECTED -> error message
-     * c) a connection exists in state REQUEST_SENT. The call must be a
-     * duplicate (or re-sent after the remote end hasn't replied for some time) -> error message
-     * d) a connection exists in state REQUEST_RECEIVED. The remote end tried to connect before we did.
-     * -> error message
-     * e) a connection exists in state CLOSED -> create new
-     */
-
-    //TODO: impose unique constraint on connections
-    if(con != null) {
-        if(con.getState()== ConnectionState.CONNECTED || con.getState()==ConnectionState.REQUEST_SENT)
-            throw new ConnectionAlreadyExistsException(con.getConnectionURI(), con.getNeedURI(), con.getRemoteNeedURI());
-      /*if(!eventType.isMessageAllowed(con.getState())){
-        throw new ConnectionAlreadyExistsException(con.getConnectionURI(), con.getNeedURI(), con.getRemoteNeedURI());
-      }*/ else {
-        //TODO: Move this to the transition() - Method in ATConnectionState
-        con.setState(con.getState().transit(eventType));
-        con = connectionRepository.save(con);
-      }
-    }
-
     return con;
   }
 
-  @Override
-  public ConnectionEvent createConnectionEvent(final URI connectionURI, final URI originator,
-    final ConnectionEventType connectionEventType) {
-    ConnectionEvent event = new ConnectionEvent();
-    event.setConnectionURI(connectionURI);
-    event.setType(connectionEventType);
-    event.setOriginatorUri(originator);
-    eventRepository.save(event);
-
-    return event;
-  }
 
   @Override
   public Connection nextConnectionState(URI connectionURI, ConnectionEventType connectionEventType)
@@ -221,16 +154,15 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     logger.debug("adding feedback to resource {}", forResource);
     Model model = rdfStorageService.loadModel(forResource);
     if (model == null) {
-      logger.debug("could not add feedback to resource {}: no such resource found", forResource );
-      return false;
+      //if no model is found, we create one.
+      model = ModelFactory.createDefaultModel();
     }
     Resource mainRes = model.getResource(forResource.toString());
     if (mainRes == null){
-      logger.debug("could not add feedback to resource {}: resource not found in model");
+      logger.debug("could not add feedback to resource {}: resource not found/created in model");
       return false;
     }
-
-    mainRes.addProperty(WON.HAS_FEEDBACK, feedback);
+    mainRes.addProperty(WON.HAS_FEEDBACK_EVENT, feedback);
     ModelExtract extract = new ModelExtract(new StatementTripleBoundary(TripleBoundary.stopNowhere));
     model.add(extract.extract(feedback, feedback.getModel()));
     logger.debug("done adding feedback for resource {}, storing...", forResource);
@@ -239,31 +171,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     return true;
   }
 
-  @Override
-  public void saveAdditionalContentForEvent(final Model content, final Connection con, final ConnectionEvent event) {
-    saveAdditionalContentForEvent(content, con, event, null);
-  }
 
-  @Override
-  public void saveAdditionalContentForEvent(final Model content, final Connection con, final ConnectionEvent event,
-    final Double score) {
-    rdfStorageService.storeModel(event,
-                                 RdfUtils.createContentForEvent(
-                                   this.URIService.createEventURI(con, event), content, con, event, score));
-  }
-    /*
-    public void saveAdditionalContentForEventReplace(final Model content, final Connection con, final ConnectionEvent event)
-    {
-        //TODO: define what content may contain and check that here! May content contain any RDF or must it be linked to the <> node?
-        Model extraDataModel = ModelFactory.createDefaultModel();
-        Resource eventNode = extraDataModel.createResource(this.URIService.createEventURI(con,event).toString());
-        extraDataModel.setNsPrefix("",eventNode.getURI().toString());
-        if (content != null) {
-            RdfUtils.replaceBaseResource(content, eventNode);
-            rdfStorageService.storeModel(event, extraDataModel);
-        }
-    }
-    */
 
   @Override
   public void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI) {

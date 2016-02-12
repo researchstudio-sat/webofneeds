@@ -24,6 +24,7 @@ import org.apache.camel.RoutesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.cryptography.ssl.MessagingContext;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.model.MessagingType;
 
@@ -32,8 +33,9 @@ import java.net.URI;
 //import won.node.camel.routes.NeedProtocolDynamicRoutes;
 
 /**
- * User: LEIH-NB
- * Date: 26.02.14
+ * This class is responsible for creating an activemq broker to communicate with
+ * a won node and for adding a route to this broker in the camel context that can
+ * in the future be used to direct messages to the WoN node.
  */
 public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCamelConfigurator {
 
@@ -43,20 +45,22 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
     private final String localComponentName = "seda";
     private String vmComponentName;
     private CamelContext camelContext;
+    private MessagingContext messagingContext;
 
     @Autowired
     protected BrokerComponentFactory brokerComponentFactory;
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public synchronized String configureCamelEndpointForNeedUri(URI brokerUri, String needProtocolQueueName){
+    public synchronized String configureCamelEndpointForNeedUri(URI wonNodeURI, URI brokerUri, String
+      needProtocolQueueName){
         String brokerComponentName = setupBrokerComponentName(brokerUri);
         if (!brokerComponentName.contains("brokerUri")){
           addCamelComponentForWonNodeBroker(brokerUri, brokerComponentName);
         }
         String endpoint = brokerComponentName+":queue:"+needProtocolQueueName;
-        endpointMap.put(brokerUri,endpoint);
-        logger.info("endpoint of wonNodeURI {} is {}",brokerUri,endpointMap.get(brokerUri));
+        endpointMap.put(wonNodeURI,endpoint);
+        logger.info("endpoint of wonNodeURI {} is {}", wonNodeURI, endpointMap.get(wonNodeURI));
         return endpoint;
     }
 
@@ -74,7 +78,8 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
 
         ActiveMQComponent activeMQComponent;
         if (camelContext.getComponent(brokerComponentName)==null){
-            activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri, MessagingType.Queue);
+            activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri,
+                                                                                              MessagingType.Queue, messagingContext);
             logger.info("adding activemqComponent for brokerUri {}",brokerUri);
             camelContext.addComponent(brokerComponentName,activeMQComponent);
           try {
@@ -104,15 +109,24 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
         this.camelContext=camelContext;
     }
 
-    @Override
+  @Override
+  public void setMessagingContext(MessagingContext messagingContext) {
+    this.messagingContext = messagingContext;
+  }
+
+  public MessagingContext getMessagingContext() {
+    return messagingContext;
+  }
+
+  @Override
     public CamelContext getCamelContext() {
         return this.camelContext;
     }
 
 
     @Override
-    public String getEndpoint(URI brokerUri) {
-        return  endpointMap.get(brokerUri);
+    public String getEndpoint(URI nodeUri) {
+        return  endpointMap.get(nodeUri);
     }
     public void setComponentName(String componentName) {
         this.componentName = componentName;
@@ -126,9 +140,6 @@ public abstract class NeedBasedCamelConfiguratorImpl implements NeedProtocolCame
     public String getBrokerComponentNameWithBrokerUri(URI brokerUri){
         return brokerComponentMap.get(brokerUri);
     }
-
-
-
 
 
 }

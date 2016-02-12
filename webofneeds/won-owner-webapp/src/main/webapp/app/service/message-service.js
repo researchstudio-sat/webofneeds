@@ -24,34 +24,6 @@ angular.module('won.owner').factory('messageService', function ($http, $q,$log, 
     //private data of the service
     var privateData = {};
 
-    //until this is no longer an issue: https://github.com/rstoyanchev/spring-websocket-portfolio/issues/42
-    //we'll send http requests in regular intervals to keep the server's http session open
-    privateData.HTTP_HEARTBEAT_INTERVAL = 25 * 1000;
-    privateData.HTTP_HEARTBEAT_URL = "rest/users/ping/";
-    //set to true while waiting for the response to the heartbeat request
-    privateData.httpHeartbeatPending = false;
-
-    var sendHeartbeat = function(){
-        if (!privateData.httpHeartbeatPending) {
-            privateData.httpHeartbeatPending = true;
-            $http.get(privateData.HTTP_HEARTBEAT_URL)
-                .success(
-                function (data, status, headers, config) {
-                    privateData.httpHeartbeatPending = false;
-                    if (status != 200){
-                        $log.debug("warn: successful http heartbeat returned status " + status);
-                    }
-                })
-                .error(
-                function(data, status, headers, config){
-                    privateData.httpHeartbeatPending = false;
-                    console.error("warn: failed http heartbeat returned status " + status);
-                });
-        }
-    }
-
-    //$interval(sendHeartbeat,privateData.HTTP_HEARTBEAT_INTERVAL);
-
     //currently registered callbacks
     privateData.callbacks = [];
 
@@ -61,36 +33,43 @@ angular.module('won.owner').factory('messageService', function ($http, $q,$log, 
     privateData.pendingOutMessages = [];
 
 
+
     var getEventData = function(json){
         $log.debug("getting data from jsonld message");
         var eventData = {};
         //call handler if there is one - it may modify the event object
         //frame the incoming jsonld to get the data that interest us
-        var frame = {"@context" : {
-            "won":"http://purl.org/webofneeds/model#",
-            "msg":"http://purl.org/webofneeds/message#" //message is the default vocabulary
-        },
-            "msg:hasMessageType": { }
-        };
+        var frame = {
+            "@context" : {
+                "won":"http://purl.org/webofneeds/model#",
+                "msg":"http://purl.org/webofneeds/message#"
+            },
+            "@type": "msg:FromOwner"
+        }
+
         //copy data from the framed message to the event object
         var framedMessage = jsonld.frame(json, frame);
+
+        if (framedMessage == null){
+            //not FromSystem? maybe it's FromSystem?
+            frame['@type'] = "msg:FromSystem";
+            //copy data from the framed message to the event object
+            framedMessage = jsonld.frame(json, frame);
+       }
+
+        if (framedMessage == null){
+            //not FromSystem? maybe it's FromExternal?
+            frame['@type'] = "msg:FromExternal";
+            //copy data from the framed message to the event object
+            framedMessage = jsonld.frame(json, frame);
+        }
+
         for (key in framedMessage){
             var propName = won.getLocalName(key);
             if (propName != null && ! won.isJsonLdKeyword(propName)) {
                 eventData[propName] = won.getSafeJsonLdValue(framedMessage[key]);
             }
         }
-/*
-        eventData.messageType = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasMessageTypeCompacted]);
-        eventData.receiverURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasReceiverCompacted]);
-        eventData.receiverNeedURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasReceiverNeedCompacted]);
-        eventData.receiverNodeURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasReceiverNodeCompacted]);
-        eventData.senderURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasSenderCompacted]);
-        eventData.senderNeedURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasSenderNeedCompacted]);
-        eventData.senderNodeURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasSenderNodeCompacted]);
-        eventData.refersToURI = won.getSafeJsonLdValue(framedMessage[won.WONMSG.refersToCompacted]);
-        eventData.responseState = won.getSafeJsonLdValue(framedMessage[won.WONMSG.hasResponseStateCompacted]);
-        */
         eventData.uri = won.getSafeJsonLdValue(framedMessage);
         eventData.framedMessage = framedMessage;
         $log.debug("done copying the data to the event object, returning the result");
@@ -160,7 +139,7 @@ angular.module('won.owner').factory('messageService', function ($http, $q,$log, 
         };
 
         newsocket.onclose = function (e) {
-            $log.debug("SockJS connection closed");
+            $log.debug("SockJS connection closed ", e);
             //TODO: reconnect when connection is lost?
             if (e.code === 1011) { // unexpected server condition - happens when the user's session times out
                 $rootScope.$apply(function () {
@@ -197,12 +176,6 @@ angular.module('won.owner').factory('messageService', function ($http, $q,$log, 
         privateData.socket = new SockJS(url, null, options);
         attachListenersToSocket(privateData.socket);
     }
-
-
-
-
-
-
 
     messageService.closeConnection = function () {
         if (privateData.socket != null && ! isClosingOrClosed()) {

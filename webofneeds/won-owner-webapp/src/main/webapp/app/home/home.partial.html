@@ -68,16 +68,14 @@
            </div>
            <div class="col-md-6">
                <form class="form-inline container" novalidate name="iNewPost" ng-submit="onClickOnNewPost()">
-                   <div>
-                       <div class="form-group col-md-12">
-                           <label for="iPostTitle" style="font-size: 1.8em;">{{iGivePostTitlText}}</label>
-                           <input type="text" class="form-control" name="iPostTitle" id="iPostTitle" ng-model="iPost.title"
-                                  placeholder="Title" required>
-                           <div class="inline">
-                               <span class="label label-warning" ng-show="iNewPost.iPostTitle.$invalid  && !iPost.firstattempt">{{iPostValidationMessage}}</span>
-                           </div>
-                           <button type="submit" class="btn btn-primary button-top-margin pull-right">{{iPostBtnText}}</button>
+                   <div class="form-group col-md-12">
+                       <label for="iPostTitle" style="font-size: 1.8em;">{{iGivePostTitlText}}</label>
+                       <input type="text" class="form-control" name="iPostTitle" id="iPostTitle" ng-model="iPost.title"
+                              placeholder="Title" required>
+                       <div class="inline">
+                           <span class="label label-warning" ng-show="iNewPost.iPostTitle.$invalid  && !iPost.firstattempt">{{iPostValidationMessage}}</span>
                        </div>
+                       <button type="submit" class="btn btn-primary button-top-margin pull-right">{{iPostBtnText}}</button>
                    </div>
                </form>
            </div>

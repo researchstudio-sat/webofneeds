@@ -1,0 +1,91 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+
+won-flex-grid {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+
+  .flexgrid__item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 10rem;
+    padding: 1rem 2rem;
+
+    .fgi__block {
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .fgi__image {
+      width: 7rem;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .fgi__text {
+      padding-top: 2rem;
+      text-align: center;
+      display: block;
+    }
+
+    .fgi__arrow {
+      display: block;
+      margin: 0 auto;
+      width: 1rem;
+    }
+
+    .fgi__additionaltext {
+      padding-top: 1rem;
+      display: block;
+      align-self: flex-end;
+    }
+  }
+}
+
+.try {
+  won-flex-grid {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+
+    .anonymous,
+    .signup {
+      width: 18rem;
+      padding: 0 5rem;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .signup {
+      border-right: 0.1rem solid $won-light-gray;
+    }
+
+    @media screen and (max-width: 20rem) {
+      .anonymous,
+      .signup {
+        width: 18rem;
+        padding: 0;
+        border: 0;
+      }
+    }
+
+    .button,
+    input {
+      width: 100%;
+    }
+
+    .anonymous {
+      .description {
+        color: white;
+        padding: 1rem 0;
+      }
+    }
+  }
+}

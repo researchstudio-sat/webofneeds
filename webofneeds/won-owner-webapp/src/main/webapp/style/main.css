@@ -13,6 +13,51 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+.text-height{
+	height:20px;
+}
+.centering {
+	display:block;
+	margin-left:auto;
+	margin-right:auto;
+}
+.thumbnail-selected {
+	display: inline-block;
+	display: block;
+	height: 100px;
+	max-width: 100%;
+	padding: 4px;
+	line-height: 1.428571429;
+	background-color: #fff;
+	border: 1px solid black;
+	border-radius: 4px;
+	-webkit-transition: all .2s ease-in-out;
+	transition: all .2s ease-in-out;
+	margin-left:auto;
+	margin-right:auto;
+}
+.thumbnail-non-selected {
+	display: inline-block;
+	display: block;
+	height: 100px;
+	max-width: 100%;
+	padding: 4px;
+	line-height: 1.428571429;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	-webkit-transition: all .2s ease-in-out;
+	transition: all .2s ease-in-out;
+	margin-left:auto;
+	margin-right:auto;
+}
+.bottom-overlap {
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+	height: 20%;
+	padding: 15px;
+}
 #postboxLink {
     text-decoration: underline;
 }
@@ -499,4 +544,8 @@ table th.resizing {
 .thumbnail-size {
     width: 150px;
     height: 150px;"
+}
+
+#createNeed .panel-title {
+	font-size: large;
 }

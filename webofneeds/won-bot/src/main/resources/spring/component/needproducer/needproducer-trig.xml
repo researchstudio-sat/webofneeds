@@ -33,7 +33,6 @@
 
     <bean id="needProducerFromTrig"
           class="won.bot.framework.component.needproducer.impl.RoundRobinCompositeNeedProducer">
-        <qualifier value="default"/>
         <property name="needFactories">
             <set>
                 <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">

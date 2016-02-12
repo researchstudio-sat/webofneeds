@@ -20,12 +20,11 @@ import com.hp.hpl.jena.rdf.model.Model;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEvent;
 import won.protocol.model.Need;
+import won.protocol.model.NeedState;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Service for obtaining information about needs and connections in the system in RDF.
@@ -45,7 +44,55 @@ public interface NeedInformationService {
      * @param page the page number
      * @return a collection of all need URIs.
      */
-    public Collection<URI> listNeedURIs(int page);
+    public Page<URI> listNeedURIs(int page);
+
+  /**
+   * Retrieves a page of the list of needs on the needserver that have a given state
+   * with number of need uris per page preference.
+   *
+   * @param page the page number
+   * @param preferredSize preferred number of members per page, null => use default
+   * @param needState Active/Inactive, null => all states
+   * @return a collection of all need URIs.
+   */
+    public Page<URI> listNeedURIs(int page, Integer preferredSize, NeedState needState);
+
+
+  /**
+   * Retrieves list of needs on the needserver that where created earlier than the given need.
+   * @param need
+   * @return
+   */
+    public Page<URI> listNeedURIsBefore(URI need);
+
+  /**
+   * Retrieves list of needs on the needserver that where created earlier than the given need
+   * that have a given state with number of need uris per page preference.
+   *
+   * @param need
+   * @param preferredSize preferred number of members per page, null => use default
+   * @param needState Active/Inactive, null => all states
+   * @return a collection of all need URIs.
+   */
+    public Page<URI> listNeedURIsBefore(URI need, Integer preferredSize, NeedState needState);
+
+  /**
+   * Retrieves list of needs on the needserver that where created later than the given need.
+   * @param need
+   * @return
+   */
+    public Page<URI> listNeedURIsAfter(URI need);
+
+  /**
+   * Retrieves list of needs on the needserver that where created later than the given need
+   * that have a given state with number of need uris per page preference.
+   *
+   * @param need
+   * @param preferredSize preferred number of members per page, null => use default
+   * @param needState Active/Inactive, null => all states
+   * @return a collection of all need URIs.
+   */
+    public Page<URI> listNeedURIsAfter(URI need, Integer preferredSize, NeedState needState);
 
     /**
      * Retrieves all connection URIs (regardless of state) for the specified local need URI.
@@ -69,7 +116,7 @@ public interface NeedInformationService {
      *
      * @return a collection of connection URIs.
      */
-    public Collection<URI> listConnectionURIs(int page);
+    public Page<URI> listConnectionURIs(int page);
 
     /**
      * Retrieves a page of the list of connection URIs (regardless of state) for the specified local need URI.
@@ -80,7 +127,7 @@ public interface NeedInformationService {
      * @throws won.protocol.exception.NoSuchNeedException
      *          if needURI is not a known need URI
      */
-    public Collection<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException;
+    public Page<URI> listConnectionURIs(URI needURI, int page) throws NoSuchNeedException;
 
     /**
      * Read general information about the need.
@@ -111,14 +158,6 @@ public interface NeedInformationService {
      */
     public Connection readConnection(URI connectionURI) throws NoSuchConnectionException;
 
-  /**
-   * Read all events for given connection URI.
-   *
-   * @param connectionURI
-   * @return
-   * @throws NoSuchConnectionException
-   */
-    public List<ConnectionEvent> readEvents(URI connectionURI) throws NoSuchConnectionException;
 
     /**
      * Retrieves the public description of the connection as an RDF graph.
@@ -132,5 +171,39 @@ public interface NeedInformationService {
      */
     public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
 
-  ConnectionEvent readEvent(URI eventURI);
+  public static class Page<T>{
+    private Collection<T> content;
+    private boolean hasNext;
+
+    public Page(final Collection<T> content, final boolean hasNext) {
+      this.content = content;
+      this.hasNext = hasNext;
+    }
+
+    public Collection<T> getContent() {
+      return content;
+    }
+
+    public boolean hasNext() {
+      return hasNext;
+    }
+  }
+
+  public static class PagedResource<T>{
+    private T content;
+    private boolean hasNext;
+
+    public PagedResource(final T content, final boolean hasNext) {
+      this.content = content;
+      this.hasNext = hasNext;
+    }
+
+    public T getContent() {
+      return content;
+    }
+
+    public boolean hasNext() {
+      return hasNext;
+    }
+  }
 }

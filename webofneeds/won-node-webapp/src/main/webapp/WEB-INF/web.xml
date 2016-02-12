@@ -5,6 +5,16 @@
 
     <display-name>WON Node Webapp</display-name>
 
+    <filter>
+        <filter-name>filterChainProxy</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>filterChainProxy</filter-name> <!-- filterChainProxy -->
+        <!-- springSecurityFilterChain -->
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <!-- SPRING config -->
 
     <listener>
@@ -16,24 +26,12 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            classpath:/spring/node-jmsonly.xml
+            classpath:/spring/node-context.xml
         </param-value>
     </context-param>
 
 
-    <!-- WEB SERVICES -->
 
-
-
-    <servlet>
-        <servlet-name>wonProtocolJaxWSServlet</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>3</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>wonProtocolJaxWSServlet</servlet-name>
-        <url-pattern>/protocol/*</url-pattern>
-    </servlet-mapping>
 
     <!-- SPRING WEB MVC config -->
     <servlet>
@@ -54,10 +52,15 @@
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 
-    <listener>
-        <listener-class>
-            com.sun.xml.ws.transport.http.servlet.WSServletContextListener
-        </listener-class>
-    </listener>
+    <!-- SECURITY -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>node-linked-data</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
 
 </web-app>

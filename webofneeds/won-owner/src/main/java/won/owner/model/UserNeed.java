@@ -33,6 +33,16 @@ public class UserNeed
   @Column( name = "uri", unique = true)
   private URI uri;
 
+  @Column( name = "matches")
+  private boolean matches;
+
+  @Column( name = "requests")
+  private boolean requests;
+
+  @Column( name = "conversations")
+  private boolean conversations;
+
+
   public UserNeed() {
   }
 
@@ -54,5 +64,29 @@ public class UserNeed
 
   public void setUri(final URI uri) {
     this.uri = uri;
+  }
+
+  public boolean isMatches() {
+    return matches;
+  }
+
+  public void setMatches(final boolean matches) {
+    this.matches = matches;
+  }
+
+  public boolean isRequests() {
+    return requests;
+  }
+
+  public void setRequests(final boolean requests) {
+    this.requests = requests;
+  }
+
+  public boolean isConversations() {
+    return conversations;
+  }
+
+  public void setConversations(final boolean conversations) {
+    this.conversations = conversations;
   }
 }

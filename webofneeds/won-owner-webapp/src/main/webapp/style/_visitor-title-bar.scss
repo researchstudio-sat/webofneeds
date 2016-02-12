@@ -1,0 +1,10 @@
+@import 'won-config';
+@import 'flex-layout';
+@import 'title-bar';
+@import 'sizing-utils';
+
+@import 'need-tab-bar';
+
+.visitor-title-bar {
+  @include need-tab-bar('vtb', 13rem);
+}

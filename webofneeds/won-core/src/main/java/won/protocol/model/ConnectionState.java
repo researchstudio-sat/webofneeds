@@ -69,6 +69,8 @@ public enum ConnectionState
             return CLOSED;
           case PARTNER_CLOSE:
             return CLOSED;
+          default:
+            return this;
         }
       case REQUEST_SENT: //the owner has initiated the connection, the request was sent to the remote need
         switch (msg) {
@@ -78,6 +80,8 @@ public enum ConnectionState
             return CLOSED;
           case PARTNER_CLOSE:
             return CLOSED;
+          default:
+            return this;
         }
       case REQUEST_RECEIVED: //a remote need has requested a connection
         switch (msg) {
@@ -87,6 +91,8 @@ public enum ConnectionState
             return CLOSED;
           case PARTNER_CLOSE:
             return CLOSED;
+          default:
+            return this;
         }
       case CONNECTED: //the connection is established
         switch (msg) {
@@ -94,6 +100,8 @@ public enum ConnectionState
             return CLOSED;
           case OWNER_CLOSE:
             return CLOSED;
+          default:
+            return this;
         }
       case CLOSED:
         switch (msg) {
@@ -101,9 +109,12 @@ public enum ConnectionState
             return REQUEST_SENT; //reopen connection
           case PARTNER_OPEN:
             return REQUEST_RECEIVED;
+          default:
+            return this;
         }
+      default:
+        return this;
     }
-    return this;   //none of the above applies: the state does not change
   }
 
   public static boolean closeOnNeedDeactivate(ConnectionState state){
@@ -114,6 +125,7 @@ public enum ConnectionState
   {
     return URI.create(WON.BASE_URI + name);
   }
+
 
   /**
    * Tries to match the given string against all enum values.
@@ -130,4 +142,18 @@ public enum ConnectionState
     logger.warn("No enum could be matched for: {}", fragment);
     return null;
   }
+
+    /**
+     * Tries to match the given URI against all enum values.
+     *
+     * @param uri URI to match
+     * @return matched enum, null otherwise
+     */
+    public static ConnectionState fromURI(final URI uri)
+    {
+        for (ConnectionState state : values())
+            if (state.getURI().equals(uri))
+                return state;
+        return null;
+    }
 }

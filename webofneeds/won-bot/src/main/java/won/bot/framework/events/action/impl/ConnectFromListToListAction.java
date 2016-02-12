@@ -114,12 +114,10 @@ public class ConnectFromListToListAction extends BaseEventBotAction
             connectHook.onConnect(fromUri, toUri);
           }
 
+          WonMessage connMessage = createWonMessage(fromUri, toUri);
           getEventListenerContext()
-            .getOwnerService()
-            .connect(fromUri,
-                     toUri,
-                     WonRdfUtils.FacetUtils.createFacetModelForHintOrConnect(fromFacet, toFacet),
-                     createWonMessage(fromUri, toUri));
+            .getWonMessageSender()
+            .sendWonMessage(connMessage);
         } catch (Exception e) {
           logger.warn("could not connect {} and {}", fromUri, toUri);  //throws
           logger.warn("caught exception", e);

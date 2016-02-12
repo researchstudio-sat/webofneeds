@@ -20,8 +20,8 @@ import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.RoutesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.matcher.camel.routes.MatcherApplicationListenerRouteBuilder;
 import won.matcher.camel.routes.Matcher2NodeDynamicRoutes;
+import won.matcher.camel.routes.MatcherApplicationListenerRouteBuilder;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.jms.MatcherProtocolCamelConfigurator;
 import won.protocol.jms.NeedBasedCamelConfiguratorImpl;
@@ -61,7 +61,8 @@ public class MatcherProtocolCamelConfiguratorImpl extends NeedBasedCamelConfigur
     ActiveMQComponent activeMQComponent;
     if (getCamelContext().getComponent(brokerComponentName)==null){
       activeMQComponent = (ActiveMQComponent) brokerComponentFactory.getBrokerComponent(brokerUri,
-                                                                                        MessagingType.Topic);
+                                                                                        MessagingType.Topic,
+                                                                                        getMessagingContext());
       logger.info("adding activemqComponent for brokerUri {} with brokerComponentName {}",brokerUri, brokerComponentName);
       getCamelContext().addComponent(brokerComponentName,activeMQComponent);
       try {

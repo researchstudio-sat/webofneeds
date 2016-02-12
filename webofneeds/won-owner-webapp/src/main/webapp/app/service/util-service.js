@@ -33,13 +33,47 @@ angular.module('won.owner').factory('utilService', function ($http, $q) {
         }
         return size;*/
     };
+    utilService.getRandomPosInt = function() {
+        return utilService.getRandomInt(1,9223372036854775807);
+    }
     utilService.getRandomInt = function(min, max){
         return Math.floor(Math.random()*(max-min+1))+min;
     }
 
+    // TODO angularjs seems to have analogous method, so usage of this one can be replaced by angular's
     utilService.isString = function(o) {
         return typeof o == "string" || (typeof o == "object" && o.constructor === String);
     }
 
+    utilService.readAsDataURL  = function(file) {
+        var deferred = $q.defer();
+
+        var reader = new FileReader();
+
+        reader.onload = function() {
+            deferred.resolve(reader.result);
+        };
+        reader.onerror = function() {
+            deferred.reject(f);
+        };
+
+        reader.readAsDataURL(file);
+
+        return deferred.promise;
+    };
+
+    utilService.concatTags = function(tags) {
+        if(tags.length>0){
+            var concTags ='';
+            for(var i = 0;i<tags.length;i++){
+                if(i==0){
+                    concTags = tags[i].text;
+                }else{
+                    concTags = concTags + ','+ tags[i].text;
+                }
+            }
+            return concTags;
+        }
+    }
     return utilService;
 });

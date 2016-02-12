@@ -1,0 +1,107 @@
+@import 'won-config';
+@import 'text';
+@import 'dynamic-textfield';
+.create-post {
+  //@include flex-column;
+  //max-width: 20rem;
+  width: 100%;
+
+  //$createPostMaxContentWidth: 46.25rem;
+  $createPostMaxContentWidth: 35rem;
+  @include max-content-width($createPostMaxContentWidth, $minContentPadding, 'cp');
+
+  > .cp__inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+
+    padding: $minContentPadding;
+  }
+
+  .cp__icon {
+    @include fixed-square($bigiconSize);
+  }
+
+
+
+  won-posttype-select {
+    margin-bottom: $minContentPadding;
+  }
+
+  .cp__mandatory-rest {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    won-image-dropzone {
+      margin-right: $minContentPadding;
+      margin-bottom: $minContentPadding;
+    }
+    won-dynamic-textfield {
+      flex-grow: 1;
+      flex-basis: 10rem;
+    }
+  }
+}
+
+won-image-dropzone {
+  $borderSize: 5.66rem;
+  $padding: 1rem;
+  @include fixed-square($borderSize);
+  display: block;
+
+  %wid__dropzone {
+
+    box-sizing: border-box;;
+    height: 100%;
+    width: 100%;
+
+    position: relative; //to allow children to use pos:absolute
+
+    overflow: hidden; // to crop the `fill`ing image
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    /* the preview is set via js:
+     * background-image: url({{self.imageDataUrl}});
+     */
+
+    input {
+      filter: alpha(opacity=0);
+      opacity: 0;
+      height: 100%;
+      width: 100%;
+      position: absolute;
+    }
+
+    & .wid__dropzone__default-bg,
+    & .wid__dropzone__preview-img {
+      @extend %center--absolute;
+      pointer-events: none;
+    }
+  }
+
+  .wid__dropzone--empty {
+    @extend %wid__dropzone;
+
+    border: $boldBorder dashed $won-line-gray;
+    border-radius: $boldBorder;
+
+    background-color: white;
+
+    .wid__dropzone__default-bg {
+      @include max-square($borderSize - 2 * $padding - 2 * $boldBorder);
+    }
+  }
+
+  .wid__dropzone--filled {
+    @extend %wid__dropzone;
+
+    border: $thinBorder solid $won-line-gray;
+
+    .wid__dropzone__default-bg {
+      display: none;
+    }
+  }
+}

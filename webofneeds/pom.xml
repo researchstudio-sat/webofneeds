@@ -17,12 +17,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>webofneeds</groupId>
     <artifactId>webofneeds</artifactId>
-    <version>1.0</version>
+    <version>0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Web of Needs Main</name>
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/researchstudio-sat/webofneeds.git</developerConnection>
-      <tag>1.0</tag>
+      <tag>HEAD</tag>
   </scm>
     <modules>
         <module>won-core</module>
@@ -32,6 +32,8 @@
         <module>won-owner-webapp</module>
         <module>won-matcher</module>
         <module>won-matcher-solr</module>
+        <module>won-matcher-service</module>
+        <module>won-matcher-siren</module>
         <module>won-matcher-webapp</module>
         <module>won-ontology-validator</module>
         <module>won-bot</module>
@@ -39,6 +41,7 @@
         <module>won-cryptography</module>
         <module>won-utils</module>
         <module>won-vocab</module>
+        <module>won-docker</module>
     </modules>
 
     <dependencyManagement>
@@ -112,6 +115,12 @@
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-amqp</artifactId>
                 <version>${activemq.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>bcpkix-jdk15on</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>javax.jms</groupId>
@@ -188,6 +197,10 @@
                         <groupId>org.slf4j</groupId>
                         <artifactId>jcl-over-slf4j</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>commons-codec</groupId>
+                        <artifactId>commons-codec</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
 
@@ -239,8 +252,8 @@
             <!-- Servlet API -->
             <dependency>
                 <groupId>javax.servlet</groupId>
-                <artifactId>servlet-api</artifactId>
-                <version>3.0-alpha-1</version>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>3.1.0</version>
             </dependency>
 
             <dependency>
@@ -277,12 +290,14 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk15on</artifactId>
                 <version>${bouncycastle.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk15on</artifactId>
                 <version>${bouncycastle.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- spring stuff -->
@@ -332,6 +347,11 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context-support</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-expression</artifactId>
                 <version>${org.springframework.version}</version>
             </dependency>
             <dependency>
@@ -399,27 +419,6 @@
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-core</artifactId>
                 <version>${org.springframework.security.version}</version>
-            </dependency>
-
-
-
-            <!-- JAX-WS (webservices)-->
-            <dependency>
-                <groupId>com.sun.xml.ws</groupId>
-                <artifactId>jaxws-rt</artifactId>
-                <version>${com.sun.xml.ws.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.xml.ws</groupId>
-                <artifactId>jaxws-tools</artifactId>
-                <version>${com.sun.xml.ws.version}</version>
-            </dependency>
-
-
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-client</artifactId>
-                <version>${com.sun.jersey.version}</version>
             </dependency>
 
             <!-- ORM  -->
@@ -584,6 +583,12 @@
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
                 <version>${org.quartz-scheduler.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>c3p0</artifactId>
+                        <groupId>c3p0</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- CACHING -->
             <dependency>
@@ -648,6 +653,40 @@
                 <groupId>org.apache.solr</groupId>
                 <version>${solr.version}</version>
             </dependency>
+
+            <!--Akka-->
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-actor_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-slf4j_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-camel_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-cluster_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-remote_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-cluster-tools_2.11</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 
@@ -755,17 +794,15 @@
                     <artifactId>copy-maven-plugin</artifactId>
                     <version>0.2.5</version>
                 </plugin>
-
-
-
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <version>0.0.26</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
     <repositories>
-        <repository>
-            <id>org.topbraid</id>
-            <url>http://www.topquadrant.com/repository/spin/</url>
-        </repository>
         <!-- jboss repo used for javax.jms -->
         <repository>
             <id>repository.jboss.org-public</id>
@@ -774,6 +811,13 @@
         </repository>
     </repositories>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>artifactory</id>
+            <url>http://satsrv03.researchstudio.at:8080/artifactory/repo/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
     <properties>
         <solr.upload.dest>${project.build.directory}</solr.upload.dest>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -781,8 +825,8 @@
             -Xlint:deprecation,fallthrough,finally,path,serial,unchecked
         </maven.compile.compilerargs>
         <compile.forked>false</compile.forked>
-        <java.source.version>1.7</java.source.version>
-        <java.target.version>1.7</java.target.version>
+        <java.source.version>1.8</java.source.version>
+        <java.target.version>1.8</java.target.version>
         <surefire.skip>false</surefire.skip>
         <surefire.failure.ignore>true</surefire.failure.ignore>
         <surefire.forkmode>once</surefire.forkmode>
@@ -791,12 +835,12 @@
         <dependencies.scope>compile</dependencies.scope>
         <!-- versions for various dependencies -->
         <aspectj.version>1.5.4</aspectj.version>
-        <bouncycastle.version>1.50</bouncycastle.version>
+        <bouncycastle.version>1.52</bouncycastle.version>
         <commons-collections.version>3.2.1</commons-collections.version>
         <commons-fileupload.version>1.2.2</commons-fileupload.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
         <commons-io.version>2.4</commons-io.version>
-        <de.uni_koblenz.aggrimm.icp.version>1.0</de.uni_koblenz.aggrimm.icp.version>
+        <de.uni_koblenz.aggrimm.icp.version>1.0.1</de.uni_koblenz.aggrimm.icp.version>
         <solr.version>3.5.0</solr.version>
         <camel.version>2.12.1</camel.version>
         <qpid.version>0.24</qpid.version>
@@ -810,25 +854,20 @@
         <ch.qos.logback.version>1.0.13</ch.qos.logback.version>
         <com.fasterxml.classmate.version>1.0.0</com.fasterxml.classmate.version>
         <com.github.jsonld-java.version>0.5.0</com.github.jsonld-java.version>
-        <com.mchange.c3p0.version>0.9.5-pre8</com.mchange.c3p0.version>
-        <com.sun.jersey.version>1.17.1</com.sun.jersey.version>
-        <com.sun.jersey.contribs-jersey-spring.version>1.17.1</com.sun.jersey.contribs-jersey-spring.version>
-        <com.sun.xml.version>2.0EA3</com.sun.xml.version>
-        <com.sun.xml.ws.version>2.2.8-promoted-b146</com.sun.xml.ws.version>
         <junit.version>4.11</junit.version>
         <org.apache.commons.email.version>1.3.1</org.apache.commons.email.version>
         <net.sf.ehcache.version>2.6.8</net.sf.ehcache.version>
-        <org.apache.jena.version>2.12.0</org.apache.jena.version>
-        <org.apache.jena-tdb.version>1.0.0</org.apache.jena-tdb.version>
-        <org.hibernate.version>4.3.6.Final</org.hibernate.version>
+        <org.apache.jena.version>2.12.1</org.apache.jena.version>
+        <org.apache.jena-tdb.version>1.1.1</org.apache.jena-tdb.version>
+        <org.hibernate.version>4.3.4.Final</org.hibernate.version>
         <org.hibernate.hibernate-validator.version>5.1.3.Final</org.hibernate.hibernate-validator.version>
         <org.javasimon.version>3.4.0</org.javasimon.version>
         <org.jboss.jandex.version>1.1.0.Final</org.jboss.jandex.version>
         <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
         <org.springframework.boot.version>1.0.2.RELEASE</org.springframework.boot.version>
         <org.springframework.data.commons-core.version>1.4.1.RELEASE</org.springframework.data.commons-core.version>
-        <org.springframework.data.commons.version>1.9.0.RELEASE</org.springframework.data.commons.version>
-        <org.springframework.data.jpa.version>1.7.0.RELEASE</org.springframework.data.jpa.version>
+        <org.springframework.data.commons.version>1.9.2.RELEASE</org.springframework.data.commons.version>
+        <org.springframework.data.jpa.version>1.7.2.RELEASE</org.springframework.data.jpa.version>
         <org.springframework.version>4.1.1.RELEASE</org.springframework.version>
         <org.springframework.security.version>3.1.3.RELEASE</org.springframework.security.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
@@ -836,11 +875,13 @@
         <postgresql.version>9.1-901.jdbc4</postgresql.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
         <javax.validation.version>1.1.0.Final</javax.validation.version>
+        <mojoexec.version>1.3.2</mojoexec.version>
         <cargo.version>1.4.2</cargo.version>
         <jrebel.version>1.1.3</jrebel.version>
         <wagon.version>1.0-beta-3</wagon.version>
         <assembly.version>2.2</assembly.version>
         <net.sf.supercsv.version>2.1.0</net.sf.supercsv.version>
+        <akka.version>2.4.0</akka.version>
     </properties>
 
     <profiles>
@@ -877,7 +918,12 @@
                         <executions>
                             <execution>
                                 <id>copy-module-dependencies</id>
-                                <phase>verify</phase>
+                                <!--
+                                    technically, 'validate' is not the correct phase, but when put here, copying the
+                                    dependencies can be executed isolated from all other tasks an thus runs faster.
+                                    For only copying the dependencies run 'mvn validate -Pcopy-module-dependencies'
+                                 -->
+                                <phase>validate</phase>
                                 <goals>
                                     <goal>copy-dependencies</goal>
                                 </goals>
@@ -920,7 +966,13 @@
                             <execution>
                                 <!-- don't use this same id in module pom.xmls, say won-owner-webapp -->
                                 <id>copy-project-dependencies</id>
-                                <phase>verify</phase>
+                                <!--
+                                    technically, 'validate' is not the correct phase, but when put here, copying the
+                                    dependencies can be executed isolated from all other tasks an thus runs faster.
+                                    For only copying the dependencies run 'mvn validate -Pcopy-project-dependencies'
+                                 -->
+                                <phase>validate</phase>
+
                                 <goals>
                                     <goal>copy-dependencies</goal>
                                 </goals>
@@ -934,6 +986,7 @@
                                     -->
                                     <excludeGroupIds>webofneeds,org.sindice.siren, org.apache.lucene</excludeGroupIds>
                                     <excludeArtifactIds>servlet-api</excludeArtifactIds>
+                                    <excludeTypes>war</excludeTypes>
                                 </configuration>
                             </execution>
                         </executions>

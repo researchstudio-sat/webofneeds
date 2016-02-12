@@ -20,18 +20,17 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.PathParser;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 import won.protocol.model.ProtocolType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WON;
 
-import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
@@ -66,7 +65,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
     }
 
     @Autowired
-    private LinkedDataSource linkedDataSource;
+    protected LinkedDataSource linkedDataSource;
 
     @Override
     public final String getProtocolQueueNameWithResource(URI resourceUri){
@@ -94,10 +93,9 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             //now, even if it's null, we return the result.
             logger.debug("returning queue name {}",activeMQOwnerProtocolQueueName);
             return activeMQOwnerProtocolQueueName;
-        } catch (UniformInterfaceException e){
+        } catch (HttpClientErrorException e){
             logger.warn("Could not obtain data for URI:{}", resourceUri);
-            ClientResponse response = e.getResponse();
-            if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND){
                 return null;
             }
             else throw e;
@@ -137,10 +135,8 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             resourceDataset,
             wonNodeUri,
             path);
-        } catch (UniformInterfaceException e){
-            ClientResponse response = e.getResponse();
-            if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
-                logger.warn("BrokerURI not found for node URI:{}", resourceUri);
+        } catch (HttpClientErrorException e){
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND){
                 return null;
             }
             else throw e;
@@ -159,11 +155,10 @@ public class ActiveMQServiceImpl implements ActiveMQService {
           resourceURI,
           path
         ));
-      }catch (UniformInterfaceException e){
-        ClientResponse response = e.getResponse();
-        if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()){
-          return null;
-        }
+      }catch (HttpClientErrorException e){
+          if (e.getStatusCode() == HttpStatus.NOT_FOUND){
+              return null;
+          }
         else throw e;
       }
 

@@ -25,8 +25,8 @@ public class MessageEventPlaceholder
     this.receiverURI = wonMessage.getReceiverURI();
     this.receiverNeedURI = wonMessage.getReceiverNeedURI();
     this.receiverNodeURI = wonMessage.getReceiverNodeURI();
-
     this.creationDate = new Date();
+    this.correspondingRemoteMessageURI = wonMessage.getCorrespondingRemoteMessageURI();
   }
 
   @Id
@@ -56,9 +56,12 @@ public class MessageEventPlaceholder
   private URI receiverNeedURI;
   @Column(name = "receiverNodeURI")
   private URI receiverNodeURI;
-
   @Column(name = "creationDate")
   private Date creationDate;
+  @Column(name = "correspondingRemoteMessageURI")
+  private URI correspondingRemoteMessageURI;
+  @Column(name = "responseMessageURI")
+  private URI responseMessageURI;
 
 
   @XmlTransient
@@ -148,6 +151,22 @@ public class MessageEventPlaceholder
 
   public void setCreationDate(final Date creationDate) {
     this.creationDate = creationDate;
+  }
+
+  public URI getCorrespondingRemoteMessageURI() {
+    return correspondingRemoteMessageURI;
+  }
+
+  public void setCorrespondingRemoteMessageURI(final URI correspondingRemoteMessageURI) {
+    this.correspondingRemoteMessageURI = correspondingRemoteMessageURI;
+  }
+
+  public URI getResponseMessageURI() {
+    return responseMessageURI;
+  }
+
+  public void setResponseMessageURI(final URI responseMessageURI) {
+    this.responseMessageURI = responseMessageURI;
   }
 
   @Override

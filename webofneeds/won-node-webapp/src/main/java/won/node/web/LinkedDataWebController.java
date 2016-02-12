@@ -18,6 +18,7 @@ package won.node.web;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,23 +35,34 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.HandlerMapping;
+import won.cryptography.service.RegistrationServer;
 import won.node.service.impl.URIService;
+import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.exception.WonProtocolException;
+import won.protocol.model.NeedState;
 import won.protocol.service.LinkedDataService;
-import won.protocol.util.HTTP;
+import won.protocol.service.NeedInformationService;
 import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.CNT;
+import won.protocol.vocabulary.HTTP;
+import won.protocol.vocabulary.WONMSG;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * TODO: check the working draft here and see to conformance:
  * http://www.w3.org/TR/ldp/
+ * TODO: edit according to the latest version of the spec
  * Not met yet:
  *
  * 4.1.13 LDPR server responses must contain accurate response ETag header values.
@@ -107,12 +120,17 @@ public class
   @Autowired
   private LinkedDataService linkedDataService;
 
+  @Autowired
+  private RegistrationServer registrationServer;
+
   //date format for Expires header (rfc 1123)
   private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyy HH:mm:ss z";
 
 
   @Autowired
   private URIService uriService;
+
+
 
   @RequestMapping(value="/", method = RequestMethod.GET)
   public String showIndexPage(){
@@ -154,12 +172,30 @@ public class
   }
 
   //webmvc controller method
+  @RequestMapping("${uri.path.page.connection}/{identifier}/events")
+  public String showConnectionEventsPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
+
+    try {
+      URI connectionURI = uriService.createConnectionURIForId(identifier);
+      String eventsURI = connectionURI.toString() + "/events";
+      Dataset rdfDataset = linkedDataService.listConnectionEventURIs(connectionURI);
+      model.addAttribute("rdfDataset", rdfDataset);
+      model.addAttribute("resourceURI", eventsURI);
+      model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(eventsURI)).toString());
+      return "rdfDatasetView";
+    } catch (NoSuchConnectionException e) {
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return "notFoundView";
+    }
+  }
+
+  //webmvc controller method
   @RequestMapping("${uri.path.page.event}/{identifier}")
   public String showEventPage(@PathVariable(value = "identifier") String identifier,
                               Model model,
                               HttpServletResponse response) {
     URI eventURI = uriService.createEventURIForId(identifier);
-    Dataset rdfDataset = linkedDataService.getEventDataset(eventURI);
+    Dataset rdfDataset = linkedDataService.getDatasetForUri(eventURI);
     if (model != null) {
       model.addAttribute("rdfDataset", rdfDataset);
       model.addAttribute("resourceURI", eventURI.toString());
@@ -171,18 +207,54 @@ public class
     }
   }
 
+    //webmvc controller method
+    @RequestMapping("${uri.path.page.attachment}/{identifier}")
+    public String showAttachmentPage(@PathVariable(value = "identifier") String identifier,
+                                Model model,
+                                HttpServletResponse response) {
+        URI attachmentURI = uriService.createAttachmentURIForId(identifier);
+        Dataset rdfDataset = linkedDataService.getDatasetForUri(attachmentURI);
+        if (model != null) {
+            model.addAttribute("rdfDataset", rdfDataset);
+            model.addAttribute("resourceURI", attachmentURI.toString());
+            model.addAttribute("dataURI", uriService.toDataURIIfPossible(attachmentURI).toString());
+            return "rdfDatasetView";
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "notFoundView";
+        }
+    }
+
   //webmvc controller method
   @RequestMapping("${uri.path.page.need}")
   public String showNeedURIListPage(
-      @RequestParam(defaultValue="-1") int page,
+      @RequestParam(value="p", required=false) Integer page,
       HttpServletRequest request,
       Model model,
-      HttpServletResponse response) {
-      Dataset rdfDataset = linkedDataService.listNeedURIs(page);
-      model.addAttribute("rdfDataset", rdfDataset);
-      model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
-      model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
-      return "rdfDatasetView";
+      HttpServletResponse response)  throws IOException {
+
+    Dataset rdfDataset = null;
+
+    // TODO keep consistent with linked data paged resource behavior when no page is specified
+      if (page == null) {
+        //String redirectToURI = getRequestUriWithAddedQuery(request, "p=1");
+        //response.sendRedirect(redirectToURI);
+        //return null;
+        // temporarily leave the behavior of returning all the need uris - for compatibility with matcher crawler
+        rdfDataset = linkedDataService.listNeedURIs();
+      } else {
+        // TODO probably at least the Link to the next/previous page should be added to the headers, as in the case of RDF
+        // returned resource
+
+        rdfDataset = linkedDataService.listNeedURIs(page).getContent();
+
+      }
+
+    model.addAttribute("rdfDataset", rdfDataset);
+    model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
+    model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
+    return "rdfDatasetView";
+
   }
 
     @RequestMapping("${uri.path.page}")
@@ -202,7 +274,7 @@ public class
     //webmvc controller method
   @RequestMapping("${uri.path.page.connection}")
   public String showConnectionURIListPage(
-      @RequestParam(defaultValue="-1") int page,
+      @RequestParam(value="p",defaultValue = "-1") int page,
       HttpServletRequest request,
       Model model,
       HttpServletResponse response) {
@@ -217,14 +289,14 @@ public class
   @RequestMapping("${uri.path.page.need}/{identifier}/connections/")
   public String showConnectionURIListPage(
       @PathVariable String identifier,
-      @RequestParam(defaultValue="-1") int page,
+      @RequestParam(value="p",defaultValue = "-1") int page,
       @RequestParam(value="deep",defaultValue = "false") boolean deep,
       HttpServletRequest request,
       Model webmvcModel,
       HttpServletResponse response) {
     URI needURI = uriService.createNeedURIForId(identifier);
     try{
-      Dataset dataset = linkedDataService.listConnectionURIs(page,needURI);
+      Dataset dataset = linkedDataService.listConnectionURIs(page, needURI);
         if (deep){
             addDeepConnectionData(needURI.toString(), dataset);
         }
@@ -236,7 +308,8 @@ public class
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return "notFoundView";
     } catch (NoSuchConnectionException e) {
-        logger.warn("did not find connection that should be connected to need. connection:{}",e.getUnknownConnectionURI());
+        logger.warn("did not find connection that should be connected to need. connection:{}",
+                    e.getUnknownConnectionURI());
         return "notFoundView"; //TODO: should display an error view
     }
   }
@@ -266,25 +339,56 @@ public class
       method = RequestMethod.GET,
       produces={"application/ld+json",
                 "application/trig",
-                "application/n-quads"})
-  public ResponseEntity<Dataset> redirectToData(
-      HttpServletRequest request) {
+                "application/n-quads",
+                "*/*"})
+  public ResponseEntity<String> redirectToData(
+      HttpServletRequest request, HttpServletResponse response) throws IOException {
     URI resourceUriPrefix = URI.create(this.resourceURIPrefix);
     URI dataUri = URI.create(this.dataURIPrefix);
-    String requestUri = request.getRequestURI();
+    String requestUri = getRequestUriWithQueryString(request);
     String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), dataUri.getPath());
     logger.debug("resource URI requested with data mime type. redirecting from {} to {}", requestUri, redirectToURI);
     if (redirectToURI.equals(requestUri)) {
         logger.debug("redirecting to same URI avoided, sending status 500 instead");
-        return new ResponseEntity<Dataset>(HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
     HttpHeaders headers = new HttpHeaders();
     headers = addExpiresHeadersBasedOnRequestURI(headers, requestUri);
-    headers.setLocation(URI.create(redirectToURI));
+    //headers.setLocation(URI.create(redirectToURI));
     addCORSHeader(headers);
-      return new ResponseEntity<Dataset>(null, headers, HttpStatus.SEE_OTHER);
+      setResponseHeaders(response, headers);
+      response.sendRedirect(redirectToURI);
+    return null;
+  }
+
+  public void setResponseHeaders(final HttpServletResponse response, final HttpHeaders headers) {
+    for(Map.Entry<String, List<String>> entry : headers.entrySet()){
+      for (String value : entry.getValue()) {
+        response.setHeader(entry.getKey(), value);
+      }
+    }
+  }
+
+  private String getRequestUriWithQueryString(final HttpServletRequest request) {
+    String requestUri = request.getRequestURI();
+    String queryString = request.getQueryString();
+    if (queryString != null){
+      requestUri += "?" + queryString;
+    }
+    return requestUri;
+  }
+
+  private String getRequestUriWithAddedQuery(final HttpServletRequest request, String query) {
+    String requestUri = request.getRequestURI();
+    String queryString = request.getQueryString();
+    if (queryString == null || queryString.length() <= 2) {
+      requestUri += "?" + query;
+    } else {
+      requestUri += "?" + queryString + "&" + query;
+    }
+    return requestUri;
   }
 
 
@@ -300,24 +404,25 @@ public class
       method = RequestMethod.GET,
       produces="text/html")
   public ResponseEntity<String> redirectToPage(
-      HttpServletRequest request) {
+      HttpServletRequest request, HttpServletResponse response)  throws IOException {
     URI resourceUriPrefix = URI.create(this.resourceURIPrefix);
     URI pageUriPrefix = URI.create(this.pageURIPrefix);
-    String requestUri = request.getRequestURI();
-
+    String requestUri = getRequestUriWithQueryString(request);
     String redirectToURI = requestUri.replaceFirst(resourceUriPrefix.getPath(), pageUriPrefix.getPath());
     logger.debug("resource URI requested with page mime type. redirecting from {} to {}", requestUri, redirectToURI);
     if (redirectToURI.equals(requestUri)) {
         logger.debug("redirecting to same URI avoided, sending status 500 instead");
-        return new ResponseEntity<String>("Could not redirect to linked data page", HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<String>("\"Could not redirect to linked data page\"", HttpStatus.INTERNAL_SERVER_ERROR);
     }
     //TODO: actually the expiry information should be the same as that of the resource that is redirected to
     HttpHeaders headers = new HttpHeaders();
     headers = addExpiresHeadersBasedOnRequestURI(headers, requestUri);
     addCORSHeader(headers);
     //add a location header
-    headers.add("Location",redirectToURI);
-    return new ResponseEntity<String>("", headers, HttpStatus.SEE_OTHER);
+    //headers.add("Location",redirectToURI);
+    setResponseHeaders(response, headers);
+    response.sendRedirect(redirectToURI);
+    return null;
   }
 
   /**
@@ -343,20 +448,93 @@ public class
   }
 
   @RequestMapping(
-      value="${uri.path.data.need}",
-      method = RequestMethod.GET,
+    value="${uri.path.data.need}",
+    method = RequestMethod.GET,
     produces={"application/ld+json",
               "application/trig",
               "application/n-quads"})
-  public ResponseEntity<Dataset> listNeedURIs(
-      HttpServletRequest request,
-      @RequestParam(value="page",defaultValue = "-1") int page) {
-    logger.debug("listNeedURIs() called");
-    Dataset model = linkedDataService.listNeedURIs(page);
-    HttpHeaders headers = addAlreadyExpiredHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), URI.create(this.needResourceURIPrefix)));
+  public ResponseEntity<Dataset> listNeedURIs(HttpServletRequest request, HttpServletResponse response,
+    @RequestParam(value="p", required=false) Integer page,
+    @RequestParam(value="resumebefore", required=false) String beforeId,
+    @RequestParam(value="resumeafter", required=false) String afterId,
+    @RequestParam(value="state", required=false) String state) throws IOException {
+    logger.debug("listNeedURIs() for page " + page + " called");
+
+    Dataset rdfDataset = null;
+    HttpHeaders headers = new HttpHeaders();
+    Integer preferedSize = getPreferredSize(request);
+
+    if (page == null && beforeId == null && afterId == null) {
+
+      //by default we redirect to the first page which displays the latest needs:
+      //String redirectToURI = getRequestUriWithAddedQuery(request, "p=1");
+      //response.sendRedirect(redirectToURI);
+      //return null;
+
+      //temporarily leave the behavior of returning all the need uris - for compatibility with matcher crawler:
+      rdfDataset = linkedDataService.listNeedURIs();
+
+    } else if (page != null) {
+
+      NeedInformationService.PagedResource<Dataset> resource = linkedDataService.listNeedURIs(page, preferedSize,
+                                                                                              NeedState.parseString(
+                                                                                                state));
+      rdfDataset = resource.getContent();
+      addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), page, resource.hasNext());
+
+    } else if (beforeId != null) {
+
+      URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + beforeId);
+      NeedInformationService.PagedResource<Dataset> resource = linkedDataService.listNeedURIsBefore(referenceNeed,
+                                                                                                    preferedSize,
+                                                                                                    NeedState.parseString(
+                                                                                                      state));
+      rdfDataset = resource.getContent();
+      //TODO a header Link for the next/prev:
+      // <...?resumeafter=oldest-in-page-need-id> rel=next
+      // <...?resumebefore=youngest-in-page-need-id> rel=prev
+      //addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), page, resource.hasNext());
+    } else {
+
+      URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + afterId);
+      NeedInformationService.PagedResource<Dataset> resource = linkedDataService.listNeedURIsAfter(referenceNeed,
+                                                                                                   preferedSize, NeedState.parseString(
+        state));
+      rdfDataset = resource.getContent();
+      //TODO a header Link for the next/prev:
+      // <...?resumeafter=oldest-in-page-need-id> rel=next
+      // <...?resumebefore=youngest-in-page-need-id> rel=prev
+      //addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), page, resource.hasNext());
+    }
+
+    headers = addAlreadyExpiredHeaders(
+      addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
+                                   URI.create(this.needResourceURIPrefix)));
     addCORSHeader(headers);
-    return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
+
+    return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
+
   }
+
+  private Integer getPreferredSize(final HttpServletRequest request) {
+
+    Integer preferedSize = null;
+    Enumeration<String> preferValue = request.getHeaders("Prefer");
+    if (preferValue != null) {
+      //TODO share prefer pattern between methods, check the supported syntax according to HTTP protocol, and take
+      // into account that client preference can also include max-triple-count and max-kbyte-count:
+      Pattern pattern = Pattern.compile("(return=representation; max-member-count=)(\"?)([0-9]+)(\"?)");
+      while (preferValue.hasMoreElements() && preferedSize == null) {
+        String value = preferValue.nextElement();
+        Matcher matcher = pattern.matcher(value);
+        if (matcher.find()) {
+          preferedSize = Integer.valueOf(matcher.group(3));
+        }
+      }
+    }
+    return preferedSize;
+  }
+
 
   @RequestMapping(
       value="${uri.path.data.connection}",
@@ -366,10 +544,12 @@ public class
               "application/n-quads"})
   public ResponseEntity<Dataset> listConnectionURIs(
       HttpServletRequest request,
-      @RequestParam(value="page", defaultValue="-1") int page) {
+      @RequestParam(value="p", defaultValue="-1") int page) {
     logger.debug("listNeedURIs() called");
     Dataset model = linkedDataService.listConnectionURIs(page);
-    HttpHeaders headers = addAlreadyExpiredHeaders(addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()), URI.create(this.connectionResourceURIPrefix)));
+    HttpHeaders headers = addAlreadyExpiredHeaders(
+      addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()),
+                                   URI.create(this.connectionResourceURIPrefix)));
     addCORSHeader(headers);
     return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
   }
@@ -406,7 +586,7 @@ public class
                 "application/trig",
                 "application/n-quads"})
     public ResponseEntity<Dataset> readNode(
-            HttpServletRequest request) {
+      HttpServletRequest request) {
         logger.debug("readNode() called");
         URI nodeUri = URI.create(this.nodeResourceURIPrefix);
         Dataset model = linkedDataService.getNodeDataset();
@@ -423,7 +603,7 @@ public class
               "application/trig",
               "application/n-quads"})
   public ResponseEntity<Dataset> readConnection(
-      HttpServletRequest request,
+    HttpServletRequest request,
       @PathVariable(value="identifier") String identifier) {
     logger.debug("readConnection() called");
     URI connectionUri = URI.create(this.connectionResourceURIPrefix + "/" + identifier);
@@ -439,6 +619,32 @@ public class
     }
   }
 
+
+  @RequestMapping(
+    value="${uri.path.data.connection}/{identifier}/events",
+    method = RequestMethod.GET,
+    produces={"application/ld+json",
+              "application/trig",
+              "application/n-quads"})
+  public ResponseEntity<Dataset> readConnectionEvents(
+    HttpServletRequest request,
+    @PathVariable(value="identifier") String identifier) {
+    logger.debug("readConnection() called");
+    URI connectionUri = URI.create(this.connectionResourceURIPrefix + "/" + identifier);
+    try {
+      Dataset dataset = linkedDataService.listConnectionEventURIs(connectionUri);
+      //TODO: events list information does change over time, unless the connection is closed and cannot be reopened.
+      // The events list of immutable connection information should never expire, the mutable should
+      HttpHeaders headers =new HttpHeaders();
+      addCORSHeader(headers);
+      return new ResponseEntity<Dataset>(dataset, headers, HttpStatus.OK);
+
+    } catch (NoSuchConnectionException e) {
+      return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+    }
+  }
+
+
   @RequestMapping(
     value="${uri.path.data.event}/{identifier}",
     method = RequestMethod.GET,
@@ -451,7 +657,7 @@ public class
     logger.debug("readConnectionEvent() called");
 
     URI eventURI = uriService.createEventURIForId(identifier);
-    Dataset rdfDataset = linkedDataService.getEventDataset(eventURI);
+    Dataset rdfDataset = linkedDataService.getDatasetForUri(eventURI);
     if (rdfDataset != null) {
       HttpHeaders headers = new HttpHeaders();
       addCORSHeader(headers);
@@ -459,7 +665,58 @@ public class
     } else {
       return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
     }
+
   }
+
+    @RequestMapping(
+            value="${uri.path.data.attachment}/{identifier}",
+            method = RequestMethod.GET,
+            produces={"application/ld+json",
+                    "application/trig",
+                    "application/n-quads",
+                    "*/*"})
+    public ResponseEntity<Dataset> readAttachment(
+            HttpServletRequest request,
+            @PathVariable(value = "identifier") String identifier) {
+        logger.debug("readAttachment() called");
+
+        URI attachmentURI = uriService.createAttachmentURIForId(identifier);
+        Dataset rdfDataset = linkedDataService.getDatasetForUri(attachmentURI);
+        if (rdfDataset != null) {
+            HttpHeaders headers = new HttpHeaders();
+            addCORSHeader(headers);
+          String mimeTypeOfResponse = RdfUtils.findFirst(rdfDataset, new RdfUtils.ModelVisitor<String>() {
+            @Override
+            public String visit(com.hp.hpl.jena.rdf.model.Model model) {
+              String content = getObjectOfPropertyAsString(model, CNT.BYTES);
+              if (content == null) return null;
+              String contentType = getObjectOfPropertyAsString(model, WONMSG.CONTENT_TYPE);
+              return contentType;
+            }
+          });
+          if (mimeTypeOfResponse != null){
+            //we found a base64 encoded attachment, we obtained its contentType, so we set it as the
+            //contentType of the response.
+            Set<MediaType> producibleMediaTypes = new HashSet<>();
+            producibleMediaTypes.add(MediaType.valueOf(mimeTypeOfResponse));
+            request.setAttribute(HandlerMapping.PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE, producibleMediaTypes);
+          }
+          return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+  private String getObjectOfPropertyAsString(com.hp.hpl.jena.rdf.model.Model model, Property property){
+    NodeIterator nodeIteratr = model.listObjectsOfProperty(property);
+    if (!nodeIteratr.hasNext()) return null;
+    String ret = nodeIteratr.next().asLiteral().getString();
+    if (nodeIteratr.hasNext()) {
+      throw new IncorrectPropertyCountException("found more than one property of cnt:bytes", 1, 2);
+    }
+    return ret;
+  }
+    
 
     /**
      * Get the RDF for the connections of the specified need.
@@ -478,7 +735,7 @@ public class
   public ResponseEntity<Dataset> readConnectionsOfNeed(
       HttpServletRequest request,
       @PathVariable(value="identifier") String identifier,
-      @RequestParam(value="page",defaultValue = "-1") int page,
+      @RequestParam(value="p",defaultValue = "-1") int page,
       @RequestParam(value="deep",defaultValue = "false") boolean deep) {
     logger.debug("readConnectionsOfNeed() called");
     URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
@@ -525,6 +782,36 @@ public class
     return headers;
   }
 
+
+  /**
+   * Adds headers describing the paged resource according to https://www.w3.org/TR/ldp-paging/
+   * (here implemented version is http://www.w3.org/TR/2015/NOTE-ldp-paging-20150630/)
+   * that inform the client about the following properties of the pages resource:
+   *
+   * Link: <uri>; rel="canonical"; etag="tag" - which resource it is a page of, and current tag of the resource
+   * Link: <http://www.w3.org/ns/ldp#Page>; rel="type" - that this is one in-sequence page resource
+   * Link: <http://www.w3.org/ns/ldp#Resource>; rel="type" - that this is a LDP Resource (should be Container in our case?)
+   * Link: <uri?p=x>; rel="next" - that the next in-sequence page resource exists and is retrievable at the given uri
+   *
+   * @param headers headers to which paged resource headers should be added
+   * @param canonicalURI uri of the LDP Resource
+   * @param page page of the Paged LDP Resource
+   * @param hasNext whether more pages exist
+   * @return the headers map with added header values
+   */
+  private void addPagedResourceInSequenceHeader(final HttpHeaders headers, final URI canonicalURI, final int page,
+                                                final boolean hasNext) {
+
+    headers.add("Link", "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
+    //Link: <http://example.org/customer-relations?p=2>; rel="next"
+    if (hasNext) {
+      int nextPage = page + 1;
+      headers.add("Link", "<" + canonicalURI.toString() + "?p=" + nextPage + ">; rel=\"next\"");
+    }
+    headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
+
+  }
+
   /**
    * Sets the Date and Expires header fields such that the response will be treated as 'never expires'
    * (and will therefore be cached forever)
@@ -558,7 +845,7 @@ public class
   private Date getNeverExpiresDate(){
     Calendar cal = Calendar.getInstance();
     cal.setTime(new Date());
-    cal.set(Calendar.YEAR,cal.get(Calendar.YEAR)+1);
+    cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 1);
     return cal.getTime();
   }
 
@@ -577,6 +864,10 @@ public class
   public void setLinkedDataService(final LinkedDataService linkedDataService)
   {
     this.linkedDataService = linkedDataService;
+  }
+
+  public void setRegistrationServer(final RegistrationServer registrationServer) {
+    this.registrationServer = registrationServer;
   }
 
   public void setUriService(final URIService uriService)
@@ -619,5 +910,41 @@ public class
 
   public void setConnectionResourceURIPath(final String connectionResourceURIPath) {
     this.connectionResourceURIPath = connectionResourceURIPath;
+  }
+
+  @RequestMapping(
+    value="${uri.path.resource}",
+    method = RequestMethod.POST,
+    produces={"text/plain"})
+  public ResponseEntity<String> register(@RequestParam("register") String registeredType, HttpServletRequest
+    request) {
+
+    logger.debug("REGISTERING " + registeredType);
+    String supportedTypesMsg = "Request parameter error; supported 'register' parameter values: 'owner', 'node'";
+
+    if (registeredType == null) {
+      logger.warn(supportedTypesMsg);
+      return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
+    }
+
+    Object certificateChainObj = request.getAttribute("javax.servlet.request.X509Certificate");
+
+    try {
+      if (registeredType.equals("owner")) {
+        String result = registrationServer.registerOwner(certificateChainObj);
+        return new ResponseEntity<String>(result, HttpStatus.OK);
+      }
+      if (registeredType.equals("node")) {
+        String result = registrationServer.registerNode(certificateChainObj);
+        return new ResponseEntity<String>(result, HttpStatus.OK);
+      } else {
+        logger.warn(supportedTypesMsg);
+        return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
+      }
+    } catch (WonProtocolException e) {
+      logger.warn("Could not register " + registeredType, e);
+      return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
   }
 }

@@ -9,7 +9,6 @@ import won.node.facet.businessactivity.coordinatorcompletion.BACCState;
 import won.node.facet.businessactivity.statemanager.BAStateManager;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.WonProtocolException;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
@@ -54,7 +53,8 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractBAFacet {
           {
             stateManager.setStateForNeedUri(BACCState.ACTIVE.getURI(), URI.create(WON_TX.PHASE_FIRST.getURI().toString()), con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI());
             storeBAStateForConnection(con, BACCState.ACTIVE.getURI());
-            ownerFacingConnectionClient.open(con.getConnectionURI(), content, wonMessage);
+            //TODO: use new system
+            // ownerFacingConnectionClient.open(con.getConnectionURI(), content, wonMessage);
 
             logger.debug("*** opened from Participant = coordinator:"+con.getNeedURI()+ " participant:"+con.getRemoteNeedURI()+
               " con:" +  con.getConnectionURI()+ " baState:"+stateManager.getStateForNeedUri(con.getNeedURI(), con.getRemoteNeedURI(), getFacetType().getURI()).toString()+
@@ -70,7 +70,8 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractBAFacet {
             //TODO: add an explanation (error message) to the model, detailing that it's too late to
             // participate in the transaction now
             //close the initiated connection
-            needFacingConnectionClient.close(con, myContent, wonMessage);   //abort sent to participant
+            //TODO: use new system
+            // needFacingConnectionClient.close(con, myContent, wonMessage);   //abort sent to participant
           }
         } catch (Exception e) {
           logger.warn("could not handle participant connect2", e);
@@ -156,7 +157,8 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractBAFacet {
                   // eventType -> URI Resource
                   r = myContent.createResource(eventType.getURI().toString());
                   baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                  needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
+                  //TODO: use new system
+                  // needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
 
                   //trigger the second phase in the corresponding states
                   propagateSecondPhase(con);
@@ -198,7 +200,8 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractBAFacet {
                 // eventType -> URI Resource
                 r = myContent.createResource(eventType.getURI().toString());
                 baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
+                //TODO: use new system
+                // needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
               }
             }
             else
@@ -210,8 +213,6 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractBAFacet {
           {
             logger.debug("The event type denoted by "+messageForSending+" is not allowed.");
           }
-        } catch (WonProtocolException e) {
-          logger.warn("caught WonProtocolException:", e);
         } catch (Exception e) {
           logger.debug("caught Exception", e);
         }
@@ -314,7 +315,8 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractBAFacet {
 
                 Resource r = myContent.createResource(BACCEventType.MESSAGE_CANCEL.getURI().toString());
                 baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                needFacingConnectionClient.sendMessage(tmpCon, myContent, wonMessage);
+                //TODO: use new system
+                // needFacingConnectionClient.sendMessage(tmpCon, myContent, wonMessage);
                 baseResource.removeAll(WON_TX.COORDINATION_MESSAGE) ;
               }
               //process COMPLETED state
@@ -341,12 +343,14 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractBAFacet {
 
                 Resource r = myContent.createResource(BACCEventType.MESSAGE_COMPENSATE.getURI().toString());
                 baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-                needFacingConnectionClient.sendMessage(tmpCon, myContent, wonMessage);
+                //TODO: use new system
+                // needFacingConnectionClient.sendMessage(tmpCon, myContent, wonMessage);
                 baseResource.removeAll(WON_TX.COORDINATION_MESSAGE) ;
               }
             }
             //now, after sending messages to all partners, tell the owner
-            ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, wonMessage);
+            //TODO: use new system
+            // ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, wonMessage);
           }
           else
           {
@@ -362,7 +366,8 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractBAFacet {
             logger.debug("Coordinator state phase: {}", BACCState.parsePhase(stateManager.getStateForNeedUri(con.getNeedURI(),
               con.getRemoteNeedURI(), getFacetType().getURI()).toString()));
 
-            ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, wonMessage);
+            //TODO: use new system
+            // ownerFacingConnectionClient.sendMessage(con.getConnectionURI(), message, wonMessage);
           }
 
           BACCEventType resendEventType = state.getResendEvent();
@@ -393,7 +398,8 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractBAFacet {
               // eventType -> URI Resource
               Resource r = myContent.createResource(resendEventType.getURI().toString());
               baseResource.addProperty(WON_TX.COORDINATION_MESSAGE, r);
-              needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
+              //TODO: use new system
+              // needFacingConnectionClient.sendMessage(con, myContent, wonMessage);
             }
             else
             {
@@ -401,8 +407,6 @@ public class BAAtomicCCCoordinatorFacetImpl extends AbstractBAFacet {
                 "Participant.");
             }
           }
-        } catch (WonProtocolException e) {
-          logger.warn("caught WonProtocolException:", e);
         } catch (Exception e) {
           logger.debug("caught Exception",e);
         }
