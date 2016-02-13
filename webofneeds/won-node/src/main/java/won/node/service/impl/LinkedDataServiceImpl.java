@@ -27,10 +27,12 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Slice;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.CryptographyService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
@@ -101,29 +103,6 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private String activeMqMatcherProtocolTopicNameNeedActivated;
   private String activeMqMatcherProtocolTopicNameNeedDeactivated;
 
-  @Deprecated
-  public Dataset listNeedURIsOld(final int pageNum)
-  {
-    Model model = ModelFactory.createDefaultModel();
-    setNsPrefixes(model);
-    Resource needListPageResource = null;
-    Collection<URI> uris = null;
-    if (pageNum >= 0) {
-      NeedInformationService.Page page = needInformationService.listNeedURIs(pageNum);
-      needListPageResource = createPage(model, this.needResourceURIPrefix+"/", pageNum, page);
-      uris = page.getContent();
-    } else {
-      uris = needInformationService.listNeedURIs();
-      needListPageResource = model.createResource(this.needResourceURIPrefix+"/");
-    }
-
-    for (URI needURI : uris) {
-      model.add(model.createStatement(needListPageResource, RDFS.member, model.createResource(needURI.toString())));
-    }
-    Dataset ret = newDatasetWithNamedModel(createDataGraphUri(needListPageResource), model);
-    addBaseUriAndDefaultPrefixes(ret);
-    return ret;
-  }
 
   public Dataset listNeedURIs()
   {
@@ -143,23 +122,33 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
 
-  public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int pageNum)
+  public NeedInformationService.PagedResource<Dataset,URI> listNeedURIs(final int pageNum)
   {
     return listNeedURIs(pageNum, null, null);
   }
 
-  public NeedInformationService.PagedResource<Dataset> listNeedURIsBefore(final URI need)
+  public NeedInformationService.PagedResource<Dataset,URI> listNeedURIsBefore(final URI need)
   {
     return listNeedURIsBefore(need, null, null);
   }
 
-  public NeedInformationService.PagedResource<Dataset> listNeedURIsAfter(final URI need)
+  public NeedInformationService.PagedResource<Dataset,URI> listNeedURIsAfter(final URI need)
   {
     return listNeedURIsAfter(need, null, null);
   }
 
-  private NeedInformationService.PagedResource<Dataset> toContainerPage(String containerUri, Collection<URI>
-    uris) {
+  private NeedInformationService.PagedResource<Dataset,URI> toContainerPage(String containerUri, Slice<URI>
+    slice) {
+
+    List<URI> uris = slice.getContent();
+    URI resumeBefore = null;
+    URI resumeAfter = null;
+    if (!slice.isFirst()) {
+      resumeBefore = uris.get(0);
+    }
+    if (!slice.isLast()) {
+      resumeAfter = uris.get(uris.size() - 1);
+    }
 
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
@@ -172,32 +161,32 @@ public class LinkedDataServiceImpl implements LinkedDataService
     }
     Dataset dataset = newDatasetWithNamedModel(createDataGraphUri(needListPageResource), model);
     addBaseUriAndDefaultPrefixes(dataset);
-    //TODO prev/next link info
-    NeedInformationService.PagedResource<Dataset> containerPage = new NeedInformationService.PagedResource(dataset,
-                                                                                                           true);
+    NeedInformationService.PagedResource<Dataset,URI> containerPage = new NeedInformationService.PagedResource
+      (dataset, resumeBefore, resumeAfter);
     return containerPage;
   }
 
-  public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int pageNum, final Integer preferedSize,
+  public NeedInformationService.PagedResource<Dataset,URI> listNeedURIs(final int pageNum, final Integer preferedSize,
                                                                     NeedState needState) {
 
     int infoServicePageNum = pageNum - 1;
-    NeedInformationService.Page page = needInformationService.listNeedURIs(infoServicePageNum, preferedSize, needState);
-    return toContainerPage(this.needResourceURIPrefix + "/", page.getContent());
+    Slice<URI> slice = needInformationService.listNeedURIs(infoServicePageNum, preferedSize, needState);
+    return toContainerPage(this.needResourceURIPrefix + "/", slice);
 
   }
-  public NeedInformationService.PagedResource<Dataset> listNeedURIsBefore(final URI need, final Integer preferedSize,
-                                                                          NeedState needState) {
+  public NeedInformationService.PagedResource<Dataset,URI> listNeedURIsBefore(
+    final URI need, final Integer preferedSize, NeedState needState) {
 
-    NeedInformationService.Page<URI> page = needInformationService.listNeedURIsBefore(need, preferedSize, needState);
-    return toContainerPage(this.needResourceURIPrefix + "/", page.getContent());
+    Slice<URI> slice = needInformationService.listNeedURIsBefore(need, preferedSize, needState);
+    return toContainerPage(this.needResourceURIPrefix + "/", slice);
 
   }
-  public NeedInformationService.PagedResource<Dataset> listNeedURIsAfter(final URI need, final Integer preferedSize,
-                                                                         NeedState needState) {
 
-    NeedInformationService.Page<URI> page = needInformationService.listNeedURIsAfter(need, preferedSize, needState);
-    return toContainerPage(this.needResourceURIPrefix + "/", page.getContent());
+  public NeedInformationService.PagedResource<Dataset, URI> listNeedURIsAfter(
+    final URI need, final Integer preferedSize, NeedState needState) {
+
+    Slice<URI> slice = needInformationService.listNeedURIsAfter(need, preferedSize, needState);
+    return toContainerPage(this.needResourceURIPrefix + "/", slice);
 
   }
 
@@ -356,6 +345,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUri(connectionResource), model));
   }
 
+  @Override
   public Dataset listConnectionEventURIs(final URI connectionUri) throws
     NoSuchConnectionException
   {
@@ -364,7 +354,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
     setNsPrefixes(model);
 
     Connection connection = needInformationService.readConnection(connectionUri);
-    Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events", WON.EVENT_CONTAINER);
+    Resource eventContainer = model.createResource(connection.getConnectionURI().toString() + "/events",
+                                                   WON.EVENT_CONTAINER);
     // add the events with the new format (only the URI, no content)
     List<MessageEventPlaceholder> connectionEvents = messageEventRepository.findByParentURI(connectionUri);
     for (MessageEventPlaceholder event : connectionEvents) {
@@ -375,6 +366,49 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUri(eventContainer), model));
   }
 
+  @Override
+  public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIs(final URI connectionUri, final int pageNum) throws
+    NoSuchConnectionException
+  {
+    int infoServicePageNum = pageNum - 1;
+    Slice<URI> slice = needInformationService.listConnectionEventURIs(connectionUri, infoServicePageNum);
+    return toContainerPage(connectionUri.toString() + "/events", slice);
+  }
+
+  @Override
+  public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIs(final URI connectionUri, final int
+    pageNum, Integer preferedSize, WonMessageType msgType) throws
+    NoSuchConnectionException
+  {
+    int infoServicePageNum = pageNum - 1;
+    Slice<URI> slice = needInformationService.listConnectionEventURIs(connectionUri, infoServicePageNum,
+                                                                      preferedSize, msgType);
+    return toContainerPage(connectionUri.toString() + "/events", slice);
+  }
+
+  @Override
+  public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIsAfter(
+    final URI connectionUri, final URI msgURI, Integer preferedSize, WonMessageType msgType) throws
+    NoSuchConnectionException
+  {
+    Slice<URI> slice = needInformationService.listConnectionEventURIsAfter(
+      connectionUri, msgURI, preferedSize, msgType);
+    return toContainerPage(connectionUri.toString() + "/events", slice);
+  }
+
+  @Override
+  public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIsBefore(
+    final URI connectionUri, final URI msgURI, Integer preferedSize, WonMessageType msgType) throws
+    NoSuchConnectionException
+  {
+
+    Slice<URI> slice = needInformationService.listConnectionEventURIsBefore(
+      connectionUri, msgURI, preferedSize, msgType);
+    return toContainerPage(connectionUri.toString() + "/events", slice);
+
+  }
+
+  @Override
   public Dataset getDatasetForUri(URI datasetUri) {
     Dataset result = rdfStorage.loadDataset(datasetUri);
     if (result == null) return null;

@@ -19,6 +19,7 @@ package won.protocol.service;
 import com.hp.hpl.jena.query.Dataset;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.message.WonMessageType;
 import won.protocol.model.NeedState;
 
 import java.net.URI;
@@ -29,22 +30,69 @@ import java.net.URI;
  */
 public interface LinkedDataService
 {
+
+  /**
+   * Returns a model containing all need URIs.
+   * @return
+   */
+  public Dataset listNeedURIs();
+
   /**
    * Returns a model containing all need URIs.
    * If page >= 0, paging is used and the respective page is returned.
    * @param page
    * @return
    */
-  public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int page);
+  public NeedInformationService.PagedResource<Dataset,URI> listNeedURIs(final int page);
 
-  public NeedInformationService.PagedResource<Dataset> listNeedURIsBefore(final URI need);
-  public NeedInformationService.PagedResource<Dataset> listNeedURIsAfter(final URI need);
 
-  public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int page, final Integer preferedSize, NeedState needState);
-  public NeedInformationService.PagedResource<Dataset> listNeedURIsBefore(final URI need, final Integer preferedSize, NeedState needState);
-  public NeedInformationService.PagedResource<Dataset> listNeedURIsAfter(final URI need, final Integer preferedSize, NeedState needState);
+  /**
+   * Returns a model containing all need URIs that are in the specified state.
+   * If page >= 0, paging is used and the respective page is returned.
+   * @param page
+   * @param preferedSize preferred number of need uris per page (null means use default)
+   * @param needState
+   * @return
+   */
+  public NeedInformationService.PagedResource<Dataset,URI> listNeedURIs(
+    final int page, final Integer preferedSize, NeedState needState);
 
-  public Dataset listNeedURIs();
+  /**
+   * Return all need URIs that where created before the provided need
+   * @param need
+   * @return
+   */
+  public NeedInformationService.PagedResource<Dataset,URI> listNeedURIsBefore(final URI need);
+
+  /**
+   * Return all need URIs that where created after the provided need
+   * @param need
+   * @return
+   */
+  public NeedInformationService.PagedResource<Dataset,URI> listNeedURIsAfter(final URI need);
+
+
+
+  /**
+   * Return all need URIs that where created after the provided need and that are in the specified state
+   * @param need
+   * @param preferedSize preferred number of need uris per page (null means use default)
+   * @param needState
+   * @return
+   */
+  public NeedInformationService.PagedResource<Dataset,URI> listNeedURIsBefore(
+    final URI need, final Integer preferedSize, NeedState needState);
+
+  /**
+   * Return all need URIs that where created after the provided need and that are in the specified state
+   * @param need
+   * @param preferedSize preferred number of need uris per page (null means use default)
+   * @param needState
+   * @return
+   */
+  public NeedInformationService.PagedResource<Dataset,URI> listNeedURIsAfter(
+    final URI need, final Integer preferedSize, NeedState needState);
+
 
   /**
    * Returns a model containing all connection URIs.
@@ -77,6 +125,58 @@ public interface LinkedDataService
    * @throws NoSuchConnectionException
    */
   public Dataset listConnectionEventURIs(final URI connectionUri) throws NoSuchConnectionException;
+
+  /**
+   * Returns a dataset containing all event uris belonging to the specified connection.
+   * If page >= 0, paging is used and the respective page is returned.
+   * @param connectionUri
+   * @param pageNum
+   * @return
+   * @throws NoSuchConnectionException
+   */
+  public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIs(
+    final URI connectionUri, final int pageNum) throws NoSuchConnectionException;
+
+  /**
+   * Returns a dataset containing all event uris belonging to the specified connection and are of the specified type.
+   * If page >= 0, paging is used and the respective page is returned. Paging is used, the preferred page size can be
+   * specified.
+   * @param connectionUri
+   * @param pageNum
+   * @param preferedSize preferred number of uris per page, null means use default
+   * @param messageType message type, null means all types
+   * @return
+   * @throws NoSuchConnectionException
+   */
+  public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIs(
+    final URI connectionUri, final int pageNum, Integer preferedSize, WonMessageType messageType) throws
+    NoSuchConnectionException;
+
+  /**
+   * Returns a dataset containing all event uris belonging to the specified connection that were created after the
+   * specified event uri. Paging is used, the preferred page size can be specified
+   * @param connectionUri
+   * @param preferedSize preferred number of uris per page, null means use default
+   * @param msgType message type, null means all types
+   * @return
+   * @throws NoSuchConnectionException
+   */
+  public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIsAfter(
+    final URI connectionUri, final URI msgURI, Integer preferedSize, WonMessageType msgType) throws
+    NoSuchConnectionException;
+
+  /**
+   * Returns a dataset containing all event uris belonging to the specified connection that were created before the
+   * specified event uri. Paging is used, the preferred page size can be specified
+   * @param connectionUri
+   * @param preferedSize preferred number of uris per page, null means use default
+   * @param msgType message type, null means all types
+   * @return
+   * @throws NoSuchConnectionException
+   */
+  public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIsBefore(
+    final URI connectionUri, final URI msgURI, Integer preferedSize, WonMessageType msgType) throws
+    NoSuchConnectionException;
 
   public Dataset getNodeDataset();
 

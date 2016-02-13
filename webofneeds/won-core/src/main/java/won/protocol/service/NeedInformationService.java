@@ -17,14 +17,17 @@
 package won.protocol.service;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import org.springframework.data.domain.Slice;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Service for obtaining information about needs and connections in the system in RDF.
@@ -44,7 +47,7 @@ public interface NeedInformationService {
      * @param page the page number
      * @return a collection of all need URIs.
      */
-    public Page<URI> listNeedURIs(int page);
+    public Slice<URI> listNeedURIs(int page);
 
   /**
    * Retrieves a page of the list of needs on the needserver that have a given state
@@ -55,7 +58,7 @@ public interface NeedInformationService {
    * @param needState Active/Inactive, null => all states
    * @return a collection of all need URIs.
    */
-    public Page<URI> listNeedURIs(int page, Integer preferredSize, NeedState needState);
+    public Slice<URI> listNeedURIs(int page, Integer preferredSize, NeedState needState);
 
 
   /**
@@ -63,7 +66,7 @@ public interface NeedInformationService {
    * @param need
    * @return
    */
-    public Page<URI> listNeedURIsBefore(URI need);
+    public Slice<URI> listNeedURIsBefore(URI need);
 
   /**
    * Retrieves list of needs on the needserver that where created earlier than the given need
@@ -74,14 +77,14 @@ public interface NeedInformationService {
    * @param needState Active/Inactive, null => all states
    * @return a collection of all need URIs.
    */
-    public Page<URI> listNeedURIsBefore(URI need, Integer preferredSize, NeedState needState);
+    public Slice<URI> listNeedURIsBefore(URI need, Integer preferredSize, NeedState needState);
 
   /**
    * Retrieves list of needs on the needserver that where created later than the given need.
    * @param need
    * @return
    */
-    public Page<URI> listNeedURIsAfter(URI need);
+    public Slice<URI> listNeedURIsAfter(URI need);
 
   /**
    * Retrieves list of needs on the needserver that where created later than the given need
@@ -92,7 +95,7 @@ public interface NeedInformationService {
    * @param needState Active/Inactive, null => all states
    * @return a collection of all need URIs.
    */
-    public Page<URI> listNeedURIsAfter(URI need, Integer preferredSize, NeedState needState);
+    public Slice<URI> listNeedURIsAfter(URI need, Integer preferredSize, NeedState needState);
 
     /**
      * Retrieves all connection URIs (regardless of state) for the specified local need URI.
@@ -162,22 +165,103 @@ public interface NeedInformationService {
     /**
      * Retrieves the public description of the connection as an RDF graph.
      *
-     *
-     *
-     *
      * @param connectionURI
      * @return
      * @throws NoSuchNeedException
      */
     public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
 
+  /**
+   * Retrieves list of event uris of the specified connection.
+   *
+   * @param connectionUri
+   * @return a collection of all event URIs.
+   */
+    public List<URI> listConnectionEventURIs(URI connectionUri);
+
+  /**
+   * Retrieves list of event uris of the specified connection that are on the given page.
+   *
+   * @param connectionUri
+   * @param pageNum
+   * @return a collection of all event URIs.
+   */
+    public Slice<URI> listConnectionEventURIs(URI connectionUri, int pageNum);
+
+  /**
+   * Retrieves list of event uris of the specified connection that have a given message type and that are on the
+   * given page, taking into account number of uris per page preference.
+   *
+   * @param connectionUri
+   * @param page
+   * @param preferredPageSize preferred number of members per page, null => use default
+   * @param messageType null => all types
+   * @return a collection of all event URIs.
+   */
+    public Slice<URI> listConnectionEventURIs(
+      URI connectionUri, int page, Integer preferredPageSize, WonMessageType messageType);
+
+  /**
+   * Retrieves list of event uris of the specified connection that where created earlier than the given
+   * event (specified by event message uri).
+   *
+   * @param connectionUri
+   * @param msgURI
+   * @return a collection of all event URIs.
+   */
+    public Slice<URI> listConnectionEventURIsBefore(URI connectionUri, URI msgURI);
+
+  /**
+   * Retrieves list of event uris of the specified connection that where created earlier than the given
+   * event (specified by event message uri) and  that have a given message type, with number of uris per page
+   * preference.
+   *
+   * @param connectionUri
+   * @param msgURI
+   * @param preferredPageSize preferred number of members per page, null => use default
+   * @param msgType null => all types
+   * @return a collection of all event URIs.
+   */
+    public Slice<URI> listConnectionEventURIsBefore(
+      URI connectionUri, URI msgURI, Integer preferredPageSize, WonMessageType msgType);
+
+
+  /**
+   * Retrieves list of event uris of the specified connection that where created later than the given
+   * event (specified by event message uri).
+   *
+   * @param connectionUri
+   * @param msgURI
+   * @return a collection of all event URIs.
+   */
+    public Slice<URI> listConnectionEventURIsAfter(URI connectionUri, URI msgURI);
+
+  /**
+   * Retrieves list of event uris of the specified connection that where created later than the given
+   * event (specified by event message uri) and  that have a given message type, with number of uris per page
+   * preference.
+   *
+   * @param connectionUri
+   * @param msgURI
+   * @param preferredPageSize preferred number of members per page, null => use default
+   * @param msgType null => all types
+   * @return a collection of all event URIs.
+   */
+    public Slice<URI> listConnectionEventURIsAfter(
+    URI connectionUri, URI msgURI, Integer preferredPageSize, WonMessageType msgType);
+
+
+  @Deprecated
   public static class Page<T>{
     private Collection<T> content;
     private boolean hasNext;
+    private T resumeBefore = null;
+    private T resumeAfter = null;
 
-    public Page(final Collection<T> content, final boolean hasNext) {
+    public Page(final Collection<T> content, final T resumeBefore, final T resumeAfter) {
       this.content = content;
-      this.hasNext = hasNext;
+      this.resumeBefore = resumeBefore;
+      this.resumeAfter = resumeAfter;
     }
 
     public Collection<T> getContent() {
@@ -185,17 +269,36 @@ public interface NeedInformationService {
     }
 
     public boolean hasNext() {
-      return hasNext;
+      return resumeAfter != null;
+    }
+
+    public T getResumeAfter() {
+      return this.resumeAfter;
+    }
+
+    public boolean hasPrevious() {
+      return resumeBefore != null;
+    }
+
+    public T getResumeBefore() {
+      return resumeBefore;
     }
   }
 
-  public static class PagedResource<T>{
-    private T content;
-    private boolean hasNext;
 
-    public PagedResource(final T content, final boolean hasNext) {
+  public static class PagedResource<T,E>{
+    private T content;
+    private E resumeBefore = null;
+    private E resumeAfter = null;
+
+    public PagedResource(final T content) {
       this.content = content;
-      this.hasNext = hasNext;
+    }
+
+    public PagedResource(final T content, final E resumeBefore, final E resumeAfter) {
+      this.content = content;
+      this.resumeBefore = resumeBefore;
+      this.resumeAfter = resumeAfter;
     }
 
     public T getContent() {
@@ -203,7 +306,20 @@ public interface NeedInformationService {
     }
 
     public boolean hasNext() {
-      return hasNext;
+      return resumeAfter != null;
+    }
+
+    public E getResumeAfter() {
+      return this.resumeAfter;
+    }
+
+    public boolean hasPrevious() {
+      return resumeBefore != null;
+    }
+
+    public E getResumeBefore() {
+      return resumeBefore;
     }
   }
+
 }

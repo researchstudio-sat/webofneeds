@@ -42,6 +42,7 @@ import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonProtocolException;
+import won.protocol.message.WonMessageType;
 import won.protocol.model.NeedState;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
@@ -476,40 +477,30 @@ public class
 
     } else if (page != null) {
 
-      NeedInformationService.PagedResource<Dataset> resource = linkedDataService.listNeedURIs(page, preferedSize,
-                                                                                              NeedState.parseString(
-                                                                                                state));
+      NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listNeedURIs(
+        page, preferedSize, NeedState.parseString(state));
       rdfDataset = resource.getContent();
       addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), page, resource.hasNext());
 
     } else if (beforeId != null) {
 
       URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + beforeId);
-      NeedInformationService.PagedResource<Dataset> resource = linkedDataService.listNeedURIsBefore(referenceNeed,
-                                                                                                    preferedSize,
-                                                                                                    NeedState.parseString(
-                                                                                                      state));
+      NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listNeedURIsBefore(
+        referenceNeed, preferedSize, NeedState.parseString(state));
       rdfDataset = resource.getContent();
-      //TODO a header Link for the next/prev:
-      // <...?resumeafter=oldest-in-page-need-id> rel=next
-      // <...?resumebefore=youngest-in-page-need-id> rel=prev
-      //addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), page, resource.hasNext());
+      addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource);
     } else {
 
       URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + afterId);
-      NeedInformationService.PagedResource<Dataset> resource = linkedDataService.listNeedURIsAfter(referenceNeed,
-                                                                                                   preferedSize, NeedState.parseString(
-        state));
+      NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listNeedURIsAfter(
+        referenceNeed, preferedSize, NeedState.parseString(state));
       rdfDataset = resource.getContent();
-      //TODO a header Link for the next/prev:
-      // <...?resumeafter=oldest-in-page-need-id> rel=next
-      // <...?resumebefore=youngest-in-page-need-id> rel=prev
-      //addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), page, resource.hasNext());
+      addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource);
     }
 
     headers = addAlreadyExpiredHeaders(
-      addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
-                                   URI.create(this.needResourceURIPrefix)));
+      addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()), URI.create(this
+                                                                                              .needResourceURIPrefix)));
     addCORSHeader(headers);
 
     return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
@@ -563,7 +554,7 @@ public class
               "application/n-quads"})
   public ResponseEntity<Dataset> readNeed(
       HttpServletRequest request,
-      @PathVariable(value="identifier") String identifier) {
+      @PathVariable(value = "identifier") String identifier) {
     logger.debug("readNeed() called");
     URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
     try {
@@ -628,19 +619,77 @@ public class
               "application/n-quads"})
   public ResponseEntity<Dataset> readConnectionEvents(
     HttpServletRequest request,
-    @PathVariable(value="identifier") String identifier) {
+    @PathVariable(value="identifier") String identifier,
+    @RequestParam(value="p", required=false) Integer page,
+    @RequestParam(value="resumebefore", required=false) String beforeId,
+    @RequestParam(value="resumeafter", required=false) String afterId,
+    @RequestParam(value="type", required=false) URI type) throws IOException {
+
     logger.debug("readConnection() called");
+    Dataset rdfDataset = null;
+    HttpHeaders headers = new HttpHeaders();
+    Integer preferedSize = getPreferredSize(request);
     URI connectionUri = URI.create(this.connectionResourceURIPrefix + "/" + identifier);
+    URI connectionEventsURI = URI.create(connectionUri.toString() + "/" + "events");
+    WonMessageType msgType = getMessageType(type);
     try {
-      Dataset dataset = linkedDataService.listConnectionEventURIs(connectionUri);
-      //TODO: events list information does change over time, unless the connection is closed and cannot be reopened.
-      // The events list of immutable connection information should never expire, the mutable should
-      HttpHeaders headers =new HttpHeaders();
-      addCORSHeader(headers);
-      return new ResponseEntity<Dataset>(dataset, headers, HttpStatus.OK);
+      if (page == null && beforeId == null && afterId == null) {
+        // paging not requested or not supported by the client
+
+        // return all events
+        rdfDataset = linkedDataService.listConnectionEventURIs(connectionUri);
+
+        //maybe we should instead redirect to the first page:
+        //String redirectToURI = getRequestUriWithAddedQuery(request, "p=1");
+        //response.sendRedirect(redirectToURI);
+        //return null;
+
+      } else if (page != null) {
+        // a page having particular page number is requested
+
+        NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionEventURIs
+          (connectionUri, page, preferedSize, msgType);
+        rdfDataset = resource.getContent();
+        addPagedResourceInSequenceHeader(headers, connectionEventsURI, page, resource.hasNext());
+
+      } else if (beforeId != null) {
+        // a page that precedes the item identified by the beforeId is requested
+
+        URI referenceEvent = uriService.createEventURIForId(beforeId);
+        NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionEventURIsBefore
+          (connectionUri, referenceEvent, preferedSize, msgType);
+        rdfDataset = resource.getContent();
+        addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource);
+
+      }  else {
+        // a page that follows the item identified by the afterId is requested
+
+        URI referenceEvent = uriService.createEventURIForId(afterId);
+        NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionEventURIsAfter
+          (connectionUri, referenceEvent, preferedSize, msgType);
+        rdfDataset = resource.getContent();
+        addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource);
+
+      }
 
     } catch (NoSuchConnectionException e) {
       return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+    }
+
+    //TODO: events list information does change over time, unless the connection is closed and cannot be reopened.
+    // The events list of immutable connection information should never expire, the mutable should
+    headers = addAlreadyExpiredHeaders(
+      addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()), connectionEventsURI));
+    addCORSHeader(headers);
+    return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
+
+  }
+
+  private WonMessageType getMessageType(final URI type) {
+    if (type != null) {
+      return WonMessageType.getWonMessageType(type);
+    } else {
+      return null;
     }
   }
 
@@ -678,7 +727,7 @@ public class
     public ResponseEntity<Dataset> readAttachment(
             HttpServletRequest request,
             @PathVariable(value = "identifier") String identifier) {
-        logger.debug("readAttachment() called");
+      logger.debug("readAttachment() called");
 
         URI attachmentURI = uriService.createAttachmentURIForId(identifier);
         Dataset rdfDataset = linkedDataService.getDatasetForUri(attachmentURI);
@@ -810,6 +859,27 @@ public class
     }
     headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
 
+  }
+
+  private void addPagedResourceInSequenceHeader(final HttpHeaders headers, final URI canonicalURI,
+                                                final NeedInformationService.PagedResource<Dataset,URI> resource) {
+
+    headers.add("Link", "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
+    if (resource.hasNext()) {
+      String id = extractResourceLocalId(resource.getResumeAfter());
+      headers.add("Link", "<" + canonicalURI.toString() + "?resumeafter=" + id + ">; rel=\"next\"");
+    }
+    if (resource.hasPrevious()) {
+      String id = extractResourceLocalId(resource.getResumeBefore());
+      headers.add("Link", "<" + canonicalURI.toString() + "?resumebefore=" + id + ">; rel=\"prev\"");
+    }
+    headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
+
+  }
+
+  private String extractResourceLocalId(final URI uri) {
+    int startIdAfter = uri.toString().replaceAll("/$", "").lastIndexOf("/");
+    return uri.toString().substring(startIdAfter + 1);
   }
 
   /**
