@@ -28,10 +28,9 @@ const rdfstore = window.rdfstore;
 (function(){
     if(!won) won = {};
 
-    function apiEndpointString(dataUri, requesterWebId) {
-        const API_ENDPOINT = '/owner/rest/linked-data/?uri=';
-        const AUTH_PARAMETER = '&requester='
-
+    const API_ENDPOINT = '/owner/rest/linked-data/?uri=';
+    const AUTH_PARAMETER = '&requester='
+    function queryString(dataUri, requesterWebId) {
         let requestUri = API_ENDPOINT + encodeURIComponent(dataUri);
         if (requesterWebId) {
             requestUri = requestUri + AUTH_PARAMETER+ encodeURIComponent(requesterWebId);
@@ -552,11 +551,40 @@ const rdfstore = window.rdfstore;
     }
 
     /**
-     * Deletes the node with specified uri from the local triplestore, then
-     * fetches the linked data for the specified uri and saves it
-     * in the local triplestore.
+     * Fetches the linked data for the specified URI and saves it in the local triple-store.
      * @param uri
-     * @return a promise to a boolean which indicates success
+     * @param requesterWebId
+     * @return {*}
+     */
+    won.ensureLoaded = function(uri, requesterWebId) {
+        if (!uri) { throw {message : "ensureLoaded: uri must not be null"}; }
+
+        console.log("linkeddata-service-won.js: ensuring loaded: " +uri);
+
+        //we also allow unresolvable resources, so as to avoid re-fetching them.
+        //we also allow resources that are currently being fetched.
+        if (cacheItemIsOkOrUnresolvableOrFetching(uri)){
+            var deferred = q.defer();
+            cacheItemMarkAccessed(uri);
+            deferred.resolve(uri);
+            return deferred.promise;
+        }
+        //uri isn't loaded or needs to be refrehed. fetch it.
+        cacheItemMarkFetching(uri);
+        return won.fetch(uri, requesterWebId)
+            .then(
+                () => cacheItemMarkAccessed(uri),
+                reason => cacheItemMarkUnresolvable(uri)
+            )
+
+    }
+
+    /**
+     * Fetches the rdf-node with the given uri from
+     * the standard API_ENDPOINT.
+     * @param uri
+     * @param requesterWebId
+     * @returns {*}
      */
     won.fetch = function(uri, requesterWebId) {
         var tempUri = uri+'?prev='+new Date().getTime();
@@ -566,19 +594,18 @@ const rdfstore = window.rdfstore;
         console.log("linkeddata-service-won.js: fetch announced: " + uri);
         const lock = getReadUpdateLockPerUri(uri);
         return lock.acquireUpdateLock().then(
-                () => loadFromOwnServer(uri, requesterWebId)
-            ).then(data => {
+                () => loadFromOwnServerIntoCache(uri, requesterWebId)
+            ).then(dataset => {
                 lock.releaseUpdateLock();
-                return data;
+                return dataset;
             });
     }
 
-    window.load4dbg = loadFromOwnServer;
-    function loadFromOwnServer(uri, requesterWebId) {
+    function loadFromOwnServerIntoCache(uri, requesterWebId) {
         return new Promise((resolve, reject) => {
             console.log("linkeddata-service-won.js: fetching:        " + uri);
 
-            let requestUri = apiEndpointString(uri, requesterWebId);
+            let requestUri = queryString(uri, requesterWebId);
             const find = '%3A';
             const re = new RegExp(find, 'g');
             requestUri = requestUri.replace(re, ':');
@@ -603,40 +630,6 @@ const rdfstore = window.rdfstore;
             );
         });
     };
-
-
-    /**
-     * Fetches the linked data for the specified URI and saves it in the local triplestore if necessary.
-     * Note: this method does not grant the caller any locks. This has to be done by the caller after calling this method.
-     * @param uri
-     * @return a promise to a boolean which indicates success
-     */
-    won.ensureLoaded = function(uri, requesterWebId) {
-        if (typeof uri === 'undefined' || uri == null  ){
-            throw {message : "ensureLoaded: uri must not be null"};
-        }
-        console.log("linkeddata-service-won.js: ensuring loaded: " +uri);
-        //we also allow unresolvable resources, so as to avoid re-fetching them.
-        //we also allow resources that are currently being fetched.
-        if (cacheItemIsOkOrUnresolvableOrFetching(uri)){
-            var deferred = q.defer();
-            cacheItemMarkAccessed(uri);
-            deferred.resolve(uri);
-            return deferred.promise;
-        }
-        //uri isn't loaded or needs to be refrehed. fetch it.
-        cacheItemMarkFetching(uri);
-        return won.fetch(uri, requesterWebId)
-            .then(
-                function(x){
-                    cacheItemMarkAccessed(uri);
-                },
-                function(reason){
-                    cacheItemMarkUnresolvable(uri);
-                }
-            )
-
-    }
 
     /**
      * Saves the specified jsonld structure in the triple store with the specified default graph URI.
