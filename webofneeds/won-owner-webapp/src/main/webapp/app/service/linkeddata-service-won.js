@@ -899,7 +899,7 @@ const rdfstore = window.rdfstore;
             });
     }
 
-    won.getLastEventOfConnection = function(connectionUri) {
+    won.getLastEventOfConnection = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastEventOfConnection: connectionUri must not be null"};
         }
@@ -907,7 +907,7 @@ const rdfstore = window.rdfstore;
             .then(function (connection) {
                 return won.getNeed(connection.hasRemoteNeed)
                     .then(function (need) {
-                        return won.getLastConnectionEvent(connectionUri)
+                        return won.getLastConnectionEvent(connectionUri, requesterWebId)
                             .then(
                                 function (event) {
                                     return {connection: connection, remoteNeed: need, event: event}
@@ -930,7 +930,7 @@ const rdfstore = window.rdfstore;
         }
         return won.getLastConnectioneventUri(connectionUri, requesterWebId)
             .then(function (eventUri) {
-                    return won.getConnectionEvent(eventUri);
+                    return won.getConnectionEvent(eventUri, requesterWebId);
             })
     }
 
@@ -1054,30 +1054,24 @@ const rdfstore = window.rdfstore;
                 message : `getEventsOfConnection: connectionUri must not be null. Got: "${connectionUri}"`
             };
         }
-        //won.getNodeWithAttributes(connectionUri, requesterWebId).then( )
-        return won.getAllConnectioneventUris(connectionUri, requesterWebId)
-            .then(eventUris => {
-                const queries = eventUris.map(eventUri => won.getConnectionEvent(eventUri, requesterWebId))
-                return Promise.all(queries).then(
-                        x => x, //if everything works, pass on the query results, i.e. the events
-                        e => `Could not get all events of connection ${connectionUri}. Reason: ${e}`
-                )
-
-            });
-                /*function (eventUris) {
-                try {
-                    var eventPromises = [];
-                    for (var evtKey in eventUris) {
-                        eventPromises.push(won.getConnectionEvent(eventUris[evtKey]));
-                    }
-                    return q.all(eventPromises)
-                } catch (e) {
-                    return q.reject("could not get all connection events for connection " + connectionUri + ". Reason: " + e);
-                }
-            });
-        */
+        return won.getNodeWithAttributes(connectionUri, requesterWebId)
+            .then(connection => won.getNodeWithAttributes(connection.hasEventContainer), requesterWebId)
+            .then(eventContainer => eventContainer.member)
+            .then(eventUris => eventUris.map(eventUri => won.getConnectionEvent(eventUri, requesterWebId)))
+            .then(queries => Promise.all(queries))
+            .then(
+                x => x, //if everything works, pass on the query results, i.e. the events
+                e => `Could not get all events of connection ${connectionUri}. Reason: ${e}`
+            );
     };
 
+    /**
+     * @deprecated this function probably doesn't work anymore. rather use getEventsOfConnection
+     *
+     * @param connectionUri
+     * @param requesterWebId
+     * @returns {*}
+     */
     won.getAllConnectioneventUris = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getAllConnectioneventUris: connectionUri must not be null"};
@@ -1337,8 +1331,10 @@ const rdfstore = window.rdfstore;
      * resulting structure by the localname of the predicate.
      * The URI is added as property 'uri'.
      *
-     * NOTE: multiple objects with the same predicates will overwrite each other (thus
-     * obfuscating possible bugs in the linked-data generation). It also ignores prefixes(!)
+     * If a predicate occurs multiple times the objects (in the rdf sense) will be
+     * grouped as an array. This is usually the case for rdfs:member, to give an example.
+     *
+     * NOTE: Atm it ignores prefixes which might lead to clashes.
      *
      * @param eventUri
      * @param requesterWebId
@@ -1363,7 +1359,17 @@ const rdfstore = window.rdfstore;
                         graph.triples.forEach(triple => {
                             //TODO this cropping ignores prefixes, causing predicates/fields to clash!
                             const propName = won.getLocalName(triple.predicate.nominalValue);
-                            node[propName] = triple.object.nominalValue;
+                            if(node[propName]) {
+                                //encountered multiple occurances of the same predicate, e.g. rdfs:member
+
+                                if(!(node[propName] instanceof Array)) {
+                                    //on the first 'clash', instantiate the predicate/property as array
+                                    node[propName] = [ node[propName] ];
+                                }
+                                node[propName].push(triple.object.nominalValue);
+                            } else {
+                                node[propName] = triple.object.nominalValue;
+                            }
                         });
                     });
                     node.uri = uri;
