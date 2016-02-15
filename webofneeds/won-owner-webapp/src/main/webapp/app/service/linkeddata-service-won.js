@@ -28,7 +28,7 @@ const rdfstore = window.rdfstore;
 (function(){
     if(!won) won = {};
 
-    function apiEndpoint(dataUri, requesterWebId) {
+    function apiEndpointString(dataUri, requesterWebId) {
         const API_ENDPOINT = '/owner/rest/linked-data/?uri=';
         const AUTH_PARAMETER = '&requester='
 
@@ -623,7 +623,7 @@ const rdfstore = window.rdfstore;
     }
 
     var fetchLinkedDataFromOwnServer = function(dataUri, requesterWebId) {
-        let requestUri = apiEndpoint(dataUri, requesterWebId);
+        let requestUri = apiEndpointString(dataUri, requesterWebId);
         const find = '%3A';
         const re = new RegExp(find, 'g');
         requestUri = requestUri.replace(re,':');
