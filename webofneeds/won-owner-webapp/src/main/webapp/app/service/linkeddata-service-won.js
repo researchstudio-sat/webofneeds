@@ -1059,10 +1059,7 @@ const rdfstore = window.rdfstore;
             .then(eventContainer => eventContainer.member)
             .then(eventUris => eventUris.map(eventUri => won.getConnectionEvent(eventUri, requesterWebId)))
             .then(queries => Promise.all(queries))
-            .then(
-                x => x, //if everything works, pass on the query results, i.e. the events
-                e => `Could not get all events of connection ${connectionUri}. Reason: ${e}`
-            );
+            .catch(e => `Could not get all events of connection ${connectionUri}. Reason: ${e}`);
     };
 
     /**
