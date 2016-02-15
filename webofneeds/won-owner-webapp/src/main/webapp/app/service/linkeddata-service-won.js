@@ -984,8 +984,7 @@ const rdfstore = window.rdfstore;
                     });
             });
     }
-
-    won.getLastEventOfConnection = function(connectionUri) {
+    won.getLastEventOfConnection = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastEventOfConnection: connectionUri must not be null"};
         }
@@ -993,7 +992,7 @@ const rdfstore = window.rdfstore;
             .then(function (connection) {
                 return won.getNeed(connection.hasRemoteNeed)
                     .then(function (need) {
-                        return won.getLastConnectionEvent(connectionUri)
+                        return won.getLastConnectionEvent(connectionUri, requesterWebId)
                             .then(
                                 function (event) {
                                     return {connection: connection, remoteNeed: need, event: event}
@@ -1010,11 +1009,11 @@ const rdfstore = window.rdfstore;
     }
 
 
-    won.getAllConnectionEvents = function(connectionUri) {
+    won.getAllConnectionEvents = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getAllConnectionEvents: connectionUri must not be null"};
         }
-        return won.getAllConnectioneventUris(connectionUri)
+        return won.getAllConnectioneventUris(connectionUri, requesterWebId)
             .then(function (eventUris) {
                 try {
                     var eventPromises = [];
@@ -1348,8 +1347,8 @@ const rdfstore = window.rdfstore;
                     });
     }
 
-    won.getLastEventTypeBeforeTime = function(connectionUri, beforeTimestamp) {
-        return won.crawlConnectionData(connectionUri).then(
+    won.getLastEventTypeBeforeTime = function(connectionUri, beforeTimestamp, requesterWebId) {
+        return won.crawlConnectionData(connectionUri, requesterWebId).then(
             function queryLastEventBeforeTime() {
                 var lock = getReadUpdateLockPerUri(connectionUri);
                 return lock.acquireReadLock().then(
