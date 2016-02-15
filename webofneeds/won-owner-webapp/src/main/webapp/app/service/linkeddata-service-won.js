@@ -574,34 +574,22 @@ const rdfstore = window.rdfstore;
         ).then(() => { lock.releaseUpdateLock()});
     }
 
-    var loadFromOwnServer = function(uri, requesterWebId) {
+    const loadFromOwnServer = function(uri, requesterWebId) {
         var deferred = q.defer();
-
-        console.log("updating:        " + uri);
         try {
-            /*
-             TODO: uncommenting the delete block is experimental. Using it is not
-             exactly safe, either, as we risk to delete triples that the subsequent
-             fetch will not restore.
-
-             console.log("deleting :       " + uri);
-             var query = "delete where {<" + uri + "> ?anyP ?anyO}";
-             var failed = {};
-             privateData.store.execute(query, function (success, graph) {
-             if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
-             failed.failed = true;
-             return;
-             }
-             console.log("deleted:         " + uri)
-             });
-             if (failed.failed) {
-             return deferred.promise;
-             }                   */
-            //the execute call above is not asynchronous, so we can safely continue outside the callback.
             console.log("fetching:        " + uri);
-            fetchLinkedDataFromOwnServer(uri, requesterWebId)
-                .then(dataset => dataset.json())
-                .then(function success(dataset) {
+
+            let requestUri = apiEndpointString(uri, requesterWebId);
+            const find = '%3A';
+            const re = new RegExp(find, 'g');
+            requestUri = requestUri.replace(re,':');
+
+            fetch(requestUri, {
+                method: 'get',
+                credentials: 'include'
+            })
+            .then(dataset => dataset.json())
+            .then(dataset => {
                     if (Object.keys(dataset).length === 0 ) {
                         deferred.reject("failed to load " + uri);
                     } else {
@@ -610,9 +598,7 @@ const rdfstore = window.rdfstore;
                         deferred.resolve(uri);
                     }
                 },
-                function failure(data) {
-                    deferred.reject("failed to load " + uri);
-                }
+                data =>  deferred.reject("failed to load " + uri)
             );
         } catch (e) {
             $rootScope.$apply(function () {
@@ -622,59 +608,6 @@ const rdfstore = window.rdfstore;
         return deferred.promise;
     }
 
-    var fetchLinkedDataFromOwnServer = function(dataUri, requesterWebId) {
-        let requestUri = apiEndpointString(dataUri, requesterWebId);
-        const find = '%3A';
-        const re = new RegExp(find, 'g');
-        requestUri = requestUri.replace(re,':');
-
-        return fetch(requestUri, {
-            method: 'get',
-            credentials: 'include'
-        });
-    };
-
-    var loadFromURI = function(uri) {
-        var deferred = q.defer();
-        console.log("updating:        " + uri);
-        try {
-            /*
-             TODO: uncommenting the delete block is experimental. Using it is not exactly safe, either, as we risk to delete triples that the subsequent fetch will not restore.
-
-             console.log("deleting :       " + uri);
-             var query = "delete where {<" + uri + "> ?anyP ?anyO}";
-             var failed = {};
-             privateData.store.execute(query, function (success, graph) {
-             if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
-             failed.failed = true;
-             return;
-             }
-             console.log("deleted:         " + uri)
-             });
-             if (failed.failed) {
-             return deferred.promise;
-             }                   */
-            //the execute call above is not asynchronous, so we can safely continue outside the callback.
-            console.log("fetching:        " + uri);
-            privateData.store.load('remote', uri, function (success, results) {
-                $rootScope.$apply(function () {
-                    if (success) {
-                        console.log("fetched:         " + uri)
-                        cacheItemInsertOrOverwrite(uri);
-                        deferred.resolve(uri);
-                    } else {
-                        deferred.reject("failed to load " + uri);
-                    }
-                });
-            });
-        } catch (e) {
-            $rootScope.$apply(function () {
-                deferred.reject("failed to load " + uri + ". Reason: " + e);
-            });
-        }
-        var promise = deferred.promise;
-        return promise;
-    }
 
     /**
      * Fetches the linked data for the specified URI and saves it in the local triplestore if necessary.
