@@ -30,6 +30,15 @@ const rdfstore = window.rdfstore;
 
     const API_ENDPOINT = '/owner/rest/linked-data/?uri=';
     const AUTH_PARAMETER = '&requester='
+
+    /**
+     * This function is used to generate the query-strings.
+     * Should anything about the way the API is accessed changed,
+     * adapt this function.
+     * @param dataUri
+     * @param requesterWebId the auth-token for the post (NOT the sessionId-cookie)
+     * @returns {string}
+     */
     function queryString(dataUri, requesterWebId) {
         let requestUri = API_ENDPOINT + encodeURIComponent(dataUri);
         if (requesterWebId) {
@@ -1323,29 +1332,6 @@ const rdfstore = window.rdfstore;
         );
     }
 
-
-
-    /**
-     * Fetches the triples where URI is subject and add objects of those triples to the
-     * resulting structure by the localname of the predicate.
-     * The URI is added as property 'uri'.
-     *
-     * NOTE: multiple objects with the same predicates will overwrite each other (thus
-     * obfuscating possible bugs in the linked-data generation).
-     *
-     * @param eventUri
-     */
-     won.getNodeWithAttributesClashfree = won.rdfNode = function(uri, requesterWebId) {
-         if (!uri) { throw {message : "rdfNode: uri must not be null"}; }
-         won.ensureLoaded(uri, requesterWebId).then(() => {
-             const lock = getReadUpdateLockPerUri(uri);
-             lock.acquireReadLock().then(() => {
-                 console.log('linkeddata-service-won.js: rdfNode: querying rdf for ', uri);
-
-             });
-         });
-
-     };
     /**
      * Fetches the triples where URI is subject and add objects of those triples to the
      * resulting structure by the localname of the predicate.
@@ -1355,43 +1341,42 @@ const rdfstore = window.rdfstore;
      * obfuscating possible bugs in the linked-data generation). It also ignores prefixes(!)
      *
      * @param eventUri
+     * @param requesterWebId
      */
     won.getNodeWithAttributes = function(uri, requesterWebId){
-        if (typeof uri === 'undefined' || uri == null  ){
+        if(!uri) {
             throw {message : "getNodeWithAttributes: uri must not be null"};
         }
-        return won.ensureLoaded(uri, requesterWebId).then(
-            function(){
-                var lock = getReadUpdateLockPerUri(uri);
-                return lock.acquireReadLock().then(
-                    function() {
-                        console.log("linkeddata-service-won.js: getNodeWithAttrs:" + uri);
-                        try {
-                            var node = {};
-                            privateData.store.node(uri, function (success, graph) {
-                                if (graph.length == 0) {
-                                    console.log("linkeddata-service-won.js: warn: could not load any attributes for node with uri: " + uri);
-                                }
-                                if (rejectIfFailed(success, graph,{message : "Error loading node with attributes for URI " + uri+".", allowNone : false, allowMultiple: true})){
-                                    return;
-                                }
-                                for (key in graph.triples) {
-                                    var propName = won.getLocalName(graph.triples[key].predicate.nominalValue);
-                                    node[propName] = graph.triples[key].object.nominalValue;
-                                }
-                            });
-                            node.uri = uri;
-                            return node;
-                        } catch (e) {
-                            return q.reject("could not get node " + uri + "with attributes: " + e);
-                        } finally {
-                            //we don't need to release after a promise resolves because
-                            //this function isn't deferred.
-                            lock.releaseReadLock();
+        return won.ensureLoaded(uri, requesterWebId).then(() => {
+            const lock = getReadUpdateLockPerUri(uri);
+            return lock.acquireReadLock().then(() => {
+                console.log("linkeddata-service-won.js: getNodeWithAttrs:" + uri);
+                try {
+                    let node = {};
+                    privateData.store.node(uri, function (success, graph) {
+                        if (graph.length == 0) {
+                            console.log("linkeddata-service-won.js: warn: could not load any attributes for node with uri: " + uri);
                         }
-                    }
-                )
+                        if (rejectIfFailed(success, graph,{message : "Error loading node with attributes for URI " + uri+".", allowNone : false, allowMultiple: true})){
+                            return;
+                        }
+                        graph.triples.forEach(triple => {
+                            //TODO this cropping ignores prefixes, causing predicates/fields to clash!
+                            const propName = won.getLocalName(triple.predicate.nominalValue);
+                            node[propName] = triple.object.nominalValue;
+                        });
+                    });
+                    node.uri = uri;
+                    return node;
+                } catch (e) {
+                    return q.reject("could not get node " + uri + "with attributes: " + e);
+                } finally {
+                    //we don't need to release after a promise resolves because
+                    //this function isn't deferred.
+                    lock.releaseReadLock();
+                }
             });
+        });
     }
 
     /**
