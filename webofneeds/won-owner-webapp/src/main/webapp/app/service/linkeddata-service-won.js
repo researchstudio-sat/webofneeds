@@ -564,10 +564,10 @@ const rdfstore = window.rdfstore;
         //we also allow unresolvable resources, so as to avoid re-fetching them.
         //we also allow resources that are currently being fetched.
         if (cacheItemIsOkOrUnresolvableOrFetching(uri)){
-            var deferred = q.defer();
-            cacheItemMarkAccessed(uri);
-            deferred.resolve(uri);
-            return deferred.promise;
+            return new Promise((resolve, reject) => {
+                cacheItemMarkAccessed(uri);
+                resolve(uri);
+            });
         }
         //uri isn't loaded or needs to be refrehed. fetch it.
         cacheItemMarkFetching(uri);
