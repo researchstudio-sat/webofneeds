@@ -566,40 +566,43 @@ const rdfstore = window.rdfstore;
         console.log("linkeddata-service-won.js: fetch announced: " + uri);
         const lock = getReadUpdateLockPerUri(uri);
         return lock.acquireUpdateLock().then(
-            // We can use loadFromURI() when we are able to supply our web-id with the call to linked data uri:
-            // return loadFromURI(uri);
-            // In the meanwhile, we use our owner-server as an intermediary that can access remote linked data
-            // on behalf of the need with its web-id, because it has the private key of that need identity:
-            () => loadFromOwnServer(uri, requesterWebId)
-        ).then(() => lock.releaseUpdateLock());
+                () => loadFromOwnServer(uri, requesterWebId)
+            ).then(data => {
+                lock.releaseUpdateLock();
+                return data;
+            });
     }
 
-    const loadFromOwnServer = (uri, requesterWebId) =>
-        new Promise((resolve, reject) => {
+    window.load4dbg = loadFromOwnServer;
+    function loadFromOwnServer(uri, requesterWebId) {
+        return new Promise((resolve, reject) => {
             console.log("linkeddata-service-won.js: fetching:        " + uri);
 
             let requestUri = apiEndpointString(uri, requesterWebId);
             const find = '%3A';
             const re = new RegExp(find, 'g');
-            requestUri = requestUri.replace(re,':');
+            requestUri = requestUri.replace(re, ':');
 
             fetch(requestUri, {
                 method: 'get',
                 credentials: 'include'
             })
             .then(dataset => dataset.json())
-            .then(dataset => {
-                    if (Object.keys(dataset).length === 0 ) {
+            .then(
+                dataset => {
+                    //make sure we've got a non-empty dataset
+                    if (Object.keys(dataset).length === 0) {
                         reject("failed to load " + uri);
                     } else {
                         console.log("linkeddata-service-won.js: fetched:         " + uri)
                         won.addJsonLdData(uri, dataset);
-                        resolve(uri);
+                        resolve(dataset);
                     }
-                },
+                  },
                 e =>  reject(`failed to load ${uri} due to reason ${e}`)
             );
         });
+    };
 
 
     /**
