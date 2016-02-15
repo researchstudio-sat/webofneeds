@@ -25,9 +25,19 @@ import * as q from 'q';
 import '../../scripts/rdfstore-js/rdf_store';
 const rdfstore = window.rdfstore;
 
-
-    (function(){
+(function(){
     if(!won) won = {};
+
+    function apiEndpoint(dataUri, requesterWebId) {
+        const API_ENDPOINT = '/owner/rest/linked-data/?uri=';
+        const AUTH_PARAMETER = '&requester='
+
+        let requestUri = API_ENDPOINT + encodeURIComponent(dataUri);
+        if (requesterWebId) {
+            requestUri = requestUri + AUTH_PARAMETER+ encodeURIComponent(requesterWebId);
+        }
+        return requestUri;
+    }
 
     var privateData = {};
 
@@ -45,7 +55,7 @@ const rdfstore = window.rdfstore;
         privateData.readUpdateLocksPerUri = {}; //uri -> ReadUpdateLock
         privateData.cacheStatus = {} //uri -> {timestamp, cacheItemState}
     }
-    var CACHE_ITEM_STATE = { OK: 1, DIRTY: 2, UNRESOLVABLE: 3, FETCHING: 4};
+    const CACHE_ITEM_STATE = { OK: 1, DIRTY: 2, UNRESOLVABLE: 3, FETCHING: 4};
 
     won.ld_reset();
 
@@ -613,35 +623,16 @@ const rdfstore = window.rdfstore;
     }
 
     var fetchLinkedDataFromOwnServer = function(dataUri, requesterWebId) {
-        var requestUri = '/owner/rest/linked-data/?uri=' + encodeURIComponent(dataUri);
-        //if (requesterWebId != null) {
-        //    requestUri = requestUri + "&requester=" + encodeURIComponent(requesterWebId);
-        //}#var requestUri = '/owner/rest/linked-data/
-       // var requestUrl = new URL('/owner/rest/linked-data/')
-        //var params = {uri:dataUri}
-        if (typeof requesterWebId != 'undefined' && requesterWebId != null) {
-            requestUri = requestUri + "&requester="+encodeURIComponent(requesterWebId);
-        }
-        var find = '%3A';
-        var re = new RegExp(find, 'g');
+        let requestUri = apiEndpoint(dataUri, requesterWebId);
+        const find = '%3A';
+        const re = new RegExp(find, 'g');
+        requestUri = requestUri.replace(re,':');
 
-
-        requestUri = requestUri.replace(re,':')
-        var promise = fetch(requestUri, {
+        return fetch(requestUri, {
             method: 'get',
             credentials: 'include'
-        })
-/*        promise.then(checkHttpStatus(response)).then(
-            function success(response){
-                return response.json();
-            },
-            function failure(response){
-                console.log("ERROR: could not fetched linked data " + dataUri + " for need " + requesterWebId)
-                return {};
-            }
-        )*/
-        return promise
-    }
+        });
+    };
 
     var loadFromURI = function(uri) {
         var deferred = q.defer();
