@@ -565,19 +565,18 @@ const rdfstore = window.rdfstore;
         }
         console.log("fetch announced: " + uri);
         const lock = getReadUpdateLockPerUri(uri);
-        return lock.acquireUpdateLock().then( () =>
+        return lock.acquireUpdateLock().then(
             // We can use loadFromURI() when we are able to supply our web-id with the call to linked data uri:
             // return loadFromURI(uri);
             // In the meanwhile, we use our owner-server as an intermediary that can access remote linked data
             // on behalf of the need with its web-id, because it has the private key of that need identity:
-            loadFromOwnServer(uri, requesterWebId)
-        ).then(() => { lock.releaseUpdateLock()});
+            () => loadFromOwnServer(uri, requesterWebId)
+        ).then(() => lock.releaseUpdateLock());
     }
 
-    const loadFromOwnServer = function(uri, requesterWebId) {
-        var deferred = q.defer();
-        try {
-            console.log("fetching:        " + uri);
+    const loadFromOwnServer = (uri, requesterWebId) =>
+        new Promise((resolve, reject) => {
+            console.log("linkeddata-service-won.js: fetching:        " + uri);
 
             let requestUri = apiEndpointString(uri, requesterWebId);
             const find = '%3A';
@@ -591,22 +590,16 @@ const rdfstore = window.rdfstore;
             .then(dataset => dataset.json())
             .then(dataset => {
                     if (Object.keys(dataset).length === 0 ) {
-                        deferred.reject("failed to load " + uri);
+                        reject("failed to load " + uri);
                     } else {
                         console.log("fetched:         " + uri)
                         won.addJsonLdData(uri, dataset);
-                        deferred.resolve(uri);
+                        resolve(uri);
                     }
                 },
-                data =>  deferred.reject("failed to load " + uri)
+                e =>  reject(`failed to load ${uri} due to reason ${e}`)
             );
-        } catch (e) {
-            $rootScope.$apply(function () {
-                deferred.reject("failed to load " + uri + ". Reason: " + e);
-            });
-        }
-        return deferred.promise;
-    }
+        });
 
 
     /**
