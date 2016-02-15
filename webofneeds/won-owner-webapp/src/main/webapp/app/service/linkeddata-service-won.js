@@ -554,23 +554,14 @@ const rdfstore = window.rdfstore;
             throw {message : "fetch: uri must not be null"};
         }
         console.log("fetch announced: " + uri);
-        var lock = getReadUpdateLockPerUri(uri);
-        return lock.acquireUpdateLock().then(
-                function() {
-                    // We can use loadFromURI() when we are able to supply our web-id with the call to linked data uri:
-                    // return loadFromURI(uri);
-                    // In the meanwhile, we use our owner-server as an intermediary that can access remote linked data
-                    // on behalf of the need with its web-id, because it has the private key of that need identity:
-                    return loadFromOwnServer(uri, requesterWebId);
-                }
-        ).then(() =>
-            {console.log("FINALLY")
-                lock.releaseUpdateLock()})
-
-        //make sure we only release the lock when our main promise resolves
-/*        ["finally"](function(){
-            lock.releaseUpdateLock();
-        });*/
+        const lock = getReadUpdateLockPerUri(uri);
+        return lock.acquireUpdateLock().then( () =>
+            // We can use loadFromURI() when we are able to supply our web-id with the call to linked data uri:
+            // return loadFromURI(uri);
+            // In the meanwhile, we use our owner-server as an intermediary that can access remote linked data
+            // on behalf of the need with its web-id, because it has the private key of that need identity:
+            loadFromOwnServer(uri, requesterWebId)
+        ).then(() => { lock.releaseUpdateLock()});
     }
 
     var loadFromOwnServer = function(uri, requesterWebId) {
@@ -579,7 +570,9 @@ const rdfstore = window.rdfstore;
         console.log("updating:        " + uri);
         try {
             /*
-             TODO: uncommenting the delete block is experimental. Using it is not exactly safe, either, as we risk to delete triples that the subsequent fetch will not restore.
+             TODO: uncommenting the delete block is experimental. Using it is not
+             exactly safe, either, as we risk to delete triples that the subsequent
+             fetch will not restore.
 
              console.log("deleting :       " + uri);
              var query = "delete where {<" + uri + "> ?anyP ?anyO}";
@@ -596,10 +589,9 @@ const rdfstore = window.rdfstore;
              }                   */
             //the execute call above is not asynchronous, so we can safely continue outside the callback.
             console.log("fetching:        " + uri);
-            fetchLinkedDataFromOwnServer(uri, requesterWebId).then(function(dataset){
-                return dataset.json()
-            }).then(
-                function success(dataset) {
+            fetchLinkedDataFromOwnServer(uri, requesterWebId)
+                .then(dataset => dataset.json())
+                .then(function success(dataset) {
                     if (Object.keys(dataset).length === 0 ) {
                         deferred.reject("failed to load " + uri);
                     } else {
@@ -1010,24 +1002,6 @@ const rdfstore = window.rdfstore;
     }
 
 
-    won.getAllConnectionEvents = function(connectionUri) {
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getAllConnectionEvents: connectionUri must not be null"};
-        }
-        return won.getAllConnectioneventUris(connectionUri)
-            .then(function (eventUris) {
-                try {
-                    var eventPromises = [];
-                    for (var evtKey in eventUris) {
-                        eventPromises.push(won.getConnectionEvent(eventUris[evtKey]));
-                    }
-                    return q.all(eventPromises)
-                } catch (e) {
-                    return q.reject("could not get all connection events for connection " + connectionUri + ". Reason: " + e);
-                }
-            });
-    }
-
     won.getLastConnectionEvent = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastConnectionEvent: connectionUri must not be null"};
@@ -1138,19 +1112,55 @@ const rdfstore = window.rdfstore;
         return won.getNodeWithAttributes(connectionUri);
     }
 
-    won.getConnectionEvent = function(eventUri) {
+    won.getConnectionEvent = function(eventUri, requesterWebId) {
         if (typeof eventUri === 'undefined' || eventUri == null  ){
             throw {message : "getConnectionEvent: eventUri must not be null"};
         }
-        return won.getNodeWithAttributes(eventUri);
+        return won.getNodeWithAttributes(eventUri, requesterWebId);
     }
 
 
+    /**
+     * Returns all events associated with a given connection.
+     * @param connectionUri
+     * @param requesterWebId
+     */
+    won.getEventsOfConnection =
+    won.getAllConnectionEvents = function(connectionUri, requesterWebId) {
+        if (!connectionUri ){
+            throw {
+                message : `getEventsOfConnection: connectionUri must not be null. Got: "${connectionUri}"`
+            };
+        }
+        //won.getNodeWithAttributes(connectionUri, requesterWebId).then( )
+        return won.getAllConnectioneventUris(connectionUri, requesterWebId)
+            .then(eventUris => {
+                const queries = eventUris.map(eventUri => won.getConnectionEvent(eventUri, requesterWebId))
+                return Promise.all(queries).then(
+                        x => x, //if everything works, pass on the query results, i.e. the events
+                        e => `Could not get all events of connection ${connectionUri}. Reason: ${e}`
+                )
+
+            });
+                /*function (eventUris) {
+                try {
+                    var eventPromises = [];
+                    for (var evtKey in eventUris) {
+                        eventPromises.push(won.getConnectionEvent(eventUris[evtKey]));
+                    }
+                    return q.all(eventPromises)
+                } catch (e) {
+                    return q.reject("could not get all connection events for connection " + connectionUri + ". Reason: " + e);
+                }
+            });
+        */
+    };
 
     won.getAllConnectioneventUris = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getAllConnectioneventUris: connectionUri must not be null"};
         }
+        //TODO ensure that the eventcontainer is loaded
         return won.ensureLoaded(connectionUri, requesterWebId).then(
             function(){
                var lock = getReadUpdateLockPerUri(connectionUri);
@@ -1407,8 +1417,29 @@ const rdfstore = window.rdfstore;
      * resulting structure by the localname of the predicate.
      * The URI is added as property 'uri'.
      *
-     * NOTE: multiple objects with the same predicates will overwrite each other. It also
-     * ignores prefixes.
+     * NOTE: multiple objects with the same predicates will overwrite each other (thus
+     * obfuscating possible bugs in the linked-data generation).
+     *
+     * @param eventUri
+     */
+     won.getNodeWithAttributesClashfree = won.rdfNode = function(uri, requesterWebId) {
+         if (!uri) { throw {message : "rdfNode: uri must not be null"}; }
+         won.ensureLoaded(uri, requesterWebId).then(() => {
+             const lock = getReadUpdateLockPerUri(uri);
+             lock.acquireReadLock().then(() => {
+                 console.log('rdfNode: querying rdf for ', uri);
+
+             });
+         });
+
+     };
+    /**
+     * Fetches the triples where URI is subject and add objects of those triples to the
+     * resulting structure by the localname of the predicate.
+     * The URI is added as property 'uri'.
+     *
+     * NOTE: multiple objects with the same predicates will overwrite each other (thus
+     * obfuscating possible bugs in the linked-data generation). It also ignores prefixes(!)
      *
      * @param eventUri
      */
