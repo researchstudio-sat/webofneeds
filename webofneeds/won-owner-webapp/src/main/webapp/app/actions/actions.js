@@ -68,7 +68,7 @@ const actionHierarchy = {
       fetch:(data)=>dispatch=>{
           data.connectionUris.forEach(function(connection){
               console.log("fetch events of connection: "+connectdionUri)
-              won.getAllConnectionEvents(connection.connection).then(function(events){
+              won.getEventsOfConnection(connection.connection).then(function(events){
                   console.log(events)
               })
           })

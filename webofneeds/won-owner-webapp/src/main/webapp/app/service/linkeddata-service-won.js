@@ -1054,8 +1054,7 @@ const rdfstore = window.rdfstore;
      * @param connectionUri
      * @param requesterWebId
      */
-    won.getEventsOfConnection =
-    won.getAllConnectionEvents = function(connectionUri, requesterWebId) {
+    won.getEventsOfConnection = function(connectionUri, requesterWebId) {
         if (!connectionUri ){
             throw {
                 message : `getEventsOfConnection: connectionUri must not be null. Got: "${connectionUri}"`
