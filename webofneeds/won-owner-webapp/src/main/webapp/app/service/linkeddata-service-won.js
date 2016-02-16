@@ -901,6 +901,12 @@ const rdfstore = window.rdfstore;
             });
     }
 
+    /**
+     * @deprecated possibly broken/duplicate. use getLatestEventOfConnection instead
+     * @param connectionUri
+     * @param requesterWebId
+     * @returns {*}
+     */
     won.getLastEventOfConnection = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastEventOfConnection: connectionUri must not be null"};
@@ -926,6 +932,12 @@ const rdfstore = window.rdfstore;
     }
 
 
+    /**
+     * @deprecated possibly broken/duplicate. use getEventsOfConnection instead
+     * @param connectionUri
+     * @param requesterWebId
+     * @returns {*}
+     */
     won.getLastConnectionEvent = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastConnectionEvent: connectionUri must not be null"};
@@ -1048,6 +1060,28 @@ const rdfstore = window.rdfstore;
         return won.getNodeWithAttributes(eventUri, requesterWebId);
     }
 
+    /*
+    won.getLastEventOfConnection = (connectionUri, requesterWebId) => {
+
+        won.getConnection(connectionUri)
+        won.getLatestEventOfConnection(connectionUri, requesterWebId)
+
+    }
+    */
+
+    /**
+     * @param connectionUri
+     * @param requesterWebId
+     * @return {*} the most recent event for that connection as a full object.
+     */
+    won.getLatestEventOfConnection = (connectionUri, requesterWebId) =>
+        won.getEventsOfConnection(connectionUri, requesterWebId)
+            //find latest event:
+            .then(events => events.reduce( (prev, curr) =>
+                Number.parseInt(prev.hasReceivedTimestamp) >=
+                Number.parseInt(curr.hasReceivedTimestamp) ?
+                    prev : curr)
+        );
 
     /**
      * Returns all events associated with a given connection.
@@ -1061,12 +1095,14 @@ const rdfstore = window.rdfstore;
             };
         }
         return won.getNodeWithAttributes(connectionUri, requesterWebId)
-            .then(connection => won.getNodeWithAttributes(connection.hasEventContainer), requesterWebId)
+            .then(connection => connection.hasEventContainer)
+            .then(eventContainerUri => won.getNodeWithAttributes(eventContainerUri, requesterWebId))
             .then(eventContainer => eventContainer.member)
             .then(eventUris => eventUris.map(eventUri => won.getConnectionEvent(eventUri, requesterWebId)))
             .then(queries => Promise.all(queries))
             .catch(e => `Could not get all events of connection ${connectionUri}. Reason: ${e}`);
     };
+
 
     /**
      * @deprecated this function probably doesn't work anymore. rather use getEventsOfConnection
