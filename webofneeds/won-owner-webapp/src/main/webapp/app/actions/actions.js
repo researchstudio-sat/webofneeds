@@ -463,15 +463,25 @@ var getConnectionRelatedDataAndDispatch=(needUri,remoteNeedUri,connectionUri,dis
     const remoteNeed = won.getNeed(remoteNeedUri);
     const ownNeed = won.getNeed(needUri);
     const connection = won.getConnection(connectionUri);
-    promises.push(remoteNeed,ownNeed,connection);
+    const events = won.getEventsOfConnection(connectionUri, needUri)
 
-    Q.all(promises).then(results=>{
+    Promise.all([remoteNeed, ownNeed, connection, events]).then(results => {
         const resultObject = {};
         resultObject.remoteNeed = results[0];
         resultObject.ownNeed = results[1];
         resultObject.connection = results[2];
+        resultObject.events = results[3];
         dispatch(actionCreators.connections__add(resultObject))
-
+        /*
+         * TODO interim solution so reducers can listen to more
+         * differentiated actions without me having to refactor all the
+         * code right away. kinda back-wards-compatibility.
+        */
+        /*
+        dispatch({type: actionTypes.connections.load, payload: resultObject});
+        dispatch({type: actionTypes.messages.connectMessageReceived, payload: resultObject});
+        dispatch({type: actionTypes.messages.hintMessageReceived, payload: resultObject});
+        */
     })
 
 }

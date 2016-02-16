@@ -1013,15 +1013,6 @@ const rdfstore = window.rdfstore;
         return won.getNodeWithAttributes(eventUri, requesterWebId);
     }
 
-    /*
-    won.getLastEventOfConnection = (connectionUri, requesterWebId) => {
-
-        won.getConnection(connectionUri)
-        won.getLatestEventOfConnection(connectionUri, requesterWebId)
-
-    }
-    */
-
     /**
      * @param connectionUri
      * @param requesterWebId
