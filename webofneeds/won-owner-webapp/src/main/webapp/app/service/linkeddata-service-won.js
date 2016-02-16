@@ -1257,8 +1257,8 @@ const rdfstore = window.rdfstore;
                     });
     }
 
-    won.getLastEventTypeBeforeTime = function(connectionUri, beforeTimestamp) {
-        return won.crawlConnectionData(connectionUri).then(
+    won.getLastEventTypeBeforeTime = function(connectionUri, beforeTimestamp, requesterWebId) {
+        return won.crawlConnectionData(connectionUri, requesterWebId).then(
             function queryLastEventBeforeTime() {
                 var lock = getReadUpdateLockPerUri(connectionUri);
                 return lock.acquireReadLock().then(
