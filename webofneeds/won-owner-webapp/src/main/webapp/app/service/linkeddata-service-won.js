@@ -901,53 +901,6 @@ const rdfstore = window.rdfstore;
             });
     }
 
-    /**
-     * @deprecated possibly broken/duplicate. use getLatestEventOfConnection instead
-     * @param connectionUri
-     * @param requesterWebId
-     * @returns {*}
-     */
-    won.getLastEventOfConnection = function(connectionUri, requesterWebId) {
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getLastEventOfConnection: connectionUri must not be null"};
-        }
-        return won.getConnection(connectionUri)
-            .then(function (connection) {
-                return won.getNeed(connection.hasRemoteNeed)
-                    .then(function (need) {
-                        return won.getLastConnectionEvent(connectionUri, requesterWebId)
-                            .then(
-                                function (event) {
-                                    return {connection: connection, remoteNeed: need, event: event}
-                                },function(reason){
-                                    //remote need's won node may be offline - don't let that kill us
-                                    var deferred = q.defer();
-                                    deferred.resolve(
-                                        {connection: connection, remoteNeed: {'title': '[could not load]'}, event: event}
-                                    );
-                                    return deferred.promise;
-                                });
-                    });
-            });
-    }
-
-
-    /**
-     * @deprecated possibly broken/duplicate. use getEventsOfConnection instead
-     * @param connectionUri
-     * @param requesterWebId
-     * @returns {*}
-     */
-    won.getLastConnectionEvent = function(connectionUri, requesterWebId) {
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getLastConnectionEvent: connectionUri must not be null"};
-        }
-        return won.getLastConnectioneventUri(connectionUri, requesterWebId)
-            .then(function (eventUri) {
-                    return won.getConnectionEvent(eventUri, requesterWebId);
-            })
-    }
-
 
     /**
      * Loads all URIs of a need's connections.
