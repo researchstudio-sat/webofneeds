@@ -281,7 +281,7 @@ const actionHierarchy = {
         hintMessageReceived:(data)=>dispatch=>{
             data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
             won.invalidateCacheForNewConnection(data.hasReceiver,data.hasReceiverNeed)
-                ['finally'](function(){
+                .then(() => {
                     let needUri = data.hasReceiverNeed;
                     let match = {}
 
