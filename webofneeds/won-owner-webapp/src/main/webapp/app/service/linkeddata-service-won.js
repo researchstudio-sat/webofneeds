@@ -54,6 +54,7 @@ const rdfstore = window.rdfstore;
         //create an rdfstore-js based store as a cache for rdf data.
         privateData.store =  rdfstore.create();
         window.store4dbg = privateData.store; //TODO deletme
+        window.ldspriv4dbg = privateData; //TODO deletme
         privateData.store.setPrefix("msg","http://purl.org/webofneeds/message#");
         privateData.store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         privateData.store.setPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
@@ -359,7 +360,8 @@ const rdfstore = window.rdfstore;
     }
 
     /**
-     * Invalidates the appropriate linked data cache items such that all information about a
+     * Invalidates the appropriate linked data cache items (i.e. the set of connections
+     * associated with a need) such that all information about a
      * newly created connection is loaded. Should be called when receiving hint or connect.
      *
      * Note that this causes an asynchronous call - the cache items may only be invalidated
@@ -370,13 +372,13 @@ const rdfstore = window.rdfstore;
      * @return a promise so the caller can chain promises after this one
      */
     won.invalidateCacheForNewConnection = function(connectionUri, needUri){
-        if (connectionUri != null) {
+        if (connectionUri) {
             cacheItemMarkDirty(connectionUri);
         }
-        return won.getNeedConnectionsUri(needUri).then(
-            function(connectionsUri){
-                if (connectionsUri != null){
-                    cacheItemMarkDirty(connectionsUri);
+        return won.getConnectionContainerOfNeed(needUri).then(
+            function(connectionContainerUri){
+                if (connectionContainerUri != null){
+                    cacheItemMarkDirty(connectionContainerUri);
                 }
             }
         );
@@ -993,7 +995,12 @@ const rdfstore = window.rdfstore;
 
     }
 
-    won.getNeedConnectionsUri = function(needUri) {
+    /**
+     * @param needUri
+     * @returns {*} the Uri of the connection container (read: set) of
+     *              connections for the given need
+     */
+    won.getConnectionContainerOfNeed = function(needUri) {
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getConnectionsUri: needUri must not be null"};
         }
