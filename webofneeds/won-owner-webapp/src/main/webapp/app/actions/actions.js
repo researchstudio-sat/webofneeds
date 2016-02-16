@@ -266,9 +266,9 @@ const actionHierarchy = {
         },
         connectMessageReceived:(data)=>dispatch=>{
             data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
+            //TODO data.hasReceiver, the connectionUri is undefined in the response message
             won.invalidateCacheForNewConnection(data.hasReceiver,data.hasReceiverNeed)
-                ['finally'](function(){
-
+                .then(() => {
                     won.getConnectionWithOwnAndRemoteNeed(data.hasReceiverNeed,data.hasSenderNeed).then(connectionData=>{
                         //TODO refactor
                         data.unreadUri = connectionData.uri;
@@ -276,7 +276,7 @@ const actionHierarchy = {
                         getConnectionRelatedDataAndDispatch(data.hasReceiverNeed,data.hasSenderNeed,connectionData.uri,dispatch)
                     })
 
-            })
+                })
         },
         hintMessageReceived:(data)=>dispatch=>{
             data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
