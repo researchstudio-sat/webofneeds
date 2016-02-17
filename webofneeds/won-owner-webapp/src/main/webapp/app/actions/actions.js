@@ -78,12 +78,12 @@ const actionHierarchy = {
         read:INJ_DEFAULT
     },
     matches: {
-        load:(data)=>(dispatch,getState)=> {
-            const state=getState();
-            for(let need in data){
-                won.getConnectionInStateForNeedWithRemoteNeed(need,"won:Suggested").then(function(results){
-                    let needData = state.getIn(['needs','needs',need]).toJS();
-                    let data = {ownNeed:needData, connections:results }
+        load:(data) => (dispatch, getState) => {
+            const state = getState();
+            for(let needUri in data){
+                won.getConnectionInStateForNeedWithRemoteNeed(needUri,"won:Suggested").then(function(results){
+                    let needData = state.getIn(['needs', 'ownNeeds', needUri]).toJS();
+                    let data = { ownNeed: needData, connections: results };
                     results.forEach(function(entry){
                         dispatch(actionCreators.matches__add(entry))
                     })

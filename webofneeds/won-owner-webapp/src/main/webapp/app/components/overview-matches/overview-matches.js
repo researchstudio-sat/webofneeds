@@ -49,7 +49,7 @@ class OverviewMatchesController {
 
     loadMatches(){
         this.matches__load(
-            this.$ngRedux.getState().getIn(['needs','needs']).toJS()
+            this.$ngRedux.getState().getIn(['needs','ownNeeds']).toJS()
         )
     }
 

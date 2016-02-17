@@ -12,12 +12,6 @@ import won from '../won-es6';
 const initialState = Immutable.fromJS({
     isFetching: false,
     didInvalidate: false,
-    /**
-     * @deprecated as this collection uses normal js-objects instead of immutable-js objects
-     * some views depend on it however :[
-     * "use ownNeeds instead"
-     */
-    needs: {},
     ownNeeds: {},
     othersNeeds: {},
 });
@@ -34,7 +28,6 @@ export default function(state = initialState, action = {}) {
         case actionTypes.needs.received:
             const ownNeed = action.payload;
             return setIfNew(state, ['ownNeeds', ownNeed.uri], ownNeed)
-                .setIn(['needs', ownNeed.uri], Immutable.fromJS(ownNeed))//@deprecated; kept for backwards-compatibility with existing views
 
         case actionTypes.connections.load:
             return action.payload.reduce(
@@ -61,7 +54,7 @@ function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
      * TODO | doing this here doesn't guarantee synchronicity with the rdf
      * TODO | unless we fetch all connections onLoad and onLogin
      */
-    return stateWithBothNeeds.updateIn(['needs', ownNeed.uri, 'connections'], connections => connections?
+    return stateWithBothNeeds.updateIn(['ownNeeds', ownNeed.uri, 'connections'], connections => connections?
             connections.push(connection.uri) :
             Immutable.List([connection.uri]) // first connection -> new List
     );
