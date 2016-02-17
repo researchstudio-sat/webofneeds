@@ -78,43 +78,43 @@ const actionHierarchy = {
         read:INJ_DEFAULT
     },
     matches: {
-      load:(data)=>(dispatch,getState)=> {
-          const state=getState();
-          for(let need in data){
-              won.getConnectionInStateForNeedWithRemoteNeed(need,"won:Suggested").then(function(results){
-                  let needData = state.getIn(['needs','needs',need]).toJS();
-                  let data = {ownNeed:needData, connections:results }
-                  results.forEach(function(entry){
-                      dispatch(actionCreators.matches__add(entry))
-                  })
+        load:(data)=>(dispatch,getState)=> {
+            const state=getState();
+            for(let need in data){
+                won.getConnectionInStateForNeedWithRemoteNeed(need,"won:Suggested").then(function(results){
+                    let needData = state.getIn(['needs','needs',need]).toJS();
+                    let data = {ownNeed:needData, connections:results }
+                    results.forEach(function(entry){
+                        dispatch(actionCreators.matches__add(entry))
+                    })
 
-              })
-          }
-      },
+                })
+            }
+        },
         add:INJ_DEFAULT,
     },
     connections:{
-      load : (need) => dispatch =>{
-          won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], need.uri)
-              .then(function(connectionsOfNeed){
-                  console.log("fetching connections");
-                  Promise.all(connectionsOfNeed.map(connection => getConnectionRelatedData(
-                      connection.need.value,
-                      connection.remoteNeed.value,
-                      connection.connection.value
-                  )))
-                  .then(connectionsWithRelatedData =>
-                      dispatch({
-                          type: actionTypes.connections.load,
-                          payload: connectionsWithRelatedData
-                      })
-                  );
-              })
-      },
+        load : (need) => dispatch =>{
+            won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], need.uri)
+                .then(function(connectionsOfNeed){
+                    console.log("fetching connections");
+                    Promise.all(connectionsOfNeed.map(connection => getConnectionRelatedData(
+                        connection.need.value,
+                        connection.remoteNeed.value,
+                        connection.connection.value
+                    )))
+                    .then(connectionsWithRelatedData =>
+                        dispatch({
+                            type: actionTypes.connections.load,
+                            payload: connectionsWithRelatedData
+                        })
+                    );
+                })
+        },
         open: (connection,message)=>dispatch =>{
 
         },
-      reset:INJ_DEFAULT,
+        reset:INJ_DEFAULT,
     },
     needs: {
         fetch: (data) => dispatch => {
