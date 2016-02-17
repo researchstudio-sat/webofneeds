@@ -15,25 +15,25 @@ const initialState = Immutable.fromJS({
     connections: Immutable.Map(),
 
 })
-export default createReducer(
-    initialState,
-    {
-        [actionTypes.connections.hintsOfNeedRetrieved]:(state,action)=>{
+export default function(state = initialState, action = {}) {
+    switch(action.type) {
+        case actionTypes.connections.hintsOfNeedRetrieved:
             return state.setIn(
                 ['connections',action.payload.connection.uri],
                 //TODO Immutable.fromJS(action.payload))
                 action.payload)
-        },
-        [actionTypes.connections.add]:(state,action)=>{
+
+        case actionTypes.connections.add:
             return state.setIn(
                 ['connections',action.payload.connection.uri],
                 //TODO Immutable.fromJS(action.payload))
                 action.payload)
-        },
-        [actionTypes.connections.reset]:(state,action)=>{
+
+        case actionTypes.connections.reset:
             return initialState;
-        }
 
+
+        default:
+            return state;
     }
-
-)
+}
