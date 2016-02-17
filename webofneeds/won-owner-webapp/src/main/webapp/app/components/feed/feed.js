@@ -16,7 +16,7 @@ class FeedController {
         this.selection = 0;
 
         const selectFromState = (state) =>({
-            posts: state.getIn(["ownNeeds", "needs"]).toJS(),
+            posts: state.getIn(["needs", "ownNeeds"]).toJS(),
             connectionsByNeed: selectConnectionsByNeed(state),
             unreadCountsByNeedAndType: selectUnreadCountsByNeedAndType(state),
 

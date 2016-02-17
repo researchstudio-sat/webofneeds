@@ -25,6 +25,12 @@ export default function(state = initialState, action = {}) {
             console.log('reducers.js: failed receive needlist action');
             return Immutable.fromJS({error: error});
 
+        case actionTypes.needs.fetch:
+            return action.payload.reduce(
+                (updatedState, ownNeed) => setIfNew(updatedState, ['ownNeeds', ownNeed.uri], ownNeed),
+                state
+            );
+
         case actionTypes.needs.received:
             const ownNeed = action.payload;
             return setIfNew(state, ['ownNeeds', ownNeed.uri], ownNeed)

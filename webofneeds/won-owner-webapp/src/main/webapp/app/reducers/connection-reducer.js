@@ -17,8 +17,6 @@ const initialState = Immutable.fromJS({
 })
 export default function(state = initialState, action = {}) {
     switch(action.type) {
-        //case actionTypes.connections.load:
-
         case actionTypes.connections.load:
             return action.payload.reduce(
                 (updatedState, connectionWithRelatedData) =>

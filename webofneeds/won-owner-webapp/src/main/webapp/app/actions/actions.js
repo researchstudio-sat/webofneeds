@@ -118,13 +118,19 @@ const actionHierarchy = {
     },
     needs: {
         fetch: (data) => dispatch => {
-            data.needs.forEach((uri,index,array)=>{
-                console.log(uri);
-                won.getNeed(uri).then(function(need){
-                        console.log("linked data fetched for need: "+uri );
-                        dispatch(actionCreators.needs__received(need))
-                        dispatch(actionCreators.connections__load(need))
-                    })})
+            const needLookups = data.needs.map(needUri => won.getNeed(needUri))
+            Promise.all(needLookups).then(needs => {
+                console.log("linked data fetched for needs: ", needs );
+                dispatch({ type: actionTypes.needs.fetch, payload: needs });
+            });
+
+            //TODO get rid of this multiple dispatching here (always push looping back into the reducer)
+            data.needs.forEach(needUri =>{
+                won.getNeed(needUri).then(need => {
+                    console.log("linked data fetched for need: ", needUri );
+                    //TODO this is the only occurance of connections__load atm. should make for easy refactoring
+                    dispatch(actionCreators.connections__load(need))
+                })})
         },
         received: INJ_DEFAULT,
         connectionsReceived:INJ_DEFAULT,
