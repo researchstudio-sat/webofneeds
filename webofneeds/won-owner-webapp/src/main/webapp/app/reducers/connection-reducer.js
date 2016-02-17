@@ -18,11 +18,6 @@ const initialState = Immutable.fromJS({
 export default function(state = initialState, action = {}) {
     switch(action.type) {
         case actionTypes.connections.hintsOfNeedRetrieved:
-            return state.setIn(
-                ['connections',action.payload.connection.uri],
-                //TODO Immutable.fromJS(action.payload))
-                action.payload)
-
         case actionTypes.connections.add:
             return state.setIn(
                 ['connections',action.payload.connection.uri],
