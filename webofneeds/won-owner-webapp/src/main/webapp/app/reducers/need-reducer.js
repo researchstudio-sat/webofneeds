@@ -28,10 +28,6 @@ export default function(state = initialState, action = {}) {
             console.log('reducers.js: failed receive needlist action');
             return Immutable.fromJS({error: error});
 
-        //TODO @deprecated? unused?
-        case actionTypes.needs.connectionsReceived:
-            return state.setIn(['needs',action.payload.needUri,'connectionUris'],action.payload.connections);
-
         case actionTypes.needs.clean:
             return initialState;
 
