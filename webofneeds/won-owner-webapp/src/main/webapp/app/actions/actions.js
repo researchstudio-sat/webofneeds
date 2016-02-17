@@ -95,14 +95,22 @@ const actionHierarchy = {
         hintsOfNeedRetrieved:INJ_DEFAULT
     },
     connections:{
-      load : (need)=>dispatch =>{
-          var allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], need.uri);
-          allConnectionsPromise.then(function(connections){
-              console.log("fetching connections")
-              connections.forEach(connection=>{
-                  getConnectionRelatedDataAndDispatch(connection.need.value,connection.remoteNeed.value,connection.connection.value,dispatch)
+      load : (need) => dispatch =>{
+          won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], need.uri)
+              .then(function(connectionsOfNeed){
+                  console.log("fetching connections");
+                  Promise.all(connectionsOfNeed.map(connection => getConnectionRelatedData(
+                      connection.need.value,
+                      connection.remoteNeed.value,
+                      connection.connection.value
+                  )))
+                  .then(connectionsWithRelatedData =>
+                      dispatch({
+                          type: actionTypes.connections.load,
+                          payload: connectionsWithRelatedData
+                      })
+                  );
               })
-          })
       },
         open: (connection,message)=>dispatch =>{
 
@@ -424,33 +432,37 @@ const actionHierarchy = {
         update: INJ_DEFAULT,
     }
 }
-var getConnectionRelatedDataAndDispatch=(needUri,remoteNeedUri,connectionUri,dispatch)=>{
-    const promises =[];
+
+function getConnectionRelatedData(needUri,remoteNeedUri,connectionUri) {
     const remoteNeed = won.getNeed(remoteNeedUri);
     const ownNeed = won.getNeed(needUri);
     const connection = won.getConnection(connectionUri);
     const events = won.getEventsOfConnection(connectionUri, needUri)
 
-    Promise.all([remoteNeed, ownNeed, connection, events]).then(results => {
-        const resultObject = {};
-        resultObject.remoteNeed = results[0];
-        resultObject.ownNeed = results[1];
-        resultObject.connection = results[2];
-        resultObject.events = results[3];
-        dispatch(actionCreators.connections__add(resultObject))
-        /*
-         * TODO interim solution so reducers can listen to more
-         * differentiated actions without me having to refactor all the
-         * code right away. kinda back-wards-compatibility.
-        */
-        /*
-        dispatch({type: actionTypes.connections.load, payload: resultObject});
-        dispatch({type: actionTypes.messages.connectMessageReceived, payload: resultObject});
-        dispatch({type: actionTypes.messages.hintMessageReceived, payload: resultObject});
-        */
-    })
+    return Promise.all([remoteNeed, ownNeed, connection, events])
+        .then(results => ({
+            remoteNeed: results[0],
+            ownNeed: results[1],
+            connection: results[2],
+            events: results[3],
+        }))
 
 }
+function getConnectionRelatedDataAndDispatch(needUri, remoteNeedUri, connectionUri, dispatch) {
+    getConnectionRelatedData(needUri, remoteNeedUri, connectionUri)
+    .then(data => dispatch(actionCreators.connections__add(data)));
+    /*
+     * TODO interim solution so reducers can listen to more
+     * differentiated actions without me having to refactor all the
+     * code right away. kinda back-wards-compatibility.
+    */
+    /*
+    dispatch({type: actionTypes.connections.load, payload: resultObject});
+    dispatch({type: actionTypes.messages.connectMessageReceived, payload: resultObject});
+    dispatch({type: actionTypes.messages.hintMessageReceived, payload: resultObject});
+    */
+}
+
 var messageTypeToEventType = {};
 messageTypeToEventType[won.WONMSG.hintMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED};
 messageTypeToEventType[won.WONMSG.connectMessageCompacted] = {eventType: won.EVENT.CONNECT_RECEIVED};

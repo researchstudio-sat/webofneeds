@@ -17,12 +17,19 @@ const initialState = Immutable.fromJS({
 })
 export default function(state = initialState, action = {}) {
     switch(action.type) {
+        //case actionTypes.connections.load:
+
+        case actionTypes.connections.load:
+            return action.payload.reduce(
+                (updatedState, connectionWithRelatedData) =>
+                    storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
+                state);
+
+        case actionTypes.messages.connectMessageReceived:
+        case actionTypes.messages.hintMessageReceived:
         case actionTypes.connections.hintsOfNeedRetrieved:
         case actionTypes.connections.add:
-            return state.setIn(
-                ['connections',action.payload.connection.uri],
-                //TODO Immutable.fromJS(action.payload))
-                action.payload)
+            return storeConnectionAndRelatedData(state, action.payload);
 
         case actionTypes.connections.reset:
             return initialState;
@@ -30,4 +37,9 @@ export default function(state = initialState, action = {}) {
         default:
             return state;
     }
+}
+function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
+    return state.setIn(
+        ['connections',connectionWithRelatedData.connection.uri],
+        connectionWithRelatedData);
 }
