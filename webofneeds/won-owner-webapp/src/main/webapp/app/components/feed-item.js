@@ -77,6 +77,9 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
+
+            window.fi4dbg = this;
+
             this.labels = labels
 
             updateRelativeTimestamps(
@@ -85,7 +88,6 @@ function genComponentConf() {
                 this.item.get('creationDate'),
                     t => this.creationDateLabel = t);
 
-            window.fi4dbg = this;
             this.maxNrOfItemsShown = 3;
         }
         showMore() {

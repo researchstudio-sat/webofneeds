@@ -27,7 +27,6 @@ export default function(state = initialState, action = {}) {
         case actionTypes.connections.reset:
             return initialState;
 
-
         default:
             return state;
     }
