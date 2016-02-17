@@ -92,7 +92,6 @@ const actionHierarchy = {
           }
       },
         add:INJ_DEFAULT,
-        hintsOfNeedRetrieved:INJ_DEFAULT
     },
     connections:{
       load : (need) => dispatch =>{
@@ -115,7 +114,6 @@ const actionHierarchy = {
         open: (connection,message)=>dispatch =>{
 
         },
-      add:INJ_DEFAULT,
       reset:INJ_DEFAULT,
     },
     needs: {
@@ -247,7 +245,12 @@ const actionHierarchy = {
                         //TODO refactor
                         data.unreadUri = connectionData.uri;
                         dispatch(actionCreators.events__addUnreadEventUri(data));
-                        getConnectionRelatedDataAndDispatch(data.hasReceiverNeed,data.hasSenderNeed,connectionData.uri,dispatch)
+
+                        getConnectionRelatedData(data.hasReceiverNeed, data.hasSenderNeed, connectionData.uri)
+                            .then(data => dispatch({
+                                type: actionTypes.messages.connectMessageReceived,
+                                payload: data
+                            }));
                     })
 
                 })
@@ -264,8 +267,12 @@ const actionHierarchy = {
                     data.matchCounterpartURI = won.getSafeJsonLdValue(data.framedMessage[won.WON.hasMatchCounterpart]);
 
                     dispatch(actionCreators.events__addUnreadEventUri(data))
-                    getConnectionRelatedDataAndDispatch(needUri,data.hasMatchCounterpart,data.hasReceiver,dispatch)
 
+                    getConnectionRelatedData(needUri, data.hasMatchCounterpart, data.hasReceiver)
+                        .then(data => dispatch({
+                            type: actionTypes.messages.hintMessageReceived,
+                            payload: data
+                        }));
 
 
                 // /add some properties to the eventData so as to make them easily accessible to consumers
@@ -447,20 +454,6 @@ function getConnectionRelatedData(needUri,remoteNeedUri,connectionUri) {
             events: results[3],
         }))
 
-}
-function getConnectionRelatedDataAndDispatch(needUri, remoteNeedUri, connectionUri, dispatch) {
-    getConnectionRelatedData(needUri, remoteNeedUri, connectionUri)
-    .then(data => dispatch(actionCreators.connections__add(data)));
-    /*
-     * TODO interim solution so reducers can listen to more
-     * differentiated actions without me having to refactor all the
-     * code right away. kinda back-wards-compatibility.
-    */
-    /*
-    dispatch({type: actionTypes.connections.load, payload: resultObject});
-    dispatch({type: actionTypes.messages.connectMessageReceived, payload: resultObject});
-    dispatch({type: actionTypes.messages.hintMessageReceived, payload: resultObject});
-    */
 }
 
 var messageTypeToEventType = {};
