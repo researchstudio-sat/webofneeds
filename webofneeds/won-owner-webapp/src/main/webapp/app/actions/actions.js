@@ -94,31 +94,6 @@ const actionHierarchy = {
         add:INJ_DEFAULT,
         hintsOfNeedRetrieved:INJ_DEFAULT
     },
-    requests:{
-      incomingReceived:(data)=>(dispatch,getState)=>{
-          const state = getState();
-          state.getIn(['events','unreadEventUris',data.hasReceiver]).toJS()
-          Object.keys(state.getIn(['events','unreadEventUris']).toJS())
-                .map(key=>state.getIn(['events','unreadEventUris']).toJS()[key])
-                .filter(event =>{
-                    if(event.eventType === won.EVENT.CONNECT_RECEIVED){
-                        return true
-                    }
-                })
-                .forEach((incomingRequest)=>{
-                  console.log(incomingRequest)
-                  getConnectionRelatedData(needUri,data.hasMatchCounterpart,data.hasReceiver).then((results)=>{
-                      match.remoteNeed=results[1]
-                      match.ownNeed = results[0]
-                      match.connection = results[2]
-
-                  })
-                })
-      },
-      incomingAdd:(data)=>(dispatch,getState)=>{
-
-      }
-    },
     connections:{
       load : (need)=>dispatch =>{
           var allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], need.uri);
