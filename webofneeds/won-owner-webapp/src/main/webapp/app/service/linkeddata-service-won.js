@@ -1425,7 +1425,12 @@ const rdfstore = window.rdfstore;
             return data.promise;
         })
     }
-    won.getConnectionsWithOwnNeed= function(ownNeedUri){
+    /**
+     * @deprecated ? should return connection-objects but just returns the connectionUris
+     * @param ownNeedUri
+     * @return {*}
+     */
+    won.getConnectionsWithOwnNeed = function(ownNeedUri){
         return won.getconnectionUrisOfNeed(ownNeedUri).then(connectionUris=>{
             let promises=[]
 
@@ -1457,7 +1462,7 @@ const rdfstore = window.rdfstore;
                     }
 
                     let needs = []
-                    let ownNeedPromise = won.getNeed(uri);
+                    let ownNeedPromise = won.getNeed(ownNeedUri);
                     needs.push(ownNeedPromise);
                     let remoteNeedPromise = won.getNeed(results[0].remoteNeed.value)
                     needs.push(remoteNeedPromise)
