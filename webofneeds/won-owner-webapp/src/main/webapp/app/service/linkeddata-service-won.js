@@ -375,7 +375,7 @@ const rdfstore = window.rdfstore;
         if (connectionUri) {
             cacheItemMarkDirty(connectionUri);
         }
-        return won.getConnectionContainerOfNeed(needUri).then(
+        return getConnectionContainerOfNeed(needUri).then(
             function(connectionContainerUri){
                 if (connectionContainerUri != null){
                     cacheItemMarkDirty(connectionContainerUri);
@@ -961,11 +961,12 @@ const rdfstore = window.rdfstore;
     }
 
     /**
+     *
      * @param needUri
      * @returns {*} the Uri of the connection container (read: set) of
      *              connections for the given need
      */
-    won.getConnectionContainerOfNeed = function(needUri) {
+    function getConnectionContainerOfNeed(needUri) {
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getConnectionsUri: needUri must not be null"};
         }
