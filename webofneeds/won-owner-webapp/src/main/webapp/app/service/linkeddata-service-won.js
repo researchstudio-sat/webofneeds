@@ -901,6 +901,14 @@ const rdfstore = window.rdfstore;
             });
     }
 
+    /**
+     * @param needUri
+     * @return {*} the data of all connection-nodes referenced by that need
+     */
+    won.getConnectionsOfNeed = (needUri) =>
+        won.getconnectionUrisOfNeed(needUri)
+        .then(connectionUris => won.getNodes(connectionUris))
+
 
     /**
      * Loads all URIs of a need's connections.
@@ -1295,9 +1303,29 @@ const rdfstore = window.rdfstore;
         );
     }
 
+    /**
+     * Maps `getNodeWithAttributes` over the list of uris and
+     * collects the results.
+     * @param uris array of strings
+     * @param requesterWebId map/object of (uri -> node's data)
+     */
+    won.getNodes = function(uris, requesterWebId) {
+        const queries = uris.map(uri =>
+            won.getNode(uri, requesterWebId)
+        );
+        return Promise.all(queries).then(nodes => {
+            const acc = {};
+            for (const node of nodes) {
+                acc[node.uri] = node;
+            }
+            return acc;
+        });
+    }
+
     //aliases (formerly functions that were just pass-throughs)
     won.getConnection =
     won.getConnectionEvent =
+    won.getNodeWithAttributes =
     /**
      * Fetches the triples where URI is subject and add objects of those triples to the
      * resulting structure by the localname of the predicate.
@@ -1311,7 +1339,7 @@ const rdfstore = window.rdfstore;
      * @param eventUri
      * @param requesterWebId
      */
-    won.getNodeWithAttributes = function(uri, requesterWebId){
+    won.getNode = function(uri, requesterWebId){
         if(!uri) {
             throw {message : "getNodeWithAttributes: uri must not be null"};
         }
