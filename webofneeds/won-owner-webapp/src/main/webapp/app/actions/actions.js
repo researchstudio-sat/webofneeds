@@ -94,22 +94,73 @@ const actionHierarchy = {
         add:INJ_DEFAULT,
     },
     connections:{
-        load : (needUri) => dispatch =>{
-            won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri)
-                .then(function(connectionsOfNeed){
-                    console.log("fetching connections");
-                    Promise.all(connectionsOfNeed.map(connection => getConnectionRelatedData(
-                        connection.need.value,
-                        connection.remoteNeed.value,
-                        connection.connection.value
-                    )))
-                    .then(connectionsWithRelatedData =>
-                        dispatch({
-                            type: actionTypes.connections.load,
-                            payload: connectionsWithRelatedData
-                        })
-                    );
+        load : (needUris) => dispatch =>{
+            /*
+            const queriesForConnections = needUris.map(needUri =>
+                won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri));
+
+            Promise.all(queriesForConnections)
+                .then(allConnectionsOfAllNeeds => {
+                    console.log("fetched connections");
+
+                    allConnectionsOfAllNeeds.map(allConnectionsOfANeed => {
+                        const queriesForConnectionRelatedData = allConnectionsOfANeed.map(connection =>
+                            getConnectionRelatedData(
+                                connection.need.value,
+                                connection.remoteNeed.value,
+                                connection.connection.value
+                            )
+                        )
+                        Promise.all(queriesForConnectionRelatedData).then()
+                        return?
+
+                    })
                 })
+                */
+
+            window.needUris4dbg = needUris;
+
+            /**
+            const ownNeedsAndConnectionData = [
+            ..., <!--ownNeed -->
+            {
+                ... : ... <!-- ownNeedData -->
+                connections: [
+                    ...
+                    {
+                        <!--connection-->
+                        ... : ...
+                        theirNeed: {
+                            <!-- another person's need data -->
+                            ...:...
+                        }
+                        ... : ...
+                    },
+                    ...
+                ],
+                ... : ...
+            }
+            ...
+            ]
+            */
+
+            needUris.forEach(needUri =>
+                won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri)
+                    .then(function(connectionsOfNeed){
+                        console.log("fetching connections");
+                        Promise.all(connectionsOfNeed.map(connection => getConnectionRelatedData(
+                            connection.need.value,
+                            connection.remoteNeed.value,
+                            connection.connection.value
+                        )))
+                        .then(connectionsWithRelatedData =>
+                            dispatch({
+                                type: actionTypes.connections.load,
+                                payload: connectionsWithRelatedData
+                            })
+                        );
+                    })
+            );
         },
         open: (connection,message)=>dispatch =>{
 
@@ -126,9 +177,12 @@ const actionHierarchy = {
             });
 
             //TODO get rid of this multiple dispatching here (always push looping back into the reducer)
+            dispatch(actionCreators.connections__load(needUris));
+            /*
             needUris.forEach(needUri => {
                 dispatch(actionCreators.connections__load(needUri));
             });
+            */
         },
         received: INJ_DEFAULT,
         connectionsReceived:INJ_DEFAULT,
