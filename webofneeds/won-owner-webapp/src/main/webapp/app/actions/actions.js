@@ -95,53 +95,43 @@ const actionHierarchy = {
     },
     connections:{
         load : (needUris) => dispatch =>{
-            /*
-            const queriesForConnections = needUris.map(needUri =>
-                won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri));
-
-            Promise.all(queriesForConnections)
-                .then(allConnectionsOfAllNeeds => {
-                    console.log("fetched connections");
-
-                    allConnectionsOfAllNeeds.map(allConnectionsOfANeed => {
-                        const queriesForConnectionRelatedData = allConnectionsOfANeed.map(connection =>
-                            getConnectionRelatedData(
-                                connection.need.value,
-                                connection.remoteNeed.value,
-                                connection.connection.value
-                            )
-                        )
-                        Promise.all(queriesForConnectionRelatedData).then()
-                        return?
-
-                    })
-                })
-                */
-
             window.needUris4dbg = needUris;
 
             /**
-            const ownNeedsAndConnectionData = [
-            ..., <!--ownNeed -->
-            {
-                ... : ... <!-- ownNeedData -->
-                connections: [
-                    ...
-                    {
-                        <!--connection-->
-                        ... : ...
-                        theirNeed: {
-                            <!-- another person's need data -->
-                            ...:...
-                        }
-                        ... : ...
-                    },
-                    ...
-                ],
-                ... : ...
-            }
-            ...
-            ]
+             const allAccessibleAndRelevantData = {
+                ownNeeds: {
+                    <needUri> : {
+                        *:*,
+                        connections: [<connectionUri>, <connectionUri>]
+                    }
+                    <needUri> : {
+                        *:*,
+                        connections: [<connectionUri>, <connectionUri>]
+                    }
+                },
+                theirNeeds: {
+                    <needUri>: {
+                        *:*,
+                        connections: [<connectionUri>, <connectionUri>] <--?
+                    }
+                },
+                connections: {
+                    <connectionUri> : {
+                        *:*,
+                        events: [<eventUri>, <eventUri>]
+                    }
+                    <connectionUri> : {
+                        *:*,
+                        events: [<eventUri>, <eventUri>]
+                    }
+                }
+                events: {
+                    <eventUri> : { *:* },
+                    <eventUri> : { *:* }
+                }
+             }
+
+
             */
 
             needUris.forEach(needUri =>
