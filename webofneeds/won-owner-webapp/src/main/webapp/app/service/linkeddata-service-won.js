@@ -658,13 +658,13 @@ const rdfstore = window.rdfstore;
      * Loads the default data of the need with the specified URI into a js object.
      * @return the object or null if no data is found for that URI in the local datastore
      */
-    won.getNeed = function(uri) {
-        if (typeof uri === 'undefined' || uri == null  ){
+    won.getNeed = function(needUri) {
+        if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getNeed: uri must not be null"};
         }
-       return won.ensureLoaded(uri).then(
+       return won.ensureLoaded(needUri).then(
            function() {
-               var lock = getReadUpdateLockPerUri(uri);
+               var lock = getReadUpdateLockPerUri(needUri);
                return lock.acquireReadLock().then(
                    function () {
                        try {
@@ -681,9 +681,9 @@ const rdfstore = window.rdfstore;
                                //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
                                //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
                                //                "GRAPH ?coreURI {"+,
-                               "<" + uri + "> " + won.WON.isInStateCompacted + " ?state .\n" +
-                               "<" + uri + "> " + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType .\n" +
-                               "<" + uri + "> " + won.WON.hasContentCompacted + " ?content .\n" +
+                               "<" + needUri + "> " + won.WON.isInStateCompacted + " ?state .\n" +
+                               "<" + needUri + "> " + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType .\n" +
+                               "<" + needUri + "> " + won.WON.hasContentCompacted + " ?content .\n" +
                                "?content dc:title ?title .\n" +
                                "OPTIONAL {?content " + won.WON.hasTagCompacted + " ?tags .}\n" +
                                "OPTIONAL {?content " + "geo:latitude" + " ?latitude .}\n" +
@@ -696,11 +696,11 @@ const rdfstore = window.rdfstore;
                                //TODO: add as soon as named graphs are handled by the rdf store
                                //                "}" +
                                //                "GRAPH ?metaURI {" +
-                               "<" + uri + "> " + " <" + "http://purl.org/dc/terms/created" + "> " + "?creationDate" +
+                               "<" + needUri + "> " + " <" + "http://purl.org/dc/terms/created" + "> " + "?creationDate" +
                                " .\n" +
-                               "<" + uri + "> " + won.WON.hasConnectionsCompacted + " ?connections .\n" +
-                               "<" + uri + "> " + won.WON.hasWonNodeCompacted + " ?wonNode .\n" +
-                               "OPTIONAL {<" + uri + "> " + won.WON.hasEventContainerCompacted + " ?eventContainer" +
+                               "<" + needUri + "> " + won.WON.hasConnectionsCompacted + " ?connections .\n" +
+                               "<" + needUri + "> " + won.WON.hasWonNodeCompacted + " ?wonNode .\n" +
+                               "OPTIONAL {<" + needUri + "> " + won.WON.hasEventContainerCompacted + " ?eventContainer" +
                                " .}\n" +
                                // if the triple below is used, we get > 1 result items, because usually here will be
                                // at least 2 events - need created and success response - therefore, it can be removed
@@ -711,11 +711,11 @@ const rdfstore = window.rdfstore;
                                "}";
                            resultObject = {};
                            privateData.store.execute(query, [], [], function (success, results) {
-                               if (rejectIfFailed(success, results, {message: "Could not load need " + uri + ".", allowNone: false, allowMultiple: false})) {
+                               if (rejectIfFailed(success, results, {message: "Could not load need " + needUri + ".", allowNone: false, allowMultiple: false})) {
                                    return;
                                }
                                var result = results[0];
-                               resultObject.uri = uri;
+                               resultObject.uri = needUri;
                                resultObject.basicNeedType = getSafeValue(result.basicNeedType);
                                resultObject.title = getSafeValue(result.title);
                                resultObject.tags = getSafeValue(result.tags);
@@ -725,7 +725,7 @@ const rdfstore = window.rdfstore;
                            });
                            return resultObject;
                        } catch (e) {
-                           return q.reject("could not load need " + uri + ". Reason: " + e);
+                           return q.reject("could not load need " + needUri + ". Reason: " + e);
                        } finally {
                            //we don't need to release after a promise resolves because
                            //this function isn't deferred.
