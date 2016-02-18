@@ -18,7 +18,8 @@
  * Created by fkleedorfer on 05.09.2014.
  */
 import {
-    checkHttpStatus
+    checkHttpStatus,
+    mapToMap
 } from '../utils';
 import * as q from 'q';
 
