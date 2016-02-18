@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * User: LEIH-NB
@@ -97,17 +98,25 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
 
     @Override
     public synchronized void addRemoteQueueListeners(List<String> endpoints, URI remoteEndpoint) throws CamelConfigurationFailedException {
-        logger.info("length of endpoints {}", endpoints.size());
         List<String> customSchemeEndpoints = adjustSchemeToRemoteEndpoint(endpoints, remoteEndpoint);
-        logger.debug(
-          "Adding queue listeners for remoteEndpoint " + remoteEndpoint + " for: " + customSchemeEndpoints.toString());
-
-        OwnerApplicationListenerRouteBuilder ownerApplicationListenerRouteBuilder = new OwnerApplicationListenerRouteBuilder(camelContext, customSchemeEndpoints, remoteEndpoint);
-        try {
-            camelContext.addRoutes(ownerApplicationListenerRouteBuilder);
-        } catch (Exception e) {
-            logger.debug("adding route to camel context failed", e);
-            throw new CamelConfigurationFailedException("adding route to camel context failed",e);
+        //remove endpoints already configured in the camel context
+        customSchemeEndpoints = customSchemeEndpoints.stream().filter(
+          x -> camelContext.hasEndpoint(x) == null
+        )
+                                                     .collect(Collectors.toList());
+        if (customSchemeEndpoints.size() > 0) {
+            logger.debug(
+              "Adding route for listening to remote queue {} ", remoteEndpoint);
+            OwnerApplicationListenerRouteBuilder ownerApplicationListenerRouteBuilder = new OwnerApplicationListenerRouteBuilder(
+              camelContext, customSchemeEndpoints, remoteEndpoint);
+            try {
+                camelContext.addRoutes(ownerApplicationListenerRouteBuilder);
+            } catch (Exception e) {
+                logger.debug("adding route to camel context failed", e);
+                throw new CamelConfigurationFailedException("adding route to camel context failed", e);
+            }
+        } else {
+            logger.debug("route for listening to remote queue {} already configured", remoteEndpoint);
         }
     }
 
