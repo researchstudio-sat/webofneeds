@@ -94,8 +94,8 @@ const actionHierarchy = {
         add:INJ_DEFAULT,
     },
     connections:{
-        load : (need) => dispatch =>{
-            won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], need.uri)
+        load : (needUri) => dispatch =>{
+            won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri)
                 .then(function(connectionsOfNeed){
                     console.log("fetching connections");
                     Promise.all(connectionsOfNeed.map(connection => getConnectionRelatedData(
@@ -118,19 +118,17 @@ const actionHierarchy = {
     },
     needs: {
         fetch: (data) => dispatch => {
-            const needLookups = data.needs.map(needUri => won.getNeed(needUri))
+            const needUris = data.needs;
+            const needLookups = needUris.map(needUri => won.getNeed(needUri));
             Promise.all(needLookups).then(needs => {
                 console.log("linked data fetched for needs: ", needs );
                 dispatch({ type: actionTypes.needs.fetch, payload: needs });
             });
 
             //TODO get rid of this multiple dispatching here (always push looping back into the reducer)
-            data.needs.forEach(needUri =>{
-                won.getNeed(needUri).then(need => {
-                    console.log("linked data fetched for need: ", needUri );
-                    //TODO this is the only occurance of connections__load atm. should make for easy refactoring
-                    dispatch(actionCreators.connections__load(need))
-                })})
+            needUris.forEach(needUri => {
+                dispatch(actionCreators.connections__load(needUri));
+            });
         },
         received: INJ_DEFAULT,
         connectionsReceived:INJ_DEFAULT,
