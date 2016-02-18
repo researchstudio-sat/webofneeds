@@ -904,6 +904,7 @@ const rdfstore = window.rdfstore;
 
     /**
      * Loads all URIs of a need's connections.
+     * @deprecated possible duplicate of `won.getConnectionsWithOwnNeed` (see there)
      */
     won.getconnectionUrisOfNeed = function(needUri) {
         if (typeof needUri === 'undefined' || needUri == null  ){
@@ -1427,6 +1428,9 @@ const rdfstore = window.rdfstore;
     }
     /**
      * @deprecated ? should return connection-objects but just returns the connectionUris
+     *             also it's not used anywhere. but it might be more elegant
+     *             in it's implementation than `getconnectionUrisOfNeed`. Does
+     *             it cover all edge-cases?
      * @param ownNeedUri
      * @return {*}
      */
