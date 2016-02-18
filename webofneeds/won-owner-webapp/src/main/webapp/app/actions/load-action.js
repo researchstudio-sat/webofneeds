@@ -28,44 +28,60 @@ export const loadAction = () => dispatch => {
     );
 }
 
-function fetchAllAccessibleAndRelevantData(needUris) {
+function fetchAllAccessibleAndRelevantData(ownNeedUris) {
 
-    const allAccessibleAndRelevantData = {/*...*/}
+
+
+    const needLookups = ownNeedUris.map(needUri => won.getNeed(needUri));
+    Promise.all(needLookups).then(ownNeeds => {
+        //TODO
+    });
+
+    const connectionLookups = ownNeedUris.map(ownNeedUri =>
+        won.getConnectionsOfNeed(ownNeedUri));
+    Promise.all(connectionLookups).then(
+        ///TODO TODO TODO TODO stopped here
+
+    )
+
+
+
+    //won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri)
+
+    const allAccessibleAndRelevantData = {/*...*/};
     /**
      const allAccessibleAndRelevantData = {
-                ownNeeds: {
-                    <needUri> : {
-                        *:*,
-                        connections: [<connectionUri>, <connectionUri>]
-                    }
-                    <needUri> : {
-                        *:*,
-                        connections: [<connectionUri>, <connectionUri>]
-                    }
-                },
-                theirNeeds: {
-                    <needUri>: {
-                        *:*,
-                        connections: [<connectionUri>, <connectionUri>] <--?
-                    }
-                },
-                connections: {
-                    <connectionUri> : {
-                        *:*,
-                        events: [<eventUri>, <eventUri>]
-                    }
-                    <connectionUri> : {
-                        *:*,
-                        events: [<eventUri>, <eventUri>]
-                    }
-                }
-                events: {
-                    <eventUri> : { *:* },
-                    <eventUri> : { *:* }
-                }
-             }
-
-
+        ownNeeds: {
+            <needUri> : {
+                *:*,
+                connections: [<connectionUri>, <connectionUri>]
+            }
+            <needUri> : {
+                *:*,
+                connections: [<connectionUri>, <connectionUri>]
+            }
+        },
+        theirNeeds: {
+            <needUri>: {
+                *:*,
+                connections: [<connectionUri>, <connectionUri>] <--?
+            }
+        },
+        connections: {
+            <connectionUri> : {
+                *:*,
+                events: [<eventUri>, <eventUri>]
+            }
+            <connectionUri> : {
+                *:*,
+                events: [<eventUri>, <eventUri>]
+            }
+        }
+        events: {
+            <eventUri> : { *:* },
+            <eventUri> : { *:* }
+        }
+     }
      */
 
 

@@ -394,3 +394,31 @@ export function withDefaults(obj, defaults) {
     }
     return ret;
 }
+
+/**
+ * applies a function over the array of unique
+ * elements and saves them as values in a Map.
+ * the keys are the original elements.
+ * @param f
+ * @param set an array with unique values
+ * @return {*}
+ */
+export function mapToMap(f, set) {
+    return new Map(
+        set.map(element => [element, f(element)])
+    );
+}
+
+/**
+ * Maps `f` over the values of `map`
+ * @param f
+ * @param map
+ * @return {Map}
+ */
+export function mapOverValues(f, map) {
+    const newMap = new Map();
+    for(const [k,v] of map.entries()) {
+        newMap.set(k, f(v));
+    }
+    return newMap;
+}
