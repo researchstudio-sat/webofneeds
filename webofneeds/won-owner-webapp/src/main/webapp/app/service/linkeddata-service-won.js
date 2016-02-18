@@ -905,20 +905,20 @@ const rdfstore = window.rdfstore;
     /**
      * Loads all URIs of a need's connections.
      */
-    won.getconnectionUrisOfNeed = function(uri) {
-        if (typeof uri === 'undefined' || uri == null  ){
+    won.getconnectionUrisOfNeed = function(needUri) {
+        if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getconnectionUrisOfNeed: uri must not be null"};
         }
-        return won.ensureLoaded(uri).then(
+        return won.ensureLoaded(needUri).then(
             function(){
-                var lock = getReadUpdateLockPerUri(uri);
+                var lock = getReadUpdateLockPerUri(needUri);
                 return lock.acquireReadLock().then(
                     function() {
                         try {
-                            var subject = uri;
+                            var subject = needUri;
                             var predicate = won.WON.hasConnections;
                             var connectionsPromises = [];
-                            privateData.store.node(uri, function (success, graph) {
+                            privateData.store.node(needUri, function (success, graph) {
                                 var resultGraph = graph.match(subject, predicate, null);
                                 if (resultGraph != null && resultGraph.length > 0) {
                                     for (key in resultGraph.triples) {
@@ -950,7 +950,7 @@ const rdfstore = window.rdfstore;
                                     return merged;
                                 });
                         } catch (e) {
-                            q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
+                            q.reject("could not get connection URIs of need + " + needUri + ". Reason:" + e);
                         } finally {
                             lock.releaseReadLock();
                         }
