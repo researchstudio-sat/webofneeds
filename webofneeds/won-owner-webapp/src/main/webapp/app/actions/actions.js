@@ -48,13 +48,17 @@ import { hierarchy2Creators } from './action-utils';
 import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 import { buildCreateMessage } from '../won-message-utils';
+
+import { loadAction } from './load-action';
+
 /**
  * all values equal to this string will be replaced by action-creators that simply
  * passes it's argument on as payload on to the reducers
  */
 const INJ_DEFAULT = 'INJECT_DEFAULT_ACTION_CREATOR';
 const actionHierarchy = {
-    /* actions received as responses or push notifications */
+    /* actions received as user responses or push notifications */
+    load: loadAction, /* triggered on pageload to cause initial crawling of linked-data and other startup tasks*/
     user: {
         /* contains all user-bound data, e.g. ownedPosts,
          * drafts, messages,...
