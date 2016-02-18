@@ -1532,16 +1532,6 @@ const rdfstore = window.rdfstore;
 
     }
 
-
-    /**
-     * Loads the connections for the need with the specified URI into an array of js objects.
-     * @return the array or null if no data is found for that URI in the local datastore
-     */
-    won.getConnections = function(uri) {
-        //TODO: SPARQL query that returns an array of connections
-    }
-
-
     /**
      * Executes the specified crawlableQuery, returns a promise to its results, which may become available
      * after downloading the required content.
