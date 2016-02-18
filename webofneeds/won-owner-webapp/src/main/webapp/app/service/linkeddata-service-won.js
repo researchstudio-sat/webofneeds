@@ -1486,9 +1486,9 @@ const rdfstore = window.rdfstore;
      * @return the array or null if no data is found for that URI in the local datastore
      */
     //TODO refactor this method.
-    won.getConnectionInStateForNeedWithRemoteNeed = function(uri,connectionState) {
+    won.getConnectionInStateForNeedWithRemoteNeed = function(needUri,connectionState) {
 
-        return won.getconnectionUrisOfNeed(uri).then(function(connectionUris){
+        return won.getconnectionUrisOfNeed(needUri).then(function(connectionUris){
             let promises=[];
             connectionUris.forEach(function(connection){
                 let resultObject = {}
@@ -1502,17 +1502,17 @@ const rdfstore = window.rdfstore;
                         "select ?remoteNeed \n" +
                         " where { \n" +
                         "<"+connectionData.uri+"> a won:Connection; \n" +
-                        "              won:belongsToNeed <" +uri +"> ; \n" +
+                        "              won:belongsToNeed <" +needUri +"> ; \n" +
                         "              won:hasRemoteNeed ?remoteNeed; \n"+
                         "              won:hasConnectionState "+ connectionState +". \n"+
                         "} \n"
 
                     privateData.store.execute(query,[],[],function(success,results){
-                        if (rejectIfFailed(success, results, {message: "Error loading connection for need " + uri + "in state"+connectionState+".", allowNone: true, allowMultiple: true})) {
+                        if (rejectIfFailed(success, results, {message: "Error loading connection for need " + needUri + "in state"+connectionState+".", allowNone: true, allowMultiple: true})) {
                             return;
                         }
                         let needs = []
-                        let ownNeedPromise = won.getNeed(uri);
+                        let ownNeedPromise = won.getNeed(needUri);
                         needs.push(ownNeedPromise);
                         let remoteNeedPromise = won.getNeed(results[0].remoteNeed.value)
                          needs.push(remoteNeedPromise)
