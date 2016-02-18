@@ -999,22 +999,6 @@ const rdfstore = window.rdfstore;
             });
     }
     
-    
-
-    won.getConnection = function(connectionUri) {
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getConnection: connectionUri must not be null"};
-        }
-        return won.getNodeWithAttributes(connectionUri);
-    }
-
-    won.getConnectionEvent = function(eventUri, requesterWebId) {
-        if (typeof eventUri === 'undefined' || eventUri == null  ){
-            throw {message : "getConnectionEvent: eventUri must not be null"};
-        }
-        return won.getNodeWithAttributes(eventUri, requesterWebId);
-    }
-
     /**
      * @param connectionUri
      * @param requesterWebId
@@ -1311,6 +1295,9 @@ const rdfstore = window.rdfstore;
         );
     }
 
+    //aliases (formerly functions that were just pass-throughs)
+    won.getConnection =
+    won.getConnectionEvent =
     /**
      * Fetches the triples where URI is subject and add objects of those triples to the
      * resulting structure by the localname of the predicate.
