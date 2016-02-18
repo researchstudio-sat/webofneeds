@@ -1391,16 +1391,6 @@ const rdfstore = window.rdfstore;
         return deferred.promise;
     }
     
-    
-
-    /**
-     * Loads the default data of the need with the specified URI into a js object.
-     * @return the object or null if no data is found for that URI in the local datastore
-     */
-    won.getMessage = function(uri) {
-        //TODO: SPARQL query that returns the common message properties
-    }
-
     won.getConnectionWithOwnAndRemoteNeed= function(ownNeedUri,remoteNeedUri){
         return won.getconnectionUrisOfNeed(ownNeedUri).then(connectionUris=>{
             let data = Q.defer()
