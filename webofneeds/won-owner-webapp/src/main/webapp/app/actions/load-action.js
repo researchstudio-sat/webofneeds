@@ -4,6 +4,7 @@
 
 import { actionTypes, actionCreators } from './actions';
 import { checkHttpStatus } from '../utils';
+import  won from '../won-es6';
 
 
 export const loadAction = () => dispatch => {

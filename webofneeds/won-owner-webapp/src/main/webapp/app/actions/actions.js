@@ -51,6 +51,8 @@ import { buildCreateMessage } from '../won-message-utils';
 
 import { loadAction } from './load-action';
 
+import  won from '../won-es6';
+
 /**
  * all values equal to this string will be replaced by action-creators that simply
  * passes it's argument on as payload on to the reducers
