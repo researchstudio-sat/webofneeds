@@ -42,6 +42,7 @@ import {
     delay,
     checkHttpStatus,
     watchImmutableRdxState,
+    entries,
 } from '../utils';
 
 import { hierarchy2Creators } from './action-utils';
@@ -460,6 +461,13 @@ function getConnectionRelatedData(needUri,remoteNeedUri,connectionUri) {
     const ownNeed = won.getNeed(needUri);
     const connection = won.getConnection(connectionUri);
     const events = won.getEventsOfConnection(connectionUri, needUri)
+        .then(eventsLookup => {
+            const eventList = [];
+            for(let [uri, event] of entries(eventsLookup)) {
+                eventList.push(event);
+            }
+            return eventList;
+        });
 
     return Promise.all([remoteNeed, ownNeed, connection, events])
         .then(results => ({

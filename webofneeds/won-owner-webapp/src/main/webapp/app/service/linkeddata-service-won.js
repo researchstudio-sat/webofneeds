@@ -1016,14 +1016,19 @@ const rdfstore = window.rdfstore;
     won.getLatestEventOfConnection = (connectionUri, requesterWebId) =>
         won.getEventsOfConnection(connectionUri, requesterWebId)
             //find latest event:
-            .then(events => events.reduce( (prev, curr) =>
-                Number.parseInt(prev.hasReceivedTimestamp) >=
-                Number.parseInt(curr.hasReceivedTimestamp) ?
-                    prev : curr)
-        );
+            .then(eventsLookup => {
+                let latestEvent = {};
+                for(let [eventUri, event] of entries(eventsLookup)) {
+                    const latestEventTime = Number.parseInt(latestEvent.hasReceivedTimestamp)
+                    const eventTime = Number.parseInt(event.hasReceivedTimestamp)
+                    latestEvent = latestEventTime >= eventTime ? latestEvent : event;
+                }
+                return latestEvent;
+            });
 
     /**
-     * Returns all events associated with a given connection.
+     * Returns all events associated with a given connection
+     * in an object of (eventUri -> eventData)
      * @param connectionUri
      * @param requesterWebId
      */
@@ -1037,8 +1042,13 @@ const rdfstore = window.rdfstore;
             .then(connection => connection.hasEventContainer)
             .then(eventContainerUri => won.getNodeWithAttributes(eventContainerUri, requesterWebId))
             .then(eventContainer => eventContainer.member)
+            .then(eventUris => won.urisToLookupMap(eventUris,
+                    eventUri => won.getConnectionEvent(eventUri, requesterWebId))
+            )
+            /*
             .then(eventUris => eventUris.map(eventUri => won.getConnectionEvent(eventUri, requesterWebId)))
             .then(queries => Promise.all(queries))
+            */
             .catch(e => `Could not get all events of connection ${connectionUri}. Reason: ${e}`);
     };
 
