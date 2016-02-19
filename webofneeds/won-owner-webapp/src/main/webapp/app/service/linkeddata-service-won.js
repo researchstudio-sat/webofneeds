@@ -19,7 +19,7 @@
  */
 import {
     checkHttpStatus,
-    mapToMap
+    entries
 } from '../utils';
 import * as q from 'q';
 

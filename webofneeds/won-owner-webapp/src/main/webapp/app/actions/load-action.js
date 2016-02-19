@@ -3,7 +3,7 @@
  */
 
 import { actionTypes, actionCreators } from './actions';
-import { checkHttpStatus } from '../utils';
+import { checkHttpStatus, entries } from '../utils';
 import  won from '../won-es6';
 
 export const loadAction = () => dispatch => {
@@ -27,9 +27,8 @@ export const loadAction = () => dispatch => {
     );
 }
 
+window.entries4dbg = entries;
 function fetchAllAccessibleAndRelevantData(ownNeedUris) {
-
-
 
     won.urisToLookupMap(ownNeedUris, won.getNeed).then(ownNeeds => {
         //ownNeeds[needUri]
