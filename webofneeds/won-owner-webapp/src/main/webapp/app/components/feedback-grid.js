@@ -13,11 +13,11 @@ function genComponentConf() {
                 <img class="feedback__icon selected" src="generated/icon-sprite.svg#ico36_feedback_good_white"/>
                 <span class="feedback__text">Good - request conversation</span>
             </div>
-            <div class="feedback" ng-click="self.rateMatch(1)">
+            <!--div class="feedback" ng-click="self.rateMatch(1)">
                 <img class="feedback__icon unselected" src="generated/icon-sprite.svg#ico36_feedback_ok"/>
                 <img class="feedback__icon selected" src="generated/icon-sprite.svg#ico36_feedback_ok_white"/>
                 <span class="feedback__text">OK - request conversation</span>
-            </div>
+            </div-->
             <div class="feedback" ng-click="self.rateMatch(2)">
                 <img class="feedback__icon unselected" src="generated/icon-sprite.svg#ico36_feedback_notatall_hi"/>
                 <img class="feedback__icon selected" src="generated/icon-sprite.svg#ico36_feedback_notatall_white"/>
@@ -41,12 +41,12 @@ function genComponentConf() {
                     this.connections__rate(this.item, 0);
                     this.openRequestDialog();
                     break;
-                case 1:
+                /*case 1:
+                    //OPTION OK WILL NOT BE IMPLEMENTED ANYMORE
                     console.log("RATE OK");
-                    //TODO: ADD OK RATING
                     this.connections__rate(this.item, 1);
                     this.openRequestDialog();
-                    break;
+                    break;*/
                 case 2:
                     console.log("RATE BAD");
                     this.connections__close(this.item);
