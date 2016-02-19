@@ -34,6 +34,9 @@
  * As a rule of thumb the lion's share of all processing should happen
  * in the reducers.
  */
+
+import  won from '../won-es6';
+
 import {
     tree2constants,
     deepFreeze,
@@ -55,8 +58,8 @@ import { buildCreateMessage,
          buildConnectMessage } from '../won-message-utils';
 
 import { loadAction } from './load-action';
+import { matchesLoad } from './matches-actions';
 
-import  won from '../won-es6';
 
 /**
  * all values equal to this string will be replaced by action-creators that simply
@@ -64,13 +67,8 @@ import  won from '../won-es6';
  */
 const INJ_DEFAULT = 'INJECT_DEFAULT_ACTION_CREATOR';
 const actionHierarchy = {
-    /* actions received as user responses or push notifications */
     load: loadAction, /* triggered on pageload to cause initial crawling of linked-data and other startup tasks*/
     user: {
-        /* contains all user-bound data, e.g. ownedPosts,
-         * drafts, messages,...
-         * This action will likely be caused as a consequence of signing in.
-         */
         loggedIn: INJ_DEFAULT,
         loginFailed: INJ_DEFAULT,
         registerFailed: INJ_DEFAULT
@@ -80,161 +78,37 @@ const actionHierarchy = {
         read:INJ_DEFAULT
     },
     matches: {
-        load:(data) => (dispatch, getState) => {
-            const state = getState();
-            for(let needUri in data){
-                won.getConnectionInStateForNeedWithRemoteNeed(needUri, "won:Suggested").then(function(results){
-                    let needData = state.getIn(['needs', 'ownNeeds', needUri]).toJS();
-                    let data = { ownNeed: needData, connections: results };
-                    //TODO only one action should be dispatched for every interaction! (reducers should be able to handle arrays)
-                    results.forEach(function(entry){
-                        dispatch(actionCreators.matches__add(entry))
-                    })
-                })
-            }
-        },
+        load: matchesLoad,
         add:INJ_DEFAULT,
     },
     connections:{
-      fetch:(data)=>dispatch=>{
-              var allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], data.needUri);
-              allConnectionsPromise.then(function(connections){
-                  console.log("fetching connections")
-                  dispatch(actionCreators.needs__connectionsReceived({needUri:data.needUri,connections:connections}))
-                  dispatch(actionCreators.events__fetch({connectionUris:connections}))
-              })
-          },
-      load : (needUris) => dispatch =>{
-            needUris.forEach(needUri =>
-                won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri)
-                    .then(function(connectionsOfNeed){
-                        console.log("fetching connections");
-                        Promise.all(connectionsOfNeed.map(connection => getConnectionRelatedData(
-                            connection.need.value,
-                            connection.remoteNeed.value,
-                            connection.connection.value
-                        )))
-                        .then(connectionsWithRelatedData =>
-                            dispatch({
-                                type: actionTypes.connections.load,
-                                payload: connectionsWithRelatedData
-                            })
-                        );
-                    })
-            );
-        },
-        open: (connectionData,message)=>(dispatch,getState) =>{
-            const state = getState();
-            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
-            let messageData = null;
-            let deferred = Q.defer()
-            won.getConnection(eventData.connection.uri).then(connection=>{
-                let msgToOpenFor = {event:eventData,connection:connection}
-                buildOpenMessage(msgToOpenFor,message).then(messageData=>{
-                    deferred.resolve(messageData);
-                })
-            })
-            deferred.promise.then((action)=>{
-                dispatch(actionCreators.messages__send(action))
-            })
-        },
-        connect: (connectionData,message)=>(dispatch,getState) =>{
-            const state = getState();
-            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
-            let messageData = null;
-            let deferred = Q.defer()
-            won.getConnection(eventData.connection.uri).then(connection=>{
-                let msgToOpenFor = {event:eventData,connection:connection}
-                buildConnectMessage(msgToOpenFor,message).then(messageData=>{
-                    deferred.resolve(messageData);
-                })
-            })
-            deferred.promise.then((action)=>{
-                dispatch(actionCreators.messages__send(action))
-            })
-        },
-        close: (connectionData)=>(dispatch,getState) =>{
-            const state = getState();
-            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
-            let messageData = null;
-            let deferred = Q.defer()
-            won.getConnection(eventData.connection.uri).then(connection=>{
-                let msgToOpenFor = {event:eventData,connection:connection}
-                buildCloseMessage(msgToOpenFor).then(messageData=>{
-                    deferred.resolve(messageData);
-                })
-            })
-            deferred.promise.then((action)=>{
-                dispatch(actionCreators.messages__send(action))
-            })
-        },
-        rate: (connectionData,rating) => (dispatch,getState) =>{
-            console.log(connectionData);
-            console.log(rating);
-
-            const state = getState();
-            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
-            let messageData = null;
-            let deferred = Q.defer()
-            won.getConnection(eventData.connection.uri).then(connection=>{
-                let msgToOpenFor = {event:eventData, connection: connection}
-                buildRateMessage(msgToOpenFor,rating).then(messageData=>{
-                    deferred.resolve(messageData);
-                })
-            })
-            deferred.promise.then((action)=>{
-                dispatch(actionCreators.messages__send(action))
-            })
-        },
+        fetch: connectionsFetch,
+        load: connectionsLoad,
+        open: connectionsOpen,
+        connect: connectionsConnect,
+        close: connectionsClose,
+        rate: connectionsRate,
         sendOpen:INJ_DEFAULT,
         add:INJ_DEFAULT,
         reset:INJ_DEFAULT,
     },
     needs: {
-        fetch: (data) => dispatch => {
-            const needUris = data.needs;
-            const needLookups = needUris.map(needUri => won.getNeed(needUri));
-            Promise.all(needLookups).then(needs => {
-                console.log("linked data fetched for needs: ", needs );
-                dispatch({ type: actionTypes.needs.fetch, payload: needs });
-            });
-
-            //TODO get rid of this multiple dispatching here (always push looping back into the reducer)
-            dispatch(actionCreators.connections__load(needUris));
-            /*
-            needUris.forEach(needUri => {
-                dispatch(actionCreators.connections__load(needUri));
-            });
-            */
-        },
+        fetch: needsFetch,
         received: INJ_DEFAULT,
         connectionsReceived:INJ_DEFAULT,
         clean:INJ_DEFAULT,
         failed: INJ_DEFAULT
     },
     drafts: {
-        /*
-         * A new draft was created (either through the view in this client or on another browser)
-         */
-        new: INJ_DEFAULT,
-        /*
-         * A draft has changed. Pass along the draftURI and the respective data.
-         */
-        change: {
+        new: INJ_DEFAULT, // A new draft was created (either through the view in this client or on another browser)
+        change: { // A draft has changed. Pass along the draftURI and the respective data.
             type: INJ_DEFAULT,
             title: INJ_DEFAULT,
             thumbnail: INJ_DEFAULT,
         },
 
         delete: INJ_DEFAULT,
-
-        publish: (draft, nodeUri) => {
-            const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
-            return {
-                type: actionTypes.drafts.publish,
-                payload: { eventUri, message, needUri, draftId: draft.draftId }
-            };
-        },
+        publish: draftsPublish,
         publishSuccessful: INJ_DEFAULT
     },
     router: {
@@ -258,311 +132,36 @@ const actionHierarchy = {
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
          */
         requestWsReset_Hack: INJ_DEFAULT,
-        messageReceived:(data)=>dispatch=> {
-            //TODO move this switch-case to the messaging agent
-            console.log('messages__messageReceived: ', data)
-            getEventData(data).then(event=>{
-                console.log('messages__messageReceived: event.hasMessageType === ', event.hasMessageType)
-                window.event4dbg = event;
-                if(event.hasMessageType === won.WONMSG.successResponseCompacted) {
-                    dispatch(actionCreators.messages__successResponseMessageReceived(event))
-                }
-                else if(event.hasMessageType === won.WONMSG.hintMessageCompacted){
-                    dispatch(actionCreators.messages__hintMessageReceived(event))
-                }
-                else if(event.hasMessageType === won.WONMSG.connectMessageCompacted){
-                    dispatch(actionCreators.messages__connectMessageReceived(event))
-                }
-            })
-
-        },
-        successResponseMessageReceived :(event)=>(dispatch,getState) =>{
-            const state = getState()
-            console.log('received response to ', event.isResponseTo, ' of ', event);
-
-            //TODO do all of this in actions.js?
-            if (event.isResponseToMessageType === won.WONMSG.createMessageCompacted) {
-                console.log("got response for CREATE: " + event.hasMessageType);
-                //TODO: if negative, use alternative need URI and send again
-                //fetch need data and store in local RDF store
-                //get URI of newly created need from message
-
-                //load the data into the local rdf store and publish NeedCreatedEvent when done
-                var needURI = event.hasReceiverNeed;
-                won.ensureLoaded(needURI)
-                    .then(
-                    function (value) {
-                        var eventData = won.clone(event);
-                        eventData.eventType = won.EVENT.NEED_CREATED;
-                        setCommStateFromResponseForLocalNeedMessage(eventData);
-                        eventData.needURI = needURI;
-                        won.getNeed(needURI)
-                            .then(function(need){
-
-                                console.log("Dispatching action " + won.EVENT.NEED_CREATED);
-                                dispatch(actionCreators.drafts__publishSuccessful({
-                                    publishEventUri: event.isResponseTo,
-                                    needUri: event.hasSenderNeed,
-                                    eventData:eventData
-                                }));
-                                dispatch(actionCreators.needs__received(need));
-                                //deferred.resolve(needURI);
-                            });
-                    });
-
-                // dispatch routing change
-                //TODO back-button doesn't work for returning to the draft
-                //TODO instead of going to the feed, this should go back to where the user was before starting the creation process.
-                dispatch(actionCreators.router__stateGo('feed'));
-
-                //TODO add to own needs
-                //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
-
-            } else if(event.isResponseToMessageType === won.WONMSG.openMessageCompacted){
-                console.log("got response for OPEN: "+event.hasMessageType)
-                let eventUri = null;
-                let isRemoteResponse = false;
-                //TODO maybe refactor these response message handling
-                if (state.getIn(['messages','waitingForAnswer', event.isRemoteResponseTo])){
-                    eventUri = event.isRemoteResponseTo
-                    dispatch(actionCreators.messages__remoteResponseReceived(event.isRemoteResponseTo))
-
-                    //TODO: handle these cases
-                    //this.gotResponseFromRemoteNode = true;
-                } else if (state.getIn(['messages','waitingForAnswer', event.isResponseTo])) {
-                    dispatch(actionCreators.messages__ownResponseReceived(event.isResponseTo))
-                    eventUri = event.isResponseTo
-                    //TODO: handle these cases
-                    //this.gotResponseFromOwnNode = true;
-                }
-                if (!isSuccessMessage(event)){
-                    console.log(event)
-                }
-
-                if(state.getIn(['messages','waitingForAnswer', eventUri]).ownResponse===true && state.getIn(['messages','waitingForAnswer', eventUri]).remoteResponse===true){
-                    won.invalidateCacheForNewMessage(event.hasReceiver).then(()=>{
-                        getConnectionRelatedDataAndDispatch(event.hasReceiverNeed,event.hasSenderNeed,event.hasReceiver,dispatch).then(connectionData=>{
-                            won.executeCrawlableQuery(
-                                won.queries["getLastEventUriOfConnection"],
-                                event.hasReceiver
-                            ).then(lastEvent=>{
-                                    connectionData.lastEvent = lastEvent;
-                                    dispatch(actionCreators.messages__openResponseReceived({eventUri,connectionData}))
-                                })
-
-                        })
-                    })
-
-
-                }
-/*                won.ensureLoaded(eventData.hasSender)
-                    .then(function(value){
-                        won.ensureLoaded(eventUri)
-                    })*/
-            }
-        },
-        connectMessageReceived:(data)=>dispatch=>{
-            data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
-            //TODO data.hasReceiver, the connectionUri is undefined in the response message
-            won.invalidateCacheForNewConnection(data.hasReceiver,data.hasReceiverNeed)
-                .then(() => {
-                    won.getConnectionWithOwnAndRemoteNeed(data.hasReceiverNeed,data.hasSenderNeed).then(connectionData=>{
-                        //TODO refactor
-                        data.unreadUri = connectionData.uri;
-                        dispatch(actionCreators.events__addUnreadEventUri(data));
-
-                        getConnectionRelatedData(data.hasReceiverNeed, data.hasSenderNeed, connectionData.uri)
-                            .then(data => dispatch({
-                                type: actionTypes.messages.connectMessageReceived,
-                                payload: data
-                            }));
-                    })
-
-                })
-        },
-        hintMessageReceived:(data)=>dispatch=>{
-            data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
-            won.invalidateCacheForNewConnection(data.hasReceiver,data.hasReceiverNeed)
-                .then(() => {
-                    let needUri = data.hasReceiverNeed;
-                    let match = {}
-
-                    data.unreadUri = data.hasReceiver;
-                    data.matchScore = data.framedMessage[won.WON.hasMatchScoreCompacted];
-                    data.matchCounterpartURI = won.getSafeJsonLdValue(data.framedMessage[won.WON.hasMatchCounterpart]);
-
-                    dispatch(actionCreators.events__addUnreadEventUri(data))
-
-                    getConnectionRelatedData(needUri, data.hasMatchCounterpart, data.hasReceiver)
-                        .then(data => dispatch({
-                            type: actionTypes.messages.hintMessageReceived,
-                            payload: data
-                        }));
-
-
-                // /add some properties to the eventData so as to make them easily accessible to consumers
-                //of the hint event
-                // below is commented as it seems to cause to hint event data loaded/displayed
-                //if (eventData.matchCounterpartURI != null) {
-                //    //load the data of the need the hint is about, if required
-                //    //linkedDataService.ensureLoaded(eventData.uri);
-                //    linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
-                //}
-
-                console.log("handling hint message")
-            });
-        }
+        messageReceived: messagesMessageReceived,
+        successResponseMessageReceived: messagesSuccessResponseMessageReceived,
+        connectMessageReceived: messagesConnectMessageReceived,
+        hintMessageReceived: messagesHintMessageReceived,
     },
-
-    /*
-    runMessagingAgent: () => (dispatch) => {
-        //TODO  move here?
-        // would require to make sendmsg an actionCreator as well
-        // con: aren't stateless functions (then again: the other async-creators aren't either)
-        //        - need to share reference to websocket for the send-method
-        //        - need to keep internal mq
-        // pro: everything that can create actions is listed here
-        createWs
-        ws.onmessage = parse && dispatch(...)^n
-    },
-    send = dispatch("pending")
-    */
-
-
-
-    verifyLogin: () => dispatch => {
-        fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
-            .then(checkHttpStatus)
-            .then(resp => resp.json())
-            /* handle data, dispatch actions */
-            .then(data => {
-                dispatch(actionCreators.user__loggedIn({loggedIn: true, email: data.username }));
-                dispatch(actionCreators.retrieveNeedUris());
-            })
-            /* handle: not-logged-in */
-            .catch(error =>
-                dispatch(actionCreators.user__loggedIn({loggedIn: false}))
-            );
-        ;
-    },
-
-    login: (username, password) => (dispatch) =>
-        fetch('/owner/rest/users/signin', {
-            method: 'post',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({username: username, password: password})
-        }).then(checkHttpStatus)
-        .then( response => {
-            return response.json()
-        }).then(
-            data => {
-                dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
-                dispatch(actionCreators.messages__requestWsReset_Hack());
-                dispatch(actionCreators.retrieveNeedUris());
-                //dispatch(actionCreators.posts__load());
-                dispatch(actionCreators.router__stateGo("feed"));
-            }
-        ).catch(
-            error => dispatch(actionCreators.user__loginFailed({loginError: "No such username/password combination registered."}))
-        ),
-    logout: () => (dispatch) =>
-        fetch('/owner/rest/users/signout', {
-            method: 'post',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({})
-        }).then(checkHttpStatus)
-        .then( response => {
-            return response.json()
-        }).then(
-            data => {
-                dispatch(actionCreators.messages__requestWsReset_Hack());
-                dispatch(actionCreators.user__loggedIn({loggedIn: false}));
-                dispatch(actionCreators.needs__clean({needs: {}}));
-                dispatch(actionCreators.posts__clean({}));
-                dispatch(actionCreators.connections__reset({}))
-                dispatch(actionCreators.router__stateGo("landingpage"));
-            }
-        ).catch(
-            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
-            error => {
-                console.log(error);
-                dispatch(actionCreators.user__loggedIn({loggedIn : true}))
-            }
-        ),
-    register: (username, password) => (dispatch) =>
-        fetch('/owner/rest/users/', {
-            method: 'post',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({username: username, password: password})
-        }).then(checkHttpStatus)
-            .then( response => {
-                return response.json()
-            }).then(
-                data => {
-                    dispatch(actionCreators.login(username,password))
-/*                    dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
-                    dispatch(actionCreators.router__stateGo("createNeed"));*/
-                }
-        ).catch(
-            //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
-            error => dispatch(actionCreators.user__registerFailed({registerError: "Registration failed"}))
-        ),
-    retrieveNeedUris: () => (dispatch) => {
-        fetch('/owner/rest/needs/', {
-            method: 'get',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include'
-        }).then(checkHttpStatus)
-            .then(response => {
-                return response.json()
-            }).then(
-                needs => dispatch(actionCreators.needs__fetch({needs: needs}))
-        ).catch(
-                error => dispatch(actionCreators.needs__failed({error: "user needlist retrieval failed"}))
-        )},
+    verifyLogin: accountVerifyLogin,
+    login: accountLogin,
+    logout: accountLogout,
+    register: accountRegister,
+    retrieveNeedUris: retrieveNeedUris,
     config: {
-        /**
-         * Anything that is load-once, read-only, global app-config
-         * should be initialized in this action. Ideally all of this
-         * should be baked-in/prerendered when shipping the code, in
-         * future versions => TODO
-         */
-        init: () => (dispatch) =>
-            /* this allows the owner-app-server to dynamically switch default nodes. */
-            fetch(/*relativePathToConfig=*/'appConfig/getDefaultWonNodeUri')
-                .then(checkHttpStatus)
-                .then(resp => resp.json())
-                .catch(err => {
-                        const defaultNodeUri = `${location.protocol}://${location.host}/won/resource`;
-                        console.info(
-                            'Failed to fetch default node uri at the relative path `',
-                            relativePathToConfig,
-                            '` (is the API endpoint there up and reachable?) -> falling back to the default ',
-                            defaultNodeUri
-                        );
-                        return defaultNodeUri;
-                })
-                .then(defaultNodeUri =>
-                    dispatch(actionCreators.config__update({ defaultNodeUri }))
-                ),
+        init: configInit,
 
         update: INJ_DEFAULT,
     }
+
+    /*
+     runMessagingAgent: () => (dispatch) => {
+     //TODO  move here?
+     // would require to make sendmsg an actionCreator as well
+     // con: aren't stateless functions (then again: the other async-creators aren't either)
+     //        - need to share reference to websocket for the send-method
+     //        - need to keep internal mq
+     // pro: everything that can create actions is listed here
+     createWs
+     ws.onmessage = parse && dispatch(...)^n
+     },
+     send = dispatch("pending")
+     */
+
 }
 
 function getConnectionRelatedData(needUri,remoteNeedUri,connectionUri) {
@@ -630,3 +229,452 @@ export const actionCreators = hierarchy2Creators(actionHierarchy);
 window.actionCreators4Dbg = actionCreators;
 window.actionTypes4Dbg = actionTypes;
 
+/////////// MOVE THESE
+
+export function connectionsFetch(data) {
+    return dispatch=> {
+        const allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], data.needUri);
+        allConnectionsPromise.then(function (connections) {
+            console.log("fetching connections")
+            dispatch(actionCreators.needs__connectionsReceived({needUri: data.needUri, connections: connections}))
+            dispatch(actionCreators.events__fetch({connectionUris: connections}))
+        })
+    }
+}
+
+export function connectionsLoad(needUris) {
+    return dispatch => {
+        needUris.forEach(needUri =>
+                won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri)
+                    .then(function (connectionsOfNeed) {
+                        console.log("fetching connections");
+                        Promise.all(connectionsOfNeed.map(connection => getConnectionRelatedData(
+                            connection.need.value,
+                            connection.remoteNeed.value,
+                            connection.connection.value
+                        )))
+                            .then(connectionsWithRelatedData =>
+                                dispatch({
+                                    type: actionTypes.connections.load,
+                                    payload: connectionsWithRelatedData
+                                })
+                        );
+                    })
+        );
+    }
+}
+
+export function connectionsOpen(connectionData,message) {
+    return (dispatch, getState) => {
+        const state = getState();
+        let eventData = state.getIn(['connections', 'connections', connectionData.connection.uri])
+        let messageData = null;
+        let deferred = Q.defer()
+        won.getConnection(eventData.connection.uri).then(connection=> {
+            let msgToOpenFor = {event: eventData, connection: connection}
+            buildOpenMessage(msgToOpenFor, message).then(messageData=> {
+                deferred.resolve(messageData);
+            })
+        })
+        deferred.promise.then((action)=> {
+            dispatch(actionCreators.messages__send(action))
+        })
+    }
+}
+
+export function connectionsConnect(connectionData,message) {
+    return (dispatch, getState) => {
+        const state = getState();
+        let eventData = state.getIn(['connections', 'connections', connectionData.connection.uri])
+        let messageData = null;
+        let deferred = Q.defer()
+        won.getConnection(eventData.connection.uri).then(connection=> {
+            let msgToOpenFor = {event: eventData, connection: connection}
+            buildConnectMessage(msgToOpenFor, message).then(messageData=> {
+                deferred.resolve(messageData);
+            })
+        })
+        deferred.promise.then((action)=> {
+            dispatch(actionCreators.messages__send(action))
+        })
+    }
+}
+
+export function connectionsClose(connectionData) {
+    return (dispatch, getState) => {
+        const state = getState();
+        let eventData = state.getIn(['connections', 'connections', connectionData.connection.uri])
+        let messageData = null;
+        let deferred = Q.defer()
+        won.getConnection(eventData.connection.uri).then(connection=> {
+            let msgToOpenFor = {event: eventData, connection: connection}
+            buildCloseMessage(msgToOpenFor).then(messageData=> {
+                deferred.resolve(messageData);
+            })
+        })
+        deferred.promise.then((action)=> {
+            dispatch(actionCreators.messages__send(action))
+        })
+    }
+}
+
+export function connectionsRate(connectionData,rating) {
+    return (dispatch, getState) => {
+        console.log(connectionData);
+        console.log(rating);
+
+        const state = getState();
+        let eventData = state.getIn(['connections', 'connections', connectionData.connection.uri])
+        let messageData = null;
+        let deferred = Q.defer()
+        won.getConnection(eventData.connection.uri).then(connection=> {
+            let msgToOpenFor = {event: eventData, connection: connection}
+            buildRateMessage(msgToOpenFor, rating).then(messageData=> {
+                deferred.resolve(messageData);
+            })
+        })
+        deferred.promise.then((action)=> {
+            dispatch(actionCreators.messages__send(action))
+        })
+    }
+}
+
+export function needsFetch(data) {
+    return dispatch => {
+        const needUris = data.needs;
+        const needLookups = needUris.map(needUri => won.getNeed(needUri));
+        Promise.all(needLookups).then(needs => {
+            console.log("linked data fetched for needs: ", needs );
+            dispatch({ type: actionTypes.needs.fetch, payload: needs });
+        });
+
+        //TODO get rid of this multiple dispatching here (always push looping back into the reducer)
+        dispatch(actionCreators.connections__load(needUris));
+        /*
+         needUris.forEach(needUri => {
+         dispatch(actionCreators.connections__load(needUri));
+         });
+         */
+    }
+}
+
+export function draftsPublish(draft, nodeUri) {
+    const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
+    return {
+        type: actionTypes.drafts.publish,
+        payload: { eventUri, message, needUri, draftId: draft.draftId }
+    };
+}
+
+export function messagesMessageReceived(data) {
+    return dispatch=> {
+        //TODO move this switch-case to the messaging agent
+        console.log('messages__messageReceived: ', data)
+        getEventData(data).then(event=> {
+            console.log('messages__messageReceived: event.hasMessageType === ', event.hasMessageType)
+            window.event4dbg = event;
+            if (event.hasMessageType === won.WONMSG.successResponseCompacted) {
+                dispatch(actionCreators.messages__successResponseMessageReceived(event))
+            }
+            else if (event.hasMessageType === won.WONMSG.hintMessageCompacted) {
+                dispatch(actionCreators.messages__hintMessageReceived(event))
+            }
+            else if (event.hasMessageType === won.WONMSG.connectMessageCompacted) {
+                dispatch(actionCreators.messages__connectMessageReceived(event))
+            }
+        })
+
+    }
+}
+
+export function messagesSuccessResponseMessageReceived(event) {
+    return (dispatch, getState) => {
+        const state = getState()
+        console.log('received response to ', event.isResponseTo, ' of ', event);
+
+        //TODO do all of this in actions.js?
+        if (event.isResponseToMessageType === won.WONMSG.createMessageCompacted) {
+            console.log("got response for CREATE: " + event.hasMessageType);
+            //TODO: if negative, use alternative need URI and send again
+            //fetch need data and store in local RDF store
+            //get URI of newly created need from message
+
+            //load the data into the local rdf store and publish NeedCreatedEvent when done
+            var needURI = event.hasReceiverNeed;
+            won.ensureLoaded(needURI)
+                .then(
+                function (value) {
+                    var eventData = won.clone(event);
+                    eventData.eventType = won.EVENT.NEED_CREATED;
+                    setCommStateFromResponseForLocalNeedMessage(eventData);
+                    eventData.needURI = needURI;
+                    won.getNeed(needURI)
+                        .then(function (need) {
+
+                            console.log("Dispatching action " + won.EVENT.NEED_CREATED);
+                            dispatch(actionCreators.drafts__publishSuccessful({
+                                publishEventUri: event.isResponseTo,
+                                needUri: event.hasSenderNeed,
+                                eventData: eventData
+                            }));
+                            dispatch(actionCreators.needs__received(need));
+                            //deferred.resolve(needURI);
+                        });
+                });
+
+            // dispatch routing change
+            //TODO back-button doesn't work for returning to the draft
+            //TODO instead of going to the feed, this should go back to where the user was before starting the creation process.
+            dispatch(actionCreators.router__stateGo('feed'));
+
+            //TODO add to own needs
+            //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
+
+        } else if (event.isResponseToMessageType === won.WONMSG.openMessageCompacted) {
+            console.log("got response for OPEN: " + event.hasMessageType)
+            let eventUri = null;
+            let isRemoteResponse = false;
+            //TODO maybe refactor these response message handling
+            if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
+                eventUri = event.isRemoteResponseTo
+                dispatch(actionCreators.messages__remoteResponseReceived(event.isRemoteResponseTo))
+
+                //TODO: handle these cases
+                //this.gotResponseFromRemoteNode = true;
+            } else if (state.getIn(['messages', 'waitingForAnswer', event.isResponseTo])) {
+                dispatch(actionCreators.messages__ownResponseReceived(event.isResponseTo))
+                eventUri = event.isResponseTo
+                //TODO: handle these cases
+                //this.gotResponseFromOwnNode = true;
+            }
+            if (!isSuccessMessage(event)) {
+                console.log(event)
+            }
+
+            if (state.getIn(['messages', 'waitingForAnswer', eventUri]).ownResponse === true && state.getIn(['messages', 'waitingForAnswer', eventUri]).remoteResponse === true) {
+                won.invalidateCacheForNewMessage(event.hasReceiver).then(()=> {
+                    getConnectionRelatedDataAndDispatch(event.hasReceiverNeed, event.hasSenderNeed, event.hasReceiver, dispatch).then(connectionData=> {
+                        won.executeCrawlableQuery(
+                            won.queries["getLastEventUriOfConnection"],
+                            event.hasReceiver
+                        ).then(lastEvent=> {
+                                connectionData.lastEvent = lastEvent;
+                                dispatch(actionCreators.messages__openResponseReceived({eventUri, connectionData}))
+                            })
+
+                    })
+                })
+
+
+            }
+            /*                won.ensureLoaded(eventData.hasSender)
+             .then(function(value){
+             won.ensureLoaded(eventUri)
+             })*/
+        }
+    }
+}
+
+export function messagesConnectMessageReceived(data) {
+    return dispatch=> {
+        data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
+        //TODO data.hasReceiver, the connectionUri is undefined in the response message
+        won.invalidateCacheForNewConnection(data.hasReceiver, data.hasReceiverNeed)
+            .then(() => {
+                won.getConnectionWithOwnAndRemoteNeed(data.hasReceiverNeed, data.hasSenderNeed).then(connectionData=> {
+                    //TODO refactor
+                    data.unreadUri = connectionData.uri;
+                    dispatch(actionCreators.events__addUnreadEventUri(data));
+
+                    getConnectionRelatedData(data.hasReceiverNeed, data.hasSenderNeed, connectionData.uri)
+                        .then(data => dispatch({
+                            type: actionTypes.messages.connectMessageReceived,
+                            payload: data
+                        }));
+                })
+
+            })
+    }
+}
+
+export function messagesHintMessageReceived(data) {
+    return dispatch=> {
+        data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
+        won.invalidateCacheForNewConnection(data.hasReceiver, data.hasReceiverNeed)
+            .then(() => {
+                let needUri = data.hasReceiverNeed;
+                let match = {}
+
+                data.unreadUri = data.hasReceiver;
+                data.matchScore = data.framedMessage[won.WON.hasMatchScoreCompacted];
+                data.matchCounterpartURI = won.getSafeJsonLdValue(data.framedMessage[won.WON.hasMatchCounterpart]);
+
+                dispatch(actionCreators.events__addUnreadEventUri(data))
+
+                getConnectionRelatedData(needUri, data.hasMatchCounterpart, data.hasReceiver)
+                    .then(data => dispatch({
+                        type: actionTypes.messages.hintMessageReceived,
+                        payload: data
+                    }));
+
+
+                // /add some properties to the eventData so as to make them easily accessible to consumers
+                //of the hint event
+                // below is commented as it seems to cause to hint event data loaded/displayed
+                //if (eventData.matchCounterpartURI != null) {
+                //    //load the data of the need the hint is about, if required
+                //    //linkedDataService.ensureLoaded(eventData.uri);
+                //    linkedDataService.ensureLoaded(eventData.matchCounterpartURI);
+                //}
+
+                console.log("handling hint message")
+            });
+    }
+}
+
+export function accountVerifyLogin() {
+    return dispatch => {
+        fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
+            .then(checkHttpStatus)
+            .then(resp => resp.json())
+            /* handle data, dispatch actions */
+            .then(data => {
+                dispatch(actionCreators.user__loggedIn({loggedIn: true, email: data.username}));
+                dispatch(actionCreators.retrieveNeedUris());
+            })
+            /* handle: not-logged-in */
+            .catch(error =>
+                dispatch(actionCreators.user__loggedIn({loggedIn: false}))
+        );
+        ;
+    }
+}
+
+export function accountLogin(username, password) {
+    return (dispatch) =>
+        fetch('/owner/rest/users/signin', {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({username: username, password: password})
+        }).then(checkHttpStatus)
+            .then(response => {
+                return response.json()
+            }).then(
+                data => {
+                dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
+                dispatch(actionCreators.messages__requestWsReset_Hack());
+                dispatch(actionCreators.retrieveNeedUris());
+                //dispatch(actionCreators.posts__load());
+                dispatch(actionCreators.router__stateGo("feed"));
+            }
+        ).catch(
+                error => dispatch(actionCreators.user__loginFailed({loginError: "No such username/password combination registered."}))
+        )
+}
+
+export function accountLogout() {
+    return (dispatch) =>
+        fetch('/owner/rest/users/signout', {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({})
+        }).then(checkHttpStatus)
+            .then(response => {
+                return response.json()
+            }).then(
+                data => {
+                dispatch(actionCreators.messages__requestWsReset_Hack());
+                dispatch(actionCreators.user__loggedIn({loggedIn: false}));
+                dispatch(actionCreators.needs__clean({needs: {}}));
+                dispatch(actionCreators.posts__clean({}));
+                dispatch(actionCreators.connections__reset({}))
+                dispatch(actionCreators.router__stateGo("landingpage"));
+            }
+        ).catch(
+            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
+                error => {
+                console.log(error);
+                dispatch(actionCreators.user__loggedIn({loggedIn: true}))
+            }
+        )
+}
+
+export function accountRegister(username, password) {
+    return (dispatch) =>
+        fetch('/owner/rest/users/', {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({username: username, password: password})
+        }).then(checkHttpStatus)
+            .then(response => {
+                return response.json()
+            }).then(
+                data => {
+                dispatch(actionCreators.login(username, password))
+                /*                    dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
+                 dispatch(actionCreators.router__stateGo("createNeed"));*/
+            }
+        ).catch(
+            //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
+                error => dispatch(actionCreators.user__registerFailed({registerError: "Registration failed"}))
+        )
+}
+
+export function retrieveNeedUris() {
+    return (dispatch) => {
+        fetch('/owner/rest/needs/', {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        }).then(checkHttpStatus)
+            .then(response => {
+                return response.json()
+            }).then(
+                needs => dispatch(actionCreators.needs__fetch({needs: needs}))
+        ).catch(
+                error => dispatch(actionCreators.needs__failed({error: "user needlist retrieval failed"}))
+        )
+    }
+}
+
+/**
+ * Anything that is load-once, read-only, global app-config
+ * should be initialized in this action. Ideally all of this
+ * should be baked-in/prerendered when shipping the code, in
+ * future versions => TODO
+ */
+export function configInit() {
+    return (dispatch) =>
+        /* this allows the owner-app-server to dynamically switch default nodes. */
+        fetch(/*relativePathToConfig=*/'appConfig/getDefaultWonNodeUri')
+            .then(checkHttpStatus)
+            .then(resp => resp.json())
+            .catch(err => {
+                const defaultNodeUri = `${location.protocol}://${location.host}/won/resource`;
+                console.info(
+                    'Failed to fetch default node uri at the relative path `',
+                    relativePathToConfig,
+                    '` (is the API endpoint there up and reachable?) -> falling back to the default ',
+                    defaultNodeUri
+                );
+                return defaultNodeUri;
+            })
+            .then(defaultNodeUri =>
+                dispatch(actionCreators.config__update({defaultNodeUri}))
+        )
+}
