@@ -19,6 +19,7 @@ package won.protocol.service;
 import com.hp.hpl.jena.query.Dataset;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.model.NeedState;
 
 import java.net.URI;
 
@@ -34,7 +35,16 @@ public interface LinkedDataService
    * @param page
    * @return
    */
-  public Dataset listNeedURIs(final int page);
+  public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int page);
+
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsBefore(final URI need);
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsAfter(final URI need);
+
+  public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int page, final Integer preferedSize, NeedState needState);
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsBefore(final URI need, final Integer preferedSize, NeedState needState);
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsAfter(final URI need, final Integer preferedSize, NeedState needState);
+
+  public Dataset listNeedURIs();
 
   /**
    * Returns a model containing all connection URIs.
@@ -59,6 +69,14 @@ public interface LinkedDataService
    * @throws NoSuchConnectionException
    */
   public Dataset getConnectionDataset(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException;
+
+  /**
+   * Returns a dataset containing all event uris belonging to the specified connection.
+   * @param connectionUri
+   * @return
+   * @throws NoSuchConnectionException
+   */
+  public Dataset listConnectionEventURIs(final URI connectionUri) throws NoSuchConnectionException;
 
   public Dataset getNodeDataset();
 

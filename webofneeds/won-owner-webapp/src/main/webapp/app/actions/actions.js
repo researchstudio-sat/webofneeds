@@ -118,8 +118,10 @@ const actionHierarchy = {
 
                   })
                 })
-      }
+      },
+      incomingAdd:(data)=>(dispatch,getState)=>{
 
+      }
     },
     connections:{
       fetch:(data)=>dispatch=>{
@@ -261,18 +263,17 @@ const actionHierarchy = {
     },
 
     messages: { /* websocket messages, e.g. post-creation, chatting */
-        send:INJ_DEFAULT,
-        waitingForAnswer: INJ_DEFAULT,
-        remoteResponseReceived:INJ_DEFAULT,
-        openResponseReceived:INJ_DEFAULT,
-        ownResponseReceived:INJ_DEFAULT,
+        markAsSent: INJ_DEFAULT,
         /**
          * TODO this action is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
          */
         requestWsReset_Hack: INJ_DEFAULT,
         messageReceived:(data)=>dispatch=> {
+            //TODO move this switch-case to the messaging agent
+            console.log('messages__messageReceived: ', data)
             getEventData(data).then(event=>{
+                console.log('messages__messageReceived: event.hasMessageType === ', event.hasMessageType)
                 window.event4dbg = event;
                 if(event.hasMessageType === won.WONMSG.successResponseCompacted) {
                     dispatch(actionCreators.messages__successResponseMessageReceived(event))
@@ -316,10 +317,10 @@ const actionHierarchy = {
                                     needUri: event.hasSenderNeed,
                                     eventData:eventData
                                 }));
-                                dispatch(actionCreators.needs__received(need))
+                                dispatch(actionCreators.needs__received(need));
                                 //deferred.resolve(needURI);
                             });
-                    })
+                    });
 
                 // dispatch routing change
                 //TODO back-button doesn't work for returning to the draft
@@ -567,24 +568,18 @@ const actionHierarchy = {
     }
 }
 var getConnectionRelatedDataAndDispatch=(needUri,remoteNeedUri,connectionUri,dispatch)=>{
-    var promises=[]
-    let remoteNeed= won.getNeed(remoteNeedUri)
-    let ownNeed=won.getNeed(needUri)
-    let connection=won.getConnection(connectionUri)
-    /*let lastEvent = won.executeCrawlableQuery(
-        won.queries["getLastEventUriOfConnection"],
-        connectionUri
-    )*/
-    //TODO: the code below doesnt work atm. meke it work later
-
-    promises.push(remoteNeed,ownNeed,connection)//,lastEvent)
+    const promises =[];
+    const remoteNeed = won.getNeed(remoteNeedUri);
+    const ownNeed = won.getNeed(needUri);
+    const connection = won.getConnection(connectionUri);
+    promises.push(remoteNeed,ownNeed,connection);
 
     Q.all(promises).then(results=>{
-        let resultObject={}
-        resultObject.remoteNeed=results[0]
-        resultObject.ownNeed = results[1]
-        resultObject.connection = results[2]
-        //resultObject.lastEvent = results[3]
+        const resultObject = {};
+        resultObject.remoteNeed = results[0];
+        resultObject.ownNeed = results[1];
+        resultObject.connection = results[2];
+        //resultObject.lastEvent = results[3];
         dispatch(actionCreators.connections__add(resultObject))
     })
 }

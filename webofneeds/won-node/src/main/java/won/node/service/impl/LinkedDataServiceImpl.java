@@ -34,6 +34,7 @@ import won.protocol.exception.NoSuchNeedException;
 import won.protocol.model.Connection;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
+import won.protocol.model.NeedState;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.LinkedDataService;
@@ -100,7 +101,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private String activeMqMatcherProtocolTopicNameNeedActivated;
   private String activeMqMatcherProtocolTopicNameNeedDeactivated;
 
-    public Dataset listNeedURIs(final int pageNum)
+  @Deprecated
+  public Dataset listNeedURIsOld(final int pageNum)
   {
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
@@ -121,6 +123,82 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Dataset ret = newDatasetWithNamedModel(createDataGraphUri(needListPageResource), model);
     addBaseUriAndDefaultPrefixes(ret);
     return ret;
+  }
+
+  public Dataset listNeedURIs()
+  {
+    Model model = ModelFactory.createDefaultModel();
+    setNsPrefixes(model);
+    Resource needListPageResource = null;
+    Collection<URI> uris = null;
+    uris = needInformationService.listNeedURIs();
+    needListPageResource = model.createResource(this.needResourceURIPrefix+"/");
+
+    for (URI needURI : uris) {
+      model.add(model.createStatement(needListPageResource, RDFS.member, model.createResource(needURI.toString())));
+    }
+    Dataset ret = newDatasetWithNamedModel(createDataGraphUri(needListPageResource), model);
+    addBaseUriAndDefaultPrefixes(ret);
+    return ret;
+  }
+
+
+  public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int pageNum)
+  {
+    return listNeedURIs(pageNum, null, null);
+  }
+
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsBefore(final URI need)
+  {
+    return listNeedURIsBefore(need, null, null);
+  }
+
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsAfter(final URI need)
+  {
+    return listNeedURIsAfter(need, null, null);
+  }
+
+  private NeedInformationService.PagedResource<Dataset> toContainerPage(String containerUri, Collection<URI>
+    uris) {
+
+    Model model = ModelFactory.createDefaultModel();
+    setNsPrefixes(model);
+    Resource needListPageResource = null;
+
+    needListPageResource = model.createResource(containerUri);
+
+    for (URI needURI : uris) {
+      model.add(model.createStatement(needListPageResource, RDFS.member, model.createResource(needURI.toString())));
+    }
+    Dataset dataset = newDatasetWithNamedModel(createDataGraphUri(needListPageResource), model);
+    addBaseUriAndDefaultPrefixes(dataset);
+    //TODO prev/next link info
+    NeedInformationService.PagedResource<Dataset> containerPage = new NeedInformationService.PagedResource(dataset,
+                                                                                                           true);
+    return containerPage;
+  }
+
+  public NeedInformationService.PagedResource<Dataset> listNeedURIs(final int pageNum, final Integer preferedSize,
+                                                                    NeedState needState) {
+
+    int infoServicePageNum = pageNum - 1;
+    NeedInformationService.Page page = needInformationService.listNeedURIs(infoServicePageNum, preferedSize, needState);
+    return toContainerPage(this.needResourceURIPrefix + "/", page.getContent());
+
+  }
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsBefore(final URI need, final Integer preferedSize,
+                                                                          NeedState needState) {
+
+    NeedInformationService.Page<URI> page = needInformationService.listNeedURIsBefore(need, preferedSize, needState);
+    return toContainerPage(this.needResourceURIPrefix + "/", page.getContent());
+
+  }
+  public NeedInformationService.PagedResource<Dataset> listNeedURIsAfter(final URI need, final Integer preferedSize,
+                                                                         NeedState needState) {
+
+    NeedInformationService.Page<URI> page = needInformationService.listNeedURIsAfter(need, preferedSize, needState);
+    return toContainerPage(this.needResourceURIPrefix + "/", page.getContent());
+
   }
 
   private String createDataGraphUri(Resource needListPageResource) {
@@ -248,7 +326,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
       blankNodeUriSpec.addProperty(WON.HAS_EVENT_URI_PREFIX, model.createLiteral(this.eventResourceURIPrefix));
   }
 
-  public Dataset getConnectionDataset(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException
+  public Dataset getConnectionDataset(final URI connectionUri, final boolean includeEventData) throws NoSuchConnectionException
   {
     Connection connection = needInformationService.readConnection(connectionUri);
 
@@ -267,25 +345,35 @@ public class LinkedDataServiceImpl implements LinkedDataService
     // add WON node link
     connectionResource.addProperty(WON.HAS_WON_NODE, model.createResource(this.resourceURIPrefix));
 
-    //create event container and attach it to the member
-    Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events", WON.EVENT_CONTAINER);
-    connectionResource.addProperty(WON.HAS_EVENT_CONTAINER, eventContainer);
-    connectionResource.addProperty(WON.HAS_REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));
-
     if (includeEventData) {
-      // add the events with the new format (only the URI, no content)
-      List<MessageEventPlaceholder> connectionEvents = messageEventRepository.findByParentURI(connectionUri);
-      for (MessageEventPlaceholder event : connectionEvents) {
-        model.add(model.createStatement(eventContainer,
-                                        RDFS.member,
-                                        model.getResource(event.getMessageURI().toString())));
-      }
+      //create event container and attach it to the member
+      Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events");
+      connectionResource.addProperty(WON.HAS_EVENT_CONTAINER, eventContainer);
+      connectionResource.addProperty(WON.HAS_REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));
+      addAdditionalData(model, connection.getConnectionURI(), connectionResource);
     }
 
     return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUri(connectionResource), model));
   }
 
+  public Dataset listConnectionEventURIs(final URI connectionUri) throws
+    NoSuchConnectionException
+  {
 
+    Model model = ModelFactory.createDefaultModel();
+    setNsPrefixes(model);
+
+    Connection connection = needInformationService.readConnection(connectionUri);
+    Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events", WON.EVENT_CONTAINER);
+    // add the events with the new format (only the URI, no content)
+    List<MessageEventPlaceholder> connectionEvents = messageEventRepository.findByParentURI(connectionUri);
+    for (MessageEventPlaceholder event : connectionEvents) {
+      model.add(model.createStatement(eventContainer,
+                                      RDFS.member,
+                                      model.getResource(event.getMessageURI().toString())));
+    }
+    return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUri(eventContainer), model));
+  }
 
   public Dataset getDatasetForUri(URI datasetUri) {
     Dataset result = rdfStorage.loadDataset(datasetUri);

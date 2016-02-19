@@ -21,8 +21,23 @@ import {
     checkHttpStatus
 } from '../utils';
 import * as q from 'q';
+
+import '../../scripts/rdfstore-js/rdf_store';
+const rdfstore = window.rdfstore;
+
 (function(){
     if(!won) won = {};
+
+    function apiEndpoint(dataUri, requesterWebId) {
+        const API_ENDPOINT = '/owner/rest/linked-data/?uri=';
+        const AUTH_PARAMETER = '&requester='
+
+        let requestUri = API_ENDPOINT + encodeURIComponent(dataUri);
+        if (requesterWebId) {
+            requestUri = requestUri + AUTH_PARAMETER+ encodeURIComponent(requesterWebId);
+        }
+        return requestUri;
+    }
 
     var privateData = {};
 
@@ -30,6 +45,7 @@ import * as q from 'q';
         privateData = {};
         //create an rdfstore-js based store as a cache for rdf data.
         privateData.store =  rdfstore.create();
+        window.store4dbg = privateData.store; //TODO deletme
         privateData.store.setPrefix("msg","http://purl.org/webofneeds/message#");
         privateData.store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         privateData.store.setPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
@@ -39,7 +55,7 @@ import * as q from 'q';
         privateData.readUpdateLocksPerUri = {}; //uri -> ReadUpdateLock
         privateData.cacheStatus = {} //uri -> {timestamp, cacheItemState}
     }
-    var CACHE_ITEM_STATE = { OK: 1, DIRTY: 2, UNRESOLVABLE: 3, FETCHING: 4};
+    const CACHE_ITEM_STATE = { OK: 1, DIRTY: 2, UNRESOLVABLE: 3, FETCHING: 4};
 
     won.ld_reset();
 
@@ -615,35 +631,16 @@ import * as q from 'q';
     }
 
     var fetchLinkedDataFromOwnServer = function(dataUri, requesterWebId) {
-        var requestUri = '/owner/rest/linked-data/?uri=' + encodeURIComponent(dataUri);
-        //if (requesterWebId != null) {
-        //    requestUri = requestUri + "&requester=" + encodeURIComponent(requesterWebId);
-        //}#var requestUri = '/owner/rest/linked-data/
-       // var requestUrl = new URL('/owner/rest/linked-data/')
-        //var params = {uri:dataUri}
-        if (typeof requesterWebId != 'undefined' && requesterWebId != null) {
-            requestUri = requestUri + "&reqeuster="+encodeURIComponent(requesterWebId);
-        }
-        var find = '%3A';
-        var re = new RegExp(find, 'g');
+        let requestUri = apiEndpoint(dataUri, requesterWebId);
+        const find = '%3A';
+        const re = new RegExp(find, 'g');
+        requestUri = requestUri.replace(re,':');
 
-
-        requestUri = requestUri.replace(re,':')
-        var promise = fetch(requestUri, {
+        return fetch(requestUri, {
             method: 'get',
             credentials: 'include'
-        })
-/*        promise.then(checkHttpStatus(response)).then(
-            function success(response){
-                return response.json();
-            },
-            function failure(response){
-                console.log("ERROR: could not fetched linked data " + dataUri + " for need " + requesterWebId)
-                return {};
-            }
-        )*/
-        return promise
-    }
+        });
+    };
 
     var loadFromURI = function(uri) {
         var deferred = q.defer();
@@ -978,34 +975,7 @@ import * as q from 'q';
                     });
             });
     }
-
-/*
-    won.getLastEventOfEachConnectionOfNeed = function(uri) {
-        if (typeof uri === 'undefined' || uri == null  ){
-            throw {message : "getLastEventOfEachConnectionOfNeed: uri must not be null"};
-        }
-        return won.getconnectionUrisOfNeed(uri)
-            .then(function(conUris) {
-                try {
-                    var promises = [];
-                    for (var conKey in conUris) {
-                        promises.push(won.getLastEventOfConnection(conUris[conKey]));
-                    }
-                    return somePromises(promises, function(key, reason){
-                        won.reportError("could not fetch last event of connection " + conUris[key], reason);
-                    }).then(function(val) {
-                        return won.deleteWhereNull(val)
-                    });
-                } catch (e) {
-                    return q.reject("could not get last event of connection " + uri + ". Reason: " + e);
-                }
-            }
-        );
-    }
-  */
-
-
-    won.getLastEventOfConnection = function(connectionUri) {
+    won.getLastEventOfConnection = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastEventOfConnection: connectionUri must not be null"};
         }
@@ -1013,7 +983,7 @@ import * as q from 'q';
             .then(function (connection) {
                 return won.getNeed(connection.hasRemoteNeed)
                     .then(function (need) {
-                        return won.getLastConnectionEvent(connectionUri)
+                        return won.getLastConnectionEvent(connectionUri, requesterWebId)
                             .then(
                                 function (event) {
                                     return {connection: connection, remoteNeed: need, event: event}
@@ -1030,11 +1000,11 @@ import * as q from 'q';
     }
 
 
-    won.getAllConnectionEvents = function(connectionUri) {
+    won.getAllConnectionEvents = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getAllConnectionEvents: connectionUri must not be null"};
         }
-        return won.getAllConnectioneventUris(connectionUri)
+        return won.getAllConnectioneventUris(connectionUri, requesterWebId)
             .then(function (eventUris) {
                 try {
                     var eventPromises = [];
@@ -1048,11 +1018,11 @@ import * as q from 'q';
             });
     }
 
-    won.getLastConnectionEvent = function(connectionUri) {
+    won.getLastConnectionEvent = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastConnectionEvent: connectionUri must not be null"};
         }
-        return won.getLastConnectioneventUri(connectionUri)
+        return won.getLastConnectioneventUri(connectionUri, requesterWebId)
             .then(function (eventUri) {
                     return won.getConnectionEvent(eventUri);
             })
@@ -1167,11 +1137,11 @@ import * as q from 'q';
 
 
 
-    won.getAllConnectioneventUris = function(connectionUri) {
+    won.getAllConnectioneventUris = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getAllConnectioneventUris: connectionUri must not be null"};
         }
-        return won.ensureLoaded(connectionUri).then(
+        return won.ensureLoaded(connectionUri, requesterWebId).then(
             function(){
                var lock = getReadUpdateLockPerUri(connectionUri);
                return lock.acquireReadLock().then(
@@ -1211,13 +1181,13 @@ import * as q from 'q';
             });
     }
 
-    won.crawlConnectionData = function(connectionUri){
+    won.crawlConnectionData = function(connectionUri, requesterWebId){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "crawlConnectionData: connectionUri must not be null"};
         }
-        return won.ensureLoaded(connectionUri).then(
+        return won.ensureLoaded(connectionUri, requesterWebId).then(
             function(){
-                return won.getAllConnectioneventUris(connectionUri).then(
+                return won.getAllConnectioneventUris(connectionUri, requesterWebId).then(
                     function(uris){
                         var eventPromises = [];
                         for (key in uris){
@@ -1231,11 +1201,11 @@ import * as q from 'q';
 
     }
 
-    won.getLastConnectioneventUri = function(connectionUri) {
+    won.getLastConnectioneventUri = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getLastConnectioneventUri: connectionUri must not be null"};
         }
-        return won.crawlConnectionData(connectionUri).then(
+        return won.crawlConnectionData(connectionUri, requesterWebId).then(
             function() {
                 var lock = getReadUpdateLockPerUri(connectionUri);
                 return lock.acquireReadLock().then(
@@ -1368,8 +1338,8 @@ import * as q from 'q';
                     });
     }
 
-    won.getLastEventTypeBeforeTime = function(connectionUri, beforeTimestamp) {
-        return won.crawlConnectionData(connectionUri).then(
+    won.getLastEventTypeBeforeTime = function(connectionUri, beforeTimestamp, requesterWebId) {
+        return won.crawlConnectionData(connectionUri, requesterWebId).then(
             function queryLastEventBeforeTime() {
                 var lock = getReadUpdateLockPerUri(connectionUri);
                 return lock.acquireReadLock().then(
@@ -1426,6 +1396,10 @@ import * as q from 'q';
      * Fetches the triples where URI is subject and add objects of those triples to the
      * resulting structure by the localname of the predicate.
      * The URI is added as property 'uri'.
+     *
+     * NOTE: multiple objects with the same predicates will overwrite each other. It also
+     * ignores prefixes.
+     *
      * @param eventUri
      */
     won.getNodeWithAttributes = function(uri, requesterWebId){
