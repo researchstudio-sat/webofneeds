@@ -252,6 +252,7 @@ const actionHierarchy = {
 
     messages: { /* websocket messages, e.g. post-creation, chatting */
         markAsSent: INJ_DEFAULT,
+        waitingForAnswer: INJ_DEFAULT,
         /**
          * TODO this action is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
@@ -571,7 +572,7 @@ function getConnectionRelatedData(needUri,remoteNeedUri,connectionUri) {
     const events = won.getEventsOfConnection(connectionUri, needUri)
         .then(eventsLookup => {
             const eventList = [];
-            for(let [uri, event] of entries(eventsLookup)) {
+            for (let [uri, event] of entries(eventsLookup)) {
                 eventList.push(event);
             }
             return eventList;
@@ -583,12 +584,13 @@ function getConnectionRelatedData(needUri,remoteNeedUri,connectionUri) {
             ownNeed: results[1],
             connection: results[2],
             events: results[3],
-        }))
+        }));
+}
 
 
 var isSuccessMessage = function isSuccessMessage(event) {
     return event.hasMessageType === won.WONMSG.successResponseCompacted;
-}
+};
 
 var messageTypeToEventType = {};
 messageTypeToEventType[won.WONMSG.hintMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED};

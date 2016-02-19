@@ -25,7 +25,7 @@ export default function(state = initialState, action = {}) {
 
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
-	case actionTypes.messages.openResponseReceived;
+        case actionTypes.messages.openResponseReceived:
             return storeConnectionAndRelatedData(state, action.payload);
 
         case actionTypes.connections.reset:
