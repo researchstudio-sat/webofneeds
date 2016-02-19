@@ -42,19 +42,30 @@ import {
     delay,
     checkHttpStatus,
     watchImmutableRdxState,
+    entries,
 } from '../utils';
 
 import { hierarchy2Creators } from './action-utils';
 import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
-import { buildCreateMessage } from '../won-message-utils';
+import { buildCreateMessage,
+         buildOpenMessage,
+         buildCloseMessage,
+         buildRateMessage,
+         buildConnectMessage } from '../won-message-utils';
+
+import { loadAction } from './load-action';
+
+import  won from '../won-es6';
+
 /**
  * all values equal to this string will be replaced by action-creators that simply
  * passes it's argument on as payload on to the reducers
  */
 const INJ_DEFAULT = 'INJECT_DEFAULT_ACTION_CREATOR';
 const actionHierarchy = {
-    /* actions received as responses or push notifications */
+    /* actions received as user responses or push notifications */
+    load: loadAction, /* triggered on pageload to cause initial crawling of linked-data and other startup tasks*/
     user: {
         /* contains all user-bound data, e.g. ownedPosts,
          * drafts, messages,...
@@ -65,59 +76,24 @@ const actionHierarchy = {
         registerFailed: INJ_DEFAULT
     },
     events:{
-      fetch:(data)=>dispatch=>{
-          data.connectionUris.forEach(function(connection){
-              console.log("fetch events of connection: "+connectdionUri)
-              won.getAllConnectionEvents(connection.connection).then(function(events){
-                  console.log(events)
-              })
-          })
-      },
-
         addUnreadEventUri:INJ_DEFAULT,
         read:INJ_DEFAULT
     },
     matches: {
-      load:(data)=>(dispatch,getState)=> {
-          const state=getState();
-          for(let need in data){
-              won.getConnectionInStateForNeedWithRemoteNeed(need,"won:Suggested").then(function(results){
-                  let needData = state.getIn(['needs','needs',need]).toJS();
-                  let data = {ownNeed:needData, connections:results }
-                  results.forEach(function(entry){
-                      dispatch(actionCreators.matches__add(entry))
-                  })
-
-              })
-          }
-      },
+        load:(data) => (dispatch, getState) => {
+            const state = getState();
+            for(let needUri in data){
+                won.getConnectionInStateForNeedWithRemoteNeed(needUri, "won:Suggested").then(function(results){
+                    let needData = state.getIn(['needs', 'ownNeeds', needUri]).toJS();
+                    let data = { ownNeed: needData, connections: results };
+                    //TODO only one action should be dispatched for every interaction! (reducers should be able to handle arrays)
+                    results.forEach(function(entry){
+                        dispatch(actionCreators.matches__add(entry))
+                    })
+                })
+            }
+        },
         add:INJ_DEFAULT,
-        hintsOfNeedRetrieved:INJ_DEFAULT
-    },
-    requests:{
-      incomingReceived:(data)=>(dispatch,getState)=>{
-          const state = getState();
-          state.getIn(['events','unreadEventUris',data.hasReceiver]).toJS()
-          Object.keys(state.getIn(['events','unreadEventUris']).toJS())
-                .map(key=>state.getIn(['events','unreadEventUris']).toJS()[key])
-                .filter(event =>{
-                    if(event.eventType === won.EVENT.CONNECT_RECEIVED){
-                        return true
-                    }
-                })
-                .forEach((incomingRequest)=>{
-                  console.log(incomingRequest)
-                  getConnectionRelatedData(needUri,data.hasMatchCounterpart,data.hasReceiver).then((results)=>{
-                      match.remoteNeed=results[1]
-                      match.ownNeed = results[0]
-                      match.connection = results[2]
-
-                  })
-                })
-      },
-      incomingAdd:(data)=>(dispatch,getState)=>{
-
-      }
     },
     connections:{
       fetch:(data)=>dispatch=>{
@@ -128,31 +104,108 @@ const actionHierarchy = {
                   dispatch(actionCreators.events__fetch({connectionUris:connections}))
               })
           },
-      load : (need)=>dispatch =>{
-          var allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], need.uri);
-          allConnectionsPromise.then(function(connections){
-              console.log("fetching connections")
-              connections.forEach(connection=>{
-                  getConnectionRelatedDataAndDispatch(connection.need.value,connection.remoteNeed.value,connection.connection.value,dispatch)
-              })
-          })
-      },
-        open: (connection,message)=>dispatch =>{
-
+      load : (needUris) => dispatch =>{
+            needUris.forEach(needUri =>
+                won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri)
+                    .then(function(connectionsOfNeed){
+                        console.log("fetching connections");
+                        Promise.all(connectionsOfNeed.map(connection => getConnectionRelatedData(
+                            connection.need.value,
+                            connection.remoteNeed.value,
+                            connection.connection.value
+                        )))
+                        .then(connectionsWithRelatedData =>
+                            dispatch({
+                                type: actionTypes.connections.load,
+                                payload: connectionsWithRelatedData
+                            })
+                        );
+                    })
+            );
         },
-      add:INJ_DEFAULT,
-      reset:INJ_DEFAULT,
+        open: (connectionData,message)=>(dispatch,getState) =>{
+            const state = getState();
+            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
+            let messageData = null;
+            let deferred = Q.defer()
+            won.getConnection(eventData.connection.uri).then(connection=>{
+                let msgToOpenFor = {event:eventData,connection:connection}
+                buildOpenMessage(msgToOpenFor,message).then(messageData=>{
+                    deferred.resolve(messageData);
+                })
+            })
+            deferred.promise.then((action)=>{
+                dispatch(actionCreators.messages__send(action))
+            })
+        },
+        connect: (connectionData,message)=>(dispatch,getState) =>{
+            const state = getState();
+            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
+            let messageData = null;
+            let deferred = Q.defer()
+            won.getConnection(eventData.connection.uri).then(connection=>{
+                let msgToOpenFor = {event:eventData,connection:connection}
+                buildConnectMessage(msgToOpenFor,message).then(messageData=>{
+                    deferred.resolve(messageData);
+                })
+            })
+            deferred.promise.then((action)=>{
+                dispatch(actionCreators.messages__send(action))
+            })
+        },
+        close: (connectionData)=>(dispatch,getState) =>{
+            const state = getState();
+            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
+            let messageData = null;
+            let deferred = Q.defer()
+            won.getConnection(eventData.connection.uri).then(connection=>{
+                let msgToOpenFor = {event:eventData,connection:connection}
+                buildCloseMessage(msgToOpenFor).then(messageData=>{
+                    deferred.resolve(messageData);
+                })
+            })
+            deferred.promise.then((action)=>{
+                dispatch(actionCreators.messages__send(action))
+            })
+        },
+        rate: (connectionData,rating) => (dispatch,getState) =>{
+            console.log(connectionData);
+            console.log(rating);
+
+            const state = getState();
+            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
+            let messageData = null;
+            let deferred = Q.defer()
+            won.getConnection(eventData.connection.uri).then(connection=>{
+                let msgToOpenFor = {event:eventData, connection: connection}
+                buildRateMessage(msgToOpenFor,rating).then(messageData=>{
+                    deferred.resolve(messageData);
+                })
+            })
+            deferred.promise.then((action)=>{
+                dispatch(actionCreators.messages__send(action))
+            })
+        },
+        sendOpen:INJ_DEFAULT,
+        add:INJ_DEFAULT,
+        reset:INJ_DEFAULT,
     },
     needs: {
         fetch: (data) => dispatch => {
-            data.needs.forEach((uri,index,array)=>{
-                console.log(uri);
-                won.getNeed(uri).then(function(need){
-                        console.log("linked data fetched for need: "+uri );
-                        dispatch(actionCreators.needs__received(need))
-                        dispatch(actionCreators.connections__load(need))
-                        //dispatch(actionCreators.connections__fetch({needUri:need.uri}))
-                    })})
+            const needUris = data.needs;
+            const needLookups = needUris.map(needUri => won.getNeed(needUri));
+            Promise.all(needLookups).then(needs => {
+                console.log("linked data fetched for needs: ", needs );
+                dispatch({ type: actionTypes.needs.fetch, payload: needs });
+            });
+
+            //TODO get rid of this multiple dispatching here (always push looping back into the reducer)
+            dispatch(actionCreators.connections__load(needUris));
+            /*
+            needUris.forEach(needUri => {
+                dispatch(actionCreators.connections__load(needUri));
+            });
+            */
         },
         received: INJ_DEFAULT,
         connectionsReceived:INJ_DEFAULT,
@@ -199,6 +252,7 @@ const actionHierarchy = {
 
     messages: { /* websocket messages, e.g. post-creation, chatting */
         markAsSent: INJ_DEFAULT,
+        waitingForAnswer: INJ_DEFAULT,
         /**
          * TODO this action is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
@@ -214,7 +268,6 @@ const actionHierarchy = {
                     dispatch(actionCreators.messages__successResponseMessageReceived(event))
                 }
                 else if(event.hasMessageType === won.WONMSG.hintMessageCompacted){
-                    console.log("got hint message")
                     dispatch(actionCreators.messages__hintMessageReceived(event))
                 }
                 else if(event.hasMessageType === won.WONMSG.connectMessageCompacted){
@@ -223,7 +276,8 @@ const actionHierarchy = {
             })
 
         },
-        successResponseMessageReceived :(event)=>dispatch=>{
+        successResponseMessageReceived :(event)=>(dispatch,getState) =>{
+            const state = getState()
             console.log('received response to ', event.isResponseTo, ' of ', event);
 
             //TODO do all of this in actions.js?
@@ -235,7 +289,8 @@ const actionHierarchy = {
 
                 //load the data into the local rdf store and publish NeedCreatedEvent when done
                 var needURI = event.hasReceiverNeed;
-                won.ensureLoaded(needURI).then(
+                won.ensureLoaded(needURI)
+                    .then(
                     function (value) {
                         var eventData = won.clone(event);
                         eventData.eventType = won.EVENT.NEED_CREATED;
@@ -263,26 +318,72 @@ const actionHierarchy = {
                 //TODO add to own needs
                 //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
 
+            } else if(event.isResponseToMessageType === won.WONMSG.openMessageCompacted){
+                console.log("got response for OPEN: "+event.hasMessageType)
+                let eventUri = null;
+                let isRemoteResponse = false;
+                //TODO maybe refactor these response message handling
+                if (state.getIn(['messages','waitingForAnswer', event.isRemoteResponseTo])){
+                    eventUri = event.isRemoteResponseTo
+                    dispatch(actionCreators.messages__remoteResponseReceived(event.isRemoteResponseTo))
+
+                    //TODO: handle these cases
+                    //this.gotResponseFromRemoteNode = true;
+                } else if (state.getIn(['messages','waitingForAnswer', event.isResponseTo])) {
+                    dispatch(actionCreators.messages__ownResponseReceived(event.isResponseTo))
+                    eventUri = event.isResponseTo
+                    //TODO: handle these cases
+                    //this.gotResponseFromOwnNode = true;
+                }
+                if (!isSuccessMessage(event)){
+                    console.log(event)
+                }
+
+                if(state.getIn(['messages','waitingForAnswer', eventUri]).ownResponse===true && state.getIn(['messages','waitingForAnswer', eventUri]).remoteResponse===true){
+                    won.invalidateCacheForNewMessage(event.hasReceiver).then(()=>{
+                        getConnectionRelatedDataAndDispatch(event.hasReceiverNeed,event.hasSenderNeed,event.hasReceiver,dispatch).then(connectionData=>{
+                            won.executeCrawlableQuery(
+                                won.queries["getLastEventUriOfConnection"],
+                                event.hasReceiver
+                            ).then(lastEvent=>{
+                                    connectionData.lastEvent = lastEvent;
+                                    dispatch(actionCreators.messages__openResponseReceived({eventUri,connectionData}))
+                                })
+
+                        })
+                    })
+
+
+                }
+/*                won.ensureLoaded(eventData.hasSender)
+                    .then(function(value){
+                        won.ensureLoaded(eventUri)
+                    })*/
             }
         },
         connectMessageReceived:(data)=>dispatch=>{
             data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
+            //TODO data.hasReceiver, the connectionUri is undefined in the response message
             won.invalidateCacheForNewConnection(data.hasReceiver,data.hasReceiverNeed)
-                ['finally'](function(){
-
+                .then(() => {
                     won.getConnectionWithOwnAndRemoteNeed(data.hasReceiverNeed,data.hasSenderNeed).then(connectionData=>{
                         //TODO refactor
                         data.unreadUri = connectionData.uri;
                         dispatch(actionCreators.events__addUnreadEventUri(data));
-                        getConnectionRelatedDataAndDispatch(data.hasReceiverNeed,data.hasSenderNeed,connectionData.uri,dispatch)
+
+                        getConnectionRelatedData(data.hasReceiverNeed, data.hasSenderNeed, connectionData.uri)
+                            .then(data => dispatch({
+                                type: actionTypes.messages.connectMessageReceived,
+                                payload: data
+                            }));
                     })
 
-            })
+                })
         },
         hintMessageReceived:(data)=>dispatch=>{
             data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
             won.invalidateCacheForNewConnection(data.hasReceiver,data.hasReceiverNeed)
-                ['finally'](function(){
+                .then(() => {
                     let needUri = data.hasReceiverNeed;
                     let match = {}
 
@@ -291,8 +392,12 @@ const actionHierarchy = {
                     data.matchCounterpartURI = won.getSafeJsonLdValue(data.framedMessage[won.WON.hasMatchCounterpart]);
 
                     dispatch(actionCreators.events__addUnreadEventUri(data))
-                    getConnectionRelatedDataAndDispatch(needUri,data.hasMatchCounterpart,data.hasReceiver,dispatch)
 
+                    getConnectionRelatedData(needUri, data.hasMatchCounterpart, data.hasReceiver)
+                        .then(data => dispatch({
+                            type: actionTypes.messages.hintMessageReceived,
+                            payload: data
+                        }));
 
 
                 // /add some properties to the eventData so as to make them easily accessible to consumers
@@ -459,23 +564,34 @@ const actionHierarchy = {
         update: INJ_DEFAULT,
     }
 }
-var getConnectionRelatedDataAndDispatch=(needUri,remoteNeedUri,connectionUri,dispatch)=>{
-    const promises =[];
+
+function getConnectionRelatedData(needUri,remoteNeedUri,connectionUri) {
     const remoteNeed = won.getNeed(remoteNeedUri);
     const ownNeed = won.getNeed(needUri);
     const connection = won.getConnection(connectionUri);
-    promises.push(remoteNeed,ownNeed,connection);
+    const events = won.getEventsOfConnection(connectionUri, needUri)
+        .then(eventsLookup => {
+            const eventList = [];
+            for (let [uri, event] of entries(eventsLookup)) {
+                eventList.push(event);
+            }
+            return eventList;
+        });
 
-    Q.all(promises).then(results=>{
-        const resultObject = {};
-        resultObject.remoteNeed = results[0];
-        resultObject.ownNeed = results[1];
-        resultObject.connection = results[2];
-        dispatch(actionCreators.connections__add(resultObject))
-
-    })
-
+    return Promise.all([remoteNeed, ownNeed, connection, events])
+        .then(results => ({
+            remoteNeed: results[0],
+            ownNeed: results[1],
+            connection: results[2],
+            events: results[3],
+        }));
 }
+
+
+var isSuccessMessage = function isSuccessMessage(event) {
+    return event.hasMessageType === won.WONMSG.successResponseCompacted;
+};
+
 var messageTypeToEventType = {};
 messageTypeToEventType[won.WONMSG.hintMessageCompacted] = {eventType: won.EVENT.HINT_RECEIVED};
 messageTypeToEventType[won.WONMSG.connectMessageCompacted] = {eventType: won.EVENT.CONNECT_RECEIVED};

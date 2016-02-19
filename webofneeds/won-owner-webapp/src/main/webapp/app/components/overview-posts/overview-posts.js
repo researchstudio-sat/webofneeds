@@ -50,7 +50,7 @@ class OverviewPostsController {
 
 
             return {
-                posts: state.getIn(["needs", "needs"]).toJS(),
+                posts: state.getIn(["needs", "ownNeeds"]).toJS(),
                 unreadEvents,
                 unreadCounts: selectUnreadCountsByNeedAndType(state),
                 //unreadMatchEventsOfNeed: unseenMatchesCounts,

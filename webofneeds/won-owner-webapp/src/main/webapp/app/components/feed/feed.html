@@ -4,7 +4,14 @@
 </header>
 <main class="feedcontent">
     <div class="fc__inner">
-        <div class="title">Recent activities</div>
-        <won-feed-item item="item" ng-repeat="item in self.posts"></won-feed-item>
+        <h1 class="title">Recent activities</h1>
+
+        <won-feed-item ng-repeat="item in self.posts.toArray()"
+                       item="item"
+                       ng-show="self.connectionsByNeed.get(item.get('uri'))"
+                       connections="self.connectionsByNeed.get(item.get('uri'))"
+                       unread-counts="self.unreadCountsByNeedAndType.get(item.get('uri'))">
+        </won-feed-item>
+
     </div>
 </main>

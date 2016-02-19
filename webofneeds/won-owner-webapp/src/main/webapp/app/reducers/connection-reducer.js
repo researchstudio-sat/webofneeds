@@ -12,24 +12,31 @@ import won from '../won-es6';
 const initialState = Immutable.fromJS({
     isFetching: false,
     didInvalidate: false,
-    connections: {}
+    connections: Immutable.Map(),
 
 })
-export default createReducer(
-    initialState,
-    {
-        [actionTypes.connections.hintsOfNeedRetrieved]:(state,action)=>{
+export default function(state = initialState, action = {}) {
+    switch(action.type) {
+        case actionTypes.connections.load:
+            return action.payload.reduce(
+                (updatedState, connectionWithRelatedData) =>
+                    storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
+                state);
 
-            let match = {"ownNeedData":action.payload.ownNeed,"connections":action.payload.connections}
-            return state.setIn(['connections',action.payload.connection.uri],action.payload)
-        },
-        [actionTypes.connections.add]:(state,action)=>{
-            return state.setIn(['connections',action.payload.connection.uri],action.payload)
-        },
-        [actionTypes.connections.reset]:(state,action)=>{
+        case actionTypes.messages.connectMessageReceived:
+        case actionTypes.messages.hintMessageReceived:
+        case actionTypes.messages.openResponseReceived:
+            return storeConnectionAndRelatedData(state, action.payload);
+
+        case actionTypes.connections.reset:
             return initialState;
-        }
 
+        default:
+            return state;
     }
-
-)
+}
+function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
+    return state.setIn(
+        ['connections',connectionWithRelatedData.connection.uri],
+        connectionWithRelatedData);
+}

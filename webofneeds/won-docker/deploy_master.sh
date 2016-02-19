@@ -26,6 +26,18 @@ fi
 
 sleep 10
 
+# create a password file for the certificates, variable ${won_certificate_passwd} must be set from outside the script
+# note: name of the password file is fixed in won-docker/nginx/nginx.conf
+echo ${won_certificate_passwd} > won_certificate_passwd_file
+ssh root@satcluster01 mkdir -p /home/install/won-server-certs
+scp won_certificate_passwd_file root@satcluster01:/home/install/won-server-certs/won_certificate_passwd_file
+rm won_certificate_passwd_file
+
+# copy the openssl.conf file to the server where the certificates are generated
+# the conf file is needed to specify alternative server names, see conf file in won-docker/gencert/openssl.conf for
+# entries of alternative server names: www.matchat.org, satcluster01.researchstudio.at, satcluster02.researchstudio.at
+scp $WORKSPACE/webofneeds/won-docker/gencert/openssl.conf root@satcluster01:/home/install/openssl.conf
+
 # wonnode/owner server certificate generator
 # PLEASE NOTE that value of PASS should be the same used in your server.xml for SSLPassword on wonnode and owner,
 # and the same as activemq.broker.keystore.password used in your wonnode activemq spring configurations for broker
@@ -36,23 +48,24 @@ sleep 10
 # command of the wonnode). Note that the filename of the certificate is also used in the tomcat config, (see
 # owner/ssl/server.xml) so be careful when changing it.
 docker -H satcluster01:2375 rm gencert_ma || echo 'No docker container found to remove with name: gencert_ma'
-docker -H satcluster01:2375 run --name=gencert_ma -e CN="satcluster01.researchstudio.at" \
--e "OPENSSL_CONFIG_FILE=$WORKSPACE/webofneeds/won-docker/gencert/openssl.conf" \
--v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:master
+docker -H satcluster01:2375 run --name=gencert_ma -e CN="www.matchat.org" \
+-e "PASS=file:/usr/local/certs/out/won_certificate_passwd_file" -e "OPENSSL_CONFIG_FILE=/usr/local/openssl.conf" \
+-v /home/install/won-server-certs:/usr/local/certs/out/ \
+-v /home/install/openssl.conf:/usr/local/openssl.conf webofneeds/gencert:master
 
-
-# copy the server certificates to the proxy server and start the nginx container if it is not already started
-ssh root@satcluster02 mkdir -p /home/install/won-servcer-certs
-rsync root@satcluster01:/home/install/won-server-certs/* ~/wonserver-certs
-rsync ~/wonserver-certs/* root@satcluster02:/home/install/won-server-certs
+# copy the server certificates (and password file) to the proxy server and start the nginx container
+# if it is not already started
+ssh root@satcluster02 mkdir -p /home/install/won-server-certs
+mkdir -p ~/won-server-certs
+rsync root@satcluster01:/home/install/won-server-certs/* ~/won-server-certs/
+rsync ~/won-server-certs/* root@satcluster02:/home/install/won-server-certs/
 
 docker -H satcluster02:2375 pull webofneeds/nginx
-if ! docker -H satcluster02:2375 run --name=nginx_ma -v /home/install/won-server-certs:/etc/nginx/won-server-certs/ -d -p 80:80 -p 443:443 webofneeds/nginx; then
+if ! docker -H satcluster02:2375 run --name=nginx_ma -v /home/install/won-server-certs:/etc/nginx/won-server-certs/ \
+-d -p 80:80 -p 443:443 webofneeds/nginx; then
   echo nginx container already available, restart old container
   docker -H satcluster02:2375 restart nginx_ma
 fi
-
-
 
 sleep 5
 
@@ -64,6 +77,7 @@ docker -H satcluster01:2375 run --name=wonnode_ma -d -e "uri.host=satcluster01.r
 "activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 \
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/wonnode_ma:/usr/local/tomcat/won/client-certs/ \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satcluster01:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
@@ -79,6 +93,7 @@ docker -H satcluster01:2375 run --name=owner_ma -d -e "node.default.host=satclus
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/owner_ma:/usr/local/tomcat/won/client-certs/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satcluster01:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
 webofneeds/owner:master
@@ -105,13 +120,10 @@ webofneeds/matcher_service:master
 
 # siren solr server
 docker -H satcluster01:2375 pull webofneeds/sirensolr
-#docker -H satcluster01:2375 stop sirensolr_ma || echo 'No docker container found to stop with name: sirensolr_ma'
-#docker -H satcluster01:2375 rm sirensolr_ma || echo 'No docker container found to remove with name: sirensolr_ma'
-echo try to start new solr server container
-if ! docker -H satcluster01:2375 run --name=sirensolr_ma -d -p 7071:8080 -p 8984:8983 --env CATALINA_OPTS="-Xmx200m -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" webofneeds/sirensolr; then
-  echo solr server container already available, restart old container
-  docker -H satcluster01:2375 restart sirensolr_ma
-fi
+docker -H satcluster01:2375 stop sirensolr_ma || echo 'No docker container found to stop with name: sirensolr_ma'
+docker -H satcluster01:2375 rm sirensolr_ma || echo 'No docker container found to remove with name: sirensolr_ma'
+docker -H satcluster01:2375 run --name=sirensolr_ma -d -p 7071:8080 -p 8984:8983 --env CATALINA_OPTS="-Xmx200m \
+-XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" webofneeds/sirensolr
 
 sleep 10
 
@@ -127,14 +139,7 @@ docker -H satcluster01:2375 run --name=matcher_siren_ma -d -e "node.host=satclus
 webofneeds/matcher_siren:master
 
 
-# if everything works up to this point - build :master images locally and push these local images into the dockerhub:
-# build:
-docker -H localhost:2375 build -t webofneeds/gencert:master $WORKSPACE/webofneeds/won-docker/gencert/
-docker -H localhost:2375 build -t webofneeds/wonnode:master $WORKSPACE/webofneeds/won-docker/wonnode/
-docker -H localhost:2375 build -t webofneeds/owner:master $WORKSPACE/webofneeds/won-docker/owner/
-docker -H localhost:2375 build -t webofneeds/matcher_service:master $WORKSPACE/webofneeds/won-docker/matcher-service/
-docker -H localhost:2375 build -t webofneeds/matcher_siren:master $WORKSPACE/webofneeds/won-docker/matcher-siren/
-# push:
+# if everything works up to this point push these local images into the dockerhub:
 docker -H localhost:2375 login -u heikofriedrich
 docker -H localhost:2375 push webofneeds/gencert:master
 docker -H localhost:2375 push webofneeds/wonnode:master

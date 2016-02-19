@@ -64,3 +64,13 @@ export const selectUnreadCountsByType = createSelector(
         .groupBy(e => e.get('eventType'))
         .map(eventsOfType => eventsOfType.size)
 )
+
+
+
+const selectConnections = state => state.getIn(['connections','connections']);
+export const selectConnectionsByNeed = createSelector(
+    selectConnections,
+    connections => connections
+        .map(cnct => Immutable.fromJS(cnct)) //TODO this is a workaround. atm connections aren't ImmutableJS-objects
+        .groupBy(cnct => cnct.getIn(['ownNeed', 'uri']))
+)

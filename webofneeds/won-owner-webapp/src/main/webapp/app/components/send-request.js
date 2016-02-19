@@ -1,8 +1,13 @@
 ;
 
 import angular from 'angular';
+import 'ng-redux';
 import extendedGalleryModule from '../components/extended-gallery';
 import { labels } from '../won-label-utils';
+import { attach } from '../utils';
+import { actionCreators }  from '../actions/actions';
+
+const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 
 function genComponentConf() {
     let template = `
@@ -44,24 +49,35 @@ function genComponentConf() {
             </div>
         </div>
         <div class="sr__footer">
-            <input type="text" placeholder="Reply Message (optional)"/>
+            <input type="text" ng-model="self.message" placeholder="Reply Message (optional)"/>
             <div class="flexbuttons">
-                <button class="won-button--filled black" ng-click="self.closeRequest()">Cancel</button>
-                <button class="won-button--filled red" ng-click="self.closeRequest()">Request Contact</button>
+                <button class="won-button--filled black" ng-click="self.closeOverlay()">Cancel</button>
+                <button class="won-button--filled red" ng-click="self.sendRequest(self.message)">Request Contact</button>
             </div>
         </div>
     `;
 
     class Controller {
         constructor() {
+            attach(this, serviceDependencies, arguments);
             this.maxThumbnails = 9;
             this.labels = labels;
+            this.message = '';
+
+            const disconnect = this.$ngRedux.connect(null, actionCreators)(this);
+            this.$scope.$on('$destroy', disconnect);
         }
 
-        closeRequest(){
+        sendRequest(message) {
+            this.connections__connect(this.item,message);
+            this.item = undefined;
+        }
+
+        closeOverlay(){
             this.item = undefined;
         }
     }
+    Controller.$inject = serviceDependencies;
 
     return {
         restrict: 'E',

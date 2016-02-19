@@ -50,9 +50,9 @@ else
 
 
 	if [ -z "$OPENSSL_CONFIG_FILE" ]; then
-		openssl req -x509 -newkey rsa:2048 -keyout $key_pem_file -out $cert_pem_file -passout pass:$PASS -days 365 -subj "/CN=${CN}"
+		openssl req -x509 -newkey rsa:2048 -keyout $key_pem_file -out $cert_pem_file -passout $PASS -days 365 -subj "/CN=${CN}"
 	else
-		openssl req -x509 -newkey rsa:2048 -keyout $key_pem_file -out $cert_pem_file -passout pass:$PASS -days 365 -subj "/CN=${CN}" -config $OPENSSL_CONFIG_FILE
+		openssl req -x509 -newkey rsa:2048 -keyout $key_pem_file -out $cert_pem_file -passout $PASS -days 365 -subj "/CN=${CN}" -config $OPENSSL_CONFIG_FILE
 	fi
 
 	openssl x509 -in $cert_pem_file -noout -text
@@ -68,7 +68,7 @@ then
 	echo "$pfx_store_file already exists."
 else
 	echo "$pfx_store_file not found. Creating pfx store containing certificate from $key_pem_file and $cert_pem_file"
-	openssl pkcs12 -export -out $pfx_store_file -passout pass:$PASS -inkey $key_pem_file -passin pass:$PASS -in $cert_pem_file
+	openssl pkcs12 -export -out $pfx_store_file -passout $PASS -inkey $key_pem_file -passin $PASS -in $cert_pem_file
 	echo "$pfx_store_file created"
 fi
 
