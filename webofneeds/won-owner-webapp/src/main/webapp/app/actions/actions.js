@@ -48,7 +48,11 @@ import {
 import { hierarchy2Creators } from './action-utils';
 import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
-import { buildCreateMessage } from '../won-message-utils';
+import { buildCreateMessage,
+         buildOpenMessage,
+         buildCloseMessage,
+         buildRateMessage,
+         buildConnectMessage } from '../won-message-utils';
 
 import { loadAction } from './load-action';
 
@@ -92,7 +96,15 @@ const actionHierarchy = {
         add:INJ_DEFAULT,
     },
     connections:{
-        load : (needUris) => dispatch =>{
+      fetch:(data)=>dispatch=>{
+              var allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], data.needUri);
+              allConnectionsPromise.then(function(connections){
+                  console.log("fetching connections")
+                  dispatch(actionCreators.needs__connectionsReceived({needUri:data.needUri,connections:connections}))
+                  dispatch(actionCreators.events__fetch({connectionUris:connections}))
+              })
+          },
+      load : (needUris) => dispatch =>{
             needUris.forEach(needUri =>
                 won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri)
                     .then(function(connectionsOfNeed){
@@ -111,9 +123,71 @@ const actionHierarchy = {
                     })
             );
         },
-        open: (connection,message)=>dispatch =>{
-
+        open: (connectionData,message)=>(dispatch,getState) =>{
+            const state = getState();
+            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
+            let messageData = null;
+            let deferred = Q.defer()
+            won.getConnection(eventData.connection.uri).then(connection=>{
+                let msgToOpenFor = {event:eventData,connection:connection}
+                buildOpenMessage(msgToOpenFor,message).then(messageData=>{
+                    deferred.resolve(messageData);
+                })
+            })
+            deferred.promise.then((action)=>{
+                dispatch(actionCreators.messages__send(action))
+            })
         },
+        connect: (connectionData,message)=>(dispatch,getState) =>{
+            const state = getState();
+            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
+            let messageData = null;
+            let deferred = Q.defer()
+            won.getConnection(eventData.connection.uri).then(connection=>{
+                let msgToOpenFor = {event:eventData,connection:connection}
+                buildConnectMessage(msgToOpenFor,message).then(messageData=>{
+                    deferred.resolve(messageData);
+                })
+            })
+            deferred.promise.then((action)=>{
+                dispatch(actionCreators.messages__send(action))
+            })
+        },
+        close: (connectionData)=>(dispatch,getState) =>{
+            const state = getState();
+            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
+            let messageData = null;
+            let deferred = Q.defer()
+            won.getConnection(eventData.connection.uri).then(connection=>{
+                let msgToOpenFor = {event:eventData,connection:connection}
+                buildCloseMessage(msgToOpenFor).then(messageData=>{
+                    deferred.resolve(messageData);
+                })
+            })
+            deferred.promise.then((action)=>{
+                dispatch(actionCreators.messages__send(action))
+            })
+        },
+        rate: (connectionData,rating) => (dispatch,getState) =>{
+            console.log(connectionData);
+            console.log(rating);
+
+            const state = getState();
+            let eventData = state.getIn(['connections','connections',connectionData.connection.uri])
+            let messageData = null;
+            let deferred = Q.defer()
+            won.getConnection(eventData.connection.uri).then(connection=>{
+                let msgToOpenFor = {event:eventData, connection: connection}
+                buildRateMessage(msgToOpenFor,rating).then(messageData=>{
+                    deferred.resolve(messageData);
+                })
+            })
+            deferred.promise.then((action)=>{
+                dispatch(actionCreators.messages__send(action))
+            })
+        },
+        sendOpen:INJ_DEFAULT,
+        add:INJ_DEFAULT,
         reset:INJ_DEFAULT,
     },
     needs: {
@@ -201,7 +275,8 @@ const actionHierarchy = {
             })
 
         },
-        successResponseMessageReceived :(event)=>dispatch=>{
+        successResponseMessageReceived :(event)=>(dispatch,getState) =>{
+            const state = getState()
             console.log('received response to ', event.isResponseTo, ' of ', event);
 
             //TODO do all of this in actions.js?
@@ -213,7 +288,8 @@ const actionHierarchy = {
 
                 //load the data into the local rdf store and publish NeedCreatedEvent when done
                 var needURI = event.hasReceiverNeed;
-                won.ensureLoaded(needURI).then(
+                won.ensureLoaded(needURI)
+                    .then(
                     function (value) {
                         var eventData = won.clone(event);
                         eventData.eventType = won.EVENT.NEED_CREATED;
@@ -241,6 +317,47 @@ const actionHierarchy = {
                 //TODO add to own needs
                 //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
 
+            } else if(event.isResponseToMessageType === won.WONMSG.openMessageCompacted){
+                console.log("got response for OPEN: "+event.hasMessageType)
+                let eventUri = null;
+                let isRemoteResponse = false;
+                //TODO maybe refactor these response message handling
+                if (state.getIn(['messages','waitingForAnswer', event.isRemoteResponseTo])){
+                    eventUri = event.isRemoteResponseTo
+                    dispatch(actionCreators.messages__remoteResponseReceived(event.isRemoteResponseTo))
+
+                    //TODO: handle these cases
+                    //this.gotResponseFromRemoteNode = true;
+                } else if (state.getIn(['messages','waitingForAnswer', event.isResponseTo])) {
+                    dispatch(actionCreators.messages__ownResponseReceived(event.isResponseTo))
+                    eventUri = event.isResponseTo
+                    //TODO: handle these cases
+                    //this.gotResponseFromOwnNode = true;
+                }
+                if (!isSuccessMessage(event)){
+                    console.log(event)
+                }
+
+                if(state.getIn(['messages','waitingForAnswer', eventUri]).ownResponse===true && state.getIn(['messages','waitingForAnswer', eventUri]).remoteResponse===true){
+                    won.invalidateCacheForNewMessage(event.hasReceiver).then(()=>{
+                        getConnectionRelatedDataAndDispatch(event.hasReceiverNeed,event.hasSenderNeed,event.hasReceiver,dispatch).then(connectionData=>{
+                            won.executeCrawlableQuery(
+                                won.queries["getLastEventUriOfConnection"],
+                                event.hasReceiver
+                            ).then(lastEvent=>{
+                                    connectionData.lastEvent = lastEvent;
+                                    dispatch(actionCreators.messages__openResponseReceived({eventUri,connectionData}))
+                                })
+
+                        })
+                    })
+
+
+                }
+/*                won.ensureLoaded(eventData.hasSender)
+                    .then(function(value){
+                        won.ensureLoaded(eventUri)
+                    })*/
             }
         },
         connectMessageReceived:(data)=>dispatch=>{
@@ -468,6 +585,9 @@ function getConnectionRelatedData(needUri,remoteNeedUri,connectionUri) {
             events: results[3],
         }))
 
+
+var isSuccessMessage = function isSuccessMessage(event) {
+    return event.hasMessageType === won.WONMSG.successResponseCompacted;
 }
 
 var messageTypeToEventType = {};

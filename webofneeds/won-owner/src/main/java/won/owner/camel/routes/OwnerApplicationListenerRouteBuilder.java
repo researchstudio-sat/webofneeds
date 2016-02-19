@@ -49,7 +49,12 @@ public class OwnerApplicationListenerRouteBuilder extends RouteBuilder  {
     @Override
     public void configure() throws Exception {
                for (int i = 0; i<endpoints.size();i++){
-                   from(endpoints.get(i)+"?concurrentConsumers=2").routeId("Node2OwnerRoute"+brokerUri)
+// we remove the concurrentConsumers part from
+// the URI as it makes it hard to check if a given endpoint is already configured in the context by searching for its
+// name.  Also, we're unsure if the concurrentConsumers part is even interpreted anywhere // from(endpoints.get(i)
+// +"?concurrentConsumers=2")
+                 from(endpoints.get(i))
+                   .routeId("Node2OwnerRoute"+brokerUri)
                            .wireTap("bean:messagingService?method=inspectMessage")
                             .to("bean:wonMessageIntoCamelProcessor")
                             .to("bean:wellformednessChecker")
