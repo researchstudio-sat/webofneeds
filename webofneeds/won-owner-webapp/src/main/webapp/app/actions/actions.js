@@ -72,15 +72,6 @@ const actionHierarchy = {
         registerFailed: INJ_DEFAULT
     },
     events:{
-      fetch:(data)=>dispatch=>{
-          data.connectionUris.forEach(function(connection){
-              console.log("fetch events of connection: "+connectdionUri)
-              won.getEventsOfConnection(connection.connection).then(function(events){
-                  console.log(events)
-              })
-          })
-      },
-
         addUnreadEventUri:INJ_DEFAULT,
         read:INJ_DEFAULT
     },
