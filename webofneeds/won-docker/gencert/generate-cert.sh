@@ -47,7 +47,14 @@ then
   fi
 else
 	echo "$key_pem_file not found. Generating self-signed certificate."
-	openssl req -x509 -newkey rsa:2048 -keyout $key_pem_file -out $cert_pem_file  -passout pass:$PASS -days 365 -subj "/CN=${CN}"
+
+
+	if [ -z "$OPENSSL_CONFIG_FILE" ]; then
+		openssl req -x509 -newkey rsa:2048 -keyout $key_pem_file -out $cert_pem_file -passout pass:$PASS -days 365 -subj "/CN=${CN}"
+	else
+		openssl req -x509 -newkey rsa:2048 -keyout $key_pem_file -out $cert_pem_file -passout pass:$PASS -days 365 -subj "/CN=${CN}" -config $OPENSSL_CONFIG_FILE
+	fi
+
 	openssl x509 -in $cert_pem_file -noout -text
 	echo "Self-signed certificate generated - please do not use it for production!"
 fi

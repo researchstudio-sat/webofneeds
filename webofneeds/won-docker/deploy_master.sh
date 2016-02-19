@@ -1,22 +1,12 @@
 # fail the whole script if one command fails
 set -e
 
-# build the won docker images on every server of the cluster so that everywhere is the latest version available
 echo start docker build of images:
 
-# wonnode 1
 docker -H satcluster01:2375 build -t webofneeds/wonnode:master $WORKSPACE/webofneeds/won-docker/wonnode/
-
-# owner 1
 docker -H satcluster01:2375 build -t webofneeds/owner:master $WORKSPACE/webofneeds/won-docker/owner/
-
-# matcher service
 docker -H satcluster01:2375 build -t webofneeds/matcher_service:master $WORKSPACE/webofneeds/won-docker/matcher-service/
-
-# siren matcher
 docker -H satcluster01:2375 build -t webofneeds/matcher_siren:master $WORKSPACE/webofneeds/won-docker/matcher-siren/
-
-# wonnode/owner server certificate generator
 docker -H satcluster01:2375 build -t webofneeds/gencert:master $WORKSPACE/webofneeds/won-docker/gencert/
 
 
@@ -46,8 +36,22 @@ sleep 10
 # command of the wonnode). Note that the filename of the certificate is also used in the tomcat config, (see
 # owner/ssl/server.xml) so be careful when changing it.
 docker -H satcluster01:2375 rm gencert_ma || echo 'No docker container found to remove with name: gencert_ma'
-docker -H satcluster01:2375 run --name=gencert_ma -e CN="satcluster01.researchstudio.at" -e "PASS=changeit" \
+docker -H satcluster01:2375 run --name=gencert_ma -e CN="satcluster01.researchstudio.at" \
+-e "OPENSSL_CONFIG_FILE=$WORKSPACE/webofneeds/won-docker/gencert/openssl.conf" \
 -v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:master
+
+
+# copy the server certificates to the proxy server and start the nginx container if it is not already started
+ssh root@satcluster02 mkdir -p /home/install/won-servcer-certs
+rsync root@satcluster01:/home/install/won-server-certs/* ~/wonserver-certs
+rsync ~/wonserver-certs/* root@satcluster02:/home/install/won-server-certs
+
+docker -H satcluster02:2375 pull webofneeds/nginx
+if ! docker -H satcluster02:2375 run --name=nginx_ma -v /home/install/won-server-certs:/etc/nginx/won-server-certs/ -d -p 80:80 -p 443:443 webofneeds/nginx; then
+  echo nginx container already available, restart old container
+  docker -H satcluster02:2375 restart nginx_ma
+fi
+
 
 
 sleep 5
