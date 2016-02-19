@@ -412,3 +412,45 @@ export function* entries(obj) {
         yield [key, obj[key]];
     }
 }
+
+/**
+ * Maps over the (value,key)-pairs of the object and produces
+ * a new object with the same keys but the function's result
+ * as values.
+ * @param obj
+ * @param f  a function `(value, key) => result` or `value => result`
+ */
+export function mapObj(obj, f) {
+    const accumulator = {};
+    for(let [key, value] of entries(obj)) {
+       accumulator[key] = f(value, key);
+    }
+    return accumulator;
+}
+
+
+/**
+ * @param listOfLists e.g. [ [1,2], [3], [], [3,4,5] ]
+ * @return {*} e.g. [1,2,3,3,4,5]
+ */
+export function flatten(listOfLists) {
+    return listOfLists.reduce(
+        (flattendList, innerList) =>
+            flattendList.concat(innerList),
+        [] //concat onto empty list as start
+    )
+}
+
+/**
+ * @param objOfObj e.g. { a: { x: 1, y: 2}, b: {z: 3}, c: {} }
+ * @return {*} e.g. {x: 1, y: 2, z: 3}
+ */
+export function flattenObj(objOfObj) {
+    let flattened = {};
+    for(const [outerKeys, innerObjects] of entries(objOfObj)) {
+        flattened = Object.assign(flattened, innerObjects);
+    }
+    return flattened;
+    
+}
+

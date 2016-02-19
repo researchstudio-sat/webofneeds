@@ -1028,29 +1028,36 @@ const rdfstore = window.rdfstore;
 
     /**
      * Returns all events associated with a given connection
-     * in an object of (eventUri -> eventData)
+     * in a promise for an object of (eventUri -> eventData)
      * @param connectionUri
      * @param requesterWebId
      */
     won.getEventsOfConnection = function(connectionUri, requesterWebId) {
+        return won.getEventUrisOfConnection(connectionUri, requesterWebId)
+            .then(eventUris => won.urisToLookupMap(eventUris,
+                    eventUri => won.getNode(eventUri, requesterWebId))
+            )
+            .catch(e => `Could not get all events of connection ${connectionUri}. Reason: ${e}`);
+    };
+
+    /**
+     * Returns the uris of all events associated with a given connection
+     * @param connectionUri
+     * @param requesterWebId
+     * @returns promise for an array strings (the uris)
+     */
+    won.getEventUrisOfConnection = function(connectionUri, requesterWebId) {
         if (!connectionUri ){
             throw {
-                message : `getEventsOfConnection: connectionUri must not be null. Got: "${connectionUri}"`
+                message : `getEventUrisOfConnection: connectionUri must not be null. Got: "${connectionUri}"`
             };
         }
         return won.getNodeWithAttributes(connectionUri, requesterWebId)
             .then(connection => connection.hasEventContainer)
             .then(eventContainerUri => won.getNodeWithAttributes(eventContainerUri, requesterWebId))
             .then(eventContainer => eventContainer.member)
-            .then(eventUris => won.urisToLookupMap(eventUris,
-                    eventUri => won.getConnectionEvent(eventUri, requesterWebId))
-            )
-            /*
-            .then(eventUris => eventUris.map(eventUri => won.getConnectionEvent(eventUri, requesterWebId)))
-            .then(queries => Promise.all(queries))
-            */
             .catch(e => `Could not get all events of connection ${connectionUri}. Reason: ${e}`);
-    };
+    }
 
 
     /**

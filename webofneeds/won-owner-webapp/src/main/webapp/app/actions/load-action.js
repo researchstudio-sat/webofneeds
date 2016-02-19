@@ -3,11 +3,10 @@
  */
 
 import { actionTypes, actionCreators } from './actions';
-import { checkHttpStatus, entries } from '../utils';
+import { checkHttpStatus, entries, flatten, flattenObj } from '../utils';
 import  won from '../won-es6';
 
 export const loadAction = () => dispatch => {
-    window.needUris4dbg = needUris;
     fetch('/owner/rest/needs/', {
         method: 'get',
         headers: {
@@ -27,48 +26,49 @@ export const loadAction = () => dispatch => {
     );
 }
 
-window.entries4dbg = entries;
 function fetchAllAccessibleAndRelevantData(ownNeedUris) {
 
-    won.urisToLookupMap(ownNeedUris, won.getNeed).then(ownNeeds => {
-        //ownNeeds[needUri]
-        //TODO
-    });
+    const allOwnNeedsPromise = won.urisToLookupMap(ownNeedUris, won.getNeed);
 
-    Promise.all(ownNeedUris.map(won.getConnectionsOfNeed))
-        .then(connectionsOfNeeds => connectionsOfNeeds.reduce(
-            // merge the connections-per-need into a single connections object
-            // this assumes that connectionUris are unique!
-            (connections, connectionsForOneNeed) =>
-                Object.assign(connections, connectionsForOneNeed), {})
-        )
-        .then(connections => {
-            //connections[connectionUri]
-            //TODO
+    const allConnectionUrisPromise =
+        Promise.all(ownNeedUris.map(won.getconnectionUrisOfNeed))
+        .then(connectionUrisPerNeed => flatten(connectionUrisPerNeed));
 
+    const allConnectionsPromise = allConnectionUrisPromise
+        .then(connectionUris => won.urisToLookupMap(connectionUris, won.getConnection));
 
+    const allEventsPromise = allConnectionUrisPromise
+        .then(connectionUris =>
+           won.urisToLookupMap(connectionUris, connectionUri =>
+               won.getConnection(connectionUri)
+               .then(connection =>
+                       won.getEventsOfConnection(connectionUri,connection.belongsToNeed)
+               )
+           )
+        ).then(eventsOfConnections =>
+            //eventsPerConnection[connectionUri][eventUri]
+            flattenObj(eventsOfConnections)
+        );
 
+    const allTheirNeedsPromise =
+        allConnectionsPromise.then(connections => {
+            const theirNeedUris = [];
+            for(const [connectionUri, connection] of entries(connections)) {
+                theirNeedUris.push(connection.hasRemoteNeed);
+            }
+            return theirNeedUris;
+        })
+        .then(theirNeedUris => won.urisToLookupMap(theirNeedUris, won.getNeed));
 
+    Promise.all([
+        allOwnNeedsPromise,
+        allConnectionsPromise,
+        allEventsPromise,
+        allTheirNeedsPromise
+    ]).then(allAccessibleAndRelevantData =>
+        console.log('\n\n\n', allAccessibleAndRelevantData, '\n\n\n')
+    )
 
-            connections.map(connection => {
-                connection.uri;
-                connection.belongsToNeed;
-
-
-
-            })
-
-        });
-
-    const connectionUris = [] //TODO get from keys of the connections object above
-
-
-
-
-
-    //won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri)
-
-    const allAccessibleAndRelevantData = {/*...*/};
     /**
      const allAccessibleAndRelevantData = {
         ownNeeds: {
