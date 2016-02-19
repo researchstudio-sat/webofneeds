@@ -1311,17 +1311,8 @@ const rdfstore = window.rdfstore;
      * @param requesterWebId map/object of (uri -> node's data)
      */
     won.getNodes = function(uris, requesterWebId) {
-        const queries = uris.map(uri =>
-            won.getNode(uri, requesterWebId)
-        );
-        return Promise.all(queries).then(nodes => {
-            const acc = {};
-            for (const node of nodes) {
-                acc[node.uri] = node;
-            }
-            return acc;
-        });
-    }
+        return won.urisToLookupMap(uris, uri => won.getNode(uri, requesterWebId));
+    };
 
     //aliases (formerly functions that were just pass-throughs)
     won.getConnection =
@@ -1546,6 +1537,27 @@ const rdfstore = window.rdfstore;
             return Q.all(promises)
         })
 
+    }
+
+
+    /**
+     * Takes an array of uris, performs the lookup function on each
+     * of them seperately, collects the results and builds an map/object
+     * with the uris as keys and the results as values.
+     * @param uris
+     * @param asyncLookupFunction
+     * @return {*}
+     */
+    won.urisToLookupMap = function(uris, asyncLookupFunction) {
+        const asyncLookups = uris.map(uri => asyncLookupFunction(uri));
+        return Promise.all(asyncLookups).then( dataObjects => {
+            const lookupMap = {};
+            //make sure there's the same
+            for (let i = 0; i < uris.length; i++) {
+                lookupMap[uris[i]] = dataObjects[i];
+            }
+            return lookupMap;
+        });
     }
 
     /**

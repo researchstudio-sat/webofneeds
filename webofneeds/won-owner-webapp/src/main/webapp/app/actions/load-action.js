@@ -6,7 +6,6 @@ import { actionTypes, actionCreators } from './actions';
 import { checkHttpStatus } from '../utils';
 import  won from '../won-es6';
 
-
 export const loadAction = () => dispatch => {
     window.needUris4dbg = needUris;
     fetch('/owner/rest/needs/', {
@@ -32,17 +31,39 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris) {
 
 
 
-    const needLookups = ownNeedUris.map(needUri => won.getNeed(needUri));
-    Promise.all(needLookups).then(ownNeeds => {
+    won.urisToLookupMap(ownNeedUris, won.getNeed).then(ownNeeds => {
+        //ownNeeds[needUri]
         //TODO
     });
 
-    const connectionLookups = ownNeedUris.map(ownNeedUri =>
-        won.getConnectionsOfNeed(ownNeedUri));
-    Promise.all(connectionLookups).then(
-        ///TODO TODO TODO TODO stopped here
+    Promise.all(ownNeedUris.map(won.getConnectionsOfNeed))
+        .then(connectionsOfNeeds => connectionsOfNeeds.reduce(
+            // merge the connections-per-need into a single connections object
+            // this assumes that connectionUris are unique!
+            (connections, connectionsForOneNeed) =>
+                Object.assign(connections, connectionsForOneNeed), {})
+        )
+        .then(connections => {
+            //connections[connectionUri]
+            //TODO
 
-    )
+
+
+
+
+            connections.map(connection => {
+                connection.uri;
+                connection.belongsToNeed;
+
+
+
+            })
+
+        });
+
+    const connectionUris = [] //TODO get from keys of the connections object above
+
+
 
 
 
