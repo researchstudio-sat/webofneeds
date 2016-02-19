@@ -63,7 +63,7 @@ export function runMessagingAgent(redux) {
                     if(firstEntry) { //undefined if queue is empty
                         const [eventUri, msg] = firstEntry;
                         ws.send(JSON.stringify(msg));
-                        redux.dispatch(actionCreators.messages__markAsSent({ eventUri, msg }));
+                        redux.dispatch(actionCreators.messages__waitingForAnswer({ eventUri, msg }));
                     }
                 }
             }

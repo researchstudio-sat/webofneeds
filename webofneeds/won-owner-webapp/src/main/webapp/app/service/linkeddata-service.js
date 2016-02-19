@@ -411,7 +411,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
         if (connectionUri != null) {
             cacheItemMarkDirty(connectionUri);
         }
-        return linkedDataService.getNeedConnectionsUri(needUri).then(
+        return linkedDataService.getConnectionContainerOfNeed(needUri).then(
             function(connectionsUri){
                 if (connectionsUri != null){
                     cacheItemMarkDirty(connectionsUri);
@@ -1269,7 +1269,7 @@ angular.module('won.owner').factory('linkedDataService', function ($q, $rootScop
      * @deprecated in favor of linkeddata-service-won.js that uses the es6-module
      * syntax and is actively maintained.
      */
-    linkedDataService.getNeedConnectionsUri = function(needUri) {
+    linkedDataService.getConnectionContainerOfNeed = function(needUri) {
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getConnectionsUri: needUri must not be null"};
         }

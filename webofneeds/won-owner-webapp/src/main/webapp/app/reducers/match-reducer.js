@@ -18,11 +18,6 @@ const initialState = Immutable.fromJS({
 export default createReducer(
     initialState,
     {
-        [actionTypes.matches.hintsOfNeedRetrieved]:(state,action)=>{
-
-            let match = {"ownNeedData":action.payload.ownNeed,"connections":action.payload.connections}
-            return state.setIn(['matches',action.payload.connection.uri],action.payload)
-        },
         [actionTypes.matches.add]:(state,action)=>{
             return state.setIn(['matches',action.payload.connection.uri],action.payload)
         }
