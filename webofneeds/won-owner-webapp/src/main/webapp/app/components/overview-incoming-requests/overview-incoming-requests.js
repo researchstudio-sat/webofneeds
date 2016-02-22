@@ -15,26 +15,48 @@ class IncomingRequestsController {
     constructor() {
         attach(this, serviceDependencies, arguments);
         window.oireq = this;
+
         this.selection = 2;
+        this.ownerSelection = 2; //ONLY NECESSARY FOR VIEW WITH NEED
 
         const selectFromState = (state)=>{
-
-            return {
-                incomingRequests: Object.keys(state.getIn(['connections','connections']).toJS())
-                    .map(key=>state.getIn(['connections','connections']).toJS()[key])
-                    .filter(conn=>{
-                        if(conn.connection.hasConnectionState===won.WON.RequestReceived && state.getIn(['events',conn.connection.uri]) !== undefined){
-                            return true
-                        }
-                    }),
-                incomingRequestsOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connections']).toJS())
-                    .map(key=>state.getIn(['connections','connections']).toJS()[key])
-                    .filter(conn=>{
-                        if(conn.connection.hasConnectionState===won.WON.RequestReceived){
-                            return true
-                        }
-                    }))
-            };
+            if(state.getIn(['router', 'currentParams', 'myUri']) === undefined) {
+                return {
+                    incomingRequests: Object.keys(state.getIn(['connections', 'connections']).toJS())
+                        .map(key=>state.getIn(['connections', 'connections']).toJS()[key])
+                        .filter(conn=> {
+                            if (conn.connection.hasConnectionState === won.WON.RequestReceived && state.getIn(['events', conn.connection.uri]) !== undefined) {
+                                return true
+                            }
+                        }),
+                    incomingRequestsOfNeed: mapToMatches(Object.keys(state.getIn(['connections', 'connections']).toJS())
+                        .map(key=>state.getIn(['connections', 'connections']).toJS()[key])
+                        .filter(conn=> {
+                            if (conn.connection.hasConnectionState === won.WON.RequestReceived) {
+                                return true
+                            }
+                        }))
+                };
+            }else{
+                const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
+                return {
+                    post: state.getIn(['needs','ownNeeds', postId]).toJS(),
+                    incomingRequests: Object.keys(state.getIn(['connections', 'connections']).toJS())
+                        .map(key=>state.getIn(['connections', 'connections']).toJS()[key])
+                        .filter(conn=> {
+                            if (conn.connection.hasConnectionState === won.WON.RequestReceived && state.getIn(['events', conn.connection.uri]) !== undefined && conn.ownNeed.uri === postId) {
+                                return true
+                            }
+                        }),
+                    incomingRequestsOfNeed: mapToMatches(Object.keys(state.getIn(['connections', 'connections']).toJS())
+                        .map(key=>state.getIn(['connections', 'connections']).toJS()[key])
+                        .filter(conn=> {
+                            if (conn.connection.hasConnectionState === won.WON.RequestReceived && conn.ownNeed.uri === postId) {
+                                return true
+                            }
+                        }))
+                };
+            }
         }
 
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
