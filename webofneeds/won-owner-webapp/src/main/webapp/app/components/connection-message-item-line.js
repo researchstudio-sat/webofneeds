@@ -1,9 +1,10 @@
 ;
 
+import won from '../won-es6';
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
 import { labels } from '../won-label-utils';
-import {attach} from '../utils.js';
+import { attach } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
@@ -37,31 +38,7 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             window.needconnmsg = this;
             this.wonLabels = labels;
-            /*            const selectFromState = (state)=>{
-
-             return {
-             unreadUris: state.getIn(['events','unreadEventUris'])
-             };
-             }
-             this.wonLabels = labels;
-
-
-             const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this);
-             //  this.loadMatches();
-             this.$scope.$on('$destroy', disconnect);*/
         }
-
-        /*        read(request){
-         if(!this.unreadUris.has(request.connection.uri)){
-         return true
-         }
-         return false;
-         }*/
-        /*        toggleRequest() {
-         this.open = !this.open;
-         }
-         */
-
 
         openMessage(item) {
             //this.events__read(item)
