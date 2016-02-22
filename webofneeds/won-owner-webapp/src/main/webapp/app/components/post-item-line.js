@@ -42,7 +42,7 @@ function genComponentConf() {
                         {{ self.unreadConversationsCount() }}
                     </span>
                 </a>
-                <a class="pil__indicators__item clickable"  ui-sref="postRequests({myUri: self.item.uri})">
+                <a class="pil__indicators__item clickable"  ui-sref="overviewIncomingRequests({myUri: self.item.uri})">
                     <img src="generated/icon-sprite.svg#ico36_incoming"
                          ng-show="self.unreadRequestsCount()"
                          class="pil__indicators__item__icon">
@@ -53,7 +53,7 @@ function genComponentConf() {
                         {{ self.unreadRequestsCount() }}
                     </span>
                 </a>
-                <a class="pil__indicators__item clickable" ui-sref="postMatches({myUri: self.item.uri})">
+                <a class="pil__indicators__item clickable" ui-sref="overviewMatches({myUri: self.item.uri})">
                     <img src="generated/icon-sprite.svg#ico36_match"
                          ng-show="self.unreadMatchesCount()"
                          class="pil__indicators__item__icon">
