@@ -23,7 +23,7 @@ function genComponentConf() {
                             <span class="conn__item__description__subtitle__group" ng-show="request.group">
                                 <img src="generated/icon-sprite.svg#ico36_group" class="mil__item__description__subtitle__group__icon">{{self.item.group}}<span class="mil__item__description__subtitle__group__dash"> &ndash; </span>
                             </span>
-                            <span class="conn__item__description__subtitle__type">{{self.wonLabels.type[self.item.remoteNeed.basicNeedType]}}</span>
+                            <span class="conn__item__description__subtitle__type">{{self.labels.type[self.item.remoteNeed.basicNeedType]}}</span>
                         </div>
                         <div class="conn__item__description__message">
                             <span class="conn__item__description__message__indicator" ng-click="self.open(self.item.connection.uri)" ng-show="!self.read(self.item.connection.uri)"/>{{self.item.lastEvent.msg}}
@@ -37,7 +37,7 @@ function genComponentConf() {
         constructor() {
             attach(this, serviceDependencies, arguments);
             window.needconnmsg = this;
-            this.wonLabels = labels;
+            this.labels = labels;
         }
 
         openMessage(item) {

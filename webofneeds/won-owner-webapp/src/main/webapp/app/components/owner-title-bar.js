@@ -53,7 +53,7 @@ function genComponentConf() {
                             </a>
                         </li>
                         <li ng-class="{'ntb__tabs__selected' : self.selection == 3}">
-                            <a href="#"
+                            <a ui-sref="overviewSentRequests({myUri: self.item.uri})"
                                 ng-class="{'disabled' : !self.hasSentRequests}">
                                 Sent Requests
                                 <span class="ntb__tabs__unread">{{ self.unreadSentRequests }}</span>
@@ -87,7 +87,7 @@ function genComponentConf() {
                     hasSentRequests: Object.keys(state.getIn(['connections','connections']).toJS())
                         .map(key=>state.getIn(['connections','connections']).toJS()[key])
                         .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.RequestReceived && conn.ownNeed.uri === this.item.uri){  //TODO: CHANGE TO REQUESTS SENT
+                            if(conn.connection.hasConnectionState===won.WON.RequestSent && conn.ownNeed.uri === this.item.uri){
                                 return true
                             }
                         }).length > 0,
@@ -107,7 +107,7 @@ function genComponentConf() {
                         }).length > 0,
                     unreadMessages: unreadCounts.getIn([this.item.uri, won.WON.Connected]), //TODO: NOT REALLY THE MESSAGE COUNT ONLY THE CONVERSATION COUNT
                     unreadIncomingRequests: unreadCounts.getIn([this.item.uri, won.WON.RequestReceived]),
-                    unreadSentRequests: unreadCounts.getIn([this.item.uri, won.WON.RequestReceived]), //TODO: CHANGE TO REQUESTS SENT
+                    unreadSentRequests: unreadCounts.getIn([this.item.uri, won.WON.RequestSent]),
                     unreadMatches: unreadCounts.getIn([this.item.uri, won.WON.Suggested]),
                 };
             };

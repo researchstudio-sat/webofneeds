@@ -20,7 +20,7 @@ function genComponentConf() {
                         <span class="ril__description__subtitle__group" ng-show="self.item.group">
                             <img src="generated/icon-sprite.svg#ico36_group" class="ril__description__subtitle__group__icon">{{self.item.group}}<span class="ril__description__subtitle__group__dash"> &ndash; </span>
                         </span>
-                        <span class="ril__description__subtitle__type">{{self.wonLabels.type[self.item[0].ownNeed.basicNeedType]}}</span>
+                        <span class="ril__description__subtitle__type">{{self.labels.type[self.item[0].ownNeed.basicNeedType]}}</span>
                     </div>
                 </div>
                 <div class="ril__carret">
@@ -40,7 +40,7 @@ function genComponentConf() {
                             <span class="mil__item__description__subtitle__group" ng-show="request.group">
                                 <img src="generated/icon-sprite.svg#ico36_group" class="mil__item__description__subtitle__group__icon">{{request.group}}<span class="mil__item__description__subtitle__group__dash"> &ndash; </span>
                             </span>
-                            <span class="mil__item__description__subtitle__type">{{self.wonLabels.type[self.item[0].remoteNeed.basicNeedType]}}</span>
+                            <span class="mil__item__description__subtitle__type">{{self.labels.type[self.item[0].remoteNeed.basicNeedType]}}</span>
                         </div>
                         <div class="mil__item__description__message">
                             <span class="mil__item__description__message__indicator" ng-show="!self.read(request)"/>{{request.message}}
@@ -60,8 +60,7 @@ function genComponentConf() {
                     unreadUris: state.getIn(['events','unreadEventUris'])
                 };
             }
-            this.wonLabels = labels;
-        
+            this.labels = labels;
 
             const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this);
             //  this.loadMatches();

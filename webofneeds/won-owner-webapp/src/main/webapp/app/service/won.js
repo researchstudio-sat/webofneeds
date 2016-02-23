@@ -62,6 +62,9 @@
     won.WON.SuggestedCompacted = won.WON.baseUri+":Suggested";
     won.WON.RequestReceived = won.WON.baseUri+"RequestReceived";
     won.WON.RequestReceivedCompacted = won.WON.baseUri+":RequestReceived";
+    won.WON.RequestSent = won.WON.baseUri+"RequestSent";
+    won.WON.RequestSentCompacted = won.WON.baseUri+":RequestSent";
+
     won.WON.Connected = won.WON.baseUri+"Connected";
 
     //EVENT TYPES

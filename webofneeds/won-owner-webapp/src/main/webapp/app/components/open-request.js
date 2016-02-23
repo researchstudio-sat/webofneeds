@@ -13,14 +13,14 @@ function genComponentConf() {
             <img class="or__header__icon clickable" src="generated/icon-sprite.svg#ico36_close" ng-click="self.closeRequest()"/>
             <div class="or__header__title">
                 <div class="or__header__title__topline">
-                    <div class="or__header__title__topline__title">{{self.item.title}}</div>
-                    <div class="or__header__title__topline__date">{{self.item.timeStamp}}</div>
+                    <div class="or__header__title__topline__title">{{self.item.remoteNeed.title}}</div>
+                    <div class="or__header__title__topline__date">{{self.item.remoteNeed.creationDate}}</div>
                 </div>
                 <div class="or__header__title__subtitle">
                     <span class="or__header__title__subtitle__group" ng-show="self.item.group">
-                        <img src="generated/icon-sprite.svg#ico36_group" class="or__header__title__subtitle__group__icon">{{self.item.group}}<span class="or__header__title__subtitle__group__dash"> &ndash; </span>
+                        <img src="generated/icon-sprite.svg#ico36_group" class="or__header__title__subtitle__group__icon">{{self.item.remoteNeed.group}}<span class="or__header__title__subtitle__group__dash"> &ndash; </span>
                     </span>
-                    <span class="or__header__title__subtitle__type">{{self.labels.type[self.item.type]}}</span>
+                    <span class="or__header__title__subtitle__type">{{self.labels.type[self.item.remoteNeed.type]}}</span>
                 </div>
             </div>
         </div>
@@ -60,7 +60,6 @@ function genComponentConf() {
             this.labels = labels;
 
             const disconnect = this.$ngRedux.connect(null, actionCreators)(this);
-            //  this.loadMatches();
             this.$scope.$on('$destroy', disconnect);
         }
 

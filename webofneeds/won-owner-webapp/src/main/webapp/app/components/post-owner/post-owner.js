@@ -5,7 +5,7 @@ import 'ng-redux';
 import visitorTitleBarModule from '../owner-title-bar';
 import galleryModule from '../gallery';
 import postMessagesModule from '../post-messages';
-import { labels } from '../../won-label-utils';
+import { labels, relativeTime, updateRelativeTimestamps } from '../../won-label-utils';
 import { attach } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
 
@@ -27,6 +27,12 @@ class Controller {
         // Using actionCreators like this means that every action defined there is available in the template.
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
         this.$scope.$on('$destroy', disconnect);
+
+        updateRelativeTimestamps(
+            this.$scope,
+            this.$interval,
+            this.post.creationDate,
+                t => this.post.creationDate = t);
     }
 }
 
