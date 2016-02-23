@@ -46,7 +46,7 @@ function genComponentConf() {
                     </li>
                 </ul>
                 <div class="mtb__inner__right">
-                    <a href="#" class="mtb__searchbtn">
+                    <a class="mtb__searchbtn clickable">
                         <img src="generated/icon-sprite.svg#ico36_search_nomargin" class="mtb__icon">
                     </a>
                 </div>
