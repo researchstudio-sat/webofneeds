@@ -1025,7 +1025,6 @@ const rdfstore = window.rdfstore;
             .then(eventUris => won.urisToLookupMap(eventUris,
                     eventUri => won.getNode(eventUri, requesterWebId))
             )
-            .catch(e => `Could not get all events of connection ${connectionUri}. Reason: ${e}`);
     };
 
     /**
@@ -1044,7 +1043,6 @@ const rdfstore = window.rdfstore;
             .then(connection => connection.hasEventContainer)
             .then(eventContainerUri => won.getNodeWithAttributes(eventContainerUri, requesterWebId))
             .then(eventContainer => eventContainer.member)
-            .catch(e => `Could not get all events of connection ${connectionUri}. Reason: ${e}`);
     }
 
 
