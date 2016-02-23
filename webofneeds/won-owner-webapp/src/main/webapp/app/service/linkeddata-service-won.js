@@ -491,6 +491,7 @@ const rdfstore = window.rdfstore;
     won.addJsonLdData = function(uri, data) {
         console.log("linkeddata-service-won.js: storing jsonld data for uri: " + uri);
         privateData.store.load("application/ld+json", data, function (success, results) {
+            //privateData.store.load("application/ld+json", data, function (success, results) {
             console.log("linkeddata-service-won.js: added jsonld data to rdf store, success: " + success);
             if (success) {
                 cacheItemMarkAccessed(uri);

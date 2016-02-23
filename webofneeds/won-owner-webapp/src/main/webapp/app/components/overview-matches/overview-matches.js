@@ -26,15 +26,15 @@ class OverviewMatchesController {
         const selectFromState = (state)=>{
 
             return {
-                matches: Object.keys(state.getIn(['connections','connections']).toJS())
-                    .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                matches: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                    .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                     .filter(conn=>{
                         if(conn.connection.hasConnectionState===won.WON.Suggested){
                             return true
                         }
                     }),
-                matchesOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connections']).toJS())
-                    .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                matchesOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                    .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                     .filter(conn=>{
                         if(conn.connection.hasConnectionState===won.WON.Suggested){
                             return true

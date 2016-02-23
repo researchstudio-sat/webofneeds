@@ -53,15 +53,15 @@ class Controller {
         const selectFromState = (state)=>{
 
             return {
-                 messages: Object.keys(state.getIn(['connections','connections']).toJS())
-                    .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                 messages: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                    .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                     .filter(conn=>{
                         if(conn.connection.hasConnectionState===won.WON.RequestReceived && state.getIn(['events',conn.connection.uri]) !== undefined){
                             return true
                         }
                     }),
-                messagesOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connections']).toJS())
-                    .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                messagesOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                    .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                     .filter(conn=>{
                         if(conn.connection.hasConnectionState===won.WON.RequestReceived){
                             return true

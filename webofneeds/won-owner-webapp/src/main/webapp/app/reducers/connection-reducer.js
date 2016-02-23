@@ -12,11 +12,17 @@ import won from '../won-es6';
 const initialState = Immutable.fromJS({
     isFetching: false,
     didInvalidate: false,
-    connections: Immutable.Map(),
+    connectionsDeprecated: Immutable.Map(),
 
 })
 export default function(state = initialState, action = {}) {
     switch(action.type) {
+        /*
+        case actionTypes.load:
+            const allPreviousConnections = action.payload.get('connections');
+            return state.mergeIn(['connections'], allPreviousConnections);
+            */
+
         case actionTypes.connections.load:
             return action.payload.reduce(
                 (updatedState, connectionWithRelatedData) =>
@@ -37,6 +43,6 @@ export default function(state = initialState, action = {}) {
 }
 function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
     return state.setIn(
-        ['connections',connectionWithRelatedData.connection.uri],
+        ['connectionsDeprecated',connectionWithRelatedData.connection.uri],
         connectionWithRelatedData);
 }

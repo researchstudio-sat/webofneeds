@@ -67,7 +67,7 @@ export const selectUnreadCountsByType = createSelector(
 
 
 
-const selectConnections = state => state.getIn(['connections','connections']);
+const selectConnections = state => state.getIn(['connections','connectionsDeprecated']);
 export const selectConnectionsByNeed = createSelector(
     selectConnections,
     connections => connections
