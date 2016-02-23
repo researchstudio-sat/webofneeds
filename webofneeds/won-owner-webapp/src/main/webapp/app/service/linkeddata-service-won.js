@@ -644,6 +644,22 @@ const rdfstore = window.rdfstore;
     };
 
     /**
+     * @param needUri
+     * @return {*} the same as getNeed but also resolves
+     * the connectionContainer to the connectionUris
+     * contained within.
+     */
+    won.getNeedWithConnectionUris = function(needUri) {
+        return Promise.all([
+            won.getNeed(needUri),
+            won.getconnectionUrisOfNeed(needUri)]
+        ).then(([need, connectionUris]) => {
+            need.hasConnections = connectionUris;
+            return need;
+        });
+    };
+
+    /**
      * Loads the default data of the need with the specified URI into a js object.
      * @return the object or null if no data is found for that URI in the local datastore
      */
@@ -1034,15 +1050,8 @@ const rdfstore = window.rdfstore;
      * @returns promise for an array strings (the uris)
      */
     won.getEventUrisOfConnection = function(connectionUri, requesterWebId) {
-        if (!connectionUri ){
-            throw {
-                message : `getEventUrisOfConnection: connectionUri must not be null. Got: "${connectionUri}"`
-            };
-        }
-        return won.getNodeWithAttributes(connectionUri, requesterWebId)
-            .then(connection => connection.hasEventContainer)
-            .then(eventContainerUri => won.getNodeWithAttributes(eventContainerUri, requesterWebId))
-            .then(eventContainer => eventContainer.member)
+        return won.getConnection(connectionUri, requesterWebId)
+            .then(connection => connection.hasEvents);
     }
 
 
@@ -1317,8 +1326,25 @@ const rdfstore = window.rdfstore;
         return won.urisToLookupMap(uris, uri => won.getNode(uri, requesterWebId));
     };
 
+    /**
+     * @param connectionUri
+     * @param requesterWebId
+     * @return {*} the connections predicates along with the uris of associated events
+     */
+    won.getConnection = function(connectionUri, requesterWebId) {
+        return won.getNode(connectionUri, requesterWebId)
+            //add the eventUris
+            .then(connection => Promise.all([
+                Promise.resolve(connection),
+                won.getNode(connection.hasEventContainer, requesterWebId)
+            ]))
+            .then( ([connection, eventContainer]) => {
+                connection.hasEvents = eventContainer.member;
+                return connection;
+            })
+    };
+
     //aliases (formerly functions that were just pass-throughs)
-    won.getConnection =
     won.getConnectionEvent =
     won.getNodeWithAttributes =
     /**
