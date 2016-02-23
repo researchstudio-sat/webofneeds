@@ -644,18 +644,6 @@ const rdfstore = window.rdfstore;
     };
 
     /**
-     * Saves the specified jsonld structure in the triple store with the specified default graph URI.
-     * @param graphURI used if no graph URI is specified in the jsonld
-     * @param jsonld the data
-     */
-    won.storeJsonLdGraph = function(graphURI, jsonld) {
-        if (typeof graphURI === 'undefined' || graphURI == null  ){
-            throw {message : "storeJsonLdGraph: graphURI must not be null"};
-        }
-        privateData.store.load("application/ld+json", jsonld, graphURI, function (success, results) {});
-    }
-
-    /**
      * Loads the default data of the need with the specified URI into a js object.
      * @return the object or null if no data is found for that URI in the local datastore
      */
