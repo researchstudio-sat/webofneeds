@@ -56,7 +56,7 @@ function storeConnectionRelatedData(state, connectionWithRelatedData) {
         (updatedState, event) =>
             updatedState.getIn(['events', event.uri]) ?
                 updatedState : // we already know this one. no need to trigger re-rendering
-                updatedState.setIn(['events', event.uri], event) // add the event
+                updatedState.setIn(['events', event.uri], Immutable.fromJS(event)) // add the event
 
         , state // start with the original state
     );

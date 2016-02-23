@@ -61,8 +61,15 @@ export default function(allNeeds = initialState, action = {}) {
 function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
     const {ownNeed, remoteNeed, connection} = connectionWithRelatedData;
     //guarantee that own need is in the state
-    const stateWithOwnNeed = setIfNew(state, ['ownNeeds', ownNeed.uri], ownNeed);
-    const stateWithBothNeeds = setIfNew(stateWithOwnNeed, ['theirNeeds', remoteNeed.uri], remoteNeed);
+    const stateWithOwnNeed = setIfNew(
+        state,
+        ['ownNeeds', ownNeed.uri],
+        Immutable.fromJS(ownNeed));
+
+    const stateWithBothNeeds = setIfNew(
+        stateWithOwnNeed,
+        ['theirNeeds', remoteNeed.uri],
+        Immutable.fromJS(remoteNeed));
 
     /* TODO | what if we get the connection while not online?
      * TODO | doing this here doesn't guarantee synchronicity with the rdf
