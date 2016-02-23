@@ -49,8 +49,9 @@ class OverviewPostsController {
 
 
 
+            const ownNeeds = state.getIn(["needs", "ownNeeds"]);
             return {
-                posts: state.getIn(["needs", "ownNeeds"]).toJS(),
+                posts: ownNeeds? ownNeeds.toJS() : {}, //TODO pass in the immutablejs-object directly
                 unreadEvents,
                 unreadCounts: selectUnreadCountsByNeedAndType(state),
                 //unreadMatchEventsOfNeed: unseenMatchesCounts,
