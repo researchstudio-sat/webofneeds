@@ -13,10 +13,10 @@ const initialState = Immutable.fromJS({
     isFetching: false,
     didInvalidate: false,
     ownNeeds: {},
-    othersNeeds: {},
+    theirNeeds: {},
 });
 
-export default function(state = initialState, action = {}) {
+export default function(allNeeds = initialState, action = {}) {
     switch(action.type) {
         case actionTypes.needs.clean:
             return initialState;
@@ -25,28 +25,36 @@ export default function(state = initialState, action = {}) {
             console.log('reducers.js: failed receive needlist action');
             return Immutable.fromJS({error: error});
 
+        case actionTypes.load:
+            const ownNeeds = action.payload.get('ownNeeds');
+            const theirNeeds = action.payload.get('theirNeeds');
+            return allNeeds
+                .mergeIn(['ownNeeds'], ownNeeds)
+                .mergeIn(['theirNeeds'], theirNeeds);
+
         case actionTypes.needs.fetch:
+            //TODO needs supplied by this action don't have a list of already associated connections
             return action.payload.reduce(
                 (updatedState, ownNeed) => setIfNew(updatedState, ['ownNeeds', ownNeed.uri], ownNeed),
-                state
+                allNeeds
             );
 
         case actionTypes.needs.received:
             const ownNeed = action.payload;
-            return setIfNew(state, ['ownNeeds', ownNeed.uri], ownNeed)
+            return setIfNew(allNeeds, ['ownNeeds', ownNeed.uri], ownNeed)
 
         case actionTypes.connections.load:
             return action.payload.reduce(
                 (updatedState, connectionWithRelatedData) =>
                     storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
-                state);
+                allNeeds);
 
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
-            return storeConnectionAndRelatedData(state, action.payload);
+            return storeConnectionAndRelatedData(allNeeds, action.payload);
 
         default:
-            return state;
+            return allNeeds;
     }
 }
 
@@ -54,13 +62,13 @@ function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
     const {ownNeed, remoteNeed, connection} = connectionWithRelatedData;
     //guarantee that own need is in the state
     const stateWithOwnNeed = setIfNew(state, ['ownNeeds', ownNeed.uri], ownNeed);
-    const stateWithBothNeeds = setIfNew(stateWithOwnNeed, ['othersNeeds', remoteNeed.uri], remoteNeed);
+    const stateWithBothNeeds = setIfNew(stateWithOwnNeed, ['theirNeeds', remoteNeed.uri], remoteNeed);
 
     /* TODO | what if we get the connection while not online?
      * TODO | doing this here doesn't guarantee synchronicity with the rdf
      * TODO | unless we fetch all connections onLoad and onLogin
      */
-    return stateWithBothNeeds.updateIn(['ownNeeds', ownNeed.uri, 'connections'], connections => connections?
+    return stateWithBothNeeds.updateIn(['ownNeeds', ownNeed.uri, 'hasConnections'], connections => connections?
             connections.push(connection.uri) :
             Immutable.List([connection.uri]) // first connection -> new List
     );
