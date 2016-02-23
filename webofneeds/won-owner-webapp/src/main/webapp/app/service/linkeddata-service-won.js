@@ -1348,50 +1348,77 @@ const rdfstore = window.rdfstore;
      * @param eventUri
      * @param requesterWebId
      */
-    won.getNode = function(uri, requesterWebId){
+    won.getNode = function(uri, requesterWebId) {
         if(!uri) {
-            throw {message : "getNodeWithAttributes: uri must not be null"};
+            return Promise.reject({message : "getNode: uri must not be null"})
         }
-        return won.ensureLoaded(uri, requesterWebId).then(() => {
-            const lock = getReadUpdateLockPerUri(uri);
-            return lock.acquireReadLock().then(() => {
-                console.log("linkeddata-service-won.js: getNodeWithAttrs:" + uri);
-                try {
-                    let node = {};
-                    privateData.store.node(uri, function (success, graph) {
-                        if (graph.length == 0) {
-                            console.log("linkeddata-service-won.js: warn: could not load any attributes for node with uri: " + uri);
-                        }
-                        if (rejectIfFailed(success, graph,{message : "Error loading node with attributes for URI " + uri+".", allowNone : false, allowMultiple: true})){
-                            return;
-                        }
-                        graph.triples.forEach(triple => {
-                            //TODO this cropping ignores prefixes, causing predicates/fields to clash!
-                            const propName = won.getLocalName(triple.predicate.nominalValue);
-                            if(node[propName]) {
-                                //encountered multiple occurances of the same predicate, e.g. rdfs:member
 
-                                if(!(node[propName] instanceof Array)) {
-                                    //on the first 'clash', instantiate the predicate/property as array
-                                    node[propName] = [ node[propName] ];
-                                }
-                                node[propName].push(triple.object.nominalValue);
-                            } else {
-                                node[propName] = triple.object.nominalValue;
-                            }
-                        });
-                    });
-                    node.uri = uri;
-                    return node;
-                } catch (e) {
-                    return q.reject("could not get node " + uri + "with attributes: " + e);
-                } finally {
-                    //we don't need to release after a promise resolves because
-                    //this function isn't deferred.
-                    lock.releaseReadLock();
-                }
-            });
-        });
+
+        let releaseLock = undefined;
+
+        const nodePromise = won.ensureLoaded(uri, requesterWebId)
+            .then(() => {
+                const lock = getReadUpdateLockPerUri(uri);
+                releaseLock = () => lock.releaseReadLock();
+                return lock.acquireReadLock();
+            })
+            .then(() => {
+                console.log("linkeddata-service-won.js: getNode:" + uri);
+                return new Promise((resolve, reject) => {
+                    privateData.store.node(uri, function (success, graph) {
+                        if(!success) {
+                            reject({
+                                message: "Error loading node with attributes for URI " + uri + "."
+                            });
+                        } else if (graph.length === 0) {
+                            /* TODO HACK / WORKAROUND
+                             * try query + manual filter. it's slower but the store
+                             * occasionally has hiccups where neither `store.node(uri)`
+                             * nor `select * where {<uri> ?p ? o}` return triples, but
+                             * `select * where { ?s ?p ?o }` contains the the desired
+                             * triples. I couldn't find out what's the cause of this
+                             * within a feasible time, but hope these issues will go
+                             * away, when we'll get around to update the store to the
+                             * newest version.
+                             */
+                            console.log('linkeddata-service-won.js: warn: could not ' +
+                                'load any attributes for node with uri: ', uri,
+                                '. Trying sparql-query + result.filter workaround.');
+                            privateData.store.graph((success, entireGraph) => {
+                                resolve(entireGraph.triples.filter(t => t.subject.nominalValue === uri))
+                            })
+                        } else {
+                            //graph.triples[0].object.nominalValue
+                            //graph.triples[0].subject.nominalValue
+                            //graph.triples[0].predicate.nominalValue
+                            resolve(graph.triples);
+                        }
+                    })
+                })
+            })
+            .then(triples => {
+                const node = {};
+                triples.forEach(triple => {
+                    //TODO this cropping ignores prefixes, causing predicates/fields to clash!
+                    const propName = won.getLocalName(triple.predicate.nominalValue);
+                    if(node[propName]) {
+                        //encountered multiple occurances of the same predicate, e.g. rdfs:member
+                        if(!(node[propName] instanceof Array)) {
+                            //on the first 'clash', instantiate the predicate/property as array
+                            node[propName] = [ node[propName] ];
+                        }
+                        node[propName].push(triple.object.nominalValue);
+                    } else {
+                        node[propName] = triple.object.nominalValue;
+                    }
+                });
+                node.uri = uri;
+                releaseLock();
+                return node;
+            })
+            .catch(releaseLock);
+
+        return nodePromise;
     }
 
     /**
