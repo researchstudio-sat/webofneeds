@@ -55,6 +55,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -275,46 +277,99 @@ public class
     //webmvc controller method
   @RequestMapping("${uri.path.page.connection}")
   public String showConnectionURIListPage(
-      @RequestParam(value="p",defaultValue = "-1") int page,
+    @RequestParam(value="p", required=false) Integer page,
+    @RequestParam(value="deep", defaultValue = "false") boolean deep,
+    @RequestParam(value="resumebefore", required=false) String beforeId,
+    @RequestParam(value="resumeafter", required=false) String afterId,
+    @RequestParam(value="timeof", required=false) String timestamp,
       HttpServletRequest request,
       Model model,
       HttpServletResponse response) {
-    Dataset rdfDataset = linkedDataService.listConnectionURIs(page);
-    model.addAttribute("rdfDataset", rdfDataset);
-    model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
-    model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
-    return "rdfDatasetView";
+
+    try {
+      DateParameter dateParam = new DateParameter(timestamp);
+      Dataset rdfDataset;
+      if (page != null) {
+        rdfDataset = linkedDataService.listConnectionURIs(page, null, dateParam.getDate(), deep).getContent();
+      } else if (beforeId != null) {
+        URI connURI = uriService.createConnectionURIForId(beforeId);
+        rdfDataset = linkedDataService.listConnectionURIsBefore(connURI, null, dateParam.getDate(), deep).getContent();
+      } else if (afterId != null) {
+        URI connURI = uriService.createConnectionURIForId(afterId);
+        rdfDataset = linkedDataService.listConnectionURIsAfter(connURI, null, dateParam.getDate(), deep).getContent();
+      }  else {
+        // all the connections:
+        rdfDataset = linkedDataService.listConnectionURIs(deep);
+      }
+      model.addAttribute("rdfDataset", rdfDataset);
+      model.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
+      model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
+      return "rdfDatasetView";
+    } catch (ParseException e) {
+      model.addAttribute("error", "could not parse timestamp parameter");
+      return "notFoundView";
+    } catch (NoSuchConnectionException e) {
+      model.addAttribute("error", "could not add connection data for " + e.getUnknownConnectionURI().toString());
+      return "notFoundView";
+    }
   }
 
   //webmvc controller method
   @RequestMapping("${uri.path.page.need}/{identifier}/connections/")
   public String showConnectionURIListPage(
       @PathVariable String identifier,
-      @RequestParam(value="p",defaultValue = "-1") int page,
+      @RequestParam(value="p", required=false) Integer page,
       @RequestParam(value="deep",defaultValue = "false") boolean deep,
+      @RequestParam(value="resumebefore", required=false) String beforeId,
+      @RequestParam(value="resumeafter", required=false) String afterId,
+      @RequestParam(value="type", required=false) String type,
+      @RequestParam(value="timeof", required=false) String timestamp,
       HttpServletRequest request,
-      Model webmvcModel,
+      Model model,
       HttpServletResponse response) {
+
     URI needURI = uriService.createNeedURIForId(identifier);
-    try{
-      Dataset dataset = linkedDataService.listConnectionURIs(page, needURI);
-        if (deep){
-            addDeepConnectionData(needURI.toString(), dataset);
-        }
-      webmvcModel.addAttribute("rdfDataset", dataset);
-      webmvcModel.addAttribute("resourceURI", uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
-      webmvcModel.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
+    try {
+      DateParameter dateParam = new DateParameter(timestamp);
+      WonMessageType eventsType = getMessageType(type);
+      Dataset rdfDataset;
+      if (page != null) {
+        rdfDataset = linkedDataService.listConnectionURIs(page, needURI, null, eventsType, dateParam.getDate(), deep)
+                                      .getContent();
+      } else if (beforeId != null) {
+        URI connURI = uriService.createConnectionURIForId(beforeId);
+        rdfDataset = linkedDataService.listConnectionURIsBefore(
+          needURI, connURI, null, eventsType, dateParam.getDate(), deep).getContent();
+      } else if (afterId != null) {
+        URI connURI = uriService.createConnectionURIForId(afterId);
+        rdfDataset = linkedDataService.listConnectionURIsAfter(
+          needURI, connURI, null, eventsType, dateParam.getDate(), deep).getContent();
+      } else {
+        // all the connections of the need:
+        rdfDataset = linkedDataService.listConnectionURIs(needURI, deep);
+      }
+      model.addAttribute("rdfDataset", rdfDataset);
+      model.addAttribute("resourceURI",
+                         uriService.toResourceURIIfPossible(URI.create(request.getRequestURI())).toString());
+      model.addAttribute("dataURI", uriService.toDataURIIfPossible(URI.create(request.getRequestURI())).toString());
       return "rdfDatasetView";
+    } catch (ParseException e) {
+      model.addAttribute("error", "could not parse timestamp parameter");
+      return "notFoundView";
     } catch (NoSuchNeedException e) {
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return "notFoundView";
     } catch (NoSuchConnectionException e) {
-        logger.warn("did not find connection that should be connected to need. connection:{}",
-                    e.getUnknownConnectionURI());
-        return "notFoundView"; //TODO: should display an error view
+      logger.warn("did not find connection that should be connected to need. connection:{}",
+                  e.getUnknownConnectionURI());
+      return "notFoundView"; //TODO: should display an error view
     }
   }
 
+  /**
+   * @deprecated  functionality moved to @see won.protocol.service.LinkedDataServiceImpl#addDeepConnectionData()
+  */
+  @Deprecated
     private void addDeepConnectionData(String needUri, Dataset dataset) throws NoSuchConnectionException {
         //add the connection model to each connection
         //TODO: use a more principled way to find the connections resource!
@@ -464,6 +519,7 @@ public class
     Dataset rdfDataset = null;
     HttpHeaders headers = new HttpHeaders();
     Integer preferedSize = getPreferredSize(request);
+    Map<String,String> passableQuery = getPassableQueryMap("state", state);
 
     if (page == null && beforeId == null && afterId == null) {
 
@@ -488,14 +544,14 @@ public class
       NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listNeedURIsBefore(
         referenceNeed, preferedSize, NeedState.parseString(state));
       rdfDataset = resource.getContent();
-      addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource);
+      addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource, passableQuery);
     } else {
 
       URI referenceNeed = URI.create(this.needResourceURIPrefix + "/" + afterId);
       NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listNeedURIsAfter(
         referenceNeed, preferedSize, NeedState.parseString(state));
       rdfDataset = resource.getContent();
-      addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource);
+      addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource, passableQuery);
     }
 
     headers = addAlreadyExpiredHeaders(
@@ -535,15 +591,67 @@ public class
               "application/n-quads"})
   public ResponseEntity<Dataset> listConnectionURIs(
       HttpServletRequest request,
-      @RequestParam(value="p", defaultValue="-1") int page) {
-    logger.debug("listNeedURIs() called");
-    Dataset model = linkedDataService.listConnectionURIs(page);
-    HttpHeaders headers = addAlreadyExpiredHeaders(
-      addLocationHeaderIfNecessary(new HttpHeaders(), URI.create(request.getRequestURI()),
+      @RequestParam(value="resumebefore", required=false) String beforeId,
+      @RequestParam(value="resumeafter", required=false) String afterId,
+      @RequestParam(value="timeof", required=false) String timestamp,
+      @RequestParam(value="deep", defaultValue = "false") boolean deep) {
+
+    logger.debug("listConnectionURIs() called");
+    Dataset rdfDataset = null;
+    HttpHeaders headers = new HttpHeaders();
+    Integer preferedSize = getPreferredSize(request);
+
+    try {
+      // even when the timestamp is not provided (null), we need to fix the time (if null, then to current),
+      // because we will return prev/next links which make no sense if the time is not fixed
+      DateParameter dateParam = new DateParameter(timestamp);
+      Map passableMap = getPassableQueryMap("timeof", dateParam.getTimestamp());
+      //if no preferred size provided by the client => the client does not support paging, return everything:
+      if (preferedSize == null) {
+        rdfDataset = linkedDataService.listConnectionURIs(deep);
+
+      } else if (beforeId == null && afterId == null) {
+        // return latest by the given timestamp
+        NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionURIs(
+          1, preferedSize, dateParam.getDate(), deep);
+        rdfDataset = resource.getContent();
+        addPagedResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource, passableMap);
+
+      // resume before parameter specified - display the connections with activities before the specified event id
+      } else {
+        if (beforeId != null) {
+          URI resumeConnURI = uriService.createConnectionURIForId(beforeId);
+          NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listConnectionURIsBefore(
+            resumeConnURI, preferedSize, dateParam.getDate(), deep);
+          rdfDataset = resource.getContent();
+          addPagedResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource, passableMap);
+
+      // resume after parameter specified - display the connections with activities after the specified event id:
+        } else { // if (afterId != null)
+          URI resumeConnURI = uriService.createConnectionURIForId(afterId);
+          NeedInformationService.PagedResource<Dataset, URI> resource = linkedDataService.listConnectionURIsAfter(
+            resumeConnURI, preferedSize, dateParam.getDate(), deep);
+          rdfDataset = resource.getContent();
+          addPagedResourceInSequenceHeader(headers, URI.create(this.connectionResourceURIPrefix), resource, passableMap);
+
+        }
+      }
+    } catch (ParseException e) {
+      logger.warn("could not parse timestamp into Date:{}", timestamp);
+      return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+    } catch (NoSuchConnectionException e) {
+      logger
+        .warn("did not find connection that should be connected to need. connection:{}", e.getUnknownConnectionURI());
+      return new ResponseEntity<Dataset>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    headers = addAlreadyExpiredHeaders(
+      addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
                                    URI.create(this.connectionResourceURIPrefix)));
     addCORSHeader(headers);
-    return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
+    return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
   }
+
 
 
   @RequestMapping(
@@ -623,7 +731,7 @@ public class
     @RequestParam(value="p", required=false) Integer page,
     @RequestParam(value="resumebefore", required=false) String beforeId,
     @RequestParam(value="resumeafter", required=false) String afterId,
-    @RequestParam(value="type", required=false) URI type) throws IOException {
+    @RequestParam(value="type", required=false) String type) {
 
     logger.debug("readConnection() called");
     Dataset rdfDataset = null;
@@ -632,7 +740,9 @@ public class
     URI connectionUri = URI.create(this.connectionResourceURIPrefix + "/" + identifier);
     URI connectionEventsURI = URI.create(connectionUri.toString() + "/" + "events");
     WonMessageType msgType = getMessageType(type);
+
     try {
+      Map passableMap = getPassableQueryMap("type", type);
       if (page == null && beforeId == null && afterId == null) {
         // paging not requested or not supported by the client
 
@@ -659,7 +769,7 @@ public class
         NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionEventURIsBefore
           (connectionUri, referenceEvent, preferedSize, msgType);
         rdfDataset = resource.getContent();
-        addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource);
+        addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
 
       }  else {
         // a page that follows the item identified by the afterId is requested
@@ -668,7 +778,7 @@ public class
         NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionEventURIsAfter
           (connectionUri, referenceEvent, preferedSize, msgType);
         rdfDataset = resource.getContent();
-        addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource);
+        addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
 
       }
 
@@ -685,9 +795,9 @@ public class
 
   }
 
-  private WonMessageType getMessageType(final URI type) {
+  private WonMessageType getMessageType(final String type) {
     if (type != null) {
-      return WonMessageType.getWonMessageType(type);
+      return WonMessageType.valueOf(type);
     } else {
       return null;
     }
@@ -765,13 +875,12 @@ public class
     }
     return ret;
   }
-    
+
 
     /**
      * Get the RDF for the connections of the specified need.
      * @param request
      * @param identifier
-     * @param page if used, returns the specified page number.
      * @param deep If true, connection data is added to the model (not only connection URIs). Default: false.
      * @return
      */
@@ -784,33 +893,70 @@ public class
   public ResponseEntity<Dataset> readConnectionsOfNeed(
       HttpServletRequest request,
       @PathVariable(value="identifier") String identifier,
-      @RequestParam(value="p",defaultValue = "-1") int page,
-      @RequestParam(value="deep",defaultValue = "false") boolean deep) {
+      @RequestParam(value="deep",defaultValue = "false") boolean deep,
+      @RequestParam(value="resumebefore", required=false) String beforeId,
+      @RequestParam(value="resumeafter", required=false) String afterId,
+      @RequestParam(value="type", required=false) String type,
+      @RequestParam(value="timeof", required=false) String timestamp) {
+
     logger.debug("readConnectionsOfNeed() called");
     URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
+    Dataset rdfDataset = null;
+    HttpHeaders headers = new HttpHeaders();
+    Integer preferedSize = getPreferredSize(request);
+    URI connectionsURI = URI.create(needUri.toString() + "/connections/");
+
 
     try {
-        Dataset model = null;
-        HttpHeaders headers = null;
-        model = linkedDataService.listConnectionURIs(page, needUri);
-        if (deep){
-            //add the connection model to each connection
-            addDeepConnectionData(needUri.toString(), model);
+      WonMessageType eventsType = getMessageType(type);
+      DateParameter dateParam = new DateParameter(timestamp);
+      Map<String,String> passableQuery = getPassableQueryMap("type", type, "timeof", dateParam.getTimestamp());
+      //if no preferred size provided by the client => the client does not support paging, return everything:
+      if (preferedSize == null) {
+        rdfDataset = linkedDataService.listConnectionURIs(needUri, deep);
+      // if no resume parameter is specified, display the latest connections:
+      } else if (beforeId == null && afterId == null) {
+        NeedInformationService.PagedResource<Dataset, URI> resource =
+          linkedDataService.listConnectionURIs(1, needUri, preferedSize, eventsType, dateParam.getDate(), deep);
+        rdfDataset = resource.getContent();
+        addPagedResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
+      } else {
+        // resume before parameter specified - display the connections with activities before the specified event id:
+        if (beforeId != null) {
+          URI resumeConnURI = uriService.createConnectionURIForId(beforeId);
+          NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionURIsBefore(
+            needUri, resumeConnURI, preferedSize, eventsType, dateParam.getDate(), deep);
+          rdfDataset = resource.getContent();
+          addPagedResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
+
+          // resume after parameter specified - display the connections with activities after the specified event id:
+        } else { // if (afterId != null)
+          URI resumeConnURI = uriService.createConnectionURIForId(afterId);
+          NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionURIsAfter(
+            needUri, resumeConnURI, preferedSize, eventsType, dateParam.getDate(), deep);
+          rdfDataset = resource.getContent();
+          addPagedResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
         }
-        //append the required headers
-        headers = addAlreadyExpiredHeaders(addLocationHeaderIfNecessary(
-                new HttpHeaders(), URI.create(request.getRequestURI()), needUri));
+      }
+
+      //append the required headers
+      headers = addAlreadyExpiredHeaders(
+        addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()), connectionsURI));
       addCORSHeader(headers);
-      return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
+      return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
+
+    } catch (ParseException e) {
+      logger.warn("could not parse timestamp into Date:{}", timestamp);
+      return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
     } catch (NoSuchNeedException e) {
+      logger.warn("did not find need {}", e.getUnknownNeedURI());
       return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
     } catch (NoSuchConnectionException e) {
-      logger.warn("did not find connection that should be connected to need. connection:{}",e.getUnknownConnectionURI());
+      logger
+        .warn("did not find connection that should be connected to need. connection:{}", e.getUnknownConnectionURI());
       return new ResponseEntity<Dataset>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
-
 
 
   /**
@@ -862,19 +1008,37 @@ public class
   }
 
   private void addPagedResourceInSequenceHeader(final HttpHeaders headers, final URI canonicalURI,
-                                                final NeedInformationService.PagedResource<Dataset,URI> resource) {
+          final NeedInformationService.PagedResource<Dataset,URI> resource, Map<String,String> queryMap) {
+
+    String queryPart = "";
+    if (queryMap != null) {
+      for (String name : queryMap.keySet()) {
+        queryPart = queryPart + "&" + name + "=" + queryMap.get(name);
+      }
+    }
 
     headers.add("Link", "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
     if (resource.hasNext()) {
       String id = extractResourceLocalId(resource.getResumeAfter());
-      headers.add("Link", "<" + canonicalURI.toString() + "?resumeafter=" + id + ">; rel=\"next\"");
+      headers.add("Link", "<" + canonicalURI.toString() + "?resumeafter=" + id + queryPart + ">; rel=\"next\"");
     }
     if (resource.hasPrevious()) {
       String id = extractResourceLocalId(resource.getResumeBefore());
-      headers.add("Link", "<" + canonicalURI.toString() + "?resumebefore=" + id + ">; rel=\"prev\"");
+      headers.add("Link", "<" + canonicalURI.toString() + "?resumebefore=" + id + queryPart + ">; rel=\"prev\"");
     }
     headers.add("Link", "<" + canonicalURI.toString() + ">; rel=\"canonical\"");
 
+  }
+
+  private Map<String,String> getPassableQueryMap(String ... nameValue) {
+    Map<String,String> nameValueMap = new HashMap<>();
+    for (int i = 0; i < nameValue.length; i++) {
+      if (nameValue[i+1] != null) {
+        nameValueMap.put(nameValue[i], nameValue[i+1]);
+      }
+      i++;
+    }
+    return nameValueMap;
   }
 
   private String extractResourceLocalId(final URI uri) {
@@ -1016,5 +1180,59 @@ public class
       return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+  }
+
+  private class DateParameter
+  {
+    private String timestamp;
+    private Date date;
+    private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+
+    /**
+     * Creates date parameter from String timestamp, assumes timestamp format is "yyyy-MM-dd'T'HH:mm:ss.SSS".
+     * If timestamp is null, the parameter is assigned current time value.
+     *
+     * @param timestamp
+     */
+    public DateParameter(final String timestamp) throws ParseException {
+      DateFormat format = new SimpleDateFormat(TIMESTAMP_FORMAT, Locale.ENGLISH);
+      if (timestamp == null) {
+        this.date = new Date();
+        this.timestamp = format.format(date);
+      } else {
+        this.date = format.parse(timestamp);
+        this.timestamp = timestamp;
+      }
+    }
+
+    /**
+     * Creates date parameter from Date.
+     *
+     *
+     * @param date
+     */
+    public DateParameter(final Date date) {
+      DateFormat format = new SimpleDateFormat(TIMESTAMP_FORMAT, Locale.ENGLISH);
+      this.timestamp = format.format(date);
+      this.date = date;
+    }
+
+    /**
+     * Gets time from String timestamp.
+     *
+     * @return
+     */
+    public Date getDate()  {
+      return date;
+    }
+
+    /**
+     * Gets String timestamp.
+     *
+     * @return
+     */
+    public String getTimestamp() {
+      return timestamp;
+    }
   }
 }

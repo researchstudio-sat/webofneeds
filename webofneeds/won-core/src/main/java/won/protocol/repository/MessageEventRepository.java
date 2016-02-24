@@ -56,4 +56,13 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
 
   MessageEventPlaceholder findOneByCorrespondingRemoteMessageURI(URI uri);
 
+  @Query("select max(msg.creationDate) from MessageEventPlaceholder msg where msg.creationDate <= :referenceDate and " +
+    "parentURI = :parent")
+  Date findMaxActivityDateOfParentAtTime(@Param("parent") URI parentURI, @Param("referenceDate") Date referenceDate);
+
+  @Query("select max(msg.creationDate) from MessageEventPlaceholder msg where msg.creationDate <= :referenceDate and " +
+    "parentURI = :parent and msg.messageType = :messageType")
+  Date findMaxActivityDateOfParentAtTime(@Param("parent") URI parentURI, @Param("messageType") WonMessageType
+    messageType, @Param("referenceDate") Date referenceDate);
+
 }

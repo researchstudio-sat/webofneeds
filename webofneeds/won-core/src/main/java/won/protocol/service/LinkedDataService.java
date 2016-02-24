@@ -23,6 +23,7 @@ import won.protocol.message.WonMessageType;
 import won.protocol.model.NeedState;
 
 import java.net.URI;
+import java.util.Date;
 
 /**
  * User: fkleedorfer
@@ -94,13 +95,136 @@ public interface LinkedDataService
     final URI need, final Integer preferedSize, NeedState needState);
 
 
+
+
   /**
-   * Returns a model containing all connection URIs.
-   * If page >= 0, paging is used and the respective page is returned.
-   * @param page
+   * Returns container dataset containing all connection URIs.
+   * If deep is true, the resource data of those connection uris is also part of the returned resource.
+   * @param deep
    * @return
+   * @throws NoSuchConnectionException only in case deep is set to true and connection data for a member connection
+   * uri cannot be retrieved.
    */
-  public Dataset listConnectionURIs(final int page);
+  public Dataset listConnectionURIs(final boolean deep) throws NoSuchConnectionException;
+
+  /**
+   * Returns a resource containing connection uris at given page.
+   * If deep is true, the resource data of those connection uris is also part of the returned resource.
+   * If page >0, paging is used and the respective page is returned.
+   * @param page
+   * @param preferredSize preferred number of connection uris per page (null means use default)
+   * @param deep
+   * @return
+   * @throws NoSuchNeedException
+   * @throws NoSuchConnectionException
+   */
+  public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIs(final int page, final Integer
+    preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException;
+
+  /**
+   * Returns a resource containing connection uris that precede (by time of their latest event activities) the
+   * given connection as of state that was at the specified time.
+   *
+   * @param beforeConnURI a connection the preceding connections of which we are interested in
+   * @param preferredSize preferred number of connection uris per page (null means use default)
+   * @param timeSpot date and time that specifies the connections and events state of interest
+   * @param deep if true, the resource data of those connection uris is also part of the resource
+   * @return
+   * @throws NoSuchNeedException
+   * @throws NoSuchConnectionException only in case deep is set to true and connection data for a member connection
+   * uri cannot be retrieved.
+   */
+  public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsBefore(
+    URI beforeConnURI, final Integer preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException;
+
+  /**
+   * Returns a resource containing connection uris that follow (by time of their latest event activities) the
+   * given connection as of state that was at the specified time.
+   *
+   * @param afterConnURI a connection the following connections of which we are interested in
+   * @param preferredSize preferred number of connection uris per page (null means use default)
+   * @param timeSpot date and time that specifies the connections and events state of interest
+   * @param deep if true, the resource data of those connection uris is also part of the resource
+   * @return
+   * @throws NoSuchNeedException
+   * @throws NoSuchConnectionException only in case deep is set to true and connection data for a member connection
+   * uri cannot be retrieved.
+   */
+  public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsAfter(
+    URI afterConnURI, final Integer preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException;
+
+
+
+
+  /**
+   * Returns a model containing all connection uris belonging to the specified need.
+   * @param needURI
+   * @return
+   * @throws NoSuchNeedException
+   */
+  public Dataset listConnectionURIs(final URI needURI, boolean deep)
+    throws NoSuchNeedException, NoSuchConnectionException;
+
+  /**
+   * Returns paged resource containing all connection uris belonging to the specified need.
+   *
+   * @param page number
+   * @param preferredSize preferred number of connection uris per page (null means use default)
+   * @param needURI local need the connections of which are retrieved
+   * @param deep if true, the resource data of those connection uris is also part of the resource
+   * @param messageType the event type that should be used for defining connection latest activity; null => all event
+   *                    types
+   * @param timeSpot time at which we want the list state to be fixed
+   * @return
+   * @throws NoSuchNeedException when specified need is not found
+   * @throws NoSuchConnectionException only in case deep is set to true and connection data for a member connection
+   * uri cannot be retrieved.
+   */
+  public NeedInformationService.PagedResource<Dataset,URI> listConnectionURIs(
+    int page, URI needURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep)
+    throws NoSuchNeedException, NoSuchConnectionException;
+
+  /**
+   * Returns paged resource containing all connection uris belonging to the specified need that precede the given
+   * connection URI from the point of view of their latest events.
+   *
+
+   * @param needURI local need the connections of which are retrieved
+   * @param resumeConnURI the returned slice connections precede (in time of their latest events) this connection uri
+   * @param preferredSize preferred number of connection uris per page (null means use default)
+   * @param messageType the event type that should be used for defining connection latest activity; null => all event
+   *                    types
+   * @param timeSpot time at which we want the list state to be fixed
+   * @param deep if true, the resource data of those connection uris is also part of the resource
+   * @return
+   * @throws NoSuchNeedException when specified need is not found
+   * @throws NoSuchConnectionException only in case deep is set to true and connection data for a member connection
+   * uri cannot be retrieved.
+   */
+  public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsBefore(
+    URI needURI, URI resumeConnURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep)
+    throws NoSuchNeedException, NoSuchConnectionException;
+
+  /**
+   * Returns paged resource containing all connection uris belonging to the specified need that follows the given
+   * connection URI from the point of view of their latest events.
+   *
+   * @param needURI local need the connections of which are retrieved
+   * @param resumeConnURI the returned slice connections follow (in time of their latest events) this connection uri
+   * @param preferredSize preferred number of connection uris per page (null means use default)
+   * @param messageType the event type that should be used for defining connection latest activity; null => all event
+   *                    types
+   * @param timeSpot time at which we want the list state to be fixed
+   * @param deep if true, the resource data of those connection uris is also part of the resource
+   * @return
+   * @throws NoSuchNeedException when specified need is not found
+   * @throws NoSuchConnectionException only in case deep is set to true and connection data for a member connection
+   * uri cannot be retrieved.
+   */
+  public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsAfter(
+    URI needURI, URI resumeConnURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep)
+    throws NoSuchNeedException, NoSuchConnectionException;
+
 
   /**
    * Returns a dataset describing the need with the specified URI.
@@ -126,23 +250,13 @@ public interface LinkedDataService
    */
   public Dataset listConnectionEventURIs(final URI connectionUri) throws NoSuchConnectionException;
 
-  /**
-   * Returns a dataset containing all event uris belonging to the specified connection.
-   * If page >= 0, paging is used and the respective page is returned.
-   * @param connectionUri
-   * @param pageNum
-   * @return
-   * @throws NoSuchConnectionException
-   */
-  public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIs(
-    final URI connectionUri, final int pageNum) throws NoSuchConnectionException;
+
 
   /**
-   * Returns a dataset containing all event uris belonging to the specified connection and are of the specified type.
-   * If page >= 0, paging is used and the respective page is returned. Paging is used, the preferred page size can be
-   * specified.
-   * @param connectionUri
-   * @param pageNum
+   * Returns paged resource containing all event uris belonging to the specified connection.
+   *
+   * @param connectionUri connection parent of the events
+   * @param pageNum number of the page to be returned
    * @param preferedSize preferred number of uris per page, null means use default
    * @param messageType message type, null means all types
    * @return
@@ -154,8 +268,9 @@ public interface LinkedDataService
 
   /**
    * Returns a dataset containing all event uris belonging to the specified connection that were created after the
-   * specified event uri. Paging is used, the preferred page size can be specified
-   * @param connectionUri
+   * specified event uri.
+   * @param connectionUri connection parent of the events
+   * @param msgURI message to follow (in message creation time)
    * @param preferedSize preferred number of uris per page, null means use default
    * @param msgType message type, null means all types
    * @return
@@ -167,8 +282,9 @@ public interface LinkedDataService
 
   /**
    * Returns a dataset containing all event uris belonging to the specified connection that were created before the
-   * specified event uri. Paging is used, the preferred page size can be specified
-   * @param connectionUri
+   * specified event uri.
+   * @param connectionUri connection parent of the events
+   * @param msgURI message to precede (in message creation time)
    * @param preferedSize preferred number of uris per page, null means use default
    * @param msgType message type, null means all types
    * @return
@@ -179,16 +295,6 @@ public interface LinkedDataService
     NoSuchConnectionException;
 
   public Dataset getNodeDataset();
-
-  /**
-   * Returns a model containing all connection uris belonging to the specified need.
-   * If page >=0, paging is used and the respective page is returned.
-   * @param page
-   * @param needURI
-   * @return
-   * @throws NoSuchNeedException
-   */
-  public Dataset listConnectionURIs(final int page, final URI needURI) throws NoSuchNeedException;
 
   /**
    * returns a dataset of the (message) event with the specified URI
