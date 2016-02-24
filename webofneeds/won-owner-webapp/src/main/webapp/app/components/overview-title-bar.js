@@ -64,15 +64,15 @@ function genComponentConf() {
 
                 return {
                     hasPosts: state.getIn(["needs", "ownNeeds"]).length > 0,
-                    hasRequests: Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                    hasRequests: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.RequestReceived){
                                 return true
                             }
                         }).length > 0,
-                    hasMatches: Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                    hasMatches: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.Suggested){
                                 return true

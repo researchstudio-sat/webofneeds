@@ -80,29 +80,29 @@ function genComponentConf() {
                 const unreadCounts = selectUnreadEventsByNeedAndType(state);
 
                 return {
-                    hasIncomingRequests: Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                    hasIncomingRequests: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.RequestReceived && conn.ownNeed.uri === this.item.uri){
                                 return true
                             }
                         }).length > 0,
-                    hasSentRequests: Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                    hasSentRequests: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.RequestSent && conn.ownNeed.uri === this.item.uri){
                                 return true
                             }
                         }).length > 0,
-                    hasMatches: Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                    hasMatches: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === this.item.uri){
                                 return true
                             }
                         }).length > 0,
-                    hasMessages: Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                    hasMessages: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.Connected && conn.ownNeed.uri === this.item.uri){
                                 return true

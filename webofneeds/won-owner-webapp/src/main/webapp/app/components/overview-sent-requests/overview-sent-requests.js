@@ -22,15 +22,15 @@ class SentRequestsController {
         const selectFromState = (state)=>{
             if(state.getIn(['router', 'currentParams', 'myUri']) === undefined) {
                 return {
-                    sentRequests: Object.keys(state.getIn(['connections', 'connections']).toJS())
-                        .map(key=>state.getIn(['connections', 'connections']).toJS()[key])
+                    sentRequests: Object.keys(state.getIn(['connections', 'connectionsDeprecated']).toJS())
+                        .map(key=>state.getIn(['connections', 'connectionsDeprecated']).toJS()[key])
                         .filter(conn=> {
                             if (conn.connection.hasConnectionState === won.WON.RequestSent && state.getIn(['events', conn.connection.uri]) !== undefined) {
                                 return true
                             }
                         }),
-                    sentRequestsOfNeed: mapToMatches(Object.keys(state.getIn(['connections', 'connections']).toJS())
-                        .map(key=>state.getIn(['connections', 'connections']).toJS()[key])
+                    sentRequestsOfNeed: mapToMatches(Object.keys(state.getIn(['connections', 'connectionsDeprecated']).toJS())
+                        .map(key=>state.getIn(['connections', 'connectionsDeprecated']).toJS()[key])
                         .filter(conn=> {
                             if (conn.connection.hasConnectionState === won.WON.RequestSent) {
                                 return true
@@ -41,15 +41,15 @@ class SentRequestsController {
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
                 return {
                     post: state.getIn(['needs','ownNeeds', postId]).toJS(),
-                    sentRequests: Object.keys(state.getIn(['connections', 'connections']).toJS())
-                        .map(key=>state.getIn(['connections', 'connections']).toJS()[key])
+                    sentRequests: Object.keys(state.getIn(['connections', 'connectionsDeprecated']).toJS())
+                        .map(key=>state.getIn(['connections', 'connectionsDeprecated']).toJS()[key])
                         .filter(conn=> {
                             if (conn.connection.hasConnectionState === won.WON.RequestSent && state.getIn(['events', conn.connection.uri]) !== undefined && conn.ownNeed.uri === postId) {
                                 return true
                             }
                         }),
-                    sentRequestsOfNeed: mapToMatches(Object.keys(state.getIn(['connections', 'connections']).toJS())
-                        .map(key=>state.getIn(['connections', 'connections']).toJS()[key])
+                    sentRequestsOfNeed: mapToMatches(Object.keys(state.getIn(['connections', 'connectionsDeprecated']).toJS())
+                        .map(key=>state.getIn(['connections', 'connectionsDeprecated']).toJS()[key])
                         .filter(conn=> {
                             if (conn.connection.hasConnectionState === won.WON.RequestSent && conn.ownNeed.uri === postId) {
                                 return true
