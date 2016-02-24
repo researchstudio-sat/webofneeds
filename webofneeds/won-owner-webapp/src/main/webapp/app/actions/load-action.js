@@ -4,6 +4,7 @@
 
 import  won from '../won-es6';
 import { actionTypes, actionCreators } from './actions';
+import Immutable from 'immutable';
 
 import {
     checkHttpStatus,
@@ -25,6 +26,7 @@ export const loadAction = () => dispatch => {
     .then(checkHttpStatus)
     .then(response => response.json())
     .then(needUris => fetchAllAccessibleAndRelevantData(needUris))
+    .then(allThatData => Immutable.fromJS(allThatData)) //!!!
     .then(allThatData => dispatch({type: actionTypes.load, payload: allThatData}))
     .catch(error => dispatch(actionCreators.needs__failed({
                 error: "user needlist retrieval failed"
@@ -35,7 +37,8 @@ export const loadAction = () => dispatch => {
 
 function fetchAllAccessibleAndRelevantData(ownNeedUris) {
 
-    const allOwnNeedsPromise = won.urisToLookupMap(ownNeedUris, won.getNeed);
+    const allOwnNeedsPromise = won.urisToLookupMap(ownNeedUris,
+        won.getNeedWithConnectionUris);
 
     const allConnectionUrisPromise =
         Promise.all(ownNeedUris.map(won.getconnectionUrisOfNeed))
@@ -67,14 +70,23 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris) {
         })
         .then(theirNeedUris => won.urisToLookupMap(theirNeedUris, won.getNeed));
 
-    Promise.all([
+    return Promise.all([
         allOwnNeedsPromise,
         allConnectionsPromise,
         allEventsPromise,
         allTheirNeedsPromise
-    ]).then(allAccessibleAndRelevantData =>
-        console.log('\n\n\n', allAccessibleAndRelevantData, '\n\n\n')
-    )
+    ]).then(([
+                allOwnNeeds,
+                allConnections,
+                allEvents,
+                allTheirNeeds
+            ]) => ({
+                ownNeeds: allOwnNeeds,
+                connections: allConnections,
+                events: allEvents,
+                theirNeeds: allTheirNeeds,
+            })
+    );
 
     /**
      const allAccessibleAndRelevantData = {
@@ -110,10 +122,6 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris) {
         }
      }
      */
-
-
-
-    //return promiseForAllData
 }
 
 /////////// THE ACTIONCREATORS BELOW SHOULD BE PART OF LOAD

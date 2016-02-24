@@ -491,6 +491,7 @@ const rdfstore = window.rdfstore;
     won.addJsonLdData = function(uri, data) {
         console.log("linkeddata-service-won.js: storing jsonld data for uri: " + uri);
         privateData.store.load("application/ld+json", data, function (success, results) {
+            //privateData.store.load("application/ld+json", data, function (success, results) {
             console.log("linkeddata-service-won.js: added jsonld data to rdf store, success: " + success);
             if (success) {
                 cacheItemMarkAccessed(uri);
@@ -644,16 +645,20 @@ const rdfstore = window.rdfstore;
     };
 
     /**
-     * Saves the specified jsonld structure in the triple store with the specified default graph URI.
-     * @param graphURI used if no graph URI is specified in the jsonld
-     * @param jsonld the data
+     * @param needUri
+     * @return {*} the same as getNeed but also resolves
+     * the connectionContainer to the connectionUris
+     * contained within.
      */
-    won.storeJsonLdGraph = function(graphURI, jsonld) {
-        if (typeof graphURI === 'undefined' || graphURI == null  ){
-            throw {message : "storeJsonLdGraph: graphURI must not be null"};
-        }
-        privateData.store.load("application/ld+json", jsonld, graphURI, function (success, results) {});
-    }
+    won.getNeedWithConnectionUris = function(needUri) {
+        return Promise.all([
+            won.getNeed(needUri),
+            won.getconnectionUrisOfNeed(needUri)]
+        ).then(([need, connectionUris]) => {
+            need.hasConnections = connectionUris;
+            return need;
+        });
+    };
 
     /**
      * Loads the default data of the need with the specified URI into a js object.
@@ -1037,7 +1042,6 @@ const rdfstore = window.rdfstore;
             .then(eventUris => won.urisToLookupMap(eventUris,
                     eventUri => won.getNode(eventUri, requesterWebId))
             )
-            .catch(e => `Could not get all events of connection ${connectionUri}. Reason: ${e}`);
     };
 
     /**
@@ -1047,16 +1051,8 @@ const rdfstore = window.rdfstore;
      * @returns promise for an array strings (the uris)
      */
     won.getEventUrisOfConnection = function(connectionUri, requesterWebId) {
-        if (!connectionUri ){
-            throw {
-                message : `getEventUrisOfConnection: connectionUri must not be null. Got: "${connectionUri}"`
-            };
-        }
-        return won.getNodeWithAttributes(connectionUri, requesterWebId)
-            .then(connection => connection.hasEventContainer)
-            .then(eventContainerUri => won.getNodeWithAttributes(eventContainerUri, requesterWebId))
-            .then(eventContainer => eventContainer.member)
-            .catch(e => `Could not get all events of connection ${connectionUri}. Reason: ${e}`);
+        return won.getConnection(connectionUri, requesterWebId)
+            .then(connection => connection.hasEvents);
     }
 
 
@@ -1331,8 +1327,25 @@ const rdfstore = window.rdfstore;
         return won.urisToLookupMap(uris, uri => won.getNode(uri, requesterWebId));
     };
 
+    /**
+     * @param connectionUri
+     * @param requesterWebId
+     * @return {*} the connections predicates along with the uris of associated events
+     */
+    won.getConnection = function(connectionUri, requesterWebId) {
+        return won.getNode(connectionUri, requesterWebId)
+            //add the eventUris
+            .then(connection => Promise.all([
+                Promise.resolve(connection),
+                won.getNode(connection.hasEventContainer, requesterWebId)
+            ]))
+            .then( ([connection, eventContainer]) => {
+                connection.hasEvents = eventContainer.member;
+                return connection;
+            })
+    };
+
     //aliases (formerly functions that were just pass-throughs)
-    won.getConnection =
     won.getConnectionEvent =
     won.getNodeWithAttributes =
     /**
@@ -1348,50 +1361,77 @@ const rdfstore = window.rdfstore;
      * @param eventUri
      * @param requesterWebId
      */
-    won.getNode = function(uri, requesterWebId){
+    won.getNode = function(uri, requesterWebId) {
         if(!uri) {
-            throw {message : "getNodeWithAttributes: uri must not be null"};
+            return Promise.reject({message : "getNode: uri must not be null"})
         }
-        return won.ensureLoaded(uri, requesterWebId).then(() => {
-            const lock = getReadUpdateLockPerUri(uri);
-            return lock.acquireReadLock().then(() => {
-                console.log("linkeddata-service-won.js: getNodeWithAttrs:" + uri);
-                try {
-                    let node = {};
-                    privateData.store.node(uri, function (success, graph) {
-                        if (graph.length == 0) {
-                            console.log("linkeddata-service-won.js: warn: could not load any attributes for node with uri: " + uri);
-                        }
-                        if (rejectIfFailed(success, graph,{message : "Error loading node with attributes for URI " + uri+".", allowNone : false, allowMultiple: true})){
-                            return;
-                        }
-                        graph.triples.forEach(triple => {
-                            //TODO this cropping ignores prefixes, causing predicates/fields to clash!
-                            const propName = won.getLocalName(triple.predicate.nominalValue);
-                            if(node[propName]) {
-                                //encountered multiple occurances of the same predicate, e.g. rdfs:member
 
-                                if(!(node[propName] instanceof Array)) {
-                                    //on the first 'clash', instantiate the predicate/property as array
-                                    node[propName] = [ node[propName] ];
-                                }
-                                node[propName].push(triple.object.nominalValue);
-                            } else {
-                                node[propName] = triple.object.nominalValue;
-                            }
-                        });
-                    });
-                    node.uri = uri;
-                    return node;
-                } catch (e) {
-                    return q.reject("could not get node " + uri + "with attributes: " + e);
-                } finally {
-                    //we don't need to release after a promise resolves because
-                    //this function isn't deferred.
-                    lock.releaseReadLock();
-                }
-            });
-        });
+
+        let releaseLock = undefined;
+
+        const nodePromise = won.ensureLoaded(uri, requesterWebId)
+            .then(() => {
+                const lock = getReadUpdateLockPerUri(uri);
+                releaseLock = () => lock.releaseReadLock();
+                return lock.acquireReadLock();
+            })
+            .then(() => {
+                console.log("linkeddata-service-won.js: getNode:" + uri);
+                return new Promise((resolve, reject) => {
+                    privateData.store.node(uri, function (success, graph) {
+                        if(!success) {
+                            reject({
+                                message: "Error loading node with attributes for URI " + uri + "."
+                            });
+                        } else if (graph.length === 0) {
+                            /* TODO HACK / WORKAROUND
+                             * try query + manual filter. it's slower but the store
+                             * occasionally has hiccups where neither `store.node(uri)`
+                             * nor `select * where {<uri> ?p ? o}` return triples, but
+                             * `select * where { ?s ?p ?o }` contains the the desired
+                             * triples. I couldn't find out what's the cause of this
+                             * within a feasible time, but hope these issues will go
+                             * away, when we'll get around to update the store to the
+                             * newest version.
+                             */
+                            console.log('linkeddata-service-won.js: warn: could not ' +
+                                'load any attributes for node with uri: ', uri,
+                                '. Trying sparql-query + result.filter workaround.');
+                            privateData.store.graph((success, entireGraph) => {
+                                resolve(entireGraph.triples.filter(t => t.subject.nominalValue === uri))
+                            })
+                        } else {
+                            //graph.triples[0].object.nominalValue
+                            //graph.triples[0].subject.nominalValue
+                            //graph.triples[0].predicate.nominalValue
+                            resolve(graph.triples);
+                        }
+                    })
+                })
+            })
+            .then(triples => {
+                const node = {};
+                triples.forEach(triple => {
+                    //TODO this cropping ignores prefixes, causing predicates/fields to clash!
+                    const propName = won.getLocalName(triple.predicate.nominalValue);
+                    if(node[propName]) {
+                        //encountered multiple occurances of the same predicate, e.g. rdfs:member
+                        if(!(node[propName] instanceof Array)) {
+                            //on the first 'clash', instantiate the predicate/property as array
+                            node[propName] = [ node[propName] ];
+                        }
+                        node[propName].push(triple.object.nominalValue);
+                    } else {
+                        node[propName] = triple.object.nominalValue;
+                    }
+                });
+                node.uri = uri;
+                releaseLock();
+                return node;
+            })
+            .catch(releaseLock);
+
+        return nodePromise;
     }
 
     /**

@@ -27,15 +27,15 @@ class OverviewMatchesController {
         const selectFromState = (state)=>{
             if(state.getIn(['router', 'currentParams', 'myUri']) === undefined){
                 return {
-                    matches: Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                    matches: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.Suggested){
                                 return true
                             }
                         }),
-                    matchesOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                    matchesOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.Suggested){
                                 return true
@@ -46,15 +46,15 @@ class OverviewMatchesController {
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
                 return {
                     post: state.getIn(['needs','ownNeeds', postId]).toJS(),
-                    matches: Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                    matches: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === postId){
                                 return true
                             }
                         }),
-                    matchesOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                    matchesOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === postId){
                                 return true

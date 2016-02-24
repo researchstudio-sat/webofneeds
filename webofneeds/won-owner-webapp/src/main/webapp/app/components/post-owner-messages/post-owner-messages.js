@@ -25,8 +25,8 @@ class Controller {
             const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
             return {
                 post: state.getIn(['needs','ownNeeds', postId]).toJS(),
-                conversations: Object.keys(state.getIn(['connections','connections']).toJS())
-                    .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                conversations: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                    .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                     .filter(conn=>{
                         if(conn.connection.hasConnectionState===won.WON.Connected && conn.ownNeed.uri === postId){
                             return true

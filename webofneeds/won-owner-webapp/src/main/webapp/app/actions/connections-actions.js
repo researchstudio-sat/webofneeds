@@ -54,7 +54,7 @@ export function connectionsLoad(needUris) {
 export function connectionsOpen(connectionData,message) {
     return (dispatch, getState) => {
         const state = getState();
-        let eventData = state.getIn(['connections', 'connections', connectionData.connection.uri])
+        let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer()
         won.getConnection(eventData.connection.uri).then(connection=> {
@@ -72,7 +72,7 @@ export function connectionsOpen(connectionData,message) {
 export function connectionsConnect(connectionData,message) {
     return (dispatch, getState) => {
         const state = getState();
-        let eventData = state.getIn(['connections', 'connections', connectionData.connection.uri])
+        let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer()
         won.getConnection(eventData.connection.uri).then(connection=> {
@@ -90,7 +90,7 @@ export function connectionsConnect(connectionData,message) {
 export function connectionsClose(connectionData) {
     return (dispatch, getState) => {
         const state = getState();
-        let eventData = state.getIn(['connections', 'connections', connectionData.connection.uri])
+        let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer()
         won.getConnection(eventData.connection.uri).then(connection=> {
@@ -111,7 +111,7 @@ export function connectionsRate(connectionData,rating) {
         console.log(rating);
 
         const state = getState();
-        let eventData = state.getIn(['connections', 'connections', connectionData.connection.uri])
+        let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer()
         won.getConnection(eventData.connection.uri).then(connection=> {
