@@ -6,8 +6,11 @@
 import angular from 'angular';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
-import {    selectUnreadCountsByType,
-            selectUnreadEventsByNeed } from '../selectors';
+import {
+    selectUnreadCountsByType,
+    selectUnreadEventsByNeed,
+    selectAllByConnections,
+} from '../selectors';
 import won from '../won-es6';
 
 
@@ -62,7 +65,7 @@ function genComponentConf() {
                 const unreadCounts = selectUnreadCountsByType(state);
                 const nrOfNeedsWithUnread = selectUnreadEventsByNeed(state).size;
                 const ownNeeds = state.getIn(["needs", "ownNeeds"]);
-                const connectionsDeprecated = state.getIn(['connections','connectionsDeprecated']).toJS();
+                const connectionsDeprecated = selectAllByConnections(state).toJS();
 
                 return {
                     hasPosts: ownNeeds && ownNeeds.size > 0,

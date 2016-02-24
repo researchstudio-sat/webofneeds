@@ -13,7 +13,7 @@ const initialState = Immutable.fromJS({
     isFetching: false,
     didInvalidate: false,
     connectionsDeprecated: {},//don't use data from this map
-    connections: {},
+    //connections: {},
 })
 export default function(state = initialState, action = {}) {
     switch(action.type) {
@@ -44,7 +44,9 @@ function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
 
     return state
         .setIn(['connections', connection.get('uri')], connection)
+        /*
         .setIn( //TODO deletme, deprecated state-structure
             ['connectionsDeprecated',connectionWithRelatedData.connection.uri],
             connectionWithRelatedData);
+            */
 }
