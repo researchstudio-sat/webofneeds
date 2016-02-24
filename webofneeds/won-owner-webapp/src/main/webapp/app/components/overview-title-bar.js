@@ -61,19 +61,21 @@ function genComponentConf() {
             const selectFromState = (state) => {
                 const unreadCounts = selectUnreadCountsByType(state);
                 const nrOfNeedsWithUnread = selectUnreadEventsByNeed(state).size;
+                const ownNeeds = state.getIn(["needs", "ownNeeds"]);
+                const connectionsDeprecated = state.getIn(['connections','connectionsDeprecated']).toJS();
 
                 return {
-                    hasPosts: state.getIn(["needs", "ownNeeds"]).length > 0,
-                    hasRequests: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
-                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
+                    hasPosts: ownNeeds && ownNeeds.size > 0,
+                    hasRequests: Object.keys(connectionsDeprecated)
+                        .map(key => connectionsDeprecated[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.RequestReceived){
                                 return true
                             }
                         }).length > 0,
-                    hasMatches: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
-                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
-                        .filter(conn=>{
+                    hasMatches: Object.keys(connectionsDeprecated)
+                        .map(key => connectionsDeprecated[key])
+                        .filter(conn => {
                             if(conn.connection.hasConnectionState===won.WON.Suggested){
                                 return true
                             }
