@@ -1,9 +1,10 @@
 ;
 
+import won from '../won-es6';
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
 import { labels } from '../won-label-utils';
-import {attach} from '../utils.js';
+import { attach } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
@@ -22,7 +23,7 @@ function genComponentConf() {
                             <span class="conn__item__description__subtitle__group" ng-show="request.group">
                                 <img src="generated/icon-sprite.svg#ico36_group" class="mil__item__description__subtitle__group__icon">{{self.item.group}}<span class="mil__item__description__subtitle__group__dash"> &ndash; </span>
                             </span>
-                            <span class="conn__item__description__subtitle__type">{{self.wonLabels.type[self.item.remoteNeed.basicNeedType]}}</span>
+                            <span class="conn__item__description__subtitle__type">{{self.labels.type[self.item.remoteNeed.basicNeedType]}}</span>
                         </div>
                         <div class="conn__item__description__message">
                             <span class="conn__item__description__message__indicator" ng-click="self.open(self.item.connection.uri)" ng-show="!self.read(self.item.connection.uri)"/>{{self.item.lastEvent.msg}}
@@ -36,32 +37,8 @@ function genComponentConf() {
         constructor() {
             attach(this, serviceDependencies, arguments);
             window.needconnmsg = this;
-            this.wonLabels = labels;
-            /*            const selectFromState = (state)=>{
-
-             return {
-             unreadUris: state.getIn(['events','unreadEventUris'])
-             };
-             }
-             this.wonLabels = labels;
-
-
-             const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this);
-             //  this.loadMatches();
-             this.$scope.$on('$destroy', disconnect);*/
+            this.labels = labels;
         }
-
-        /*        read(request){
-         if(!this.unreadUris.has(request.connection.uri)){
-         return true
-         }
-         return false;
-         }*/
-        /*        toggleRequest() {
-         this.open = !this.open;
-         }
-         */
-
 
         openMessage(item) {
             //this.events__read(item)

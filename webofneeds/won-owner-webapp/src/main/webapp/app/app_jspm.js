@@ -28,6 +28,7 @@ import { actionCreators }  from './actions/actions';
 import topnav from './components/topnav';
 import createNeedComponent from './components/create-need/create-need';
 import overviewIncomingRequestsComponent from './components/overview-incoming-requests/overview-incoming-requests';
+import overviewSentRequestsComponent from './components/overview-sent-requests/overview-sent-requests';
 import matchesComponent from './components/matches/matches';
 import postVisitorComponent from './components/post-visitor/post-visitor';
 import postOwnerComponent from './components/post-owner/post-owner';
@@ -62,6 +63,7 @@ let app = angular.module('won.owner', [
     //views
     createNeedComponent,
     overviewIncomingRequestsComponent,
+    overviewSentRequestsComponent,
     matchesComponent,
     postVisitorComponent,
     postOwnerComponent,
@@ -104,6 +106,20 @@ app.filter('filterByNeedState', function(){
             return filtered;
         }
     })
+    /*Filters All events so that only the ones with textMessages remain*/
+    .filter('filterByEventMsgs', function(){
+        return function(events){
+            var filtered =[];
+            angular.forEach(events,function(event){
+                if(event.hasTextMessage !== undefined){
+                    filtered.push(event);
+                }
+            })
+
+            return filtered;
+        }
+    })
+
 app.config([ '$urlRouterProvider', '$stateProvider', configRouting ]);
 app.run([ '$ngRedux', $ngRedux => runMessagingAgent($ngRedux) ]);
 
