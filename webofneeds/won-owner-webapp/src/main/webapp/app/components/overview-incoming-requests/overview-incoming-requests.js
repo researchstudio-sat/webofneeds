@@ -20,15 +20,15 @@ class IncomingRequestsController {
         const selectFromState = (state)=>{
 
             return {
-                incomingRequests: Object.keys(state.getIn(['connections','connections']).toJS())
-                    .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                incomingRequests: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                    .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                     .filter(conn=>{
                         if(conn.connection.hasConnectionState===won.WON.RequestReceived && state.getIn(['events',conn.connection.uri]) !== undefined){
                             return true
                         }
                     }),
-                incomingRequestsOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connections']).toJS())
-                    .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                incomingRequestsOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
+                    .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
                     .filter(conn=>{
                         if(conn.connection.hasConnectionState===won.WON.RequestReceived){
                             return true

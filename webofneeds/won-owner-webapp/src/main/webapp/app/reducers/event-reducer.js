@@ -9,28 +9,59 @@ import { combineReducersStable } from '../redux-utils';
 import won from '../won-es6';
 
 const initialState = Immutable.fromJS({
-        /*
-    unreadEventsByNeedByType: {},
-    unreadEventsByTypeByNeed:{ <needUri>:
-        'hint': {count: 0, timestamp: new Date().getTime() },
-        'connect': {count: 0, timestamp: new Date().getTime()},
-        'message': {count: 0, timestamp: new Date().getTime()},
-        'close': {count: 0, timestamp: new Date().getTime()},
-        'created': {count: 0, timestamp: new Date().getTime()}
-    },
-    */
-    unreadEventUris:{}
+    events: {},
+    unreadEventUris:{},
 })
-export default createReducer(
-    initialState,
-    {
 
-        [actionTypes.events.addUnreadEventUri]:(state,action)=>{
-            return state.setIn(['unreadEventUris',action.payload.unreadUri],Immutable.fromJS(action.payload))
-        },
-        [actionTypes.events.read]:(state,action) => state.deleteIn(['unreadEventUris', action.payload])
+export default function(state = initialState, action = {}) {
+    switch(action.type) {
+
+        case actionTypes.load:
+            const allPreviousEvents = action.payload.get('events');
+            return state.mergeIn(['events'], allPreviousEvents);
+
+        case actionTypes.events.addUnreadEventUri:
+            //TODO this should only store the URI
+            return state.setIn(
+                ['unreadEventUris',action.payload.unreadUri],
+                Immutable.fromJS(action.payload)
+            );
+
+        case actionTypes.events.read:
+            return state.deleteIn(['unreadEventUris', action.payload]);
+
+
+        /**
+         * @deprecated this is a legacy action
+         */
+        case actionTypes.connections.load:
+            return action.payload.reduce(
+                (updatedState, connectionWithRelatedData) =>
+                    storeConnectionRelatedData(updatedState, connectionWithRelatedData),
+                state);
+
+        case actionTypes.messages.connectMessageReceived:
+        case actionTypes.messages.hintMessageReceived:
+        case actionTypes.messages.openResponseReceived:
+            return storeConnectionRelatedData(state, action.payload);
+
+
+        default:
+            return state;
     }
-)
+}
+function storeConnectionRelatedData(state, connectionWithRelatedData) {
+    return connectionWithRelatedData.events.reduce(
+
+        (updatedState, event) =>
+            updatedState.getIn(['events', event.uri]) ?
+                updatedState : // we already know this one. no need to trigger re-rendering
+                updatedState.setIn(['events', event.uri], Immutable.fromJS(event)) // add the event
+
+        , state // start with the original state
+    );
+}
+
 var createOrUpdateUnreadEntry = function(needURI, eventData, unreadEntry){
 
     if(unreadEntry == null || typeof unreadEntry === 'undefined'){
