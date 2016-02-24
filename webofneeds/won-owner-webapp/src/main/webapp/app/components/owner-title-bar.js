@@ -24,7 +24,9 @@ function genComponentConf() {
                     </div>
                 </div>
                 <div class="ntb__inner__right">
-                    <img class="ntb__icon" src="generated/icon-sprite.svg#ico_settings">
+                    <img class="ntb__icon clickable" src="generated/icon-sprite.svg#ico_settings" ng-show="!self.settingsOpen" ng-click="self.settingsOpen = true" ng-mouseenter="self.settingsOpen = true">
+                    <button class="won-button--filled thin red" ng-show="self.isActive && self.settingsOpen" ng-mouseleave="self.settingsOpen=false" ng-click="self.closePost()">Close Post</button>
+                    <button class="won-button--filled thin red" ng-show="!self.isActive && self.settingsOpen" ng-mouseleave="self.settingsOpen=false" ng-click="self.reOpenPost()">Reopen Post</button>
                     <ul class="ntb__tabs">
                         <li ng-class="{'ntb__tabs__selected' : self.selection == 4}">
                             <a ui-sref="postInfo({myUri: self.item.uri})">
@@ -72,6 +74,7 @@ function genComponentConf() {
 
             window.otb = this;
             this.labels = labels;
+            this.settingsOpen = false;
 
             const selectFromState = (state)=>{
                 const unreadCounts = selectUnreadEventsByNeedAndType(state);
@@ -109,11 +112,22 @@ function genComponentConf() {
                     unreadIncomingRequests: unreadCounts.getIn([this.item.uri, won.WON.RequestReceived]),
                     unreadSentRequests: unreadCounts.getIn([this.item.uri, won.WON.RequestSent]),
                     unreadMatches: unreadCounts.getIn([this.item.uri, won.WON.Suggested]),
+                    isActive: state.getIn(['needs','ownNeeds', this.item.uri, 'state']) === won.WON.Active
                 };
             };
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
+        }
+
+        closePost() {
+            console.log("CLOSING THE POST: "+this.item.uri);
+            //this.needs__close(this.item);
+        }
+
+        reOpenPost() {
+            console.log("RE-OPENING THE POST: "+this.item.uri);
+            //this.needs__reopen(this.item);
         }
     }
     Controller.$inject = serviceDependencies;

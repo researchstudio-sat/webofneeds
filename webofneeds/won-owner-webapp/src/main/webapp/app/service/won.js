@@ -40,6 +40,8 @@
     won.WON.hasWonNodeCompacted = won.WON.prefix+":hasWonNode";
     won.WON.Active = won.WON.baseUri + "Active";
     won.WON.ActiveCompacted = won.WON.prefix + ":Active";
+    won.WON.Closed = won.WON.baseUri + "Closed";
+    won.WON.ClosedCompacted = won.WON.prefix + ":Closed";
 
     won.WON.Inactive = won.WON.baseUri + "Inactive"
     won.WON.InactiveCompacted = won.WON.prefix + ":Inactive"
