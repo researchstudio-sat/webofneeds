@@ -12,8 +12,8 @@ import won from '../won-es6';
 const initialState = Immutable.fromJS({
     isFetching: false,
     didInvalidate: false,
-    connectionsDeprecated: {},//don't use data from this map
-    //connections: {},
+    //connectionsDeprecated: {},//don't use data from this map
+    connections: {},
 })
 export default function(state = initialState, action = {}) {
     switch(action.type) {
