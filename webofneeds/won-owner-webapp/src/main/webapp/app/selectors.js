@@ -66,7 +66,7 @@ export const selectUnreadCountsByType = createSelector(
 )
 
 
-
+//TODO there's certainly more elegant ways to implement this selector than first grouping by connection then by need
 export const selectConnectionsByNeed = createSelector(
     selectAllByConnections,
     connections => connections
