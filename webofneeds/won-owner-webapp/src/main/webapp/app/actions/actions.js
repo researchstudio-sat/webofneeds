@@ -124,6 +124,8 @@ const actionHierarchy = {
         received: INJ_DEFAULT,
         connectionsReceived:INJ_DEFAULT,
         clean:INJ_DEFAULT,
+        reopen: needsOpen,
+        close: needsClose,
         failed: INJ_DEFAULT
     },
     drafts: {
@@ -271,3 +273,43 @@ export const messageTypeToEventType = deepFreeze({
     [won.WONMSG.needStateMessageCompacted] : {eventType: won.EVENT.NEED_STATE_MESSAGE_RECEIVED},
     [won.WONMSG.errorMessageCompacted] : {eventType: won.EVENT.NOT_TRANSMITTED }
 });
+
+export function needsOpen(needData) {
+    return (dispatch, getState) => {
+        const state = getState();
+        //TODO: IMPLEMENT ME
+        /*const eventData = selectAllByConnections(state).get(connectionData.connection.uri).toJS(); // TODO avoid toJS;
+        //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
+        let messageData = null;
+        let deferred = Q.defer()
+        won.getConnection(eventData.connection.uri).then(connection=> {
+            let msgToOpenFor = {event: eventData, connection: connection}
+            buildConnectMessage(msgToOpenFor, message).then(messageData=> {
+                deferred.resolve(messageData);
+            })
+        })
+        deferred.promise.then((action)=> {
+            dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
+        })*/
+    }
+}
+
+export function needsClose(needData) {
+    return (dispatch, getState) => {
+        const state = getState();
+        //TODO: IMPLEMENT ME
+        /*const eventData = selectAllByConnections(state).get(connectionData.connection.uri).toJS();// TODO avoid toJS
+        //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
+        let messageData = null;
+        let deferred = Q.defer()
+        won.getConnection(eventData.connection.uri).then(connection=> {
+            let msgToOpenFor = {event: eventData, connection: connection}
+            buildCloseMessage(msgToOpenFor).then(messageData=> {
+                deferred.resolve(messageData);
+            })
+        })
+        deferred.promise.then((action)=> {
+            dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
+        })*/
+    }
+}

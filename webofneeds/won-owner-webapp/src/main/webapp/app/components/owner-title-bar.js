@@ -129,12 +129,12 @@ function genComponentConf() {
 
         closePost() {
             console.log("CLOSING THE POST: "+this.item.uri);
-            //this.needs__close(this.item);
+            this.needs__close(this.item);
         }
 
         reOpenPost() {
             console.log("RE-OPENING THE POST: "+this.item.uri);
-            //this.needs__reopen(this.item);
+            this.needs__reopen(this.item);
         }
     }
     Controller.$inject = serviceDependencies;
