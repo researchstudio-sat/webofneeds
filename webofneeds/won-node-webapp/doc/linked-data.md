@@ -55,10 +55,11 @@ Only one of the paging parameter can be used per request.
     state: e.g., state=Active (for needs container) takes into account only needs with Active state
     timeof: e.g., timeof=2016-02-23 (for connections container) considers only the events before that date
 
-They are specific for each container. For events and connections container, the type time parameter can be specified 
-(considered events/messages type: OPEN, CLOSE, ). For needs container, the need state can be specified 
-(Active/Inactive). For need connections container, the timeof parameter can be specified, i.e. the time before which we 
-should consider events activity can be specified (in format _yyyy-MM-dd'T'HH:mm:ss.SSS_)
+They are specific for each container. For events and connections container, the type parameter can be 
+specified (supported types: HINT_MESSAGE, HINT_FEEDBACK_MESSAGE, CONNECT, OPEN, CONNECTION_MESSAGE, 
+CLOSE). For needs container, the need state can be specified (Active/Inactive). For need connections container, the 
+timeof parameter can be specified, i.e. the time before which we should consider events activity can be specified (in
+ format _yyyy-MM-dd'T'HH:mm:ss.SSS_)
 
   **member content parameter** defines if the content of the container member resources has to be returned:
   
