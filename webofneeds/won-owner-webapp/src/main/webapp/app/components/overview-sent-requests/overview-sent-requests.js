@@ -9,6 +9,7 @@ import requestItemLineModule from '../request-item-line';
 import openRequestModule from '../open-request';
 import { attach,mapToMatches } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
+import { selectAllByConnections } from '../../selectors';
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 
 class SentRequestsController {
@@ -20,17 +21,20 @@ class SentRequestsController {
         this.ownerSelection = 3; //ONLY NECESSARY FOR VIEW WITH NEED
 
         const selectFromState = (state)=>{
+
+            const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
+
             if(state.getIn(['router', 'currentParams', 'myUri']) === undefined) {
                 return {
-                    sentRequests: Object.keys(state.getIn(['connections', 'connectionsDeprecated']).toJS())
-                        .map(key=>state.getIn(['connections', 'connectionsDeprecated']).toJS()[key])
+                    sentRequests: Object.keys(connectionsDeprecated)
+                        .map(key => connectionsDeprecated[key])
                         .filter(conn=> {
                             if (conn.connection.hasConnectionState === won.WON.RequestSent && state.getIn(['events', conn.connection.uri]) !== undefined) {
                                 return true
                             }
                         }),
-                    sentRequestsOfNeed: mapToMatches(Object.keys(state.getIn(['connections', 'connectionsDeprecated']).toJS())
-                        .map(key=>state.getIn(['connections', 'connectionsDeprecated']).toJS()[key])
+                    sentRequestsOfNeed: mapToMatches(Object.keys(connectionsDeprecated)
+                        .map(key => connectionsDeprecated[key])
                         .filter(conn=> {
                             if (conn.connection.hasConnectionState === won.WON.RequestSent) {
                                 return true
@@ -41,15 +45,15 @@ class SentRequestsController {
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
                 return {
                     post: state.getIn(['needs','ownNeeds', postId]).toJS(),
-                    sentRequests: Object.keys(state.getIn(['connections', 'connectionsDeprecated']).toJS())
-                        .map(key=>state.getIn(['connections', 'connectionsDeprecated']).toJS()[key])
+                    sentRequests: Object.keys(connectionsDeprecated)
+                        .map(key => connectionsDeprecated[key])
                         .filter(conn=> {
                             if (conn.connection.hasConnectionState === won.WON.RequestSent && state.getIn(['events', conn.connection.uri]) !== undefined && conn.ownNeed.uri === postId) {
                                 return true
                             }
                         }),
-                    sentRequestsOfNeed: mapToMatches(Object.keys(state.getIn(['connections', 'connectionsDeprecated']).toJS())
-                        .map(key=>state.getIn(['connections', 'connectionsDeprecated']).toJS()[key])
+                    sentRequestsOfNeed: mapToMatches(Object.keys(connectionsDeprecated)
+                        .map(key => connectionsDeprecated[key])
                         .filter(conn=> {
                             if (conn.connection.hasConnectionState === won.WON.RequestSent && conn.ownNeed.uri === postId) {
                                 return true

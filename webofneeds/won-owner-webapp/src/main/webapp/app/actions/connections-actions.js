@@ -6,6 +6,8 @@ import  won from '../won-es6';
 import { actionTypes, actionCreators, getConnectionRelatedData, messageTypeToEventType  } from './actions';
 import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 
+import { selectAllByConnections } from '../selectors';
+
 import {
     checkHttpStatus,
 } from '../utils';
@@ -54,7 +56,8 @@ export function connectionsLoad(needUris) {
 export function connectionsOpen(connectionData,message) {
     return (dispatch, getState) => {
         const state = getState();
-        let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
+        const eventData = selectAllByConnections(state).get(connectionData.connection.uri).toJS(); // TODO avoid toJS;
+        //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer()
         won.getConnection(eventData.connection.uri).then(connection=> {
@@ -72,7 +75,8 @@ export function connectionsOpen(connectionData,message) {
 export function connectionsConnect(connectionData,message) {
     return (dispatch, getState) => {
         const state = getState();
-        let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
+        const eventData = selectAllByConnections(state).get(connectionData.connection.uri).toJS(); // TODO avoid toJS;
+        //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer()
         won.getConnection(eventData.connection.uri).then(connection=> {
@@ -90,7 +94,8 @@ export function connectionsConnect(connectionData,message) {
 export function connectionsClose(connectionData) {
     return (dispatch, getState) => {
         const state = getState();
-        let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
+        const eventData = selectAllByConnections(state).get(connectionData.connection.uri);// TODO avoid toJS
+        //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer()
         won.getConnection(eventData.connection.uri).then(connection=> {
@@ -111,7 +116,8 @@ export function connectionsRate(connectionData,rating) {
         console.log(rating);
 
         const state = getState();
-        let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
+        const eventData = selectAllByConnections(state).get(connectionData.connection.uri);// TODO avoid toJS
+        //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer()
         won.getConnection(eventData.connection.uri).then(connection=> {

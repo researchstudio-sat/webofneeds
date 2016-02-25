@@ -12,7 +12,7 @@ import won from '../won-es6';
 const initialState = Immutable.fromJS({
     isFetching: false,
     didInvalidate: false,
-    connectionsDeprecated: {},//don't use data from this map
+    //connectionsDeprecated: {},//don't use data from this map
     connections: {},
 })
 export default function(state = initialState, action = {}) {
@@ -44,7 +44,9 @@ function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
 
     return state
         .setIn(['connections', connection.get('uri')], connection)
+        /*
         .setIn( //TODO deletme, deprecated state-structure
             ['connectionsDeprecated',connectionWithRelatedData.connection.uri],
             connectionWithRelatedData);
+            */
 }

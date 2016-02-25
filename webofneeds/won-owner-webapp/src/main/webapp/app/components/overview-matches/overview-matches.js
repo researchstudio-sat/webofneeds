@@ -10,6 +10,7 @@ import sendRequestModule from '../send-request';
 import { attach,mapToMatches} from '../../utils';
 import { labels } from '../../won-label-utils';
 import { actionCreators }  from '../../actions/actions';
+import { selectAllByConnections } from '../../selectors';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 class OverviewMatchesController {
@@ -24,18 +25,21 @@ class OverviewMatchesController {
 
         this.viewType = 0;
 
-        const selectFromState = (state)=>{
+        const selectFromState = (state) => {
+
+            const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
+
             if(state.getIn(['router', 'currentParams', 'myUri']) === undefined){
                 return {
-                    matches: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
-                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
+                    matches: Object.keys(connectionsDeprecated)
+                        .map(key => connectionsDeprecated[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.Suggested){
                                 return true
                             }
                         }),
-                    matchesOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
-                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
+                    matchesOfNeed:mapToMatches(Object.keys(connectionsDeprecated)
+                        .map(key => connectionsDeprecated[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.Suggested){
                                 return true
@@ -46,15 +50,15 @@ class OverviewMatchesController {
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
                 return {
                     post: state.getIn(['needs','ownNeeds', postId]).toJS(),
-                    matches: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
-                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
+                    matches: Object.keys(connectionsDeprecated)
+                        .map(key => connectionsDeprecated)
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === postId){
                                 return true
                             }
                         }),
-                    matchesOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
-                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
+                    matchesOfNeed:mapToMatches(Object.keys(connectionsDeprecated)
+                        .map(key => connectionsDeprecated[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === postId){
                                 return true

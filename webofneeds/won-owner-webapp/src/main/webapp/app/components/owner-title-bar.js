@@ -5,7 +5,7 @@ import squareImageModule from '../components/square-image';
 import { attach,mapToMatches } from '../utils';
 import won from '../won-es6';
 import { labels } from '../won-label-utils';
-import { selectUnreadEventsByNeedAndType } from '../selectors';
+import { selectUnreadEventsByNeedAndType, selectAllByConnections } from '../selectors';
 import { actionCreators }  from '../actions/actions';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
@@ -78,31 +78,40 @@ function genComponentConf() {
 
             const selectFromState = (state)=>{
                 const unreadCounts = selectUnreadEventsByNeedAndType(state);
+                const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
 
                 return {
-                    hasIncomingRequests: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
-                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
+                    hasIncomingRequests: state.getIn(['connections', 'connections'])
+                        .filter(conn =>
+                            conn.get('hasConnectionState') === won.WON.RequestReceived
+                            && conn.get('belongsToNeed') === this.item.uri
+                        ).size > 0,
+
+                    /*
+                    hasIncomingRequests: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
+                        .map(key => connectionsDeprecated[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.RequestReceived && conn.ownNeed.uri === this.item.uri){
                                 return true
                             }
                         }).length > 0,
-                    hasSentRequests: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
-                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
+                    */
+                    hasSentRequests: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
+                        .map(key => connectionsDeprecated[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.RequestSent && conn.ownNeed.uri === this.item.uri){
                                 return true
                             }
                         }).length > 0,
-                    hasMatches: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
-                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
+                    hasMatches: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
+                        .map(key => connectionsDeprecated[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === this.item.uri){
                                 return true
                             }
                         }).length > 0,
-                    hasMessages: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
-                        .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
+                    hasMessages: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
+                        .map(key => connectionsDeprecated[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.Connected && conn.ownNeed.uri === this.item.uri){
                                 return true

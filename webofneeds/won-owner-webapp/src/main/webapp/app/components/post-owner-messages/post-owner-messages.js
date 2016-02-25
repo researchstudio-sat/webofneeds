@@ -12,6 +12,7 @@ import won from '../../won-es6';
 import { actionCreators }  from '../../actions/actions';
 import needConnectionMessageLineModule from '../connection-message-item-line';
 import openConversationModule from '../open-conversation';
+import { selectAllByConnections } from '../../selectors';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 class Controller {
@@ -23,10 +24,12 @@ class Controller {
 
         const selectFromState = (state)=>{
             const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
+            const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
+
             return {
                 post: state.getIn(['needs','ownNeeds', postId]).toJS(),
-                conversations: Object.keys(state.getIn(['connections','connectionsDeprecated']).toJS())
-                    .map(key=>state.getIn(['connections','connectionsDeprecated']).toJS()[key])
+                conversations: Object.keys(connectionsDeprecated)
+                    .map(key => connectionsDeprecated[key])
                     .filter(conn=>{
                         if(conn.connection.hasConnectionState===won.WON.Connected && conn.ownNeed.uri === postId){
                             return true
