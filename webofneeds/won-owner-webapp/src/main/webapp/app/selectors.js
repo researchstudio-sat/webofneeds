@@ -66,15 +66,6 @@ export const selectUnreadCountsByType = createSelector(
 )
 
 
-//TODO there's certainly more elegant ways to implement this selector than first grouping by connection then by need
-export const selectConnectionsByNeed = createSelector(
-    selectAllByConnections,
-    connections => connections
-        .map(cnct => Immutable.fromJS(cnct)) //TODO this is a workaround. atm connections aren't ImmutableJS-objects
-        .groupBy(cnct => cnct.getIn(['ownNeed', 'uri']))
-);
-
-
 /**
  * selects a map of `connectionUri -> { connection, events, ownNeed, remoteNeed }`
  * - thus: everything a connection has direct references to. Use this selector
@@ -108,6 +99,16 @@ const allByConnectionUri = (connectionUri)  => {
     const connection = state.getIn(['connections', 'connections', connectionUri]);
     return allByConnection(connection);
 };
+
+//TODO there's certainly more elegant ways to implement this selector than first grouping by connection then by need
+export const selectConnectionsByNeed = createSelector(
+    selectAllByConnections,
+        connections => connections
+        .map(cnct => Immutable.fromJS(cnct)) //TODO this is a workaround. atm connections aren't ImmutableJS-objects
+        .groupBy(cnct => cnct.getIn(['ownNeed', 'uri']))
+);
+
+
 
 window.selectAllByConnections4dbg = selectAllByConnections;
 window.allByConnection4db = allByConnection;
