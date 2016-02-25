@@ -4,23 +4,23 @@
 @import 'flex-layout';
 
 
-.ownerpostcontent {
+.overviewsentrequestscontent {
   @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
   align-items: flex-start;
 
   .oir__openrequest,
-  .owner__messages{
+  .oir__requests{
     flex-grow: 1;
     max-width: 35rem;
     margin: 0.5rem;
   }
 
-  .owner__openconversation{
+  .oir__openrequest{
     background: white;
     border: 0.1rem solid $won-line-gray;
   }
 }
 
 
-@import 'connection-message-item-line';
-//@import 'open-conversation';
+@import 'request-item-line';
+@import 'open-request';

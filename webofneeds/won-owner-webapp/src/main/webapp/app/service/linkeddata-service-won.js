@@ -18,7 +18,8 @@
  * Created by fkleedorfer on 05.09.2014.
  */
 import {
-    checkHttpStatus
+    checkHttpStatus,
+    entries
 } from '../utils';
 import * as q from 'q';
 
@@ -28,10 +29,18 @@ const rdfstore = window.rdfstore;
 (function(){
     if(!won) won = {};
 
-    function apiEndpoint(dataUri, requesterWebId) {
-        const API_ENDPOINT = '/owner/rest/linked-data/?uri=';
-        const AUTH_PARAMETER = '&requester='
+    const API_ENDPOINT = '/owner/rest/linked-data/?uri=';
+    const AUTH_PARAMETER = '&requester='
 
+    /**
+     * This function is used to generate the query-strings.
+     * Should anything about the way the API is accessed changed,
+     * adapt this function.
+     * @param dataUri
+     * @param requesterWebId the auth-token for the post (NOT the sessionId-cookie)
+     * @returns {string}
+     */
+    function queryString(dataUri, requesterWebId) {
         let requestUri = API_ENDPOINT + encodeURIComponent(dataUri);
         if (requesterWebId) {
             requestUri = requestUri + AUTH_PARAMETER+ encodeURIComponent(requesterWebId);
@@ -46,6 +55,7 @@ const rdfstore = window.rdfstore;
         //create an rdfstore-js based store as a cache for rdf data.
         privateData.store =  rdfstore.create();
         window.store4dbg = privateData.store; //TODO deletme
+        window.ldspriv4dbg = privateData; //TODO deletme
         privateData.store.setPrefix("msg","http://purl.org/webofneeds/message#");
         privateData.store.setPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         privateData.store.setPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
@@ -101,7 +111,7 @@ const rdfstore = window.rdfstore;
                 if (failures + successes >= numPromises) deferred.resolve(results);
             }, function(reason) {
                 failures ++;
-                console.log("warning: promise failed. Reason " + JSON.stringify(reason));
+                console.log("linkeddata-service-won.js: warning: promise failed. Reason " + JSON.stringify(reason));
                 if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
                 results[key] = null;
                 handler(key, reason);
@@ -157,14 +167,14 @@ const rdfstore = window.rdfstore;
             var deferred = q.defer();
             if (this.updateInProgress || this.blockedUpdaters.length > 0){
                 //updates are already in progress or are waiting. block.
-                console.log("rul:read:block:  " + this.uri + " " + this.getLockStatusString());
+                console.log("linkeddata-service-won.js: rul:read:block:  " + this.uri + " " + this.getLockStatusString());
                 this.blockedReaders.push(deferred);
                 this.grantLockToUpdaters();
             } else {
                 //nobody wishes to update the resource, the caller may read it
                 //add the deferred execution to the blocked list, just in case
                 //there are others blocket there, and then grant access to all
-                console.log("rul:read:grant:  " + this.uri + " " + this.getLockStatusString());
+                console.log("linkeddata-service-won.js: rul:read:grant:  " + this.uri + " " + this.getLockStatusString());
                 this.blockedReaders.push(deferred);
                 this.grantLockToReaders();
             }
@@ -175,10 +185,10 @@ const rdfstore = window.rdfstore;
 
             if (this.activeReaderCount > 0 ) {
                 //readers are present, we have to wait till they are done
-                console.log("rul:updt:block:  " + this.uri + " " + this.getLockStatusString());
+                console.log("linkeddata-service-won.js: rul:updt:block:  " + this.uri + " " + this.getLockStatusString());
                 this.blockedUpdaters.push(deferred);
             } else {
-                console.log("rul:updt:grant:  " + this.uri + " " + this.getLockStatusString());
+                console.log("linkeddata-service-won.js: rul:updt:grant:  " + this.uri + " " + this.getLockStatusString());
                 //add the deferred update to the list of blocked updates just
                 //in case there are more, then grant the lock to all of them
                 this.blockedUpdaters.push(deferred);
@@ -188,7 +198,7 @@ const rdfstore = window.rdfstore;
             return deferred.promise;
         },
         releaseReadLock: function(){
-            console.log("rul:read:release:" + this.uri + " " + this.getLockStatusString());
+            console.log("linkeddata-service-won.js: rul:read:release:" + this.uri + " " + this.getLockStatusString());
             this.activeReaderCount --;
             if (this.activeReaderCount < 0){
                 throw {message: "Released a read lock that was never acquired"}
@@ -198,7 +208,7 @@ const rdfstore = window.rdfstore;
             }
         },
         releaseUpdateLock: function(){
-            console.log("rul:updt:release:" + this.uri + " " + this.getLockStatusString());
+            console.log("linkeddata-service-won.js: rul:updt:release:" + this.uri + " " + this.getLockStatusString());
             this.activeUpdaterCount --;
             if (this.activeUpdaterCount < 0){
                 throw {message: "Released an update lock that was never acquired"}
@@ -210,7 +220,7 @@ const rdfstore = window.rdfstore;
         },
         grantLockToUpdaters: function() {
             if (this.blockedUpdaters.length > 0 && ! this.updateInProgress) {
-                console.log("rul:updt:all:    " + this.uri + " " + this.getLockStatusString());
+                console.log("linkeddata-service-won.js: rul:updt:all:    " + this.uri + " " + this.getLockStatusString());
                 //there are blocked updaters. let them proceed.
                 this.updateInProgress = true;
                 for (var i = 0; i < this.blockedUpdaters.length; i++) {
@@ -224,7 +234,7 @@ const rdfstore = window.rdfstore;
         },
         grantLockToReaders: function() {
             if (this.blockedReaders.length > 0) {
-                console.log("rul:readers:all: " + this.uri + " " + this.getLockStatusString());
+                console.log("linkeddata-service-won.js: rul:readers:all: " + this.uri + " " + this.getLockStatusString());
                 //there are blocked readers. let them proceed.
                 for (var i = 0; i < this.blockedReaders.length; i++) {
                     var deferredRead = this.blockedReaders[i];
@@ -241,7 +251,7 @@ const rdfstore = window.rdfstore;
 
 
     var cacheItemInsertOrOverwrite = function(uri){
-        console.log("add to cache:    " + uri);
+        console.log("linkeddata-service-won.js: add to cache:    " + uri);
         privateData.cacheStatus[uri] = {
             timestamp: new Date().getTime(),
             state: CACHE_ITEM_STATE.OK
@@ -257,7 +267,7 @@ const rdfstore = window.rdfstore;
             ret = entry.state === state;
         }
         var retStr = (ret + "     ").substr(0,5);
-        console.log("cacheSt: " + nameOfState + ":" +retStr + "   " + uri);
+        console.log("linkeddata-service-won.js: cacheSt: " + nameOfState + ":" +retStr + "   " + uri);
         return ret;
     }
 
@@ -270,7 +280,7 @@ const rdfstore = window.rdfstore;
             ret = entry.state === CACHE_ITEM_STATE.OK || entry.state === CACHE_ITEM_STATE.UNRESOLVABLE || entry.state == CACHE_ITEM_STATE.FETCHING;
         }
         var retStr = (ret + "     ").substr(0,5);
-        console.log("cacheSt: OK or Unresolvable:" +retStr + "   " + uri);
+        console.log("linkeddata-service-won.js: cacheSt: OK or Unresolvable:" +retStr + "   " + uri);
         return ret;
     }
 
@@ -308,7 +318,7 @@ const rdfstore = window.rdfstore;
         } else if (entry.state === CACHE_ITEM_STATE.DIRTY){
             throw {message : "Trying to mark uri " + uri +" as accessed, but it is already dirty"}
         }
-        console.log("mark accessed:   " + uri);
+        console.log("linkeddata-service-won.js: mark accessed:   " + uri);
         privateData.cacheStatus[uri].timestamp = new Date().getTime();
     }
 
@@ -317,17 +327,17 @@ const rdfstore = window.rdfstore;
         if (typeof entry === 'undefined') {
             return;
         }
-        console.log("mark dirty:      " + uri);
+        console.log("linkeddata-service-won.js: mark dirty:      " + uri);
         privateData.cacheStatus[uri].state = CACHE_ITEM_STATE.DIRTY;
     }
 
     var cacheItemMarkUnresolvable = function cacheItemMarkUnresolvable(uri){
-        console.log("mark unres:      " + uri);
+        console.log("linkeddata-service-won.js: mark unres:      " + uri);
         privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.UNRESOLVABLE};
     }
 
     var cacheItemMarkFetching = function cacheItemMarkFetching(uri){
-        console.log("mark fetching:   " + uri);
+        console.log("linkeddata-service-won.js: mark fetching:   " + uri);
         privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.FETCHING};
     }
 
@@ -351,7 +361,8 @@ const rdfstore = window.rdfstore;
     }
 
     /**
-     * Invalidates the appropriate linked data cache items such that all information about a
+     * Invalidates the appropriate linked data cache items (i.e. the set of connections
+     * associated with a need) such that all information about a
      * newly created connection is loaded. Should be called when receiving hint or connect.
      *
      * Note that this causes an asynchronous call - the cache items may only be invalidated
@@ -362,13 +373,13 @@ const rdfstore = window.rdfstore;
      * @return a promise so the caller can chain promises after this one
      */
     won.invalidateCacheForNewConnection = function(connectionUri, needUri){
-        if (connectionUri != null) {
+        if (connectionUri) {
             cacheItemMarkDirty(connectionUri);
         }
-        return won.getNeedConnectionsUri(needUri).then(
-            function(connectionsUri){
-                if (connectionsUri != null){
-                    cacheItemMarkDirty(connectionsUri);
+        return getConnectionContainerOfNeed(needUri).then(
+            function(connectionContainerUri){
+                if (connectionContainerUri != null){
+                    cacheItemMarkDirty(connectionContainerUri);
                 }
             }
         );
@@ -478,9 +489,10 @@ const rdfstore = window.rdfstore;
      * The uri is used for cache control.
      */
     won.addJsonLdData = function(uri, data) {
-        console.log("storing jsonld data for uri: " + uri);
+        console.log("linkeddata-service-won.js: storing jsonld data for uri: " + uri);
         privateData.store.load("application/ld+json", data, function (success, results) {
-            console.log("added jsonld data to rdf store, success: " + success);
+            //privateData.store.load("application/ld+json", data, function (success, results) {
+            console.log("linkeddata-service-won.js: added jsonld data to rdf store, success: " + success);
             if (success) {
                 cacheItemMarkAccessed(uri);
             }
@@ -552,194 +564,113 @@ const rdfstore = window.rdfstore;
     }
 
     /**
-     * Deletes the node with specified uri from the local triplestore, then
-     * fetches the linked data for the specified uri and saves it
-     * in the local triplestore.
+     * Fetches the linked data for the specified URI and saves it in the local triple-store.
      * @param uri
-     * @return a promise to a boolean which indicates success
+     * @param requesterWebId
+     * @return {*}
+     */
+    won.ensureLoaded = function(uri, requesterWebId) {
+        if (!uri) { throw {message : "ensureLoaded: uri must not be null"}; }
+
+        console.log("linkeddata-service-won.js: ensuring loaded: " +uri);
+
+        //we also allow unresolvable resources, so as to avoid re-fetching them.
+        //we also allow resources that are currently being fetched.
+        if (cacheItemIsOkOrUnresolvableOrFetching(uri)){
+            return new Promise((resolve, reject) => {
+                cacheItemMarkAccessed(uri);
+                resolve(uri);
+            });
+        }
+        //uri isn't loaded or needs to be refrehed. fetch it.
+        cacheItemMarkFetching(uri);
+        return won.fetch(uri, requesterWebId)
+            .then(
+                () => cacheItemMarkAccessed(uri),
+                reason => cacheItemMarkUnresolvable(uri)
+            )
+
+    }
+
+    /**
+     * Fetches the rdf-node with the given uri from
+     * the standard API_ENDPOINT.
+     * @param uri
+     * @param requesterWebId
+     * @returns {*}
      */
     won.fetch = function(uri, requesterWebId) {
         var tempUri = uri+'?prev='+new Date().getTime();
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "fetch: uri must not be null"};
         }
-        console.log("fetch announced: " + uri);
-        var lock = getReadUpdateLockPerUri(uri);
+        console.log("linkeddata-service-won.js: fetch announced: " + uri);
+        const lock = getReadUpdateLockPerUri(uri);
         return lock.acquireUpdateLock().then(
-                function() {
-                    // We can use loadFromURI() when we are able to supply our web-id with the call to linked data uri:
-                    // return loadFromURI(uri);
-                    // In the meanwhile, we use our owner-server as an intermediary that can access remote linked data
-                    // on behalf of the need with its web-id, because it has the private key of that need identity:
-                    return loadFromOwnServer(uri, requesterWebId);
-                }
-        ).then(() =>
-            {console.log("FINALLY")
-                lock.releaseUpdateLock()})
-
-        //make sure we only release the lock when our main promise resolves
-/*        ["finally"](function(){
-            lock.releaseUpdateLock();
-        });*/
-    }
-
-    var loadFromOwnServer = function(uri, requesterWebId) {
-        var deferred = q.defer();
-
-        console.log("updating:        " + uri);
-        try {
-            /*
-             TODO: uncommenting the delete block is experimental. Using it is not exactly safe, either, as we risk to delete triples that the subsequent fetch will not restore.
-
-             console.log("deleting :       " + uri);
-             var query = "delete where {<" + uri + "> ?anyP ?anyO}";
-             var failed = {};
-             privateData.store.execute(query, function (success, graph) {
-             if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
-             failed.failed = true;
-             return;
-             }
-             console.log("deleted:         " + uri)
-             });
-             if (failed.failed) {
-             return deferred.promise;
-             }                   */
-            //the execute call above is not asynchronous, so we can safely continue outside the callback.
-            console.log("fetching:        " + uri);
-            fetchLinkedDataFromOwnServer(uri, requesterWebId).then(function(dataset){
-                return dataset.json()
-            }).then(
-                function success(dataset) {
-                    if (Object.keys(dataset).length === 0 ) {
-                        deferred.reject("failed to load " + uri);
-                    } else {
-                        console.log("fetched:         " + uri)
-                        won.addJsonLdData(uri, dataset);
-                        deferred.resolve(uri);
-                    }
-                },
-                function failure(data) {
-                    deferred.reject("failed to load " + uri);
-                }
-            );
-        } catch (e) {
-            $rootScope.$apply(function () {
-                deferred.reject("failed to load " + uri + ". Reason: " + e);
+                () => loadFromOwnServerIntoCache(uri, requesterWebId)
+            ).then(dataset => {
+                lock.releaseUpdateLock();
+                return dataset;
             });
-        }
-        return deferred.promise;
     }
 
-    var fetchLinkedDataFromOwnServer = function(dataUri, requesterWebId) {
-        let requestUri = apiEndpoint(dataUri, requesterWebId);
-        const find = '%3A';
-        const re = new RegExp(find, 'g');
-        requestUri = requestUri.replace(re,':');
+    function loadFromOwnServerIntoCache(uri, requesterWebId) {
+        return new Promise((resolve, reject) => {
+            console.log("linkeddata-service-won.js: fetching:        " + uri);
 
-        return fetch(requestUri, {
-            method: 'get',
-            credentials: 'include'
+            let requestUri = queryString(uri, requesterWebId);
+            const find = '%3A';
+            const re = new RegExp(find, 'g');
+            requestUri = requestUri.replace(re, ':');
+
+            fetch(requestUri, {
+                method: 'get',
+                credentials: 'include'
+            })
+            .then(dataset => dataset.json())
+            .then(
+                dataset => {
+                    //make sure we've got a non-empty dataset
+                    if (Object.keys(dataset).length === 0) {
+                        reject("failed to load " + uri);
+                    } else {
+                        console.log("linkeddata-service-won.js: fetched:         " + uri)
+                        won.addJsonLdData(uri, dataset);
+                        resolve(dataset);
+                    }
+                  },
+                e =>  reject(`failed to load ${uri} due to reason ${e}`)
+            );
         });
     };
 
-    var loadFromURI = function(uri) {
-        var deferred = q.defer();
-        console.log("updating:        " + uri);
-        try {
-            /*
-             TODO: uncommenting the delete block is experimental. Using it is not exactly safe, either, as we risk to delete triples that the subsequent fetch will not restore.
-
-             console.log("deleting :       " + uri);
-             var query = "delete where {<" + uri + "> ?anyP ?anyO}";
-             var failed = {};
-             privateData.store.execute(query, function (success, graph) {
-             if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
-             failed.failed = true;
-             return;
-             }
-             console.log("deleted:         " + uri)
-             });
-             if (failed.failed) {
-             return deferred.promise;
-             }                   */
-            //the execute call above is not asynchronous, so we can safely continue outside the callback.
-            console.log("fetching:        " + uri);
-            privateData.store.load('remote', uri, function (success, results) {
-                $rootScope.$apply(function () {
-                    if (success) {
-                        console.log("fetched:         " + uri)
-                        cacheItemInsertOrOverwrite(uri);
-                        deferred.resolve(uri);
-                    } else {
-                        deferred.reject("failed to load " + uri);
-                    }
-                });
-            });
-        } catch (e) {
-            $rootScope.$apply(function () {
-                deferred.reject("failed to load " + uri + ". Reason: " + e);
-            });
-        }
-        var promise = deferred.promise;
-        return promise;
-    }
-
     /**
-     * Fetches the linked data for the specified URI and saves it in the local triplestore if necessary.
-     * Note: this method does not grant the caller any locks. This has to be done by the caller after calling this method.
-     * @param uri
-     * @return a promise to a boolean which indicates success
+     * @param needUri
+     * @return {*} the same as getNeed but also resolves
+     * the connectionContainer to the connectionUris
+     * contained within.
      */
-    won.ensureLoaded = function(uri, requesterWebId) {
-        if (typeof uri === 'undefined' || uri == null  ){
-            throw {message : "ensureLoaded: uri must not be null"};
-        }
-        console.log("ensuring loaded: " +uri);
-        //we also allow unresolvable resources, so as to avoid re-fetching them.
-        //we also allow resources that are currently being fetched.
-        if (cacheItemIsOkOrUnresolvableOrFetching(uri)){
-            var deferred = q.defer();
-            cacheItemMarkAccessed(uri);
-            deferred.resolve(uri);
-            return deferred.promise;
-        }
-        //uri isn't loaded or needs to be refrehed. fetch it.
-        cacheItemMarkFetching(uri);
-        return won.fetch(uri, requesterWebId)
-            .then(
-                function(x){
-                    cacheItemMarkAccessed(uri);
-                },
-                function(reason){
-                    cacheItemMarkUnresolvable(uri);
-                }
-            )
-
-    }
-
-    /**
-     * Saves the specified jsonld structure in the triple store with the specified default graph URI.
-     * @param graphURI used if no graph URI is specified in the jsonld
-     * @param jsonld the data
-     */
-    won.storeJsonLdGraph = function(graphURI, jsonld) {
-        if (typeof graphURI === 'undefined' || graphURI == null  ){
-            throw {message : "storeJsonLdGraph: graphURI must not be null"};
-        }
-        privateData.store.load("application/ld+json", jsonld, graphURI, function (success, results) {});
-    }
+    won.getNeedWithConnectionUris = function(needUri) {
+        return Promise.all([
+            won.getNeed(needUri),
+            won.getconnectionUrisOfNeed(needUri)]
+        ).then(([need, connectionUris]) => {
+            need.hasConnections = connectionUris;
+            return need;
+        });
+    };
 
     /**
      * Loads the default data of the need with the specified URI into a js object.
      * @return the object or null if no data is found for that URI in the local datastore
      */
-    won.getNeed = function(uri) {
-        if (typeof uri === 'undefined' || uri == null  ){
+    won.getNeed = function(needUri) {
+        if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getNeed: uri must not be null"};
         }
-       return won.ensureLoaded(uri).then(
+       return won.ensureLoaded(needUri).then(
            function() {
-               var lock = getReadUpdateLockPerUri(uri);
+               var lock = getReadUpdateLockPerUri(needUri);
                return lock.acquireReadLock().then(
                    function () {
                        try {
@@ -756,9 +687,9 @@ const rdfstore = window.rdfstore;
                                //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
                                //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
                                //                "GRAPH ?coreURI {"+,
-                               "<" + uri + "> " + won.WON.isInStateCompacted + " ?state .\n" +
-                               "<" + uri + "> " + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType .\n" +
-                               "<" + uri + "> " + won.WON.hasContentCompacted + " ?content .\n" +
+                               "<" + needUri + "> " + won.WON.isInStateCompacted + " ?state .\n" +
+                               "<" + needUri + "> " + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType .\n" +
+                               "<" + needUri + "> " + won.WON.hasContentCompacted + " ?content .\n" +
                                "?content dc:title ?title .\n" +
                                "OPTIONAL {?content " + won.WON.hasTagCompacted + " ?tags .}\n" +
                                "OPTIONAL {?content " + "geo:latitude" + " ?latitude .}\n" +
@@ -771,11 +702,11 @@ const rdfstore = window.rdfstore;
                                //TODO: add as soon as named graphs are handled by the rdf store
                                //                "}" +
                                //                "GRAPH ?metaURI {" +
-                               "<" + uri + "> " + " <" + "http://purl.org/dc/terms/created" + "> " + "?creationDate" +
+                               "<" + needUri + "> " + " <" + "http://purl.org/dc/terms/created" + "> " + "?creationDate" +
                                " .\n" +
-                               "<" + uri + "> " + won.WON.hasConnectionsCompacted + " ?connections .\n" +
-                               "<" + uri + "> " + won.WON.hasWonNodeCompacted + " ?wonNode .\n" +
-                               "OPTIONAL {<" + uri + "> " + won.WON.hasEventContainerCompacted + " ?eventContainer" +
+                               "<" + needUri + "> " + won.WON.hasConnectionsCompacted + " ?connections .\n" +
+                               "<" + needUri + "> " + won.WON.hasWonNodeCompacted + " ?wonNode .\n" +
+                               "OPTIONAL {<" + needUri + "> " + won.WON.hasEventContainerCompacted + " ?eventContainer" +
                                " .}\n" +
                                // if the triple below is used, we get > 1 result items, because usually here will be
                                // at least 2 events - need created and success response - therefore, it can be removed
@@ -786,11 +717,11 @@ const rdfstore = window.rdfstore;
                                "}";
                            resultObject = {};
                            privateData.store.execute(query, [], [], function (success, results) {
-                               if (rejectIfFailed(success, results, {message: "Could not load need " + uri + ".", allowNone: false, allowMultiple: false})) {
+                               if (rejectIfFailed(success, results, {message: "Could not load need " + needUri + ".", allowNone: false, allowMultiple: false})) {
                                    return;
                                }
                                var result = results[0];
-                               resultObject.uri = uri;
+                               resultObject.uri = needUri;
                                resultObject.basicNeedType = getSafeValue(result.basicNeedType);
                                resultObject.title = getSafeValue(result.title);
                                resultObject.tags = getSafeValue(result.tags);
@@ -800,7 +731,7 @@ const rdfstore = window.rdfstore;
                            });
                            return resultObject;
                        } catch (e) {
-                           return q.reject("could not load need " + uri + ". Reason: " + e);
+                           return q.reject("could not load need " + needUri + ". Reason: " + e);
                        } finally {
                            //we don't need to release after a promise resolves because
                            //this function isn't deferred.
@@ -975,77 +906,34 @@ const rdfstore = window.rdfstore;
                     });
             });
     }
-    won.getLastEventOfConnection = function(connectionUri, requesterWebId) {
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getLastEventOfConnection: connectionUri must not be null"};
-        }
-        return won.getConnection(connectionUri)
-            .then(function (connection) {
-                return won.getNeed(connection.hasRemoteNeed)
-                    .then(function (need) {
-                        return won.getLastConnectionEvent(connectionUri, requesterWebId)
-                            .then(
-                                function (event) {
-                                    return {connection: connection, remoteNeed: need, event: event}
-                                },function(reason){
-                                    //remote need's won node may be offline - don't let that kill us
-                                    var deferred = q.defer();
-                                    deferred.resolve(
-                                        {connection: connection, remoteNeed: {'title': '[could not load]'}, event: event}
-                                    );
-                                    return deferred.promise;
-                                });
-                    });
-            });
-    }
 
-
-    won.getAllConnectionEvents = function(connectionUri, requesterWebId) {
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getAllConnectionEvents: connectionUri must not be null"};
-        }
-        return won.getAllConnectioneventUris(connectionUri, requesterWebId)
-            .then(function (eventUris) {
-                try {
-                    var eventPromises = [];
-                    for (var evtKey in eventUris) {
-                        eventPromises.push(won.getConnectionEvent(eventUris[evtKey]));
-                    }
-                    return q.all(eventPromises)
-                } catch (e) {
-                    return q.reject("could not get all connection events for connection " + connectionUri + ". Reason: " + e);
-                }
-            });
-    }
-
-    won.getLastConnectionEvent = function(connectionUri, requesterWebId) {
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getLastConnectionEvent: connectionUri must not be null"};
-        }
-        return won.getLastConnectioneventUri(connectionUri, requesterWebId)
-            .then(function (eventUri) {
-                    return won.getConnectionEvent(eventUri);
-            })
-    }
+    /**
+     * @param needUri
+     * @return {*} the data of all connection-nodes referenced by that need
+     */
+    won.getConnectionsOfNeed = (needUri) =>
+        won.getconnectionUrisOfNeed(needUri)
+        .then(connectionUris => won.getNodes(connectionUris))
 
 
     /**
      * Loads all URIs of a need's connections.
+     * @deprecated possible duplicate of `won.getConnectionsWithOwnNeed` (see there)
      */
-    won.getconnectionUrisOfNeed = function(uri) {
-        if (typeof uri === 'undefined' || uri == null  ){
+    won.getconnectionUrisOfNeed = function(needUri) {
+        if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getconnectionUrisOfNeed: uri must not be null"};
         }
-        return won.ensureLoaded(uri).then(
+        return won.ensureLoaded(needUri).then(
             function(){
-                var lock = getReadUpdateLockPerUri(uri);
+                var lock = getReadUpdateLockPerUri(needUri);
                 return lock.acquireReadLock().then(
                     function() {
                         try {
-                            var subject = uri;
+                            var subject = needUri;
                             var predicate = won.WON.hasConnections;
                             var connectionsPromises = [];
-                            privateData.store.node(uri, function (success, graph) {
+                            privateData.store.node(needUri, function (success, graph) {
                                 var resultGraph = graph.match(subject, predicate, null);
                                 if (resultGraph != null && resultGraph.length > 0) {
                                     for (key in resultGraph.triples) {
@@ -1077,7 +965,7 @@ const rdfstore = window.rdfstore;
                                     return merged;
                                 });
                         } catch (e) {
-                            q.reject("could not get connection URIs of need + " + uri + ". Reason:" + e);
+                            q.reject("could not get connection URIs of need + " + needUri + ". Reason:" + e);
                         } finally {
                             lock.releaseReadLock();
                         }
@@ -1087,7 +975,13 @@ const rdfstore = window.rdfstore;
 
     }
 
-    won.getNeedConnectionsUri = function(needUri) {
+    /**
+     *
+     * @param needUri
+     * @returns {*} the Uri of the connection container (read: set) of
+     *              connections for the given need
+     */
+    function getConnectionContainerOfNeed(needUri) {
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getConnectionsUri: needUri must not be null"};
         }
@@ -1119,28 +1013,61 @@ const rdfstore = window.rdfstore;
             });
     }
     
-    
+    /**
+     * @param connectionUri
+     * @param requesterWebId
+     * @return {*} the most recent event for that connection as a full object.
+     */
+    won.getLatestEventOfConnection = (connectionUri, requesterWebId) =>
+        won.getEventsOfConnection(connectionUri, requesterWebId)
+            //find latest event:
+            .then(eventsLookup => {
+                let latestEvent = {};
+                for(let [eventUri, event] of entries(eventsLookup)) {
+                    const latestEventTime = Number.parseInt(latestEvent.hasReceivedTimestamp)
+                    const eventTime = Number.parseInt(event.hasReceivedTimestamp)
+                    latestEvent = latestEventTime >= eventTime ? latestEvent : event;
+                }
+                return latestEvent;
+            });
 
-    won.getConnection = function(connectionUri) {
-        if (typeof connectionUri === 'undefined' || connectionUri == null  ){
-            throw {message : "getConnection: connectionUri must not be null"};
-        }
-        return won.getNodeWithAttributes(connectionUri);
+    /**
+     * Returns all events associated with a given connection
+     * in a promise for an object of (eventUri -> eventData)
+     * @param connectionUri
+     * @param requesterWebId
+     */
+    won.getEventsOfConnection = function(connectionUri, requesterWebId) {
+        return won.getEventUrisOfConnection(connectionUri, requesterWebId)
+            .then(eventUris => won.urisToLookupMap(eventUris,
+                    eventUri => won.getNode(eventUri, requesterWebId))
+            )
+    };
+
+    /**
+     * Returns the uris of all events associated with a given connection
+     * @param connectionUri
+     * @param requesterWebId
+     * @returns promise for an array strings (the uris)
+     */
+    won.getEventUrisOfConnection = function(connectionUri, requesterWebId) {
+        return won.getConnection(connectionUri, requesterWebId)
+            .then(connection => connection.hasEvents);
     }
 
-    won.getConnectionEvent = function(eventUri) {
-        if (typeof eventUri === 'undefined' || eventUri == null  ){
-            throw {message : "getConnectionEvent: eventUri must not be null"};
-        }
-        return won.getNodeWithAttributes(eventUri);
-    }
 
-
-
+    /**
+     * @deprecated this function probably doesn't work anymore. rather use getEventsOfConnection
+     *
+     * @param connectionUri
+     * @param requesterWebId
+     * @returns {*}
+     */
     won.getAllConnectioneventUris = function(connectionUri, requesterWebId) {
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getAllConnectioneventUris: connectionUri must not be null"};
         }
+        //TODO ensure that the eventcontainer is loaded
         return won.ensureLoaded(connectionUri, requesterWebId).then(
             function(){
                var lock = getReadUpdateLockPerUri(connectionUri);
@@ -1390,54 +1317,121 @@ const rdfstore = window.rdfstore;
         );
     }
 
+    /**
+     * Maps `getNodeWithAttributes` over the list of uris and
+     * collects the results.
+     * @param uris array of strings
+     * @param requesterWebId map/object of (uri -> node's data)
+     */
+    won.getNodes = function(uris, requesterWebId) {
+        return won.urisToLookupMap(uris, uri => won.getNode(uri, requesterWebId));
+    };
 
+    /**
+     * @param connectionUri
+     * @param requesterWebId
+     * @return {*} the connections predicates along with the uris of associated events
+     */
+    won.getConnection = function(connectionUri, requesterWebId) {
+        return won.getNode(connectionUri, requesterWebId)
+            //add the eventUris
+            .then(connection => Promise.all([
+                Promise.resolve(connection),
+                won.getNode(connection.hasEventContainer, requesterWebId)
+            ]))
+            .then( ([connection, eventContainer]) => {
+                connection.hasEvents = eventContainer.member;
+                return connection;
+            })
+    };
 
+    //aliases (formerly functions that were just pass-throughs)
+    won.getConnectionEvent =
+    won.getNodeWithAttributes =
     /**
      * Fetches the triples where URI is subject and add objects of those triples to the
      * resulting structure by the localname of the predicate.
      * The URI is added as property 'uri'.
      *
-     * NOTE: multiple objects with the same predicates will overwrite each other. It also
-     * ignores prefixes.
+     * If a predicate occurs multiple times the objects (in the rdf sense) will be
+     * grouped as an array. This is usually the case for rdfs:member, to give an example.
+     *
+     * NOTE: Atm it ignores prefixes which might lead to clashes.
      *
      * @param eventUri
+     * @param requesterWebId
      */
-    won.getNodeWithAttributes = function(uri, requesterWebId){
-        if (typeof uri === 'undefined' || uri == null  ){
-            throw {message : "getNodeWithAttributes: uri must not be null"};
+    won.getNode = function(uri, requesterWebId) {
+        if(!uri) {
+            return Promise.reject({message : "getNode: uri must not be null"})
         }
-        return won.ensureLoaded(uri, requesterWebId).then(
-            function(){
-                var lock = getReadUpdateLockPerUri(uri);
-                return lock.acquireReadLock().then(
-                    function() {
-                        console.log("getNodeWithAttrs:" + uri);
-                        try {
-                            var node = {};
-                            privateData.store.node(uri, function (success, graph) {
-                                if (graph.length == 0) {
-                                    console.log("warn: could not load any attributes for node with uri: " + uri);
-                                }
-                                if (rejectIfFailed(success, graph,{message : "Error loading node with attributes for URI " + uri+".", allowNone : false, allowMultiple: true})){
-                                    return;
-                                }
-                                for (key in graph.triples) {
-                                    var propName = won.getLocalName(graph.triples[key].predicate.nominalValue);
-                                    node[propName] = graph.triples[key].object.nominalValue;
-                                }
+
+
+        let releaseLock = undefined;
+
+        const nodePromise = won.ensureLoaded(uri, requesterWebId)
+            .then(() => {
+                const lock = getReadUpdateLockPerUri(uri);
+                releaseLock = () => lock.releaseReadLock();
+                return lock.acquireReadLock();
+            })
+            .then(() => {
+                console.log("linkeddata-service-won.js: getNode:" + uri);
+                return new Promise((resolve, reject) => {
+                    privateData.store.node(uri, function (success, graph) {
+                        if(!success) {
+                            reject({
+                                message: "Error loading node with attributes for URI " + uri + "."
                             });
-                            node.uri = uri;
-                            return node;
-                        } catch (e) {
-                            return q.reject("could not get node " + uri + "with attributes: " + e);
-                        } finally {
-                            //we don't need to release after a promise resolves because
-                            //this function isn't deferred.
-                            lock.releaseReadLock();
+                        } else if (graph.length === 0) {
+                            /* TODO HACK / WORKAROUND
+                             * try query + manual filter. it's slower but the store
+                             * occasionally has hiccups where neither `store.node(uri)`
+                             * nor `select * where {<uri> ?p ? o}` return triples, but
+                             * `select * where { ?s ?p ?o }` contains the the desired
+                             * triples. I couldn't find out what's the cause of this
+                             * within a feasible time, but hope these issues will go
+                             * away, when we'll get around to update the store to the
+                             * newest version.
+                             */
+                            console.log('linkeddata-service-won.js: warn: could not ' +
+                                'load any attributes for node with uri: ', uri,
+                                '. Trying sparql-query + result.filter workaround.');
+                            privateData.store.graph((success, entireGraph) => {
+                                resolve(entireGraph.triples.filter(t => t.subject.nominalValue === uri))
+                            })
+                        } else {
+                            //graph.triples[0].object.nominalValue
+                            //graph.triples[0].subject.nominalValue
+                            //graph.triples[0].predicate.nominalValue
+                            resolve(graph.triples);
                         }
+                    })
+                })
+            })
+            .then(triples => {
+                const node = {};
+                triples.forEach(triple => {
+                    //TODO this cropping ignores prefixes, causing predicates/fields to clash!
+                    const propName = won.getLocalName(triple.predicate.nominalValue);
+                    if(node[propName]) {
+                        //encountered multiple occurances of the same predicate, e.g. rdfs:member
+                        if(!(node[propName] instanceof Array)) {
+                            //on the first 'clash', instantiate the predicate/property as array
+                            node[propName] = [ node[propName] ];
+                        }
+                        node[propName].push(triple.object.nominalValue);
+                    } else {
+                        node[propName] = triple.object.nominalValue;
                     }
-                )
-            });
+                });
+                node.uri = uri;
+                releaseLock();
+                return node;
+            })
+            .catch(releaseLock);
+
+        return nodePromise;
     }
 
     /**
@@ -1448,7 +1442,7 @@ const rdfstore = window.rdfstore;
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "deleteNode: uri must not be null"};
         }
-        console.log("deleting node:   " + uri);
+        console.log("linkeddata-service-won.js: deleting node:   " + uri);
         var deferred = q.defer();
         var query = "delete where {<"+uri+"> ?anyP ?anyO}";
         //var query = "select ?anyO where {<"+uri+"> ?anyP ?anyO}";
@@ -1463,16 +1457,6 @@ const rdfstore = window.rdfstore;
         return deferred.promise;
     }
     
-    
-
-    /**
-     * Loads the default data of the need with the specified URI into a js object.
-     * @return the object or null if no data is found for that URI in the local datastore
-     */
-    won.getMessage = function(uri) {
-        //TODO: SPARQL query that returns the common message properties
-    }
-
     won.getConnectionWithOwnAndRemoteNeed= function(ownNeedUri,remoteNeedUri){
         return won.getconnectionUrisOfNeed(ownNeedUri).then(connectionUris=>{
             let data = Q.defer()
@@ -1506,61 +1490,14 @@ const rdfstore = window.rdfstore;
             return data.promise;
         })
     }
-    won.getConnectionsWithOwnNeed= function(ownNeedUri){
-        return won.getconnectionUrisOfNeed(ownNeedUri).then(connectionUris=>{
-            let promises=[]
-
-            connectionUris.forEach(connection=>{
-                let resultObject = {}
-                let data = Q.defer()
-
-                promises.push(won.ensureLoaded(connection))
-
-                let query="prefix msg: <http://purl.org/webofneeds/message#> \n"+
-                    "prefix won: <http://purl.org/webofneeds/model#> \n" +
-                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
-                    "select ?connection ?remoteNeed \n" +
-                    " where { \n" +
-                    "?connection a won:Connection; \n" +
-                    "              won:belongsToNeed <" +ownNeedUri +"> ; \n" +
-                    "              won:hasRemoteNeed ?remoteNeed ."+
-                    "} \n"
-
-                privateData.store.execute(query,[],[],function(success,results){
-                    if (rejectIfFailed(success, results, {message: "Error loading connection for need " + ownNeedUri, allowNone: true, allowMultiple: true})) {
-                        return;
-                    }
-                    if(results.length ===1){
-                        let connection = null;
-                        won.getConnection(results[0].connection.value).then(connectionData=>{
-                            return data.resolve(connectionData)
-                        })
-                    }
-
-                    let needs = []
-                    let ownNeedPromise = won.getNeed(uri);
-                    needs.push(ownNeedPromise);
-                    let remoteNeedPromise = won.getNeed(results[0].remoteNeed.value)
-                    needs.push(remoteNeedPromise)
-                    Q.all(needs).then(function(needData){
-                        resultObject.ownNeed = needData[0]
-                        resultObject.remoteNeed=needData[1]
-                        return data.resolve(resultObject );
-                    })
-                })
-            })
-
-            return Q.all(promises)
-        })
-    }
     /**
      * Loads the hints for the need with the specified URI into an array of js objects.
      * @return the array or null if no data is found for that URI in the local datastore
      */
     //TODO refactor this method.
-    won.getConnectionInStateForNeedWithRemoteNeed = function(uri,connectionState) {
+    won.getConnectionInStateForNeedWithRemoteNeed = function(needUri,connectionState) {
 
-        return won.getconnectionUrisOfNeed(uri).then(function(connectionUris){
+        return won.getconnectionUrisOfNeed(needUri).then(function(connectionUris){
             let promises=[];
             connectionUris.forEach(function(connection){
                 let resultObject = {}
@@ -1574,17 +1511,17 @@ const rdfstore = window.rdfstore;
                         "select ?remoteNeed \n" +
                         " where { \n" +
                         "<"+connectionData.uri+"> a won:Connection; \n" +
-                        "              won:belongsToNeed <" +uri +"> ; \n" +
+                        "              won:belongsToNeed <" +needUri +"> ; \n" +
                         "              won:hasRemoteNeed ?remoteNeed; \n"+
                         "              won:hasConnectionState "+ connectionState +". \n"+
                         "} \n"
 
                     privateData.store.execute(query,[],[],function(success,results){
-                        if (rejectIfFailed(success, results, {message: "Error loading connection for need " + uri + "in state"+connectionState+".", allowNone: true, allowMultiple: true})) {
+                        if (rejectIfFailed(success, results, {message: "Error loading connection for need " + needUri + "in state"+connectionState+".", allowNone: true, allowMultiple: true})) {
                             return;
                         }
                         let needs = []
-                        let ownNeedPromise = won.getNeed(uri);
+                        let ownNeedPromise = won.getNeed(needUri);
                         needs.push(ownNeedPromise);
                         let remoteNeedPromise = won.getNeed(results[0].remoteNeed.value)
                          needs.push(remoteNeedPromise)
@@ -1606,13 +1543,24 @@ const rdfstore = window.rdfstore;
 
 
     /**
-     * Loads the connections for the need with the specified URI into an array of js objects.
-     * @return the array or null if no data is found for that URI in the local datastore
+     * Takes an array of uris, performs the lookup function on each
+     * of them seperately, collects the results and builds an map/object
+     * with the uris as keys and the results as values.
+     * @param uris
+     * @param asyncLookupFunction
+     * @return {*}
      */
-    won.getConnections = function(uri) {
-        //TODO: SPARQL query that returns an array of connections
+    won.urisToLookupMap = function(uris, asyncLookupFunction) {
+        const asyncLookups = uris.map(uri => asyncLookupFunction(uri));
+        return Promise.all(asyncLookups).then( dataObjects => {
+            const lookupMap = {};
+            //make sure there's the same
+            for (let i = 0; i < uris.length; i++) {
+                lookupMap[uris[i]] = dataObjects[i];
+            }
+            return lookupMap;
+        });
     }
-
 
     /**
      * Executes the specified crawlableQuery, returns a promise to its results, which may become available
@@ -1625,7 +1573,7 @@ const rdfstore = window.rdfstore;
 
         var executeQuery = function executeQuery(query, baseUri, relevantResources){
             query = query.replace(/\:\:baseUri\:\:/g, baseUri);
-            console.log("executing query: \n"+query);
+            console.log("linkeddata-service-won.js: executing query: \n"+query);
             var locks = getReadUpdateLocksPerUris(relevantResources);
             var promises = acquireReadLocks(locks);
             return q.all(promises).then(
@@ -1640,7 +1588,7 @@ const rdfstore = window.rdfstore;
                         });
                         return resultObject.results;
                     } catch (e) {
-                        console.log("Could not execute query. Reason: " + e);
+                        console.log("linkeddata-service-won.js: Could not execute query. Reason: " + e);
                         return q.reject("Could not execute query. Reason: " + e);
                     } finally {
                         //release the read locks
@@ -1655,7 +1603,7 @@ const rdfstore = window.rdfstore;
         }
 
         var resolvePropertyPathsFromBaseUri = function resolvePropertyPathsFromBaseUri(propertyPaths, baseUri, relevantResources){
-            console.log("resolving " + propertyPaths.length + " property paths on baseUri " + baseUri);
+            console.log("linkeddata-service-won.js: resolving " + propertyPaths.length + " property paths on baseUri " + baseUri);
             var locks = getReadUpdateLocksPerUris(relevantResources);
             var promises = acquireReadLocks(locks);
             return q.all(promises).then(
@@ -1664,7 +1612,7 @@ const rdfstore = window.rdfstore;
                         var resolvedUris = [];
                         propertyPaths.map(
                             function(propertyPath){
-                                console.log("resolving property path: " + propertyPath.propertyPath);
+                                console.log("linkeddata-service-won.js: resolving property path: " + propertyPath.propertyPath);
                                 var foundUris = won.resolvePropertyPathFromBaseUri(
                                         baseUri,
                                         propertyPath.propertyPath,
@@ -1672,7 +1620,7 @@ const rdfstore = window.rdfstore;
 
                                 //resolve all property paths, add to 'resolvedUris'
                                 Array.prototype.push.apply(resolvedUris, foundUris);
-                                console.log("resolved to " + foundUris.length + " resources (total " + resolvedUris.length+")");
+                                console.log("linkeddata-service-won.js: resolved to " + foundUris.length + " resources (total " + resolvedUris.length+")");
                         });
                         return resolvedUris;
                     }catch(e){
@@ -1692,13 +1640,13 @@ const rdfstore = window.rdfstore;
             if (won.isNull(recursionData.depth)){
                 recursionData.depth = 0;
             }
-            console.log("crawlableQuery:resolveOrExecute depth=" + recursionData.depth + ", resolvedUris=" + JSON.stringify(resolvedUris)+", relevantResources=" + JSON.stringify(relevantResources));
+            console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute depth=" + recursionData.depth + ", resolvedUris=" + JSON.stringify(resolvedUris)+", relevantResources=" + JSON.stringify(relevantResources));
             recursionData.depth++;
             if (won.containsAll(relevantResources, resolvedUris) || recursionData.depth >= MAX_RECURSIONS) {
-                console.log("crawlableQuery:resolveOrExecute crawling done");
+                console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute crawling done");
                 return executeQuery(crawlableQuery.query, baseUri, relevantResources);
             } else {
-                console.log("crawlableQuery:resolveOrExecute resolving property paths ...");
+                console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute resolving property paths ...");
                 Array.prototype.push.apply(relevantResources, resolvedUris);
                 var loadedPromises = relevantResources.map(function(x){ return won.ensureLoaded(x, requesterWebId)});
                 return q.all(loadedPromises)
@@ -1775,7 +1723,9 @@ const rdfstore = window.rdfstore;
                 "}\n" +
                 "order by desc(?receivedTimestamp)"
         },
-        // get each connection of the specified need
+        /**
+         * Despite the name, returns the connections fo the specified need themselves. TODO rename
+         */
         "getAllConnectionUrisOfNeed" : {
             propertyPaths : [
                 { prefixes :

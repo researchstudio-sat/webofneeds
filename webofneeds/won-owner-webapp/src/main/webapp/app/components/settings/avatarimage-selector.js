@@ -7,7 +7,7 @@ import angular from 'angular';
 function genLoginConf() {
     let template = `
                     <div class="avatarimage__header">
-                        <a href="#" class="avatarimage__header__button" ng-click="self.open = false">
+                        <a class="avatarimage__header__button clickable" ng-click="self.open = false">
                             <img class="avatarimage__header__button__iconsmall" src="generated/icon-sprite.svg#ico36_person"/>
                             <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" class="avatarimage__header__button__carret">
                         </a>
@@ -24,7 +24,7 @@ function genLoginConf() {
                         <img class="avatarimage__grid__item clickable" src="generated/icon-sprite.svg#ico36_person">
                     </div>
                     <div class="avatarimage__footer">
-                        <a href="#">Upload user image</a>
+                        <a class="clickable">Upload user image</a>
                     </div>`;
 
 
