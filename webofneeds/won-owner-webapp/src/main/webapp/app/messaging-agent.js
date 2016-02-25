@@ -63,6 +63,7 @@ export function runMessagingAgent(redux) {
                     if(firstEntry) { //undefined if queue is empty
                         const [eventUri, msg] = firstEntry;
                         ws.send(JSON.stringify(msg));
+                        console.log("sent message: "+JSON.stringify(msg));
                         redux.dispatch(actionCreators.messages__waitingForAnswer({ eventUri, msg }));
                     }
                 }
@@ -85,10 +86,21 @@ export function runMessagingAgent(redux) {
 
     };
     function onMessage(receivedMsg) {
-        const parsedMsg = JSON.parse(receivedMsg.data);
+        const data = JSON.parse(receivedMsg.data);
 
-        redux.dispatch(actionCreators.messages__messageReceived(parsedMsg))
-
+        console.log('onMessage: ', data);
+        getEventData(data).then(event=> {
+            console.log('onMessage: event.hasMessageType === ', event.hasMessageType);
+            if (event.hasMessageType === won.WONMSG.successResponseCompacted) {
+                redux.dispatch(actionCreators.messages__successResponseMessageReceived(event))
+            }
+            else if (event.hasMessageType === won.WONMSG.hintMessageCompacted) {
+                redux.dispatch(actionCreators.messages__hintMessageReceived(event))
+            }
+            else if (event.hasMessageType === won.WONMSG.connectMessageCompacted) {
+                redux.dispatch(actionCreators.messages__connectMessageReceived(event))
+            }
+        })
 
     };
     function onError(e) {

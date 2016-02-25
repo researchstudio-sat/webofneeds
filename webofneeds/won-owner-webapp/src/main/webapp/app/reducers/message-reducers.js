@@ -24,7 +24,6 @@ const initialState = Immutable.fromJS({
 });
 export function messagesReducerAlt(messages = initialState, action = {}) {
     switch(action.type) {
-        case actionTypes.messages.openResponseReceived:
         case actionTypes.drafts.publishSuccessful:
             return messages.removeIn(['waitingForAnswer', action.payload.eventUri]);
         default:
@@ -45,7 +44,6 @@ export const messagesReducer =  createReducer(
 
     //handlers
     {
-
         [actionTypes.drafts.publish]: (messages, {payload:{eventUri, message}}) =>
             messages.setIn(['enqueued', eventUri], message),
 
@@ -56,21 +54,10 @@ export const messagesReducer =  createReducer(
                 .setIn(['waitingForAnswer', eventUri], msg)
 
         },
-        [actionTypes.messages.remoteResponseReceived]:(messages,action)=>{
-            let data = messages.getIn(['waitingForAnswer',action.payload]);
-            data.remoteResponse = true
-            return messages.setIn(['waitingForAnswer',action.payload],data)
-        },
-        [actionTypes.messages.ownResponseReceived]:(messages,action)=>{
-            let data = messages.getIn(['waitingForAnswer',action.payload]);
-            data.ownResponse = true
-            return messages.setIn(['waitingForAnswer',action.payload],data)
-        },
-        [actionTypes.messages.openResponseReceived]:(messages,{payload:{eventUri}})=>
-            messages.removeIn(['waitingForAnswer', eventUri]),
-        [actionTypes.messages.send]:(messages,action)=>
-            messages.setIn(['enqueued',action.payload.eventUri],action.payload.message)
-        ,
+
+        [actionTypes.messages.send]:(messages,{payload: {eventUri, message}})=>
+                messages.setIn(['enqueued', eventUri], message),
+
         [actionTypes.drafts.publishSuccessful]: (messages, {payload:{ publishEventUri }}) =>
             messages.removeIn(['waitingForAnswer', publishEventUri]),
 
