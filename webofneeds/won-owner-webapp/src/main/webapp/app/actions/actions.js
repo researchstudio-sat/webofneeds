@@ -68,7 +68,6 @@ import {
 import {
     messagesConnectMessageReceived,
     messagesHintMessageReceived,
-    messagesMessageReceived,
     messagesSuccessResponseMessageReceived
 } from './messages-actions';
 import {
@@ -112,6 +111,8 @@ const actionHierarchy = {
         load: connectionsLoad,
         open: connectionsOpen,
         connect: connectionsConnect,
+        accepted: INJ_DEFAULT,
+        denied: INJ_DEFAULT,
         close: connectionsClose,
         rate: connectionsRate,
         sendOpen:INJ_DEFAULT,
@@ -151,14 +152,13 @@ const actionHierarchy = {
     },
 
     messages: { /* websocket messages, e.g. post-creation, chatting */
-        markAsSent: INJ_DEFAULT,
+        send: INJ_DEFAULT,
         waitingForAnswer: INJ_DEFAULT,
         /**
          * TODO this action is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
          */
         requestWsReset_Hack: INJ_DEFAULT,
-        messageReceived: messagesMessageReceived,
         successResponseMessageReceived: messagesSuccessResponseMessageReceived,
         connectMessageReceived: messagesConnectMessageReceived,
         hintMessageReceived: messagesHintMessageReceived,
@@ -231,7 +231,6 @@ export function draftsPublish(draft, nodeUri) {
     };
 }
 
-
 /**
  * @deprecated i need to delete this again *
  * @param needUri
@@ -260,11 +259,6 @@ export function getConnectionRelatedData(needUri,remoteNeedUri,connectionUri) {
             events: results[3],
         }));
 }
-
-
-var isSuccessMessage = function isSuccessMessage(event) {
-    return event.hasMessageType === won.WONMSG.successResponseCompacted;
-};
 
 export const messageTypeToEventType = deepFreeze({
     [won.WONMSG.hintMessageCompacted] : {eventType: won.EVENT.HINT_RECEIVED},

@@ -92,7 +92,6 @@ export function buildCloseMessage(msgToConnectFor){
         var message = new won.MessageBuilder(won.WONMSG.closeMessage)
             .eventURI(eventUri)
             .forEnvelopeData(envelopeData)
-            .hasTextMessage(textMessage)
             .hasOwnerDirection()
             .hasSentTimestamp(new Date().getTime())
             .build();
@@ -216,9 +215,10 @@ export  function setCommStateFromResponseForLocalNeedMessage(event) {
         event.commState = won.COMMUNUCATION_STATE.NOT_TRANSMITTED;
     }
 }
-var isSuccessMessage = function isSuccessMessage(event) {
+export function isSuccessMessage(event) {
     return event.hasMessageType === won.WONMSG.successResponseCompacted;
 }
+
 export function getEventData(msgJson) {
     console.log('getting data from jsonld message');
 

@@ -63,11 +63,13 @@ export function connectionsOpen(connectionData,message) {
         won.getConnection(eventData.connection.uri).then(connection=> {
             let msgToOpenFor = {event: eventData, connection: connection}
             buildOpenMessage(msgToOpenFor, message).then(messageData=> {
+                console.log("built open message");
                 deferred.resolve(messageData);
             })
         })
         deferred.promise.then((action)=> {
-            dispatch(actionCreators.messages__send(action))
+            console.log("dispatching messages__send action"+ action);
+            dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
         })
     }
 }
@@ -86,7 +88,7 @@ export function connectionsConnect(connectionData,message) {
             })
         })
         deferred.promise.then((action)=> {
-            dispatch(actionCreators.messages__send(action))
+            dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
         })
     }
 }
@@ -94,7 +96,7 @@ export function connectionsConnect(connectionData,message) {
 export function connectionsClose(connectionData) {
     return (dispatch, getState) => {
         const state = getState();
-        const eventData = selectAllByConnections(state).get(connectionData.connection.uri);// TODO avoid toJS
+        const eventData = selectAllByConnections(state).get(connectionData.connection.uri).toJS();// TODO avoid toJS
         //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer()
@@ -105,7 +107,7 @@ export function connectionsClose(connectionData) {
             })
         })
         deferred.promise.then((action)=> {
-            dispatch(actionCreators.messages__send(action))
+            dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
         })
     }
 }
@@ -127,7 +129,7 @@ export function connectionsRate(connectionData,rating) {
             })
         })
         deferred.promise.then((action)=> {
-            dispatch(actionCreators.messages__send(action))
+            dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
         })
     }
 }
