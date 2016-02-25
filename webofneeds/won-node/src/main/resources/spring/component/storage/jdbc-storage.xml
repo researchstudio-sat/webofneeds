@@ -71,7 +71,7 @@
             <map>
                 <!-- here's the right place to configure query caching and 2nd level cache -->
                 <entry key="hibernate.cache.use_minimal_puts" value="true" />
-                <entry key="hibernate.show_sql" value="true" />
+                <entry key="hibernate.show_sql" value="false" />
             </map>
         </property>
     </bean>
