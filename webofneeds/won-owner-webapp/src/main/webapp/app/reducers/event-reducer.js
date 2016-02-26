@@ -42,7 +42,6 @@ export default function(state = initialState, action = {}) {
 
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
-        case actionTypes.messages.openResponseReceived:
             return storeConnectionRelatedData(state, action.payload);
 
 
@@ -51,6 +50,8 @@ export default function(state = initialState, action = {}) {
     }
 }
 function storeConnectionRelatedData(state, connectionWithRelatedData) {
+    console.log("EVENT-REDUCER STORING CONNECTION AND RELATED DATA");
+    console.log(connectionWithRelatedData);
     return connectionWithRelatedData.events.reduce(
 
         (updatedState, event) =>

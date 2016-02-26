@@ -9,17 +9,22 @@ import { combineReducersStable } from '../redux-utils';
 import { buildCreateMessage } from '../won-message-utils';
 import won from '../won-es6';
 
-const initialState = Immutable.fromJS({
-    isFetching: false,
-    didInvalidate: false,
-    //connectionsDeprecated: {},//don't use data from this map
-    connections: {},
-})
+const initialState = Immutable.fromJS({})
 export default function(state = initialState, action = {}) {
     switch(action.type) {
         case actionTypes.load:
             const allPreviousConnections = action.payload.get('connections');
-            return state.mergeIn(['connections'], allPreviousConnections);
+            return state.merge(allPreviousConnections);
+
+        case actionTypes.connections.accepted:
+            const acceptEvent = action.payload;
+            const acceptConnectionUri = acceptEvent.hasReceiver;
+            return state.setIn([acceptConnectionUri, 'hasConnectionState'], won.WON.Connected);
+
+        case actionTypes.connections.denied:
+            const deniedEvent = action.payload;
+            const deniedConnectionUri = deniedEvent.hasReceiver;
+            return state.setIn([deniedConnectionUri, 'hasConnectionState'], won.WON.Closed);
 
         case actionTypes.connections.load:
             return action.payload.reduce(
@@ -29,7 +34,6 @@ export default function(state = initialState, action = {}) {
 
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
-        case actionTypes.messages.openResponseReceived:
             return storeConnectionAndRelatedData(state, action.payload);
 
         case actionTypes.connections.reset:
@@ -40,13 +44,10 @@ export default function(state = initialState, action = {}) {
     }
 }
 function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
+    console.log("STORING CONNECTION AND RELATED DATA");
+    console.log(connectionWithRelatedData);
     const connection = Immutable.fromJS(connectionWithRelatedData.connection);
 
     return state
-        .setIn(['connections', connection.get('uri')], connection)
-        /*
-        .setIn( //TODO deletme, deprecated state-structure
-            ['connectionsDeprecated',connectionWithRelatedData.connection.uri],
-            connectionWithRelatedData);
-            */
+        .setIn([connection.get('uri')], connection)
 }

@@ -24,18 +24,15 @@ class IncomingRequestsController {
                 return {
                     incomingRequests: Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
-                        .filter(conn=> {
-                            if (conn.connection.hasConnectionState === won.WON.RequestReceived && state.getIn(['events', conn.connection.uri]) !== undefined) {
-                                return true
-                            }
-                        }),
+                        .filter(conn=>
+                            conn.connection.hasConnectionState === won.WON.RequestReceived && state.getIn(['events', conn.connection.uri]) !== undefined
+                        ),
                     incomingRequestsOfNeed: mapToMatches(Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
-                        .filter(conn=> {
-                            if (conn.connection.hasConnectionState === won.WON.RequestReceived) {
-                                return true
-                            }
-                        }))
+                        .filter(conn=>
+                            conn.connection.hasConnectionState === won.WON.RequestReceived
+                        )
+                    )
                 };
             }else{
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
@@ -43,18 +40,15 @@ class IncomingRequestsController {
                     post: state.getIn(['needs','ownNeeds', postId]).toJS(),
                     incomingRequests: Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
-                        .filter(conn=> {
-                            if (conn.connection.hasConnectionState === won.WON.RequestReceived && state.getIn(['events', conn.connection.uri]) !== undefined && conn.ownNeed.uri === postId) {
-                                return true
-                            }
-                        }),
+                        .filter(conn=>
+                            conn.connection.hasConnectionState === won.WON.RequestReceived && state.getIn(['events', conn.connection.uri]) !== undefined && conn.ownNeed.uri === postId
+                        ),
                     incomingRequestsOfNeed: mapToMatches(Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
-                        .filter(conn=> {
-                            if (conn.connection.hasConnectionState === won.WON.RequestReceived && conn.ownNeed.uri === postId) {
-                                return true
-                            }
-                        }))
+                        .filter(conn=>
+                            conn.connection.hasConnectionState === won.WON.RequestReceived && conn.ownNeed.uri === postId
+                        )
+                    )
                 };
             }
         }

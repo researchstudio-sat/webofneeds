@@ -81,7 +81,7 @@ function genComponentConf() {
                 const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
 
                 return {
-                    hasIncomingRequests: state.getIn(['connections', 'connections'])
+                    hasIncomingRequests: state.getIn(['connections'])
                         .filter(conn =>
                             conn.get('hasConnectionState') === won.WON.RequestReceived
                             && conn.get('belongsToNeed') === this.item.uri
@@ -113,9 +113,7 @@ function genComponentConf() {
                     hasMessages: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
                         .map(key => connectionsDeprecated[key])
                         .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.Connected && conn.ownNeed.uri === this.item.uri){
-                                return true
-                            }
+                            return conn.connection.hasConnectionState===won.WON.Connected && conn.ownNeed.uri === this.item.uri
                         }).length > 0,
                     unreadMessages: unreadCounts.getIn([this.item.uri, won.WON.Connected]), //TODO: NOT REALLY THE MESSAGE COUNT ONLY THE CONVERSATION COUNT
                     unreadIncomingRequests: unreadCounts.getIn([this.item.uri, won.WON.RequestReceived]),
