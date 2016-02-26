@@ -17,14 +17,14 @@ export default function(state = initialState, action = {}) {
             return state.merge(allPreviousConnections);
 
         case actionTypes.connections.accepted:
-            const event = action.payload;
-            const connectionUri = event.hasReceiver;
-            return state.setIn([connectionUri, 'hasConnectionState'], won.WON.Connected);
+            const acceptEvent = action.payload;
+            const acceptConnectionUri = acceptEvent.hasReceiver;
+            return state.setIn([acceptConnectionUri, 'hasConnectionState'], won.WON.Connected);
 
         case actionTypes.connections.denied:
-            const event = action.payload;
-            const connectionUri = event.hasReceiver;
-            return state.setIn([connectionUri, 'hasConnectionState'], won.WON.Closed);
+            const deniedEvent = action.payload;
+            const deniedConnectionUri = deniedEvent.hasReceiver;
+            return state.setIn([deniedConnectionUri, 'hasConnectionState'], won.WON.Closed);
 
         case actionTypes.connections.load:
             return action.payload.reduce(
