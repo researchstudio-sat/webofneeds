@@ -46,7 +46,7 @@ function genComponentConf() {
         <div class="or__footer">
             <input type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
             <div class="flexbuttons">
-                <button class="won-button--filled black"ng-click="self.closeRequest">Decline</button>
+                <button class="won-button--filled black"ng-click="self.closeRequest()">Decline</button>
                 <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Accept</button>
             </div>
         </div>
@@ -65,9 +65,10 @@ function genComponentConf() {
 
         openRequest(message){
             this.connections__open(this.item,message);
+            this.item = undefined;
         }
         closeRequest(){
-            this.message='';
+            this.connections__close(this.item);
             this.item = undefined;
         }
     }

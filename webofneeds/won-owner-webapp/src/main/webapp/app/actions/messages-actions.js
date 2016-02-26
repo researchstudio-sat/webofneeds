@@ -16,35 +16,15 @@ import {
     buildOpenMessage,
     buildCloseMessage,
     buildRateMessage,
-    buildConnectMessage
+    buildConnectMessage,
+    isSuccessMessage
 } from '../won-message-utils';
-
-export function messagesMessageReceived(data) {
-    return dispatch=> {
-        //TODO move this switch-case to the messaging agent
-        console.log('messages__messageReceived: ', data)
-        getEventData(data).then(event=> {
-            console.log('messages__messageReceived: event.hasMessageType === ', event.hasMessageType)
-            window.event4dbg = event;
-            if (event.hasMessageType === won.WONMSG.successResponseCompacted) {
-                dispatch(actionCreators.messages__successResponseMessageReceived(event))
-            }
-            else if (event.hasMessageType === won.WONMSG.hintMessageCompacted) {
-                dispatch(actionCreators.messages__hintMessageReceived(event))
-            }
-            else if (event.hasMessageType === won.WONMSG.connectMessageCompacted) {
-                dispatch(actionCreators.messages__connectMessageReceived(event))
-            }
-        })
-
-    }
-}
 
 export function messagesSuccessResponseMessageReceived(event) {
     return (dispatch, getState) => {
         const state = getState()
         console.log('received response to ', event.isResponseTo, ' of ', event);
-
+        console.log("responseType",event.isResponseToMessageType);
         //TODO do all of this in actions.js?
         if (event.isResponseToMessageType === won.WONMSG.createMessageCompacted) {
             console.log("got response for CREATE: " + event.hasMessageType);
@@ -84,46 +64,35 @@ export function messagesSuccessResponseMessageReceived(event) {
             //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
 
         } else if (event.isResponseToMessageType === won.WONMSG.openMessageCompacted) {
-            console.log("got response for OPEN: " + event.hasMessageType)
+            console.log("got response for OPEN: " + event.hasMessageType);
             let eventUri = null;
+            let receiverUri = null;
             let isRemoteResponse = false;
             //TODO maybe refactor these response message handling
             if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
-                eventUri = event.isRemoteResponseTo
-                dispatch(actionCreators.messages__remoteResponseReceived(event.isRemoteResponseTo))
-
-                //TODO: handle these cases
-                //this.gotResponseFromRemoteNode = true;
-            } else if (state.getIn(['messages', 'waitingForAnswer', event.isResponseTo])) {
-                dispatch(actionCreators.messages__ownResponseReceived(event.isResponseTo))
-                eventUri = event.isResponseTo
-                //TODO: handle these cases
-                //this.gotResponseFromOwnNode = true;
+                console.log("messages waitingForAnswer",event);
+                eventUri = event.isRemoteResponseTo;
+                dispatch(actionCreators.connections__accepted(event));
             }
+
             if (!isSuccessMessage(event)) {
                 console.log(event)
             }
-
-            if (state.getIn(['messages', 'waitingForAnswer', eventUri]).ownResponse === true && state.getIn(['messages', 'waitingForAnswer', eventUri]).remoteResponse === true) {
-                won.invalidateCacheForNewMessage(event.hasReceiver).then(()=> {
-                    getConnectionRelatedDataAndDispatch(event.hasReceiverNeed, event.hasSenderNeed, event.hasReceiver, dispatch).then(connectionData=> {
-                        won.executeCrawlableQuery(
-                            won.queries["getLastEventUriOfConnection"],
-                            event.hasReceiver
-                        ).then(lastEvent=> {
-                                connectionData.lastEvent = lastEvent;
-                                dispatch(actionCreators.messages__openResponseReceived({eventUri, connectionData}))
-                            })
-
-                    })
-                })
-
-
+        } else if (event.isResponseToMessageType === won.WONMSG.closeMessageCompacted) {
+            console.log("got response for CLOSE: " + event.hasMessageType);
+            let eventUri = null;
+            let receiverUri = null;
+            let isRemoteResponse = false;
+            //TODO maybe refactor these response message handling
+            if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
+                console.log("messages waitingForAnswer",event);
+                eventUri = event.isRemoteResponseTo;
+                dispatch(actionCreators.connections__denied(event));
             }
-            /*                won.ensureLoaded(eventData.hasSender)
-             .then(function(value){
-             won.ensureLoaded(eventUri)
-             })*/
+
+            if (!isSuccessMessage(event)) {
+                console.log(event)
+            }
         }
     }
 }

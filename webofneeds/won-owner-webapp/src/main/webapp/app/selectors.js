@@ -79,7 +79,7 @@ export const selectUnreadCountsByType = createSelector(
 export const selectAllByConnections = createSelector(
     state => state, //reselect's createSelector always needs a dependency
     state => state
-        .getIn(['connections', 'connections'])
+        .getIn(['connections'])
         .map(connection => allByConnection(connection)(state))
 );
 const allByConnection = (connection) => (state) => {
@@ -96,7 +96,7 @@ const allByConnection = (connection) => (state) => {
     return Immutable.Map({ connection, events, ownNeed, remoteNeed });
 };
 const allByConnectionUri = (connectionUri)  => {
-    const connection = state.getIn(['connections', 'connections', connectionUri]);
+    const connection = state.getIn(['connections', connectionUri]);
     return allByConnection(connection);
 };
 
