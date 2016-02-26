@@ -18,6 +18,7 @@ package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.action.EventBotAction;
 import won.bot.framework.events.action.impl.*;
 import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.event.impl.*;
@@ -43,6 +44,8 @@ public class EchoBot extends EventBot
   protected BaseEventListener connectionCloser;
   protected BaseEventListener needDeactivator;
 
+  private Integer numberOfEchoNeedsPerNeed;
+
   @Override
   protected void initializeEventListeners()
   {
@@ -61,8 +64,8 @@ public class EchoBot extends EventBot
     this.needCreator = new ActionOnEventListener(
             ctx,
             new NotFilter(new NeedUriInNamedListFilter(ctx, NAME_NEEDS)),
-            new CreateEchoNeedWithFacetsAction(ctx,NAME_NEEDS)
-    );
+            prepareCreateNeedAction(ctx)
+            );
     bus.subscribe(NeedCreatedEventForMatcher.class,this.needCreator);
 
     //as soon as the echo need is created, connect to original
@@ -84,5 +87,21 @@ public class EchoBot extends EventBot
     bus.subscribe(OpenFromOtherNeedEvent.class, this.autoResponder);
     bus.subscribe(MessageFromOtherNeedEvent.class, this.autoResponder);
 
+  }
+
+  private EventBotAction prepareCreateNeedAction(final EventListenerContext ctx) {
+    if (numberOfEchoNeedsPerNeed == null) {
+      return new CreateEchoNeedWithFacetsAction(ctx,NAME_NEEDS);
+    } else {
+      CreateEchoNeedWithFacetsAction[] actions = new CreateEchoNeedWithFacetsAction[numberOfEchoNeedsPerNeed];
+      for (int i = 0; i < numberOfEchoNeedsPerNeed; i++) {
+        actions[i] = new CreateEchoNeedWithFacetsAction(ctx,NAME_NEEDS);
+      }
+      return new MultipleActions(ctx, actions);
+    }
+  }
+
+  public void setNumberOfEchoNeedsPerNeed(final Integer numberOfEchoNeedsPerNeed) {
+    this.numberOfEchoNeedsPerNeed = numberOfEchoNeedsPerNeed;
   }
 }
