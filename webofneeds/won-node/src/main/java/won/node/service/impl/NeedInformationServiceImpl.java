@@ -24,10 +24,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
+import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
+import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.repository.ConnectionRepository;
+import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.NeedRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.NeedInformationService;
@@ -36,6 +39,7 @@ import won.protocol.util.DataAccessUtils;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
  * User: fkleedorfer
@@ -52,6 +56,8 @@ public class NeedInformationServiceImpl implements NeedInformationService
   @Autowired
   private ConnectionRepository connectionRepository;
   @Autowired
+  private MessageEventRepository messageEventRepository;
+  @Autowired
   private URIService uriService;
 
   private static final int DEFAULT_PAGE_SIZE = 500;
@@ -65,37 +71,25 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
-  public Page<URI> listNeedURIs(int page)
-  {
-    return listNeedURIs(page, null, null);
-  }
-
-  @Override
-  public Page<URI> listNeedURIs(int page, Integer preferedPageSize, NeedState needState)
+  public Slice<URI> listNeedURIs(int page, Integer preferedPageSize, NeedState needState)
   {
     int pageSize = this.pageSize;
+    int pageNum = page - 1;
     if (preferedPageSize != null && preferedPageSize < this.pageSize) {
       pageSize = preferedPageSize;
     }
-    Slice slice = null;
+    Slice<URI> slice = null;
     if (needState == null) {
-      slice = needRepository.getAllNeedURIs(new PageRequest(page, pageSize, Sort.Direction.DESC, "creationDate"));
+      slice = needRepository.getAllNeedURIs(new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
     } else {
-      slice = needRepository.getAllNeedURIs(needState, new PageRequest(page, pageSize, Sort.Direction.DESC,
-                                                                      "creationDate"));
+      slice = needRepository.getAllNeedURIs(needState, new PageRequest(pageNum, pageSize, Sort.Direction.DESC,
+                                                                       "creationDate"));
     }
-    return new Page(slice.getContent(), slice.hasNext());
+    return slice;
   }
 
   @Override
-  public Page<URI> listNeedURIsBefore(URI needURI)
-  {
-    return listNeedURIsBefore(needURI, null, null);
-
-  }
-
-  @Override
-  public Page<URI> listNeedURIsBefore(URI needURI, Integer preferedPageSize, NeedState needState)
+  public Slice<URI> listNeedURIsBefore(URI needURI, Integer preferedPageSize, NeedState needState)
   {
     Need referenceNeed = needRepository.findOneByNeedURI(needURI);
     Date referenceDate = referenceNeed.getCreationDate();
@@ -103,7 +97,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
     if (preferedPageSize != null && preferedPageSize < this.pageSize) {
       pageSize = preferedPageSize;
     }
-    Slice slice = null;
+    Slice<URI> slice = null;
     if (needState == null) {
       slice = needRepository.getNeedURIsBefore(referenceDate, new PageRequest(0, pageSize, Sort
         .Direction.DESC, "creationDate"));
@@ -111,17 +105,11 @@ public class NeedInformationServiceImpl implements NeedInformationService
       slice = needRepository.getNeedURIsBefore(referenceDate, needState, new PageRequest(0, pageSize, Sort
         .Direction.DESC, "creationDate"));
     }
-    return new Page(slice.getContent(), slice.hasNext());
+    return slice;
   }
 
   @Override
-  public Page<URI> listNeedURIsAfter(URI needURI)
-  {
-    return listNeedURIsAfter(needURI, null, null);
-  }
-
-  @Override
-  public Page<URI> listNeedURIsAfter(URI needURI, Integer preferedPageSize, NeedState needState)
+  public Slice<URI> listNeedURIsAfter(URI needURI, Integer preferedPageSize, NeedState needState)
   {
     Need referenceNeed = needRepository.findOneByNeedURI(needURI);
     Date referenceDate = referenceNeed.getCreationDate();
@@ -129,15 +117,57 @@ public class NeedInformationServiceImpl implements NeedInformationService
     if (preferedPageSize != null && preferedPageSize < this.pageSize) {
       pageSize = preferedPageSize;
     }
-    Slice slice = null;
+    Slice<URI> slice = null;
     if (needState == null) {
       slice = needRepository.getNeedURIsAfter(referenceDate, new PageRequest(0, pageSize, Sort.Direction.ASC,
                                                                              "creationDate"));
     } else {
       slice = needRepository.getNeedURIsAfter(referenceDate, needState, new PageRequest(0, pageSize, Sort.Direction.ASC,
-                                                                             "creationDate"));
+                                                                                        "creationDate"));
     }
-    return new Page(slice.getContent(), slice.hasNext());
+    return slice;
+  }
+
+
+  @Override
+  public Collection<URI> listConnectionURIs()
+  {
+    return connectionRepository.getAllConnectionURIs();
+  }
+
+  @Override
+  public Slice<URI> listConnectionURIs(int page, Integer preferedPageSize, Date timeSpot)
+  {
+    int pageSize = getPageSize(preferedPageSize);
+    int pageNum = page - 1;
+    Slice<URI> slice = connectionRepository.getConnectionURIByLatestActivity(
+      timeSpot,
+      new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+    return slice;
+  }
+
+  @Override
+  public Slice<URI> listConnectionURIsBefore(
+    final URI resumeConnURI, final Integer preferredPageSize, final Date timeSpot) {
+
+    Date resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
+    int pageSize = getPageSize(preferredPageSize);
+    Slice<URI> slice = null;
+    slice = connectionRepository.getConnectionURIsBeforeByLatestActivity(
+      resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+    return slice;
+  }
+
+  @Override
+  public Slice<URI> listConnectionURIsAfter(
+    final URI resumeConnURI, final Integer preferredPageSize, final Date timeSpot) {
+
+    Date resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
+    int pageSize = getPageSize(preferredPageSize);
+    Slice<URI> slice = null;
+    slice = connectionRepository.getConnectionURIsAfterByLatestActivity(
+      resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.ASC, "max(msg.creationDate)"));
+    return slice;
   }
 
   @Override
@@ -147,25 +177,62 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
-  public Collection<URI> listConnectionURIs()
-  {
-    return connectionRepository.getAllConnectionURIs();
+  public Slice<URI> listConnectionURIs(final URI needURI, int page, Integer preferedPageSize, WonMessageType
+    messageType, Date timeSpot) {
+    Slice<URI> slice = null;
+    int pageSize = getPageSize(preferedPageSize);
+    int pageNum = page - 1;
+    if (messageType == null) {
+      slice = connectionRepository.getConnectionURIByLatestActivity(needURI, timeSpot, new PageRequest(
+        pageNum, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+    } else {
+      slice = connectionRepository.getConnectionURIByLatestActivity(
+        needURI, messageType, timeSpot, new PageRequest(
+          pageNum, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+    }
+    return slice;
   }
 
   @Override
-  public Page<URI> listConnectionURIs(int page)
-  {
-    Slice slice = connectionRepository.getAllConnectionURIs(new PageRequest(page, this.pageSize));
-    return new Page(slice.getContent(), slice.hasNext());
+  public Slice listConnectionURIsBefore(final URI needURI, final URI resumeConnURI, final Integer preferredPageSize,
+                                        WonMessageType messageType, final Date timeSpot) {
+
+    Date resume = null;
+    int pageSize = getPageSize(preferredPageSize);
+    Slice<URI> slice = null;
+    if (messageType == null) {
+      resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
+      slice = connectionRepository.getConnectionURIsBeforeByLatestActivity(
+        needURI, resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+    } else {
+      resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, messageType, timeSpot);
+      slice = connectionRepository.getConnectionURIsBeforeByLatestActivity(
+        needURI, resume, messageType, timeSpot, new PageRequest(
+          0, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+    }
+    return slice;
   }
 
   @Override
-  public Page<URI> listConnectionURIs(final URI needURI, int page) throws NoSuchNeedException
-  {
-    Slice slice = connectionRepository.getAllConnectionURIsForNeedURI(needURI, new PageRequest(page,
-      this.pageSize));
-    return new Page(slice.getContent(), slice.hasNext());
+  public Slice listConnectionURIsAfter(final URI needURI, final URI resumeConnURI, final Integer preferredPageSize,
+                                        final WonMessageType messageType, final Date timeSpot) {
+
+    Date resume = null;
+    int pageSize = getPageSize(preferredPageSize);
+    Slice<URI> slice = null;
+    if (messageType == null) {
+      resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
+      slice = connectionRepository.getConnectionURIsAfterByLatestActivity(
+        needURI, resume, timeSpot, new PageRequest(0, pageSize, Sort.Direction.ASC, "max(msg.creationDate)"));
+    } else {
+      resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, messageType, timeSpot);
+      slice = connectionRepository.getConnectionURIsAfterByLatestActivity(
+        needURI, resume, messageType, timeSpot, new PageRequest(
+          0, pageSize, Sort.Direction.ASC, "max(msg.creationDate)"));
+    }
+    return slice;
   }
+
 
   @Override
   public Need readNeed(final URI needURI) throws NoSuchNeedException
@@ -194,6 +261,71 @@ public class NeedInformationServiceImpl implements NeedInformationService
   public Model readConnectionContent(final URI connectionURI) throws NoSuchConnectionException
   {
     return null;
+  }
+
+
+  @Override
+  public List<URI> listConnectionEventURIs(URI connectionUri) {
+    return messageEventRepository.getMessageURIsByParentURI(connectionUri);
+  }
+
+  @Override
+  public Slice<URI> listConnectionEventURIs(
+    URI connectionUri, int page, Integer preferedPageSize, WonMessageType messageType)
+  {
+    int pageSize = getPageSize(preferedPageSize);
+    int pageNum = page - 1;
+    Slice<URI> slice = null;
+    if (messageType == null) {
+      slice = messageEventRepository.getMessageURIsByParentURI(
+        connectionUri, new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
+    } else {
+      slice = messageEventRepository.getMessageURIsByParentURI(
+        connectionUri, messageType, new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
+    }
+    return slice;
+  }
+
+  @Override
+  public Slice<URI> listConnectionEventURIsAfter(URI connectionUri, URI msgURI, Integer preferredPageSize,
+                                                 WonMessageType msgType) {
+      MessageEventPlaceholder referenceMsg = messageEventRepository.findOneByMessageURI(msgURI);
+      Date referenceDate = referenceMsg.getCreationDate();
+      int pageSize = getPageSize(preferredPageSize);
+      Slice<URI> slice = null;
+      if (msgType == null) {
+        slice = messageEventRepository.getMessageURIsByParentURIAfter(
+          connectionUri, referenceDate, new PageRequest(0, pageSize, Sort.Direction.ASC, "creationDate"));
+      } else {
+        slice = messageEventRepository.getMessageURIsByParentURIAfter(
+          connectionUri, referenceDate, msgType, new PageRequest(0, pageSize, Sort.Direction.ASC, "creationDate"));
+      }
+      return slice;
+  }
+
+  @Override
+  public Slice<URI> listConnectionEventURIsBefore(final URI connectionUri, final URI msgURI, final Integer
+    preferredPageSize, final WonMessageType msgType) {
+    MessageEventPlaceholder referenceMsg = messageEventRepository.findOneByMessageURI(msgURI);
+    Date referenceDate = referenceMsg.getCreationDate();
+    int pageSize = getPageSize(preferredPageSize);
+    Slice<URI> slice = null;
+    if (msgType == null) {
+      slice = messageEventRepository.getMessageURIsByParentURIBefore(
+        connectionUri, referenceDate, new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
+    } else {
+      slice = messageEventRepository.getMessageURIsByParentURIBefore(
+        connectionUri, referenceDate, msgType, new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
+    }
+    return slice;
+  }
+
+  private int getPageSize(final Integer preferredPageSize) {
+    int pageSize = this.pageSize;
+    if (preferredPageSize != null && preferredPageSize < this.pageSize) {
+      pageSize = preferredPageSize;
+    }
+    return pageSize;
   }
 
   public void setNeedRepository(final NeedRepository needRepository)
