@@ -37,8 +37,15 @@ import java.net.URI;
 public class SendMessageAction extends BaseEventBotAction
 {
 
+  private String message = "Hello World";
+
   public SendMessageAction(final EventListenerContext eventListenerContext) {
     super(eventListenerContext);
+  }
+
+  public SendMessageAction(final EventListenerContext eventListenerContext, final String message) {
+    super(eventListenerContext);
+    this.message = message;
   }
 
   @Override
@@ -58,7 +65,7 @@ public class SendMessageAction extends BaseEventBotAction
   }
 
   protected String createTextMessage() {
-    return "hello world";
+    return message;
   }
 
   private void sendMessage(final ConnectionSpecificEvent messageEvent) {
