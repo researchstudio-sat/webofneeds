@@ -39,6 +39,11 @@ export default function(allNeeds = initialState, action = {}) {
                 allNeeds
             );
 
+        case actionTypes.needs.deactivate:
+            const deactivateEvent = action.payload;
+            const deactivateNeedUri = deactivateEvent.hasReceiver;
+            return state.setIn(["ownNeeds", deactivateNeedUri, 'state'], won.WON.Inactive);
+
         case actionTypes.needs.received:
             const ownNeed = action.payload;
             return setIfNew(allNeeds, ['ownNeeds', ownNeed.uri], ownNeed)

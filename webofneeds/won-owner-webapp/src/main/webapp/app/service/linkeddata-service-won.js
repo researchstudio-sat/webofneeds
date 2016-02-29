@@ -422,6 +422,7 @@ const rdfstore = window.rdfstore;
 
     var getReadUpdateLocksPerUris = function(uris){
         var locks = [];
+        console.log("uris",uris);
         uris.map(
             function(uri){
                 locks.push(getReadUpdateLockPerUri(uri));
@@ -1551,6 +1552,7 @@ const rdfstore = window.rdfstore;
      * @return {*}
      */
     won.urisToLookupMap = function(uris, asyncLookupFunction) {
+        console.log("urisToLookupMap uris", uris);
         const asyncLookups = uris.map(uri => asyncLookupFunction(uri));
         return Promise.all(asyncLookups).then( dataObjects => {
             const lookupMap = {};

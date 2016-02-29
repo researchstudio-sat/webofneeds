@@ -93,6 +93,21 @@ export function messagesSuccessResponseMessageReceived(event) {
             if (!isSuccessMessage(event)) {
                 console.log(event)
             }
+        } else if (event.isResponseToMessageType === won.WONMSG.closeNeedMessageCompacted) {
+            console.log("got response for DEACTIVATE: "+ event.hasMessageType);
+            let eventUri = null;
+            let receiverUri = null;
+            let isRemoteResponse = false;
+            //TODO maybe refactor these response message handling
+            if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
+                console.log("messages waitingForAnswer",event);
+                eventUri = event.isRemoteResponseTo;
+                dispatch(actionCreators.connections__denied(event));
+            }
+
+            if (!isSuccessMessage(event)) {
+                console.log(event)
+            }
         }
     }
 }

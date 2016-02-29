@@ -53,6 +53,7 @@ import { hierarchy2Creators } from './action-utils';
 import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import {
     buildCreateMessage,
+    buildCloseNeedMessage
 } from '../won-message-utils';
 
 // </utils>
@@ -297,19 +298,17 @@ export function needsOpen(needData) {
 export function needsClose(needData) {
     return (dispatch, getState) => {
         const state = getState();
-        //TODO: IMPLEMENT ME
-        /*const eventData = selectAllByConnections(state).get(connectionData.connection.uri).toJS();// TODO avoid toJS
-        //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
+        console.log("need data",needData);
+
         let messageData = null;
-        let deferred = Q.defer()
-        won.getConnection(eventData.connection.uri).then(connection=> {
-            let msgToOpenFor = {event: eventData, connection: connection}
-            buildCloseMessage(msgToOpenFor).then(messageData=> {
-                deferred.resolve(messageData);
-            })
-        })
+        let deferred = Q.defer();
+
+        buildCloseNeedMessage(needData.uri).then(messageData=> {
+            deferred.resolve(messageData);
+        });
+
         deferred.promise.then((action)=> {
             dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
-        })*/
+        })
     }
 }

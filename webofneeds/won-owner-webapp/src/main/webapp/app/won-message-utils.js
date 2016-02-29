@@ -109,7 +109,31 @@ export function buildCloseMessage(msgToConnectFor){
     return deferred.promise;
 
 }
+export function buildCloseNeedMessage(needUri){
+    let deferred = Q.defer();
 
+    var buildMessage = function(envelopeData) {
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+        var message = new won.MessageBuilder(won.WONMSG.closeNeedMessage)
+            .eventURI(eventUri)
+            //.hasReceiverNode(privateData.defaultWonNodeUri) //TODO: NODE URI
+            .hasOwnerDirection()
+            .hasSentTimestamp(new Date().getTime())
+            .forEnvelopeData(envelopeData)
+            .build();
+
+        return {eventUri: eventUri, message: message};
+    };
+
+    won.getEnvelopeDataForNeed(needUri)
+        .then(function(envelopeData){
+            deferred.resolve(buildMessage(envelopeData))
+        },
+        won.reportError("cannot close need "+ needUri)
+    );
+
+    return deferred.promise;
+}
 
 export function buildConnectMessage(msgToConnectFor, textMessage){
     let deferred = Q.defer();
