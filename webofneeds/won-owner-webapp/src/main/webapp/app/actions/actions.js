@@ -298,7 +298,6 @@ export function needsOpen(needData) {
 export function needsClose(needData) {
     return (dispatch, getState) => {
         const state = getState();
-        console.log("need data",needData);
 
         let messageData = null;
         const messageDataPromise = buildCloseNeedMessage(
