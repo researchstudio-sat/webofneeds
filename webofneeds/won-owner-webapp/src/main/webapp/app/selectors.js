@@ -30,7 +30,7 @@ export const selectUnreadEventsRework = createSelector(
  * @deprecated
  * @param state
  */
-export const selectUnreadEvents = state => state.getIn(['events', 'unreadEvents']);
+export const selectUnreadEvents = state => state.getIn(['events', 'unreadEventUris']);
 
 //const selectUnreadEvents = state => state.getIn(['events', 'unreadEventUris']);
 

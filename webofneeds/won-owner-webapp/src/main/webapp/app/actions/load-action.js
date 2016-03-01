@@ -10,7 +10,8 @@ import {
     checkHttpStatus,
     entries,
     flatten,
-    flattenObj
+    flattenObj,
+    urisToLookupMap
 } from '../utils';
 
 
@@ -24,10 +25,14 @@ export const loadAction = () => dispatch => {
         credentials: 'include'
     })
     .then(checkHttpStatus)
-    .then(response => response.json())
-    .then(needUris => fetchAllAccessibleAndRelevantData(needUris))
-    .then(allThatData => Immutable.fromJS(allThatData)) //!!!
-    .then(allThatData => dispatch({type: actionTypes.load, payload: allThatData}))
+    .then(response =>
+            response.json())
+    .then(needUris =>
+            fetchAllAccessibleAndRelevantData(needUris))
+    .then(allThatData =>
+            Immutable.fromJS(allThatData)) //!!!
+    .then(allThatData =>
+            dispatch({type: actionTypes.load, payload: allThatData}))
     .catch(error => dispatch(actionCreators.needs__failed({
                 error: "user needlist retrieval failed"
             })
@@ -35,21 +40,25 @@ export const loadAction = () => dispatch => {
     );
 }
 
+window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
 function fetchAllAccessibleAndRelevantData(ownNeedUris) {
 
-    const allOwnNeedsPromise = won.urisToLookupMap(ownNeedUris,
+    window.urisToLookupMap4dbg = urisToLookupMap;
+    const allOwnNeedsPromise = urisToLookupMap(ownNeedUris,
         won.getNeedWithConnectionUris);
 
     const allConnectionUrisPromise =
         Promise.all(ownNeedUris.map(won.getconnectionUrisOfNeed))
-        .then(connectionUrisPerNeed => flatten(connectionUrisPerNeed));
+        .then(connectionUrisPerNeed =>
+                flatten(connectionUrisPerNeed));
 
     const allConnectionsPromise = allConnectionUrisPromise
-        .then(connectionUris => won.urisToLookupMap(connectionUris, won.getConnection));
+        .then(connectionUris =>
+            urisToLookupMap(connectionUris, won.getConnection));
 
     const allEventsPromise = allConnectionUrisPromise
         .then(connectionUris =>
-           won.urisToLookupMap(connectionUris, connectionUri =>
+           urisToLookupMap(connectionUris, connectionUri =>
                won.getConnection(connectionUri)
                .then(connection =>
                        won.getEventsOfConnection(connectionUri,connection.belongsToNeed)
@@ -68,7 +77,8 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris) {
             }
             return theirNeedUris;
         })
-        .then(theirNeedUris => won.urisToLookupMap(theirNeedUris, won.getNeed));
+        .then(theirNeedUris =>
+                urisToLookupMap(theirNeedUris, won.getNeed));
 
     return Promise.all([
         allOwnNeedsPromise,
