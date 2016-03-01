@@ -275,7 +275,7 @@ export const messageTypeToEventType = deepFreeze({
     [won.WONMSG.errorMessageCompacted] : {eventType: won.EVENT.NOT_TRANSMITTED }
 });
 
-export function needsOpen(needData) {
+export function needsOpen(needUri) {
     return (dispatch, getState) => {
         const state = getState();
         //TODO: IMPLEMENT ME
@@ -295,27 +295,29 @@ export function needsOpen(needData) {
     }
 }
 
-export function needsClose(needData) {
+export function needsClose(needUri) {
     return (dispatch, getState) => {
-        const state = getState();
-
-        let messageData = null;
-        const messageDataPromise = buildCloseNeedMessage(
-            needData.uri,
-            state.getIn(['config', 'defaultNodeUri'])
-        );
-
-        messageDataPromise.then((data)=> {
+        buildCloseNeedMessage(
+            needUri,
+            getState().getIn(['config', 'defaultNodeUri'])
+        )
+        .then((data)=> {
             console.log(data);
             dispatch(actionCreators.messages__send({
                 eventUri: data.eventUri,
                 message: data.message
             }));
-        });
-        //TODO stopped here
-
-        return messageDataPromise;
-
+        })
+        .then(() =>
+            // assume close went through successfully, update GUI
+            dispatch({
+                type: actionTypes.needs.close,
+                payload: needUri
+            })
+        )
+        .then(() =>
+            // go back to overview
+            dispatch(actionCreators.router__stateGo('overviewPosts'))
+        )
     }
-
 }
