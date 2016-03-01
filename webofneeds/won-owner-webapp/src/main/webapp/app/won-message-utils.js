@@ -110,9 +110,7 @@ export function buildCloseMessage(msgToConnectFor){
 
 }
 export function buildCloseNeedMessage(needUri, wonNodeUri){
-    let deferred = Q.defer();
-
-    var buildMessage = function(envelopeData) {
+    const buildMessage = function(envelopeData) {
         var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
         var message = new won.MessageBuilder(won.WONMSG.closeNeedMessage)
             .eventURI(eventUri)
@@ -125,13 +123,11 @@ export function buildCloseNeedMessage(needUri, wonNodeUri){
         return {eventUri: eventUri, message: message};
     };
 
-    won.getEnvelopeDataForNeed(needUri)
+    return won.getEnvelopeDataForNeed(needUri)
         .then(
             envelopeData => buildMessage(envelopeData),
             err => won.reportError("cannot close need "+ needUri)
         );
-
-    return deferred.promise;
 }
 
 export function buildConnectMessage(msgToConnectFor, textMessage){
