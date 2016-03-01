@@ -19,7 +19,8 @@
  */
 import {
     checkHttpStatus,
-    entries
+    entries,
+    urisToLookupMap
 } from '../utils';
 import * as q from 'q';
 
@@ -915,7 +916,6 @@ const rdfstore = window.rdfstore;
         won.getconnectionUrisOfNeed(needUri)
         .then(connectionUris => won.getNodes(connectionUris))
 
-
     /**
      * Loads all URIs of a need's connections.
      * @deprecated possible duplicate of `won.getConnectionsWithOwnNeed` (see there)
@@ -1039,7 +1039,7 @@ const rdfstore = window.rdfstore;
      */
     won.getEventsOfConnection = function(connectionUri, requesterWebId) {
         return won.getEventUrisOfConnection(connectionUri, requesterWebId)
-            .then(eventUris => won.urisToLookupMap(eventUris,
+            .then(eventUris => urisToLookupMap(eventUris,
                     eventUri => won.getNode(eventUri, requesterWebId))
             )
     };
@@ -1324,7 +1324,7 @@ const rdfstore = window.rdfstore;
      * @param requesterWebId map/object of (uri -> node's data)
      */
     won.getNodes = function(uris, requesterWebId) {
-        return won.urisToLookupMap(uris, uri => won.getNode(uri, requesterWebId));
+        return urisToLookupMap(uris, uri => won.getNode(uri, requesterWebId));
     };
 
     /**
@@ -1539,27 +1539,6 @@ const rdfstore = window.rdfstore;
             return Q.all(promises)
         })
 
-    }
-
-
-    /**
-     * Takes an array of uris, performs the lookup function on each
-     * of them seperately, collects the results and builds an map/object
-     * with the uris as keys and the results as values.
-     * @param uris
-     * @param asyncLookupFunction
-     * @return {*}
-     */
-    won.urisToLookupMap = function(uris, asyncLookupFunction) {
-        const asyncLookups = uris.map(uri => asyncLookupFunction(uri));
-        return Promise.all(asyncLookups).then( dataObjects => {
-            const lookupMap = {};
-            //make sure there's the same
-            for (let i = 0; i < uris.length; i++) {
-                lookupMap[uris[i]] = dataObjects[i];
-            }
-            return lookupMap;
-        });
     }
 
     /**

@@ -701,7 +701,7 @@
             return null;
         },
         addDataToNode: function(data, graphName, nodeId, predicate, object){
-            var node = getNodeInGraph(data, graphName, nodeId);
+            var node = this.getNodeInGraph(data, graphName, nodeId);
             if (node != null) {
                 node[predicate] = object;
             }

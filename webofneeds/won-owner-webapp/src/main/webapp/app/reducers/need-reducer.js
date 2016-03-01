@@ -14,6 +14,7 @@ const initialState = Immutable.fromJS({
     didInvalidate: false,
     ownNeeds: {},
     theirNeeds: {},
+    errors: []
 });
 
 export default function(allNeeds = initialState, action = {}) {
@@ -23,7 +24,7 @@ export default function(allNeeds = initialState, action = {}) {
 
         case actionTypes.needs.failed:
             console.log('reducers.js: failed receive needlist action');
-            return Immutable.fromJS({error: action.payload.error});
+            return allNeeds.update('errors', errors => errors.push(action.payload.error));
 
         case actionTypes.load:
             const ownNeeds = action.payload.get('ownNeeds');
