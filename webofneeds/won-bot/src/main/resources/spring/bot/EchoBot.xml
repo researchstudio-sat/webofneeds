@@ -21,6 +21,8 @@
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
 
     <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.EchoBot">
+        <!-- optional property, by default one echo need per each need will be created -->
+        <property name="numberOfEchoNeedsPerNeed" value="3" />
         <property name="taskScheduler" ref="taskScheduler" />
         <!--property name="needProducer" ref="needProducerFromMails" /-->
         <!--property name="nodeURISource" ref="nodeUriSourceRandom" /-->
