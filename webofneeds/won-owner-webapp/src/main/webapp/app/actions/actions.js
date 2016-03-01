@@ -305,12 +305,14 @@ export function needsClose(needData) {
             state.getIn(['config', 'defaultNodeUri'])
         );
 
-        messageDataPromise.then((action)=> {
+        messageDataPromise.then((data)=> {
+            console.log(data);
             dispatch(actionCreators.messages__send({
-                eventUri: action.eventUri,
-                message: action.message
+                eventUri: data.eventUri,
+                message: data.message
             }));
         });
+        //TODO stopped here
 
         return messageDataPromise;
 

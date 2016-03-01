@@ -792,6 +792,7 @@ const rdfstore = window.rdfstore;
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getWonNodeUriOfNeed: needUri must not be null"};
         }
+        //return won.getNode(needUri).then(need => need[won.WON.hasWonNode]);
         return won.getUniqueObjectOfProperty(needUri, won.WON.hasWonNode)
             .then(
                 function(result){return result;},
