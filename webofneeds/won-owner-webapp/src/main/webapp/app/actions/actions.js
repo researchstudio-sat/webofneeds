@@ -301,14 +301,20 @@ export function needsClose(needData) {
         console.log("need data",needData);
 
         let messageData = null;
-        let deferred = Q.defer();
+        const messageDataPromise = buildCloseNeedMessage(
+            needData.uri,
+            state.getIn(['config', 'defaultNodeUri'])
+        );
 
-        buildCloseNeedMessage(needData.uri).then(messageData=> {
-            deferred.resolve(messageData);
+        messageDataPromise.then((action)=> {
+            dispatch(actionCreators.messages__send({
+                eventUri: action.eventUri,
+                message: action.message
+            }));
         });
 
-        deferred.promise.then((action)=> {
-            dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
-        })
+        return messageDataPromise;
+
     }
+
 }
