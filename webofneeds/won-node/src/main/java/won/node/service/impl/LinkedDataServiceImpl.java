@@ -331,7 +331,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     throws NoSuchNeedException, NoSuchConnectionException {
     List<URI> uris = new ArrayList<URI>(needInformationService.listConnectionURIs(needURI));
     NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
-      this.connectionResourceURIPrefix+"/", new SliceImpl<URI>(uris));
+      this.uriService.createConnectionsURIForNeed(needURI).toString(), new SliceImpl<URI>(uris));
     if (deep) {
       addDeepConnectionData(containerPage.getContent(), uris);
     }
@@ -345,7 +345,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     throws NoSuchNeedException, NoSuchConnectionException {
     Slice<URI> slice = needInformationService.listConnectionURIs(needURI, page, preferredSize, messageType, timeSpot);
     NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
-      needURI.toString() + "/connections/", slice);
+      this.uriService.createConnectionsURIForNeed(needURI).toString(), slice);
     if (deep) {
       addDeepConnectionData(containerPage.getContent(), slice.getContent());
     }
@@ -359,7 +359,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Slice<URI> slice = needInformationService.listConnectionURIsBefore(
       needURI, beforeEventURI, preferredSize, messageType, timeSpot);
     NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
-      needURI.toString() + "/connections/", slice);
+      this.uriService.createConnectionsURIForNeed(needURI).toString(), slice);
     if (deep) {
       addDeepConnectionData(containerPage.getContent(), slice.getContent());
     }
@@ -373,7 +373,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Slice<URI> slice = needInformationService.listConnectionURIsAfter(
       needURI, resumeConnURI, preferredSize, messageType, timeSpot);
     NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
-      needURI.toString() + "/connections/", slice);
+      this.uriService.createConnectionsURIForNeed(needURI).toString(), slice);
     if (deep) {
       addDeepConnectionData(containerPage.getContent(), slice.getContent());
     }
@@ -409,7 +409,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   {
     Slice<URI> slice = needInformationService.listConnectionEventURIs(connectionUri, pageNum,
                                                                       preferedSize, msgType);
-    return toContainerPage(connectionUri.toString() + "/events", slice);
+    return toContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice);
   }
 
   @Override
@@ -419,7 +419,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   {
     Slice<URI> slice = needInformationService.listConnectionEventURIsAfter(
       connectionUri, msgURI, preferedSize, msgType);
-    return toContainerPage(connectionUri.toString() + "/events", slice);
+    return toContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice);
   }
 
   @Override
@@ -430,7 +430,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     Slice<URI> slice = needInformationService.listConnectionEventURIsBefore(
       connectionUri, msgURI, preferedSize, msgType);
-    return toContainerPage(connectionUri.toString() + "/events", slice);
+    return toContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice);
 
   }
 

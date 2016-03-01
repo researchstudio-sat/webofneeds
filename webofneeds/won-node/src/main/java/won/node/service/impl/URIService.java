@@ -109,6 +109,14 @@ public class URIService
     return URI.create(needResourceURIPrefix.toString() + "/" + id);
   }
 
+  public URI createConnectionsURIForNeed(URI needURI) {
+    return URI.create(needURI.toString() + "/connections/");
+  }
+
+  public URI createEventsURIForConnection(URI connURI) {
+    return URI.create(connURI.toString() + "/events/");
+  }
+
   public URI createConnectionURIForId(String id) {
     return URI.create(connectionResourceURIPrefix.toString() + "/"   + id);
   }

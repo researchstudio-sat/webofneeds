@@ -206,7 +206,9 @@ docker -H satsrv06:2375 stop need_creator_bot_int || echo 'No docker container f
 docker -H satsrv06:2375 rm need_creator_bot_int || echo 'No docker container found to remove with name: need_creator_bot_int'
 docker -H satsrv06:2375 stop echo_bot_int || echo 'No docker container found to stop with name: echo_bot_int'
 docker -H satsrv06:2375 rm echo_bot_int || echo 'No docker container found to remove with name: echo_bot_int'
-docker -H satsrv06:2375 run --name=echo_bot_int -d \
+docker -H satsrv06:2375 stop debug_bot_int || echo 'No docker container found to stop with name: debug_bot_int'
+docker -H satsrv06:2375 rm debug_bot_int || echo 'No docker container found to remove with name: debug_bot_int'
+docker -H satsrv06:2375 run --name=debug_bot_int -d \
 -e "node.default.host=satsrv04.researchstudio.at" -e "node.default.http.port=8889" \
 -e "won.node.uris=https://satsrv04.researchstudio.at:8889/won/resource https://satsrv05.researchstudio.at:8889/won/resource" \
 -p 9013:9013 \

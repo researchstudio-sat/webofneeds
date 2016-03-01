@@ -915,67 +915,17 @@ const rdfstore = window.rdfstore;
      * @return {*} the data of all connection-nodes referenced by that need
      */
     won.getConnectionsOfNeed = (needUri) =>
-        won.getconnectionUrisOfNeed(needUri)
+        won.getConnectionUrisOfNeed(needUri)
         .then(connectionUris => won.getNodes(connectionUris))
 
-    /**
+    won.getconnectionUrisOfNeed =
+    /*
      * Loads all URIs of a need's connections.
-     * @deprecated possible duplicate of `won.getConnectionsWithOwnNeed` (see there)
      */
-    won.getconnectionUrisOfNeed = function(needUri) {
-        if (typeof needUri === 'undefined' || needUri == null  ){
-            throw {message : "getconnectionUrisOfNeed: uri must not be null"};
-        }
-        return won.ensureLoaded(needUri).then(
-            function(){
-                var lock = getReadUpdateLockPerUri(needUri);
-                return lock.acquireReadLock().then(
-                    function() {
-                        try {
-                            var subject = needUri;
-                            var predicate = won.WON.hasConnections;
-                            var connectionsPromises = [];
-                            privateData.store.node(needUri, function (success, graph) {
-                                var resultGraph = graph.match(subject, predicate, null);
-                                if (resultGraph != null && resultGraph.length > 0) {
-                                    for (key in resultGraph.triples) {
-                                        var connectionsURI = resultGraph.triples[key].object.nominalValue;
-                                        //TODO: here, we fetch, but if we knew that the connections container didn't change
-                                        //we could just ensureLoaded. See https://github.com/researchstudio-sat/webofneeds/issues/109
-                                        connectionsPromises.push(won.ensureLoaded(connectionsURI).then(function (success) {
-                                            var connectionUris = [];
-                                            privateData.store.node(connectionsURI, function (success, graph) {
-                                                if (graph != null && graph.length > 0) {
-                                                    var memberTriples = graph.match(connectionsURI, createNameNodeInStore("rdfs:member"), null);
-                                                    for (var memberKey in memberTriples.triples) {
-                                                        var member = memberTriples.triples[memberKey].object.nominalValue;
-                                                        connectionUris.push(member);
-                                                    }
-                                                }
-                                            });
-                                            return connectionUris;
-                                        }));
-                                    }
-                                }
-                            });
-                            return q.all(connectionsPromises)
-                                .then(function (listOfLists) {
-                                    //for each hasConnections triple (should only be one, but hey) we get a list of connections.
-                                    //now flatten the list.
-                                    var merged = [];
-                                    merged = merged.concat.apply(merged, listOfLists);
-                                    return merged;
-                                });
-                        } catch (e) {
-                            q.reject("could not get connection URIs of need + " + needUri + ". Reason:" + e);
-                        } finally {
-                            lock.releaseReadLock();
-                        }
-                    }
-                )
-            });
-
-    }
+    won.getConnectionUrisOfNeed = (needUri) =>
+        won.getNode(needUri)
+            .then(need => won.getNode(need.hasConnections))
+            .then(connectionContainer => connectionContainer.member)
 
     /**
      *
