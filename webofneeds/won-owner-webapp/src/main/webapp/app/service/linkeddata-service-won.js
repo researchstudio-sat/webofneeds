@@ -1403,9 +1403,7 @@ const rdfstore = window.rdfstore;
                                 resolve(entireGraph.triples.filter(t => t.subject.nominalValue === uri))
                             })
                         } else {
-                            //graph.triples[0].object.nominalValue
-                            //graph.triples[0].subject.nominalValue
-                            //graph.triples[0].predicate.nominalValue
+                            //.node(...) was successful. return the node's tripples
                             resolve(graph.triples);
                         }
                     })
