@@ -20,99 +20,103 @@ import {
     isSuccessMessage
 } from '../won-message-utils';
 
-export function messagesSuccessResponseMessageReceived(event) {
+export function successfulCloseNeed(event) {
     return (dispatch, getState) => {
-        const state = getState()
-        console.log('received response to ', event.isResponseTo, ' of ', event);
-        console.log("responseType",event.isResponseToMessageType);
-        //TODO do all of this in actions.js?
-        if (event.isResponseToMessageType === won.WONMSG.createMessageCompacted) {
-            console.log("got response for CREATE: " + event.hasMessageType);
-            //TODO: if negative, use alternative need URI and send again
-            //fetch need data and store in local RDF store
-            //get URI of newly created need from message
+        const state = getState();
+        console.log("got response for DEACTIVATE: " + event.hasMessageType);
+        let eventUri = null;
+        let receiverUri = null;
+        let isRemoteResponse = false;
+        //TODO maybe refactor these response message handling
+        if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
+            console.log("messages waitingForAnswer", event);
+            eventUri = event.isRemoteResponseTo;
+            dispatch(actionCreators.connections__denied(event));
+        }
 
-            //load the data into the local rdf store and publish NeedCreatedEvent when done
-            var needURI = event.hasReceiverNeed;
-            won.ensureLoaded(needURI)
-                .then(
-                function (value) {
-                    var eventData = won.clone(event);
-                    eventData.eventType = won.EVENT.NEED_CREATED;
-                    setCommStateFromResponseForLocalNeedMessage(eventData);
-                    eventData.needURI = needURI;
-                    won.getNeed(needURI)
-                        .then(function (need) {
+        if (!isSuccessMessage(event)) {
+            console.log(event)
+        }
+    }
+}
+export function successfulClose(event) {
+    return (dispatch, getState) => {
+        const state = getState();
+        console.log("got response for CLOSE: " + event.hasMessageType);
+        let eventUri = null;
+        let receiverUri = null;
+        let isRemoteResponse = false;
+        //TODO maybe refactor these response message handling
+        if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
+            console.log("messages waitingForAnswer", event);
+            eventUri = event.isRemoteResponseTo;
+            dispatch(actionCreators.connections__denied(event));
+        }
 
-                            console.log("Dispatching action " + won.EVENT.NEED_CREATED);
-                            dispatch(actionCreators.drafts__publishSuccessful({
-                                publishEventUri: event.isResponseTo,
-                                needUri: event.hasSenderNeed,
-                                eventData: eventData
-                            }));
-                            dispatch(actionCreators.needs__received(need));
-                            //deferred.resolve(needURI);
-                        });
-                });
-
-            // dispatch routing change
-            //TODO back-button doesn't work for returning to the draft
-            //TODO instead of going to the feed, this should go back to where the user was before starting the creation process.
-            dispatch(actionCreators.router__stateGo('feed'));
-
-            //TODO add to own needs
-            //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
-
-        } else if (event.isResponseToMessageType === won.WONMSG.openMessageCompacted) {
-            console.log("got response for OPEN: " + event.hasMessageType);
-            let eventUri = null;
-            let receiverUri = null;
-            let isRemoteResponse = false;
-            //TODO maybe refactor these response message handling
-            if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
-                console.log("messages waitingForAnswer",event);
-                eventUri = event.isRemoteResponseTo;
-                dispatch(actionCreators.connections__accepted(event));
-            }
-
-            if (!isSuccessMessage(event)) {
-                console.log(event)
-            }
-        } else if (event.isResponseToMessageType === won.WONMSG.closeMessageCompacted) {
-            console.log("got response for CLOSE: " + event.hasMessageType);
-            let eventUri = null;
-            let receiverUri = null;
-            let isRemoteResponse = false;
-            //TODO maybe refactor these response message handling
-            if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
-                console.log("messages waitingForAnswer",event);
-                eventUri = event.isRemoteResponseTo;
-                dispatch(actionCreators.connections__denied(event));
-            }
-
-            if (!isSuccessMessage(event)) {
-                console.log(event)
-            }
-        } else if (event.isResponseToMessageType === won.WONMSG.closeNeedMessageCompacted) {
-            console.log("got response for DEACTIVATE: "+ event.hasMessageType);
-            let eventUri = null;
-            let receiverUri = null;
-            let isRemoteResponse = false;
-            //TODO maybe refactor these response message handling
-            if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
-                console.log("messages waitingForAnswer",event);
-                eventUri = event.isRemoteResponseTo;
-                dispatch(actionCreators.connections__denied(event));
-            }
-
-            if (!isSuccessMessage(event)) {
-                console.log(event)
-            }
+        if (!isSuccessMessage(event)) {
+            console.log(event)
         }
     }
 }
 
-export function messagesConnectMessageReceived(data) {
+export function successfulOpen(event){
+    return (dispatch, getState) => {
+        const state = getState();
+        console.log("got response for OPEN: " + event.hasMessageType);
+        let eventUri = null;
+        let receiverUri = null;
+        let isRemoteResponse = false;
+        //TODO maybe refactor these response message handling
+        if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
+            console.log("messages waitingForAnswer", event);
+            eventUri = event.isRemoteResponseTo;
+            dispatch(actionCreators.connections__accepted(event));
+        }
+
+        if (!isSuccessMessage(event)) {
+            console.log(event)
+        }
+    }
+}
+
+export function successfulCreate(event) {
+    return (dispatch) => {
+        //const state = getState();
+        console.log("got response for CREATE: " + event.hasMessageType);
+        //TODO: if negative, use alternative need URI and send again
+        //fetch need data and store in local RDF store
+        //get URI of newly created need from message
+
+        //load the data into the local rdf store and publish NeedCreatedEvent when done
+        var needURI = event.hasReceiverNeed;
+        won.ensureLoaded(needURI)
+            .then(() => {
+                var eventData = won.clone(event);
+                eventData.eventType = won.EVENT.NEED_CREATED;
+                setCommStateFromResponseForLocalNeedMessage(eventData);
+                eventData.needURI = needURI;
+                won.getNeed(needURI).then((need) => {
+                    console.log("Dispatching action " + won.EVENT.NEED_CREATED);
+                    dispatch(actionCreators.drafts__publishSuccessful({
+                        publishEventUri: event.isResponseTo,
+                        needUri: event.hasSenderNeed,
+                        eventData: eventData
+                    }));
+                    dispatch(actionCreators.needs__received(need));
+                });
+            });
+
+        // dispatch routing change
+        //TODO back-button doesn't work for returning to the draft
+        //TODO instead of going to the feed, this should go back to where the user was before starting the creation process.
+        dispatch(actionCreators.router__stateGo('feed'));
+
+        //TODO add to own needs
+        //  linkeddataservice.crawl(event.hasSenderNeed) //agents shouldn't directyl communicate with each other, should they?
+    }
+}
+
+export function connectMessageReceived(data) {
     return dispatch=> {
         data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
         //TODO data.hasReceiver, the connectionUri is undefined in the response message
@@ -134,7 +138,7 @@ export function messagesConnectMessageReceived(data) {
     }
 }
 
-export function messagesHintMessageReceived(data) {
+export function hintMessageReceived(data) {
     return dispatch=> {
         data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
         won.invalidateCacheForNewConnection(data.hasReceiver, data.hasReceiverNeed)

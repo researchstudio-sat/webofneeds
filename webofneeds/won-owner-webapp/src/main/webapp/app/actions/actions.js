@@ -66,11 +66,7 @@ import {
     accountRegister,
     accountVerifyLogin
 } from './account-actions';
-import {
-    messagesConnectMessageReceived,
-    messagesHintMessageReceived,
-    messagesSuccessResponseMessageReceived
-} from './messages-actions';
+
 import {
     connectionsClose,
     connectionsConnect,
@@ -79,6 +75,8 @@ import {
     connectionsOpen,
     connectionsRate
 } from './connections-actions';
+
+import * as messages from './messages-actions';
 
 import { loadAction, retrieveNeedUris, configInit, needsFetch } from './load-action';
 import { matchesLoad } from './matches-actions';
@@ -154,17 +152,37 @@ const actionHierarchy = {
         openPostsView:INJ_DEFAULT
     },
 
+    /**
+     * Server triggered interactions
+     */
     messages: { /* websocket messages, e.g. post-creation, chatting */
-        send: INJ_DEFAULT,
+        send: INJ_DEFAULT, //TODO this should be part of proper, user-story-level actions (e.g. need.publish or sendCnctMsg)
+
+        create: {
+            success: messages.successfulCreate,
+            //failure: messages.failedCreate
+        },
+        open: {
+            success: messages.successfulOpen,
+            //failure: messages.failedOpen
+        },
+        close: {
+            success: messages.successfulClose,
+            //failure: messages.failedClose
+        },
+        closeNeed: {
+            success: messages.successfulCloseNeed,
+            //failure: messages.failedCloseNeed
+        },
+        connectMessageReceived: messages.connectMessageReceived,
+        hintMessageReceived: messages.hintMessageReceived,
+
         waitingForAnswer: INJ_DEFAULT,
         /**
          * TODO this action is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
          */
         requestWsReset_Hack: INJ_DEFAULT,
-        successResponseMessageReceived: messagesSuccessResponseMessageReceived,
-        connectMessageReceived: messagesConnectMessageReceived,
-        hintMessageReceived: messagesHintMessageReceived,
     },
     verifyLogin: accountVerifyLogin,
     login: accountLogin,
