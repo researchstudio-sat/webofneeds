@@ -9,50 +9,51 @@ import { combineReducersStable } from '../redux-utils';
 import { buildCreateMessage } from '../won-message-utils';
 import won from '../won-es6';
 
-const initialState = Immutable.fromJS({})
-export default function(state = initialState, action = {}) {
+const initialState = Immutable.fromJS({});
+
+export default function(connections = initialState, action = {}) {
     switch(action.type) {
         case actionTypes.messages.closeNeed.failed:
         case actionTypes.load:
             const allPreviousConnections = action.payload.get('connections');
-            return state.merge(allPreviousConnections);
+            return connections.merge(allPreviousConnections);
 
         case actionTypes.connections.accepted:
             const acceptEvent = action.payload;
             const acceptConnectionUri = acceptEvent.hasReceiver;
-            return state.setIn([acceptConnectionUri, 'hasConnectionState'], won.WON.Connected);
+            return connections.setIn([acceptConnectionUri, 'hasConnectionState'], won.WON.Connected);
 
         case actionTypes.needs.received:
             const connectionUris = action.payload.affectedConnections
             if (!connectionUris){
-                return state;
+                return connections;
             } else {
                 return connectionUris.reduce((updatedConnections, connectionUri) =>
                     updatedConnections.setIn([connectionUri, 'hasConnectionState'], won.WON.Closed),
-                    state
+                    connections
                 )
             }
 
         case actionTypes.messages.close.success:
             const deniedEvent = action.payload;
             const deniedConnectionUri = deniedEvent.hasReceiver;
-            return state.setIn([deniedConnectionUri, 'hasConnectionState'], won.WON.Closed);
+            return connections.setIn([deniedConnectionUri, 'hasConnectionState'], won.WON.Closed);
 
         case actionTypes.connections.load:
             return action.payload.reduce(
                 (updatedState, connectionWithRelatedData) =>
                     storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
-                state);
+                connections);
 
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
-            return storeConnectionAndRelatedData(state, action.payload);
+            return storeConnectionAndRelatedData(connections, action.payload);
 
         case actionTypes.connections.reset:
             return initialState;
 
         default:
-            return state;
+            return connections;
     }
 }
 function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
