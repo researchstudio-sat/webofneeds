@@ -35,7 +35,7 @@
     that https://www.google.com/settings/security/lesssecureapps is turned on.
     Change this confuguration if another mail server should be used -->
     <bean id="springMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="${email.from.won.smtp.host"/>
+        <property name="host" value="${email.from.won.smtp.host}"/>
         <property name="port" value="587" />
         <property name="username" value="${email.from.won.user}" />
         <property name="password" value="${email.from.won.password}" />
