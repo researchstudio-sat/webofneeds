@@ -66,6 +66,9 @@ docker -H satcluster01:2375 run --name=wonnode_ma -d -e "uri.host=satcluster01.r
 -e "JMEM_OPTS=-Xmx400m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/wonnode:master
 
+# expect OWNER won-mail-sender host, user and password (i.e. configuration for no-replay won-owner-app-email-account) be
+# set as environment variables, e.g. MAIL_USER=changeuser MAIL_PASS=changepass MAIL_HOST=smtp.changehost.com
+echo ${MAIL_USER} at ${MAIL_HOST} is used as owner no-replay won-owner-app-email-account
 
 # owner
 docker -H satcluster01:2375 stop owner_ma || echo 'No docker container found to stop with name: owner_ma'
@@ -73,6 +76,7 @@ docker -H satcluster01:2375 rm owner_ma || echo 'No docker container found to re
 docker -H satcluster01:2375 run --name=owner_ma -d -e "node.default.host=satcluster01.researchstudio.at" \
 -e "node.default.http.port=8889" -p 8082:8443 \
 -e "uri.host=satcluster01.researchstudio.at" -e "http.port=8082" \
+-e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/owner_ma:/usr/local/tomcat/won/client-certs/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
