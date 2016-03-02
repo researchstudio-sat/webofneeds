@@ -400,17 +400,15 @@ const rdfstore = window.rdfstore;
         if (connectionUri != null) {
             cacheItemMarkDirty(connectionUri);
         }
-        return q.when(true); //return a promise for chaining
+        return Promise.resolve(true); //return a promise for chaining
     }
     won.invalidateCacheForNeed = function(needUri){
         if (needUri != null) {
             cacheItemMarkDirty(needUri);
             cacheItemMarkDirty(needUri+'/connections/')
         }
-        return q.when(true); //return a promise for chaining
+        return Promise.resolve(true); //return a promise for chaining
     }
-
-
 
     var getReadUpdateLockPerUri = function(uri){
         var lock = privateData.readUpdateLocksPerUri[uri];

@@ -12,6 +12,7 @@ import won from '../won-es6';
 const initialState = Immutable.fromJS({})
 export default function(state = initialState, action = {}) {
     switch(action.type) {
+        case actionTypes.messages.closeNeed.failed:
         case actionTypes.load:
             const allPreviousConnections = action.payload.get('connections');
             return state.merge(allPreviousConnections);
@@ -21,7 +22,18 @@ export default function(state = initialState, action = {}) {
             const acceptConnectionUri = acceptEvent.hasReceiver;
             return state.setIn([acceptConnectionUri, 'hasConnectionState'], won.WON.Connected);
 
-        case actionTypes.connections.denied:
+        case actionTypes.needs.received:
+            const connectionUris = action.payload.affectedConnections
+            if (!connectionUris){
+                return state;
+            } else {
+                return connectionUris.reduce((updatedConnections, connectionUri) =>
+                    updatedConnections.setIn([connectionUri, 'hasConnectionState'], won.WON.Closed),
+                    state
+                )
+            }
+
+        case actionTypes.messages.close.success:
             const deniedEvent = action.payload;
             const deniedConnectionUri = deniedEvent.hasReceiver;
             return state.setIn([deniedConnectionUri, 'hasConnectionState'], won.WON.Closed);

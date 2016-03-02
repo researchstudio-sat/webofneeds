@@ -7,6 +7,8 @@ import  won from '../won-es6';
 import { actionTypes, actionCreators, getConnectionRelatedData, messageTypeToEventType } from './actions';
 import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 
+import Immutable from 'immutable';
+
 import {
     checkHttpStatus,
 } from '../utils';
@@ -17,7 +19,8 @@ import {
     buildCloseMessage,
     buildRateMessage,
     buildConnectMessage,
-    isSuccessMessage
+    isSuccessMessage,
+    fetchAllAccessibleAndRelevantData
 } from '../won-message-utils';
 
 export function successfulCloseNeed(event) {
@@ -26,14 +29,55 @@ export function successfulCloseNeed(event) {
         //TODO maybe refactor these response message handling
         if (getState().getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
             console.log("messages waitingForAnswer", event);
-            dispatch(actionCreators.connections__denied(event));
+            //dispatch(actionCreators.connections__denied(event));
         }
     }
 }
 export function failedCloseNeed(event) {
     return (dispatch, getState) => {
+        const needUri = event.hasReceiverNeed;
+        won.invalidateCacheForNeed(needUri) // mark need and it's connection container dirty
+            .then(() =>
+                won.getConnectionUrisOfNeed(needUri)
+            ).then(connectionUris =>
+                Promise.all(
+                    connectionUris.map(cnctUri =>
+                        won.invalidateCacheForNewMessage(cnctUri, needUri) // mark connections dirty
+                    )
+                )
+            ).then(() =>
+                // as the need and it's connections have been marked dirty
+                // they will be reloaded on this action.
+                fetchAllAccessibleAndRelevantData([needUri])
+            ).then(allThatData =>
+                dispatch({
+                    type: actionTypes.messages.closeNeed.failed,
+                    payload: Immutable.fromJS(allThatData)
+                })
+            );
     }
 }
+
+        /*
+         hasReceiverNeed: "https://192.168.124.53:8443/won/resource/need/1741189480636743700"
+         hasSenderNeed: "https://192.168.124.53:8443/won/resource/need/1741189480636743700"
+         has....Connection
+         event.uri
+
+
+         won.WONMSG.hasReceiverNeed = won.WONMSG.baseUri + "hasReceiverNeed";
+         won.WONMSG.hasReceiverNeedCompacted = won.WONMSG.prefix + ":hasReceiverNeed";
+         won.WONMSG.hasReceiver = won.WONMSG.baseUri + "hasReceiver"; // connection if connection event
+         won.WONMSG.hasReceiverCompacted = won.WONMSG.prefix + ":hasReceiver";
+         won.WONMSG.hasReceiverNode = won.WONMSG.baseUri + "hasReceiverNode";
+         won.WONMSG.hasReceiverNodeCompacted = won.WONMSG.prefix + ":hasReceiverNode";
+         won.WONMSG.hasSenderNeed = won.WONMSG.baseUri + "hasSenderNeed";
+         won.WONMSG.hasSenderNeedCompacted = won.WONMSG.prefix + ":hasSenderNeed";
+         won.WONMSG.hasSender = won.WONMSG.baseUri + "hasSender";
+         won.WONMSG.hasSenderCompacted = won.WONMSG.prefix + ":hasSender";
+         won.WONMSG.hasSenderNode = won.WONMSG.baseUri + "hasSenderNode";
+         won.WONMSG.hasSenderNodeCompacted = won.WONMSG.prefix + ":hasSenderNode";
+         */
 
 export function successfulClose(event) {
     return (dispatch, getState) => {
@@ -46,7 +90,10 @@ export function successfulClose(event) {
         if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
             console.log("messages waitingForAnswer", event);
             eventUri = event.isRemoteResponseTo;
-            dispatch(actionCreators.connections__denied(event));
+            dispatch({
+                type: actionTypes.messages.close.success,
+                payload: event
+            });
         }
     }
 }

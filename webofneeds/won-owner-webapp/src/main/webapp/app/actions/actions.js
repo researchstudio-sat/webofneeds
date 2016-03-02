@@ -111,7 +111,6 @@ const actionHierarchy = {
         open: connectionsOpen,
         connect: connectionsConnect,
         accepted: INJ_DEFAULT,
-        denied: INJ_DEFAULT,
         close: connectionsClose,
         rate: connectionsRate,
         sendOpen:INJ_DEFAULT,
@@ -157,17 +156,23 @@ const actionHierarchy = {
      */
     messages: { /* websocket messages, e.g. post-creation, chatting */
         send: INJ_DEFAULT, //TODO this should be part of proper, user-story-level actions (e.g. need.publish or sendCnctMsg)
+
+        /*
+         * posting things to the server should be optimistic and assume
+         * success that is rolled back in case of a failure or timeout.
+         */
+
         create: {
             success: messages.successfulCreate,
-            //failure: messages.failedCreate
+            //TODO failure: messages.failedCreate
         },
         open: {
             success: messages.successfulOpen,
-            //failure: messages.failedOpen
+            //TODO failure: messages.failedOpen
         },
         close: {
             success: messages.successfulClose,
-            //failure: messages.failedClose
+            //TODO failure: messages.failedClose
         },
         closeNeed: {
             success: messages.successfulCloseNeed,
@@ -329,7 +334,10 @@ export function needsClose(needUri) {
             // assume close went through successfully, update GUI
             dispatch({
                 type: actionTypes.needs.close,
-                payload: needUri
+                payload: {
+                    ownNeedUri: needUri,
+                    affectedConnections: getState().getIn(['needs', 'ownNeeds', needUri, 'hasConnections'])
+                }
             })
         )
         .then(() =>
