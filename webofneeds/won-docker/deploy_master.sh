@@ -72,6 +72,7 @@ docker -H satcluster01:2375 stop owner_ma || echo 'No docker container found to 
 docker -H satcluster01:2375 rm owner_ma || echo 'No docker container found to remove with name: owner_ma'
 docker -H satcluster01:2375 run --name=owner_ma -d -e "node.default.host=satcluster01.researchstudio.at" \
 -e "node.default.http.port=8889" -p 8082:8443 \
+-e "uri.host=satcluster01.researchstudio.at" -e "http.port=8082" \
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/owner_ma:/usr/local/tomcat/won/client-certs/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \

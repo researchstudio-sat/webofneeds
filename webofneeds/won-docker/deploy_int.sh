@@ -131,6 +131,7 @@ echo ${MAIL_USER} at ${MAIL_HOST} is used as owner no-replay won-owner-app-email
 docker -H satsrv04:2375 stop owner_int || echo 'No docker container found to stop with name: owner_int'
 docker -H satsrv04:2375 rm owner_int || echo 'No docker container found to remove with name: owner_int'
 docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.researchstudio.at" \
+-e "uri.host=satsrv04.researchstudio.at" -e "http.port=8082" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -e "node.default.http.port=8889" -p 8082:8443 \
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
@@ -147,6 +148,7 @@ webofneeds/owner:int
 docker -H satsrv05:2375 stop owner_int || echo 'No docker container found to stop with name: owner_int'
 docker -H satsrv05:2375 rm owner_int || echo 'No docker container found to remove with name: owner_int'
 docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv05.researchstudio.at" \
+-e "uri.host=satsrv05.researchstudio.at" -e "http.port=8082" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -e "node.default.http.port=8889" -p 8082:8443 \
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \

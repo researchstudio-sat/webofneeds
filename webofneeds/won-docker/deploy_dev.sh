@@ -88,6 +88,7 @@ docker -H satsrv04:2375 stop owner_dev || echo 'No docker container found to sto
 docker -H satsrv04:2375 rm owner_dev || echo 'No docker container found to remove with name: owner_dev'
 docker -H satsrv04:2375 run --name=owner_dev -d -e "node.default.host=satsrv04.researchstudio.at" \
 -e "node.default.http.port=8888" \
+-e "uri.host=satsrv04.researchstudio.at" -e "http.port=8081" \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5432/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
@@ -103,6 +104,7 @@ docker -H satsrv05:2375 stop owner_dev || echo 'No docker container found to sto
 docker -H satsrv05:2375 rm owner_dev || echo 'No docker container found to remove with name: owner_dev'
 docker -H satsrv05:2375 run --name=owner_dev -d -e "node.default.host=satsrv05.researchstudio.at" \
 -e "node.default.http.port=8888" \
+-e "uri.host=satsrv05.researchstudio.at" -e "http.port=8081" \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5432/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
