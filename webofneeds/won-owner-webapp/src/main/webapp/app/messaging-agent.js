@@ -130,7 +130,7 @@ export function runMessagingAgent(redux) {
                     if(event.hasMessageType === won.WONMSG.successResponseCompacted)
                         redux.dispatch(actionCreators.messages__closeNeed__success(event));
                     else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
-                      redux.dispatch(actionCreators.messages__closeNeed__failed(event));
+                        redux.dispatch(actionCreators.messages__closeNeed__failed(event));
                     break;
             }
         })
