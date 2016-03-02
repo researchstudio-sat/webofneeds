@@ -3,6 +3,8 @@ set -e
 
 # expect OWNER won-mail-sender user and password (i.e. configuration for no-replay won-owner-app-email-account) be set
 # in advance as environment variables, e.g. MAIL_USER=changeuser MAIL_PASS=changepass MAIL_HOST=smtp.changehost.com
+echo ${MAIL_USER}
+echo ${MAIL_HOST}
 
 # build the won docker images on every server of the cluster so that everywhere is the latest version available
 echo start docker build of images:
