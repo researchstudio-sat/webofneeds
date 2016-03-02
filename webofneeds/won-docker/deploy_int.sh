@@ -1,6 +1,9 @@
 # fail the whole script if one command fails
 set -e
 
+# expect OWNER won-mail-sender user and password (i.e. configuration for no-replay won-owner-app-email-account) be set
+# in advance as environment variables, e.g. MAIL_USER=changeuser MAIL_PASS=changepass MAIL_HOST=smtp.changehost.com
+
 # build the won docker images on every server of the cluster so that everywhere is the latest version available
 echo start docker build of images:
 
@@ -127,6 +130,7 @@ sleep 20
 docker -H satsrv04:2375 stop owner_int || echo 'No docker container found to stop with name: owner_int'
 docker -H satsrv04:2375 rm owner_int || echo 'No docker container found to remove with name: owner_int'
 docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.researchstudio.at" \
+-e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -e "node.default.http.port=8889" -p 8082:8443 \
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/owner_int:/usr/local/tomcat/won/client-certs/ \
@@ -142,6 +146,7 @@ webofneeds/owner:int
 docker -H satsrv05:2375 stop owner_int || echo 'No docker container found to stop with name: owner_int'
 docker -H satsrv05:2375 rm owner_int || echo 'No docker container found to remove with name: owner_int'
 docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv05.researchstudio.at" \
+-e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -e "node.default.http.port=8889" -p 8082:8443 \
 -v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v /home/install/won-client-certs/owner_int:/usr/local/tomcat/won/client-certs/ \
