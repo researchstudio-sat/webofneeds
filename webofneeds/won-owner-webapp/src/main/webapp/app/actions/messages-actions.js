@@ -33,12 +33,14 @@ export function successfulCloseNeed(event) {
             eventUri = event.isRemoteResponseTo;
             dispatch(actionCreators.connections__denied(event));
         }
-
-        if (!isSuccessMessage(event)) {
-            console.log(event)
-        }
     }
 }
+export function failedCloseNeed(event) {
+    return (dispatch, getState) => {
+    }
+
+}
+
 export function successfulClose(event) {
     return (dispatch, getState) => {
         const state = getState();
@@ -51,10 +53,6 @@ export function successfulClose(event) {
             console.log("messages waitingForAnswer", event);
             eventUri = event.isRemoteResponseTo;
             dispatch(actionCreators.connections__denied(event));
-        }
-
-        if (!isSuccessMessage(event)) {
-            console.log(event)
         }
     }
 }
@@ -71,10 +69,6 @@ export function successfulOpen(event){
             console.log("messages waitingForAnswer", event);
             eventUri = event.isRemoteResponseTo;
             dispatch(actionCreators.connections__accepted(event));
-        }
-
-        if (!isSuccessMessage(event)) {
-            console.log(event)
         }
     }
 }

@@ -157,7 +157,6 @@ const actionHierarchy = {
      */
     messages: { /* websocket messages, e.g. post-creation, chatting */
         send: INJ_DEFAULT, //TODO this should be part of proper, user-story-level actions (e.g. need.publish or sendCnctMsg)
-
         create: {
             success: messages.successfulCreate,
             //failure: messages.failedCreate
@@ -172,7 +171,7 @@ const actionHierarchy = {
         },
         closeNeed: {
             success: messages.successfulCloseNeed,
-            //failure: messages.failedCloseNeed
+            failure: messages.failedCloseNeed
         },
         connectMessageReceived: messages.connectMessageReceived,
         hintMessageReceived: messages.hintMessageReceived,
