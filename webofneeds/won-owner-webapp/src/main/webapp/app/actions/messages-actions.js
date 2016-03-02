@@ -22,15 +22,10 @@ import {
 
 export function successfulCloseNeed(event) {
     return (dispatch, getState) => {
-        const state = getState();
         console.log("got response for DEACTIVATE: " + event.hasMessageType);
-        let eventUri = null;
-        let receiverUri = null;
-        let isRemoteResponse = false;
         //TODO maybe refactor these response message handling
-        if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
+        if (getState().getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
             console.log("messages waitingForAnswer", event);
-            eventUri = event.isRemoteResponseTo;
             dispatch(actionCreators.connections__denied(event));
         }
     }
@@ -38,7 +33,6 @@ export function successfulCloseNeed(event) {
 export function failedCloseNeed(event) {
     return (dispatch, getState) => {
     }
-
 }
 
 export function successfulClose(event) {
