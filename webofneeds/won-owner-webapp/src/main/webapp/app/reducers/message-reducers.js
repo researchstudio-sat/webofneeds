@@ -22,52 +22,36 @@ const initialState = Immutable.fromJS({
      */
     resetWsRequested_Hack: false,
 });
-export function messagesReducerAlt(messages = initialState, action = {}) {
+export function messagesReducer(messages = initialState, action = {}) {
     switch(action.type) {
         case actionTypes.drafts.publishSuccessful:
             return messages.removeIn(['waitingForAnswer', action.payload.eventUri]);
-        default:
-            return messages;
-    }
-}
-export const messagesReducer =  createReducer(
-    //initial state
-    Immutable.fromJS({
-        enqueued: {},
-        waitingForAnswer: {},
-        /**
-         * TODO this field is part of the session-upgrade hack documented in:
-         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
-         */
-        resetWsRequested_Hack: false,
-    }),
 
-    //handlers
-    {
-        [actionTypes.drafts.publish]: (messages, {payload:{eventUri, message}}) =>
-            messages.setIn(['enqueued', eventUri], message),
-
-        [actionTypes.messages.waitingForAnswer]: (messages, {payload:{ eventUri }}) => {
-            const msg = messages.getIn(['enqueued', eventUri]);
+        case actionTypes.messages.waitingForAnswer:
+            const pendingEventUri = action.payload.eventUri;
+            const msg = messages.getIn(['enqueued', pendingEventUri]);
             return messages
-                .removeIn(['enqueued', eventUri])
-                .setIn(['waitingForAnswer', eventUri], msg)
+                .removeIn(['enqueued', pendingEventUri])
+                .setIn(['waitingForAnswer', pendingEventUri], msg);
 
-        },
+        case actionTypes.messages.send:
+            const {eventUri, message} = action.payload;
+            return messages.setIn(['enqueued', eventUri], message);
 
-        [actionTypes.messages.send]:(messages,{payload: {eventUri, message}})=>
-                messages.setIn(['enqueued', eventUri], message),
-
-        [actionTypes.drafts.publishSuccessful]: (messages, {payload:{ publishEventUri }}) =>
-            messages.removeIn(['waitingForAnswer', publishEventUri]),
+        case actionTypes.drafts.publishSuccessful:
+            const { publishEventUri } = action.payload;
+            return messages.removeIn(['waitingForAnswer', publishEventUri]);
 
         /**
          * TODO this sub-reducer is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
          */
-        [actionTypes.messages.requestWsReset_Hack]: (messages, { payload = true}) =>
-            messages.set('resetWsRequested_Hack', payload),
+         case actionTypes.messages.requestWsReset_Hack:
+             const flag = (action.payload === undefined) ? true : action.payload;
+             return messages.set('resetWsRequested_Hack', flag);
 
+        default:
+            return messages;
     }
-);
+}
 
