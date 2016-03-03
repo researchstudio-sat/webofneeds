@@ -219,7 +219,7 @@ public class WonWebSocketHandler
           }
           return;
         case HINT_MESSAGE:
-          if (userNeed.isRequests()) {
+          if (userNeed.isMatches()) {
             emailSender.sendNotificationMessage(user.getEmail(), "Match", wonMessage.getReceiverNeedURI().toString());
           }
           return;
