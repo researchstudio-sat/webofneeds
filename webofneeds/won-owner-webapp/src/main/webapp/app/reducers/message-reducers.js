@@ -24,8 +24,15 @@ const initialState = Immutable.fromJS({
 });
 export function messagesReducer(messages = initialState, action = {}) {
     switch(action.type) {
+
+        case actionTypes.drafts.publish:
+            return messages.setIn(
+                ['enqueued', action.payload.eventUri],
+                action.payload.message
+            );
+
         case actionTypes.drafts.publishSuccessful:
-            return messages.removeIn(['waitingForAnswer', action.payload.eventUri]);
+            return messages.removeIn(['waitingForAnswer', action.payload.publishEventUri]);
 
         case actionTypes.messages.waitingForAnswer:
             const pendingEventUri = action.payload.eventUri;
@@ -35,12 +42,11 @@ export function messagesReducer(messages = initialState, action = {}) {
                 .setIn(['waitingForAnswer', pendingEventUri], msg);
 
         case actionTypes.messages.send:
-            const {eventUri, message} = action.payload;
-            return messages.setIn(['enqueued', eventUri], message);
+            return messages.setIn(
+                ['enqueued', action.payload.eventUri],
+                action.payload.message
+            );
 
-        case actionTypes.drafts.publishSuccessful:
-            const { publishEventUri } = action.payload;
-            return messages.removeIn(['waitingForAnswer', publishEventUri]);
 
         /**
          * TODO this sub-reducer is part of the session-upgrade hack documented in:
