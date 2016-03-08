@@ -59,7 +59,11 @@ export default function(connections = initialState, action = {}) {
 function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
     console.log("STORING CONNECTION AND RELATED DATA");
     console.log(connectionWithRelatedData);
-    const connection = Immutable.fromJS(connectionWithRelatedData.connection);
+
+    const connection = Immutable
+        .fromJS(connectionWithRelatedData.connection)
+        //make sure we have a set of events (as opposed to a list with redundancies)
+        .set('hasEvents', Immutable.Set(connectionWithRelatedData.connection.hasEvents));
 
     return state
         .setIn([connection.get('uri')], connection)
