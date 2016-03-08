@@ -69,7 +69,7 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction
         logger.debug("RECEIVED REMOTE RESPONSE EVENT {} for uri {}", event, responseEvent.getRemoteResponseToMessageURI
           ());
         msgSplitsBCDE.get(responseEvent.getRemoteResponseToMessageURI().toString()).stop();
-      } else if (responseEvent.getConnectionURI() != null) {
+      } else if (msgSplitsBC.get(responseEvent.getOriginalMessageURI().toString()) != null) {
         logger.debug("RECEIVED RESPONSE EVENT {} for uri {}", event, responseEvent.getOriginalMessageURI());
         msgSplitsBC.get(responseEvent.getOriginalMessageURI().toString()).stop();
       }
