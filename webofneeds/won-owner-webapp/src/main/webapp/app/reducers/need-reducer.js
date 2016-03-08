@@ -63,26 +63,32 @@ export default function(allNeeds = initialState, action = {}) {
     }
 }
 
+function needToImmutable(need) {
+    return Immutable
+        .fromJS(need)
+        .set('hasConnections', Immutable.Set(need.hasConnections))
+}
+
 function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
     const {ownNeed, remoteNeed, connection} = connectionWithRelatedData;
     //guarantee that own need is in the state
     const stateWithOwnNeed = setIfNew(
         state,
         ['ownNeeds', ownNeed.uri],
-        Immutable.fromJS(ownNeed));
+        needToImmutable(ownNeed));
 
     const stateWithBothNeeds = setIfNew(
         stateWithOwnNeed,
         ['theirNeeds', remoteNeed.uri],
-        Immutable.fromJS(remoteNeed));
+        needToImmutable(remoteNeed));
 
     /* TODO | what if we get the connection while not online?
      * TODO | doing this here doesn't guarantee synchronicity with the rdf
      * TODO | unless we fetch all connections onLoad and onLogin
      */
-    return stateWithBothNeeds.updateIn(['ownNeeds', ownNeed.uri, 'hasConnections'], connections => connections?
-            connections.push(connection.uri) :
-            Immutable.List([connection.uri]) // first connection -> new List
+    return stateWithBothNeeds.updateIn(
+        ['ownNeeds', ownNeed.uri, 'hasConnections'],
+        connections => connections.add(connection.uri)
     );
 }
 
@@ -91,6 +97,6 @@ function setIfNew(state, path, obj){
         //we've seen this need before, no need to overwrite it
         val :
         //it's the first time we see this need -> add it
-        Immutable.fromJS(obj))
+        needToImmutable(obj))
 }
 
