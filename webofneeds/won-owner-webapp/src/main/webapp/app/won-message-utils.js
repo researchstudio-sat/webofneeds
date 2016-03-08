@@ -109,7 +109,26 @@ export function buildCloseMessage(msgToConnectFor){
     return deferred.promise;
 
 }
+export function buildCloseNeedMessage(needUri, wonNodeUri){
+    const buildMessage = function(envelopeData) {
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+        var message = new won.MessageBuilder(won.WONMSG.closeNeedMessage)
+            .eventURI(eventUri)
+            .hasReceiverNode(wonNodeUri)
+            .hasOwnerDirection()
+            .hasSentTimestamp(new Date().getTime())
+            .forEnvelopeData(envelopeData)
+            .build();
 
+        return {eventUri: eventUri, message: message};
+    };
+
+    return won.getEnvelopeDataForNeed(needUri)
+        .then(
+            envelopeData => buildMessage(envelopeData),
+            err => won.reportError("cannot close need "+ needUri)
+        );
+}
 
 export function buildConnectMessage(msgToConnectFor, textMessage){
     let deferred = Q.defer();
@@ -290,4 +309,98 @@ export function getEventData(msgJson) {
         eventData.framedMessage = framedSimplifiedMessage;
         return eventData;
     }) ;
+}
+
+window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
+export function fetchAllAccessibleAndRelevantData(ownNeedUris) {
+
+    window.urisToLookupMap4dbg = urisToLookupMap;
+    const allOwnNeedsPromise = urisToLookupMap(ownNeedUris,
+        won.getNeedWithConnectionUris);
+
+    const allConnectionUrisPromise =
+        Promise.all(ownNeedUris.map(won.getconnectionUrisOfNeed))
+            .then(connectionUrisPerNeed =>
+                flatten(connectionUrisPerNeed));
+
+    const allConnectionsPromise = allConnectionUrisPromise
+        .then(connectionUris =>
+            urisToLookupMap(connectionUris, won.getConnection));
+
+    const allEventsPromise = allConnectionUrisPromise
+        .then(connectionUris =>
+            urisToLookupMap(connectionUris, connectionUri =>
+                    won.getConnection(connectionUri)
+                        .then(connection =>
+                            won.getEventsOfConnection(connectionUri,connection.belongsToNeed)
+                    )
+            )
+    ).then(eventsOfConnections =>
+            //eventsPerConnection[connectionUri][eventUri]
+            flattenObj(eventsOfConnections)
+    );
+
+    const allTheirNeedsPromise =
+        allConnectionsPromise.then(connections => {
+            const theirNeedUris = [];
+            for(const [connectionUri, connection] of entries(connections)) {
+                theirNeedUris.push(connection.hasRemoteNeed);
+            }
+            return theirNeedUris;
+        })
+            .then(theirNeedUris =>
+                urisToLookupMap(theirNeedUris, won.getNeed));
+
+    return Promise.all([
+        allOwnNeedsPromise,
+        allConnectionsPromise,
+        allEventsPromise,
+        allTheirNeedsPromise
+    ]).then(([
+            allOwnNeeds,
+            allConnections,
+            allEvents,
+            allTheirNeeds
+            ]) => ({
+            ownNeeds: allOwnNeeds,
+            connections: allConnections,
+            events: allEvents,
+            theirNeeds: allTheirNeeds,
+        })
+    );
+
+    /**
+     const allAccessibleAndRelevantData = {
+        ownNeeds: {
+            <needUri> : {
+                *:*,
+                connections: [<connectionUri>, <connectionUri>]
+            }
+            <needUri> : {
+                *:*,
+                connections: [<connectionUri>, <connectionUri>]
+            }
+        },
+        theirNeeds: {
+            <needUri>: {
+                *:*,
+                connections: [<connectionUri>, <connectionUri>] <--?
+            }
+        },
+        connections: {
+            <connectionUri> : {
+                *:*,
+                events: [<eventUri>, <eventUri>]
+            }
+            <connectionUri> : {
+                *:*,
+                events: [<eventUri>, <eventUri>]
+            }
+        }
+        events: {
+            <eventUri> : { *:* },
+            <eventUri> : { *:* }
+        }
+     }
+     */
 }

@@ -20,7 +20,8 @@
 import {
     checkHttpStatus,
     entries,
-    urisToLookupMap
+    urisToLookupMap,
+    is
 } from '../utils';
 import * as q from 'q';
 
@@ -400,17 +401,15 @@ const rdfstore = window.rdfstore;
         if (connectionUri != null) {
             cacheItemMarkDirty(connectionUri);
         }
-        return q.when(true); //return a promise for chaining
+        return Promise.resolve(true); //return a promise for chaining
     }
     won.invalidateCacheForNeed = function(needUri){
         if (needUri != null) {
             cacheItemMarkDirty(needUri);
             cacheItemMarkDirty(needUri+'/connections/')
         }
-        return q.when(true); //return a promise for chaining
+        return Promise.resolve(true); //return a promise for chaining
     }
-
-
 
     var getReadUpdateLockPerUri = function(uri){
         var lock = privateData.readUpdateLocksPerUri[uri];
@@ -423,6 +422,7 @@ const rdfstore = window.rdfstore;
 
     var getReadUpdateLocksPerUris = function(uris){
         var locks = [];
+        console.log("uris",uris);
         uris.map(
             function(uri){
                 locks.push(getReadUpdateLockPerUri(uri));
@@ -651,9 +651,10 @@ const rdfstore = window.rdfstore;
      * the connectionContainer to the connectionUris
      * contained within.
      */
+    won.getNeed =
     won.getNeedWithConnectionUris = function(needUri) {
         return Promise.all([
-            won.getNeed(needUri),
+            getNeedData(needUri),
             won.getconnectionUrisOfNeed(needUri)]
         ).then(([need, connectionUris]) => {
             need.hasConnections = connectionUris;
@@ -665,7 +666,7 @@ const rdfstore = window.rdfstore;
      * Loads the default data of the need with the specified URI into a js object.
      * @return the object or null if no data is found for that URI in the local datastore
      */
-    won.getNeed = function(needUri) {
+    function getNeedData(needUri) {
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getNeed: uri must not be null"};
         }
@@ -791,6 +792,7 @@ const rdfstore = window.rdfstore;
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getWonNodeUriOfNeed: needUri must not be null"};
         }
+        //return won.getNode(needUri).then(need => need[won.WON.hasWonNode]);
         return won.getUniqueObjectOfProperty(needUri, won.WON.hasWonNode)
             .then(
                 function(result){return result;},
@@ -923,7 +925,16 @@ const rdfstore = window.rdfstore;
     won.getConnectionUrisOfNeed = (needUri) =>
         won.getNode(needUri)
             .then(need => won.getNode(need.hasConnections))
-            .then(connectionContainer => connectionContainer.member)
+            .then(connectionContainer => {
+                /*
+                 * if there's only a single rdfs:member in the event
+                 * container, getNode will not return an array, so we
+                 * need to make sure it's one from here on out.
+                 */
+                return is('String', connectionContainer.member) ?
+                    [connectionContainer.member] :
+                    connectionContainer.member
+            })
 
     /**
      *
@@ -1290,7 +1301,14 @@ const rdfstore = window.rdfstore;
                 won.getNode(connection.hasEventContainer, requesterWebId)
             ]))
             .then( ([connection, eventContainer]) => {
-                connection.hasEvents = eventContainer.member;
+                /*
+                 * if there's only a single rdfs:member in the event
+                 * container, getNode will not return an array, so we
+                 * need to make sure it's one from here on out.
+                 */
+                connection.hasEvents = is('String', eventContainer.member) ?
+                    [eventContainer.member] :
+                    eventContainer.member
                 return connection;
             })
     };
@@ -1351,9 +1369,7 @@ const rdfstore = window.rdfstore;
                                 resolve(entireGraph.triples.filter(t => t.subject.nominalValue === uri))
                             })
                         } else {
-                            //graph.triples[0].object.nominalValue
-                            //graph.triples[0].subject.nominalValue
-                            //graph.triples[0].predicate.nominalValue
+                            //.node(...) was successful. return the node's tripples
                             resolve(graph.triples);
                         }
                     })

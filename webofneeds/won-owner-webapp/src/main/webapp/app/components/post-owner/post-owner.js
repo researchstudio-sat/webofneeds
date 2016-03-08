@@ -13,14 +13,17 @@ const serviceDependencies = ['$scope', '$interval', '$ngRedux', '$q'];
 
 class Controller {
     constructor() {
+        window.poc4dbg = this;
         attach(this, serviceDependencies, arguments);
 
         this.selection = 4;
 
         const selectFromState = (state) => {
             const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
+            const post = state.getIn(['needs','ownNeeds', postId]);
             return {
-                post: state.getIn(['needs','ownNeeds', postId]).toJS()
+                post: post,
+                postJS: post.toJS()
             }
         };
 

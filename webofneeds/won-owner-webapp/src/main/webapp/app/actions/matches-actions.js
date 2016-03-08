@@ -14,6 +14,7 @@ export function matchesLoad(data) {
                 let data = {ownNeed: needData, connections: results};
                 //TODO only one action should be dispatched for every interaction! (reducers should be able to handle arrays)
                 results.forEach(function (entry) {
+                    console.log("add match: ",entry);
                     dispatch(actionCreators.matches__add(entry))
                 })
             })
