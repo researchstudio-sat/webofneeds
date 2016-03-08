@@ -163,10 +163,12 @@ export function connectMessageReceived(data) {
                     dispatch(actionCreators.events__addUnreadEventUri(data));
 
                     getConnectionRelatedData(data.hasReceiverNeed, data.hasSenderNeed, connectionData.uri)
-                        .then(data => dispatch({
+                    .then(data =>
+                        dispatch({
                             type: actionTypes.messages.connectMessageReceived,
                             payload: data
-                        }));
+                        })
+                    );
                 })
 
             })
@@ -185,14 +187,17 @@ export function hintMessageReceived(data) {
                 data.matchScore = data.framedMessage[won.WON.hasMatchScoreCompacted];
                 data.matchCounterpartURI = won.getSafeJsonLdValue(data.framedMessage[won.WON.hasMatchCounterpart]);
 
-                dispatch(actionCreators.events__addUnreadEventUri(data))
+                console.log('going to crawl connection related data');//deletme
 
                 getConnectionRelatedData(needUri, data.hasMatchCounterpart, data.hasReceiver)
-                    .then(data => dispatch({
+                .then(data =>
+                    dispatch({
                         type: actionTypes.messages.hintMessageReceived,
                         payload: data
-                    }));
+                    })
+                );
 
+                dispatch(actionCreators.events__addUnreadEventUri(data));
 
                 // /add some properties to the eventData so as to make them easily accessible to consumers
                 //of the hint event

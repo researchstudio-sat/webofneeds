@@ -257,13 +257,13 @@ export function draftsPublish(draft, nodeUri) {
 }
 
 /**
- * @deprecated i need to delete this again *
+ * @deprecated used for keeping old code.
  * @param needUri
  * @param remoteNeedUri
  * @param connectionUri
  * @return {*}
  */
-export function getConnectionRelatedData(needUri,remoteNeedUri,connectionUri) {
+export function getConnectionRelatedData(needUri, remoteNeedUri, connectionUri) {
     const remoteNeed = won.getNeed(remoteNeedUri);
     const ownNeed = won.getNeed(needUri);
     const connection = won.getConnection(connectionUri);
