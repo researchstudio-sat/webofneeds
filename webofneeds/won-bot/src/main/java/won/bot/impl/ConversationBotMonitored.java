@@ -119,9 +119,8 @@ public class ConversationBotMonitored extends EventBot
     this.monitor = new ActionOnEventListener(ctx, "msgMonitor", new MessageLifecycleMonitoringAction(ctx));
     bus.subscribe(MessageDispatchStartedEvent.class, this.monitor);
     bus.subscribe(MessageDispatchedEvent.class, this.monitor);
-    bus.subscribe(MessageDeliveryResponseReceivedEvent.class, this.monitor);
-    bus.subscribe(MessageReceivedByCounterpartEvent.class, this.monitor);
-    bus.subscribe(MessageDeliveryRemoteResponseReceivedEvent.class, this.monitor);
+    bus.subscribe(SuccessResponseEvent.class, this.monitor);
+    bus.subscribe(MessageFromOtherNeedEvent.class, this.monitor);
   }
 
 

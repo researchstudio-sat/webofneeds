@@ -22,11 +22,10 @@ import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.EventBotActionUtils;
 import won.bot.framework.events.event.ConnectionSpecificEvent;
 import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.impl.MessageFromOtherNeedEvent;
-import won.bot.framework.events.event.impl.monitor.*;
+import won.bot.framework.events.event.impl.monitor.MessageDispatchStartedEvent;
+import won.bot.framework.events.event.impl.monitor.MessageDispatchedEvent;
 import won.bot.framework.events.filter.EventFilter;
 import won.bot.framework.events.listener.AbstractHandleFirstNEventsListener;
-import won.bot.framework.events.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -90,44 +89,10 @@ public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFi
         Model messageContent = WonRdfUtils.MessageUtils.textMessage(message);
         URI connectionUri = messageEvent.getConnectionURI();
 
-        if (messageEvent instanceof MessageFromOtherNeedEvent) {
-          URI remoteMessageURI = ((MessageFromOtherNeedEvent) messageEvent).getWonMessage().getCorrespondingRemoteMessageURI();
-          ctx.getEventBus().publish(new MessageReceivedByCounterpartEvent(remoteMessageURI));
-        }
-
-
         WonMessage wonMessage = createWonMessage(connectionUri, messageContent);
         //remember the message URI so we can react to success/failure responses
         final URI msgURI = wonMessage.getMessageURI();
         EventBotActionUtils.rememberInListIfNamePresent(ctx, msgURI, "msgURIs");
-
-        EventListener deliveryCallback = new EventListener()
-        {
-          @Override
-          public void onEvent(Event event) throws Exception {
-            logger.debug("message publish successful, message URI is {}", msgURI);
-            // fire message received delivery response (success or failure)
-            ctx.getEventBus().publish(new MessageDeliveryResponseReceivedEvent(msgURI));
-          }
-        };
-
-        EventBotActionUtils.makeAndSubscribeResponseListener(
-          wonMessage, deliveryCallback, deliveryCallback, ctx);
-
-
-        EventListener remoteDeliveryCallback = new EventListener()
-        {
-          @Override
-          public void onEvent(Event event) throws Exception {
-            logger.debug("message publish successful, message URI is {}", msgURI);
-            // fire message received delivery response (success or failure)
-            ctx.getEventBus().publish(new MessageDeliveryRemoteResponseReceivedEvent(msgURI));
-          }
-        };
-
-        EventBotActionUtils.makeAndSubscribeRemoteResponseListener(
-          wonMessage, remoteDeliveryCallback, remoteDeliveryCallback, ctx);
-        logger.debug("registered listeners for remote response to message URI {}", msgURI);
 
         logger.debug("sending message " + message);
         try {

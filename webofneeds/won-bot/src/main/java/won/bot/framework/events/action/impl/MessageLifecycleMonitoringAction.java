@@ -6,7 +6,13 @@ import org.javasimon.Stopwatch;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.impl.monitor.*;
+import won.bot.framework.events.event.impl.DeliveryResponseEvent;
+import won.bot.framework.events.event.impl.FailureResponseEvent;
+import won.bot.framework.events.event.impl.MessageFromOtherNeedEvent;
+import won.bot.framework.events.event.impl.SuccessResponseEvent;
+import won.bot.framework.events.event.impl.monitor.MessageDispatchStartedEvent;
+import won.bot.framework.events.event.impl.monitor.MessageDispatchedEvent;
+import won.bot.framework.events.event.impl.monitor.MessageSpecificEvent;
 
 import java.net.URI;
 import java.util.Collections;
@@ -53,14 +59,23 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction
 
       } else if (event instanceof MessageDispatchedEvent) {
         msgSplitsB.get(msgURI.toString()).stop();
-      } else if (event instanceof MessageDeliveryResponseReceivedEvent) {
-        msgSplitsBC.get(msgURI.toString()).stop();
-      } else if (event instanceof MessageReceivedByCounterpartEvent) {
-        msgSplitsBCD.get(msgURI.toString()).stop();
-      } else if (event instanceof MessageDeliveryRemoteResponseReceivedEvent) {
-        msgSplitsBCDE.get(msgURI.toString()).stop();
       }
 
+
+    } else if (event instanceof SuccessResponseEvent || event instanceof FailureResponseEvent) {
+
+      DeliveryResponseEvent responseEvent = (DeliveryResponseEvent) event;
+      if (responseEvent.isRemoteResponse()) {
+        logger.debug("RECEIVED REMOTE RESPONSE EVENT {} for uri {}", event, responseEvent.getRemoteResponseToMessageURI
+          ());
+        msgSplitsBCDE.get(responseEvent.getRemoteResponseToMessageURI().toString()).stop();
+      } else if (responseEvent.getConnectionURI() != null) {
+        logger.debug("RECEIVED RESPONSE EVENT {} for uri {}", event, responseEvent.getOriginalMessageURI());
+        msgSplitsBC.get(responseEvent.getOriginalMessageURI().toString()).stop();
+      }
+    } else if (event instanceof MessageFromOtherNeedEvent) {
+      URI remoteMessageURI = ((MessageFromOtherNeedEvent) event).getWonMessage().getCorrespondingRemoteMessageURI();
+      msgSplitsBCD.get(remoteMessageURI.toString()).stop();
     }
 
   }
