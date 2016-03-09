@@ -16,6 +16,20 @@ public class WonOwnerMailSender {
 
   private WonMailSender wonMailSender;
 
+  private static final String OWNER_REMOTE_NEED_LINK = "/rework.html#/post/visitor/info/?theirUri=";
+  private static final String OWNER_CONNECTION_LINK = "/rework.html#/post/visitor/messages/?myUri=<>&theirUri=";
+  private static final String OWNER_LOCAL_NEED_LINK = "/rework.html#/post/owner/info?myUri=";
+
+  private static final String NOTIFICATION_END = "\n\n\n" +
+    "Sincerely yours,\nOwner application team" +
+    "\n\n\n\n" +
+    "You have received this email because you are subscribed to getting Match" +
+    " notifications for your posting. If you received this email in error please click on the link below." +
+    "\n" +
+    "\n\n" +
+    "This is an automatic email, please do not reply." ;
+
+
   @Autowired
   private URIService uriService;
 
@@ -48,6 +62,10 @@ public class WonOwnerMailSender {
 
   }
 
+  @Deprecated
+  /**
+   * @deprecated as composes email with link to the old GUI
+   */
   public void sendNotificationMessage(String toEmail, String messageType, String receiverNeed) {
 
     String subject = "You received a new " + messageType;
@@ -80,6 +98,64 @@ public class WonOwnerMailSender {
       //TODO implement the link that should do something that makes sense..."
       "\n\n" +
       "This is an automatic email, please do not reply.";
+
+    logger.info("sending " + subject + " to " + toEmail);
+
+    this.wonMailSender.sendTextMessage(toEmail, subject, text);
+
+  }
+
+  public void sendHintNotificationMessage(String toEmail, String localNeed, String remoteNeed) {
+
+    String subject = "You have received a new Match";
+    String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
+
+    String linkLocalNeed = uriService.getOwnerProtocolOwnerURI() + OWNER_LOCAL_NEED_LINK + localNeed;
+    String linkMatch = uriService.getOwnerProtocolOwnerURI() + OWNER_REMOTE_NEED_LINK + remoteNeed;
+    // TODO when we implement login in context functionality, we should send here the link that
+    // would point to the private link page of the corresponding need, the would in turn redirect
+    // to sign-in dialog, and after user signs in, would display that need private link page
+
+    String text = "Dear User," +
+      "\n\n" +
+      subject +
+      " for your posting " +
+      linkLocalNeed +
+      ". Please visit " +
+      linkMatch +
+      " to view it in detail." +
+      NOTIFICATION_END
+      ;
+
+    logger.info("sending " + subject + " to " + toEmail);
+
+    this.wonMailSender.sendTextMessage(toEmail, subject, text);
+
+  }
+
+  public void sendConversationNotificationMessage(String toEmail, String msgType, String localNeed, String
+    remoteNeed) {
+
+    String subject = "You have received a new Conversation " + msgType;
+    String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
+
+    String linkLocalNeed = uriService.getOwnerProtocolOwnerURI() + OWNER_LOCAL_NEED_LINK + localNeed;
+    String linkConnection = uriService.getOwnerProtocolOwnerURI() + OWNER_CONNECTION_LINK.replaceAll("<>", localNeed)
+      + remoteNeed;
+    // TODO when we implement login in context functionality, we should send here the link that
+    // would point to the private link page of the corresponding need, the would in turn redirect
+    // to sign-in dialog, and after user signs in, would display that need private link page
+
+    String text = "Dear User," +
+      "\n\n" +
+      subject +
+      " for your posting " +
+      linkLocalNeed +
+      ". Please visit " +
+      linkConnection +
+      " to view it in detail." +
+      NOTIFICATION_END
+      ;
 
     logger.info("sending " + subject + " to " + toEmail);
 
