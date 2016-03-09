@@ -204,13 +204,13 @@ public class WonWebSocketHandler
         case OPEN:
           if (userNeed.isConversations()) {
             emailSender.sendConversationNotificationMessage(
-              user.getEmail(), "Conversation Request", needUri.toString(), wonMessage.getSenderNeedURI().toString());
+              user.getEmail(), "Message", needUri.toString(), wonMessage.getSenderNeedURI().toString());
           }
           return;
         case CONNECTION_MESSAGE:
           if (userNeed.isConversations()) {
             emailSender.sendConversationNotificationMessage(
-              user.getEmail(), "Conversation Request", needUri.toString(), wonMessage.getSenderNeedURI().toString());
+              user.getEmail(), "Message", needUri.toString(), wonMessage.getSenderNeedURI().toString());
           }
           return;
         case CONNECT:
