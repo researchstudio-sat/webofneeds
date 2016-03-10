@@ -85,10 +85,10 @@ function genComponentConf() {
         input () {
             console.log('got input in dynamic textfeld ', this.getText());
             if(!this.displayingPlaceholder) {
-                const newVal = this.getText();
-                if(newVal !== this.getUnsanitizedText()) {
+                if(this.getText() !== this.getUnsanitizedText()) {
                     this.sanitize();
                 }
+                const newVal = this.getText().trim();
                 //make sure the text field contains the sanitized text (so user sees what they're posting)
                 //this.setText(newVal);
 
@@ -139,13 +139,13 @@ function genComponentConf() {
             this.setText(this.getText());
         }
         getUnsanitizedText() {
-            return this.textField().innerHTML;
+            return this.textField().textContent;
         }
         getText() {
             //sanitize input
-            return this.$sanitize(this.textField().innerHTML)
-                .replace(/<(?:.|\n)*?>/gm, '') //strip html tags
-                .trim();
+            return this.$sanitize(this.getUnsanitizedText())
+                .replace(/<(?:.|\n)*?>/gm, ''); //strip html tags
+
         }
         setText(txt) {
             this.textField().innerHTML = txt
