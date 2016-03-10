@@ -86,7 +86,7 @@ function genComponentConf() {
             console.log('got input in dynamic textfeld ', this.getText());
             if(!this.displayingPlaceholder) {
                 if(this.getUnsanitizedText() !== this.getText() ||
-                    this.textField().innerHTML.contains('<br>.')) { //also supress line breaks inside the text in copy-pasted text
+                    this.textField().innerHTML.match(/<br>./)) { //also supress line breaks inside the text in copy-pasted text
                         this.setText(this.getText()); //sanitize
                     }
                 const newVal = this.getText().trim();
