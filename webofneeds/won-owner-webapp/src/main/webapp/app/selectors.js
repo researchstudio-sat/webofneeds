@@ -20,7 +20,7 @@ window.selectUnreadUris4dbg =  selectUnreadEventUris;
 
 //TODO the earlier unreadEvents was organised by need-uri!
 
-export const selectUnreadEventsRework = createSelector(
+export const selectUnreadEvents = createSelector(
     selectEvents, selectUnreadEventUris,
     (events, unreadEventUris) =>
         unreadEventUris.map(eventUri => events.get(eventUri))
@@ -30,7 +30,7 @@ export const selectUnreadEventsRework = createSelector(
  * @deprecated
  * @param state
  */
-export const selectUnreadEvents = state => state.getIn(['events', 'unreadEventUris']);
+export const selectUnreadEventsDeprecated = state => state.getIn(['events', 'unreadEventUris']);
 
 //const selectUnreadEvents = state => state.getIn(['events', 'unreadEventUris']);
 
