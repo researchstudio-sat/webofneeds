@@ -151,18 +151,18 @@ export function successfulCreate(event) {
     }
 }
 
-export function connectMessageReceived(data) {
+export function connectMessageReceived(event) {
     return dispatch=> {
-        data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
+        event.eventType = messageTypeToEventType[event.hasMessageType].eventType;
         //TODO data.hasReceiver, the connectionUri is undefined in the response message
-        won.invalidateCacheForNewConnection(data.hasReceiver, data.hasReceiverNeed)
+        won.invalidateCacheForNewConnection(event.hasReceiver, event.hasReceiverNeed)
             .then(() => {
-                won.getConnectionWithOwnAndRemoteNeed(data.hasReceiverNeed, data.hasSenderNeed).then(connectionData=> {
+                won.getConnectionWithOwnAndRemoteNeed(event.hasReceiverNeed, event.hasSenderNeed).then(connectionData=> {
                     //TODO refactor
-                    data.unreadUri = connectionData.uri;
-                    dispatch(actionCreators.events__addUnreadEventUri(data));
+                    event.unreadUri = connectionData.uri;
+                    dispatch(actionCreators.events__addUnreadEventUri(event));
 
-                    getConnectionRelatedData(data.hasReceiverNeed, data.hasSenderNeed, connectionData.uri)
+                    getConnectionRelatedData(event.hasReceiverNeed, event.hasSenderNeed, connectionData.uri)
                     .then(data =>
                         dispatch({
                             type: actionTypes.messages.connectMessageReceived,
@@ -175,21 +175,21 @@ export function connectMessageReceived(data) {
     }
 }
 
-export function hintMessageReceived(data) {
+export function hintMessageReceived(event) {
     return dispatch=> {
-        data.eventType = messageTypeToEventType[data.hasMessageType].eventType;
-        won.invalidateCacheForNewConnection(data.hasReceiver, data.hasReceiverNeed)
+        event.eventType = messageTypeToEventType[event.hasMessageType].eventType;
+        won.invalidateCacheForNewConnection(event.hasReceiver, event.hasReceiverNeed)
             .then(() => {
-                let needUri = data.hasReceiverNeed;
+                let needUri = event.hasReceiverNeed;
                 let match = {}
 
-                data.unreadUri = data.hasReceiver;
-                data.matchScore = data.framedMessage[won.WON.hasMatchScoreCompacted];
-                data.matchCounterpartURI = won.getSafeJsonLdValue(data.framedMessage[won.WON.hasMatchCounterpart]);
+                event.unreadUri = event.hasReceiver;
+                event.matchScore = event.framedMessage[won.WON.hasMatchScoreCompacted];
+                event.matchCounterpartURI = won.getSafeJsonLdValue(event.framedMessage[won.WON.hasMatchCounterpart]);
 
                 console.log('going to crawl connection related data');//deletme
 
-                getConnectionRelatedData(needUri, data.hasMatchCounterpart, data.hasReceiver)
+                getConnectionRelatedData(needUri, event.hasMatchCounterpart, event.hasReceiver)
                 .then(data =>
                     dispatch({
                         type: actionTypes.messages.hintMessageReceived,
@@ -197,7 +197,7 @@ export function hintMessageReceived(data) {
                     })
                 );
 
-                dispatch(actionCreators.events__addUnreadEventUri(data));
+                dispatch(actionCreators.events__addUnreadEventUri(event));
 
                 // /add some properties to the eventData so as to make them easily accessible to consumers
                 //of the hint event
