@@ -20,16 +20,8 @@ export default function(state = initialState, action = {}) {
             const allPreviousEvents = action.payload.get('events');
             return state.mergeIn(['events'], allPreviousEvents);
 
-        case actionTypes.events.addUnreadEventUri:
-            //TODO this should only store the URI
-            return state.setIn(
-                ['unreadEventUris',action.payload.unreadUri],
-                Immutable.fromJS(action.payload)
-            );
-
         case actionTypes.events.read:
             return state.deleteIn(['unreadEventUris', action.payload]);
-
 
         /**
          * @deprecated this is a legacy action
@@ -42,8 +34,12 @@ export default function(state = initialState, action = {}) {
 
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
-            return storeConnectionRelatedData(state, action.payload);
-
+            const event = action.payload.receivedEvent;
+            const updatedState = state.setIn(
+                ['unreadEventUris', event.unreadUri],
+                Immutable.fromJS(event)
+            );
+            return storeConnectionRelatedData(updatedState, action.payload);
 
         default:
             return state;

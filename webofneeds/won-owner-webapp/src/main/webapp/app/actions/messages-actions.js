@@ -159,15 +159,15 @@ export function connectMessageReceived(event) {
             .then(() => {
                 won.getConnectionWithOwnAndRemoteNeed(event.hasReceiverNeed, event.hasSenderNeed).then(connectionData=> {
                     //TODO refactor
-                    event.unreadUri = connectionData.uri;
-                    dispatch(actionCreators.events__addUnreadEventUri(event));
-
                     getConnectionRelatedData(event.hasReceiverNeed, event.hasSenderNeed, connectionData.uri)
-                    .then(data =>
-                        dispatch({
-                            type: actionTypes.messages.connectMessageReceived,
-                            payload: data
-                        })
+                    .then(data => {
+                            event.unreadUri = connectionData.uri;
+                            data.receivedEvent = event;
+                            dispatch({
+                                type: actionTypes.messages.connectMessageReceived,
+                                payload: data
+                            });
+                        }
                     );
                 })
 
@@ -190,14 +190,14 @@ export function hintMessageReceived(event) {
                 console.log('going to crawl connection related data');//deletme
 
                 getConnectionRelatedData(needUri, event.hasMatchCounterpart, event.hasReceiver)
-                .then(data =>
-                    dispatch({
-                        type: actionTypes.messages.hintMessageReceived,
-                        payload: data
-                    })
+                .then(data => {
+                        data.receivedEvent = event;
+                        dispatch({
+                            type: actionTypes.messages.hintMessageReceived,
+                            payload: data
+                        });
+                    }
                 );
-
-                dispatch(actionCreators.events__addUnreadEventUri(event));
 
                 // /add some properties to the eventData so as to make them easily accessible to consumers
                 //of the hint event
