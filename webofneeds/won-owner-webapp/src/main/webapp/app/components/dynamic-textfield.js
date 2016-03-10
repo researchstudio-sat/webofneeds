@@ -85,9 +85,10 @@ function genComponentConf() {
         input () {
             console.log('got input in dynamic textfeld ', this.getText());
             if(!this.displayingPlaceholder) {
-                if(this.getText() !== this.getUnsanitizedText()) {
-                    this.sanitize();
-                }
+                if(this.getUnsanitizedText() !== this.getText() ||
+                    this.textField().innerHTML.contains('<br>.')) { //also supress line breaks inside the text in copy-pasted text
+                        this.setText(this.getText()); //sanitize
+                    }
                 const newVal = this.getText().trim();
                 //make sure the text field contains the sanitized text (so user sees what they're posting)
                 //this.setText(newVal);
@@ -135,15 +136,14 @@ function genComponentConf() {
         textField() {
             return this.textFieldNg()[0];
         }
-        sanitize() {
-            this.setText(this.getText());
-        }
         getUnsanitizedText() {
             return this.textField().textContent;
         }
         getText() {
             //sanitize input
-            return this.$sanitize(this.getUnsanitizedText())
+            //return this.$sanitize(this.getUnsanitizedText())
+            return this.getUnsanitizedText()
+                .replace(/<br>/gm, ' ')
                 .replace(/<(?:.|\n)*?>/gm, ''); //strip html tags
 
         }
