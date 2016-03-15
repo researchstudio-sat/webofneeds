@@ -477,6 +477,33 @@ export function urisToLookupMap(uris, asyncLookupFunction) {
 }
 
 /**
+ * Maps an asynchronous function over the values of an object or
+ * the elements of an array. It returns a promise with the result,
+ * when all applications of the asyncFunction have finished.
+ * @param object
+ * @param asyncFunction
+ * @return {*}
+ */
+export function mapJoin(object, asyncFunction) {
+    if(is('Array', object)) {
+        const promises = object.map(el => asyncFunction(el));
+        return Promise.all(promises);
+    } else if(is('Object', object)){
+        const keys = Object.keys(object);
+        const promises = keys.map(k => asyncFunction(object[k]));
+        return Promise.all(promises).then(results => {
+            const acc = {};
+            results.forEach((result, i) => {
+                acc[keys[i]] = result;
+            });
+            return acc;
+        });
+    } else {
+        return undefined;
+    }
+}
+
+/**
  * Stable method of determining the type
  * taken from http://bonsaiden.github.io/JavaScript-Garden/
  * @param type
