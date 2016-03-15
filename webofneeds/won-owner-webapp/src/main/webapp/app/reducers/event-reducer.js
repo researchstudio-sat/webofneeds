@@ -10,8 +10,7 @@ import won from '../won-es6';
 
 const initialState = Immutable.fromJS({
     events: {},
-    unreadEventUris:{},
-})
+}).set('unreadEventUris', Immutable.Set());
 
 export default function(state = initialState, action = {}) {
     switch(action.type) {
@@ -21,7 +20,8 @@ export default function(state = initialState, action = {}) {
             return state.mergeIn(['events'], allPreviousEvents);
 
         case actionTypes.events.read:
-            return state.deleteIn(['unreadEventUris', action.payload]);
+            return state.update('unreadEventUris',
+                    unread => unread.remove(action.payload));
 
         /**
          * @deprecated this is a legacy action
@@ -37,11 +37,8 @@ export default function(state = initialState, action = {}) {
             //TODO events should be an object too
             const event = action.payload.events.filter(e => e.uri === action.payload.receivedEvent)[0];
             event.unreadUri = action.payload.updatedConnection;
-            const updatedState = state.setIn(
-                ['unreadEventUris', action.payload.updatedConnection],
-                Immutable.fromJS(event)
-            //Immutable.fromJS({uri: event.uri})
-            );
+
+            const updatedState = state.update('unreadEventUris', unread => unread.add(event.uri));
             return storeConnectionRelatedData(updatedState, action.payload);
 
         default:

@@ -11,12 +11,7 @@ const selectConnections = state => state.getIn(['connections']);
 const selectEvents = state => state.getIn(['events', 'events']);
 
 export const selectUnreadEventUris = state => state
-    .getIn(['events', 'unreadEventUris'])
-    //TODO unreadEventUris should just be this set of strings in the first place (to avoid saving redundant data)
-    .map(event => event.get('uri'))
-    .toSet();
-
-window.selectUnreadUris4dbg =  selectUnreadEventUris;
+    .getIn(['events', 'unreadEventUris']);
 
 //TODO the earlier unreadEvents was organised by need-uri!
 
@@ -25,12 +20,6 @@ export const selectUnreadEvents = createSelector(
     (events, unreadEventUris) =>
         unreadEventUris.map(eventUri => events.get(eventUri))
 );
-
-/**
- * @deprecated
- * @param state
- */
-export const selectUnreadEventsDeprecated = state => state.getIn(['events', 'unreadEventUris']);
 
 //const selectUnreadEvents = state => state.getIn(['events', 'unreadEventUris']);
 
