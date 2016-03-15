@@ -7,7 +7,7 @@ import Immutable from 'immutable';
 
 
 //TODO update to reflect simplfied state (drop one 'connections')
-const selectConnections = state => state.getIn(['connections', 'connections']);
+const selectConnections = state => state.getIn(['connections']);
 const selectEvents = state => state.getIn(['events', 'events']);
 
 export const selectUnreadEventUris = state => state
