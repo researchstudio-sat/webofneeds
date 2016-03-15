@@ -34,12 +34,13 @@ export default function(state = initialState, action = {}) {
 
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
-            //const event = action.payload.receivedEvent;
-            const event = action.payload.events[action.payload.receivedEvent];
+            //TODO events should be an object too
+            const event = action.payload.events.filter(e => e.uri === action.payload.receivedEvent)[0];
             event.unreadUri = action.payload.updatedConnection;
             const updatedState = state.setIn(
                 ['unreadEventUris', action.payload.updatedConnection],
                 Immutable.fromJS(event)
+            //Immutable.fromJS({uri: event.uri})
             );
             return storeConnectionRelatedData(updatedState, action.payload);
 

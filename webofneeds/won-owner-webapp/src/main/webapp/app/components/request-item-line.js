@@ -6,6 +6,8 @@ import { labels } from '../won-label-utils';
 import {attach} from '../utils.js';
 import { actionCreators }  from '../actions/actions';
 
+import { selectUnreadEvents } from '../selectors';
+
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
@@ -57,7 +59,7 @@ function genComponentConf() {
             const selectFromState = (state)=>{
 
                 return {
-                    unreadUris: state.getIn(['events','unreadEventUris'])
+                    unreadUris: selectUnreadEvents(state)
                 };
             }
             this.labels = labels;
