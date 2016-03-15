@@ -10,7 +10,8 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.PEMWriter;
-import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.cryptography.service.CertificateService;
 import won.cryptography.service.KeyPairService;
 import won.cryptography.service.KeyStoreService;
@@ -31,6 +32,7 @@ import java.util.Set;
  */
 public class TestSigningUtils {
 
+  private final static Logger LOGGER = LoggerFactory.getLogger(TestSigningUtils.class);
 
   public static final String KEYS_FILE =
     "/won-signed-messages/test-keys.jks";
@@ -108,16 +110,16 @@ public class TestSigningUtils {
   }
 
 
+  /**
+   * Not a test - but sometimes can be useful for generating test keys.
+   *
+   * @throws Exception
+   */
+  //@Test
   public void generateTestKeystore() throws Exception {
     Security.addProvider(new BouncyCastleProvider());
-    //URL keyUrl = TestSigningUtils.class.getResource(KEYS_FILE);
-    File keysFile = null;
-    //if (keyUrl == null) {
-      keysFile = new File("test-keys2.jks");
-    //} else {
-    //  keysFile = new File(TestSigningUtils.class.getResource(KEYS_FILE).getFile());
-    //}
 
+    File keysFile = new File("test-keys2.jks");
     KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
     storeService.init();
 
@@ -130,7 +132,12 @@ public class TestSigningUtils {
 
   }
 
-  @Test
+  /**
+   * Not a test - but sometimes can be useful for generating test keys.
+   *
+   * @throws Exception
+   */
+  //@Test
   public void generateKeystoreForNodeAndOwner() throws Exception {
 
     Security.addProvider(new BouncyCastleProvider());
@@ -159,20 +166,20 @@ public class TestSigningUtils {
   }
 
 
-  public void writeCert() throws IOException, CertificateException {
+  public void printCerts() throws IOException, CertificateException {
     //load public  keys:
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
     KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
 
-    writeCerificate(storeService, needCertUri, needCertUri);
-    writeCerificate(storeService, ownerCertUri, ownerCertUri);
-    writeCerificate(storeService, ownerCertUri, nodeCertUri);
+    printCerificate(storeService, needCertUri, needCertUri);
+    printCerificate(storeService, ownerCertUri, ownerCertUri);
+    printCerificate(storeService, ownerCertUri, nodeCertUri);
 
 
 
   }
 
-  private void writeCerificate(final KeyStoreService storeService, final String keyName, final String certUri)
+  private void printCerificate(final KeyStoreService storeService, final String keyName, final String certUri)
     throws IOException, CertificateException {
 
     System.out.println(keyName);
@@ -203,7 +210,7 @@ public class TestSigningUtils {
     Certificate cert = certificateService.createSelfSignedCertificate(serialNumber, keyPair, certUri, certUri);
     storeService.putKey(certUri, keyPair.getPrivate(), new Certificate[]{cert}, false);
 
-    System.out.println(cert);
+    LOGGER.debug("Adding for uri {} certificate {}", certUri, cert);
     //KeyInformationExtractorBouncyCastle extractor = new KeyInformationExtractorBouncyCastle();
   }
 
@@ -220,7 +227,7 @@ public class TestSigningUtils {
 
   public static void writeToTempFile(final Dataset testDataset) throws IOException {
     File outFile = File.createTempFile("won", ".trig");
-    System.out.println(outFile);
+    LOGGER.debug("Check output in temp file: " + outFile);
     OutputStream os = new FileOutputStream(outFile);
     RDFDataMgr.write(os, testDataset, RDFFormat.TRIG.getLang());
     os.close();

@@ -36,17 +36,6 @@ public class SigningFrameworkTest {
     private static final String RESOURCE_FILE = "/test_12_content_cupboard_45_45_15.ttl";
     private static final String RESOURCE_URI = "http://www.example.com/resource/need/12";
 
-//
-//    @Test
-//    public void modelToGraphCollectionTest() throws Exception {
-//
-//        Model model1 = ModelFactory.createDefaultModel();
-//        InputStream is1 = SigningFrameworkTest.class.getResourceAsStream(RESOURCE_FILE);
-//        model1.read(new InputStreamReader(is1), RESOURCE_URI, FileUtils.langTurtle);
-//        GraphCollection gc = CryptographyUtils.modelToGraphCollection(model1, RESOURCE_URI);
-//
-//        Assert.assertEquals(RESOURCE_URI, gc.getGraphs().get(0).getName());
-//    }
 
     // read write from signingframework by signingframework produces orig input?
     // yes

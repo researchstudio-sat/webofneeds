@@ -33,7 +33,7 @@ public class WonKeysReaderWriterTest
   private WonKeysReaderWriter extractor;
 
   @Before
-  public void init() {
+  public void init() throws Exception {
 
     keys = new TestingKeys(TestSigningUtils.KEYS_FILE);
     extractor = new WonKeysReaderWriter();

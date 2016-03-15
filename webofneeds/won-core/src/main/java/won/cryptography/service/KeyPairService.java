@@ -1,15 +1,14 @@
 package won.cryptography.service;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.cryptography.exception.KeyNotSupportedException;
 import won.cryptography.key.KeyInformationExtractor;
-import won.cryptography.model.WONCryptographyModel;
 
-import java.security.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.SecureRandom;
 import java.security.spec.ECGenParameterSpec;
 
 /**
@@ -22,93 +21,47 @@ public class KeyPairService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private KeyPairGenerator keyPairGenerator = new KeyPairGeneratorSpi.ECDSA();
+    private KeyPairGenerator keyPairGeneratorBrainpoolp384r1 = new KeyPairGeneratorSpi.ECDSA();
+    private org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi keyPairGeneratorSecp384r1 = new org.bouncycastle
+      .jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi.ECDSA();
 
     public KeyPairService(KeyInformationExtractor keyInformationExtractor) {
+        this();
         this.keyInformationExtractor = keyInformationExtractor;
     }
 
     private KeyInformationExtractor keyInformationExtractor;
 
-    public KeyPairService() {}
+    public KeyPairService() {
+        try {
+            // use the predefined curves
+            ECGenParameterSpec ecGenSpec = new ECGenParameterSpec("brainpoolp384r1");
+            keyPairGeneratorBrainpoolp384r1.initialize(ecGenSpec, new SecureRandom());
 
-    /**
-     * produces RDF out of the public key of the key pair and adds it to the
-     * model of the subject
-     *
-     * @param subject Apache Jena Resource where the RDF will be added
-     * @param keyPair KeyPair which includes the public key
-     * @throws won.cryptography.exception.KeyNotSupportedException
-     */
-    public void appendPublicKeyRDF(Resource subject, KeyPair keyPair)
-            throws KeyNotSupportedException {
-        appendPublicKeyRDF(subject, keyPair.getPublic());
-    }
-
-    /**
-     * produces RDF out of the public key and adds it to the model of the subject
-     *
-     * @param subject   Apache Jena Resource where the RDF will be added
-     * @param publicKey public key which will be added
-     * @throws won.cryptography.exception.KeyNotSupportedException
-     */
-    public void appendPublicKeyRDF(Resource subject, PublicKey publicKey)
-            throws KeyNotSupportedException {
-
-        Model model = subject.getModel();
-
-        Resource blankNode = model.createResource();
-        subject.addProperty(WONCryptographyModel.CERT_key_Property, blankNode);
-
-
-        String curveID = keyInformationExtractor.getCurveID(publicKey);
-        if (curveID != null) {
-            blankNode.addProperty(WONCryptographyModel.CRYPT_ecc_curveID_Property,
-                    curveID);
+        } catch (Exception e) {
+            logger.error("Could not initialize bouncycastle key pair generator for ECDSA brainpoolp384r1");
+            throw new IllegalArgumentException(e);
         }
 
-        blankNode.addProperty(WONCryptographyModel.CRYPT_ecc_algorithm_Property,
-                keyInformationExtractor.getAlgorithm(publicKey));
-
-        blankNode.addProperty(WONCryptographyModel.CRYPT_ecc_qx_Property,
-                keyInformationExtractor.getQX(publicKey));
-
-        blankNode.addProperty(WONCryptographyModel.CRYPT_ecc_qy_Property,
-                              keyInformationExtractor.getQY(publicKey));
-
-
-    }
-
-    //TODO make better api for curve support, and ideally also add RSA support...
-    public KeyPair generateNewKeyPairInSecp384r1() {
-        ECGenParameterSpec ecGenSpec = new ECGenParameterSpec("secp384r1");
-        org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi keyPairGenerator = new org.bouncycastle
-          .jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi.ECDSA();
         try {
-            keyPairGenerator.initialize(ecGenSpec, new SecureRandom());
+            ECGenParameterSpec ecGenSpec = new ECGenParameterSpec("secp384r1");
+            keyPairGeneratorSecp384r1.initialize(ecGenSpec, new SecureRandom());
         } catch (InvalidAlgorithmParameterException e) {
             logger.error("Could not initialize bouncycastle key pair generator for ECDSA secp384r1");
             throw new IllegalArgumentException(e);
         }
-        KeyPair pair = keyPairGenerator.generateKeyPair();
+    }
+
+
+    //TODO make better api for curve support, and ideally also add RSA support...
+    public KeyPair generateNewKeyPairInSecp384r1() {
+        KeyPair pair =  keyPairGeneratorSecp384r1.generateKeyPair();
         return pair;
     }
 
 
     public KeyPair generateNewKeyPairInBrainpoolp384r1() {
-        KeyPair pair = null;
-
-        try {
-
-            // use the predefined curves
-            ECGenParameterSpec ecGenSpec = new ECGenParameterSpec("brainpoolp384r1");
-            keyPairGenerator.initialize(ecGenSpec, new SecureRandom());
-            pair = keyPairGenerator.generateKeyPair();
-
-        } catch (Exception e) {
-            logger.warn("An error occurred!", e);
-        }
-
+        KeyPair pair = keyPairGeneratorBrainpoolp384r1.generateKeyPair();
         return pair;
     }
 }

@@ -1,10 +1,12 @@
 package won.cryptography.utils;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import won.cryptography.service.KeyStoreService;
 
 import java.io.File;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,11 +21,15 @@ public class TestingKeys
   private Map<String, PublicKey> publicKeys = new HashMap<>();
   private Map<String, PrivateKey> privateKeys = new HashMap<>();
 
-  public TestingKeys(final String keysFilePath) {
+  public TestingKeys(final String keysFilePath) throws Exception {
+
+    Security.addProvider(new BouncyCastleProvider());
 
     //load keys:
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
     KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
+    storeService.setDefaultAlias(TestSigningUtils.ownerCertUri);
+    storeService.init();
 
     privateKeys.put(TestSigningUtils.needCertUri, storeService.getPrivateKey(TestSigningUtils.needCertUri));
     privateKeys.put(TestSigningUtils.ownerCertUri, storeService.getPrivateKey(TestSigningUtils.ownerCertUri));
