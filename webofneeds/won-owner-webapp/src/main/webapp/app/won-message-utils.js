@@ -3,7 +3,11 @@
  */
 
 
-import { getRandomPosInt, checkHttpStatus } from './utils';
+import {
+    getRandomPosInt,
+    checkHttpStatus,
+    mapJoin,
+} from './utils';
 import won from './won-es6';
 
 import jsonld from 'jsonld';
@@ -238,7 +242,7 @@ export function isSuccessMessage(event) {
     return event.hasMessageType === won.WONMSG.successResponseCompacted;
 }
 
-export function getEventData(msgJson) {
+export function getEventsFromMessage(msgJson) {
     console.log('getting data from jsonld message');
 
     const eventData = {};
@@ -256,14 +260,20 @@ export function getEventData(msgJson) {
             '@type': source
         }));
 
-    const maybeFramedMsg = Promise.all(framingAttempts)
-        .then(framedMessages =>
-            //filter out failed framing attempts
-            framedMessages.filter(msg => msg['@graph'].length > 0)
-        )
+    const maybeFramedMsgs = Promise.all(framingAttempts)
+        .then(framedMessages => {
+            let acc = {};
+            framedMessages.forEach((msg, i) => {
+                //filter out failed framing attempts
+                if( msg['@graph'].length > 0) {
+                    acc[acceptedSources[i]] = msg;
+                }
+            });
+            return acc;
+        })
         .then(msgFramings => {
             /* check framing results for failures */
-            if(msgFramings.length < 1) {
+            if(Object.keys(msgFramings).length < 1) {
                 /* Not a valid type */
                 const e = new Error('Tried to jsond-ld-frame the message ', msgJson,
                     ' but it\'s type was neither of the following, accepted types: ',
@@ -273,42 +283,31 @@ export function getEventData(msgJson) {
                 e.framedMessages = msgFramings;
                 throw e;
             }
-/*            else if(msgFramings.length > 1) {
-
-                /!* Multiple type declarations -> not valid json-ld *!/
-                const e = new Error('The framing found ' + msgFramings.length +
-                    'message types. Either the message wasn\'t valid json-ld or the ' +
-                    'framing has a bug. Please open a github issue at ' +
-                    'https://github.com/researchstudio-sat/webofneeds/issues/ in that ' +
-                    'case with all message. \n message before framing: ' + msgJson,
-                    '\nmessage after framing: ' + msgFramings
-                    );
-                e.msgJson = msgJson;
-                e.acceptedSources = acceptedSources;
-                e.framedMessages = msgFramings;
-                throw e;
-            } */
             else {
-                return msgFramings[0];
+                return msgFramings;
             }
         });
 
-    return maybeFramedMsg.then(framedMessage => {
-        const framedSimplifiedMessage = Object.assign(
-            { '@context': framedMessage['@context'] }, //keep context
-            framedMessage['@graph'][0] //use first node - the graph should only consist of one node at this point
-        );
-        let eventData = {};
-        for (key in framedSimplifiedMessage){
-            const propName = won.getLocalName(key);
-            if (propName != null && ! won.isJsonLdKeyword(propName)) {
-                eventData[propName] = won.getSafeJsonLdValue(framedSimplifiedMessage[key]);
+    const simplifiedEvents = maybeFramedMsgs.then(framedMessages =>
+        mapJoin(framedMessages, framedMessage => {
+            console.log(framedMessages);//TODO deletme. to prevent it from being optimized away.
+            const framedSimplifiedMessage = Object.assign(
+                { '@context': framedMessage['@context'] }, //keep context
+                framedMessage['@graph'][0] //use first node - the graph should only consist of one node at this point
+            );
+            let eventData = {};
+            for (key in framedSimplifiedMessage){
+                const propName = won.getLocalName(key);
+                if (propName != null && ! won.isJsonLdKeyword(propName)) {
+                    eventData[propName] = won.getSafeJsonLdValue(framedSimplifiedMessage[key]);
+                }
             }
-        }
-        eventData.uri = won.getSafeJsonLdValue(framedSimplifiedMessage);
-        eventData.framedMessage = framedSimplifiedMessage;
-        return eventData;
-    }) ;
+            eventData.uri = won.getSafeJsonLdValue(framedSimplifiedMessage);
+            eventData.framedMessage = framedSimplifiedMessage;
+            return eventData;
+        })
+    );
+    return simplifiedEvents;
 }
 
 window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;

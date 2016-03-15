@@ -20,7 +20,7 @@
 import { attach, delay, watchImmutableRdxState} from './utils';
 //import './message-service'; //TODO still uses es5
 import { actionCreators }  from './actions/actions';
-import { getEventData,setCommStateFromResponseForLocalNeedMessage } from './won-message-utils';
+import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from './won-message-utils';
 import SockJS from 'sockjs';
 import * as messages from './actions/messages-actions';
 
@@ -91,47 +91,50 @@ export function runMessagingAgent(redux) {
         const data = JSON.parse(receivedMsg.data);
 
         console.log('onMessage: ', data);
-        getEventData(data).then(event=> {
-            console.log('onMessage: event.hasMessageType === ', event.hasMessageType);
+        getEventsFromMessage(data).then(events => {
 
-            switch (event.hasMessageType) {
-                case won.WONMSG.hintMessageCompacted:
-                    redux.dispatch(actionCreators.messages__hintMessageReceived(event));
-                    break;
-
-                case won.WONMSG.connectMessageCompacted:
-                    redux.dispatch(actionCreators.messages__connectMessageReceived(event));
-                    break;
+            /* Other clients or matcher initiated stuff: */
+            if (events['msg:FromExternal'] &&
+                events['msg:FromExternal'].hasMessageType === won.WONMSG.hintMessageCompacted){
+                    redux.dispatch(actionCreators.messages__hintMessageReceived(events['msg:FromExternal']));
+            }
+            if(events['msg:FromExternal'] &&
+               events['msg:FromOwner'] &&
+               events['msg:FromOwner'].hasMessageType === won.WONMSG.connectMessageCompacted ){
+                    redux.dispatch(actionCreators.messages__connectMessageReceived(events));
             }
 
-            switch(event.isResponseToMessageType) {
-                case won.WONMSG.createMessageCompacted:
-                    if(event.hasMessageType === won.WONMSG.successResponseCompacted)
-                        redux.dispatch(actionCreators.messages__create__success(event));
-                    //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
-                    //    redux.dispatch(actionCreators.messages__create__failed(event));
-                    break;
+            /* responses to own actions: */
+            if(events['msg:FromSystem']) {
+                switch (events['msg:FromSystem'].isResponseToMessageType) {
+                    case won.WONMSG.createMessageCompacted:
+                        if (events['msg:FromSystem'].hasMessageType === won.WONMSG.successResponseCompacted)
+                            redux.dispatch(actionCreators.messages__create__success(events['msg:FromSystem']));
+                        //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
+                        //    redux.dispatch(actionCreators.messages__create__failed(event));
+                        break;
 
-                case won.WONMSG.openMessageCompacted:
-                    if(event.hasMessageType === won.WONMSG.successResponseCompacted)
-                        redux.dispatch(actionCreators.messages__open__success(event));
-                    //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
-                    //  redux.dispatch(actionCreators.messages__open__failed(event));
-                    break;
+                    case won.WONMSG.openMessageCompacted:
+                        if (events['msg:FromSystem'].hasMessageType === won.WONMSG.successResponseCompacted)
+                            redux.dispatch(actionCreators.messages__open__success(events['msg:FromSystem']));
+                        //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
+                        //  redux.dispatch(actionCreators.messages__open__failed(event));
+                        break;
 
-                case won.WONMSG.closeMessageCompacted:
-                    if(event.hasMessageType === won.WONMSG.successResponseCompacted)
-                        redux.dispatch(actionCreators.messages__close__success(event));
-                    //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
-                    //  redux.dispatch(actionCreators.messages__close__failed(event));
-                    break;
+                    case won.WONMSG.closeMessageCompacted:
+                        if (events['msg:FromSystem'].hasMessageType === won.WONMSG.successResponseCompacted)
+                            redux.dispatch(actionCreators.messages__close__success(events['msg:FromSystem']));
+                        //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
+                        //  redux.dispatch(actionCreators.messages__close__failed(event));
+                        break;
 
-                case won.WONMSG.closeNeedMessageCompacted:
-                    if(event.hasMessageType === won.WONMSG.successResponseCompacted)
-                        redux.dispatch(actionCreators.messages__closeNeed__success(event));
-                    else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
-                        redux.dispatch(actionCreators.messages__closeNeed__failed(event));
-                    break;
+                    case won.WONMSG.closeNeedMessageCompacted:
+                        if (events['msg:FromSystem'].hasMessageType === won.WONMSG.successResponseCompacted)
+                            redux.dispatch(actionCreators.messages__closeNeed__success(events['msg:FromSystem']));
+                        else if (events['msg:FromSystem'].hasMessageType === won.WONMSG.failureResponseCompacted)
+                            redux.dispatch(actionCreators.messages__closeNeed__failed(events['msg:FromSystem']));
+                        break;
+                }
             }
         })
 

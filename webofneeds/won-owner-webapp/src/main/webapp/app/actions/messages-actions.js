@@ -5,7 +5,7 @@
 
 import  won from '../won-es6';
 import { actionTypes, actionCreators, getConnectionRelatedData, messageTypeToEventType } from './actions';
-import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
+import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 
 import Immutable from 'immutable';
 
@@ -151,18 +151,22 @@ export function successfulCreate(event) {
     }
 }
 
-export function connectMessageReceived(event) {
+export function connectMessageReceived(events) {
     return dispatch=> {
-        event.eventType = messageTypeToEventType[event.hasMessageType].eventType;
+        const remoteEvent = events['msg:FromOwner'];
+        const ownEvent = events['msg:FromExternal'];
+        remoteEvent.eventType = messageTypeToEventType[remoteEvent.hasMessageType].eventType;
         //TODO data.hasReceiver, the connectionUri is undefined in the response message
-        won.invalidateCacheForNewConnection(event.hasReceiver, event.hasReceiverNeed)
+        won.invalidateCacheForNewConnection(ownEvent.hasReceiver, remoteEvent.hasReceiverNeed)
             .then(() => {
-                won.getConnectionWithOwnAndRemoteNeed(event.hasReceiverNeed, event.hasSenderNeed).then(connectionData=> {
+                won.getConnectionWithOwnAndRemoteNeed(remoteEvent.hasReceiverNeed, remoteEvent.hasSenderNeed).then(connectionData=> {
                     //TODO refactor
-                    getConnectionRelatedData(event.hasReceiverNeed, event.hasSenderNeed, connectionData.uri)
+                    getConnectionRelatedData(remoteEvent.hasReceiverNeed, remoteEvent.hasSenderNeed, connectionData.uri)
                     .then(data => {
-                            event.unreadUri = connectionData.uri;
-                            data.receivedEvent = event;
+                            //making sure it's the same thing. trying to approach a point,
+                            // where this is *just* a uri and everythinng else is in the state.
+                            data.receivedEvent = ownEvent.uri;
+                            data.updatedConnection = connectionData.uri;
                             dispatch({
                                 type: actionTypes.messages.connectMessageReceived,
                                 payload: data
@@ -183,7 +187,7 @@ export function hintMessageReceived(event) {
                 let needUri = event.hasReceiverNeed;
                 let match = {}
 
-                event.unreadUri = event.hasReceiver;
+                event.unreadUri = event.hasReceiver;//TODO should be deprecated (as it's set in the event-reducer)
                 event.matchScore = event.framedMessage[won.WON.hasMatchScoreCompacted];
                 event.matchCounterpartURI = won.getSafeJsonLdValue(event.framedMessage[won.WON.hasMatchCounterpart]);
 
@@ -191,7 +195,8 @@ export function hintMessageReceived(event) {
 
                 getConnectionRelatedData(needUri, event.hasMatchCounterpart, event.hasReceiver)
                 .then(data => {
-                        data.receivedEvent = event;
+                        data.receivedEvent = event.uri;
+                        data.updatedConnection = event.hasReceiver;
                         dispatch({
                             type: actionTypes.messages.hintMessageReceived,
                             payload: data
