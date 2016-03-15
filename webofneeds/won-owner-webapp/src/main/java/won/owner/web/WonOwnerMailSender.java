@@ -23,8 +23,8 @@ public class WonOwnerMailSender {
   private static final String NOTIFICATION_END = "\n\n\n" +
     "Sincerely yours,\nOwner application team" +
     "\n\n\n\n" +
-    "You have received this email because you are subscribed to getting Match" +
-    " notifications for your posting. If you received this email in error please click on the link below." +
+    "You have received this email because you are subscribed to getting " +
+    "notifications for your posting. If you received this email in error please click on the link below." +
     "\n" +
     "\n\n" +
     "This is an automatic email, please do not reply." ;
