@@ -4,7 +4,7 @@
 
 import  won from '../won-es6';
 import { actionTypes, actionCreators, getConnectionRelatedData, messageTypeToEventType  } from './actions';
-import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
+import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 
 import { selectAllByConnections } from '../selectors';
 

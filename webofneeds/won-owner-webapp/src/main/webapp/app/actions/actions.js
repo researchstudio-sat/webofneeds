@@ -50,7 +50,7 @@ import {
     entries,
 } from '../utils';
 import { hierarchy2Creators } from './action-utils';
-import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
+import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import {
     buildCreateMessage,
     buildCloseNeedMessage

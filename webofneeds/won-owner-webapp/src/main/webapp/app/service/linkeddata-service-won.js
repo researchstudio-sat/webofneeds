@@ -1001,7 +1001,7 @@ const rdfstore = window.rdfstore;
     won.getEventsOfConnection = function(connectionUri, requesterWebId) {
         return won.getEventUrisOfConnection(connectionUri, requesterWebId)
             .then(eventUris => urisToLookupMap(eventUris,
-                    eventUri => won.getNode(eventUri, requesterWebId))
+                    eventUri => won.getEvent(eventUri, requesterWebId))
             )
     };
 
@@ -1314,6 +1314,31 @@ const rdfstore = window.rdfstore;
     };
 
     //aliases (formerly functions that were just pass-throughs)
+    won.getEvent = (uri, requesterWebId) => won.getNode(uri, requesterWebId)
+            .then(event => {
+                // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
+                if(is('Array', event.hasReceivedTimestamp)) {
+                    const latestFirst = event.hasReceivedTimestamp.sort((x,y) => new Date(x) > new Date(y));
+                    event.hasReceivedTimestamp = latestFirst[0];
+                }
+
+                if(!event.hasCorrespondingRemoteMessage) {
+                    return event;
+                } else {
+                    /*
+                    * there's some messages (e.g. incoming connect) where there's
+                    * vital information in the correspondingRemoteMessage. So
+                    * we fetch it here.
+                    */
+                    return won
+                        .getNode(event.hasCorrespondingRemoteMessage, requesterWebId)
+                        .then(correspondingEvent => {
+                           event.hasCorrespondingRemoteMessage = correspondingEvent;
+                           return event;
+                        })
+                }
+            });
+
     won.getConnectionEvent =
     won.getNodeWithAttributes =
     /**

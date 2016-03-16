@@ -7,30 +7,19 @@ import Immutable from 'immutable';
 
 
 //TODO update to reflect simplfied state (drop one 'connections')
-const selectConnections = state => state.getIn(['connections', 'connections']);
+const selectConnections = state => state.getIn(['connections']);
 const selectEvents = state => state.getIn(['events', 'events']);
 
 export const selectUnreadEventUris = state => state
-    .getIn(['events', 'unreadEventUris'])
-    //TODO unreadEventUris should just be this set of strings in the first place (to avoid saving redundant data)
-    .map(event => event.get('uri'))
-    .toSet();
-
-window.selectUnreadUris4dbg =  selectUnreadEventUris;
+    .getIn(['events', 'unreadEventUris']);
 
 //TODO the earlier unreadEvents was organised by need-uri!
 
-export const selectUnreadEventsRework = createSelector(
+export const selectUnreadEvents = createSelector(
     selectEvents, selectUnreadEventUris,
     (events, unreadEventUris) =>
         unreadEventUris.map(eventUri => events.get(eventUri))
 );
-
-/**
- * @deprecated
- * @param state
- */
-export const selectUnreadEvents = state => state.getIn(['events', 'unreadEventUris']);
 
 //const selectUnreadEvents = state => state.getIn(['events', 'unreadEventUris']);
 
