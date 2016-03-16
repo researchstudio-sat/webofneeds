@@ -113,8 +113,7 @@ const actionHierarchy = {
         accepted: INJ_DEFAULT,
         close: connectionsClose,
         rate: connectionsRate,
-        sendOpen:INJ_DEFAULT,
-        add:INJ_DEFAULT,
+        sendChatMessage: INJ_DEFAULT,
         reset:INJ_DEFAULT,
     },
     needs: {
