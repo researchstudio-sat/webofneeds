@@ -22,8 +22,13 @@ function genComponentConf() {
             </div>
         </div>
         <div class="pm__footer">
-            <won-dynamic-textfield placeholder="::'Your Message'"></won-dynamic-textfield>
-            <button class="won-button--filled red">Send</button>
+            <won-dynamic-textfield
+                placeholder="::'Your Message'"
+                on-input="::self.input(value)">
+            </won-dynamic-textfield>
+            <button
+                class="won-button--filled red"
+                ng-click="::self.send()">Send</button>
         </div>
     `;
 
@@ -31,7 +36,18 @@ function genComponentConf() {
         constructor() {
             window.pm4dbg = this;
 
-            this.postmsg = this;
+            this.postmsg4dbg = this;
+        }
+
+        input(input) {
+            console.log('post message: ', input);
+            this.chatMessage = input;
+        }
+        send() {
+            const trimmedMsg = this.chatMessage.trim();
+            if(trimmedMsg) {
+               this.connections__sendChatMessage(trimmedMsg);
+            }
         }
     }
 
