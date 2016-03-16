@@ -50,7 +50,6 @@ function genComponentConf() {
         }
 
         input(input) {
-            console.log('post message: ', input);
             this.chatMessage = input;
         }
 
