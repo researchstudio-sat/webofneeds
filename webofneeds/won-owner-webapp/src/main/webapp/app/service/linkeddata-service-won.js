@@ -625,9 +625,10 @@ const rdfstore = window.rdfstore;
             requestUri = requestUri.replace(re, ':');
 
             fetch(requestUri, {
-                method: 'get',
-                credentials: 'include'
-            })
+                    method: 'get',
+                    credentials: "same-origin",
+                    headers: { 'Accept': 'application/ld+json' }
+                })
             .then(dataset => dataset.json())
             .then(
                 dataset => {
