@@ -33,21 +33,25 @@ function genComponentConf() {
             console.log('dynamic-textfield.js : in ctrl', this, this.$element)
             */
 
+            window.dtf4dbg = this;
 
             this.displayingPlaceholder = true;
             this.value = '';
 
-            this.textFieldNg().bind('keydown',e => this.onKeydown(e))
+            this.textFieldNg().bind('keydown',e => this.onKeydown(e)) //prevent enter
+                              .bind('keyup', () => this.input()) // handle title changes
                               .bind('focus', (e) => this.onFocus(e))
                               .bind('blur', (e) => this.onBlur(e))
-                              .bind('keyup drop paste', () => this.input())
-            //this.textField().addEventListener('keyup', () => this.input());
-            //this.textField().addEventListener('drop', () => this.input());
-            //this.textField().addEventListener('paste', () => this.input());
-
-            //don't want the default input event to bubble and leak into this directives event-stream
+                            /*
+                              .bind('drop paste', (e) => {
+                                  e.stopPropagation();
+                                  this.sanitize();
+                                  return this.input();
+                              })
+                              */
+                              //don't want the default input event to bubble and leak into this directives event-stream
                               .bind('input', (e) => e.stopPropagation());
-            //this.textField().addEventListener('input', (e) => e.stopPropagation());
+
 
             /*
             *   TODO
@@ -79,10 +83,15 @@ function genComponentConf() {
             }
         }
         input () {
+            console.log('got input in dynamic textfeld ', this.getText());
             if(!this.displayingPlaceholder) {
-                const newVal = this.getText();
+                if(this.getUnsanitizedText() !== this.getText() ||
+                    this.textField().innerHTML.match(/<br>./)) { //also supress line breaks inside the text in copy-pasted text
+                        this.setText(this.getText()); //sanitize
+                    }
+                const newVal = this.getText().trim();
                 //make sure the text field contains the sanitized text (so user sees what they're posting)
-                this.setText(newVal);
+                //this.setText(newVal);
 
                 //compare with previous value, if different
                 if(this.value !== newVal) {
@@ -127,11 +136,16 @@ function genComponentConf() {
         textField() {
             return this.textFieldNg()[0];
         }
+        getUnsanitizedText() {
+            return this.textField().textContent;
+        }
         getText() {
             //sanitize input
-            return this.$sanitize(this.textField().innerHTML)
-                .replace(/<(?:.|\n)*?>/gm, '') //strip html tags
-                .trim();
+            //return this.$sanitize(this.getUnsanitizedText())
+            return this.getUnsanitizedText()
+                .replace(/<br>/gm, ' ')
+                .replace(/<(?:.|\n)*?>/gm, ''); //strip html tags
+
         }
         setText(txt) {
             this.textField().innerHTML = txt
