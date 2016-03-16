@@ -20,6 +20,13 @@ import {
     buildConnectMessage
 } from '../won-message-utils';
 
+export function connectionsChatMessage(chatMessage) {
+   return dispatch => {
+       console.log('connectionsChatMessage: ', chatMessage);
+
+   }
+}
+
 export function connectionsFetch(data) {
     return dispatch=> {
         const allConnectionsPromise = won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], data.needUri);

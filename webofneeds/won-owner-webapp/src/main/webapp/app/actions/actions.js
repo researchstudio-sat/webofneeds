@@ -73,7 +73,8 @@ import {
     connectionsFetch,
     connectionsLoad,
     connectionsOpen,
-    connectionsRate
+    connectionsRate,
+    connectionsChatMessage,
 } from './connections-actions';
 
 import * as messages from './messages-actions';
@@ -113,7 +114,7 @@ const actionHierarchy = {
         accepted: INJ_DEFAULT,
         close: connectionsClose,
         rate: connectionsRate,
-        sendChatMessage: INJ_DEFAULT,
+        sendChatMessage: connectionsChatMessage,
         reset:INJ_DEFAULT,
     },
     needs: {

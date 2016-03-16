@@ -3,6 +3,10 @@
 import angular from 'angular';
 import squareImageModule from './square-image';
 import dynamicTextFieldModule from './dynamic-textfield';
+import { attach } from '../utils.js'
+import { actionCreators }  from '../actions/actions';
+
+const serviceDependencies = ['$ngRedux', '$scope'];
 
 function genComponentConf() {
     let template = `
@@ -33,16 +37,23 @@ function genComponentConf() {
     `;
 
     class Controller {
-        constructor() {
+        constructor(/* arguments = dependency injections */) {
+            attach(this, serviceDependencies, arguments);
             window.pm4dbg = this;
+            //this.postmsg = this;
+            const selectFromState = state => ({
+                state4dbg: state
+            });
 
-            this.postmsg4dbg = this;
+            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
+            this.$scope.$on('$destroy', disconnect);
         }
 
         input(input) {
             console.log('post message: ', input);
             this.chatMessage = input;
         }
+
         send() {
             const trimmedMsg = this.chatMessage.trim();
             if(trimmedMsg) {
@@ -50,6 +61,7 @@ function genComponentConf() {
             }
         }
     }
+    Controller.$inject = serviceDependencies;
 
     return {
         restrict: 'E',
