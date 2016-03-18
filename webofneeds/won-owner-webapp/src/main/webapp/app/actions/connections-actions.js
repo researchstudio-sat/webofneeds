@@ -5,6 +5,7 @@
 import  won from '../won-es6';
 import { actionTypes, actionCreators, getConnectionRelatedData, messageTypeToEventType  } from './actions';
 import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
+import { getRandomPosInt } from '../utils';
 
 import { selectAllByConnections } from '../selectors';
 
@@ -20,10 +21,27 @@ import {
     buildConnectMessage
 } from '../won-message-utils';
 
-export function connectionsChatMessage(chatMessage) {
+export function connectionsChatMessage(chatMessage, connectionUri) {
    return dispatch => {
-       console.log('connectionsChatMessage: ', chatMessage);
+       console.log('connectionsChatMessage: ', chatMessage, connectionUri);
 
+       won.getEnvelopeDataforConnection(connectionUri)
+           .then(envelopeData => {
+               const eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt(1,9223372036854775807);
+
+               const message = new won.MessageBuilder(won.WONMSG.connectionMessage)
+                   .eventURI(eventUri)
+                   .forEnvelopeData(envelopeData)
+                   .addContentGraphData(won.WON.hasTextMessage, chatMessage)
+                   .hasOwnerDirection()
+                   .hasSentTimestamp(new Date().getTime())
+                   .build();
+
+               return {eventUri, message};
+
+           }).then(eventUriAndMessage => {
+               dispatch(actionCreators.messages__send(eventUriAndMessage));
+           });
    }
 }
 
