@@ -29,7 +29,7 @@ function genComponentConf() {
                     </won-square-image>
                     <div class="pm__content__message__content">
                         <div class="pm__content__message__content__text">{{ message.hasTextMessage }}</div>
-                        <div class="pm__content__message__content__time">{{ message.hasReceivedTimestamp }}</div>
+                        <div class="pm__content__message__content__time">{{ message.humanReadableTimestamp }}</div>
                     </div>
             </div>
         </div>
@@ -57,19 +57,29 @@ function genComponentConf() {
             this.$scope.$on('$destroy', disconnect);
         }
         chatMessages() {
-            return this.connectionAndRelatedData.events.filter(e => {
-                if(e.hasTextMessage) return true;
-                else {
+            if (!this.connectionAndRelatedData || !this.connectionAndRelatedData.events) {
+                return [];
+            }else {
+                const toDate = (ts) => new Date(Number.parseInt(ts));
+                return this.connectionAndRelatedData.events.filter(e => {
+                    if (e.hasTextMessage) return true;
+                    else {
+                        const remote = e.hasCorrespondingRemoteMessage;
+                        return remote && remote.hasTextMessage;
+                    }
+                }).map(e => {
                     const remote = e.hasCorrespondingRemoteMessage;
-                    return remote && remote.hasTextMessage;
-                }
-            }).map(e => {
-                const remote = e.hasCorrespondingRemoteMessage;
-                if(e.hasTextMessage)
-                    return e;
-                else
-                    return remote;
-            })
+                    if (e.hasTextMessage)
+                        return e;
+                    else
+                        return remote;
+                }).sort((a, b) =>
+                    toDate(a.hasReceivedTimestamp) > toDate(b.hasReceivedTimestamp)
+                ).map(e => {
+                        e.humanReadableTimestamp = (toDate(e.hasReceivedTimestamp)).toString();
+                        return e;
+                    });
+            }
 
         }
 
