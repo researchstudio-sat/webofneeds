@@ -168,11 +168,11 @@ and two signatures:
 
 The outer envelope is represented by the named graph 
 ```<../event/n8s7pk2y0nxdyg20s0rc#envelope-05af>```. It references another envelope as well
- as its signature. Verification of this message proceeds in a chained manner: 
+as its signature. Verification of this message proceeds in a chained manner: 
  * verification of the outer envelope ```<.../event/n8s7pk2y0nxdyg20s0rc#envelope-05af>```
   signed by the signature ```<.../event/n8s7pk2y0nxdyg20s0rc#envelope-05af-sig>```
  * verification of the referenced envelope ```<.../event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d>``` signed by the signature 
- ```<.../event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d-sig>```
+```<.../event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d-sig>```
  * equality check of the referenced signature value in the signature graph and in the referencing envelope
    
 
@@ -228,7 +228,7 @@ it signs the added metadata, and sends it to URI2/S/.
 
 * steps marked by **D**:
  * The recipient publishing service successfully receives the message and, after adding metadata and signing the 
- message, publishes it. Finally it is sent to its destination, URL2/O/. 
+message, publishes it. Finally it is sent to its destination, URL2/O/. 
 
 * steps marked by **E**:
  * The recipient’s publishing 

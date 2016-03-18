@@ -12,7 +12,7 @@ On all those channels we apply TLS protocol, to ensure endpoints authentication 
 protect it from eavesdropping by the unauthorized parties. 
 
 
-### User browser and Owner application server channel
+###User browser and Owner application server channel
 
 <img src="tls-channels-owner-owner.png" width="800"/>
 
@@ -37,7 +37,7 @@ and Application configurations). The user authentication is managed by Spring se
 For development purposes, Owner application server has self-signed certificate. For production, a certificate signed 
 by a trusted CA should be used, otherwise users cannot be sure they communicate with the announced server.
  
- ###Owner-Node, Matcher-Node, Node-Node applications channel
+###Owner-Node, Matcher-Node, Node-Node applications channel
  
 <img src="tls-channels-jms-node.png" width="800"/>
  
@@ -62,7 +62,7 @@ not implemented for authenticating endpoints on the communication channels liste
 verification. It is also possible to switch to it in the current design, provided all communication channel endpoints
 have a WebID with their public key published. 
  
-### Node application channel for reading linked data
+###Node application channel for reading linked data
   
 <img src="tls-channels-everyone-node.png" width="800"/>
 
