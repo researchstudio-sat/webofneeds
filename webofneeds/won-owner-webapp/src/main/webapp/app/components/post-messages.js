@@ -5,6 +5,7 @@ import squareImageModule from './square-image';
 import dynamicTextFieldModule from './dynamic-textfield';
 import { attach } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
+import { labels, updateRelativeTimestamps } from '../won-label-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 
@@ -17,12 +18,19 @@ function genComponentConf() {
             <img class="pm__header__options__icon clickable" src="generated/icon-sprite.svg#ico_settings" ng-click="self.openConversationOption()"/>
         </div>
         <div class="pm__content">
-            <div class="pm__content__message" ng-repeat="message in self.connectionAndRelatedData.events |filterByEventMsgs" ng-class="message.hasSenderNeed == self.connectionAndRelatedData.ownNeed.uri? 'right' : 'left'">
-                <won-square-image title="self.connectionAndRelatedData.remoteNeed.title" src="self.connectionAndRelatedData.remoteNeed.titleImgSrc" ng-show="message.hasSenderNeed != self.connectionAndRelatedData.ownNeed.uri"></won-square-image>
-                <div class="pm__content__message__content">
-                    <div class="pm__content__message__content__text">{{message.hasTextMessage}}</div>
-                    <div class="pm__content__message__content__time">{{message.hasReceivedTimestamp}}</div>
-                </div>
+            <div
+                class="pm__content__message"
+                ng-repeat="message in self.chatMessages()"
+                ng-class="message.hasSenderNeed == self.connectionAndRelatedData.ownNeed.uri? 'right' : 'left'">
+                    <won-square-image
+                        title="self.connectionAndRelatedData.remoteNeed.title"
+                        src="self.connectionAndRelatedData.remoteNeed.titleImgSrc"
+                        ng-show="message.hasSenderNeed != self.connectionAndRelatedData.ownNeed.uri">
+                    </won-square-image>
+                    <div class="pm__content__message__content">
+                        <div class="pm__content__message__content__text">{{ message.hasTextMessage }}</div>
+                        <div class="pm__content__message__content__time">{{ message.hasReceivedTimestamp }}</div>
+                    </div>
             </div>
         </div>
         <div class="pm__footer">
@@ -47,6 +55,22 @@ function genComponentConf() {
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
+        }
+        chatMessages() {
+            return this.connectionAndRelatedData.events.filter(e => {
+                if(e.hasTextMessage) return true;
+                else {
+                    const remote = e.hasCorrespondingRemoteMessage;
+                    return remote && remote.hasTextMessage;
+                }
+            }).map(e => {
+                const remote = e.hasCorrespondingRemoteMessage;
+                if(e.hasTextMessage)
+                    return e;
+                else
+                    return remote;
+            })
+
         }
 
         input(input) {

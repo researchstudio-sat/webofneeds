@@ -109,10 +109,11 @@ app.filter('filterByNeedState', function(){
         return function(events){
             var filtered =[];
             angular.forEach(events,function(event){
-                if(event.hasTextMessage !== undefined){
+                if(event.hasTextMessage !== undefined ||
+                    (event.hasCorrespondingRemoteMessage && event.hasCorrespondingRemoteMessage.hasTextMessage )){
                     filtered.push(event);
                 }
-            })
+            });
 
             return filtered;
         }

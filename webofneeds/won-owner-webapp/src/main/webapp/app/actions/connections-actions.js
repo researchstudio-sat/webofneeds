@@ -41,6 +41,10 @@ export function connectionsChatMessage(chatMessage, connectionUri) {
 
            }).then(eventUriAndMessage => {
                dispatch(actionCreators.messages__send(eventUriAndMessage));
+               /*TODO optimistic success assumption
+               * const dataFromExpectedAnswer = ‥
+               //dispatch{{actionType: actionTypes.connections.sendChatMessage, payload: dataFromExpectedAnswer});
+               */
            });
    }
 }

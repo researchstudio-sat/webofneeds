@@ -92,6 +92,7 @@ export function runMessagingAgent(redux) {
 
         console.log('onMessage: ', data);
         getEventsFromMessage(data).then(events => {
+            console.log('onMessage - events: ', events);
 
             /* Other clients or matcher initiated stuff: */
             if (events['msg:FromExternal'] &&
@@ -102,6 +103,13 @@ export function runMessagingAgent(redux) {
                events['msg:FromOwner'] &&
                events['msg:FromOwner'].hasMessageType === won.WONMSG.connectMessageCompacted ){
                     redux.dispatch(actionCreators.messages__connectMessageReceived(events));
+            }
+
+            if(events['msg:FromExternal'] &&
+                events['msg:FromOwner'] &&
+                events['msg:FromOwner'].hasMessageType === won.WONMSG.connectionMessageCompacted ){
+                //got a chat message on a connection
+                redux.dispatch(actionCreators.messages__connectionMessageReceived(events));
             }
 
             /* responses to own actions: */
@@ -133,6 +141,10 @@ export function runMessagingAgent(redux) {
                             redux.dispatch(actionCreators.messages__closeNeed__success(events['msg:FromSystem']));
                         else if (events['msg:FromSystem'].hasMessageType === won.WONMSG.failureResponseCompacted)
                             redux.dispatch(actionCreators.messages__closeNeed__failed(events['msg:FromSystem']));
+                        break;
+
+                    case won.WONMSG.connectionMessageCompacted:
+                        //TODO handle succesful posting
                         break;
                 }
             }

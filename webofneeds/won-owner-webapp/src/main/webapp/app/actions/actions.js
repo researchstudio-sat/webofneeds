@@ -178,6 +178,7 @@ const actionHierarchy = {
             success: messages.successfulCloseNeed,
             failure: messages.failedCloseNeed
         },
+        connectionMessageReceived: messages.connectionMessageReceived,
         connectMessageReceived: messages.connectMessageReceived,
         hintMessageReceived: messages.hintMessageReceived,
 

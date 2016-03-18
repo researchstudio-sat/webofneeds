@@ -32,6 +32,7 @@ export default function(state = initialState, action = {}) {
                     storeConnectionRelatedData(updatedState, connectionWithRelatedData),
                 state);
 
+        case actionTypes.messages.connectionMessageReceived:
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
             //TODO events should be an object too
