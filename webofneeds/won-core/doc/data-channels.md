@@ -14,7 +14,8 @@ protect it from eavesdropping by the unauthorized parties.
 
 ###User browser and Owner application server channel
 
-<img src="tls-channels-owner-owner.png" width="800"/>
+
+<img src="tls-channels-owner-owner.png" width="600"/>
 
 This is a channel directly facing the user when creating and managing his Needs, establishing and conducting 
 communication with other Needs. The user uses the browser, where the Owner application client side creates HTTP and 
@@ -38,8 +39,9 @@ For development purposes, Owner application server has self-signed certificate. 
 by a trusted CA should be used, otherwise users cannot be sure they communicate with the announced server.
  
 ###Owner-Node, Matcher-Node, Node-Node applications channel
- 
-<img src="tls-channels-jms-node.png" width="800"/>
+
+
+<img src="tls-channels-jms-node.png" width="600"/>
  
 The channel between Owner application server and Node server, Matcher and Node server, as well 
 as between two Node servers, is a TLS protected JMS channel (using activeMQ implementation) with required server and 
@@ -63,8 +65,9 @@ verification. It is also possible to switch to it in the current design, provide
 have a WebID with their public key published. 
  
 ###Node application channel for reading linked data
-  
-<img src="tls-channels-everyone-node.png" width="800"/>
+
+
+<img src="tls-channels-everyone-node.png" width="600"/>
 
 This is a channel on which the linked data is transferred from Node web application to any client that wants to read 
 this data. The client reads data via HTTP GET requests to the data URIs. These include Needs and Nodes resource 
