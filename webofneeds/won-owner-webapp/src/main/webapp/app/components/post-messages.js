@@ -12,13 +12,13 @@ function genComponentConf() {
     let template = `
         <div class="pm__header">
             <img class="pm__header__icon clickable" src="generated/icon-sprite.svg#ico36_close" ng-click="self.closeConversation()"/>
-            <div class="pm__header__title">Conversation about "{{self.item.remoteNeed.title}}"</div>
+            <div class="pm__header__title">Conversation about "{{self.connectionAndRelatedData.remoteNeed.title}}"</div>
             <div class="pm__header__options">Options  </div>
             <img class="pm__header__options__icon clickable" src="generated/icon-sprite.svg#ico_settings" ng-click="self.openConversationOption()"/>
         </div>
         <div class="pm__content">
-            <div class="pm__content__message" ng-repeat="message in self.item.events |filterByEventMsgs" ng-class="message.hasSenderNeed == self.item.ownNeed.uri? 'right' : 'left'">
-                <won-square-image title="self.item.remoteNeed.title" src="self.item.remoteNeed.titleImgSrc" ng-show="message.hasSenderNeed != self.item.ownNeed.uri"></won-square-image>
+            <div class="pm__content__message" ng-repeat="message in self.connectionAndRelatedData.events |filterByEventMsgs" ng-class="message.hasSenderNeed == self.connectionAndRelatedData.ownNeed.uri? 'right' : 'left'">
+                <won-square-image title="self.connectionAndRelatedData.remoteNeed.title" src="self.connectionAndRelatedData.remoteNeed.titleImgSrc" ng-show="message.hasSenderNeed != self.connectionAndRelatedData.ownNeed.uri"></won-square-image>
                 <div class="pm__content__message__content">
                     <div class="pm__content__message__content__text">{{message.hasTextMessage}}</div>
                     <div class="pm__content__message__content__time">{{message.hasReceivedTimestamp}}</div>
@@ -55,8 +55,9 @@ function genComponentConf() {
 
         send() {
             const trimmedMsg = this.chatMessage.trim();
+            const connectionUri = this.connectionAndRelatedData.connection.uri;
             if(trimmedMsg) {
-               this.connections__sendChatMessage(trimmedMsg);
+               this.connections__sendChatMessage(trimmedMsg, connectionUri);
             }
         }
     }
@@ -67,7 +68,7 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {item: "=",
+        scope: {connectionAndRelatedData: "=",
                 openConversation:"="},
         template: template
     }
