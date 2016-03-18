@@ -170,7 +170,7 @@ The outer envelope is represented by the named graph
 ```<../event/n8s7pk2y0nxdyg20s0rc#envelope-05af>```. It references another envelope as well
 as its signature. Verification of this message proceeds in a chained manner: 
  * verification of the outer envelope ```<.../event/n8s7pk2y0nxdyg20s0rc#envelope-05af>```
-  signed by the signature ```<.../event/n8s7pk2y0nxdyg20s0rc#envelope-05af-sig>```
+signed by the signature ```<.../event/n8s7pk2y0nxdyg20s0rc#envelope-05af-sig>```
  * verification of the referenced envelope ```<.../event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d>``` signed by the signature 
 ```<.../event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d-sig>```
  * equality check of the referenced signature value in the signature graph and in the referencing envelope
