@@ -11,7 +11,7 @@ By default Node, Need, Connection and container resources are public in WoN - ca
 By default Event resources can only be accessed by the party that has identity of one of the participants of this 
 event: receiver need, receiver node, sender need or sender node. WebID-TLS is used to verify the identity. The 
 node web application configuration in web.xml points to the 
-[configuration](src/main/resources/spring/node-context.xml) that specifies the WebID filter and access control rules 
+[configuration](../src/main/resources/spring/node-context.xml) that specifies the WebID filter and access control rules 
 to use. 
 
 ##### Debugging resources with restricted access

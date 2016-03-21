@@ -71,7 +71,7 @@ have a WebID with their public key published.
 
 This is a channel on which the linked data is transferred from Node web application to any client that wants to read 
 this data. The client reads data via HTTP GET requests to the data URIs. These include Needs and Nodes resource 
-descriptions and their messages. See more details in [won-node-webapp](../won-node-webapp) module.
+descriptions and their messages. See more details in [won-node-webapp](../../won-node-webapp) module.
   
 The channel is implemented as HTTPS channel with required server and client authentication. 
 The server is authenticated so that the linked data client can be sure it can trust the returned data is really 

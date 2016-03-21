@@ -81,7 +81,7 @@ In WoN reference implementation, Tomcat is used as a stand-alone web server on w
 application run. The configuration below is therefore specific to Tomcat. We use 
 [Tomcat 8.0.24](https://tomcat.apache.org/download-80.cgi) and 
 [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) 
-(using ava 8 provides the benefit that TLS1.2 will be used by default).
+(using Java 8 provides the benefit that TLS1.2 will be used by default).
 
 In order to provide Owner and Node as secure services, to which one can connect using HTTPS, the WoN servers have 
 been configured:
