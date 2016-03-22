@@ -10,8 +10,8 @@ import postMessagesModule from '../post-messages';
 import { attach,mapToMatches } from '../../utils';
 import won from '../../won-es6';
 import { actionCreators }  from '../../actions/actions';
-import needConnectionMessageLineModule from '../connection-message-item-line';
 import openConversationModule from '../open-conversation';
+import connectionSelectionModule from '../connection-selection';
 import { selectAllByConnections } from '../../selectors';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
@@ -25,21 +25,31 @@ class Controller {
         const selectFromState = (state)=>{
             const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
             const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
+            const conversations = Object.keys(connectionsDeprecated)
+                    .map(key => connectionsDeprecated[key])
+                    .filter(conn =>
+                        conn.connection.hasConnectionState === won.WON.Connected &&
+                        conn.ownNeed.uri === postId
+                    );
+            const conversationUris = conversations.map(conn => conn.connection.uri)
 
             return {
                 post: state.getIn(['needs','ownNeeds', postId]).toJS(),
-                conversations: Object.keys(connectionsDeprecated)
-                    .map(key => connectionsDeprecated[key])
-                    .filter(conn=>{
-                        if(conn.connection.hasConnectionState===won.WON.Connected && conn.ownNeed.uri === postId){
-                            return true
-                        }
-                    }),
+                allByConnections: connectionsDeprecated,
+                conversations: conversations,
+                conversationUris: conversationUris,
             };
         }
 
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
         this.$scope.$on('$destroy', disconnect);
+    }
+    setOpenConversation(connectionUri) {
+        console.log('p-o-m -- setOpenConversation: ', connectionUri);
+        this.openConversationUri = connectionUri;
+    }
+    getOpenConversation() {
+        return this.allByConnections[this.openConversationUri];
     }
 }
 
@@ -49,7 +59,8 @@ export default angular.module('won.owner.components.postOwner.messages', [
         visitorTitleBarModule,
         galleryModule,
         postMessagesModule,
-        needConnectionMessageLineModule
+        needConnectionMessageLineModule,
+        connectionSelectionModule,
     ])
     .controller('PostOwnerMessagesController', Controller)
     .name;

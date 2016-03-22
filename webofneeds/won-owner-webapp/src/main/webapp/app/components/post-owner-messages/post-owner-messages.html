@@ -4,17 +4,14 @@
     <won-owner-title-bar selection="self.selection" item="self.post"></won-owner-title-bar>
 </header>
 <main class="ownerpostcontent">
-    <div class="owner__messages">
-        <won-connection-message-item-line
-                open="false"
-                open-conversation="self.openConversation"
-                item="item"
-                ng-repeat="(key,item) in self.conversations">
-        </won-connection-message-item-line>
-    </div>
-    <div class="post-messages" ng-show="self.openConversation">
+    <won-connection-selection
+            class="owner__messages"
+            connection-uris="self.conversationUris"
+            selected-connection="::self.setOpenConversation(connectionUri)">
+    </won-connection-selection>
+    <div class="post-messages" ng-show="self.getOpenConversation()">
         <div class="post-messages__inner">
-            <won-post-messages connection-and-related-data="self.openConversation"></won-post-messages>
+            <won-post-messages connection-and-related-data="self.getOpenConversation()"></won-post-messages>
         </div>
     </div>
 </main>
