@@ -174,7 +174,7 @@ function genComponentConf() {
             onInput: '&',
             /*
              * Usage:
-             *  on-input="myCallback(value, valid)"
+             *  on-change="myCallback(value, valid)"
              */
             onChange: '&',
         },
