@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #####################################################################
 # set up certificate Common Name CN (for servers should be its host)
@@ -63,12 +63,24 @@ fi
 #########################################################################
 # store generated key and certificate in pfx key store, if does not exist
 #########################################################################
+
+# $PASS can be file:<filetopassword> or pass:<password>
+PASS_STR="$PASS"
+
 if [ -f "$pfx_store_file" ]
 then
 	echo "$pfx_store_file already exists."
 else
 	echo "$pfx_store_file not found. Creating pfx store containing certificate from $key_pem_file and $cert_pem_file"
-	openssl pkcs12 -export -out $pfx_store_file -passout $PASS -inkey $key_pem_file -passin $PASS -in $cert_pem_file
+
+	# since the openssl tool throws an error if there is the same passin file specified as for passout, we have to read
+	# the password from the file to avoid this error in case the password is passed in a file (PASS=file:<pathToFile>)
+	if [[ $PASS == file:* ]]; then
+		PASS_STR=`cat ${PASS:5}`
+		PASS_STR="pass:$PASS_STR"
+	fi
+
+	openssl pkcs12 -export -out $pfx_store_file -passout $PASS_STR -inkey $key_pem_file -passin $PASS -in $cert_pem_file
 	echo "$pfx_store_file created"
 fi
 
@@ -81,7 +93,9 @@ then
 	echo "$jks_store_file already exists."
 else
 	echo "$jks_store_file not found. Creating java key store containing certificates from $pfx_store_file"
-	$KEYTOOL -importkeystore -srckeystore $pfx_store_file -srcstoretype pkcs12 -destkeystore $jks_store_file -deststoretype JKS -srcstorepass $PASS  -deststorepass $PASS
+
+	# since the keytool has problems with file:<password> format, we pass the password here directly (without pass: prefix however)
+	$KEYTOOL -importkeystore -srckeystore $pfx_store_file -srcstoretype pkcs12 -destkeystore $jks_store_file 	-deststoretype JKS -srcstorepass ${PASS_STR:5} -deststorepass ${PASS_STR:5}
 	echo "$jks_store_file created"
 fi
 

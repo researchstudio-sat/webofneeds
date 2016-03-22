@@ -57,6 +57,7 @@ docker -H satcluster01:2375 run --name=gencert_ma -e CN="www.matchat.org" \
 # if it is not already started
 ssh root@satcluster02 mkdir -p /home/install/won-server-certs
 mkdir -p ~/won-server-certs
+rm ~/won-server-certs/*
 rsync root@satcluster01:/home/install/won-server-certs/* ~/won-server-certs/
 rsync ~/won-server-certs/* root@satcluster02:/home/install/won-server-certs/
 
