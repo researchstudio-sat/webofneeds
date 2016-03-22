@@ -19,7 +19,7 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
         { path: '/overview/incoming-requests?myUri', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
         { path: '/overview/sent-requests?myUri', component: 'overview-sent-requests', as: 'overviewSentRequests' },
         { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' },
-        { path: '/post/owner/conversations?myUri', component: 'post-owner-messages', as: 'postConversations' },
+        { path: '/post/owner/conversations?myUri?openConversation', component: 'post-owner-messages', as: 'postConversations' },
         { path: '/post/owner/info?myUri', component: 'post-owner', as: 'postInfo' },
         { path: '/post/visitor/info/?myUri?theirUri', component: 'post-visitor', as: 'postVisitor' },
         { path: '/post/visitor/messages/?myUri?theirUri', component: 'post-visitor-msgs', as: 'postVisitorMsgs' },

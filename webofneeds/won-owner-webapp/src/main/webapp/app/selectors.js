@@ -16,7 +16,8 @@ export const selectUnreadEventUris = state => state
 //TODO the earlier unreadEvents was organised by need-uri!
 
 export const selectUnreadEvents = createSelector(
-    selectEvents, selectUnreadEventUris,
+    selectEvents,
+    selectUnreadEventUris,
     (events, unreadEventUris) =>
         unreadEventUris.map(eventUri => events.get(eventUri))
 );
@@ -127,6 +128,32 @@ export const selectConnectionsByNeed = createSelector(
         .groupBy(cnct => cnct.getIn(['ownNeed', 'uri']))
 );
 
+const selectRouterParams = state => state.getIn(['router', 'currentParams']);
+
+export const selectOpenConnectionUri = createSelector(
+    selectRouterParams,
+    selectConnections,
+    (routerParams, connections) => {
+        const openConversation = routerParams.get('openConversation');
+        const myUri = routerParams.get('myUri');
+        const theirUri = routerParams.get('theirUri');
+        if(openConversation) {
+            return openConversation;
+        } else if (myUri && theirUri) {
+            /*
+             returns undefined when there's no
+             connection like that in the state.
+             */
+            return connections
+                .filter(c =>
+                    c.get('belongsToNeed') === myUri  &&
+                    c.get('hasRemoteNeed') === theirUri
+                ).keySeq().first()
+        } else {
+            return undefined;
+        }
+    }
+);
 
 
 window.selectAllByConnections4dbg = selectAllByConnections;

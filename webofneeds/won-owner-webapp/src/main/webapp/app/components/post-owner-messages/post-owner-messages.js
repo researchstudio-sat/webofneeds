@@ -18,8 +18,6 @@ const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 class Controller {
     constructor() {
         attach(this, serviceDependencies, arguments);
-        this.selection = 0;
-        this.openConversation = undefined;
         window.msgs4dbg = this;
 
         const selectFromState = (state)=>{
@@ -38,17 +36,19 @@ class Controller {
                 allByConnections: connectionsDeprecated,
                 conversations: conversations,
                 conversationUris: conversationUris,
+                routerParams: state.getIn(['router', 'currentParams']),
             };
         }
 
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
         this.$scope.$on('$destroy', disconnect);
     }
-    setOpenConversation(connectionUri) {
-        this.openConversationUri = connectionUri;
-    }
-    getOpenConversation() {
-        return this.allByConnections[this.openConversationUri];
+    openConversation(connectionUri) {
+        console.log('openConversation ', connectionUri);
+        this.router__stateGo('postConversations', {
+            myUri: this.routerParams.get('myUri'),
+            openConversation: connectionUri,
+        })
     }
 }
 
@@ -58,7 +58,6 @@ export default angular.module('won.owner.components.postOwner.messages', [
         visitorTitleBarModule,
         galleryModule,
         postMessagesModule,
-        needConnectionMessageLineModule,
         connectionSelectionModule,
     ])
     .controller('PostOwnerMessagesController', Controller)
