@@ -5,7 +5,12 @@
 </header>
 <main class="ownerpostcontent">
     <div class="owner__messages">
-        <won-connection-message-item-line open="false" open-conversation="self.openConversation" item="item" ng-repeat="(key,item) in self.conversations"></won-connection-message-item-line>
+        <won-connection-message-item-line
+                open="false"
+                open-conversation="self.openConversation"
+                item="item"
+                ng-repeat="(key,item) in self.conversations">
+        </won-connection-message-item-line>
     </div>
     <div class="post-messages" ng-show="self.openConversation">
         <div class="post-messages__inner">
