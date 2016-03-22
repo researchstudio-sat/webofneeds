@@ -84,12 +84,18 @@ docker -H satsrv05:2375 run --name=wonnode_dev -d -e "uri.host=satsrv05.research
 
 sleep 20
 
+# expect OWNER won-mail-sender host, user and password (i.e. configuration for no-replay won-owner-app-email-account) be
+# set as environment variables, e.g. MAIL_USER=changeuser MAIL_PASS=changepass MAIL_HOST=smtp.changehost.com
+echo ${MAIL_USER} at ${MAIL_HOST} is used as owner no-replay won-owner-app-email-account
+
 # owner 1
 docker -H satsrv04:2375 build -t webofneeds/owner:dev $WORKSPACE/webofneeds/won-docker/owner/
 docker -H satsrv04:2375 stop owner_dev || echo 'No docker container found to stop with name: owner_dev'
 docker -H satsrv04:2375 rm owner_dev || echo 'No docker container found to remove with name: owner_dev'
 docker -H satsrv04:2375 run --name=owner_dev -d -e "node.default.host=satsrv04.researchstudio.at" \
 -e "node.default.http.port=8888" \
+-e "uri.host=satsrv04.researchstudio.at" -e "http.port=8081" \
+-e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5432/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
@@ -105,6 +111,8 @@ docker -H satsrv05:2375 stop owner_dev || echo 'No docker container found to sto
 docker -H satsrv05:2375 rm owner_dev || echo 'No docker container found to remove with name: owner_dev'
 docker -H satsrv05:2375 run --name=owner_dev -d -e "node.default.host=satsrv05.researchstudio.at" \
 -e "node.default.http.port=8888" \
+-e "uri.host=satsrv05.researchstudio.at" -e "http.port=8081" \
+-e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5432/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \

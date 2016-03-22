@@ -1,0 +1,26 @@
+@import 'won-config';
+@import 'sizing-utils';
+@import 'fonts';
+@import 'flex-layout';
+
+
+.overviewsentrequestscontent {
+  @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
+  align-items: flex-start;
+
+  .oir__openrequest,
+  .oir__requests{
+    flex-grow: 1;
+    max-width: 35rem;
+    margin: 0.5rem;
+  }
+
+  .oir__openrequest{
+    background: white;
+    border: 0.1rem solid $won-line-gray;
+  }
+}
+
+
+@import 'request-item-line';
+@import 'open-request';

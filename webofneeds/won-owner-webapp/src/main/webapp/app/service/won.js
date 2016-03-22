@@ -40,6 +40,8 @@
     won.WON.hasWonNodeCompacted = won.WON.prefix+":hasWonNode";
     won.WON.Active = won.WON.baseUri + "Active";
     won.WON.ActiveCompacted = won.WON.prefix + ":Active";
+    won.WON.Closed = won.WON.baseUri + "Closed";
+    won.WON.ClosedCompacted = won.WON.prefix + ":Closed";
 
     won.WON.Inactive = won.WON.baseUri + "Inactive"
     won.WON.InactiveCompacted = won.WON.prefix + ":Inactive"
@@ -56,13 +58,16 @@
     won.WON.hasRemoteConnection = won.WON.baseUri+"hasRemoteConnection";
     won.WON.hasRemoteConnectionCompacted = won.WON.prefix+":hasRemoteConnection";
 
-    won.WON.hasConnectionState = won.WON.baseUri+"hasConnectionState"
-    won.WON.hasConnectionState = won.WON.prefix+":hasConnectionState"
-    won.WON.Suggested = won.WON.baseUri+"Suggested"
-    won.WON.SuggestedCompacted = won.WON.baseUri+":Suggested"
-    won.WON.RequestReceived = won.WON.baseUri+"RequestReceived"
-    won.WON.RequestReceivedCompacted = won.WON.baseUri+":RequestReceived"
+    won.WON.hasConnectionState = won.WON.baseUri+"hasConnectionState";
+    won.WON.hasConnectionState = won.WON.prefix+":hasConnectionState";
+    won.WON.Suggested = won.WON.baseUri+"Suggested";
+    won.WON.SuggestedCompacted = won.WON.baseUri+":Suggested";
+    won.WON.RequestReceived = won.WON.baseUri+"RequestReceived";
+    won.WON.RequestReceivedCompacted = won.WON.baseUri+":RequestReceived";
+    won.WON.RequestSent = won.WON.baseUri+"RequestSent";
+    won.WON.RequestSentCompacted = won.WON.baseUri+":RequestSent";
 
+    won.WON.Connected = won.WON.baseUri+"Connected";
 
     //EVENT TYPES
     won.WON.OwnerClose = won.WON.baseUri + "OwnerClose";
@@ -696,7 +701,7 @@
             return null;
         },
         addDataToNode: function(data, graphName, nodeId, predicate, object){
-            var node = getNodeInGraph(data, graphName, nodeId);
+            var node = this.getNodeInGraph(data, graphName, nodeId);
             if (node != null) {
                 node[predicate] = object;
             }

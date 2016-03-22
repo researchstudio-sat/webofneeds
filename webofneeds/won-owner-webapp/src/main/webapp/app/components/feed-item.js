@@ -80,7 +80,7 @@ function genComponentConf() {
 
             window.fi4dbg = this;
 
-            this.labels = labels
+            this.labels = labels;
 
             updateRelativeTimestamps(
                 this.$scope,

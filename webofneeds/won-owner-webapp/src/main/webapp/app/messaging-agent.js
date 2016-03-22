@@ -20,8 +20,9 @@
 import { attach, delay, watchImmutableRdxState} from './utils';
 //import './message-service'; //TODO still uses es5
 import { actionCreators }  from './actions/actions';
-import { getEventData,setCommStateFromResponseForLocalNeedMessage } from './won-message-utils';
+import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from './won-message-utils';
 import SockJS from 'sockjs';
+import * as messages from './actions/messages-actions';
 
 export function runMessagingAgent(redux) {
 
@@ -63,6 +64,7 @@ export function runMessagingAgent(redux) {
                     if(firstEntry) { //undefined if queue is empty
                         const [eventUri, msg] = firstEntry;
                         ws.send(JSON.stringify(msg));
+                        console.log("sent message: "+JSON.stringify(msg));
                         redux.dispatch(actionCreators.messages__waitingForAnswer({ eventUri, msg }));
                     }
                 }
@@ -84,11 +86,57 @@ export function runMessagingAgent(redux) {
         );
 
     };
+
     function onMessage(receivedMsg) {
-        const parsedMsg = JSON.parse(receivedMsg.data);
+        const data = JSON.parse(receivedMsg.data);
 
-        redux.dispatch(actionCreators.messages__messageReceived(parsedMsg))
+        console.log('onMessage: ', data);
+        getEventsFromMessage(data).then(events => {
 
+            /* Other clients or matcher initiated stuff: */
+            if (events['msg:FromExternal'] &&
+                events['msg:FromExternal'].hasMessageType === won.WONMSG.hintMessageCompacted){
+                    redux.dispatch(actionCreators.messages__hintMessageReceived(events['msg:FromExternal']));
+            }
+            if(events['msg:FromExternal'] &&
+               events['msg:FromOwner'] &&
+               events['msg:FromOwner'].hasMessageType === won.WONMSG.connectMessageCompacted ){
+                    redux.dispatch(actionCreators.messages__connectMessageReceived(events));
+            }
+
+            /* responses to own actions: */
+            if(events['msg:FromSystem']) {
+                switch (events['msg:FromSystem'].isResponseToMessageType) {
+                    case won.WONMSG.createMessageCompacted:
+                        if (events['msg:FromSystem'].hasMessageType === won.WONMSG.successResponseCompacted)
+                            redux.dispatch(actionCreators.messages__create__success(events['msg:FromSystem']));
+                        //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
+                        //    redux.dispatch(actionCreators.messages__create__failed(event));
+                        break;
+
+                    case won.WONMSG.openMessageCompacted:
+                        if (events['msg:FromSystem'].hasMessageType === won.WONMSG.successResponseCompacted)
+                            redux.dispatch(actionCreators.messages__open__success(events['msg:FromSystem']));
+                        //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
+                        //  redux.dispatch(actionCreators.messages__open__failed(event));
+                        break;
+
+                    case won.WONMSG.closeMessageCompacted:
+                        if (events['msg:FromSystem'].hasMessageType === won.WONMSG.successResponseCompacted)
+                            redux.dispatch(actionCreators.messages__close__success(events['msg:FromSystem']));
+                        //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
+                        //  redux.dispatch(actionCreators.messages__close__failed(event));
+                        break;
+
+                    case won.WONMSG.closeNeedMessageCompacted:
+                        if (events['msg:FromSystem'].hasMessageType === won.WONMSG.successResponseCompacted)
+                            redux.dispatch(actionCreators.messages__closeNeed__success(events['msg:FromSystem']));
+                        else if (events['msg:FromSystem'].hasMessageType === won.WONMSG.failureResponseCompacted)
+                            redux.dispatch(actionCreators.messages__closeNeed__failed(events['msg:FromSystem']));
+                        break;
+                }
+            }
+        })
 
     };
     function onError(e) {

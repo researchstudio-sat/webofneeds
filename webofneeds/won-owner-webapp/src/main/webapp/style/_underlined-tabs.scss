@@ -20,6 +20,12 @@
     color: black;
     text-decoration: none;
     display: block;
+    white-space: nowrap;
+
+    &.disabled {
+      pointer-events: none;
+      color: lightgrey;
+    }
   }
 
 

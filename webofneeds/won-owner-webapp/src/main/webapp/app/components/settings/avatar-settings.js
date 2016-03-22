@@ -30,7 +30,7 @@ function genComponentConf() {
                                 <label class="label">Avatarname</label>
                                 <div class="subtitle">Created on {{item.creationDate}}</div>
                             </div>
-                            <a href="#" class="avatar__header__button" ng-click="item.open = true">
+                            <a class="avatar__header__button clickable" ng-click="item.open = true">
                                 <img class="avatar__header__button__iconsmall" src="generated/icon-sprite.svg#ico36_person"/>
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down" class="avatar__header__button__carret">
                             </a>
