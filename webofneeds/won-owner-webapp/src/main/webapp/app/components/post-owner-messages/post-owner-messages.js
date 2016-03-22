@@ -45,7 +45,6 @@ class Controller {
         this.$scope.$on('$destroy', disconnect);
     }
     setOpenConversation(connectionUri) {
-        console.log('p-o-m -- setOpenConversation: ', connectionUri);
         this.openConversationUri = connectionUri;
     }
     getOpenConversation() {
