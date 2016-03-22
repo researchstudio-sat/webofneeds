@@ -134,9 +134,16 @@ export const selectOpenConnectionUri = createSelector(
     selectRouterParams,
     selectConnections,
     (routerParams, connections) => {
-        const openConversation = routerParams.get('openConversation');
-        const myUri = routerParams.get('myUri');
-        const theirUri = routerParams.get('theirUri');
+        //de-escaping is lost in transpiling if not done in two steps :|
+        const openConversationEscaped = routerParams.get('openConversation');
+        const openConversation = decodeURIComponent(openConversationEscaped);
+
+        const myUriEscaped = routerParams.get('myUri');
+        const myUri = decodeURIComponent(myUriEscaped);
+
+        const theirUriEscaped = routerParams.get('theirUri');
+        const theirUri = decodeURIComponent(theirUriEscaped);
+
         if(openConversation) {
             return openConversation;
         } else if (myUri && theirUri) {

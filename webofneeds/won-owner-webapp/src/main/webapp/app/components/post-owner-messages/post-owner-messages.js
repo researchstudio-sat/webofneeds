@@ -46,7 +46,7 @@ class Controller {
     openConversation(connectionUri) {
         console.log('openConversation ', connectionUri);
         this.router__stateGo('postConversations', {
-            myUri: this.routerParams.get('myUri'),
+            myUri: decodeURIComponent(this.routerParams.get('myUri')),
             openConversation: connectionUri,
         })
     }

@@ -13,10 +13,19 @@ const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
         <div class="pm__header">
-            <img class="pm__header__icon clickable" src="generated/icon-sprite.svg#ico36_close" ng-click="self.closeConversation()"/>
-            <div class="pm__header__title">Conversation about "{{ self.connectionData.getIn(['remoteNeed', 'title']) }}"</div>
-            <div class="pm__header__options">Options  </div>
-            <img class="pm__header__options__icon clickable" src="generated/icon-sprite.svg#ico_settings" ng-click="self.openConversationOption()"/>
+            <img class="pm__header__icon clickable"
+                src="generated/icon-sprite.svg#ico36_close"
+                ng-click="self.closeConversation()"/>
+            <div class="pm__header__title">
+                Conversation about "{{ self.connectionData.getIn(['remoteNeed', 'title']) }}"
+            </div>
+            <div class="pm__header__options">
+                Options
+            </div>
+            <img
+                class="pm__header__options__icon clickable"
+                src="generated/icon-sprite.svg#ico_settings"
+                ng-click="self.openConversationOption()"/>
         </div>
         <div class="pm__content">
             <div
@@ -49,6 +58,7 @@ function genComponentConf() {
         constructor(/* arguments = dependency injections */) {
             attach(this, serviceDependencies, arguments);
             window.pm4dbg = this;
+            window.selectOpenConnectionUri4dbg = selectOpenConnectionUri;
             //this.postmsg = this;
             const selectFromState = state => {
                 const connectionUri = selectOpenConnectionUri(state);
