@@ -152,19 +152,40 @@ export function successfulCreate(event) {
 }
 
 export function connectionMessageReceived(events) {
-    return reloadConnectionAndDispatch(events, actionTypes.messages.connectionMessageReceived);
-}
-
-export function connectMessageReceived(events) {
-    return reloadConnectionAndDispatch(events, actionTypes.messages.connectMessageReceived);
-}
-
-function reloadConnectionAndDispatch(events, actionType) {
     return dispatch => {
         const eventOnRemote = events['msg:FromOwner'];
         const eventOnOwn = events['msg:FromExternal'];
         eventOnRemote.eventType = messageTypeToEventType[eventOnRemote.hasMessageType].eventType;
         //TODO data.hasReceiver, the connectionUri is undefined in the response message
+        won.invalidateCacheForNewMessage(eventOnOwn.hasReceiver)
+            .then(() => {
+                won.getConnectionWithOwnAndRemoteNeed(eventOnRemote.hasReceiverNeed, eventOnRemote.hasSenderNeed).then(connectionData=> {
+                    //TODO refactor
+                    getConnectionRelatedData(eventOnRemote.hasReceiverNeed, eventOnRemote.hasSenderNeed, connectionData.uri)
+                        .then(data => {
+                            //making sure it's the same thing. trying to approach a point,
+                            // where this is *just* a uri and everythinng else is in the state.
+                            data.receivedEvent = eventOnOwn.uri;
+                            data.updatedConnection = connectionData.uri;
+                            dispatch({
+                                type: actionTypes.messages.connectionMessageReceived,
+                                payload: data
+                            });
+                        }
+                    );
+                })
+
+            })
+    }
+}
+
+export function connectMessageReceived(events) {
+    //return reloadConnectionAndDispatch(events, actionTypes.messages.connectMessageReceived);
+    const actionType = actionTypes.messages.connectMessageReceived;
+    return dispatch => {
+        const eventOnRemote = events['msg:FromOwner'];
+        const eventOnOwn = events['msg:FromExternal'];
+        eventOnRemote.eventType = messageTypeToEventType[eventOnRemote.hasMessageType].eventType;
         won.invalidateCacheForNewConnection(eventOnOwn.hasReceiver, eventOnRemote.hasReceiverNeed)
         .then(() => {
             won.getConnectionWithOwnAndRemoteNeed(eventOnRemote.hasReceiverNeed, eventOnRemote.hasSenderNeed).then(connectionData=> {
@@ -175,6 +196,8 @@ function reloadConnectionAndDispatch(events, actionType) {
                         // where this is *just* a uri and everythinng else is in the state.
                         data.receivedEvent = eventOnOwn.uri;
                         data.updatedConnection = connectionData.uri;
+                        won.getNode(data.receivedEvent, data.ownNeed.uri).then(x =>
+                            console.log('aaaaaaaa ', x));
                         dispatch({
                             type: actionTypes.messages.connectMessageReceived,
                             payload: data

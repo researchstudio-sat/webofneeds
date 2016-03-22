@@ -401,7 +401,12 @@ const rdfstore = window.rdfstore;
         if (connectionUri != null) {
             cacheItemMarkDirty(connectionUri);
         }
-        return Promise.resolve(true); //return a promise for chaining
+        return won.getNode(connectionUri)
+            .then(connection => {
+                if(connection.hasEventContainer) {
+                    cacheItemMarkDirty(connection.hasEventContainer);
+                }
+            });
     }
     won.invalidateCacheForNeed = function(needUri){
         if (needUri != null) {
