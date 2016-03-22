@@ -1,6 +1,7 @@
 ;
 
 import angular from 'angular';
+import Immutable from 'immutable';
 import squareImageModule from './square-image';
 import dynamicTextFieldModule from './dynamic-textfield';
 import { attach } from '../utils.js'
@@ -30,7 +31,7 @@ function genComponentConf() {
         <div class="pm__content">
             <div
                 class="pm__content__message"
-                ng-repeat="message in self.chatMessages().toJS()"
+                ng-repeat="message in self.chatMessages"
                 ng-class="message.hasSenderNeed == self.connectionData.getIn(['ownNeed', 'uri']) ? 'right' : 'left'">
                     <won-square-image
                         title="self.connectionData.getIn(['remoteNeed', 'title'])"
@@ -59,45 +60,20 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             window.pm4dbg = this;
             window.selectOpenConnectionUri4dbg = selectOpenConnectionUri;
+            window.selectChatMessages4dbg = selectChatMessages;
             //this.postmsg = this;
             const selectFromState = state => {
                 const connectionUri = selectOpenConnectionUri(state);
+                const chatMessages = selectChatMessages(state);
                 return {
                     connectionData: selectAllByConnections(state).get(connectionUri),
+                    chatMessages: chatMessages && chatMessages.toJS(), //toJS needed as ng-repeat won't work otherwise :|
                     state4dbg: state,
                 }
             };
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
-        }
-        chatMessages() {
-            if (!this.connectionData || !this.connectionData.get('events')) {
-                return [];
-            }else {
-                const toDate = (ts) => new Date(Number.parseInt(ts));
-                return this.connectionData.get('events').filter(e => {
-                    if (e.get('hasTextMessage')) return true;
-                    else {
-                        const remote = e.get('hasCorrespondingRemoteMessage');
-                        return remote && remote.get('hasTextMessage');
-                    }
-                }).map(e => {
-                    const remote = e.get('hasCorrespondingRemoteMessage');
-                    if (e.get('hasTextMessage'))
-                        return e;
-                    else
-                        return remote;
-                }).sort((a, b) =>
-                    toDate(a.get('hasReceivedTimestamp')) > toDate(b.get('hasReceivedTimestamp'))
-                ).map(e => {
-                    e.set('humanReadableTimestamp', (
-                            toDate(e.get('hasReceivedTimestamp'))
-                        ).toString());
-                    return e;
-                });
-            }
-
         }
 
         input(input) {
@@ -132,3 +108,37 @@ export default angular.module('won.owner.components.postMessages', [
 ])
     .directive('wonPostMessages', genComponentConf)
     .name;
+
+
+//TODO refactor so that it always returns an array of immutable messages to
+// allow ng-repeat without giving up the cheaper digestion
+function selectChatMessages(state) {
+    const connectionUri = selectOpenConnectionUri(state);
+    const connectionData = selectAllByConnections(state).get(connectionUri);
+    if (!connectionData || !connectionData.get('events')) {
+        return Immutable.List();
+    }else {
+        const toDate = (ts) => new Date(Number.parseInt(ts));
+        return connectionData.get('events').filter(e => {
+            if (e.get('hasTextMessage')) return true;
+            else {
+                const remote = e.get('hasCorrespondingRemoteMessage');
+                return remote && remote.get('hasTextMessage');
+            }
+        }).map(e => {
+            const remote = e.get('hasCorrespondingRemoteMessage');
+            if (e.get('hasTextMessage'))
+                return e;
+            else
+                return remote;
+        }).sort((a, b) =>
+            toDate(a.get('hasReceivedTimestamp')) > toDate(b.get('hasReceivedTimestamp'))
+        ).map(e => {
+                e.set('humanReadableTimestamp', (
+                    toDate(e.get('hasReceivedTimestamp'))
+                ).toString());
+                return e;
+            });
+    }
+
+}
