@@ -598,20 +598,37 @@ const rdfstore = window.rdfstore;
         //we also allow unresolvable resources, so as to avoid re-fetching them.
         //we also allow resources that are currently being fetched.
         if (cacheItemIsOkOrUnresolvableOrFetching(uri)){
-            return new Promise((resolve, reject) => {
-                cacheItemMarkAccessed(uri);
-                resolve(uri);
-            });
+            cacheItemMarkAccessed(uri);
+            return Promise.resolve(uri);
         }
+
+        /*
+         * TODO we can't mark all resources as fetching when doing
+         * a deep request. We need to find a way to deal with this.
+         * Atm we risk running parallel requests.
+         */
         //uri isn't loaded or needs to be refrehed. fetch it.
         cacheItemMarkFetching(uri);
         return won.fetch(uri, requesterWebId, deep, layerSize)
             .then(
-                () => cacheItemMarkAccessed(uri),
+                (dataset) => {
+                    if(!deep) {
+                        cacheItemMarkAccessed(uri);
+                    } else {
+                        cacheItemMarkAccessed(uri);
+                        selectLoadedResourcesFromDataset(
+                            dataset
+                        ).then(allLoadedResources =>
+                            allLoadedResources.forEach(resourceUri =>
+                                cacheItemMarkAccessed(resourceUri)
+                            )
+                        )
+                    }
+                },
                 reason => cacheItemMarkUnresolvable(uri)
             )
 
-    }
+    };
 
     /**
      * Fetches the rdf-node with the given uri from
@@ -637,6 +654,61 @@ const rdfstore = window.rdfstore;
                 lock.releaseUpdateLock();
                 return dataset;
             });
+    };
+
+    function selectLoadedResourcesFromDataset(dataset) {
+        /*
+         * create a temporary store to load the dataset into
+         * so we only query over the new triples
+         */
+        const tmpstore = rdfstore.create();
+
+        //TODO avoid duplicate parsing of the dataset
+        const storeWithDatasetP = new Promise((resolve, reject) =>
+                tmpstore.load('application/ld+json', dataset,
+                    (success, results) => success ?
+                        resolve(tmpstore) :
+                        reject(`couldn't load dataset for ${needUri} into temporary store.`)
+                )
+        );
+
+        const allLoadedResourcesP = storeWithDatasetP.then(tmpstore => {
+            const queryPromise = new Promise((resolve, reject) =>
+                    //TODO use the existing constants for prefixes
+                    //TODO eliminate redundant queries
+                    //TODO rdf:type for connectionContainer?
+                    tmpstore.execute(`
+                prefix won: <http://purl.org/webofneeds/model#>
+                prefix msg: <http://purl.org/webofneeds/message#>
+                prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+                prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                select distinct ?s where {
+                    { ?s rdf:type won:Need } union
+                    { ?s won:hasConnections ?o } union
+
+                    { ?s rdf:type won:Connection } union
+                    { ?s won:hasEventContainer ?o } union
+
+                    { ?s rdfs:member ?o } union
+                    { ?s rdf:type won:EventContainer } union
+
+                    { ?s rdf:type msg:FromOwner } union
+                    { ?s rdf:type msg:FromSystem } union
+                    { ?s rdf:type msg:FromExternal } union
+                    { ?s msg:hasMessageType ?o } union
+                    { ?s won:hasCorrespondingRemoteMessage ?o } union
+                    { ?s won:hasReceiver ?o }.
+                }`,
+                        (success, results) => success ?
+                            resolve(results) :
+                            reject(`couldn't execute query for ${needUri} on temporary store for ${uri}`)
+                    )
+            );
+            //final cleanup and return
+            return queryPromise.then(queryResults => queryResults.map(r => r.s.value))
+        });
+
+        return allLoadedResourcesP;
     }
 
     function loadFromOwnServerIntoCache(uri, requesterWebId, deep, layerSize) {

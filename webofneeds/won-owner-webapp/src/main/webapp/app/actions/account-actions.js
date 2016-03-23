@@ -47,7 +47,6 @@ export function accountLogin(username, password) {
                 dispatch(actionCreators.messages__requestWsReset_Hack());
                 dispatch(actionCreators.load()); //TODO should be part of the login if only called together
                 dispatch(actionCreators.retrieveNeedUris());//TODO deprecated.
-                //dispatch(actionCreators.posts__load());
                 dispatch(actionCreators.router__stateGo("feed"));
             }
         ).catch(
