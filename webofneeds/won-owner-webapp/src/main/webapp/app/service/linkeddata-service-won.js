@@ -31,8 +31,6 @@ const rdfstore = window.rdfstore;
 (function(){
     if(!won) won = {};
 
-    const API_ENDPOINT = '/owner/rest/linked-data/?uri=';
-    const AUTH_PARAMETER = '&requester='
 
     /**
      * This function is used to generate the query-strings.
@@ -40,12 +38,29 @@ const rdfstore = window.rdfstore;
      * adapt this function.
      * @param dataUri
      * @param requesterWebId the auth-token for the post (NOT the sessionId-cookie)
+     * @deep if true, a query with this string will cause connections and events
+     * of a need to be queried along with it in one big request.
+     * @layerSize if you only want to fetch the latest N events of every connection
+     *  and N connections with latest updates.
      * @returns {string}
      */
-    function queryString(dataUri, requesterWebId) {
-        let requestUri = API_ENDPOINT + encodeURIComponent(dataUri);
+    function queryString(dataUri, requesterWebId, deep, layerSize) {
+        /*
+        e.g. a full query with everything set might look like:
+        https://192.168.124.53:8443/owner/rest/linked-data/
+        ?uri=https://192.168.124.53:8443/won/resource/need/6384164629658481000/deep
+        &layer-size=5
+        &requester=https://192.168.124.53:8443/won/resource/need/6384164629658481000
+        */
+        let requestUri = '/owner/rest/linked-data/?uri=' + encodeURIComponent(dataUri);
+        if (deep) {
+            requestUri = requestUri + '/deep';
+        }
+        if (layerSize) {
+            requestUri = requestUri + '&layer-size=' + layerSize;
+        }
         if (requesterWebId) {
-            requestUri = requestUri + AUTH_PARAMETER+ encodeURIComponent(requesterWebId);
+            requestUri = requestUri + '&requester=' + encodeURIComponent(requesterWebId);
         }
         return requestUri;
     }
@@ -567,10 +582,15 @@ const rdfstore = window.rdfstore;
     /**
      * Fetches the linked data for the specified URI and saves it in the local triple-store.
      * @param uri
-     * @param requesterWebId
+     * @param requesterWebId the auth-token for the post (NOT the sessionId-cookie).
+     * Usually the uri of the need that `uri` belongs to.
+     * @deep if true, a query with this string will cause connections and events
+     * of a need to be queried along with it in one big request.
+     * @layerSize if you only want to fetch the latest N events of every connection
+     *  and N connections with latest updates.
      * @return {*}
      */
-    won.ensureLoaded = function(uri, requesterWebId) {
+    won.ensureLoaded = function(uri, requesterWebId, deep = false, layerSize = 0) {
         if (!uri) { throw {message : "ensureLoaded: uri must not be null"}; }
 
         console.log("linkeddata-service-won.js: ensuring loaded: " +uri);
@@ -585,7 +605,7 @@ const rdfstore = window.rdfstore;
         }
         //uri isn't loaded or needs to be refrehed. fetch it.
         cacheItemMarkFetching(uri);
-        return won.fetch(uri, requesterWebId)
+        return won.fetch(uri, requesterWebId, deep, layerSize)
             .then(
                 () => cacheItemMarkAccessed(uri),
                 reason => cacheItemMarkUnresolvable(uri)
@@ -597,29 +617,33 @@ const rdfstore = window.rdfstore;
      * Fetches the rdf-node with the given uri from
      * the standard API_ENDPOINT.
      * @param uri
-     * @param requesterWebId
+     * @param requesterWebId the auth-token for the post (NOT the sessionId-cookie)
+     * Usually the uri of the need that `uri` belongs to.
+     * @deep if true, a query with this string will cause connections and events
+     * of a need to be queried along with it in one big request.
+     * @layerSize if you only want to fetch the latest N events of every connection
+     *  and N connections with latest updates.
      * @returns {*}
      */
-    won.fetch = function(uri, requesterWebId) {
-        var tempUri = uri+'?prev='+new Date().getTime();
+    won.fetch = function(uri, requesterWebId, deep = false, layerSize = 0) {
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "fetch: uri must not be null"};
         }
         console.log("linkeddata-service-won.js: fetch announced: " + uri);
         const lock = getReadUpdateLockPerUri(uri);
         return lock.acquireUpdateLock().then(
-                () => loadFromOwnServerIntoCache(uri, requesterWebId)
+                () => loadFromOwnServerIntoCache(uri, requesterWebId, deep, layerSize)
             ).then(dataset => {
                 lock.releaseUpdateLock();
                 return dataset;
             });
     }
 
-    function loadFromOwnServerIntoCache(uri, requesterWebId) {
+    function loadFromOwnServerIntoCache(uri, requesterWebId, deep, layerSize) {
         return new Promise((resolve, reject) => {
             console.log("linkeddata-service-won.js: fetching:        " + uri);
 
-            let requestUri = queryString(uri, requesterWebId);
+            let requestUri = queryString(uri, requesterWebId, deep, layerSize);
             const find = '%3A';
             const re = new RegExp(find, 'g');
             requestUri = requestUri.replace(re, ':');
