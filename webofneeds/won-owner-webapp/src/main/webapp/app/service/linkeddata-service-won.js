@@ -57,7 +57,11 @@ const rdfstore = window.rdfstore;
             requestUri = requestUri + '/deep';
         }
         if (layerSize) {
-            requestUri = requestUri + '&layer-size=' + layerSize;
+            /*
+             * the ? is because this parameter is still part of the`uri`-parameter
+             * that is passed on to the node.
+             */
+            requestUri = requestUri + '?layer-size=' + layerSize;
         }
         if (requesterWebId) {
             requestUri = requestUri + '&requester=' + encodeURIComponent(requesterWebId);
