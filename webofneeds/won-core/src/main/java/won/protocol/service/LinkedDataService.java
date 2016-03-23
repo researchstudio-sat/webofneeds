@@ -17,6 +17,7 @@
 package won.protocol.service;
 
 import com.hp.hpl.jena.query.Dataset;
+import org.springframework.context.NoSuchMessageException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessageType;
@@ -235,12 +236,24 @@ public interface LinkedDataService
   public Dataset getNeedDataset(final URI needUri) throws NoSuchNeedException;
 
   /**
+   * Returns a dataset describing the need with the specified URI.
+   * @param needUri
+   * @param deep - include need's connections datasets and each connection's events' datasets
+   * @param deepLayerSize - number of connections and events to include in the deep need dataset
+   * @return
+   * @throws NoSuchNeedException
+   */
+  public Dataset getNeedDataset(final URI needUri, final boolean deep, final Integer deepLayerSize)  throws
+    NoSuchNeedException, NoSuchConnectionException, NoSuchMessageException;
+
+  /**
    * Returns a model describing the connection with the specified URI.
    * @param connectionUri
    * @return
    * @throws NoSuchConnectionException
    */
-  public Dataset getConnectionDataset(final URI connectionUri, boolean includeEventData) throws NoSuchConnectionException;
+  public Dataset getConnectionDataset(final URI connectionUri, boolean includeEventContainer) throws
+    NoSuchConnectionException;
 
   /**
    * Returns a dataset containing all event uris belonging to the specified connection.
@@ -250,6 +263,14 @@ public interface LinkedDataService
    */
   public Dataset listConnectionEventURIs(final URI connectionUri) throws NoSuchConnectionException;
 
+  /**
+   * Returns a dataset containing all event uris belonging to the specified connection.
+   * @param connectionUri
+   * @param deep - include events dataset
+   * @return
+   * @throws NoSuchConnectionException
+   */
+  public Dataset listConnectionEventURIs(final URI connectionUri, final boolean deep) throws NoSuchConnectionException;
 
 
   /**
