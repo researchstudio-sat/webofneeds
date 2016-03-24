@@ -47,11 +47,11 @@ function genComponentConf() {
         <div class="pm__footer">
             <won-dynamic-textfield
                 placeholder="::'Your Message'"
-                on-input="::self.input(value)">
+                on-input="::self.input(value)"
+                on-submit="::self.send()"
+                submit-button-label="::'Send'"
+                >
             </won-dynamic-textfield>
-            <button
-                class="won-button--filled red"
-                ng-click="::self.send()">Send</button>
         </div>
     `;
 

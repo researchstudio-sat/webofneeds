@@ -9,14 +9,22 @@ import { dispatchEvent, attach } from '../utils';
 
 function genComponentConf() {
     let template = `
-        <div class="wdt__text"
-             ng-class="{'wdt__text--placeholder' : self.displayingPlaceholder, 'wdt__text--invalid' : !self.valid()}"
-             contenteditable="true">
-             {{::self.placeholder}}
+        <div class="wdt__left">
+            <div class="wdt__text"
+                 ng-class="{'wdt__text--placeholder' : self.displayingPlaceholder, 'wdt__text--invalid' : !self.valid()}"
+                 contenteditable="true">
+                 {{::self.placeholder}}
+            </div>
+            <span class="wdt__charcount" ng-show="self.maxChars">
+                {{self.maxChars - self.value.length}} Chars left
+            </span>
         </div>
-        <span class="wdt__charcount" ng-show="self.maxChars">
-            {{self.maxChars - self.value.length}} Chars left
-        </span>
+        <button
+            class="wdt__submitbutton red"
+            ng-show="submitButtonLabel"
+            ng-click="::self.submit()">
+            {{ submitButtonLabel }}
+        </button>
     `;
 
     const serviceDependencies = ['$scope', '$element', '$sanitize', '$sce'/*injections as strings here*/];
@@ -63,6 +71,7 @@ function genComponentConf() {
         onKeydown(e) {
             // prevent typing enter as it causes `<div>`s in the value
             if(e.keyCode === 13) {
+                this.submit();
                 return false;
             }
         }
@@ -81,6 +90,14 @@ function genComponentConf() {
                 dispatchEvent(this.$element[0], 'change', payload);
                 //this.$scope.$emit(eventName, payload); //bubbles through $scopes not dom
             }
+        }
+        submit () {
+            const payload = {
+                value: this.value,
+                valid: this.valid()
+            };
+            this.onSubmit(payload);
+            dispatchEvent(this.$element[0], 'submit', payload);
         }
         input () {
             console.log('got input in dynamic textfeld ', this.getText());
@@ -177,6 +194,14 @@ function genComponentConf() {
              *  on-change="myCallback(value, valid)"
              */
             onChange: '&',
+
+            submitButtonLabel: '=',
+            /*
+             * Usage:
+             *  on-submit="myCallback(value)"
+             */
+            onSubmit: '&',
+
         },
         template: template
     }

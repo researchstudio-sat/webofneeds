@@ -1,7 +1,21 @@
+@import 'won';
+
 won-dynamic-textfield {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: row;
+  align-items: flex-start; //along top
+
+  .wdt__left {
+    flex-grow: 1; //use up all the space not occupied by the button
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .wdt__submitbutton {
+    @extend .won-button--filled;
+  }
 
   .wdt__text {
     align-self: stretch;
