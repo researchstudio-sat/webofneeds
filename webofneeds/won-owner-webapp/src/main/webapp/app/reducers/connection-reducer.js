@@ -35,9 +35,11 @@ export default function(connections = initialState, action = {}) {
             }
 
         case actionTypes.messages.close.success:
-            const deniedEvent = action.payload;
-            const deniedConnectionUri = deniedEvent.hasReceiver;
-            return connections.setIn([deniedConnectionUri, 'hasConnectionState'], won.WON.Closed);
+            var eventUri = action.payload.uri;
+            var connectionUri = action.payload.hasReceiver;
+            return connections
+                .setIn([connectionUri, 'hasConnectionState'], won.WON.Closed)
+                .updateIn([connectionUri, 'hasEvents'], events => events.add(eventUri));
 
         case actionTypes.connections.load:
             return action.payload.reduce(
