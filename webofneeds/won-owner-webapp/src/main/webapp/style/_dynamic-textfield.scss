@@ -5,12 +5,16 @@ won-dynamic-textfield {
   flex-direction: row;
   align-items: stretch; //all same height
 
+  min-width: 0; // so a size is specified and break-word works
+
   .wdt__left {
-    flex-grow: 1; //use up all the space not occupied by the button
+    flex-grow: 1; // use up all the space not occupied by the button
 
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+
+    min-width: 0; // so a size is specified and break-word works
   }
 
   .wdt__submitbutton {
@@ -19,6 +23,7 @@ won-dynamic-textfield {
   }
 
   .wdt__text {
+
     align-self: stretch;
     border: $thinBorder solid $won-line-gray;
     border-radius: 0.1rem;
@@ -34,6 +39,9 @@ won-dynamic-textfield {
     padding: $verticalPadding 0.438rem;
 
     box-sizing: border-box;
+
+    min-width: 0; // so a size is specified and break-word works
+    word-wrap: break-word;
 
     &.wdt__text--invalid {
       border-color: $won-red;
