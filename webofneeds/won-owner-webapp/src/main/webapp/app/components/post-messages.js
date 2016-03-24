@@ -116,32 +116,56 @@ export default angular.module('won.owner.components.postMessages', [
 function selectChatMessages(state) {
     const connectionUri = selectOpenConnectionUri(state);
     const connectionData = selectAllByConnections(state).get(connectionUri);
+
     if (!connectionData || !connectionData.get('events')) {
         return Immutable.List();
+
     } else {
-        const toDate = (ts) => new Date(Number.parseInt(ts));
-        return connectionData.get('events').filter(e => {
-            if (e.get('hasTextMessage')) return true;
-            else {
-                const remote = e.get('hasCorrespondingRemoteMessage');
-                return remote && remote.get('hasTextMessage');
-            }
-        }).map(e => {
-            const remote = e.get('hasCorrespondingRemoteMessage');
-            if (e.get('hasTextMessage'))
-                return e;
-            else
-                return remote;
-        }).sort((a, b) =>
-            toDate(a.get('hasReceivedTimestamp')) > toDate(b.get('hasReceivedTimestamp'))
-        ).map(e => e.set(
-                'humanReadableTimestamp',
-                relativeTime(
-                    state.get('lastUpdateTime'),
-                    toDate(e.get('hasReceivedTimestamp'))
-                )
+
+        const chatMessagesPromise = connectionData.get('events')
+
+            /* filter for valid chat messages */
+            .filter(event => {
+                if (event.get('hasTextMessage')) return true;
+                else {
+                    const remote = event.get('hasCorrespondingRemoteMessage');
+                    return remote && remote.get('hasTextMessage');
+                }
+            }).map(event => {
+                const remote = event.get('hasCorrespondingRemoteMessage');
+                if (event.get('hasTextMessage'))
+                    return event;
+                else
+                    return remote;
+            })
+
+            /* sort them so the latest get shown last */
+            .sort((event1, event2) =>
+                selectTimestamp(event1) > selectTimestamp(event2)
             )
-        );
+
+            /* add a nice relative timestamp */
+            .map(event => event.set(
+                    'humanReadableTimestamp',
+                    relativeTime(
+                        state.get('lastUpdateTime'),
+                        selectTimestamp(event)
+                    )
+                )
+            );
+
+        return chatMessagesPromise;
     }
 
+}
+
+function toDate(ts) {
+    return new Date(Number.parseInt(ts));
+}
+function selectTimestamp(event) {
+    if(event.get('hasReceivedTimestamp')) {
+        return toDate(event.get('hasReceivedTimestamp'));
+    } else if(event.get('hasSentTimestamp')) {
+        return toDate(event.get('hasSentTimestamp')) ;
+    }
 }

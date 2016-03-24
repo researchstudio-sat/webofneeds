@@ -35,6 +35,12 @@ export default function(state = initialState, action = {}) {
         case actionTypes.messages.close.success:
             var event = action.payload;
             return state.setIn(['events', event.uri], Immutable.fromJS(event));
+
+        case actionTypes.connections.sendChatMessage:
+            var eventUri = action.payload.eventUri;
+            var event = action.payload.optimisticEvent;
+            return state.setIn(['events', eventUri], Immutable.fromJS(event));
+
         case actionTypes.messages.connectionMessageReceived:
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:

@@ -35,26 +35,43 @@ export function connectionsChatMessage(chatMessage, connectionUri) {
        console.log('connectionsChatMessage: ', chatMessage, connectionUri);
 
        won.getEnvelopeDataforConnection(connectionUri)
-           .then(envelopeData => {
-               const eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt(1,9223372036854775807);
+       .then(envelopeData => {
+           const eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt(1,9223372036854775807);
 
-               const message = new won.MessageBuilder(won.WONMSG.connectionMessage)
-                   .eventURI(eventUri)
-                   .forEnvelopeData(envelopeData)
-                   .addContentGraphData(won.WON.hasTextMessage, chatMessage)
-                   .hasOwnerDirection()
-                   .hasSentTimestamp(new Date().getTime())
-                   .build();
+           /*
+            * Build the json-ld message that's signed on the owner-server
+            * and then send to the won-node.
+            */
+           const message = new won.MessageBuilder(won.WONMSG.connectionMessage)
+               .eventURI(eventUri)
+               .forEnvelopeData(envelopeData)
+               .addContentGraphData(won.WON.hasTextMessage, chatMessage)
+               .hasOwnerDirection()
+               .hasSentTimestamp(new Date().getTime().toString())
+               .build();
 
-               return {eventUri, message};
+           /*
+            * not sure how elegant it is to build the ld and then parse
+            * it again. It uses existing utilities at least, reducing
+            * redundant program logic. ^^
+             */
+           const optimisticEventPromise = getEventsFromMessage(message)
+               .then(optimisticEvent => optimisticEvent['msg:FromOwner'])
 
-           }).then(eventUriAndMessage => {
-               dispatch(actionCreators.messages__send(eventUriAndMessage));
-               /*TODO optimistic success assumption
-               * const dataFromExpectedAnswer = ‥
-               //dispatch{{actionType: actionTypes.connections.sendChatMessage, payload: dataFromExpectedAnswer});
-               */
-           });
+           return Promise.all([
+               Promise.resolve(message),
+               optimisticEventPromise,
+           ]);
+       })
+       .then( ([ message, optimisticEvent ]) => dispatch({
+               type: actionTypes.connections.sendChatMessage,
+               payload: {
+                   eventUri: optimisticEvent.uri,
+                   message,
+                   optimisticEvent,
+               }
+           })
+       );
    }
 }
 

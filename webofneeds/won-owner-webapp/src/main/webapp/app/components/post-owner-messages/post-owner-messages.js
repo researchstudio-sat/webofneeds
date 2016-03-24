@@ -31,8 +31,10 @@ class Controller {
                     );
             const conversationUris = conversations.map(conn => conn.connection.uri)
 
+            const post = state.getIn(['needs','ownNeeds', postId]);
+
             return {
-                post: state.getIn(['needs','ownNeeds', postId]).toJS(),
+                post: post && post.toJS? post.toJS() : {},
                 allByConnections: connectionsDeprecated,
                 conversations: conversations,
                 conversationUris: conversationUris,

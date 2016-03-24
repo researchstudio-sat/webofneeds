@@ -41,6 +41,12 @@ export default function(connections = initialState, action = {}) {
                 .setIn([connectionUri, 'hasConnectionState'], won.WON.Closed)
                 .updateIn([connectionUri, 'hasEvents'], events => events.add(eventUri));
 
+        case actionTypes.connections.sendChatMessage:
+            var eventUri = action.payload.eventUri;
+            var connectionUri = action.payload.optimisticEvent.hasSender;
+            return connections
+                .updateIn([connectionUri, 'hasEvents'], events => events.add(eventUri));
+
         case actionTypes.connections.load:
             return action.payload.reduce(
                 (updatedState, connectionWithRelatedData) =>
