@@ -1,6 +1,6 @@
 package won.bot.framework.events.event.impl.monitor;
 
-import java.net.URI;
+import won.protocol.message.WonMessage;
 
 /**
  * User: ypanchenko
@@ -8,7 +8,7 @@ import java.net.URI;
  */
 public class MessageDispatchStartedEvent extends MessageSpecificEvent
 {
-  public MessageDispatchStartedEvent(final URI messageURI) {
-    super(messageURI);
+  public MessageDispatchStartedEvent(final WonMessage message) {
+    super(message);
   }
 }

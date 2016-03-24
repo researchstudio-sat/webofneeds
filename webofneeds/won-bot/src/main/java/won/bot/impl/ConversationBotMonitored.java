@@ -18,10 +18,15 @@ package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.action.impl.*;
 import won.bot.framework.events.bus.EventBus;
+import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.impl.*;
-import won.bot.framework.events.event.impl.monitor.*;
+import won.bot.framework.events.event.impl.monitor.CrawlDoneEvent;
+import won.bot.framework.events.event.impl.monitor.CrawlReadyEvent;
+import won.bot.framework.events.event.impl.monitor.MessageDispatchStartedEvent;
+import won.bot.framework.events.event.impl.monitor.MessageDispatchedEvent;
 import won.bot.framework.events.listener.BaseEventListener;
 import won.bot.framework.events.listener.EventListener;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
@@ -36,7 +41,7 @@ public class ConversationBotMonitored extends EventBot
 {
 
   private static final int NO_OF_NEEDS = 2;
-  private static final int NO_OF_MESSAGES = 500;
+  private static final int NO_OF_MESSAGES = 1;
   private static final long MILLIS_BETWEEN_MESSAGES = 100;
     private static final String NAME_NEEDS = "needs";
 
@@ -53,6 +58,7 @@ public class ConversationBotMonitored extends EventBot
   protected BaseEventListener connectionCloser;
   protected BaseEventListener needDeactivator;
   protected BaseEventListener workDoneSignaller;
+  protected BaseEventListener crawlReadySignaller;
   protected BaseEventListener monitor;
 
   @Override
@@ -108,12 +114,24 @@ public class ConversationBotMonitored extends EventBot
     bus.subscribe(CloseFromOtherNeedEvent.class, this.needDeactivator);
 
     //add a listener that counts two NeedDeactivatedEvents and then tells the
-    //framework that the bot's work is done
-    this.workDoneSignaller = new ActionOnceAfterNEventsListener(
+    //framework that the bot's messaging work is done and connection messages linked data can be crawled
+    this.crawlReadySignaller = new ActionOnceAfterNEventsListener(
         ctx,
-        NO_OF_NEEDS, new SignalWorkDoneAction(ctx)
+        NO_OF_NEEDS, new BaseEventBotAction(ctx){
+      @Override
+      protected void doRun(Event event) throws Exception {
+        bus.publish(new CrawlReadyEvent());
+      }
+    }
     );
-    bus.subscribe(NeedDeactivatedEvent.class, this.workDoneSignaller);
+    bus.subscribe(NeedDeactivatedEvent.class, this.crawlReadySignaller);
+
+
+    //add a listener that, when crawl is done, tells the
+    //framework that the bot's work is done
+    this.workDoneSignaller = new ActionOnEventListener(ctx,new SignalWorkDoneAction(ctx));
+    bus.subscribe(CrawlDoneEvent.class, this.workDoneSignaller);
+
 
     //add a listener that reacts to monitoring events
     this.monitor = new ActionOnEventListener(ctx, "msgMonitor", new MessageLifecycleMonitoringAction(ctx));
@@ -121,6 +139,7 @@ public class ConversationBotMonitored extends EventBot
     bus.subscribe(MessageDispatchedEvent.class, this.monitor);
     bus.subscribe(SuccessResponseEvent.class, this.monitor);
     bus.subscribe(MessageFromOtherNeedEvent.class, this.monitor);
+    bus.subscribe(CrawlReadyEvent.class, this.monitor);
   }
 
 

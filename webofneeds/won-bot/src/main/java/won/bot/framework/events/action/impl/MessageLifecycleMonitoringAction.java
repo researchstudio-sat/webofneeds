@@ -1,5 +1,9 @@
 package won.bot.framework.events.action.impl;
 
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.sparql.core.Quad;
+import org.apache.commons.io.Charsets;
+import org.apache.jena.riot.Lang;
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
@@ -10,14 +14,12 @@ import won.bot.framework.events.event.impl.DeliveryResponseEvent;
 import won.bot.framework.events.event.impl.FailureResponseEvent;
 import won.bot.framework.events.event.impl.MessageFromOtherNeedEvent;
 import won.bot.framework.events.event.impl.SuccessResponseEvent;
-import won.bot.framework.events.event.impl.monitor.MessageDispatchStartedEvent;
-import won.bot.framework.events.event.impl.monitor.MessageDispatchedEvent;
-import won.bot.framework.events.event.impl.monitor.MessageSpecificEvent;
+import won.bot.framework.events.event.impl.monitor.*;
+import won.protocol.message.WonMessage;
+import won.protocol.util.RdfUtils;
 
 import java.net.URI;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class MessageLifecycleMonitoringAction extends BaseEventBotAction
@@ -26,6 +28,8 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction
   Map<String, Split> msgSplitsBC = Collections.synchronizedMap(new HashMap<>());
   Map<String, Split> msgSplitsBCD = Collections.synchronizedMap(new HashMap<>());
   Map<String, Split> msgSplitsBCDE = Collections.synchronizedMap(new HashMap<>());
+  Map<URI,URI> connectionMsgUris = Collections.synchronizedMap(new HashMap<>());
+  Map<URI,URI> responseMsgUris = Collections.synchronizedMap(new HashMap<>());
 
   private long startTestTime = -1;
 
@@ -41,9 +45,11 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction
     Stopwatch stopwatchBCD = SimonManager.getStopwatch("messageTripBCD");
     Stopwatch stopwatchBCDE = SimonManager.getStopwatch("messageTripBCDE");
 
+
     if (event instanceof MessageSpecificEvent) {
 
-      URI msgURI = ((MessageSpecificEvent) event).getMessageURI();
+      MessageSpecificEvent msgEvent = (MessageSpecificEvent) event;
+      URI msgURI = msgEvent.getMessageURI();
       logger.debug("RECEIVED EVENT {} for uri {}", event, msgURI);
 
       if (event instanceof MessageDispatchStartedEvent) {
@@ -57,6 +63,8 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction
         msgSplitsBCD.put(msgURI.toString(), splitBCD);
         msgSplitsBCDE.put(msgURI.toString(), splitBCDE);
 
+        connectionMsgUris.put(msgURI, msgEvent.getNeedURI());
+
       } else if (event instanceof MessageDispatchedEvent) {
         msgSplitsB.get(msgURI.toString()).stop();
       }
@@ -65,19 +73,67 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction
     } else if (event instanceof SuccessResponseEvent || event instanceof FailureResponseEvent) {
 
       DeliveryResponseEvent responseEvent = (DeliveryResponseEvent) event;
+
+      if (connectionMsgUris.keySet().contains(responseEvent.getOriginalMessageURI()) ||
+        connectionMsgUris.keySet().contains(responseEvent.getRemoteResponseToMessageURI())) {
+        responseMsgUris.put(responseEvent.getMessage().getMessageURI(), responseEvent.getNeedURI());
+        if (responseEvent.isRemoteResponse()) {
+          responseMsgUris.put(responseEvent.getMessage().getCorrespondingRemoteMessageURI(), responseEvent.getRemoteNeedURI());
+        }
+      }
+
+
       if (responseEvent.isRemoteResponse()) {
-        logger.debug("RECEIVED REMOTE RESPONSE EVENT {} for uri {}", event, responseEvent.getRemoteResponseToMessageURI
-          ());
-        msgSplitsBCDE.get(responseEvent.getRemoteResponseToMessageURI().toString()).stop();
+        if (msgSplitsBC.get(responseEvent.getRemoteResponseToMessageURI().toString()) != null) {
+          logger.debug("RECEIVED REMOTE RESPONSE EVENT {} for uri {}", event, responseEvent.getRemoteResponseToMessageURI
+            ());
+          msgSplitsBCDE.get(responseEvent.getRemoteResponseToMessageURI().toString()).stop();
+        }
       } else if (msgSplitsBC.get(responseEvent.getOriginalMessageURI().toString()) != null) {
         logger.debug("RECEIVED RESPONSE EVENT {} for uri {}", event, responseEvent.getOriginalMessageURI());
         msgSplitsBC.get(responseEvent.getOriginalMessageURI().toString()).stop();
       }
     } else if (event instanceof MessageFromOtherNeedEvent) {
-      URI remoteMessageURI = ((MessageFromOtherNeedEvent) event).getWonMessage().getCorrespondingRemoteMessageURI();
+      WonMessage msg = ((MessageFromOtherNeedEvent) event).getWonMessage();
+      URI remoteMessageURI = msg.getCorrespondingRemoteMessageURI();
       msgSplitsBCD.get(remoteMessageURI.toString()).stop();
+
+      connectionMsgUris.put(msg.getMessageURI(), msg.getReceiverNeedURI());
+
+    } else if (event instanceof CrawlReadyEvent) {
+      logger.info("\nConversation between Needs: " + getEventListenerContext().getBotContext().listNeedUris());
+      reportMessageSizes(connectionMsgUris, "Connection Messages");
+      reportMessageSizes(responseMsgUris, "Delivery Responses");
+      getEventListenerContext().getEventBus().publish(new CrawlDoneEvent());
     }
 
+
+  }
+
+  private void reportMessageSizes(final Map<URI, URI> msgUris, String name) {
+    int[] counter = new int[4];
+    Set<URI> keys = msgUris.keySet();
+    for (URI uri : keys) {
+      Dataset dataset = getEventListenerContext().getLinkedDataSource().getDataForResource(uri, msgUris.get(uri));
+      record(dataset, counter);
+    }
+    String sizeInfo = "\nSIZES for " + name  + ":\n" +
+      "messages=" + counter[0] + ", named-graphs=" + counter[1] + ", " +
+      "quads=" + counter[2] + ", bytes-in-Trig-UTF8=" + counter[3];
+    logger.info(sizeInfo);
+  }
+
+  private void record(final Dataset dataset, final int[] counter) {
+
+
+    counter[0]++;
+    counter[1] = counter[1] + RdfUtils.getModelNames(dataset).size();
+    Iterator<Quad> quadsIterator = dataset.asDatasetGraph().find();
+    while (quadsIterator.hasNext()) {
+      quadsIterator.next();
+      counter[2]++;
+    }
+    counter[3] = counter[3] + RdfUtils.writeDatasetToString(dataset, Lang.TRIG).getBytes(Charsets.UTF_8).length;
   }
 
 }

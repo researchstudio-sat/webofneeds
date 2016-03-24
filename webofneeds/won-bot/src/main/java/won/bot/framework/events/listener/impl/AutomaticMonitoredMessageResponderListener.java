@@ -19,7 +19,6 @@ package won.bot.framework.events.listener.impl;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.EventBotActionUtils;
 import won.bot.framework.events.event.ConnectionSpecificEvent;
 import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.impl.monitor.MessageDispatchStartedEvent;
@@ -88,19 +87,14 @@ public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFi
         String message = createMessage();
         Model messageContent = WonRdfUtils.MessageUtils.textMessage(message);
         URI connectionUri = messageEvent.getConnectionURI();
-
         WonMessage wonMessage = createWonMessage(connectionUri, messageContent);
-        //remember the message URI so we can react to success/failure responses
-        final URI msgURI = wonMessage.getMessageURI();
-        EventBotActionUtils.rememberInListIfNamePresent(ctx, msgURI, "msgURIs");
-
         logger.debug("sending message " + message);
         try {
           // fire start message sending monitor event (message sending includes signing)
-          ctx.getEventBus().publish(new MessageDispatchStartedEvent(msgURI));
+          ctx.getEventBus().publish(new MessageDispatchStartedEvent(wonMessage));
           ctx.getWonMessageSender().sendWonMessage(wonMessage);
           // fire message is sent monitor event
-          ctx.getEventBus().publish(new MessageDispatchedEvent(msgURI));
+          ctx.getEventBus().publish(new MessageDispatchedEvent(wonMessage));
         } catch (Exception e) {
           logger.warn("could not send message via connection {}", connectionUri, e);
         }

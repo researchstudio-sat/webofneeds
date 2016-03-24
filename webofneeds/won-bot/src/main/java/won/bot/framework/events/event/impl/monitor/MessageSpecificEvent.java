@@ -1,6 +1,7 @@
 package won.bot.framework.events.event.impl.monitor;
 
 import won.bot.framework.events.event.BaseEvent;
+import won.protocol.message.WonMessage;
 
 import java.net.URI;
 
@@ -11,13 +12,17 @@ import java.net.URI;
 public abstract class MessageSpecificEvent extends BaseEvent
 {
 
-  private URI messageURI;
+  private WonMessage message;
 
-  public MessageSpecificEvent(final URI messageURI) {
-    this.messageURI = messageURI;
+  public MessageSpecificEvent(final WonMessage message) {
+    this.message = message;
   }
 
   public URI getMessageURI() {
-    return messageURI;
+    return message.getMessageURI();
+  }
+
+  public URI getNeedURI() {
+    return message.getSenderNeedURI();
   }
 }
