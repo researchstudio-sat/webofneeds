@@ -148,6 +148,15 @@ public interface ConnectionRepository extends WonRepository<Connection>
     @Param("messageType") WonMessageType messageType,
     @Param("referenceDate") Date referenceDate, Pageable pageable);
 
+  @Query("select msg.parentURI from MessageEventPlaceholder msg " +
+    "where (((msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) " +
+    "   or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI)) " +
+    "   and (msg.messageType = :messageType)) " +
+    "group by msg.parentURI")
+  Slice<URI> getConnectionURIByLatestActivity(
+    @Param("need") URI needURI,
+    @Param("messageType") WonMessageType messageType, Pageable pageable);
+
 
 
   @Query("select msg.parentURI from MessageEventPlaceholder msg " +

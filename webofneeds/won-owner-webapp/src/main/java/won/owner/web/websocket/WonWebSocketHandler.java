@@ -41,6 +41,7 @@ import won.protocol.message.WonMessageDecoder;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
+import won.protocol.util.WonRdfUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -198,29 +199,32 @@ public class WonWebSocketHandler
       return;
     }
 
+    String textMsg = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
+
     try {
       switch (wonMessage.getMessageType()) {
         case OPEN:
           if (userNeed.isConversations()) {
-            emailSender.sendNotificationMessage(user.getEmail(), "Conversation Message",
-                                                wonMessage.getReceiverNeedURI().toString());
+            emailSender.sendConversationNotificationHtmlMessage(
+              user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), textMsg);
           }
           return;
         case CONNECTION_MESSAGE:
           if (userNeed.isConversations()) {
-            emailSender.sendNotificationMessage(user.getEmail(), "Conversation Message",
-                                                wonMessage.getReceiverNeedURI().toString());
+            emailSender.sendConversationNotificationHtmlMessage(
+              user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), textMsg);
           }
           return;
         case CONNECT:
           if (userNeed.isRequests()) {
-            emailSender.sendNotificationMessage(user.getEmail(), "Conversation Request",
-                                                wonMessage.getReceiverNeedURI().toString());
+            emailSender.sendConnectNotificationHtmlMessage(
+              user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), textMsg);
           }
           return;
         case HINT_MESSAGE:
-          if (userNeed.isRequests()) {
-            emailSender.sendNotificationMessage(user.getEmail(), "Match", wonMessage.getReceiverNeedURI().toString());
+          if (userNeed.isMatches()) {
+            String remoteNeedUri = WonRdfUtils.MessageUtils.toMatch(wonMessage).getToNeed().toString();
+            emailSender.sendHintNotificationMessageHtml(user.getEmail(), needUri.toString(), remoteNeedUri);
           }
           return;
         //TODO close message can be of either type depending of state of the connection...

@@ -19,7 +19,9 @@
  */
 import {
     checkHttpStatus,
-    entries
+    entries,
+    urisToLookupMap,
+    is
 } from '../utils';
 import * as q from 'q';
 
@@ -399,17 +401,15 @@ const rdfstore = window.rdfstore;
         if (connectionUri != null) {
             cacheItemMarkDirty(connectionUri);
         }
-        return q.when(true); //return a promise for chaining
+        return Promise.resolve(true); //return a promise for chaining
     }
     won.invalidateCacheForNeed = function(needUri){
         if (needUri != null) {
             cacheItemMarkDirty(needUri);
             cacheItemMarkDirty(needUri+'/connections/')
         }
-        return q.when(true); //return a promise for chaining
+        return Promise.resolve(true); //return a promise for chaining
     }
-
-
 
     var getReadUpdateLockPerUri = function(uri){
         var lock = privateData.readUpdateLocksPerUri[uri];
@@ -422,6 +422,7 @@ const rdfstore = window.rdfstore;
 
     var getReadUpdateLocksPerUris = function(uris){
         var locks = [];
+        console.log("uris",uris);
         uris.map(
             function(uri){
                 locks.push(getReadUpdateLockPerUri(uri));
@@ -624,9 +625,10 @@ const rdfstore = window.rdfstore;
             requestUri = requestUri.replace(re, ':');
 
             fetch(requestUri, {
-                method: 'get',
-                credentials: 'include'
-            })
+                    method: 'get',
+                    credentials: "same-origin",
+                    headers: { 'Accept': 'application/ld+json' }
+                })
             .then(dataset => dataset.json())
             .then(
                 dataset => {
@@ -650,9 +652,10 @@ const rdfstore = window.rdfstore;
      * the connectionContainer to the connectionUris
      * contained within.
      */
+    won.getNeed =
     won.getNeedWithConnectionUris = function(needUri) {
         return Promise.all([
-            won.getNeed(needUri),
+            getNeedData(needUri),
             won.getconnectionUrisOfNeed(needUri)]
         ).then(([need, connectionUris]) => {
             need.hasConnections = connectionUris;
@@ -664,7 +667,7 @@ const rdfstore = window.rdfstore;
      * Loads the default data of the need with the specified URI into a js object.
      * @return the object or null if no data is found for that URI in the local datastore
      */
-    won.getNeed = function(needUri) {
+    function getNeedData(needUri) {
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getNeed: uri must not be null"};
         }
@@ -790,6 +793,7 @@ const rdfstore = window.rdfstore;
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getWonNodeUriOfNeed: needUri must not be null"};
         }
+        //return won.getNode(needUri).then(need => need[won.WON.hasWonNode]);
         return won.getUniqueObjectOfProperty(needUri, won.WON.hasWonNode)
             .then(
                 function(result){return result;},
@@ -912,68 +916,26 @@ const rdfstore = window.rdfstore;
      * @return {*} the data of all connection-nodes referenced by that need
      */
     won.getConnectionsOfNeed = (needUri) =>
-        won.getconnectionUrisOfNeed(needUri)
+        won.getConnectionUrisOfNeed(needUri)
         .then(connectionUris => won.getNodes(connectionUris))
 
-
-    /**
+    won.getconnectionUrisOfNeed =
+    /*
      * Loads all URIs of a need's connections.
-     * @deprecated possible duplicate of `won.getConnectionsWithOwnNeed` (see there)
      */
-    won.getconnectionUrisOfNeed = function(needUri) {
-        if (typeof needUri === 'undefined' || needUri == null  ){
-            throw {message : "getconnectionUrisOfNeed: uri must not be null"};
-        }
-        return won.ensureLoaded(needUri).then(
-            function(){
-                var lock = getReadUpdateLockPerUri(needUri);
-                return lock.acquireReadLock().then(
-                    function() {
-                        try {
-                            var subject = needUri;
-                            var predicate = won.WON.hasConnections;
-                            var connectionsPromises = [];
-                            privateData.store.node(needUri, function (success, graph) {
-                                var resultGraph = graph.match(subject, predicate, null);
-                                if (resultGraph != null && resultGraph.length > 0) {
-                                    for (key in resultGraph.triples) {
-                                        var connectionsURI = resultGraph.triples[key].object.nominalValue;
-                                        //TODO: here, we fetch, but if we knew that the connections container didn't change
-                                        //we could just ensureLoaded. See https://github.com/researchstudio-sat/webofneeds/issues/109
-                                        connectionsPromises.push(won.ensureLoaded(connectionsURI).then(function (success) {
-                                            var connectionUris = [];
-                                            privateData.store.node(connectionsURI, function (success, graph) {
-                                                if (graph != null && graph.length > 0) {
-                                                    var memberTriples = graph.match(connectionsURI, createNameNodeInStore("rdfs:member"), null);
-                                                    for (var memberKey in memberTriples.triples) {
-                                                        var member = memberTriples.triples[memberKey].object.nominalValue;
-                                                        connectionUris.push(member);
-                                                    }
-                                                }
-                                            });
-                                            return connectionUris;
-                                        }));
-                                    }
-                                }
-                            });
-                            return q.all(connectionsPromises)
-                                .then(function (listOfLists) {
-                                    //for each hasConnections triple (should only be one, but hey) we get a list of connections.
-                                    //now flatten the list.
-                                    var merged = [];
-                                    merged = merged.concat.apply(merged, listOfLists);
-                                    return merged;
-                                });
-                        } catch (e) {
-                            q.reject("could not get connection URIs of need + " + needUri + ". Reason:" + e);
-                        } finally {
-                            lock.releaseReadLock();
-                        }
-                    }
-                )
-            });
-
-    }
+    won.getConnectionUrisOfNeed = (needUri) =>
+        won.getNode(needUri)
+            .then(need => won.getNode(need.hasConnections))
+            .then(connectionContainer => {
+                /*
+                 * if there's only a single rdfs:member in the event
+                 * container, getNode will not return an array, so we
+                 * need to make sure it's one from here on out.
+                 */
+                return is('String', connectionContainer.member) ?
+                    [connectionContainer.member] :
+                    connectionContainer.member
+            })
 
     /**
      *
@@ -1039,8 +1001,8 @@ const rdfstore = window.rdfstore;
      */
     won.getEventsOfConnection = function(connectionUri, requesterWebId) {
         return won.getEventUrisOfConnection(connectionUri, requesterWebId)
-            .then(eventUris => won.urisToLookupMap(eventUris,
-                    eventUri => won.getNode(eventUri, requesterWebId))
+            .then(eventUris => urisToLookupMap(eventUris,
+                    eventUri => won.getEvent(eventUri, requesterWebId))
             )
     };
 
@@ -1324,7 +1286,7 @@ const rdfstore = window.rdfstore;
      * @param requesterWebId map/object of (uri -> node's data)
      */
     won.getNodes = function(uris, requesterWebId) {
-        return won.urisToLookupMap(uris, uri => won.getNode(uri, requesterWebId));
+        return urisToLookupMap(uris, uri => won.getNode(uri, requesterWebId));
     };
 
     /**
@@ -1340,12 +1302,44 @@ const rdfstore = window.rdfstore;
                 won.getNode(connection.hasEventContainer, requesterWebId)
             ]))
             .then( ([connection, eventContainer]) => {
-                connection.hasEvents = eventContainer.member;
+                /*
+                 * if there's only a single rdfs:member in the event
+                 * container, getNode will not return an array, so we
+                 * need to make sure it's one from here on out.
+                 */
+                connection.hasEvents = is('String', eventContainer.member) ?
+                    [eventContainer.member] :
+                    eventContainer.member
                 return connection;
             })
     };
 
     //aliases (formerly functions that were just pass-throughs)
+    won.getEvent = (uri, requesterWebId) => won.getNode(uri, requesterWebId)
+            .then(event => {
+                // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
+                if(is('Array', event.hasReceivedTimestamp)) {
+                    const latestFirst = event.hasReceivedTimestamp.sort((x,y) => new Date(x) > new Date(y));
+                    event.hasReceivedTimestamp = latestFirst[0];
+                }
+
+                if(!event.hasCorrespondingRemoteMessage) {
+                    return event;
+                } else {
+                    /*
+                    * there's some messages (e.g. incoming connect) where there's
+                    * vital information in the correspondingRemoteMessage. So
+                    * we fetch it here.
+                    */
+                    return won
+                        .getNode(event.hasCorrespondingRemoteMessage, requesterWebId)
+                        .then(correspondingEvent => {
+                           event.hasCorrespondingRemoteMessage = correspondingEvent;
+                           return event;
+                        })
+                }
+            });
+
     won.getConnectionEvent =
     won.getNodeWithAttributes =
     /**
@@ -1401,9 +1395,7 @@ const rdfstore = window.rdfstore;
                                 resolve(entireGraph.triples.filter(t => t.subject.nominalValue === uri))
                             })
                         } else {
-                            //graph.triples[0].object.nominalValue
-                            //graph.triples[0].subject.nominalValue
-                            //graph.triples[0].predicate.nominalValue
+                            //.node(...) was successful. return the node's tripples
                             resolve(graph.triples);
                         }
                     })
@@ -1539,27 +1531,6 @@ const rdfstore = window.rdfstore;
             return Q.all(promises)
         })
 
-    }
-
-
-    /**
-     * Takes an array of uris, performs the lookup function on each
-     * of them seperately, collects the results and builds an map/object
-     * with the uris as keys and the results as values.
-     * @param uris
-     * @param asyncLookupFunction
-     * @return {*}
-     */
-    won.urisToLookupMap = function(uris, asyncLookupFunction) {
-        const asyncLookups = uris.map(uri => asyncLookupFunction(uri));
-        return Promise.all(asyncLookups).then( dataObjects => {
-            const lookupMap = {};
-            //make sure there's the same
-            for (let i = 0; i < uris.length; i++) {
-                lookupMap[uris[i]] = dataObjects[i];
-            }
-            return lookupMap;
-        });
     }
 
     /**

@@ -29,7 +29,6 @@ import topnav from './components/topnav';
 import createNeedComponent from './components/create-need/create-need';
 import overviewIncomingRequestsComponent from './components/overview-incoming-requests/overview-incoming-requests';
 import overviewSentRequestsComponent from './components/overview-sent-requests/overview-sent-requests';
-import matchesComponent from './components/matches/matches';
 import postVisitorComponent from './components/post-visitor/post-visitor';
 import postOwnerComponent from './components/post-owner/post-owner';
 import postOwnerMessagesComponent from './components/post-owner-messages/post-owner-messages';
@@ -64,7 +63,6 @@ let app = angular.module('won.owner', [
     createNeedComponent,
     overviewIncomingRequestsComponent,
     overviewSentRequestsComponent,
-    matchesComponent,
     postVisitorComponent,
     postOwnerComponent,
     postOwnerMessagesComponent,

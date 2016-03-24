@@ -1,7 +1,13 @@
 package won.utils.mail;
 
-import org.springframework.mail.MailSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+
+import javax.mail.internet.MimeMessage;
 
 /**
  * User: ypanchenko
@@ -10,10 +16,12 @@ import org.springframework.mail.SimpleMailMessage;
 public class WonMailSender
 {
 
-  private MailSender mailSender;
+  private JavaMailSender mailSender;
   private SimpleMailMessage templateMessage;
 
-  public void setMailSender(MailSender mailSender) {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+
+  public void setMailSender(JavaMailSender mailSender) {
     this.mailSender = mailSender;
   }
 
@@ -26,7 +34,26 @@ public class WonMailSender
     msg.setSubject(subject);
     msg.setTo(toEmail);
     msg.setText(text);
-    mailSender.send(msg);
+    try{
+      mailSender.send(msg);
+    } catch (MailException ex) {
+      logger.warn(ex.getMessage());
+    }
+  }
+
+  public void sendHtmlMessage(String toEmail, String subject, String htmlBody) {
+
+    MimeMessage msg = mailSender.createMimeMessage();
+    try{
+      MimeMessageHelper helper = new MimeMessageHelper(msg, true);
+      helper.setFrom(this.templateMessage.getFrom());
+      helper.setSubject(subject);
+      helper.setTo(toEmail);
+      helper.setText(htmlBody, true);
+      mailSender.send(msg);
+    } catch (Exception ex) {
+      logger.warn(ex.getMessage());
+    }
   }
 
 }

@@ -14,6 +14,7 @@ const initialState = Immutable.fromJS({
     didInvalidate: false,
     ownNeeds: {},
     theirNeeds: {},
+    errors: []
 });
 
 export default function(allNeeds = initialState, action = {}) {
@@ -23,7 +24,7 @@ export default function(allNeeds = initialState, action = {}) {
 
         case actionTypes.needs.failed:
             console.log('reducers.js: failed receive needlist action');
-            return Immutable.fromJS({error: action.payload.error});
+            return allNeeds.update('errors', errors => errors.push(action.payload.error));
 
         case actionTypes.load:
             const ownNeeds = action.payload.get('ownNeeds');
@@ -38,6 +39,10 @@ export default function(allNeeds = initialState, action = {}) {
                 (updatedState, ownNeed) => setIfNew(updatedState, ['ownNeeds', ownNeed.uri], ownNeed),
                 allNeeds
             );
+
+        case actionTypes.needs.close:
+            const needUri = action.payload.ownNeedUri;
+            return allNeeds.setIn(["ownNeeds", needUri, 'state'], won.WON.Inactive);
 
         case actionTypes.needs.received:
             const ownNeed = action.payload;
@@ -58,26 +63,32 @@ export default function(allNeeds = initialState, action = {}) {
     }
 }
 
+function needToImmutable(need) {
+    return Immutable
+        .fromJS(need)
+        .set('hasConnections', Immutable.Set(need.hasConnections))
+}
+
 function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
     const {ownNeed, remoteNeed, connection} = connectionWithRelatedData;
     //guarantee that own need is in the state
     const stateWithOwnNeed = setIfNew(
         state,
         ['ownNeeds', ownNeed.uri],
-        Immutable.fromJS(ownNeed));
+        needToImmutable(ownNeed));
 
     const stateWithBothNeeds = setIfNew(
         stateWithOwnNeed,
         ['theirNeeds', remoteNeed.uri],
-        Immutable.fromJS(remoteNeed));
+        needToImmutable(remoteNeed));
 
     /* TODO | what if we get the connection while not online?
      * TODO | doing this here doesn't guarantee synchronicity with the rdf
      * TODO | unless we fetch all connections onLoad and onLogin
      */
-    return stateWithBothNeeds.updateIn(['ownNeeds', ownNeed.uri, 'hasConnections'], connections => connections?
-            connections.push(connection.uri) :
-            Immutable.List([connection.uri]) // first connection -> new List
+    return stateWithBothNeeds.updateIn(
+        ['ownNeeds', ownNeed.uri, 'hasConnections'],
+        connections => connections.add(connection.uri)
     );
 }
 
@@ -86,6 +97,6 @@ function setIfNew(state, path, obj){
         //we've seen this need before, no need to overwrite it
         val :
         //it's the first time we see this need -> add it
-        Immutable.fromJS(obj))
+        needToImmutable(obj))
 }
 

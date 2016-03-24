@@ -18,18 +18,26 @@ package won.bot.framework.events.action.impl;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.sparql.path.Path;
+import com.hp.hpl.jena.sparql.path.PathParser;
 import org.apache.commons.lang3.StringUtils;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.EventBotActionUtils;
+import won.bot.framework.events.action.impl.counter.Counter;
+import won.bot.framework.events.action.impl.counter.CounterImpl;
 import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.NeedCreationFailedEvent;
-import won.bot.framework.events.event.impl.FailureResponseEvent;
-import won.bot.framework.events.event.impl.NeedCreatedEvent;
-import won.bot.framework.events.event.impl.NeedCreatedEventForMatcher;
+import won.bot.framework.events.event.NeedSpecificEvent;
+import won.bot.framework.events.event.impl.*;
+import won.bot.framework.events.event.impl.debugbot.ConnectDebugCommandEvent;
+import won.bot.framework.events.event.impl.debugbot.HintDebugCommandEvent;
+import won.bot.framework.events.event.impl.debugbot.NeedCreatedEventForDebugConnect;
+import won.bot.framework.events.event.impl.debugbot.NeedCreatedEventForDebugHint;
 import won.bot.framework.events.listener.EventListener;
 import won.protocol.message.WonMessage;
 import won.protocol.model.BasicNeedType;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.NeedModelBuilder;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -40,13 +48,19 @@ import java.net.URI;
 * Creates a need with the specified facets.
 * If no facet is specified, the ownerFacet will be used.
 */
-public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction
+public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
 {
-  public CreateEchoNeedWithFacetsAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
+
+  private Counter counter = new CounterImpl("DebugNeedsCounter");
+
+  private boolean isInitialForHint;
+  private boolean isInitialForConnect;
+
+  public CreateDebugNeedWithFacetsAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
     super(eventListenerContext, uriListName, facets);
   }
 
-  public CreateEchoNeedWithFacetsAction(EventListenerContext eventListenerContext, URI... facets) {
+  public CreateDebugNeedWithFacetsAction(EventListenerContext eventListenerContext, URI... facets) {
     super(eventListenerContext, facets);
   }
 
@@ -54,17 +68,41 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction
     protected void doRun(Event event) throws Exception
     {
         String replyText = "";
-        if (! (event instanceof NeedCreatedEventForMatcher)){
-          logger.error("CreateEchoNeedWithFacetsAction can only handle NeedCreatedEventForMatcher");
+        URI reactingToNeedUriTmp = null;
+        Dataset needDataset = null;
+        if (event instanceof NeedSpecificEvent) {
+          reactingToNeedUriTmp = ((NeedSpecificEvent) event).getNeedURI();
+        } else {
+          logger.warn("could not process non-need specific event {}", event);
           return;
         }
-        final URI reactingToNeedUri = ((NeedCreatedEventForMatcher) event).getNeedURI();
-        final Dataset needDataset = ((NeedCreatedEventForMatcher)event).getNeedData();
-        String titleString = WonRdfUtils.NeedUtils.getNeedTitle(needDataset, reactingToNeedUri);
-        if (titleString != null){
-          replyText = titleString;
+        if (event instanceof NeedCreatedEventForMatcher) {
+          needDataset = ((NeedCreatedEventForMatcher) event).getNeedData();
+        } else if (event instanceof HintDebugCommandEvent) {
+          reactingToNeedUriTmp = ((HintDebugCommandEvent) event).getRemoteNeedURI();
+        } else if (event instanceof ConnectDebugCommandEvent) {
+          reactingToNeedUriTmp = ((ConnectDebugCommandEvent) event).getRemoteNeedURI();
         } else {
-          replyText = "Your Posting (" + reactingToNeedUri.toString() +")";
+          logger.error("CreateEchoNeedWithFacetsAction cannot handle " + event.getClass().getName());
+          return;
+        }
+        final URI reactingToNeedUri = reactingToNeedUriTmp;
+        Path titlePath = PathParser.parse("won:hasContent/dc:title", DefaultPrefixUtils.getDefaultPrefixes());
+
+        String titleString = null;
+        if (needDataset != null) {
+          titleString = RdfUtils.getStringPropertyForPropertyPath(needDataset, reactingToNeedUri, titlePath);
+        }
+        if (titleString != null){
+          if (isInitialForConnect) {
+            replyText = "Debugging with initial connect: " + titleString;
+          } else if (isInitialForHint) {
+            replyText = "Debugging with initial hint: " + titleString;
+          } else {
+            replyText = "Debugging: " + titleString;
+          }
+        } else {
+          replyText = "Debug Need No. " + counter.increment();
         }
 
         WonNodeInformationService wonNodeInformationService =
@@ -74,12 +112,14 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction
         final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
         final Model needModel =
                 new NeedModelBuilder()
-                        .setTitle("RE: " + replyText)
-                        .setBasicNeedType(BasicNeedType.SUPPLY)
-                        .setDescription("This is a need automatically created by the EchoBot.")
+                        .setTitle(replyText)
+                        .setBasicNeedType(BasicNeedType.DO_TOGETHER)
+                        .setDescription("This is a need automatically created by the DebugBot.")
                         .setUri(needURI)
                         .setFacetTypes(facets)
                         .build();
+
+      final Event origEvent = event;
 
         logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
 
@@ -93,8 +133,16 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction
           @Override
           public void onEvent(Event event) throws Exception {
             logger.debug("need creation successful, new need URI is {}", needURI);
-            getEventListenerContext().getEventBus()
-                                     .publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
+            if ((origEvent instanceof HintDebugCommandEvent) || isInitialForHint) {
+              getEventListenerContext().getEventBus()
+                                       .publish(new NeedCreatedEventForDebugHint(needURI, wonNodeUri, needModel, null));
+            } else if ((origEvent instanceof ConnectDebugCommandEvent) || isInitialForConnect) {
+              getEventListenerContext().getEventBus()
+                                       .publish(new NeedCreatedEventForDebugConnect(needURI, wonNodeUri, needModel, null));
+            } else {
+              getEventListenerContext().getEventBus()
+                                       .publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
+            }
             //put the mapping between the original and the reaction in to the context.
             getEventListenerContext().getBotContext().put(reactingToNeedUri, needURI);
             getEventListenerContext().getBotContext().put(needURI, reactingToNeedUri);
@@ -120,4 +168,11 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction
     }
 
 
+  public void setIsInitialForHint(final boolean isInitialForHint) {
+    this.isInitialForHint = isInitialForHint;
+  }
+
+  public void setIsInitialForConnect(final boolean isInitialForConnect) {
+    this.isInitialForConnect = isInitialForConnect;
+  }
 }
