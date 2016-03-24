@@ -6,7 +6,7 @@ import squareImageModule from './square-image';
 import dynamicTextFieldModule from './dynamic-textfield';
 import { attach } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
-import { labels, updateRelativeTimestamps } from '../won-label-utils';
+import { labels, relativeTime } from '../won-label-utils';
 import { selectAllByConnections, selectOpenConnectionUri } from '../selectors';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
@@ -61,6 +61,7 @@ function genComponentConf() {
             window.pm4dbg = this;
             window.selectOpenConnectionUri4dbg = selectOpenConnectionUri;
             window.selectChatMessages4dbg = selectChatMessages;
+
             //this.postmsg = this;
             const selectFromState = state => {
                 const connectionUri = selectOpenConnectionUri(state);
@@ -133,12 +134,14 @@ function selectChatMessages(state) {
                 return remote;
         }).sort((a, b) =>
             toDate(a.get('hasReceivedTimestamp')) > toDate(b.get('hasReceivedTimestamp'))
-        ).map(e => {
-                e.set('humanReadableTimestamp', (
+        ).map(e => e.set(
+                'humanReadableTimestamp',
+                relativeTime(
+                    state.get('lastUpdateTime'),
                     toDate(e.get('hasReceivedTimestamp'))
-                ).toString());
-                return e;
-            });
+                )
+            )
+        );
     }
 
 }
