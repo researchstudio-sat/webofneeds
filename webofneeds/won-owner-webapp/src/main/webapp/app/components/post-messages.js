@@ -117,7 +117,7 @@ function selectChatMessages(state) {
     const connectionData = selectAllByConnections(state).get(connectionUri);
     if (!connectionData || !connectionData.get('events')) {
         return Immutable.List();
-    }else {
+    } else {
         const toDate = (ts) => new Date(Number.parseInt(ts));
         return connectionData.get('events').filter(e => {
             if (e.get('hasTextMessage')) return true;
