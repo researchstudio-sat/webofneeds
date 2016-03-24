@@ -3,8 +3,8 @@
  */
 
 import  won from '../won-es6';
-import { actionTypes, actionCreators, getConnectionRelatedData, messageTypeToEventType  } from './actions';
-import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
+
+
 import { getRandomPosInt } from '../utils';
 
 import { selectAllByConnections } from '../selectors';
@@ -14,11 +14,20 @@ import {
 } from '../utils';
 
 import {
+    actionTypes,
+    actionCreators,
+    getConnectionRelatedData,
+    messageTypeToEventType
+} from './actions';
+
+import {
     buildCreateMessage,
     buildOpenMessage,
     buildCloseMessage,
     buildRateMessage,
-    buildConnectMessage
+    buildConnectMessage,
+    setCommStateFromResponseForLocalNeedMessage,
+    getEventsFromMessage,
 } from '../won-message-utils';
 
 export function connectionsChatMessage(chatMessage, connectionUri) {
