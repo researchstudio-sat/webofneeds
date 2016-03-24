@@ -36,7 +36,7 @@ public class WonVerifierTest
   TestingKeys keys;
 
   @Before
-  public void init() {
+  public void init() throws Exception {
 
     keys = new TestingKeys(TestSigningUtils.KEYS_FILE);
   }
