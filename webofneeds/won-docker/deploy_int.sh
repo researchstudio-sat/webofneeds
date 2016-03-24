@@ -2,7 +2,7 @@
 set -e
 
 # base folder is used to mount some files (e.g. certificates) from the server into the containers
-base_folder=/home/install
+base_folder=/home/install/won/int
 
 # if the GENERATE_NEW_CERTIFICATES flag is set to true then setup things in a way that the certificates are recreated
 # that (currently) includes:
@@ -10,12 +10,12 @@ base_folder=/home/install
 # - emptying the postgres database (all need data is lost!) => is done later in the script anyway
 if [ "$GENERATE_NEW_CERTIFICATES" = true ] ; then
   echo generating new certificates! Old files and postgres need database will be deleted!
-  ssh install@satsrv04 rm -rf $base_folder/won-server-certs/*
-  ssh install@satsrv05 rm -rf $base_folder/won-server-certs/*
-  ssh install@satsrv06 rm -rf $base_folder/won-server-certs/*
-  ssh install@satsrv04 rm -rf $base_folder/won-client-certs/*
-  ssh install@satsrv05 rm -rf $base_folder/won-client-certs/*
-  ssh install@satsrv06 rm -rf $base_folder/won-client-certs/*
+  ssh root@satsrv04 rm -rf $base_folder/won-server-certs/*
+  ssh root@satsrv05 rm -rf $base_folder/won-server-certs/*
+  ssh root@satsrv06 rm -rf $base_folder/won-server-certs/*
+  ssh root@satsrv04 rm -rf $base_folder/won-client-certs/*
+  ssh root@satsrv05 rm -rf $base_folder/won-client-certs/*
+  ssh root@satsrv06 rm -rf $base_folder/won-client-certs/*
 fi
 
 # build the won docker images on every server of the cluster so that everywhere is the latest version available

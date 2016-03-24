@@ -2,7 +2,7 @@
 set -e
 
 # base folder is used to mount some files (e.g. certificates) from the server into the containers
-base_folder=/home/install
+base_folder=/home/install/won/dev
 
 # if the GENERATE_NEW_CERTIFICATES flag is set to true then setup things in a way that the certificates are recreated
 # that (currently) includes:
@@ -10,12 +10,12 @@ base_folder=/home/install
 # - emptying the postgres database (all need data is lost!)
 if [ "$GENERATE_NEW_CERTIFICATES" = true ] ; then
   echo generating new certificates! Old files and postgres need database will be deleted!
-  ssh install@satsrv04 rm -rf $base_folder/won-server-certs/*
-  ssh install@satsrv05 rm -rf $base_folder/won-server-certs/*
-  ssh install@satsrv06 rm -rf $base_folder/won-server-certs/*
-  ssh install@satsrv04 rm -rf $base_folder/won-client-certs/*
-  ssh install@satsrv05 rm -rf $base_folder/won-client-certs/*
-  ssh install@satsrv06 rm -rf $base_folder/won-client-certs/*
+  ssh root@satsrv04 rm -rf $base_folder/won-server-certs/*
+  ssh root@satsrv05 rm -rf $base_folder/won-server-certs/*
+  ssh root@satsrv06 rm -rf $base_folder/won-server-certs/*
+  ssh root@satsrv04 rm -rf $base_folder/won-client-certs/*
+  ssh root@satsrv05 rm -rf $base_folder/won-client-certs/*
+  ssh root@satsrv06 rm -rf $base_folder/won-client-certs/*
   docker -H satsrv04:2375 stop postgres_ma || echo 'No docker container found to stop with name: postgres_ma'
   docker -H satsrv05:2375 stop postgres_ma || echo 'No docker container found to stop with name: postgres_ma'
   docker -H satsrv04:2375 rm postgres_ma || echo 'No docker container found to remove with name: postgres_ma'
