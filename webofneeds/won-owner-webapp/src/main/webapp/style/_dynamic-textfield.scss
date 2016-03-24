@@ -3,7 +3,7 @@
 won-dynamic-textfield {
   display: flex;
   flex-direction: row;
-  align-items: flex-start; //along top
+  align-items: stretch; //all same height
 
   .wdt__left {
     flex-grow: 1; //use up all the space not occupied by the button
@@ -15,6 +15,7 @@ won-dynamic-textfield {
 
   .wdt__submitbutton {
     @extend .won-button--filled;
+    margin-left: 0.5rem;
   }
 
   .wdt__text {

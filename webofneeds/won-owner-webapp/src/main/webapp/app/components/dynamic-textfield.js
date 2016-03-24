@@ -13,17 +13,17 @@ function genComponentConf() {
             <div class="wdt__text"
                  ng-class="{'wdt__text--placeholder' : self.displayingPlaceholder, 'wdt__text--invalid' : !self.valid()}"
                  contenteditable="true">
-                 {{::self.placeholder}}
+                 {{ ::self.placeholder }}
             </div>
             <span class="wdt__charcount" ng-show="self.maxChars">
-                {{self.maxChars - self.value.length}} Chars left
+                {{ self.maxChars - self.value.length }} Chars left
             </span>
         </div>
         <button
             class="wdt__submitbutton red"
-            ng-show="submitButtonLabel"
+            ng-show="::self.submitButtonLabel"
             ng-click="::self.submit()">
-            {{ submitButtonLabel }}
+            {{ ::self.submitButtonLabel }}
         </button>
     `;
 
@@ -92,12 +92,17 @@ function genComponentConf() {
             }
         }
         submit () {
-            const payload = {
-                value: this.value,
-                valid: this.valid()
-            };
-            this.onSubmit(payload);
-            dispatchEvent(this.$element[0], 'submit', payload);
+            if(this.submitButtonLabel || this.submittable) {
+                const payload = {
+                    value: this.value,
+                    valid: this.valid()
+                };
+                this.onSubmit(payload);
+                dispatchEvent(this.$element[0], 'submit', payload);
+
+                // clear text
+                this.setText('');
+            }
         }
         input () {
             console.log('got input in dynamic textfeld ', this.getText());
@@ -186,21 +191,27 @@ function genComponentConf() {
             maxChars: '=',
             /*
              * Usage:
-             *  on-input="myCallback(value, valid)"
+             *  on-input="::myCallback(value, valid)"
              */
             onInput: '&',
             /*
              * Usage:
-             *  on-change="myCallback(value, valid)"
+             *  on-change="::myCallback(value, valid)"
              */
             onChange: '&',
 
             submitButtonLabel: '=',
             /*
              * Usage:
-             *  on-submit="myCallback(value)"
+             *  on-submit="::myCallback(value)"
              */
             onSubmit: '&',
+
+            /*
+             * if you don't specify a submit-button-label
+             * set this flag to true to enable submit-events.
+             */
+            submittable: '='
 
         },
         template: template
