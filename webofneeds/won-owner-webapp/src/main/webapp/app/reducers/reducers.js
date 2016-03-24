@@ -69,11 +69,8 @@ const reducers = {
     postOverview:postsReducer,
     messages: messagesReducer,
 
-    // contains the Date.now() of the last tick
-    tickTime: (state = Date.now(), action = {}) =>
-        action.type === actionTypes.tick ?
-            action.payload :
-            state,
+    // contains the Date.now() of the last action
+    lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
 
     config: createReducer(
         //initial state
