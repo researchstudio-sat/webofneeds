@@ -45,6 +45,7 @@ export default function(connections = initialState, action = {}) {
                     storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
                 connections);
 
+        case actionTypes.messages.connectionMessageReceived:
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
             return storeConnectionAndRelatedData(connections, action.payload);
