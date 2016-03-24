@@ -68,6 +68,13 @@ const reducers = {
     matches: matchReducer,
     postOverview:postsReducer,
     messages: messagesReducer,
+
+    // contains the Date.now() of the last tick
+    tickTime: (state = Date.now(), action = {}) =>
+        action.type === actionTypes.tick ?
+            action.payload :
+            state,
+
     config: createReducer(
         //initial state
         Immutable.Map(),

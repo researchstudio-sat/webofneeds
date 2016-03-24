@@ -196,9 +196,9 @@ const actionHierarchy = {
     retrieveNeedUris: retrieveNeedUris,
     config: {
         init: configInit,
-
         update: INJ_DEFAULT,
-    }
+    },
+    tick: startTicking,
 
     /*
      runMessagingAgent: () => (dispatch) => {
@@ -247,6 +247,14 @@ window.actionTypes4Dbg = actionTypes;
 
 
 //////////// STUFF THAT SHOULD BE IN OTHER FILES BELOW //////////////////
+
+export function startTicking() {
+    return (dispatch) =>
+        setInterval(() =>
+            dispatch({ type: actionTypes.tick, payload: Date.now() }),
+            60000
+        );
+}
 
 
 export function draftsPublish(draft, nodeUri) {

@@ -122,9 +122,6 @@ app.filter('filterByNeedState', function(){
 app.config([ '$urlRouterProvider', '$stateProvider', configRouting ]);
 app.run([ '$ngRedux', $ngRedux => runMessagingAgent($ngRedux) ]);
 
-//app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.runMessagingAgent()) ]);
-
-
 
 app.run([ '$ngRedux', $ngRedux =>
     $ngRedux.dispatch(actionCreators.config__init())
@@ -132,6 +129,13 @@ app.run([ '$ngRedux', $ngRedux =>
 
 //check login status. TODO: this should actually be baked-in data (to avoid the extra roundtrip)
 app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]);
+
+/*
+ * this action-creator dispatches once per minute thus making
+ * sure the gui is updated at least that often (so relative
+ * timestamps are up-to-date)
+ */
+app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.tick())]);
 
 //let app = angular.module('won.owner',[...other modules...]);
 angular.bootstrap(document, ['won.owner'], {
