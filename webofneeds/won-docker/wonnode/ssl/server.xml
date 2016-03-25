@@ -93,7 +93,7 @@
     scheme="https" secure="true" SSLEnabled="true"
     SSLCertificateFile="/usr/local/tomcat/conf/ssl/t-cert.pem"
     SSLCertificateKeyFile="/usr/local/tomcat/conf/ssl/t-key.pem"
-    SSLPassword="changeit"
+    SSLPassword="${CERTIFICATE_PASSWORD}"
     SSLVerifyClient="optionalNoCA" 
     SSLVerifyDepth="2" 
     sslProtocol="TLS"/>

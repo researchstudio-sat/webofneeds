@@ -1,6 +1,27 @@
 # fail the whole script if one command fails
 set -e
 
+# base folder is used to mount some files (e.g. certificates) from the server into the containers
+base_folder=/home/install/won/dev
+
+# if the GENERATE_NEW_CERTIFICATES flag is set to true then setup things in a way that the certificates are recreated
+# that (currently) includes:
+# - deleting content of the server and client certificate folder
+# - emptying the postgres database (all need data is lost!)
+if [ "$GENERATE_NEW_CERTIFICATES" = true ] ; then
+  echo generating new certificates! Old files and postgres need database will be deleted!
+  ssh root@satsrv04 rm -rf $base_folder/won-server-certs/*
+  ssh root@satsrv05 rm -rf $base_folder/won-server-certs/*
+  ssh root@satsrv06 rm -rf $base_folder/won-server-certs/*
+  ssh root@satsrv04 rm -rf $base_folder/won-client-certs/*
+  ssh root@satsrv05 rm -rf $base_folder/won-client-certs/*
+  ssh root@satsrv06 rm -rf $base_folder/won-client-certs/*
+  docker -H satsrv04:2375 stop postgres_dev || echo 'No docker container found to stop with name: postgres_dev'
+  docker -H satsrv05:2375 stop postgres_dev || echo 'No docker container found to stop with name: postgres_dev'
+  docker -H satsrv04:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
+  docker -H satsrv05:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
+fi
+
 # build won docker images and deploy to sat cluster
 echo start docker build and deployment:
 
@@ -28,24 +49,23 @@ fi
 
 
 # wonnode/owner server certificate generator
-# Please note that value of PASS should be the same used in your server.xml for SSLPassword on wonnode and owner,
-# and the same as activemq.broker.keystore.password used in your wonnode activemq spring configurations for broker
+# Please note that value of PASS (if you set a non-default password) should be the same used in your server.xml for
+# SSLPassword on wonnode and owner, and the same as activemq.broker.keystore.password used in your wonnode activemq
+# spring configurations for broker, set the password with "-e PASS=pass:<your_password>" or "-e
+# PASS=file:<your_file_with_password>"
 docker -H satsrv04:2375 build -t webofneeds/gencert:dev $WORKSPACE/webofneeds/won-docker/gencert/
 docker -H satsrv04:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
-docker -H satsrv04:2375 run --name=gencert_dev -e CN="satsrv04.researchstudio.at" -e "PASS=changeit" \
--v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
+docker -H satsrv04:2375 run --name=gencert_dev -e CN="satsrv04.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
+-v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
 docker -H satsrv05:2375 build -t webofneeds/gencert:dev $WORKSPACE/webofneeds/won-docker/gencert/
 docker -H satsrv05:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
-docker -H satsrv05:2375 run --name=gencert_dev -e CN="satsrv05.researchstudio.at" -e "PASS=changeit" \
--v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
+docker -H satsrv05:2375 run --name=gencert_dev -e CN="satsrv05.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
+-v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
 docker -H satsrv06:2375 build -t webofneeds/gencert:dev $WORKSPACE/webofneeds/won-docker/gencert/
 docker -H satsrv06:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
-docker -H satsrv06:2375 run --name=gencert_dev -e CN="satsrv06.researchstudio.at" -e "PASS=changeit" \
--v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
+docker -H satsrv06:2375 run --name=gencert_dev -e CN="satsrv06.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
+-v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
 docker -H satsrv07:2375 build -t webofneeds/gencert:dev $WORKSPACE/webofneeds/won-docker/gencert/
-docker -H satsrv07:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
-docker -H satsrv07:2375 run --name=gencert_dev -e CN="satsrv07.researchstudio.at" -e "PASS=changeit" \
--v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
 
 sleep 10
 
@@ -58,8 +78,9 @@ docker -H satsrv04:2375 run --name=wonnode_dev -d -e "uri.host=satsrv04.research
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5432/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
--v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
--v /home/install/won-client-certs/wonnode_dev:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v $base_folder/won-client-certs/wonnode_dev:/usr/local/tomcat/won/client-certs/ \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 8888:8443 -p 61616:61616 \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/wonnode:dev
@@ -74,8 +95,9 @@ docker -H satsrv05:2375 run --name=wonnode_dev -d -e "uri.host=satsrv05.research
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5432/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
--v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
--v /home/install/won-client-certs/wonnode_dev:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v $base_folder/won-client-certs/wonnode_dev:/usr/local/tomcat/won/client-certs/ \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 8888:8443 -p 61616:61616 \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/wonnode:dev
@@ -97,8 +119,9 @@ docker -H satsrv04:2375 run --name=owner_dev -d -e "node.default.host=satsrv04.r
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5432/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
--v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
--v /home/install/won-client-certs/owner_dev:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v $base_folder/won-client-certs/owner_dev:/usr/local/tomcat/won/client-certs/ \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 8081:8443 \
 -e "JMEM_OPTS=-Xmx1000m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/owner:dev
@@ -114,8 +137,9 @@ docker -H satsrv05:2375 run --name=owner_dev -d -e "node.default.host=satsrv05.r
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5432/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
--v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
--v /home/install/won-client-certs/owner_dev:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v $base_folder/won-client-certs/owner_dev:/usr/local/tomcat/won/client-certs/ \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 8081:8443 \
 -e "JMEM_OPTS=-Xmx1000m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/owner:dev
@@ -135,7 +159,7 @@ docker -H satsrv06:2375 run --name=matcher_service_dev -d -e "node.host=satsrv06
 -e "cluster.seed.host=satsrv06.researchstudio.at" \
 -e "uri.sparql.endpoint=http://satsrv06.researchstudio.at:9999/bigdata/namespace/kb/sparql" \
 -e "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8888/won/resource,https://satsrv05.researchstudio.at:8888/won/resource" \
--v /home/install/won-client-certs/matcher_service_int:/usr/src/matcher-service/client-certs/ \
+-v $base_folder/won-client-certs/matcher_service_int:/usr/src/matcher-service/client-certs/ \
 -e "cluster.local.port=2551" -e "cluster.seed.port=2551" -p 2551:2551 \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/matcher_service:dev
