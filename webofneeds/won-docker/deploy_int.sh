@@ -82,13 +82,13 @@ sleep 10
 # spring configurations for broker, set the password with "-e PASS=pass:<your_password>" or "-e
 # PASS=file:<your_file_with_password>"
 docker -H satsrv04:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
-docker -H satsrv04:2375 run --name=gencert_int -e CN="satsrv04.researchstudio.at" -e "PASS=pass:changeit" \
+docker -H satsrv04:2375 run --name=gencert_int -e CN="satsrv04.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
 -v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
 docker -H satsrv05:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
-docker -H satsrv05:2375 run --name=gencert_int -e CN="satsrv05.researchstudio.at" -e "PASS=pass:changeit" \
+docker -H satsrv05:2375 run --name=gencert_int -e CN="satsrv05.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
 -v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
 docker -H satsrv06:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
-docker -H satsrv06:2375 run --name=gencert_int -e CN="satsrv06.researchstudio.at" -e "PASS=pass:changeit" \
+docker -H satsrv06:2375 run --name=gencert_int -e CN="satsrv06.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
 -v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
 
 
@@ -115,6 +115,7 @@ docker -H satsrv04:2375 run --name=wonnode_int -d -e "uri.host=satsrv04.research
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9010:9010 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
@@ -131,6 +132,7 @@ docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv05.research
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9010:9010 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
@@ -155,6 +157,7 @@ docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.r
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9011:9011 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx1000m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
@@ -172,6 +175,7 @@ docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv05.r
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9011:9011 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \

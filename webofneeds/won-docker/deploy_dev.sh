@@ -16,10 +16,10 @@ if [ "$GENERATE_NEW_CERTIFICATES" = true ] ; then
   ssh root@satsrv04 rm -rf $base_folder/won-client-certs/*
   ssh root@satsrv05 rm -rf $base_folder/won-client-certs/*
   ssh root@satsrv06 rm -rf $base_folder/won-client-certs/*
-  docker -H satsrv04:2375 stop postgres_ma || echo 'No docker container found to stop with name: postgres_ma'
-  docker -H satsrv05:2375 stop postgres_ma || echo 'No docker container found to stop with name: postgres_ma'
-  docker -H satsrv04:2375 rm postgres_ma || echo 'No docker container found to remove with name: postgres_ma'
-  docker -H satsrv05:2375 rm postgres_ma || echo 'No docker container found to remove with name: postgres_ma'
+  docker -H satsrv04:2375 stop postgres_dev || echo 'No docker container found to stop with name: postgres_dev'
+  docker -H satsrv05:2375 stop postgres_dev || echo 'No docker container found to stop with name: postgres_dev'
+  docker -H satsrv04:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
+  docker -H satsrv05:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
 fi
 
 # build won docker images and deploy to sat cluster
@@ -55,15 +55,15 @@ fi
 # PASS=file:<your_file_with_password>"
 docker -H satsrv04:2375 build -t webofneeds/gencert:dev $WORKSPACE/webofneeds/won-docker/gencert/
 docker -H satsrv04:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
-docker -H satsrv04:2375 run --name=gencert_dev -e CN="satsrv04.researchstudio.at" -e "PASS=pass:changeit" \
+docker -H satsrv04:2375 run --name=gencert_dev -e CN="satsrv04.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
 -v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
 docker -H satsrv05:2375 build -t webofneeds/gencert:dev $WORKSPACE/webofneeds/won-docker/gencert/
 docker -H satsrv05:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
-docker -H satsrv05:2375 run --name=gencert_dev -e CN="satsrv05.researchstudio.at" -e "PASS=pass:changeit" \
+docker -H satsrv05:2375 run --name=gencert_dev -e CN="satsrv05.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
 -v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
 docker -H satsrv06:2375 build -t webofneeds/gencert:dev $WORKSPACE/webofneeds/won-docker/gencert/
 docker -H satsrv06:2375 rm gencert_dev || echo 'No docker container found to remove with name: gencert_dev'
-docker -H satsrv06:2375 run --name=gencert_dev -e CN="satsrv06.researchstudio.at" -e "PASS=pass:changeit" \
+docker -H satsrv06:2375 run --name=gencert_dev -e CN="satsrv06.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
 -v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:dev
 docker -H satsrv07:2375 build -t webofneeds/gencert:dev $WORKSPACE/webofneeds/won-docker/gencert/
 
@@ -80,6 +80,7 @@ docker -H satsrv04:2375 run --name=wonnode_dev -d -e "uri.host=satsrv04.research
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/wonnode_dev:/usr/local/tomcat/won/client-certs/ \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 8888:8443 -p 61616:61616 \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/wonnode:dev
@@ -96,6 +97,7 @@ docker -H satsrv05:2375 run --name=wonnode_dev -d -e "uri.host=satsrv05.research
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/wonnode_dev:/usr/local/tomcat/won/client-certs/ \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 8888:8443 -p 61616:61616 \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/wonnode:dev
@@ -119,6 +121,7 @@ docker -H satsrv04:2375 run --name=owner_dev -d -e "node.default.host=satsrv04.r
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/owner_dev:/usr/local/tomcat/won/client-certs/ \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 8081:8443 \
 -e "JMEM_OPTS=-Xmx1000m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/owner:dev
@@ -136,6 +139,7 @@ docker -H satsrv05:2375 run --name=owner_dev -d -e "node.default.host=satsrv05.r
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/owner_dev:/usr/local/tomcat/won/client-certs/ \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 8081:8443 \
 -e "JMEM_OPTS=-Xmx1000m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/owner:dev
