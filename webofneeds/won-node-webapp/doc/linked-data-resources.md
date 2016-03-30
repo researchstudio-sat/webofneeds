@@ -1,4 +1,5 @@
 ## WoN resource types and meanings
+HTTP GET method is supported for all WoN data via the following resources:
 
   **node** represents information of node as publishing service, - protocols, endpoints, web identity.
     
