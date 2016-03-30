@@ -29,6 +29,9 @@ In order to support this architecture, the [authentication](doc/authentication.m
 linked data level (authentication of Needs, Nodes and their Messages) and application level (authentication of Owner, 
 Node and Matcher applications). 
 
+The very rough overview of the classes involved in secure environment setup and usage can be found 
+[here](doc/security-classes.pdf).
+
 ###Security Future work
 * Key revocation, including when a key is compromised, is not yet accounted for in our architecture;
 *	Integration of user definable access control rules to their data, i.e. 
