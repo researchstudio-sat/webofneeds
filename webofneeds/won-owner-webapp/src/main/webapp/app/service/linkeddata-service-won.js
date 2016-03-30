@@ -270,7 +270,14 @@ const rdfstore = window.rdfstore;
     };
 
 
-
+    /**
+     * We got the rdf but didn't know the uri of the resource
+     * first (e.g. due to server-side bundling like http-2)
+     * Preferably use `cacheItemMarkAccessed` as it's
+     * undefined-check might catch some bugs early.
+     *
+     * @param uri
+     */
     var cacheItemInsertOrOverwrite = function(uri){
         console.log("linkeddata-service-won.js: add to cache:    " + uri);
         privateData.cacheStatus[uri] = {
@@ -298,7 +305,10 @@ const rdfstore = window.rdfstore;
         if (typeof entry === 'undefined') {
             ret = false
         } else {
-            ret = entry.state === CACHE_ITEM_STATE.OK || entry.state === CACHE_ITEM_STATE.UNRESOLVABLE || entry.state == CACHE_ITEM_STATE.FETCHING;
+            ret =
+                entry.state === CACHE_ITEM_STATE.OK ||
+                entry.state === CACHE_ITEM_STATE.UNRESOLVABLE ||
+                entry.state === CACHE_ITEM_STATE.FETCHING;
         }
         var retStr = (ret + "     ").substr(0,5);
         console.log("linkeddata-service-won.js: cacheSt: OK or Unresolvable:" +retStr + "   " + uri);
@@ -335,9 +345,13 @@ const rdfstore = window.rdfstore;
     var cacheItemMarkAccessed = function cacheItemMarkAccessed(uri){
         var entry = privateData.cacheStatus[uri];
         if (typeof entry === 'undefined') {
-            throw {message : "Trying to mark unloaded uri " + uri +" as accessed"}
+            const message = "Trying to mark unloaded uri " + uri +" as accessed";
+            console.error(message);
+            throw { message }
         } else if (entry.state === CACHE_ITEM_STATE.DIRTY){
-            throw {message : "Trying to mark uri " + uri +" as accessed, but it is already dirty"}
+            const message = "Trying to mark uri " + uri +" as accessed, but it is already dirty";
+            console.error(message);
+            throw { message };
         }
         console.log("linkeddata-service-won.js: mark accessed:   " + uri);
         privateData.cacheStatus[uri].timestamp = new Date().getTime();
@@ -617,15 +631,18 @@ const rdfstore = window.rdfstore;
             .then(
                 (dataset) => {
                     if(!deep) {
-                        cacheItemMarkAccessed(uri);
+                        cacheItemInsertOrOverwrite(uri)
+                        return uri;
                     } else {
-                        cacheItemMarkAccessed(uri);
-                        selectLoadedResourcesFromDataset(
+                        return selectLoadedResourcesFromDataset(
                             dataset
-                        ).then(allLoadedResources =>
-                            allLoadedResources.forEach(resourceUri =>
-                                cacheItemMarkAccessed(resourceUri)
-                            )
+                        ).then(allLoadedResources => {
+                                console.log('linkeddata-service-won.js: ensuring loaded deep: ', allLoadedResources);
+                                allLoadedResources.forEach(resourceUri =>
+                                        cacheItemInsertOrOverwrite(resourceUri)
+                                )
+                                return allLoadedResources;
+                            }
                         )
                     }
                 },
