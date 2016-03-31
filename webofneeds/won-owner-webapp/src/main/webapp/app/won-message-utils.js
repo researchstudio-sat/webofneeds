@@ -3,7 +3,11 @@
  */
 
 
-import { getRandomPosInt, checkHttpStatus } from './utils';
+import {
+    getRandomPosInt,
+    checkHttpStatus,
+    mapJoin,
+} from './utils';
 import won from './won-es6';
 
 import jsonld from 'jsonld';
@@ -55,10 +59,139 @@ messageService.sendMessage = function(msg) {
 };
 
 */
+//TODO: IMPL THIS
+export function buildRateMessage(msgToRateFor, rating){
+    let deferred = Q.defer();
+    var buildMessage = function(envelopeData, eventToRateFor) {
+        //TODO: use event URI pattern specified by WoN node
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+        var message = new won.MessageBuilder(won.WONMSG.openMessage)
+            .eventURI(eventUri)
+            .forEnvelopeData(envelopeData)
+            .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
+            .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
+            .hasTextMessage(rating) //TODO: RATING BESSER DEFINIEREN
+            .hasOwnerDirection()
+            .hasSentTimestamp(new Date().getTime())
+            .build();
+        //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.OPEN_SENT);
+        return {eventUri:eventUri,message:message};
+    }
+
+    //fetch all data needed
+    won.getEnvelopeDataforConnection(msgToOpenFor.connection.uri)
+        .then(function(envelopeData){
+            deferred.resolve(buildMessage(envelopeData, msgToOpenFor.event));
+        },
+        won.reportError("cannot open connection " + msgToOpenFor.connection.uri)
+    );
+    return deferred.promise;
+}
+
+export function buildCloseMessage(msgToConnectFor){
+    let deferred = Q.defer();
+    var buildMessage = function(envelopeData, eventToConnectFor) {
+        //TODO: use event URI pattern specified by WoN node
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+        var message = new won.MessageBuilder(won.WONMSG.closeMessage)
+            .eventURI(eventUri)
+            .forEnvelopeData(envelopeData)
+            .hasOwnerDirection()
+            .hasSentTimestamp(new Date().getTime())
+            .build();
+        //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CLOSE_SENT);
+        return {eventUri:eventUri,message:message};
+    }
+
+    //fetch all data needed
+    won.getEnvelopeDataforConnection(msgToConnectFor.connection.uri)
+        .then(function(envelopeData){
+            deferred.resolve(buildMessage(envelopeData, msgToConnectFor.event));
+        },
+        won.reportError("cannot open connection " + msgToConnectFor.connection.uri)
+    );
+    return deferred.promise;
+
+}
+export function buildCloseNeedMessage(needUri, wonNodeUri){
+    const buildMessage = function(envelopeData) {
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+        var message = new won.MessageBuilder(won.WONMSG.closeNeedMessage)
+            .eventURI(eventUri)
+            .hasReceiverNode(wonNodeUri)
+            .hasOwnerDirection()
+            .hasSentTimestamp(new Date().getTime())
+            .forEnvelopeData(envelopeData)
+            .build();
+
+        return {eventUri: eventUri, message: message};
+    };
+
+    return won.getEnvelopeDataForNeed(needUri)
+        .then(
+            envelopeData => buildMessage(envelopeData),
+            err => won.reportError("cannot close need "+ needUri)
+        );
+}
+
+export function buildConnectMessage(msgToConnectFor, textMessage){
+    let deferred = Q.defer();
+    var buildMessage = function(envelopeData, eventToConnectFor) {
+        //TODO: use event URI pattern specified by WoN node
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+        var message = new won.MessageBuilder(won.WONMSG.connectMessage)
+            .eventURI(eventUri)
+            .forEnvelopeData(envelopeData)
+            .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
+            .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
+            .hasTextMessage(textMessage)
+            .hasOwnerDirection()
+            .hasSentTimestamp(new Date().getTime())
+            .build();
+        //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECT_SENT);
+        return {eventUri:eventUri,message:message};
+    }
+
+    //fetch all data needed
+    won.getEnvelopeDataforConnection(msgToConnectFor.connection.uri)
+        .then(function(envelopeData){
+            deferred.resolve(buildMessage(envelopeData, msgToConnectFor.event));
+        },
+        won.reportError("cannot open connection " + msgToConnectFor.connection.uri)
+    );
+    return deferred.promise;
+
+}
 
 
+export function buildOpenMessage(msgToOpenFor, textMessage){
+    let deferred = Q.defer();
+    var buildMessage = function(envelopeData, eventToOpenFor) {
+        //TODO: use event URI pattern specified by WoN node
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+        var message = new won.MessageBuilder(won.WONMSG.openMessage)
+            .eventURI(eventUri)
+            .forEnvelopeData(envelopeData)
+            .hasFacet(won.WON.OwnerFacet) //TODO: looks like a copy-paste-leftover from connect
+            .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
+            .hasTextMessage(textMessage)
+            .hasOwnerDirection()
+            .hasSentTimestamp(new Date().getTime())
+            .build();
+        //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.OPEN_SENT);
+        return {eventUri:eventUri,message:message};
+    }
 
+    //fetch all data needed
+    won.getEnvelopeDataforConnection(msgToOpenFor.connection.uri)
+        .then(function(envelopeData){
+            deferred.resolve(buildMessage(envelopeData, msgToOpenFor.event));
+        },
+        won.reportError("cannot open connection " + msgToOpenFor.connection.uri)
+    );
+    return deferred.promise;
 
+}
 
 export function buildCreateMessage(need, wonNodeUri) {
     if(!need.type || !need.title)
@@ -105,10 +238,11 @@ export  function setCommStateFromResponseForLocalNeedMessage(event) {
         event.commState = won.COMMUNUCATION_STATE.NOT_TRANSMITTED;
     }
 }
-var isSuccessMessage = function isSuccessMessage(event) {
+export function isSuccessMessage(event) {
     return event.hasMessageType === won.WONMSG.successResponseCompacted;
 }
-export function getEventData(msgJson) {
+
+export function getEventsFromMessage(msgJson) {
     console.log('getting data from jsonld message');
 
     const eventData = {};
@@ -126,14 +260,20 @@ export function getEventData(msgJson) {
             '@type': source
         }));
 
-    const maybeFramedMsg = Promise.all(framingAttempts)
-        .then(framedMessages =>
-            //filter out failed framing attempts
-            framedMessages.filter(msg => msg['@graph'].length > 0)
-        )
+    const maybeFramedMsgs = Promise.all(framingAttempts)
+        .then(framedMessages => {
+            let acc = {};
+            framedMessages.forEach((msg, i) => {
+                //filter out failed framing attempts
+                if( msg['@graph'].length > 0) {
+                    acc[acceptedSources[i]] = msg;
+                }
+            });
+            return acc;
+        })
         .then(msgFramings => {
             /* check framing results for failures */
-            if(msgFramings.length < 1) {
+            if(Object.keys(msgFramings).length < 1) {
                 /* Not a valid type */
                 const e = new Error('Tried to jsond-ld-frame the message ', msgJson,
                     ' but it\'s type was neither of the following, accepted types: ',
@@ -143,40 +283,123 @@ export function getEventData(msgJson) {
                 e.framedMessages = msgFramings;
                 throw e;
             }
-/*            else if(msgFramings.length > 1) {
-
-                /!* Multiple type declarations -> not valid json-ld *!/
-                const e = new Error('The framing found ' + msgFramings.length +
-                    'message types. Either the message wasn\'t valid json-ld or the ' +
-                    'framing has a bug. Please open a github issue at ' +
-                    'https://github.com/researchstudio-sat/webofneeds/issues/ in that ' +
-                    'case with all message. \n message before framing: ' + msgJson,
-                    '\nmessage after framing: ' + msgFramings
-                    );
-                e.msgJson = msgJson;
-                e.acceptedSources = acceptedSources;
-                e.framedMessages = msgFramings;
-                throw e;
-            } */
             else {
-                return msgFramings[0];
+                return msgFramings;
             }
         });
 
-    return maybeFramedMsg.then(framedMessage => {
-        const framedSimplifiedMessage = Object.assign(
-            { '@context': framedMessage['@context'] }, //keep context
-            framedMessage['@graph'][0] //use first node - the graph should only consist of one node at this point
-        );
-        let eventData = {};
-        for (key in framedSimplifiedMessage){
-            const propName = won.getLocalName(key);
-            if (propName != null && ! won.isJsonLdKeyword(propName)) {
-                eventData[propName] = won.getSafeJsonLdValue(framedSimplifiedMessage[key]);
+    const simplifiedEvents = maybeFramedMsgs.then(framedMessages =>
+        mapJoin(framedMessages, framedMessage => {
+            console.log(framedMessages);//TODO deletme. to prevent it from being optimized away.
+            const framedSimplifiedMessage = Object.assign(
+                { '@context': framedMessage['@context'] }, //keep context
+                framedMessage['@graph'][0] //use first node - the graph should only consist of one node at this point
+            );
+            let eventData = {};
+            for (key in framedSimplifiedMessage){
+                const propName = won.getLocalName(key);
+                if (propName != null && ! won.isJsonLdKeyword(propName)) {
+                    eventData[propName] = won.getSafeJsonLdValue(framedSimplifiedMessage[key]);
+                }
+            }
+            eventData.uri = won.getSafeJsonLdValue(framedSimplifiedMessage);
+            eventData.framedMessage = framedSimplifiedMessage;
+            return eventData;
+        })
+    );
+    return simplifiedEvents;
+}
+
+window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
+export function fetchAllAccessibleAndRelevantData(ownNeedUris) {
+
+    window.urisToLookupMap4dbg = urisToLookupMap;
+    const allOwnNeedsPromise = urisToLookupMap(ownNeedUris,
+        won.getNeedWithConnectionUris);
+
+    const allConnectionUrisPromise =
+        Promise.all(ownNeedUris.map(won.getconnectionUrisOfNeed))
+            .then(connectionUrisPerNeed =>
+                flatten(connectionUrisPerNeed));
+
+    const allConnectionsPromise = allConnectionUrisPromise
+        .then(connectionUris =>
+            urisToLookupMap(connectionUris, won.getConnection));
+
+    const allEventsPromise = allConnectionUrisPromise
+        .then(connectionUris =>
+            urisToLookupMap(connectionUris, connectionUri =>
+                    won.getConnection(connectionUri)
+                        .then(connection =>
+                            won.getEventsOfConnection(connectionUri,connection.belongsToNeed)
+                    )
+            )
+    ).then(eventsOfConnections =>
+            //eventsPerConnection[connectionUri][eventUri]
+            flattenObj(eventsOfConnections)
+    );
+
+    const allTheirNeedsPromise =
+        allConnectionsPromise.then(connections => {
+            const theirNeedUris = [];
+            for(const [connectionUri, connection] of entries(connections)) {
+                theirNeedUris.push(connection.hasRemoteNeed);
+            }
+            return theirNeedUris;
+        })
+            .then(theirNeedUris =>
+                urisToLookupMap(theirNeedUris, won.getNeed));
+
+    return Promise.all([
+        allOwnNeedsPromise,
+        allConnectionsPromise,
+        allEventsPromise,
+        allTheirNeedsPromise
+    ]).then(([
+            allOwnNeeds,
+            allConnections,
+            allEvents,
+            allTheirNeeds
+            ]) => ({
+            ownNeeds: allOwnNeeds,
+            connections: allConnections,
+            events: allEvents,
+            theirNeeds: allTheirNeeds,
+        })
+    );
+
+    /**
+     const allAccessibleAndRelevantData = {
+        ownNeeds: {
+            <needUri> : {
+                *:*,
+                connections: [<connectionUri>, <connectionUri>]
+            }
+            <needUri> : {
+                *:*,
+                connections: [<connectionUri>, <connectionUri>]
+            }
+        },
+        theirNeeds: {
+            <needUri>: {
+                *:*,
+                connections: [<connectionUri>, <connectionUri>] <--?
+            }
+        },
+        connections: {
+            <connectionUri> : {
+                *:*,
+                events: [<eventUri>, <eventUri>]
+            }
+            <connectionUri> : {
+                *:*,
+                events: [<eventUri>, <eventUri>]
             }
         }
-        eventData.uri = won.getSafeJsonLdValue(framedSimplifiedMessage);
-        eventData.framedMessage = framedSimplifiedMessage;
-        return eventData;
-    }) ;
+        events: {
+            <eventUri> : { *:* },
+            <eventUri> : { *:* }
+        }
+     }
+     */
 }

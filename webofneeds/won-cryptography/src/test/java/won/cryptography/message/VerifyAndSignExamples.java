@@ -2,6 +2,7 @@ package won.cryptography.message;
 
 import com.hp.hpl.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,12 +13,14 @@ import won.cryptography.utils.TestingDataSource;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
+import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
 import won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor;
 import won.protocol.util.RdfUtils;
 
 import java.io.File;
 import java.net.URI;
+import java.security.Security;
 
 /**
  * User: ypanchenko
@@ -45,23 +48,24 @@ public class VerifyAndSignExamples
   private static final String RESOURCE_FILE_NL = "/won-signed-messages/need-with-nl-nosig.trig";
 
 
-
-
-  //private CryptographyService cryptoService;
   SignatureAddingWonMessageProcessor nodeAddingProcessor;
   SignatureAddingWonMessageProcessor ownerAddingProcessor;
   SignatureCheckingWonMessageProcessor checkingProcessor;
 
 
   @Before
-  public void init() {
+  public void init() throws Exception {
+
     // initialize signature adding and signature checking processors:
 
+    Security.addProvider(new BouncyCastleProvider());
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
     KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
-    //CryptographyService cryptoService = new CryptographyService(storeService);
+    storeService.setDefaultAlias(TestSigningUtils.ownerCertUri);
+    storeService.init();
     DefaultSecurityWonTransmissionService config = new DefaultSecurityWonTransmissionService();
     config.setClientKeyStoreService(storeService);
+    config.initialize();
 
     nodeAddingProcessor = new SignatureAddingWonMessageProcessor();
     nodeAddingProcessor.setCryptographyService(config.getClientCryptographyService());
@@ -121,7 +125,12 @@ public class VerifyAndSignExamples
     //TestSigningUtils.writeToTempFile(outputDataset);
 
     // the receiver of this message should be able to verify it
-    checkingProcessor.process(outputMessage);
+    try {
+      checkingProcessor.process(outputMessage);
+      // if we got to here without exceptions - we were able to verify the signature
+    } catch (WonMessageProcessingException e) {
+      Assert.fail("Signature verification failed");
+    }
 
   }
 
@@ -144,7 +153,12 @@ public class VerifyAndSignExamples
     WonMessage inputMessage = new WonMessage(inputDataset);
 
     // node verifies the signature:
-    WonMessage verifiedMessage = checkingProcessor.process(inputMessage);
+    WonMessage verifiedMessage = null;
+    try {
+      verifiedMessage = checkingProcessor.process(inputMessage);
+    } catch (WonMessageProcessingException e) {
+      Assert.fail("Signature verification failed");
+    }
 
     // node then process the message in some way, and adds its own envelope,
     // the envelope should contain the reference to the verified signatures
@@ -156,19 +170,24 @@ public class VerifyAndSignExamples
     Dataset outputDataset = nodeWonMessage.getCompleteDataset();
     Assert.assertEquals(5, RdfUtils.getModelNames(outputDataset).size());
     // write for debugging
-    TestSigningUtils.writeToTempFile(outputDataset);
+    //TestSigningUtils.writeToTempFile(outputDataset);
 
     // node should then sign its envelope
     WonMessage signedMessage = nodeAddingProcessor.process(nodeWonMessage);
 
     Assert.assertEquals(6, RdfUtils.getModelNames(outputDataset).size());
     // write for debugging
-    TestSigningUtils.writeToTempFile(outputDataset);
+    //TestSigningUtils.writeToTempFile(outputDataset);
 
     // everyone should be able to verify this message, inculding when it was read from RDF:
     String datasetString = RdfUtils.writeDatasetToString(signedMessage.getCompleteDataset(), Lang.TRIG);
     WonMessage outputMessage = new WonMessage(RdfUtils.readDatasetFromString(datasetString, Lang.TRIG));
-    checkingProcessor.process(outputMessage);
+
+    try {
+      checkingProcessor.process(outputMessage);
+    } catch (WonMessageProcessingException e) {
+      Assert.fail("Signature verification failed");
+    }
 
   }
 

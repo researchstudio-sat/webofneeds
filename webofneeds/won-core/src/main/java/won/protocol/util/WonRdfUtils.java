@@ -5,6 +5,8 @@ import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.rdf.model.impl.PropertyImpl;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
+import com.hp.hpl.jena.sparql.path.Path;
+import com.hp.hpl.jena.sparql.path.PathParser;
 import com.hp.hpl.jena.vocabulary.RDF;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
@@ -653,6 +655,12 @@ public class WonRdfUtils
       }
     }
 
+    public static String getNeedTitle(Dataset needDataset, URI needUri) {
+      Path titlePath = PathParser.parse("won:hasContent/dc:title", DefaultPrefixUtils.getDefaultPrefixes());
+      String titleString = RdfUtils.getStringPropertyForPropertyPath(needDataset, needUri, titlePath);
+      return titleString;
+    }
+
   }
 
   private static Model createModelWithBaseResource() {
@@ -661,4 +669,5 @@ public class WonRdfUtils
       model.createResource(model.getNsPrefixURI(""));
       return model;
     }
+
 }

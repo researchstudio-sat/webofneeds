@@ -3,8 +3,10 @@
 import angular from 'angular';
 import squareImageModule from './square-image';
 import feedbackGridModule from './feedback-grid';
-import { labels } from '../won-label-utils';
+import { attach } from '../utils';
+import { labels, relativeTime, updateRelativeTimestamps } from '../won-label-utils';
 
+const serviceDependencies = ['$scope', '$interval'];
 function genComponentConf() {
     let template = `
         <div class="mgi__description">
@@ -13,7 +15,7 @@ function genComponentConf() {
                 <div class="mgi__description__post__text">
                     <div class="mgi__description__post__text__topline">
                         <div class="mgi__description__post__text__topline__title">{{self.item.remoteNeed.title}}</div>
-                        <div class="mgi__description__post__text__topline__date">{{self.item.remoteNeed.creationDate}}</div>
+                        <div class="mgi__description__post__text__topline__date">{{self.creationDate}}</div>
                     </div>
                     <div class="mgi__description__post__text__subtitle">
                         <span class="mgi__description__post__text__subtitle__group" ng-show="self.item.group">
@@ -34,18 +36,19 @@ function genComponentConf() {
                 </div>
             </div>
         </div>
-        <div class="mgi__match clickable" ng-if="!self.feedbackVisible" ng-click="self.showFeedback()">
+        <div class="mgi__match clickable" ng-if="!self.feedbackVisible" ng-click="self.showFeedback()" ng-mouseenter="self.showFeedback()">
             <div class="mgi__match__description">
                 <div class="mgi__match__description__title">{{self.item.ownNeed.title}}</div>
                 <div class="mgi__match__description__type">{{self.labels.type[self.item.ownNeed.basicNeedType]}}</div>
             </div>
             <won-square-image src="self.getRandomImage()" title="self.item.ownNeed.title"></won-square-image>
         </div>
-        <won-feedback-grid item="self.item" request-item="self.requestItem" ng-if="self.feedbackVisible"/>
+        <won-feedback-grid item="self.item" request-item="self.requestItem" ng-mouseleave="self.hideFeedback()" ng-if="self.feedbackVisible"/>
     `;
 
     class Controller {
         constructor() {
+            attach(this, serviceDependencies, arguments);
             this.images=[
                 "images/furniture1.png",
                 "images/furniture2.png",
@@ -54,6 +57,13 @@ function genComponentConf() {
             ];
             this.feedbackVisible = false;
             this.labels = labels;
+
+            updateRelativeTimestamps(
+                this.$scope,
+                this.$interval,
+                this.item.remoteNeed.creationDate,
+                    t => this.creationDate = t);
+
         }
 
         showFeedback() {
@@ -69,10 +79,11 @@ function genComponentConf() {
         }
 
         getRandomImage(){
-            let i = Math.floor((Math.random()*4))
+            let i = Math.floor((Math.random()*4));
             return this.images[0];
         }
     }
+    Controller.$inject = serviceDependencies;
 
     return {
         restrict: 'E',

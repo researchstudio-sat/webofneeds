@@ -37,10 +37,10 @@ public class UserNeed
   private boolean matches;
 
   @Column( name = "requests")
-  private boolean requests;
+  private boolean requests = true;
 
   @Column( name = "conversations")
-  private boolean conversations;
+  private boolean conversations = true;
 
 
   public UserNeed() {

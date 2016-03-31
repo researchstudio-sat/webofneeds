@@ -79,8 +79,9 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     try {
         element = cache.get(resource);
     }catch(CacheException e){
-        //logging on info level as not reporting errors here can make misconfiguration hard to detect
-        logger.info(String.format("Couldn't fetch resource %s",resource),e);
+        //logging on warn level as not reporting errors here can make misconfiguration hard to detect
+        logger.warn(String.format("Couldn't fetch resource %s", resource));
+        logger.debug("Exception is:", e);
         return DatasetFactory.createMem();
     }
 
@@ -109,7 +110,8 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
       try {
         element = cache.get(key);
       }catch(CacheException e){
-        logger.debug(String.format("Couldn't fetch resource %s",resource),e);
+        logger.warn(String.format("Couldn't fetch resource %s", resource));
+        logger.debug("Exception is:", e);
         return DatasetFactory.createMem();
       }
     }

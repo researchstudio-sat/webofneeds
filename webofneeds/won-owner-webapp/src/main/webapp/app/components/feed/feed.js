@@ -3,29 +3,60 @@ import overviewTitleBarModule from '../overview-title-bar';
 import feedItemModule from '../feed-item'
 import { actionCreators }  from '../../actions/actions';
 import { attach } from '../../utils';
+
+import {
+    selectConnectionsByNeed,
+    selectUnreadCountsByNeedAndType,
+    selectUnreadEvents
+} from '../../selectors';
+
 const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 class FeedController {
     constructor() {
         attach(this, serviceDependencies, arguments);
         this.selection = 0;
 
-        this.r1 = {id: "123213213", title: "I am the request one", type: 3, titleImgSrc: "images/someNeedTitlePic.png", message: "To whoom it may concern. We are a group of peole in the Lestis et eaquuntiore dolluptaspid quatur quisinia aspe sus voloreiusa plis", images: [{src: "images/furniture2.png"},{src: "images/furniture1.png"},{src: "images/furniture3.png"},{src: "images/furniture4.png"},{src: "images/furniture_big.jpg"},{src: "images/furniture2.png"},{src: "images/furniture1.png"},{src: "images/furniture3.png"},{src: "images/furniture4.png"},{src: "images/furniture_big.jpg"},{src: "images/furniture2.png"},{src: "images/furniture1.png"},{src: "images/furniture3.png"},{src: "images/furniture4.png"},{src: "images/furniture_big.jpg"}]};
-        this.r2 = {id: "123213213", title: "I am the request one", type: 3, titleImgSrc: "images/someNeedTitlePic.png", message: "To whoom it may concern. We are a group of peole in the Lestis et eaquuntiore dolluptaspid quatur quisinia aspe sus voloreiusa plis", images: [{src: "images/furniture2.png"},{src: "images/furniture1.png"},{src: "images/furniture3.png"},{src: "images/furniture4.png"},{src: "images/furniture_big.jpg"},{src: "images/furniture2.png"},{src: "images/furniture1.png"},{src: "images/furniture3.png"},{src: "images/furniture4.png"},{src: "images/furniture_big.jpg"},{src: "images/furniture2.png"}]};
-        this.r3 = {id: "123213213", title: "I am the request one", type: 3, titleImgSrc: "images/someNeedTitlePic.png", message: "To whoom it may concern. We are a group of peole in the Lestis et eaquuntiore dolluptaspid quatur quisinia aspe sus voloreiusa plis", images: [{src: "images/furniture2.png"},{src: "images/furniture1.png"},{src: "images/furniture3.png"},{src: "images/furniture4.png"},{src: "images/furniture_big.jpg"},{src: "images/furniture2.png"},{src: "images/furniture1.png"},{src: "images/furniture3.png"},{src: "images/furniture4.png"},{src: "images/furniture_big.jpg"}]};
-        this.r4 = {id: "123213213", title: "I am the request one", type: 3, titleImgSrc: "images/someNeedTitlePic.png", message: "To whoom it may concern. We are a group of peole in the Lestis et eaquuntiore dolluptaspid quatur quisinia aspe sus voloreiusa plis"};
 
-        this.items = [{id: "121337345", title: "New flat, need furniture", type: 1, requests: [this.r1], matches: [this.r1]},
-            {id: "121337345", title: "Clean park 1020 Vienna", type: 4, group: "gaming", requests: [this.r1, this.r2, this.r3, this.r4], matches: [this.r1, this.r2, this.r3, this.r4]},
-            {id: "121337345", title: "Car sharing 1020 Vienna", type: 2, titleImgSrc: "images/someNeedTitlePic.png", requests: [this.r2], matches: [this.r2]},
-            {id: "121337345", title: "tutu", type: 3, group: "sat lunch group" , requests: [this.r1, this.r2, this.r3, this.r4]},
-            {id: "121337345", title: "Local Artistry", type: 2, titleImgSrc: "images/someNeedTitlePic.png", requests: [this.r1, this.r2]},
-            {id: "121337345", title: "Cycling Tour de France", type: 3, requests: [this.r1, this.r2]}];
+        const selectFromState = (state) => {
 
-        const selectFromState = (state) =>({
-            posts: state.getIn(["needs", "needs"]).toJS()
-        })
+
+            /*
+            const unreadEventUris = state
+                .getIn(['events', 'unreadEventUris'])
+                .map(event => event.get('uri'))
+                .toSet();
+                */
+            //const events = state.getIn(['events', 'events']);
+            //unreadEventUris.map(eventUri => events.get(eventUri));
+
+            const unreadEvents = selectUnreadEvents(state);
+
+            window.selectUnread4dbg = selectUnreadEvents;
+
+            const eventsByConnection = state.getIn(['events', 'events'])
+
+            const connectionsByNeed = state.getIn(['needs', 'ownNeeds'])
+                .map(ownNeed => ownNeed.get('hasConnections'));
+            //TODO attach events
+
+            // sort by newest event (excluding matches)
+
+            // wenn sich die sortierung aufgrund neuer events verändern wuerde, wird ein button/link angezeigt ("new messages/requests. click to update")
+            // always show latest message in a line
+
+            return {
+                unreadEvents4dbg: unreadEvents,
+                state4dbg: state,
+
+                posts: state.getIn(["needs", "ownNeeds"]),
+                connectionsByNeed: selectConnectionsByNeed(state),
+                unreadCountsByNeedAndType: selectUnreadCountsByNeedAndType(state),
+            }
+        }
         const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this)
         this.$scope.$on('$destroy', disconnect);
+
+        window.fc4dbg = this;
     }
 
 }

@@ -6,7 +6,22 @@ import { createSelector } from 'reselect';
 import Immutable from 'immutable';
 
 
-const selectUnreadEvents = state => state.getIn(['events', 'unreadEventUris']);
+//TODO update to reflect simplfied state (drop one 'connections')
+const selectConnections = state => state.getIn(['connections']);
+const selectEvents = state => state.getIn(['events', 'events']);
+
+export const selectUnreadEventUris = state => state
+    .getIn(['events', 'unreadEventUris']);
+
+//TODO the earlier unreadEvents was organised by need-uri!
+
+export const selectUnreadEvents = createSelector(
+    selectEvents, selectUnreadEventUris,
+    (events, unreadEventUris) =>
+        unreadEventUris.map(eventUri => events.get(eventUri))
+);
+
+//const selectUnreadEvents = state => state.getIn(['events', 'unreadEventUris']);
 
 /**
  * @param {object} state
@@ -15,10 +30,14 @@ const selectUnreadEvents = state => state.getIn(['events', 'unreadEventUris']);
  *      `unreadEventsByNeed.get('http://example.org/won/resource/need/1234')`
  */
 export const selectUnreadEventsByNeed = createSelector(
-    selectUnreadEvents,
+    selectUnreadEvents, selectConnections,
     // group by need, resulting in:  `{ <needUri>: { <cnctUri>: e1, <cnctUri>: e2, ...}, <needUri>: ...}`
-    unreadEvents => unreadEvents.groupBy(e => e.get('hasReceiverNeed'))
-)
+    //TODO hasReceiverNeed is not guaranteed to exist.
+    (unreadEvents, connections) => unreadEvents.groupBy(e => {
+        const connectionUri = e.get('hasReceiver');
+        return connections.getIn([connectionUri, 'belongsToNeed']);
+    })
+);
 
 /**
  * from: state.events.unreadEventUris  of "type" ~Map<connection,latestevent>
@@ -64,3 +83,51 @@ export const selectUnreadCountsByType = createSelector(
         .groupBy(e => e.get('eventType'))
         .map(eventsOfType => eventsOfType.size)
 )
+
+
+/**
+ * selects a map of `connectionUri -> { connection, events, ownNeed, remoteNeed }`
+ * - thus: everything a connection has direct references to. Use this selector
+ * when you're needing connection-centric data (e.g. for a view with a strong
+ * focus on the connection)
+ *
+ * NOTE: the app-state used to have events and needs stored in this fashion.
+ * Thus, this selector is also used to allow older code to use the new
+ * state-structure with minimal changes.
+ */
+export const selectAllByConnections = createSelector(
+    state => state, //reselect's createSelector always needs a dependency
+    state => state
+        .getIn(['connections'])
+        .map(connection => allByConnection(connection)(state))
+);
+const allByConnection = (connection) => (state) => {
+    const ownNeedUri = connection.get('belongsToNeed');
+    const ownNeed = state.getIn(['needs', 'ownNeeds', ownNeedUri]);
+
+    const remoteNeedUri = connection.get('hasRemoteNeed');
+    const remoteNeed = state.getIn(['needs', 'theirNeeds', remoteNeedUri]);
+
+    const events = connection
+        .get('hasEvents')
+        .map(eventUri => state.getIn(['events', 'events', eventUri]));
+
+    return Immutable.Map({ connection, events, ownNeed, remoteNeed });
+};
+const allByConnectionUri = (connectionUri)  => {
+    const connection = state.getIn(['connections', connectionUri]);
+    return allByConnection(connection);
+};
+
+//TODO there's certainly more elegant ways to implement this selector than first grouping by connection then by need
+export const selectConnectionsByNeed = createSelector(
+    selectAllByConnections,
+        connections => connections
+        .map(cnct => Immutable.fromJS(cnct)) //TODO this is a workaround. atm connections aren't ImmutableJS-objects
+        .groupBy(cnct => cnct.getIn(['ownNeed', 'uri']))
+);
+
+
+
+window.selectAllByConnections4dbg = selectAllByConnections;
+window.allByConnection4db = allByConnection;

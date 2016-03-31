@@ -24,6 +24,7 @@ RUN cd /usr/local/tomcat/bin/tomcat-native-1.1.33-src/jni/native/ && ./configure
 # add webofneeds default config env variables
 ENV WON_CONFIG_DIR=/usr/local/tomcat/won/conf
 ENV LOGBACK_CONFIG=logback_info.xml
+ENV CERTIFICATE_PASSWORD=changeit
 
 # add the webofneeds files
 ADD ./tomcat-libs/* /usr/local/tomcat/lib/

@@ -83,6 +83,10 @@ body {
   &.darkgray { @include button-color(white, $won-dark-gray); }
   &.lighterblue { @include button-color(white, $won-lighter-blue); }
   &.black { @include button-color(white, black); }
+
+  &.thin {
+    padding: 0.4em 2em;
+  }
 }
 
 input[type=text],
@@ -117,6 +121,7 @@ input[type=email] {
 @import 'settings';
 @import 'overview-posts';
 @import 'overview-incoming-requests';
+@import 'overview-sent-requests';
 @import 'feed';
 @import 'overview-matches';
 @import 'feedback-grid';

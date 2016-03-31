@@ -17,6 +17,8 @@
             <!-- webID verification filter for all message (event) resources -->
             <sec:filter-chain pattern="^/(resource|data|page)/event/.+" filters="
             webIdVerificationFilter"/>
+            <sec:filter-chain pattern="^/(resource|data|page)/need/[a-zA-z0-9]+/deep.*" filters="
+            webIdVerificationFilter"/>
         </sec:filter-chain-map>
     </bean>
     <bean id="webIdVerificationFilter" class="won.cryptography.webid.WebIdVerificationFilter"/>

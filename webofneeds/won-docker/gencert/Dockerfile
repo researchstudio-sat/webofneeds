@@ -17,8 +17,8 @@ RUN apt-get install oracle-java8-set-default
 #keytool path, used by certificate generation script for creating jks
 ENV KEYTOOL /usr/lib/jvm/java-8-oracle/bin/keytool
 
-#specify your password when run via -e "PASS=your_password"
-ENV DEFAULT_PASS changeit
+#specify your password when run via -e "PASS=pass:<your_password>" or in a file like "PASS=file:<your_file>"
+ENV DEFAULT_PASS pass:changeit
 
 #specify your certificate host when run via -e "CN=your_host"
 ENV DEFAULT_CN localhost

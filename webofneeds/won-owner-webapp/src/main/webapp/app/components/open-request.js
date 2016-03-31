@@ -13,14 +13,14 @@ function genComponentConf() {
             <img class="or__header__icon clickable" src="generated/icon-sprite.svg#ico36_close" ng-click="self.closeRequest()"/>
             <div class="or__header__title">
                 <div class="or__header__title__topline">
-                    <div class="or__header__title__topline__title">{{self.item.title}}</div>
-                    <div class="or__header__title__topline__date">{{self.item.timeStamp}}</div>
+                    <div class="or__header__title__topline__title">{{self.item.remoteNeed.title}}</div>
+                    <div class="or__header__title__topline__date">{{self.item.remoteNeed.creationDate}}</div>
                 </div>
                 <div class="or__header__title__subtitle">
                     <span class="or__header__title__subtitle__group" ng-show="self.item.group">
-                        <img src="generated/icon-sprite.svg#ico36_group" class="or__header__title__subtitle__group__icon">{{self.item.group}}<span class="or__header__title__subtitle__group__dash"> &ndash; </span>
+                        <img src="generated/icon-sprite.svg#ico36_group" class="or__header__title__subtitle__group__icon">{{self.item.remoteNeed.group}}<span class="or__header__title__subtitle__group__dash"> &ndash; </span>
                     </span>
-                    <span class="or__header__title__subtitle__type">{{self.labels.type[self.item.type]}}</span>
+                    <span class="or__header__title__subtitle__type">{{self.labels.type[self.item.remoteNeed.type]}}</span>
                 </div>
             </div>
         </div>
@@ -46,8 +46,8 @@ function genComponentConf() {
         <div class="or__footer">
             <input type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
             <div class="flexbuttons">
-                <button class="won-button--filled black">Decline</button>
-                <button class="won-button--filled red" ng-click="openRequest()">Accept</button>
+                <button class="won-button--filled black"ng-click="self.closeRequest()">Decline</button>
+                <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Accept</button>
             </div>
         </div>
     `;
@@ -58,13 +58,17 @@ function genComponentConf() {
             window.openreq = this;
             this.message='';
             this.labels = labels;
+
+            const disconnect = this.$ngRedux.connect(null, actionCreators)(this);
+            this.$scope.$on('$destroy', disconnect);
         }
 
         openRequest(message){
             this.connections__open(this.item,message);
+            this.item = undefined;
         }
         closeRequest(){
-            this.message='';
+            this.connections__close(this.item);
             this.item = undefined;
         }
     }

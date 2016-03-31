@@ -394,3 +394,125 @@ export function withDefaults(obj, defaults) {
     }
     return ret;
 }
+
+/**
+ * taken from: https://esdiscuss.org/topic/es6-iteration-over-object-values
+ *
+ * example usage:
+ *
+ * ```javascript
+ * for (let [key, value] of entries(o)) {
+ *   console.log(key, ' --> ', value)
+ * }
+ * ```
+ * @param obj the object to generate a (key,value)-pair iterator for
+ */
+export function* entries(obj) {
+    for (let key of Object.keys(obj)) {
+        yield [key, obj[key]];
+    }
+}
+
+/**
+ * Maps over the (value,key)-pairs of the object and produces
+ * a new object with the same keys but the function's result
+ * as values.
+ * @param obj
+ * @param f  a function `(value, key) => result` or `value => result`
+ */
+export function mapObj(obj, f) {
+    const accumulator = {};
+    for(let [key, value] of entries(obj)) {
+       accumulator[key] = f(value, key);
+    }
+    return accumulator;
+}
+
+
+/**
+ * @param listOfLists e.g. [ [1,2], [3], [], [3,4,5] ]
+ * @return {*} e.g. [1,2,3,3,4,5]
+ */
+export function flatten(listOfLists) {
+    return listOfLists.reduce(
+        (flattendList, innerList) =>
+            flattendList.concat(innerList),
+        [] //concat onto empty list as start
+    )
+}
+
+/**
+ * @param objOfObj e.g. { a: { x: 1, y: 2}, b: {z: 3}, c: {} }
+ * @return {*} e.g. {x: 1, y: 2, z: 3}
+ */
+export function flattenObj(objOfObj) {
+    let flattened = {};
+    for(const [outerKeys, innerObjects] of entries(objOfObj)) {
+        flattened = Object.assign(flattened, innerObjects);
+    }
+    return flattened;
+    
+}
+
+/**
+ * Takes a single uri or an array of uris, performs the lookup function on each
+ * of them seperately, collects the results and builds an map/object
+ * with the uris as keys and the results as values.
+ * @param uris
+ * @param asyncLookupFunction
+ * @return {*}
+ */
+export function urisToLookupMap(uris, asyncLookupFunction) {
+    //make sure we have an array and not a single uri.
+    const urisAsArray = is('Array', uris) ? uris : [uris];
+    const asyncLookups = urisAsArray.map(uri => asyncLookupFunction(uri));
+    return Promise.all(asyncLookups).then( dataObjects => {
+        const lookupMap = {};
+        //make sure there's the same
+        for (let i = 0; i < uris.length; i++) {
+            lookupMap[uris[i]] = dataObjects[i];
+        }
+        return lookupMap;
+    });
+}
+
+/**
+ * Maps an asynchronous function over the values of an object or
+ * the elements of an array. It returns a promise with the result,
+ * when all applications of the asyncFunction have finished.
+ * @param object
+ * @param asyncFunction
+ * @return {*}
+ */
+export function mapJoin(object, asyncFunction) {
+    if(is('Array', object)) {
+        const promises = object.map(el => asyncFunction(el));
+        return Promise.all(promises);
+    } else if(is('Object', object)){
+        const keys = Object.keys(object);
+        const promises = keys.map(k => asyncFunction(object[k]));
+        return Promise.all(promises).then(results => {
+            const acc = {};
+            results.forEach((result, i) => {
+                acc[keys[i]] = result;
+            });
+            return acc;
+        });
+    } else {
+        return undefined;
+    }
+}
+
+/**
+ * Stable method of determining the type
+ * taken from http://bonsaiden.github.io/JavaScript-Garden/
+ * @param type
+ * @param obj
+ * @return {boolean}
+ */
+export function is(type, obj) {
+    var clas = Object.prototype.toString.call(obj).slice(8, -1);
+    return obj !== undefined && obj !== null && clas === type;
+}
+
+

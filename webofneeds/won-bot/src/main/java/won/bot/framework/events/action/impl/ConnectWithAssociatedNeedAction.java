@@ -28,7 +28,6 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
-import java.util.List;
 
 /**
  * BaseEventBotAction connecting two needs on the specified facets.
