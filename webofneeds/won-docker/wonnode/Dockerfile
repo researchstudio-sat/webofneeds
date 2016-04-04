@@ -1,6 +1,6 @@
 # before docker build can be executed, the war file, the tomcat libs folder
 # and the conf directory have to be copied into this folder (done by maven build)
-FROM tomcat:8.0-jre8
+FROM tomcat:8.0.30-jre8
 RUN apt-get update && apt-get install -y \
     vim \
     less \
@@ -16,10 +16,10 @@ RUN apt-get install oracle-java8-installer -y
 RUN apt-get install oracle-java8-set-default
 
 # compile APR library to use for tomcat ssl connector
-RUN cd /usr/local/tomcat/bin/
 RUN tar -xf /usr/local/tomcat/bin/tomcat-native.tar.gz -C /usr/local/tomcat/bin/
 RUN apt-get update && apt-get install libapr1-dev libssl-dev gcc make -y
-RUN cd /usr/local/tomcat/bin/tomcat-native-1.1.33-src/jni/native/ && ./configure --with-apr=/usr --with-java-home=/usr/lib/jvm/java-8-oracle && make && make install
+RUN cd /usr/local/tomcat/bin/$(ls /usr/local/tomcat/bin/ | grep tomcat-native-)/jni/native/ && \
+./configure --with-apr=/usr --with-java-home=/usr/lib/jvm/java-8-oracle && make && make install
 
 # add webofneeds default config env variables
 ENV WON_CONFIG_DIR=/usr/local/tomcat/won/conf
