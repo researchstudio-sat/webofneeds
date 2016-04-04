@@ -61,16 +61,20 @@ rm ~/won-server-certs/*
 rsync root@satcluster01:$base_folder/won-server-certs/* ~/won-server-certs/
 rsync ~/won-server-certs/* root@satcluster02:$base_folder/won-server-certs/
 
+# copy the nginx.conf file to the proxy server
+rsync $WORKSPACE/webofneeds/won-docker/nginx/nginx.conf root@satcluster02:$base_folder/nginx.conf
+
 echo run nginx proxy server
 docker -H satcluster02:2375 pull webofneeds/nginx
 if ! docker -H satcluster02:2375 run --name=nginx_ma -v $base_folder/won-server-certs:/etc/nginx/won-server-certs/ \
--d -p 80:80 -p 443:443 webofneeds/nginx; then
+-v $base_folder/nginx.conf:/etc/nginx/nginx.conf -d -p 80:80 -p 443:443 nginx; then
   echo nginx container already available, restart old container
   docker -H satcluster02:2375 restart nginx_ma
 fi
 
 # run the script to start webofneeds containers on host satcluster01
-$WORKSPACE/webofneeds/won-docker/deploy_master_run.sh
+public_node_uri=www.matchat.org
+. $WORKSPACE/webofneeds/won-docker/deploy_master_run.sh
 
 echo push automatically built webobofneeds images to docker hub
 docker -H satcluster01:2375 login -u heikofriedrich
