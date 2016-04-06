@@ -25,6 +25,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -158,6 +159,31 @@ public class
     }
   }
 
+  /**
+   * This request URL should be protected by WebID filter because the result contains events data - which is data with
+   * restricted access. See filterChainProxy in node-context.xml.
+   *
+   * @param identifier
+   * @param model
+   * @param response
+   * @return
+   */
+  //webmvc controller method
+  @RequestMapping("${uri.path.page.need}/{identifier}/deep")
+  public String showDeepNeedPage(@PathVariable String identifier, Model model, HttpServletResponse response, @RequestParam(value="layer-size", required=false) Integer layerSize) {
+    try {
+      URI needURI = uriService.createNeedURIForId(identifier);
+      Dataset rdfDataset = linkedDataService.getNeedDataset(needURI, true, layerSize);
+      model.addAttribute("rdfDataset", rdfDataset);
+      model.addAttribute("resourceURI", needURI.toString());
+      model.addAttribute("dataURI", uriService.toDataURIIfPossible(needURI).toString());
+      return "rdfDatasetView";
+    } catch (NoSuchNeedException|NoSuchConnectionException|NoSuchMessageException e) {
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return "notFoundView";
+    }
+  }
+
   //webmvc controller method
   @RequestMapping("${uri.path.page.connection}/{identifier}")
   public String showConnectionPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
@@ -229,6 +255,15 @@ public class
   }
 
 
+  /**
+   * This request URL should be protected by WebID filter because the result contains events data - which is data with
+   * restricted access. See filterChainProxy in node-context.xml.
+   *
+   * @param identifier
+   * @param model
+   * @param response
+   * @return
+   */
   //webmvc controller method
   @RequestMapping("${uri.path.page.event}/{identifier}")
   public String showEventPage(@PathVariable(value = "identifier") String identifier,
@@ -746,7 +781,39 @@ public class
       addCORSHeader(headers);
       return new ResponseEntity<Dataset>(dataset, headers, HttpStatus.OK);
     } catch (NoSuchNeedException e) {
+      return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
+    }
 
+  }
+
+
+  /**
+   * This request URL should be protected by WebID filter because the result contains events data - which is data with
+   * restricted access. See filterChainProxy in node-context.xml.
+   *
+   * @param request
+   * @param identifier
+   * @return
+   */
+  @RequestMapping(
+    value="${uri.path.data.need}/{identifier}/deep",
+    method = RequestMethod.GET,
+    produces={"application/ld+json",
+              "application/trig",
+              "application/n-quads"})
+  public ResponseEntity<Dataset> readNeedDeep(
+    HttpServletRequest request,
+    @PathVariable(value = "identifier") String identifier,
+    @RequestParam(value="layer-size", required=false) Integer layerSize) {
+    logger.debug("readNeed() called");
+    URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
+    try {
+      Dataset dataset = linkedDataService.getNeedDataset(needUri, true, layerSize);
+      //TODO: need information does change over time. The immutable need information should never expire, the mutable should
+      HttpHeaders headers = new HttpHeaders();
+      addCORSHeader(headers);
+      return new ResponseEntity<Dataset>(dataset, headers, HttpStatus.OK);
+    } catch (NoSuchNeedException|NoSuchConnectionException|NoSuchMessageException e) {
       return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
     }
 
@@ -879,6 +946,14 @@ public class
   }
 
 
+  /**
+   * This request URL should be protected by WebID filter because the result contains events data - which is data with
+   * restricted access. See filterChainProxy in node-context.xml.
+   *
+   * @param request
+   * @param identifier
+   * @return
+   */
   @RequestMapping(
     value="${uri.path.data.event}/{identifier}",
     method = RequestMethod.GET,

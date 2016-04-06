@@ -140,9 +140,15 @@ public class NeedInformationServiceImpl implements NeedInformationService
   {
     int pageSize = getPageSize(preferedPageSize);
     int pageNum = page - 1;
-    Slice<URI> slice = connectionRepository.getConnectionURIByLatestActivity(
-      timeSpot,
-      new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+    Slice<URI> slice;
+    if (timeSpot == null) {
+      slice = connectionRepository.getConnectionURIByLatestActivity(
+        new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+    } else {
+      slice = connectionRepository.getConnectionURIByLatestActivity(
+        timeSpot,
+        new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+    }
     return slice;
   }
 
@@ -182,13 +188,19 @@ public class NeedInformationServiceImpl implements NeedInformationService
     Slice<URI> slice = null;
     int pageSize = getPageSize(preferedPageSize);
     int pageNum = page - 1;
+    PageRequest pageRequest = new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "max(msg.creationDate)");
     if (messageType == null) {
-      slice = connectionRepository.getConnectionURIByLatestActivity(needURI, timeSpot, new PageRequest(
-        pageNum, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+      if (timeSpot == null) {
+        slice = connectionRepository.getConnectionURIByLatestActivity(needURI, pageRequest);
+      } else {
+        slice = connectionRepository.getConnectionURIByLatestActivity(needURI, timeSpot, pageRequest);
+      }
     } else {
-      slice = connectionRepository.getConnectionURIByLatestActivity(
-        needURI, messageType, timeSpot, new PageRequest(
-          pageNum, pageSize, Sort.Direction.DESC, "max(msg.creationDate)"));
+      if (timeSpot == null) {
+        slice = connectionRepository.getConnectionURIByLatestActivity(needURI, messageType, pageRequest);
+      } else {
+        slice = connectionRepository.getConnectionURIByLatestActivity(needURI, messageType, timeSpot, pageRequest);
+      }
     }
     return slice;
   }

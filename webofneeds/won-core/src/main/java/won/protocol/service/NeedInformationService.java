@@ -90,7 +90,7 @@ public interface NeedInformationService {
      *
      * @param page the page number
      * @param preferredSize preferred number of members per page or null; null => use default
-     * @param timeSpot time at which we want the list state to be fixed
+     * @param timeSpot time at which we want the list state to be fixed, if null - current state
      *
      * @return a slice connection URIs.
      */
@@ -102,7 +102,7 @@ public interface NeedInformationService {
      *
      * @param resumeConnURI the returned slice connections precede (in time of their latest events) this connection uri
      * @param preferredPageSize preferred number of members per page or null; null => use default
-     * @param timeSpot time at which we want the list state to be fixed
+     * @param timeSpot time at which we want the list state to be fixed, cannot be null
      *
      * @return a slice of connection URIs.
      */
@@ -115,7 +115,7 @@ public interface NeedInformationService {
      *
      * @param resumeConnURI the returned slice connections follow (in time of their latest events) this connection uri
      * @param preferredPageSize preferred number of members per page or null; null => use default
-     * @param timeSpot time at which we want the list state to be fixed
+     * @param timeSpot time at which we want the list state to be fixed, cannot be null
      *
      * @return a slice of connection URIs.
      */
@@ -141,7 +141,7 @@ public interface NeedInformationService {
      * @param preferredSize preferred number of members per page or null; null => use default
      * @param messageType event type that should be used for defining connection latest activity; null => all event
      *                    types
-     * @param timeSpot time at which we want the list state to be fixed
+     * @param timeSpot time at which we want the list state to be fixed, if null - current state
      * @return a collection of connection URIs.
      * @throws won.protocol.exception.NoSuchNeedException
      *          if needURI is not a known need URI
@@ -157,7 +157,7 @@ public interface NeedInformationService {
      * @param preferredPageSize preferred number of members per page or null; null => use default
      * @param messageType event type that should be used for defining connection latest activity; null => all event
      *                    types
-     * @param timeSpot time at which we want the list state to be fixed
+     * @param timeSpot time at which we want the list state to be fixed, cannot be null
      *
      * @return a slice of connection URIs.
      */
@@ -172,7 +172,7 @@ public interface NeedInformationService {
      * @param preferredPageSize preferred number of members per page or null; null => use default
      * @param messageType event type that should be used for defining connection latest activity; null => all event
      *                    types
-     * @param timeSpot time at which we want the list state to be fixed
+     * @param timeSpot time at which we want the list state to be fixed, cannot be null
      *
      * @return a slice of connection URIs.
      */
