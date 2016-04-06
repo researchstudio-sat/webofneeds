@@ -22,13 +22,25 @@
             </div>
         </div>
         <div ng-show="self.viewType == 0" class="omc__content__flow">
-            <won-matches-flow-item item="item" request-item="self.sendRequest" ng-repeat="(key,item) in self.matches"></won-matches-flow-item>
+            <won-matches-flow-item
+                    item="item"
+                    request-item="self.sendRequest"
+                    ng-repeat="(key,item) in self.matches">
+            </won-matches-flow-item>
         </div>
         <div ng-show="self.viewType == 1" class="omc__content__grid">
-            <won-matches-grid-item item="item" request-item="self.sendRequest" ng-repeat="(key,item) in self.matches"></won-matches-grid-item>
+            <won-matches-grid-item
+                    item="item"
+                    request-item="self.sendRequest"
+                    ng-repeat="(key,item) in self.matches">
+            </won-matches-grid-item>
         </div>
         <div ng-show="self.viewType == 2" class="omc__content__list">
-            <won-matches-list-item item="item" request-item="self.sendRequest" ng-repeat="(key,item) in self.matchesOfNeed"></won-matches-list-item>
+            <won-matches-list-item
+                    item="item"
+                    request-item="self.sendRequest"
+                    ng-repeat="(key,item) in self.matchesOfNeed">
+            </won-matches-list-item>
         </div>
     </div>
     <div class="omc__sendrequest" ng-show="self.sendRequest">
