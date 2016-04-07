@@ -27,6 +27,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
@@ -162,37 +163,56 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   public Dataset getNeedDataset(final URI needUri) throws NoSuchNeedException {
-    Need need = needInformationService.readNeed(needUri);
+  Need need = needInformationService.readNeed(needUri);
 
-    // load the dataset from storage
-    Dataset dataset = rdfStorage.loadDataset(need.getNeedURI());
-    Model metaModel = needModelMapper.toModel(need);
+  // load the dataset from storage
+  Dataset dataset = rdfStorage.loadDataset(need.getNeedURI());
+  Model metaModel = needModelMapper.toModel(need);
 
-    Resource needResource = metaModel.getResource(needUri.toString());
+  Resource needResource = metaModel.getResource(needUri.toString());
 
-    // add connections
-    Resource connectionsContainer = metaModel.createResource(need.getNeedURI().toString() + "/connections/");
-    metaModel.add(metaModel.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
+  // add connections
+  Resource connectionsContainer = metaModel.createResource(need.getNeedURI().toString() + "/connections/");
+  metaModel.add(metaModel.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
 
-    // add need event container
-    Resource needEventContainer = metaModel.createResource(need.getNeedURI().toString()+"#events", WON.EVENT_CONTAINER);
-    metaModel.add(metaModel.createStatement(needResource, WON.HAS_EVENT_CONTAINER, needEventContainer));
+  // add need event container
+  Resource needEventContainer = metaModel.createResource(need.getNeedURI().toString()+"#events", WON.EVENT_CONTAINER);
+  metaModel.add(metaModel.createStatement(needResource, WON.HAS_EVENT_CONTAINER, needEventContainer));
 
-    // add need event URIs
-    List<MessageEventPlaceholder> messageEvents = messageEventRepository.findByParentURI(needUri);
-    for (MessageEventPlaceholder messageEvent : messageEvents) {
-      metaModel.add(metaModel.createStatement(needEventContainer,
-                                      RDFS.member,
-                                      metaModel.getResource(messageEvent.getMessageURI().toString())));
+  // add need event URIs
+  List<MessageEventPlaceholder> messageEvents = messageEventRepository.findByParentURI(needUri);
+  for (MessageEventPlaceholder messageEvent : messageEvents) {
+    metaModel.add(metaModel.createStatement(needEventContainer,
+                                            RDFS.member,
+                                            metaModel.getResource(messageEvent.getMessageURI().toString())));
+  }
+
+  // add WON node link
+  needResource.addProperty(WON.HAS_WON_NODE, metaModel.createResource(this.resourceURIPrefix));
+
+  // add meta model to dataset
+  String needMetaInformationURI = uriService.createNeedSysInfoGraphURI(needUri).toString();
+  dataset.addNamedModel(needMetaInformationURI, metaModel);
+  addBaseUriAndDefaultPrefixes(dataset);
+  return dataset;
+}
+
+  @Override
+  public Dataset getNeedDataset(final URI needUri, boolean deep, Integer deepLayerSize
+                                ) throws NoSuchNeedException, NoSuchConnectionException, NoSuchMessageException {
+    Dataset dataset = getNeedDataset(needUri);
+    if (deep) {
+      Slice<URI> slice = needInformationService.listConnectionURIs(needUri, 1, deepLayerSize, null, null);
+      NeedInformationService.PagedResource<Dataset, URI> connectionsResource = toContainerPage(
+        this.uriService.createConnectionsURIForNeed(needUri).toString(), slice);
+      addDeepConnectionData(connectionsResource.getContent(), slice.getContent());
+      RdfUtils.addDatasetToDataset(dataset, connectionsResource.getContent());
+      for (URI connectionUri : slice.getContent()) {
+        NeedInformationService.PagedResource<Dataset,URI> eventsResource = listConnectionEventURIs(
+          connectionUri, 1, deepLayerSize, null, true);
+        RdfUtils.addDatasetToDataset(dataset, eventsResource.getContent());
+      }
     }
-
-    // add WON node link
-    needResource.addProperty(WON.HAS_WON_NODE, metaModel.createResource(this.resourceURIPrefix));
-
-    // add meta model to dataset
-    String needMetaInformationURI = uriService.createNeedSysInfoGraphURI(needUri).toString();
-    dataset.addNamedModel(needMetaInformationURI, metaModel);
-    addBaseUriAndDefaultPrefixes(dataset);
     return dataset;
   }
 
@@ -243,13 +263,14 @@ public class LinkedDataServiceImpl implements LinkedDataService
       Resource blankNodeUriSpec = model.createResource();
       res.addProperty(WON.HAS_URI_PATTERN_SPECIFICATION, blankNodeUriSpec);
       blankNodeUriSpec.addProperty(WON.HAS_NEED_URI_PREFIX,
-        model.createLiteral(this.needResourceURIPrefix));
+                                   model.createLiteral(this.needResourceURIPrefix));
       blankNodeUriSpec.addProperty(WON.HAS_CONNECTION_URI_PREFIX,
                                    model.createLiteral(this.connectionResourceURIPrefix));
       blankNodeUriSpec.addProperty(WON.HAS_EVENT_URI_PREFIX, model.createLiteral(this.eventResourceURIPrefix));
   }
 
-  public Dataset getConnectionDataset(final URI connectionUri, final boolean includeEventData) throws NoSuchConnectionException
+  public Dataset getConnectionDataset(final URI connectionUri, final boolean includeEventContainer) throws
+    NoSuchConnectionException
   {
     Connection connection = needInformationService.readConnection(connectionUri);
 
@@ -268,11 +289,10 @@ public class LinkedDataServiceImpl implements LinkedDataService
     // add WON node link
     connectionResource.addProperty(WON.HAS_WON_NODE, model.createResource(this.resourceURIPrefix));
 
-    if (includeEventData) {
+    if (includeEventContainer) {
       //create event container and attach it to the member
       Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events");
       connectionResource.addProperty(WON.HAS_EVENT_CONTAINER, eventContainer);
-      connectionResource.addProperty(WON.HAS_REMOTE_NEED, model.createResource(connection.getRemoteNeedURI().toString()));
       addAdditionalData(model, connection.getConnectionURI(), connectionResource);
     }
 
@@ -384,6 +404,13 @@ public class LinkedDataServiceImpl implements LinkedDataService
   public Dataset listConnectionEventURIs(final URI connectionUri) throws
     NoSuchConnectionException
   {
+    return  listConnectionEventURIs(connectionUri, false);
+  }
+
+  @Override
+  public Dataset listConnectionEventURIs(final URI connectionUri, boolean deep) throws
+    NoSuchConnectionException
+  {
 
     Model model = ModelFactory.createDefaultModel();
     setNsPrefixes(model);
@@ -393,12 +420,19 @@ public class LinkedDataServiceImpl implements LinkedDataService
                                                    WON.EVENT_CONTAINER);
     // add the events with the new format (only the URI, no content)
     List<MessageEventPlaceholder> connectionEvents = messageEventRepository.findByParentURI(connectionUri);
+    Dataset eventsContainerDataset = newDatasetWithNamedModel(createDataGraphUri(eventContainer), model);
+    addBaseUriAndDefaultPrefixes(eventsContainerDataset);
     for (MessageEventPlaceholder event : connectionEvents) {
       model.add(model.createStatement(eventContainer,
                                       RDFS.member,
                                       model.getResource(event.getMessageURI().toString())));
+      if (deep) {
+        Dataset eventDataset = getDatasetForUri(event.getMessageURI());
+        RdfUtils.addDatasetToDataset(eventsContainerDataset, eventDataset);
+      }
     }
-    return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUri(eventContainer), model));
+
+    return eventsContainerDataset;
   }
 
 
@@ -410,6 +444,23 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Slice<URI> slice = needInformationService.listConnectionEventURIs(connectionUri, pageNum,
                                                                       preferedSize, msgType);
     return toContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice);
+  }
+
+  public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIs(final URI connectionUri, final int
+    pageNum, Integer preferedSize, WonMessageType msgType, boolean deep) throws
+    NoSuchConnectionException
+  {
+    Slice<URI> slice = needInformationService.listConnectionEventURIs(connectionUri, pageNum,
+                                                                      preferedSize, msgType);
+    NeedInformationService.PagedResource<Dataset,URI> containerPage = toContainerPage(
+      this.uriService.createEventsURIForConnection(connectionUri).toString(), slice);
+    if (deep) {
+      for (URI eventUri : slice.getContent()) {
+        Dataset eventDataset = getDatasetForUri(eventUri);
+        RdfUtils.addDatasetToDataset(containerPage.getContent(), eventDataset);
+      }
+    }
+    return containerPage;
   }
 
   @Override
@@ -571,7 +622,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     //add the connection model for each connection URI
     for (URI connectionURI : connectionURIs) {
       Dataset connectionDataset =
-        getConnectionDataset(connectionURI, false); //do not include event data
+        getConnectionDataset(connectionURI, true);
       RdfUtils.addDatasetToDataset(dataset, connectionDataset);
     }
   }

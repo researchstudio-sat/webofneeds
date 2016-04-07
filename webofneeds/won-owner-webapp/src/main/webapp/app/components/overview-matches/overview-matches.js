@@ -26,44 +26,26 @@ class OverviewMatchesController {
         this.viewType = 0;
 
         const selectFromState = (state) => {
+            const allMatchesByConnections = selectAllByConnections(state)
+                    .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested);
 
-            const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
-
-            if(state.getIn(['router', 'currentParams', 'myUri']) === undefined){
+            if(state.getIn(['router', 'currentParams', 'myUri']) === undefined) {
+                //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
+                const matchesByConnectionUri = allMatchesByConnections.toList().toJS();
                 return {
-                    matches: Object.keys(connectionsDeprecated)
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.Suggested){
-                                return true
-                            }
-                        }),
-                    matchesOfNeed:mapToMatches(Object.keys(connectionsDeprecated)
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.Suggested){
-                                return true
-                            }
-                        }))
+                    matches: matchesByConnectionUri,
+                    matchesOfNeed: mapToMatches(matchesByConnectionUri),
                 };
-            }else{
+            } else {
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
+                const matchesByConnectionUri = allMatchesByConnections
+                    .filter(conn => conn.getIn(['ownNeed', 'uri']) === postId)
+                    .toList().toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
                 return {
+                    //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
                     post: state.getIn(['needs','ownNeeds', postId]).toJS(),
-                    matches: Object.keys(connectionsDeprecated)
-                        .map(key => connectionsDeprecated)
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === postId){
-                                return true
-                            }
-                        }),
-                    matchesOfNeed:mapToMatches(Object.keys(connectionsDeprecated)
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === postId){
-                                return true
-                            }
-                        }))
+                    matches: matchesByConnectionUri,
+                    matchesOfNeed:mapToMatches(matchesByConnectionUri)
                 };
             }
         }

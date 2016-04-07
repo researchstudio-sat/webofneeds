@@ -1,6 +1,23 @@
 # fail the whole script if one command fails
 set -e
 
+# base folder is used to mount some files (e.g. certificates) from the server into the containers
+base_folder=/home/install/won/int
+
+# if the GENERATE_NEW_CERTIFICATES flag is set to true then setup things in a way that the certificates are recreated
+# that (currently) includes:
+# - deleting content of the server and client certificate folder
+# - emptying the postgres database (all need data is lost!) => is done later in the script anyway
+if [ "$GENERATE_NEW_CERTIFICATES" = true ] ; then
+  echo generating new certificates! Old files and postgres need database will be deleted!
+  ssh root@satsrv04 rm -rf $base_folder/won-server-certs/*
+  ssh root@satsrv05 rm -rf $base_folder/won-server-certs/*
+  ssh root@satsrv06 rm -rf $base_folder/won-server-certs/*
+  ssh root@satsrv04 rm -rf $base_folder/won-client-certs/*
+  ssh root@satsrv05 rm -rf $base_folder/won-client-certs/*
+  ssh root@satsrv06 rm -rf $base_folder/won-client-certs/*
+fi
+
 # build the won docker images on every server of the cluster so that everywhere is the latest version available
 echo start docker build of images:
 
@@ -60,20 +77,19 @@ docker -H satsrv05:2375 run --name=postgres_int -d -p 5433:5432 -m 256m webofnee
 sleep 10
 
 # wonnode/owner server certificate generator
-# Please note that value of PASS should be the same used in your server.xml for SSLPassword on wonnode and owner,
-# and the same as activemq.broker.keystore.password used in your wonnode activemq spring configurations for broker
+# Please note that value of PASS (if you set a non-default password) should be the same used in your server.xml for
+# SSLPassword on wonnode and owner, and the same as activemq.broker.keystore.password used in your wonnode activemq
+# spring configurations for broker, set the password with "-e PASS=pass:<your_password>" or "-e
+# PASS=file:<your_file_with_password>"
 docker -H satsrv04:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
-docker -H satsrv04:2375 run --name=gencert_int -e CN="satsrv04.researchstudio.at" -e "PASS=changeit" \
--v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
+docker -H satsrv04:2375 run --name=gencert_int -e CN="satsrv04.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
+-v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
 docker -H satsrv05:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
-docker -H satsrv05:2375 run --name=gencert_int -e CN="satsrv05.researchstudio.at" -e "PASS=changeit" \
--v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
+docker -H satsrv05:2375 run --name=gencert_int -e CN="satsrv05.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
+-v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
 docker -H satsrv06:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
-docker -H satsrv06:2375 run --name=gencert_int -e CN="satsrv06.researchstudio.at" -e "PASS=changeit" \
--v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
-docker -H satsrv07:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
-docker -H satsrv07:2375 run --name=gencert_int -e CN="satsrv07.researchstudio.at" -e "PASS=changeit" \
--v /home/install/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
+docker -H satsrv06:2375 run --name=gencert_int -e CN="satsrv06.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
+-v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
 
 
 sleep 5
@@ -94,11 +110,12 @@ docker -H satsrv04:2375 stop wonnode_int || echo 'No docker container found to s
 docker -H satsrv04:2375 rm wonnode_int || echo 'No docker container found to remove with name: wonnode_int'
 docker -H satsrv04:2375 run --name=wonnode_int -d -e "uri.host=satsrv04.researchstudio.at" -e "http.port=8889" -e \
 "activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 \
--v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
--v /home/install/won-client-certs/wonnode_int:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v $base_folder/won-client-certs/wonnode_int:/usr/local/tomcat/won/client-certs/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9010:9010 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
@@ -110,11 +127,12 @@ docker -H satsrv05:2375 stop wonnode_int || echo 'No docker container found to s
 docker -H satsrv05:2375 rm wonnode_int || echo 'No docker container found to remove with name: wonnode_int'
 docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv05.researchstudio.at" -e "http.port=8889" \
 -e "activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 \
--v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
--v /home/install/won-client-certs/wonnode_int:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v $base_folder/won-client-certs/wonnode_int:/usr/local/tomcat/won/client-certs/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9010:9010 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
@@ -134,11 +152,12 @@ docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.r
 -e "uri.host=satsrv04.researchstudio.at" -e "http.port=8082" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -e "node.default.http.port=8889" -p 8082:8443 \
--v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
--v /home/install/won-client-certs/owner_int:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v $base_folder/won-client-certs/owner_int:/usr/local/tomcat/won/client-certs/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9011:9011 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx1000m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
@@ -151,11 +170,12 @@ docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv05.r
 -e "uri.host=satsrv05.researchstudio.at" -e "http.port=8082" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -e "node.default.http.port=8889" -p 8082:8443 \
--v /home/install/won-server-certs:/usr/local/tomcat/conf/ssl/ \
--v /home/install/won-client-certs/owner_int:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
+-v $base_folder/won-client-certs/owner_int:/usr/local/tomcat/won/client-certs/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9011:9011 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
@@ -177,7 +197,7 @@ docker -H satsrv06:2375 run --name=matcher_service_int -d -e "node.host=satsrv06
 -e "uri.sparql.endpoint=http://satsrv06.researchstudio.at:10000/bigdata/namespace/kb/sparql" \
 -e "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8889/won/resource,https://satsrv05.researchstudio.at:8889/won/resource" \
 -e "cluster.local.port=2561" -e "cluster.seed.port=2561" -p 2561:2561 \
--v /home/install/won-client-certs/matcher_service_int:/usr/src/matcher-service/client-certs/ \
+-v $base_folder/won-client-certs/matcher_service_int:/usr/src/matcher-service/client-certs/ \
 -p 9010:9010 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
