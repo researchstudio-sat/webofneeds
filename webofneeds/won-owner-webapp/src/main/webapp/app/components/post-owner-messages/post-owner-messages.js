@@ -18,6 +18,7 @@ const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 class Controller {
     constructor() {
         attach(this, serviceDependencies, arguments);
+        this.selection = 0;
         window.msgs4dbg = this;
 
         const selectFromState = (state)=>{
