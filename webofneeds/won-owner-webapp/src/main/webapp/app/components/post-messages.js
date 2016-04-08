@@ -96,9 +96,6 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {
-            openConversation: "=", //TODO used bidirectional binding :(
-        },
         template: template
     }
 }
