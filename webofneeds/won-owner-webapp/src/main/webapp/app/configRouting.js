@@ -15,7 +15,7 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
         { path: '/landingpage?:focusSignup', component: 'landingpage' },
         { path: '/create-need/:draftId', component: 'create-need' },
         { path: '/feed', component: 'feed' },
-        { path: '/overview/matches?myUri', component: 'overview-matches', as: 'overviewMatches' },
+        { path: '/overview/matches?viewType?myUri?connectionUri', component: 'overview-matches', as: 'overviewMatches' },
         { path: '/overview/incoming-requests?myUri', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
         { path: '/overview/sent-requests?myUri', component: 'overview-sent-requests', as: 'overviewSentRequests' },
         { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' },
