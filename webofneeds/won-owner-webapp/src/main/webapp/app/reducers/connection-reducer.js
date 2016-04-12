@@ -34,6 +34,13 @@ export default function(connections = initialState, action = {}) {
                 )
             }
 
+        case actionTypes.messages.connect.success:
+            var eventUri = action.payload.uri;
+            var connectionUri = action.payload.hasReceiver;
+            return connections
+                .setIn([connectionUri, 'hasConnectionState'], won.WON.RequestSent)
+                .updateIn([connectionUri, 'hasEvents'], events => events.add(eventUri));
+
         case actionTypes.messages.close.success:
             var eventUri = action.payload.uri;
             var connectionUri = action.payload.hasReceiver;
