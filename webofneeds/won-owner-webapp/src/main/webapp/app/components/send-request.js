@@ -54,7 +54,7 @@ function genComponentConf() {
             <input type="text" ng-model="self.message" placeholder="Reply Message (optional)"/>
             <div class="flexbuttons">
                 <button class="won-button--filled black" ui-sref="overviewMatches({connectionUri: null})">Cancel</button>
-                <button class="won-button--filled red" ng-click="self.sendRequest(self.message)">Request Contact</button>
+                <button class="won-button--filled red" ng-click="self.sendRequest(self.message)" ui-sref="overviewMatches({connectionUri: null})">Request Contact</button>
             </div>
         </div>
     `;
@@ -81,7 +81,7 @@ function genComponentConf() {
         }
 
         sendRequest(message) {
-            this.connections__connect(this.connection, message);
+            this.connections__connect(this.connectionUri, message);
         }
     }
     Controller.$inject = serviceDependencies;
