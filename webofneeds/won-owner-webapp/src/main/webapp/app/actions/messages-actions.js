@@ -98,6 +98,25 @@ export function successfulClose(event) {
     }
 }
 
+export function successfulConnect(event) {
+    return (dispatch, getState) => {
+        const state = getState();
+        console.log("got response for CONNECT: " + event.hasMessageType);
+        let eventUri = null;
+        let receiverUri = null;
+        let isRemoteResponse = false;
+        //TODO maybe refactor these response message handling
+        if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
+            console.log("messages waitingForAnswer", event);
+            eventUri = event.isRemoteResponseTo;
+            dispatch({
+                type: actionTypes.messages.connect.success,
+                payload: event
+            });
+        }
+    }
+}
+
 export function successfulOpen(event){
     return (dispatch, getState) => {
         const state = getState();

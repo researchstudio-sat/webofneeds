@@ -473,11 +473,12 @@
     won.reportError = function(message) {
         if (arguments.length == 1) {
             return function(reason) {
-                console.log(message + " reason: " + reason);
+                console.log(message, " reason: ", reason);
             }
-        }
-        return function(reason) {
-            console.log("Error! reason: " + reason);
+        } else {
+            return function (reason) {
+                console.log("Error! reason: ", reason);
+            }
         }
     }
 
