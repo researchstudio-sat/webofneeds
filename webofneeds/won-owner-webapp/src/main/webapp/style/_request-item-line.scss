@@ -6,16 +6,16 @@
 won-request-item-line {
   display: block;
 
+  a {
+    text-decoration: none;
+  }
+
   .ril {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     padding: 0.5rem 0;
     border-bottom: 0.1rem solid $won-line-gray;
-
-    a {
-      text-decoration: none;
-    }
 
     @include square-image($postIconSize, 0, 0.5rem, 0, 0);
 
