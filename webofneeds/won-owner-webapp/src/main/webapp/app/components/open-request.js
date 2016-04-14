@@ -45,7 +45,7 @@ function genComponentConf() {
                 </div>
             </div>
         </div>
-        <div class="or__footer" ng-if="{{::!self.isSentRequest()}}">
+        <div class="or__footer" ng-if="::(!self.isSentRequest())">
             <input type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
             <div class="flexbuttons">
                 <button class="won-button--filled black" ui-sref="overviewIncomingRequests({connectionUri: null})" ng-click="self.closeRequest()">Decline</button>
