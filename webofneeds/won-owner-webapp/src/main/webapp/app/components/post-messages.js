@@ -14,9 +14,10 @@ const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
         <div class="pm__header">
-            <img class="pm__header__icon clickable"
-                src="generated/icon-sprite.svg#ico36_close"
-                ng-click="self.closeConversation()"/>
+            <a ui-sref="postConversations({openConversation : null})">
+                <img class="pm__header__icon clickable"
+                     src="generated/icon-sprite.svg#ico36_close"/>
+            </a>
             <div class="pm__header__title">
                 Conversation about "{{ self.connectionData.getIn(['remoteNeed', 'title']) }}"
             </div>
@@ -95,9 +96,7 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {
-            openConversation: "=", //TODO used bidirectional binding :(
-        },
+        scope: { },
         template: template
     }
 }

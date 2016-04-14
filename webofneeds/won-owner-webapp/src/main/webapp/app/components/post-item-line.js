@@ -53,7 +53,7 @@ function genComponentConf() {
                         {{ self.unreadRequestsCount() }}
                     </span>
                 </a>
-                <a class="pil__indicators__item clickable" ui-sref="overviewMatches({myUri: self.item.uri})">
+                <a class="pil__indicators__item clickable" ui-sref="overviewMatches({viewType: 0, myUri: self.item.uri})">
                     <img src="generated/icon-sprite.svg#ico36_match"
                          ng-show="self.unreadMatchesCount()"
                          class="pil__indicators__item__icon">

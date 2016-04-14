@@ -23,17 +23,20 @@ class OverviewMatchesController {
         this.ownerSelection = 1; //ONLY NECESSARY FOR VIEW WITH NEED
         this.labels = labels;
 
-        this.viewType = 0;
-
         const selectFromState = (state) => {
             const allMatchesByConnections = selectAllByConnections(state)
                     .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested);
+
+            const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
+            const viewType = state.getIn(['router','currentParams','viewType']);
 
             if(state.getIn(['router', 'currentParams', 'myUri']) === undefined) {
                 //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
                 const matchesByConnectionUri = allMatchesByConnections.toList().toJS();
                 return {
+                    viewType: viewType,
                     matches: matchesByConnectionUri,
+                    connection: state.getIn(['connections', connectionUri]),
                     matchesOfNeed: mapToMatches(matchesByConnectionUri),
                 };
             } else {
@@ -43,8 +46,10 @@ class OverviewMatchesController {
                     .toList().toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
                 return {
                     //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
+                    viewType: viewType,
                     post: state.getIn(['needs','ownNeeds', postId]).toJS(),
                     matches: matchesByConnectionUri,
+                    connection: state.getIn(['connections', connectionUri]),
                     matchesOfNeed:mapToMatches(matchesByConnectionUri)
                 };
             }

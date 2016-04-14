@@ -41,7 +41,7 @@ function genComponentConf() {
                             </a>
                         </li>
                         <li ng-class="{'ntb__tabs__selected' : self.selection == 1}">
-                            <a ui-sref="overviewMatches({myUri: self.item.uri})"
+                            <a ui-sref="overviewMatches({viewType: 0, myUri: self.item.uri})"
                                 ng-class="{'disabled' : !self.hasMatches}">
                                 Matches
                                 <span class="ntb__tabs__unread">{{ self.unreadMatches }}</span>
