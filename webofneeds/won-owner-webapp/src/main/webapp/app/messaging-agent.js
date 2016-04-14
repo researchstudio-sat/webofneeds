@@ -155,6 +155,8 @@ export function runMessagingAgent(redux) {
         console.error('websocket error: ', e);
         this.close();
     };
+
+    let reconnectAttempts = 0;
     function onClose(e) {
         if(e.wasClean){
             console.log('websocket closed.');
@@ -164,14 +166,20 @@ export function runMessagingAgent(redux) {
         if(unsubscribeWatch && typeof unsubscribeWatch === 'function')
             unsubscribeWatch();
 
-        if (e.code === 1011) {
+        if (e.code === 1011 || reconnectAttempts > 5) {
             console.log('either your session timed out or you encountered an unexpected server condition. \n', e.reason);
+        } else if (reconnectAttempts > 1) {
+            setTimeout(() => {
+                ws = newSock();
+                reconnectAttempts++;
+            }, 2000);
         } else {
             // posting anonymously creates a new session for each post
             // thus we need to reconnect here
             // TODO reconnect only on next message instead of straight away <-- bad idea, prevents push notifications
             // TODO add a delay if first reconnect fails
             ws = newSock();
+            reconnectAttempts++;
         }
     };
 }
