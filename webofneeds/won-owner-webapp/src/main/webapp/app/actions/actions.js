@@ -174,6 +174,10 @@ const actionHierarchy = {
             success: messages.successfulClose,
             //TODO failure: messages.failedClose
         },
+        connect: {
+            success: messages.successfulConnect,
+            //TODO failure: messages.failedConnect
+        },
         closeNeed: {
             success: messages.successfulCloseNeed,
             failure: messages.failedCloseNeed

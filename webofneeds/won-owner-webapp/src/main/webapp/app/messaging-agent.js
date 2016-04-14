@@ -122,6 +122,13 @@ export function runMessagingAgent(redux) {
                         //    redux.dispatch(actionCreators.messages__create__failed(event));
                         break;
 
+                    case won.WONMSG.connectMessageCompacted:
+                        if (events['msg:FromSystem'].hasMessageType === won.WONMSG.successResponseCompacted)
+                            redux.dispatch(actionCreators.messages__connect__success(events['msg:FromSystem']));
+                        //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
+                        //  redux.dispatch(actionCreators.messages__open__failed(event));
+                        break;
+
                     case won.WONMSG.openMessageCompacted:
                         if (events['msg:FromSystem'].hasMessageType === won.WONMSG.successResponseCompacted)
                             redux.dispatch(actionCreators.messages__open__success(events['msg:FromSystem']));
