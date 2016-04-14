@@ -1,7 +1,10 @@
 <!-- TODO parametrize by selected tab -->
 <header>
     <won-topnav></won-topnav>
-    <won-owner-title-bar selection="self.selection" item="self.post">
+    <won-owner-title-bar
+            selection="self.selection"
+            post-uri="self.post.uri"
+            item="self.post">
     </won-owner-title-bar>
 </header>
 <main class="ownerpostcontent">

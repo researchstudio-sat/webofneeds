@@ -79,9 +79,10 @@ function genComponentConf() {
             const selectFromState = (state)=>{
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
                 const allByConnections = selectAllByConnections(state);
+                const post = state.getIn(['needs','ownNeeds', postId]);
 
                 return {
-                    post: state.getIn(['needs','ownNeeds', postId]).toJS(),
+                    post: post? post.toJS() : {},
                     allByConnections: allByConnections,
                 };
             }

@@ -35,6 +35,7 @@ class Controller {
             const post = state.getIn(['needs','ownNeeds', postId]);
 
             return {
+                myUri: postId,
                 post: post && post.toJS? post.toJS() : {},
                 allByConnections: connectionsDeprecated,
                 conversations: conversations,

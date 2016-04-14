@@ -29,33 +29,33 @@ function genComponentConf() {
                     <button class="won-button--filled thin red" ng-show="!self.isActive && self.settingsOpen" ng-mouseleave="self.settingsOpen=false" ng-click="self.reOpenPost()">Reopen Post</button>
                     <ul class="ntb__tabs">
                         <li ng-class="{'ntb__tabs__selected' : self.selection == 4}">
-                            <a ui-sref="postInfo({myUri: self.item.uri})">
+                            <a ui-sref="postInfo({myUri: self.myUri})">
                                 Post Info
                             </a>
                         </li>
                         <li ng-class="{'ntb__tabs__selected' : self.selection == 0}">
-                            <a ui-sref="postConversations({myUri: self.item.uri})"
+                            <a ui-sref="postConversations({myUri: self.myUri})"
                                 ng-class="{'disabled' : !self.hasMessages}">
                                 Messages
                                 <span class="ntb__tabs__unread">{{ self.unreadMessages }}</span>
                             </a>
                         </li>
                         <li ng-class="{'ntb__tabs__selected' : self.selection == 1}">
-                            <a ui-sref="overviewMatches({viewType: 0, myUri: self.item.uri})"
+                            <a ui-sref="overviewMatches({viewType: 0, myUri: self.myUri})"
                                 ng-class="{'disabled' : !self.hasMatches}">
                                 Matches
                                 <span class="ntb__tabs__unread">{{ self.unreadMatches }}</span>
                             </a>
                         </li>
                         <li ng-class="{'ntb__tabs__selected' : self.selection == 2}">
-                            <a ui-sref="overviewIncomingRequests({myUri: self.item.uri})"
+                            <a ui-sref="overviewIncomingRequests({myUri: self.myUri})"
                                 ng-class="{'disabled' : !self.hasIncomingRequests}">
                                 Requests
                                 <span class="ntb__tabs__unread">{{ self.unreadIncomingRequests }}</span>
                             </a>
                         </li>
                         <li ng-class="{'ntb__tabs__selected' : self.selection == 3}">
-                            <a ui-sref="overviewSentRequests({myUri: self.item.uri})"
+                            <a ui-sref="overviewSentRequests({myUri: self.myUri})"
                                 ng-class="{'disabled' : !self.hasSentRequests}">
                                 Sent Requests
                                 <span class="ntb__tabs__unread">{{ self.unreadSentRequests }}</span>
@@ -80,41 +80,46 @@ function genComponentConf() {
                 const unreadCounts = selectUnreadEventsByNeedAndType(state);
                 const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
 
-                return {
-                    hasIncomingRequests: state.getIn(['connections'])
-                        .filter(conn =>
-                            conn.get('hasConnectionState') === won.WON.RequestReceived
-                            && conn.get('belongsToNeed') === this.item.uri
-                        ).size > 0,
+                const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
+                const post = state.getIn(['needs','ownNeeds', postId]);
 
-                    /*
-                    hasIncomingRequests: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.RequestReceived && conn.ownNeed.uri === this.item.uri){
-                                return true
-                            }
-                        }).length > 0,
-                    */
-                    hasSentRequests: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.RequestSent && conn.ownNeed.uri === this.item.uri){
-                                return true
-                            }
-                        }).length > 0,
-                    hasMatches: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === this.item.uri){
-                                return true
-                            }
-                        }).length > 0,
-                    hasMessages: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>{
-                            return conn.connection.hasConnectionState===won.WON.Connected && conn.ownNeed.uri === this.item.uri
-                        }).length > 0,
+                this.item = post? post.toJS() : {};//TODO 4dbg deletme
+
+                const hasIncomingRequests = state.getIn(['connections'])
+                        .filter(conn =>
+                        conn.get('hasConnectionState') === won.WON.RequestReceived
+                        && conn.get('belongsToNeed') === postId
+                    ).size > 0;
+
+                const hasSentRequests = Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
+                    .map(key => connectionsDeprecated[key])
+                    .filter(conn=>{
+                        if(conn.connection.hasConnectionState===won.WON.RequestSent && conn.ownNeed.uri === postId){
+                            return true
+                        }
+                    }).length > 0;
+
+                const hasMatches = Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
+                    .map(key => connectionsDeprecated[key])
+                    .filter(conn=>{
+                        if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === postId){
+                            return true
+                        }
+                    }).length > 0;
+
+                const hasMessages =  Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
+                    .map(key => connectionsDeprecated[key])
+                    .filter(conn=>{
+                        return conn.connection.hasConnectionState===won.WON.Connected && conn.ownNeed.uri === postId
+                    }).length > 0;
+
+                return {
+                    myUri: postId,
+                    item: post? post.toJS() : {},
+                    hasIncomingRequests,
+                    hasSentRequests,
+                    hasMatches,
+                    hasMessages,
                     unreadMessages: unreadCounts.getIn([this.item.uri, won.WON.Connected]), //TODO: NOT REALLY THE MESSAGE COUNT ONLY THE CONVERSATION COUNT
                     unreadIncomingRequests: unreadCounts.getIn([this.item.uri, won.WON.RequestReceived]),
                     unreadSentRequests: unreadCounts.getIn([this.item.uri, won.WON.RequestSent]),
@@ -144,8 +149,11 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         template: template,
-        scope: {selection: "=",
-                item: "="}
+        scope: {
+            selection: "=",
+            //item: "=",
+            postUri: "=",
+        }
     }
 }
 

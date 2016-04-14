@@ -22,8 +22,9 @@ class Controller {
             const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
             const post = state.getIn(['needs','ownNeeds', postId]);
             return {
+                postUri: postId,
                 post: post,
-                postJS: post.toJS()
+                postJS: post? post.toJS() : {},
             }
         };
 
