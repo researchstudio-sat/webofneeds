@@ -1,20 +1,17 @@
 <!-- TODO parametrize by selected tab -->
 <header>
     <won-topnav></won-topnav>
-    <won-owner-title-bar
-            selection="self.selection"
-            post-uri="self.post.uri"
-            item="self.post">
+    <won-owner-title-bar selection="::self.selection">
     </won-owner-title-bar>
 </header>
 <main class="ownerpostcontent">
     <won-connection-selection
             class="owner__messages"
-            connection-type="http://purl.org/webofneeds/model#Connected"
-            connection-uris="self.conversationUris"
-            selected-connection="::self.openConversation(connectionUri)">
+            connection-type="::self.wonConnected"
+            selected-connection="::self.openConversation(connectionUri)"
+            >
     </won-connection-selection>
-    <div class="post-messages" ng-show="self.routerParams.get('openConversation')">
+    <div class="post-messages" ng-show="self.conversationIsOpen">
         <div class="post-messages__inner">
             <won-post-messages></won-post-messages>
         </div>

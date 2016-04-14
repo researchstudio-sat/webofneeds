@@ -84,32 +84,19 @@ function genComponentConf() {
                 const post = state.getIn(['needs','ownNeeds', postId]);
                 const postJS = post? post.toJS() : {};
 
-                /*
-                * TODO this is a hack. For some reason passing directive parameters from post-owner-messages
-                * doesn't work. Passing the type to filter for would be the preferred option.
-                */
-                const isMessagesView = state.getIn(['router', 'currentState', 'name']) === 'postConversations';
-                if(isMessagesView) {
-                    const connectionUris = allByConnections
-                        .filter(conn =>
-                            conn.getIn(['connection', 'hasConnectionState']) === self.connectionType &&
-                            conn.getIn(['ownNeed', 'uri']) === postId
-                        )
-                        .map(conn => conn.getIn(['connection','uri']))
-                        .toList().toJS();
+                const connectionUris = allByConnections
+                    .filter(conn =>
+                        conn.getIn(['connection', 'hasConnectionState']) === self.connectionType &&
+                        conn.getIn(['ownNeed', 'uri']) === postId
+                    )
+                    .map(conn => conn.getIn(['connection','uri']))
+                    .toList().toJS();
 
-                    return {
-                        connectionUris,
-                        allByConnections,
-                        post: postJS,
-                    };
-                } else {
-                    return {
-                        connectionUris: [],
-                        allByConnections,
-                        post: postJS,
-                    };
-                }
+                return {
+                    connectionUris,
+                    allByConnections,
+                    post: postJS,
+                };
             }
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
@@ -122,13 +109,6 @@ function genComponentConf() {
         getOpen() {
             return this.allByConnections.get(this.openUri);
         }
-
-        openMessage(item) {
-            //this.events__read(item)
-            this.openConversation = item;
-            this.selectedConnectionUri = item.connection.uri;
-            this.selectedConnection(item.connection.uri);
-        }
     }
     Controller.$inject = serviceDependencies;
     return {
@@ -137,11 +117,7 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-            /*
-             * TODO '@' is a hack here that requires using this with the full type url
-             * for some reason I couldn't binding via '=' wasn't working though.
-             */
-            connectionType: "@",
+            connectionType: "=",
             /*
              * Usage:
              *  selected-connection="myCallback(connectionUri)"
@@ -152,6 +128,8 @@ function genComponentConf() {
     }
 
 }
+
+
 
 export default angular.module('won.owner.components.connectionSelection', [])
     .directive('wonConnectionSelection', genComponentConf)

@@ -4,8 +4,8 @@
 ;
 
 import angular from 'angular';
-import visitorTitleBarModule from '../owner-title-bar';
-import galleryModule from '../gallery';
+import ownerTitleBarModule from '../owner-title-bar';
+//import galleryModule from '../gallery';
 import postMessagesModule from '../post-messages';
 import { attach,mapToMatches } from '../../utils';
 import won from '../../won-es6';
@@ -14,7 +14,7 @@ import openConversationModule from '../open-conversation';
 import connectionSelectionModule from '../connection-selection';
 import { selectAllByConnections } from '../../selectors';
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope'];
+const serviceDependencies = ['$ngRedux', '$scope'];
 class Controller {
     constructor() {
         attach(this, serviceDependencies, arguments);
@@ -42,7 +42,7 @@ class Controller {
                 allByConnections: connectionsDeprecated,
                 conversations: conversations,
                 conversationUris: conversationUris,
-                routerParams: state.getIn(['router', 'currentParams']),
+                conversationIsOpen: !!state.getIn(['router', 'currentParams', 'openConversation']),
             };
         }
 
@@ -52,7 +52,7 @@ class Controller {
     openConversation(connectionUri) {
         console.log('openConversation ', connectionUri);
         this.router__stateGo('postConversations', {
-            myUri: decodeURIComponent(this.routerParams.get('myUri')),
+            myUri: decodeURIComponent(this.myUri),
             openConversation: connectionUri,
         })
     }
@@ -60,11 +60,13 @@ class Controller {
 
 Controller.$inject = serviceDependencies;
 
+
+
 export default angular.module('won.owner.components.postOwner.messages', [
-        visitorTitleBarModule,
-        galleryModule,
-        postMessagesModule,
-        connectionSelectionModule,
-    ])
+    ownerTitleBarModule,
+    //galleryModule,
+    postMessagesModule,
+    connectionSelectionModule,
+])
     .controller('PostOwnerMessagesController', Controller)
     .name;

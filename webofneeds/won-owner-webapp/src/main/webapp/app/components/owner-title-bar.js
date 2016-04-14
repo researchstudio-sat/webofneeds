@@ -149,8 +149,6 @@ function genComponentConf() {
         template: template,
         scope: {
             selection: "=",
-            //item: "=",
-            postUri: "=",
         }
     }
 }
