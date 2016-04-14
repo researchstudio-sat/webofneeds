@@ -83,8 +83,6 @@ function genComponentConf() {
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
                 const post = state.getIn(['needs','ownNeeds', postId]);
 
-                this.item = post? post.toJS() : {};//TODO 4dbg deletme
-
                 const hasIncomingRequests = state.getIn(['connections'])
                         .filter(conn =>
                         conn.get('hasConnectionState') === won.WON.RequestReceived
@@ -120,11 +118,11 @@ function genComponentConf() {
                     hasSentRequests,
                     hasMatches,
                     hasMessages,
-                    unreadMessages: unreadCounts.getIn([this.item.uri, won.WON.Connected]), //TODO: NOT REALLY THE MESSAGE COUNT ONLY THE CONVERSATION COUNT
-                    unreadIncomingRequests: unreadCounts.getIn([this.item.uri, won.WON.RequestReceived]),
-                    unreadSentRequests: unreadCounts.getIn([this.item.uri, won.WON.RequestSent]),
-                    unreadMatches: unreadCounts.getIn([this.item.uri, won.WON.Suggested]),
-                    isActive: state.getIn(['needs','ownNeeds', this.item.uri, 'state']) === won.WON.Active
+                    unreadMessages: unreadCounts.getIn([postId, won.WON.Connected]), //TODO: NOT REALLY THE MESSAGE COUNT ONLY THE CONVERSATION COUNT
+                    unreadIncomingRequests: unreadCounts.getIn([postId, won.WON.RequestReceived]),
+                    unreadSentRequests: unreadCounts.getIn([postId, won.WON.RequestSent]),
+                    unreadMatches: unreadCounts.getIn([postId, won.WON.Suggested]),
+                    isActive: state.getIn(['needs','ownNeeds', postId, 'state']) === won.WON.Active
                 };
             };
 

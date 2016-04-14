@@ -20,6 +20,7 @@ class Controller {
         attach(this, serviceDependencies, arguments);
         this.selection = 0;
         window.msgs4dbg = this;
+        this.wonConnected = won.WON.Connected;
 
         const selectFromState = (state)=>{
             const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
@@ -35,6 +36,7 @@ class Controller {
             const post = state.getIn(['needs','ownNeeds', postId]);
 
             return {
+                wonConnected: won.WON.Connected,
                 myUri: postId,
                 post: post && post.toJS? post.toJS() : {},
                 allByConnections: connectionsDeprecated,

@@ -76,15 +76,40 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             this.labels = labels;
 
+            const self = this;
+
             const selectFromState = (state)=>{
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
                 const allByConnections = selectAllByConnections(state);
                 const post = state.getIn(['needs','ownNeeds', postId]);
+                const postJS = post? post.toJS() : {};
 
-                return {
-                    post: post? post.toJS() : {},
-                    allByConnections: allByConnections,
-                };
+                /*
+                * TODO this is a hack. For some reason passing directive parameters from post-owner-messages
+                * doesn't work. Passing the type to filter for would be the preferred option.
+                */
+                const isMessagesView = state.getIn(['router', 'currentState', 'name']) === 'postConversations';
+                if(isMessagesView) {
+                    const connectionUris = allByConnections
+                        .filter(conn =>
+                            conn.getIn(['connection', 'hasConnectionState']) === self.connectionType &&
+                            conn.getIn(['ownNeed', 'uri']) === postId
+                        )
+                        .map(conn => conn.getIn(['connection','uri']))
+                        .toList().toJS();
+
+                    return {
+                        connectionUris,
+                        allByConnections,
+                        post: postJS,
+                    };
+                } else {
+                    return {
+                        connectionUris: [],
+                        allByConnections,
+                        post: postJS,
+                    };
+                }
             }
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
@@ -112,7 +137,11 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-            connectionUris: "=",
+            /*
+             * TODO '@' is a hack here that requires using this with the full type url
+             * for some reason I couldn't binding via '=' wasn't working though.
+             */
+            connectionType: "@",
             /*
              * Usage:
              *  selected-connection="myCallback(connectionUri)"
