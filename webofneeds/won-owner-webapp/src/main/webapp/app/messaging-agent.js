@@ -129,6 +129,15 @@ export function runMessagingAgent(redux) {
                         //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
                         //  redux.dispatch(actionCreators.messages__open__failure(event));
                         break;
+
+                    case won.WONMSG.connectionMessageCompacted:
+                        var eventUri = msgFromSystem.isRemoteResponseTo || msgFromSystem.isResponseTo;
+                        var connectionUri = msgFromSystem.hasReceiver;
+                        if (msgFromSystem.hasMessageType === won.WONMSG.successResponseCompacted)
+                            redux.dispatch(actionCreators.messages__chatMessage__success({ eventUri, connectionUri }));
+                        else if(event.hasMessageType === won.WONMSG.failureResponseCompacted) {
+                            redux.dispatch(actionCreators.messages__chatMessage__failure({ eventUri, connectionUri }));
+                        }
                         break;
 
                     case won.WONMSG.openMessageCompacted:

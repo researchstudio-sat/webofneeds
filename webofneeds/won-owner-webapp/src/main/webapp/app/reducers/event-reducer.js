@@ -41,6 +41,9 @@ export default function(state = initialState, action = {}) {
             var event = action.payload.optimisticEvent;
             return state.setIn(['events', eventUri], Immutable.fromJS(event));
 
+        case actionTypes.chatMessage.failure:
+            return state.removeIn(['events', action.payload.eventUri]);
+
         case actionTypes.messages.connectionMessageReceived:
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
