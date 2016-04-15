@@ -36,6 +36,13 @@ export function successfulCloseNeed(event) {
 export function failedCloseNeed(event) {
     return (dispatch, getState) => {
         const needUri = event.hasReceiverNeed;
+        /*
+        * TODO not sure if it's necessary to invalidate
+        * the cache here as the previous action will just have
+        * been an optimistic update of the state. Invalidation
+        * should happen in the action that causes the interaction
+        * with the server.
+        */
         won.invalidateCacheForNeed(needUri) // mark need and it's connection container dirty
             .then(() =>
                 won.getConnectionUrisOfNeed(needUri)
@@ -270,3 +277,5 @@ export function hintMessageReceived(event) {
             });
     }
 }
+
+

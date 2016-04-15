@@ -71,7 +71,7 @@ export function connectionsChatMessage(chatMessage, connectionUri) {
                    optimisticEvent,
                }
            })
-       );
+       )
    }
 }
 

@@ -58,6 +58,7 @@ export default function(state = initialState, action = {}) {
 function storeConnectionRelatedData(state, connectionWithRelatedData) {
     console.log("EVENT-REDUCER STORING CONNECTION AND RELATED DATA");
     console.log(connectionWithRelatedData);
+    //TODO replace with simple call mergeDeepIn to guarantee that the state is always a super-set of the rdf-store
     return connectionWithRelatedData.events.reduce(
 
         (updatedState, event) =>
