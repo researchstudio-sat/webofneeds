@@ -76,13 +76,26 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             this.labels = labels;
 
+            const self = this;
+
             const selectFromState = (state)=>{
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
                 const allByConnections = selectAllByConnections(state);
+                const post = state.getIn(['needs','ownNeeds', postId]);
+                const postJS = post? post.toJS() : {};
+
+                const connectionUris = allByConnections
+                    .filter(conn =>
+                        conn.getIn(['connection', 'hasConnectionState']) === self.connectionType &&
+                        conn.getIn(['ownNeed', 'uri']) === postId
+                    )
+                    .map(conn => conn.getIn(['connection','uri']))
+                    .toList().toJS();
 
                 return {
-                    post: state.getIn(['needs','ownNeeds', postId]).toJS(),
-                    allByConnections: allByConnections,
+                    connectionUris,
+                    allByConnections,
+                    post: postJS,
                 };
             }
 
@@ -96,13 +109,6 @@ function genComponentConf() {
         getOpen() {
             return this.allByConnections.get(this.openUri);
         }
-
-        openMessage(item) {
-            //this.events__read(item)
-            this.openConversation = item;
-            this.selectedConnectionUri = item.connection.uri;
-            this.selectedConnection(item.connection.uri);
-        }
     }
     Controller.$inject = serviceDependencies;
     return {
@@ -111,7 +117,7 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-            connectionUris: "=",
+            connectionType: "=",
             /*
              * Usage:
              *  selected-connection="myCallback(connectionUri)"
@@ -122,6 +128,8 @@ function genComponentConf() {
     }
 
 }
+
+
 
 export default angular.module('won.owner.components.connectionSelection', [])
     .directive('wonConnectionSelection', genComponentConf)

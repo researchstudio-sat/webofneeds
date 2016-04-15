@@ -29,33 +29,33 @@ function genComponentConf() {
                     <button class="won-button--filled thin red" ng-show="!self.isActive && self.settingsOpen" ng-mouseleave="self.settingsOpen=false" ng-click="self.reOpenPost()">Reopen Post</button>
                     <ul class="ntb__tabs">
                         <li ng-class="{'ntb__tabs__selected' : self.selection == 4}">
-                            <a ui-sref="postInfo({myUri: self.postId})">
+                            <a ui-sref="postInfo({myUri: self.myUri})">
                                 Post Info
                             </a>
                         </li>
                         <li ng-class="{'ntb__tabs__selected' : self.selection == 0}">
-                            <a ui-sref="postConversations({myUri: self.postId})"
+                            <a ui-sref="postConversations({myUri: self.myUri})"
                                 ng-class="{'disabled' : !self.hasMessages}">
                                 Messages
                                 <span class="ntb__tabs__unread">{{ self.unreadMessages }}</span>
                             </a>
                         </li>
                         <li ng-class="{'ntb__tabs__selected' : self.selection == 1}">
-                            <a ui-sref="overviewMatches({viewType: 0, myUri: self.postId})"
+                            <a ui-sref="overviewMatches({viewType: 0, myUri: self.myUri})"
                                 ng-class="{'disabled' : !self.hasMatches}">
                                 Matches
                                 <span class="ntb__tabs__unread">{{ self.unreadMatches }}</span>
                             </a>
                         </li>
                         <li ng-class="{'ntb__tabs__selected' : self.selection == 2}">
-                            <a ui-sref="overviewIncomingRequests({myUri: self.postId})"
+                            <a ui-sref="overviewIncomingRequests({myUri: self.myUri})"
                                 ng-class="{'disabled' : !self.hasIncomingRequests}">
                                 Requests
                                 <span class="ntb__tabs__unread">{{ self.unreadIncomingRequests }}</span>
                             </a>
                         </li>
                         <li ng-class="{'ntb__tabs__selected' : self.selection == 3}">
-                            <a ui-sref="overviewSentRequests({myUri: self.postId})"
+                            <a ui-sref="overviewSentRequests({myUri: self.myUri})"
                                 ng-class="{'disabled' : !self.hasSentRequests}">
                                 Sent Requests
                                 <span class="ntb__tabs__unread">{{ self.unreadSentRequests }}</span>
@@ -82,7 +82,7 @@ function genComponentConf() {
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
 
                 return {
-                    postId: postId,
+                    myUri: postId,
                     post: state.getIn(['needs','ownNeeds', postId]),
                     hasIncomingRequests: state.getIn(['connections'])
                         .filter(conn =>
@@ -137,7 +137,9 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         template: template,
-        scope: {selection: "="}
+        scope: {
+            selection: "=",
+        }
     }
 }
 
