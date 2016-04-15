@@ -41,6 +41,9 @@ export default function(state = initialState, action = {}) {
             var event = action.payload.optimisticEvent;
             return state.setIn(['events', eventUri], Immutable.fromJS(event));
 
+        case actionTypes.chatMessage.failure:
+            return state.removeIn(['events', action.payload.eventUri]);
+
         case actionTypes.messages.connectionMessageReceived:
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
@@ -58,6 +61,7 @@ export default function(state = initialState, action = {}) {
 function storeConnectionRelatedData(state, connectionWithRelatedData) {
     console.log("EVENT-REDUCER STORING CONNECTION AND RELATED DATA");
     console.log(connectionWithRelatedData);
+    //TODO replace with simple call mergeDeepIn to guarantee that the state is always a super-set of the rdf-store
     return connectionWithRelatedData.events.reduce(
 
         (updatedState, event) =>

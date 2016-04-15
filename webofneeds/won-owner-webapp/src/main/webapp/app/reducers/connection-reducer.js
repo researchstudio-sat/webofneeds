@@ -60,6 +60,12 @@ export default function(connections = initialState, action = {}) {
                     storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
                 connections);
 
+        case actionTypes.chatMessage.failure:
+            return state.updateIn(
+                ['connections', action.payload.connectionUri, 'hasEvents'],
+                eventUris => eventUris.remove(action.payload.eventUri)
+            );
+
         case actionTypes.messages.connectionMessageReceived:
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
@@ -76,11 +82,12 @@ function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
     console.log("STORING CONNECTION AND RELATED DATA");
     console.log(connectionWithRelatedData);
 
+    //make sure we have a set of events (as opposed to a list with redundancies)
+    const events = Immutable.Set(connectionWithRelatedData.connection.hasEvents)
     const connection = Immutable
         .fromJS(connectionWithRelatedData.connection)
-        //make sure we have a set of events (as opposed to a list with redundancies)
-        .set('hasEvents', Immutable.Set(connectionWithRelatedData.connection.hasEvents));
+        .set('hasEvents', events);
 
     return state
-        .setIn([connection.get('uri')], connection)
+        .mergeDeepIn([connection.get('uri')], connection);
 }

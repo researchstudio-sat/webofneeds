@@ -152,9 +152,11 @@ const actionHierarchy = {
     },
 
     /**
-     * Server triggered interactions
+     * Server triggered interactions (aka received messages)
      */
     messages: { /* websocket messages, e.g. post-creation, chatting */
+        //TODO get rid of send and rename to receivedMessage
+
         send: INJ_DEFAULT, //TODO this should be part of proper, user-story-level actions (e.g. need.publish or sendCnctMsg)
 
         /*
@@ -177,6 +179,10 @@ const actionHierarchy = {
         connect: {
             success: messages.successfulConnect,
             //TODO failure: messages.failedConnect
+        },
+        chatMessage: {
+            success: INJ_DEFAULT,
+            failure: INJ_DEFAULT
         },
         closeNeed: {
             success: messages.successfulCloseNeed,
