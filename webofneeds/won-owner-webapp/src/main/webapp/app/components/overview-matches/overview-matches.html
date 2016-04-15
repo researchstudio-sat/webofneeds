@@ -26,14 +26,14 @@
         </div>
         <div ng-if="self.viewType == 0" class="omc__content__flow">
             <won-matches-flow-item
-                    item="item"
-                    ng-repeat="(key,item) in self.matches">
+                    connection-uri="m.getIn(['connection','uri'])"
+                    ng-repeat="m in self.matches">
             </won-matches-flow-item>
         </div>
         <div ng-if="self.viewType == 1" class="omc__content__grid">
             <won-matches-grid-item
-                    item="item"
-                    ng-repeat="(key,item) in self.matches">
+                    connection-uri="m.getIn(['connection','uri'])"
+                    ng-repeat="m in self.matches">
             </won-matches-grid-item>
         </div>
         <div ng-if="self.viewType == 2" class="omc__content__list">

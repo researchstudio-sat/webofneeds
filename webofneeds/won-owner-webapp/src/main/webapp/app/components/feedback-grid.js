@@ -8,7 +8,7 @@ import { actionCreators }  from '../actions/actions';
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-            <a class="feedback" ng-click="self.rateMatch(0)" ui-sref="overviewMatches({connectionUri : self.item.connection.uri})">
+            <a class="feedback" ng-click="self.rateMatch(0)" ui-sref="overviewMatches({connectionUri : self.connectionUri})">
                 <img class="feedback__icon unselected" src="generated/icon-sprite.svg#ico36_feedback_good"/>
                 <img class="feedback__icon selected" src="generated/icon-sprite.svg#ico36_feedback_good_white"/>
                 <span class="feedback__text">Good - request conversation</span>
@@ -36,7 +36,7 @@ function genComponentConf() {
             switch(rating) {
                 case 0:
                     console.log("RATE GOOD");
-                    this.connections__rate(this.item.connection.uri, 0);
+                    this.connections__rate(this.connectionUri, 0);
                     break;
                 /*case 1:
                     //OPTION OK WILL NOT BE IMPLEMENTED ANYMORE
@@ -45,8 +45,8 @@ function genComponentConf() {
                     break;*/
                 case 2:
                     console.log("RATE BAD");
-                    this.connections__close(this.item.connection.uri);
-                    this.connections__rate(this.item.connection.uri, 2);
+                    this.connections__close(this.connectionUri);
+                    this.connections__rate(this.connectionUri, 2);
                     //TODO: ADD A BAD RATING, CLOSE MATCH
                     break;
             }
@@ -59,7 +59,7 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: { item: "=" },
+        scope: { connectionUri: "=" },
         template: template
     }
 }

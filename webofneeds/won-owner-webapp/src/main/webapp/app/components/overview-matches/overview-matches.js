@@ -31,26 +31,24 @@ class OverviewMatchesController {
             const viewType = state.getIn(['router','currentParams','viewType']);
 
             if(state.getIn(['router', 'currentParams', 'myUri']) === undefined) {
-                //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
-                const matchesByConnectionUri = allMatchesByConnections.toList().toJS();
+                const matchesByConnectionUri = allMatchesByConnections.toList();
                 return {
                     viewType: viewType,
-                    matches: matchesByConnectionUri,
+                    matches: matchesByConnectionUri.toArray(),
                     connection: state.getIn(['connections', connectionUri]),
-                    matchesOfNeed: mapToMatches(matchesByConnectionUri),
+                    matchesOfNeed: mapToMatches(matchesByConnectionUri.toJS()),//TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
                 };
             } else {
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
                 const matchesByConnectionUri = allMatchesByConnections
                     .filter(conn => conn.getIn(['ownNeed', 'uri']) === postId)
-                    .toList().toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
+                    .toList();
                 return {
-                    //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
                     viewType: viewType,
-                    post: state.getIn(['needs','ownNeeds', postId]).toJS(),
-                    matches: matchesByConnectionUri,
+                    post: state.getIn(['needs','ownNeeds', postId]),
+                    matches: matchesByConnectionUri.toArray(),
                     connection: state.getIn(['connections', connectionUri]),
-                    matchesOfNeed:mapToMatches(matchesByConnectionUri)
+                    matchesOfNeed:mapToMatches(matchesByConnectionUri.toJS())//TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
                 };
             }
         }
