@@ -86,7 +86,7 @@ export function failedCloseNeed(event) {
          won.WONMSG.hasSenderNodeCompacted = won.WONMSG.prefix + ":hasSenderNode";
          */
 
-export function successfulClose(event) {
+export function successfulCloseConnection(event) {
     return (dispatch, getState) => {
         const state = getState();
         console.log("got response for CLOSE: " + event.hasMessageType);
@@ -94,7 +94,14 @@ export function successfulClose(event) {
         let receiverUri = null;
         let isRemoteResponse = false;
         //TODO maybe refactor these response message handling
-        if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
+        if (state.getIn(['messages', 'waitingForAnswer', event.isResponseTo])) {
+            console.log("messages waitingForAnswer", event);
+            eventUri = event.isResponseTo;
+            dispatch({
+                type: actionTypes.messages.close.success,
+                payload: event
+            });
+        } else if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
             console.log("messages waitingForAnswer", event);
             eventUri = event.isRemoteResponseTo;
             dispatch({

@@ -60,7 +60,7 @@ export default function(connections = initialState, action = {}) {
                     storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
                 connections);
 
-        case actionTypes.chatMessage.failure:
+        case actionTypes.messages.chatMessage.failure:
             return state.updateIn(
                 ['connections', action.payload.connectionUri, 'hasEvents'],
                 eventUris => eventUris.remove(action.payload.eventUri)

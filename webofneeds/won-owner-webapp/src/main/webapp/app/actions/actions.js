@@ -172,8 +172,8 @@ const actionHierarchy = {
             success: messages.successfulOpen,
             //TODO failure: messages.failedOpen
         },
-        close: {
-            success: messages.successfulClose,
+        close: { //TODO: NAME SEEMS GENERIC EVEN THOUGH IT IS ONLY USED FOR CLOSING CONNECITONS; REFACTOR THIS SOMEDAY
+            success: messages.successfulCloseConnection,
             //TODO failure: messages.failedClose
         },
         connect: {
