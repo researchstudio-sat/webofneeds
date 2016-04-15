@@ -122,6 +122,13 @@ export function runMessagingAgent(redux) {
                         //    redux.dispatch(actionCreators.messages__create__failed(event));
                         break;
 
+                    case won.WONMSG.connectMessageCompacted:
+                        if (events['msg:FromSystem'].hasMessageType === won.WONMSG.successResponseCompacted)
+                            redux.dispatch(actionCreators.messages__connect__success(events['msg:FromSystem']));
+                        //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
+                        //  redux.dispatch(actionCreators.messages__open__failed(event));
+                        break;
+
                     case won.WONMSG.openMessageCompacted:
                         if (events['msg:FromSystem'].hasMessageType === won.WONMSG.successResponseCompacted)
                             redux.dispatch(actionCreators.messages__open__success(events['msg:FromSystem']));
@@ -155,6 +162,8 @@ export function runMessagingAgent(redux) {
         console.error('websocket error: ', e);
         this.close();
     };
+
+    let reconnectAttempts = 0;
     function onClose(e) {
         if(e.wasClean){
             console.log('websocket closed.');
@@ -164,14 +173,20 @@ export function runMessagingAgent(redux) {
         if(unsubscribeWatch && typeof unsubscribeWatch === 'function')
             unsubscribeWatch();
 
-        if (e.code === 1011) {
+        if (e.code === 1011 || reconnectAttempts > 5) {
             console.log('either your session timed out or you encountered an unexpected server condition. \n', e.reason);
+        } else if (reconnectAttempts > 1) {
+            setTimeout(() => {
+                ws = newSock();
+                reconnectAttempts++;
+            }, 2000);
         } else {
             // posting anonymously creates a new session for each post
             // thus we need to reconnect here
             // TODO reconnect only on next message instead of straight away <-- bad idea, prevents push notifications
             // TODO add a delay if first reconnect fails
             ws = newSock();
+            reconnectAttempts++;
         }
     };
 }

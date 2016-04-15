@@ -17,10 +17,10 @@ function genComponentConf() {
                     <a ui-sref="overviewPosts">
                         <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__icon">
                     </a>
-                    <won-square-image src="self.item.titleImgSrc" title="self.item.title"></won-square-image>
+                    <won-square-image src="self.post.get('titleImgSrc')" title="self.post.get('title')"></won-square-image>
                     <div class="ntb__inner__left__titles">
-                        <h1 class="ntb__title">{{self.item.title}}</h1>
-                        <div class="ntb__inner__left__titles__type">{{self.labels.type[self.item.basicNeedType]}}</div>
+                        <h1 class="ntb__title">{{self.post.get('title')}}</h1>
+                        <div class="ntb__inner__left__titles__type">{{self.labels.type[self.post.get('basicNeedType')]}}</div>
                     </div>
                 </div>
                 <div class="ntb__inner__right">
@@ -79,45 +79,35 @@ function genComponentConf() {
             const selectFromState = (state)=>{
                 const unreadCounts = selectUnreadEventsByNeedAndType(state);
                 const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
-
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
-                const post = state.getIn(['needs','ownNeeds', postId]);
-
-                const hasIncomingRequests = state.getIn(['connections'])
-                        .filter(conn =>
-                        conn.get('hasConnectionState') === won.WON.RequestReceived
-                        && conn.get('belongsToNeed') === postId
-                    ).size > 0;
-
-                const hasSentRequests = Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
-                    .map(key => connectionsDeprecated[key])
-                    .filter(conn=>{
-                        if(conn.connection.hasConnectionState===won.WON.RequestSent && conn.ownNeed.uri === postId){
-                            return true
-                        }
-                    }).length > 0;
-
-                const hasMatches = Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
-                    .map(key => connectionsDeprecated[key])
-                    .filter(conn=>{
-                        if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === postId){
-                            return true
-                        }
-                    }).length > 0;
-
-                const hasMessages =  Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
-                    .map(key => connectionsDeprecated[key])
-                    .filter(conn=>{
-                        return conn.connection.hasConnectionState===won.WON.Connected && conn.ownNeed.uri === postId
-                    }).length > 0;
 
                 return {
                     myUri: postId,
-                    item: post? post.toJS() : {},
-                    hasIncomingRequests,
-                    hasSentRequests,
-                    hasMatches,
-                    hasMessages,
+                    post: state.getIn(['needs','ownNeeds', postId]),
+                    hasIncomingRequests: state.getIn(['connections'])
+                        .filter(conn =>
+                            conn.get('hasConnectionState') === won.WON.RequestReceived
+                            && conn.get('belongsToNeed') === postId
+                        ).size > 0,
+                    hasSentRequests: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
+                        .map(key => connectionsDeprecated[key])
+                        .filter(conn=>{
+                            if(conn.connection.hasConnectionState===won.WON.RequestSent && conn.ownNeed.uri === postId){
+                                return true
+                            }
+                        }).length > 0,
+                    hasMatches: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
+                        .map(key => connectionsDeprecated[key])
+                        .filter(conn=>{
+                            if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === postId){
+                                return true
+                            }
+                        }).length > 0,
+                    hasMessages: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
+                        .map(key => connectionsDeprecated[key])
+                        .filter(conn=>{
+                            return conn.connection.hasConnectionState===won.WON.Connected && conn.ownNeed.uri === postId
+                        }).length > 0,
                     unreadMessages: unreadCounts.getIn([postId, won.WON.Connected]), //TODO: NOT REALLY THE MESSAGE COUNT ONLY THE CONVERSATION COUNT
                     unreadIncomingRequests: unreadCounts.getIn([postId, won.WON.RequestReceived]),
                     unreadSentRequests: unreadCounts.getIn([postId, won.WON.RequestSent]),
@@ -131,13 +121,13 @@ function genComponentConf() {
         }
 
         closePost() {
-            console.log("CLOSING THE POST: "+this.item.uri);
-            this.needs__close(this.item.uri);
+            console.log("CLOSING THE POST: "+this.post.get("uri"));
+            this.needs__close(this.post.get("uri"));
         }
 
         reOpenPost() {
-            console.log("RE-OPENING THE POST: "+this.item.uri);
-            this.needs__reopen(this.item.uri);
+            console.log("RE-OPENING THE POST: "+this.post.get("uri"));
+            this.needs__reopen(this.post.get("uri"));
         }
     }
     Controller.$inject = serviceDependencies;

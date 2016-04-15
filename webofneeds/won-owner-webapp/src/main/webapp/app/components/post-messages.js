@@ -120,7 +120,7 @@ function selectChatMessages(state) {
 
     } else {
 
-        const chatMessagesPromise = connectionData.get('events')
+        const chatMessages = connectionData.get('events')
 
             /* filter for valid chat messages */
             .filter(event => {
@@ -139,7 +139,7 @@ function selectChatMessages(state) {
 
             /* sort them so the latest get shown last */
             .sort((event1, event2) =>
-                selectTimestamp(event1) > selectTimestamp(event2)
+                selectTimestamp(event1) - selectTimestamp(event2)
             )
 
             /* add a nice relative timestamp */
@@ -152,7 +152,7 @@ function selectChatMessages(state) {
                 )
             );
 
-        return chatMessagesPromise;
+        return chatMessages;
     }
 
 }
