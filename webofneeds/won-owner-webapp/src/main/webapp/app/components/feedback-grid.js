@@ -36,7 +36,7 @@ function genComponentConf() {
             switch(rating) {
                 case 0:
                     console.log("RATE GOOD");
-                    this.connections__rate(this.item, 0);
+                    this.connections__rate(this.item.connection.uri, 0);
                     break;
                 /*case 1:
                     //OPTION OK WILL NOT BE IMPLEMENTED ANYMORE
@@ -45,8 +45,8 @@ function genComponentConf() {
                     break;*/
                 case 2:
                     console.log("RATE BAD");
-                    this.connections__close(this.item);
-                    this.connections__rate(this.item, 2);
+                    this.connections__close(this.item.connection.uri);
+                    this.connections__rate(this.item.connection.uri, 2);
                     //TODO: ADD A BAD RATING, CLOSE MATCH
                     break;
             }
