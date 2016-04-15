@@ -5,9 +5,11 @@ import squareImageModule from './square-image';
 import extendedGalleryModule from './extended-gallery';
 import feedbackGridModule from './feedback-grid';
 import { attach } from '../utils';
+import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime, updateRelativeTimestamps } from '../won-label-utils';
+import { selectAllByConnections } from '../selectors';
 
-const serviceDependencies = ['$scope', '$interval'];
+const serviceDependencies = ['$q', '$ngRedux', '$scope', '$interval'];
 function genComponentConf() {
     let template = `
         <div ng-show="self.images" class="mfi__gallery">
@@ -15,14 +17,14 @@ function genComponentConf() {
         </div>
         <div class="mfi__description clickable">
             <div class="mfi__description__topline">
-                <div class="mfi__description__topline__title clickable"><b>{{self.item.remoteNeed.title}}</b></div>
+                <div class="mfi__description__topline__title clickable"><b>{{self.connectionData.getIn(['remoteNeed','title'])}}</b></div>
                 <div class="mfi__description__topline__date">{{self.creationDate}}</div>
             </div>
             <div class="mfi__description__subtitle">
-                <span class="mfi__description__subtitle__group" ng-show="self.item.group">
-                    <img src="generated/icon-sprite.svg#ico36_group" class="mfi__description__subtitle__group__icon">{{self.item.group}}<span class="mfi__description__subtitle__group__dash"> &ndash; </span>
+                <span class="mfi__description__subtitle__group" ng-show="self.connection.get('group')">
+                    <img src="generated/icon-sprite.svg#ico36_group" class="mfi__description__subtitle__group__icon">{{self.connectionData.get('group')}}<span class="mfi__description__subtitle__group__dash"> &ndash; </span>
                 </span>
-                <span class="mfi__description__subtitle__type">{{self.labels.type[self.item.remoteNeed.basicNeedType]}}</span>
+                <span class="mfi__description__subtitle__type">{{self.labels.type[self.connectionData.getIn(['remoteNeed','basicNeedType'])]}}</span>
             </div>
             <div class="mfi__description__content">
                 <div class="mfi__description__content__location">
@@ -37,12 +39,12 @@ function genComponentConf() {
         </div>
         <div class="mfi__match clickable" ng-if="!self.feedbackVisible" ng-click="self.showFeedback()" ng-mouseenter="self.showFeedback()" >
             <div class="mfi__match__description">
-                <div class="mfi__match__description__title">{{self.item.ownNeed.title}}</div>
-                <div class="mfi__match__description__type">{{self.labels.type[self.item.ownNeed.basicNeedType]}}</div>
+                <div class="mfi__match__description__title">{{self.connectionData.getIn(['ownNeed','title'])}}</div>
+                <div class="mfi__match__description__type">{{self.labels.type[self.connectionData.getIn(['ownNeed','basicNeedType'])]}}</div>
             </div>
-            <won-square-image src="self.getRandomImage()" title="self.item.ownNeed.title"></won-square-image>
+            <won-square-image src="self.getRandomImage()" title="self.connectionData.getIn(['ownNeed','title'])"></won-square-image>
         </div>
-        <won-feedback-grid item="self.item" ng-mouseleave="self.hideFeedback()" ng-if="self.feedbackVisible"/>
+        <won-feedback-grid connection-uri="self.connectionUri" ng-mouseleave="self.hideFeedback()" ng-if="self.feedbackVisible"/>
     `;
 
     class Controller {
@@ -56,12 +58,21 @@ function genComponentConf() {
                 "images/furniture2.png",
                 "images/furniture3.png",
                 "images/furniture4.png",
-            ]
+            ];
+
+            const selectFromState = (state) => {
+                return {
+                    connectionData: selectAllByConnections(state).get(this.connectionUri)
+                };
+            };
+
+            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
+            this.$scope.$on('$destroy', disconnect);
 
             updateRelativeTimestamps(
                 this.$scope,
                 this.$interval,
-                this.item.remoteNeed.creationDate,
+                this.connectionData.getIn(["remoteNeed","creationDate"]),
                     t => this.creationDate = t);
 
         }
@@ -79,7 +90,7 @@ function genComponentConf() {
         }
 
         getRandomImage(){
-            let i = Math.floor((Math.random()*4))
+            let i = Math.floor((Math.random()*4));
             return this.images[2];
         }
 
@@ -91,7 +102,9 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: { item: "=" },
+        scope: {
+            connectionUri: "="
+        },
         template: template
     }
 }
