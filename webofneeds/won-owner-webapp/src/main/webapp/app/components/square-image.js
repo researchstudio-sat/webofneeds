@@ -30,7 +30,7 @@ function genComponentConf() {
             if(this.title)
                 return this.title.charAt(0).toUpperCase();
             else
-                return undefined;
+                return "?";
         }
     }
 
