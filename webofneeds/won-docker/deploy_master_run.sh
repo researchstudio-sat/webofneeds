@@ -6,7 +6,6 @@ set -e
 # ====================================
 
 # full hostname where application is deployed
-# deploy_host=localhost
 deploy_host=satcluster01.researchstudio.at
 
 # docker options to execute docker commands with
@@ -14,10 +13,13 @@ deploy_host=satcluster01.researchstudio.at
 docker_options="-H ${deploy_host}:2375"
 
 # set this to true if using a reverse proxy server that takes care of client certificate authentication
-behind_proxy=false
+# behind_proxy=true
+if [ -z "$behind_proxy" ]; then
+  behind_proxy=false
+fi
 
 # public node uri, used in the linked data uris, default if not set use deploy_host
-public_node_uri="www.matchat.org"
+# public_node_uri="www.matchat.org"
 if [ -z "$public_node_uri" ]; then
   public_node_uri=${deploy_host}
 fi
@@ -58,9 +60,9 @@ sleep 10
 echo run wonnode container
 docker ${docker_options} stop wonnode_ma || echo 'No docker container found to stop with name: wonnode_ma'
 docker ${docker_options} rm wonnode_ma || echo 'No docker container found to remove with name: wonnode_ma'
-docker ${docker_options} run --name=wonnode_ma -d -e "uri.host=$public_node_uri" -e "http.port=443" -e \
+docker ${docker_options} run --name=wonnode_ma -d -e "uri.host=$public_node_uri" -e "http.port=443" \
 -e "uri.prefix=https://${public_node_uri}/won" \
-"activemq.broker.port=61617" -p 443:8443 -p 61617:61617 \
+-e "activemq.broker.port=61617" -p 443:8443 -p 61617:61617 \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/wonnode_ma:/usr/local/tomcat/won/client-certs/ \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
@@ -87,7 +89,7 @@ docker ${docker_options} rm matcher_service_ma || echo 'No docker container foun
 docker ${docker_options} run --name=matcher_service_ma -d -e "node.host=${deploy_host}" \
 -e "cluster.seed.host=${deploy_host}" \
 -e "uri.sparql.endpoint=http://${deploy_host}:10000/bigdata/namespace/kb/sparql" \
--e "wonNodeController.wonNode.crawl=https://${deploy_host}:8889/won/resource" \
+-e "wonNodeController.wonNode.crawl=https://${public_node_uri}/won/resource" \
 -e "cluster.local.port=2561" -e "cluster.seed.port=2561" -p 2561:2561 \
 -v $base_folder/won-client-certs/matcher_service_ma:/usr/src/matcher-service/client-certs/ \
 -e "JMEM_OPTS=-Xmx250m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
@@ -115,11 +117,11 @@ docker ${docker_options} run --name=owner_ma -d -e "node.default.host=$public_no
 -e "node.default.http.port=443" -p 8082:8443 \
 -e "uri.host=$public_node_uri" -e "http.port=8082" \
 -e "uri.prefix.node.default=https://${public_node_uri}/won" \
+-e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/owner_ma:/usr/local/tomcat/won/client-certs/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
--e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://${deploy_host}:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
 webofneeds/owner:master
