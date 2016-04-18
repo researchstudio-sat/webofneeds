@@ -66,7 +66,7 @@ rsync $WORKSPACE/webofneeds/won-docker/nginx/nginx.conf root@satcluster02:$base_
 
 echo run nginx proxy server
 if ! docker -H satcluster02:2375 run --name=nginx_ma -v $base_folder/won-server-certs:/etc/nginx/won-server-certs/ \
--v $base_folder/nginx.conf:/etc/nginx/nginx.conf -d -p 80:80 -p 443:443 nginx; then
+-v $base_folder/nginx.conf:/etc/nginx/nginx.conf -d -p 80:80 -p 443:443 -p 61617:61617 nginx; then
   echo nginx container already available, restart old container
   docker -H satcluster02:2375 restart nginx_ma
 fi

@@ -59,6 +59,7 @@ echo run wonnode container
 docker ${docker_options} stop wonnode_ma || echo 'No docker container found to stop with name: wonnode_ma'
 docker ${docker_options} rm wonnode_ma || echo 'No docker container found to remove with name: wonnode_ma'
 docker ${docker_options} run --name=wonnode_ma -d -e "uri.host=$public_node_uri" -e "http.port=443" -e \
+-e "uri.prefix=https://${public_node_uri}/won" \
 "activemq.broker.port=61617" -p 443:8443 -p 61617:61617 \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/wonnode_ma:/usr/local/tomcat/won/client-certs/ \
@@ -113,6 +114,7 @@ docker ${docker_options} rm owner_ma || echo 'No docker container found to remov
 docker ${docker_options} run --name=owner_ma -d -e "node.default.host=$public_node_uri" \
 -e "node.default.http.port=443" -p 8082:8443 \
 -e "uri.host=$public_node_uri" -e "http.port=8082" \
+-e "uri.prefix.node.default=https://${public_node_uri}/won" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/owner_ma:/usr/local/tomcat/won/client-certs/ \
