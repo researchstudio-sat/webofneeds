@@ -34,8 +34,8 @@ export function messagesReducer(messages = initialState, action = {}) {
         case actionTypes.drafts.publishSuccessful:
             return messages.removeIn(['waitingForAnswer', action.payload.publishEventUri]);
 
-        case actionTypes.messages.chatMessge.failure:
-        case actionTypes.messages.chatMessge.success:
+        case actionTypes.messages.chatMessage.failure:
+        case actionTypes.messages.chatMessage.success:
             return messages.removeIn(['waitingForAnswer', action.payload.eventUri]);
 
 
