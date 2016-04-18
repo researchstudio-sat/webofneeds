@@ -13,6 +13,9 @@ deploy_host=satcluster01.researchstudio.at
 # docker_options=
 docker_options="-H ${deploy_host}:2375"
 
+# set this to true if using a reverse proxy server that takes care of client certificate authentication
+behind_proxy=false
+
 # public node uri, used in the linked data uris, default if not set use deploy_host
 public_node_uri="www.matchat.org"
 if [ -z "$public_node_uri" ]; then
@@ -60,6 +63,7 @@ docker ${docker_options} run --name=wonnode_ma -d -e "uri.host=$public_node_uri"
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/wonnode_ma:/usr/local/tomcat/won/client-certs/ \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
+-e "client.authentication.behind.proxy=$behind_proxy" \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://${deploy_host}:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
