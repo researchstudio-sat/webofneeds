@@ -13,25 +13,27 @@ function genComponentConf() {
     let template = `
         <div class="sr__caption">
             <div class="sr__caption__title">Send Conversation Request</div>
-            <img class="sr__caption__icon clickable" src="generated/icon-sprite.svg#ico36_close" ng-click="self.closeRequest()"/>
+            <a ui-sref="overviewMatches({connectionUri: null})">
+                <img class="sr__caption__icon clickable" src="generated/icon-sprite.svg#ico36_close"/>
+            </a>
         </div>
         <div class="sr__header">
             <div class="sr__header__title">
                 <div class="sr__header__title__topline">
-                    <div class="sr__header__title__topline__title">{{self.item.remoteNeed.title}}</div>
-                    <div class="sr__header__title__topline__date">{{self.item.remoteNeed.creationDate}}</div>
+                    <div class="sr__header__title__topline__title">{{self.theirNeed.get('title')}}</div>
+                    <div class="sr__header__title__topline__date">{{self.theirNeed.get('creationDate')}}</div>
                 </div>
                 <div class="sr__header__title__subtitle">
-                    <span class="sr__header__title__subtitle__group" ng-show="self.item.group">
-                        <img src="generated/icon-sprite.svg#ico36_group" class="sr__header__title__subtitle__group__icon">{{self.item.group}}<span class="sr__header__title__subtitle__group__dash"> &ndash; </span>
+                    <span class="sr__header__title__subtitle__group" ng-show="self.theirNeed.get('group')">
+                        <img src="generated/icon-sprite.svg#ico36_group" class="sr__header__title__subtitle__group__icon">{{self.theirNeed.get('group')}}<span class="sr__header__title__subtitle__group__dash"> &ndash; </span>
                     </span>
-                    <span class="sr__header__title__subtitle__type">{{self.labels.type[self.item.type]}}</span>
+                    <span class="sr__header__title__subtitle__type">{{self.labels.type[self.theirNeed.get('basicNeedType')]}}</span>
                 </div>
             </div>
         </div>
         <div class="sr__content">
-            <div class="sr__content__images" ng-show="self.item.images">
-                <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.item.images" class="vertical"></won-extended-gallery>
+            <div class="sr__content__images" ng-show="self.theirNeed.get('images')">
+                <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.theirNeed.get('images')" class="vertical"></won-extended-gallery>
             </div>
             <div class="sr__content__description">
                 <div class="sr__content__description__location">
@@ -51,8 +53,8 @@ function genComponentConf() {
         <div class="sr__footer">
             <input type="text" ng-model="self.message" placeholder="Reply Message (optional)"/>
             <div class="flexbuttons">
-                <button class="won-button--filled black" ng-click="self.closeOverlay()">Cancel</button>
-                <button class="won-button--filled red" ng-click="self.sendRequest(self.message)">Request Contact</button>
+                <button class="won-button--filled black" ui-sref="overviewMatches({connectionUri: null})">Cancel</button>
+                <button class="won-button--filled red" ng-click="self.sendRequest(self.message)" ui-sref="overviewMatches({connectionUri: null})">Request Contact</button>
             </div>
         </div>
     `;
@@ -63,18 +65,23 @@ function genComponentConf() {
             this.maxThumbnails = 9;
             this.labels = labels;
             this.message = '';
+            window.openMatch4dbg = this;
 
-            const disconnect = this.$ngRedux.connect(null, actionCreators)(this);
+            const selectFromState = (state) => {
+                const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
+
+                return {
+                    connectionUri: connectionUri,
+                    connection: state.getIn(['connections', connectionUri]),
+                    theirNeed: state.getIn(['needs','theirNeeds', state.getIn(['connections', connectionUri, 'hasRemoteNeed'])])
+                }
+            };
+            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
         }
 
         sendRequest(message) {
-            this.connections__connect(this.item,message);
-            this.item = undefined;
-        }
-
-        closeOverlay(){
-            this.item = undefined;
+            this.connections__connect(this.connectionUri, message);
         }
     }
     Controller.$inject = serviceDependencies;
@@ -84,7 +91,7 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {item: "="},
+        scope: {},
         template: template
     }
 }

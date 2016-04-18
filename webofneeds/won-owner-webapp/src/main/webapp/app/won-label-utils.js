@@ -57,7 +57,7 @@ export function relativeTime(now, previous) {
  * in accordance with the maximum granularity of our relative timestamps.
  *
  * @param $scope {object} the $scope injected into your controller
- * @param $interval {object} the $intervall injected into your controller
+ * @param $interval {object} the $interval injected into your controller
  * @param creationDate {Date} the time stamp used as baseline of the relative timestamps
  * @param callback {function} it gets a string with a human readable, relative timestamp that you can
  *                            directly bind to your controller or scope in this callback.

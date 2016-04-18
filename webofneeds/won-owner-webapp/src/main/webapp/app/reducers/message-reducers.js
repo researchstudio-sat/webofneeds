@@ -34,6 +34,11 @@ export function messagesReducer(messages = initialState, action = {}) {
         case actionTypes.drafts.publishSuccessful:
             return messages.removeIn(['waitingForAnswer', action.payload.publishEventUri]);
 
+        case actionTypes.messages.chatMessge.failure:
+        case actionTypes.messages.chatMessge.success:
+            return messages.removeIn(['waitingForAnswer', action.payload.eventUri]);
+
+
         case actionTypes.messages.waitingForAnswer:
             const pendingEventUri = action.payload.eventUri;
             const msg = messages.getIn(['enqueued', pendingEventUri]);
@@ -41,6 +46,7 @@ export function messagesReducer(messages = initialState, action = {}) {
                 .removeIn(['enqueued', pendingEventUri])
                 .setIn(['waitingForAnswer', pendingEventUri], msg);
 
+        case actionTypes.connections.sendChatMessage:
         case actionTypes.messages.send:
             return messages.setIn(
                 ['enqueued', action.payload.eventUri],

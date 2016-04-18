@@ -31,8 +31,9 @@ import won.protocol.model.FacetType;
 import java.net.URI;
 
 /**
- * Bot that creates a new 'Re:' need for each need that is created in the system and connects. When a connection is established,
- * all messages are just echoed.
+ * Bot that reacts to each new need that is created in the system by creating two needs, it sends a connect message from
+ * one of these needs, and a hint message for original need offering match to another of these needs. Additionally,
+ * it reacts to certain commands send via text messages on the connections with the created by the bot needs.
  */
 public class DebugBot extends EventBot
 {

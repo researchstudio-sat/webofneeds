@@ -159,7 +159,7 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
             getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
           }
         };
-      EventBotActionUtils.makeAndSubscribeResponseListener(needURI,
+      EventBotActionUtils.makeAndSubscribeResponseListener(
         createNeedMessage, successCallback, failureCallback, getEventListenerContext());
 
       logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());

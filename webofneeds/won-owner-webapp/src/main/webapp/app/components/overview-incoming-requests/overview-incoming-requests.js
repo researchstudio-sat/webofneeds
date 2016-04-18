@@ -19,9 +19,11 @@ class IncomingRequestsController {
 
         const selectFromState = (state)=>{
             const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
+            const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
 
             if(state.getIn(['router', 'currentParams', 'myUri']) === undefined) {
                 return {
+                    connection: state.getIn(['connections', connectionUri]),
                     incomingRequests: Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
                         .filter(conn=>
@@ -38,6 +40,7 @@ class IncomingRequestsController {
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
                 return {
                     post: state.getIn(['needs','ownNeeds', postId]).toJS(),
+                    connection: state.getIn(['connections', connectionUri]),
                     incomingRequests: Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
                         .filter(conn=>

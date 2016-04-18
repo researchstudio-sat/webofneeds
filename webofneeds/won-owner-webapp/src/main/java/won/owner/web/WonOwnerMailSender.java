@@ -31,8 +31,8 @@ public class WonOwnerMailSender {
   private static final String NOTIFICATION_END = "\n\n\n" +
     "Sincerely yours,\nOwner application team" +
     "\n\n\n\n" +
-    "You have received this email because you are subscribed to getting Match" +
-    " notifications for your posting. If you received this email in error please click on the link below." +
+    "You have received this email because you are subscribed to getting " +
+    "notifications for your posting. If you received this email in error please click on the link below." +
     "\n" +
     "\n\n" +
     "This is an automatic email, please do not reply." ;
@@ -42,10 +42,10 @@ public class WonOwnerMailSender {
     " Hi there," +
     "</p>";
   private static final String NOTIFICATION_END_HTML =
-    "<br/><br/>" +
+    "<br/>" +
     "<p>" +
     " <span>Best Wishes,</span>" +
-    " </br>" +
+    " <br/>" +
     " <span>Owner application team</span>" +
     "</p>";
 
@@ -203,13 +203,13 @@ public class WonOwnerMailSender {
     String body =
     "<div>" +
       NOTIFICATION_START_HTML +
-      "<p>The person behind '<a href=\"" + linkRemoteNeed + "\">" + remoteNeedTitle + "</a>" +
-      "   ' has send <a href=\"" + linkLocalNeed + "\">you</a> a message. They wrote:" +
+      "<p>The person behind '<a href=\"" + linkRemoteNeed + "\">" + remoteNeedTitle + "</a>'" +
+      "   has send <a href=\"" + linkLocalNeed + "\">you</a> a message. They wrote:" +
       "</p>" +
       "<p style=\"border-left:thick solid #808080;\">" +
       "   <span style=\"margin-left:5px;color:#808080;\">" + textMsg + "</span>" +
       "</p>" +
-      "<a href=\"" + linkConnection + "\">[Click here to answer them]</a>" +
+      "<p><a href=\"" + linkConnection + "\">[Click here to answer them]</a></p>" +
       NOTIFICATION_END_HTML +
     "</div>";
 
@@ -245,10 +245,10 @@ public class WonOwnerMailSender {
     String body =
       "<div>" +
         NOTIFICATION_START_HTML +
-        "<p>The person behind '<a href=\"" + linkRemoteNeed + "\">" + remoteNeedTitle + "</a>" +
-        "   ' wants to contact <a href=\"" + linkLocalNeed + "\">you</a>. " +
+        "<p>The person behind '<a href=\"" + linkRemoteNeed + "\">" + remoteNeedTitle + "</a>'" +
+        "   wants to contact <a href=\"" + linkLocalNeed + "\">you</a>. " +
         theyWrote +
-        "<a href=\"" + linkConnection + "\">[Click here to pick up the conversation]</a>" +
+        "<p><a href=\"" + linkConnection + "\">[Click here to pick up the conversation]</a></p>" +
         NOTIFICATION_END_HTML +
       "</div>";
 
@@ -273,10 +273,10 @@ public class WonOwnerMailSender {
     String body =
       "<div>" +
         NOTIFICATION_START_HTML +
-        "<p>The post '<a href=\"" + linkRemoteNeed + "\">" + remoteNeedTitle + "</a>" +
+        "<p>The post '<a href=\"" + linkRemoteNeed + "\">" + remoteNeedTitle + "</a>'" +
         "   might be interesting for <a href=\"" + linkLocalNeed + "\">you</a>. " +
         "</p>" +
-        "<a href=\"" + linkConnection + "\">[Click here to request a conversation]</a>" +
+        "<p><a href=\"" + linkConnection + "\">[Click here to request a conversation]</a></p>" +
         NOTIFICATION_END_HTML +
         "</div>";
 

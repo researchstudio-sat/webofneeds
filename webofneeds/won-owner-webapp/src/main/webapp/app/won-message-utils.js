@@ -7,6 +7,8 @@ import {
     getRandomPosInt,
     checkHttpStatus,
     mapJoin,
+    urisToLookupMap,
+    flattenObj,
 } from './utils';
 import won from './won-es6';
 
@@ -243,8 +245,6 @@ export function isSuccessMessage(event) {
 }
 
 export function getEventsFromMessage(msgJson) {
-    console.log('getting data from jsonld message');
-
     const eventData = {};
     //call handler if there is one - it may modify the event object
     //frame the incoming jsonld to get the data that interest us
@@ -290,7 +290,6 @@ export function getEventsFromMessage(msgJson) {
 
     const simplifiedEvents = maybeFramedMsgs.then(framedMessages =>
         mapJoin(framedMessages, framedMessage => {
-            console.log(framedMessages);//TODO deletme. to prevent it from being optimized away.
             const framedSimplifiedMessage = Object.assign(
                 { '@context': framedMessage['@context'] }, //keep context
                 framedMessage['@graph'][0] //use first node - the graph should only consist of one node at this point
@@ -313,49 +312,56 @@ export function getEventsFromMessage(msgJson) {
 window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
 export function fetchAllAccessibleAndRelevantData(ownNeedUris) {
 
-    window.urisToLookupMap4dbg = urisToLookupMap;
-    const allOwnNeedsPromise = urisToLookupMap(ownNeedUris,
-        won.getNeedWithConnectionUris);
-
-    const allConnectionUrisPromise =
-        Promise.all(ownNeedUris.map(won.getconnectionUrisOfNeed))
-            .then(connectionUrisPerNeed =>
-                flatten(connectionUrisPerNeed));
-
-    const allConnectionsPromise = allConnectionUrisPromise
-        .then(connectionUris =>
-            urisToLookupMap(connectionUris, won.getConnection));
-
-    const allEventsPromise = allConnectionUrisPromise
-        .then(connectionUris =>
-            urisToLookupMap(connectionUris, connectionUri =>
-                    won.getConnection(connectionUri)
-                        .then(connection =>
-                            won.getEventsOfConnection(connectionUri,connection.belongsToNeed)
-                    )
-            )
-    ).then(eventsOfConnections =>
-            //eventsPerConnection[connectionUri][eventUri]
-            flattenObj(eventsOfConnections)
+    const allLoadedPromise = Promise.all(
+        ownNeedUris.map(uri => won.ensureLoaded(uri, uri, deep = true))
     );
 
-    const allTheirNeedsPromise =
-        allConnectionsPromise.then(connections => {
-            const theirNeedUris = [];
-            for(const [connectionUri, connection] of entries(connections)) {
-                theirNeedUris.push(connection.hasRemoteNeed);
-            }
-            return theirNeedUris;
-        })
-            .then(theirNeedUris =>
-                urisToLookupMap(theirNeedUris, won.getNeed));
+    const allDataRawPromise = allLoadedPromise.then(() => {
+        const allOwnNeedsPromise = urisToLookupMap(ownNeedUris,
+            won.getNeedWithConnectionUris);
 
-    return Promise.all([
-        allOwnNeedsPromise,
-        allConnectionsPromise,
-        allEventsPromise,
-        allTheirNeedsPromise
-    ]).then(([
+        const allConnectionUrisPromise =
+            Promise.all(ownNeedUris.map(won.getconnectionUrisOfNeed))
+                .then(connectionUrisPerNeed =>
+                    flatten(connectionUrisPerNeed));
+
+        const allConnectionsPromise = allConnectionUrisPromise
+            .then(connectionUris =>
+                urisToLookupMap(connectionUris, won.getConnection));
+
+        const allEventsPromise = allConnectionUrisPromise
+            .then(connectionUris =>
+                urisToLookupMap(connectionUris, connectionUri =>
+                        won.getConnection(connectionUri)
+                            .then(connection =>
+                                won.getEventsOfConnection(connectionUri,connection.belongsToNeed)
+                        )
+                )
+        ).then(eventsOfConnections =>
+                //eventsPerConnection[connectionUri][eventUri]
+                flattenObj(eventsOfConnections)
+        );
+
+        const allTheirNeedsPromise =
+            allConnectionsPromise.then(connections => {
+                const theirNeedUris = [];
+                for(const [connectionUri, connection] of entries(connections)) {
+                    theirNeedUris.push(connection.hasRemoteNeed);
+                }
+                return theirNeedUris;
+            })
+                .then(theirNeedUris =>
+                    urisToLookupMap(theirNeedUris, won.getNeed));
+
+        return Promise.all([
+            allOwnNeedsPromise,
+            allConnectionsPromise,
+            allEventsPromise,
+            allTheirNeedsPromise
+        ]);
+    });
+
+    return allDataRawPromise.then(([
             allOwnNeeds,
             allConnections,
             allEvents,

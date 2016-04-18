@@ -25,7 +25,6 @@ public class KeyStoreService
   // therefore temporarily we can use 'PKCS12':
   //private static final String KEY_STORE_TYPE = "PKCS12";
 
-  // ToDo: password should really not be here! (FS)
   private String storePW;
 
   private File storeFile;
