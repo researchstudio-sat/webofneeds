@@ -434,7 +434,12 @@ const rdfstore = window.rdfstore;
         if (connectionUri != null) {
             cacheItemMarkDirty(connectionUri);
         }
-        return Promise.resolve(true); //return a promise for chaining
+        return won.getNode(connectionUri)
+            .then(connection => {
+                if(connection.hasEventContainer) {
+                    cacheItemMarkDirty(connection.hasEventContainer);
+                }
+            });
     }
     won.invalidateCacheForNeed = function(needUri){
         if (needUri != null) {
@@ -482,6 +487,7 @@ const rdfstore = window.rdfstore;
 
 
     /**
+     * @deprecated doesn't really return a promise. use buildRejectionMessage instead.
      * Checks the query results (success, data) as returned by store.execute or store.node
      * and assuming that we are inside a deferred execution, calls q.reject if the
      * query failed.
@@ -492,7 +498,20 @@ const rdfstore = window.rdfstore;
      * * message: string - if set, the message is prepended to the generic error message (with 1 whitespace in between)
      */
     var rejectIfFailed = function(success, data, options){
-        var errorMessage = null;
+        const rejectionMessage = buildRejectionMessage(success, data, options);
+        if(rejectionMessage) {
+            // observation: the error happens for #hasRemoteConnection property of suggested connection, but this
+            // property is really not there (and should not be), so in that case it's not an error...
+            console.log(rejectionMessage);
+            // TODO: this q.reject seems to have no effect
+            q.reject(rejectionMessage)
+            return true;
+        }
+        return false;
+    }
+
+    function buildRejectionMessage (success, data, options) {
+        let errorMessage = null;
         if (typeof options === 'undefined' || options == null) {
             options = {};
         }
@@ -501,20 +520,25 @@ const rdfstore = window.rdfstore;
         }
         if (!success){
             errorMessage = "Query failed: " + data;
-        } else if (typeof options.allowNone !== undefined  && options.allowNone == false && data.length == 0){
-            errorMessage = "No results found.";
-        } else if (typeof options.allowMultiple !== undefined  && options.allowMultiple == false && data.length > 1){
-            errorMessage = "More than one result found.";
+        } else if (
+            typeof options.allowNone !== undefined
+            && options.allowNone == false
+            && data.length == 0){
+                errorMessage = "No results found.";
+        } else if (
+            typeof options.allowMultiple !== undefined
+            && options.allowMultiple == false
+            && data.length > 1){
+                errorMessage = "More than one result found.";
         }
-        if (errorMessage != null) {
+        if (errorMessage === null) {
+            return '';
+        } else {
             // observation: the error happens for #hasRemoteConnection property of suggested connection, but this
             // property is really not there (and should not be), so in that case it's not an error...
-            console.log(options.message + " " + errorMessage);
-            // TODO: this q.reject seems to have no effect
-            q.reject(options.message + " " + errorMessage);
-            return true;
+            console.error(options.message + " " + errorMessage);
+            return options.message + " " + errorMessage;
         }
-        return false;
     }
 
 
@@ -528,7 +552,7 @@ const rdfstore = window.rdfstore;
             //privateData.store.load("application/ld+json", data, function (success, results) {
             console.log("linkeddata-service-won.js: added jsonld data to rdf store, success: " + success);
             if (success) {
-                cacheItemMarkAccessed(uri);
+                cacheItemInsertOrOverwrite(uri);
             }
         });
     }
@@ -746,7 +770,8 @@ const rdfstore = window.rdfstore;
                     credentials: "same-origin",
                     headers: { 'Accept': 'application/ld+json' }
                 })
-            .then(dataset => dataset.json())
+            .then(dataset =>
+                dataset.json())
             .then(
                 dataset => {
                     //make sure we've got a non-empty dataset
@@ -754,12 +779,17 @@ const rdfstore = window.rdfstore;
                         reject("failed to load " + uri);
                     } else {
                         console.log("linkeddata-service-won.js: fetched:         " + uri)
-                        won.addJsonLdData(uri, dataset);
-                        resolve(dataset);
+                        Promise.resolve()
+                            .then(() =>
+                                won.deleteNode(uri)) //remove any remaining stale data
+                            .then(() =>
+                                won.addJsonLdData(uri, dataset))
+                            .then(() =>
+                                resolve(dataset));
                     }
                   },
                 e =>  reject(`failed to load ${uri} due to reason ${e}`)
-            );
+            )
         });
     };
 
@@ -1552,19 +1582,25 @@ const rdfstore = window.rdfstore;
             throw {message : "deleteNode: uri must not be null"};
         }
         console.log("linkeddata-service-won.js: deleting node:   " + uri);
-        var deferred = q.defer();
-        var query = "delete where {<"+uri+"> ?anyP ?anyO}";
+        const query = "delete where {<"+uri+"> ?anyP ?anyO}";
         //var query = "select ?anyO where {<"+uri+"> ?anyP ?anyO}";
-        privateData.store.execute(query, function (success, graph) {
-            if (rejectIfFailed(success, graph, {message: "Error deleting node with URI " + uri + "."})) {
-                return;
-            } else {
-                cacheItemRemove(uri);
-                deferred.resolve();
-            }
+        return new Promise((resolve, reject) => {
+            privateData.store.execute(query, function (success, graph) {
+                const rejMsg = buildRejectionMessage(
+                    success,
+                    graph, {
+                        message: "Error deleting node with URI " + uri + "."
+                    }
+                );
+                if (rejMsg) {
+                    reject(rejMsg);
+                } else {
+                    cacheItemRemove(uri);
+                    resolve();
+                }
+            });
         });
-        return deferred.promise;
-    }
+    };
     
     won.getConnectionWithOwnAndRemoteNeed= function(ownNeedUri,remoteNeedUri){
         return won.getconnectionUrisOfNeed(ownNeedUri).then(connectionUris=>{

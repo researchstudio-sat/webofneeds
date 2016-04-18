@@ -82,6 +82,10 @@ function genComponentConf() {
 
             this.labels = labels;
 
+            /*
+            * TODO there's tick events now. use state.get('lastUpdateTime')
+            * to calculate relative timestamps
+            */
             updateRelativeTimestamps(
                 this.$scope,
                 this.$interval,

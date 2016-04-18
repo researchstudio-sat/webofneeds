@@ -34,10 +34,25 @@ export default function(connections = initialState, action = {}) {
                 )
             }
 
+        case actionTypes.messages.connect.success:
+            var eventUri = action.payload.uri;
+            var connectionUri = action.payload.hasReceiver;
+            return connections
+                .setIn([connectionUri, 'hasConnectionState'], won.WON.RequestSent)
+                .updateIn([connectionUri, 'hasEvents'], events => events.add(eventUri));
+
         case actionTypes.messages.close.success:
-            const deniedEvent = action.payload;
-            const deniedConnectionUri = deniedEvent.hasReceiver;
-            return connections.setIn([deniedConnectionUri, 'hasConnectionState'], won.WON.Closed);
+            var eventUri = action.payload.uri;
+            var connectionUri = action.payload.hasReceiver;
+            return connections
+                .setIn([connectionUri, 'hasConnectionState'], won.WON.Closed)
+                .updateIn([connectionUri, 'hasEvents'], events => events.add(eventUri));
+
+        case actionTypes.connections.sendChatMessage:
+            var eventUri = action.payload.eventUri;
+            var connectionUri = action.payload.optimisticEvent.hasSender;
+            return connections
+                .updateIn([connectionUri, 'hasEvents'], events => events.add(eventUri));
 
         case actionTypes.connections.load:
             return action.payload.reduce(
@@ -45,6 +60,13 @@ export default function(connections = initialState, action = {}) {
                     storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
                 connections);
 
+        case actionTypes.messages.chatMessage.failure:
+            return state.updateIn(
+                ['connections', action.payload.connectionUri, 'hasEvents'],
+                eventUris => eventUris.remove(action.payload.eventUri)
+            );
+
+        case actionTypes.messages.connectionMessageReceived:
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
             return storeConnectionAndRelatedData(connections, action.payload);
@@ -60,11 +82,12 @@ function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
     console.log("STORING CONNECTION AND RELATED DATA");
     console.log(connectionWithRelatedData);
 
+    //make sure we have a set of events (as opposed to a list with redundancies)
+    const events = Immutable.Set(connectionWithRelatedData.connection.hasEvents)
     const connection = Immutable
         .fromJS(connectionWithRelatedData.connection)
-        //make sure we have a set of events (as opposed to a list with redundancies)
-        .set('hasEvents', Immutable.Set(connectionWithRelatedData.connection.hasEvents));
+        .set('hasEvents', events);
 
     return state
-        .setIn([connection.get('uri')], connection)
+        .mergeDeepIn([connection.get('uri')], connection);
 }

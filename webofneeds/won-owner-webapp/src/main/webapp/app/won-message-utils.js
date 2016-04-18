@@ -245,8 +245,6 @@ export function isSuccessMessage(event) {
 }
 
 export function getEventsFromMessage(msgJson) {
-    console.log('getting data from jsonld message');
-
     const eventData = {};
     //call handler if there is one - it may modify the event object
     //frame the incoming jsonld to get the data that interest us
@@ -292,7 +290,6 @@ export function getEventsFromMessage(msgJson) {
 
     const simplifiedEvents = maybeFramedMsgs.then(framedMessages =>
         mapJoin(framedMessages, framedMessage => {
-            console.log(framedMessages);//TODO deletme. to prevent it from being optimized away.
             const framedSimplifiedMessage = Object.assign(
                 { '@context': framedMessage['@context'] }, //keep context
                 framedMessage['@graph'][0] //use first node - the graph should only consist of one node at this point
