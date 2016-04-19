@@ -72,6 +72,7 @@ if ! docker -H satcluster02:2375 run --name=nginx_ma -v $base_folder/won-server-
 fi
 
 # run the script to start webofneeds containers on host satcluster01
+docker_options="-H satcluster01:2375"
 public_node_uri=www.matchat.org
 behind_proxy=true
 . $WORKSPACE/webofneeds/won-docker/deploy_master_run.sh

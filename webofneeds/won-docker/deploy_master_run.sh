@@ -9,8 +9,10 @@ set -e
 deploy_host=satcluster01.researchstudio.at
 
 # docker options to execute docker commands with
-# docker_options=
-docker_options="-H ${deploy_host}:2375"
+# docker_options="-H satcluster01.researchstudio.at:2375"
+if [ -z "$docker_options" ]; then
+  docker_options=
+fi
 
 # set this to true if using a reverse proxy server that takes care of client certificate authentication
 # behind_proxy=true
