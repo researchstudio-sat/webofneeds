@@ -41,12 +41,36 @@ export default function(state = initialState, action = {}) {
             return storeOptimisticEvent(state, action.payload.optimisticEvent);
 
         case actionTypes.messages.chatMessage.failure:
-            return state.removeIn(['events', action.payload.eventUri]);
+            //var eventOnRemoteNode = action.payload.events['msg:FromOwner'];
+            //var eventOnOwnNode = action.payload.events['msg:FromExternal'];
+            //var connectionUri = msgFromOwner.hasReceiver;
+            var msgFromOwner = action.payload.events['msg:FromSystem'];
+            var eventUri = msgFromOwner.isRemoteResponseTo || msgFromOwner.isResponseTo;
+            return state.removeIn(['events', eventUri]);
 
-        case actionTypes.messages.chatMessage.success:
-            var updatedEvents = Immutable.fromJS(action.payload.events);
-            return state.removeIn(['events', action.payload.eventUri, 'unconfirmed'])
-                .mergeDeepIn(['events'], updatedEvents);
+        case actionTypes.messages.chatMessage.successOwn:
+            var msgFromOwner = Immutable.fromJS(action.payload.events['msg:FromSystem']);
+            var eventUri = msgFromOwner.get('isResponseTo');
+            return state
+                .setIn(['events', msgFromOwner.get('uri')], msgFromOwner)
+                .updateIn(['events', eventUri], e =>
+                    // This is a good-enough solution. We assume the republishing done
+                    // by the owner happens at the same time that it sends us
+                    // the success-response -- so we just use the latters timestamp
+                    // with the optimistic event created previously.
+                    e.set('hasSentTimestamp', msgFromOwner.get('hasReceivedTimestamp'))
+                     .set('hasReceivedTimestamp', msgFromOwner.get('hasReceivedTimestamp'))
+                )
+
+        case actionTypes.messages.chatMessage.successRemote:
+            //var eventOnRemoteNode = Immutable.fromJS(action.payload.events['msg:FromOwner']);
+            var eventOnOwnNode = Immutable.fromJS(action.payload.events['msg:FromExternal']);
+            var msgFromOwner = Immutable.fromJS(action.payload.events['msg:FromSystem']);
+            var eventUri = msgFromOwner.get('isRemoteResponseTo');
+            return state
+                .setIn(['events', msgFromOwner.get('uri')], msgFromOwner)
+                .setIn(['events', eventOnOwnNode.get('uri')], eventOnOwnNode)
+                .setIn(['events', eventUri, 'unconfirmed'], false);
 
 
         case actionTypes.messages.connectionMessageReceived:

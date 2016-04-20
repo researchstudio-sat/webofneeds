@@ -65,37 +65,6 @@ export function failedCloseNeed(event) {
     }
 }
 
-export function successfulChatMessage({eventUri, connectionUri}) {
-    return (dispatch, getState) => {
-        // invalidate cache
-        const requesterId = getState().getIn(['connections', connectionUri, 'belongsToNeed']);
-        console.log('successfulChatMessage: ', eventUri, connectionUri);
-        won.invalidateCacheForNewMessage(connectionUri)
-        .then(() =>
-            Promise.all([
-                won.getConnection(connectionUri, requesterId),
-                won.getEventsOfConnection(connectionUri, requesterId)
-            ])
-        ).then( ([connection, events]) => {
-            console.log('successfulChatMessage: ', connection, events);
-
-            dispatch({
-                type: actionTypes.messages.chatMessage.success,
-                payload: {
-                    eventUri,
-                    events,
-                    connectionUri,
-                    connection,
-                }
-            })
-        });
-        // reload connection
-        // dispatch event as it's seen by the owner
-
-    }
-}
-
-
         /*
          hasReceiverNeed: "https://192.168.124.53:8443/won/resource/need/1741189480636743700"
          hasSenderNeed: "https://192.168.124.53:8443/won/resource/need/1741189480636743700"

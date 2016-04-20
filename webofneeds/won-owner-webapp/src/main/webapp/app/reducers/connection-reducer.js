@@ -35,18 +35,14 @@ export default function(connections = initialState, action = {}) {
             }
 
         case actionTypes.messages.connect.success:
-            var eventUri = action.payload.uri;
             var connectionUri = action.payload.hasReceiver;
-            return connections
+            return storeEventUris(connections, connectionUri, [action.payload.uri])
                 .setIn([connectionUri, 'hasConnectionState'], won.WON.RequestSent)
-                .updateIn([connectionUri, 'hasEvents'], events => events.add(eventUri));
 
         case actionTypes.messages.close.success:
-            var eventUri = action.payload.uri;
             var connectionUri = action.payload.hasReceiver;
-            return connections
-                .setIn([connectionUri, 'hasConnectionState'], won.WON.Closed)
-                .updateIn([connectionUri, 'hasEvents'], events => events.add(eventUri));
+            return storeEventUris(connections, connectionUri, [action.payload.uri])
+                .setIn([connectionUri, 'hasConnectionState'], won.WON.Closed);
 
         case actionTypes.connections.sendChatMessage:
             var eventUri = action.payload.eventUri;
@@ -66,10 +62,20 @@ export default function(connections = initialState, action = {}) {
                 eventUris => eventUris.remove(action.payload.eventUri)
             );
 
-        case actionTypes.messages.chatMessage.success:
-            var updatedConnection = Immutable.fromJS(action.payload.connection);
-            var connectionUri = updatedConnection.get('uri');
-            return state.mergeDeepIn([connectionUri], updatedConnection);
+        case actionTypes.messages.chatMessage.successOwn:
+            var msgFromOwner = action.payload.events['msg:FromSystem'];
+            var connectionUri = msgFromOwner.hasReceiver;
+            return storeEventUris(connections, connectionUri, [msgFromOwner.uri]);
+
+        case actionTypes.messages.chatMessage.successRemote:
+            var eventOnOwnNode = action.payload.events['msg:FromExternal'];
+            var msgFromOwner = action.payload.events['msg:FromSystem'];
+            var connectionUri = msgFromOwner.hasReceiver;
+            return storeEventUris(
+                connections,
+                connectionUri,
+                [msgFromOwner.uri, eventOnOwnNode.uri]
+            );
 
         case actionTypes.messages.connectionMessageReceived:
         case actionTypes.messages.connectMessageReceived:
@@ -83,6 +89,15 @@ export default function(connections = initialState, action = {}) {
             return connections;
     }
 }
+
+function storeEventUris(connections, connectionUri, eventUris) {
+    return connections.updateIn(
+        [connectionUri, 'hasEvents'],
+        events => events.merge(eventUris)
+    );
+}
+
+
 function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
     console.log("STORING CONNECTION AND RELATED DATA");
     console.log(connectionWithRelatedData);
