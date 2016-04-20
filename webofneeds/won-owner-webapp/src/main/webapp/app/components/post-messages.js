@@ -40,8 +40,19 @@ function genComponentConf() {
                         ng-show="message.hasSenderNeed != self.connectionData.getIn(['ownNeed', 'uri'])">
                     </won-square-image>
                     <div class="pm__content__message__content">
-                        <div class="pm__content__message__content__text">{{ message.hasTextMessage }}{{ message.unconfirmed }}</div>
-                        <div class="pm__content__message__content__time">{{ message.humanReadableTimestamp }}</div>
+                        <div class="pm__content__message__content__text">
+                            {{ message.hasTextMessage }}
+                        </div>
+                        <div
+                            ng-show="message.unconfirmed"
+                            class="pm__content__message__content__time">
+                                Pending‥
+                        </div>
+                        <div
+                            ng-hide="message.unconfirmed"
+                            class="pm__content__message__content__time">
+                                {{ message.humanReadableTimestamp }}
+                        </div>
                     </div>
             </div>
         </div>
