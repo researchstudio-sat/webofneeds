@@ -178,8 +178,8 @@ export function connectionsRate(connectionUri,rating) {
         let messageData = null;
         let deferred = Q.defer();
         won.getConnection(eventData.connection.uri).then(connection=> {
-            let msgToOpenFor = {event: eventData, connection: connection};
-            buildRateMessage(msgToOpenFor, rating).then(messageData=> {
+            let msgToRateFor = {event: eventData, connection: connection};
+            buildRateMessage(msgToRateFor, rating).then(messageData=> {
                 deferred.resolve(messageData);
             })
         });
