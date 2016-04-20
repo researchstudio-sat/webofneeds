@@ -67,6 +67,7 @@ function genComponentConf() {
                 const connectionUri = selectOpenConnectionUri(state);
                 const chatMessages = selectChatMessages(state);
                 return {
+                    lastUpdateTime: state.get('lastUpdateTime'),
                     connectionData: selectAllByConnections(state).get(connectionUri),
                     chatMessages: chatMessages && chatMessages.toJS(), //toJS needed as ng-repeat won't work otherwise :|
                     state4dbg: state,

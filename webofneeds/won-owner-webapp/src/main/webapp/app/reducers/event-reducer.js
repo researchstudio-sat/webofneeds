@@ -38,11 +38,16 @@ export default function(state = initialState, action = {}) {
 
         case actionTypes.connections.sendChatMessage:
             var eventUri = action.payload.eventUri;
-            var event = action.payload.optimisticEvent;
-            return state.setIn(['events', eventUri], Immutable.fromJS(event));
+            return storeOptimisticEvent(state, action.payload.optimisticEvent);
 
         case actionTypes.messages.chatMessage.failure:
             return state.removeIn(['events', action.payload.eventUri]);
+
+        case actionTypes.messages.chatMessage.success:
+            var updatedEvents = Immutable.fromJS(action.payload.events);
+            return state.removeIn(['events', action.payload.eventUri, 'unconfirmed'])
+                .mergeDeepIn(['events'], updatedEvents);
+
 
         case actionTypes.messages.connectionMessageReceived:
         case actionTypes.messages.connectMessageReceived:
@@ -58,19 +63,18 @@ export default function(state = initialState, action = {}) {
             return state;
     }
 }
+
+function storeOptimisticEvent(state, event) {
+    var optimisticEvent = Immutable
+        .fromJS(event)
+        .set('unconfirmed', true);
+    return state.setIn(['events', event.uri], optimisticEvent);
+}
+
 function storeConnectionRelatedData(state, connectionWithRelatedData) {
-    console.log("EVENT-REDUCER STORING CONNECTION AND RELATED DATA");
-    console.log(connectionWithRelatedData);
-    //TODO replace with simple call mergeDeepIn to guarantee that the state is always a super-set of the rdf-store
-    return connectionWithRelatedData.events.reduce(
-
-        (updatedState, event) =>
-            updatedState.getIn(['events', event.uri]) ?
-                updatedState : // we already know this one. no need to trigger re-rendering
-                updatedState.setIn(['events', event.uri], Immutable.fromJS(event)) // add the event
-
-        , state // start with the original state
-    );
+    const keyValuePairs = connectionWithRelatedData.events.map(e => [e.uri, Immutable.fromJS(e)]);
+    const updatedEvents = Immutable.Map(keyValuePairs);
+    return state.mergeDeepIn(['events'], updatedEvents);
 }
 
 var createOrUpdateUnreadEntry = function(needURI, eventData, unreadEntry){

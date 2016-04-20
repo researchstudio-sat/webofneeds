@@ -61,10 +61,15 @@ export default function(connections = initialState, action = {}) {
                 connections);
 
         case actionTypes.messages.chatMessage.failure:
-            return state.updateIn(
-                ['connections', action.payload.connectionUri, 'hasEvents'],
+            return connections.updateIn(
+                [action.payload.connectionUri, 'hasEvents'],
                 eventUris => eventUris.remove(action.payload.eventUri)
             );
+
+        case actionTypes.messages.chatMessage.success:
+            var updatedConnection = Immutable.fromJS(action.payload.connection);
+            var connectionUri = updatedConnection.get('uri');
+            return state.mergeDeepIn([connectionUri], updatedConnection);
 
         case actionTypes.messages.connectionMessageReceived:
         case actionTypes.messages.connectMessageReceived:
