@@ -2,6 +2,7 @@ package won.cryptography.message;
 
 import com.hp.hpl.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +16,7 @@ import won.protocol.util.RdfUtils;
 import java.io.File;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.interfaces.ECPrivateKey;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,10 +52,13 @@ public class WonMessageSignerVerifierTest
   private PrivateKey nodeKey;
 
   @Before
-  public void init() {
+  public void init() throws Exception {
     //load public  keys:
+    Security.addProvider(new BouncyCastleProvider());
     File keysFile = new File(this.getClass().getResource(TestSigningUtils.KEYS_FILE).getFile());
     KeyStoreService storeService = new KeyStoreService(keysFile, "temp");
+    storeService.setDefaultAlias(TestSigningUtils.ownerCertUri);
+    storeService.init();
 
     pubKeysMap.put(TestSigningUtils.needCertUri, storeService.getCertificate(TestSigningUtils.needCertUri).getPublicKey());
     pubKeysMap.put(TestSigningUtils.ownerCertUri, storeService.getCertificate(TestSigningUtils.ownerCertUri).getPublicKey());

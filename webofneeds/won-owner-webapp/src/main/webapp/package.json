@@ -11,9 +11,11 @@
   "devDependencies": {
     "gulp": "^3.9.0",
     "gulp-autoprefixer": "^3.1.0",
+    "gulp-jspm": "^0.5.7",
     "gulp-minify-css": "^1.2.2",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^2.1.0",
+    "gulp-sourcemaps": "^1.6.0",
     "gulp-svg-sprite": "^1.2.16",
     "jspm": "^0.16.15",
     "jspm-bower-endpoint": "^0.3.2",
@@ -51,9 +53,9 @@
       "sockjs": "bower:sockjs@0.3.4"
     },
     "devDependencies": {
-      "babel": "npm:babel-core@5.1.13",
-      "babel-runtime": "npm:babel-runtime@5.1.13",
-      "core-js": "npm:core-js@0.9.4"
+      "babel": "npm:babel-core@^5.8.24",
+      "babel-runtime": "npm:babel-runtime@^5.8.24",
+      "core-js": "npm:core-js@^1.1.4"
     }
   }
 }

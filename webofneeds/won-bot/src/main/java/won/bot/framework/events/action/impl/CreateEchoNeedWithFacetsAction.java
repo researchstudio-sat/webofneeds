@@ -18,8 +18,6 @@ package won.bot.framework.events.action.impl;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.sparql.path.Path;
-import com.hp.hpl.jena.sparql.path.PathParser;
 import org.apache.commons.lang3.StringUtils;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.EventBotActionUtils;
@@ -32,7 +30,6 @@ import won.bot.framework.events.listener.EventListener;
 import won.protocol.message.WonMessage;
 import won.protocol.model.BasicNeedType;
 import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.NeedModelBuilder;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -63,9 +60,7 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction
         }
         final URI reactingToNeedUri = ((NeedCreatedEventForMatcher) event).getNeedURI();
         final Dataset needDataset = ((NeedCreatedEventForMatcher)event).getNeedData();
-        final NeedModelBuilder inBuilder = new NeedModelBuilder();
-        Path titlePath = PathParser.parse("won:hasContent/dc:title", DefaultPrefixUtils.getDefaultPrefixes());
-        String titleString = RdfUtils.getStringPropertyForPropertyPath(needDataset, reactingToNeedUri, titlePath);
+        String titleString = WonRdfUtils.NeedUtils.getNeedTitle(needDataset, reactingToNeedUri);
         if (titleString != null){
           replyText = titleString;
         } else {
@@ -116,7 +111,7 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction
             getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
           }
         };
-      EventBotActionUtils.makeAndSubscribeResponseListener(needURI,
+      EventBotActionUtils.makeAndSubscribeResponseListener(
         createNeedMessage, successCallback, failureCallback, getEventListenerContext());
 
       logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());

@@ -1,7 +1,7 @@
 <!-- TODO parametrize by selected tab -->
 <header>
     <won-topnav></won-topnav>
-    <won-owner-title-bar selection="self.selection" item="self.post"></won-owner-title-bar>
+    <won-owner-title-bar selection="self.selection"></won-owner-title-bar>
 </header>
 <main class="post-info">
     <div class="post-info__inner">
@@ -9,12 +9,12 @@
 
         <div class="post-info__inner__right">
             <h2 class="post-info__heading">Created</h2>
-            <p class="post-info__details">{{self.post.creationDate}}</p>
+            <p class="post-info__details">{{ self.post.get('creationDate') }}</p>
 
             <h2 class="post-info__heading">Description</h2>
-            <p class="post-info__details">{{self.post.description}}</p>
+            <p class="post-info__details">{{ self.post.get('description') }}</p>
             <h2 class="post-info__heading">Location</h2>
-            <p class="post-info__details">{{self.post.location}}</p>
+            <p class="post-info__details">{{ self.post.get('location') }}</p>
         </div>
     </div>
 </main>

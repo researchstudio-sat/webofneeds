@@ -10,6 +10,7 @@ import sendRequestModule from '../send-request';
 import { attach,mapToMatches} from '../../utils';
 import { labels } from '../../won-label-utils';
 import { actionCreators }  from '../../actions/actions';
+import { selectAllByConnections } from '../../selectors';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 class OverviewMatchesController {
@@ -22,44 +23,32 @@ class OverviewMatchesController {
         this.ownerSelection = 1; //ONLY NECESSARY FOR VIEW WITH NEED
         this.labels = labels;
 
-        this.viewType = 0;
+        const selectFromState = (state) => {
+            const allMatchesByConnections = selectAllByConnections(state)
+                    .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested);
 
-        const selectFromState = (state)=>{
-            if(state.getIn(['router', 'currentParams', 'myUri']) === undefined){
+            const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
+            const viewType = state.getIn(['router','currentParams','viewType']);
+
+            if(state.getIn(['router', 'currentParams', 'myUri']) === undefined) {
+                const matchesByConnectionUri = allMatchesByConnections.toList();
                 return {
-                    matches: Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.Suggested){
-                                return true
-                            }
-                        }),
-                    matchesOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.Suggested){
-                                return true
-                            }
-                        }))
+                    viewType: viewType,
+                    matches: matchesByConnectionUri.toArray(),
+                    connection: state.getIn(['connections', connectionUri]),
+                    matchesOfNeed: mapToMatches(matchesByConnectionUri.toJS()),//TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
                 };
-            }else{
+            } else {
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
+                const matchesByConnectionUri = allMatchesByConnections
+                    .filter(conn => conn.getIn(['ownNeed', 'uri']) === postId)
+                    .toList();
                 return {
-                    post: state.getIn(['needs','ownNeeds', postId]).toJS(),
-                    matches: Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === postId){
-                                return true
-                            }
-                        }),
-                    matchesOfNeed:mapToMatches(Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === postId){
-                                return true
-                            }
-                        }))
+                    viewType: viewType,
+                    post: state.getIn(['needs','ownNeeds', postId]),
+                    matches: matchesByConnectionUri.toArray(),
+                    connection: state.getIn(['connections', connectionUri]),
+                    matchesOfNeed:mapToMatches(matchesByConnectionUri.toJS())//TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
                 };
             }
         }

@@ -13,14 +13,16 @@ const serviceDependencies = ['$scope', '$interval', '$ngRedux', '$q'];
 
 class Controller {
     constructor() {
+        window.poc4dbg = this;
         attach(this, serviceDependencies, arguments);
 
         this.selection = 4;
 
         const selectFromState = (state) => {
             const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
+            const post = state.getIn(['needs','ownNeeds', postId]);
             return {
-                post: state.getIn(['needs','ownNeeds', postId]).toJS()
+                post: post
             }
         };
 
@@ -31,8 +33,8 @@ class Controller {
         updateRelativeTimestamps(
             this.$scope,
             this.$interval,
-            this.post.creationDate,
-                t => this.post.creationDate = t);
+            this.post.get('creationDate'),
+                t => this.post.set('creationDate', t));
     }
 }
 

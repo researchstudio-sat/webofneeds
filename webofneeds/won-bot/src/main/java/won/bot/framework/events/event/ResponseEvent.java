@@ -28,4 +28,10 @@ public interface ResponseEvent extends NeedSpecificEvent, ConnectionSpecificEven
    * @return
    */
   public URI getOriginalMessageURI();
+
+  /**
+   * Returns the URI of the remote message that caused the response.
+   * @return
+   */
+  public URI getRemoteResponseToMessageURI();
 }

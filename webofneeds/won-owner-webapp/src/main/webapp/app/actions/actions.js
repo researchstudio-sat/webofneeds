@@ -50,9 +50,10 @@ import {
     entries,
 } from '../utils';
 import { hierarchy2Creators } from './action-utils';
-import { getEventData,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
+import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import {
     buildCreateMessage,
+    buildCloseNeedMessage
 } from '../won-message-utils';
 
 // </utils>
@@ -65,20 +66,18 @@ import {
     accountRegister,
     accountVerifyLogin
 } from './account-actions';
-import {
-    messagesConnectMessageReceived,
-    messagesHintMessageReceived,
-    messagesMessageReceived,
-    messagesSuccessResponseMessageReceived
-} from './messages-actions';
+
 import {
     connectionsClose,
     connectionsConnect,
     connectionsFetch,
     connectionsLoad,
     connectionsOpen,
-    connectionsRate
+    connectionsRate,
+    connectionsChatMessage,
 } from './connections-actions';
+
+import * as messages from './messages-actions';
 
 import { loadAction, retrieveNeedUris, configInit, needsFetch } from './load-action';
 import { matchesLoad } from './matches-actions';
@@ -112,10 +111,10 @@ const actionHierarchy = {
         load: connectionsLoad,
         open: connectionsOpen,
         connect: connectionsConnect,
+        accepted: INJ_DEFAULT,
         close: connectionsClose,
         rate: connectionsRate,
-        sendOpen:INJ_DEFAULT,
-        add:INJ_DEFAULT,
+        sendChatMessage: connectionsChatMessage,
         reset:INJ_DEFAULT,
     },
     needs: {
@@ -123,6 +122,8 @@ const actionHierarchy = {
         received: INJ_DEFAULT,
         connectionsReceived:INJ_DEFAULT,
         clean:INJ_DEFAULT,
+        reopen: needsOpen,
+        close: needsClose,
         failed: INJ_DEFAULT
     },
     drafts: {
@@ -150,18 +151,53 @@ const actionHierarchy = {
         openPostsView:INJ_DEFAULT
     },
 
+    /**
+     * Server triggered interactions (aka received messages)
+     */
     messages: { /* websocket messages, e.g. post-creation, chatting */
-        markAsSent: INJ_DEFAULT,
+        //TODO get rid of send and rename to receivedMessage
+
+        send: INJ_DEFAULT, //TODO this should be part of proper, user-story-level actions (e.g. need.publish or sendCnctMsg)
+
+        /*
+         * posting things to the server should be optimistic and assume
+         * success that is rolled back in case of a failure or timeout.
+         */
+
+        create: {
+            success: messages.successfulCreate,
+            //TODO failure: messages.failedCreate
+        },
+        open: {
+            success: messages.successfulOpen,
+            //TODO failure: messages.failedOpen
+        },
+        close: { //TODO: NAME SEEMS GENERIC EVEN THOUGH IT IS ONLY USED FOR CLOSING CONNECITONS; REFACTOR THIS SOMEDAY
+            success: messages.successfulCloseConnection,
+            //TODO failure: messages.failedClose
+        },
+        connect: {
+            success: messages.successfulConnect,
+            //TODO failure: messages.failedConnect
+        },
+        chatMessage: {
+            success: INJ_DEFAULT,
+            failure: INJ_DEFAULT
+        },
+        closeNeed: {
+            success: messages.successfulCloseNeed,
+            failure: messages.failedCloseNeed
+        },
+        connectionMessageReceived: messages.connectionMessageReceived,
+        connectMessageReceived: messages.connectMessageReceived,
+        hintMessageReceived: messages.hintMessageReceived,
+
         waitingForAnswer: INJ_DEFAULT,
         /**
          * TODO this action is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
          */
         requestWsReset_Hack: INJ_DEFAULT,
-        messageReceived: messagesMessageReceived,
-        successResponseMessageReceived: messagesSuccessResponseMessageReceived,
-        connectMessageReceived: messagesConnectMessageReceived,
-        hintMessageReceived: messagesHintMessageReceived,
     },
     verifyLogin: accountVerifyLogin,
     login: accountLogin,
@@ -170,9 +206,9 @@ const actionHierarchy = {
     retrieveNeedUris: retrieveNeedUris,
     config: {
         init: configInit,
-
         update: INJ_DEFAULT,
-    }
+    },
+    tick: startTicking,
 
     /*
      runMessagingAgent: () => (dispatch) => {
@@ -222,6 +258,14 @@ window.actionTypes4Dbg = actionTypes;
 
 //////////// STUFF THAT SHOULD BE IN OTHER FILES BELOW //////////////////
 
+export function startTicking() {
+    return (dispatch) =>
+        setInterval(() =>
+            dispatch({ type: actionTypes.tick, payload: Date.now() }),
+            60000
+        );
+}
+
 
 export function draftsPublish(draft, nodeUri) {
     const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
@@ -231,15 +275,14 @@ export function draftsPublish(draft, nodeUri) {
     };
 }
 
-
 /**
- * @deprecated i need to delete this again *
+ * @deprecated used for keeping old code.
  * @param needUri
  * @param remoteNeedUri
  * @param connectionUri
  * @return {*}
  */
-export function getConnectionRelatedData(needUri,remoteNeedUri,connectionUri) {
+export function getConnectionRelatedData(needUri, remoteNeedUri, connectionUri) {
     const remoteNeed = won.getNeed(remoteNeedUri);
     const ownNeed = won.getNeed(needUri);
     const connection = won.getConnection(connectionUri);
@@ -261,11 +304,6 @@ export function getConnectionRelatedData(needUri,remoteNeedUri,connectionUri) {
         }));
 }
 
-
-var isSuccessMessage = function isSuccessMessage(event) {
-    return event.hasMessageType === won.WONMSG.successResponseCompacted;
-};
-
 export const messageTypeToEventType = deepFreeze({
     [won.WONMSG.hintMessageCompacted] : {eventType: won.EVENT.HINT_RECEIVED},
     [won.WONMSG.connectMessageCompacted] : {eventType: won.EVENT.CONNECT_RECEIVED},
@@ -277,3 +315,53 @@ export const messageTypeToEventType = deepFreeze({
     [won.WONMSG.needStateMessageCompacted] : {eventType: won.EVENT.NEED_STATE_MESSAGE_RECEIVED},
     [won.WONMSG.errorMessageCompacted] : {eventType: won.EVENT.NOT_TRANSMITTED }
 });
+
+export function needsOpen(needUri) {
+    return (dispatch, getState) => {
+        const state = getState();
+        //TODO: IMPLEMENT ME
+        /*const eventData = selectAllByConnections(state).get(connectionData.connection.uri).toJS(); // TODO avoid toJS;
+        //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
+        let messageData = null;
+        let deferred = Q.defer()
+        won.getConnection(eventData.connection.uri).then(connection=> {
+            let msgToOpenFor = {event: eventData, connection: connection}
+            buildConnectMessage(msgToOpenFor, message).then(messageData=> {
+                deferred.resolve(messageData);
+            })
+        })
+        deferred.promise.then((action)=> {
+            dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
+        })*/
+    }
+}
+
+export function needsClose(needUri) {
+    return (dispatch, getState) => {
+        buildCloseNeedMessage(
+            needUri,
+            getState().getIn(['config', 'defaultNodeUri'])
+        )
+        .then((data)=> {
+            console.log(data);
+            dispatch(actionCreators.messages__send({
+                eventUri: data.eventUri,
+                message: data.message
+            }));
+        })
+        .then(() =>
+            // assume close went through successfully, update GUI
+            dispatch({
+                type: actionTypes.needs.close,
+                payload: {
+                    ownNeedUri: needUri,
+                    affectedConnections: getState().getIn(['needs', 'ownNeeds', needUri, 'hasConnections'])
+                }
+            })
+        )
+        .then(() =>
+            // go back to overview
+            dispatch(actionCreators.router__stateGo('overviewPosts'))
+        )
+    }
+}

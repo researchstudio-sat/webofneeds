@@ -16,13 +16,18 @@
 
 package won.protocol.repository;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
+import won.protocol.model.MessageEventPlaceholder;
 
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -68,4 +73,133 @@ public interface ConnectionRepository extends WonRepository<Connection>
   @Query("select c from Connection c where c.needURI = ?1 and c.state != ?2")
   List<Connection> getConnectionsByNeedURIAndNotInState(URI needURI, ConnectionState connectionState);
 
+
+
+  /**
+   * Obtains connectionURIs grouped by the connectionURI itself and with message properties attached. The paging
+   * request therefore can use criteria based on aggregated messages properties of the connection,
+   * such as max(msg.creationDate). For example:
+   * <code>new PageRequest(0, 1, Sort.Direction.DESC, "max(msg.creationDate)"))</code>
+   * @param pageable
+   * @return
+   */
+  @Query("select msg.parentURI from MessageEventPlaceholder msg " +
+    "where (msg.senderURI = msg.parentURI or msg.receiverURI = msg.parentURI) " +
+    "group by msg.parentURI")
+  Slice<URI> getConnectionURIByLatestActivity(Pageable pageable);
+
+
+  @Query("select msg.parentURI from MessageEventPlaceholder msg " +
+    "where ((msg.senderURI = msg.parentURI or msg.receiverURI = msg.parentURI) and (msg.creationDate < :referenceDate))" +
+    "group by msg.parentURI")
+  Slice<URI> getConnectionURIByLatestActivity(
+    @Param("referenceDate") Date referenceDate, Pageable pageable);
+
+
+  @Query("select msg.parentURI from MessageEventPlaceholder msg " +
+    "where ((msg.senderURI = msg.parentURI or msg.receiverURI = msg.parentURI) and (msg.creationDate < :referenceDate))" +
+    "group by msg.parentURI having max(msg.creationDate) < :resumeDate")
+  Slice<URI> getConnectionURIsBeforeByLatestActivity(
+    @Param("resumeDate") Date resumeEventDate,
+    @Param("referenceDate") Date referenceDate,
+    Pageable pageable);
+
+
+  @Query("select msg.parentURI from MessageEventPlaceholder msg " +
+    "where ((msg.senderURI = msg.parentURI or msg.receiverURI = msg.parentURI) and (msg.creationDate < :referenceDate))" +
+    "group by msg.parentURI having max(msg.creationDate) > :resumeDate")
+  Slice<URI> getConnectionURIsAfterByLatestActivity(
+    @Param("resumeDate") Date resumeEventDate,
+    @Param("referenceDate") Date referenceDate,
+    Pageable pageable);
+
+
+
+  /**
+   * Obtains connectionURIs of the provided Need grouped by the connectionURI itself and with message properties
+   * attached. The paging request therefore can use criteria based on aggregated messages properties of the connection,
+   * such as max(msg.creationDate). For example:
+   * <code>new PageRequest(0, 1, Sort.Direction.DESC, "max(msg.creationDate)"))</code>
+   * @param needURI
+   * @param pageable
+   * @return
+   */
+  @Query("select msg.parentURI from MessageEventPlaceholder msg " +
+    "where (msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) " +
+    "   or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI) " +
+    "group by msg.parentURI")
+  Slice<URI> getConnectionURIByLatestActivity(@Param("need") URI needURI, Pageable pageable);
+
+  @Query("select msg.parentURI from MessageEventPlaceholder msg " +
+    "where (((msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) " +
+    "   or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI)) and (msg.creationDate < :referenceDate)) " +
+    "group by msg.parentURI")
+  Slice<URI> getConnectionURIByLatestActivity(
+    @Param("need") URI needURI,
+    @Param("referenceDate") Date referenceDate, Pageable pageable);
+
+  @Query("select msg.parentURI from MessageEventPlaceholder msg " +
+    "where (((msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) " +
+    "   or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI)) and (msg.creationDate < :referenceDate)" +
+    "   and (msg.messageType = :messageType)) " +
+    "group by msg.parentURI")
+  Slice<URI> getConnectionURIByLatestActivity(
+    @Param("need") URI needURI,
+    @Param("messageType") WonMessageType messageType,
+    @Param("referenceDate") Date referenceDate, Pageable pageable);
+
+  @Query("select msg.parentURI from MessageEventPlaceholder msg " +
+    "where (((msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) " +
+    "   or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI)) " +
+    "   and (msg.messageType = :messageType)) " +
+    "group by msg.parentURI")
+  Slice<URI> getConnectionURIByLatestActivity(
+    @Param("need") URI needURI,
+    @Param("messageType") WonMessageType messageType, Pageable pageable);
+
+
+
+  @Query("select msg.parentURI from MessageEventPlaceholder msg " +
+    "where (((msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) " +
+    "   or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI)) and (msg.creationDate < :referenceDate))" +
+    "group by msg.parentURI having max(msg.creationDate) < :resumeDate")
+  Slice<URI> getConnectionURIsBeforeByLatestActivity(
+    @Param("need") URI needURI,
+    @Param("resumeDate") Date resumeEventDate,
+    @Param("referenceDate") Date referenceDate,
+    Pageable pageable);
+
+  @Query("select msg.parentURI from MessageEventPlaceholder msg " +
+    "where (((msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI)) " +
+    "   and (msg.creationDate < :referenceDate) and (msg.messageType = :messageType))" +
+    "group by msg.parentURI having max(msg.creationDate) < :resumeDate")
+  Slice<URI> getConnectionURIsBeforeByLatestActivity(
+    @Param("need") URI needURI,
+    @Param("resumeDate") Date resumeEventDate,
+    @Param("messageType") WonMessageType messageType,
+    @Param("referenceDate") Date referenceDate,
+    Pageable pageable);
+
+
+
+  @Query("select msg.parentURI from MessageEventPlaceholder msg " +
+    "where (((msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) " +
+    "   or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI)) and (msg.creationDate < :referenceDate))" +
+    "group by msg.parentURI having max(msg.creationDate) > :resumeDate")
+  Slice<URI> getConnectionURIsAfterByLatestActivity(
+    @Param("need") URI needURI,
+    @Param("resumeDate") Date resumeEventDate,
+    @Param("referenceDate") Date referenceDate,
+    Pageable pageable);
+
+  @Query("select msg.parentURI from MessageEventPlaceholder msg " +
+    "where (((msg.senderNeedURI = :need and msg.senderURI = msg.parentURI) or (msg.receiverNeedURI = :need and msg.receiverURI = msg.parentURI)) " +
+    "   and (msg.creationDate < :referenceDate) and (msg.messageType = :messageType))" +
+    "group by msg.parentURI having max(msg.creationDate) > :resumeDate")
+  Slice<URI> getConnectionURIsAfterByLatestActivity(
+    @Param("need") URI needURI,
+    @Param("resumeDate") Date resumeEventDate,
+    @Param("messageType") WonMessageType messageType,
+    @Param("referenceDate") Date referenceDate,
+    Pageable pageable);
 }

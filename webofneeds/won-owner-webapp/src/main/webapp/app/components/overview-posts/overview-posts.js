@@ -5,7 +5,7 @@ import overviewTitleBarModule from '../overview-title-bar';
 import postItemLineModule from '../post-item-line';
 import { actionCreators }  from '../../actions/actions';
 import { attach } from '../../utils';
-import { selectUnreadCountsByNeedAndType } from '../../selectors';
+import { selectUnreadEvents, selectUnreadCountsByNeedAndType } from '../../selectors';
 import won from '../../won-es6';
 
 const ZERO_UNSEEN = Object.freeze({
@@ -22,7 +22,7 @@ class OverviewPostsController {
         this.selection = 1;
 
         const selectFromState = (state) => {
-            const unreadEvents = state.getIn(["events", "unreadEventUris"]);
+            const unreadEvents = selectUnreadEvents(state);
             const receivedHintEvents = unreadEvents.filter(e=>e.get('eventType')===won.EVENT.HINT_RECEIVED);
             let unseenMatchesCounts = Immutable.Map();
             receivedHintEvents.forEach(e => {
@@ -49,8 +49,9 @@ class OverviewPostsController {
 
 
 
+            const ownNeeds = state.getIn(["needs", "ownNeeds"]);
             return {
-                posts: state.getIn(["needs", "ownNeeds"]).toJS(),
+                posts: ownNeeds? ownNeeds.toJS() : {}, //TODO pass in the immutablejs-object directly
                 unreadEvents,
                 unreadCounts: selectUnreadCountsByNeedAndType(state),
                 //unreadMatchEventsOfNeed: unseenMatchesCounts,

@@ -9,28 +9,70 @@ import { combineReducersStable } from '../redux-utils';
 import won from '../won-es6';
 
 const initialState = Immutable.fromJS({
-        /*
-    unreadEventsByNeedByType: {},
-    unreadEventsByTypeByNeed:{ <needUri>:
-        'hint': {count: 0, timestamp: new Date().getTime() },
-        'connect': {count: 0, timestamp: new Date().getTime()},
-        'message': {count: 0, timestamp: new Date().getTime()},
-        'close': {count: 0, timestamp: new Date().getTime()},
-        'created': {count: 0, timestamp: new Date().getTime()}
-    },
-    */
-    unreadEventUris:{}
-})
-export default createReducer(
-    initialState,
-    {
+    events: {},
+}).set('unreadEventUris', Immutable.Set());
 
-        [actionTypes.events.addUnreadEventUri]:(state,action)=>{
-            return state.setIn(['unreadEventUris',action.payload.unreadUri],Immutable.fromJS(action.payload))
-        },
-        [actionTypes.events.read]:(state,action) => state.deleteIn(['unreadEventUris', action.payload])
+export default function(state = initialState, action = {}) {
+    switch(action.type) {
+
+        case actionTypes.load:
+            const allPreviousEvents = action.payload.get('events');
+            return state.mergeIn(['events'], allPreviousEvents);
+
+        case actionTypes.events.read:
+            return state.update('unreadEventUris',
+                    unread => unread.remove(action.payload));
+
+        /**
+         * @deprecated this is a legacy action
+         */
+        case actionTypes.connections.load:
+            return action.payload.reduce(
+                (updatedState, connectionWithRelatedData) =>
+                    storeConnectionRelatedData(updatedState, connectionWithRelatedData),
+                state);
+
+        case actionTypes.messages.close.success:
+            var event = action.payload;
+            return state.setIn(['events', event.uri], Immutable.fromJS(event));
+
+        case actionTypes.connections.sendChatMessage:
+            var eventUri = action.payload.eventUri;
+            var event = action.payload.optimisticEvent;
+            return state.setIn(['events', eventUri], Immutable.fromJS(event));
+
+        case actionTypes.messages.chatMessage.failure:
+            return state.removeIn(['events', action.payload.eventUri]);
+
+        case actionTypes.messages.connectionMessageReceived:
+        case actionTypes.messages.connectMessageReceived:
+        case actionTypes.messages.hintMessageReceived:
+            //TODO events should be an object too
+            var event = action.payload.events.filter(e => e.uri === action.payload.receivedEvent)[0];
+            event.unreadUri = action.payload.updatedConnection;
+
+            var updatedState = state.update('unreadEventUris', unread => unread.add(event.uri));
+            return storeConnectionRelatedData(updatedState, action.payload);
+
+        default:
+            return state;
     }
-)
+}
+function storeConnectionRelatedData(state, connectionWithRelatedData) {
+    console.log("EVENT-REDUCER STORING CONNECTION AND RELATED DATA");
+    console.log(connectionWithRelatedData);
+    //TODO replace with simple call mergeDeepIn to guarantee that the state is always a super-set of the rdf-store
+    return connectionWithRelatedData.events.reduce(
+
+        (updatedState, event) =>
+            updatedState.getIn(['events', event.uri]) ?
+                updatedState : // we already know this one. no need to trigger re-rendering
+                updatedState.setIn(['events', event.uri], Immutable.fromJS(event)) // add the event
+
+        , state // start with the original state
+    );
+}
+
 var createOrUpdateUnreadEntry = function(needURI, eventData, unreadEntry){
 
     if(unreadEntry == null || typeof unreadEntry === 'undefined'){

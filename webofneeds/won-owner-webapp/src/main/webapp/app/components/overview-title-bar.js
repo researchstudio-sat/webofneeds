@@ -6,8 +6,11 @@
 import angular from 'angular';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
-import {    selectUnreadCountsByType,
-            selectUnreadEventsByNeed } from '../selectors';
+import {
+    selectUnreadCountsByType,
+    selectUnreadEventsByNeed,
+    selectAllByConnections,
+} from '../selectors';
 import won from '../won-es6';
 
 
@@ -38,7 +41,7 @@ function genComponentConf() {
                         </a>
                     </li>
                     <li ng-class="{'mtb__tabs__selected' : self.selection == 3}">
-                        <a ui-sref="overviewMatches"
+                        <a ui-sref="overviewMatches({viewType: 0})"
                             ng-class="{'disabled' : !self.hasMatches}">
                             Matches
                             <span class="mtb__tabs__unread">{{ self.unreadMatches }}</span>
@@ -61,19 +64,21 @@ function genComponentConf() {
             const selectFromState = (state) => {
                 const unreadCounts = selectUnreadCountsByType(state);
                 const nrOfNeedsWithUnread = selectUnreadEventsByNeed(state).size;
+                const ownNeeds = state.getIn(["needs", "ownNeeds"]);
+                const connectionsDeprecated = selectAllByConnections(state).toJS();
 
                 return {
-                    hasPosts: state.getIn(["needs", "ownNeeds"]).length > 0,
-                    hasRequests: Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
+                    hasPosts: ownNeeds && ownNeeds.size > 0,
+                    hasRequests: Object.keys(connectionsDeprecated)
+                        .map(key => connectionsDeprecated[key])
                         .filter(conn=>{
                             if(conn.connection.hasConnectionState===won.WON.RequestReceived){
                                 return true
                             }
                         }).length > 0,
-                    hasMatches: Object.keys(state.getIn(['connections','connections']).toJS())
-                        .map(key=>state.getIn(['connections','connections']).toJS()[key])
-                        .filter(conn=>{
+                    hasMatches: Object.keys(connectionsDeprecated)
+                        .map(key => connectionsDeprecated[key])
+                        .filter(conn => {
                             if(conn.connection.hasConnectionState===won.WON.Suggested){
                                 return true
                             }

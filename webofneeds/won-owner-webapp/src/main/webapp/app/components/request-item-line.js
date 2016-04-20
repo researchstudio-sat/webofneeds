@@ -6,6 +6,8 @@ import { labels } from '../won-label-utils';
 import {attach} from '../utils.js';
 import { actionCreators }  from '../actions/actions';
 
+import { selectUnreadEvents } from '../selectors';
+
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
@@ -29,7 +31,11 @@ function genComponentConf() {
                 </div>
             </div>
             <div class="mil" ng-show="self.open">
-                <div class="mil__item clickable" ng-class="self.openRequest === request? 'selected' : ''" ng-repeat="request in self.item" ng-click="self.openMessage(request)">
+                <a class="mil__item clickable"
+                    ng-class="request.connection.uri === self.connectionUri? 'selected' : ''"
+                    ng-repeat="request in self.item"
+                    ui-sref="{{::self.openRequestItemUrl()}}"
+                    ng-click="self.openMessage(request)">
                     <won-square-image src="request.titleImgSrc" title="request.remoteNeed.title"></won-square-image>
                     <div class="mil__item__description">
                         <div class="mil__item__description__topline">
@@ -46,7 +52,7 @@ function genComponentConf() {
                             <span class="mil__item__description__message__indicator" ng-show="!self.read(request)"/>{{request.message}}
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
     `;
 
@@ -55,9 +61,10 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             window.reqitemline = this;
             const selectFromState = (state)=>{
-
                 return {
-                    unreadUris: state.getIn(['events','unreadEventUris'])
+                    connectionUri: decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri'])),
+                    currentPage: state.getIn(['router','currentState','name']),
+                    unreadUris: selectUnreadEvents(state)
                 };
             }
             this.labels = labels;
@@ -65,6 +72,10 @@ function genComponentConf() {
             const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this);
             //  this.loadMatches();
             this.$scope.$on('$destroy', disconnect);
+        }
+
+        openRequestItemUrl() {
+            return this.currentPage === "overviewSentRequests" ? "overviewSentRequests({connectionUri: request.connection.uri})" : "overviewIncomingRequests({connectionUri: request.connection.uri})";
         }
 
         read(request){
@@ -79,7 +90,6 @@ function genComponentConf() {
 
         openMessage(request) {
             this.events__read(request.connection.uri)
-            this.openRequest = request;
         }
     
 
@@ -91,8 +101,7 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {item: "=",
-                open: "=",
-                openRequest: "="},
+                open: "="},
         template: template
     }
 

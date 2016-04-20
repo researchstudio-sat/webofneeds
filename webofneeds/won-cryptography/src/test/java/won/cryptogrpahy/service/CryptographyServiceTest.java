@@ -1,18 +1,16 @@
 package won.cryptogrpahy.service;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import won.cryptography.exception.KeyNotSupportedException;
 import won.cryptography.key.KeyInformationExtractorBouncyCastle;
 import won.cryptography.service.KeyPairService;
-import won.protocol.vocabulary.WON;
 
-import java.io.ByteArrayOutputStream;
 import java.security.KeyPair;
 
 /**
@@ -20,6 +18,8 @@ import java.security.KeyPair;
  * Date: 17.07.2014
  */
 public class CryptographyServiceTest {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 
     private ApplicationContext context;
@@ -30,18 +30,26 @@ public class CryptographyServiceTest {
                 new String[]{"spring/component/cryptographyServices.xml"});
     }
 
-    // ToDo: no tests yet, just used for debugging (FS)
-
     @Test
-    public void generateKeyPair() {
+    public void testGenerateKeyPairBrainpoolp384r1() {
 
         KeyPairService keyPairService = context.getBean("keyPairService", KeyPairService.class);
         KeyPair keypair = keyPairService.generateNewKeyPairInBrainpoolp384r1();
-        System.out.println(keypair);
+        Assert.assertNotNull(keypair.getPublic());
+        Assert.assertNotNull(keypair.getPrivate());
     }
 
     @Test
-    public void getParametersOfKeyPair() {
+    public void testGenerateKeyPairSecp384r1() {
+
+        KeyPairService keyPairService = context.getBean("keyPairService", KeyPairService.class);
+        KeyPair keypair = keyPairService.generateNewKeyPairInSecp384r1();
+        Assert.assertNotNull(keypair.getPublic());
+        Assert.assertNotNull(keypair.getPrivate());
+    }
+
+    @Test
+    public void testInfoExractorOfKeyPairBrainpoolp384r1() {
 
         KeyPairService keyPairService = context.getBean("keyPairService", KeyPairService.class);
         KeyPair keypair = keyPairService.generateNewKeyPairInBrainpoolp384r1();
@@ -49,37 +57,49 @@ public class CryptographyServiceTest {
         KeyInformationExtractorBouncyCastle extractor = new KeyInformationExtractorBouncyCastle();
 
         try {
-            System.out.println("algorithm: " + extractor.getAlgorithm(keypair.getPublic()));
-            System.out.println("curveID: " + extractor.getCurveID(keypair.getPublic()));
-            System.out.println("qx: " + extractor.getQX(keypair.getPublic()));
-            System.out.println("qy: " + extractor.getQY(keypair.getPublic()));
+            Assert.assertEquals("ECDSA", extractor.getAlgorithm(keypair.getPublic()));
+            LOGGER.debug("algorithm: " + extractor.getAlgorithm(keypair.getPublic()));
+
+            Assert.assertEquals("brainpoolp384r1", extractor.getCurveID(keypair.getPublic()));
+            LOGGER.debug("curveID: " + extractor.getCurveID(keypair.getPublic()));
+
+            Assert.assertNotNull(extractor.getQX(keypair.getPublic()));
+            LOGGER.debug("qx: " + extractor.getQX(keypair.getPublic()));
+
+            Assert.assertNotNull(extractor.getQY(keypair.getPublic()));
+            LOGGER.debug("qy: " + extractor.getQY(keypair.getPublic()));
+
         } catch (KeyNotSupportedException ex) {
-            ex.printStackTrace();
+            Assert.fail(ex.getMessage());
         }
 
     }
 
     @Test
-    public void getRDFFromKeyParameters() {
+    public void testInfoExtractorOfKeyPairSecp384r1() {
 
         KeyPairService keyPairService = context.getBean("keyPairService", KeyPairService.class);
-        KeyPair keypair = keyPairService.generateNewKeyPairInBrainpoolp384r1();
+        KeyPair keypair = keyPairService.generateNewKeyPairInSecp384r1();
 
+        KeyInformationExtractorBouncyCastle extractor = new KeyInformationExtractorBouncyCastle();
 
         try {
+            Assert.assertEquals("ECDSA", extractor.getAlgorithm(keypair.getPublic()));
+            LOGGER.debug("algorithm: " + extractor.getAlgorithm(keypair.getPublic()));
 
-            Model needModel = ModelFactory.createDefaultModel();
-            Resource needResource = needModel.createResource("no:uri", WON.NEED);
+            Assert.assertEquals("secp384r1", extractor.getCurveID(keypair.getPublic()));
+            LOGGER.debug("curveID: " + extractor.getCurveID(keypair.getPublic()));
 
-            keyPairService.appendPublicKeyRDF(needResource, keypair);
+            Assert.assertNotNull(extractor.getQX(keypair.getPublic()));
+            LOGGER.debug("qx: " + extractor.getQX(keypair.getPublic()));
 
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            needModel.write(os, "Turtle");
-            System.out.println(new String(os.toByteArray()));
+            Assert.assertNotNull(extractor.getQY(keypair.getPublic()));
+            LOGGER.debug("qy: " + extractor.getQY(keypair.getPublic()));
 
         } catch (KeyNotSupportedException ex) {
-            ex.printStackTrace();
+            Assert.fail(ex.getMessage());
         }
 
     }
+
 }

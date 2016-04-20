@@ -15,6 +15,7 @@
                             unread-counts="self.unreadCounts.get(item.uri)"
                             ng-repeat="item in self.posts |filterByNeedState: 'http://purl.org/webofneeds/model#Active'">
         </won-post-item-line>
+        <!--
         <div class="title clickable"
              ng-click="self.draftsOpen = !self.draftsOpen">
             Drafts
@@ -24,8 +25,8 @@
                             item="item"
                             unread-counts="self.unreadCounts.get(item.uri)"
                             ng-repeat="item in self.drafts">
-            <!--unread-match-events-of-need="self.unreadMatchEventsOfNeed"-->
         </won-post-item-line>
+        -->
         <div class="title clickable"
              ng-click="self.closedPostsOpen = !self.closedPostsOpen">
             Closed
@@ -34,7 +35,7 @@
         <won-post-item-line ng-show="self.closedPostsOpen"
                             item="item"
                             unread-counts="self.unreadCounts.get(item.uri)"
-                            ng-repeat="item in self.posts |filterByNeedState:'inactive'">
+                            ng-repeat="item in self.posts |filterByNeedState: 'http://purl.org/webofneeds/model#Inactive'">
         </won-post-item-line>
     </div>
 </main>

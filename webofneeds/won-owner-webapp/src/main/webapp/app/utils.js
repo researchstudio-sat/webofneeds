@@ -454,3 +454,65 @@ export function flattenObj(objOfObj) {
     
 }
 
+/**
+ * Takes a single uri or an array of uris, performs the lookup function on each
+ * of them seperately, collects the results and builds an map/object
+ * with the uris as keys and the results as values.
+ * @param uris
+ * @param asyncLookupFunction
+ * @return {*}
+ */
+export function urisToLookupMap(uris, asyncLookupFunction) {
+    //make sure we have an array and not a single uri.
+    const urisAsArray = is('Array', uris) ? uris : [uris];
+    const asyncLookups = urisAsArray.map(uri => asyncLookupFunction(uri));
+    return Promise.all(asyncLookups).then( dataObjects => {
+        const lookupMap = {};
+        //make sure there's the same
+        for (let i = 0; i < uris.length; i++) {
+            lookupMap[uris[i]] = dataObjects[i];
+        }
+        return lookupMap;
+    });
+}
+
+/**
+ * Maps an asynchronous function over the values of an object or
+ * the elements of an array. It returns a promise with the result,
+ * when all applications of the asyncFunction have finished.
+ * @param object
+ * @param asyncFunction
+ * @return {*}
+ */
+export function mapJoin(object, asyncFunction) {
+    if(is('Array', object)) {
+        const promises = object.map(el => asyncFunction(el));
+        return Promise.all(promises);
+    } else if(is('Object', object)){
+        const keys = Object.keys(object);
+        const promises = keys.map(k => asyncFunction(object[k]));
+        return Promise.all(promises).then(results => {
+            const acc = {};
+            results.forEach((result, i) => {
+                acc[keys[i]] = result;
+            });
+            return acc;
+        });
+    } else {
+        return undefined;
+    }
+}
+
+/**
+ * Stable method of determining the type
+ * taken from http://bonsaiden.github.io/JavaScript-Garden/
+ * @param type
+ * @param obj
+ * @return {boolean}
+ */
+export function is(type, obj) {
+    var clas = Object.prototype.toString.call(obj).slice(8, -1);
+    return obj !== undefined && obj !== null && clas === type;
+}
+
+

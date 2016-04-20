@@ -68,6 +68,10 @@ const reducers = {
     matches: matchReducer,
     postOverview:postsReducer,
     messages: messagesReducer,
+
+    // contains the Date.now() of the last action
+    lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
+
     config: createReducer(
         //initial state
         Immutable.Map(),

@@ -20,10 +20,10 @@ System.config({
     "angular-sanitize": "github:angular/bower-angular-sanitize@1.4.8",
     "angular-ui-router": "npm:angular-ui-router@0.2.15",
     "angular-ui-utils": "github:angular-ui/ui-utils@2.0.0",
-    "babel": "npm:babel-core@5.1.13",
-    "babel-runtime": "npm:babel-runtime@5.1.13",
+    "babel": "npm:babel-core@5.8.35",
+    "babel-runtime": "npm:babel-runtime@5.8.35",
     "bootstrap": "github:twbs/bootstrap@3.3.5",
-    "core-js": "npm:core-js@0.9.4",
+    "core-js": "npm:core-js@1.2.6",
     "fetch": "github:github/fetch@0.10.1",
     "font-awesome": "bower:font-awesome@4.3.0",
     "immutable": "npm:immutable@3.7.5",
@@ -224,6 +224,9 @@ System.config({
       "crypto": "github:jspm/nodelibs-crypto@0.1.0",
       "url": "github:jspm/nodelibs-url@0.1.0"
     },
+    "npm:babel-runtime@5.8.35": {
+      "process": "github:jspm/nodelibs-process@0.1.2"
+    },
     "npm:babel@5.8.21": {
       "babel-core": "npm:babel-core@5.8.34",
       "child_process": "github:jspm/nodelibs-child_process@0.1.0",
@@ -391,8 +394,11 @@ System.config({
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "path": "github:jspm/nodelibs-path@0.1.0"
     },
-    "npm:core-js@0.9.4": {
-      "process": "github:jspm/nodelibs-process@0.1.2"
+    "npm:core-js@1.2.6": {
+      "fs": "github:jspm/nodelibs-fs@0.1.2",
+      "path": "github:jspm/nodelibs-path@0.1.0",
+      "process": "github:jspm/nodelibs-process@0.1.2",
+      "systemjs-json": "github:systemjs/plugin-json@0.1.0"
     },
     "npm:core-util-is@1.0.2": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
