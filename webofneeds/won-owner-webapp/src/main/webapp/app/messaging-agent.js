@@ -137,7 +137,7 @@ export function runMessagingAgent(redux) {
                             && msgFromSystem.isRemoteResponseTo) {
                                 // got the second success-response (from the remote-node)
                                 redux.dispatch(actionCreators.messages__chatMessage__success({eventUri, connectionUri}));
-                        } else if(event.hasMessageType === won.WONMSG.failureResponseCompacted) {
+                        } else if(msgFromSystem.hasMessageType === won.WONMSG.failureResponseCompacted) {
                             redux.dispatch(actionCreators.messages__chatMessage__failure({ eventUri, connectionUri }));
                         }
                         break;
