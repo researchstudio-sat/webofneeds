@@ -4,12 +4,12 @@ import angular from 'angular';
 import Immutable from 'immutable';
 import squareImageModule from './square-image';
 import dynamicTextFieldModule from './dynamic-textfield';
-import { attach, is } from '../utils.js'
+import { attach, is, delay } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime } from '../won-label-utils';
 import { selectAllByConnections, selectOpenConnectionUri } from '../selectors';
 
-const serviceDependencies = ['$ngRedux', '$scope'];
+const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
 function genComponentConf() {
     let template = `
@@ -73,8 +73,18 @@ function genComponentConf() {
             window.selectOpenConnectionUri4dbg = selectOpenConnectionUri;
             window.selectChatMessages4dbg = selectChatMessages;
 
+            const self = this;
+
             //this.postmsg = this;
             const selectFromState = state => {
+
+                //TODO seems like rather bad practice to have sideffects here
+                //scroll to bottom directly after rendering, if snapped
+                delay(0).then(() => {
+                    self.updateScrollposition();
+                    console.log('pm - delay ', self._snapBottom, self.chatMessages.length)
+                });
+
                 const connectionUri = selectOpenConnectionUri(state);
                 const chatMessages = selectChatMessages(state);
                 return {
@@ -87,6 +97,33 @@ function genComponentConf() {
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
+
+            this.snapBottom();
+        }
+
+        updateScrollposition() {
+            if(this._snapBottom) {
+                this.scrollToBottom();
+            }
+        }
+        scrollToBottom() {
+            this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
+        }
+        snapBottom() {
+            this._snapBottom = true;
+            this.scrollToBottom();
+        }
+        unsnapBottom() {
+            this._snapBottom = false;
+        }
+        scrollContainerNg() {
+            if(!this._scrollContainer) {
+                this._scrollContainer = this.$element.find('.pm__content');
+            }
+            return this._scrollContainer;
+        }
+        scrollContainer() {
+            return this.scrollContainerNg()[0];
         }
 
         input(input) {
@@ -109,7 +146,7 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: { },
-        template: template
+        template: template,
     }
 }
 
