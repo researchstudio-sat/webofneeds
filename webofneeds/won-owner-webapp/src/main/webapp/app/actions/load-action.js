@@ -81,7 +81,7 @@ export function configInit() {
                 const defaultNodeUri = `${location.protocol}://${location.host}/won/resource`;
                 console.info(
                     'Failed to fetch default node uri at the relative path `',
-                    relativePathToConfig,
+                    'appConfig/getDefaultWonNodeUri',
                     '` (is the API endpoint there up and reachable?) -> falling back to the default ',
                     defaultNodeUri
                 );
@@ -95,19 +95,18 @@ export function configInit() {
 export function needsFetch(data) {
     return dispatch => {
         const needUris = data.needs;
-        const needLookups = needUris.map(needUri => won.getNeed(needUri));
-        Promise.all(needLookups).then(needs => {
+        const allLoadedPromise = Promise.all(
+            needUris.map(uri =>
+                won.ensureLoaded(uri, uri, deep = true))
+        ).then(() => Promise.all(
+            needUris.map(needUri =>
+                won.getNeed(needUri))
+        )).then(needs => {
             console.log("linked data fetched for needs: ", needs );
             dispatch({ type: actionTypes.needs.fetch, payload: needs });
+            //TODO get rid of this multiple dispatching here (always push looping back into the reducer)
+            dispatch(actionCreators.connections__load(needUris));
         });
-
-        //TODO get rid of this multiple dispatching here (always push looping back into the reducer)
-        dispatch(actionCreators.connections__load(needUris));
-        /*
-         needUris.forEach(needUri => {
-         dispatch(actionCreators.connections__load(needUri));
-         });
-         */
     }
 }
 

@@ -1,15 +1,19 @@
 <!-- TODO parametrize by selected tab -->
 <header>
     <won-topnav></won-topnav>
-    <won-owner-title-bar selection="self.selection" item="self.post"></won-owner-title-bar>
+    <won-owner-title-bar selection="self.selection">
+    </won-owner-title-bar>
 </header>
 <main class="ownerpostcontent">
-    <div class="owner__messages">
-        <won-connection-message-item-line open="false" open-conversation="self.openConversation" item="item" ng-repeat="(key,item) in self.conversations"></won-connection-message-item-line>
-    </div>
-    <div class="post-messages" ng-show="self.openConversation">
+    <won-connection-selection
+            class="owner__messages"
+            connection-type="::self.wonConnected"
+            selected-connection="::self.openConversation(connectionUri)"
+            >
+    </won-connection-selection>
+    <div class="post-messages" ng-show="self.conversationIsOpen">
         <div class="post-messages__inner">
-            <won-post-messages item="self.openConversation"></won-post-messages>
+            <won-post-messages></won-post-messages>
         </div>
     </div>
 </main>

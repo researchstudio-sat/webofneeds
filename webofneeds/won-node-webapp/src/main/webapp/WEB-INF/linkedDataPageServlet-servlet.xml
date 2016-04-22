@@ -69,6 +69,7 @@
         <property name="nodeResourceURIPrefix" value="${uri.prefix.node}"/>
         <property name="uriService" ref="uriService" />
         <property name="registrationServer" ref="registrationServer" />
+        <property name="behindProxy" value="${client.authentication.behind.proxy}" />
     </bean>
 
 </beans>

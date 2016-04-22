@@ -22,8 +22,7 @@ class Controller {
             const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
             const post = state.getIn(['needs','ownNeeds', postId]);
             return {
-                post: post,
-                postJS: post.toJS()
+                post: post
             }
         };
 
@@ -34,8 +33,8 @@ class Controller {
         updateRelativeTimestamps(
             this.$scope,
             this.$interval,
-            this.post.creationDate,
-                t => this.post.creationDate = t);
+            this.post.get('creationDate'),
+                t => this.post.set('creationDate', t));
     }
 }
 

@@ -57,6 +57,11 @@
     won.WON.hasRemoteNeedCompacted = won.WON.prefix+":hasRemoteNeed";
     won.WON.hasRemoteConnection = won.WON.baseUri+"hasRemoteConnection";
     won.WON.hasRemoteConnectionCompacted = won.WON.prefix+":hasRemoteConnection";
+    won.WON.forResource = won.WON.baseUri+"forResource";
+    won.WON.hasBinaryRating = won.WON.baseUri+"hasBinaryRating";
+    won.WON.binaryRatingGood = won.WON.baseUri+"Good";
+    won.WON.binaryRatingBad = won.WON.baseUri+"Bad";
+    won.WON.hasFeedback = won.WON.baseUri+"hasFeedback";
 
     won.WON.hasConnectionState = won.WON.baseUri+"hasConnectionState";
     won.WON.hasConnectionState = won.WON.prefix+":hasConnectionState";
@@ -219,6 +224,7 @@
     won.WONMSG.closeMessage = won.WONMSG.baseUri + "CloseMessage";
     won.WONMSG.closeMessageCompacted = won.WONMSG.prefix + ":CloseMessage";
     won.WONMSG.openMessage = won.WONMSG.baseUri + "OpenMessage";
+    won.WONMSG.feedbackMessage = won.WONMSG.baseUri + "HintFeedbackMessage";
     won.WONMSG.openMessageCompacted = won.WONMSG.prefix + ":OpenMessage";
     won.WONMSG.openSentMessage = won.WONMSG.baseUri + "OpenSentMessage";
     won.WONMSG.openSentMessageCompacted = won.WONMSG.prefix + ":OpenSentMessage";
@@ -473,11 +479,12 @@
     won.reportError = function(message) {
         if (arguments.length == 1) {
             return function(reason) {
-                console.log(message + " reason: " + reason);
+                console.log(message, " reason: ", reason);
             }
-        }
-        return function(reason) {
-            console.log("Error! reason: " + reason);
+        } else {
+            return function (reason) {
+                console.log("Error! reason: ", reason);
+            }
         }
     }
 
@@ -1307,6 +1314,18 @@
         },
         addContentGraphData: function(predicate, object){
             this.getContentGraphNode()[predicate] = object;
+            return this;
+        },
+        addRating: function(rating, connectionUri){
+            this.getContentGraphNode()[won.WON.hasFeedback] = {
+                "@id" : "_:b0",
+                "http://purl.org/webofneeds/model#forResource" : {
+                    "@id" : connectionUri
+                },
+                "http://purl.org/webofneeds/model#hasBinaryRating" : {
+                    "@id" : rating
+                }
+            };
             return this;
         },
         build: function () {

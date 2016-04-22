@@ -32,13 +32,26 @@ export default function(state = initialState, action = {}) {
                     storeConnectionRelatedData(updatedState, connectionWithRelatedData),
                 state);
 
+        case actionTypes.messages.close.success:
+            var event = action.payload;
+            return state.setIn(['events', event.uri], Immutable.fromJS(event));
+
+        case actionTypes.connections.sendChatMessage:
+            var eventUri = action.payload.eventUri;
+            var event = action.payload.optimisticEvent;
+            return state.setIn(['events', eventUri], Immutable.fromJS(event));
+
+        case actionTypes.messages.chatMessage.failure:
+            return state.removeIn(['events', action.payload.eventUri]);
+
+        case actionTypes.messages.connectionMessageReceived:
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
             //TODO events should be an object too
-            const event = action.payload.events.filter(e => e.uri === action.payload.receivedEvent)[0];
+            var event = action.payload.events.filter(e => e.uri === action.payload.receivedEvent)[0];
             event.unreadUri = action.payload.updatedConnection;
 
-            const updatedState = state.update('unreadEventUris', unread => unread.add(event.uri));
+            var updatedState = state.update('unreadEventUris', unread => unread.add(event.uri));
             return storeConnectionRelatedData(updatedState, action.payload);
 
         default:
@@ -48,6 +61,7 @@ export default function(state = initialState, action = {}) {
 function storeConnectionRelatedData(state, connectionWithRelatedData) {
     console.log("EVENT-REDUCER STORING CONNECTION AND RELATED DATA");
     console.log(connectionWithRelatedData);
+    //TODO replace with simple call mergeDeepIn to guarantee that the state is always a super-set of the rdf-store
     return connectionWithRelatedData.events.reduce(
 
         (updatedState, event) =>

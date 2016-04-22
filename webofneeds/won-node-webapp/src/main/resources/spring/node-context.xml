@@ -21,7 +21,10 @@
             webIdVerificationFilter"/>
         </sec:filter-chain-map>
     </bean>
-    <bean id="webIdVerificationFilter" class="won.cryptography.webid.WebIdVerificationFilter"/>
+    <bean id="webIdVerificationFilter" class="won.cryptography.webid.WebIdVerificationFilter">
+        <property name="behindProxy" value="${client.authentication.behind.proxy}" />
+    </bean>
+
     <bean id="webIdVerificationAgent" class="won.cryptography.webid.WebIDVerificationAgent">
         <property name="linkedDataSource" ref="linkedDataSource" />
     </bean>

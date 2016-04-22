@@ -140,6 +140,17 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     return connectionRepository.save(con);
   }
 
+  @Override
+  public Connection nextConnectionState(Connection con, ConnectionEventType connectionEventType)
+    throws IllegalMessageForConnectionStateException {
+    //perform state transit
+    ConnectionState nextState = performStateTransit(con, connectionEventType);
+    //set new state and save in the db
+    con.setState(nextState);
+    //save in the db
+    return connectionRepository.save(con);
+  }
+
   /**
    * Adds feedback, represented by the subgraph reachable from feedback, to the RDF description of the
    * item identified by forResource

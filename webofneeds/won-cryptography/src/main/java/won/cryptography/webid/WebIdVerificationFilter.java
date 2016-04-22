@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.security.PublicKey;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -28,6 +29,18 @@ public class WebIdVerificationFilter implements Filter
   @Autowired
   private WebIDVerificationAgent verificationAgent;
 
+  // true if the node is behind a reverse proxy
+  private boolean behindProxy;
+
+
+  public boolean isBehindProxy() {
+    return behindProxy;
+  }
+
+  public void setBehindProxy(final boolean behindProxy) {
+    this.behindProxy = behindProxy;
+  }
+
 
   public void init(final FilterConfig filterConfig) throws ServletException {
 
@@ -39,14 +52,17 @@ public class WebIdVerificationFilter implements Filter
     final HttpServletRequest httpRequest = (HttpServletRequest) request;
     final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-    X509Certificate[] certChain = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-    if (isCertificatePresented(httpRequest, httpResponse, certChain) && isWebIDAcessGranted(httpRequest,
-                                                                                            httpResponse,
-                                                                                            certChain[0])) {
-      filterChain.doFilter(request, response);
+    X509Certificate[] certChain = null;
+    try {
+      certChain = CertificateUtils.extractClientCertificateFromRequest(httpRequest, behindProxy);
+    } catch (CertificateException e) {
+      logger.error(e.getMessage());
     }
 
-
+    if (isCertificatePresented(httpRequest, httpResponse, certChain) && isWebIDAcessGranted(
+      httpRequest, httpResponse, certChain[0])) {
+      filterChain.doFilter(request, response);
+    }
   }
 
   private boolean isWebIDAcessGranted(final HttpServletRequest request, final HttpServletResponse response, final
@@ -104,9 +120,6 @@ public class WebIdVerificationFilter implements Filter
     }
 
   }
-
-
-
 
   private boolean isCertificatePresented(final HttpServletRequest request, final HttpServletResponse response, final
   X509Certificate[] certChain) throws IOException {

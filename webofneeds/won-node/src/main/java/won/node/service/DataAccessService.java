@@ -48,6 +48,9 @@ public interface DataAccessService
   Connection nextConnectionState(URI connectionURI, ConnectionEventType connectionEventType)
                                                         throws NoSuchConnectionException, IllegalMessageForConnectionStateException;
 
+  Connection nextConnectionState(Connection con, ConnectionEventType connectionEventType)
+    throws IllegalMessageForConnectionStateException;
+
   /**
    * Adds feedback, represented by the subgraph reachable from feedback, to the RDF description of the
    * item identified by forResource
