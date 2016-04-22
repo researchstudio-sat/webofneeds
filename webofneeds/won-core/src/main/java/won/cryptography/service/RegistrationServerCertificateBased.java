@@ -39,7 +39,7 @@ public class RegistrationServerCertificateBased implements RegistrationServer
       String ownerSha1Fingerprint = DigestUtils.shaHex(ownerCertChain[0].getEncoded());
       ownerId = ownerManagementService.registerOwnerApplication(ownerSha1Fingerprint);
     } catch (CertificateException e) {
-      new WonProtocolException(e);
+      throw new WonProtocolException(e);
     }
     logger.info("Registered owner with id " + ownerId);
     return ownerId;
