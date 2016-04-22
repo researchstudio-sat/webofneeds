@@ -19,7 +19,7 @@ function genComponentConf() {
             <div class="conn">
                  <div
                  class="conn__item clickable"
-                 ng-class="self.openUri === connectionUri? 'selected' : ''"
+                 ng-class="self.openConversationUri === connectionUri? 'selected' : ''"
                  ng-click="self.setOpen(connectionUri)">
                      <!--TODO request.titleImgSrc isn't defined -->
                     <won-square-image
@@ -80,6 +80,7 @@ function genComponentConf() {
 
             const selectFromState = (state)=>{
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
+                const openConversationUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'openConversation']));
                 const allByConnections = selectAllByConnections(state);
                 const post = state.getIn(['needs','ownNeeds', postId]);
                 const postJS = post? post.toJS() : {};
@@ -95,6 +96,7 @@ function genComponentConf() {
                 return {
                     connectionUris,
                     allByConnections,
+                    openConversationUri,
                     post: postJS,
                 };
             }
