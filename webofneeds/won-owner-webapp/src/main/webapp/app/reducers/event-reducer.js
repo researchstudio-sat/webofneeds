@@ -38,11 +38,40 @@ export default function(state = initialState, action = {}) {
 
         case actionTypes.connections.sendChatMessage:
             var eventUri = action.payload.eventUri;
-            var event = action.payload.optimisticEvent;
-            return state.setIn(['events', eventUri], Immutable.fromJS(event));
+            return storeOptimisticEvent(state, action.payload.optimisticEvent);
 
         case actionTypes.messages.chatMessage.failure:
-            return state.removeIn(['events', action.payload.eventUri]);
+            //var eventOnRemoteNode = action.payload.events['msg:FromOwner'];
+            //var eventOnOwnNode = action.payload.events['msg:FromExternal'];
+            //var connectionUri = msgFromOwner.hasReceiver;
+            var msgFromOwner = action.payload.events['msg:FromSystem'];
+            var eventUri = msgFromOwner.isRemoteResponseTo || msgFromOwner.isResponseTo;
+            return state.removeIn(['events', eventUri]);
+
+        case actionTypes.messages.chatMessage.successOwn:
+            var msgFromOwner = Immutable.fromJS(action.payload.events['msg:FromSystem']);
+            var eventUri = msgFromOwner.get('isResponseTo');
+            return state
+                .setIn(['events', msgFromOwner.get('uri')], msgFromOwner)
+                .updateIn(['events', eventUri], e =>
+                    // This is a good-enough solution. We assume the republishing done
+                    // by the owner happens at the same time that it sends us
+                    // the success-response -- so we just use the latters timestamp
+                    // with the optimistic event created previously.
+                    e.set('hasSentTimestamp', msgFromOwner.get('hasReceivedTimestamp'))
+                     .set('hasReceivedTimestamp', msgFromOwner.get('hasReceivedTimestamp'))
+                )
+
+        case actionTypes.messages.chatMessage.successRemote:
+            //var eventOnRemoteNode = Immutable.fromJS(action.payload.events['msg:FromOwner']);
+            var eventOnOwnNode = Immutable.fromJS(action.payload.events['msg:FromExternal']);
+            var msgFromOwner = Immutable.fromJS(action.payload.events['msg:FromSystem']);
+            var eventUri = msgFromOwner.get('isRemoteResponseTo');
+            return state
+                .setIn(['events', msgFromOwner.get('uri')], msgFromOwner)
+                .setIn(['events', eventOnOwnNode.get('uri')], eventOnOwnNode)
+                .setIn(['events', eventUri, 'unconfirmed'], false);
+
 
         case actionTypes.messages.connectionMessageReceived:
         case actionTypes.messages.connectMessageReceived:
@@ -58,19 +87,18 @@ export default function(state = initialState, action = {}) {
             return state;
     }
 }
+
+function storeOptimisticEvent(state, event) {
+    var optimisticEvent = Immutable
+        .fromJS(event)
+        .set('unconfirmed', true);
+    return state.setIn(['events', event.uri], optimisticEvent);
+}
+
 function storeConnectionRelatedData(state, connectionWithRelatedData) {
-    console.log("EVENT-REDUCER STORING CONNECTION AND RELATED DATA");
-    console.log(connectionWithRelatedData);
-    //TODO replace with simple call mergeDeepIn to guarantee that the state is always a super-set of the rdf-store
-    return connectionWithRelatedData.events.reduce(
-
-        (updatedState, event) =>
-            updatedState.getIn(['events', event.uri]) ?
-                updatedState : // we already know this one. no need to trigger re-rendering
-                updatedState.setIn(['events', event.uri], Immutable.fromJS(event)) // add the event
-
-        , state // start with the original state
-    );
+    const keyValuePairs = connectionWithRelatedData.events.map(e => [e.uri, Immutable.fromJS(e)]);
+    const updatedEvents = Immutable.Map(keyValuePairs);
+    return state.mergeDeepIn(['events'], updatedEvents);
 }
 
 var createOrUpdateUnreadEntry = function(needURI, eventData, unreadEntry){

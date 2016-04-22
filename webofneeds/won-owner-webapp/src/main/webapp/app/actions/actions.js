@@ -181,8 +181,10 @@ const actionHierarchy = {
             //TODO failure: messages.failedConnect
         },
         chatMessage: {
-            success: INJ_DEFAULT,
-            failure: INJ_DEFAULT
+            //success: messages.successfulChatMessage,
+            successRemote: INJ_DEFAULT, //2nd successResponse
+            successOwn: INJ_DEFAULT, //1st successResponse
+            failure: INJ_DEFAULT,
         },
         closeNeed: {
             success: messages.successfulCloseNeed,

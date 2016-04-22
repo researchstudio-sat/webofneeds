@@ -4,7 +4,7 @@ import angular from 'angular';
 import Immutable from 'immutable';
 import squareImageModule from './square-image';
 import dynamicTextFieldModule from './dynamic-textfield';
-import { attach } from '../utils.js'
+import { attach, is } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime } from '../won-label-utils';
 import { selectAllByConnections, selectOpenConnectionUri } from '../selectors';
@@ -40,8 +40,19 @@ function genComponentConf() {
                         ng-show="message.hasSenderNeed != self.connectionData.getIn(['ownNeed', 'uri'])">
                     </won-square-image>
                     <div class="pm__content__message__content">
-                        <div class="pm__content__message__content__text">{{ message.hasTextMessage }}</div>
-                        <div class="pm__content__message__content__time">{{ message.humanReadableTimestamp }}</div>
+                        <div class="pm__content__message__content__text">
+                            {{ message.hasTextMessage }}
+                        </div>
+                        <div
+                            ng-show="message.unconfirmed"
+                            class="pm__content__message__content__time">
+                                Pending‥
+                        </div>
+                        <div
+                            ng-hide="message.unconfirmed"
+                            class="pm__content__message__content__time">
+                                {{ message.humanReadableTimestamp }}
+                        </div>
                     </div>
             </div>
         </div>
@@ -67,6 +78,7 @@ function genComponentConf() {
                 const connectionUri = selectOpenConnectionUri(state);
                 const chatMessages = selectChatMessages(state);
                 return {
+                    lastUpdateTime: state.get('lastUpdateTime'),
                     connectionData: selectAllByConnections(state).get(connectionUri),
                     chatMessages: chatMessages && chatMessages.toJS(), //toJS needed as ng-repeat won't work otherwise :|
                     state4dbg: state,
@@ -126,7 +138,10 @@ function selectChatMessages(state) {
             .filter(event => {
                 if (event.get('hasTextMessage')) return true;
                 else {
-                    const remote = event.get('hasCorrespondingRemoteMessage');
+                    let remote = event.get('hasCorrespondingRemoteMessage');
+                    if(is('String', remote)) {
+                        remote = state.getIn(['events', 'events', remote]);
+                    }
                     return remote && remote.get('hasTextMessage');
                 }
             }).map(event => {
@@ -141,6 +156,24 @@ function selectChatMessages(state) {
             .sort((event1, event2) =>
                 selectTimestamp(event1) - selectTimestamp(event2)
             )
+            /*
+             * sort so the latest, optimistic/unconfirmed
+             * messages are always at the bottom.
+             */
+            .sort((event1, event2) => {
+                const u1 = event1.get('unconfirmed');
+                const u2 = event2.get('unconfirmed');
+
+                if(u1 && !u2) {
+                  return 1;
+                }
+                else if (!u1 && u2) {
+                    return -1;
+                }
+                else {
+                    return 0;
+                }
+            })
 
             /* add a nice relative timestamp */
             .map(event => event.set(
