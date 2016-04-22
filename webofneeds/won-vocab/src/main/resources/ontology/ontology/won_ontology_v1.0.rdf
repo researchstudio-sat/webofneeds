@@ -5,11 +5,11 @@
     <!ENTITY sioc "http://rdfs.org/sioc/types#" >
     <!ENTITY schema_org "http://schema.rdfs.org/all#" >
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY dc "http://purl.org/dc/elements/1.1/" >
     <!ENTITY oslc "http://open-services.net/ns/core#" >
     <!ENTITY gr "http://purl.org/goodrelations/v1#" >
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY won "http://purl.org/webofneeds/model#" >
-    <!ENTITY xml "http://www.w3.org/XML/1998/namespace" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
 ]>
@@ -18,22 +18,23 @@
 <rdf:RDF xmlns="http://purl.org/webofneeds/model#"
      xml:base="http://purl.org/webofneeds/model"
      xmlns:sioc="http://rdfs.org/sioc/types#"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:oslc="http://open-services.net/ns/core#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-     xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:won="http://purl.org/webofneeds/model#"
      xmlns:gr="http://purl.org/goodrelations/v1#"
      xmlns:schema_org="http://schema.rdfs.org/all#">
     <owl:Ontology rdf:about="http://purl.org/webofneeds/model">
-        <owl:imports rdf:resource="http://open-services.net/ns/core#"/>
-        <owl:imports rdf:resource="http://purl.org/goodrelations/v1"/>
+        <dc:date rdf:datatype="&xsd;date">2013-12-13</dc:date>
+        <dc:title>Web of Needs Ontology</dc:title>
+        <dc:creator>Fabian Salcher</dc:creator>
+        <dc:creator>Florian Kleedorfer</dc:creator>
+        <rdfs:comment xml:lang="en">Ontology for the Web of Needs data model.</rdfs:comment>
         <owl:versionIRI rdf:resource="http://purl.org/webofneeds/model/1.0"/>
-        <owl:imports rdf:resource="http://schema.rdfs.org/all"/>
-        <owl:imports rdf:resource="http://www.w3.org/2000/01/rdf-schema#"/>
-        <owl:imports rdf:resource="http://www.w3.org/ns/ldp#"/>
+        <owl:ontologyIRI rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Ontology>
     
 
@@ -70,7 +71,8 @@
 
     <owl:ObjectProperty rdf:about="&won;allowsMatchWith">
         <rdf:type rdf:resource="&owl;SymmetricProperty"/>
-        <rdfs:comment>Connects two basic need types to indicate that they are suitable for a match.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Connects two basic need types to indicate that they are suitable for a match.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:range rdf:resource="&won;BasicNeedType"/>
         <rdfs:domain rdf:resource="&won;BasicNeedType"/>
     </owl:ObjectProperty>
@@ -80,7 +82,8 @@
     <!-- http://purl.org/webofneeds/model#embedSpinAsk -->
 
     <owl:ObjectProperty rdf:about="&won;embedSpinAsk">
-        <rdfs:comment>allows to attach a SPIN ASK clause to a content description, restricting possible matches</rdfs:comment>
+        <rdfs:comment xml:lang="en">allows to attach a SPIN ASK clause to a content description, restricting possible matches</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:ObjectProperty>
     
 
@@ -89,6 +92,7 @@
 
     <owl:ObjectProperty rdf:about="&won;hasAdditionalData">
         <rdfs:comment rdf:datatype="&xsd;string">Contains additional information in form of an RDF graph about an event.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:range rdf:resource="&owl;Thing"/>
     </owl:ObjectProperty>
     
@@ -98,7 +102,8 @@
 
     <owl:ObjectProperty rdf:about="&won;hasBasicNeedType">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>Specifies the basic need type of a need. This is primarily intended as a guidance for matching services.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Specifies the basic need type of a need. This is primarily intended as a guidance for matching services.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:range rdf:resource="&won;BasicNeedType"/>
         <rdfs:domain rdf:resource="&won;Need"/>
     </owl:ObjectProperty>
@@ -108,7 +113,8 @@
     <!-- http://purl.org/webofneeds/model#hasBrokerUri -->
 
     <owl:ObjectProperty rdf:about="&won;hasBrokerUri">
-        <rdfs:comment>Specifies the ActiveMQ broker URI to be used to contact the need.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Specifies the ActiveMQ broker URI to be used to contact the need.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;WonOverActiveMq"/>
     </owl:ObjectProperty>
     
@@ -118,7 +124,8 @@
 
     <owl:ObjectProperty rdf:about="&won;hasConnectionState">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>Indicates the state in which the Connection object is.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Indicates the state in which the Connection object is.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;Connection"/>
         <rdfs:range rdf:resource="&won;ConnectionState"/>
     </owl:ObjectProperty>
@@ -128,7 +135,8 @@
     <!-- http://purl.org/webofneeds/model#hasConnections -->
 
     <owl:ObjectProperty rdf:about="&won;hasConnections">
-        <rdfs:comment>Links the Need object to its connections.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Links the Need object to its connections.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:range rdf:resource="&won;ConnectionContainer"/>
         <rdfs:domain rdf:resource="&won;Facet"/>
     </owl:ObjectProperty>
@@ -138,7 +146,8 @@
     <!-- http://purl.org/webofneeds/model#hasContent -->
 
     <owl:ObjectProperty rdf:about="&won;hasContent">
-        <rdfs:comment>Links the Need entity with the node representing its &apos;content&apos;.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Links the Need entity with the node representing its &apos;content&apos;.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;Need"/>
         <rdfs:range rdf:resource="&won;NeedContent"/>
     </owl:ObjectProperty>
@@ -148,7 +157,8 @@
     <!-- http://purl.org/webofneeds/model#hasContentDescription -->
 
     <owl:ObjectProperty rdf:about="&won;hasContentDescription">
-        <rdfs:comment>Connects the need content node with a node that is intended to be connected to an arbitrary RDF graph used to describe the need content with any vocabulary or ontology.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Connects the need content node with a node that is intended to be connected to an arbitrary RDF graph used to describe the need content with any vocabulary or ontology.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;NeedContent"/>
         <rdfs:range rdf:resource="&owl;Thing"/>
     </owl:ObjectProperty>
@@ -158,7 +168,8 @@
     <!-- http://purl.org/webofneeds/model#hasCurrency -->
 
     <owl:ObjectProperty rdf:about="&won;hasCurrency">
-        <rdfs:comment>The currency for all prices given using the ISO 4217 standard (3 characters).</rdfs:comment>
+        <rdfs:comment xml:lang="en">The currency for all prices given using the ISO 4217 standard (3 characters).</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;PriceSpecification"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:ObjectProperty>
@@ -168,7 +179,8 @@
     <!-- http://purl.org/webofneeds/model#hasDepth -->
 
     <owl:ObjectProperty rdf:about="&won;hasDepth">
-        <rdfs:comment>Depth specified as a QuantitativeValue (specifies unit of measurement and value). </rdfs:comment>
+        <rdfs:comment xml:lang="en">Depth specified as a QuantitativeValue (specifies unit of measurement and value). </rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:subPropertyOf rdf:resource="&won;hasQuantitativeProperty"/>
     </owl:ObjectProperty>
     
@@ -178,7 +190,8 @@
 
     <owl:ObjectProperty rdf:about="&won;hasEventContainer">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>Links the Connection object to a container containing connection events (messages).</rdfs:comment>
+        <rdfs:comment xml:lang="en">Links the Connection object to a container containing connection events (messages).</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;Connection"/>
         <rdfs:range rdf:resource="&won;EventContainer"/>
     </owl:ObjectProperty>
@@ -188,7 +201,8 @@
     <!-- http://purl.org/webofneeds/model#hasFacet -->
 
     <owl:ObjectProperty rdf:about="&won;hasFacet">
-        <rdfs:comment>Indicates that a need or connection supports the specified facet (=behaviour).</rdfs:comment>
+        <rdfs:comment xml:lang="en">Indicates that a need or connection supports the specified facet (=behaviour).</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:range rdf:resource="&won;Facet"/>
         <rdfs:domain rdf:resource="&won;Need"/>
     </owl:ObjectProperty>
@@ -198,7 +212,8 @@
     <!-- http://purl.org/webofneeds/model#hasHeight -->
 
     <owl:ObjectProperty rdf:about="&won;hasHeight">
-        <rdfs:comment>Height specified as a QuantitativeValue (specifies unit of measurement and value). </rdfs:comment>
+        <rdfs:comment xml:lang="en">Height specified as a QuantitativeValue (specifies unit of measurement and value). </rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:subPropertyOf rdf:resource="&won;hasQuantitativeProperty"/>
     </owl:ObjectProperty>
     
@@ -208,7 +223,8 @@
 
     <owl:ObjectProperty rdf:about="&won;hasISOCode">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>Specifies the ISO region code as defined in ISO 3166-2.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Specifies the ISO region code as defined in ISO 3166-2.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;Region"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:ObjectProperty>
@@ -218,7 +234,8 @@
     <!-- http://purl.org/webofneeds/model#hasLocationSpecification -->
 
     <owl:ObjectProperty rdf:about="&won;hasLocationSpecification">
-        <rdfs:comment>Links a NeedDescription entity to a description of its location.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Links a NeedDescription entity to a description of its location.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:range rdf:resource="&won;LocationSpecification"/>
         <rdfs:domain rdf:resource="&won;NeedModality"/>
     </owl:ObjectProperty>
@@ -228,7 +245,8 @@
     <!-- http://purl.org/webofneeds/model#hasMatcherProtocolEndpoint -->
 
     <owl:ObjectProperty rdf:about="&won;hasMatcherProtocolEndpoint">
-        <rdfs:comment>Points to the matcherProtocol webservice endpoint of the need. I.e., matchers can communicate with the need through this endpoint.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Points to the matcherProtocol webservice endpoint of the need. I.e., matchers can communicate with the need through this endpoint.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:ObjectProperty>
     
 
@@ -236,7 +254,8 @@
     <!-- http://purl.org/webofneeds/model#hasNeedModality -->
 
     <owl:ObjectProperty rdf:about="&won;hasNeedModality">
-        <rdfs:comment>Defines the &apos;modality&apos; of the need; in contrast to the content (the &apos;what&apos; ) this should define where, when, and how</rdfs:comment>
+        <rdfs:comment xml:lang="en">Defines the &apos;modality&apos; of the need; in contrast to the content (the &apos;what&apos; ) this should define where, when, and how</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;Need"/>
         <rdfs:range rdf:resource="&won;NeedModality"/>
     </owl:ObjectProperty>
@@ -246,7 +265,8 @@
     <!-- http://purl.org/webofneeds/model#hasNeedProtocolEndpoint -->
 
     <owl:ObjectProperty rdf:about="&won;hasNeedProtocolEndpoint">
-        <rdfs:comment>Points to the needProtocol webservice endpoint of the need. I.e., won nodes can communicate with the need through this endpoint.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Points to the needProtocol webservice endpoint of the need. I.e., won nodes can communicate with the need through this endpoint.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:subPropertyOf rdf:resource="&owl;topObjectProperty"/>
     </owl:ObjectProperty>
     
@@ -256,7 +276,8 @@
 
     <owl:ObjectProperty rdf:about="&won;hasOriginator">
         <rdf:type rdf:resource="&owl;InverseFunctionalProperty"/>
-        <rdfs:comment>The entity (Need, Connection, or Service - eg. matching service) that originated the event.</rdfs:comment>
+        <rdfs:comment xml:lang="en">The entity (Need, Connection, or Service - eg. matching service) that originated the event.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:ObjectProperty>
     
 
@@ -265,7 +286,8 @@
 
     <owl:ObjectProperty rdf:about="&won;hasOwner">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>Specifies who controls the need.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Specifies who controls the need.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;Need"/>
     </owl:ObjectProperty>
     
@@ -274,7 +296,8 @@
     <!-- http://purl.org/webofneeds/model#hasOwnerProtocolEndpoint -->
 
     <owl:ObjectProperty rdf:about="&won;hasOwnerProtocolEndpoint">
-        <rdfs:comment>Points to the ownerProtocol webservice endpoint of the need. I.e., owner applications can communicate with the need through this endpoint.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Points to the ownerProtocol webservice endpoint of the need. I.e., owner applications can communicate with the need through this endpoint.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:ObjectProperty>
     
 
@@ -282,7 +305,8 @@
     <!-- http://purl.org/webofneeds/model#hasPriceSpecification -->
 
     <owl:ObjectProperty rdf:about="&won;hasPriceSpecification">
-        <rdfs:comment>Specifies the price of a need.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Specifies the price of a need.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;NeedModality"/>
         <rdfs:range rdf:resource="&won;PriceSpecification"/>
     </owl:ObjectProperty>
@@ -292,8 +316,9 @@
     <!-- http://purl.org/webofneeds/model#hasQuantitativeProperty -->
 
     <owl:ObjectProperty rdf:about="&won;hasQuantitativeProperty">
-        <rdfs:comment>Superproperty for quantitative properties. Some are already defined in the ontology.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Superproperty for quantitative properties. Some are already defined in the ontology.</rdfs:comment>
         <rdfs:range rdf:resource="&gr;QuantitativeValue"/>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;NeedContent"/>
     </owl:ObjectProperty>
     
@@ -305,7 +330,8 @@
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdf:type rdf:resource="&owl;InverseFunctionalProperty"/>
         <rdf:type rdf:resource="&owl;SymmetricProperty"/>
-        <rdfs:comment>Links a Connection object to its remote counterpart.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Links a Connection object to its remote counterpart.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;Connection"/>
         <rdfs:range rdf:resource="&won;Connection"/>
     </owl:ObjectProperty>
@@ -315,7 +341,8 @@
     <!-- http://purl.org/webofneeds/model#hasRemoteFacet -->
 
     <owl:ObjectProperty rdf:about="&won;hasRemoteFacet">
-        <rdfs:comment>Indicates that a remote need or remote connection supports the specified facet (=behaviour) or specifies the remote facet to connect with.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Indicates that a remote need or remote connection supports the specified facet (=behaviour) or specifies the remote facet to connect with.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:ObjectProperty>
     
 
@@ -323,7 +350,8 @@
     <!-- http://purl.org/webofneeds/model#hasTag -->
 
     <owl:ObjectProperty rdf:about="&won;hasTag">
-        <rdfs:comment>Specifies a tag for the need content.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Specifies a tag for the need content.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:ObjectProperty>
     
@@ -333,7 +361,8 @@
 
     <owl:ObjectProperty rdf:about="&won;hasTextDescription">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>Textual description of the need. May contain #hashtags but no HTML, XHTML or other formatting.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Textual description of the need. May contain #hashtags but no HTML, XHTML or other formatting.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;NeedContent"/>
         <rdfs:range rdf:resource="&xsd;string"/>
     </owl:ObjectProperty>
@@ -343,7 +372,8 @@
     <!-- http://purl.org/webofneeds/model#hasTimeSpecification -->
 
     <owl:ObjectProperty rdf:about="&won;hasTimeSpecification">
-        <rdfs:comment>Specifies when the Need object is available.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Specifies when the Need object is available.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;NeedModality"/>
         <rdfs:range rdf:resource="&won;TimeSpecification"/>
     </owl:ObjectProperty>
@@ -353,7 +383,8 @@
     <!-- http://purl.org/webofneeds/model#hasWeight -->
 
     <owl:ObjectProperty rdf:about="&won;hasWeight">
-        <rdfs:comment>Weight specified as a QuantitativeValue (specifies unit of measurement and value). </rdfs:comment>
+        <rdfs:comment xml:lang="en">Weight specified as a QuantitativeValue (specifies unit of measurement and value). </rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:subPropertyOf rdf:resource="&won;hasQuantitativeProperty"/>
     </owl:ObjectProperty>
     
@@ -362,7 +393,8 @@
     <!-- http://purl.org/webofneeds/model#hasWidth -->
 
     <owl:ObjectProperty rdf:about="&won;hasWidth">
-        <rdfs:comment>Width specified as a QuantitativeValue (specifies unit of measurement and value). </rdfs:comment>
+        <rdfs:comment xml:lang="en">Width specified as a QuantitativeValue (specifies unit of measurement and value). </rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:subPropertyOf rdf:resource="&won;hasQuantitativeProperty"/>
     </owl:ObjectProperty>
     
@@ -372,7 +404,8 @@
 
     <owl:ObjectProperty rdf:about="&won;isInState">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>Defines the Need object&apos;s state.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Defines the Need object&apos;s state.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;Need"/>
         <rdfs:range rdf:resource="&won;NeedState"/>
     </owl:ObjectProperty>
@@ -382,7 +415,8 @@
     <!-- http://purl.org/webofneeds/model#supportsWonProtocolImpl -->
 
     <owl:ObjectProperty rdf:about="&won;supportsWonProtocolImpl">
-        <rdfs:comment>Connects a Need object with a description of a WON protocol it supports.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Connects a Need object with a description of a WON protocol it supports.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;Need"/>
         <rdfs:range rdf:resource="&won;WonProtocol"/>
     </owl:ObjectProperty>
@@ -403,6 +437,7 @@
     <!-- http://purl.org/dc/terms#created -->
 
     <owl:DatatypeProperty rdf:about="http://purl.org/dc/terms#created">
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:subPropertyOf rdf:resource="&owl;topDataProperty"/>
     </owl:DatatypeProperty>
     
@@ -417,7 +452,8 @@
     <!-- http://purl.org/webofneeds/model#hasActiveMQNeedProtocolQueueName -->
 
     <owl:DatatypeProperty rdf:about="&won;hasActiveMQNeedProtocolQueueName">
-        <rdfs:comment>Name of the ActiveMQ queue used for the need protocol.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Name of the ActiveMQ queue used for the need protocol.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:DatatypeProperty>
     
 
@@ -425,7 +461,8 @@
     <!-- http://purl.org/webofneeds/model#hasActiveMQOwnerProtocolQueueName -->
 
     <owl:DatatypeProperty rdf:about="&won;hasActiveMQOwnerProtocolQueueName">
-        <rdfs:comment>Name of the ActiveMQ queue used for the owner protocol.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Name of the ActiveMQ queue used for the owner protocol.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:DatatypeProperty>
     
 
@@ -433,7 +470,8 @@
     <!-- http://purl.org/webofneeds/model#hasCurrency -->
 
     <owl:DatatypeProperty rdf:about="&won;hasCurrency">
-        <rdfs:comment>The currency for all prices given using the ISO 4217 standard (3 characters).</rdfs:comment>
+        <rdfs:comment xml:lang="en">The currency for all prices given using the ISO 4217 standard (3 characters).</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:DatatypeProperty>
     
 
@@ -442,7 +480,8 @@
 
     <owl:DatatypeProperty rdf:about="&won;hasEndTime">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>The end time as an xsd:dateTimeStamp.</rdfs:comment>
+        <rdfs:comment xml:lang="en">The end time as an xsd:dateTimeStamp.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;TimeSpecification"/>
         <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
     </owl:DatatypeProperty>
@@ -453,7 +492,8 @@
 
     <owl:DatatypeProperty rdf:about="&won;hasISOCode">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>Specifies the ISO region code as defined in ISO 3166-2.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Specifies the ISO region code as defined in ISO 3166-2.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:DatatypeProperty>
     
 
@@ -461,7 +501,8 @@
     <!-- http://purl.org/webofneeds/model#hasLowerPriceLimit -->
 
     <owl:DatatypeProperty rdf:about="&won;hasLowerPriceLimit">
-        <rdfs:comment>The lower price limit (only value, no currency).</rdfs:comment>
+        <rdfs:comment xml:lang="en">The lower price limit (only value, no currency).</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;PriceSpecification"/>
         <rdfs:range rdf:resource="&xsd;float"/>
     </owl:DatatypeProperty>
@@ -472,7 +513,8 @@
 
     <owl:DatatypeProperty rdf:about="&won;hasRecursIn">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>If set, specifies the interval of recurrence measured from the startTime, in xsd:duration.</rdfs:comment>
+        <rdfs:comment xml:lang="en">If set, specifies the interval of recurrence measured from the startTime, in xsd:duration.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;TimeSpecification"/>
         <rdfs:range rdf:resource="&xsd;duration"/>
     </owl:DatatypeProperty>
@@ -483,7 +525,8 @@
 
     <owl:DatatypeProperty rdf:about="&won;hasRecursInfiniteTimes">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>Indicates that the TimeSpecification is repeated until the end of time.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Indicates that the TimeSpecification is repeated until the end of time.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;TimeSpecification"/>
         <rdfs:range rdf:resource="&xsd;boolean"/>
     </owl:DatatypeProperty>
@@ -494,7 +537,8 @@
 
     <owl:DatatypeProperty rdf:about="&won;hasRecursTimes">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>Specifies how often the interval recurs.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Specifies how often the interval recurs.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;TimeSpecification"/>
         <rdfs:range rdf:resource="&xsd;integer"/>
     </owl:DatatypeProperty>
@@ -505,7 +549,8 @@
 
     <owl:DatatypeProperty rdf:about="&won;hasStartTime">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>The start time as an xsd:dateTimeStamp.</rdfs:comment>
+        <rdfs:comment xml:lang="en">The start time as an xsd:dateTimeStamp.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;TimeSpecification"/>
         <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
     </owl:DatatypeProperty>
@@ -515,7 +560,8 @@
     <!-- http://purl.org/webofneeds/model#hasTag -->
 
     <owl:DatatypeProperty rdf:about="&won;hasTag">
-        <rdfs:comment>Specifies a tag for the need content.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Specifies a tag for the need content.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:DatatypeProperty>
     
 
@@ -524,7 +570,8 @@
 
     <owl:DatatypeProperty rdf:about="&won;hasTextDescription">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>Textual description of the need. May contain #hashtags but no HTML, XHTML or other formatting.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Textual description of the need. May contain #hashtags but no HTML, XHTML or other formatting.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:DatatypeProperty>
     
 
@@ -533,7 +580,8 @@
 
     <owl:DatatypeProperty rdf:about="&won;hasTimeStamp">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
-        <rdfs:comment>The time and date when the event occurred.</rdfs:comment>
+        <rdfs:comment xml:lang="en">The time and date when the event occurred.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:range rdf:resource="&xsd;dateTimeStamp"/>
     </owl:DatatypeProperty>
     
@@ -542,7 +590,8 @@
     <!-- http://purl.org/webofneeds/model#hasUpperPriceLimit -->
 
     <owl:DatatypeProperty rdf:about="&won;hasUpperPriceLimit">
-        <rdfs:comment>The upper price limit (only value, no currency).</rdfs:comment>
+        <rdfs:comment xml:lang="en">The upper price limit (only value, no currency).</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:domain rdf:resource="&won;PriceSpecification"/>
         <rdfs:range rdf:resource="&xsd;float"/>
     </owl:DatatypeProperty>
@@ -553,6 +602,7 @@
 
     <owl:DatatypeProperty rdf:about="http://www.w3.org/2003/01/geo/wgs84_pos#latitude">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <rdfs:range rdf:resource="&xsd;float"/>
         <rdfs:domain rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#Point"/>
     </owl:DatatypeProperty>
@@ -580,10 +630,17 @@
     
 
 
+    <!-- http://purl.org/goodrelations/v1#QuantitativeValue -->
+
+    <owl:Class rdf:about="&gr;QuantitativeValue"/>
+    
+
+
     <!-- http://purl.org/webofneeds/model#BasicNeedType -->
 
     <owl:Class rdf:about="&won;BasicNeedType">
-        <rdfs:comment>Superclass for the types of needs there are. Used primarily to indicate which types of needs are expected as hints.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Superclass for types of needs. Used primarily to indicate which types of needs are compatible with each other for sending hints.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -591,7 +648,8 @@
     <!-- http://purl.org/webofneeds/model#Connection -->
 
     <owl:Class rdf:about="&won;Connection">
-        <rdfs:comment>Represents a Connection to between two Needs. Whenever two Needs are connected, each Need creates a dedicated Connection object which encapsulate all information about the connection.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Represents a Connection to between two Needs. Whenever two Needs are connected, each Need creates a dedicated Connection object which encapsulate all information about the connection.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -600,7 +658,8 @@
 
     <owl:Class rdf:about="&won;ConnectionContainer">
         <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/ldp#CompositeContainer"/>
-        <rdfs:comment>Container for Connections.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Container for Connections.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -608,7 +667,8 @@
     <!-- http://purl.org/webofneeds/model#ConnectionState -->
 
     <owl:Class rdf:about="&won;ConnectionState">
-        <rdfs:comment>A Connection&apos;s state.</rdfs:comment>
+        <rdfs:comment xml:lang="en">A Connection&apos;s state.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -617,7 +677,8 @@
 
     <owl:Class rdf:about="&won;EventContainer">
         <rdfs:subClassOf rdf:resource="http://www.w3.org/ns/ldp#CompositeContainer"/>
-        <rdfs:comment>Container for Events.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Container for Events.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -625,7 +686,8 @@
     <!-- http://purl.org/webofneeds/model#Facet -->
 
     <owl:Class rdf:about="&won;Facet">
-        <rdfs:comment>Facets are behaviours a Need can choose to support. Connections have a Facet; Needs can be connected through multiple Connections if they have different Facets.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Facets are behaviours a Need can choose to support. Connections have a Facet; Needs can be connected through multiple Connections if they have different Facets.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -633,7 +695,8 @@
     <!-- http://purl.org/webofneeds/model#LocationSpecification -->
 
     <owl:Class rdf:about="&won;LocationSpecification">
-        <rdfs:comment>Specifies where a Need is available.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Specifies where a Need is available.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -642,8 +705,9 @@
 
     <owl:Class rdf:about="&won;Need">
         <rdfs:label>Need</rdfs:label>
-        <rdfs:comment>A need is an online entity controlled by a person or organization. Its purpose is to be connected to other such needs via Connections, so it can be said that it represents the need to interact with others.
+        <rdfs:comment xml:lang="en">A need is an online entity controlled by a person or organization. Its purpose is to be connected to other such needs via Connections, so it can be said that it represents the need to interact with others.
 It specifies a content - what the need is about, which may be something that is offered for sale, sought for rental etc.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -651,7 +715,8 @@ It specifies a content - what the need is about, which may be something that is 
     <!-- http://purl.org/webofneeds/model#NeedContent -->
 
     <owl:Class rdf:about="&won;NeedContent">
-        <rdfs:comment>Whatever the Need is about.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Whatever the Need is about.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -659,7 +724,8 @@ It specifies a content - what the need is about, which may be something that is 
     <!-- http://purl.org/webofneeds/model#NeedModality -->
 
     <owl:Class rdf:about="&won;NeedModality">
-        <rdfs:comment>Defines the &apos;modality&apos; of the need; in contrast to the NeedContent (the &apos;what&apos; ) this should define where, when, and how</rdfs:comment>
+        <rdfs:comment xml:lang="en">Defines the &apos;modality&apos; of the need; in contrast to the NeedContent (the &apos;what&apos; ) this should define where, when, and how</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -667,7 +733,8 @@ It specifies a content - what the need is about, which may be something that is 
     <!-- http://purl.org/webofneeds/model#NeedState -->
 
     <owl:Class rdf:about="&won;NeedState">
-        <rdfs:comment>The Need&apos;s state.</rdfs:comment>
+        <rdfs:comment xml:lang="en">The Need&apos;s state.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -675,7 +742,8 @@ It specifies a content - what the need is about, which may be something that is 
     <!-- http://purl.org/webofneeds/model#PriceSpecification -->
 
     <owl:Class rdf:about="&won;PriceSpecification">
-        <rdfs:comment>Specifies the price.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Specifies the price.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -684,6 +752,7 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:Class rdf:about="&won;Region">
         <rdfs:subClassOf rdf:resource="&won;LocationSpecification"/>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -691,7 +760,8 @@ It specifies a content - what the need is about, which may be something that is 
     <!-- http://purl.org/webofneeds/model#TimeSpecification -->
 
     <owl:Class rdf:about="&won;TimeSpecification">
-        <rdfs:comment>Specifies when a Need is available. Matching services should try to find Needs with TimeSpecifications that overlap with this needs&apos; TimeSpecifications.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Specifies when a Need is available. Matching services should try to find Needs with TimeSpecifications that overlap with this needs&apos; TimeSpecifications.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -700,7 +770,8 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:Class rdf:about="&won;WonOverActiveMq">
         <rdfs:subClassOf rdf:resource="&won;WonProtocol"/>
-        <rdfs:comment>The Web of Needs protocol implementation that uses ActiveMQ.</rdfs:comment>
+        <rdfs:comment xml:lang="en">The Web of Needs protocol implementation that uses ActiveMQ.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -708,8 +779,9 @@ It specifies a content - what the need is about, which may be something that is 
     <!-- http://purl.org/webofneeds/model#WonOverSoapWs -->
 
     <owl:Class rdf:about="&won;WonOverSoapWs">
-        <rdfs:subClassOf rdf:resource="&gr;WarrantyPromise"/>
-        <rdfs:comment>The Web of Needs Protocol implelementation that uses SOAP Webservices.</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="&won;WonProtocol"/>
+        <rdfs:comment xml:lang="en">The Web of Needs Protocol implelementation that uses SOAP Webservices.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -717,8 +789,9 @@ It specifies a content - what the need is about, which may be something that is 
     <!-- http://purl.org/webofneeds/model#WonProtocol -->
 
     <owl:Class rdf:about="&won;WonProtocol">
-        <rdfs:comment>Superclass for Web of Needs protocol implementations.
+        <rdfs:comment xml:lang="en">Superclass for Web of Needs protocol implementations.
 </rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:Class>
     
 
@@ -726,6 +799,12 @@ It specifies a content - what the need is about, which may be something that is 
     <!-- http://rdfs.org/sioc/types#Tag -->
 
     <owl:Class rdf:about="&sioc;Tag"/>
+    
+
+
+    <!-- http://www.w3.org/2001/XMLSchema#string -->
+
+    <owl:Class rdf:about="&xsd;string"/>
     
 
 
@@ -758,7 +837,8 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:NamedIndividual rdf:about="&won;Active">
         <rdf:type rdf:resource="&won;NeedState"/>
-        <rdfs:comment>The active state. </rdfs:comment>
+        <rdfs:comment xml:lang="en">The active state. </rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:NamedIndividual>
     
 
@@ -767,7 +847,8 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:NamedIndividual rdf:about="&won;Closed">
         <rdf:type rdf:resource="&won;ConnectionState"/>
-        <rdfs:comment>The closed state. No Messages are forwarded in this state. Re-opening a connection is possbile.</rdfs:comment>
+        <rdfs:comment xml:lang="en">The closed state. No Messages are forwarded in this state. Re-opening a connection is possbile.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:NamedIndividual>
     
 
@@ -776,7 +857,8 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:NamedIndividual rdf:about="&won;Connected">
         <rdf:type rdf:resource="&won;ConnectionState"/>
-        <rdfs:comment>The connected state. Messages are forwarded to/from the owner.</rdfs:comment>
+        <rdfs:comment xml:lang="en">The connected state. Messages are forwarded to/from the owner.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:NamedIndividual>
     
 
@@ -785,7 +867,8 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:NamedIndividual rdf:about="&won;Critique">
         <rdf:type rdf:resource="&won;BasicNeedType"/>
-        <rdfs:comment>Indicates that the Need owner is dissatisfied with something, which should be described in more detail through NeedDescription and NeedModality. The owner may be interested in doing something about the problem, so matching services are advised to provide hints to similar Critique Needs.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Indicates that the Need owner is dissatisfied with something, which should be described in more detail through NeedDescription and NeedModality. The owner may be interested in doing something about the problem, so matching services are advised to provide hints to similar Critique Needs.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <allowsMatchWith rdf:resource="&won;Critique"/>
     </owl:NamedIndividual>
     
@@ -795,7 +878,8 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:NamedIndividual rdf:about="&won;Demand">
         <rdf:type rdf:resource="&won;BasicNeedType"/>
-        <rdfs:comment>Indicates that the Need owner wants to obtain, borrow, rent, etc. something or consume a service. Hints to Supply objects are expected.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Indicates that the Need owner wants to obtain, borrow, rent, etc. something or consume a service. Hints to Supply objects are expected.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <allowsMatchWith rdf:resource="&won;Supply"/>
     </owl:NamedIndividual>
     
@@ -805,7 +889,8 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:NamedIndividual rdf:about="&won;DoTogether">
         <rdf:type rdf:resource="&won;BasicNeedType"/>
-        <rdfs:comment>Indicates that the Need owner is interested in social activty of some sort. Hints to other DoTogether Needs are expected.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Indicates that the Need owner is interested in social activty of some sort. Hints to other DoTogether Needs are expected.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <allowsMatchWith rdf:resource="&won;DoTogether"/>
     </owl:NamedIndividual>
     
@@ -815,7 +900,8 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:NamedIndividual rdf:about="&won;GroupFacet">
         <rdf:type rdf:resource="&won;Facet"/>
-        <rdfs:comment>The group facet. Messages are forwarded to all connections with this facet.</rdfs:comment>
+        <rdfs:comment xml:lang="en">The group facet. Messages are forwarded to all connections with this facet.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:NamedIndividual>
     
 
@@ -824,7 +910,8 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:NamedIndividual rdf:about="&won;Inactive">
         <rdf:type rdf:resource="&won;NeedState"/>
-        <rdfs:comment>The incative state. Needs do not communicate in this state. Intended to stop receiving messages for something not currently of interest.</rdfs:comment>
+        <rdfs:comment xml:lang="en">The incative state. Needs do not communicate in this state. Intended to stop receiving messages for something not currently of interest.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:NamedIndividual>
     
 
@@ -833,7 +920,8 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:NamedIndividual rdf:about="&won;OwnerFacet">
         <rdf:type rdf:resource="&won;Facet"/>
-        <rdfs:comment>The Default facet. All messages and events are forwarded to the owner, no action is taken automatically.</rdfs:comment>
+        <rdfs:comment xml:lang="en">The Default facet. All messages and events are forwarded to the owner, no action is taken automatically.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:NamedIndividual>
     
 
@@ -842,7 +930,8 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:NamedIndividual rdf:about="&won;RequestReceived">
         <rdf:type rdf:resource="&won;ConnectionState"/>
-        <rdfs:comment>Half-open state. The connection has been opened by the remote counterpart but not yet been accepted by the local end.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Half-open state. The connection has been opened by the remote counterpart but not yet been accepted by the local end.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:NamedIndividual>
     
 
@@ -851,7 +940,8 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:NamedIndividual rdf:about="&won;RequestSent">
         <rdf:type rdf:resource="&won;ConnectionState"/>
-        <rdfs:comment>Half-open state. The Connection has been requested by the local end but not yet been accepted by the remote counterpart.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Half-open state. The Connection has been requested by the local end but not yet been accepted by the remote counterpart.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:NamedIndividual>
     
 
@@ -860,7 +950,8 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:NamedIndividual rdf:about="&won;Suggested">
         <rdf:type rdf:resource="&won;ConnectionState"/>
-        <rdfs:comment>Suggested state. The Connection has been created through a Hint Event but not yet been opened by either of the sides.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Suggested state. The Connection has been created through a Hint Event but not yet been opened by either of the sides.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
     </owl:NamedIndividual>
     
 
@@ -869,7 +960,8 @@ It specifies a content - what the need is about, which may be something that is 
 
     <owl:NamedIndividual rdf:about="&won;Supply">
         <rdf:type rdf:resource="&won;BasicNeedType"/>
-        <rdfs:comment>Indicates that the Need owner wants to sell, lend or give away something. Hints to Demand Needs are expected.</rdfs:comment>
+        <rdfs:comment xml:lang="en">Indicates that the Need owner wants to sell, lend or give away something. Hints to Demand Needs are expected.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="http://purl.org/webofneeds/model"/>
         <allowsMatchWith rdf:resource="&won;Demand"/>
     </owl:NamedIndividual>
 </rdf:RDF>
