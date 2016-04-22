@@ -36,8 +36,7 @@ containers:
 
 The script has a config section at the beginning where you can "set deployment specific variables". Change the
 variables there according to your environment. The most important variables you may need to change are your deployment
-host server (deploy_host) and the docker options (docker_options) you use to run docker commands. By default the
-docker options are left empty.
+host server (deploy_host) and the docker options (docker_options) you use to run docker commands and the basefolder (base_folder) which is used to store the certificates. By default the docker options are left empty.
 
 When the script executes it runs all the above listed docker images as containers and downloads them from the
 webofneeds docker hub repository if not available locally. If the script finishes without error all components
@@ -51,7 +50,7 @@ The owner and won node applications should be accessible through the browser und
 * **owner:** https://${deploy_host}:8082/owner
 * **wonnode:** https://${deploy_host}/won
 
-**NOTE**: If you change the `${deploy_host}` in the script you must either provide a different directory for the certificates or delete the certificates beforehand, otherwise the creation of elements will not be possible due to faulty certificates.
+**NOTE**: If you change the `${deploy_host}` in the script you must either provide a different directory for the certificates or delete the certificates beforehand, otherwise the creation of elements will not be possible due to faulty certificates. Also delete the postgres docker container to wipe all preexisting data it is not valid for different certificates anymore.
 
 **NOTE**: for deployment on a Windows server basically the same steps as described for Linux apply expect that there is
 no script available for Windows at the moment. But the docker commands in the scripts can be executed in the same way
