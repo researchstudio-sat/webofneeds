@@ -29,4 +29,5 @@ public class WONCRYPT
   public static final Property ECC_QX = m.createProperty(BASE_URI, "ecc_qx");
   public static final Property ECC_QY = m.createProperty(BASE_URI, "ecc_qy");
 
+  public static final String CLIENT_CERTIFICATE_HEADER = "X-Client-Certificate";
 }

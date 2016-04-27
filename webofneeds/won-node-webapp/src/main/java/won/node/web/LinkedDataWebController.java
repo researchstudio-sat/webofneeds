@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.HandlerMapping;
 import won.cryptography.service.RegistrationServer;
+import won.cryptography.webid.CertificateUtils;
 import won.node.service.impl.URIService;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.exception.NoSuchConnectionException;
@@ -55,7 +56,10 @@ import won.protocol.vocabulary.WONMSG;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -121,6 +125,10 @@ public class
   //prefix for human readable pages
   private String pageURIPrefix;
   private String  nodeResourceURIPrefix;
+
+  // true if the node is behind a reverse proxy
+  private boolean behindProxy;
+
   @Autowired
   private LinkedDataService linkedDataService;
 
@@ -1165,7 +1173,8 @@ public class
     final HttpHeaders headers, final URI canonicalURI,
     final NeedInformationService.PagedResource<Dataset,URI> resource, final int page, String queryPart) {
 
-    headers.add("Link", "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
+    headers.add("Link",
+                "<http://www.w3.org/ns/ldp#Resource>; rel=\"type\", <http://www.w3.org/ns/ldp#Page>; rel=\"type\"");
     //Link: <http://example.org/customer-relations?p=2>; rel="next"
     if (resource.hasNext()) {
       int nextPage = page + 1;
@@ -1315,7 +1324,7 @@ public class
     method = RequestMethod.POST,
     produces={"text/plain"})
   public ResponseEntity<String> register(@RequestParam("register") String registeredType, HttpServletRequest
-    request) {
+    request) throws CertificateException, UnsupportedEncodingException {
 
     logger.debug("REGISTERING " + registeredType);
     String supportedTypesMsg = "Request parameter error; supported 'register' parameter values: 'owner', 'node'";
@@ -1325,15 +1334,21 @@ public class
       return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
     }
 
-    Object certificateChainObj = request.getAttribute("javax.servlet.request.X509Certificate");
+    X509Certificate[] certChain = null;
+    try {
+      certChain = CertificateUtils.extractClientCertificateFromRequest(request, behindProxy);
+    } catch (CertificateException e) {
+      logger.error(e.getMessage());
+      return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
+    }
 
     try {
       if (registeredType.equals("owner")) {
-        String result = registrationServer.registerOwner(certificateChainObj);
+        String result = registrationServer.registerOwner(certChain);
         return new ResponseEntity<String>(result, HttpStatus.OK);
       }
       if (registeredType.equals("node")) {
-        String result = registrationServer.registerNode(certificateChainObj);
+        String result = registrationServer.registerNode(certChain);
         return new ResponseEntity<String>(result, HttpStatus.OK);
       } else {
         logger.warn(supportedTypesMsg);
@@ -1398,5 +1413,13 @@ public class
     public String getTimestamp() {
       return timestamp;
     }
+  }
+
+  public boolean isBehindProxy() {
+    return behindProxy;
+  }
+
+  public void setBehindProxy(final boolean behindProxy) {
+    this.behindProxy = behindProxy;
   }
 }

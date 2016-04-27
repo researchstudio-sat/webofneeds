@@ -44,7 +44,7 @@ function genComponentConf() {
             window.dtf4dbg = this;
 
             this.displayingPlaceholder = true;
-            this.value = '';
+            this.lastInput = '';
 
             this.textFieldNg().bind('keydown',e => this.onKeydown(e)) //prevent enter
                               .bind('keyup', () => this.input()) // handle title changes
@@ -76,14 +76,15 @@ function genComponentConf() {
             }
         }
         onFocus(e) {
-            this.preEditValue = this.value;
+            this.preEditValue = this.getText().trim();
             this.clearPlaceholder();
         }
         onBlur(e) {
             this.addPlaceholderIfEmpty();
-            if(this.value !== this.preEditValue) {
+            const value = this.getText().trim();
+            if(value !== this.preEditValue) {
                 const payload = {
-                    value: this.value,
+                    value: value,
                     valid: this.valid()
                 };
                 this.onChange(payload);
@@ -94,7 +95,7 @@ function genComponentConf() {
         submit () {
             if(this.submitButtonLabel || this.submittable) {
                 const payload = {
-                    value: this.value,
+                    value: this.getText().trim(),
                     valid: this.valid()
                 };
                 this.onSubmit(payload);
@@ -111,17 +112,15 @@ function genComponentConf() {
                     this.textField().innerHTML.match(/<br>./)) { //also supress line breaks inside the text in copy-pasted text
                         this.setText(this.getText()); //sanitize
                     }
-                const newVal = this.getText().trim();
-                //make sure the text field contains the sanitized text (so user sees what they're posting)
-                //this.setText(newVal);
 
                 //compare with previous value, if different
-                if(this.value !== newVal) {
-                    this.value = newVal;
+                const newVal = this.getText().trim();
+                if(this.lastInput !== newVal) {
+                    this.lastInput = newVal;
 
                     // -> publish input event
                     const payload = {
-                        value: this.value,
+                        value: newVal,
                         valid: this.valid()
                     };
                     this.onInput(payload);
@@ -173,7 +172,7 @@ function genComponentConf() {
             this.textField().innerHTML = txt
         }
         valid() {
-            return this.value.length < this.maxChars;
+            return this.getText().trim().length < this.maxChars;
         }
         // view -> model
         // model -> view
