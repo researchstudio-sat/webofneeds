@@ -133,12 +133,16 @@ export function runMessagingAgent(redux) {
                     case won.WONMSG.connectionMessageCompacted:
                         var eventUri = msgFromSystem.isRemoteResponseTo || msgFromSystem.isResponseTo;
                         var connectionUri = msgFromSystem.hasReceiver;
-                        if (msgFromSystem.hasMessageType === won.WONMSG.successResponseCompacted
-                            && msgFromSystem.isRemoteResponseTo) {
-                                // got the second success-response (from the remote-node)
-                                redux.dispatch(actionCreators.messages__chatMessage__success({eventUri, connectionUri}));
+                        if (msgFromSystem.hasMessageType === won.WONMSG.successResponseCompacted) {
+                            if (msgFromSystem.isRemoteResponseTo) {
+                                // got the second success-response (from the remote-node) - 2nd ACK
+                                redux.dispatch(actionCreators.messages__chatMessage__successRemote({ events }));
+                            } else {
+                                // got the first success-response (from our own node) - 1st ACK
+                                redux.dispatch(actionCreators.messages__chatMessage__successOwn({ events }));
+                            }
                         } else if(msgFromSystem.hasMessageType === won.WONMSG.failureResponseCompacted) {
-                            redux.dispatch(actionCreators.messages__chatMessage__failure({ eventUri, connectionUri }));
+                            redux.dispatch(actionCreators.messages__chatMessage__failure({ events }));
                         }
                         break;
 
