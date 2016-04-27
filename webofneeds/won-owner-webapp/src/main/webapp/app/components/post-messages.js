@@ -98,9 +98,16 @@ function genComponentConf() {
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
 
-            this.snapBottom();
+            this.snapToBottom();
         }
 
+        snapToBottom() {
+            this._snapBottom = true;
+            this.scrollToBottom();
+        }
+        unsnapFromBottom() {
+            this._snapBottom = false;
+        }
         updateScrollposition() {
             if(this._snapBottom) {
                 this.scrollToBottom();
@@ -109,12 +116,6 @@ function genComponentConf() {
         scrollToBottom() {
             this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
         }
-        snapBottom() {
-            this._snapBottom = true;
-            this.scrollToBottom();
-        }
-        unsnapBottom() {
-            this._snapBottom = false;
         }
         scrollContainerNg() {
             if(!this._scrollContainer) {
