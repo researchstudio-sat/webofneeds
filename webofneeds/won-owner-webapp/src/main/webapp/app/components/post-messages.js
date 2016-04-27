@@ -75,6 +75,8 @@ function genComponentConf() {
 
             const self = this;
 
+            this.scrollContainerNg().bind('scroll', e => this.onScroll(e));
+
             //this.postmsg = this;
             const selectFromState = state => {
 
@@ -114,8 +116,23 @@ function genComponentConf() {
             }
         }
         scrollToBottom() {
+            this._programmaticallyScrolling = true;
+
             this.scrollContainer().scrollTop = this.scrollContainer().scrollHeight;
         }
+        onScroll(e) {
+            if(!this._programmaticallyScrolling) {
+                //only unsnap if the user scrolled themselves
+                this.unsnapFromBottom();
+            }
+
+            const sc = this.scrollContainer();
+            const isAtBottom = sc.scrollTop + sc.offsetHeight >= sc.scrollHeight;
+            if(isAtBottom) {
+                this.snapToBottom();
+            }
+
+            this._programmaticallyScrolling = false
         }
         scrollContainerNg() {
             if(!this._scrollContainer) {
