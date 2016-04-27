@@ -57,7 +57,7 @@ let app = angular.module('won.owner', [
     ngReduxRouterModule,
 
     //components
-    topnav, //used in rework.html/index.html
+    topnav,
 
     //views
     createNeedComponent,

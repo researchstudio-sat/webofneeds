@@ -24,9 +24,9 @@ public class WonOwnerMailSender {
   @Autowired
   LinkedDataSource linkedDataSource;
 
-  private static final String OWNER_REMOTE_NEED_LINK = "/rework.html#/post/visitor/info/?theirUri=";
-  private static final String OWNER_CONNECTION_LINK = "/rework.html#/post/visitor/messages/?myUri=<>&theirUri=";
-  private static final String OWNER_LOCAL_NEED_LINK = "/rework.html#/post/owner/info?myUri=";
+  private static final String OWNER_REMOTE_NEED_LINK = "/#/post/visitor/info/?theirUri=";
+  private static final String OWNER_CONNECTION_LINK = "/#/post/visitor/messages/?myUri=<>&theirUri=";
+  private static final String OWNER_LOCAL_NEED_LINK = "/#/post/owner/info?myUri=";
 
   private static final String NOTIFICATION_END = "\n\n\n" +
     "Sincerely yours,\nOwner application team" +
