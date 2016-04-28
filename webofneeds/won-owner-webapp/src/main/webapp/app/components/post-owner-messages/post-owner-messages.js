@@ -29,8 +29,9 @@ class Controller {
 
             const encodedConnectionUri = state.getIn(['router', 'currentParams', 'connectionUri']) ||
                 state.getIn(['router', 'currentParams', 'openConversation']); // TODO old parameter
+            const connectionUri = encodedConnectionUri? decodeURIComponent(encodedConnectionUri) : undefined;
             const actualConnectionType = state.getIn([
-                'connections', decodeURIComponent(encodedConnectionUri), 'hasConnectionState'
+                'connections', connectionUri, 'hasConnectionState'
             ]);
 
             const encodedConnectionType = state.getIn(['router', 'currentParams', 'connectionType']);
@@ -49,7 +50,7 @@ class Controller {
                 connectionUri: decodeURIComponent(encodedConnectionUri),
 
                 showConversationDetails: connectionIsOpen && connectionTypeInParams === won.WON.Connected,
-                showMatchDetails: connectionIsOpen && connectionTypeInParams === won.WON.Hint,
+                showMatchDetails: connectionIsOpen && connectionTypeInParams === won.WON.Suggested,
             };
         }
 

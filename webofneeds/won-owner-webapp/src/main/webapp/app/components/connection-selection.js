@@ -86,14 +86,19 @@ function genComponentConf() {
                 const encodedConnectionUri = state.getIn(['router', 'currentParams', 'connectionUri']) ||
                     state.getIn(['router', 'currentParams', 'openConversation']); // TODO old parameter
 
-                const openConnectionUri = decodeURIComponent(encodedConnectionUri);
+                const openConnectionUri = encodedConnectionUri? decodeURIComponent(encodedConnectionUri) : undefined;
                 const allByConnections = selectAllByConnections(state);
                 const post = state.getIn(['needs','ownNeeds', postUri]);
                 const postJS = post? post.toJS() : {};
 
+                const encodedConnectionType = state.getIn(['router', 'currentParams', 'connectionType']);
+                const connectionTypeInParams = (encodedConnectionType ? decodeURIComponent(encodedConnectionType) : undefined) ||
+                    won.WON.Connected; // TODO old parameter
+                const connectionType = connectionTypeInParams || self.connectionType
+
                 const connectionUris = allByConnections
                     .filter(conn =>
-                        conn.getIn(['connection', 'hasConnectionState']) === self.connectionType &&
+                        conn.getIn(['connection', 'hasConnectionState']) === connectionType &&
                         conn.getIn(['ownNeed', 'uri']) === postUri
                     )
                     .map(conn => conn.getIn(['connection','uri']))
