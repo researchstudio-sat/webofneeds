@@ -6,8 +6,20 @@
 </header>
 <main class="ownerpostcontent">
 
-    <a ui-sref="post({connectionType: 'http://purl.org/webofneeds/model#Suggested', openConversation: null, connectionUri: null, postUri: self.postUri})">Hint</a>
-    <a ui-sref="post({connectionType: 'http://purl.org/webofneeds/model#Connected', openConversation: null, connectionUri: null, postUri: self.postUri})">Connected</a>
+    <ul>
+        <li>
+            <a ui-sref="post({connectionType: 'http://purl.org/webofneeds/model#Suggested', openConversation: null, connectionUri: null, postUri: self.postUri})">Hint</a>
+        </li>
+        <li>
+            <a ui-sref="post({connectionType: 'http://purl.org/webofneeds/model#Connected', openConversation: null, connectionUri: null, postUri: self.postUri})">Connected</a>
+        </li>
+        <li>
+            <a ui-sref="post({connectionType: 'http://purl.org/webofneeds/model#RequestReceived', openConversation: null, connectionUri: null, postUri: self.postUri})">Requests</a>
+        </li>
+        <li>
+            <a ui-sref="post({connectionType: 'http://purl.org/webofneeds/model#RequestSent', openConversation: null, connectionUri: null, postUri: self.postUri})">Sent Requests</a>
+        </li>
+    </ul>
 
     <!-- left column -->
     <won-connection-selection
@@ -24,6 +36,11 @@
         <div class="post-messages__inner">
             <won-post-messages></won-post-messages>
         </div>
+    </div>
+
+    <!-- Incoming Requests: -->
+    <div class="post-messages" ng-show="self.showIncomingRequestDetails">
+        <won-open-request></won-open-request>
     </div>
 
     <!-- Matches: -->

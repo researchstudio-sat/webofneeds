@@ -11,6 +11,7 @@ import { attach,mapToMatches } from '../../utils';
 import won from '../../won-es6';
 import { actionCreators }  from '../../actions/actions';
 import openConversationModule from '../open-conversation';
+import openRequestModule from '../open-request';
 import connectionSelectionModule from '../connection-selection';
 import { selectAllByConnections } from '../../selectors';
 
@@ -76,6 +77,7 @@ export default angular.module('won.owner.components.postOwner.messages', [
     //galleryModule,
     postMessagesModule,
     connectionSelectionModule,
+    openRequestModule,
 ])
     .controller('PostOwnerMessagesController', Controller)
     .name;

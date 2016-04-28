@@ -5,6 +5,7 @@ import extendedGalleryModule from '../components/extended-gallery';
 import { labels } from '../won-label-utils';
 import {attach} from '../utils.js'
 import { actionCreators }  from '../actions/actions';
+import { selectOpenConnectionUri } from '../selectors';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
@@ -61,13 +62,14 @@ function genComponentConf() {
             this.message='';
             this.labels = labels;
             const selectFromState = (state) => {
-                const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
+                const connectionUri = selectOpenConnectionUri(state);
+                const theirNeedUri = state.getIn(['connections', connectionUri, 'hasRemoteNeed']);
 
                 return {
                     currentPage: state.getIn(['router','currentState','name']),
                     connectionUri: connectionUri,
                     connection: state.getIn(['connections', connectionUri]),
-                    theirNeed: state.getIn(['needs','theirNeeds', state.getIn(['connections', connectionUri, 'hasRemoteNeed'])])
+                    theirNeed: state.getIn(['needs','theirNeeds', theirNeedUri]),
                 }
             };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
