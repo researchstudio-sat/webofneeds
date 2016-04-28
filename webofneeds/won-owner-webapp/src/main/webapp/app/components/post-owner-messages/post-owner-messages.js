@@ -43,7 +43,6 @@ class Controller {
                 actualConnectionType == connectionTypeInParams;
 
             return {
-                myUri: postUri, // TODO old parameter
                 postUri: postUri,
 
                 connectionType: connectionTypeInParams,
@@ -51,6 +50,8 @@ class Controller {
 
                 showConversationDetails: connectionIsOpen && connectionTypeInParams === won.WON.Connected,
                 showMatchDetails: connectionIsOpen && connectionTypeInParams === won.WON.Suggested,
+                showIncomingRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestReceived,
+                showSentRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestSent,
             };
         }
 
@@ -58,11 +59,8 @@ class Controller {
         this.$scope.$on('$destroy', disconnect);
     }
     openConnection(connectionUri) {
-        this.router__stateGo('post', { //TODO change to post
-            myUri: decodeURIComponent(this.myUri), // TODO old parameter
-            postUri: decodeURIComponent(this.postUri) ||
-                    decodeURIComponent(this.myUri), // TODO old parameter
-            openConversation: connectionUri, // TODO old parameter
+        this.router__stateGo('post', {
+            postUri: decodeURIComponent(this.postUri),
             connectionUri: connectionUri,
             connectionType: this.connectionType,
         })
