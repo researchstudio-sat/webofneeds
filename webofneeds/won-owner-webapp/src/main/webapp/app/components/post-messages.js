@@ -89,8 +89,8 @@ function genComponentConf() {
             this.$scope.$on('$destroy', disconnect);
         }
 
-        input(input) {
-            this.chatMessage = input;
+        input(userInput) {
+            this.chatMessage = userInput;
         }
 
         send() {
