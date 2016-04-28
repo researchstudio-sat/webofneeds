@@ -72,7 +72,7 @@ function genComponentConf() {
 
     class Controller {
         constructor() {
-            window.connSel4db = this;
+            window.connSel4dbg = this;
             attach(this, serviceDependencies, arguments);
             this.labels = labels;
 
