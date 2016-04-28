@@ -39,11 +39,18 @@
     </div>
 
 
+    <!-- Matches: -->
+    <div class="post-messages" ng-show="self.showMatchDetails">
+        <div class="post-messages__inner">
+            Can't handle matches here yet.
+        </div>
+    </div>
+
 
     <!-- left column for connection-typed tabs -->
     <won-connection-selection
             class="owner__messages"
-            ng-show="!!self.connectionType"
+            ng-show="!self.showMatchDetails || self.connectionType"
             connection-type="self.connectionType"
             selected-connection="::self.openConnection(connectionUri)"
             >
@@ -68,11 +75,5 @@
         <won-open-request></won-open-request>
     </div>
 
-    <!-- Matches: -->
-    <div class="post-messages" ng-show="self.showMatchDetails">
-        <div class="post-messages__inner">
-            Can't handle matches here yet.
-        </div>
-    </div>
     <!-- /right column -->
 </main>
