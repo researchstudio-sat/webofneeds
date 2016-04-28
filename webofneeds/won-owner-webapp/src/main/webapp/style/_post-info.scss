@@ -3,12 +3,14 @@
 
 .post-info {
   @include max-content-width($maxContentWidth, $minContentPadding, 'post-info');
-  padding-top: 2rem;
+  padding: 2rem;
   display: flex;
   flex-direction: row;
   justify-content: center;
   flex-wrap: wrap;
   align-items: flex-start;
+  width: 100%;
+
 
   .post-info__heading {
     font-size: $normalFontSize;
