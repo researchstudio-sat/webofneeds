@@ -67,9 +67,9 @@
 this line loads the bundled app. comment it out if you want
 jspm to dynamically load and compile the sources at runtime.
 this makes for easier debugging, as you get seperate
-source files in the dev-tools' source explorer.
+source files in the dev-tools' source explorer.-->
 
-<script src="./generated/app_jspm.bundle.js"></script>-->
+<script src="./generated/app_jspm.bundle.js"></script>
 
 <script>
     System.import('./app/app_jspm')
