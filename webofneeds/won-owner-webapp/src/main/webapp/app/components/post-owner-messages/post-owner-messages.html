@@ -6,9 +6,44 @@
 </header>
 <main class="ownerpostcontent">
 
-    <!-- left column -->
+
+    <!-- Post info view when there's no connection-state/-type selected -->
+    <div class="post-info__inner" ng-show="!self.connectionType">
+        <won-gallery class="post-info__inner__left"></won-gallery>
+
+        <div class="post-info__inner__right">
+            <h2 class="post-info__heading" ng-show="self.post.get('friendlyTimestamp')">
+                Created
+            </h2>
+            <p class="post-info__details" ng-show="self.post.get('friendlyTimestamp')">
+                {{ self.post.get('friendlyTimestamp') }}
+            </p>
+
+            <h2 class="post-info__heading"
+                ng-show="self.post.get('description')">
+                Description
+            </h2>
+            <p class="post-info__details"
+                ng-show="self.post.get('description')">
+                {{ self.post.get('description') }}
+            </p>
+            <h2 class="post-info__heading"
+                ng-show="self.post.get('location')">
+                Location
+            </h2>
+            <p class="post-info__details"
+                ng-show="self.post.get('location')">
+                {{ self.post.get('location') }}
+            </p>
+        </div>
+    </div>
+
+
+
+    <!-- left column for connection-typed tabs -->
     <won-connection-selection
             class="owner__messages"
+            ng-show="!!self.connectionType"
             connection-type="self.connectionType"
             selected-connection="::self.openConnection(connectionUri)"
             >

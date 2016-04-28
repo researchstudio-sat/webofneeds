@@ -29,7 +29,7 @@ function genComponentConf() {
                     <button class="won-button--filled thin red" ng-show="!self.isActive && self.settingsOpen" ng-mouseleave="self.settingsOpen=false" ng-click="self.reOpenPost()">Reopen Post</button>
                     <ul class="ntb__tabs">
                         <li ng-class="{'ntb__tabs__selected' : self.selectedTab === 'Info'}">
-                            <a ui-sref="postInfo({myUri: self.postUri})">
+                            <a ui-sref="post({connectionType: null, openConversation: null, connectionUri: null, postUri: self.postUri})">
                                 Post Info
                             </a>
                         </li>

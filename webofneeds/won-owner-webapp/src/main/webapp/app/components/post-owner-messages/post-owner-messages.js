@@ -14,6 +14,7 @@ import openConversationModule from '../open-conversation';
 import openRequestModule from '../open-request';
 import connectionSelectionModule from '../connection-selection';
 import { selectAllByConnections } from '../../selectors';
+import { relativeTime } from '../../won-label-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 class Controller {
@@ -26,7 +27,7 @@ class Controller {
         const selectFromState = (state)=>{
             const encodedPostUri = state.getIn(['router', 'currentParams', 'postUri']) ||
                                 state.getIn(['router', 'currentParams', 'myUri']) ; // TODO old parameter
-            const postUri = decodeURIComponent(encodedPostUri);
+            const postUri = encodedPostUri ? decodeURIComponent(encodedPostUri) : undefined;
 
             const encodedConnectionUri = state.getIn(['router', 'currentParams', 'connectionUri']) ||
                 state.getIn(['router', 'currentParams', 'openConversation']); // TODO old parameter
@@ -36,15 +37,21 @@ class Controller {
             ]);
 
             const encodedConnectionType = state.getIn(['router', 'currentParams', 'connectionType']);
-            const connectionTypeInParams = (encodedConnectionType ? decodeURIComponent(encodedConnectionType) : undefined) ||
-                won.WON.Connected; // TODO old parameter
+            const connectionTypeInParams = (encodedConnectionType ? decodeURIComponent(encodedConnectionType) : undefined);
 
             const connectionIsOpen = !!encodedConnectionUri &&
                 //make sure we don't get a mismatch between supposed type and actual type:
                 actualConnectionType == connectionTypeInParams;
 
+            let post = state.getIn(['needs', 'ownNeeds', postUri]);
+            if(post) {
+                const timestamp = relativeTime(state.get('lastUpdateTime'), post.get('creationDate'));
+                post = post.set('friendlyTimestamp', timestamp);
+            }
+
             return {
-                postUri: postUri,
+                postUri,
+                post,
 
                 connectionType: connectionTypeInParams,
                 connectionUri: decodeURIComponent(encodedConnectionUri),

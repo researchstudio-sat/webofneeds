@@ -30,7 +30,6 @@ import createNeedComponent from './components/create-need/create-need';
 import overviewIncomingRequestsComponent from './components/overview-incoming-requests/overview-incoming-requests';
 import overviewSentRequestsComponent from './components/overview-sent-requests/overview-sent-requests';
 import postVisitorComponent from './components/post-visitor/post-visitor';
-import postOwnerComponent from './components/post-owner/post-owner';
 import postOwnerMessagesComponent from './components/post-owner-messages/post-owner-messages';
 import postVisitorMsgsComponent from './components/post-visitor-msgs/post-visitor-msgs';
 import { camel2Hyphen, hyphen2Camel, firstToLowerCase } from './utils';
@@ -64,7 +63,6 @@ let app = angular.module('won.owner', [
     overviewIncomingRequestsComponent,
     overviewSentRequestsComponent,
     postVisitorComponent,
-    postOwnerComponent,
     postOwnerMessagesComponent,
     postVisitorMsgsComponent,
     landingPageComponent,

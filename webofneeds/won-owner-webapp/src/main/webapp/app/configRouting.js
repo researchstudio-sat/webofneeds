@@ -24,7 +24,6 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
             component: 'post-owner-messages', as: 'postConversations' },
         { path: '/post/?postUri?connectionUri?connectionType', component: 'post-owner-messages', as: 'post' },
 
-        { path: '/post/owner/info?myUri', component: 'post-owner', as: 'postInfo' },
         { path: '/post/visitor/info/?myUri?theirUri', component: 'post-visitor', as: 'postVisitor' },
         { path: '/post/visitor/messages/?myUri?theirUri', component: 'post-visitor-msgs', as: 'postVisitorMsgs' },
 

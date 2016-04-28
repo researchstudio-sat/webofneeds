@@ -1,6 +1,6 @@
 @import 'sizing-utils';
 
-.post-info {
+.ownerpostcontent {
 
   @include max-content-width($maxContentWidth, $minContentPadding, 'post-info');
   padding-top: 2rem;
