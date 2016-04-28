@@ -5,15 +5,22 @@
     </won-owner-title-bar>
 </header>
 <main class="ownerpostcontent">
+
+    <!-- left column -->
     <won-connection-selection
             class="owner__messages"
-            connection-type="::self.wonConnected"
-            selected-connection="::self.openConversation(connectionUri)"
+            connection-type="self.connectionType"
+            selected-connection="::self.openConnection(connectionUri)"
             >
     </won-connection-selection>
-    <div class="post-messages" ng-show="self.conversationIsOpen">
+    <!-- /left column -->
+
+    <!-- right column -->
+    <!-- Conversations: -->
+    <div class="post-messages" ng-show="self.showConversationDetails">
         <div class="post-messages__inner">
             <won-post-messages></won-post-messages>
         </div>
     </div>
+    <!-- /right column -->
 </main>

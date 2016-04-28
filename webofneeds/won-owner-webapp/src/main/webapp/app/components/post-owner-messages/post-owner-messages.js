@@ -23,37 +23,47 @@ class Controller {
         this.wonConnected = won.WON.Connected;
 
         const selectFromState = (state)=>{
-            const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
-            const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
-            const conversations = Object.keys(connectionsDeprecated)
-                    .map(key => connectionsDeprecated[key])
-                    .filter(conn =>
-                        conn.connection.hasConnectionState === won.WON.Connected &&
-                        conn.ownNeed.uri === postId
-                    );
-            const conversationUris = conversations.map(conn => conn.connection.uri)
+            const encodedPostUri = state.getIn(['router', 'currentParams', 'postUri']) ||
+                                state.getIn(['router', 'currentParams', 'myUri']) ; // TODO old parameter
+            const postUri = decodeURIComponent(encodedPostUri);
 
-            const post = state.getIn(['needs','ownNeeds', postId]);
+            const encodedConnectionUri = state.getIn(['router', 'currentParams', 'connectionUri']) ||
+                state.getIn(['router', 'currentParams', 'openConversation']); // TODO old parameter
+            const actualConnectionType = state.getIn([
+                'connections', decodeURIComponent(encodedConnectionUri), 'hasConnectionState'
+            ]);
+
+            const encodedConnectionType = state.getIn(['router', 'currentParams', 'connectionType']);
+            const connectionTypeInParams = (encodedConnectionType ? decodeURIComponent(encodedConnectionType) : undefined) ||
+                won.WON.Connected; // TODO old parameter
+
+            const connectionIsOpen = !!encodedConnectionUri &&
+                //make sure we don't get a mismatch between supposed type and actual type:
+                actualConnectionType == connectionTypeInParams;
 
             return {
-                wonConnected: won.WON.Connected,
-                myUri: postId,
-                post: post && post.toJS? post.toJS() : {},
-                allByConnections: connectionsDeprecated,
-                conversations: conversations,
-                conversationUris: conversationUris,
-                conversationIsOpen: !!state.getIn(['router', 'currentParams', 'openConversation']),
+                myUri: postUri, // TODO old parameter
+                postUri: postUri,
+
+                connectionType: connectionTypeInParams,
+                connectionUri: decodeURIComponent(encodedConnectionUri),
+
+                showConversationDetails: connectionIsOpen && connectionTypeInParams === won.WON.Connected,
+                showMatchDetails: connectionIsOpen && connectionTypeInParams === won.WON.Hint,
             };
         }
 
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
         this.$scope.$on('$destroy', disconnect);
     }
-    openConversation(connectionUri) {
-        console.log('openConversation ', connectionUri);
-        this.router__stateGo('postConversations', {
-            myUri: decodeURIComponent(this.myUri),
-            openConversation: connectionUri,
+    openConnection(connectionUri) {
+        this.router__stateGo('post', { //TODO change to post
+            myUri: decodeURIComponent(this.myUri), // TODO old parameter
+            postUri: decodeURIComponent(this.postUri) ||
+                    decodeURIComponent(this.myUri), // TODO old parameter
+            openConversation: connectionUri, // TODO old parameter
+            connectionUri: connectionUri,
+            connectionType: this.connectionType,
         })
     }
 }

@@ -79,16 +79,22 @@ function genComponentConf() {
             const self = this;
 
             const selectFromState = (state)=>{
-                const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
-                const openConversationUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'openConversation']));
+                const encodedPostUri = state.getIn(['router', 'currentParams', 'postUri']) ||
+                    state.getIn(['router', 'currentParams', 'myUri']) ; // TODO old parameter
+                const postUri = decodeURIComponent(encodedPostUri);
+
+                const encodedConnectionUri = state.getIn(['router', 'currentParams', 'connectionUri']) ||
+                    state.getIn(['router', 'currentParams', 'openConversation']); // TODO old parameter
+
+                const openConnectionUri = decodeURIComponent(encodedConnectionUri);
                 const allByConnections = selectAllByConnections(state);
-                const post = state.getIn(['needs','ownNeeds', postId]);
+                const post = state.getIn(['needs','ownNeeds', postUri]);
                 const postJS = post? post.toJS() : {};
 
                 const connectionUris = allByConnections
                     .filter(conn =>
                         conn.getIn(['connection', 'hasConnectionState']) === self.connectionType &&
-                        conn.getIn(['ownNeed', 'uri']) === postId
+                        conn.getIn(['ownNeed', 'uri']) === postUri
                     )
                     .map(conn => conn.getIn(['connection','uri']))
                     .toList().toJS();
@@ -96,7 +102,7 @@ function genComponentConf() {
                 return {
                     connectionUris,
                     allByConnections,
-                    openConversationUri,
+                    openConversationUri: openConnectionUri,
                     post: postJS,
                 };
             }
