@@ -135,17 +135,18 @@ export const selectOpenConnectionUri = createSelector(
     selectConnections,
     (routerParams, connections) => {
         //de-escaping is lost in transpiling if not done in two steps :|
-        const openConversationEscaped = routerParams.get('openConversation');
-        const openConversation = decodeURIComponent(openConversationEscaped);
+        const openConnectionEncoded = routerParams.get('connectionUri') ||
+                                        routerParams.get('openConversation'); //TODO deprecated parameter
+        const openConnectionUri = openConnectionEncoded? decodeURIComponent(openConnectionEncoded) : undefined;
 
-        const myUriEscaped = routerParams.get('myUri');
-        const myUri = decodeURIComponent(myUriEscaped);
+        const myUriEscaped = routerParams.get('myUri'); //TODO deprecated parameter
+        const myUri = myUriEscaped? decodeURIComponent(myUriEscaped) : undefined;
 
-        const theirUriEscaped = routerParams.get('theirUri');
+        const theirUriEscaped = routerParams.get('theirUri'); //TODO deprecated parameter
         const theirUri = decodeURIComponent(theirUriEscaped);
 
-        if(openConversation) {
-            return openConversation;
+        if(openConnectionUri) {
+            return openConnectionUri;
         } else if (myUri && theirUri) {
             /*
              returns undefined when there's no
