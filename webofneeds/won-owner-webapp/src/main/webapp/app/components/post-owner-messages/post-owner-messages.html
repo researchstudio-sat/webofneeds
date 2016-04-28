@@ -6,6 +6,9 @@
 </header>
 <main class="ownerpostcontent">
 
+    <a ui-sref="post({connectionType: 'http://purl.org/webofneeds/model#Hint', openConversation: null, connectionUri: self.connectionUri, postUri: self.postUri})">Hint</a>
+    <a ui-sref="post({connectionType: 'http://purl.org/webofneeds/model#Connected', openConversation: null, connectionUri: self.connectionUri, postUri: self.postUri})">Connected</a>
+
     <!-- left column -->
     <won-connection-selection
             class="owner__messages"
@@ -20,6 +23,19 @@
     <div class="post-messages" ng-show="self.showConversationDetails">
         <div class="post-messages__inner">
             <won-post-messages></won-post-messages>
+        </div>
+    </div>
+
+    <!-- Matches: -->
+    <div class="post-messages" ng-show="self.showMatchDetails">
+        <div class="post-messages__inner">
+            <div class="omc__content__list">
+                <!-- TODO feeling like a matroschka yet? -->
+                <won-matches-list-item
+                        item="item"
+                        ng-repeat="(key,item) in self.matchesOfNeed">
+                </won-matches-list-item>
+            </div>
         </div>
     </div>
     <!-- /right column -->
