@@ -28,34 +28,35 @@ function genComponentConf() {
                     <button class="won-button--filled thin red" ng-show="self.isActive && self.settingsOpen" ng-mouseleave="self.settingsOpen=false" ng-click="self.closePost()">Close Post</button>
                     <button class="won-button--filled thin red" ng-show="!self.isActive && self.settingsOpen" ng-mouseleave="self.settingsOpen=false" ng-click="self.reOpenPost()">Reopen Post</button>
                     <ul class="ntb__tabs">
-                        <li ng-class="{'ntb__tabs__selected' : self.selection == 4}">
+                        <li ng-class="{'ntb__tabs__selected' : self.selectedTab === 'Info'}">
                             <a ui-sref="postInfo({myUri: self.postUri})">
                                 Post Info
                             </a>
                         </li>
-                        <li ng-class="{'ntb__tabs__selected' : self.selection == 0}">
-                            <a ui-sref="postConversations({postUri: self.postUri})"
+                        <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Connected}">
+
+                            <a ui-sref="post({connectionType: self.WON.Connected, openConversation: null, connectionUri: null, postUri: self.postUri})"
                                 ng-class="{'disabled' : !self.hasMessages}">
                                 Messages
                                 <span class="ntb__tabs__unread">{{ self.unreadMessages }}</span>
                             </a>
                         </li>
-                        <li ng-class="{'ntb__tabs__selected' : self.selection == 1}">
-                            <a ui-sref="overviewMatches({viewType: 0, myUri: self.postUri})"
+                        <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Suggested}">
+                            <a ui-sref="post({connectionType: self.WON.Suggested, openConversation: null, connectionUri: null, postUri: self.postUri})"
                                 ng-class="{'disabled' : !self.hasMatches}">
                                 Matches
                                 <span class="ntb__tabs__unread">{{ self.unreadMatches }}</span>
                             </a>
                         </li>
-                        <li ng-class="{'ntb__tabs__selected' : self.selection == 2}">
-                            <a ui-sref="overviewIncomingRequests({myUri: self.postUri})"
+                        <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestReceived}">
+                            <a ui-sref="post({connectionType: self.WON.RequestReceived, openConversation: null, connectionUri: null, postUri: self.postUri})"
                                 ng-class="{'disabled' : !self.hasIncomingRequests}">
                                 Requests
                                 <span class="ntb__tabs__unread">{{ self.unreadIncomingRequests }}</span>
                             </a>
                         </li>
-                        <li ng-class="{'ntb__tabs__selected' : self.selection == 3}">
-                            <a ui-sref="overviewSentRequests({myUri: self.postUri})"
+                        <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestSent}">
+                            <a ui-sref="post({connectionType: self.WON.RequestSent, openConversation: null, connectionUri: null, postUri: self.postUri})"
                                 ng-class="{'disabled' : !self.hasSentRequests}">
                                 Sent Requests
                                 <span class="ntb__tabs__unread">{{ self.unreadSentRequests }}</span>
@@ -84,7 +85,12 @@ function genComponentConf() {
                     state.getIn(['router', 'currentParams', 'myUri']) ; // TODO old parameter
                 const postUri = decodeURIComponent(encodedPostUri);
 
+                const encodedConnectionType = state.getIn(['router', 'currentParams', 'connectionType']);
+                const connectionTypeInParams = encodedConnectionType ? decodeURIComponent(encodedConnectionType) : undefined;
+
                 return {
+                    selectedTab: connectionTypeInParams || 'Info',
+                    WON: won.WON,
                     postUri: postUri,
                     post: state.getIn(['needs','ownNeeds', postUri]),
                     hasIncomingRequests: state.getIn(['connections'])
