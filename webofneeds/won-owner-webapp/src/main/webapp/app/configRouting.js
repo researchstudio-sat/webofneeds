@@ -28,7 +28,6 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
         { path: '/post/owner/info?myUri', component: 'post-owner', as: 'postInfo' },
         { path: '/post/visitor/info/?myUri?theirUri', component: 'post-visitor', as: 'postVisitor' },
         { path: '/post/visitor/messages/?myUri?theirUri', component: 'post-visitor-msgs', as: 'postVisitorMsgs' },
-        //{ path: '/post/?selectedTab?postUri?connectionUri', component: 'post', as: 'post' },
 
     ].forEach( ({path, component, as}) => {
 
@@ -49,22 +48,6 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
 
     $urlRouterProvider.when('/settings/', '/settings/general');
 
-    /*
-    function postTemplateProvider($stateParams) {
-
-        return '<div></div>';
-    }
-    */
-    /*
-    $stateProvider
-        .state('post', {
-            url: '/post/?postUri',
-            templateUrl: $stateParams => './app/components/post-visitor/post-visitor.html',
-            //templateProvider: $stateParams => './app/components/post-visitor/post-visitor.html'
-            controllerProvider: $stateParams => 'PostVisitorController',
-
-        });
-        */
 
     $stateProvider
         .state('settings', {
