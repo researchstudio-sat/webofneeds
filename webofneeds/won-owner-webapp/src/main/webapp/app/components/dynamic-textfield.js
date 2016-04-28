@@ -9,14 +9,22 @@ import { dispatchEvent, attach } from '../utils';
 
 function genComponentConf() {
     let template = `
-        <div class="wdt__text"
-             ng-class="{'wdt__text--placeholder' : self.displayingPlaceholder, 'wdt__text--invalid' : !self.valid()}"
-             contenteditable="true">
-             {{::self.placeholder}}
+        <div class="wdt__left">
+            <div class="wdt__text"
+                 ng-class="{'wdt__text--placeholder' : self.displayingPlaceholder, 'wdt__text--invalid' : !self.valid()}"
+                 contenteditable="true">
+                 {{ ::self.placeholder }}
+            </div>
+            <span class="wdt__charcount" ng-show="self.maxChars">
+                {{ self.maxChars - self.value.length }} Chars left
+            </span>
         </div>
-        <span class="wdt__charcount" ng-show="self.maxChars">
-            {{self.maxChars - self.value.length}} Chars left
-        </span>
+        <button
+            class="wdt__submitbutton red"
+            ng-show="::self.submitButtonLabel"
+            ng-click="::self.submit()">
+            {{ ::self.submitButtonLabel }}
+        </button>
     `;
 
     const serviceDependencies = ['$scope', '$element', '$sanitize', '$sce'/*injections as strings here*/];
@@ -36,7 +44,7 @@ function genComponentConf() {
             window.dtf4dbg = this;
 
             this.displayingPlaceholder = true;
-            this.value = '';
+            this.lastInput = '';
 
             this.textFieldNg().bind('keydown',e => this.onKeydown(e)) //prevent enter
                               .bind('keyup', () => this.input()) // handle title changes
@@ -63,23 +71,38 @@ function genComponentConf() {
         onKeydown(e) {
             // prevent typing enter as it causes `<div>`s in the value
             if(e.keyCode === 13) {
+                this.submit();
                 return false;
             }
         }
         onFocus(e) {
-            this.preEditValue = this.value;
+            this.preEditValue = this.getText().trim();
             this.clearPlaceholder();
         }
         onBlur(e) {
             this.addPlaceholderIfEmpty();
-            if(this.value !== this.preEditValue) {
+            const value = this.getText().trim();
+            if(value !== this.preEditValue) {
                 const payload = {
-                    value: this.value,
+                    value: value,
                     valid: this.valid()
                 };
                 this.onChange(payload);
                 dispatchEvent(this.$element[0], 'change', payload);
                 //this.$scope.$emit(eventName, payload); //bubbles through $scopes not dom
+            }
+        }
+        submit () {
+            if(this.submitButtonLabel || this.submittable) {
+                const payload = {
+                    value: this.getText().trim(),
+                    valid: this.valid()
+                };
+                this.onSubmit(payload);
+                dispatchEvent(this.$element[0], 'submit', payload);
+
+                // clear text
+                this.setText('');
             }
         }
         input () {
@@ -89,17 +112,15 @@ function genComponentConf() {
                     this.textField().innerHTML.match(/<br>./)) { //also supress line breaks inside the text in copy-pasted text
                         this.setText(this.getText()); //sanitize
                     }
-                const newVal = this.getText().trim();
-                //make sure the text field contains the sanitized text (so user sees what they're posting)
-                //this.setText(newVal);
 
                 //compare with previous value, if different
-                if(this.value !== newVal) {
-                    this.value = newVal;
+                const newVal = this.getText().trim();
+                if(this.lastInput !== newVal) {
+                    this.lastInput = newVal;
 
                     // -> publish input event
                     const payload = {
-                        value: this.value,
+                        value: newVal,
                         valid: this.valid()
                     };
                     this.onInput(payload);
@@ -151,7 +172,7 @@ function genComponentConf() {
             this.textField().innerHTML = txt
         }
         valid() {
-            return this.value.length < this.maxChars;
+            return this.getText().trim().length < this.maxChars;
         }
         // view -> model
         // model -> view
@@ -169,14 +190,28 @@ function genComponentConf() {
             maxChars: '=',
             /*
              * Usage:
-             *  on-input="myCallback(value, valid)"
+             *  on-input="::myCallback(value, valid)"
              */
             onInput: '&',
             /*
              * Usage:
-             *  on-input="myCallback(value, valid)"
+             *  on-change="::myCallback(value, valid)"
              */
             onChange: '&',
+
+            submitButtonLabel: '=',
+            /*
+             * Usage:
+             *  on-submit="::myCallback(value)"
+             */
+            onSubmit: '&',
+
+            /*
+             * if you don't specify a submit-button-label
+             * set this flag to true to enable submit-events.
+             */
+            submittable: '='
+
         },
         template: template
     }

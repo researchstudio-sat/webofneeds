@@ -129,8 +129,8 @@ public class BridgeForLinkedDataController {
 
   /**
    * Currently copies all the headers from the given headers to the headers of the response.
-   * TODO check with spec if any headers should not be copied (e.g , it seems Transfer-Encoding should not be
-   * copied by proxies)
+   * TODO check with spec if any other headers should not be copied
+   * (e.g , it seems Transfer-Encoding should not be copied by proxies, see https://www.w3.org/Protocols/rfc2616/rfc2616-sec19.html#sec19.4.6)
    *
    * @param fromHeaders
    * @param toResponse
@@ -138,7 +138,11 @@ public class BridgeForLinkedDataController {
   private void copyLinkedDataResponseRelevantHeaders(final HttpHeaders fromHeaders, final HttpServletResponse toResponse) {
     for (String headerName : fromHeaders.keySet()) {
       for (String headerValue : fromHeaders.get(headerName)) {
-        toResponse.addHeader(headerName, headerValue);
+
+          if ((headerName != "Transfer-Encoding") || (headerValue != "chunked")) {
+            //we allow all transfer codings except chunked, because we don't do chunking here!
+            toResponse.addHeader(headerName, headerValue);
+          }
       }
     }
   }

@@ -29,7 +29,8 @@ ENV CERTIFICATE_PASSWORD=changeit
 # add the webofneeds files
 ADD ./tomcat-libs/* /usr/local/tomcat/lib/
 ADD ./owner.war /usr/local/tomcat/webapps/
-ADD ./conf /usr/local/tomcat/won/conf
+ADD ./conf/owner.properties /usr/local/tomcat/won/conf/owner.properties
+ADD ./conf/logback* /usr/local/tomcat/won/conf/
 
 # configure tomcat
 ADD ./setenv.sh /usr/local/tomcat/bin/

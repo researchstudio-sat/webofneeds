@@ -73,7 +73,8 @@ import {
     connectionsFetch,
     connectionsLoad,
     connectionsOpen,
-    connectionsRate
+    connectionsRate,
+    connectionsChatMessage,
 } from './connections-actions';
 
 import * as messages from './messages-actions';
@@ -113,8 +114,7 @@ const actionHierarchy = {
         accepted: INJ_DEFAULT,
         close: connectionsClose,
         rate: connectionsRate,
-        sendOpen:INJ_DEFAULT,
-        add:INJ_DEFAULT,
+        sendChatMessage: connectionsChatMessage,
         reset:INJ_DEFAULT,
     },
     needs: {
@@ -152,9 +152,11 @@ const actionHierarchy = {
     },
 
     /**
-     * Server triggered interactions
+     * Server triggered interactions (aka received messages)
      */
     messages: { /* websocket messages, e.g. post-creation, chatting */
+        //TODO get rid of send and rename to receivedMessage
+
         send: INJ_DEFAULT, //TODO this should be part of proper, user-story-level actions (e.g. need.publish or sendCnctMsg)
 
         /*
@@ -170,14 +172,25 @@ const actionHierarchy = {
             success: messages.successfulOpen,
             //TODO failure: messages.failedOpen
         },
-        close: {
-            success: messages.successfulClose,
+        close: { //TODO: NAME SEEMS GENERIC EVEN THOUGH IT IS ONLY USED FOR CLOSING CONNECITONS; REFACTOR THIS SOMEDAY
+            success: messages.successfulCloseConnection,
             //TODO failure: messages.failedClose
+        },
+        connect: {
+            success: messages.successfulConnect,
+            //TODO failure: messages.failedConnect
+        },
+        chatMessage: {
+            //success: messages.successfulChatMessage,
+            successRemote: INJ_DEFAULT, //2nd successResponse
+            successOwn: INJ_DEFAULT, //1st successResponse
+            failure: INJ_DEFAULT,
         },
         closeNeed: {
             success: messages.successfulCloseNeed,
             failure: messages.failedCloseNeed
         },
+        connectionMessageReceived: messages.connectionMessageReceived,
         connectMessageReceived: messages.connectMessageReceived,
         hintMessageReceived: messages.hintMessageReceived,
 
@@ -195,9 +208,9 @@ const actionHierarchy = {
     retrieveNeedUris: retrieveNeedUris,
     config: {
         init: configInit,
-
         update: INJ_DEFAULT,
-    }
+    },
+    tick: startTicking,
 
     /*
      runMessagingAgent: () => (dispatch) => {
@@ -246,6 +259,14 @@ window.actionTypes4Dbg = actionTypes;
 
 
 //////////// STUFF THAT SHOULD BE IN OTHER FILES BELOW //////////////////
+
+export function startTicking() {
+    return (dispatch) =>
+        setInterval(() =>
+            dispatch({ type: actionTypes.tick, payload: Date.now() }),
+            60000
+        );
+}
 
 
 export function draftsPublish(draft, nodeUri) {

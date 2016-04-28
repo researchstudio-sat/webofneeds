@@ -8,11 +8,11 @@ import { actionCreators }  from '../actions/actions';
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-            <div class="feedback" ng-click="self.rateMatch(0)">
+            <a class="feedback" ng-click="self.rateMatch(0)" ui-sref="overviewMatches({connectionUri : self.connectionUri})">
                 <img class="feedback__icon unselected" src="generated/icon-sprite.svg#ico36_feedback_good"/>
                 <img class="feedback__icon selected" src="generated/icon-sprite.svg#ico36_feedback_good_white"/>
                 <span class="feedback__text">Good - request conversation</span>
-            </div>
+            </a>
             <!--div class="feedback" ng-click="self.rateMatch(1)">
                 <img class="feedback__icon unselected" src="generated/icon-sprite.svg#ico36_feedback_ok"/>
                 <img class="feedback__icon selected" src="generated/icon-sprite.svg#ico36_feedback_ok_white"/>
@@ -28,7 +28,6 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
-
             const disconnect = this.$ngRedux.connect(null, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
         }
@@ -37,27 +36,20 @@ function genComponentConf() {
             switch(rating) {
                 case 0:
                     console.log("RATE GOOD");
-                    //TODO: ADD GOOD RATING
-                    this.connections__rate(this.item, 0);
-                    this.openRequestDialog();
+                    this.connections__rate(this.connectionUri, won.WON.binaryRatingGood);
                     break;
                 /*case 1:
                     //OPTION OK WILL NOT BE IMPLEMENTED ANYMORE
                     console.log("RATE OK");
                     this.connections__rate(this.item, 1);
-                    this.openRequestDialog();
                     break;*/
                 case 2:
                     console.log("RATE BAD");
-                    this.connections__close(this.item);
-                    this.connections__rate(this.item, 2);
+                    this.connections__close(this.connectionUri);
+                    this.connections__rate(this.connectionUri, won.WON.binaryRatingBad);
                     //TODO: ADD A BAD RATING, CLOSE MATCH
                     break;
             }
-        }
-
-        openRequestDialog(){
-            this.requestItem = this.item;
         }
     }
     Controller.$inject = serviceDependencies;
@@ -67,8 +59,7 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {item: "=",
-                requestItem: "="},
+        scope: { connectionUri: "=" },
         template: template
     }
 }

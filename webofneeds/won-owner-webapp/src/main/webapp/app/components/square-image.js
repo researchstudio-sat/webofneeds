@@ -27,7 +27,10 @@ function genComponentConf() {
         }
 
         generateTitleCharacter() {
-            return this.title.charAt(0).toUpperCase();
+            if(this.title)
+                return this.title.charAt(0).toUpperCase();
+            else
+                return "?";
         }
     }
 

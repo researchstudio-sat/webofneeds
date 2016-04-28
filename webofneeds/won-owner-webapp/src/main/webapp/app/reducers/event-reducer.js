@@ -32,31 +32,73 @@ export default function(state = initialState, action = {}) {
                     storeConnectionRelatedData(updatedState, connectionWithRelatedData),
                 state);
 
+        case actionTypes.messages.close.success:
+            var event = action.payload;
+            return state.setIn(['events', event.uri], Immutable.fromJS(event));
+
+        case actionTypes.connections.sendChatMessage:
+            var eventUri = action.payload.eventUri;
+            return storeOptimisticEvent(state, action.payload.optimisticEvent);
+
+        case actionTypes.messages.chatMessage.failure:
+            //var eventOnRemoteNode = action.payload.events['msg:FromOwner'];
+            //var eventOnOwnNode = action.payload.events['msg:FromExternal'];
+            //var connectionUri = msgFromOwner.hasReceiver;
+            var msgFromOwner = action.payload.events['msg:FromSystem'];
+            var eventUri = msgFromOwner.isRemoteResponseTo || msgFromOwner.isResponseTo;
+            return state.removeIn(['events', eventUri]);
+
+        case actionTypes.messages.chatMessage.successOwn:
+            var msgFromOwner = Immutable.fromJS(action.payload.events['msg:FromSystem']);
+            var eventUri = msgFromOwner.get('isResponseTo');
+            return state
+                .setIn(['events', msgFromOwner.get('uri')], msgFromOwner)
+                .updateIn(['events', eventUri], e =>
+                    // This is a good-enough solution. We assume the republishing done
+                    // by the owner happens at the same time that it sends us
+                    // the success-response -- so we just use the latters timestamp
+                    // with the optimistic event created previously.
+                    e.set('hasSentTimestamp', msgFromOwner.get('hasReceivedTimestamp'))
+                     .set('hasReceivedTimestamp', msgFromOwner.get('hasReceivedTimestamp'))
+                )
+
+        case actionTypes.messages.chatMessage.successRemote:
+            //var eventOnRemoteNode = Immutable.fromJS(action.payload.events['msg:FromOwner']);
+            var eventOnOwnNode = Immutable.fromJS(action.payload.events['msg:FromExternal']);
+            var msgFromOwner = Immutable.fromJS(action.payload.events['msg:FromSystem']);
+            var eventUri = msgFromOwner.get('isRemoteResponseTo');
+            return state
+                .setIn(['events', msgFromOwner.get('uri')], msgFromOwner)
+                .setIn(['events', eventOnOwnNode.get('uri')], eventOnOwnNode)
+                .setIn(['events', eventUri, 'unconfirmed'], false);
+
+
+        case actionTypes.messages.connectionMessageReceived:
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.hintMessageReceived:
             //TODO events should be an object too
-            const event = action.payload.events.filter(e => e.uri === action.payload.receivedEvent)[0];
+            var event = action.payload.events.filter(e => e.uri === action.payload.receivedEvent)[0];
             event.unreadUri = action.payload.updatedConnection;
 
-            const updatedState = state.update('unreadEventUris', unread => unread.add(event.uri));
+            var updatedState = state.update('unreadEventUris', unread => unread.add(event.uri));
             return storeConnectionRelatedData(updatedState, action.payload);
 
         default:
             return state;
     }
 }
+
+function storeOptimisticEvent(state, event) {
+    var optimisticEvent = Immutable
+        .fromJS(event)
+        .set('unconfirmed', true);
+    return state.setIn(['events', event.uri], optimisticEvent);
+}
+
 function storeConnectionRelatedData(state, connectionWithRelatedData) {
-    console.log("EVENT-REDUCER STORING CONNECTION AND RELATED DATA");
-    console.log(connectionWithRelatedData);
-    return connectionWithRelatedData.events.reduce(
-
-        (updatedState, event) =>
-            updatedState.getIn(['events', event.uri]) ?
-                updatedState : // we already know this one. no need to trigger re-rendering
-                updatedState.setIn(['events', event.uri], Immutable.fromJS(event)) // add the event
-
-        , state // start with the original state
-    );
+    const keyValuePairs = connectionWithRelatedData.events.map(e => [e.uri, Immutable.fromJS(e)]);
+    const updatedEvents = Immutable.Map(keyValuePairs);
+    return state.mergeDeepIn(['events'], updatedEvents);
 }
 
 var createOrUpdateUnreadEntry = function(needURI, eventData, unreadEntry){

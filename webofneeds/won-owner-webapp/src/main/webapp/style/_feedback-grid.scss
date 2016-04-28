@@ -6,6 +6,10 @@
 won-feedback-grid {
   display: flex;
 
+  a {
+    text-decoration: none;
+  }
+
   .feedback {
     display: flex;
     cursor: pointer;
