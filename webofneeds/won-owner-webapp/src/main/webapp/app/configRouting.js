@@ -22,8 +22,7 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
 
         { path: '/post/owner/conversations?postUri?connectionUri?connectionType' + '?theseParametersAreOld?myUri?openConversation',
             component: 'post-owner-messages', as: 'postConversations' },
-        { path: '/post/owner/conversations?postUri?connectionUri?connectionType' + '?theseParametersAreOld?myUri?openConversation',
-            component: 'post-owner-messages', as: 'post' },
+        { path: '/post/?postUri?connectionUri?connectionType', component: 'post-owner-messages', as: 'post' },
 
         { path: '/post/owner/info?myUri', component: 'post-owner', as: 'postInfo' },
         { path: '/post/visitor/info/?myUri?theirUri', component: 'post-visitor', as: 'postVisitor' },
@@ -47,7 +46,6 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
         })
 
     $urlRouterProvider.when('/settings/', '/settings/general');
-
 
     $stateProvider
         .state('settings', {
