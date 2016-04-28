@@ -40,7 +40,7 @@
 
 
     <!-- Matches: -->
-    <div class="post-messages" ng-show="self.showMatchDetails">
+    <div class="post-messages" ng-show="self.showMatches">
         <div class="post-messages__inner">
             Can't handle matches here yet.
         </div>
@@ -50,7 +50,7 @@
     <!-- left column for connection-typed tabs -->
     <won-connection-selection
             class="owner__messages"
-            ng-show="!self.showMatchDetails || self.connectionType"
+            ng-show="self.showConnectionSelection"
             connection-type="self.connectionType"
             selected-connection="::self.openConnection(connectionUri)"
             >

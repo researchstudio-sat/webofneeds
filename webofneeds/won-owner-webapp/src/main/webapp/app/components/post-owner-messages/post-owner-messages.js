@@ -56,8 +56,9 @@ class Controller {
                 connectionType: connectionTypeInParams,
                 connectionUri: decodeURIComponent(encodedConnectionUri),
 
+                showConnectionSelection: !!connectionTypeInParams && connectionTypeInParams !== won.WON.Suggested,
+                showMatches: connectionTypeInParams === won.WON.Suggested,
                 showConversationDetails: connectionIsOpen && connectionTypeInParams === won.WON.Connected,
-                showMatchDetails: connectionIsOpen && connectionTypeInParams === won.WON.Suggested,
                 showIncomingRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestReceived,
                 showSentRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestSent,
             };
