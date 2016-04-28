@@ -111,7 +111,9 @@ const allByConnection = (connection) => (state) => {
 
     const events = connection
         .get('hasEvents')
-        .map(eventUri => state.getIn(['events', 'events', eventUri]));
+        .map(eventUri => state.getIn(['events', 'events', eventUri]))
+        .filter(event => !!event);
+
 
     return Immutable.Map({ connection, events, ownNeed, remoteNeed });
 };

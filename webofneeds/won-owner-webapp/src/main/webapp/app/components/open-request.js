@@ -46,7 +46,7 @@ function genComponentConf() {
                 </div>
             </div>
         </div>
-        <div class="or__footer" ng-show="::(!self.isSentRequest())">
+        <div class="or__footer" ng-show="::(self.isReceivedRequest)">
             <input type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
             <div class="flexbuttons">
                 <button class="won-button--filled black" ui-sref="overviewIncomingRequests({connectionUri: null})" ng-click="self.closeRequest()">Decline</button>
@@ -65,8 +65,13 @@ function genComponentConf() {
                 const connectionUri = selectOpenConnectionUri(state);
                 const theirNeedUri = state.getIn(['connections', connectionUri, 'hasRemoteNeed']);
 
+                const connectionState = state.getIn(['connections', connectionUri, 'hasConnectionState']);
+                const isSentRequest = connectionState === won.WON.RequestSent;
+                const isReceivedRequest = connectionState === won.WON.RequestReceived;
+
                 return {
-                    currentPage: state.getIn(['router','currentState','name']),
+                    isSentRequest,
+                    isReceivedRequest,
                     connectionUri: connectionUri,
                     connection: state.getIn(['connections', connectionUri]),
                     theirNeed: state.getIn(['needs','theirNeeds', theirNeedUri]),
@@ -76,12 +81,8 @@ function genComponentConf() {
             this.$scope.$on('$destroy', disconnect);
         }
 
-        isSentRequest() {
-            return this.currentPage === "overviewSentRequests";
-        }
-
         closeRequestItemUrl() {
-            return this.isSentRequest() ? "overviewSentRequests({connectionUri: null})" : "overviewIncomingRequests({connectionUri: null})";
+            return this.isSentRequest ? "overviewSentRequests({connectionUri: null})" : "overviewIncomingRequests({connectionUri: null})";
         }
 
         openRequest(message){
