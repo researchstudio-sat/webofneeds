@@ -34,6 +34,12 @@ base_folder=/home/install
 if [ -z "$won_certificate_passwd" ]; then
   won_certificate_passwd=changeit
 fi
+
+# configure the mail server, if needed
+# MAIL_USER=
+# MAIL_PASS=
+# MAIL_HOST=
+
 # ====================================
 
 

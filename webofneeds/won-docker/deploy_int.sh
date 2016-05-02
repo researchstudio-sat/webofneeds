@@ -62,6 +62,47 @@ docker -H satsrv07:2375 build -t webofneeds/bots:int $WORKSPACE/webofneeds/won-d
 # start the won containers on dedicated servers of the cluster
 echo run docker containers:
 
+# copy the openssl.conf file to the server where the certificates are generated
+ssh root@satsrv05 mkdir -p $base_folder/won-server-certs
+scp $WORKSPACE/webofneeds/won-docker/gencert/openssl-dev-int.conf root@satsrv05:$base_folder/openssl-dev-int.conf
+
+# wonnode/owner server certificate generator
+# Please note that value of PASS (if you set a non-default password) should be the same used in your server.xml for
+# SSLPassword on wonnode and owner, and the same as activemq.broker.keystore.password used in your wonnode activemq
+# spring configurations for broker, set the password with "-e PASS=pass:<your_password>" or "-e
+# PASS=file:<your_file_with_password>"
+
+# satsrv04 => standard certificate creation for this host only
+docker -H satsrv04:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
+docker -H satsrv04:2375 run --name=gencert_int -e CN="satsrv04.researchstudio.at" \
+-e "PASS=pass:${won_certificate_passwd}" -v $base_folder/won-server-certs:/usr/local/certs/out/ webofneeds/gencert:int
+
+# satsrv05 => certificate creation for multiple hosts
+docker -H satsrv05:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
+docker -H satsrv05:2375 run --name=gencert_int -e CN="satsrv06.researchstudio.at" \
+-e "OPENSSL_CONFIG_FILE=/usr/local/openssl.conf"  -e "PASS=pass:${won_certificate_passwd}" \
+-v $base_folder/won-server-certs:/usr/local/certs/out/ -v $base_folder/openssl-dev-int.conf:/usr/local/openssl.conf \
+webofneeds/gencert:int
+
+# get the certificates and create a password file (for the nginx) to read the certificate
+ssh root@satsrv06 mkdir -p $base_folder/won-server-certs
+mkdir -p ~/won-server-certs
+rm ~/won-server-certs/*
+echo ${won_certificate_passwd} > ~/won-server-certs/won_certificate_passwd_file
+rsync root@satsrv05:$base_folder/won-server-certs/* ~/won-server-certs/
+rsync ~/won-server-certs/* root@satsrv06:$base_folder/won-server-certs/
+
+# copy the nginx.conf file to the proxy server
+rsync $WORKSPACE/webofneeds/won-docker/nginx/nginx-int.conf root@satsrv06:$base_folder/nginx-int.conf
+
+echo run nginx proxy server
+if ! docker -H satsrv06:2375 run --name=nginx_int -v $base_folder/won-server-certs:/etc/nginx/won-server-certs/ \
+-v $base_folder/nginx-int.conf:/etc/nginx/nginx.conf -d -p 80:80 -p 443:443 -p 61617:61617 nginx; then
+  echo nginx container already available, restart old container
+  docker -H satsrv06:2375 restart nginx_int
+fi
+
+
 # postgres db 1
 docker -H satsrv04:2375 pull webofneeds/postgres
 docker -H satsrv04:2375 stop postgres_int || echo 'No docker container found to stop with name: postgres_int'
@@ -74,35 +115,8 @@ docker -H satsrv05:2375 stop postgres_int || echo 'No docker container found to 
 docker -H satsrv05:2375 rm postgres_int || echo 'No docker container found to remove with name: postgres_int'
 docker -H satsrv05:2375 run --name=postgres_int -d -p 5433:5432 -m 256m webofneeds/postgres
 
+
 sleep 10
-
-# wonnode/owner server certificate generator
-# Please note that value of PASS (if you set a non-default password) should be the same used in your server.xml for
-# SSLPassword on wonnode and owner, and the same as activemq.broker.keystore.password used in your wonnode activemq
-# spring configurations for broker, set the password with "-e PASS=pass:<your_password>" or "-e
-# PASS=file:<your_file_with_password>"
-docker -H satsrv04:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
-docker -H satsrv04:2375 run --name=gencert_int -e CN="satsrv04.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
--v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
-docker -H satsrv05:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
-docker -H satsrv05:2375 run --name=gencert_int -e CN="satsrv05.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
--v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
-docker -H satsrv06:2375 rm gencert_int || echo 'No docker container found to remove with name: gencert_int'
-docker -H satsrv06:2375 run --name=gencert_int -e CN="satsrv06.researchstudio.at" -e "PASS=pass:${won_certificate_passwd}" \
--v $base_folder/won-server-certs:/usr/local/certs/out/  webofneeds/gencert:int
-
-
-sleep 5
-
-#stop wonnode_int1/2/3/4 instances
-docker -H satsrv04:2375 stop wonnode_int1 || echo 'No docker container found to stop with name: wonnode_int'
-docker -H satsrv04:2375 rm wonnode_int1 || echo 'No docker container found to remove with name: wonnode_int'
-docker -H satsrv04:2375 stop wonnode_int3 || echo 'No docker container found to stop with name: wonnode_int'
-docker -H satsrv04:2375 rm wonnode_int3 || echo 'No docker container found to remove with name: wonnode_int'
-docker -H satsrv05:2375 stop wonnode_int2 || echo 'No docker container found to stop with name: wonnode_int'
-docker -H satsrv05:2375 rm wonnode_int2 || echo 'No docker container found to remove with name: wonnode_int'
-docker -H satsrv05:2375 stop wonnode_int4 || echo 'No docker container found to stop with name: wonnode_int'
-docker -H satsrv05:2375 rm wonnode_int4 || echo 'No docker container found to remove with name: wonnode_int'
 
 
 # wonnode 1
@@ -122,10 +136,12 @@ docker -H satsrv04:2375 run --name=wonnode_int -d -e "uri.host=satsrv04.research
 -m 350m \
 webofneeds/wonnode:int
 
-# wonnode 2
+# wonnode 2 (used with the nginx proxy that runs on satsrv06)
 docker -H satsrv05:2375 stop wonnode_int || echo 'No docker container found to stop with name: wonnode_int'
 docker -H satsrv05:2375 rm wonnode_int || echo 'No docker container found to remove with name: wonnode_int'
 docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv05.researchstudio.at" -e "http.port=8889" \
+-e "uri.prefix=https://satsrv06.researchstudio.at/won" \
+-e "client.authentication.behind.proxy=true" \
 -e "activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/wonnode_int:/usr/local/tomcat/won/client-certs/ \
@@ -138,6 +154,7 @@ docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv05.research
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m \
 webofneeds/wonnode:int
+
 
 sleep 20
 
@@ -166,10 +183,11 @@ webofneeds/owner:int
 # owner 2
 docker -H satsrv05:2375 stop owner_int || echo 'No docker container found to stop with name: owner_int'
 docker -H satsrv05:2375 rm owner_int || echo 'No docker container found to remove with name: owner_int'
-docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv05.researchstudio.at" \
+docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv06.researchstudio.at" \
 -e "uri.host=satsrv05.researchstudio.at" -e "http.port=8082" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
--e "node.default.http.port=8889" -p 8082:8443 \
+-e "node.default.http.port=443" -p 8082:8443 \
+-e "uri.prefix.node.default=https://satsrv06.researchstudio.at/won" \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/owner_int:/usr/local/tomcat/won/client-certs/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
@@ -195,7 +213,7 @@ docker -H satsrv06:2375 rm matcher_service_int || echo 'No docker container foun
 docker -H satsrv06:2375 run --name=matcher_service_int -d -e "node.host=satsrv06.researchstudio.at" \
 -e "cluster.seed.host=satsrv06.researchstudio.at" \
 -e "uri.sparql.endpoint=http://satsrv06.researchstudio.at:10000/bigdata/namespace/kb/sparql" \
--e "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8889/won/resource,https://satsrv05.researchstudio.at:8889/won/resource" \
+-e "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8889/won/resource,https://satsrv06.researchstudio.at/won/resource" \
 -e "cluster.local.port=2561" -e "cluster.seed.port=2561" -p 2561:2561 \
 -v $base_folder/won-client-certs/matcher_service_int:/usr/src/matcher-service/client-certs/ \
 -p 9010:9010 \
@@ -238,7 +256,7 @@ docker -H satsrv06:2375 stop debug_bot_int || echo 'No docker container found to
 docker -H satsrv06:2375 rm debug_bot_int || echo 'No docker container found to remove with name: debug_bot_int'
 docker -H satsrv06:2375 run --name=debug_bot_int -d \
 -e "node.default.host=satsrv04.researchstudio.at" -e "node.default.http.port=8889" \
--e "won.node.uris=https://satsrv04.researchstudio.at:8889/won/resource https://satsrv05.researchstudio.at:8889/won/resource" \
+-e "won.node.uris=https://satsrv04.researchstudio.at:8889/won/resource https://satsrv06.researchstudio.at/won/resource" \
 -p 9013:9013 \
 -e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9013 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9013 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
