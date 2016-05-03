@@ -72,7 +72,7 @@ function genTopnavConf() {
 
             const selectFromState = (state) => ({
                 loggedIn: state.getIn(['user', 'loggedIn']),
-                email: state.get(['user','email'])
+                email: state.getIn(['user','email'])
             });
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
