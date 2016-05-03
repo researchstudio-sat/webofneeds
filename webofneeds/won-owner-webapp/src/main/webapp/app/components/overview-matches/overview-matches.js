@@ -26,30 +26,34 @@ class OverviewMatchesController {
                     .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested);
 
             const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
-            const viewType = state.getIn(['router','currentParams','viewType']);
+            const encodedPostUri =
+                state.getIn(['router', 'currentParams', 'postUri']) ||
+                state.getIn(['router', 'currentParams', 'myUri']); //deprecated parameter
+            const postUri = decodeURIComponent(encodedPostUri)
 
-            if(state.getIn(['router', 'currentParams', 'myUri']) === undefined) {
-                const matchesByConnectionUri = allMatchesByConnections.toList();
-                return {
-                    viewType: viewType,
-                    matches: matchesByConnectionUri.toArray(),
-                    connection: state.getIn(['connections', connectionUri]),
-                    matchesOfNeed: mapToMatches(matchesByConnectionUri.toJS()),//TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
-                };
-            } else {
-                const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
-                const matchesByConnectionUri = allMatchesByConnections
-                    .filter(conn => conn.getIn(['ownNeed', 'uri']) === postId)
-                    .toList();
-                return {
-                    viewType: viewType,
-                    post: state.getIn(['needs','ownNeeds', postId]),
-                    matches: matchesByConnectionUri.toArray(),
-                    connection: state.getIn(['connections', connectionUri]),
-                    matchesOfNeed:mapToMatches(matchesByConnectionUri.toJS())//TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
-                };
+            // either of 'tiles', 'grid', 'list'
+            let layout = state.getIn(['router','currentParams','layout']);
+            if(!layout) {
+                layout = 'tiles';
             }
-        }
+
+            let matchesByConnectionUri;
+            if(state.getIn(['router', 'currentParams', 'myUri']) === undefined) { //overview
+                matchesByConnectionUri = allMatchesByConnections.toList();
+            } else { // post-owner view
+                matchesByConnectionUri = allMatchesByConnections
+                    .filter(conn => conn.getIn(['ownNeed', 'uri']) === postUri)
+                    .toList();
+            }
+
+            return {
+                layout,
+                connection: state.getIn(['connections', connectionUri]),
+                matches: matchesByConnectionUri.toArray(),
+                matchesOfNeed: mapToMatches(matchesByConnectionUri.toJS()),//TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
+                post: state.getIn(['needs','ownNeeds', postUri]),
+            };
+        };
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
       //  this.loadMatches();
         this.$scope.$on('$destroy', disconnect);

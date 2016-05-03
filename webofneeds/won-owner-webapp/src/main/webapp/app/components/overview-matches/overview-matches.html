@@ -10,33 +10,33 @@
             <div class="dummy"></div>
             <div class="title" ng-if="!self.post">Matches to your needs</div>
             <div class="omc__header__viewtype">
-                <a ui-sref="overviewMatches({viewType: 0})">
-                    <img ng-src="{{self.viewType == 0 ? 'generated/icon-sprite.svg#ico-filter_tile_selected' : 'generated/icon-sprite.svg#ico-filter_tile'}}"
+                <a ui-sref="overviewMatches({layout: 'tiles'})">
+                    <img ng-src="{{self.layout === 'tiles' ? 'generated/icon-sprite.svg#ico-filter_tile_selected' : 'generated/icon-sprite.svg#ico-filter_tile'}}"
                      class="omc__header__viewtype__icon clickable"/>
                 </a>
-                <a ui-sref="overviewMatches({viewType: 1})">
-                    <img ng-src="{{self.viewType == 1 ? 'generated/icon-sprite.svg#ico-filter_compact_selected' : 'generated/icon-sprite.svg#ico-filter_compact'}}"
+                <a ui-sref="overviewMatches({layout: 'grid'})">
+                    <img ng-src="{{self.layout === 'grid' ? 'generated/icon-sprite.svg#ico-filter_compact_selected' : 'generated/icon-sprite.svg#ico-filter_compact'}}"
                      class="omc__header__viewtype__icon clickable"/>
                 </a>
-                <a ui-sref="overviewMatches({viewType: 2})">
-                    <img ng-src="{{self.viewType == 2 ? 'generated/icon-sprite.svg#ico-filter_list_selected' : 'generated/icon-sprite.svg#ico-filter_list'}}"
+                <a ui-sref="overviewMatches({layout: 'list'})">
+                    <img ng-src="{{self.layout === 'list' ? 'generated/icon-sprite.svg#ico-filter_list_selected' : 'generated/icon-sprite.svg#ico-filter_list'}}"
                      class="omc__header__viewtype__icon clickable"/>
                 </a>
             </div>
         </div>
-        <div ng-if="self.viewType == 0" class="omc__content__flow">
+        <div ng-if="self.layout === 'tiles'" class="omc__content__flow">
             <won-matches-flow-item
                     connection-uri="m.getIn(['connection','uri'])"
                     ng-repeat="m in self.matches">
             </won-matches-flow-item>
         </div>
-        <div ng-if="self.viewType == 1" class="omc__content__grid">
+        <div ng-if="self.layout === 'grid'" class="omc__content__grid">
             <won-matches-grid-item
                     connection-uri="m.getIn(['connection','uri'])"
                     ng-repeat="m in self.matches">
             </won-matches-grid-item>
         </div>
-        <div ng-if="self.viewType == 2" class="omc__content__list">
+        <div ng-if="self.layout === 'list'" class="omc__content__list">
             <won-matches-list-item
                     item="item"
                     ng-repeat="(key,item) in self.matchesOfNeed">
