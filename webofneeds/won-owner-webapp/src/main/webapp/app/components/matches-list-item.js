@@ -3,7 +3,11 @@
 import angular from 'angular';
 import squareImageModule from './square-image';
 import { labels } from '../won-label-utils';
+import { attach } from '../utils';
+import { actionCreators }  from '../actions/actions';
+//import won from '../won-es6';
 
+const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
         <div class="mli clickable" ng-click="self.toggleMatches()">
@@ -46,6 +50,7 @@ function genComponentConf() {
                 <div class="smli__item clickable"
                         ng-class="{'selected' : self.openRequest === match}"
                         ng-repeat="match in self.item"
+                        ui-sref="overviewMatches({layout: 'list', myUri: match.connection.belongsToNeed, connectionUri: match.connection.uri})"
                         ng-mouseenter="self.showFeedback()"
                         ng-mouseleave="self.hideFeedback()">
                     <div class="smli__item__header">
@@ -102,14 +107,23 @@ function genComponentConf() {
 
     class Controller {
         constructor() {
+            attach(this, serviceDependencies, arguments);
+
+            window.mli4dbg = this;
+
             this.maxThumbnails = 4;
             this.labels = labels;
+
+            const selectFromState = (state) => ({ });
+            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
+            this.$scope.$on('$destroy', disconnect);
         }
 
         toggleMatches() {
             this.open = !this.open;
         }
     }
+    Controller.$inject = serviceDependencies;
 
     return {
         restrict: 'E',
