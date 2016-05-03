@@ -21,15 +21,15 @@ let template = `
                 <div class="dummy"></div>
                 <div class="title" ng-if="!self.post">Matches to your needs</div>
                 <div class="omc__header__viewtype">
-                    <a ui-sref="overviewMatches({layout: 'tiles'})">
+                    <a ui-sref="{{ self.isOverview ? 'overviewMatches({layout: self.LAYOUT.TILES})' : 'post({layout : self.LAYOUT.TILES})' }}">
                         <img ng-src="{{self.layout === 'tiles' ? 'generated/icon-sprite.svg#ico-filter_tile_selected' : 'generated/icon-sprite.svg#ico-filter_tile'}}"
                          class="omc__header__viewtype__icon clickable"/>
                     </a>
-                    <a ui-sref="overviewMatches({layout: 'grid'})">
+                    <a ui-sref="{{ self.isOverview ? 'overviewMatches({layout: self.LAYOUT.GRID})' : 'post({layout : self.LAYOUT.GRID})' }}">
                         <img ng-src="{{self.layout === 'grid' ? 'generated/icon-sprite.svg#ico-filter_compact_selected' : 'generated/icon-sprite.svg#ico-filter_compact'}}"
                          class="omc__header__viewtype__icon clickable"/>
                     </a>
-                    <a ui-sref="overviewMatches({layout: 'list'})">
+                    <a ui-sref="{{ self.isOverview ? 'overviewMatches({layout: self.LAYOUT.LIST})' : 'post({layout : self.LAYOUT.LIST})' }}">
                         <img ng-src="{{self.layout === 'list' ? 'generated/icon-sprite.svg#ico-filter_list_selected' : 'generated/icon-sprite.svg#ico-filter_list'}}"
                          class="omc__header__viewtype__icon clickable"/>
                     </a>
@@ -59,6 +59,9 @@ let template = `
         </div>
     </div>
 `
+
+const LAYOUT = Object.freeze({ TILES: 'tiles', GRID: 'grid', LIST: 'list'});
+
 class Controller {
     constructor() {
         attach(this, serviceDependencies, arguments);
@@ -83,17 +86,20 @@ class Controller {
                 layout = 'tiles';
             }
 
+            const isOverview = !encodedPostUri;
             let matchesByConnectionUri;
-            if(state.getIn(['router', 'currentParams', 'myUri']) === undefined) { //overview
-                matchesByConnectionUri = allMatchesByConnections.toList();
-            } else { // post-owner view
+            if(isOverview) { //overview
                 matchesByConnectionUri = allMatchesByConnections
                     .filter(conn => conn.getIn(['ownNeed', 'uri']) === postUri)
                     .toList();
+            } else { // post-owner view
+                matchesByConnectionUri = allMatchesByConnections.toList();
             }
 
             return {
+                isOverview,
                 layout,
+                LAYOUT,
                 connection: state.getIn(['connections', connectionUri]),
                 matches: matchesByConnectionUri.toArray(),
                 matchesOfNeed: mapToMatches(matchesByConnectionUri.toJS()),//TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.

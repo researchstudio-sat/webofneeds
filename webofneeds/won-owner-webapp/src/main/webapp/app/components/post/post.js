@@ -13,6 +13,7 @@ import { actionCreators }  from '../../actions/actions';
 import openConversationModule from '../open-conversation';
 import openRequestModule from '../open-request';
 import connectionSelectionModule from '../connection-selection';
+import matchesModule from '../matches';
 import { selectAllByConnections } from '../../selectors';
 import { relativeTime } from '../../won-label-utils';
 
@@ -86,6 +87,7 @@ export default angular.module('won.owner.components.post', [
     postMessagesModule,
     connectionSelectionModule,
     openRequestModule,
+    matchesModule,
 ])
     .controller('PostController', Controller)
     .name;
