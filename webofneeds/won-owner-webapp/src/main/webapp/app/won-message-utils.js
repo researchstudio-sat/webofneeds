@@ -61,7 +61,7 @@ messageService.sendMessage = function(msg) {
 };
 
 */
-//TODO: IMPL THIS
+
 export function buildRateMessage(msgToRateFor, rating){
     let deferred = Q.defer();
     var buildMessage = function(envelopeData, eventToRateFor) {
