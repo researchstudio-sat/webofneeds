@@ -17,23 +17,27 @@ import { actionCreators }  from '../../actions/actions';
 const postTypeTexts = [
     {
         type: won.WON.BasicNeedTypeDemand,
-        text: 'I want to have something',
-        helpText: 'Use this type in case (want) foo sam quam aspic temod et que in prendiae perovidel.',
+        text: 'I\'m looking for ...',
+        helpText: 'Select this if you are looking for things or services other people offer',
     },
     {
         type: won.WON.BasicNeedTypeSupply,
-        text: 'I offer something',
-        helpText: 'Use this type in case (offer) case sam quam aspic temod et que in prendiae perovidel.'
+        text: 'I\'m offering ...',
+        helpText: 'Use this if you are offering an item or a service. You will find people who said' +
+        ' I\'m looking' +
+        ' for...\''
     },
     {
         type: won.WON.BasicNeedTypeDotogether,
-        text: 'I want to do something together',
-        helpText: 'Use this type in case case (together) sam quam aspic temod et que in prendiae perovidel.'
+        text: 'I want to find someone to ...',
+        helpText: 'Select this if you are looking to find other people who share your interest. You will be matched' +
+        ' with other people who chose this option.'
     },
     {
         type: won.WON.BasicNeedTypeCritique,
-        text: 'I want to change something',
-        helpText: 'Use this type in case (change) case sam quam aspic temod et que in prendiae perovidel.'
+        text: 'I want to do something about ...',
+        helpText: 'Select this if there is some problem you want to fix (or get fixed). You will be' +
+        ' matched with other people who chose this option and have a similiar idea.'
     }
 ]
 
