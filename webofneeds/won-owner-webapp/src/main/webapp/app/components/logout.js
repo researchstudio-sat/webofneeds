@@ -24,8 +24,8 @@ function genLogoutConf() {
             this.password = "";
 
             const logout = (state) => ({
-                loggedIn: state.get('user').toJS().loggedIn,
-                email: state.get('user').toJS().email
+                loggedIn: state.getIn(['user','loggedIn']),
+                email: state.getIn(['user','email'])
             });
 
             const disconnect = this.$ngRedux.connect(logout, actionCreators)(this);

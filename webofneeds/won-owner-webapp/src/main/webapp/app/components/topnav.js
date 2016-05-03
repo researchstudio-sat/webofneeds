@@ -13,7 +13,7 @@ function genTopnavConf() {
         <nav class="topnav">
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
-                    <a class="topnav__button">
+                    <a  ui-sref="{{ self.loggedIn ? 'feed' : 'landingpage' }}" class="topnav__button">
                         <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__button__icon">
                         <span class="topnav__page-title topnav__button__caption">Web of Needs</span>
                     </a>
@@ -63,21 +63,19 @@ function genTopnavConf() {
         </nav>
     `;
 
-    const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
+    const serviceDependencies = ['$q', '$ngRedux', '$scope', /*injections as strings here*/];
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */){
             attach(this, serviceDependencies, arguments);
+            window.tnc4dbg = this;
 
-
-
-            const login = (state) => ({
-                loggedIn: state.get('user').toJS().loggedIn,
-                email: state.get('user').toJS().email
+            const selectFromState = (state) => ({
+                loggedIn: state.getIn(['user', 'loggedIn']),
+                email: state.getIn(['user','email'])
             });
 
-
-            const disconnect = this.$ngRedux.connect(login, actionCreators)(this);
+            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy',disconnect);
         }
     }
