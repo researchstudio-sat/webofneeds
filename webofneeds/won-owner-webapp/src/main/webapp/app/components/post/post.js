@@ -80,12 +80,12 @@ Controller.$inject = serviceDependencies;
 
 
 
-export default angular.module('won.owner.components.postOwner.messages', [
+export default angular.module('won.owner.components.post', [
     ownerTitleBarModule,
     //galleryModule,
     postMessagesModule,
     connectionSelectionModule,
     openRequestModule,
 ])
-    .controller('PostOwnerMessagesController', Controller)
+    .controller('PostController', Controller)
     .name;
