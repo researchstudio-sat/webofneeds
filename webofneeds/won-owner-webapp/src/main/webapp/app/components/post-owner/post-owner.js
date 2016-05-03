@@ -30,11 +30,11 @@ class Controller {
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
         this.$scope.$on('$destroy', disconnect);
 
-        updateRelativeTimestamps(
+        /*updateRelativeTimestamps(
             this.$scope,
             this.$interval,
             this.post.get('creationDate'),
-                t => this.post.set('creationDate', t));
+                t => this.post.set('creationDate', t));*/
     }
 }
 
