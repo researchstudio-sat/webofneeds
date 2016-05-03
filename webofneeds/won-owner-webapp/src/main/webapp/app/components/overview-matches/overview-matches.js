@@ -19,8 +19,6 @@ class OverviewMatchesController {
 
         window.omc=this;
 
-        this.selection = 3;
-        this.ownerSelection = 1; //ONLY NECESSARY FOR VIEW WITH NEED
         this.labels = labels;
 
         const selectFromState = (state) => {
