@@ -40,9 +40,11 @@ export default function(allNeeds = initialState, action = {}) {
                 allNeeds
             );
 
+        case actionTypes.needs.reopen:
+            return allNeeds.setIn(["ownNeeds", action.payload.ownNeedUri, 'state'], won.WON.Active);
+
         case actionTypes.needs.close:
-            const needUri = action.payload.ownNeedUri;
-            return allNeeds.setIn(["ownNeeds", needUri, 'state'], won.WON.Inactive);
+            return allNeeds.setIn(["ownNeeds", action.payload.ownNeedUri, 'state'], won.WON.Inactive);
 
         case actionTypes.needs.received:
             const ownNeed = action.payload;

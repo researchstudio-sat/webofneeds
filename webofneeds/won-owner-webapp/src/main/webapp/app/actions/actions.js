@@ -53,7 +53,8 @@ import { hierarchy2Creators } from './action-utils';
 import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import {
     buildCreateMessage,
-    buildCloseNeedMessage
+    buildCloseNeedMessage,
+    buildOpenNeedMessage
 } from '../won-message-utils';
 
 // </utils>
@@ -321,20 +322,27 @@ export const messageTypeToEventType = deepFreeze({
 export function needsOpen(needUri) {
     return (dispatch, getState) => {
         const state = getState();
-        //TODO: IMPLEMENT ME
-        /*const eventData = selectAllByConnections(state).get(connectionData.connection.uri).toJS(); // TODO avoid toJS;
-        //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
-        let messageData = null;
-        let deferred = Q.defer()
-        won.getConnection(eventData.connection.uri).then(connection=> {
-            let msgToOpenFor = {event: eventData, connection: connection}
-            buildConnectMessage(msgToOpenFor, message).then(messageData=> {
-                deferred.resolve(messageData);
+        buildOpenNeedMessage(
+            needUri,
+            getState().getIn(['config', 'defaultNodeUri'])
+        )
+            .then((data)=> {
+                console.log(data);
+                dispatch(actionCreators.messages__send({
+                    eventUri: data.eventUri,
+                    message: data.message
+                }));
             })
-        })
-        deferred.promise.then((action)=> {
-            dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
-        })*/
+            .then(() =>
+                // assume close went through successfully, update GUI
+                dispatch({
+                    type: actionTypes.needs.reopen,
+                    payload: {
+                        ownNeedUri: needUri,
+                        affectedConnections: getState().getIn(['needs', 'ownNeeds', needUri, 'hasConnections'])
+                    }
+                })
+        )
     }
 }
 
