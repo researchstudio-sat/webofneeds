@@ -75,7 +75,7 @@ class Controller {
             const encodedPostUri =
                 state.getIn(['router', 'currentParams', 'postUri']) ||
                 state.getIn(['router', 'currentParams', 'myUri']); //deprecated parameter
-            const postUri = decodeURIComponent(encodedPostUri)
+            const postUri = decodeURIComponent(encodedPostUri);
 
             // either of 'tiles', 'grid', 'list'
             let layout = state.getIn(['router','currentParams','layout']);
