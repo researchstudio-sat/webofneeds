@@ -56,10 +56,19 @@ public class DeactivateNeedMessageProcessor extends AbstractCamelProcessor
     URI messageURI = wonNodeInformationService.generateEventURI();
     URI remoteWonNode = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(con.getRemoteNeedURI(),
       linkedDataSource);
+
+    //send close to remote node
     WonMessage message = new WonMessageBuilder().setMessagePropertiesForClose(messageURI,
       con.getConnectionURI(), con.getNeedURI(), need.getWonNodeURI(), con.getRemoteConnectionURI(),
       con.getRemoteNeedURI(), remoteWonNode).build();
     sendSystemMessageToRemoteNode(message);
+
+    //send close to owner app(s)
+    messageURI = wonNodeInformationService.generateEventURI();
+    message = new WonMessageBuilder().setMessagePropertiesForClose(messageURI,
+      con.getConnectionURI(), con.getNeedURI(), need.getWonNodeURI(), con.getConnectionURI(),
+      con.getNeedURI(), need.getWonNodeURI()).build();
+    sendSystemMessageToOwner(message);
   }
 
 }
