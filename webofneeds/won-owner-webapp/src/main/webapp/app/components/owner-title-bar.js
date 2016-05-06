@@ -17,7 +17,7 @@ function genComponentConf() {
                     <a ui-sref="overviewPosts">
                         <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__icon">
                     </a>
-                    <won-square-image src="self.post.get('titleImgSrc')" title="self.post.get('title')"></won-square-image>
+                    <won-square-image ng-class="{'inactive' : !self.isActive}" src="self.post.get('titleImgSrc')" title="self.post.get('title')"></won-square-image>
                     <div class="ntb__inner__left__titles">
                         <h1 class="ntb__title">{{self.post.get('title')}}</h1>
                         <div class="ntb__inner__left__titles__type">{{self.labels.type[self.post.get('basicNeedType')]}}</div>
@@ -36,28 +36,28 @@ function genComponentConf() {
                         <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Connected}">
 
                             <a ui-sref="post({connectionType: self.WON.Connected, openConversation: null, connectionUri: null, postUri: self.postUri})"
-                                ng-class="{'disabled' : !self.hasMessages}">
+                                ng-class="{'disabled' : !self.hasMessages || !self.isActive}">
                                 Messages
                                 <span class="ntb__tabs__unread">{{ self.unreadMessages }}</span>
                             </a>
                         </li>
                         <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.Suggested}">
                             <a ui-sref="post({connectionType: self.WON.Suggested, openConversation: null, connectionUri: null, postUri: self.postUri})"
-                                ng-class="{'disabled' : !self.hasMatches}">
+                                ng-class="{'disabled' : !self.hasMatches || !self.isActive}">
                                 Matches
                                 <span class="ntb__tabs__unread">{{ self.unreadMatches }}</span>
                             </a>
                         </li>
                         <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestReceived}">
                             <a ui-sref="post({connectionType: self.WON.RequestReceived, openConversation: null, connectionUri: null, postUri: self.postUri})"
-                                ng-class="{'disabled' : !self.hasIncomingRequests}">
+                                ng-class="{'disabled' : !self.hasIncomingRequests || !self.isActive}">
                                 Requests
                                 <span class="ntb__tabs__unread">{{ self.unreadIncomingRequests }}</span>
                             </a>
                         </li>
                         <li ng-class="{'ntb__tabs__selected' : self.selectedTab === self.WON.RequestSent}">
                             <a ui-sref="post({connectionType: self.WON.RequestSent, openConversation: null, connectionUri: null, postUri: self.postUri})"
-                                ng-class="{'disabled' : !self.hasSentRequests}">
+                                ng-class="{'disabled' : !self.hasSentRequests || !self.isActive}">
                                 Sent Requests
                                 <span class="ntb__tabs__unread">{{ self.unreadSentRequests }}</span>
                             </a>
