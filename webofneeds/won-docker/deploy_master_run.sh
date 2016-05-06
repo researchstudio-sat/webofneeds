@@ -124,6 +124,7 @@ docker ${docker_options} rm owner_ma || echo 'No docker container found to remov
 docker ${docker_options} run --name=owner_ma -d -e "node.default.host=$public_node_uri" \
 -e "node.default.http.port=443" -p 8082:8443 \
 -e "uri.host=$public_node_uri" -e "http.port=8082" \
+-e "uri.prefix=https://$public_node_uri" \
 -e "uri.prefix.node.default=https://${public_node_uri}/won" \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \

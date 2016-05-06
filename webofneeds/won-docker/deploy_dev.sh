@@ -201,12 +201,13 @@ docker -H satsrv04:2375 run --name=owner_dev -d -e "node.default.host=satsrv04.r
 -e "JMEM_OPTS=-Xmx1000m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/owner:dev
 
-# owner 2
+# owner 2 (behind proxy on satsrv07)
 docker -H satsrv05:2375 build -t webofneeds/owner:dev $WORKSPACE/webofneeds/won-docker/owner/
 docker -H satsrv05:2375 stop owner_dev || echo 'No docker container found to stop with name: owner_dev'
 docker -H satsrv05:2375 rm owner_dev || echo 'No docker container found to remove with name: owner_dev'
 docker -H satsrv05:2375 run --name=owner_dev -d -e "node.default.host=satsrv07.researchstudio.at" \
 -e "node.default.http.port=443" -e "uri.host=satsrv07.researchstudio.at" -e "http.port=8081" \
+-e "uri.prefix=https://satsrv07.researchstudio.at" \
 -e "uri.prefix.node.default=https://satsrv07.researchstudio.at/won" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
