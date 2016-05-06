@@ -84,9 +84,10 @@ webofneeds/wonnode:master
 # bigdata
 echo run bigdata container
 docker ${docker_options} pull webofneeds/bigdata
-docker ${docker_options} stop bigdata_ma || echo 'No docker container found to stop with name: bigdata_ma'
-docker ${docker_options} rm bigdata_ma || echo 'No docker container found to remove with name: bigdata_ma'
-docker ${docker_options} run --name=bigdata_ma -d -p 10000:9999 -m 400m webofneeds/bigdata
+if ! docker ${docker_options} run --name=bigdata_ma -d -p 10000:9999 -m 400m webofneeds/bigdata; then
+  echo bigdata container already available, restart old container
+  docker ${docker_options} restart bigdata_ma
+fi
 
 sleep 10
 
@@ -106,10 +107,13 @@ webofneeds/matcher_service:master
 # siren solr server
 echo run solr server container
 docker ${docker_options} pull webofneeds/sirensolr
-docker ${docker_options} stop sirensolr_ma || echo 'No docker container found to stop with name: sirensolr_ma'
-docker ${docker_options} rm sirensolr_ma || echo 'No docker container found to remove with name: sirensolr_ma'
-docker ${docker_options} run --name=sirensolr_ma -d -p 7071:8080 -p 8984:8983 --env CATALINA_OPTS="-Xmx200m \
--XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" webofneeds/sirensolr
+if ! docker ${docker_options} run --name=sirensolr_ma -d -p 7071:8080 -p 8984:8983 --env CATALINA_OPTS="-Xmx200m \
+     -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" webofneeds/sirensolr; then
+  echo solr server container already available, restart old container
+  docker ${docker_options} restart sirensolr_ma
+fi
+
+
 
 sleep 10
 

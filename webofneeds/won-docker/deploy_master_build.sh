@@ -16,6 +16,10 @@ if [ "$GENERATE_NEW_CERTIFICATES" = true ] ; then
   ssh root@satcluster01 rm -rf $base_folder/won-client-certs/*
   docker -H satcluster01:2375 stop postgres_ma || echo 'No docker container found to stop with name: postgres_ma'
   docker -H satcluster01:2375 rm postgres_ma || echo 'No docker container found to remove with name: postgres_ma'
+  docker ${docker_options} stop bigdata_ma || echo 'No docker container found to stop with name: bigdata_ma'
+  docker ${docker_options} rm bigdata_ma || echo 'No docker container found to remove with name: bigdata_ma'
+  docker ${docker_options} stop sirensolr_ma || echo 'No docker container found to stop with name: sirensolr_ma'
+  docker ${docker_options} rm sirensolr_ma || echo 'No docker container found to remove with name: sirensolr_ma'
 fi
 
 echo start docker build of images:
