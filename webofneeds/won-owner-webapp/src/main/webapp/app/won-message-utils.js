@@ -61,7 +61,7 @@ messageService.sendMessage = function(msg) {
 };
 
 */
-//TODO: IMPL THIS
+
 export function buildRateMessage(msgToRateFor, rating){
     let deferred = Q.defer();
     var buildMessage = function(envelopeData, eventToRateFor) {
@@ -133,6 +133,29 @@ export function buildCloseNeedMessage(needUri, wonNodeUri){
             err => won.reportError("cannot close need "+ needUri)
         );
 }
+
+export function buildOpenNeedMessage(needUri, wonNodeUri){
+    const buildMessage = function(envelopeData) {
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+        var message = new won.MessageBuilder(won.WONMSG.activateNeedMessage)
+            .eventURI(eventUri)
+            .hasReceiverNode(wonNodeUri)
+            .hasOwnerDirection()
+            .hasSentTimestamp(new Date().getTime())
+            .forEnvelopeData(envelopeData)
+            .build();
+
+        return {eventUri: eventUri, message: message};
+    };
+
+    return won.getEnvelopeDataForNeed(needUri)
+        .then(
+            envelopeData => buildMessage(envelopeData),
+            err => won.reportError("cannot close need "+ needUri)
+    );
+}
+
+
 
 export function buildConnectMessage(msgToConnectFor, textMessage){
     let deferred = Q.defer();

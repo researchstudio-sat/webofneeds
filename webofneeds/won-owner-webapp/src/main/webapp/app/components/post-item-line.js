@@ -11,7 +11,7 @@ const serviceDependencies = ['$scope', '$interval'];
 function genComponentConf() {
     let template = `
             <a ui-sref="postInfo({myUri: self.item.uri})">
-                <won-square-image src="self.item.titleImgSrc" title="self.item.title"></won-square-image>
+                <won-square-image  ng-class="{'inactive' : !self.isActive()}" src="self.item.titleImgSrc" title="self.item.title"></won-square-image>
             </a>
             <a class="pil__description clickable" ui-sref="postInfo({myUri: self.item.uri})">
                 <div class="pil__description__topline">
@@ -89,6 +89,10 @@ function genComponentConf() {
                 this.item.creationDate,
                 t => this.creationDate = t);
 
+        }
+
+        isActive() {
+            return this.item.state === won.WON.Active;
         }
 
         unreadXCount(type) {
