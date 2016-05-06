@@ -205,12 +205,13 @@ docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.r
 -e "JMEM_OPTS=-Xmx1000m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/owner:int
 
-# owner 2
+# owner 2 (behind proxy on satsrv06)
 docker -H satsrv05:2375 build -t webofneeds/owner:int $WORKSPACE/webofneeds/won-docker/owner/
 docker -H satsrv05:2375 stop owner_int || echo 'No docker container found to stop with name: owner_int'
 docker -H satsrv05:2375 rm owner_int || echo 'No docker container found to remove with name: owner_int'
 docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv06.researchstudio.at" \
 -e "uri.host=satsrv06.researchstudio.at" -e "http.port=8082" \
+-e "uri.prefix=https://satsrv06.researchstudio.at" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -e "node.default.http.port=443" -p 8082:8443 \
 -e "uri.prefix.node.default=https://satsrv06.researchstudio.at/won" \
