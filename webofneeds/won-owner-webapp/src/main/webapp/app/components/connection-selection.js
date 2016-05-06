@@ -7,9 +7,9 @@ import won from '../won-es6';
 import angular from 'angular';
 import squareImageModule from './square-image';
 import { labels } from '../won-label-utils';
-import { attach } from '../utils.js';
+import { attach, decodeUriComponentProperly } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
-import { selectAllByConnections } from '../selectors';
+import { selectOpenConnectionUri, selectAllByConnections } from '../selectors';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
@@ -86,15 +86,16 @@ function genComponentConf() {
                 const encodedConnectionUri = state.getIn(['router', 'currentParams', 'connectionUri']) ||
                     state.getIn(['router', 'currentParams', 'openConversation']); // TODO old parameter
 
-                const openConnectionUri = encodedConnectionUri? decodeURIComponent(encodedConnectionUri) : undefined;
+                const openConnectionUri = selectOpenConnectionUri(state);
                 const allByConnections = selectAllByConnections(state);
                 const post = state.getIn(['needs','ownNeeds', postUri]);
                 const postJS = post? post.toJS() : {};
 
-                const encodedConnectionType = state.getIn(['router', 'currentParams', 'connectionType']);
-                const connectionTypeInParams = (encodedConnectionType ? decodeURIComponent(encodedConnectionType) : undefined) ||
+                const connectionTypeInParams = decodeUriComponentProperly(
+                        state.getIn(['router', 'currentParams', 'connectionType'])
+                    ) ||
                     won.WON.Connected; // TODO old parameter
-                const connectionType = connectionTypeInParams || self.connectionType
+                const connectionType = connectionTypeInParams || self.connectionType;
 
                 const connectionUris = allByConnections
                     .filter(conn =>

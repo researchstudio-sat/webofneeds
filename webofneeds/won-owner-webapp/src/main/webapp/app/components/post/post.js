@@ -7,14 +7,14 @@ import angular from 'angular';
 import ownerTitleBarModule from '../owner-title-bar';
 //import galleryModule from '../gallery';
 import postMessagesModule from '../post-messages';
-import { attach,mapToMatches } from '../../utils';
+import { attach, mapToMatches, decodeUriComponentProperly } from '../../utils';
 import won from '../../won-es6';
 import { actionCreators }  from '../../actions/actions';
 import openConversationModule from '../open-conversation';
 import openRequestModule from '../open-request';
 import connectionSelectionModule from '../connection-selection';
 import matchesModule from '../matches';
-import { selectAllByConnections } from '../../selectors';
+import { selectAllByConnections, selectOpenPostUri, selectOpenConnectionUri } from '../../selectors';
 import { relativeTime } from '../../won-label-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
@@ -22,25 +22,20 @@ class Controller {
     constructor() {
         attach(this, serviceDependencies, arguments);
         this.selection = 0;
-        window.msgs4dbg = this;
+        window.p4dbg = this;
         this.wonConnected = won.WON.Connected;
 
         const selectFromState = (state)=>{
-            const encodedPostUri = state.getIn(['router', 'currentParams', 'postUri']) ||
-                                state.getIn(['router', 'currentParams', 'myUri']) ; // TODO old parameter
-            const postUri = encodedPostUri ? decodeURIComponent(encodedPostUri) : undefined;
+            const postUri = selectOpenPostUri(state);
 
-            const encodedConnectionUri = state.getIn(['router', 'currentParams', 'connectionUri']) ||
-                state.getIn(['router', 'currentParams', 'openConversation']); // TODO old parameter
-            const connectionUri = encodedConnectionUri? decodeURIComponent(encodedConnectionUri) : undefined;
+            const connectionUri = selectOpenConnectionUri(state);
             const actualConnectionType = state.getIn([
                 'connections', connectionUri, 'hasConnectionState'
             ]);
 
-            const encodedConnectionType = state.getIn(['router', 'currentParams', 'connectionType']);
-            const connectionTypeInParams = (encodedConnectionType ? decodeURIComponent(encodedConnectionType) : undefined);
+            const connectionTypeInParams = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionType']));
 
-            const connectionIsOpen = !!encodedConnectionUri &&
+            const connectionIsOpen = !!connectionUri &&
                 //make sure we don't get a mismatch between supposed type and actual type:
                 actualConnectionType == connectionTypeInParams;
 
@@ -53,10 +48,8 @@ class Controller {
             return {
                 postUri,
                 post,
-
+                connectionUri,
                 connectionType: connectionTypeInParams,
-                connectionUri: decodeURIComponent(encodedConnectionUri),
-
                 showConnectionSelection: !!connectionTypeInParams && connectionTypeInParams !== won.WON.Suggested,
                 showMatches: connectionTypeInParams === won.WON.Suggested,
                 showConversationDetails: connectionIsOpen && connectionTypeInParams === won.WON.Connected,

@@ -515,4 +515,11 @@ export function is(type, obj) {
     return obj !== undefined && obj !== null && clas === type;
 }
 
+export function decodeUriComponentProperly(encodedUri) {
+    if(!encodedUri)
+        return undefined; //for some reason decodeUri(undefined) yields "undefined"
+    else
+        return decodeURIComponent(encodedUri);
+}
+
 

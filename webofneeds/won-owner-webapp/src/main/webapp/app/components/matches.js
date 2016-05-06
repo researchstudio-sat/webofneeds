@@ -7,10 +7,10 @@ import matchesGridItemModule from './matches-grid-item';
 import matchesListItemModule from './matches-list-item';
 import sendRequestModule from './send-request';
 
-import { attach,mapToMatches} from '../utils';
+import { attach, mapToMatches, decodeUriComponentProperly} from '../utils';
 import { labels } from '../won-label-utils';
 import { actionCreators }  from '../actions/actions';
-import { selectAllByConnections } from '../selectors';
+import { selectAllByConnections, selectOpenPostUri, displayingOverview } from '../selectors';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 let template = `
@@ -72,11 +72,9 @@ class Controller {
             const allMatchesByConnections = selectAllByConnections(state)
                     .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested);
 
-            const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
-            const encodedPostUri =
-                state.getIn(['router', 'currentParams', 'postUri']) ||
-                state.getIn(['router', 'currentParams', 'myUri']); //deprecated parameter
-            const postUri = decodeURIComponent(encodedPostUri);
+            const postUri = selectOpenPostUri(state);
+            const connectionUri = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionUri']));
+
 
             // either of 'tiles', 'grid', 'list'
             let layout = state.getIn(['router','currentParams','layout']);
@@ -84,7 +82,7 @@ class Controller {
                 layout = 'tiles';
             }
 
-            const isOverview = !encodedPostUri;
+            const isOverview = displayingOverview(state);
             let matchesByConnectionUri;
             if(isOverview) { //overview
                 matchesByConnectionUri = allMatchesByConnections

@@ -4,6 +4,7 @@
 
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
+import { decodeUriComponentProperly } from './utils';
 
 
 //TODO update to reflect simplfied state (drop one 'connections')
@@ -137,15 +138,14 @@ export const selectOpenConnectionUri = createSelector(
     selectConnections,
     (routerParams, connections) => {
         //de-escaping is lost in transpiling if not done in two steps :|
-        const openConnectionEncoded = routerParams.get('connectionUri') ||
-                                        routerParams.get('openConversation'); //TODO deprecated parameter
-        const openConnectionUri = openConnectionEncoded? decodeURIComponent(openConnectionEncoded) : undefined;
+        const openConnectionUri = decodeUriComponentProperly(
+            routerParams.get('connectionUri') ||
+            routerParams.get('openConversation')
+        );
 
-        const myUriEscaped = routerParams.get('myUri'); //TODO deprecated parameter
-        const myUri = myUriEscaped? decodeURIComponent(myUriEscaped) : undefined;
+        const myUri = decodeUriComponentProperly(routerParams.get('myUri')); //TODO deprecated parameter
 
-        const theirUriEscaped = routerParams.get('theirUri'); //TODO deprecated parameter
-        const theirUri = decodeURIComponent(theirUriEscaped);
+        const theirUri = decodeUriComponentProperly(routerParams.get('theirUri')); //TODO deprecated parameter
 
         if(openConnectionUri) {
             return openConnectionUri;
@@ -164,6 +164,24 @@ export const selectOpenConnectionUri = createSelector(
         }
     }
 );
+
+export const selectOpenPostUri = createSelector(
+    state => state,
+    state => {
+        const encodedPostUri =
+            state.getIn(['router', 'currentParams', 'postUri']) ||
+            state.getIn(['router', 'currentParams', 'myUri']); //deprecated parameter
+        if(!encodedPostUri)
+            return undefined;
+        else
+            return decodeURIComponent(encodedPostUri);
+    }
+);
+
+export const displayingOverview = createSelector(
+    selectOpenPostUri,
+    postUri => !postUri //if there's a postUri, this is almost certainly a detail view
+)
 
 
 window.selectAllByConnections4dbg = selectAllByConnections;

@@ -2,7 +2,7 @@
 
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
-import { attach,mapToMatches } from '../utils';
+import { attach, mapToMatches, decodeUriComponentProperly } from '../utils';
 import won from '../won-es6';
 import { labels } from '../won-label-utils';
 import { selectUnreadEventsByNeedAndType, selectAllByConnections } from '../selectors';
@@ -85,8 +85,7 @@ function genComponentConf() {
                     state.getIn(['router', 'currentParams', 'myUri']) ; // TODO old parameter
                 const postUri = decodeURIComponent(encodedPostUri);
 
-                const encodedConnectionType = state.getIn(['router', 'currentParams', 'connectionType']);
-                const connectionTypeInParams = encodedConnectionType ? decodeURIComponent(encodedConnectionType) : undefined;
+                const connectionTypeInParams = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionType']));
 
                 return {
                     selectedTab: connectionTypeInParams || 'Info',
