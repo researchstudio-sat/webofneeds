@@ -14,7 +14,7 @@ import {
     urisToLookupMap
 } from '../utils';
 
-import { fetchAllAccessibleAndRelevantData } from '../won-message-utils';
+import { fetchDataForOwnedNeeds } from '../won-message-utils';
 
 export const pageLoadAction = () => dispatch => {
     /* TODO the data fetched here should be baked into
@@ -26,7 +26,7 @@ export const pageLoadAction = () => dispatch => {
     .then(resp => resp.json())
     /* handle data, dispatch actions */
     .then(data =>
-        load(true, data.username)
+        fetchDataForOwnedNeeds(data.username)
     )
     .then(allThatData =>
         dispatch({
@@ -44,32 +44,6 @@ export const pageLoadAction = () => dispatch => {
     )
 }
 
-export function load(loggedIn, email) {
-    return fetch('/owner/rest/needs/', {
-        method: 'get',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-    })
-    .then(checkHttpStatus)
-    .then(response =>
-        response.json())
-    .then(needUris =>
-        fetchAllAccessibleAndRelevantData(needUris))
-    .then(allThatData =>
-        Immutable.fromJS(allThatData)) //!!!
-    .then(allThatData => {
-        const payload = allThatData
-            .set('loggedIn', loggedIn)
-            .set('email', email);
-        return payload;
-    })
-    .catch(error => {
-        throw({msg: 'user needlist retrieval failed', error});
-    });
-}
 
 /////////// THE ACTIONCREATORS BELOW SHOULD BE PART OF PAGELOAD
 

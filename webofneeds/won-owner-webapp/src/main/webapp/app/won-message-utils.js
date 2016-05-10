@@ -332,8 +332,52 @@ export function getEventsFromMessage(msgJson) {
     return simplifiedEvents;
 }
 
+export function fetchDataForOwnedNeeds(emailOrNeedUris) {
+    let needUrisPromise, email;
+    if(is('Array', emailOrNeedUris)) {
+        email = undefined;
+        needUrisPromise = Promise.resolve(emailOrNeedUris);
+    } else if (is('Array', emailOrNeedUris)) {
+        email = emailOrNeedUris;
+        needUrisPromise = fetchOwnedNeedUris();
+    } else {
+        throw({msg: "got something that's neither an email-adress nor a list of needUris" });
+    }
+
+    const dataPromise = needUrisPromise.then(needUris =>
+            fetchAllAccessibleAndRelevantData(needUris)
+        )
+        .catch(error => {
+            throw({msg: 'user needlist retrieval failed', error});
+        });
+
+    if(email) {
+        return dataPromise.then(allThatData =>
+            allThatData
+                .set('loggedIn', true)
+                .set('email', email)
+        )
+    } else {
+        return dataPromise;
+    }
+}
+function fetchOwnedNeedUris() {
+    return fetch('/owner/rest/needs/', {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        })
+        .then(checkHttpStatus)
+        .then(response =>
+            response.json()
+        )
+}
+
 window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
-export function fetchAllAccessibleAndRelevantData(ownNeedUris) {
+function fetchAllAccessibleAndRelevantData(ownNeedUris) {
 
     const allLoadedPromise = Promise.all(
         ownNeedUris.map(uri => won.ensureLoaded(uri, uri, deep = true))
@@ -384,18 +428,22 @@ export function fetchAllAccessibleAndRelevantData(ownNeedUris) {
         ]);
     });
 
-    return allDataRawPromise.then(([
-            allOwnNeeds,
-            allConnections,
-            allEvents,
-            allTheirNeeds
+    return allDataRawPromise
+        .then(([
+                allOwnNeeds,
+                allConnections,
+                allEvents,
+                allTheirNeeds
             ]) => ({
-            ownNeeds: allOwnNeeds,
-            connections: allConnections,
-            events: allEvents,
-            theirNeeds: allTheirNeeds,
-        })
-    );
+                ownNeeds: allOwnNeeds,
+                connections: allConnections,
+                events: allEvents,
+                theirNeeds: allTheirNeeds,
+            })
+        )
+        .then(
+            Immutable.fromJS
+        );
 
     /**
      const allAccessibleAndRelevantData = {

@@ -4,7 +4,7 @@
 
 import  won from '../won-es6';
 import { actionTypes, actionCreators } from './actions';
-import { load } from './load-action';
+import { fetchDataForOwnedNeeds } from '../won-message-utils';
 
 import {
     checkHttpStatus,
@@ -25,7 +25,7 @@ export function accountLogin(username, password) {
             return response.json()
         })
         .then( data =>
-            load(true, username)
+            fetchDataForOwnedNeeds(username)
         )
         .then(allThatData =>
             dispatch({
