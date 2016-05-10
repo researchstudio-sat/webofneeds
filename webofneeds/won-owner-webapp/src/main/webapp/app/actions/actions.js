@@ -96,11 +96,6 @@ import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 const INJ_DEFAULT = 'INJECT_DEFAULT_ACTION_CREATOR';
 const actionHierarchy = {
     initialPageLoad: pageLoadAction,
-    user: {
-        loggedIn: INJ_DEFAULT,
-        loginFailed: INJ_DEFAULT,
-        registerFailed: INJ_DEFAULT
-    },
     events:{
         addUnreadEventUri:INJ_DEFAULT,
         read:INJ_DEFAULT
@@ -203,10 +198,11 @@ const actionHierarchy = {
          */
         requestWsReset_Hack: INJ_DEFAULT,
     },
-    verifyLogin: accountVerifyLogin,
     login: accountLogin,
     logout: accountLogout,
     register: accountRegister,
+    loginFailed: INJ_DEFAULT,
+    registerFailed: INJ_DEFAULT,
     config: {
         init: configInit,
         update: INJ_DEFAULT,

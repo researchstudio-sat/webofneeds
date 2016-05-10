@@ -13,7 +13,6 @@ const initialState = Immutable.fromJS({});
 
 export default function(userData = initialState, action = {}) {
     switch(action.type) {
-        case actionTypes.user.loggedIn:
         case actionTypes.initialPageLoad:
         case actionTypes.login:
 
@@ -30,12 +29,14 @@ export default function(userData = initialState, action = {}) {
                 console.log('reducers.js: received notlogged in action from app-server');
                 return Immutable.fromJS({loggedIn: false});
             }
+        case actionTypes.logout:
+            return Immutable.fromJS({loggedIn: false});
 
-        case actionTypes.user.loginFailed:
+        case actionTypes.loginFailed:
             console.log('reducers.js: received UNsuccessful-login action from app-server');
             return Immutable.fromJS({loginError: action.payload.loginError});
 
-        case actionTypes.user.registerFailed:
+        case actionTypes.registerFailed:
             console.log('reducers.js: received UNsuccessful-login action from app-server');
             return Immutable.fromJS({registerError: action.payload.registerError});
 

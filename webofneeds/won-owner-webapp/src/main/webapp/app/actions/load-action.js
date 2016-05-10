@@ -25,10 +25,9 @@ export const pageLoadAction = () => dispatch => {
     .then(checkHttpStatus)
     .then(resp => resp.json())
     /* handle data, dispatch actions */
-    .then(data => {
-        dispatch(actionCreators.user__loggedIn({loggedIn: true, email: data.username}));
-        return load(dispatch, true, data.username);
-    })
+    .then(data =>
+        load(true, data.username)
+    )
     .then(allThatData =>
         dispatch({
             type: actionTypes.initialPageLoad,
@@ -38,7 +37,10 @@ export const pageLoadAction = () => dispatch => {
     /* handle: not-logged-in */
     .catch(error =>
         //TODO load data of non-owned need!!!
-        dispatch(actionCreators.user__loggedIn({loggedIn: false}))
+        dispatch({
+            type: actionTypes.initialPageLoad,
+            payload: Immutable.fromJS({loggedIn: false})
+        })
     )
 }
 

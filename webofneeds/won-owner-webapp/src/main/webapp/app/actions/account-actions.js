@@ -34,14 +34,16 @@ export function accountLogin(username, password) {
             })
         )
         .then(() => {
-            dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
             dispatch(actionCreators.messages__requestWsReset_Hack());
             dispatch(actionCreators.router__stateGo("feed"));
         })
         .catch(error => {
             //TODO load data of non-owned need!!!
-            dispatch(actionCreators.user__loggedIn({loggedIn: false}));
-            dispatch(actionCreators.user__loginFailed({loginError: "No such username/password combination registered."}))
+            dispatch({
+                type: actionTypes.login,
+                payload: Immutable.fromJS({loggedIn: false})
+            })
+            dispatch(actionCreators.loginFailed({loginError: "No such username/password combination registered."}))
         })
 }
 
@@ -58,20 +60,20 @@ export function accountLogout() {
         }).then(checkHttpStatus)
         .then(response => {
             return response.json()
-        }).then(
-            data => {
+        }).then(data =>
+            dispatch({
+                type: actionTypes.logout,
+                payload: Immutable.fromJS({loggedIn: false})
+            })
+        )
+        .then(() => {
             dispatch(actionCreators.messages__requestWsReset_Hack());
-            dispatch(actionCreators.user__loggedIn({loggedIn: false}));
-            dispatch(actionCreators.needs__clean({needs: {}}));
-            dispatch(actionCreators.posts__clean({}));
-            dispatch(actionCreators.connections__reset({}))
             dispatch(actionCreators.router__stateGo("landingpage"));
-        }
-        ).catch(
+        })
+        .catch(
             //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
             error => {
                 console.log(error);
-                dispatch(actionCreators.user__loggedIn({loggedIn: true}))
             }
         )
 }
@@ -98,6 +100,6 @@ export function accountRegister(username, password) {
         ).catch(
             //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
                 error =>
-                    dispatch(actionCreators.user__registerFailed({registerError: "Registration failed"}))
+                    dispatch(actionCreators.registerFailed({registerError: "Registration failed"}))
         )
 }

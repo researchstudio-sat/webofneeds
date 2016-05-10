@@ -83,7 +83,8 @@ export default function(connections = initialState, action = {}) {
         case actionTypes.messages.hintMessageReceived:
             return storeConnectionAndRelatedData(connections, action.payload);
 
-        case actionTypes.connections.reset:
+        case actionTypes.logout:
+
             return initialState;
 
         default:
