@@ -8,38 +8,7 @@
 
 
     <!-- Post info view when there's no connection-state/-type selected -->
-    <div class="post-info" ng-show="!self.connectionType">
-        <div class="post-info__inner">
-            <won-gallery class="post-info__inner__left"></won-gallery>
-
-            <div class="post-info__inner__right">
-                <h2 class="post-info__heading" ng-show="self.post.get('friendlyTimestamp')">
-                    Created
-                </h2>
-                <p class="post-info__details" ng-show="self.post.get('friendlyTimestamp')">
-                    {{ self.post.get('friendlyTimestamp') }}
-                </p>
-
-                <h2 class="post-info__heading"
-                    ng-show="self.post.get('description')">
-                    Description
-                </h2>
-                <p class="post-info__details"
-                    ng-show="self.post.get('description')">
-                    {{ self.post.get('description') }}
-                </p>
-                <h2 class="post-info__heading"
-                    ng-show="self.post.get('location')">
-                    Location
-                </h2>
-                <p class="post-info__details"
-                    ng-show="self.post.get('location')">
-                    {{ self.post.get('location') }}
-                </p>
-            </div>
-        </div>
-    </div>
-
+    <won-post-info ng-show="!self.connectionType"></won-post-info>
 
     <!-- Matches: -->
     <won-matches ng-show="self.showMatches"></won-matches>

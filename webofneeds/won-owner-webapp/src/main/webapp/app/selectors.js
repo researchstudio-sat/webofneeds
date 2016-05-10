@@ -5,11 +5,13 @@
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
 import { decodeUriComponentProperly } from './utils';
+import { relativeTime } from './won-label-utils';
 
-
-//TODO update to reflect simplfied state (drop one 'connections')
 const selectConnections = state => state.getIn(['connections']);
 const selectEvents = state => state.getIn(['events', 'events']);
+const selectOwnNeeds = state => state.getIn(['needs', 'ownNeeds']);
+const selectTheirNeeds = state => state.getIn(['needs', 'theirNeeds']);
+const selectLastUpdateTime = state => state.get('lastUpdateTime');
 
 export const selectUnreadEventUris = state => state
     .getIn(['events', 'unreadEventUris']);
@@ -177,6 +179,22 @@ export const selectOpenPostUri = createSelector(
             return decodeURIComponent(encodedPostUri);
     }
 );
+
+export const selectOpenPost = createSelector(
+    selectOpenPostUri, selectOwnNeeds, selectTheirNeeds, selectLastUpdateTime,
+    (openPostUri, ownNeeds, theirNeeds, lastUpdateTime) => {
+        let post = ownNeeds.get(openPostUri) || theirNeeds.get(openPostUri);
+        if(post) {
+            const timestamp = relativeTime(lastUpdateTime, post.get('creationDate'));
+            post = post.set('friendlyTimestamp', timestamp);
+        }
+        return post;
+    }
+)
+export const selectOwningOpenPost = createSelector(
+    selectOpenPostUri, selectOwnNeeds,
+    (openPostUri, ownNeeds) => !!ownNeeds.get(openPostUri)
+)
 
 export const displayingOverview = createSelector(
     selectOpenPostUri,

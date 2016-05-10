@@ -13,8 +13,15 @@ import { actionCreators }  from '../../actions/actions';
 import openConversationModule from '../open-conversation';
 import openRequestModule from '../open-request';
 import connectionSelectionModule from '../connection-selection';
+import postInfoModule from '../post-info';
 import matchesModule from '../matches';
-import { selectAllByConnections, selectOpenPostUri, selectOpenConnectionUri } from '../../selectors';
+import {
+    selectAllByConnections,
+    selectOpenPostUri,
+    selectOpenConnectionUri,
+    selectOpenPost,
+    selectOwningOpenPost
+} from '../../selectors';
 import { relativeTime } from '../../won-label-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
@@ -39,15 +46,10 @@ class Controller {
                 //make sure we don't get a mismatch between supposed type and actual type:
                 actualConnectionType == connectionTypeInParams;
 
-            let post = state.getIn(['needs', 'ownNeeds', postUri]);
-            if(post) {
-                const timestamp = relativeTime(state.get('lastUpdateTime'), post.get('creationDate'));
-                post = post.set('friendlyTimestamp', timestamp);
-            }
-
             return {
-                postUri,
-                post,
+                postUri: selectOpenPostUri(state),
+                post: selectOpenPost(state),
+                postIsOwned: selectOwningOpenPost(state),
                 connectionUri,
                 connectionType: connectionTypeInParams,
                 showConnectionSelection: !!connectionTypeInParams && connectionTypeInParams !== won.WON.Suggested,
@@ -81,6 +83,7 @@ export default angular.module('won.owner.components.post', [
     connectionSelectionModule,
     openRequestModule,
     matchesModule,
+    postInfoModule,
 ])
     .controller('PostController', Controller)
     .name;
