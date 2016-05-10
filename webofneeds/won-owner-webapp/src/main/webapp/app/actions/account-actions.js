@@ -18,7 +18,7 @@ export function accountVerifyLogin() {
             .then(data => {
                 dispatch(actionCreators.user__loggedIn({loggedIn: true, email: data.username}));
                 dispatch(actionCreators.load()); //TODO should be part of the login if only called together
-                dispatch(actionCreators.retrieveNeedUris());//TODO deprecated.
+                //dispatch(actionCreators.retrieveNeedUris());//TODO deprecated.
             })
             /* handle: not-logged-in */
             .catch(error =>
@@ -46,7 +46,7 @@ export function accountLogin(username, password) {
                 dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
                 dispatch(actionCreators.messages__requestWsReset_Hack());
                 dispatch(actionCreators.load()); //TODO should be part of the login if only called together
-                dispatch(actionCreators.retrieveNeedUris());//TODO deprecated.
+                //dispatch(actionCreators.retrieveNeedUris());//TODO deprecated.
                 dispatch(actionCreators.router__stateGo("feed"));
             }
         ).catch(

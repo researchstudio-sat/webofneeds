@@ -80,7 +80,7 @@ import {
 
 import * as messages from './messages-actions';
 
-import { loadAction, retrieveNeedUris, configInit, needsFetch } from './load-action';
+import { loadAction, configInit } from './load-action';
 import { matchesLoad } from './matches-actions';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 
@@ -119,7 +119,6 @@ const actionHierarchy = {
         reset:INJ_DEFAULT,
     },
     needs: {
-        fetch: needsFetch,
         received: INJ_DEFAULT,
         connectionsReceived:INJ_DEFAULT,
         clean:INJ_DEFAULT,
@@ -206,7 +205,6 @@ const actionHierarchy = {
     login: accountLogin,
     logout: accountLogout,
     register: accountRegister,
-    retrieveNeedUris: retrieveNeedUris,
     config: {
         init: configInit,
         update: INJ_DEFAULT,

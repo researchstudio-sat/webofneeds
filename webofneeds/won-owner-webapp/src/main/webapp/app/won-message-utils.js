@@ -9,6 +9,8 @@ import {
     mapJoin,
     urisToLookupMap,
     flattenObj,
+    flatten,
+    entries,
 } from './utils';
 import won from './won-es6';
 
@@ -347,11 +349,11 @@ export function fetchAllAccessibleAndRelevantData(ownNeedUris) {
                     flatten(connectionUrisPerNeed));
 
         const allConnectionsPromise = allConnectionUrisPromise
-            .then(connectionUris =>
+            .then(connectionUris => //delivers an obj<idx, string>
                 urisToLookupMap(connectionUris, won.getConnection));
 
         const allEventsPromise = allConnectionUrisPromise
-            .then(connectionUris =>
+            .then(connectionUris => //expects an array
                 urisToLookupMap(connectionUris, connectionUri =>
                         won.getConnection(connectionUri)
                             .then(connection =>

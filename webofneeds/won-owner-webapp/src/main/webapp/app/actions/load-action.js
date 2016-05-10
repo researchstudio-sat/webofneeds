@@ -33,10 +33,13 @@ export const loadAction = () => dispatch => {
             fetchAllAccessibleAndRelevantData(needUris))
     .then(allThatData =>
             Immutable.fromJS(allThatData)) //!!!
-    .then(allThatData =>
-            dispatch({type: actionTypes.load, payload: allThatData}))
+    .then(allThatData => {
+            dispatch({type: actionTypes.load, payload: allThatData})
+            //dispatch({ type: actionTypes.needs.fetch, payload: needs });
+    })
     .catch(error => dispatch(actionCreators.needs__failed({
-                error: "user needlist retrieval failed"
+                error: "user needlist retrieval failed",
+                e: error
             })
         )
     );
@@ -44,26 +47,6 @@ export const loadAction = () => dispatch => {
 
 
 /////////// THE ACTIONCREATORS BELOW SHOULD BE PART OF LOAD
-
-export function retrieveNeedUris() {
-    return (dispatch) => {
-        fetch('/owner/rest/needs/', {
-            method: 'get',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include'
-        }).then(checkHttpStatus)
-            .then(response => {
-                return response.json()
-            }).then(
-                needs => dispatch(actionCreators.needs__fetch({needs: needs}))
-        ).catch(
-                error => dispatch(actionCreators.needs__failed({error: "user needlist retrieval failed"}))
-        )
-    }
-}
 
 /**
  * Anything that is load-once, read-only, global app-config
@@ -90,23 +73,5 @@ export function configInit() {
             .then(defaultNodeUri =>
                 dispatch(actionCreators.config__update({defaultNodeUri}))
         )
-}
-
-export function needsFetch(data) {
-    return dispatch => {
-        const needUris = data.needs;
-        const allLoadedPromise = Promise.all(
-            needUris.map(uri =>
-                won.ensureLoaded(uri, uri, deep = true))
-        ).then(() => Promise.all(
-            needUris.map(needUri =>
-                won.getNeed(needUri))
-        )).then(needs => {
-            console.log("linked data fetched for needs: ", needs );
-            dispatch({ type: actionTypes.needs.fetch, payload: needs });
-            //TODO get rid of this multiple dispatching here (always push looping back into the reducer)
-            dispatch(actionCreators.connections__load(needUris));
-        });
-    }
 }
 
