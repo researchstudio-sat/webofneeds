@@ -49,7 +49,7 @@ class Controller {
             return {
                 postUri: selectOpenPostUri(state),
                 post: selectOpenPost(state),
-                postIsOwned: selectOwningOpenPost(state),
+                owningPost: selectOwningOpenPost(state),
                 connectionUri,
                 connectionType: connectionTypeInParams,
                 showConnectionSelection: !!connectionTypeInParams && connectionTypeInParams !== won.WON.Suggested,
