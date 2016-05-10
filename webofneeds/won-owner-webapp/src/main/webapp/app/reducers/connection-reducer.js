@@ -14,7 +14,8 @@ const initialState = Immutable.fromJS({});
 export default function(connections = initialState, action = {}) {
     switch(action.type) {
         case actionTypes.messages.closeNeed.failed:
-        case actionTypes.load:
+        case actionTypes.initialPageLoad:
+        case actionTypes.login:
             const allPreviousConnections = action.payload.get('connections');
             return connections.merge(allPreviousConnections);
 

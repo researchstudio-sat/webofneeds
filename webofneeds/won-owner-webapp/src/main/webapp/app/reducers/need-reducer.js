@@ -26,7 +26,8 @@ export default function(allNeeds = initialState, action = {}) {
             console.log('reducers.js: failed receive needlist action');
             return allNeeds.update('errors', errors => errors.push(action.payload.error));
 
-        case actionTypes.load:
+        case actionTypes.initialPageLoad:
+        case actionTypes.login:
             const ownNeeds = action.payload.get('ownNeeds');
             const theirNeeds = action.payload.get('theirNeeds');
             return allNeeds

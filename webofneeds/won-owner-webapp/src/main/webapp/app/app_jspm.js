@@ -126,7 +126,8 @@ app.run([ '$ngRedux', $ngRedux =>
 ]);
 
 //check login status. TODO: this should actually be baked-in data (to avoid the extra roundtrip)
-app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]);
+//app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]);
+app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.initialPageLoad())]);
 
 /*
  * this action-creator dispatches once per minute thus making

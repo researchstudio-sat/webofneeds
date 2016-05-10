@@ -14,7 +14,15 @@ const initialState = Immutable.fromJS({});
 export default function(userData = initialState, action = {}) {
     switch(action.type) {
         case actionTypes.user.loggedIn:
-            var {loggedIn, email} = action.payload
+        case actionTypes.initialPageLoad:
+        case actionTypes.login:
+
+            //because we get payload as immutablejs-map sometimes but not always
+            var immutablePayload = Immutable.fromJS(action.payload);
+
+            var loggedIn = immutablePayload.get('loggedIn');
+            var email = immutablePayload.get('email');
+
             if(loggedIn == true){
                 console.log('reducers.js: received successful-login action from app-server');
                 return Immutable.fromJS({loggedIn: true, email: email});
