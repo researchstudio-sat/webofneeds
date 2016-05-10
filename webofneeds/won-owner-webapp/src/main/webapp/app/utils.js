@@ -436,7 +436,7 @@ export function mapObj(obj, f) {
 export function flatten(listOfLists) {
     return listOfLists.reduce(
         (flattendList, innerList) =>
-            flattendList.concat(innerList),
+            innerList? flattendList.concat(innerList) : [], //not concatenating `undefined`s
         [] //concat onto empty list as start
     )
 }
