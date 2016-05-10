@@ -14,6 +14,9 @@
 # - start matcher service on satsrv06 and connect with wonnodes on satsrv04 and proxied wonnode on satsrv05
 # - start siren solr server on satsrv06 as a need index
 # - start siren matcher on satsrv06 as a matcher and connect to matcher service
+#
+# The databases (postgres), rdf-stores (bigdata) and indices (solr) are kept between deployments and are only
+# deleted and created new if the certificate changes and the postgres db has to be recreated.
 ##############################################################################################################
 
 
@@ -38,10 +41,15 @@ if [ "$GENERATE_NEW_CERTIFICATES" = true ] ; then
   ssh root@satsrv05 rm -rf $base_folder/won-client-certs
   ssh root@satsrv06 rm -rf $base_folder/won-client-certs
   rm -rf $jenkins_base_folder/won-server-certs
+
   docker -H satsrv04:2375 stop postgres_dev || echo 'No docker container found to stop with name: postgres_dev'
   docker -H satsrv05:2375 stop postgres_dev || echo 'No docker container found to stop with name: postgres_dev'
   docker -H satsrv04:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
   docker -H satsrv05:2375 rm postgres_dev || echo 'No docker container found to remove with name: postgres_dev'
+  docker -H satsrv06:2375 stop bigdata_dev || echo 'No docker container found to stop with name: bigdata_dev'
+  docker -H satsrv06:2375 rm bigdata_dev || echo 'No docker container found to remove with name: bigdata_dev'
+  docker -H satsrv06:2375 stop sirensolr_dev || echo 'No docker container found to stop with name: sirensolr_dev'
+  docker -H satsrv06:2375 rm sirensolr_dev || echo 'No docker container found to remove with name: sirensolr_dev'
 fi
 
 # build won docker images and deploy to sat cluster
@@ -154,10 +162,11 @@ sleep 20
 
 # bigdata
 docker -H satsrv06:2375 pull webofneeds/bigdata
-docker -H satsrv06:2375 stop bigdata_dev || echo 'No docker container found to stop with name: bigdata_dev'
-docker -H satsrv06:2375 rm bigdata_dev || echo 'No docker container found to remove with name: bigdata_dev'
-docker -H satsrv06:2375 run --name=bigdata_dev -d -p 9999:9999 \
--m 256m webofneeds/bigdata
+echo try to start new bigdata container
+if ! docker -H satsrv06:2375 run --name=bigdata_dev -d -p 9999:9999 -m 256m webofneeds/bigdata; then
+  echo bigdata container already available, restart old container
+  docker -H satsrv06:2375 restart bigdata_dev
+fi
 
 # matcher service
 docker -H satsrv06:2375 build -t webofneeds/matcher_service:dev $WORKSPACE/webofneeds/won-docker/matcher-service/
@@ -174,9 +183,12 @@ docker -H satsrv06:2375 run --name=matcher_service_dev -d -e "node.host=satsrv06
 
 # siren solr server
 docker -H satsrv06:2375 pull webofneeds/sirensolr
-docker -H satsrv06:2375 stop sirensolr_dev || echo 'No docker container found to stop with name: sirensolr_dev'
-docker -H satsrv06:2375 rm sirensolr_dev || echo 'No docker container found to remove with name: sirensolr_dev'
-docker -H satsrv06:2375 run --name=sirensolr_dev -d -p 7070:8080 -p 8983:8983 --env CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" -m 350m webofneeds/sirensolr
+echo try to start new solr server container
+if ! docker -H satsrv06:2375 run --name=sirensolr_dev -d -p 7070:8080 -p 8983:8983 \
+--env CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" -m 350m webofneeds/sirensolr; then
+  echo solr server container already available, restart old container
+  docker -H satsrv06:2375 restart sirensolr_dev
+fi
 
 
 # expect OWNER won-mail-sender host, user and password (i.e. configuration for no-replay won-owner-app-email-account) be
@@ -201,12 +213,13 @@ docker -H satsrv04:2375 run --name=owner_dev -d -e "node.default.host=satsrv04.r
 -e "JMEM_OPTS=-Xmx1000m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/owner:dev
 
-# owner 2
+# owner 2 (behind proxy on satsrv07)
 docker -H satsrv05:2375 build -t webofneeds/owner:dev $WORKSPACE/webofneeds/won-docker/owner/
 docker -H satsrv05:2375 stop owner_dev || echo 'No docker container found to stop with name: owner_dev'
 docker -H satsrv05:2375 rm owner_dev || echo 'No docker container found to remove with name: owner_dev'
 docker -H satsrv05:2375 run --name=owner_dev -d -e "node.default.host=satsrv07.researchstudio.at" \
 -e "node.default.http.port=443" -e "uri.host=satsrv07.researchstudio.at" -e "http.port=8081" \
+-e "uri.prefix=https://satsrv07.researchstudio.at" \
 -e "uri.prefix.node.default=https://satsrv07.researchstudio.at/won" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
