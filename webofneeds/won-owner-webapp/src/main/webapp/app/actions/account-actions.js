@@ -88,16 +88,25 @@ export function accountRegister(username, password) {
             },
             credentials: 'include',
             body: JSON.stringify({username: username, password: password})
-        }).then(checkHttpStatus)
-            .then(response => {
-                return response.json()
-            }).then(
+        })
+        .then(
+            checkHttpStatus
+        )
+        .then(response =>
+            response.json()
+        )
+        .then(
                 data => {
-                dispatch(actionCreators.login(username, password))
-                /*                    dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
-                 dispatch(actionCreators.router__stateGo("createNeed"));*/
-            }
-        ).catch(
+                    /* TODO shouldn't we already have a valid
+                    * session at this point and thus just need
+                    * to execute the data-fetching part of login
+                    * (the fetchDataForOwnedNeeds, redirect
+                    * and wsReset)
+                    */
+                    dispatch(actionCreators.login(username, password));
+                }
+            )
+        .catch(
             //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
                 error =>
                     dispatch(actionCreators.registerFailed({registerError: "Registration failed"}))
