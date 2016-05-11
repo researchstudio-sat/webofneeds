@@ -380,6 +380,14 @@ function fetchOwnedNeedUris() {
 
 window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
 function fetchAllAccessibleAndRelevantData(ownNeedUris) {
+    if(!is('Array', ownNeedUris) || ownNeedUris.length === 0 ) {
+        return Immutable.fromJS({
+            ownNeeds: {},
+            connections: {},
+            events: {},
+            theirNeeds: {},
+        });
+    }
 
     const allLoadedPromise = Promise.all(
         ownNeedUris.map(uri => won.ensureLoaded(uri, uri, deep = true))
