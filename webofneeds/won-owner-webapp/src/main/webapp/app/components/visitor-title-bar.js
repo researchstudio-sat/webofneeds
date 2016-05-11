@@ -25,7 +25,7 @@ function genComponentConf() {
                         <div class="vtb__inner__left__titles__type">{{self.labels.type[self.post.get('type')]}}, {{self.post.get('creationDate')}} </div>
                     </div>
                 </div>
-                <div class="vtb__inner__right">
+                <div class="vtb__inner__right" ng-show="self.hasConnectionWithOwnPost">
                     <button class="won-button--filled red">Quit Contact</button>
                     <ul class="vtb__tabs">
                         <li ng-class="self.selection == 0? 'vtb__tabs__selected' : ''" ng-click="self.selection = 0">
@@ -50,6 +50,7 @@ function genComponentConf() {
             window.vtb4dbg = this;
             const selectFromState = state => ({
                 post: selectOpenPost(state)
+                hasConnectionWithOwnPost: false,
             });
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
