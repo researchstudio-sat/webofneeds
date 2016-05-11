@@ -22,7 +22,9 @@ function genComponentConf() {
                     <won-square-image title="self.post.get('title')" src="self.post.get('titleImgSrc')"></won-square-image>
                     <div class="vtb__inner__left__titles">
                         <h1 class="vtb__title">{{self.post.get('title')}}</h1>
-                        <div class="vtb__inner__left__titles__type">{{self.labels.type[self.post.get('type')]}}, {{self.post.get('creationDate')}} </div>
+                        <div class="vtb__inner__left__titles__type">
+                            {{self.labels.type[self.post.get('basicNeedType')]}}
+                        </div>
                     </div>
                 </div>
                 <div class="vtb__inner__right" ng-show="self.hasConnectionWithOwnPost">
@@ -49,7 +51,8 @@ function genComponentConf() {
             this.labels = labels;
             window.vtb4dbg = this;
             const selectFromState = state => ({
-                post: selectOpenPost(state)
+                post: selectOpenPost(state),
+                labels,
                 hasConnectionWithOwnPost: false,
             });
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
