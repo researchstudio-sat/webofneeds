@@ -3,6 +3,8 @@
  */
 
 
+import won from './won-es6';
+import Immutable from 'immutable';
 import {
     getRandomPosInt,
     checkHttpStatus,
@@ -11,8 +13,8 @@ import {
     flattenObj,
     flatten,
     entries,
+    is,
 } from './utils';
-import won from './won-es6';
 
 import jsonld from 'jsonld';
 window.jsonld4Dbg = jsonld;

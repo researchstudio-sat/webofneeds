@@ -3,6 +3,7 @@
  */
 
 import  won from '../won-es6';
+import Immutable from 'immutable';
 import { actionTypes, actionCreators } from './actions';
 import { fetchDataForOwnedNeeds } from '../won-message-utils';
 
