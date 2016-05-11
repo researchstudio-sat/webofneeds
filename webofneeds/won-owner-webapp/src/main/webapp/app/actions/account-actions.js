@@ -43,7 +43,7 @@ export function accountLogin(username, password) {
                 type: actionTypes.login,
                 payload: Immutable.fromJS({loggedIn: false})
             })
-            dispatch(actionCreators.loginFailed({loginError: "No such username/password combination registered."}))
+            dispatch(actionCreators.loginFailed({loginError: "No such username/password combination registered.", error}))
         })
 }
 
@@ -107,6 +107,6 @@ export function accountRegister(username, password) {
         .catch(
             //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
                 error =>
-                    dispatch(actionCreators.registerFailed({registerError: "Registration failed"}))
+                    dispatch(actionCreators.registerFailed({registerError: "Registration failed", error}))
         )
 }
