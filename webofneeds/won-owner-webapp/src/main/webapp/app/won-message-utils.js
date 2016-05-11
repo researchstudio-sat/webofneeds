@@ -339,7 +339,7 @@ export function fetchDataForOwnedNeeds(emailOrNeedUris) {
     if(is('Array', emailOrNeedUris)) {
         email = undefined;
         needUrisPromise = Promise.resolve(emailOrNeedUris);
-    } else if (is('Array', emailOrNeedUris)) {
+    } else if (is('String', emailOrNeedUris)) {
         email = emailOrNeedUris;
         needUrisPromise = fetchOwnedNeedUris();
     } else {
