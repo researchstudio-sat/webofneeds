@@ -20,11 +20,11 @@ export function accountLogin(username, password) {
             },
             credentials: 'include',
             body: JSON.stringify({username: username, password: password})
-        }).then(checkHttpStatus)
-        .then(response => {
-            return response.json()
         })
-        .then( data =>
+        .then(
+            checkHttpStatus
+        )
+        .then( response =>
             fetchDataForOwnedNeeds(username)
         )
         .then(allThatData =>
@@ -57,10 +57,11 @@ export function accountLogout() {
             },
             credentials: 'include',
             body: JSON.stringify({})
-        }).then(checkHttpStatus)
-        .then(response => {
-            return response.json()
-        }).then(data =>
+        })
+        .then(
+            checkHttpStatus
+        )
+        .then(response =>
             dispatch({
                 type: actionTypes.logout,
                 payload: Immutable.fromJS({loggedIn: false})
@@ -92,11 +93,8 @@ export function accountRegister(username, password) {
         .then(
             checkHttpStatus
         )
-        .then(response =>
-            response.json()
-        )
         .then(
-                data => {
+                response => {
                     /* TODO shouldn't we already have a valid
                     * session at this point and thus just need
                     * to execute the data-fetching part of login
