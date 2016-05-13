@@ -12,9 +12,6 @@
   max-width: 35rem;
   margin: 0.5rem;
   @include max-content-width(35rem, $minContentPadding, 'post-messages');
-  padding-top: 2rem;
-
-
 
   .post-messages__inner {
     display: flex;

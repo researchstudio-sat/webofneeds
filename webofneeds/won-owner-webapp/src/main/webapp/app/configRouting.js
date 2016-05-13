@@ -15,12 +15,11 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
         { path: '/landingpage?:focusSignup', component: 'landingpage' },
         { path: '/create-need/:draftId', component: 'create-need' },
         { path: '/feed', component: 'feed' },
-        { path: '/overview/matches?viewType?myUri?connectionUri', component: 'overview-matches', as: 'overviewMatches' },
+        { path: '/overview/matches?layout?myUri?connectionUri', component: 'overview-matches', as: 'overviewMatches' },
         { path: '/overview/incoming-requests?myUri?connectionUri', component: 'overview-incoming-requests', as: 'overviewIncomingRequests' },
         { path: '/overview/sent-requests?myUri?connectionUri', component: 'overview-sent-requests', as: 'overviewSentRequests' },
         { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' },
-        { path: '/post/owner/conversations?myUri?openConversation', component: 'post-owner-messages', as: 'postConversations' },
-        { path: '/post/owner/info?myUri', component: 'post-owner', as: 'postInfo' },
+        { path: '/post/?postUri?connectionUri?connectionType?layout', component: 'post', as: 'post' },
         { path: '/post/visitor/info/?myUri?theirUri', component: 'post-visitor', as: 'postVisitor' },
         { path: '/post/visitor/messages/?myUri?theirUri', component: 'post-visitor-msgs', as: 'postVisitorMsgs' },
 
@@ -42,6 +41,7 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
         })
 
     $urlRouterProvider.when('/settings/', '/settings/general');
+
     $stateProvider
         .state('settings', {
             url: '/settings',
