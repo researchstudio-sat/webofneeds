@@ -16,6 +16,12 @@ import 'redux';
 import ngReduxModule from 'ng-redux';
 import ngReduxRouterModule from 'redux-ui-router';
 import uiRouterModule from 'angular-ui-router';
+import {
+    camel2Hyphen,
+    hyphen2Camel,
+    firstToLowerCase,
+    delay,
+} from './utils';
 
 //---------- Config -----------
 import configRouting from './configRouting';
@@ -32,7 +38,6 @@ import overviewSentRequestsComponent from './components/overview-sent-requests/o
 import postVisitorComponent from './components/post-visitor/post-visitor';
 import postComponent from './components/post/post';
 import postVisitorMsgsComponent from './components/post-visitor-msgs/post-visitor-msgs';
-import { camel2Hyphen, hyphen2Camel, firstToLowerCase } from './utils';
 import landingPageComponent from './components/landingpage/landingpage';
 import overviewPostsComponent from './components/overview-posts/overview-posts';
 import feedComponent from './components/feed/feed';
@@ -127,7 +132,13 @@ app.run([ '$ngRedux', $ngRedux =>
 
 //check login status. TODO: this should actually be baked-in data (to avoid the extra roundtrip)
 //app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]);
-app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.initialPageLoad())]);
+app.run([ '$ngRedux', '$state', '$urlRouter', ($ngRedux, $uiRouterState, $urlRouter) => {
+    $urlRouter.sync();
+    let foo = arguments;
+    delay(0).then(() => { //to make sure the the route is synchronised and in the state.
+        $ngRedux.dispatch(actionCreators.initialPageLoad())
+    })
+}]);
 
 /*
  * this action-creator dispatches once per minute thus making

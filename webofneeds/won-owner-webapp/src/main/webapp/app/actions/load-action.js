@@ -5,6 +5,7 @@
 import  won from '../won-es6';
 import { actionTypes, actionCreators } from './actions';
 import Immutable from 'immutable';
+import { selectOpenPostUri } from '../selectors';
 
 import {
     checkHttpStatus,
@@ -14,9 +15,12 @@ import {
     urisToLookupMap
 } from '../utils';
 
-import { fetchDataForOwnedNeeds } from '../won-message-utils';
+import {
+    fetchDataForOwnedNeeds,
+    fetchDataForNonOwnedNeedOnly,
+} from '../won-message-utils';
 
-export const pageLoadAction = () => dispatch => {
+export const pageLoadAction = () => (dispatch, getState) => {
     /* TODO the data fetched here should be baked into
     * the send html thus significantly improving the
     * initial page-load-speed.
@@ -35,13 +39,16 @@ export const pageLoadAction = () => dispatch => {
         })
     )
     /* handle: not-logged-in */
-    .catch(error =>
-        //TODO load data of non-owned need!!!
-        dispatch({
-            type: actionTypes.initialPageLoad,
-            payload: Immutable.fromJS({loggedIn: false})
-        })
-    )
+    .catch(error => {
+        const postUri = selectOpenPostUri(getState());
+        fetchDataForNonOwnedNeedOnly(postUri)
+        .then(publicData =>
+            dispatch({
+                type: actionTypes.initialPageLoad,
+                payload: publicData
+            })
+        );
+    })
 }
 
 

@@ -334,6 +334,21 @@ export function getEventsFromMessage(msgJson) {
     return simplifiedEvents;
 }
 
+const emptyDataset = Immutable.fromJS({
+    ownNeeds: {},
+    connections: {},
+    events: {},
+    theirNeeds: {},
+})
+export function fetchDataForNonOwnedNeedOnly(needUri) {
+    return won.getNeed(needUri)
+    .then(need =>
+            emptyDataset
+                .setIn(['theirNeeds', needUri], Immutable.fromJS(need))
+                .set('loggedIn', false)
+    )
+}
+
 export function fetchDataForOwnedNeeds(emailOrNeedUris) {
     let needUrisPromise, email;
     if(is('Array', emailOrNeedUris)) {
@@ -381,12 +396,7 @@ function fetchOwnedNeedUris() {
 window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
 function fetchAllAccessibleAndRelevantData(ownNeedUris) {
     if(!is('Array', ownNeedUris) || ownNeedUris.length === 0 ) {
-        return Immutable.fromJS({
-            ownNeeds: {},
-            connections: {},
-            events: {},
-            theirNeeds: {},
-        });
+        return emptyDataset;
     }
 
     const allLoadedPromise = Promise.all(
@@ -444,15 +454,12 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris) {
                 allConnections,
                 allEvents,
                 allTheirNeeds
-            ]) => ({
+            ]) => emptyDataset.mergeDeep(Immutable.fromJS({
                 ownNeeds: allOwnNeeds,
                 connections: allConnections,
                 events: allEvents,
                 theirNeeds: allTheirNeeds,
-            })
-        )
-        .then(
-            Immutable.fromJS
+            }))
         );
 
     /**
