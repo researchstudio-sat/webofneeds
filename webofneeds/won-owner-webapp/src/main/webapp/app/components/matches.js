@@ -86,10 +86,11 @@ class Controller {
             let matchesByConnectionUri;
             if(isOverview) { //overview
                 matchesByConnectionUri = allMatchesByConnections
-                    .filter(conn => conn.getIn(['ownNeed', 'uri']) === postUri)
                     .toList();
             } else { // post-owner view
-                matchesByConnectionUri = allMatchesByConnections.toList();
+                matchesByConnectionUri = allMatchesByConnections
+                    .filter(conn => conn.getIn(['ownNeed', 'uri']) === postUri)
+                    .toList();
             }
 
             return {
