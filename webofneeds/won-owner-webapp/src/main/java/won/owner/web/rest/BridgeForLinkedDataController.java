@@ -1,10 +1,12 @@
 package won.owner.web.rest;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,11 +21,13 @@ import won.owner.model.User;
 import won.owner.model.UserNeed;
 import won.owner.service.impl.WONUserDetailService;
 import won.protocol.rest.LinkedDataRestBridge;
+import won.protocol.rest.RDFMediaType;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -86,20 +90,18 @@ public class BridgeForLinkedDataController {
     restTemplate.execute(
       URI.create(resourceUri),
       HttpMethod.valueOf(request.getMethod()),
-       new RequestCallback()
-       {
-         @Override
-         public void doWithRequest(final ClientHttpRequest request)
-           throws IOException {
-           request.getHeaders()
+      new RequestCallback() {
+        @Override
+        public void doWithRequest(final ClientHttpRequest request)
+                throws IOException {
+          request.getHeaders()
                   .setAll(requestHeaders.toSingleValueMap());
-         }
-       },
-      new ResponseExtractor<Object>()
-      {
+        }
+      },
+      new ResponseExtractor<Object>() {
         @Override
         public ClientHttpResponse extractData(final ClientHttpResponse originalResponse)
-          throws IOException {
+                throws IOException {
           prepareBridgeResponseOutputStream(originalResponse, response);
           //we don't really need to return anything, so we don't
           return null;
@@ -112,11 +114,19 @@ public class BridgeForLinkedDataController {
   private void prepareBridgeResponseOutputStream(final ClientHttpResponse originalResponse, final HttpServletResponse response)
     throws IOException {
     // create response headers
-    copyLinkedDataResponseRelevantHeaders(originalResponse.getHeaders(), response);
-    response.setStatus(originalResponse.getRawStatusCode());
-    // create response body
-    copyResponseBody(originalResponse, response);
-    // close response output stream
+    MediaType originalResponseMediaType = originalResponse.getHeaders().getContentType();
+    if(RDFMediaType.isRDFMediaType(originalResponseMediaType)){
+      copyLinkedDataResponseRelevantHeaders(originalResponse.getHeaders(), response);
+      response.setStatus(originalResponse.getRawStatusCode());
+      // create response body
+      copyResponseBody(originalResponse, response);
+      // close response output stream
+    } else {
+      response.setStatus(HttpStatus.SC_BAD_GATEWAY);
+      response.getOutputStream().print("The nodes' response was of type " + originalResponseMediaType
+              + ". For security reasons the owner-server only forwards responses of the following types " +
+              RDFMediaType.rdfMediaTypes.toString());
+    };
     response.getOutputStream().flush();
     response.getOutputStream().close();
   }
