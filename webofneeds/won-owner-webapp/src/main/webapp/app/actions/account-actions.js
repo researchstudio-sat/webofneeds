@@ -3,30 +3,13 @@
  */
 
 import  won from '../won-es6';
+import Immutable from 'immutable';
 import { actionTypes, actionCreators } from './actions';
+import { fetchDataForOwnedNeeds } from '../won-message-utils';
 
 import {
     checkHttpStatus,
 } from '../utils';
-
-export function accountVerifyLogin() {
-    return dispatch => {
-        fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
-            .then(checkHttpStatus)
-            .then(resp => resp.json())
-            /* handle data, dispatch actions */
-            .then(data => {
-                dispatch(actionCreators.user__loggedIn({loggedIn: true, email: data.username}));
-                dispatch(actionCreators.load()); //TODO should be part of the login if only called together
-                dispatch(actionCreators.retrieveNeedUris());//TODO deprecated.
-            })
-            /* handle: not-logged-in */
-            .catch(error =>
-                dispatch(actionCreators.user__loggedIn({loggedIn: false}))
-        );
-        ;
-    }
-}
 
 export function accountLogin(username, password) {
     return (dispatch) =>
@@ -38,20 +21,31 @@ export function accountLogin(username, password) {
             },
             credentials: 'include',
             body: JSON.stringify({username: username, password: password})
-        }).then(checkHttpStatus)
-            .then(response => {
-                return response.json()
-            }).then(
-                data => {
-                dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
-                dispatch(actionCreators.messages__requestWsReset_Hack());
-                dispatch(actionCreators.load()); //TODO should be part of the login if only called together
-                dispatch(actionCreators.retrieveNeedUris());//TODO deprecated.
-                dispatch(actionCreators.router__stateGo("feed"));
-            }
-        ).catch(
-                error => dispatch(actionCreators.user__loginFailed({loginError: "No such username/password combination registered."}))
+        })
+        .then(
+            checkHttpStatus
         )
+        .then( response =>
+            fetchDataForOwnedNeeds(username)
+        )
+        .then(allThatData =>
+            dispatch({
+                type: actionTypes.login,
+                payload: allThatData
+            })
+        )
+        .then(() => {
+            dispatch(actionCreators.messages__requestWsReset_Hack());
+            dispatch(actionCreators.router__stateGo("feed"));
+        })
+        .catch(error => {
+            //TODO load data of non-owned need!!!
+            dispatch({
+                type: actionTypes.login,
+                payload: Immutable.fromJS({loggedIn: false})
+            })
+            dispatch(actionCreators.loginFailed({loginError: "No such username/password combination registered.", error}))
+        })
 }
 
 export function accountLogout() {
@@ -64,23 +58,24 @@ export function accountLogout() {
             },
             credentials: 'include',
             body: JSON.stringify({})
-        }).then(checkHttpStatus)
-            .then(response => {
-                return response.json()
-            }).then(
-                data => {
-                dispatch(actionCreators.messages__requestWsReset_Hack());
-                dispatch(actionCreators.user__loggedIn({loggedIn: false}));
-                dispatch(actionCreators.needs__clean({needs: {}}));
-                dispatch(actionCreators.posts__clean({}));
-                dispatch(actionCreators.connections__reset({}))
-                dispatch(actionCreators.router__stateGo("landingpage"));
-            }
-        ).catch(
+        })
+        .then(
+            checkHttpStatus
+        )
+        .then(response =>
+            dispatch({
+                type: actionTypes.logout,
+                payload: Immutable.fromJS({loggedIn: false})
+            })
+        )
+        .then(() => {
+            dispatch(actionCreators.messages__requestWsReset_Hack());
+            dispatch(actionCreators.router__stateGo("landingpage"));
+        })
+        .catch(
             //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
-                error => {
+            error => {
                 console.log(error);
-                dispatch(actionCreators.user__loggedIn({loggedIn: true}))
             }
         )
 }
@@ -95,17 +90,24 @@ export function accountRegister(username, password) {
             },
             credentials: 'include',
             body: JSON.stringify({username: username, password: password})
-        }).then(checkHttpStatus)
-            .then(response => {
-                return response.json()
-            }).then(
-                data => {
-                dispatch(actionCreators.login(username, password))
-                /*                    dispatch(actionCreators.user__loggedIn({loggedIn: true, email: username}));
-                 dispatch(actionCreators.router__stateGo("createNeed"));*/
-            }
-        ).catch(
+        })
+        .then(
+            checkHttpStatus
+        )
+        .then(
+                response => {
+                    /* TODO shouldn't we already have a valid
+                    * session at this point and thus just need
+                    * to execute the data-fetching part of login
+                    * (the fetchDataForOwnedNeeds, redirect
+                    * and wsReset)
+                    */
+                    dispatch(actionCreators.login(username, password));
+                }
+            )
+        .catch(
             //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
-                error => dispatch(actionCreators.user__registerFailed({registerError: "Registration failed"}))
+                error =>
+                    dispatch(actionCreators.registerFailed({registerError: "Registration failed", error}))
         )
 }

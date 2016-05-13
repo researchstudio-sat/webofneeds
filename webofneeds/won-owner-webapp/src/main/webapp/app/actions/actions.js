@@ -65,7 +65,6 @@ import {
     accountLogin,
     accountLogout,
     accountRegister,
-    accountVerifyLogin
 } from './account-actions';
 
 import {
@@ -80,7 +79,10 @@ import {
 
 import * as messages from './messages-actions';
 
-import { loadAction, retrieveNeedUris, configInit, needsFetch } from './load-action';
+import {
+    configInit,
+    pageLoadAction
+} from './load-action';
 import { matchesLoad } from './matches-actions';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 
@@ -93,12 +95,7 @@ import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
  */
 const INJ_DEFAULT = 'INJECT_DEFAULT_ACTION_CREATOR';
 const actionHierarchy = {
-    load: loadAction, /* triggered on pageload to cause initial crawling of linked-data and other startup tasks*/
-    user: {
-        loggedIn: INJ_DEFAULT,
-        loginFailed: INJ_DEFAULT,
-        registerFailed: INJ_DEFAULT
-    },
+    initialPageLoad: pageLoadAction,
     events:{
         addUnreadEventUri:INJ_DEFAULT,
         read:INJ_DEFAULT
@@ -119,7 +116,6 @@ const actionHierarchy = {
         reset:INJ_DEFAULT,
     },
     needs: {
-        fetch: needsFetch,
         received: INJ_DEFAULT,
         connectionsReceived:INJ_DEFAULT,
         clean:INJ_DEFAULT,
@@ -202,11 +198,11 @@ const actionHierarchy = {
          */
         requestWsReset_Hack: INJ_DEFAULT,
     },
-    verifyLogin: accountVerifyLogin,
     login: accountLogin,
     logout: accountLogout,
     register: accountRegister,
-    retrieveNeedUris: retrieveNeedUris,
+    loginFailed: INJ_DEFAULT,
+    registerFailed: INJ_DEFAULT,
     config: {
         init: configInit,
         update: INJ_DEFAULT,

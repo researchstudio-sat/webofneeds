@@ -8,7 +8,7 @@ import { labels } from '../won-label-utils';
 import { selectUnreadEventsByNeedAndType, selectAllByConnections } from '../selectors';
 import { actionCreators }  from '../actions/actions';
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope'];
+const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
         <nav class="need-tab-bar" ng-cloak ng-show="{{true}}">

@@ -15,7 +15,8 @@ const initialState = Immutable.fromJS({
 export default function(state = initialState, action = {}) {
     switch(action.type) {
 
-        case actionTypes.load:
+        case actionTypes.initialPageLoad:
+        case actionTypes.login:
             const allPreviousEvents = action.payload.get('events');
             return state.mergeIn(['events'], allPreviousEvents);
 
