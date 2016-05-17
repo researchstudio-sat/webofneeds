@@ -1,5 +1,0 @@
-/**
- * 
- * User: ${USER}
- * Date: ${DATE}
- */
