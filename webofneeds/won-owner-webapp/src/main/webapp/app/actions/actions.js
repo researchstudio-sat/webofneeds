@@ -138,7 +138,8 @@ const actionHierarchy = {
     router: {
         stateGo,
         stateReload,
-        stateTransitionTo
+        stateTransitionTo,
+        accessedNonLoadedPost: INJ_DEFAULT, //dispatched in configRouting.js
     },
     posts:{
         load:INJ_DEFAULT,

@@ -2,6 +2,24 @@
  * Created by ksinger on 08.10.2015.
  */
 
+import won from './won-es6';
+import Immutable from 'immutable';
+import { actionTypes, actionCreators } from './actions/actions';
+
+import {
+    selectOwnNeeds,
+    selectTheirNeeds,
+} from './selectors';
+
+import {
+    fetchDataForNonOwnedNeedOnly,
+} from './won-message-utils';
+
+import {
+    decodeUriComponentProperly
+} from './utils';
+
+
 /**
  * Adapted from https://github.com/neilff/redux-ui-router/blob/master/example/index.js
  * @param $urlRouterProvider
@@ -63,6 +81,7 @@ export const runAccessControl = [ '$rootScope', '$ngRedux', ($rootScope, $ngRedu
 
             switch(toState.name) {
                 case 'post':
+                    postViewEnsureLoaded($ngRedux, toParams.postUri);
                     break;
                 case 'landingpage':
                     break;
@@ -81,6 +100,38 @@ export const runAccessControl = [ '$rootScope', '$ngRedux', ($rootScope, $ngRedu
     );
 
 }];
+
+
+function postViewEnsureLoaded($ngRedux, encodedPostUri) {
+    console.log('in postViewEnsureLoaded');
+    const postUri = decodeUriComponentProperly(encodedPostUri);
+    const state = $ngRedux.getState();
+
+    if (postUri
+        && !selectOwnNeeds(state).has(postUri)
+        && !selectTheirNeeds(state).has(postUri)) {
+
+        /*
+         * got an uri but no post loaded to the state yet ->
+         * assuming that if you're logged in you either did a
+         * page-reload with a valid session or signed in, thus
+         * loading your own needs as part of the `initialPageLoad`
+         * or `login` action-creators. Thus we assume
+         * you loaded the app in some other view,
+         * got a link to a non-owned need and pasted it. Thus
+         * the `initiaPageLoad` didn't load this need yet. Also
+         * we can be sure it's not your need and load it as `theirNeed`.
+         */
+        return won.getNeed(postUri)
+            .then(need =>
+                $ngRedux.dispatch({
+                    type: actionTypes.router.accessedNonLoadedPost,
+                    payload: Immutable.fromJS({ theirNeed: need })
+                })
+            );
+    } else {
+        return Promise.resolve();
+    }
 }
 
 
