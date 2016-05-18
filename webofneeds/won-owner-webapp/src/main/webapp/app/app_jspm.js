@@ -24,7 +24,7 @@ import {
 } from './utils';
 
 //---------- Config -----------
-import configRouting from './configRouting';
+import { configRouting, runAccessControl } from './configRouting';
 import configRedux from './configRedux';
 
 //--------- Actions -----------
@@ -122,13 +122,15 @@ app.filter('filterByNeedState', function(){
         }
     })
 
-app.config([ '$urlRouterProvider', '$stateProvider', configRouting ]);
+app.config(configRouting);
 app.run([ '$ngRedux', $ngRedux => runMessagingAgent($ngRedux) ]);
 
 
 app.run([ '$ngRedux', $ngRedux =>
     $ngRedux.dispatch(actionCreators.config__init())
 ]);
+
+app.run(runAccessControl);
 
 //check login status. TODO: this should actually be baked-in data (to avoid the extra roundtrip)
 //app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]);

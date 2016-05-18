@@ -7,8 +7,7 @@
  * @param $urlRouterProvider
  * @param $stateProvider
  */
-
-export default function configRouting($urlRouterProvider, $stateProvider) {
+export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRouterProvider, $stateProvider) => {
     $urlRouterProvider.otherwise('/landingpage');
 
     [
@@ -56,6 +55,32 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
             template: `<won-general-settings></won-general-settings>`
         })
 
+}]
+
+export const runAccessControl = [ '$rootScope', '$ngRedux', ($rootScope, $ngRedux) => {
+    $rootScope.$on('$stateChangeStart',
+        (event, toState, toParams, fromState, fromParams, options) => {
+
+            switch(toState.name) {
+                case 'post':
+                    break;
+                case 'landingpage':
+                    break;
+                default:
+                    if(!$ngRedux.getState().getIn(['user', 'loggedIn'])) {
+                        console.error(
+                            "Tried to access view that won't work" +
+                            "without logging in. Blocking route-change."
+                        );
+                        event.preventDefault();
+                    }
+            }
+
+
+        }
+    );
+
+}];
 }
 
 
