@@ -16,7 +16,9 @@ import {
 } from './won-message-utils';
 
 import {
-    decodeUriComponentProperly
+    delay,
+    decodeUriComponentProperly,
+    checkHttpStatus,
 } from './utils';
 
 
@@ -75,31 +77,33 @@ export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRout
 
 }]
 
-export const runAccessControl = [ '$rootScope', '$ngRedux', ($rootScope, $ngRedux) => {
-    $rootScope.$on('$stateChangeStart',
-        (event, toState, toParams, fromState, fromParams, options) => {
+export const runAccessControl = [ '$rootScope', '$ngRedux', '$urlRouter',
+    ($rootScope, $ngRedux, $urlRouter) => {
+        $rootScope.$on('$stateChangeStart',
+            (event, toState, toParams, fromState, fromParams, options) => {
 
-            switch(toState.name) {
-                case 'post':
-                    postViewEnsureLoaded($ngRedux, toParams.postUri);
-                    break;
-                case 'landingpage':
-                    break;
-                default:
-                    if(!$ngRedux.getState().getIn(['user', 'loggedIn'])) {
-                        console.error(
-                            "Tried to access view that won't work" +
-                            "without logging in. Blocking route-change."
+                const hasPreviousState = !!fromState.name;
+
+                switch(toState.name) {
+                    case 'post':
+                        postViewEnsureLoaded(
+                            $ngRedux,
+                            toParams.postUri
                         );
-                        event.preventDefault();
-                    }
+                        break;
+
+                    case 'landingpage':
+                        break;
+
+                    default:
+                        preventRouteChangeIfNotLoggedIn($ngRedux, event, toState, toParams, hasPreviousState);
+                }
+
+
             }
-
-
-        }
-    );
-
-}];
+        );
+    }
+];
 
 
 function postViewEnsureLoaded($ngRedux, encodedPostUri) {
@@ -122,15 +126,77 @@ function postViewEnsureLoaded($ngRedux, encodedPostUri) {
          * the `initiaPageLoad` didn't load this need yet. Also
          * we can be sure it's not your need and load it as `theirNeed`.
          */
-        return won.getNeed(postUri)
+        won.getNeed(postUri)
             .then(need =>
                 $ngRedux.dispatch({
                     type: actionTypes.router.accessedNonLoadedPost,
                     payload: Immutable.fromJS({ theirNeed: need })
                 })
-            );
+            )
+            .catch(error => {
+                console.log(
+                    `Failed to load need ${postUri}.`,
+                    `Reverting to previous router-state.`,
+                    `Error: `, error
+                );
+                $ngRedux.dispatch(
+                    actionCreators.router__back()
+                )
+            });
+    }
+}
+
+//TODO make into router__back AC
+function back(hasPreviousState, $ngRedux) {
+    if(hasPreviousState) {
+        history.back(); //TODO might break if other
+                        // route-changes were caused
+                        // while this promise evaluated
     } else {
-        return Promise.resolve();
+        $ngRedux.dispatch(
+            actionCreators.router__stateGo('landingpage')
+        );
+
+    }
+
+}
+
+function preventRouteChangeIfNotLoggedIn($ngRedux, event, toState, toParams, hasPreviousState) {
+    const errorString = "Tried to access view that won't work" +
+        "without logging in. Blocking route-change.";
+    const state = $ngRedux.getState();
+
+    if ( state.get('initialLoadFinished') ) {
+        if(state.getIn(['user', 'loggedIn'])) {
+            return; // logged in. continue route-change as intended.
+        } else {
+            //sure to be logged out
+            event.preventDefault();
+            console.error(errorString);
+        }
+    } else {
+        if(hasPreviousState) {
+            event.preventDefault();
+            console.log('Not sure about login-status -- ' +
+                'will reinitialize route-change once it\'s been clarified.');
+        }
+
+        fetch('rest/users/isSignedIn', {credentials: 'include'})
+        .then(checkHttpStatus) // will reject if not logged in
+        .then(() => //logged in -- re-initiate route-change
+            $ngRedux.dispatch(
+                actionCreators.router__stateGo(toState, toParams)
+            )
+        )
+        .catch(error => {
+            //now certainly not logged in.
+            console.error(errorString, error)
+            if (!hasPreviousState) {
+                $ngRedux.dispatch(
+                    actionCreators.router__stateGo('landingpage')
+                );
+            }
+        });
     }
 }
 
