@@ -35,6 +35,13 @@ export default function(allNeeds = initialState, action = {}) {
                 .mergeIn(['ownNeeds'], ownNeeds)
                 .mergeIn(['theirNeeds'], theirNeeds);
 
+        case actionTypes.router.accessedNonLoadedPost:
+            const theirNeed = action.payload.get('theirNeed');
+            return allNeeds.setIn(
+                ['theirNeeds', theirNeed.get('uri')],
+                theirNeed
+            );
+
         case actionTypes.needs.fetch:
             //TODO needs supplied by this action don't have a list of already associated connections
             return action.payload.reduce(
