@@ -173,10 +173,7 @@ export const selectOpenPostUri = createSelector(
         const encodedPostUri =
             state.getIn(['router', 'currentParams', 'postUri']) ||
             state.getIn(['router', 'currentParams', 'myUri']); //deprecated parameter
-        if(!encodedPostUri)
-            return undefined;
-        else
-            return decodeURIComponent(encodedPostUri);
+        return decodeUriComponentProperly(encodedPostUri);
     }
 );
 
