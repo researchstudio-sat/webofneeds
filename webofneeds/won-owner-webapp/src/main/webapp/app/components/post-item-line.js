@@ -10,10 +10,14 @@ import { createSelector } from 'reselect';
 const serviceDependencies = ['$scope', '$interval'];
 function genComponentConf() {
     let template = `
-            <a ui-sref="postInfo({myUri: self.item.uri})">
-                <won-square-image  ng-class="{'inactive' : !self.isActive()}" src="self.item.titleImgSrc" title="self.item.title"></won-square-image>
+            <a ui-sref="post({postUri: self.item.uri})">
+                <won-square-image  
+                    ng-class="{'inactive' : !self.isActive()}" 
+                     src="self.item.titleImgSrc" 
+                     title="self.item.title">
+                </won-square-image>
             </a>
-            <a class="pil__description clickable" ui-sref="postInfo({myUri: self.item.uri})">
+            <a class="pil__description clickable" ui-sref="post({postUri: self.item.uri})">
                 <div class="pil__description__topline">
                     <div class="pil__description__topline__title">{{self.item.title}}</div>
                     <div class="pil__description__topline__creationdate">{{self.creationDate}}</div>
@@ -31,7 +35,7 @@ function genComponentConf() {
                 </div>
             </a>
             <div class="pil__indicators">
-                <a class="pil__indicators__item clickable" ui-sref="postConversations({myUri: self.item.uri})">
+                <a class="pil__indicators__item clickable" ui-sref="post({postUri: self.item.uri, connectionType: self.WON.Connected})">
                     <img src="generated/icon-sprite.svg#ico36_message_light"
                          ng-show="false && self.unreadConversationsCount()"
                          class="pil__indicators__item__icon">
@@ -45,7 +49,7 @@ function genComponentConf() {
                         {{ self.unreadConversationsCount() }}
                     </span>
                 </a>
-                <a class="pil__indicators__item clickable"  ui-sref="overviewIncomingRequests({myUri: self.item.uri})">
+                <a class="pil__indicators__item clickable"  ui-sref="post({postUri: self.item.uri, connectionType: self.WON.RequestReceived})">
                     <img src="generated/icon-sprite.svg#ico36_incoming_light"
                              ng-show="false && self.unreadRequestsCount()"
                              class="pil__indicators__item__icon">
@@ -59,7 +63,7 @@ function genComponentConf() {
                         {{ self.unreadRequestsCount() }}
                     </span>
                 </a>
-                <a class="pil__indicators__item clickable" ui-sref="overviewMatches({viewType: 0, myUri: self.item.uri})">
+                <a class="pil__indicators__item clickable" ui-sref="post({postUri: self.item.uri, connectionType: self.WON.Suggested})">
                     <img src="generated/icon-sprite.svg#ico36_match_light"
                          ng-show="false && self.unreadMatchesCount()"
                          class="pil__indicators__item__icon">

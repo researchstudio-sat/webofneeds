@@ -5,6 +5,7 @@
 import  won from '../won-es6';
 import { actionTypes, actionCreators } from './actions';
 import Immutable from 'immutable';
+import { selectOpenPostUri } from '../selectors';
 
 import {
     checkHttpStatus,
@@ -14,56 +15,44 @@ import {
     urisToLookupMap
 } from '../utils';
 
-import { fetchAllAccessibleAndRelevantData } from '../won-message-utils';
+import {
+    fetchDataForOwnedNeeds,
+    fetchDataForNonOwnedNeedOnly,
+} from '../won-message-utils';
 
-
-export const loadAction = () => dispatch => {
-    fetch('/owner/rest/needs/', {
-        method: 'get',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-    })
+export const pageLoadAction = () => (dispatch, getState) => {
+    /* TODO the data fetched here should be baked into
+    * the send html thus significantly improving the
+    * initial page-load-speed.
+    */
+    fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
     .then(checkHttpStatus)
-    .then(response =>
-            response.json())
-    .then(needUris =>
-            fetchAllAccessibleAndRelevantData(needUris))
+    .then(resp => resp.json())
+    /* handle data, dispatch actions */
+    .then(data =>
+        fetchDataForOwnedNeeds(data.username)
+    )
     .then(allThatData =>
-            Immutable.fromJS(allThatData)) //!!!
-    .then(allThatData =>
-            dispatch({type: actionTypes.load, payload: allThatData}))
-    .catch(error => dispatch(actionCreators.needs__failed({
-                error: "user needlist retrieval failed"
+        dispatch({
+            type: actionTypes.initialPageLoad,
+            payload: allThatData
+        })
+    )
+    /* handle: not-logged-in */
+    .catch(error => {
+        const postUri = selectOpenPostUri(getState());
+        fetchDataForNonOwnedNeedOnly(postUri)
+        .then(publicData =>
+            dispatch({
+                type: actionTypes.initialPageLoad,
+                payload: publicData
             })
-        )
-    );
+        );
+    })
 }
 
 
-/////////// THE ACTIONCREATORS BELOW SHOULD BE PART OF LOAD
-
-export function retrieveNeedUris() {
-    return (dispatch) => {
-        fetch('/owner/rest/needs/', {
-            method: 'get',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include'
-        }).then(checkHttpStatus)
-            .then(response => {
-                return response.json()
-            }).then(
-                needs => dispatch(actionCreators.needs__fetch({needs: needs}))
-        ).catch(
-                error => dispatch(actionCreators.needs__failed({error: "user needlist retrieval failed"}))
-        )
-    }
-}
+/////////// THE ACTIONCREATORS BELOW SHOULD BE PART OF PAGELOAD
 
 /**
  * Anything that is load-once, read-only, global app-config
@@ -90,23 +79,5 @@ export function configInit() {
             .then(defaultNodeUri =>
                 dispatch(actionCreators.config__update({defaultNodeUri}))
         )
-}
-
-export function needsFetch(data) {
-    return dispatch => {
-        const needUris = data.needs;
-        const allLoadedPromise = Promise.all(
-            needUris.map(uri =>
-                won.ensureLoaded(uri, uri, deep = true))
-        ).then(() => Promise.all(
-            needUris.map(needUri =>
-                won.getNeed(needUri))
-        )).then(needs => {
-            console.log("linked data fetched for needs: ", needs );
-            dispatch({ type: actionTypes.needs.fetch, payload: needs });
-            //TODO get rid of this multiple dispatching here (always push looping back into the reducer)
-            dispatch(actionCreators.connections__load(needUris));
-        });
-    }
 }
 

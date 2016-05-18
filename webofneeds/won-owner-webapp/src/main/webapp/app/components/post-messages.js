@@ -144,8 +144,8 @@ function genComponentConf() {
             return this.scrollContainerNg()[0];
         }
 
-        input(input) {
-            this.chatMessage = input;
+        input(userInput) {
+            this.chatMessage = userInput;
         }
 
         send() {

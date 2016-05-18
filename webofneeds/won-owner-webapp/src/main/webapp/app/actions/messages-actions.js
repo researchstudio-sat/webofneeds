@@ -20,7 +20,7 @@ import {
     buildRateMessage,
     buildConnectMessage,
     isSuccessMessage,
-    fetchAllAccessibleAndRelevantData
+    fetchDataForOwnedNeeds
 } from '../won-message-utils';
 
 export function successfulCloseNeed(event) {
@@ -55,11 +55,12 @@ export function failedCloseNeed(event) {
             ).then(() =>
                 // as the need and it's connections have been marked dirty
                 // they will be reloaded on this action.
-                fetchAllAccessibleAndRelevantData([needUri])
+                fetchDataForOwnedNeeds([needUri])
+                //fetchAllAccessibleAndRelevantData([needUri])
             ).then(allThatData =>
                 dispatch({
                     type: actionTypes.messages.closeNeed.failed,
-                    payload: Immutable.fromJS(allThatData)
+                    payload: allThatData
                 })
             );
     }
