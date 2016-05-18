@@ -7,8 +7,7 @@
  * @param $urlRouterProvider
  * @param $stateProvider
  */
-
-export default function configRouting($urlRouterProvider, $stateProvider) {
+export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRouterProvider, $stateProvider) => {
     $urlRouterProvider.otherwise('/landingpage');
 
     [
@@ -20,8 +19,8 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
         { path: '/overview/sent-requests?myUri?connectionUri', component: 'overview-sent-requests', as: 'overviewSentRequests' },
         { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' },
         { path: '/post/?postUri?connectionUri?connectionType?layout', component: 'post', as: 'post' },
-        { path: '/post/visitor/info/?myUri?theirUri', component: 'post-visitor', as: 'postVisitor' },
-        { path: '/post/visitor/messages/?myUri?theirUri', component: 'post-visitor-msgs', as: 'postVisitorMsgs' },
+        //{ path: '/post/visitor/info/?myUri?theirUri', component: 'post-visitor', as: 'postVisitor' },
+        //{ path: '/post/visitor/messages/?myUri?theirUri', component: 'post-visitor-msgs', as: 'postVisitorMsgs' },
 
     ].forEach( ({path, component, as}) => {
 
@@ -56,6 +55,32 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
             template: `<won-general-settings></won-general-settings>`
         })
 
+}]
+
+export const runAccessControl = [ '$rootScope', '$ngRedux', ($rootScope, $ngRedux) => {
+    $rootScope.$on('$stateChangeStart',
+        (event, toState, toParams, fromState, fromParams, options) => {
+
+            switch(toState.name) {
+                case 'post':
+                    break;
+                case 'landingpage':
+                    break;
+                default:
+                    if(!$ngRedux.getState().getIn(['user', 'loggedIn'])) {
+                        console.error(
+                            "Tried to access view that won't work" +
+                            "without logging in. Blocking route-change."
+                        );
+                        event.preventDefault();
+                    }
+            }
+
+
+        }
+    );
+
+}];
 }
 
 
