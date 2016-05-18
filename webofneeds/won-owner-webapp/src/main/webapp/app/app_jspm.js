@@ -136,7 +136,6 @@ app.run(runAccessControl);
 //app.run([ '$ngRedux', $ngRedux => $ngRedux.dispatch(actionCreators.verifyLogin())]);
 app.run([ '$ngRedux', '$state', '$urlRouter', ($ngRedux, $uiRouterState, $urlRouter) => {
     $urlRouter.sync();
-    let foo = arguments;
     delay(0).then(() => { //to make sure the the route is synchronised and in the state.
         $ngRedux.dispatch(actionCreators.initialPageLoad())
     })
