@@ -5,6 +5,7 @@ import extendedGalleryModule from '../components/extended-gallery';
 import { labels } from '../won-label-utils';
 import {attach} from '../utils.js'
 import { actionCreators }  from '../actions/actions';
+import { selectOpenConnectionUri, displayingOverview } from '../selectors';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
@@ -15,14 +16,24 @@ function genComponentConf() {
             </a>
             <div class="or__header__title">
                 <div class="or__header__title__topline">
-                    <div class="or__header__title__topline__title">{{self.theirNeed.get('title')}}</div>
-                    <div class="or__header__title__topline__date">{{self.theirNeed.get('creationDate')}}</div>
+                    <div class="or__header__title__topline__title">
+                        {{self.theirNeed.get('title')}}
+                    </div>
+                    <div class="or__header__title__topline__date">
+                        {{self.theirNeed.get('creationDate')}}
+                    </div>
                 </div>
                 <div class="or__header__title__subtitle">
                     <span class="or__header__title__subtitle__group" ng-show="{{self.theirNeed.get('group')}}">
-                        <img src="generated/icon-sprite.svg#ico36_group" class="or__header__title__subtitle__group__icon">{{self.theirNeed.get('group')}}<span class="or__header__title__subtitle__group__dash"> &ndash; </span>
+                        <img
+                            src="generated/icon-sprite.svg#ico36_group"
+                            class="or__header__title__subtitle__group__icon">
+                        {{self.theirNeed.get('group')}}
+                        <span class="or__header__title__subtitle__group__dash"> &ndash; </span>
                     </span>
-                    <span class="or__header__title__subtitle__type">{{self.labels.type[self.theirNeed.get('basicNeedType')]}}</span>
+                    <span class="or__header__title__subtitle__type">
+                        {{self.labels.type[self.theirNeed.get('basicNeedType')]}}
+                    </span>
                 </div>
             </div>
         </div>
@@ -45,10 +56,13 @@ function genComponentConf() {
                 </div>
             </div>
         </div>
-        <div class="or__footer" ng-show="::(!self.isSentRequest())">
+        <div class="or__footer" ng-show="::(self.isReceivedRequest)">
             <input type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
             <div class="flexbuttons">
-                <button class="won-button--filled black" ui-sref="overviewIncomingRequests({connectionUri: null})" ng-click="self.closeRequest()">Decline</button>
+                <button
+                    class="won-button--filled black"
+                    ui-sref="{{ self.isOverview? 'overviewIncomingRequests({connectionUri: null})' : 'post({connectionUri: null})' }}"
+                    ng-click="self.closeRequest()">Decline</button>
                 <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Accept</button>
             </div>
         </div>
@@ -57,29 +71,35 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
-            window.openreq = this;
+            window.openreq4dbg = this;
             this.message='';
             this.labels = labels;
             const selectFromState = (state) => {
-                const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
+                const connectionUri = selectOpenConnectionUri(state);
+                const theirNeedUri = state.getIn(['connections', connectionUri, 'hasRemoteNeed']);
+
+                const connectionState = state.getIn(['connections', connectionUri, 'hasConnectionState']);
+                const isSentRequest = connectionState === won.WON.RequestSent;
+                const isReceivedRequest = connectionState === won.WON.RequestReceived;
 
                 return {
-                    currentPage: state.getIn(['router','currentState','name']),
+                    isSentRequest,
+                    isReceivedRequest,
+                    isOverview: displayingOverview(state),
                     connectionUri: connectionUri,
                     connection: state.getIn(['connections', connectionUri]),
-                    theirNeed: state.getIn(['needs','theirNeeds', state.getIn(['connections', connectionUri, 'hasRemoteNeed'])])
+                    theirNeed: state.getIn(['needs','theirNeeds', theirNeedUri]),
                 }
             };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
         }
 
-        isSentRequest() {
-            return this.currentPage === "overviewSentRequests";
-        }
-
         closeRequestItemUrl() {
-            return this.isSentRequest() ? "overviewSentRequests({connectionUri: null})" : "overviewIncomingRequests({connectionUri: null})";
+            if(this.isOverview)
+                return this.isSentRequest ? "overviewSentRequests({connectionUri: null})" : "overviewIncomingRequests({connectionUri: null})";
+            else
+                return "post({connectionUri: null})";
         }
 
         openRequest(message){

@@ -698,6 +698,10 @@ const rdfstore = window.rdfstore;
             ).then(dataset => {
                 lock.releaseUpdateLock();
                 return dataset;
+            })
+            .catch(error => {
+                lock.releaseUpdateLock();
+                throw({msg: 'Failed to fetch ' + uri, causedBy: error});
             });
     };
 
@@ -788,7 +792,7 @@ const rdfstore = window.rdfstore;
                                 resolve(dataset));
                     }
                   },
-                e =>  reject(`failed to load ${uri} due to reason ${e}`)
+                e =>  reject(`failed to load ${uri} due to reason: "${e}"`)
             )
         });
     };

@@ -5,16 +5,17 @@
 import { actionTypes } from '../actions/actions';
 import { repeatVar } from '../utils';
 import Immutable from 'immutable';
-import { createReducer } from 'redux-immutablejs'
+import { createReducer } from 'redux-immutablejs';
 import { combineReducersStable } from '../redux-utils';
 import { draftsReducer } from './drafts-reducer';
-import { messagesReducer } from './message-reducers'
+import { messagesReducer } from './message-reducers';
 import reduceReducers from 'reduce-reducers';
-import postsReducer from './posts-reducer'
-import needReducer from './need-reducer'
-import eventReducer from './event-reducer'
-import matchReducer from './match-reducer'
-import connectionReducer from './connection-reducer'
+import postsReducer from './posts-reducer';
+import needReducer from './need-reducer';
+import eventReducer from './event-reducer';
+import userReducer from './user-reducer';
+import matchReducer from './match-reducer';
+import connectionReducer from './connection-reducer';
 
 /*
  * this reducer attaches a 'router' object to our state that keeps the routing state.
@@ -39,31 +40,7 @@ const reducers = {
     connections:connectionReducer,
     drafts: draftsReducer,
     events: eventReducer,
-    user: createReducer(
-        //initial state
-        Immutable.Map(),
-
-        //handlers
-        {
-            [actionTypes.user.loggedIn]: (state, {payload: {loggedIn, email}}) => {
-                if(loggedIn == true){
-                    console.log('reducers.js: received successful-login action from app-server');
-                    return Immutable.fromJS({loggedIn: true, email: email});
-                }else{
-                    console.log('reducers.js: received notlogged in action from app-server');
-                    return Immutable.fromJS({loggedIn: false});
-                }
-            },
-            [actionTypes.user.loginFailed]: (state, {payload: {loginError}}) => {
-                console.log('reducers.js: received UNsuccessful-login action from app-server');
-                return Immutable.fromJS({loginError: loginError});
-            },
-            [actionTypes.user.registerFailed]: (state, {payload: {registerError}}) => {
-                console.log('reducers.js: received UNsuccessful-login action from app-server');
-                return Immutable.fromJS({registerError: registerError});
-            }
-        }
-    ),
+    user: userReducer,
     needs:needReducer,
     matches: matchReducer,
     postOverview:postsReducer,

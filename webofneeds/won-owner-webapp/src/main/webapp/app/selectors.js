@@ -4,11 +4,14 @@
 
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
+import { decodeUriComponentProperly } from './utils';
+import { relativeTime } from './won-label-utils';
 
-
-//TODO update to reflect simplfied state (drop one 'connections')
 const selectConnections = state => state.getIn(['connections']);
 const selectEvents = state => state.getIn(['events', 'events']);
+const selectOwnNeeds = state => state.getIn(['needs', 'ownNeeds']);
+const selectTheirNeeds = state => state.getIn(['needs', 'theirNeeds']);
+const selectLastUpdateTime = state => state.get('lastUpdateTime');
 
 export const selectUnreadEventUris = state => state
     .getIn(['events', 'unreadEventUris']);
@@ -111,7 +114,9 @@ const allByConnection = (connection) => (state) => {
 
     const events = connection
         .get('hasEvents')
-        .map(eventUri => state.getIn(['events', 'events', eventUri]));
+        .map(eventUri => state.getIn(['events', 'events', eventUri]))
+        .filter(event => !!event);
+
 
     return Immutable.Map({ connection, events, ownNeed, remoteNeed });
 };
@@ -135,17 +140,17 @@ export const selectOpenConnectionUri = createSelector(
     selectConnections,
     (routerParams, connections) => {
         //de-escaping is lost in transpiling if not done in two steps :|
-        const openConversationEscaped = routerParams.get('openConversation');
-        const openConversation = decodeURIComponent(openConversationEscaped);
+        const openConnectionUri = decodeUriComponentProperly(
+            routerParams.get('connectionUri') ||
+            routerParams.get('openConversation')
+        );
 
-        const myUriEscaped = routerParams.get('myUri');
-        const myUri = decodeURIComponent(myUriEscaped);
+        const myUri = decodeUriComponentProperly(routerParams.get('myUri')); //TODO deprecated parameter
 
-        const theirUriEscaped = routerParams.get('theirUri');
-        const theirUri = decodeURIComponent(theirUriEscaped);
+        const theirUri = decodeUriComponentProperly(routerParams.get('theirUri')); //TODO deprecated parameter
 
-        if(openConversation) {
-            return openConversation;
+        if(openConnectionUri) {
+            return openConnectionUri;
         } else if (myUri && theirUri) {
             /*
              returns undefined when there's no
@@ -161,6 +166,40 @@ export const selectOpenConnectionUri = createSelector(
         }
     }
 );
+
+export const selectOpenPostUri = createSelector(
+    state => state,
+    state => {
+        const encodedPostUri =
+            state.getIn(['router', 'currentParams', 'postUri']) ||
+            state.getIn(['router', 'currentParams', 'myUri']); //deprecated parameter
+        if(!encodedPostUri)
+            return undefined;
+        else
+            return decodeURIComponent(encodedPostUri);
+    }
+);
+
+export const selectOpenPost = createSelector(
+    selectOpenPostUri, selectOwnNeeds, selectTheirNeeds, selectLastUpdateTime,
+    (openPostUri, ownNeeds, theirNeeds, lastUpdateTime) => {
+        let post = ownNeeds.get(openPostUri) || theirNeeds.get(openPostUri);
+        if(post) {
+            const timestamp = relativeTime(lastUpdateTime, post.get('creationDate'));
+            post = post.set('friendlyTimestamp', timestamp);
+        }
+        return post;
+    }
+)
+export const selectOwningOpenPost = createSelector(
+    selectOpenPostUri, selectOwnNeeds,
+    (openPostUri, ownNeeds) => !!ownNeeds.get(openPostUri)
+)
+
+export const displayingOverview = createSelector(
+    selectOpenPostUri,
+    postUri => !postUri //if there's a postUri, this is almost certainly a detail view
+)
 
 
 window.selectAllByConnections4dbg = selectAllByConnections;

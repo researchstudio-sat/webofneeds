@@ -36,11 +36,14 @@ containers:
 
 The script has a config section at the beginning where you can "set deployment specific variables". Change the
 variables there according to your environment. The most important variables you may need to change are your deployment
-host server (deploy_host) and the docker options (docker_options) you use to run docker commands and the basefolder (base_folder) which is used to store the certificates. By default the docker options are left empty.
+host server (`deploy_host`) and the docker options (`docker_options`) you use to run docker commands and the basefolder
+(`base_folder`) which is used to store the certificates. By default the docker options are left empty.
 
 When the script executes it runs all the above listed docker images as containers and downloads them from the
 webofneeds docker hub repository if not available locally. If the script finishes without error all components
-should be started.
+should be started. Some data containers (like, the databases, rdf-store and solr index) are kept and only
+restarted if this script is started again. Also the certificate is created on the first execution of the script, and
+reused in later executions. All other containers will be created new every time this script is started.
 
 The owner and won node applications should be accessible through the browser under the following URLS (substitute the
  deploy_host variable accordingly):

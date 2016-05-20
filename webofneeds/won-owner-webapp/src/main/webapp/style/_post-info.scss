@@ -1,9 +1,10 @@
 @import 'sizing-utils';
 
-.post-info {
 
+won-post-info {
   @include max-content-width($maxContentWidth, $minContentPadding, 'post-info');
-  padding-top: 2rem;
+  padding: 2rem;
+  width: 100%;
 
   .post-info__heading {
     font-size: $normalFontSize;
@@ -12,8 +13,10 @@
   .post-info__details {
     margin-bottom: 1rem;
   }
+
   .post-info__inner {
     display: flex;
+    flex-direction: row;
     justify-content: center;
     flex-wrap: wrap;
     align-items: flex-start;
@@ -27,7 +30,6 @@
       flex-grow: 1;
       flex-basis: 15rem;
     }
+
   }
 }
-
-

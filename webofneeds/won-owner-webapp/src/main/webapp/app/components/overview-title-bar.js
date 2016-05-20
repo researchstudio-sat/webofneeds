@@ -41,7 +41,7 @@ function genComponentConf() {
                         </a>
                     </li>
                     <li ng-class="{'mtb__tabs__selected' : self.selection == 3}">
-                        <a ui-sref="overviewMatches({viewType: 0})"
+                        <a ui-sref="overviewMatches()"
                             ng-class="{'disabled' : !self.hasMatches}">
                             Matches
                             <span class="mtb__tabs__unread">{{ self.unreadMatches }}</span>

@@ -18,6 +18,12 @@ package won.protocol.rest;
 
 import org.springframework.http.MediaType;
 
+import javax.print.attribute.standard.Media;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * User: fkleedorfer
  * Date: 28.11.12
@@ -32,4 +38,28 @@ public class RDFMediaType
   public static final MediaType APPLICATION_TRIG = new MediaType("application", "trig");
   public static final MediaType APPLICATION_JSONLD = new MediaType("application", "ld+json");
   public static final MediaType APPLICATION_NQUADS = new MediaType("application", "n-quads");
+
+
+  public static final Set<MediaType> rdfMediaTypes;
+  static {
+
+    HashSet<MediaType> types = new HashSet<MediaType>(
+      Arrays.asList(new MediaType[]{
+        TEXT_TURTLE,
+        APPLICATION_RDF_XML,
+        APPLICATION_X_TURTLE,
+        TEXT_RDF_N3,
+        APPLICATION_JSON,
+        APPLICATION_TRIG,
+        APPLICATION_JSONLD,
+        APPLICATION_NQUADS
+      })
+    );
+    rdfMediaTypes = Collections.unmodifiableSet(types);
+
+  }
+
+  public static boolean isRDFMediaType(MediaType mediaType) {
+      return rdfMediaTypes.contains(mediaType);
+  }
 }

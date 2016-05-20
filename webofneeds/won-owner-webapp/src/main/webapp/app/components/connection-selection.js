@@ -7,9 +7,9 @@ import won from '../won-es6';
 import angular from 'angular';
 import squareImageModule from './square-image';
 import { labels } from '../won-label-utils';
-import { attach } from '../utils.js';
+import { attach, decodeUriComponentProperly } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
-import { selectAllByConnections } from '../selectors';
+import { selectOpenConnectionUri, selectAllByConnections } from '../selectors';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
@@ -72,23 +72,35 @@ function genComponentConf() {
 
     class Controller {
         constructor() {
-            window.connSel4db = this;
+            window.connSel4dbg = this;
             attach(this, serviceDependencies, arguments);
             this.labels = labels;
 
             const self = this;
 
             const selectFromState = (state)=>{
-                const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
-                const openConversationUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'openConversation']));
+                const encodedPostUri = state.getIn(['router', 'currentParams', 'postUri']) ||
+                    state.getIn(['router', 'currentParams', 'myUri']) ; // TODO old parameter
+                const postUri = decodeURIComponent(encodedPostUri);
+
+                const encodedConnectionUri = state.getIn(['router', 'currentParams', 'connectionUri']) ||
+                    state.getIn(['router', 'currentParams', 'openConversation']); // TODO old parameter
+
+                const openConnectionUri = selectOpenConnectionUri(state);
                 const allByConnections = selectAllByConnections(state);
-                const post = state.getIn(['needs','ownNeeds', postId]);
+                const post = state.getIn(['needs','ownNeeds', postUri]);
                 const postJS = post? post.toJS() : {};
+
+                const connectionTypeInParams = decodeUriComponentProperly(
+                        state.getIn(['router', 'currentParams', 'connectionType'])
+                    ) ||
+                    won.WON.Connected; // TODO old parameter
+                const connectionType = connectionTypeInParams || self.connectionType;
 
                 const connectionUris = allByConnections
                     .filter(conn =>
-                        conn.getIn(['connection', 'hasConnectionState']) === self.connectionType &&
-                        conn.getIn(['ownNeed', 'uri']) === postId
+                        conn.getIn(['connection', 'hasConnectionState']) === connectionType &&
+                        conn.getIn(['ownNeed', 'uri']) === postUri
                     )
                     .map(conn => conn.getIn(['connection','uri']))
                     .toList().toJS();
@@ -96,7 +108,7 @@ function genComponentConf() {
                 return {
                     connectionUris,
                     allByConnections,
-                    openConversationUri,
+                    openConversationUri: openConnectionUri,
                     post: postJS,
                 };
             }

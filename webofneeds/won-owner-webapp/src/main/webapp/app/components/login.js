@@ -37,8 +37,8 @@ function genLoginConf() {
             this.password = "";
 
             const login = (state) => ({
-                loggedIn: state.get('user').toJS().loggedIn,
-                loginError: state.get('user').toJS().loginError
+                loggedIn: state.getIn(['user','loggedIn']),
+                loginError: state.getIn(['user','loginError'])
             });
 
             const disconnect = this.$ngRedux.connect(login, actionCreators)(this);
