@@ -329,10 +329,23 @@ public class WonMessageBuilder
     URI remoteConnection,
     URI remoteNeed,
     URI remoteWonNode) {
+   return setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_OWNER,localConnection, localNeed,
+                                       localWonNode, remoteConnection, remoteNeed, remoteWonNode);
+  }
+
+  public WonMessageBuilder setMessagePropertiesForClose(
+    URI messageURI,
+    WonMessageDirection direction,
+    URI localConnection,
+    URI localNeed,
+    URI localWonNode,
+    URI remoteConnection,
+    URI remoteNeed,
+    URI remoteWonNode) {
 
     this
       .setMessageURI(messageURI)
-      .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
+      .setWonMessageDirection(direction)
       .setWonMessageType(WonMessageType.CLOSE)
       .setSenderURI(localConnection)
       .setSenderNeedURI(localNeed)
