@@ -102,8 +102,10 @@ public class WonMessageRoutes  extends RouteBuilder
         //process, let them do that, then send the resulting message to the remote end.
       .choice()
         .when(PredicateBuilder.and(
-                header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
-                new ShouldCallFacetImplForMessagePredicate()))
+                header(WonCamelConstants.DIRECTION_HEADER).isEqualTo(URI.create(WONMSG.TYPE_FROM_OWNER_STRING)),
+                PredicateBuilder.and(
+                  header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
+                  new ShouldCallFacetImplForMessagePredicate())))
             //put the local connection URI into the header
             .setHeader(WonCamelConstants.CONNECTION_URI_HEADER,
                     new GetEnvelopePropertyExpression(WonCamelConstants.ORIGINAL_MESSAGE_HEADER,
