@@ -56,6 +56,11 @@ function loadingWhileSignedOut(dispatch, getState) {
                     payload: publicData
                 })
         );
+    } else {
+        dispatch({
+            type: actionTypes.initialPageLoad,
+            payload: Immutable.Map()
+        })
     }
 
 }
