@@ -3,9 +3,9 @@
  */
 
 import  won from '../won-es6';
-import { actionTypes, actionCreators } from './actions';
 import Immutable from 'immutable';
-import { selectOpenPostUri } from '../selectors';
+import { actionTypes, actionCreators } from './actions';
+import { selectOpenPostUri, selectOpenPost } from '../selectors';
 
 import {
     checkHttpStatus,
@@ -24,31 +24,45 @@ export const pageLoadAction = () => (dispatch, getState) => {
     /* TODO the data fetched here should be baked into
     * the send html thus significantly improving the
     * initial page-load-speed.
+    * TODO fetch config data here as well
     */
-    fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
+    fetch('rest/users/isSignedIn', {credentials: 'include'})
     .then(checkHttpStatus)
     .then(resp => resp.json())
     /* handle data, dispatch actions */
-    .then(data =>
-        fetchDataForOwnedNeeds(data.username)
-    )
+    .then(data => loadingWhileSignedIn(dispatch, data.username))
+    /* handle: not-logged-in */
+    .catch(error => loadingWhileSignedOut(dispatch, getState));
+}
+
+function loadingWhileSignedIn(dispatch, username) {
+    fetchDataForOwnedNeeds(username)
     .then(allThatData =>
         dispatch({
             type: actionTypes.initialPageLoad,
             payload: allThatData
         })
     )
-    /* handle: not-logged-in */
-    .catch(error => {
-        const postUri = selectOpenPostUri(getState());
+}
+
+function loadingWhileSignedOut(dispatch, getState) {
+    const state = getState();
+    const postUri = selectOpenPostUri(state);
+    if(postUri && !selectOpenPost(state)) { //got an uri but no post loaded yet
         fetchDataForNonOwnedNeedOnly(postUri)
-        .then(publicData =>
-            dispatch({
-                type: actionTypes.initialPageLoad,
-                payload: publicData
-            })
+            .then(publicData =>
+                dispatch({
+                    type: actionTypes.initialPageLoad,
+                    payload: publicData
+                })
         );
-    })
+    } else {
+        dispatch({
+            type: actionTypes.initialPageLoad,
+            payload: Immutable.Map()
+        })
+    }
+
 }
 
 

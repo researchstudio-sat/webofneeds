@@ -31,7 +31,7 @@ function genComponentConf() {
                     <button class="won-button--filled red">Quit Contact</button>
                     <ul class="vtb__tabs">
                         <li ng-class="self.selection == 0? 'vtb__tabs__selected' : ''" ng-click="self.selection = 0">
-                        <a ui-sref="postVisitorMsgs({myUri: 'http://example.org/121337345'})">
+                        <a ui-sref="post({ERROR: 'Messages tab not implemented yet'})">
                             Messages
                             <span class="vtb__tabs__unread">{{self.post.get('messages').length}}</span>
                         </a></li>

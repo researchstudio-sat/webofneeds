@@ -2,13 +2,32 @@
  * Created by ksinger on 08.10.2015.
  */
 
+import won from './won-es6';
+import Immutable from 'immutable';
+import { actionTypes, actionCreators } from './actions/actions';
+
+import {
+    selectOwnNeeds,
+    selectTheirNeeds,
+} from './selectors';
+
+import {
+    fetchDataForNonOwnedNeedOnly,
+} from './won-message-utils';
+
+import {
+    delay,
+    decodeUriComponentProperly,
+    checkHttpStatus,
+} from './utils';
+
+
 /**
  * Adapted from https://github.com/neilff/redux-ui-router/blob/master/example/index.js
  * @param $urlRouterProvider
  * @param $stateProvider
  */
-
-export default function configRouting($urlRouterProvider, $stateProvider) {
+export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRouterProvider, $stateProvider) => {
     $urlRouterProvider.otherwise('/landingpage');
 
     [
@@ -20,8 +39,8 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
         { path: '/overview/sent-requests?myUri?connectionUri', component: 'overview-sent-requests', as: 'overviewSentRequests' },
         { path: '/overview/posts', component: 'overview-posts', as: 'overviewPosts' },
         { path: '/post/?postUri?connectionUri?connectionType?layout', component: 'post', as: 'post' },
-        { path: '/post/visitor/info/?myUri?theirUri', component: 'post-visitor', as: 'postVisitor' },
-        { path: '/post/visitor/messages/?myUri?theirUri', component: 'post-visitor-msgs', as: 'postVisitorMsgs' },
+        //{ path: '/post/visitor/info/?myUri?theirUri', component: 'post-visitor', as: 'postVisitor' },
+        //{ path: '/post/visitor/messages/?myUri?theirUri', component: 'post-visitor-msgs', as: 'postVisitorMsgs' },
 
     ].forEach( ({path, component, as}) => {
 
@@ -56,6 +75,129 @@ export default function configRouting($urlRouterProvider, $stateProvider) {
             template: `<won-general-settings></won-general-settings>`
         })
 
+}]
+
+export const runAccessControl = [ '$rootScope', '$ngRedux', '$urlRouter',
+    ($rootScope, $ngRedux, $urlRouter) => {
+        $rootScope.$on('$stateChangeStart',
+            (event, toState, toParams, fromState, fromParams, options) => {
+
+                const hasPreviousState = !!fromState.name;
+
+                switch(toState.name) {
+                    case 'post':
+                        postViewEnsureLoaded(
+                            $ngRedux,
+                            toParams.postUri
+                        );
+                        break;
+
+                    case 'landingpage':
+                        break;
+
+                    default:
+                        preventRouteChangeIfNotLoggedIn($ngRedux, event, toState, toParams, hasPreviousState);
+                }
+
+
+            }
+        );
+    }
+];
+
+
+function postViewEnsureLoaded($ngRedux, encodedPostUri) {
+    console.log('in postViewEnsureLoaded');
+    const postUri = decodeUriComponentProperly(encodedPostUri);
+    const state = $ngRedux.getState();
+
+    if (postUri
+        && !selectOwnNeeds(state).has(postUri)
+        && !selectTheirNeeds(state).has(postUri)) {
+
+        /*
+         * got an uri but no post loaded to the state yet ->
+         * assuming that if you're logged in you either did a
+         * page-reload with a valid session or signed in, thus
+         * loading your own needs as part of the `initialPageLoad`
+         * or `login` action-creators. Thus we assume
+         * you loaded the app in some other view,
+         * got a link to a non-owned need and pasted it. Thus
+         * the `initiaPageLoad` didn't load this need yet. Also
+         * we can be sure it's not your need and load it as `theirNeed`.
+         */
+        won.getNeed(postUri)
+            .then(need =>
+                $ngRedux.dispatch({
+                    type: actionTypes.router.accessedNonLoadedPost,
+                    payload: Immutable.fromJS({ theirNeed: need })
+                })
+            )
+            .catch(error => {
+                console.log(
+                    `Failed to load need ${postUri}.`,
+                    `Reverting to previous router-state.`,
+                    `Error: `, error
+                );
+                $ngRedux.dispatch(
+                    actionCreators.router__back()
+                )
+            });
+    }
+}
+
+//TODO make into router__back AC
+function back(hasPreviousState, $ngRedux) {
+    if(hasPreviousState) {
+        history.back(); //TODO might break if other
+                        // route-changes were caused
+                        // while this promise evaluated
+    } else {
+        $ngRedux.dispatch(
+            actionCreators.router__stateGo('landingpage')
+        );
+
+    }
+
+}
+
+function preventRouteChangeIfNotLoggedIn($ngRedux, event, toState, toParams, hasPreviousState) {
+    const errorString = "Tried to access view that won't work" +
+        "without logging in. Blocking route-change.";
+    const state = $ngRedux.getState();
+
+    if ( state.get('initialLoadFinished') ) {
+        if(state.getIn(['user', 'loggedIn'])) {
+            return; // logged in. continue route-change as intended.
+        } else {
+            //sure to be logged out
+            event.preventDefault();
+            console.error(errorString);
+        }
+    } else {
+        if(hasPreviousState) {
+            event.preventDefault();
+            console.log('Not sure about login-status -- ' +
+                'will reinitialize route-change once it\'s been clarified.');
+        }
+
+        fetch('rest/users/isSignedIn', {credentials: 'include'})
+        .then(checkHttpStatus) // will reject if not logged in
+        .then(() => //logged in -- re-initiate route-change
+            $ngRedux.dispatch(
+                actionCreators.router__stateGo(toState, toParams)
+            )
+        )
+        .catch(error => {
+            //now certainly not logged in.
+            console.error(errorString, error)
+            if (!hasPreviousState) {
+                $ngRedux.dispatch(
+                    actionCreators.router__stateGo('landingpage')
+                );
+            }
+        });
+    }
 }
 
 
