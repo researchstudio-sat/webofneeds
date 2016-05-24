@@ -8,6 +8,7 @@ import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
+import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.model.Connection;
@@ -57,18 +58,15 @@ public class DeactivateNeedMessageProcessor extends AbstractCamelProcessor
     URI remoteWonNode = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(con.getRemoteNeedURI(),
       linkedDataSource);
 
-    //send close to remote node
-    WonMessage message = new WonMessageBuilder().setMessagePropertiesForClose(messageURI,
-      con.getConnectionURI(), con.getNeedURI(), need.getWonNodeURI(), con.getRemoteConnectionURI(),
-      con.getRemoteNeedURI(), remoteWonNode).build();
-    sendSystemMessageToRemoteNode(message);
-
-    //send close to owner app(s)
+    //send close from system to each connection
     messageURI = wonNodeInformationService.generateEventURI();
-    message = new WonMessageBuilder().setMessagePropertiesForClose(messageURI,
-      con.getConnectionURI(), con.getNeedURI(), need.getWonNodeURI(), con.getConnectionURI(),
-      con.getNeedURI(), need.getWonNodeURI()).build();
-    sendSystemMessageToOwner(message);
+    WonMessage message = new WonMessageBuilder()
+      .setMessagePropertiesForClose(messageURI,
+                                    WonMessageDirection.FROM_SYSTEM,
+                                    con.getConnectionURI(), con.getNeedURI(),
+                                    need.getWonNodeURI(), con.getConnectionURI(),
+                                    con.getNeedURI(), need.getWonNodeURI()).build();
+    sendSystemMessageToRemoteNode(message);
   }
 
 }
