@@ -74,7 +74,7 @@ public class WebIdVerificationFilter implements Filter
       webIDs = CertificateService.getWebIdFromSubjectAlternativeNames(cert);
     } catch (CertificateParsingException e) {
       logger.error("error extracting subject alternative names", e);
-      response.sendError(HttpServletResponse.SC_FORBIDDEN, "No cerificate provided for WebID protected resource");
+      response.sendError(HttpServletResponse.SC_FORBIDDEN, "No certificate provided for WebID protected resource");
       return false;
     }
     if (webIDs == null || webIDs.isEmpty()) {
