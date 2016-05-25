@@ -3,14 +3,18 @@
  */
 
 
+import won from './won-es6';
+import Immutable from 'immutable';
 import {
     getRandomPosInt,
     checkHttpStatus,
     mapJoin,
     urisToLookupMap,
     flattenObj,
+    flatten,
+    entries,
+    is,
 } from './utils';
-import won from './won-es6';
 
 import jsonld from 'jsonld';
 window.jsonld4Dbg = jsonld;
@@ -61,7 +65,7 @@ messageService.sendMessage = function(msg) {
 };
 
 */
-//TODO: IMPL THIS
+
 export function buildRateMessage(msgToRateFor, rating){
     let deferred = Q.defer();
     var buildMessage = function(envelopeData, eventToRateFor) {
@@ -133,6 +137,29 @@ export function buildCloseNeedMessage(needUri, wonNodeUri){
             err => won.reportError("cannot close need "+ needUri)
         );
 }
+
+export function buildOpenNeedMessage(needUri, wonNodeUri){
+    const buildMessage = function(envelopeData) {
+        var eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt();
+        var message = new won.MessageBuilder(won.WONMSG.activateNeedMessage)
+            .eventURI(eventUri)
+            .hasReceiverNode(wonNodeUri)
+            .hasOwnerDirection()
+            .hasSentTimestamp(new Date().getTime())
+            .forEnvelopeData(envelopeData)
+            .build();
+
+        return {eventUri: eventUri, message: message};
+    };
+
+    return won.getEnvelopeDataForNeed(needUri)
+        .then(
+            envelopeData => buildMessage(envelopeData),
+            err => won.reportError("cannot close need "+ needUri)
+    );
+}
+
+
 
 export function buildConnectMessage(msgToConnectFor, textMessage){
     let deferred = Q.defer();
@@ -307,8 +334,70 @@ export function getEventsFromMessage(msgJson) {
     return simplifiedEvents;
 }
 
+const emptyDataset = Immutable.fromJS({
+    ownNeeds: {},
+    connections: {},
+    events: {},
+    theirNeeds: {},
+})
+export function fetchDataForNonOwnedNeedOnly(needUri) {
+    return won.getNeed(needUri)
+    .then(need =>
+            emptyDataset
+                .setIn(['theirNeeds', needUri], Immutable.fromJS(need))
+                .set('loggedIn', false)
+    )
+}
+
+export function fetchDataForOwnedNeeds(emailOrNeedUris) {
+    let needUrisPromise, email;
+    if(is('Array', emailOrNeedUris)) {
+        email = undefined;
+        needUrisPromise = Promise.resolve(emailOrNeedUris);
+    } else if (is('String', emailOrNeedUris)) {
+        email = emailOrNeedUris;
+        needUrisPromise = fetchOwnedNeedUris();
+    } else {
+        throw({msg: "got something that's neither an email-adress nor a list of needUris" });
+    }
+
+    const dataPromise = needUrisPromise.then(needUris =>
+            fetchAllAccessibleAndRelevantData(needUris)
+        )
+        .catch(error => {
+            throw({msg: 'user needlist retrieval failed', error});
+        });
+
+    if(email) {
+        return dataPromise.then(allThatData =>
+            allThatData
+                .set('loggedIn', true)
+                .set('email', email)
+        )
+    } else {
+        return dataPromise;
+    }
+}
+function fetchOwnedNeedUris() {
+    return fetch('/owner/rest/needs/', {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        })
+        .then(checkHttpStatus)
+        .then(response =>
+            response.json()
+        )
+}
+
 window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
-export function fetchAllAccessibleAndRelevantData(ownNeedUris) {
+function fetchAllAccessibleAndRelevantData(ownNeedUris) {
+    if(!is('Array', ownNeedUris) || ownNeedUris.length === 0 ) {
+        return emptyDataset;
+    }
 
     const allLoadedPromise = Promise.all(
         ownNeedUris.map(uri => won.ensureLoaded(uri, uri, deep = true))
@@ -324,11 +413,11 @@ export function fetchAllAccessibleAndRelevantData(ownNeedUris) {
                     flatten(connectionUrisPerNeed));
 
         const allConnectionsPromise = allConnectionUrisPromise
-            .then(connectionUris =>
+            .then(connectionUris => //delivers an obj<idx, string>
                 urisToLookupMap(connectionUris, won.getConnection));
 
         const allEventsPromise = allConnectionUrisPromise
-            .then(connectionUris =>
+            .then(connectionUris => //expects an array
                 urisToLookupMap(connectionUris, connectionUri =>
                         won.getConnection(connectionUri)
                             .then(connection =>
@@ -359,18 +448,19 @@ export function fetchAllAccessibleAndRelevantData(ownNeedUris) {
         ]);
     });
 
-    return allDataRawPromise.then(([
-            allOwnNeeds,
-            allConnections,
-            allEvents,
-            allTheirNeeds
-            ]) => ({
-            ownNeeds: allOwnNeeds,
-            connections: allConnections,
-            events: allEvents,
-            theirNeeds: allTheirNeeds,
-        })
-    );
+    return allDataRawPromise
+        .then(([
+                allOwnNeeds,
+                allConnections,
+                allEvents,
+                allTheirNeeds
+            ]) => emptyDataset.mergeDeep(Immutable.fromJS({
+                ownNeeds: allOwnNeeds,
+                connections: allConnections,
+                events: allEvents,
+                theirNeeds: allTheirNeeds,
+            }))
+        );
 
     /**
      const allAccessibleAndRelevantData = {

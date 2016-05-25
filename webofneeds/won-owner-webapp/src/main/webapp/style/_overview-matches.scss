@@ -3,8 +3,11 @@
 @import 'fonts';
 @import 'flex-layout';
 
-.overviewmatchescontent {
+won-matches {
+  width: 100%;
+  display: block;
   @include max-content-width($maxContentWidth, $minContentPadding, 'omc');
+
 
   .omc__sendrequest {
     position: absolute;

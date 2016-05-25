@@ -1,0 +1,59 @@
+<!-- TODO parametrize by selected tab -->
+<header>
+    <won-topnav></won-topnav>
+    <won-owner-title-bar
+            selection="self.selection"
+            ng-show="self.owningPost">
+    </won-owner-title-bar>
+    <won-visitor-title-bar
+            selection="::1"
+            item="self.post"
+            ng-show="!self.owningPost">
+    </won-visitor-title-bar>
+</header>
+<main class="ownerpostcontent">
+
+
+    <!-- Post info view when there's no connection-state/-type selected -->
+    <won-post-info ng-show="!self.connectionType || !self.owningPost"></won-post-info>
+
+    <!-- Matches: -->
+    <won-matches ng-show="self.showMatches && self.owningPost"></won-matches>
+
+
+    <!-- left column for connection-typed tabs -->
+    <won-connection-selection
+            class="owner__messages"
+            ng-show="self.showConnectionSelection && self.owningPost"
+            connection-type="self.connectionType"
+            selected-connection="::self.openConnection(connectionUri)"
+            >
+    </won-connection-selection>
+    <!-- /left column -->
+
+    <!-- right column -->
+    <!-- Conversations: -->
+    <div
+        class="post-messages"
+        ng-show="self.showConversationDetails && self.owningPost">
+            <div class="post-messages__inner">
+                <won-post-messages></won-post-messages>
+            </div>
+    </div>
+
+    <!-- Incoming Requests: -->
+    <div
+        class="post-messages"
+        ng-show="self.showIncomingRequestDetails && self.owningPost">
+            <won-open-request></won-open-request>
+    </div>
+
+    <!-- Sent Requests: -->
+    <div
+        class="post-messages"
+        ng-show="self.showSentRequestDetails && self.owningPost">
+            <won-open-request></won-open-request>
+    </div>
+
+    <!-- /right column -->
+</main>

@@ -436,7 +436,7 @@ export function mapObj(obj, f) {
 export function flatten(listOfLists) {
     return listOfLists.reduce(
         (flattendList, innerList) =>
-            flattendList.concat(innerList),
+            innerList? flattendList.concat(innerList) : [], //not concatenating `undefined`s
         [] //concat onto empty list as start
     )
 }
@@ -465,7 +465,12 @@ export function flattenObj(objOfObj) {
 export function urisToLookupMap(uris, asyncLookupFunction) {
     //make sure we have an array and not a single uri.
     const urisAsArray = is('Array', uris) ? uris : [uris];
-    const asyncLookups = urisAsArray.map(uri => asyncLookupFunction(uri));
+    const asyncLookups = urisAsArray.map(uri =>
+        asyncLookupFunction(uri)
+        .catch(error => {
+            throw({msg: `failed lookup for ${uri} in utils.js:urisToLookupMap`, error, urisAsArray, uris})
+        })
+    );
     return Promise.all(asyncLookups).then( dataObjects => {
         const lookupMap = {};
         //make sure there's the same
@@ -513,6 +518,13 @@ export function mapJoin(object, asyncFunction) {
 export function is(type, obj) {
     var clas = Object.prototype.toString.call(obj).slice(8, -1);
     return obj !== undefined && obj !== null && clas === type;
+}
+
+export function decodeUriComponentProperly(encodedUri) {
+    if(!encodedUri)
+        return undefined; //for some reason decodeUri(undefined) yields "undefined"
+    else
+        return decodeURIComponent(encodedUri);
 }
 
 

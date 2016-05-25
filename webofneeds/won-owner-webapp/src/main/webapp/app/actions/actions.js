@@ -53,7 +53,8 @@ import { hierarchy2Creators } from './action-utils';
 import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 import {
     buildCreateMessage,
-    buildCloseNeedMessage
+    buildCloseNeedMessage,
+    buildOpenNeedMessage
 } from '../won-message-utils';
 
 // </utils>
@@ -64,7 +65,6 @@ import {
     accountLogin,
     accountLogout,
     accountRegister,
-    accountVerifyLogin
 } from './account-actions';
 
 import {
@@ -79,7 +79,10 @@ import {
 
 import * as messages from './messages-actions';
 
-import { loadAction, retrieveNeedUris, configInit, needsFetch } from './load-action';
+import {
+    configInit,
+    pageLoadAction
+} from './load-action';
 import { matchesLoad } from './matches-actions';
 import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
 
@@ -92,12 +95,7 @@ import { stateGo, stateReload, stateTransitionTo } from 'redux-ui-router';
  */
 const INJ_DEFAULT = 'INJECT_DEFAULT_ACTION_CREATOR';
 const actionHierarchy = {
-    load: loadAction, /* triggered on pageload to cause initial crawling of linked-data and other startup tasks*/
-    user: {
-        loggedIn: INJ_DEFAULT,
-        loginFailed: INJ_DEFAULT,
-        registerFailed: INJ_DEFAULT
-    },
+    initialPageLoad: pageLoadAction,
     events:{
         addUnreadEventUri:INJ_DEFAULT,
         read:INJ_DEFAULT
@@ -118,7 +116,6 @@ const actionHierarchy = {
         reset:INJ_DEFAULT,
     },
     needs: {
-        fetch: needsFetch,
         received: INJ_DEFAULT,
         connectionsReceived:INJ_DEFAULT,
         clean:INJ_DEFAULT,
@@ -201,11 +198,11 @@ const actionHierarchy = {
          */
         requestWsReset_Hack: INJ_DEFAULT,
     },
-    verifyLogin: accountVerifyLogin,
     login: accountLogin,
     logout: accountLogout,
     register: accountRegister,
-    retrieveNeedUris: retrieveNeedUris,
+    loginFailed: INJ_DEFAULT,
+    registerFailed: INJ_DEFAULT,
     config: {
         init: configInit,
         update: INJ_DEFAULT,
@@ -321,20 +318,27 @@ export const messageTypeToEventType = deepFreeze({
 export function needsOpen(needUri) {
     return (dispatch, getState) => {
         const state = getState();
-        //TODO: IMPLEMENT ME
-        /*const eventData = selectAllByConnections(state).get(connectionData.connection.uri).toJS(); // TODO avoid toJS;
-        //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
-        let messageData = null;
-        let deferred = Q.defer()
-        won.getConnection(eventData.connection.uri).then(connection=> {
-            let msgToOpenFor = {event: eventData, connection: connection}
-            buildConnectMessage(msgToOpenFor, message).then(messageData=> {
-                deferred.resolve(messageData);
+        buildOpenNeedMessage(
+            needUri,
+            getState().getIn(['config', 'defaultNodeUri'])
+        )
+            .then((data)=> {
+                console.log(data);
+                dispatch(actionCreators.messages__send({
+                    eventUri: data.eventUri,
+                    message: data.message
+                }));
             })
-        })
-        deferred.promise.then((action)=> {
-            dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
-        })*/
+            .then(() =>
+                // assume close went through successfully, update GUI
+                dispatch({
+                    type: actionTypes.needs.reopen,
+                    payload: {
+                        ownNeedUri: needUri,
+                        affectedConnections: getState().getIn(['needs', 'ownNeeds', needUri, 'hasConnections'])
+                    }
+                })
+        )
     }
 }
 

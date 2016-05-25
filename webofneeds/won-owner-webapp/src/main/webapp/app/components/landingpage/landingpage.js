@@ -41,8 +41,8 @@ class LandingpageController {
 
         const signup = (state) => ({
             focusSignup: state.getIn(['router', 'currentParams', 'focusSignup']) === "true",
-            loggedIn: state.get('user').toJS().loggedIn,
-            registerError: state.get('user').toJS().registerError
+            loggedIn: state.getIn(['user','loggedIn']),
+            registerError: state.getIn(['user','registerError'])
         });
 
         const disconnect = this.$ngRedux.connect(signup, actionCreators)(this);

@@ -19,6 +19,7 @@ const initialState = Immutable.fromJS({
 
 export default function(allNeeds = initialState, action = {}) {
     switch(action.type) {
+        case actionTypes.logout:
         case actionTypes.needs.clean:
             return initialState;
 
@@ -26,7 +27,8 @@ export default function(allNeeds = initialState, action = {}) {
             console.log('reducers.js: failed receive needlist action');
             return allNeeds.update('errors', errors => errors.push(action.payload.error));
 
-        case actionTypes.load:
+        case actionTypes.initialPageLoad:
+        case actionTypes.login:
             const ownNeeds = action.payload.get('ownNeeds');
             const theirNeeds = action.payload.get('theirNeeds');
             return allNeeds
@@ -40,9 +42,11 @@ export default function(allNeeds = initialState, action = {}) {
                 allNeeds
             );
 
+        case actionTypes.needs.reopen:
+            return allNeeds.setIn(["ownNeeds", action.payload.ownNeedUri, 'state'], won.WON.Active);
+
         case actionTypes.needs.close:
-            const needUri = action.payload.ownNeedUri;
-            return allNeeds.setIn(["ownNeeds", needUri, 'state'], won.WON.Inactive);
+            return allNeeds.setIn(["ownNeeds", action.payload.ownNeedUri, 'state'], won.WON.Inactive);
 
         case actionTypes.needs.received:
             const ownNeed = action.payload;
