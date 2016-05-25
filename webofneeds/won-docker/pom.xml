@@ -31,10 +31,10 @@
                         <phase>package</phase>
                         <configuration>
                             <target>
-                                <chmod file="deploy_master_build.sh" perm="777"/>
-                                <chmod file="deploy_master_run.sh" perm="777"/>
+                                <chmod file="deploy_live_build.sh" perm="777"/>
+                                <chmod file="deploy_live_run.sh" perm="777"/>
                                 <chmod file="deploy_int.sh" perm="777"/>
-                                <chmod file="deploy_dev.sh" perm="777"/>
+                                <chmod file="deploy_master.sh" perm="777"/>
                             </target>
                         </configuration>
                         <goals>

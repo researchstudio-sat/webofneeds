@@ -12,14 +12,14 @@ the webofneeds applications as docker containers. There are images for the follo
 * sirensolr: a solr server with siren plugin used by the matcher-siren (~219 MB)
 * gencert: a tool that can generate certificates for wonnode and owner application (~496 MB)
 
-These components can be deployed on different servers (for an example see [deploy_dev.sh](deploy_dev.sh)) or on the
-same server (for an example see [deploy_master_run.sh](deploy_master_run.sh)). The configuration can be done by
+These components can be deployed on different servers (for an example see [deploy_master.sh](deploy_master.sh)) or on
+ the same server (for an example see [deploy_live_run.sh](deploy_live_run.sh)). The configuration can be done by
 passing parameters and mounting volumes into the docker containers.
 
 ### How to deploy and run all webofneeds components on a Linux (or MacOSX) server
 
 1. Install and configure docker (https://www.docker.com)
-2. Download the script [deploy_master_run.sh](deploy_master_run.sh) and configure it
+2. Download the script [deploy_live_run.sh](deploy_live_run.sh) and configure it
 3. Make sure no other services on the server are running on the following ports that are used by the different
 containers: 
  * 443
