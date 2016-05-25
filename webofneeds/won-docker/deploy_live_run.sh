@@ -14,6 +14,9 @@ if [ -z "$docker_options" ]; then
   docker_options=
 fi
 
+# tag name of images to use for deployment (default uses master images)
+deploy_image_tag_name=master
+
 # set this to true if using a reverse proxy server that takes care of client certificate authentication
 # behind_proxy=true
 if [ -z "$behind_proxy" ]; then
@@ -48,69 +51,69 @@ echo run docker containers:
 
 # a new certificate is created in the base_folder/won-server-certs dir if there is not already one available
 echo create certificate if not available
-docker ${docker_options} rm gencert_ma || echo 'No docker container found to remove with name: gencert_ma'
-docker ${docker_options} run --name=gencert_ma -e CN="${deploy_host}" \
+docker ${docker_options} rm gencert || echo 'No docker container found to remove with name: gencert'
+docker ${docker_options} run --name=gencert -e CN="${deploy_host}" \
 -e "PASS=pass:${won_certificate_passwd}" -v $base_folder/won-server-certs:/usr/local/certs/out/ \
-webofneeds/gencert:master
+webofneeds/gencert:${deploy_image_tag_name}
 
 # postgres
 # NOTE: do not redeploy the postgres database for won node and owner to keep the data after deployments postgres db
 echo run postgres container
 docker ${docker_options} pull webofneeds/postgres
-if ! docker ${docker_options} run --name=postgres_ma -d -p 5433:5432 webofneeds/postgres; then
+if ! docker ${docker_options} run --name=postgres -d -p 5433:5432 webofneeds/postgres; then
   echo postgres container already available, restart old container
-  docker ${docker_options} restart postgres_ma
+  docker ${docker_options} restart postgres
 fi
 
 sleep 10
 
 # wonnode
 echo run wonnode container
-docker ${docker_options} stop wonnode_ma || echo 'No docker container found to stop with name: wonnode_ma'
-docker ${docker_options} rm wonnode_ma || echo 'No docker container found to remove with name: wonnode_ma'
-docker ${docker_options} run --name=wonnode_ma -d -e "uri.host=$public_node_uri" -e "http.port=443" \
+docker ${docker_options} stop wonnode || echo 'No docker container found to stop with name: wonnode'
+docker ${docker_options} rm wonnode || echo 'No docker container found to remove with name: wonnode'
+docker ${docker_options} run --name=wonnode -d -e "uri.host=$public_node_uri" -e "http.port=443" \
 -e "uri.prefix=https://${public_node_uri}/won" \
 -e "activemq.broker.port=61617" -p 443:8443 -p 61617:61617 \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
--v $base_folder/won-client-certs/wonnode_ma:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/ \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -e "client.authentication.behind.proxy=$behind_proxy" \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://${deploy_host}:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -e "JMEM_OPTS=-Xmx400m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
-webofneeds/wonnode:master
+webofneeds/wonnode:${deploy_image_tag_name}
 
 # bigdata
 echo run bigdata container
 docker ${docker_options} pull webofneeds/bigdata
-if ! docker ${docker_options} run --name=bigdata_ma -d -p 10000:9999 -m 400m webofneeds/bigdata; then
+if ! docker ${docker_options} run --name=bigdata -d -p 10000:9999 -m 400m webofneeds/bigdata; then
   echo bigdata container already available, restart old container
-  docker ${docker_options} restart bigdata_ma
+  docker ${docker_options} restart bigdata
 fi
 
 sleep 10
 
 # matcher service
 echo run matcher service container
-docker ${docker_options} stop matcher_service_ma || echo 'No docker container found to stop with name: matcher_service_ma'
-docker ${docker_options} rm matcher_service_ma || echo 'No docker container found to remove with name: matcher_service_ma'
-docker ${docker_options} run --name=matcher_service_ma -d -e "node.host=${deploy_host}" \
+docker ${docker_options} stop matcher_service || echo 'No docker container found to stop with name: matcher_service'
+docker ${docker_options} rm matcher_service || echo 'No docker container found to remove with name: matcher_service'
+docker ${docker_options} run --name=matcher_service -d -e "node.host=${deploy_host}" \
 -e "cluster.seed.host=${deploy_host}" \
 -e "uri.sparql.endpoint=http://${deploy_host}:10000/bigdata/namespace/kb/sparql" \
 -e "wonNodeController.wonNode.crawl=https://${public_node_uri}/won/resource" \
 -e "cluster.local.port=2561" -e "cluster.seed.port=2561" -p 2561:2561 \
--v $base_folder/won-client-certs/matcher_service_ma:/usr/src/matcher-service/client-certs/ \
+-v $base_folder/won-client-certs/matcher_service:/usr/src/matcher-service/client-certs/ \
 -e "JMEM_OPTS=-Xmx250m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
-webofneeds/matcher_service:master
+webofneeds/matcher_service:${deploy_image_tag_name}
 
 # siren solr server
 echo run solr server container
 docker ${docker_options} pull webofneeds/sirensolr
-if ! docker ${docker_options} run --name=sirensolr_ma -d -p 7071:8080 -p 8984:8983 --env CATALINA_OPTS="-Xmx200m \
+if ! docker ${docker_options} run --name=sirensolr -d -p 7071:8080 -p 8984:8983 --env CATALINA_OPTS="-Xmx200m \
      -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" webofneeds/sirensolr; then
   echo solr server container already available, restart old container
-  docker ${docker_options} restart sirensolr_ma
+  docker ${docker_options} restart sirensolr
 fi
 
 
@@ -123,9 +126,9 @@ echo ${MAIL_USER} at ${MAIL_HOST} is used as owner no-replay won-owner-app-email
 
 # owner
 echo run owner container
-docker ${docker_options} stop owner_ma || echo 'No docker container found to stop with name: owner_ma'
-docker ${docker_options} rm owner_ma || echo 'No docker container found to remove with name: owner_ma'
-docker ${docker_options} run --name=owner_ma -d -e "node.default.host=$public_node_uri" \
+docker ${docker_options} stop owner || echo 'No docker container found to stop with name: owner'
+docker ${docker_options} rm owner || echo 'No docker container found to remove with name: owner'
+docker ${docker_options} run --name=owner -d -e "node.default.host=$public_node_uri" \
 -e "node.default.http.port=443" -p 8082:8443 \
 -e "uri.host=$public_node_uri" -e "http.port=8082" \
 -e "uri.prefix=https://$public_node_uri" \
@@ -133,19 +136,19 @@ docker ${docker_options} run --name=owner_ma -d -e "node.default.host=$public_no
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
--v $base_folder/won-client-certs/owner_ma:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/won-client-certs/owner:/usr/local/tomcat/won/client-certs/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://${deploy_host}:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
-webofneeds/owner:master
+webofneeds/owner:${deploy_image_tag_name}
 
 # siren matcher
 echo run siren matcher container
-docker ${docker_options} stop matcher_siren_ma || echo 'No docker container found to stop with name: matcher_siren_ma'
-docker ${docker_options} rm matcher_siren_ma || echo 'No docker container found to remove with name: matcher_siren_ma'
-docker ${docker_options} run --name=matcher_siren_ma -d -e "node.host=${deploy_host}" \
+docker ${docker_options} stop matcher_siren || echo 'No docker container found to stop with name: matcher_siren'
+docker ${docker_options} rm matcher_siren || echo 'No docker container found to remove with name: matcher_siren'
+docker ${docker_options} run --name=matcher_siren -d -e "node.host=${deploy_host}" \
 -e "cluster.seed.host=${deploy_host}" -e "cluster.seed.port=2561" -e "cluster.local.port=2562" \
 -e "matcher.siren.uri.solr.server=http://${deploy_host}:8984/solr/won/" \
 -e "matcher.siren.uri.solr.server.public=http://${deploy_host}:8984/solr/#/won/" \
 -p 2562:2562 -e "JMEM_OPTS=-Xmx250m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
-webofneeds/matcher_siren:master
+webofneeds/matcher_siren:${deploy_image_tag_name}
