@@ -29,8 +29,8 @@ export default function(allNeeds = initialState, action = {}) {
 
         case actionTypes.initialPageLoad:
         case actionTypes.login:
-            const ownNeeds = action.payload.get('ownNeeds');
-            const theirNeeds = action.payload.get('theirNeeds');
+            const ownNeeds = action.payload.get('ownNeeds').map(need => connectionListToSet(need));
+            const theirNeeds = action.payload.get('theirNeeds').map(need => connectionListToSet(need));
             return allNeeds
                 .mergeIn(['ownNeeds'], ownNeeds)
                 .mergeIn(['theirNeeds'], theirNeeds);
@@ -39,13 +39,14 @@ export default function(allNeeds = initialState, action = {}) {
             const theirNeed = action.payload.get('theirNeed');
             return allNeeds.setIn(
                 ['theirNeeds', theirNeed.get('uri')],
-                theirNeed
+                connectionListToSet(theirNeed)
             );
 
         case actionTypes.needs.fetch:
             //TODO needs supplied by this action don't have a list of already associated connections
             return action.payload.reduce(
-                (updatedState, ownNeed) => setIfNew(updatedState, ['ownNeeds', ownNeed.uri], ownNeed),
+                (updatedState, ownNeed) =>
+                    setIfNew(updatedState, ['ownNeeds', ownNeed.uri], ownNeed),
                 allNeeds
             );
 
@@ -72,6 +73,10 @@ export default function(allNeeds = initialState, action = {}) {
         default:
             return allNeeds;
     }
+}
+
+function connectionListToSet(need) {
+    return need.update('hasConnections', hasConnections => Immutable.Set(hasConnections));
 }
 
 function needToImmutable(need) {
