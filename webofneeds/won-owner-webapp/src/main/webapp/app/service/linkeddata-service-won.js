@@ -1076,7 +1076,9 @@ const rdfstore = window.rdfstore;
      */
     won.getConnectionUrisOfNeed = (needUri) =>
         won.getNode(needUri)
-            .then(need => won.getNode(need.hasConnections))
+            .then(need =>
+                won.getNode(need.hasConnections)
+            )
             .then(connectionContainer => {
                 /*
                  * if there's only a single rdfs:member in the event
@@ -1087,6 +1089,10 @@ const rdfstore = window.rdfstore;
                     [connectionContainer.member] :
                     connectionContainer.member
             })
+            .catch(error => {
+                error.message = "Failed to fetch connection uris for need <" + needUri + "> because of:\n" + error.message;
+                throw(error);
+            });
 
     /**
      *
