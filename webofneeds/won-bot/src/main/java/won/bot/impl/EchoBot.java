@@ -87,6 +87,8 @@ public class EchoBot extends EventBot
     bus.subscribe(OpenFromOtherNeedEvent.class, this.autoResponder);
     bus.subscribe(MessageFromOtherNeedEvent.class, this.autoResponder);
 
+    bus.subscribe(CloseFromOtherNeedEvent.class,
+                  new ActionOnEventListener(ctx, new LogAction(ctx,"received close message from remote need.")));
   }
 
   private EventBotAction prepareCreateNeedAction(final EventListenerContext ctx) {
