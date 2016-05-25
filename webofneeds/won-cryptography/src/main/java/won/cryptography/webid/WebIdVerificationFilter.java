@@ -128,8 +128,8 @@ public class WebIdVerificationFilter implements Filter
       logger.debug("" + certChain[0].toString());
       presented = true;
     } else {
-      logger.warn("No cerificate provided! Access denied");
-      response.sendError(HttpServletResponse.SC_FORBIDDEN, "No cerificate provided for WebID protected resource");
+      logger.warn("No certificate provided! Access denied");
+      response.sendError(HttpServletResponse.SC_FORBIDDEN, "No certificate provided for WebID protected resource");
     }
     return presented;
   }
