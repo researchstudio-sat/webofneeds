@@ -29,6 +29,8 @@ import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
 import won.protocol.vocabulary.WONMSG;
 
+import java.net.URI;
+
 
 /**
  * Processes a CLOSE message coming from the FROM_SYSTEM direction.
@@ -60,21 +62,22 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor
     //if the connection was in suggested state, don't send a close message to the remote need
     if (originalState != ConnectionState.SUGGESTED) {
       //prepare the message to pass to the remote node
-      final WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage);
+      final WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage, con);
       //put it into the 'outbound message' header (so the persister doesn't pick up the wrong one).
-      message.setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
+      exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
       //add the information about the corresponding message to the local one
       wonMessage = new WonMessageBuilder()
         .wrap(wonMessage)
-        .setSenderURI(con.getConnectionURI()) //TODO: check if the sender URI is duplicated in the wrapped message
+        .setSenderURI(con.getConnectionURI())
         .setCorrespondingRemoteMessageURI(newWonMessage.getMessageURI())
         .build();
-      //put it into the header so the persister will pick it up later
+      //replace the local message in the header with its updated version so the persister will pick it up later
       message.setHeader(WonCamelConstants.MESSAGE_HEADER,wonMessage);
     }
   }
 
-  private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage) {
+  private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage, Connection con) {
+    URI remoteNodeURI = wonNodeInformationService.getWonNodeUri(con.getConnectionURI());
     //create the message to send to the remote node
     return new WonMessageBuilder()
       .setPropertiesForPassingMessageToRemoteNode(
