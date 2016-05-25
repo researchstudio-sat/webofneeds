@@ -162,7 +162,7 @@ function back(hasPreviousState, $ngRedux) {
 }
 
 function preventRouteChangeIfNotLoggedIn($ngRedux, event, toState, toParams, hasPreviousState) {
-    const errorString = "Tried to access view that won't work" +
+    const errorString = "Tried to access view \"" + toState + "\" that won't work" +
         "without logging in. Blocking route-change.";
     const state = $ngRedux.getState();
 
