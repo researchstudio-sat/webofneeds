@@ -112,10 +112,12 @@ class CreateNeedController {
         return titlePicZoneNg[0];
     }
     publish() {
-        this.drafts__publish(
-            this.$ngRedux.getState().getIn(['drafts', this.draftId]).toJS(),
-            this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
-        );
+        if (!this.pendingPublishing) {
+            this.drafts__publish(
+                this.$ngRedux.getState().getIn(['drafts', this.draftId]).toJS(),
+                this.$ngRedux.getState().getIn(['config', 'defaultNodeUri'])
+            );
+        }
 
         //on-image-picked="::self.drafts__change__thumbnail({draftId: self.draftId, image: image})">
     }
