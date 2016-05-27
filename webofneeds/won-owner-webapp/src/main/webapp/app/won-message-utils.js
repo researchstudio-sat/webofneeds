@@ -220,6 +220,24 @@ export function buildOpenMessage(msgToOpenFor, textMessage){
 
 }
 
+/**
+ *
+ * @param need
+ * @param wonNodeUri
+ * @return {{
+ *    message: (
+ *      {
+ *          @id,
+ *          msg:hasDestinationUri,
+ *          msg:hasAttachmentGraphUri
+ *      }|
+ *      {@id}|
+ *      {@graph, @context}
+ *    ),
+ *    eventUri: string,
+ *    needUri: string
+ * }}
+ */
 export function buildCreateMessage(need, wonNodeUri) {
     if(!need.type || !need.title)
         throw new Error('Tried to create post without type or title. ', need);
