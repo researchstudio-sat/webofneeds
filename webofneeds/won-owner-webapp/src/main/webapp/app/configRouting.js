@@ -19,6 +19,7 @@ import {
     delay,
     decodeUriComponentProperly,
     checkHttpStatus,
+    getRandomPosInt,
 } from './utils';
 
 
@@ -29,6 +30,9 @@ import {
  */
 export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRouterProvider, $stateProvider) => {
     $urlRouterProvider.otherwise('/landingpage');
+
+    //make sure create-need is called with a draftId
+    //$urlRouterProvider.when('/create-need/', [() => '/create-need/' + getRandomPosInt()]);
 
     [
         { path: '/landingpage?:focusSignup', component: 'landingpage' },
