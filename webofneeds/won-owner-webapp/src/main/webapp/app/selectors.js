@@ -57,8 +57,15 @@ export const selectUnreadEventsByNeedAndType = createSelector(
     selectUnreadEventsByNeed,
     eventsGroupedByNeed =>
         // group by event-type
-        eventsGroupedByNeed.map(cnctsOfNeed => cnctsOfNeed.groupBy(e => e.get('eventType')))
+        eventsGroupedByNeed.map(groupByType)
 );
+
+function groupByType(events) {
+    return events.groupBy(e =>
+        e.get('hasMessageType') ||
+        e.getIn(['hasCorrespondingRemoteMessage', 'hasMessageType'])
+    )
+}
 
 /**
  * @param {object} state
@@ -83,8 +90,7 @@ export const selectUnreadCountsByNeedAndType = createSelector(
  */
 export const selectUnreadCountsByType = createSelector(
     selectUnreadEvents,
-    unreadEvents => unreadEvents
-        .groupBy(e => e.get('eventType'))
+    unreadEvents => groupByType(unreadEvents)
         .map(eventsOfType => eventsOfType.size)
 )
 

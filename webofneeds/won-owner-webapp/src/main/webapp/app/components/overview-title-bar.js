@@ -37,14 +37,14 @@ function genComponentConf() {
                         <a ui-sref="overviewIncomingRequests"
                             ng-class="{'disabled' : !self.hasRequests}">
                             Incoming Requests
-                            <span class="mtb__tabs__unread">{{ self.unreadRequests }}</span>
+                            <span class="mtb__tabs__unread">{{ self.unreadRequests.size }}</span>
                         </a>
                     </li>
                     <li ng-class="{'mtb__tabs__selected' : self.selection == 3}">
                         <a ui-sref="overviewMatches()"
                             ng-class="{'disabled' : !self.hasMatches}">
                             Matches
-                            <span class="mtb__tabs__unread">{{ self.unreadMatches }}</span>
+                            <span class="mtb__tabs__unread">{{ self.unreadMatches.size }}</span>
                         </a>
                     </li>
                 </ul>
@@ -83,8 +83,10 @@ function genComponentConf() {
                                 return true
                             }
                         }).length > 0,
-                    unreadRequests: unreadCounts.get(won.EVENT.CONNECT_RECEIVED),
-                    unreadMatches: unreadCounts.get(won.EVENT.HINT_RECEIVED),
+                    unreadMessages: unreadCounts.get(won.WONMSG.connectionMessage),
+                    unreadIncomingRequests: unreadCounts.get(won.WONMSG.connectMessage),
+                    unreadSentRequests: unreadCounts.get(won.WONMSG.connectSentMessage),
+                    unreadMatches: unreadCounts.get(won.WONMSG.hintMessage),
                     nrOfNeedsWithUnreadEvents: nrOfNeedsWithUnread > 0? nrOfNeedsWithUnread : undefined,
                 };
             };
