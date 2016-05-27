@@ -49,22 +49,26 @@ const reducers = {
     // contains the Date.now() of the last action
     lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),
 
-    config: createReducer(
-        //initial state
-        Immutable.Map(),
+    initialLoadFinished: (state = false, action = {}) =>
+        state || action.type === actionTypes.initialPageLoad,
 
-        //handlers
-        {
-            [actionTypes.config.update]: (state, { payload }) =>
+
+    //config: createReducer(
+    config: (config = Immutable.Map(), action = {}) => {
+        switch(action.type) {
+
+            case actionTypes.config.update:
                 /*
                  * `.merge` assumes a flat config-object. should the config
                  * become nested, use `mergeDeep` instead or use a
                  * custom merging-function (or more fine-grained actions)
                  */
-                state.merge(payload)
-        }
+                return config.merge(action.payload);
 
-    ),
+            default:
+                return config;
+        }
+    },
 }
 
 

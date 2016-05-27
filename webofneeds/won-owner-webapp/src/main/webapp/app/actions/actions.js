@@ -138,7 +138,9 @@ const actionHierarchy = {
     router: {
         stateGo,
         stateReload,
-        stateTransitionTo
+        stateTransitionTo,
+        back: stateBack,
+        accessedNonLoadedPost: INJ_DEFAULT, //dispatched in configRouting.js
     },
     posts:{
         load:INJ_DEFAULT,
@@ -369,5 +371,22 @@ export function needsClose(needUri) {
             // go back to overview
             dispatch(actionCreators.router__stateGo('overviewPosts'))
         )
+    }
+}
+
+/**
+ * Action-Creator that goes back in the browser history
+ * without leaving the app.
+ * @param dispatch
+ * @param getState
+ */
+function stateBack() {
+    return (dispatch, getState) => {
+        const hasPreviousState = !!getState().getIn(['router', 'prevState', 'name']);
+        if (hasPreviousState) {
+            history.back();
+        } else {
+            dispatch(actionCreators.router__stateGo('landingpage'));
+        }
     }
 }

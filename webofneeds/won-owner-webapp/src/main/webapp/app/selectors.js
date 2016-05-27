@@ -7,11 +7,11 @@ import Immutable from 'immutable';
 import { decodeUriComponentProperly } from './utils';
 import { relativeTime } from './won-label-utils';
 
-const selectConnections = state => state.getIn(['connections']);
-const selectEvents = state => state.getIn(['events', 'events']);
-const selectOwnNeeds = state => state.getIn(['needs', 'ownNeeds']);
-const selectTheirNeeds = state => state.getIn(['needs', 'theirNeeds']);
-const selectLastUpdateTime = state => state.get('lastUpdateTime');
+export const selectConnections = state => state.getIn(['connections']);
+export const selectEvents = state => state.getIn(['events', 'events']);
+export const selectOwnNeeds = state => state.getIn(['needs', 'ownNeeds']);
+export const selectTheirNeeds = state => state.getIn(['needs', 'theirNeeds']);
+export const selectLastUpdateTime = state => state.get('lastUpdateTime');
 
 export const selectUnreadEventUris = state => state
     .getIn(['events', 'unreadEventUris']);
@@ -173,10 +173,7 @@ export const selectOpenPostUri = createSelector(
         const encodedPostUri =
             state.getIn(['router', 'currentParams', 'postUri']) ||
             state.getIn(['router', 'currentParams', 'myUri']); //deprecated parameter
-        if(!encodedPostUri)
-            return undefined;
-        else
-            return decodeURIComponent(encodedPostUri);
+        return decodeUriComponentProperly(encodedPostUri);
     }
 );
 
