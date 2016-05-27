@@ -96,7 +96,7 @@ export const runAccessControl = [ '$rootScope', '$ngRedux', '$urlRouter',
                         break;
 
                     default:
-                        preventRouteChangeIfNotLoggedIn($ngRedux, event, toState, toParams, hasPreviousState);
+                        preventRouteChangeIfNotLoggedIn($ngRedux, event, toState.name, toParams, hasPreviousState);
                 }
 
 
