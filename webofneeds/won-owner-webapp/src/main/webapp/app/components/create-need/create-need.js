@@ -60,10 +60,6 @@ class CreateNeedController {
                 draftId,
                 pendingPublishing: state.hasIn(['drafts', draftId, 'pendingPublishingAs']),
                 userHasSelectedType: state.hasIn(['drafts', draftId, 'type']),
-
-                //TODO for debugging; deletme
-                state: state,
-                wubs: state.get('wubs'),
             }
         };
 
