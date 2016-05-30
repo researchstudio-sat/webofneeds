@@ -28,8 +28,12 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
     ?numTypedEvents
     ?numAddressedEvents
 
+
     (if(?numEvents < 1 || ?numEvents > 2
-    || ?numTypedEvents != 1 || ?numAddressedEvents != 1 || ?numEvents != (1 + ?numRemoteEvents),
+    || ?numTypedEvents != 1
+     # numAdressedEvents == 2 in case of a forwarded message. Allow it.
+    || ?numAddressedEvents < 1 || ?numAddressedEvents > 2
+    || ?numEvents != (1 + ?numRemoteEvents),
     "FAIL", "OK") AS ?check)
 
   WHERE

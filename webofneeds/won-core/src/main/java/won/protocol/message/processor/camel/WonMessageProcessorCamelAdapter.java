@@ -26,7 +26,7 @@ import won.protocol.message.processor.WonMessageProcessor;
  * Adapts a WonMessageProcessor to act as a camel processor.
  * The WonMessage object is expected to be found in <code>exchange.getIn()</code>
  * in the 'wonMessage' header. After successful processing,
- * the resulting wonMessage object is replaced by the original one.
+ * the resulting wonMessage object replaces the original one.
  */
 public class WonMessageProcessorCamelAdapter implements Processor {
 

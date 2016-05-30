@@ -58,11 +58,16 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor
 
     Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getSenderURI());
     ConnectionState originalState = con.getState();
+      //TODO: we could introduce SYSTEM_CLOSE here
     con = dataService.nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
     //if the connection was in suggested state, don't send a close message to the remote need
     if (originalState != ConnectionState.SUGGESTED) {
       //prepare the message to pass to the remote node
       final WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage, con);
+      //abort if there is no remote connection
+      if (newWonMessage == null) {
+        return;
+      }
       //put it into the 'outbound message' header (so the persister doesn't pick up the wrong one).
       exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
       //add the information about the corresponding message to the local one
@@ -74,16 +79,31 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor
       //replace the local message in the header with its updated version so the persister will pick it up later
       message.setHeader(WonCamelConstants.MESSAGE_HEADER,wonMessage);
     }
+
+    //because the FromSystem message is now in the message header, it will be
+    //picked up by the routing system and delivered to the owner.
+
+    //the message for the remote connection is in the outbound message header and will be
+    // sent to the remote connection.
   }
 
   private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage, Connection con) {
-    URI remoteNodeURI = wonNodeInformationService.getWonNodeUri(con.getConnectionURI());
+    //there need not be a remote connection. Don't create a message if this is the case.
+    if (con.getRemoteConnectionURI() == null) return null;
+    URI remoteNodeURI = wonNodeInformationService.getWonNodeUri(con.getRemoteConnectionURI());
+    URI localNodeURI = wonNodeInformationService.getWonNodeUri(con.getConnectionURI());
     //create the message to send to the remote node
     return new WonMessageBuilder()
       .setPropertiesForPassingMessageToRemoteNode(
         wonMessage,
         wonNodeInformationService
-          .generateEventURI(wonMessage.getReceiverNodeURI()))
+          .generateEventURI(remoteNodeURI))
+      .setSenderNodeURI(localNodeURI)
+      .setSenderURI(con.getConnectionURI())
+      .setSenderNeedURI(con.getNeedURI())
+      .setReceiverNodeURI(remoteNodeURI)
+      .setReceiverURI(con.getRemoteConnectionURI())
+      .setReceiverNeedURI(con.getRemoteNeedURI())
       .build();
   }
 
