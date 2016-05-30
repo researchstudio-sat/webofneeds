@@ -36,6 +36,13 @@ export const pageLoadAction = () => (dispatch, getState) => {
 }
 
 function loadingWhileSignedIn(dispatch, username) {
+    dispatch({
+        type: actionTypes.initialPageLoad,
+        payload: Immutable.fromJS({
+            email: username,
+            loggedIn: true
+        })
+    });
     fetchDataForOwnedNeeds(username)
     .then(allThatData =>
         dispatch({

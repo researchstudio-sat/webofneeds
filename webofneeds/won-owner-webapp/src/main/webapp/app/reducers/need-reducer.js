@@ -29,8 +29,10 @@ export default function(allNeeds = initialState, action = {}) {
 
         case actionTypes.initialPageLoad:
         case actionTypes.login:
-            const ownNeeds = action.payload.get('ownNeeds');
-            const theirNeeds = action.payload.get('theirNeeds');
+            let ownNeeds = action.payload.get('ownNeeds');
+            ownNeeds = ownNeeds? ownNeeds.map(need => connectionListToSet(need)) : Immutable.Set();
+            let theirNeeds = action.payload.get('theirNeeds');
+            theirNeeds = theirNeeds? theirNeeds.map(need => connectionListToSet(need)) : Immutable.Set();
             return allNeeds
                 .mergeIn(['ownNeeds'], ownNeeds)
                 .mergeIn(['theirNeeds'], theirNeeds);
