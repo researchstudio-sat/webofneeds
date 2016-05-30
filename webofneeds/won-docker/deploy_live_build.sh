@@ -14,20 +14,20 @@ if [ "$GENERATE_NEW_CERTIFICATES" = true ] ; then
   echo generating new certificates! Old files and postgres need database will be deleted!
   ssh root@satcluster01 rm -rf $base_folder/won-server-certs/*
   ssh root@satcluster01 rm -rf $base_folder/won-client-certs/*
-  docker -H satcluster01:2375 stop postgres_ma || echo 'No docker container found to stop with name: postgres_ma'
-  docker -H satcluster01:2375 rm postgres_ma || echo 'No docker container found to remove with name: postgres_ma'
-  docker ${docker_options} stop bigdata_ma || echo 'No docker container found to stop with name: bigdata_ma'
-  docker ${docker_options} rm bigdata_ma || echo 'No docker container found to remove with name: bigdata_ma'
-  docker ${docker_options} stop sirensolr_ma || echo 'No docker container found to stop with name: sirensolr_ma'
-  docker ${docker_options} rm sirensolr_ma || echo 'No docker container found to remove with name: sirensolr_ma'
+  docker -H satcluster01:2375 stop postgres || echo 'No docker container found to stop with name: postgres'
+  docker -H satcluster01:2375 rm postgres || echo 'No docker container found to remove with name: postgres'
+  docker ${docker_options} stop bigdata || echo 'No docker container found to stop with name: bigdata'
+  docker ${docker_options} rm bigdata || echo 'No docker container found to remove with name: bigdata'
+  docker ${docker_options} stop sirensolr || echo 'No docker container found to stop with name: sirensolr'
+  docker ${docker_options} rm sirensolr || echo 'No docker container found to remove with name: sirensolr'
 fi
 
 echo start docker build of images:
-docker -H satcluster01:2375 build -t webofneeds/wonnode:master $WORKSPACE/webofneeds/won-docker/wonnode/
-docker -H satcluster01:2375 build -t webofneeds/owner:master $WORKSPACE/webofneeds/won-docker/owner/
-docker -H satcluster01:2375 build -t webofneeds/matcher_service:master $WORKSPACE/webofneeds/won-docker/matcher-service/
-docker -H satcluster01:2375 build -t webofneeds/matcher_siren:master $WORKSPACE/webofneeds/won-docker/matcher-siren/
-docker -H satcluster01:2375 build -t webofneeds/gencert:master $WORKSPACE/webofneeds/won-docker/gencert/
+docker -H satcluster01:2375 build -t webofneeds/wonnode:live $WORKSPACE/webofneeds/won-docker/wonnode/
+docker -H satcluster01:2375 build -t webofneeds/owner:live $WORKSPACE/webofneeds/won-docker/owner/
+docker -H satcluster01:2375 build -t webofneeds/matcher_service:live $WORKSPACE/webofneeds/won-docker/matcher-service/
+docker -H satcluster01:2375 build -t webofneeds/matcher_siren:live $WORKSPACE/webofneeds/won-docker/matcher-siren/
+docker -H satcluster01:2375 build -t webofneeds/gencert:live $WORKSPACE/webofneeds/won-docker/gencert/
 
 
 # create a password file for the certificates, variable ${won_certificate_passwd} must be set from outside the script
@@ -51,11 +51,11 @@ scp $WORKSPACE/webofneeds/won-docker/gencert/openssl.conf root@satcluster01:$bas
 # folders where needed (e.g. for tomcat, that folder is '/usr/local/tomcat/conf/ssl/', as used e.g. in the run
 # command of the wonnode). Note that the filename of the certificate is also used in the tomcat config, (see
 # owner/ssl/server.xml) so be careful when changing it.
-docker -H satcluster01:2375 rm gencert_ma || echo 'No docker container found to remove with name: gencert_ma'
-docker -H satcluster01:2375 run --name=gencert_ma -e CN="www.matchat.org" \
+docker -H satcluster01:2375 rm gencert || echo 'No docker container found to remove with name: gencert'
+docker -H satcluster01:2375 run --name=gencert -e CN="www.matchat.org" \
 -e "PASS=file:/usr/local/certs/out/won_certificate_passwd_file" -e "OPENSSL_CONFIG_FILE=/usr/local/openssl.conf" \
 -v $base_folder/won-server-certs:/usr/local/certs/out/ \
--v $base_folder/openssl.conf:/usr/local/openssl.conf webofneeds/gencert:master
+-v $base_folder/openssl.conf:/usr/local/openssl.conf webofneeds/gencert:live
 
 # copy the server certificates (and password file) to the proxy server and start the nginx container
 # if it is not already started
@@ -69,22 +69,23 @@ rsync ~/won-server-certs/* root@satcluster02:$base_folder/won-server-certs/
 rsync $WORKSPACE/webofneeds/won-docker/nginx/nginx.conf root@satcluster02:$base_folder/nginx.conf
 
 echo run nginx proxy server
-if ! docker -H satcluster02:2375 run --name=nginx_ma -v $base_folder/won-server-certs:/etc/nginx/won-server-certs/ \
+if ! docker -H satcluster02:2375 run --name=nginx -v $base_folder/won-server-certs:/etc/nginx/won-server-certs/ \
 -v $base_folder/nginx.conf:/etc/nginx/nginx.conf -d -p 80:80 -p 443:443 -p 61617:61617 nginx; then
   echo nginx container already available, restart old container
-  docker -H satcluster02:2375 restart nginx_ma
+  docker -H satcluster02:2375 restart nginx
 fi
 
 # run the script to start webofneeds containers on host satcluster01
 docker_options="-H satcluster01:2375"
 public_node_uri=www.matchat.org
 behind_proxy=true
-. $WORKSPACE/webofneeds/won-docker/deploy_master_run.sh
+deploy_image_tag_name=live
+. $WORKSPACE/webofneeds/won-docker/deploy_live_run.sh
 
 echo push automatically built webobofneeds images to docker hub
 docker -H satcluster01:2375 login -u heikofriedrich
-docker -H satcluster01:2375 push webofneeds/gencert:master
-docker -H satcluster01:2375 push webofneeds/wonnode:master
-docker -H satcluster01:2375 push webofneeds/owner:master
-docker -H satcluster01:2375 push webofneeds/matcher_service:master
-docker -H satcluster01:2375 push webofneeds/matcher_siren:master
+docker -H satcluster01:2375 push webofneeds/gencert:live
+docker -H satcluster01:2375 push webofneeds/wonnode:live
+docker -H satcluster01:2375 push webofneeds/owner:live
+docker -H satcluster01:2375 push webofneeds/matcher_service:live
+docker -H satcluster01:2375 push webofneeds/matcher_siren:live
