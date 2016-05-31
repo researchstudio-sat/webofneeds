@@ -31,7 +31,10 @@ function genComponentConf() {
 
 
                     <div class ="ntb__inner__right__upper">
-                        <h1 class="ntb__title">{{self.post.get('title')}}</h1>
+                        <hgroup>
+                            <h1 class="ntb__title">{{self.post.get('title')}}</h1>
+                            <div class="ntb__titles__type">{{self.labels.type[self.post.get('basicNeedType')]}}</div>
+                        </hgroup>
                         <img
                             class="ntb__icon clickable"
                             src="generated/icon-sprite.svg#ico_settings"
@@ -54,9 +57,7 @@ function genComponentConf() {
                         </button>
                     </div>
 
-
                     <div class ="ntb__inner__right__lower">
-                        <div class="ntb__titles__type">{{self.labels.type[self.post.get('basicNeedType')]}}</div>
                         <ul class="ntb__tabs">
                             <li ng-class="{'ntb__tabs__selected' : self.selectedTab === 'Info'}">
                                 <a ui-sref="post({connectionType: null, openConversation: null, connectionUri: null, postUri: self.postUri})">

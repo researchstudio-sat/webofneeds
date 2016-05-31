@@ -66,7 +66,7 @@
         flex-direction: row;
         align-content: center;
         align-items: flex-start;
-        justify-content: space-between;
+        justify-content: flex-end;
 
         > .#{$prefix}__titles__type {
           /*align-self: flex-start;*/
