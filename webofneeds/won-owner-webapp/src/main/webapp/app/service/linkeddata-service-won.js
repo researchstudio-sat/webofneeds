@@ -1066,9 +1066,14 @@ const rdfstore = window.rdfstore;
      * @param needUri
      * @return {*} the data of all connection-nodes referenced by that need
      */
-    won.getConnectionsOfNeed = (needUri) =>
+    won.getConnectionsOfNeed = (needUri, requesterWebId = needUri) =>
         won.getConnectionUrisOfNeed(needUri)
-        .then(connectionUris => won.getNodes(connectionUris))
+        .then(connectionUris =>
+            urisToLookupMap(
+                connectionUris,
+                uri => won.getConnection(uri, requesterWebId)
+            )
+        );
 
     won.getconnectionUrisOfNeed =
     /*
@@ -1452,6 +1457,9 @@ const rdfstore = window.rdfstore;
      * @return {*} the connections predicates along with the uris of associated events
      */
     won.getConnection = function(connectionUri, requesterWebId) {
+        if(!is('String', connectionUri)) {
+            throw new Error('Tried to request connection infos for sthg that isn\'t an uri: ' + connectionUri);
+        }
         return won.getNode(connectionUri, requesterWebId)
             //add the eventUris
             .then(connection => Promise.all([
@@ -1611,40 +1619,19 @@ const rdfstore = window.rdfstore;
             });
         });
     };
-    
-    won.getConnectionWithOwnAndRemoteNeed= function(ownNeedUri,remoteNeedUri){
-        return won.getconnectionUrisOfNeed(ownNeedUri).then(connectionUris=>{
-            let data = Q.defer()
-            let promises=[]
-            connectionUris.forEach(connection=>{
-                promises.push(won.ensureLoaded(connection))
-            })
-            Q.all(promises).then(results=>{
-                let query="prefix msg: <http://purl.org/webofneeds/message#> \n"+
-                    "prefix won: <http://purl.org/webofneeds/model#> \n" +
-                    "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
-                    "select ?connection \n" +
-                    " where { \n" +
-                    "?connection a won:Connection; \n" +
-                    "              won:belongsToNeed <" +ownNeedUri +"> ; \n" +
-                    "              won:hasRemoteNeed <" +remoteNeedUri +"> ."+
-                    "} \n"
 
-                privateData.store.execute(query,[],[],function(success,results){
-                    if (rejectIfFailed(success, results, {message: "Error loading connection for need " + ownNeedUri, allowNone: true, allowMultiple: true})) {
-                        return;
-                    }
-                    if(results.length ===1){
-                        let connection = null;
-                        won.getConnection(results[0].connection.value).then(connectionData=>{
-                            return data.resolve(connectionData)
-                        })
-                    }
-                })
-            })
-            return data.promise;
+    won.getConnectionWithOwnAndRemoteNeed = function(ownNeedUri, remoteNeedUri) {
+        return won.getConnectionsOfNeed(ownNeedUri).then(connections => {
+            for(let connectionUri of Object.keys(connections)) {
+                if(connections[connectionUri].hasRemoteNeed === remoteNeedUri) {
+                    return connections[connectionUri];
+                }
+            }
+            throw new Error("Couldn't find connection between own need <" +
+               ownNeedUri + "> and remote need <" + remoteNeedUri + ">.");
         })
-    }
+    };
+    
     /**
      * Loads the hints for the need with the specified URI into an array of js objects.
      * @return the array or null if no data is found for that URI in the local datastore
