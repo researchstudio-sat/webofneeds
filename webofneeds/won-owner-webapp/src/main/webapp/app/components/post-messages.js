@@ -4,7 +4,7 @@ import angular from 'angular';
 import Immutable from 'immutable';
 import squareImageModule from './square-image';
 import dynamicTextFieldModule from './dynamic-textfield';
-import { attach, is, delay } from '../utils.js'
+import { attach, is, delay, toDate } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime } from '../won-label-utils';
 import { selectAllByConnections, selectOpenConnectionUri } from '../selectors';
@@ -243,10 +243,6 @@ function selectChatMessages(state) {
         return chatMessages;
     }
 
-}
-
-function toDate(ts) {
-    return new Date(Number.parseInt(ts));
 }
 function selectTimestamp(event) {
     if(event.get('hasReceivedTimestamp')) {
