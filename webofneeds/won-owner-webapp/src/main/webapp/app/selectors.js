@@ -4,7 +4,11 @@
 
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
-import { decodeUriComponentProperly } from './utils';
+import won from './won-es6';
+import {
+    decodeUriComponentProperly,
+    toDate,
+} from './utils';
 import { relativeTime } from './won-label-utils';
 
 export const selectConnections = state => state.getIn(['connections']);
@@ -171,6 +175,42 @@ export const selectOpenConnectionUri = createSelector(
             return undefined;
         }
     }
+);
+
+export const selectOpenConnection = createSelector(
+    selectOpenConnectionUri, selectConnections,
+    (uri, connections) =>
+        connections.get(uri)
+);
+
+export const selectEventsOfOpenConnection = createSelector(
+    selectOpenConnection, selectEvents,
+    (connection, allEvents) => connection
+        .get('hasEvents')
+        .map(eventUri => allEvents.get(eventUri))
+);
+
+export const selectRequestTimestampOfOpenConnection = createSelector(
+    selectEventsOfOpenConnection,
+    events => events
+        .filter(event =>
+            event.getIn(['hasCorrespondingRemoteMessage', 'hasMessageType']) === won.WONMSG.connectMessage ||
+            event.get('hasMessageType') === won.WONMSG.connectMessage
+        )
+        .map(event => {
+            if (event.get('type') === won.WONMSG.FromExternal) {
+                return event.get('hasReceivedTimestamp');
+            } else if (event.getIn(['hasCorrespondingRemoteMessage', 'type']) === won.WONMSG.FromExternal) {
+                return event.getIn(['hasCorrespondingRemoteMessage', 'hasReceivedTimestamp'])
+            } else {
+                throw new Error("Encountered connect message of unexpected " +
+                    "format (neither the message nor it's counterpart were " +
+                    "`FromExternal`, thus a the one our own node created)." );
+            }
+        })
+        .map(timestamp => toDate(timestamp))
+        .sort()
+        .first()
 );
 
 export const selectOpenPostUri = createSelector(
