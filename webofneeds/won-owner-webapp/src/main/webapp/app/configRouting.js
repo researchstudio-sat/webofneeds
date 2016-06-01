@@ -19,6 +19,7 @@ import {
     delay,
     decodeUriComponentProperly,
     checkHttpStatus,
+    getRandomPosInt,
 } from './utils';
 
 
@@ -29,6 +30,9 @@ import {
  */
 export const configRouting = [ '$urlRouterProvider', '$stateProvider', ($urlRouterProvider, $stateProvider) => {
     $urlRouterProvider.otherwise('/landingpage');
+
+    //make sure create-need is called with a draftId
+    //$urlRouterProvider.when('/create-need/', [() => '/create-need/' + getRandomPosInt()]);
 
     [
         { path: '/landingpage?:focusSignup', component: 'landingpage' },
@@ -162,7 +166,7 @@ function back(hasPreviousState, $ngRedux) {
 }
 
 function preventRouteChangeIfNotLoggedIn($ngRedux, event, toState, toParams, hasPreviousState) {
-    const errorString = "Tried to access view that won't work" +
+    const errorString = "Tried to access view \"" + toState + "\" that won't work" +
         "without logging in. Blocking route-change.";
     const state = $ngRedux.getState();
 

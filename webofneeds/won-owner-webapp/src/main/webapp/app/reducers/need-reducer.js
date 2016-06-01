@@ -41,13 +41,14 @@ export default function(allNeeds = initialState, action = {}) {
             const theirNeed = action.payload.get('theirNeed');
             return allNeeds.setIn(
                 ['theirNeeds', theirNeed.get('uri')],
-                theirNeed
+                connectionListToSet(theirNeed)
             );
 
         case actionTypes.needs.fetch:
             //TODO needs supplied by this action don't have a list of already associated connections
             return action.payload.reduce(
-                (updatedState, ownNeed) => setIfNew(updatedState, ['ownNeeds', ownNeed.uri], ownNeed),
+                (updatedState, ownNeed) =>
+                    setIfNew(updatedState, ['ownNeeds', ownNeed.uri], ownNeed),
                 allNeeds
             );
 
@@ -74,6 +75,10 @@ export default function(allNeeds = initialState, action = {}) {
         default:
             return allNeeds;
     }
+}
+
+function connectionListToSet(need) {
+    return need.update('hasConnections', hasConnections => Immutable.Set(hasConnections));
 }
 
 function needToImmutable(need) {

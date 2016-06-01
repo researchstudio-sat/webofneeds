@@ -16,7 +16,7 @@ function genComponentConf() {
                  {{ ::self.placeholder }}
             </div>
             <span class="wdt__charcount" ng-show="self.maxChars">
-                {{ self.maxChars - self.value.length }} Chars left
+                {{ self.charactersLeft() }} characters left
             </span>
         </div>
         <button
@@ -78,6 +78,13 @@ function genComponentConf() {
         onFocus(e) {
             this.preEditValue = this.getText().trim();
             this.clearPlaceholder();
+        }
+        charactersLeft() {
+            if(this.displayingPlaceholder) {
+                return this.maxChars;
+            } else {
+                return this.maxChars - this.getText().trim().length;
+            }
         }
         onBlur(e) {
             this.addPlaceholderIfEmpty();

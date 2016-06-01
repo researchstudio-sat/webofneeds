@@ -16,8 +16,7 @@ export default function(connections = initialState, action = {}) {
         case actionTypes.messages.closeNeed.failed:
         case actionTypes.initialPageLoad:
         case actionTypes.login:
-            const allPreviousConnections = action.payload.get('connections');
-            return connections.merge(allPreviousConnections);
+            return storeConnections(connections, action.payload.get('connections'));
 
         case actionTypes.connections.accepted:
             const acceptEvent = action.payload;
@@ -48,8 +47,10 @@ export default function(connections = initialState, action = {}) {
         case actionTypes.connections.sendChatMessage:
             var eventUri = action.payload.eventUri;
             var connectionUri = action.payload.optimisticEvent.hasSender;
-            return connections
-                .updateIn([connectionUri, 'hasEvents'], events => events.add(eventUri));
+            return connections.updateIn(
+                [connectionUri, 'hasEvents'],
+                events => events.add(eventUri)
+            );
 
         case actionTypes.connections.load:
             return action.payload.reduce(
@@ -89,6 +90,18 @@ export default function(connections = initialState, action = {}) {
 
         default:
             return connections;
+    }
+}
+
+function storeConnections(connections, connectionsToStore) {
+    if(connectionsToStore) {
+        const connectionsWithEventSets = connectionsToStore.map(connection =>
+                //make sure hasEvents are sets
+                connection.update('hasEvents', events => Immutable.Set(events))
+        );
+        return connections.merge(connectionsWithEventSets);
+    } else {
+        return connections;
     }
 }
 
