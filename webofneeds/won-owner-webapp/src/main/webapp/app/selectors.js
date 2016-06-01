@@ -190,27 +190,31 @@ export const selectEventsOfOpenConnection = createSelector(
         .map(eventUri => allEvents.get(eventUri))
 );
 
-export const selectRequestTimestampOfOpenConnection = createSelector(
+export const selectConnectMessageOfOpenConnection = createSelector(
     selectEventsOfOpenConnection,
     events => events
         .filter(event =>
             event.getIn(['hasCorrespondingRemoteMessage', 'hasMessageType']) === won.WONMSG.connectMessage ||
             event.get('hasMessageType') === won.WONMSG.connectMessage
         )
-        .map(event => {
-            if (event.get('type') === won.WONMSG.FromExternal) {
-                return event.get('hasReceivedTimestamp');
-            } else if (event.getIn(['hasCorrespondingRemoteMessage', 'type']) === won.WONMSG.FromExternal) {
-                return event.getIn(['hasCorrespondingRemoteMessage', 'hasReceivedTimestamp'])
-            } else {
-                throw new Error("Encountered connect message of unexpected " +
-                    "format (neither the message nor it's counterpart were " +
-                    "`FromExternal`, thus a the one our own node created)." );
-            }
-        })
-        .map(timestamp => toDate(timestamp))
-        .sort()
         .first()
+)
+
+export const selectRequestTimestampOfOpenConnection = createSelector(
+    selectConnectMessageOfOpenConnection,
+    connectMsg => {
+        let timestamp;
+        if (connectMsg.get('type') === won.WONMSG.FromExternal) {
+            timestamp = connectMsg.get('hasReceivedTimestamp');
+        } else if (connectMsg.getIn(['hasCorrespondingRemoteMessage', 'type']) === won.WONMSG.FromExternal) {
+            timestamp = connectMsg.getIn(['hasCorrespondingRemoteMessage', 'hasReceivedTimestamp'])
+        } else {
+            throw new Error("Encountered connect message of unexpected " +
+                "format (neither the message nor it's counterpart were " +
+                "`FromExternal`, thus a the one our own node created)." );
+        }
+        return toDate(timestamp)
+    }
 );
 
 export const selectOpenPostUri = createSelector(
