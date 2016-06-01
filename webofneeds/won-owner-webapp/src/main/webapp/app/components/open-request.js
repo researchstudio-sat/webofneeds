@@ -17,6 +17,7 @@ import {
     selectEventsOfOpenConnection,
     selectLastUpdateTime,
     selectOpenConnection,
+    selectConnectMessageOfOpenConnection,
 } from '../selectors';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
@@ -66,9 +67,15 @@ function genComponentConf() {
                     <span>Available until 5th May</span>
                 </div>
                 -->
-                <div class="or__content__description__text">
-                    <img class="or__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_description"/>
-                    <span>These lovley Chairs need a new home since I am moving These are the first X chars of the message et eaquuntiore dolluptaspid quam que quatur quisinia aspe sus voloreiusa plis Sae quatectibus eumendi bla volupita dolupta el et andunt …</span>
+                <div class="or__content__description__text"
+                    ng-show="!!self.theirNeed.get('description') || !!self.textMsg">
+                    <img
+                        class="or__content__description__indicator"
+                        src="generated/icon-sprite.svg#ico16_indicator_description"/>
+                    <span>
+                        <p>{{ self.theirNeed.get('description') }}</p>
+                        <p>{{ self.textMsg }}</p>
+                    </span>
                 </div>
             </div>
         </div>
@@ -96,22 +103,28 @@ function genComponentConf() {
                 const connectionState = connection && connection.get('hasConnectionState');
                 const theirNeedUri = connection && connection.get('hasRemoteNeed');
                 const theirNeed = state.getIn(['needs','theirNeeds', theirNeedUri]);
+                const connectMsg = selectConnectMessageOfOpenConnection(state);
+
 
                 return {
+                    theirNeed,
+
                     connectionUri: connectionUri,
                     isSentRequest: connectionState === won.WON.RequestSent,
                     isReceivedRequest: connectionState === won.WON.RequestReceived,
 
                     isOverview: displayingOverview(state),
                     connection: selectOpenConnection(state),
-                    theirNeed,
 
                     timestamp: theirNeed && relativeTime(
                         selectLastUpdateTime(state),
                         theirNeed.get('creationDate')
                     ),
-                    selectOpenConnection,
-                    selectOpenConnectionUri,
+
+                    textMsg: connectMsg && (
+                        connectMsg.get('hasTextMessage') ||
+                        connectMsg.getIn(['hasCorrespondingRemoteMessage', 'hasTextMessage'])
+                    ),
 
 
                 }
