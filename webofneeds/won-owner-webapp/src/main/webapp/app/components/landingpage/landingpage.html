@@ -4,7 +4,7 @@
 <main>
     <a class="curtain" ng-show="self.focusSignup" ui-sref="landingpage({focusSignup: false})"></a>
     <div class="welcome">
-        <div class="title">Welcome to the web of needs</div>
+        <div class="title">Welcome to the Web of Needs</div>
         <won-flex-grid items="::self.peopleGrid"></won-flex-grid>
         <div class="w__description">
             <span class="wd__title">What is a &laquo;need&raquo;?</span>
@@ -28,6 +28,7 @@
     </div>
     <div class="try" ng-show="!self.loggedIn">
         <div class="title">Try it yourself!</div>
+        <div class="sub title">We hope you like this beta version! Please note that we may have to delete your data for technical reasons.</div>
         <div class="trygrid">
             <div class="tg__signup">
                 <div class="block" ng-form name="registerForm">
@@ -42,13 +43,13 @@
                 </div>
                 <button id="signup" class="won-button--filled darkgray" ng-disabled="registerForm.$invalid" ng-click="::self.register(self.email, self.password)">That’s all we need. Let’s go!</button>
             </div>
-            <div class="tg__anonymous">
+            <!--div class="tg__anonymous">
                 <div class="block">
                     <div class="header">Try without registration!</div>
                     <div class="description">You don’t need to register. </div>
                 </div>
                 <button class="won-button--filled darkgray" ui-sref="createNeed({draftId: 0})">Continue without registration!</button>
-            </div>
+            </div-->
         </div>
     </div>
 </main>
