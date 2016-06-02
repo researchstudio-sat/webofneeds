@@ -4,7 +4,7 @@ import angular from 'angular';
 import Immutable from 'immutable';
 import squareImageModule from './square-image';
 import dynamicTextFieldModule from './dynamic-textfield';
-import { attach, is, delay } from '../utils.js'
+import { attach, is, delay, toDate } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime } from '../won-label-utils';
 import { selectAllByConnections, selectOpenConnectionUri } from '../selectors';
@@ -33,15 +33,15 @@ function genComponentConf() {
             <div
                 class="pm__content__message"
                 ng-repeat="message in self.chatMessages"
-                ng-class="message.hasSenderNeed == self.connectionData.getIn(['ownNeed', 'uri']) ? 'right' : 'left'">
+                ng-class="message.get('hasSenderNeed') == self.connectionData.getIn(['ownNeed', 'uri']) ? 'right' : 'left'">
                     <won-square-image
                         title="self.connectionData.getIn(['remoteNeed', 'title'])"
                         src="self.connectionData.getIn(['remoteNeed', 'titleImgSrc'])"
-                        ng-show="message.hasSenderNeed != self.connectionData.getIn(['ownNeed', 'uri'])">
+                        ng-show="message.get('hasSenderNeed') != self.connectionData.getIn(['ownNeed', 'uri'])">
                     </won-square-image>
                     <div class="pm__content__message__content">
                         <div class="pm__content__message__content__text">
-                            {{ message.hasTextMessage }}
+                            {{ message.get('hasTextMessage') }}
                         </div>
                         <div
                             ng-show="message.unconfirmed"
@@ -51,7 +51,7 @@ function genComponentConf() {
                         <div
                             ng-hide="message.unconfirmed"
                             class="pm__content__message__content__time">
-                                {{ message.humanReadableTimestamp }}
+                                {{ message.get('humanReadableTimestamp') }}
                         </div>
                     </div>
             </div>
@@ -92,7 +92,7 @@ function genComponentConf() {
                 return {
                     lastUpdateTime: state.get('lastUpdateTime'),
                     connectionData: selectAllByConnections(state).get(connectionUri),
-                    chatMessages: chatMessages && chatMessages.toJS(), //toJS needed as ng-repeat won't work otherwise :|
+                    chatMessages: chatMessages && chatMessages.toArray(), //toArray needed as ng-repeat won't work otherwise :|
                     state4dbg: state,
                 }
             };
@@ -243,10 +243,6 @@ function selectChatMessages(state) {
         return chatMessages;
     }
 
-}
-
-function toDate(ts) {
-    return new Date(Number.parseInt(ts));
 }
 function selectTimestamp(event) {
     if(event.get('hasReceivedTimestamp')) {
