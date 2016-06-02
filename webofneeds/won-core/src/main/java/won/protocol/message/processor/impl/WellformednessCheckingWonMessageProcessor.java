@@ -41,16 +41,17 @@ import won.protocol.util.RdfUtils;
 public class WellformednessCheckingWonMessageProcessor implements WonMessageProcessor
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
-
+  WonMessageValidator validator = new WonMessageValidator();
 
   @Override
   public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
     Dataset dataset = message.getCompleteDataset();
-    WonMessageValidator validator = new WonMessageValidator();
+
     StringBuilder errorMessage = new StringBuilder("Message is not valid, failed at check ");
     boolean valid = validator.validate(dataset, errorMessage);
     if (!valid) {
-      logger.info(errorMessage.toString() + "\n" + RdfUtils.writeDatasetToString(dataset, Lang.TRIG));
+      logger.info(errorMessage.toString() + "\n Offending message:\n" + RdfUtils.writeDatasetToString(dataset, Lang
+        .TRIG));
       throw new WonMessageNotWellFormedException(errorMessage.toString());
     }
     return message;

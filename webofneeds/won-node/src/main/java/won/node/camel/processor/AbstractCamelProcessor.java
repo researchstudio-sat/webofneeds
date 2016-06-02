@@ -118,18 +118,29 @@ public abstract class AbstractCamelProcessor implements Processor
                                        "seda:NeedProtocolOut");
   }
 
-  protected void sendSystemMessageToRemoteNode(WonMessage message){
+  /**
+   * Processes the system message (allowing facet implementations) and delivers it, depending on its receiver settings.
+   *
+   * @param message
+   */
+  protected void sendSystemMessage(WonMessage message){
     Map headerMap = new HashMap<String, Object>();
     headerMap.put(WonCamelConstants.MESSAGE_HEADER, message);
     messagingService.sendInOnlyMessage(null, headerMap, null,
-      "seda:SystemMessageToRemoteNode");
+      "seda:SystemMessageIn");
   }
 
+  /**
+   * Sends a system message to the owner without facet processing. Useful for Response messages.
+   * @param message
+   */
   protected void sendSystemMessageToOwner(WonMessage message) {
     sendSystemMessageToOwner(message, null);
   }
 
   /**
+   * Sends a system message to the owner without facet processing. Useful for Response messages.
+   *
    * Allows for adding the ownerApplicationId to the exchange used during creation and
    * sending of the system message. This is useful for cases in which the owner application
    * cannot determined otherwise, which can happen when need creation fails.

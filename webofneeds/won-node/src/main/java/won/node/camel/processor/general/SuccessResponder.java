@@ -46,7 +46,7 @@ public class SuccessResponder extends AbstractCamelProcessor
     if (WonMessageDirection.FROM_OWNER == originalMessage.getEnvelopeType()){
       sendSystemMessageToOwner(responseMessage);
     } else if (WonMessageDirection.FROM_EXTERNAL == originalMessage.getEnvelopeType()){
-      sendSystemMessageToRemoteNode(responseMessage);
+      sendSystemMessage(responseMessage);
     }
   }
 }

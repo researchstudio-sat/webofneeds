@@ -31,8 +31,11 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService
 
   @Override
   public WonNodeInfo getWonNodeInformation(URI wonNodeURI) {
+    assert wonNodeURI != null;
     Dataset nodeDataset = linkedDataSource.getDataForResource(wonNodeURI);
-    return WonRdfUtils.WonNodeUtils.getWonNodeInfo(wonNodeURI, nodeDataset);
+    WonNodeInfo info = WonRdfUtils.WonNodeUtils.getWonNodeInfo(wonNodeURI, nodeDataset);
+    if (info == null) throw new IllegalStateException("Could not obtain WonNodeInformation for URI " + wonNodeURI);
+    return info;
   }
 
   @Override
@@ -72,7 +75,11 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService
 
   @Override
   public URI getWonNodeUri(final URI resourceURI) {
-    return WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(resourceURI, linkedDataSource);
+    URI wonNodeURI = WonLinkedDataUtils.getWonNodeURIForNeedOrConnectionURI(resourceURI, linkedDataSource);
+    if (wonNodeURI == null) throw new
+        IllegalStateException("Could not obtain WoN node URI for resource " + resourceURI);
+    return wonNodeURI;
+
   }
 
   @Override
