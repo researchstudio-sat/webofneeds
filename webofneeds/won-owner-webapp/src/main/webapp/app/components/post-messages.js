@@ -46,7 +46,7 @@ function genComponentConf() {
                         <div
                             ng-show="message.unconfirmed"
                             class="pm__content__message__content__time">
-                                Pending‥
+                                Pending&nbsp;&hellip;
                         </div>
                         <div
                             ng-hide="message.unconfirmed"

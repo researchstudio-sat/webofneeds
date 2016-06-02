@@ -17,27 +17,26 @@ import { actionCreators }  from '../../actions/actions';
 const postTypeTexts = [
     {
         type: won.WON.BasicNeedTypeDemand,
-        text: 'I\'m looking for ...',
+        text: 'I\'m looking for',
         helpText: 'Select this if you are looking for things or services other people offer',
     },
     {
         type: won.WON.BasicNeedTypeSupply,
-        text: 'I\'m offering ...',
+        text: 'I\'m offering',
         helpText: 'Use this if you are offering an item or a service. You will find people who said' +
-        ' I\'m looking' +
-        ' for...\''
+        ' that they\'re looking for something.'
     },
     {
         type: won.WON.BasicNeedTypeDotogether,
-        text: 'I want to find someone to ...',
+        text: 'I want to find someone to',
         helpText: 'Select this if you are looking to find other people who share your interest. You will be matched' +
-        ' with other people who chose this option.'
+        ' with other people who chose this option as well.'
     },
     {
         type: won.WON.BasicNeedTypeCritique,
-        text: 'I want to do something about ...',
+        text: 'I want to do something about',
         helpText: 'Select this if there is some problem you want to fix (or get fixed). You will be' +
-        ' matched with other people who chose this option and have a similiar idea.'
+        ' matched with other people who chose this option as well and have a similar idea.'
     }
 ]
 
