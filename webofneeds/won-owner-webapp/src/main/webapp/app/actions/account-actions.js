@@ -5,7 +5,7 @@
 import  won from '../won-es6';
 import Immutable from 'immutable';
 import { actionTypes, actionCreators } from './actions';
-import { fetchDataForOwnedNeeds } from '../won-message-utils';
+import { fetchOwnedData } from '../won-message-utils';
 
 import {
     checkHttpStatus,
@@ -26,7 +26,7 @@ export function accountLogin(username, password) {
             checkHttpStatus
         )
         .then( response =>
-            fetchDataForOwnedNeeds(username)
+            fetchOwnedData(username)
         )
         .then(allThatData =>
             dispatch({

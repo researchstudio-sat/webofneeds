@@ -16,7 +16,7 @@ import {
 } from '../utils';
 
 import {
-    fetchDataForOwnedNeeds,
+    fetchOwnedData,
     fetchDataForNonOwnedNeedOnly,
 } from '../won-message-utils';
 
@@ -43,7 +43,7 @@ function loadingWhileSignedIn(dispatch, username) {
             loggedIn: true
         })
     });
-    fetchDataForOwnedNeeds(username)
+    fetchOwnedData(username)
     .then(allThatData =>
         dispatch({
             type: actionTypes.initialPageLoad,
