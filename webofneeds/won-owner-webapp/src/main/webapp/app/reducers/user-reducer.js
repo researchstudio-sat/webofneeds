@@ -9,7 +9,7 @@ import { combineReducersStable } from '../redux-utils';
 import { buildCreateMessage } from '../won-message-utils';
 import won from '../won-es6';
 
-const initialState = Immutable.fromJS({});
+const initialState = Immutable.fromJS({loggedIn: false});
 
 export default function(userData = initialState, action = {}) {
     switch(action.type) {
@@ -22,13 +22,13 @@ export default function(userData = initialState, action = {}) {
             var loggedIn = immutablePayload.get('loggedIn');
             var email = immutablePayload.get('email');
 
-            if(loggedIn == true){
+            if(loggedIn){
                 console.log('reducers.js: received successful-login action from app-server');
                 return Immutable.fromJS({loggedIn: true, email: email});
-            }else{
-                console.log('reducers.js: received notlogged in action from app-server');
-                return Immutable.fromJS({loggedIn: false});
+            } else {
+                return userData;
             }
+
         case actionTypes.logout:
             return Immutable.fromJS({loggedIn: false});
 

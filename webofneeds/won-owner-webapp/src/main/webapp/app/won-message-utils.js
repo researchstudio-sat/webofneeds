@@ -357,7 +357,12 @@ const emptyDataset = Immutable.fromJS({
     connections: {},
     events: {},
     theirNeeds: {},
-})
+});
+
+function wellFormedPayload(payload) {
+    return emptyDataset.mergeDeep(Immutable.fromJS(payload));
+}
+
 export function fetchDataForNonOwnedNeedOnly(needUri) {
     return won.getNeed(needUri)
     .then(need =>
@@ -382,10 +387,12 @@ export function fetchDataForOwnedNeeds(needUris, email, curriedDispatch) {
         });
 
     if(email) {
+        const userData = {loggedIn: true, email};
+        if(curriedDispatch) {
+            curriedDispatch(wellFormedPayload(userData));
+        }
         return dataPromise.then(allThatData =>
-            allThatData
-                .set('loggedIn', true)
-                .set('email', email)
+            allThatData.merge(Immutable.fromJS(userData))
         )
     } else {
         return dataPromise;
@@ -411,6 +418,8 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
     if(!is('Array', ownNeedUris) || ownNeedUris.length === 0 ) {
         return Promise.resolve(emptyDataset);
     }
+
+    dispatchWellFormed = (payload) => curriedDispatch(wellFormedPayload(payload));
 
     const allLoadedPromise = Promise.all(
         ownNeedUris.map(uri => won.ensureLoaded(uri, uri, deep = true))
@@ -453,6 +462,12 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
                 .then(theirNeedUris =>
                     urisToLookupMap(theirNeedUris, won.getNeed));
 
+        //dispatch to the curried-in action as soon as any part of the data arrives
+        allOwnNeedsPromise.then(ownNeeds => dispatchWellFormed({ownNeeds}));
+        allConnectionsPromise.then(connections => dispatchWellFormed({connections}));
+        allEventsPromise.then(events => dispatchWellFormed({events}));
+        allTheirNeedsPromise.then(theirNeeds => dispatchWellFormed({theirNeeds}));
+
         return Promise.all([
             allOwnNeedsPromise,
             allConnectionsPromise,
@@ -462,17 +477,8 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
     });
 
     return allDataRawPromise
-        .then(([
-                allOwnNeeds,
-                allConnections,
-                allEvents,
-                allTheirNeeds
-            ]) => emptyDataset.mergeDeep(Immutable.fromJS({
-                ownNeeds: allOwnNeeds,
-                connections: allConnections,
-                events: allEvents,
-                theirNeeds: allTheirNeeds,
-            }))
+        .then(([ ownNeeds, connections, events, theirNeeds ]) =>
+            wellFormedPayload({ ownNeeds, connections, events, theirNeeds, })
         );
 
     /**
