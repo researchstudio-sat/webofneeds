@@ -36,16 +36,16 @@ public class OwnerManagementServiceImpl implements ApplicationManagementService 
         logger.debug("ownerApplicationId: "+ownerApplicationId.toString() );
 
         if (ownerApplicatonRepository.findByOwnerApplicationId(ownerApplicationId).isEmpty()) {
+            logger.info("Registering owner application for the first time with id: {}", ownerApplicationId);
             OwnerApplication ownerApplication = new OwnerApplication();
             ownerApplication.setOwnerApplicationId(ownerApplicationId.toString());
-            logger.debug("ownerApplicationId: " + ownerApplication.getOwnerApplicationId().toString());
             ownerApplication = ownerApplicatonRepository.save(ownerApplication);
             List<String> queueNames = queueManagementService.generateQueueNamesForOwnerApplication(ownerApplication);
             ownerApplication.setQueueNames(queueNames);
             ownerApplication = ownerApplicatonRepository.save(ownerApplication);
-            return ownerApplicationId.toString();
+            return ownerApplicationId;
         } else {
-            logger.error("Registration failed: owner with id {} is already registered", ownerApplicationId);
+            logger.info("Registering already known owner application with id: {}", ownerApplicationId);
             return ownerApplicationId;
         }
 
