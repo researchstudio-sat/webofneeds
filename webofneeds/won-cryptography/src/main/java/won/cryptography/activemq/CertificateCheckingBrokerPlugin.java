@@ -24,9 +24,14 @@ import org.apache.activemq.broker.BrokerPlugin;
  */
 public class CertificateCheckingBrokerPlugin implements BrokerPlugin
 {
+  private String queueNamePrefixToCheck = "OwnerProtocol.Out.";
+
   @Override
   public Broker installPlugin(final Broker broker) throws Exception {
-    return new CertificateCheckingBrokerFilter(broker);
+    return new CertificateCheckingBrokerFilter(broker, this.queueNamePrefixToCheck);
   }
 
+  public void setQueueNamePrefixToCheck(final String queueNamePrefixToCheck) {
+    this.queueNamePrefixToCheck = queueNamePrefixToCheck;
+  }
 }

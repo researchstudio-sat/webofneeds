@@ -37,12 +37,13 @@ public class CertificateCheckingBrokerFilter extends BrokerFilter
 {
 
 
-  private String queueNamePrefixToCheck = "OwnerProtocol.Out.";
+  private String queueNamePrefixToCheck;
   private AliasGenerator aliasGenerator = new AliasFromFingerprintGenerator();
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  public CertificateCheckingBrokerFilter(final Broker next) {
+  public CertificateCheckingBrokerFilter(final Broker next, String queueNamePrefixToCheck) {
     super(next);
+    this.queueNamePrefixToCheck = queueNamePrefixToCheck;
   }
 
   @Override
@@ -104,7 +105,4 @@ public class CertificateCheckingBrokerFilter extends BrokerFilter
     return false;
   }
 
-  public void setQueueNamePrefixToCheck(final String queueNamePrefixToCheck) {
-    this.queueNamePrefixToCheck = queueNamePrefixToCheck;
-  }
 }
