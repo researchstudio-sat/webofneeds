@@ -3,7 +3,8 @@
 import angular from 'angular';
 import 'ng-redux';
 import extendedGalleryModule from '../components/extended-gallery';
-import { labels } from '../won-label-utils';
+import { selectLastUpdateTime } from '../selectors';
+import { labels, relativeTime } from '../won-label-utils';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 
@@ -21,7 +22,7 @@ function genComponentConf() {
             <div class="sr__header__title">
                 <div class="sr__header__title__topline">
                     <div class="sr__header__title__topline__title">{{self.theirNeed.get('title')}}</div>
-                    <div class="sr__header__title__topline__date">{{self.theirNeed.get('creationDate')}}</div>
+                    <div class="sr__header__title__topline__date">{{self.theirCreationDate}}</div>
                 </div>
                 <div class="sr__header__title__subtitle">
                     <span class="sr__header__title__subtitle__group" ng-show="self.theirNeed.get('group')">
@@ -71,10 +72,15 @@ function genComponentConf() {
             const selectFromState = (state) => {
                 const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
 
+                const theirNeedUri = state.getIn(['connections', connectionUri, 'hasRemoteNeed']);
+                const theirNeed = state.getIn(['needs','theirNeeds', theirNeedUri]);
+                const theirCreationDate = relativeTime(selectLastUpdateTime(state, theirNeed.get('creationDate')));
+
                 return {
                     connectionUri: connectionUri,
                     connection: state.getIn(['connections', connectionUri]),
-                    theirNeed: state.getIn(['needs','theirNeeds', state.getIn(['connections', connectionUri, 'hasRemoteNeed'])])
+                    theirNeed,
+                    theirCreationDate,
                 }
             };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
