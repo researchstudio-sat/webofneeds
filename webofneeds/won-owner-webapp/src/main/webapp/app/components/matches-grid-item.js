@@ -27,16 +27,16 @@ function genComponentConf() {
                     </div>
                 </div>
             </div>
-            <div class="mgi__description__content" ng-show="self.ownNeed.get('location') || self.ownNeed.get('deadline')">
+            <div class="mgi__description__content" ng-show="self.theirNeed.get('location') || self.theirNeed.get('deadline')">
                 <div class="mgi__description__content__location"
-                    ng-show="self.ownNeed.get('location')">
+                    ng-show="self.theirNeed.get('location')">
                         <img class="mgi__description__content__indicator" src="generated/icon-sprite.svg#ico16_indicator_location"/>
-                        <span>{{ self.ownNeed.get('location') }}</span>
+                        <span>{{ self.theirNeed.get('location') }}</span>
                 </div>
                 <div class="mgi__description__content__datetime"
-                    ng-show="self.ownNeed.get('deadline')">
+                    ng-show="self.theirNeed.get('deadline')">
                         <img class="mgi__description__content__indicator" src="generated/icon-sprite.svg#ico16_indicator_time"/>
-                        <span>{{ self.ownNeed.get('deadline') }}</span>
+                        <span>{{ self.theirNeed.get('deadline') }}</span>
                 </div>
             </div>
         </div>
@@ -67,6 +67,7 @@ function genComponentConf() {
                 return {
                     connectionData,
                     ownNeed: connectionData.get('ownNeed'),
+                    theirNeed: connectionData.get('remoteNeed')
                 };
             };
 
