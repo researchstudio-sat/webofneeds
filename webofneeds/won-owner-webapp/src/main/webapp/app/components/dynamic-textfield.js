@@ -50,13 +50,14 @@ function genComponentConf() {
                               .bind('keyup', () => this.input()) // handle title changes
                               .bind('focus', (e) => this.onFocus(e))
                               .bind('blur', (e) => this.onBlur(e))
-                            /*
                               .bind('drop paste', (e) => {
-                                  e.stopPropagation();
-                                  this.sanitize();
-                                  return this.input();
+                                  //e.stopPropagation();
+                                  //TODO strip formatting
+                                    //TODO insert at cursor position
+                                  //this.setText(this.getText()); //sanitize
+                                  //return false;
+                                console.log('dynamicTextfield paste ', e);
                               })
-                              */
                               //don't want the default input event to bubble and leak into this directives event-stream
                               .bind('input', (e) => e.stopPropagation());
 
@@ -165,14 +166,13 @@ function genComponentConf() {
             return this.textFieldNg()[0];
         }
         getUnsanitizedText() {
-            return this.textField().textContent;
+            return this.textField().innerHTML;
         }
         getText() {
             //sanitize input
-            //return this.$sanitize(this.getUnsanitizedText())
-            return this.getUnsanitizedText()
+            return this.textField().innerText
                 .replace(/<br>/gm, ' ')
-                .replace(/<(?:.|\n)*?>/gm, ''); //strip html tags
+                //.replace(/<(?:.|\n)*?>/gm, ''); //strip html tags; TODO doesn't work on tags with properties<b>
 
         }
         setText(txt) {
