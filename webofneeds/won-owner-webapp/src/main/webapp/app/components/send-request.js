@@ -35,19 +35,20 @@ function genComponentConf() {
             <div class="sr__content__images" ng-show="self.theirNeed.get('images')">
                 <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.theirNeed.get('images')" class="vertical"></won-extended-gallery>
             </div>
-            <div class="sr__content__description">
-                <div class="sr__content__description__location">
-                    <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_location"/>
-                    <span>Vienna area</span>
-                </div>
-                <div class="sr__content__description__datetime">
-                    <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_time"/>
-                    <span>Available until 5th May</span>
-                </div>
-                <div class="sr__content__description__text">
-                    <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_description"/>
-                    <span>These lovley Chairs need a new home since I am moving These are the first X chars of the message et eaquuntiore dolluptaspid quam que quatur quisinia aspe sus voloreiusa plis Sae quatectibus eumendi bla volupita dolupta el et andunt …</span>
-                </div>
+            <div class="sr__content__description"
+                ng-show="self.theirNeed.get('location') || self.theirNeed.get('deadline') || self.theirNeed.get('description')">
+                    <div class="sr__content__description__location" ng-show="self.theirNeed.get('location')">
+                        <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_location"/>
+                        <span>{{ self.theirNeed.get('location') }}</span>
+                    </div>
+                    <div class="sr__content__description__datetime" ng-show="self.theirNeed.get('deadline')">
+                        <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_time"/>
+                        <span>{{ self.theirNeed.get('deadline') }} </span>
+                    </div>
+                    <div class="sr__content__description__text" ng-show="self.theirNeed.get('description')">
+                        <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_description"/>
+                        <span>{{ self.theirNeed.get('description }} </span>
+                    </div>
             </div>
         </div>
         <div class="sr__footer">
