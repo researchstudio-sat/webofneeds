@@ -25,8 +25,7 @@ public class WonMessageRoutes  extends RouteBuilder
 
     onException(Exception.class)
       .to("bean:failResponder")
-      .handled(true)
-      .wireTap("bean:messagingService?method=inspectMessage");
+      .handled(true);
 
 
 
