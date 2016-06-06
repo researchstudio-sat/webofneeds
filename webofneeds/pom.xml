@@ -809,7 +809,17 @@
             <name>JBoss repository</name>
             <url>https://repository.jboss.org/nexus/content/groups/public</url>
         </repository>
+        <repository>
+            <id>central</id>
+            <name>Maven Repository Switchboard</name>
+            <layout>default</layout>
+            <url>http://repo1.maven.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
     </repositories>
+
 
     <pluginRepositories>
         <pluginRepository>
@@ -842,7 +852,7 @@
         <commons-io.version>2.4</commons-io.version>
         <de.uni_koblenz.aggrimm.icp.version>1.0.1</de.uni_koblenz.aggrimm.icp.version>
         <solr.version>3.5.0</solr.version>
-        <camel.version>2.12.1</camel.version>
+        <camel.version>2.17.1</camel.version>
         <qpid.version>0.24</qpid.version>
         <activemq.version>5.8.0</activemq.version>
         <activemq.conf>classpath:</activemq.conf>
