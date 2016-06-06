@@ -367,21 +367,16 @@ export function fetchDataForNonOwnedNeedOnly(needUri) {
     )
 }
 
-export function fetchDataForOwnedNeeds(emailOrNeedUris) {
-    let needUrisPromise, email;
-    if(is('Array', emailOrNeedUris)) {
-        email = undefined;
-        needUrisPromise = Promise.resolve(emailOrNeedUris);
-    } else if (is('String', emailOrNeedUris)) {
-        email = emailOrNeedUris;
-        needUrisPromise = fetchOwnedNeedUris();
-    } else {
-        throw({msg: "got something that's neither an email-adress nor a list of needUris" });
-    }
+export function fetchOwnedData(email, curriedDispatch) {
+    return fetchOwnedNeedUris()
+        .then(needUris =>
+            fetchDataForOwnedNeeds(needUris, email, curriedDispatch)
+        );
+}
+export function fetchDataForOwnedNeeds(needUris, email, curriedDispatch) {
 
-    const dataPromise = needUrisPromise.then(needUris =>
-            fetchAllAccessibleAndRelevantData(needUris)
-        )
+    const dataPromise =
+        fetchAllAccessibleAndRelevantData(needUris, curriedDispatch)
         .catch(error => {
             throw({msg: 'user needlist retrieval failed', error});
         });
@@ -412,9 +407,9 @@ function fetchOwnedNeedUris() {
 }
 
 window.fetchAll4dbg = fetchAllAccessibleAndRelevantData;
-function fetchAllAccessibleAndRelevantData(ownNeedUris) {
+function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => undefined) {
     if(!is('Array', ownNeedUris) || ownNeedUris.length === 0 ) {
-        return emptyDataset;
+        return Promise.resolve(emptyDataset);
     }
 
     const allLoadedPromise = Promise.all(
