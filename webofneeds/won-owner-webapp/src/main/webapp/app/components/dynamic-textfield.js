@@ -71,7 +71,7 @@ function genComponentConf() {
         }
         onKeydown(e) {
             // prevent typing enter as it causes `<div>`s in the value
-            if(e.keyCode === 13) {
+            if (e.keyCode === 13 && (e.ctrlKey || !this.twoPartText) ) {
                 this.submit();
                 return false;
             }
@@ -116,9 +116,13 @@ function genComponentConf() {
         input () {
             console.log('got input in dynamic textfeld ', this.getText());
             if(!this.displayingPlaceholder) {
-                if(this.getUnsanitizedText() !== this.getText() ||
-                    this.textField().innerHTML.match(/<br>./)) { //also supress line breaks inside the text in copy-pasted text
-                        this.setText(this.getText()); //sanitize
+
+                if((this.getUnsanitizedText() !== this.getText()) ||
+                    (!this.twoPartText && this.textField().innerHTML.match(/<br>./))) { //also suppress line breaks inside the text in copy-pasted text
+                        //sanitize
+                        let text = this.getText();
+                            //text = text.replace(/\n/gm, '<br>');
+                        this.setText(this.getText());
                     }
 
                 //compare with previous value, if different
@@ -170,9 +174,15 @@ function genComponentConf() {
         }
         getText() {
             //sanitize input
-            return this.textField().innerText
-                .replace(/<br>/gm, ' ')
+            let text = this.textField().innerText;
+            if(!this.twoPartText) {
+               text = text.replace(/<br>/gm, ' ');
+                //TODO STOPPED HERE!!!!!!!
                 //.replace(/<(?:.|\n)*?>/gm, ''); //strip html tags; TODO doesn't work on tags with properties<b>
+            }
+            return text;
+
+
 
         }
         setText(txt) {
@@ -205,6 +215,14 @@ function genComponentConf() {
              *  on-change="::myCallback(value, valid)"
              */
             onChange: '&',
+
+            /*
+             * If this flag is set to true the callbacks
+             * will get the text as array of two strings.
+             * Only the first one -- which essentially is the
+             * first line of text -- will be limited by maxChars.
+             */
+            twoPartText: '=',
 
             submitButtonLabel: '=',
             /*
