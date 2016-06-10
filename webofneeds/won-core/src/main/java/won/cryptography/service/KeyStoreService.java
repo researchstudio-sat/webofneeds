@@ -40,6 +40,9 @@ public class KeyStoreService
   public KeyStoreService(File storeFile, String storePW) {
     this.storeFile = storeFile;
     this.storePW = storePW;
+    logger.info("Using key store file {} with key store type {}, provider {}", new Object[]{storeFile,
+                                                                                            KEY_STORE_TYPE,
+                                                                                            PROVIDER_BC});
   }
 
   public PrivateKey getPrivateKey(String alias) {

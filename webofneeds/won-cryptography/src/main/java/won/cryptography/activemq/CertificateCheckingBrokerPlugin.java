@@ -14,30 +14,24 @@
  *    limitations under the License.
  */
 
-package won.node.camel.route;
+package won.cryptography.activemq;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.builder.RouteBuilder;
+import org.apache.activemq.broker.Broker;
+import org.apache.activemq.broker.BrokerPlugin;
 
 /**
- * User: LEIH-NB
- * Date: 25.11.13
+ * Broker plugin for checking consumer's certificates against queue names.
  */
-
-public class NeedProtocolDynamicRoutes extends RouteBuilder
+public class CertificateCheckingBrokerPlugin implements BrokerPlugin
 {
+  private String queueNamePrefixToCheck = "OwnerProtocol.Out.";
 
+  @Override
+  public Broker installPlugin(final Broker broker) throws Exception {
+    return new CertificateCheckingBrokerFilter(broker, this.queueNamePrefixToCheck);
+  }
 
-    private String from;
-
-    public NeedProtocolDynamicRoutes(CamelContext camelContext, String from){
-        super(camelContext);
-        this.from = from;
-
-    }
-    @Override
-    public void configure() throws Exception {
-        from(from).routeId(from)
-                .recipientList(header("remoteBrokerEndpoint"));
-    }
+  public void setQueueNamePrefixToCheck(final String queueNamePrefixToCheck) {
+    this.queueNamePrefixToCheck = queueNamePrefixToCheck;
+  }
 }

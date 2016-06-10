@@ -47,13 +47,15 @@ http://www.springframework.org/schema/websocket/spring-websocket-4.0.xsd">
 		<property name="prefix" value="/WEB-INF/jsp/"/>
 		<property name="suffix" value=".jsp"/>
 	</bean>
-    <websocket:handlers>
+    <!--
+    we move to annotation config in WebSocketConfig.java
+    websocket:handlers>
         <websocket:mapping path="/msg" handler="wonWebSocketHandler"/>
         <websocket:handshake-interceptors>
             <bean class="won.owner.web.websocket.WonHandshakeInterceptor"/>
         </websocket:handshake-interceptors>
         <websocket:sockjs/>
-    </websocket:handlers>
+    </websocket:handlers-->
 
 
 

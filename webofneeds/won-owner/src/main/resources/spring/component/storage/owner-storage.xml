@@ -79,10 +79,26 @@
                 <prop key="hibernate.dialect">won.protocol.util.hibernate.Postgres9WithFKIndicesDialect</prop>
 
                 <prop key="hbm2ddl.auto">create</prop>
-                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.generate_statistics">false</prop>
             </props>
         </property>
     </bean>
+
+    <!-- ==================================== -->
+    <!--  Hibernate 4.3 Statistics for JMX    -->
+    <!-- ==================================== -->
+    <!--bean id="jmxExporter" class="org.springframework.jmx.export.MBeanExporter">
+        <property name="beans">
+            <map>
+                <entry key="Hibernate:type=OwnerStatistics">
+                    <bean class="won.monitoring.hibernate.HibernateStatisticsFactoryBean">
+                        <property name="sessionFactory" ref="sessionFactory" />
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean-->
 
     <!-- Configure transaction management -->
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
