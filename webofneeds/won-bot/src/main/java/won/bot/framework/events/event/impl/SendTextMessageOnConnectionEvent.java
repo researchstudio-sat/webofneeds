@@ -18,7 +18,6 @@ package won.bot.framework.events.event.impl;
 
 import won.bot.framework.events.event.BaseEvent;
 import won.bot.framework.events.event.ConnectionSpecificEvent;
-import won.protocol.model.Connection;
 
 import java.net.URI;
 
@@ -28,22 +27,16 @@ import java.net.URI;
  */
 public class SendTextMessageOnConnectionEvent extends BaseEvent implements ConnectionSpecificEvent
 {
-  private Connection connection;
+  private URI connectionURI;
   private String textMessage;
 
-  public SendTextMessageOnConnectionEvent(final Connection con, final String textMessage) {
-    this.connection = con;
+  public SendTextMessageOnConnectionEvent(final String textMessage, URI connectionURI) {
     this.textMessage = textMessage;
+    this.connectionURI = connectionURI;
   }
 
-  @Override
   public URI getConnectionURI() {
-    return connection.getConnectionURI();
-  }
-
-  @Override
-  public URI getRemoteNeedURI() {
-    return connection.getRemoteNeedURI();
+    return this.connectionURI;
   }
 
   public String getTextMessage() {

@@ -24,7 +24,7 @@ import java.net.URI;
  *
  */
 public abstract class BaseNeedAndConnectionSpecificEvent extends BaseEvent implements NeedSpecificEvent,
-  ConnectionSpecificEvent
+  ConnectionSpecificEvent, RemoteNeedSpecificEvent
 {
   private final Connection con;
 

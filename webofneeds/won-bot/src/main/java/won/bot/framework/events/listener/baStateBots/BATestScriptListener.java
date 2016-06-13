@@ -21,10 +21,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.event.ConnectionSpecificEvent;
-import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.MessageEvent;
-import won.bot.framework.events.event.NeedSpecificEvent;
+import won.bot.framework.events.event.*;
 import won.bot.framework.events.event.impl.ConnectFromOtherNeedEvent;
 import won.bot.framework.events.filter.EventFilter;
 import won.bot.framework.events.filter.impl.*;
@@ -363,7 +360,7 @@ public class BATestScriptListener extends AbstractFinishingListener
    * fetching the linked data description for the connection and checking the remoteNeed URI.
    */
   private boolean isRelevantEvent(final Event event, final URI needURI, final URI connectionURI) {
-    URI remoteNeedURI = ((ConnectionSpecificEvent)event).getRemoteNeedURI();
+    URI remoteNeedURI = ((RemoteNeedSpecificEvent)event).getRemoteNeedURI();
     if (remoteNeedURI == null){
       logger.debug("remote need URI not found in event data, fetching linked data for {}", connectionURI);
       remoteNeedURI = WonLinkedDataUtils.getRemoteNeedURIforConnectionURI(connectionURI,

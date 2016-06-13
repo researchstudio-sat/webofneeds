@@ -19,20 +19,9 @@ package won.bot.framework.events.event;
 import java.net.URI;
 
 /**
- * Interface for events that are raised because a response message was received.
+ * Created by fkleedorfer on 13.06.2016.
  */
-public interface ResponseEvent extends NeedSpecificEvent, ConnectionSpecificEvent, RemoteNeedSpecificEvent
+public interface RemoteNeedSpecificEvent extends ConnectionSpecificEvent
 {
-  /**
-   * Returns the URI of the message that caused the response.
-   * @return
-   */
-  public URI getOriginalMessageURI();
-
-  /**
-   * Returns the URI of the remote message that caused the response.
-   * @return
-   */
-  public URI getRemoteResponseToMessageURI();
-
+  URI getRemoteNeedURI();
 }

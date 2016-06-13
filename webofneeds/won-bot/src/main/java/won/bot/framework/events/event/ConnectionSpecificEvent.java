@@ -24,5 +24,4 @@ import java.net.URI;
 public interface ConnectionSpecificEvent
 {
   public URI getConnectionURI();
-  public URI getRemoteNeedURI();
 }

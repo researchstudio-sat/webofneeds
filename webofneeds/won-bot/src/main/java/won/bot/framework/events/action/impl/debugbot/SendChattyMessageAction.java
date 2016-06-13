@@ -18,12 +18,13 @@ package won.bot.framework.events.action.impl.debugbot;
 
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
-import won.bot.framework.events.action.BotActionUtils;
 import won.bot.framework.events.event.Event;
-import won.protocol.message.WonMessage;
+import won.bot.framework.events.event.impl.SendTextMessageOnConnectionEvent;
 
 import java.net.URI;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Action to perform when the debug bot is set to be 'chatty' - that is,
@@ -37,6 +38,7 @@ public class SendChattyMessageAction extends BaseEventBotAction
   private Random random;
   MessageTimingManager messageTimingManager;
   private String[] messagesForLongInactivity;
+
 
   public SendChattyMessageAction(final EventListenerContext eventListenerContext, final double
     probabilityOfSendingMessage, MessageTimingManager messageTimingManager, final String[]
@@ -86,9 +88,8 @@ public class SendChattyMessageAction extends BaseEventBotAction
             "doing that, say 'chatty on'";
           break;
       }
-      WonMessage wonMessage = BotActionUtils.createWonMessage(getEventListenerContext(), con, message);
-      getEventListenerContext().getWonMessageSender().sendWonMessage(wonMessage);
-
+      //publish an event that causes the message to be sent
+      getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent(message, con));
     }
     if (toRemove != null) chattyConnections.removeAll(toRemove);
   }

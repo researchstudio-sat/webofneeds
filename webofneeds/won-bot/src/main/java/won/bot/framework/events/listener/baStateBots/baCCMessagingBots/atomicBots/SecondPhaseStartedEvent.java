@@ -3,6 +3,7 @@ package won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBo
 import won.bot.framework.events.event.BaseEvent;
 import won.bot.framework.events.event.ConnectionSpecificEvent;
 import won.bot.framework.events.event.NeedSpecificEvent;
+import won.bot.framework.events.event.RemoteNeedSpecificEvent;
 
 import java.net.URI;
 
@@ -10,7 +11,8 @@ import java.net.URI;
  * Event for signalling that the second phase in the Business Activity with atomic outcome has started.
  * It is connection-specific to allow BATestScriptListeners to react to it.
  */
-public class SecondPhaseStartedEvent extends BaseEvent implements ConnectionSpecificEvent, NeedSpecificEvent
+public class SecondPhaseStartedEvent extends BaseEvent implements ConnectionSpecificEvent, NeedSpecificEvent,
+  RemoteNeedSpecificEvent
 {
   private URI needURI;
   private URI connectionURI;

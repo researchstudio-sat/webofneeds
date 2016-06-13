@@ -66,7 +66,11 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
   };
 
   public static final String[] RANDOM_MESSAGES = {
-  "How are you?", "Hang on...", "I am getting the hang of this", "Type 'usage' to see what I can do for you!",
+    "Is there anything I can do for you?",
+    "Did you read the news today?",
+    "By the way, don't you just love the weather these days?",
+    "Type 'usage' to see what I can do for you!",
+    "I think I might see a movie tonight",
   };
 
   public static final String[] LAST_MESSAGES = {
@@ -99,33 +103,33 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
             getEventListenerContext().getEventBus().publish(new UsageDebugCommandEvent(con));
           }
           else if (PATTERN_HINT.matcher(message).matches()){
-            getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent(con,"Ok, I'll create" +
-              " a new need and make it send a hint to you."));
+            getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent("Ok, I'll create" +
+              " a new need and make it send a hint to you.", con.getConnectionURI()));
             getEventListenerContext().getEventBus().publish(new HintDebugCommandEvent(con));
           }
           else if (PATTERN_CONNECT.matcher(message).matches()){
-            getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent(con,"Ok, I'll " +
-              "create a new need and make it send a connect to you."));
+            getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent("Ok, I'll " +
+              "create a new need and make it send a connect to you.", con.getConnectionURI()));
             getEventListenerContext().getEventBus().publish(new ConnectDebugCommandEvent(con));
           }
           else if (PATTERN_CLOSE.matcher(message).matches()){
-            getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent(con,"Ok, I'll close " +
-              "this connection"));
+            getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent("Ok, I'll close " +
+              "this connection", con.getConnectionURI()));
             getEventListenerContext().getEventBus().publish(new CloseDebugCommandEvent(con));
           }
           else if (PATTERN_DEACTIVATE.matcher(message).matches()) {
-            getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent(con,"Ok, I'll " +
-              "deactivate this need. This will close the connection we are currently talking on."));
+            getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent("Ok, I'll " +
+              "deactivate this need. This will close the connection we are currently talking on.", con.getConnectionURI()));
             getEventListenerContext().getEventBus().publish(new DeactivateDebugCommandEvent(con));
           }
           else if (PATTERN_CHATTY_ON.matcher(message).matches()){
-            getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent(con,"Ok, I'll " +
-              "send you messages spontaneously from time to time."));
+            getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent("Ok, I'll " +
+              "send you messages spontaneously from time to time.", con.getConnectionURI()));
             getEventListenerContext().getEventBus().publish(new SetChattinessDebugCommandEvent(con, true));
           }
           else if (PATTERN_CHATTY_OFF.matcher(message).matches()){
-            getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent(con,"Ok, from now on" +
-              " I will be quiet and only respond to your messages."));
+            getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent("Ok, from now on" +
+              " I will be quiet and only respond to your messages.", con.getConnectionURI()));
             getEventListenerContext().getEventBus().publish(new SetChattinessDebugCommandEvent(con, false));
           }
           else if (PATTERN_SEND_N.matcher(message).matches()) {
@@ -141,8 +145,9 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
             }
           } catch (Exception e) {
             //error: send an error message
-            getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent(con,
-              "Did not understand your command '" + message +"': " + e.getClass().getSimpleName()+":"+ e.getMessage()));
+            getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent(
+              "Did not understand your command '" + message +"': "
+                + e.getClass().getSimpleName()+":"+ e.getMessage(), con.getConnectionURI()));
           }
       }
   }

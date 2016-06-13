@@ -49,8 +49,10 @@ public class AnswerWithElizaAction extends BaseEventBotAction
       MessageToElizaEvent messageToElizaEvent = (MessageToElizaEvent) event;
       Eliza elizaInstance = getElizaInstanceForConnection(messageToElizaEvent.getCon());
       String elizasResponse = elizaInstance.processInput(((MessageToElizaEvent) event).getMessage());
-      getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent(messageToElizaEvent.getCon
-        (), elizasResponse));
+      getEventListenerContext().getEventBus().publish(
+        new SendTextMessageOnConnectionEvent(
+          elizasResponse,
+          messageToElizaEvent.getCon().getConnectionURI()));
     }
   }
 
