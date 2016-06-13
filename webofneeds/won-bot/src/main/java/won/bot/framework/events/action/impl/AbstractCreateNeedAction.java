@@ -70,9 +70,7 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
 
     RdfUtils.replaceBaseURI(needModel, needURI.toString());
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
-            .setMessagePropertiesForCreate(
+    return WonMessageBuilder.setMessagePropertiesForCreate(
                     wonNodeInformationService.generateEventURI(
                             wonNodeURI),
                     needURI,

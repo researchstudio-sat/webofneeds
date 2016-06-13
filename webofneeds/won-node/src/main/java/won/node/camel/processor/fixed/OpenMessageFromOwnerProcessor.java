@@ -53,7 +53,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
     connectionRepository.save(con);
 
     //add the information about the corresponding message to the local one
-    wonMessage = new WonMessageBuilder()
+    wonMessage = WonMessageBuilder
             .wrap(wonMessage)
             .setCorrespondingRemoteMessageURI(newWonMessage.getMessageURI())
             .build();
@@ -64,7 +64,7 @@ public class OpenMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
 
   private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage, Connection con) {
     //create the message to send to the remote node
-    return new WonMessageBuilder()
+    return WonMessageBuilder
       .setPropertiesForPassingMessageToRemoteNode(
         wonMessage,
         wonNodeInformationService

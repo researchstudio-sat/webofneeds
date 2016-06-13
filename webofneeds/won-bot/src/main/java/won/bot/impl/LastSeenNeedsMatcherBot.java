@@ -100,8 +100,7 @@ public class LastSeenNeedsMatcherBot extends EventBot
     URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(
       getEventListenerContext().getLinkedDataSource().getDataForResource(needURI), needURI);
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
+    return WonMessageBuilder
       .setMessagePropertiesForHint(
         wonNodeInformationService.generateEventURI(
           localWonNode),

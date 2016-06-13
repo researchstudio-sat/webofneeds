@@ -63,20 +63,20 @@ public class StandardTwoPhaseCommitNoVoteBot extends EventBot{
     this.needConnector = new ActionOnceAfterNEventsListener(
       ctx, "needConnector", noOfNeeds,
       new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
-        FacetType.CoordinatorFacet.getURI(), FacetType.ParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES));
+        FacetType.CoordinatorFacet.getURI(), FacetType.ParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi!"));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
     //add a listener that is informed of the connect/open events and that auto-opens
     //subscribe it to:
     // * connect events - so it responds with open
     // * open events - so it responds with open (if the open received was the first open, and we still need to accept the connection)
-    this.autoOpener = new ActionOnEventListener(ctx, "autoOpener", new OpenConnectionAction(ctx));
+    this.autoOpener = new ActionOnEventListener(ctx, "autoOpener", new OpenConnectionAction(ctx, "Hi!"));
     bus.subscribe(OpenFromOtherNeedEvent.class, this.autoOpener);
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
     this.autoCloser = new ActionOnceAfterNEventsListener(
       ctx, "autoCloser",
-      noOfNeeds-3, new CloseConnectionAction(ctx)
+      noOfNeeds-3, new CloseConnectionAction(ctx, "Bye!")
     );
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoCloser);
 

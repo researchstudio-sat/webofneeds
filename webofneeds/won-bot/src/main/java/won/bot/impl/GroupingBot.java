@@ -138,14 +138,16 @@ public class GroupingBot extends EventBot
                                                                                                       .getURI(),
                                                                                              FacetType.GroupFacet
                                                                                                       .getURI(),
-                                                                                             MILLIS_BETWEEN_MESSAGES));
+                                                                                             MILLIS_BETWEEN_MESSAGES,
+                                                                                             "Hi from the " +
+                                                                                               "GroupingBot!"));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
     //add a listener that is informed of the connect/open events and that auto-opens
     //subscribe it to:
     // * connect events - so it responds with open
     // * open events - so it responds with open (if the open received was the first open, and we still need to accept the connection)
-    this.autoOpener = new ActionOnEventListener(ctx, new OpenConnectionAction(ctx));
+    this.autoOpener = new ActionOnEventListener(ctx, new OpenConnectionAction(ctx, "Hi from the GroupingBot!"));
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
     //now, once all connections have been opened, make 1 bot send a message to the group, the subsequent listener will cause let wild chatting to begin

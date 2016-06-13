@@ -84,8 +84,7 @@ public class MatcherCLI implements CommandLineRunner
     URI wonNode = WonLinkedDataUtils
       .getWonNodeURIForNeedOrConnection(needURI, linkedDataSource.getDataForResource(needURI));
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
+    return WonMessageBuilder
       .setMessagePropertiesForHint(
         wonNodeInformationService.generateEventURI(
           wonNode),

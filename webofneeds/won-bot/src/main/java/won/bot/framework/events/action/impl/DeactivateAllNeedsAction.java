@@ -58,9 +58,7 @@ public class DeactivateAllNeedsAction extends BaseEventBotAction
     URI localWonNode = WonRdfUtils.NeedUtils.queryWonNode(
       getEventListenerContext().getLinkedDataSource().getDataForResource(needURI));
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
-      .setMessagePropertiesForDeactivate(
+    return WonMessageBuilder.setMessagePropertiesForDeactivate(
         wonNodeInformationService.generateEventURI(
           localWonNode),
         needURI,

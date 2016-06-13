@@ -17,7 +17,6 @@
 package won.bot.framework.events.action.impl;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.event.ConnectionSpecificEvent;
@@ -27,7 +26,6 @@ import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
@@ -70,11 +68,10 @@ public class RespondWithEchoToMessageAction extends BaseEventBotAction
         } else {
           message = createMessage(null);
         }
-        Model messageContent = WonRdfUtils.MessageUtils.textMessage(message);
         URI connectionUri = messageEvent.getConnectionURI();
         logger.debug("sending message " + message);
         try {
-          getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionUri, messageContent));
+          getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionUri, message));
         } catch (Exception e) {
           logger.warn("could not send message via connection {}", connectionUri, e);
         }
@@ -96,7 +93,7 @@ public class RespondWithEchoToMessageAction extends BaseEventBotAction
     }
   }
 
-  private WonMessage createWonMessage(URI connectionURI, Model content) throws WonMessageBuilderException {
+  private WonMessage createWonMessage(URI connectionURI, String textMessage) throws WonMessageBuilderException {
 
     WonNodeInformationService wonNodeInformationService =
       getEventListenerContext().getWonNodeInformationService();
@@ -110,10 +107,8 @@ public class RespondWithEchoToMessageAction extends BaseEventBotAction
       getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
     URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
-    RdfUtils.replaceBaseURI(content, messageURI.toString());
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
+    return WonMessageBuilder
       .setMessagePropertiesForConnectionMessage(
         messageURI,
         connectionURI,
@@ -122,7 +117,7 @@ public class RespondWithEchoToMessageAction extends BaseEventBotAction
         WonRdfUtils.NeedUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
         remoteNeed,
         WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
-        content)
+        textMessage)
       .build();
   }
 

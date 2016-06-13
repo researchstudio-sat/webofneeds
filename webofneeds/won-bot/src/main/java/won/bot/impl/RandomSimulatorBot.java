@@ -126,8 +126,8 @@ public class RandomSimulatorBot extends EventBot
           new MultipleActions(ctx,
             new SendFeedbackForHintAction(ctx),
             new ProbabilisticSelectionAction(ctx, PROB_OPEN_ON_HINT, (long) this.hashCode(),
-              new OpenConnectionAction(ctx),
-              new CloseConnectionAction(ctx)))
+              new OpenConnectionAction(ctx, "Hi!"),
+              new CloseConnectionAction(ctx, "Bye!")))
           )));
 
     //when an open or connect is received, send message or close randomly after a random timeout
@@ -135,8 +135,8 @@ public class RandomSimulatorBot extends EventBot
       new ActionOnEventListener(ctx, "open-reactor",
         new RandomDelayedAction(ctx,MIN_RECATION_TIMEOUT_MILLIS, MAX_REACTION_TIMEOUT_MILLIS, (long) this.hashCode(),
           new ProbabilisticSelectionAction(ctx, PROB_MESSAGE_ON_OPEN, (long) this.hashCode(),
-            new OpenConnectionAction(ctx),
-            new CloseConnectionAction(ctx))));
+            new OpenConnectionAction(ctx, "Hi!"),
+            new CloseConnectionAction(ctx, "Bye!"))));
     bus.subscribe(OpenFromOtherNeedEvent.class,opener);
     bus.subscribe(ConnectFromOtherNeedEvent.class,opener);
 
@@ -145,7 +145,7 @@ public class RandomSimulatorBot extends EventBot
       new RandomDelayedAction(ctx,MIN_RECATION_TIMEOUT_MILLIS, MAX_REACTION_TIMEOUT_MILLIS, (long) this.hashCode(),
         new ProbabilisticSelectionAction(ctx, PROB_MESSAGE_ON_MESSAGE, (long) this.hashCode(),
           new SendMessageAction(ctx),
-          new CloseConnectionAction(ctx))));
+          new CloseConnectionAction(ctx, "Bye!"))));
     bus.subscribe(MessageFromOtherNeedEvent.class, replyer);
     bus.subscribe(OpenFromOtherNeedEvent.class, replyer);
 

@@ -14,28 +14,33 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.events.action.impl;
+package won.bot.framework.events.action.impl.debugbot;
 
 import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.EventBotAction;
+import won.bot.framework.events.action.BaseEventBotAction;
+import won.bot.framework.events.event.ConnectionSpecificEvent;
 import won.bot.framework.events.event.Event;
 
+
 /**
- * Action that delegates to the specified action after a specified fixed delay.
+ *
  */
-public abstract class DelayedDelegatingAction extends AbstractDelegatingAction
+public class RecordMessageSentTimeAction extends BaseEventBotAction
 {
+  private MessageTimingManager timingManager ;
 
-  public DelayedDelegatingAction(final EventListenerContext eventListenerContext, final EventBotAction delegate) {
-    super(eventListenerContext, delegate);
+  public RecordMessageSentTimeAction(final EventListenerContext eventListenerContext, MessageTimingManager
+    timingManager) {
+    super(eventListenerContext);
+    this.timingManager = timingManager;
   }
-
-  protected abstract long getDelay();
 
   @Override
   protected void doRun(final Event event) throws Exception {
-    long delay = getDelay();
-    assert delay >= 0 : "delay must not be negative";
-    delegateDelayed(event, delay);
+    if (event instanceof ConnectionSpecificEvent){
+      timingManager.updateMessageTimeForMessageSent(((ConnectionSpecificEvent)event).getConnectionURI());
+    }
   }
+
+
 }

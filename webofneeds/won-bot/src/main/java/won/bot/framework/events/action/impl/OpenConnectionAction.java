@@ -41,9 +41,12 @@ import java.net.URI;
 public class OpenConnectionAction extends BaseEventBotAction
 {
 
-  public OpenConnectionAction(final EventListenerContext context)
+  private String welcomeMessage;
+
+  public OpenConnectionAction(final EventListenerContext context, final String welcomeMessage)
   {
     super(context);
+    this.welcomeMessage = welcomeMessage;
   }
 
   @Override
@@ -86,8 +89,7 @@ public class OpenConnectionAction extends BaseEventBotAction
     Dataset remoteNeedRDF =
       getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
+    return WonMessageBuilder
       .setMessagePropertiesForOpen(
         wonNodeInformationService.generateEventURI(
           wonNode),
@@ -96,7 +98,7 @@ public class OpenConnectionAction extends BaseEventBotAction
         wonNode,
         WonRdfUtils.NeedUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
         remoteNeed,
-        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed)
+        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed), welcomeMessage
       )
       .build();
   }
@@ -115,8 +117,7 @@ public class OpenConnectionAction extends BaseEventBotAction
     URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(localNeedRDF, fromUri);
     URI remoteWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, toUri);
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return  builder
+    return  WonMessageBuilder
       .setMessagePropertiesForConnect(
         wonNodeInformationService.generateEventURI(
           localWonNode),
@@ -125,7 +126,7 @@ public class OpenConnectionAction extends BaseEventBotAction
         localWonNode,
         remoteFacet,
         toUri,
-        remoteWonNode)
+        remoteWonNode, welcomeMessage)
       .build();
   }
 }

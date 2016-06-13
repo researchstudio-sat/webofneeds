@@ -17,7 +17,6 @@
 package won.bot.framework.events.listener.impl;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.event.ConnectionSpecificEvent;
 import won.bot.framework.events.event.Event;
@@ -29,7 +28,6 @@ import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
@@ -85,9 +83,8 @@ public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFi
 
         EventListenerContext ctx = getEventListenerContext();
         String message = createMessage();
-        Model messageContent = WonRdfUtils.MessageUtils.textMessage(message);
         URI connectionUri = messageEvent.getConnectionURI();
-        WonMessage wonMessage = createWonMessage(connectionUri, messageContent);
+        WonMessage wonMessage = createWonMessage(connectionUri, message);
         logger.debug("sending message " + message);
         try {
           // fire start message sending monitor event (message sending includes signing)
@@ -119,7 +116,7 @@ public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFi
     getEventListenerContext().getEventBus().unsubscribe(this);
   }
 
-  private WonMessage createWonMessage(URI connectionURI, Model content) throws WonMessageBuilderException {
+  private WonMessage createWonMessage(URI connectionURI, String message ) throws WonMessageBuilderException {
 
     WonNodeInformationService wonNodeInformationService =
       getEventListenerContext().getWonNodeInformationService();
@@ -134,10 +131,8 @@ public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFi
       getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
     URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
-    RdfUtils.replaceBaseURI(content, messageURI.toString());
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
+    return WonMessageBuilder
       .setMessagePropertiesForConnectionMessage(
         messageURI,
         connectionURI,
@@ -146,7 +141,7 @@ public class AutomaticMonitoredMessageResponderListener extends AbstractHandleFi
         WonRdfUtils.NeedUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
         remoteNeed,
         WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
-        content)
+        message)
       .build();
   }
 

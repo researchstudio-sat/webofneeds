@@ -37,12 +37,15 @@ public class ConnectTwoNeedsAction extends BaseEventBotAction
 {
   private URI remoteFacet;
   private URI localFacet;
+  private String welcomeMessage;
 
-  public ConnectTwoNeedsAction(final EventListenerContext eventListenerContext, final URI remoteFacet, final URI localFacet)
+  public ConnectTwoNeedsAction(final EventListenerContext eventListenerContext, final URI remoteFacet, final URI
+    localFacet, final String welcomeMessage)
   {
     super(eventListenerContext);
     this.remoteFacet = remoteFacet;
     this.localFacet = localFacet;
+    this.welcomeMessage = welcomeMessage;
   }
 
   @Override
@@ -72,9 +75,9 @@ public class ConnectTwoNeedsAction extends BaseEventBotAction
     URI remoteWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, toUri);
 
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return  builder
-      .setMessagePropertiesForConnect(
+
+    return
+      WonMessageBuilder.setMessagePropertiesForConnect(
         wonNodeInformationService.generateEventURI(
           localWonNode),
         localFacet,
@@ -82,7 +85,8 @@ public class ConnectTwoNeedsAction extends BaseEventBotAction
         localWonNode,
         remoteFacet,
         toUri,
-        remoteWonNode)
+        remoteWonNode,
+        welcomeMessage)
       .build();
   }
 

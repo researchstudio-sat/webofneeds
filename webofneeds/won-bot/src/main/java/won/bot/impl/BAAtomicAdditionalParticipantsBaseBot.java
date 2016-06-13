@@ -209,7 +209,7 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
       new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
         getCoordinatorFacetType().getURI(),
         getParticipantFacetType().getURI(), MILLIS_BETWEEN_MESSAGES,
-        scriptConnectHook),1);
+        scriptConnectHook, "Hi!"),1);
     bus.subscribe(FinishedEvent.class, this.needConnector);
 
     //wait until the non-delayed participants are connected and done with their scripts
@@ -224,7 +224,7 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
       new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT_DELAYED,
         getCoordinatorFacetType().getURI(),
         getParticipantFacetType().getURI(), MILLIS_BETWEEN_MESSAGES,
-        scriptConnectWithDelayHook),1);
+        scriptConnectWithDelayHook, "Hi!"),1);
     bus.subscribe(FinishedEvent.class, this.needConnectorWithDelay);
 
     //for each group member, there are 2 listeners waiting for messages. when they are all finished, we're done.

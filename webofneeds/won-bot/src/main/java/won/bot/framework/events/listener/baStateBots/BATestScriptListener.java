@@ -289,8 +289,7 @@ public class BATestScriptListener extends AbstractFinishingListener
     URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(localNeedRDF, fromNeedUri);
     URI remoteWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, toNeedUri);
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return  builder
+    return  WonMessageBuilder
       .setMessagePropertiesForConnectionMessage(
         wonNodeInformationService.generateEventURI(
           localWonNode),
@@ -318,8 +317,7 @@ public class BATestScriptListener extends AbstractFinishingListener
     URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(localNeedRDF, fromNeedUri);
     URI remoteWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, toNeedUri);
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return  builder
+    return  WonMessageBuilder
       .setMessagePropertiesForOpen(
         wonNodeInformationService.generateEventURI(
           localWonNode),
@@ -328,7 +326,7 @@ public class BATestScriptListener extends AbstractFinishingListener
         localWonNode,
         toConUri,
         toNeedUri,
-        remoteWonNode)
+        remoteWonNode,null)
       .build();
   }
 

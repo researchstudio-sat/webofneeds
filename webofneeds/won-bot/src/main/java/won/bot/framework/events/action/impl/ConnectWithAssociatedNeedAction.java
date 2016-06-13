@@ -38,12 +38,15 @@ public class ConnectWithAssociatedNeedAction extends BaseEventBotAction
 {
   private URI remoteFacet;
   private URI localFacet;
+  private String welcomeMessage;
 
-  public ConnectWithAssociatedNeedAction(final EventListenerContext eventListenerContext, final URI remoteFacet, final URI localFacet)
+  public ConnectWithAssociatedNeedAction(final EventListenerContext eventListenerContext, final URI remoteFacet,
+                                         final URI localFacet, String welcomeMessage)
   {
     super(eventListenerContext);
     this.remoteFacet = remoteFacet;
     this.localFacet = localFacet;
+    this.welcomeMessage = welcomeMessage;
   }
 
   @Override
@@ -79,8 +82,7 @@ public class ConnectWithAssociatedNeedAction extends BaseEventBotAction
     URI remoteWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, toUri);
 
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return  builder
+    return WonMessageBuilder
       .setMessagePropertiesForConnect(
         wonNodeInformationService.generateEventURI(
           localWonNode),
@@ -89,7 +91,7 @@ public class ConnectWithAssociatedNeedAction extends BaseEventBotAction
         localWonNode,
         remoteFacet,
         toUri,
-        remoteWonNode)
+        remoteWonNode, welcomeMessage)
       .build();
   }
 

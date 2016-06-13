@@ -14,13 +14,13 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.events.action.impl;
+package won.bot.framework.events.action.impl.debugbot;
 
 import com.hp.hpl.jena.query.Dataset;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
-import won.bot.framework.events.event.ConnectionSpecificEvent;
 import won.bot.framework.events.event.Event;
+import won.bot.framework.events.event.impl.debugbot.SendNDebugCommandEvent;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -28,45 +28,51 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
+import java.util.Date;
 
 /**
- * Listener that will try to obtain a connectionURI from any event
- * passed to it and close that connection.
+ * Created by fkleedorfer on 09.06.2016.
  */
-public class CloseConnectionAction extends BaseEventBotAction
+public class SendNDebugMessagesAction extends BaseEventBotAction
 {
-
-  private String farewellMessage;
-  public CloseConnectionAction(final EventListenerContext context, String farewellMessage) {
-    super(context);
-    this.farewellMessage = farewellMessage;
+  String[] messages = {"one", "two"};
+  private long delayBetweenMessages = 1000;
+  public SendNDebugMessagesAction(final EventListenerContext eventListenerContext, long delayBetweenMessages,
+                                  String... messages) {
+    super(eventListenerContext);
+    this.delayBetweenMessages = delayBetweenMessages;
+    this.messages = messages;
   }
 
   @Override
   protected void doRun(final Event event) throws Exception {
-    if (event instanceof ConnectionSpecificEvent) {
-      ConnectionSpecificEvent connectionSpecificEvent = (ConnectionSpecificEvent) event;
-      logger.debug("trying to close connection related to event {}", connectionSpecificEvent);
-      try {
-        URI connectionURI = null;
-        connectionURI = connectionSpecificEvent.getConnectionURI();
-        logger.debug("Extracted connection uri {}", connectionURI);
-        if (connectionURI != null) {
-          logger.debug("closing connection {}", connectionURI);
-
-          getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionURI));
-        } else {
-          logger.warn("could not determine which connection to close for event {}", event);
-        }
-      } catch (Exception e) {
-        logger.warn("error trying to close connection", e);
+    int n = this.messages.length;
+    if (event instanceof SendNDebugCommandEvent){
+      SendNDebugCommandEvent sendNDebugCommandEvent = (SendNDebugCommandEvent) event;
+      n = Math.min(n,((SendNDebugCommandEvent)event).getNumberOfMessagesToSend());
+      long delay = 0;
+      URI connUri = sendNDebugCommandEvent.getConnectionURI();
+      for (int i = 0; i < n; i++){
+        delay += delayBetweenMessages;
+        String messageText = this.messages[i];
+        getEventListenerContext().getTaskScheduler().schedule(createMessageTask(connUri, messageText),new Date(System
+          .currentTimeMillis()+delay));
       }
-    } else {
-      logger.warn("could not determine which connection to close for event {}", event);
     }
   }
 
-  private WonMessage createWonMessage(URI connectionURI) throws WonMessageBuilderException {
+  private Runnable createMessageTask(final URI connectionURI, final String messageText) {
+    return new Runnable()
+    {
+      @Override
+      public void run() {
+        getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionURI, messageText));
+      }
+    };
+  }
+
+
+  private WonMessage createWonMessage(URI connectionURI, String message) throws WonMessageBuilderException {
 
     WonNodeInformationService wonNodeInformationService =
       getEventListenerContext().getWonNodeInformationService();
@@ -79,17 +85,18 @@ public class CloseConnectionAction extends BaseEventBotAction
     Dataset remoteNeedRDF =
       getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
-    return WonMessageBuilder.setMessagePropertiesForClose(
-        wonNodeInformationService.generateEventURI(
-          wonNode),
+    URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
+
+    return WonMessageBuilder
+      .setMessagePropertiesForConnectionMessage(
+        messageURI,
         connectionURI,
         localNeed,
         wonNode,
         WonRdfUtils.NeedUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
         remoteNeed,
         WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
-        farewellMessage
-      )
+        message)
       .build();
   }
 }

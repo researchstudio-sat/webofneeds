@@ -70,8 +70,7 @@ public class SendFeedbackForHintAction extends BaseEventBotAction
     URI localNeed = WonRdfUtils.NeedUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
     URI wonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
+    return WonMessageBuilder
       .setMessagePropertiesForHintFeedback(
         wonNodeInformationService.generateEventURI(
           wonNode),

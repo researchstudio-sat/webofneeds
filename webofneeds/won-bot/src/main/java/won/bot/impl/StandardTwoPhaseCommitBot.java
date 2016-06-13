@@ -70,7 +70,7 @@ public class StandardTwoPhaseCommitBot extends EventBot{
     this.needConnector = new ActionOnEventListener(
       ctx, "needConnector", new FinishedEventFilter(creationWaiter),
       new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
-        FacetType.CoordinatorFacet.getURI(), FacetType.ParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES),
+        FacetType.CoordinatorFacet.getURI(), FacetType.ParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi!"),
       1);
     bus.subscribe(FinishedEvent.class, this.needConnector);
 
@@ -79,7 +79,7 @@ public class StandardTwoPhaseCommitBot extends EventBot{
     // * connect events - so it responds with open
     // * open events - so it responds with open (if the open received was the first open, and we still need to accept the connection)
     this.autoOpener = new ActionOnEventListener(ctx,new NeedUriInNamedListFilter(ctx, URI_LIST_NAME_PARTICIPANT),
-      new OpenConnectionAction(ctx));
+      new OpenConnectionAction(ctx,"Hi!"));
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
     //after the last connect event, all connections are closed!

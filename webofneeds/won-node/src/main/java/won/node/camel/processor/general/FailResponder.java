@@ -76,7 +76,7 @@ public class FailResponder extends AbstractCamelProcessor
       logger.debug("Sending FailureResponse {}", newMessageURI);
       Model errorMessageContent = WonRdfUtils.MessageUtils.textMessage(errormessage);
       RdfUtils.replaceBaseURI(errorMessageContent, newMessageURI.toString());
-      WonMessage responseMessage = new WonMessageBuilder()
+      WonMessage responseMessage = WonMessageBuilder
               .setPropertiesForNodeResponse(originalMessage, false,newMessageURI)
               .addContent(
                 errorMessageContent,

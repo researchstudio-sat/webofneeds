@@ -74,7 +74,9 @@ public class EchoBot extends EventBot
                     ctx,
                     "needConnector",
                     new RandomDelayedAction(ctx, 5000,5000,1,
-                        new ConnectWithAssociatedNeedAction(ctx,FacetType.OwnerFacet.getURI(),FacetType.OwnerFacet.getURI())));
+                        new ConnectWithAssociatedNeedAction(ctx,FacetType.OwnerFacet.getURI(),FacetType.OwnerFacet
+                          .getURI(),"Greetings! I am the EchoBot! I will repeat everything you say, which you might " +
+                          "find useful for testing purposes.")));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
 

@@ -78,14 +78,17 @@ public class ConversationBotMonitored extends EventBot
     //count until 2 needs were created, then
     //   * connect the 2 needs
     this.needConnector = new ActionOnceAfterNEventsListener(ctx,"needConnector",
-        NO_OF_NEEDS, new ConnectFromListToListAction(ctx,NAME_NEEDS,NAME_NEEDS,FacetType.OwnerFacet.getURI(),FacetType.OwnerFacet.getURI(), MILLIS_BETWEEN_MESSAGES));
+        NO_OF_NEEDS, new ConnectFromListToListAction(ctx,NAME_NEEDS,NAME_NEEDS,FacetType.OwnerFacet.getURI(),
+                                                     FacetType.OwnerFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hello," +
+                                                       "I am the ConversationBot, a simple bot that will exchange " +
+                                                       "messages and deactivate its needs after some time."));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
     //add a listener that is informed of the connect/open events and that auto-opens
     //subscribe it to:
     // * connect events - so it responds with open
     // * open events - so it responds with open (if the open received was the first open, and we still need to accept the connection)
-    this.autoOpener = new ActionOnEventListener(ctx, new OpenConnectionAction(ctx));
+    this.autoOpener = new ActionOnEventListener(ctx, new OpenConnectionAction(ctx,"Hi, I am the ConverssationBot."));
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
     //add a listener that auto-responds to messages by a message and at different stages of messages processing fires
@@ -100,11 +103,11 @@ public class ConversationBotMonitored extends EventBot
     //add a listener that closes the connection after it has seen 10 messages
     this.connectionCloser = new ActionOnceAfterNEventsListener(
         ctx,
-        NO_OF_MESSAGES, new CloseConnectionAction(ctx)
+        NO_OF_MESSAGES, new CloseConnectionAction(ctx, "Farewell!")
     );
     bus.subscribe( MessageFromOtherNeedEvent.class, this.connectionCloser);
     //add a listener that closes the connection when a failureEvent occurs
-    EventListener onFailureConnectionCloser = new ActionOnEventListener(ctx, new CloseConnectionAction(ctx));
+    EventListener onFailureConnectionCloser = new ActionOnEventListener(ctx, new CloseConnectionAction(ctx,"Farewell!"));
     bus.subscribe(FailureResponseEvent.class, onFailureConnectionCloser);
 
     //add a listener that auto-responds to a close message with a deactivation of both needs.

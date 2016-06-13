@@ -17,25 +17,28 @@
 package won.bot.framework.events.action.impl;
 
 import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.EventBotAction;
+import won.bot.framework.events.event.ConnectionSpecificEvent;
 import won.bot.framework.events.event.Event;
 
 /**
- * Action that delegates to the specified action after a specified fixed delay.
+ * Created by fkleedorfer on 09.06.2016.
  */
-public abstract class DelayedDelegatingAction extends AbstractDelegatingAction
+public class SendMultipleMessagesAction extends SendMessageAction
 {
+  String[] messages = {"Message One", "Message Two", "Message Three"};
 
-  public DelayedDelegatingAction(final EventListenerContext eventListenerContext, final EventBotAction delegate) {
-    super(eventListenerContext, delegate);
+  public SendMultipleMessagesAction(final EventListenerContext eventListenerContext, final String...
+    messages) {
+    super(eventListenerContext);
+    this.messages = messages;
   }
-
-  protected abstract long getDelay();
 
   @Override
   protected void doRun(final Event event) throws Exception {
-    long delay = getDelay();
-    assert delay >= 0 : "delay must not be negative";
-    delegateDelayed(event, delay);
+    if (event instanceof ConnectionSpecificEvent) {
+      for (int i = 0; i < messages.length; i++) {
+        sendMessage((ConnectionSpecificEvent) event, messages[i]);
+      }
+    }
   }
 }

@@ -17,17 +17,15 @@
 package won.bot.framework.events.listener.impl;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
-import won.bot.framework.events.event.Event;
+import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.event.ConnectionSpecificEvent;
+import won.bot.framework.events.event.Event;
 import won.bot.framework.events.filter.EventFilter;
 import won.bot.framework.events.listener.AbstractHandleFirstNEventsListener;
-import won.bot.framework.events.EventListenerContext;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
@@ -81,11 +79,10 @@ public class AutomaticMessageResponderListener extends AbstractHandleFirstNEvent
       public void run()
       {
         String message = createMessage();
-        Model messageContent = WonRdfUtils.MessageUtils.textMessage(message);
         URI connectionUri = messageEvent.getConnectionURI();
         logger.debug("sending message " + message);
         try {
-          getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionUri, messageContent));
+          getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionUri, message));
         } catch (Exception e) {
           logger.warn("could not send message via connection {}", connectionUri, e);
         }
@@ -110,7 +107,7 @@ public class AutomaticMessageResponderListener extends AbstractHandleFirstNEvent
     getEventListenerContext().getEventBus().unsubscribe(this);
   }
 
-  private WonMessage createWonMessage(URI connectionURI, Model content) throws WonMessageBuilderException {
+  private WonMessage createWonMessage(URI connectionURI, String message) throws WonMessageBuilderException {
 
     WonNodeInformationService wonNodeInformationService =
       getEventListenerContext().getWonNodeInformationService();
@@ -125,10 +122,8 @@ public class AutomaticMessageResponderListener extends AbstractHandleFirstNEvent
       getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
     URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
-    RdfUtils.replaceBaseURI(content, messageURI.toString());
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
+    return WonMessageBuilder
       .setMessagePropertiesForConnectionMessage(
         messageURI,
         connectionURI,
@@ -137,7 +132,7 @@ public class AutomaticMessageResponderListener extends AbstractHandleFirstNEvent
         WonRdfUtils.NeedUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
         remoteNeed,
         WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
-        content)
+        message)
       .build();
   }
 

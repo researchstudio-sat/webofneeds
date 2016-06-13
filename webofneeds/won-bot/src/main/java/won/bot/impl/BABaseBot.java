@@ -128,7 +128,7 @@ public abstract class BABaseBot extends EventBot
       ctx, "needConnector", noOfNeeds,
       new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
         getCoordinatorFacetType().getURI(), getParticipantFacetType().getURI(), MILLIS_BETWEEN_MESSAGES,
-        scriptConnectHook));
+        scriptConnectHook,"Hi!"));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
 

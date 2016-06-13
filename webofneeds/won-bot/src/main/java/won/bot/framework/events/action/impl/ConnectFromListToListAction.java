@@ -42,17 +42,22 @@ public class ConnectFromListToListAction extends BaseEventBotAction
       private URI toFacet;
       private long millisBetweenCalls;
       private ConnectHook connectHook;
+      private String welcomeMessage;
 
-  public ConnectFromListToListAction(EventListenerContext eventListenerContext, String fromListName, String toListName, URI fromFacet, URI toFacet, final long millisBetweenCalls) {
+  public ConnectFromListToListAction(EventListenerContext eventListenerContext, String fromListName, String
+    toListName, URI fromFacet, URI toFacet, final long millisBetweenCalls, String welcomeMessage) {
       super(eventListenerContext);
       this.fromListName = fromListName;
       this.toListName = toListName;
       this.fromFacet = fromFacet;
       this.toFacet = toFacet;
       this.millisBetweenCalls = millisBetweenCalls;
+      this.welcomeMessage = welcomeMessage;
   }
 
-  public ConnectFromListToListAction(final EventListenerContext eventListenerContext, final String fromListName, final String toListName, final URI fromFacet, final URI toFacet, final long millisBetweenCalls, final ConnectHook connectHook) {
+  public ConnectFromListToListAction(final EventListenerContext eventListenerContext, final String fromListName,
+                                     final String toListName, final URI fromFacet, final URI toFacet, final long
+                                       millisBetweenCalls, final ConnectHook connectHook, String welcomeMessage) {
     super(eventListenerContext);
     this.fromListName = fromListName;
     this.toListName = toListName;
@@ -60,6 +65,7 @@ public class ConnectFromListToListAction extends BaseEventBotAction
     this.toFacet = toFacet;
     this.millisBetweenCalls = millisBetweenCalls;
     this.connectHook = connectHook;
+    this.welcomeMessage = welcomeMessage;
   }
 
   @Override
@@ -140,8 +146,7 @@ public class ConnectFromListToListAction extends BaseEventBotAction
     URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(localNeedRDF, fromUri);
     URI remoteWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, toUri);
 
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return  builder
+    return  WonMessageBuilder
       .setMessagePropertiesForConnect(
         wonNodeInformationService.generateEventURI(
           localWonNode),
@@ -150,7 +155,7 @@ public class ConnectFromListToListAction extends BaseEventBotAction
         localWonNode,
         toFacet,
         toUri,
-        remoteWonNode)
+        remoteWonNode, welcomeMessage)
       .build();
   }
 

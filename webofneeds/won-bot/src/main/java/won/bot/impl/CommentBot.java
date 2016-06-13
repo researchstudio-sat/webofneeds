@@ -77,11 +77,12 @@ public class CommentBot extends EventBot
 
     this.needConnector = new ActionOnceAfterNEventsListener(ctx,
         2, new ConnectFromListToListAction(ctx, NAME_NEEDS,NAME_COMMENTS,  FacetType.OwnerFacet.getURI(),
-                                           FacetType.CommentFacet.getURI(),MILLIS_BETWEEN_MESSAGES)
+                                           FacetType.CommentFacet.getURI(),MILLIS_BETWEEN_MESSAGES, "Hi, I am the " +
+                                             "CommentBot.")
     );
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
-      this.autoOpener = new ActionOnEventListener(ctx,new OpenConnectionAction(ctx));
+      this.autoOpener = new ActionOnEventListener(ctx,new OpenConnectionAction(ctx, "Hi!"));
       bus.subscribe(OpenFromOtherNeedEvent.class, this.autoOpener);
       bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 

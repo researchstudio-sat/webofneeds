@@ -16,29 +16,23 @@
 
 package won.bot.framework.events.action.impl;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
-import won.bot.framework.events.event.Event;
-import won.bot.framework.events.action.BaseEventBotAction;
-import won.bot.framework.events.event.ConnectionSpecificEvent;
 import won.bot.framework.events.EventListenerContext;
-import won.protocol.exception.WonMessageBuilderException;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
+import won.bot.framework.events.action.BaseEventBotAction;
+import won.bot.framework.events.action.BotActionUtils;
+import won.bot.framework.events.event.ConnectionSpecificEvent;
+import won.bot.framework.events.event.Event;
 
 import java.net.URI;
 import java.util.Date;
 
 /**
- * Listener that responds to open and message events with automatic messages.
+ * Listener that responds to a message with automatic messages.
  * Can be configured to apply a timeout (non-blocking) before sending messages.
  */
 public class RespondToMessageAction extends BaseEventBotAction
 {
   private long millisTimeoutBeforeReply = 0;
+  private String message = null;
 
   public RespondToMessageAction(EventListenerContext eventListenerContext) {
     super(eventListenerContext);
@@ -47,6 +41,17 @@ public class RespondToMessageAction extends BaseEventBotAction
   public RespondToMessageAction(final EventListenerContext eventListenerContext, final long millisTimeoutBeforeReply) {
     super(eventListenerContext);
     this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
+  }
+
+  public RespondToMessageAction(final EventListenerContext eventListenerContext, final long millisTimeoutBeforeReply, final String message) {
+    super(eventListenerContext);
+    this.millisTimeoutBeforeReply = millisTimeoutBeforeReply;
+    this.message = message;
+  }
+
+  public RespondToMessageAction(final EventListenerContext eventListenerContext, final String message) {
+    super(eventListenerContext);
+    this.message = message;
   }
 
   @Override
@@ -64,11 +69,12 @@ public class RespondToMessageAction extends BaseEventBotAction
       public void run()
       {
         String message = createMessage();
-        Model messageContent = WonRdfUtils.MessageUtils.textMessage(message);
         URI connectionUri = messageEvent.getConnectionURI();
         logger.debug("sending message " + message);
         try {
-          getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionUri, messageContent));
+          getEventListenerContext().getWonMessageSender().sendWonMessage(
+            BotActionUtils.createWonMessage(
+              getEventListenerContext(),connectionUri, message));
         } catch (Exception e) {
           logger.warn("could not send message via connection {}", connectionUri, e);
         }
@@ -78,38 +84,10 @@ public class RespondToMessageAction extends BaseEventBotAction
 
   private String createMessage()
   {
-    String message = "auto reply (delay: "+ millisTimeoutBeforeReply + " millis)";
-    return message;
+    if (message != null) return message;
+    return "auto reply (delay: "+ millisTimeoutBeforeReply + " millis)";
   }
 
-  private WonMessage createWonMessage(URI connectionURI, Model content) throws WonMessageBuilderException {
 
-    WonNodeInformationService wonNodeInformationService =
-      getEventListenerContext().getWonNodeInformationService();
-
-    Dataset connectionRDF =
-      getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-    URI remoteNeed = WonRdfUtils.NeedUtils.getRemoteNeedURIFromConnection(connectionRDF, connectionURI);
-    URI localNeed = WonRdfUtils.NeedUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
-    URI wonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
-    Dataset remoteNeedRDF =
-      getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
-
-    URI messageURI = wonNodeInformationService.generateEventURI(wonNode);
-    RdfUtils.replaceBaseURI(content, messageURI.toString());
-
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
-      .setMessagePropertiesForConnectionMessage(
-        messageURI,
-        connectionURI,
-        localNeed,
-        wonNode,
-        WonRdfUtils.NeedUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
-        remoteNeed,
-        WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
-        content)
-      .build();
-  }
 
 }
