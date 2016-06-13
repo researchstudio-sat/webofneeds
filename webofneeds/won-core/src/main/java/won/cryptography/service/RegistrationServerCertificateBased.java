@@ -1,10 +1,11 @@
 package won.cryptography.service;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.cryptography.ssl.AliasFromFingerprintGenerator;
+import won.cryptography.ssl.AliasGenerator;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.service.ApplicationManagementService;
 
@@ -23,6 +24,8 @@ public class RegistrationServerCertificateBased implements RegistrationServer
   @Autowired
   private ApplicationManagementService ownerManagementService;
   private TrustStrategy trustStrategy;
+  private AliasGenerator aliasGenerator = new AliasFromFingerprintGenerator();
+
 
 
   public RegistrationServerCertificateBased(final TrustStrategy trustStrategy) {
@@ -31,18 +34,18 @@ public class RegistrationServerCertificateBased implements RegistrationServer
   }
 
   public String registerOwner(Object certificateChainObj) throws WonProtocolException {
-
-    String ownerId = null;
+    String alias = null;
     X509Certificate[] ownerCertChain = extractCertificateChain(certificateChainObj);
     checkTrusted(ownerCertChain);
     try {
-      String ownerSha1Fingerprint = DigestUtils.shaHex(ownerCertChain[0].getEncoded());
-      ownerId = ownerManagementService.registerOwnerApplication(ownerSha1Fingerprint);
-    } catch (CertificateException e) {
+      alias  = aliasGenerator.generateAlias(ownerCertChain[0]);
+      logger.info("Public key hash to be used as ownerApplicationId: {}", alias);
+      alias = ownerManagementService.registerOwnerApplication(alias);
+    } catch (Exception e) {
+      logger.warn("could not register owner", e);
       throw new WonProtocolException(e);
     }
-    logger.info("Registered owner with id " + ownerId);
-    return ownerId;
+    return alias;
   }
 
   public String registerNode(Object certificateChainObj) throws WonProtocolException {

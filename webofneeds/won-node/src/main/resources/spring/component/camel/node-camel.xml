@@ -18,7 +18,10 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
 
     <!-- Camel configuration -->
-    <camel:camelContext id="wonNodeCamel" trace="false">
+    <!--camel:camelContext id="wonNodeCamel" trace="false"  we comment this out for testing if using the 'trace'
+    attribute causes the resources for tracing to be allocated (CamelInternalProcessor$BacklogTracerAdvice with 100k
+    elements in its queue) -->
+    <camel:camelContext id="wonNodeCamel">
         <camel:packageScan>
             <camel:package>won.node.camel.route.fixed</camel:package>
         </camel:packageScan>

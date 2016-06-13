@@ -21,7 +21,7 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/owner.properties" ignore-unresolvable="true"/>
 
     <!-- messaging beans -->
-    <camel:camelContext id="wonOwnerCamel" trace="false">
+    <camel:camelContext id="wonOwnerCamel">
         <camel:packageScan>
             <camel:package>won.owner.camel.routes.fixed</camel:package>
         </camel:packageScan>
