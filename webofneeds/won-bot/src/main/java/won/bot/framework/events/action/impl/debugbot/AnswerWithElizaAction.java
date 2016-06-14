@@ -20,7 +20,7 @@ import codeanticode.eliza.Eliza;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.impl.SendTextMessageOnConnectionEvent;
+import won.bot.framework.events.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.events.event.impl.debugbot.MessageToElizaEvent;
 import won.protocol.model.Connection;
 

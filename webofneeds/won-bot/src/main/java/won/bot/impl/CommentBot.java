@@ -19,11 +19,19 @@ package won.bot.impl;
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
-import won.bot.framework.events.action.impl.*;
+import won.bot.framework.events.action.impl.lifecycle.SignalWorkDoneAction;
+import won.bot.framework.events.action.impl.needlifecycle.CreateNeedWithFacetsAction;
+import won.bot.framework.events.action.impl.needlifecycle.DeactivateAllNeedsAction;
+import won.bot.framework.events.action.impl.wonmessage.ConnectFromListToListAction;
+import won.bot.framework.events.action.impl.wonmessage.OpenConnectionAction;
 import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.event.BaseEvent;
 import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.impl.*;
+import won.bot.framework.events.event.impl.lifecycle.ActEvent;
+import won.bot.framework.events.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.events.event.impl.needlifecycle.NeedDeactivatedEvent;
+import won.bot.framework.events.event.impl.wonmessage.ConnectFromOtherNeedEvent;
+import won.bot.framework.events.event.impl.wonmessage.OpenFromOtherNeedEvent;
 import won.bot.framework.events.listener.BaseEventListener;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
@@ -65,10 +73,10 @@ public class CommentBot extends EventBot
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ActionOnEventListener(
         ctx,
-        new CreateNeedWithFacetsAction(ctx,NAME_NEEDS),
+        new CreateNeedWithFacetsAction(ctx, NAME_NEEDS),
         NO_OF_NEEDS
     );
-    bus.subscribe(ActEvent.class,this.needCreator);
+    bus.subscribe(ActEvent.class, this.needCreator);
 
     //count until 1 need is created, then create a comment facet
     this.commentFacetCreator = new ActionOnEventListener(ctx,
@@ -76,8 +84,8 @@ public class CommentBot extends EventBot
     bus.subscribe(NeedCreatedEvent.class, this.commentFacetCreator);
 
     this.needConnector = new ActionOnceAfterNEventsListener(ctx,
-        2, new ConnectFromListToListAction(ctx, NAME_NEEDS,NAME_COMMENTS,  FacetType.OwnerFacet.getURI(),
-                                           FacetType.CommentFacet.getURI(),MILLIS_BETWEEN_MESSAGES, "Hi, I am the " +
+        2, new ConnectFromListToListAction(ctx, NAME_NEEDS, NAME_COMMENTS, FacetType.OwnerFacet.getURI(),
+                                           FacetType.CommentFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi, I am the " +
                                              "CommentBot.")
     );
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
@@ -100,7 +108,7 @@ public class CommentBot extends EventBot
 
 
       //deactivate all needs when the assertion was executed
-      this.allNeedsDeactivator = new ActionOnEventListener(ctx,new DeactivateAllNeedsAction(ctx),1);
+      this.allNeedsDeactivator = new ActionOnEventListener(ctx, new DeactivateAllNeedsAction(ctx), 1);
       bus.subscribe(AssertionsExecutedEvent.class, this.allNeedsDeactivator);
 
       //add a listener that counts two NeedDeactivatedEvents and then tells the

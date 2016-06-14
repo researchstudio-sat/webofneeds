@@ -18,7 +18,7 @@ package won.bot.framework.events.filter.impl;
 
 import won.bot.framework.events.event.Event;
 import won.bot.framework.events.listener.EventListener;
-import won.bot.framework.events.event.impl.FinishedEvent;
+import won.bot.framework.events.event.impl.listener.FinishedEvent;
 import won.bot.framework.events.filter.EventFilter;
 
 /**

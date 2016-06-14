@@ -27,7 +27,13 @@ import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.bus.impl.AsyncEventBusImpl;
 import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.impl.*;
+import won.bot.framework.events.event.impl.lifecycle.*;
+import won.bot.framework.events.event.impl.matcher.MatcherRegisteredEvent;
+import won.bot.framework.events.event.impl.matcher.NeedActivatedEventForMatcher;
+import won.bot.framework.events.event.impl.matcher.NeedCreatedEventForMatcher;
+import won.bot.framework.events.event.impl.matcher.NeedDeactivatedEventForMatcher;
+import won.bot.framework.events.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.events.event.impl.wonmessage.*;
 import won.bot.framework.events.listener.BaseEventListener;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
@@ -238,7 +244,7 @@ public class EventBot extends TriggeredBot
   {
     this.eventBus = new AsyncEventBusImpl(getExecutor());
     //add an eventhandler that reacts to errors
-    this.getEventBus().subscribe(ErrorEvent.class,new ErrorEventListener(getEventListenerContext()));
+    this.getEventBus().subscribe(ErrorEvent.class, new ErrorEventListener(getEventListenerContext()));
     initializeEventListeners();
     this.eventBus.publish(new InitializeEvent());
   }

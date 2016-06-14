@@ -20,9 +20,15 @@ import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.impl.*;
 import won.bot.framework.events.action.impl.debugbot.*;
+import won.bot.framework.events.action.impl.matcher.RegisterMatcherAction;
+import won.bot.framework.events.action.impl.needlifecycle.DeactivateNeedAction;
+import won.bot.framework.events.action.impl.wonmessage.*;
 import won.bot.framework.events.bus.EventBus;
-import won.bot.framework.events.event.impl.*;
+import won.bot.framework.events.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.events.event.impl.debugbot.*;
+import won.bot.framework.events.event.impl.lifecycle.ActEvent;
+import won.bot.framework.events.event.impl.matcher.NeedCreatedEventForMatcher;
+import won.bot.framework.events.event.impl.wonmessage.*;
 import won.bot.framework.events.filter.impl.NeedUriInNamedListFilter;
 import won.bot.framework.events.filter.impl.NotFilter;
 import won.bot.framework.events.listener.BaseEventListener;
@@ -76,7 +82,7 @@ public class DebugBot extends EventBot
       new RegisterMatcherAction(ctx),
       1
     );
-    bus.subscribe(ActEvent.class,this.matcherRegistrator);
+    bus.subscribe(ActEvent.class, this.matcherRegistrator);
 
     //create the echo need for debug initial connect - if we're not reacting to the creation of our own echo need.
     CreateDebugNeedWithFacetsAction needForInitialConnectAction = new CreateDebugNeedWithFacetsAction(ctx, NAME_NEEDS);
@@ -112,7 +118,7 @@ public class DebugBot extends EventBot
       ctx,
       "needHinter",
       new RandomDelayedAction(ctx, CONNECT_DELAY_MILLIS,CONNECT_DELAY_MILLIS,1,
-                              new HintAssociatedNeedAction(ctx,FacetType.OwnerFacet.getURI(),FacetType.OwnerFacet.getURI(), matcherUri)
+                              new HintAssociatedNeedAction(ctx, FacetType.OwnerFacet.getURI(), FacetType.OwnerFacet.getURI(), matcherUri)
       ));
     bus.subscribe(NeedCreatedEventForDebugHint.class, this.needHinter);
 

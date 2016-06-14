@@ -18,9 +18,17 @@ package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.impl.*;
+import won.bot.framework.events.action.impl.lifecycle.SignalWorkDoneAction;
+import won.bot.framework.events.action.impl.needlifecycle.CreateNeedWithFacetsAction;
+import won.bot.framework.events.action.impl.needlifecycle.DeactivateAllNeedsAction;
+import won.bot.framework.events.action.impl.wonmessage.CloseConnectionAction;
+import won.bot.framework.events.action.impl.wonmessage.ConnectFromListToListAction;
+import won.bot.framework.events.action.impl.wonmessage.OpenConnectionAction;
 import won.bot.framework.events.bus.EventBus;
-import won.bot.framework.events.event.impl.*;
+import won.bot.framework.events.event.impl.lifecycle.ActEvent;
+import won.bot.framework.events.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.events.event.impl.needlifecycle.NeedDeactivatedEvent;
+import won.bot.framework.events.event.impl.wonmessage.*;
 import won.bot.framework.events.listener.BaseEventListener;
 import won.bot.framework.events.listener.EventListener;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
@@ -62,15 +70,15 @@ public class ConversationBot extends EventBot
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ActionOnEventListener(
         ctx,
-        new CreateNeedWithFacetsAction(ctx,NAME_NEEDS),
+        new CreateNeedWithFacetsAction(ctx, NAME_NEEDS),
         NO_OF_NEEDS
     );
-    bus.subscribe(ActEvent.class,this.needCreator);
+    bus.subscribe(ActEvent.class, this.needCreator);
 
     //count until 2 needs were created, then
     //   * connect the 2 needs
     this.needConnector = new ActionOnceAfterNEventsListener(ctx,"needConnector",
-        NO_OF_NEEDS, new ConnectFromListToListAction(ctx,NAME_NEEDS,NAME_NEEDS,FacetType.OwnerFacet.getURI(),
+        NO_OF_NEEDS, new ConnectFromListToListAction(ctx, NAME_NEEDS, NAME_NEEDS, FacetType.OwnerFacet.getURI(),
                                                      FacetType.OwnerFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi, I " +
                                                        "am the ConversationBot." +
                                                        ""));
@@ -106,7 +114,7 @@ public class ConversationBot extends EventBot
     //add a listener that auto-responds to a close message with a deactivation of both needs.
     //subscribe it to:
     // * close events
-    this.needDeactivator = new ActionOnEventListener(ctx, new DeactivateAllNeedsAction(ctx),1);
+    this.needDeactivator = new ActionOnEventListener(ctx, new DeactivateAllNeedsAction(ctx), 1);
     bus.subscribe(CloseFromOtherNeedEvent.class, this.needDeactivator);
 
     //add a listener that counts two NeedDeactivatedEvents and then tells the

@@ -2,8 +2,8 @@ package won.bot.framework.events.listener.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.impl.MessageFromOtherNeedEvent;
-import won.bot.framework.events.event.impl.OpenFromOtherNeedEvent;
+import won.bot.framework.events.event.impl.wonmessage.MessageFromOtherNeedEvent;
+import won.bot.framework.events.event.impl.wonmessage.OpenFromOtherNeedEvent;
 import won.bot.framework.events.listener.BaseEventListener;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.listener.baStateBots.BATestBotScript;

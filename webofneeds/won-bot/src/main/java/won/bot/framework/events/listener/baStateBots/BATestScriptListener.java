@@ -22,7 +22,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.event.*;
-import won.bot.framework.events.event.impl.ConnectFromOtherNeedEvent;
+import won.bot.framework.events.event.impl.wonmessage.ConnectFromOtherNeedEvent;
 import won.bot.framework.events.filter.EventFilter;
 import won.bot.framework.events.filter.impl.*;
 import won.bot.framework.events.listener.AbstractFinishingListener;

@@ -1,5 +1,6 @@
 package won.bot.framework.events.event.impl.monitor;
 
+import won.bot.framework.events.event.impl.wonmessage.MessageSpecificEvent;
 import won.protocol.message.WonMessage;
 
 /**

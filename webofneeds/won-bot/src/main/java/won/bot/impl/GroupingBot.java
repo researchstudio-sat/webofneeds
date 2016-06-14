@@ -17,11 +17,21 @@
 package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
+import won.bot.framework.events.action.impl.lifecycle.SignalWorkDoneAction;
+import won.bot.framework.events.action.impl.needlifecycle.CreateNeedWithFacetsAction;
+import won.bot.framework.events.action.impl.needlifecycle.DeactivateAllNeedsOfGroupAction;
+import won.bot.framework.events.action.impl.wonmessage.ConnectFromListToListAction;
+import won.bot.framework.events.action.impl.wonmessage.OpenConnectionAction;
+import won.bot.framework.events.action.impl.wonmessage.RespondToMessageAction;
 import won.bot.framework.events.event.Event;
 import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.impl.*;
-import won.bot.framework.events.event.impl.*;
+import won.bot.framework.events.event.impl.lifecycle.ActEvent;
+import won.bot.framework.events.event.impl.listener.FinishedEvent;
+import won.bot.framework.events.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.events.event.impl.wonmessage.CloseFromOtherNeedEvent;
+import won.bot.framework.events.event.impl.wonmessage.ConnectFromOtherNeedEvent;
+import won.bot.framework.events.event.impl.wonmessage.MessageFromOtherNeedEvent;
 import won.bot.framework.events.filter.impl.*;
 import won.bot.framework.events.listener.*;
 import won.bot.framework.events.action.*;
@@ -153,7 +163,7 @@ public class GroupingBot extends EventBot
     //now, once all connections have been opened, make 1 bot send a message to the group, the subsequent listener will cause let wild chatting to begin
     this.conversationStarter = new ActionOnceAfterNEventsListener(ctx, "conversationStarter", NO_OF_GROUPMEMBERS,
                                                                     new RespondToMessageAction(ctx,
-                                                                      MILLIS_BETWEEN_MESSAGES)
+                                                                                               MILLIS_BETWEEN_MESSAGES)
     );
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.conversationStarter);
 

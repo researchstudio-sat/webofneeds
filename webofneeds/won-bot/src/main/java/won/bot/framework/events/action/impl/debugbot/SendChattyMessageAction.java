@@ -19,7 +19,7 @@ package won.bot.framework.events.action.impl.debugbot;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.impl.SendTextMessageOnConnectionEvent;
+import won.bot.framework.events.event.impl.command.SendTextMessageOnConnectionEvent;
 
 import java.net.URI;
 import java.util.HashSet;

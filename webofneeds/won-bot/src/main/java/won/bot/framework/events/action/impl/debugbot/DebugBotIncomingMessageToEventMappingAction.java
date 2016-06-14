@@ -23,7 +23,7 @@ import won.bot.framework.events.event.BaseNeedAndConnectionSpecificEvent;
 import won.bot.framework.events.event.ConnectionSpecificEvent;
 import won.bot.framework.events.event.Event;
 import won.bot.framework.events.event.MessageEvent;
-import won.bot.framework.events.event.impl.SendTextMessageOnConnectionEvent;
+import won.bot.framework.events.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.events.event.impl.debugbot.*;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;

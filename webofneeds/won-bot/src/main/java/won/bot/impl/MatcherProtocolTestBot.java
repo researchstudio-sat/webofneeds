@@ -20,9 +20,20 @@ import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.action.impl.*;
+import won.bot.framework.events.action.impl.lifecycle.SignalWorkDoneAction;
+import won.bot.framework.events.action.impl.matcher.MatchNeedsAction;
+import won.bot.framework.events.action.impl.matcher.RegisterMatcherAction;
+import won.bot.framework.events.action.impl.needlifecycle.CreateNeedWithFacetsAction;
+import won.bot.framework.events.action.impl.needlifecycle.DeactivateAllNeedsAction;
 import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.impl.*;
+import won.bot.framework.events.event.impl.lifecycle.ActEvent;
+import won.bot.framework.events.event.impl.matcher.MatcherRegisteredEvent;
+import won.bot.framework.events.event.impl.matcher.NeedCreatedEventForMatcher;
+import won.bot.framework.events.event.impl.matcher.NeedDeactivatedEventForMatcher;
+import won.bot.framework.events.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.events.event.impl.needlifecycle.NeedDeactivatedEvent;
+import won.bot.framework.events.event.impl.wonmessage.HintFromMatcherEvent;
 import won.bot.framework.events.listener.BaseEventListener;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
 import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
@@ -60,12 +71,12 @@ public class MatcherProtocolTestBot extends EventBot
       new RegisterMatcherAction(ctx),
       1
     );
-    bus.subscribe(ActEvent.class,this.matcherRegistrator);
+    bus.subscribe(ActEvent.class, this.matcherRegistrator);
 
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ActionOnEventListener(
         ctx,
-        new CreateNeedWithFacetsAction(ctx,NAME_NEEDS),
+        new CreateNeedWithFacetsAction(ctx, NAME_NEEDS),
         NO_OF_NEEDS
     );
 
@@ -75,12 +86,12 @@ public class MatcherProtocolTestBot extends EventBot
       protected void doRun(final Event event) throws Exception {
         getEventListenerContext().getEventBus().subscribe(ActEvent.class, needCreator);
       }
-    },1));
+    }, 1));
 
     this.matcherNotifier = new ActionOnceAfterNEventsListener(ctx,4,new LogAction(ctx,
       "Received all events for newly created needs."));
-    bus.subscribe(NeedCreatedEventForMatcher.class,matcherNotifier);
-    bus.subscribe(NeedCreatedEvent.class,matcherNotifier);
+    bus.subscribe(NeedCreatedEventForMatcher.class, matcherNotifier);
+    bus.subscribe(NeedCreatedEvent.class, matcherNotifier);
 
     this.matcher = new ActionOnceAfterNEventsListener(
             ctx,

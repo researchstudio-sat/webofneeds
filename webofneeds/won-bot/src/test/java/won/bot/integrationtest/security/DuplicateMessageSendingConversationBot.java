@@ -20,9 +20,20 @@ import won.bot.IntegrationtestBot;
 import won.bot.framework.events.EventListenerContext;
 import won.bot.framework.events.action.BaseEventBotAction;
 import won.bot.framework.events.action.impl.*;
+import won.bot.framework.events.action.impl.lifecycle.SignalWorkDoneAction;
+import won.bot.framework.events.action.impl.needlifecycle.CreateNeedWithFacetsAction;
+import won.bot.framework.events.action.impl.needlifecycle.DeactivateAllNeedsAction;
+import won.bot.framework.events.action.impl.wonmessage.CloseConnectionAction;
+import won.bot.framework.events.action.impl.wonmessage.ConnectFromListToListAction;
+import won.bot.framework.events.action.impl.wonmessage.OpenConnectionAction;
 import won.bot.framework.events.bus.EventBus;
 import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.impl.*;
+import won.bot.framework.events.event.impl.lifecycle.ActEvent;
+import won.bot.framework.events.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.events.event.impl.needlifecycle.NeedDeactivatedEvent;
+import won.bot.framework.events.event.impl.test.TestFailedEvent;
+import won.bot.framework.events.event.impl.test.TestPassedEvent;
+import won.bot.framework.events.event.impl.wonmessage.*;
 import won.bot.framework.events.listener.BaseEventListener;
 import won.bot.framework.events.listener.EventListener;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
@@ -69,17 +80,17 @@ public class DuplicateMessageSendingConversationBot extends IntegrationtestBot
 
     //create needs every trigger execution until 2 needs are created
 
-    bus.subscribe(ActEvent.class,new ActionOnEventListener(
+    bus.subscribe(ActEvent.class, new ActionOnEventListener(
             ctx,
-            new CreateNeedWithFacetsAction(ctx,NAME_NEEDS),
+            new CreateNeedWithFacetsAction(ctx, NAME_NEEDS),
             NO_OF_NEEDS
         ));
 
     //connect needs
-    bus.subscribe(NeedCreatedEvent.class, new ActionOnceAfterNEventsListener(ctx,"needConnector",
-            NO_OF_NEEDS * 2, new ConnectFromListToListAction(ctx,NAME_NEEDS,NAME_NEEDS,FacetType.OwnerFacet.getURI(),
-                                                             FacetType.OwnerFacet.getURI(), MILLIS_BETWEEN_MESSAGES,
-                                                             "Hi!"
+    bus.subscribe(NeedCreatedEvent.class, new ActionOnceAfterNEventsListener(ctx, "needConnector",
+                                                                             NO_OF_NEEDS * 2, new ConnectFromListToListAction(ctx, NAME_NEEDS, NAME_NEEDS, FacetType.OwnerFacet.getURI(),
+                                                                                                                              FacetType.OwnerFacet.getURI(), MILLIS_BETWEEN_MESSAGES,
+                                                                                                                              "Hi!"
                                                              )));
 
     //add a listener that is informed of the connect/open events and that auto-opens

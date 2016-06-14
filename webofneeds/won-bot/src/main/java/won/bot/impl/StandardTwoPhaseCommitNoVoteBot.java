@@ -2,9 +2,20 @@ package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.impl.*;
+import won.bot.framework.events.action.impl.facet.TwoPhaseCommitNoVoteDeactivateAllNeedsAction;
+import won.bot.framework.events.action.impl.lifecycle.SignalWorkDoneAction;
+import won.bot.framework.events.action.impl.needlifecycle.CreateNeedWithFacetsAction;
+import won.bot.framework.events.action.impl.wonmessage.CloseConnectionAction;
+import won.bot.framework.events.action.impl.wonmessage.ConnectFromListToListAction;
+import won.bot.framework.events.action.impl.wonmessage.OpenConnectionAction;
 import won.bot.framework.events.bus.EventBus;
-import won.bot.framework.events.event.impl.*;
+import won.bot.framework.events.event.impl.lifecycle.ActEvent;
+import won.bot.framework.events.event.impl.listener.FinishedEvent;
+import won.bot.framework.events.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.events.event.impl.needlifecycle.NeedDeactivatedEvent;
+import won.bot.framework.events.event.impl.wonmessage.CloseFromOtherNeedEvent;
+import won.bot.framework.events.event.impl.wonmessage.ConnectFromOtherNeedEvent;
+import won.bot.framework.events.event.impl.wonmessage.OpenFromOtherNeedEvent;
 import won.bot.framework.events.filter.impl.FinishedEventFilter;
 import won.bot.framework.events.listener.BaseEventListener;
 import won.bot.framework.events.listener.impl.ActionOnEventListener;
@@ -63,7 +74,7 @@ public class StandardTwoPhaseCommitNoVoteBot extends EventBot{
     this.needConnector = new ActionOnceAfterNEventsListener(
       ctx, "needConnector", noOfNeeds,
       new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
-        FacetType.CoordinatorFacet.getURI(), FacetType.ParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi!"));
+                                      FacetType.CoordinatorFacet.getURI(), FacetType.ParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi!"));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
     //add a listener that is informed of the connect/open events and that auto-opens
@@ -81,7 +92,7 @@ public class StandardTwoPhaseCommitNoVoteBot extends EventBot{
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoCloser);
 
     //after the last connect event, all connections are closed!
-    this.needDeactivator = new ActionOnEventListener(ctx, new TwoPhaseCommitNoVoteDeactivateAllNeedsAction(ctx),1);
+    this.needDeactivator = new ActionOnEventListener(ctx, new TwoPhaseCommitNoVoteDeactivateAllNeedsAction(ctx), 1);
     bus.subscribe(CloseFromOtherNeedEvent.class, this.needDeactivator);
 
     //add a listener that counts two NeedDeactivatedEvents and then tells the
