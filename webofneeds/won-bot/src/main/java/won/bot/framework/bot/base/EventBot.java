@@ -23,18 +23,18 @@ import won.bot.framework.bot.BotContext;
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
-import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.bus.EventBus;
-import won.bot.framework.events.bus.impl.AsyncEventBusImpl;
-import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.impl.lifecycle.*;
-import won.bot.framework.events.event.impl.matcher.MatcherRegisteredEvent;
-import won.bot.framework.events.event.impl.matcher.NeedActivatedEventForMatcher;
-import won.bot.framework.events.event.impl.matcher.NeedCreatedEventForMatcher;
-import won.bot.framework.events.event.impl.matcher.NeedDeactivatedEventForMatcher;
-import won.bot.framework.events.event.impl.needlifecycle.NeedCreatedEvent;
-import won.bot.framework.events.event.impl.wonmessage.*;
-import won.bot.framework.events.listener.BaseEventListener;
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.bus.EventBus;
+import won.bot.framework.eventbot.bus.impl.AsyncEventBusImpl;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.lifecycle.*;
+import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisteredEvent;
+import won.bot.framework.eventbot.event.impl.matcher.NeedActivatedEventForMatcher;
+import won.bot.framework.eventbot.event.impl.matcher.NeedCreatedEventForMatcher;
+import won.bot.framework.eventbot.event.impl.matcher.NeedDeactivatedEventForMatcher;
+import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.*;
+import won.bot.framework.eventbot.listener.BaseEventListener;
 import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
@@ -372,7 +372,7 @@ public class EventBot extends TriggeredBot
     }
 
     @Override
-    protected void doOnEvent(final won.bot.framework.events.event.Event event) throws Exception {
+    protected void doOnEvent(final won.bot.framework.eventbot.event.Event event) throws Exception {
       synchronized (monitor) {
         if (event instanceof ErrorEvent) {
           //only react to an ErrorEvent

@@ -17,23 +17,23 @@
 package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.impl.lifecycle.SignalWorkDoneAction;
-import won.bot.framework.events.action.impl.needlifecycle.CreateNeedWithFacetsAction;
-import won.bot.framework.events.action.impl.needlifecycle.DeactivateAllNeedsAction;
-import won.bot.framework.events.action.impl.wonmessage.CloseConnectionAction;
-import won.bot.framework.events.action.impl.wonmessage.ConnectFromListToListAction;
-import won.bot.framework.events.action.impl.wonmessage.OpenConnectionAction;
-import won.bot.framework.events.bus.EventBus;
-import won.bot.framework.events.event.impl.lifecycle.ActEvent;
-import won.bot.framework.events.event.impl.needlifecycle.NeedCreatedEvent;
-import won.bot.framework.events.event.impl.needlifecycle.NeedDeactivatedEvent;
-import won.bot.framework.events.event.impl.wonmessage.*;
-import won.bot.framework.events.listener.BaseEventListener;
-import won.bot.framework.events.listener.EventListener;
-import won.bot.framework.events.listener.impl.ActionOnEventListener;
-import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
-import won.bot.framework.events.listener.impl.AutomaticMessageResponderListener;
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.CreateNeedWithFacetsAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.CloseConnectionAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.ConnectFromListToListAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionAction;
+import won.bot.framework.eventbot.bus.EventBus;
+import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
+import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.eventbot.event.impl.needlifecycle.NeedDeactivatedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.*;
+import won.bot.framework.eventbot.listener.BaseEventListener;
+import won.bot.framework.eventbot.listener.EventListener;
+import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
+import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
+import won.bot.framework.eventbot.listener.impl.AutomaticMessageResponderListener;
 import won.protocol.model.FacetType;
 
 /**

@@ -1,8 +1,8 @@
 package won.bot.impl;
 
-import won.bot.framework.events.listener.baStateBots.BATestBotScript;
-import won.bot.framework.events.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.*;
-import won.bot.framework.events.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsUriBot.*;
+import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsTextBot.*;
+import won.bot.framework.eventbot.listener.baStateBots.baPCMessagingBots.atomicBots.coordinationMessageAsUriBot.*;
 import won.protocol.model.FacetType;
 
 import java.util.ArrayList;

@@ -17,7 +17,7 @@
 package won.bot;
 
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.eventbot.EventListenerContext;
 
 /**
  * Base bot for integration tests.

@@ -32,7 +32,7 @@
     <aop:config proxy-target-class="false">
         <!--aop:advisor advice-ref="monitoringInterceptor"
         pointcut="execution(* won.bot.framework.bot.base.EventBot.*(..))"/>
-        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.bot.framework.events.action.*.*(..))"/-->
+        <aop:advisor advice-ref="monitoringInterceptor" pointcut="execution(* won.bot.framework.eventbot.action.*.*(..))"/-->
     </aop:config>
 
 

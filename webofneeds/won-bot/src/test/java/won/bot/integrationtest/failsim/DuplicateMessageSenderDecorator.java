@@ -16,7 +16,7 @@
 
 package won.bot.integrationtest.failsim;
 
-import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.eventbot.EventListenerContext;
 import won.protocol.message.WonMessage;
 import won.protocol.message.sender.WonMessageSender;
 import won.protocol.message.sender.exception.WonMessageSenderException;
