@@ -13,6 +13,11 @@
         <p>enq'd msgs: {{self.state.getIn(['messages', 'enqueued']).toJS()}}</p>
         <p>pending answer: {{self.state.getIn(['messages', 'sent']).toJS()}}</p>
         -->
+        <won-dynamic-textfield-rdxd
+                placeholder="::'What'"
+                max-chars="::self.characterLimit"
+                on-input="::self.drafts__change__title({draftId: self.draftId, title: value})">
+        </won-dynamic-textfield-rdxd>
 
         <won-posttype-select
                 options="::self.postTypeTexts"

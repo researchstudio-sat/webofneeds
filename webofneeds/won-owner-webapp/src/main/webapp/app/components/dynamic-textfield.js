@@ -12,9 +12,7 @@ function genComponentConf() {
         <div class="wdt__left">
             <div class="wdt__text"
                  ng-class="{'wdt__text--placeholder' : self.displayingPlaceholder, 'wdt__text--invalid' : !self.valid()}"
-                 contenteditable="true">
-                 {{ ::self.placeholder }}
-            </div>
+                 contenteditable="true">{{ ::self.placeholder }}</div> <!-- keep innerHTML in one line. -->
             <span class="wdt__charcount" ng-show="self.maxChars">
                 {{ self.charactersLeft() }} characters left
             </span>
@@ -118,7 +116,8 @@ function genComponentConf() {
             if(!this.displayingPlaceholder) {
                 if(this.getUnsanitizedText() !== this.getText() ||
                     this.textField().innerHTML.match(/<br>./)) { //also supress line breaks inside the text in copy-pasted text
-                        this.setText(this.getText()); //sanitize
+                        this.sanitize();
+                        //this.setText(this.getText()); //sanitize
                     }
 
                 //compare with previous value, if different
@@ -138,6 +137,10 @@ function genComponentConf() {
                     this.$scope.$digest(); //update charcount
                 }
             }
+        }
+        sanitize() {
+            this.setText(this.getText()); //sanitize
+            //placeCaretAtEnd(this.textField());
         }
         clearPlaceholder() {
             if(this.displayingPlaceholder) {
@@ -170,16 +173,31 @@ function genComponentConf() {
         }
         getText() {
             //sanitize input
-            return this.textField().innerText
+            //return this.textField().innerText
+            return this.getUnsanitizedText()
                 .replace(/<br>/gm, ' ')
-                //.replace(/<(?:.|\n)*?>/gm, ''); //strip html tags; TODO doesn't work on tags with properties<b>
+                .replace(/\n/gm, ' ')
+                .replace(/<(?:.|\n)*?>/gm, '') //strip html tags; TODO doesn't work on tags with properties<b>
+                //.replace(/ /gm, '&nbsp;');
 
         }
         setText(txt) {
-            this.textField().innerHTML = txt
+            //TODO determine caret position
+            this.textField().innerHTML = txt + '<br>'; //trailing <br> is necessary to avoid bug with vanishing spaces
+            //TODO place caret as close as possible to original position
         }
         valid() {
             return this.getText().trim().length < this.maxChars;
+        }
+
+        getCaretPosition() {
+            const selection = window.getSelection();
+            const contentNode = this.textfield().firstChild;
+            if(selection && selection.focusNode === contentNode) { //cursor is in node
+                return selection.focusOffset;
+            } else {
+                return -1;
+            }
         }
         // view -> model
         // model -> view
@@ -228,3 +246,26 @@ export default angular.module('won.owner.components.dynamicTextfield', [
     ])
     .directive('wonDynamicTextfield', genComponentConf)
     .name;
+
+
+/**
+ * Adapted from <http://stackoverflow.com/questions/4233265/contenteditable-set-caret-at-the-end-of-the-text-cross-browser>
+ * @param el
+ */
+function placeCaretAtEnd(el) {
+    if(!el) { return; }
+    el.focus();
+    if (window.getSelection && document.createRange) {
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+    } else if (document.body.createTextRange) {
+        var textRange = document.body.createTextRange();
+        textRange.moveToElementText(el);
+        textRange.collapse(false);
+        textRange.select();
+    }
+}
