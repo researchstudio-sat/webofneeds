@@ -192,17 +192,18 @@ public class DebugBot extends EventBot
     bus.subscribe(MessageToElizaEvent.class, new ActionOnEventListener(ctx, new AnswerWithElizaAction(ctx,20)));
 
     //remember when we sent the last message
-    bus.subscribe(SendTextMessageOnConnectionEvent.class,
+    bus.subscribe(WonMessageSentOnConnectionEvent.class,
                   new ActionOnEventListener(ctx, new RecordMessageSentTimeAction(ctx, timingManager)));
     //remember when we got the last message
-    bus.subscribe(MessageFromOtherNeedEvent.class,
+    bus.subscribe(WonMessageReceivedOnConnectionEvent.class,
                   new ActionOnEventListener(ctx, new RecordMessageReceivedTimeAction(ctx, timingManager)));
-    //initialize the sent timestamp
+    //initialize the sent timestamp when the open message is received
     bus.subscribe(OpenFromOtherNeedEvent.class,
                   new ActionOnEventListener(ctx, new RecordMessageSentTimeAction(ctx, timingManager)));
-    //initialize the sent timestamp
+    //initialize the sent timestamp when the connect message is received
     bus.subscribe(ConnectFromOtherNeedEvent.class,
                   new ActionOnEventListener(ctx, new RecordMessageSentTimeAction(ctx, timingManager)));
+
   }
 
 
