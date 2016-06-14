@@ -79,13 +79,18 @@ public class SendChattyMessageAction extends BaseEventBotAction
           message = getRandomMessage(this.messagesForShortInactivity);
           break;
         case LONG:
+          if (random.nextBoolean()) {
+            //in case of a longer period of inactivity, we become less chatty: only
+            //send about half the amount of messages
+            continue theloop;
+          }
           message = getRandomMessage(this.messagesForLongInactivity);
           break;
         case TOO_LONG:
           if (toRemove == null) toRemove = new HashSet<URI>();
           toRemove.add(con);
           message = "Ok, you've been absent for a while now. I will stop bugging you. If you want me to resume " +
-            "doing that, say 'chatty on'";
+            "doing that, say 'chatty on'. For more information, say 'usage'";
           break;
       }
       //publish an event that causes the message to be sent
