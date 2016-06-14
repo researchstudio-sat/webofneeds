@@ -39,20 +39,26 @@ public class MessageTimingManager
   }
 
   public static enum InactivityPeriod{
-    ACTIVE(60*1000),SHORT(5*60*1000), LONG(10*60*1000), TOO_LONG(-1);
+    ACTIVE(60*1000, 60*1000),SHORT(5*60*1000, 60*1000), LONG(10*60*1000, 120*1000), TOO_LONG(-1, 120*1000);
 
-    InactivityPeriod(final long timeout) {
+    InactivityPeriod(final long timeout, final long minimalPauseBetweenMessages) {
       this.timeout = timeout;
+      this.minimalPauseBetweenMessages = minimalPauseBetweenMessages;
     }
 
     private long timeout;
+    private long minimalPauseBetweenMessages;
 
     public long getTimeout() {
       return timeout;
     }
+    public long getMinimalPauseBetweenMessages() { return minimalPauseBetweenMessages;}
 
     public boolean isWithin(long inactivityInMillis){
       return  inactivityInMillis <= timeout;
+    }
+    public boolean isPauseLongEnough(long pauseLengthInMIllis) { return pauseLengthInMIllis >=
+      minimalPauseBetweenMessages;
     }
 
     public static InactivityPeriod getInactivityPeriod(Date lastAction){
@@ -69,6 +75,15 @@ public class MessageTimingManager
       if (LONG.isWithin(diff)) return LONG;
       return TOO_LONG;
     }
+  }
+
+  public boolean isWaitedLongEnough(URI connectionUri){
+    Date lastSent = getTimestampMapForKey
+      (KEY_LAST_MESSAGE_OUT_TIMESTAMPS).get
+      (connectionUri);
+    if (lastSent == null) return false; //avoid sending messages on every actEvent if too many needs are connected
+    return getInactivityPeriodOfPartner(connectionUri)
+      .isPauseLongEnough(System.currentTimeMillis() - lastSent.getTime());
   }
 
   public InactivityPeriod getInactivityPeriodOfPartner(URI connectionUri){

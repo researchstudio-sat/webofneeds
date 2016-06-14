@@ -61,15 +61,16 @@ public class SendChattyMessageAction extends BaseEventBotAction
       if (random.nextDouble() > probabilityOfSendingMessage) {
         continue;
       }
-
-      //don't send a chatty message when we just sent one
-      if (messageTimingManager.getInactivityPeriodOfSelf(con) == MessageTimingManager.InactivityPeriod.ACTIVE) {
-        continue;
-      }
-
       //determine which kind of message to send depending on inactivity of partner.
       MessageTimingManager.InactivityPeriod inactivityPeriod = messageTimingManager
         .getInactivityPeriodOfPartner(con);
+
+      //don't send a chatty message when we just sent one
+      if (!this.messageTimingManager.isWaitedLongEnough(con)) {
+        continue;
+      }
+
+
       String message = null;
       switch (inactivityPeriod) {
         case ACTIVE:
@@ -79,11 +80,6 @@ public class SendChattyMessageAction extends BaseEventBotAction
           message = getRandomMessage(this.messagesForShortInactivity);
           break;
         case LONG:
-          if (random.nextBoolean()) {
-            //in case of a longer period of inactivity, we become less chatty: only
-            //send about half the amount of messages
-            continue theloop;
-          }
           message = getRandomMessage(this.messagesForLongInactivity);
           break;
         case TOO_LONG:
