@@ -33,7 +33,9 @@ import won.matcher.component.MatcherNodeURISource;
 import won.matcher.protocol.impl.MatcherProtocolMatcherServiceImplJMSBased;
 import won.protocol.matcher.MatcherProtocolNeedServiceClientSide;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.sender.WonMessageSender;
+import won.protocol.message.sender.exception.WonMessageSenderException;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
 import won.protocol.model.Match;
@@ -80,6 +82,7 @@ public class EventBot extends TriggeredBot
 {
   private EventBus eventBus;
   private EventListenerContext eventListenerContext = new MyEventListenerContext();
+  private EventGeneratingWonMessageSenderWrapper wonMessageSenderWrapper;
 
 
 
@@ -287,7 +290,7 @@ public class EventBot extends TriggeredBot
 
     public WonMessageSender getWonMessageSender()
     {
-      return EventBot.this.getWonMessageSender();
+      return getWonMessageSenderWrapperLazily();
     }
 
     public MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient(){
@@ -343,6 +346,13 @@ public class EventBot extends TriggeredBot
     }
   }
 
+  private EventGeneratingWonMessageSenderWrapper getWonMessageSenderWrapperLazily() {
+    if (this.wonMessageSenderWrapper == null){
+      this.wonMessageSenderWrapper = new EventGeneratingWonMessageSenderWrapper(EventBot.this.getWonMessageSender());
+    }
+    return wonMessageSenderWrapper;
+  }
+
   /**
    * Event listener that will stop the bot by publishing a WorkDoneEvent if an ErrorEvent is seen.
    * Expects to be registered for WorkDoneEvents and ErrorEvents and will not react to a WorkDoneEvent.
@@ -356,7 +366,7 @@ public class EventBot extends TriggeredBot
     }
 
     @Override
-    protected void doOnEvent(final Event event) throws Exception {
+    protected void doOnEvent(final won.bot.framework.events.event.Event event) throws Exception {
       synchronized (monitor) {
         if (event instanceof ErrorEvent) {
           //only react to an ErrorEvent
@@ -378,6 +388,38 @@ public class EventBot extends TriggeredBot
     private void setDoneAndUnsubscribe() {
       done = true;
       getEventBus().unsubscribe(this);
+    }
+  }
+
+  /**
+   * Wraps a WonMessageSender so a WonMessageSentEvent can be published after a message has been sent.
+   */
+  private class EventGeneratingWonMessageSenderWrapper implements WonMessageSender
+  {
+    private final WonMessageSender delegate;
+
+    public EventGeneratingWonMessageSenderWrapper(final WonMessageSender delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public void sendWonMessage(final WonMessage message) throws WonMessageSenderException {
+      delegate.sendWonMessage(message);
+      //publish the WonMessageSent event if no exception was raised
+      WonMessageType type = message.getMessageType();
+      Event event = null;
+      //if the event is connection specific, raise a more specialized event
+      switch (type){
+        case CLOSE:
+        case CONNECT:
+        case CONNECTION_MESSAGE:
+        case OPEN:
+          event = new WonMessageSentOnConnectionEvent(message);
+          break;
+        default:
+          event = new WonMessageSentEvent(message);
+      }
+      getEventBus().publish(event);
     }
   }
 

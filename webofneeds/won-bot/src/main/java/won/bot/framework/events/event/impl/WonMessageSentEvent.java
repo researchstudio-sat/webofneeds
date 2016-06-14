@@ -16,22 +16,29 @@
 
 package won.bot.framework.events.event.impl;
 
+import won.bot.framework.events.event.BaseEvent;
+import won.bot.framework.events.event.MessageEvent;
 import won.protocol.message.WonMessage;
-import won.protocol.model.Connection;
+import won.protocol.message.WonMessageType;
 
 /**
- *
+ * Created by fkleedorfer on 14.06.2016.
  */
-public class MessageFromOtherNeedEvent extends WonMessageReceivedOnConnectionEvent
+public class WonMessageSentEvent extends BaseEvent implements MessageEvent
 {
-  public MessageFromOtherNeedEvent(final Connection con, final WonMessage wonMessage) {
-    super(con, wonMessage);
+  private final WonMessage message;
+
+  public WonMessageSentEvent(WonMessage message) {
+    this.message = message;
   }
 
   @Override
-  public String toString() {
-    return "MessageFromOtherNeedEvent{" +
-      "wonMessage=" + getWonMessage() +
-      '}';
+  public WonMessage getWonMessage() {
+    return this.message;
+  }
+
+  @Override
+  public WonMessageType getWonMessageType() {
+    return this.message.getMessageType();
   }
 }

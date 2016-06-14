@@ -16,22 +16,30 @@
 
 package won.bot.framework.events.event.impl;
 
+import won.bot.framework.events.event.BaseNeedAndConnectionSpecificEvent;
+import won.bot.framework.events.event.MessageEvent;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 
 /**
- *
+ * Base class for all events that signal an incoming WonMessage (but not a Success/FailureResponse).
  */
-public class MessageFromOtherNeedEvent extends WonMessageReceivedOnConnectionEvent
+public class WonMessageReceivedOnConnectionEvent extends BaseNeedAndConnectionSpecificEvent implements MessageEvent
 {
-  public MessageFromOtherNeedEvent(final Connection con, final WonMessage wonMessage) {
-    super(con, wonMessage);
+  private final WonMessage wonMessage;
+
+  public WonMessageReceivedOnConnectionEvent(final Connection con, final WonMessage wonMessage) {
+    super(con);
+    this.wonMessage = wonMessage;
+  }
+
+  public WonMessage getWonMessage() {
+    return wonMessage;
   }
 
   @Override
-  public String toString() {
-    return "MessageFromOtherNeedEvent{" +
-      "wonMessage=" + getWonMessage() +
-      '}';
+  public WonMessageType getWonMessageType() {
+    return this.wonMessage.getMessageType();
   }
 }

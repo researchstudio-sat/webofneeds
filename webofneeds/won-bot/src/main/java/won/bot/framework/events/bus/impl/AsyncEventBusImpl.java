@@ -18,13 +18,14 @@ package won.bot.framework.events.bus.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.events.event.Event;
 import won.bot.framework.events.bus.EventBus;
+import won.bot.framework.events.event.Event;
 import won.bot.framework.events.listener.EventListener;
 import won.bot.framework.events.listener.SubscriptionAware;
 
 import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -132,7 +133,24 @@ public class AsyncEventBusImpl implements EventBus
   private List<EventListener> getEventListenersForEvent(final Event event)
   {
     //the map is secured against concurrent modification, the list inside is unmodifiable
-    return listenerMap.get(event.getClass());
+    List<Class<? extends Event>> classes = getEventTypes(event.getClass());
+    return listenerMap.entrySet().stream()
+                      .filter(entry -> classes.contains(entry.getKey()))
+                      .flatMap(e -> e.getValue().stream())
+                      .collect(Collectors.toList());
+  }
+
+  private List<Class<? extends Event>> getEventTypes(final Class<? extends Event> clazz) {
+    Class superclass = clazz.getSuperclass();
+    List<Class<? extends Event>> ret = null;
+    if (!Event.class.isAssignableFrom(superclass)){
+      //we have an event base class
+      ret = new LinkedList<>();
+    } else {
+      ret = getEventTypes(superclass);
+    }
+    ret.add(clazz);
+    return ret;
   }
 
 

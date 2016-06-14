@@ -16,24 +16,17 @@
 
 package won.bot.framework.events.event.impl;
 
-import won.bot.framework.events.event.BaseNeedAndConnectionSpecificEvent;
-import won.bot.framework.events.event.MessageEvent;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 
 /**
  *
  */
-public class CloseFromOtherNeedEvent extends BaseNeedAndConnectionSpecificEvent implements MessageEvent
+public class CloseFromOtherNeedEvent extends WonMessageReceivedOnConnectionEvent
 {
-  private final WonMessage wonMessage;
 
   public CloseFromOtherNeedEvent(final Connection con, final WonMessage wonMessage) {
-    super(con);
-    this.wonMessage = wonMessage;
+    super(con, wonMessage);
   }
 
-  public WonMessage getWonMessage() {
-    return wonMessage;
-  }
 }

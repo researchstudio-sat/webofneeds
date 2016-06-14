@@ -19,6 +19,7 @@ package won.bot.framework.events.event.impl;
 import won.bot.framework.events.event.BaseEvent;
 import won.bot.framework.events.event.MessageEvent;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageType;
 import won.protocol.model.Match;
 
 /**
@@ -43,5 +44,10 @@ public class HintFromMatcherEvent extends BaseEvent  implements MessageEvent
   public WonMessage getWonMessage()
   {
     return wonMessage;
+  }
+
+  @Override
+  public WonMessageType getWonMessageType() {
+    return this.wonMessage.getMessageType();
   }
 }

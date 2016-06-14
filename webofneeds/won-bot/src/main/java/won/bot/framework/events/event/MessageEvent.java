@@ -1,6 +1,7 @@
 package won.bot.framework.events.event;
 
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageType;
 
 /**
  * Tagging interface that indicates that the event was created when an
@@ -10,4 +11,5 @@ import won.protocol.message.WonMessage;
 public interface MessageEvent
 {
   public WonMessage getWonMessage();
+  public WonMessageType getWonMessageType();
 }
