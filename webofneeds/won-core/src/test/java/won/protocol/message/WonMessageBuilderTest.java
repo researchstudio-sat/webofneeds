@@ -33,6 +33,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import static won.protocol.message.WonMessageBuilder.wrap;
+
 public class WonMessageBuilderTest
 {
   private static final URI MSG_URI_1 = URI.create("http://example.com/msg/1234");
@@ -237,14 +239,12 @@ public class WonMessageBuilderTest
   }
 
   private WonMessageBuilder createMessageWithEnvelopeType(){
-    return new WonMessageBuilder()
-      .setMessageURI(MSG_URI_1)
+    return new WonMessageBuilder(MSG_URI_1)
       .setWonMessageType(WonMessageType.CLOSE)
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
   }
   private WonMessageBuilder createMessageWithoutContent(){
-    return new WonMessageBuilder()
-      .setMessageURI(MSG_URI_1)
+    return new WonMessageBuilder(MSG_URI_1)
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
       .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
   }
@@ -259,23 +259,20 @@ public class WonMessageBuilderTest
   }
 
   private WonMessageBuilder wrapMessage(final WonMessage msg1) {
-    return new WonMessageBuilder()
-      .wrap(msg1)
+    return wrap(msg1)
       .setReceiverURI(CONNECTION_URI_1)
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
   }
 
   private WonMessageBuilder createMessageWithContent(){
-      return new WonMessageBuilder()
-        .setMessageURI(MSG_URI_1)
+      return new WonMessageBuilder(MSG_URI_1)
         .addContent(createContent(), null)
         .setWonMessageType(WonMessageType.HINT_MESSAGE)
         .setWonMessageDirection(WonMessageDirection.FROM_OWNER);
   }
 
   private WonMessageBuilder createMessageWithTwoContentGraphs(){
-    return new WonMessageBuilder()
-      .setMessageURI(MSG_URI_1)
+    return new WonMessageBuilder(MSG_URI_1)
       .addContent(createContent(), null)
       .addContent(createDifferentContent(), null)
       .setWonMessageType(WonMessageType.HINT_MESSAGE)
@@ -283,9 +280,8 @@ public class WonMessageBuilderTest
   }
 
   private WonMessageBuilder copyEnvelopeAndContent(WonMessage msg) {
-    return new WonMessageBuilder()
-      .setMessageURI(MSG_URI_2)
-      .copyEnvelopeFromWonMessage(msg)
+    return
+       WonMessageBuilder.copyEnvelopeFromWonMessage(msg)
       .copyContentFromMessageReplacingMessageURI(msg)
       .setReceiverURI(CONNECTION_URI_1)
       .addContent(createDifferentContent(), null)

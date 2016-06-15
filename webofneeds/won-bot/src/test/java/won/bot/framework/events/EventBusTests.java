@@ -22,9 +22,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import won.bot.framework.events.bus.impl.AsyncEventBusImpl;
-import won.bot.framework.events.event.Event;
-import won.bot.framework.events.listener.EventListener;
+import won.bot.framework.eventbot.bus.impl.AsyncEventBusImpl;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.listener.EventListener;
 
 import java.util.concurrent.CountDownLatch;
 

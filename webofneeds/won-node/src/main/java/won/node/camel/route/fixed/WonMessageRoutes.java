@@ -57,7 +57,10 @@ public class WonMessageRoutes  extends RouteBuilder
     from("seda:OwnerProtocolOut?concurrentConsumers=2")
       .routeId("OwnerProtocolOut")
       .to("bean:ownerProtocolOutgoingMessagesProcessor")
-      .recipientList(header("ownerApplicationIDs"));
+      //note: here it might happen that the recipient list contains only endpoint URIs that cannot be found
+      // e.g. when client's public keys changed and hence their queuenames did, too. Added stopOnException to deal
+      // with that.
+      .recipientList(header("ownerApplicationIDs")).stopOnException();
 
     /**
      * System messages: treated almost as incoming from owner.

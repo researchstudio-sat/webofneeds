@@ -16,7 +16,7 @@
 
 package won.bot;
 
-import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.eventbot.EventListenerContext;
 
 /**
  *

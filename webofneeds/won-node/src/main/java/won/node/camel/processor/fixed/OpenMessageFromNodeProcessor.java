@@ -58,7 +58,7 @@ public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor
 
   private WonMessage createMessageToSendToOwner(WonMessage wonMessage, URI localConnectionURI) {
     //create the message to send to the owner
-    WonMessageBuilder builder = new WonMessageBuilder()
+    WonMessageBuilder builder = WonMessageBuilder
       .setPropertiesForPassingMessageToOwner(wonMessage);
     if (wonMessage.getReceiverURI() == null){
       //if we just created a new connection, add the connection URI as the receiverURI

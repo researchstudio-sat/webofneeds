@@ -29,6 +29,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
+
 /**
  * Utilities for populating/manipulating the RDF models used throughout the WON application.
  */
@@ -160,6 +162,17 @@ public class WonRdfUtils
 
   public static class MessageUtils
   {
+    /**
+     * Adds the specified text as a won:hasTextMessage to the model's base resource.
+     * @param message
+     * @return
+     */
+    public static Model addMessage(Model model, String message) {
+      Resource baseRes = RdfUtils.findOrCreateBaseResource(model);
+      baseRes.addProperty(WON.HAS_TEXT_MESSAGE, message, XSDDatatype.XSDstring);
+      return model;
+    }
+
     /**
      * Creates an RDF model containing a text message.
      * @param message
@@ -393,7 +406,7 @@ public class WonRdfUtils
     public static Model createFacetModelForHintOrConnect(URI facet, URI remoteFacet)
     {
       Model model = ModelFactory.createDefaultModel();
-      Resource baseResource = RdfUtils.findOrCreateBaseResource(model);
+      Resource baseResource = findOrCreateBaseResource(model);
       WonRdfUtils.FacetUtils.addFacet(model, facet);
       WonRdfUtils.FacetUtils.addRemoteFacet(model, remoteFacet);
       logger.debug("facet model contains these facets: from:{} to:{}", facet, remoteFacet);

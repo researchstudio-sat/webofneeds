@@ -32,8 +32,6 @@ public class DeactivateNeedMessageProcessor extends AbstractCamelProcessor
 {
   Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
-
   public void process(final Exchange exchange) throws Exception {
     WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     URI receiverNeedURI = wonMessage.getReceiverNeedURI();
@@ -61,7 +59,7 @@ public class DeactivateNeedMessageProcessor extends AbstractCamelProcessor
     //the close message is directed at our local connection. It will
     //be routed to the owner and forwarded to to remote connection
     URI messageURI = wonNodeInformationService.generateEventURI();
-    WonMessage message = new WonMessageBuilder()
+    WonMessage message = WonMessageBuilder
       .setMessagePropertiesForClose(messageURI,
                                     WonMessageDirection.FROM_SYSTEM,
                                     con.getConnectionURI(),
@@ -69,7 +67,7 @@ public class DeactivateNeedMessageProcessor extends AbstractCamelProcessor
                                     need.getWonNodeURI(),
                                     con.getConnectionURI(),
                                     con.getNeedURI(),
-                                    need.getWonNodeURI()).build();
+                                    need.getWonNodeURI(), "Closed because Need was deactivated").build();
 
     sendSystemMessage(message);
   }

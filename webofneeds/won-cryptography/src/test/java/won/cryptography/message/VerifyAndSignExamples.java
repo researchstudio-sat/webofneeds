@@ -6,8 +6,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import won.cryptography.service.KeyStoreService;
 import won.cryptography.service.DefaultSecurityWonTransmissionService;
+import won.cryptography.service.KeyStoreService;
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingDataSource;
 import won.protocol.message.WonMessage;
@@ -96,8 +96,7 @@ public class VerifyAndSignExamples
     // WonMessage inputMessage = needKeyGeneratorAndAdder.process(inputMessage);
 
     // owner adds envelope
-    WonMessage wonMessage = new WonMessageBuilder()
-      .setMessageURI(URI.create(EVENT_ENV1_URI))
+    WonMessage wonMessage = new WonMessageBuilder(URI.create(EVENT_ENV1_URI))
       .setSenderNeedURI(URI.create(NEED_URI))
       .addContent(inputDataset.getNamedModel(NEED_CORE_DATA_URI), null)
       .setWonMessageDirection(WonMessageDirection.FROM_OWNER)
@@ -162,8 +161,7 @@ public class VerifyAndSignExamples
 
     // node then process the message in some way, and adds its own envelope,
     // the envelope should contain the reference to the verified signatures
-    WonMessage nodeWonMessage = new WonMessageBuilder()
-      .wrap(verifiedMessage)
+    WonMessage nodeWonMessage = WonMessageBuilder.wrap(verifiedMessage)
       .setWonMessageDirection(WonMessageDirection.FROM_SYSTEM)
       .build();
 

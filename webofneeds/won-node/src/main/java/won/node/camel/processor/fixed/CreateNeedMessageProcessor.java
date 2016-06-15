@@ -1,12 +1,7 @@
 package won.node.camel.processor.fixed;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
-import com.hp.hpl.jena.sparql.path.Path;
-import com.hp.hpl.jena.sparql.path.PathParser;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.javasimon.SimonManager;
@@ -24,8 +19,6 @@ import won.protocol.model.Facet;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 import won.protocol.model.OwnerApplication;
-import won.protocol.util.DefaultPrefixUtils;
-import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -113,7 +106,7 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
 
   private WonMessage makeNeedCreatedMessageForMatcher(final Need need) throws NoSuchNeedException {
     Dataset needDataset = linkedDataService.getNeedDataset(need.getNeedURI());
-    return new WonMessageBuilder()
+    return WonMessageBuilder
       .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateEventURI(),
                                                       need.getNeedURI(), need.getWonNodeURI())
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
@@ -121,7 +114,7 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
   }
 
   private WonMessage makeCreateResponseMessage(final WonMessage wonMessage) {
-    return new WonMessageBuilder().setPropertiesForNodeResponse(
+    return WonMessageBuilder.setPropertiesForNodeResponse(
             wonMessage,
             true,
             this.wonNodeInformationService.generateEventURI()).build();
