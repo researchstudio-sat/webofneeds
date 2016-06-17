@@ -9,10 +9,12 @@ import createNeedTitleBarModule from '../create-need-title-bar';
 import posttypeSelectModule from '../posttype-select';
 import labelledHrModule from '../labelled-hr';
 import dynamicTextfieldModule from '../dynamic-textfield';
+import needTextfieldModule from '../need-textfield';
 import imageDropzoneModule from '../image-dropzone';
 //import draftStoreModule from '../../stores/draft-store';
 import { attach } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
+
 
 const postTypeTexts = [
     {
@@ -135,7 +137,7 @@ export default angular.module('won.owner.components.createNeed', [
         labelledHrModule,
         dynamicTextfieldModule,
         imageDropzoneModule,
-
+        needTextfieldModule,
     ])
     //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
     .controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
