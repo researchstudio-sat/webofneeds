@@ -98,7 +98,7 @@ public class WonMessageRoutes  extends RouteBuilder
         //call the default implementation, which may alter the message.
         // Also, it puts any outbound message in the respective header
       .routeId("OwnerProtocolLogic")
-      .routingSlip(method("messageTypeSlip"))
+      .routingSlip(method("fixedMessageProcessorSlip"))
       .to("bean:signatureAdder")
       .to("bean:persister")
       //swap: outbound becomes 'normal' message, 'normal' becomes 'original' - note: in some cases (create, activate,
@@ -107,21 +107,7 @@ public class WonMessageRoutes  extends RouteBuilder
       .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER))
         //now if the outbound message is one that facet implementations can
         //process, let them do that, then send the resulting message to the remote end.
-      .choice()
-        .when(PredicateBuilder.and(
-                header(WonCamelConstants.DIRECTION_HEADER).isEqualTo(URI.create(WONMSG.TYPE_FROM_OWNER_STRING)),
-                PredicateBuilder.and(
-                  header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
-                  new ShouldCallFacetImplForMessagePredicate())))
-            //put the local connection URI into the header
-            .setHeader(WonCamelConstants.CONNECTION_URI_HEADER,
-                    new GetEnvelopePropertyExpression(WonCamelConstants.ORIGINAL_MESSAGE_HEADER,
-                            URI.create(WONMSG.SENDER_PROPERTY.getURI().toString())))
-            //look into the db to find the facet we are using
-            .to("bean:facetExtractor")
-            .routingSlip(method("facetTypeSlip"))
-            .endChoice() //end choice
-      .end()
+
       .choice()
           .when(
             //check if the outbound message header is set, otherwise we don't have anything to
@@ -154,10 +140,30 @@ public class WonMessageRoutes  extends RouteBuilder
       //if we didn't raise an exception so far, send a success response
       //for that, we have to re-instate the original (not the outbound) messagge, so we reply to the right one
       .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER))
-      .filter(PredicateBuilder.and(
+      .choice()
+        .when(PredicateBuilder.and(
               header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
               PredicateBuilder.not(new IsResponseMessagePredicate())))
-            .to("bean:successResponder");
+            .to("bean:successResponder")
+        .endChoice()
+        .end()
+      //now, call the facet implementation
+      .choice()
+        .when(PredicateBuilder.and(
+          header(WonCamelConstants.DIRECTION_HEADER).isEqualTo(URI.create(WONMSG.TYPE_FROM_OWNER_STRING)),
+          PredicateBuilder.and(
+            header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
+            new ShouldCallFacetImplForMessagePredicate())))
+        //put the local connection URI into the header
+        .setHeader(WonCamelConstants.CONNECTION_URI_HEADER,
+                   new GetEnvelopePropertyExpression(WonCamelConstants.ORIGINAL_MESSAGE_HEADER,
+                                                     URI.create(WONMSG.SENDER_PROPERTY.getURI().toString())))
+        //look into the db to find the facet we are using
+        .to("bean:facetExtractor")
+        .routingSlip(method("facetTypeSlip"))
+        .endChoice() //end choice
+        .end()
+      .routingSlip(method("fixedMessageReactionProcessorSlip"));
 
     /**
      * Need protocol, incoming
@@ -179,7 +185,7 @@ public class WonMessageRoutes  extends RouteBuilder
             .to("bean:signatureChecker")
             .to("bean:wrapperFromExternal")
             //call the default implementation, which may alter the message.
-            .routingSlip(method("messageTypeSlip"))
+            .routingSlip(method("fixedMessageProcessorSlip"))
             .to("bean:signatureAdder")
             .to("bean:persister")
              //put the local connection URI into the header
@@ -199,7 +205,9 @@ public class WonMessageRoutes  extends RouteBuilder
                       header(WonCamelConstants.MESSAGE_HEADER).isNotNull(),
                       PredicateBuilder.not(new IsResponseMessagePredicate())))
                 .to("bean:successResponder")
-            .end();
+            .endChoice()
+            .end()
+    .routingSlip(method("fixedMessageReactionProcessorSlip"));
 
     /**
      * Need protocol, outgoing
