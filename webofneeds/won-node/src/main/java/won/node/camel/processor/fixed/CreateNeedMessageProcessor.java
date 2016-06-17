@@ -1,7 +1,6 @@
 package won.node.camel.processor.fixed;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.javasimon.SimonManager;
@@ -10,10 +9,7 @@ import org.javasimon.Stopwatch;
 import org.springframework.stereotype.Service;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
-import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Facet;
 import won.protocol.model.Need;
@@ -43,16 +39,6 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     Need need = storeNeed(wonMessage);
     authorizeOwnerApplicationForNeed(message, need);
-    try {
-      WonMessage newNeedNotificationMessage = makeNeedCreatedMessageForMatcher(need);
-      //TODO: remove mPMC here, use method from base class
-      Dataset needContent = wonMessage.getMessageContent();
-      URI needURI = getNeedURIFromWonMessage(needContent);
-      matcherProtocolMatcherClient.needCreated(needURI, ModelFactory.createDefaultModel(),
-      newNeedNotificationMessage);
-    } catch (Exception e) {
-      logger.warn("could not create NeedCreatedNotification", e);
-    }
   }
 
   private Need storeNeed(final WonMessage wonMessage) {
@@ -104,21 +90,6 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     authorizeOwnerApplicationForNeed(ownerApplicationID, need);
   }
 
-  private WonMessage makeNeedCreatedMessageForMatcher(final Need need) throws NoSuchNeedException {
-    Dataset needDataset = linkedDataService.getNeedDataset(need.getNeedURI());
-    return WonMessageBuilder
-      .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateEventURI(),
-                                                      need.getNeedURI(), need.getWonNodeURI())
-      .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL)
-      .build(needDataset);
-  }
-
-  private WonMessage makeCreateResponseMessage(final WonMessage wonMessage) {
-    return WonMessageBuilder.setPropertiesForNodeResponse(
-            wonMessage,
-            true,
-            this.wonNodeInformationService.generateEventURI()).build();
-  }
 
 
   private URI getNeedURIFromWonMessage(final Dataset wonMessage) {
@@ -130,12 +101,7 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     return needURI;
   }
 
-  private void authorizeOwnerApplicationForNeedURI(final String ownerApplicationID, URI needURI) {
-    logger.debug("AUTHORIZING owner application. needURI:{}, OwnerApplicationId:{}", needURI, ownerApplicationID);
-    Need need = needRepository.findByNeedURI(needURI).get(0);
 
-    authorizeOwnerApplicationForNeed(ownerApplicationID, need);
-  }
 
   private void authorizeOwnerApplicationForNeed(final String ownerApplicationID, Need need) {
     String stopwatchName = getClass().getName() + ".authorizeOwnerApplicationForNeed";

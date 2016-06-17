@@ -36,8 +36,6 @@ public class ActivateNeedMessageProcessor extends AbstractCamelProcessor
     need.setState(NeedState.ACTIVE);
     logger.debug("Setting Need State: " + need.getState());
     needRepository.save(need);
-    //TODO: shouldn't we send a dedicated message?
-    matcherProtocolMatcherClient.needActivated(need.getNeedURI(), wonMessage);
   }
 
 }
