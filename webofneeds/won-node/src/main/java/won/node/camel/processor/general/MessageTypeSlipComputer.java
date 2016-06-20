@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
@@ -25,14 +24,27 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * User: syim
- * Date: 11.03.2015
+ * Computes a message slip for message processors that are annotated with appropriate marker annotations.
+ * The annotation class to look for has to be passed to this slip in the constructor.
+ *
  */
 public class MessageTypeSlipComputer implements InitializingBean, ApplicationContextAware, Expression
 {
   Logger logger = LoggerFactory.getLogger(this.getClass());
   HashMap<String, Object> fixedMessageProcessorsMap;
   private ApplicationContext applicationContext;
+  private Class annotationClazz;
+  private boolean allowNoMatchingProcessor = false;
+
+  public MessageTypeSlipComputer(final String annotationClazzName) throws ClassNotFoundException {
+    this.annotationClazz = Class.forName(annotationClazzName);
+  }
+
+  public MessageTypeSlipComputer(final String annotationClazzName, final boolean allowNoMatchingProcessor)
+    throws ClassNotFoundException {
+    this(annotationClazzName);
+    this.allowNoMatchingProcessor = allowNoMatchingProcessor;
+  }
 
   public void setApplicationContext(ApplicationContext applicationContext) {
     this.applicationContext = applicationContext;
@@ -41,8 +53,7 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    fixedMessageProcessorsMap = (HashMap)applicationContext.getBeansWithAnnotation(FixedMessageProcessor
-            .class);
+    fixedMessageProcessorsMap = (HashMap)applicationContext.getBeansWithAnnotation(this.annotationClazz);
 
   }
 
@@ -83,7 +94,11 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
       }
     }
     try {
-      slip = "bean:"+computeMessageTypeSlip(messageType,direction) + "?method=" + method;
+      String bean = computeMessageTypeSlip(messageType,direction);
+      if (bean == null) {
+        return null;
+      }
+      slip = "bean:"+ bean + "?method=" + method;
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
     } catch (InvocationTargetException e) {
@@ -103,11 +118,14 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
     while (iter.hasNext()) {
       Map.Entry pair = (Map.Entry)iter.next();
       Processor wonMessageProcessor = (Processor)pair.getValue();
-      Annotation annotation = wonMessageProcessor.getClass().getAnnotation(FixedMessageProcessor.class);
+      Annotation annotation = wonMessageProcessor.getClass().getAnnotation(annotationClazz);
 
       if(matches(annotation, messageType, direction, null)){
         return pair.getKey().toString();
       }
+    }
+    if (allowNoMatchingProcessor) {
+      return null;
     }
     throw new WonMessageProcessingException(String.format("unexpected combination of messageType %s " +
       "and direction %s encountered", messageType, direction));
