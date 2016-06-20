@@ -95,26 +95,41 @@ export function runMessagingAgent(redux) {
             console.log('onMessage - events: ', events);
 
             /* Other clients or matcher initiated stuff: */
-            if (events['msg:FromExternal'] &&
-                events['msg:FromExternal'].hasMessageType === won.WONMSG.hintMessageCompacted){
-                    redux.dispatch(actionCreators.messages__hintMessageReceived(events['msg:FromExternal']));
-            }
-            if(events['msg:FromExternal'] &&
-               events['msg:FromOwner'] &&
-               events['msg:FromOwner'].hasMessageType === won.WONMSG.connectMessageCompacted ){
-                    redux.dispatch(actionCreators.messages__connectMessageReceived(events));
-            }
+            const msgFromExternal = events['msg:FromExternal'];
+            const msgFromSystem = events['msg:FromSystem'];
 
-            if(events['msg:FromExternal'] &&
-                events['msg:FromOwner'] &&
-                events['msg:FromOwner'].hasMessageType === won.WONMSG.connectionMessageCompacted ){
-                //got a chat message on a connection
-                redux.dispatch(actionCreators.messages__connectionMessageReceived(events));
-            }
+            if(msgFromExternal) {
+                const msgFromOwner = events['msg:FromOwner'];
 
+                switch (msgFromExternal.hasMessageType){
+                    case won.WONMSG.hintMessageCompacted:
+                        redux.dispatch(actionCreators.messages__hintMessageReceived(msgFromExternal));
+                        break;
+                    default:
+                        console.warn("MESSAGE PROCESSING IS NOT IMPLEMENTED FOR THIS CASE: ",events);
+                        break;
+                }
+
+                if(msgFromOwner){
+                    switch (msgFromOwner.hasMessageType) {
+                        case won.WONMSG.connectMessageCompacted:
+                            redux.dispatch(actionCreators.messages__connectMessageReceived(events));
+                            break;
+                        case won.WONMSG.connectionMessageCompacted:
+                            redux.dispatch(actionCreators.messages__connectionMessageReceived(events));
+                            break;
+                        case won.WONMSG.closeMessageCompacted:
+                            console.log("REMOTE CONNECTION CLOSE");
+                            redux.dispatch(actionCreators.messages__close__success(msgFromOwner));
+                            break;
+                        default:
+                            console.warn("MESSAGE PROCESSING IS NOT IMPLEMENTED FOR THIS CASE: ",events);
+                            break;
+                    }
+                }
+            }
             /* responses to own actions: */
-            if(events['msg:FromSystem']) {
-                const msgFromSystem = events['msg:FromSystem'];
+            if(msgFromSystem) {
                 switch (msgFromSystem.isResponseToMessageType) {
                     case won.WONMSG.createMessageCompacted:
                         if (msgFromSystem.hasMessageType === won.WONMSG.successResponseCompacted)
@@ -154,7 +169,7 @@ export function runMessagingAgent(redux) {
                         break;
 
                     case won.WONMSG.closeMessageCompacted:
-                        if (msgFromSystem.hasMessageType === won.WONMSG.successResponseCompacted)
+                        if (msgFromSystem.hasMessageType === won.WONMSG.successResponseCompacted) //JUMP HERE AND ONLY HERE WHEN CLOSE MESSAGES COME IN!
                             redux.dispatch(actionCreators.messages__close__success(msgFromSystem));
                         //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
                         //  redux.dispatch(actionCreators.messages__close__failure(event));
@@ -169,6 +184,9 @@ export function runMessagingAgent(redux) {
 
                     case won.WONMSG.connectionMessageCompacted:
                         //TODO handle succesful posting
+                        break;
+                    default:
+                        console.warn("MESSAGE PROCESSING IS NOT IMPLEMENTED FOR THIS CASE: ",events);
                         break;
                 }
             }

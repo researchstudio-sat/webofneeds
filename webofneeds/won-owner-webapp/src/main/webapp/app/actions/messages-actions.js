@@ -111,7 +111,6 @@ export function successfulCloseConnection(event) {
             });
         } else {
             //when a connection is closed by the node (e.g. when you close/deactivate a need all its corresponding connections will be closed)
-            console.log("close the connection because the need closed");
             dispatch({
                 type: actionTypes.messages.close.success,
                 payload: event
