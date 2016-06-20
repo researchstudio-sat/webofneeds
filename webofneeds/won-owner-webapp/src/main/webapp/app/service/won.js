@@ -215,6 +215,7 @@
     won.WONMSG.closeNeedSentMessageCompacted = won.WONMSG.prefix +":DeactivateSentMessage";
     won.WONMSG.hintMessage = won.WONMSG.baseUri + "HintMessage";
     won.WONMSG.hintMessageCompacted = won.WONMSG.prefix + ":HintMessage";
+    won.WONMSG.hintFeedbackMessageCompacted = won.WONMSG.prefix + ":HintFeedbackMessage";
     won.WONMSG.connectMessage = won.WONMSG.baseUri + "ConnectMessage";
     won.WONMSG.connectMessageCompacted = won.WONMSG.prefix + ":ConnectMessage";
     won.WONMSG.connectSentMessage = won.WONMSG.baseUri + "ConnectSentMessage";
