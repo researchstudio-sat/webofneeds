@@ -162,7 +162,7 @@
   <!-- processor for checking if message event, create need, or create connection uri is already in use -->
   <bean name="uriInUseChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
     <constructor-arg>
-      <bean class="won.node.camel.processor.fixed.UriAlreadyUsedCheckingWonMessageProcessor"/>
+      <bean class="won.node.camel.processor.general.UriAlreadyUsedCheckingWonMessageProcessor"/>
     </constructor-arg>
   </bean>
   <!-- processor for checking well-formedness of messages -->
@@ -191,7 +191,14 @@
     </constructor-arg>
   </bean>
   <!-- routing logic for wonMessages, computing which message-type specific processor -->
-  <bean name="messageTypeSlip" class="won.node.camel.processor.general.MessageTypeSlipComputer"/>
+  <bean name="fixedMessageProcessorSlip" class="won.node.camel.processor.general.MessageTypeSlipComputer">
+    <constructor-arg value="won.node.camel.processor.annotation.FixedMessageProcessor" />
+  </bean>
+  <!-- routing logic for wonMessages, computing which message-type specific processor -->
+  <bean name="fixedMessageReactionProcessorSlip" class="won.node.camel.processor.general.MessageTypeSlipComputer">
+    <constructor-arg value="won.node.camel.processor.annotation.FixedMessageReactionProcessor" />
+    <constructor-arg name="allowNoMatchingProcessor" value="true" />
+  </bean>
   <!-- routing logic for wonMessages, computing which facet-specific processor to use -->
   <bean name="facetTypeSlip" class="won.node.camel.processor.general.FacetTypeSlipComputer"/>
 </beans>
