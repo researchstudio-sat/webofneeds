@@ -187,7 +187,8 @@ function genComponentConf() {
             //TODO place caret as close as possible to original position
         }
         valid() {
-            return this.getText().trim().length < this.maxChars;
+            return !this.maxChars ||
+                this.getText().trim().length < this.maxChars;
         }
 
         getCaretPosition() {
