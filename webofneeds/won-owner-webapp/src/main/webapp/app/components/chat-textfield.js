@@ -85,7 +85,7 @@ function genComponentConf() {
             return this.maxChars - this.medium.value().length;
         }
         valid() {
-            return this.medium.value().length > 0 && this.charactersLeft() >= 0;
+            return !this.maxChars || this.charactersLeft() >= 0;
         }
 
         initMedium() {
