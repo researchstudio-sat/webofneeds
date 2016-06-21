@@ -115,7 +115,7 @@ docker -H satsrv04:2375 build -t webofneeds/wonnode:int $WORKSPACE/webofneeds/wo
 docker -H satsrv04:2375 stop wonnode_int || echo 'No docker container found to stop with name: wonnode_int'
 docker -H satsrv04:2375 rm wonnode_int || echo 'No docker container found to remove with name: wonnode_int'
 docker -H satsrv04:2375 run --name=wonnode_int -d -e "uri.host=satsrv04.researchstudio.at" -e "http.port=8889" -e \
-"activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 \
+"activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 -p 62911:62911\
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/wonnode_int:/usr/local/tomcat/won/client-certs/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
@@ -123,7 +123,10 @@ docker -H satsrv04:2375 run --name=wonnode_int -d -e "uri.host=satsrv04.research
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9010:9010 \
--e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
+-e "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62911,server=y,suspend=n
+-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false
+-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010
+-Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m \
 webofneeds/wonnode:int
@@ -135,7 +138,7 @@ docker -H satsrv05:2375 rm wonnode_int || echo 'No docker container found to rem
 docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv06.researchstudio.at" -e "http.port=8889" \
 -e "uri.prefix=https://satsrv06.researchstudio.at/won" \
 -e "client.authentication.behind.proxy=true" \
--e "activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 \
+-e "activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 -p 62911:62911 \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/wonnode_int:/usr/local/tomcat/won/client-certs/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
@@ -143,7 +146,10 @@ docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv06.research
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9010:9010 \
--e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010 -Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
+-e "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62911,server=y,suspend=n
+-Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false
+-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010
+-Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m \
 webofneeds/wonnode:int
@@ -193,7 +199,7 @@ docker -H satsrv04:2375 rm owner_int || echo 'No docker container found to remov
 docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.researchstudio.at" \
 -e "uri.host=satsrv04.researchstudio.at" -e "http.port=8082" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
--e "node.default.http.port=8889" -p 8082:8443 \
+-e "node.default.http.port=8889" -p 8082:8443 -p 62912:62912 \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/owner_int:/usr/local/tomcat/won/client-certs/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
@@ -201,7 +207,10 @@ docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.r
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9011:9011 \
--e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
+-e "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62912,server=y,suspend=n
+-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false
+-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011
+-Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx1000m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/owner:int
 
@@ -213,7 +222,7 @@ docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv06.r
 -e "uri.host=satsrv06.researchstudio.at" -e "http.port=8082" \
 -e "uri.prefix=https://satsrv06.researchstudio.at" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
--e "node.default.http.port=443" -p 8082:8443 \
+-e "node.default.http.port=443" -p 8082:8443 -p 62912:62912 \
 -e "uri.prefix.node.default=https://satsrv06.researchstudio.at/won" \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/owner_int:/usr/local/tomcat/won/client-certs/ \
@@ -222,7 +231,10 @@ docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv06.r
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9011:9011 \
--e "JMX_OPTS=-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011 -Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
+-e "JMX_OPTS=JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62912,server=y,suspend=n
+-Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false
+-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011
+-Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m \
 webofneeds/owner:int
