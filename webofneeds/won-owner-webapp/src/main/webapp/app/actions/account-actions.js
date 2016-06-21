@@ -70,6 +70,7 @@ export function accountLogout() {
             })
         )
         .then(() => {
+            won.clearStore();
             dispatch(actionCreators.messages__requestWsReset_Hack());
             dispatch(actionCreators.router__stateGo("landingpage"));
         })

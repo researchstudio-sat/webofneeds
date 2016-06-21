@@ -71,8 +71,7 @@ const rdfstore = window.rdfstore;
 
     var privateData = {};
 
-    won.ld_reset = function() {
-        privateData = {};
+    won.clearStore = function () {
         //create an rdfstore-js based store as a cache for rdf data.
         privateData.store =  rdfstore.create();
         window.store4dbg = privateData.store; //TODO deletme
@@ -88,7 +87,7 @@ const rdfstore = window.rdfstore;
     }
     const CACHE_ITEM_STATE = { OK: 1, DIRTY: 2, UNRESOLVABLE: 3, FETCHING: 4};
 
-    won.ld_reset();
+    won.clearStore();
 
 
     var createNameNodeInStore = function(uri){
@@ -268,7 +267,6 @@ const rdfstore = window.rdfstore;
         }
 
     };
-
 
     /**
      * We got the rdf but didn't know the uri of the resource
@@ -762,7 +760,7 @@ const rdfstore = window.rdfstore;
 
     function loadFromOwnServerIntoCache(uri, requesterWebId, deep, layerSize) {
         return new Promise((resolve, reject) => {
-            //console.log("linkeddata-service-won.js: fetching:        " + uri);
+            console.log("linkeddata-service-won.js: fetching:        " + uri);
 
             let requestUri = queryString(uri, requesterWebId, deep, layerSize);
             const find = '%3A';
