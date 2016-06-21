@@ -25,12 +25,6 @@ function genComponentConf() {
                 {{ self.charactersLeft() }} characters left
             </span>
         </div>
-        <button
-            class="wdt__submitbutton red"
-            ng-show="::self.submitButtonLabel"
-            ng-click="::self.submit()">
-            {{ ::self.submitButtonLabel }}
-        </button>
     `;
 
     const serviceDependencies = ['$scope', '$element', '$ngRedux', '$sanitize', '$sce'/*injections as strings here*/];
