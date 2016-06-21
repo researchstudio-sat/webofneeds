@@ -27,7 +27,7 @@ function genComponentConf() {
         </div>
     `;
 
-    const serviceDependencies = ['$scope', '$element', '$ngRedux', '$sanitize', '$sce'/*injections as strings here*/];
+    const serviceDependencies = ['$scope', '$element', '$ngRedux', /*injections as strings here*/];
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */) {
