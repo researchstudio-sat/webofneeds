@@ -3,7 +3,6 @@
 import angular from 'angular';
 import Immutable from 'immutable';
 import squareImageModule from './square-image';
-import dynamicTextFieldModule from './dynamic-textfield';
 import chatTextFieldModule from './chat-textfield';
 import { attach, is, delay, toDate } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
@@ -171,7 +170,6 @@ function genComponentConf() {
 
 export default angular.module('won.owner.components.postMessages', [
     squareImageModule,
-    dynamicTextFieldModule,
     chatTextFieldModule,
 ])
     .directive('wonPostMessages', genComponentConf)

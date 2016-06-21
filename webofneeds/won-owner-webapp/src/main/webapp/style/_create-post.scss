@@ -38,7 +38,7 @@
       margin-right: $minContentPadding;
       margin-bottom: $minContentPadding;
     }
-    & need-textfield, & won-dynamic-textfield {
+    & need-textfield {
       flex-grow: 1;
       flex-basis: 10rem;
     }
