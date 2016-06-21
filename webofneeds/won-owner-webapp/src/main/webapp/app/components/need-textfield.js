@@ -125,34 +125,7 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {
-            placeholder: '=',
-            maxChars: '=',
-            /*
-             * Usage:
-             *  on-input="::myCallback(value, valid)"
-             */
-            onInput: '&',
-            /*
-             * Usage:
-             *  on-change="::myCallback(value, valid)"
-             */
-            onChange: '&',
-
-            submitButtonLabel: '=',
-            /*
-             * Usage:
-             *  on-submit="::myCallback(value)"
-             */
-            onSubmit: '&',
-
-            /*
-             * if you don't specify a submit-button-label
-             * set this flag to true to enable submit-events.
-             */
-            submittable: '='
-
-        },
+        scope: { },
         template: template
     }
 }
