@@ -54,10 +54,10 @@ function genComponentConf() {
                 this.input()
             });
             this.mediumMountNg().bind('keydown', e =>
-                this.keydown()
+                this.keydown(e)
             );
         }
-        keydown() {
+        keydown(e) {
             if(e.keyCode === 13) {
                 this.submit();
                 return false;
