@@ -17,14 +17,22 @@
 package won.bot.integrationtest.security;
 
 import won.bot.IntegrationtestBot;
-import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.impl.*;
-import won.bot.framework.events.bus.EventBus;
-import won.bot.framework.events.event.NeedCreationFailedEvent;
-import won.bot.framework.events.event.impl.*;
-import won.bot.framework.events.listener.impl.ActionOnEventListener;
-import won.bot.framework.events.listener.impl.ActionOnFirstNEventsListener;
-import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.impl.*;
+import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.CreateNeedWithFacetsAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsAction;
+import won.bot.framework.eventbot.bus.EventBus;
+import won.bot.framework.eventbot.event.NeedCreationFailedEvent;
+import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
+import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.eventbot.event.impl.needlifecycle.NeedDeactivatedEvent;
+import won.bot.framework.eventbot.event.impl.test.SuccessEvent;
+import won.bot.framework.eventbot.event.impl.test.TestFailedEvent;
+import won.bot.framework.eventbot.event.impl.test.TestPassedEvent;
+import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
+import won.bot.framework.eventbot.listener.impl.ActionOnFirstNEventsListener;
+import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
 import won.bot.integrationtest.failsim.ConstantNewEventURIDecorator;
 
 /**
@@ -59,7 +67,7 @@ public class DuplicateMessageURIFailureBot extends IntegrationtestBot
               new MultipleActions(ctx,
                 new LogErrorAction(ctx,
                         "Should not have been able to create 2 needs using message with identical URIs"),
-                new PublishEventAction(ctx, new TestFailedEvent(this,"Should not have been able to create 2 needs with identical URI")))));
+                new PublishEventAction(ctx, new TestFailedEvent(this, "Should not have been able to create 2 needs with identical URI")))));
 
     //log success if we could create 1 need
     bus.subscribe(
@@ -99,7 +107,7 @@ public class DuplicateMessageURIFailureBot extends IntegrationtestBot
 
     //wait for the needDeactivated event, then say we're done.
     bus.subscribe(
-            NeedDeactivatedEvent.class, new ActionOnceAfterNEventsListener(
+      NeedDeactivatedEvent.class, new ActionOnceAfterNEventsListener(
             ctx, 1, new SignalWorkDoneAction(ctx, this)));
 
 

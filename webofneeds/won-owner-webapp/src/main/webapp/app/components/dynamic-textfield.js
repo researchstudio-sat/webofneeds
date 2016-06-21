@@ -45,9 +45,10 @@ function genComponentConf() {
             this.lastInput = '';
 
             this.textFieldNg().bind('keydown',e => this.onKeydown(e)) //prevent enter
-                              .bind('keyup', () => this.input()) // handle title changes
-                              .bind('focus', (e) => this.onFocus(e))
-                              .bind('blur', (e) => this.onBlur(e))
+                              .bind('keyup', e => this.input(e)) // handle title changes
+                              .bind('focus', e => this.onFocus(e))
+                              .bind('blur', e => this.onBlur(e))
+                            /*
                               .bind('drop paste', (e) => {
                                   //e.stopPropagation();
                                   //TODO strip formatting
@@ -70,7 +71,6 @@ function genComponentConf() {
         onKeydown(e) {
             // prevent typing enter as it causes `<div>`s in the value
             if(e.keyCode === 13) {
-                this.submit();
                 return false;
             }
         }
@@ -111,8 +111,15 @@ function genComponentConf() {
                 this.setText('');
             }
         }
-        input () {
-            console.log('got input in dynamic textfeld ', this.getText());
+        input (e) {
+            console.log('got input in dynamic textfeld ', e.keyCode, '->', this.getText());
+
+            //enter key submits
+            if(e.keyCode === 13) {
+                this.submit();
+                return false;
+            }
+
             if(!this.displayingPlaceholder) {
                 if(this.getUnsanitizedText() !== this.getText() ||
                     this.textField().innerHTML.match(/<br>./)) { //also supress line breaks inside the text in copy-pasted text

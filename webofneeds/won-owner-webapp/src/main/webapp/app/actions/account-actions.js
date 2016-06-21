@@ -39,12 +39,13 @@ export function accountLogin(username, password) {
             dispatch(actionCreators.router__stateGo("feed"));
         })
         .catch(error => {
+            console.log("accountLogin ErrorObject", error);
             //TODO load data of non-owned need!!!
             dispatch({
                 type: actionTypes.login,
                 payload: Immutable.fromJS({loggedIn: false})
             })
-            dispatch(actionCreators.loginFailed({loginError: "No such username/password combination registered.", error}))
+            dispatch(actionCreators.loginFailed({loginError: error.msg? error.msg : "Unknown Username/Password Combination", error}))
         })
 }
 
@@ -69,6 +70,7 @@ export function accountLogout() {
             })
         )
         .then(() => {
+            won.clearStore();
             dispatch(actionCreators.messages__requestWsReset_Hack());
             dispatch(actionCreators.router__stateGo("landingpage"));
         })

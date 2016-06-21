@@ -38,8 +38,7 @@ public class SendMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
     }
     WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage, con);
     //add the information about the remote message to the locally stored one
-    WonMessageBuilder builder = new WonMessageBuilder();
-    builder.wrap(wonMessage)
+    WonMessageBuilder builder = WonMessageBuilder.wrap(wonMessage)
             .setCorrespondingRemoteMessageURI(newWonMessage.getMessageURI());
     if (wonMessage.getReceiverURI() == null){
        builder.setReceiverURI(con.getRemoteConnectionURI());
@@ -53,7 +52,7 @@ public class SendMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
 
   private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage, final Connection con) {
     //create the message to send to the remote node
-    return new WonMessageBuilder()
+    return WonMessageBuilder
       .setPropertiesForPassingMessageToRemoteNode(
         wonMessage,
         wonNodeInformationService

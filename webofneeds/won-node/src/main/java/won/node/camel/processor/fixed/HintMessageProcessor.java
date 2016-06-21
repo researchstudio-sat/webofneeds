@@ -69,7 +69,7 @@ public class HintMessageProcessor extends AbstractCamelProcessor
 
   private WonMessage createMessageToSendToOwner(WonMessage wonMessage, Connection con) {
     //create the message to send to the owner
-    return new WonMessageBuilder()
+    return WonMessageBuilder
       .setPropertiesForPassingMessageToOwner(wonMessage)
         //set the uri of the newly created connection as receiver
       .setReceiverURI(con.getConnectionURI())

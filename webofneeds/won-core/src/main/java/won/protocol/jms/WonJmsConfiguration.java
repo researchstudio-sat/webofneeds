@@ -21,7 +21,7 @@ public class WonJmsConfiguration extends JmsConfiguration
   }
 
   public void configureJmsConfigurationForQueues(){
-    setConcurrentConsumers(15);
+    setConcurrentConsumers(5);
   }
 
   public void configureJmsConfigurationForTopics(){

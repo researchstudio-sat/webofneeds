@@ -1,8 +1,7 @@
 package won.cryptography.ssl;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
-import java.security.cert.CertificateEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -12,14 +11,33 @@ import java.security.cert.X509Certificate;
  */
 public class AliasFromFingerprintGenerator implements AliasGenerator
 {
+  public AliasFromFingerprintGenerator() {
+  }
+
   @Override
   public String generateAlias(final X509Certificate certificate) throws CertificateException {
     String fingerprint = null;
     try {
-      fingerprint = DigestUtils.shaHex(certificate.getEncoded());
-    } catch (CertificateEncodingException e) {
+      fingerprint = digest(certificate.getEncoded());
+    } catch (Exception e) {
       new CertificateException("Alias generation from certificate fingerprint failed", e);
     }
     return fingerprint;
+  }
+
+  public String digest(final byte[] data) throws NoSuchAlgorithmException {
+    MessageDigest md = MessageDigest.getInstance("SHA3-224");
+    byte[] hash = md.digest(data);
+    StringBuffer hexString = new StringBuffer();
+    for (int i = 0; i < hash.length; i++) {
+      String hex = Integer.toHexString(0xff & hash[i]);
+      if(hex.length() == 1) hexString.append('0');
+      hexString.append(hex);
+    }
+    return hexString.toString();
+  }
+
+  public static void main (String... args) throws Exception{
+    System.out.println("digest:" + new AliasFromFingerprintGenerator().digest("digest".getBytes()));
   }
 }

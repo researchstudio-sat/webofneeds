@@ -25,10 +25,7 @@ import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
-import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import won.owner.model.User;
 import won.owner.model.UserNeed;
@@ -60,6 +57,8 @@ public class WonWebSocketHandler
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
+  //if we're receiving a partial message, a StringBuilder will be in the session's attributes map under this key
+  private static final String SESSION_ATTRIBUTE_PARTIAL_MESSAGE = "partialMessage";
 
   private OwnerApplicationService ownerApplicationService;
 
@@ -131,10 +130,38 @@ public class WonWebSocketHandler
   public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException
   {
     logger.debug("OA Server - WebSocket message received: {}", message.getPayload());
-
     updateSession(session);
 
-    WonMessage wonMessage = WonMessageDecoder.decodeFromJsonLd(message.getPayload());
+    if (!message.isLast()){
+      //we have an intermediate part of the current message.
+      session.getAttributes()
+             .putIfAbsent(SESSION_ATTRIBUTE_PARTIAL_MESSAGE, new StringBuilder());
+    }
+    //now check if we have the partial message string builder in the session.
+    //if we do, we're processing a partial message, and we have to append the current message payload
+    StringBuilder sb = (StringBuilder) session.getAttributes().get(SESSION_ATTRIBUTE_PARTIAL_MESSAGE);
+    String completePayload = null; //will hold the final message
+    if (sb == null) {
+      //No string builder found in the session - we're not processing a partial message.
+      //The complete payload is in the current message. Get it and continue.
+      completePayload = message.getPayload();
+    } else {
+      //the string builder is there - we're processing a partial message. append the current piece
+      sb.append(message.getPayload());
+      if (message.isLast()){
+        //we've received the last part. pass it on to the next processing steps.
+        completePayload = sb.toString();
+        //also, we do not need the string builder in the session any longer. remove it:
+        session.getAttributes().remove(SESSION_ATTRIBUTE_PARTIAL_MESSAGE);
+      } else {
+        //This is not the last part of the message.
+        //We have stored it along with all previous parts. Abort processing this message and wait for the
+        // next part
+        return;
+      }
+    }
+
+    WonMessage wonMessage = WonMessageDecoder.decodeFromJsonLd(completePayload);
     //remember which user or (if not logged in) which needUri the session is bound to
     User user = getUserForSession(session);
     if (user != null) {
@@ -162,6 +189,15 @@ public class WonWebSocketHandler
         sessionRepository.save(activeSession);
       }
     }
+  }
+
+  /**
+   * We want to keep the buffer in the underlying server small (8k per websocket), but still
+   * be able to receive large messages. Hence, we have to be able to handle partial messages here.
+   */
+  @Override
+  public boolean supportsPartialMessages() {
+    return true;
   }
 
   @Override

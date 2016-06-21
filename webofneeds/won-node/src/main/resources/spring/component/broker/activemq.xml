@@ -211,13 +211,11 @@
 
         </sslContext>
 
-        <messageAuthorizationPolicy>
-            <spring:bean class="won.cryptography.service.MessageOwnerConsumptionPolicy"></spring:bean>
-        </messageAuthorizationPolicy>
-
-        <!--networkConnectors>
-            <networkConnector uri="static:(tcp://localhost:61617)" ></networkConnector>
-        </networkConnectors-->
+        <plugins>
+            <spring:bean id="certificateCheckingPlugin" class="won.cryptography.activemq.CertificateCheckingBrokerPlugin">
+                <spring:property name="queueNamePrefixToCheck" value="OwnerProtocol.Out." />
+            </spring:bean>
+        </plugins>
 
         <!-- destroy the spring context on shutdown to stop jetty -->
         <shutdownHooks>

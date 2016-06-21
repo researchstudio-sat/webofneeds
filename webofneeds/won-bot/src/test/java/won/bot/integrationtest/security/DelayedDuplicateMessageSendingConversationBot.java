@@ -16,7 +16,7 @@
 
 package won.bot.integrationtest.security;
 
-import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.integrationtest.failsim.BaseEventListenerContextDecorator;
 import won.bot.integrationtest.failsim.DelayedDuplicateMessageSenderDecorator;
 

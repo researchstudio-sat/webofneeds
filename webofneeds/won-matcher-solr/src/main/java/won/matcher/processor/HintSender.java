@@ -70,8 +70,7 @@ public class HintSender implements MatchProcessor
     throws WonMessageBuilderException {
 
     URI wonNode = wonNodeInformationService.getWonNodeUri(needURI);
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
+    return WonMessageBuilder
       .setMessagePropertiesForHint(
         wonNodeInformationService.generateEventURI(
           wonNode),
