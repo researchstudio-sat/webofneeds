@@ -48,7 +48,7 @@ function genComponentConf() {
                     </div>
                     <div class="sr__content__description__text" ng-show="self.theirNeed.get('description')">
                         <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_description"/>
-                        <span>{{ self.theirNeed.get('description }} </span>
+                        <span>{{ self.theirNeed.get('description') }} </span>
                     </div>
             </div>
         </div>
