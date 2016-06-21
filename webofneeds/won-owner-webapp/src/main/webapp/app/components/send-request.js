@@ -74,13 +74,14 @@ function genComponentConf() {
 
                 const theirNeedUri = state.getIn(['connections', connectionUri, 'hasRemoteNeed']);
                 const theirNeed = state.getIn(['needs','theirNeeds', theirNeedUri]);
-                const theirCreationDate = relativeTime(selectLastUpdateTime(state, theirNeed.get('creationDate')));
 
                 return {
                     connectionUri: connectionUri,
                     connection: state.getIn(['connections', connectionUri]),
                     theirNeed,
-                    theirCreationDate,
+                    theirCreationDate: theirNeed ?
+                        relativeTime(selectLastUpdateTime(state, theirNeed.get('creationDate'))) :
+                        undefined,
                 }
             };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
