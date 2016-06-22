@@ -15,7 +15,9 @@ if [ -z "$docker_options" ]; then
 fi
 
 # tag name of images to use for deployment (default uses master images)
-deploy_image_tag_name=master
+if [ -z "$deploy_image_tag_name" ]; then
+  deploy_image_tag_name=master
+fi
 
 # set this to true if using a reverse proxy server that takes care of client certificate authentication
 # behind_proxy=true
@@ -45,6 +47,13 @@ fi
 
 # ====================================
 
+echo "deployment options: "
+echo "docker_options: $docker_options"
+echo "deploy_image_tag_name: $deploy_image_tag_name"
+echo "public_node_uri: $public_node_uri"
+echo "deploy_host: $deploy_host"
+echo "behind_proxy: $behind_proxy"
+echo "base_folder: $base_folder"
 
 # start the won containers on dedicated servers of the cluster
 echo run docker containers:
