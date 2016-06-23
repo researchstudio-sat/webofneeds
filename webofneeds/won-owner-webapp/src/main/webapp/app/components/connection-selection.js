@@ -18,17 +18,19 @@ function genComponentConf() {
                 ng-repeat="(key,connectionUri) in self.connectionUris">
             <div class="conn">
                  <div
-                 class="conn__item clickable"
-                 ng-class="self.openConversationUri === connectionUri? 'selected' : ''"
-                 ng-click="self.setOpen(connectionUri)">
+                 class="conn__item"
+                 ng-class="self.openConversationUri === connectionUri? 'selected' : ''">
                      <!--TODO request.titleImgSrc isn't defined -->
                     <won-square-image
                         src="request.titleImgSrc"
-                        title="self.allByConnections.getIn([connectionUri, 'remoteNeed', 'title'])">
+                        class="clickable"
+                        title="self.allByConnections.getIn([connectionUri, 'remoteNeed', 'title'])"
+                        ng-click="self.setOpen(connectionUri)">
                     </won-square-image>
                     <div class="conn__item__description">
                         <div class="conn__item__description__topline">
-                            <div class="conn__item__description__topline__title">
+                            <div class="conn__item__description__topline__title clickable"
+                                        ng-click="self.setOpen(connectionUri)">
                                 {{ self.allByConnections.getIn([connectionUri, 'remoteNeed', 'title']) }}
                             </div>
                             <div class="conn__item__description__topline__date">
@@ -36,7 +38,12 @@ function genComponentConf() {
                             </div>
                             <img
                                 class="conn__item__description__topline__icon"
-                                src="generated/icon-sprite.svg#ico_settings">
+                                src="generated/icon-sprite.svg#ico_settings"
+                                ng-show="!self.settingsOpen && self.openConversationUri === connectionUri"
+                                ng-mouseenter="self.settingsOpen = true">
+                            <div class="conn__item__description__settings" ng-show="self.settingsOpen && self.openConversationUri === connectionUri" ng-mouseleave="self.settingsOpen=false">
+                                <button class="won-button--filled thin red" ng-click="self.closeConnection(connectionUri)">Close Connection</button>
+                            </div>
                         </div>
                         <div class="conn__item__description__subtitle">
                             <span class="conn__item__description__subtitle__group" ng-show="request.group">
@@ -75,6 +82,7 @@ function genComponentConf() {
             window.connSel4dbg = this;
             attach(this, serviceDependencies, arguments);
             this.labels = labels;
+            this.settingsOpen = false;
 
             const self = this;
 
@@ -122,6 +130,11 @@ function genComponentConf() {
         }
         getOpen() {
             return this.allByConnections.get(this.openUri);
+        }
+
+        closeConnection(connectionUri) {
+            this.settingsOpen = false;
+            this.connections__close(connectionUri);
         }
     }
     Controller.$inject = serviceDependencies;
