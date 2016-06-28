@@ -20,7 +20,7 @@ function genTopnavConf() {
                 </div>
                 <div class="topnav__inner__center" ng-show="self.loggedIn">
                     <a ui-sref="createNeed" class="topnav__button">
-                        <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon">
+                        <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon logo">
                         <span class="topnav__button__caption">New Need</span>
                     </a>
                 </div>

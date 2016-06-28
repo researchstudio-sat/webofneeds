@@ -24,7 +24,8 @@ function genComponentConf() {
                      <!--TODO request.titleImgSrc isn't defined -->
                     <won-square-image
                         src="request.titleImgSrc"
-                        title="self.allByConnections.getIn([connectionUri, 'remoteNeed', 'title'])">
+                        title="self.allByConnections.getIn([connectionUri, 'remoteNeed', 'title'])"
+                        uri="self.allByConnections.getIn([connectionUri, 'remoteNeed', 'uri'])">
                     </won-square-image>
                     <div class="conn__item__description">
                         <div class="conn__item__description__topline">

@@ -17,7 +17,12 @@ function genComponentConf() {
                     <a ui-sref="overviewPosts">
                         <img src="generated/icon-sprite.svg#ico36_backarrow" class="ntb__icon">
                     </a>
-                    <won-square-image ng-class="{'inactive' : !self.isActive}" src="self.post.get('titleImgSrc')" title="self.post.get('title')"></won-square-image>
+                    <won-square-image 
+                        ng-class="{'inactive' : !self.isActive}" 
+                        src="self.post.get('titleImgSrc')" 
+                        title="self.post.get('title')"
+                        uri="self.post.get('uri')">
+                    </won-square-image>
                     <div class="ntb__inner__left__titles">
                         <h1 class="ntb__title">{{self.post.get('title')}}</h1>
                         <div class="ntb__inner__left__titles__type">{{self.labels.type[self.post.get('basicNeedType')]}}</div>

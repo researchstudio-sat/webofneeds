@@ -19,7 +19,11 @@ function genComponentConf() {
                     <a ng-click="self.back()">
                         <img src="generated/icon-sprite.svg#ico36_backarrow" class="vtb__icon">
                     </a>
-                    <won-square-image title="self.post.get('title')" src="self.post.get('titleImgSrc')"></won-square-image>
+                    <won-square-image 
+                        title="self.post.get('title')" 
+                        src="self.post.get('titleImgSrc')"
+                        uri="self.post.get('uri')">
+                    </won-square-image>
                     <div class="vtb__inner__left__titles">
                         <h1 class="vtb__title">{{self.post.get('title')}}</h1>
                         <div class="vtb__inner__left__titles__type">

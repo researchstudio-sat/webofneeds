@@ -42,7 +42,11 @@ function genComponentConf() {
                 <div class="mfi__match__description__title">{{self.connectionData.getIn(['ownNeed','title'])}}</div>
                 <div class="mfi__match__description__type">{{self.labels.type[self.connectionData.getIn(['ownNeed','basicNeedType'])]}}</div>
             </div>
-            <won-square-image src="self.getRandomImage()" title="self.connectionData.getIn(['ownNeed','title'])"></won-square-image>
+            <won-square-image 
+                src="self.connectionData.getIn(['ownNeed','titleImgSrc'])" 
+                title="self.connectionData.getIn(['ownNeed','title'])"
+                uri="self.connectionData.getIn(['ownNeed','uri'])">
+            </won-square-image>
         </div>
         <won-feedback-grid connection-uri="self.connectionUri" ng-mouseleave="self.hideFeedback()" ng-if="self.feedbackVisible"/>
     `;
@@ -53,12 +57,7 @@ function genComponentConf() {
             this.labels = labels;
             this.feedbackVisible = false;
             this.maxThumbnails = 4;
-            this.images=[
-                "images/furniture1.png",
-                "images/furniture2.png",
-                "images/furniture3.png",
-                "images/furniture4.png",
-            ];
+            this.images=[];
 
             const selectFromState = (state) => {
                 return {
@@ -88,12 +87,6 @@ function genComponentConf() {
         toggleFeedback(){
             this.feedbackVisible = !this.feedbackVisible;
         }
-
-        getRandomImage(){
-            let i = Math.floor((Math.random()*4));
-            return this.images[2];
-        }
-
     }
     Controller.$inject = serviceDependencies;
 
