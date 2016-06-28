@@ -13,7 +13,12 @@ const serviceDependencies = ['$q', '$ngRedux', '$scope', '$interval'];
 function genComponentConf() {
     let template = `
         <div ng-show="self.images" class="mfi__gallery">
-            <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.images" class="horizontal"></won-extended-gallery>
+            <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.images" class="horizontal" ng-show="self.images.length > 0"></won-extended-gallery>
+            <won-square-image 
+                title="self.connectionData.getIn(['remoteNeed','title'])"
+                uri="self.connectionData.getIn(['remoteNeed','uri'])"
+                ng-show="self.images.length == 0">
+            </won-square-image>
         </div>
         <div class="mfi__description clickable">
             <div class="mfi__description__topline">
@@ -26,7 +31,7 @@ function genComponentConf() {
                 </span>
                 <span class="mfi__description__subtitle__type">{{self.labels.type[self.connectionData.getIn(['remoteNeed','basicNeedType'])]}}</span>
             </div>
-            <div class="mfi__description__content">
+            <div class="mfi__description__content" ng-show="false"><!-- include once you have content in your needs that needs to be displayed here -->
                 <div class="mfi__description__content__location">
                     <img class="mfi__description__content__indicator" src="generated/icon-sprite.svg#ico16_indicator_location"/>
                     <span>Vienna area</span>

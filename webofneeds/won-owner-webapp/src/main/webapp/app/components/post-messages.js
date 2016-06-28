@@ -3,7 +3,7 @@
 import angular from 'angular';
 import Immutable from 'immutable';
 import squareImageModule from './square-image';
-import dynamicTextFieldModule from './dynamic-textfield';
+import chatTextFieldModule from './chat-textfield';
 import { attach, is, delay, toDate } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime } from '../won-label-utils';
@@ -57,14 +57,14 @@ function genComponentConf() {
                     </div>
             </div>
         </div>
-        <won-dynamic-textfield
+        <chat-textfield
             class="pm__footer"
             placeholder="::'Your Message'"
             on-input="::self.input(value)"
             on-submit="::self.send()"
             submit-button-label="::'Send'"
             >
-        </won-dynamic-textfield>
+        </chat-textfield>
     `;
 
     class Controller {
@@ -171,7 +171,7 @@ function genComponentConf() {
 
 export default angular.module('won.owner.components.postMessages', [
     squareImageModule,
-    dynamicTextFieldModule
+    chatTextFieldModule,
 ])
     .directive('wonPostMessages', genComponentConf)
     .name;

@@ -3,7 +3,8 @@
 import angular from 'angular';
 import 'ng-redux';
 import extendedGalleryModule from '../components/extended-gallery';
-import { labels } from '../won-label-utils';
+import { selectLastUpdateTime } from '../selectors';
+import { labels, relativeTime } from '../won-label-utils';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 
@@ -21,7 +22,7 @@ function genComponentConf() {
             <div class="sr__header__title">
                 <div class="sr__header__title__topline">
                     <div class="sr__header__title__topline__title">{{self.theirNeed.get('title')}}</div>
-                    <div class="sr__header__title__topline__date">{{self.theirNeed.get('creationDate')}}</div>
+                    <div class="sr__header__title__topline__date">{{self.theirCreationDate}}</div>
                 </div>
                 <div class="sr__header__title__subtitle">
                     <span class="sr__header__title__subtitle__group" ng-show="self.theirNeed.get('group')">
@@ -35,19 +36,20 @@ function genComponentConf() {
             <div class="sr__content__images" ng-show="self.theirNeed.get('images')">
                 <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.theirNeed.get('images')" class="vertical"></won-extended-gallery>
             </div>
-            <div class="sr__content__description">
-                <div class="sr__content__description__location">
-                    <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_location"/>
-                    <span>Vienna area</span>
-                </div>
-                <div class="sr__content__description__datetime">
-                    <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_time"/>
-                    <span>Available until 5th May</span>
-                </div>
-                <div class="sr__content__description__text">
-                    <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_description"/>
-                    <span>These lovley Chairs need a new home since I am moving These are the first X chars of the message et eaquuntiore dolluptaspid quam que quatur quisinia aspe sus voloreiusa plis Sae quatectibus eumendi bla volupita dolupta el et andunt …</span>
-                </div>
+            <div class="sr__content__description"
+                ng-show="self.theirNeed.get('location') || self.theirNeed.get('deadline') || self.theirNeed.get('description')">
+                    <div class="sr__content__description__location" ng-show="self.theirNeed.get('location')">
+                        <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_location"/>
+                        <span>{{ self.theirNeed.get('location') }}</span>
+                    </div>
+                    <div class="sr__content__description__datetime" ng-show="self.theirNeed.get('deadline')">
+                        <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_time"/>
+                        <span>{{ self.theirNeed.get('deadline') }} </span>
+                    </div>
+                    <div class="sr__content__description__text" ng-show="self.theirNeed.get('description')">
+                        <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_description"/>
+                        <span>{{ self.theirNeed.get('description') }} </span>
+                    </div>
             </div>
         </div>
         <div class="sr__footer">
@@ -70,10 +72,16 @@ function genComponentConf() {
             const selectFromState = (state) => {
                 const connectionUri = decodeURIComponent(state.getIn(['router', 'currentParams', 'connectionUri']));
 
+                const theirNeedUri = state.getIn(['connections', connectionUri, 'hasRemoteNeed']);
+                const theirNeed = state.getIn(['needs','theirNeeds', theirNeedUri]);
+
                 return {
                     connectionUri: connectionUri,
                     connection: state.getIn(['connections', connectionUri]),
-                    theirNeed: state.getIn(['needs','theirNeeds', state.getIn(['connections', connectionUri, 'hasRemoteNeed'])])
+                    theirNeed,
+                    theirCreationDate: theirNeed ?
+                        relativeTime(selectLastUpdateTime(state, theirNeed.get('creationDate'))) :
+                        undefined,
                 }
             };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);

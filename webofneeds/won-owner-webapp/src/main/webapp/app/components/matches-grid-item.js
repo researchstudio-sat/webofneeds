@@ -27,21 +27,23 @@ function genComponentConf() {
                     </div>
                 </div>
             </div>
-            <div class="mgi__description__content">
-                <div class="mgi__description__content__location">
-                    <img class="mgi__description__content__indicator" src="generated/icon-sprite.svg#ico16_indicator_location"/>
-                    <span>Vienna area</span>
+            <div class="mgi__description__content" ng-show="self.theirNeed.get('location') || self.theirNeed.get('deadline')">
+                <div class="mgi__description__content__location"
+                    ng-show="self.theirNeed.get('location')">
+                        <img class="mgi__description__content__indicator" src="generated/icon-sprite.svg#ico16_indicator_location"/>
+                        <span>{{ self.theirNeed.get('location') }}</span>
                 </div>
-                <div class="mgi__description__content__datetime">
-                    <img class="mgi__description__content__indicator" src="generated/icon-sprite.svg#ico16_indicator_time"/>
-                    <span>Available until 5th May</span>
+                <div class="mgi__description__content__datetime"
+                    ng-show="self.theirNeed.get('deadline')">
+                        <img class="mgi__description__content__indicator" src="generated/icon-sprite.svg#ico16_indicator_time"/>
+                        <span>{{ self.theirNeed.get('deadline') }}</span>
                 </div>
             </div>
         </div>
         <div class="mgi__match clickable" ng-if="!self.feedbackVisible" ng-click="self.showFeedback()" ng-mouseenter="self.showFeedback()">
             <div class="mgi__match__description">
-                <div class="mgi__match__description__title">{{self.connectionData.getIn(['ownNeed','basicNeedType'])}}</div>
-                <div class="mgi__match__description__type">{{self.labels.type[self.connectionData.getIn(['ownNeed','basicNeedType'])]}}</div>
+                <div class="mgi__match__description__title">{{self.ownNeed.get('title')}}</div>
+                <div class="mgi__match__description__type">{{self.labels.type[self.ownNeed.get('basicNeedType')]}}</div>
             </div>
             <won-square-image 
                 src="self.connectionData.getIn(['ownNeed','titleImgSrc'])" 
@@ -65,8 +67,11 @@ function genComponentConf() {
             this.labels = labels;
 
             const selectFromState = (state) => {
+                const connectionData = selectAllByConnections(state).get(this.connectionUri);
                 return {
-                    connectionData: selectAllByConnections(state).get(this.connectionUri),
+                    connectionData,
+                    ownNeed: connectionData.get('ownNeed'),
+                    theirNeed: connectionData.get('remoteNeed')
                 };
             };
 
