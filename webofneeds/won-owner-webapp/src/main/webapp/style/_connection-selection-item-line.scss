@@ -39,6 +39,15 @@
         flex-grow: 1;
         padding-right: 1rem;
 
+        &__settings {
+          position: absolute;
+          border: 0.1rem solid $won-line-gray;
+          background-color: white;
+          white-space: nowrap;
+          padding: 0.5rem;
+          right: 1rem;
+        }
+
         &__topline{
           display: flex;
           flex-wrap: wrap;
