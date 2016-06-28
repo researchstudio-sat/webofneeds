@@ -4,10 +4,11 @@ import angular from 'angular';
 import squareImageModule from '../components/square-image';
 import won from '../won-es6';
 import { attach } from '../utils';
+import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime, updateRelativeTimestamps   } from '../won-label-utils';
 import { createSelector } from 'reselect';
 
-const serviceDependencies = ['$scope', '$interval'];
+const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
     let template = `
             <a ui-sref="post({postUri: self.item.uri})">
@@ -87,6 +88,15 @@ function genComponentConf() {
             window.pil4dbg = this; //TODO deletme
             this.labels = labels;
             //this.EVENT = won.EVENT;
+
+            const selectFromState = (state) => {
+                return {
+                    WON: won.WON
+                };
+            };
+
+            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
+            this.$scope.$on('$destroy', disconnect);
 
             updateRelativeTimestamps(
                 this.$scope,
