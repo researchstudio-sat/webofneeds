@@ -27,7 +27,7 @@ function genComponentConf() {
                 </span>
                 <span class="mfi__description__subtitle__type">{{self.labels.type[self.connectionData.getIn(['remoteNeed','basicNeedType'])]}}</span>
             </div>
-            <div class="mfi__description__content">
+            <div class="mfi__description__content" ng-show="false"><!-- include once you have content in your needs that needs to be displayed here -->
                 <div class="mfi__description__content__location">
                     <img class="mfi__description__content__indicator" src="generated/icon-sprite.svg#ico16_indicator_location"/>
                     <span>Vienna area</span>
