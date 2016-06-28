@@ -13,7 +13,8 @@ const serviceDependencies = ['$q', '$ngRedux', '$scope', '$interval'];
 function genComponentConf() {
     let template = `
         <div ng-show="self.images" class="mfi__gallery">
-            <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.images" class="horizontal"></won-extended-gallery>
+            <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.images" class="horizontal" ng-show="self.images.length > 0"></won-extended-gallery>
+            <won-square-image title="self.connectionData.getIn(['remoteNeed','title'])" ng-show="self.images.length == 0"></won-square-image>
         </div>
         <div class="mfi__description clickable">
             <div class="mfi__description__topline">
@@ -53,12 +54,7 @@ function genComponentConf() {
             this.labels = labels;
             this.feedbackVisible = false;
             this.maxThumbnails = 4;
-            this.images=[
-                "images/furniture1.png",
-                "images/furniture2.png",
-                "images/furniture3.png",
-                "images/furniture4.png",
-            ];
+            this.images=[]; //
 
             const selectFromState = (state) => {
                 return {

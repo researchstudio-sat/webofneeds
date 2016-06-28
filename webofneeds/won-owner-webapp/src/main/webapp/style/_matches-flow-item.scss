@@ -81,6 +81,23 @@ won-matches-flow-item {
 
   .mfi__gallery {
     padding: 0.5rem 0.5rem 0 0.5rem;
+
+    @include square-image(10rem, 0, 0, 0, 0rem);
+    won-square-image {
+      .image {
+        width: 100%;
+        height: 10rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &__noimage {
+          color: white;
+          font-size: 8rem;
+        }
+      }
+    }
+
     won-extended-gallery {
       .eg__selected {
         flex-grow: 1;

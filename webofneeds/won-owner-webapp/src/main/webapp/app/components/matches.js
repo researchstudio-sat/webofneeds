@@ -20,12 +20,10 @@ let template = `
             <div class="dummy"></div>
             <div class="title" ng-if="!self.post">Matches to your needs</div>
             <div class="omc__header__viewtype">
-                <!--
                 <a ui-sref="{{ self.isOverview ? 'overviewMatches({layout: self.LAYOUT.TILES})' : 'post({layout : self.LAYOUT.TILES})' }}">
                     <img ng-src="{{self.layout === 'tiles' ? 'generated/icon-sprite.svg#ico-filter_tile_selected' : 'generated/icon-sprite.svg#ico-filter_tile'}}"
                      class="omc__header__viewtype__icon clickable"/>
                 </a>
-                -->
                 <a ui-sref="{{ self.isOverview ? 'overviewMatches({layout: self.LAYOUT.GRID})' : 'post({layout : self.LAYOUT.GRID})' }}">
                     <img ng-src="{{self.layout === 'grid' ? 'generated/icon-sprite.svg#ico-filter_compact_selected' : 'generated/icon-sprite.svg#ico-filter_compact'}}"
                      class="omc__header__viewtype__icon clickable"/>
@@ -36,14 +34,12 @@ let template = `
                 </a>
             </div>
         </div>
-        <!--
         <div ng-if="self.layout === 'tiles'" class="omc__content__flow">
             <won-matches-flow-item
                     connection-uri="m.getIn(['connection','uri'])"
                     ng-repeat="m in self.matches">
             </won-matches-flow-item>
         </div>
-        -->
         <div ng-if="self.layout === 'grid'" class="omc__content__grid">
             <won-matches-grid-item
                     connection-uri="m.getIn(['connection','uri'])"
