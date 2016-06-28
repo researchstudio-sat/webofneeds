@@ -37,6 +37,7 @@ function genComponentConf() {
                     <won-square-image
                         title="self.connectionData.getIn(['remoteNeed', 'title'])"
                         src="self.connectionData.getIn(['remoteNeed', 'titleImgSrc'])"
+                        uri="self.connectionData.getIn(['remoteNeed', 'uri'])"
                         ng-show="message.get('hasSenderNeed') != self.connectionData.getIn(['ownNeed', 'uri'])">
                     </won-square-image>
                     <div class="pm__content__message__content">

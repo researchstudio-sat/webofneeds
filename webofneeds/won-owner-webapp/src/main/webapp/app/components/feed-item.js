@@ -8,7 +8,11 @@ const serviceDependencies = ['$scope', '$interval'];
 function genComponentConf() {
     let template = `
             <div class="fi clickable">
-                <won-square-image src="self.item.get('titleImg')" title="self.item.get('title')"></won-square-image>
+                <won-square-image 
+                    src="self.item.get('titleImg')" 
+                    title="self.item.get('title')"
+                    uri="self.item.get('uri')">
+                </won-square-image>
                 <div class="fi__description">
                     <div class="fi__description__topline">
                         <div class="fi__description__topline__title">{{self.item.get('title')}}</div>
@@ -28,7 +32,8 @@ function genComponentConf() {
                 <div class="fmil__item clickable" ng-repeat="cnct in self.connections.toArray() track by $index" ng-show="$index < self.maxNrOfItemsShown">
                     <won-square-image
                         src="cnct.get('titleImg')"
-                        title="cnct.getIn(['remoteNeed','title'])">
+                        title="cnct.getIn(['remoteNeed','title'])"
+                        uri="cnct.getIn(['remoteNeed','uri'])">
                     </won-square-image>
                     <div class="fmil__item__description">
                         <div class="fmil__item__description__topline">

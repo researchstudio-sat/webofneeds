@@ -13,7 +13,8 @@ function genComponentConf() {
         <div class="mli clickable" ng-click="self.toggleMatches()">
                 <won-square-image
                     src="self.item.titleImgSrc"
-                    title="self.item[0].ownNeed.title">
+                    title="self.item[0].ownNeed.title"
+                    uri="self.item[0].ownNeed.uri">
                 </won-square-image>
                 <div class="mli__description">
                     <div class="mli__description__topline">
@@ -56,7 +57,8 @@ function genComponentConf() {
                     <div class="smli__item__header">
                         <won-square-image
                             src="match.images[0].src"
-                            title="match.remoteNeed.title">
+                            title="match.remoteNeed.title"
+                            uri="match.remoteNeed.uri">
                         </won-square-image>
                         <div class="smli__item__header__text">
                             <div class="smli__item__header__text__topline">

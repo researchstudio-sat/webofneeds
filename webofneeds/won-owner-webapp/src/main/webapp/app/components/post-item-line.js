@@ -13,8 +13,9 @@ function genComponentConf() {
             <a ui-sref="post({postUri: self.item.uri})">
                 <won-square-image  
                     ng-class="{'inactive' : !self.isActive()}" 
-                     src="self.item.titleImgSrc" 
-                     title="self.item.title">
+                    src="self.item.titleImgSrc" 
+                    title="self.item.title"
+                    uri="self.item.uri">
                 </won-square-image>
             </a>
             <a class="pil__description clickable" ui-sref="post({postUri: self.item.uri})">

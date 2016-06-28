@@ -25,6 +25,7 @@ function genComponentConf() {
                         src="request.titleImgSrc"
                         class="clickable"
                         title="self.allByConnections.getIn([connectionUri, 'remoteNeed', 'title'])"
+                        uri="self.allByConnections.getIn([connectionUri, 'remoteNeed', 'uri'])"
                         ng-click="self.setOpen(connectionUri)">
                     </won-square-image>
                     <div class="conn__item__description">
