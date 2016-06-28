@@ -19,7 +19,7 @@ function genLoginConf() {
                             type="email"
                             required
                             autofocus
-                            ng-keyup="$event.keyCode == 13 && self.login(self.email, self.password)"/>
+                            ng-keyup="self.loginReset() || ($event.keyCode == 13 && self.login(self.email, self.password))"/>
                         <span class="wl__errormsg">
                             {{self.loginError}}
                         </span>
@@ -28,7 +28,7 @@ function genLoginConf() {
                             ng-model="self.password"
                             type="password"
                             required
-                            ng-keyup="$event.keyCode == 13 && self.login(self.email, self.password)"/>
+                            ng-keyup="self.loginReset() || ($event.keyCode == 13 && self.login(self.email, self.password))"/>
                     </div>
                     <!-- TODO: Implement remember me and forgot password --><!--div class="wl__table">
                         <div class="wlt__left">
