@@ -8,12 +8,18 @@ import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
 import { combineReducersStable } from '../redux-utils';
 
+const initialState = Immutable.fromJS({});
+
+
 export const draftsReducer = createReducer(
     //initial state
     Immutable.Map(),
 
     //handlers
     {
+        [actionTypes.logout]: () => {
+            return initialState;
+        },
         /**
          * @param {*} draftId : the draft that's type has changed
          * @param {string} type : the short-hand won-type (e.g. `'won:Demand'`)
