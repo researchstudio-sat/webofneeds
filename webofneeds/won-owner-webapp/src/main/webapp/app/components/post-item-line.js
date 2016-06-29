@@ -7,6 +7,7 @@ import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime, updateRelativeTimestamps   } from '../won-label-utils';
 import { createSelector } from 'reselect';
+import { selectAllByConnections } from '../selectors';
 
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
@@ -37,48 +38,54 @@ function genComponentConf() {
                 </div>
             </a>
             <div class="pil__indicators">
-                <a class="pil__indicators__item clickable" ui-sref="post({postUri: self.item.uri, connectionType: self.WON.Connected})">
+                <a class="pil__indicators__item clickable" ng-show="self.hasConversations" ui-sref="post({postUri: self.item.uri, connectionType: self.WON.Connected})">
                     <img src="generated/icon-sprite.svg#ico36_message_light"
-                         ng-show="false && self.unreadConversationsCount()"
+                         ng-show="!self.unreadConversationsCount()"
                          class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_message"
                          ng-show="self.unreadConversationsCount()"
-                         class="pil__indicators__item__icon">
-                    <img src="generated/icon-sprite.svg#ico36_message_grey"
-                         ng-show="!self.unreadConversationsCount()"
                          class="pil__indicators__item__icon">
                     <span class="pil__indicators__item__caption">
                         {{ self.unreadConversationsCount() }}
                     </span>
                 </a>
-                <a class="pil__indicators__item clickable"  ui-sref="post({postUri: self.item.uri, connectionType: self.WON.RequestReceived})">
+                <div class="pil__indicators__item" ng-show="!self.hasConversations">
+                    <img src="generated/icon-sprite.svg#ico36_message_grey"
+                         class="pil__indicators__item__icon">
+                     <span class="pil__indicators__item__caption"></span>
+                </div>
+                <a class="pil__indicators__item clickable" ng-show="self.hasRequests" ui-sref="post({postUri: self.item.uri, connectionType: self.WON.RequestReceived})">
                     <img src="generated/icon-sprite.svg#ico36_incoming_light"
-                             ng-show="false && self.unreadRequestsCount()"
+                             ng-show="!self.unreadRequestsCount()"
                              class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_incoming"
                          ng-show="self.unreadRequestsCount()"
-                         class="pil__indicators__item__icon">
-                    <img src="generated/icon-sprite.svg#ico36_incoming_grey"
-                         ng-show="!self.unreadRequestsCount()"
                          class="pil__indicators__item__icon">
                     <span class="pil__indicators__item__caption">
                         {{ self.unreadRequestsCount() }}
                     </span>
                 </a>
-                <a class="pil__indicators__item clickable" ui-sref="post({postUri: self.item.uri, connectionType: self.WON.Suggested})">
+                <div class="pil__indicators__item" ng-show="!self.hasRequests">
+                    <img src="generated/icon-sprite.svg#ico36_incoming_grey"
+                         class="pil__indicators__item__icon">
+                     <span class="pil__indicators__item__caption"></span>
+                </div>
+                <a class="pil__indicators__item clickable" ng-show="self.hasMatches" ui-sref="post({postUri: self.item.uri, connectionType: self.WON.Suggested})">
                     <img src="generated/icon-sprite.svg#ico36_match_light"
-                         ng-show="false && self.unreadMatchesCount()"
+                         ng-show="!self.unreadMatchesCount()"
                          class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_match"
                          ng-show="self.unreadMatchesCount()"
-                         class="pil__indicators__item__icon">
-                    <img src="generated/icon-sprite.svg#ico36_match_grey"
-                         ng-show="!self.unreadMatchesCount()"
                          class="pil__indicators__item__icon">
                     <span class="pil__indicators__item__caption">
                         {{ self.unreadMatchesCount() }}
                     </span>
                 </a>
+                <div class="pil__indicators__item" ng-show="!self.hasMatches">
+                    <img src="generated/icon-sprite.svg#ico36_match_grey"
+                         class="pil__indicators__item__icon">
+                     <span class="pil__indicators__item__caption"></span>
+                </div>
             </div>
     `;
 
@@ -90,7 +97,13 @@ function genComponentConf() {
             //this.EVENT = won.EVENT;
 
             const selectFromState = (state) => {
+                const allConnectionsByNeedUri = selectAllByConnections(state)
+                    .filter(conn => conn.getIn(['ownNeed', 'uri']) === this.item.uri);
+
                 return {
+                    hasConversations: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Connected).length > 0,
+                    hasRequests: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.RequestReceived).length > 0,
+                    hasMatches: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested).length > 0,
                     WON: won.WON
                 };
             };
