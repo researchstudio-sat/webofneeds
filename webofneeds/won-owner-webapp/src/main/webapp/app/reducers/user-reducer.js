@@ -39,6 +39,9 @@ export default function(userData = initialState, action = {}) {
         case actionTypes.loginReset:
             return Immutable.fromJS({loginError: null});
 
+        case actionTypes.registerReset:
+            return Immutable.fromJS({registerError: null});
+        
         case actionTypes.registerFailed:
             console.log('reducers.js: received UNsuccessful-login action from app-server');
             return Immutable.fromJS({registerError: action.payload.registerError});

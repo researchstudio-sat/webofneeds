@@ -110,6 +110,6 @@ export function accountRegister(username, password) {
         .catch(
             //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
                 error =>
-                    dispatch(actionCreators.registerFailed({registerError: "Registration failed", error}))
+                    dispatch(actionCreators.registerFailed({registerError: "Registration failed (E-Mail might already be used)", error}))
         )
 }
