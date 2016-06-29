@@ -7,6 +7,7 @@ import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime, updateRelativeTimestamps   } from '../won-label-utils';
 import { createSelector } from 'reselect';
+import { selectAllByConnections } from '../selectors';
 
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
@@ -39,13 +40,13 @@ function genComponentConf() {
             <div class="pil__indicators">
                 <a class="pil__indicators__item clickable" ui-sref="post({postUri: self.item.uri, connectionType: self.WON.Connected})">
                     <img src="generated/icon-sprite.svg#ico36_message_light"
-                         ng-show="false && self.unreadConversationsCount()"
+                         ng-show="self.hasConversations && !self.unreadConversationsCount()"
                          class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_message"
-                         ng-show="self.unreadConversationsCount()"
+                         ng-show="!self.hasConversations && self.unreadConversationsCount()"
                          class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_message_grey"
-                         ng-show="!self.unreadConversationsCount()"
+                         ng-show="!self.hasConversations && !self.unreadConversationsCount()"
                          class="pil__indicators__item__icon">
                     <span class="pil__indicators__item__caption">
                         {{ self.unreadConversationsCount() }}
@@ -53,13 +54,13 @@ function genComponentConf() {
                 </a>
                 <a class="pil__indicators__item clickable"  ui-sref="post({postUri: self.item.uri, connectionType: self.WON.RequestReceived})">
                     <img src="generated/icon-sprite.svg#ico36_incoming_light"
-                             ng-show="false && self.unreadRequestsCount()"
+                             ng-show="self.hasRequests && !self.unreadRequestsCount()"
                              class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_incoming"
-                         ng-show="self.unreadRequestsCount()"
+                         ng-show="!self.hasRequests && self.unreadRequestsCount()"
                          class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_incoming_grey"
-                         ng-show="!self.unreadRequestsCount()"
+                         ng-show="!self.hasRequests && !self.unreadRequestsCount()"
                          class="pil__indicators__item__icon">
                     <span class="pil__indicators__item__caption">
                         {{ self.unreadRequestsCount() }}
@@ -67,13 +68,13 @@ function genComponentConf() {
                 </a>
                 <a class="pil__indicators__item clickable" ui-sref="post({postUri: self.item.uri, connectionType: self.WON.Suggested})">
                     <img src="generated/icon-sprite.svg#ico36_match_light"
-                         ng-show="false && self.unreadMatchesCount()"
+                         ng-show="self.hasMatches && !self.unreadMatchesCount()"
                          class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_match"
-                         ng-show="self.unreadMatchesCount()"
+                         ng-show="!self.hasMatches && self.unreadMatchesCount()"
                          class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_match_grey"
-                         ng-show="!self.unreadMatchesCount()"
+                         ng-show="!self.hasMatches && !self.unreadMatchesCount()"
                          class="pil__indicators__item__icon">
                     <span class="pil__indicators__item__caption">
                         {{ self.unreadMatchesCount() }}
@@ -90,7 +91,13 @@ function genComponentConf() {
             //this.EVENT = won.EVENT;
 
             const selectFromState = (state) => {
+                const allConnectionsByNeedUri = selectAllByConnections(state)
+                    .filter(conn => conn.getIn(['ownNeed', 'uri']) === this.item.uri);
+
                 return {
+                    hasConversations: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Connected).length > 0,
+                    hasRequests: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.RequestReceived).length > 0,
+                    hasMatches: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested).length > 0,
                     WON: won.WON
                 };
             };
