@@ -38,48 +38,54 @@ function genComponentConf() {
                 </div>
             </a>
             <div class="pil__indicators">
-                <a class="pil__indicators__item clickable" ui-sref="post({postUri: self.item.uri, connectionType: self.WON.Connected})">
+                <a class="pil__indicators__item clickable" ng-show="self.hasConversations" ui-sref="post({postUri: self.item.uri, connectionType: self.WON.Connected})">
                     <img src="generated/icon-sprite.svg#ico36_message_light"
-                         ng-show="self.hasConversations && !self.unreadConversationsCount()"
+                         ng-show="!self.unreadConversationsCount()"
                          class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_message"
-                         ng-show="!self.hasConversations && self.unreadConversationsCount()"
-                         class="pil__indicators__item__icon">
-                    <img src="generated/icon-sprite.svg#ico36_message_grey"
-                         ng-show="!self.hasConversations && !self.unreadConversationsCount()"
+                         ng-show="self.unreadConversationsCount()"
                          class="pil__indicators__item__icon">
                     <span class="pil__indicators__item__caption">
                         {{ self.unreadConversationsCount() }}
                     </span>
                 </a>
-                <a class="pil__indicators__item clickable"  ui-sref="post({postUri: self.item.uri, connectionType: self.WON.RequestReceived})">
+                <div class="pil__indicators__item" ng-show="!self.hasConversations">
+                    <img src="generated/icon-sprite.svg#ico36_message_grey"
+                         class="pil__indicators__item__icon">
+                     <span class="pil__indicators__item__caption"></span>
+                </div>
+                <a class="pil__indicators__item clickable" ng-show="self.hasRequests" ui-sref="post({postUri: self.item.uri, connectionType: self.WON.RequestReceived})">
                     <img src="generated/icon-sprite.svg#ico36_incoming_light"
-                             ng-show="self.hasRequests && !self.unreadRequestsCount()"
+                             ng-show="!self.unreadRequestsCount()"
                              class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_incoming"
-                         ng-show="!self.hasRequests && self.unreadRequestsCount()"
-                         class="pil__indicators__item__icon">
-                    <img src="generated/icon-sprite.svg#ico36_incoming_grey"
-                         ng-show="!self.hasRequests && !self.unreadRequestsCount()"
+                         ng-show="self.unreadRequestsCount()"
                          class="pil__indicators__item__icon">
                     <span class="pil__indicators__item__caption">
                         {{ self.unreadRequestsCount() }}
                     </span>
                 </a>
-                <a class="pil__indicators__item clickable" ui-sref="post({postUri: self.item.uri, connectionType: self.WON.Suggested})">
+                <div class="pil__indicators__item" ng-show="!self.hasRequests">
+                    <img src="generated/icon-sprite.svg#ico36_incoming_grey"
+                         class="pil__indicators__item__icon">
+                     <span class="pil__indicators__item__caption"></span>
+                </div>
+                <a class="pil__indicators__item clickable" ng-show="self.hasMatches" ui-sref="post({postUri: self.item.uri, connectionType: self.WON.Suggested})">
                     <img src="generated/icon-sprite.svg#ico36_match_light"
-                         ng-show="self.hasMatches && !self.unreadMatchesCount()"
+                         ng-show="!self.unreadMatchesCount()"
                          class="pil__indicators__item__icon">
                     <img src="generated/icon-sprite.svg#ico36_match"
-                         ng-show="!self.hasMatches && self.unreadMatchesCount()"
-                         class="pil__indicators__item__icon">
-                    <img src="generated/icon-sprite.svg#ico36_match_grey"
-                         ng-show="!self.hasMatches && !self.unreadMatchesCount()"
+                         ng-show="self.unreadMatchesCount()"
                          class="pil__indicators__item__icon">
                     <span class="pil__indicators__item__caption">
                         {{ self.unreadMatchesCount() }}
                     </span>
                 </a>
+                <div class="pil__indicators__item" ng-show="!self.hasMatches">
+                    <img src="generated/icon-sprite.svg#ico36_match_grey"
+                         class="pil__indicators__item__icon">
+                     <span class="pil__indicators__item__caption"></span>
+                </div>
             </div>
     `;
 
