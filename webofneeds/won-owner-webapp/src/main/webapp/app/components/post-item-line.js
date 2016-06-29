@@ -101,9 +101,9 @@ function genComponentConf() {
                     .filter(conn => conn.getIn(['ownNeed', 'uri']) === this.item.uri);
 
                 return {
-                    hasConversations: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Connected).length > 0,
-                    hasRequests: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.RequestReceived).length > 0,
-                    hasMatches: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested).length > 0,
+                    hasConversations: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Connected).size > 0,
+                    hasRequests: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.RequestReceived).size > 0,
+                    hasMatches: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested).size > 0,
                     WON: won.WON
                 };
             };
