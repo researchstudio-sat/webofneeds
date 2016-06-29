@@ -205,6 +205,7 @@ const actionHierarchy = {
     register: accountRegister,
     loginFailed: INJ_DEFAULT,
     loginReset: INJ_DEFAULT,
+    registerReset: INJ_DEFAULT,
     registerFailed: INJ_DEFAULT,
     config: {
         init: configInit,
