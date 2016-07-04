@@ -17,31 +17,12 @@ Web of needs is built of
    it finds a good match.
 
 Requirements for getting started:
-- jdk 1.6 or later
-- maven 2 or later
-- tomcat 6 or later as application-server
-- nodejs
+- install docker (we use 1.7.0)
+- follow the [instructions here](https://github.com/researchstudio-sat/webofneeds/webofneeds/won-docker/README.md) to set up all the neccessary components of web of needs locally
 
 For Build instructions and more detailed information, [please consult the wiki](https://github.com/researchstudio-sat/webofneeds/wiki).
 
-To prevent reinventing the wheel every single day, 
-we come back to existing (old) technology for the matching services:
-- siren                   -> http://siren.sindice.com/ 
-- triplestore(virtuoso)   -> http://virtuoso.openlinksw.com/
-- solr                    -> http://lucene.apache.org/solr/
-- ldspider                -> https://code.google.com/p/ldspider/
-
 ---
-
-won-node
-- all needs and offers will be saved there
-
-won-owner
-- needs are managed by the won-owner
-
-matching-service
-- the matching-service crawls the won-nodes and looks for need and offer entries with corresponding values.
-
 
 See also: http://events.linkeddata.org/ldow2013/papers/ldow2013-paper-13.pdf
 
