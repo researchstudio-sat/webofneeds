@@ -18,7 +18,7 @@ Web of needs is built of
 
 Requirements for getting started:
 - install docker (we use 1.7.0)
-- follow the [instructions here](https://github.com/researchstudio-sat/webofneeds/webofneeds/won-docker/README.md) to set up all the neccessary components of web of needs locally
+- follow the [instructions here](webofneeds/won-docker/README.md) to set up all the neccessary components of web of needs locally
 
 For Build instructions and more detailed information, [please consult the wiki](https://github.com/researchstudio-sat/webofneeds/wiki).
 
