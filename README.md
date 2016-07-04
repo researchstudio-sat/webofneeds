@@ -20,8 +20,6 @@ Requirements for getting started:
 - install docker (we use 1.7.0)
 - follow the [instructions here](webofneeds/won-docker/README.md) to set up all the neccessary components of web of needs locally
 
-For Build instructions and more detailed information, [please consult the wiki](https://github.com/researchstudio-sat/webofneeds/wiki).
-
 ---
 
 See also: http://events.linkeddata.org/ldow2013/papers/ldow2013-paper-13.pdf
