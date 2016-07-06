@@ -10,9 +10,7 @@
             <span class="title__counter">{{self.posts.size}}</span>
         </div>
         <won-post-item-line ng-show="self.activePostsOpen"
-                            item="item"
-                            unread-match-events-of-need="self.unreadMatchEventsOfNeed.get(item.uri)"
-                            unread-counts="self.unreadCounts.get(item.uri)"
+                            need-uri="item.uri"
                             ng-repeat="item in self.posts |filterByNeedState: 'http://purl.org/webofneeds/model#Active'">
         </won-post-item-line>
         <!--
@@ -33,8 +31,7 @@
             <span class="title__counter">{{self.closedPosts.length}}</span>
         </div>
         <won-post-item-line ng-show="self.closedPostsOpen"
-                            item="item"
-                            unread-counts="self.unreadCounts.get(item.uri)"
+                            need-uri="item.uri"
                             ng-repeat="item in self.posts |filterByNeedState: 'http://purl.org/webofneeds/model#Inactive'">
         </won-post-item-line>
     </div>
