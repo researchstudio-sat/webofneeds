@@ -21,7 +21,7 @@ function genComponentConf() {
                 ng-click="self.unSelect($index)"
                 won-enter="self.unSelect($index)"
                 tabindex="0">
-                    <span>{{o.text}}</span>
+                    <span>{{o.text}}&nbsp;&hellip;</span>
                     <img src="generated/icon-sprite.svg#ico36_help"
                          ng-click="self.unSelectHelpFor($index); $event.stopPropagation();"
                          class="ts__option__help-btn">

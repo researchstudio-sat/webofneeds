@@ -17,7 +17,10 @@ const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
         <div class="post-info__inner">
-            <won-gallery class="post-info__inner__left"></won-gallery>
+            <won-gallery
+                class="post-info__inner__left"
+                ng-show="self.post.get('hasImages')">
+            </won-gallery>
 
             <div class="post-info__inner__right">
                 <h2 class="post-info__heading" ng-show="self.post.get('friendlyTimestamp')">

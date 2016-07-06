@@ -15,12 +15,12 @@ function genTopnavConf() {
                 <div class="topnav__inner__left">
                     <a  ui-sref="{{ self.loggedIn ? 'feed' : 'landingpage' }}" class="topnav__button">
                         <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__button__icon">
-                        <span class="topnav__page-title topnav__button__caption">Web of Needs</span>
+                        <span class="topnav__page-title topnav__button__caption">Web of Needs &ndash; Beta</span>
                     </a>
                 </div>
                 <div class="topnav__inner__center" ng-show="self.loggedIn">
                     <a ui-sref="createNeed" class="topnav__button">
-                        <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon">
+                        <img src="generated/icon-sprite.svg#ico36_plus" class="topnav__button__icon logo">
                         <span class="topnav__button__caption">New Need</span>
                     </a>
                 </div>

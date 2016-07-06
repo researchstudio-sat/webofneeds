@@ -34,6 +34,8 @@ import java.util.Map;
  * in header 'wonMessgage'. If that header is empty, the WonMessage found in the
  * body is deserialized and put into the in header 'wonMessage'.
  * Moreover, the 'messageType' header is set.
+ *
+ * To avoid confusions, the body of the exchange's in is deleted.
  */
 public class WonMessageIntoCamelProcessor implements Processor
 {
@@ -54,6 +56,7 @@ public class WonMessageIntoCamelProcessor implements Processor
     }
     exchange.getIn().setHeader(WonCamelConstants.MESSAGE_TYPE_HEADER, URI.create(wonMessage.getMessageType().getResource().getURI()));
     exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, wonMessage);
+    exchange.getIn().setBody(null);
   }
 
 }

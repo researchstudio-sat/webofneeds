@@ -1,14 +1,25 @@
 package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.impl.*;
-import won.bot.framework.events.bus.EventBus;
-import won.bot.framework.events.event.impl.*;
-import won.bot.framework.events.filter.impl.FinishedEventFilter;
-import won.bot.framework.events.listener.BaseEventListener;
-import won.bot.framework.events.listener.impl.ActionOnEventListener;
-import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.impl.facet.TwoPhaseCommitNoVoteDeactivateAllNeedsAction;
+import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.CreateNeedWithFacetsAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.CloseConnectionAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.ConnectFromListToListAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionAction;
+import won.bot.framework.eventbot.bus.EventBus;
+import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
+import won.bot.framework.eventbot.event.impl.listener.FinishedEvent;
+import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.eventbot.event.impl.needlifecycle.NeedDeactivatedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherNeedEvent;
+import won.bot.framework.eventbot.filter.impl.FinishedEventFilter;
+import won.bot.framework.eventbot.listener.BaseEventListener;
+import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
+import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
 import won.protocol.model.FacetType;
 
 /**
@@ -63,25 +74,25 @@ public class StandardTwoPhaseCommitNoVoteBot extends EventBot{
     this.needConnector = new ActionOnceAfterNEventsListener(
       ctx, "needConnector", noOfNeeds,
       new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
-        FacetType.CoordinatorFacet.getURI(), FacetType.ParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES));
+                                      FacetType.CoordinatorFacet.getURI(), FacetType.ParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi!"));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
     //add a listener that is informed of the connect/open events and that auto-opens
     //subscribe it to:
     // * connect events - so it responds with open
     // * open events - so it responds with open (if the open received was the first open, and we still need to accept the connection)
-    this.autoOpener = new ActionOnEventListener(ctx, "autoOpener", new OpenConnectionAction(ctx));
+    this.autoOpener = new ActionOnEventListener(ctx, "autoOpener", new OpenConnectionAction(ctx, "Hi!"));
     bus.subscribe(OpenFromOtherNeedEvent.class, this.autoOpener);
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
     this.autoCloser = new ActionOnceAfterNEventsListener(
       ctx, "autoCloser",
-      noOfNeeds-3, new CloseConnectionAction(ctx)
+      noOfNeeds-3, new CloseConnectionAction(ctx, "Bye!")
     );
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoCloser);
 
     //after the last connect event, all connections are closed!
-    this.needDeactivator = new ActionOnEventListener(ctx, new TwoPhaseCommitNoVoteDeactivateAllNeedsAction(ctx),1);
+    this.needDeactivator = new ActionOnEventListener(ctx, new TwoPhaseCommitNoVoteDeactivateAllNeedsAction(ctx), 1);
     bus.subscribe(CloseFromOtherNeedEvent.class, this.needDeactivator);
 
     //add a listener that counts two NeedDeactivatedEvents and then tells the

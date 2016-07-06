@@ -16,7 +16,7 @@ import {
 } from '../utils';
 
 import {
-    fetchDataForOwnedNeeds,
+    fetchOwnedData,
     fetchDataForNonOwnedNeedOnly,
 } from '../won-message-utils';
 
@@ -36,20 +36,11 @@ export const pageLoadAction = () => (dispatch, getState) => {
 }
 
 function loadingWhileSignedIn(dispatch, username) {
-    dispatch({
+    const curriedDispatch = (payload) => dispatch({
         type: actionTypes.initialPageLoad,
-        payload: Immutable.fromJS({
-            email: username,
-            loggedIn: true
-        })
+        payload
     });
-    fetchDataForOwnedNeeds(username)
-    .then(allThatData =>
-        dispatch({
-            type: actionTypes.initialPageLoad,
-            payload: allThatData
-        })
-    )
+    fetchOwnedData(username, curriedDispatch);
 }
 
 function loadingWhileSignedOut(dispatch, getState) {

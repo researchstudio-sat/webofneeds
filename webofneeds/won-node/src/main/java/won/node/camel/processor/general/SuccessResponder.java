@@ -41,12 +41,12 @@ public class SuccessResponder extends AbstractCamelProcessor
     // with other means which ownerapplications to send the response to.
     if (originalMessage.getSenderNeedURI() == null) return;
     URI newMessageURI = this.wonNodeInformationService.generateEventURI();
-    WonMessage responseMessage = new WonMessageBuilder().setPropertiesForNodeResponse(originalMessage, true,
+    WonMessage responseMessage = WonMessageBuilder.setPropertiesForNodeResponse(originalMessage, true,
       newMessageURI).build();
     if (WonMessageDirection.FROM_OWNER == originalMessage.getEnvelopeType()){
       sendSystemMessageToOwner(responseMessage);
     } else if (WonMessageDirection.FROM_EXTERNAL == originalMessage.getEnvelopeType()){
-      sendSystemMessageToRemoteNode(responseMessage);
+      sendSystemMessage(responseMessage);
     }
   }
 }

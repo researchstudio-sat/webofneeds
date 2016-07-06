@@ -5,7 +5,7 @@
 import  won from '../won-es6';
 import Immutable from 'immutable';
 import { actionTypes, actionCreators } from './actions';
-import { fetchDataForOwnedNeeds } from '../won-message-utils';
+import { fetchOwnedData } from '../won-message-utils';
 
 import {
     checkHttpStatus,
@@ -26,7 +26,7 @@ export function accountLogin(username, password) {
             checkHttpStatus
         )
         .then( response =>
-            fetchDataForOwnedNeeds(username)
+            fetchOwnedData(username)
         )
         .then(allThatData =>
             dispatch({
@@ -39,12 +39,13 @@ export function accountLogin(username, password) {
             dispatch(actionCreators.router__stateGo("feed"));
         })
         .catch(error => {
+            console.log("accountLogin ErrorObject", error);
             //TODO load data of non-owned need!!!
             dispatch({
                 type: actionTypes.login,
                 payload: Immutable.fromJS({loggedIn: false})
             })
-            dispatch(actionCreators.loginFailed({loginError: "No such username/password combination registered.", error}))
+            dispatch(actionCreators.loginFailed({loginError: error.msg? error.msg : "Unknown Username/Password Combination", error}))
         })
 }
 
@@ -69,6 +70,7 @@ export function accountLogout() {
             })
         )
         .then(() => {
+            won.clearStore();
             dispatch(actionCreators.messages__requestWsReset_Hack());
             dispatch(actionCreators.router__stateGo("landingpage"));
         })
@@ -108,6 +110,6 @@ export function accountRegister(username, password) {
         .catch(
             //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
                 error =>
-                    dispatch(actionCreators.registerFailed({registerError: "Registration failed", error}))
+                    dispatch(actionCreators.registerFailed({registerError: "Registration failed (E-Mail might already be used)", error}))
         )
 }

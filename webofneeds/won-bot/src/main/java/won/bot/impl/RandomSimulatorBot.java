@@ -17,21 +17,33 @@
 package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.BaseEventBotAction;
-import won.bot.framework.events.action.impl.*;
-import won.bot.framework.events.action.impl.counter.Counter;
-import won.bot.framework.events.action.impl.counter.CounterImpl;
-import won.bot.framework.events.action.impl.counter.DecrementCounterAction;
-import won.bot.framework.events.action.impl.counter.IncrementCounterAction;
-import won.bot.framework.events.bus.EventBus;
-import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.NeedCreationFailedEvent;
-import won.bot.framework.events.event.impl.*;
-import won.bot.framework.events.listener.BaseEventListener;
-import won.bot.framework.events.listener.EventListener;
-import won.bot.framework.events.listener.impl.ActionOnEventListener;
-import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.action.impl.*;
+import won.bot.framework.eventbot.action.impl.counter.Counter;
+import won.bot.framework.eventbot.action.impl.counter.CounterImpl;
+import won.bot.framework.eventbot.action.impl.counter.DecrementCounterAction;
+import won.bot.framework.eventbot.action.impl.counter.IncrementCounterAction;
+import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.CreateNeedWithFacetsAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.CloseConnectionAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.SendFeedbackForHintAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.SendMessageAction;
+import won.bot.framework.eventbot.bus.EventBus;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.NeedCreationFailedEvent;
+import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
+import won.bot.framework.eventbot.event.impl.needlifecycle.NeedProducerExhaustedEvent;
+import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherNeedEvent;
+import won.bot.framework.eventbot.listener.BaseEventListener;
+import won.bot.framework.eventbot.listener.EventListener;
+import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
+import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
 
 /**
  *
@@ -126,8 +138,8 @@ public class RandomSimulatorBot extends EventBot
           new MultipleActions(ctx,
             new SendFeedbackForHintAction(ctx),
             new ProbabilisticSelectionAction(ctx, PROB_OPEN_ON_HINT, (long) this.hashCode(),
-              new OpenConnectionAction(ctx),
-              new CloseConnectionAction(ctx)))
+              new OpenConnectionAction(ctx, "Hi!"),
+              new CloseConnectionAction(ctx, "Bye!")))
           )));
 
     //when an open or connect is received, send message or close randomly after a random timeout
@@ -135,17 +147,17 @@ public class RandomSimulatorBot extends EventBot
       new ActionOnEventListener(ctx, "open-reactor",
         new RandomDelayedAction(ctx,MIN_RECATION_TIMEOUT_MILLIS, MAX_REACTION_TIMEOUT_MILLIS, (long) this.hashCode(),
           new ProbabilisticSelectionAction(ctx, PROB_MESSAGE_ON_OPEN, (long) this.hashCode(),
-            new OpenConnectionAction(ctx),
-            new CloseConnectionAction(ctx))));
-    bus.subscribe(OpenFromOtherNeedEvent.class,opener);
-    bus.subscribe(ConnectFromOtherNeedEvent.class,opener);
+            new OpenConnectionAction(ctx, "Hi!"),
+            new CloseConnectionAction(ctx, "Bye!"))));
+    bus.subscribe(OpenFromOtherNeedEvent.class, opener);
+    bus.subscribe(ConnectFromOtherNeedEvent.class, opener);
 
     //when an open is received, send message or close randomly after a random timeout
     EventListener replyer = new ActionOnEventListener(ctx, "message-reactor",
       new RandomDelayedAction(ctx,MIN_RECATION_TIMEOUT_MILLIS, MAX_REACTION_TIMEOUT_MILLIS, (long) this.hashCode(),
         new ProbabilisticSelectionAction(ctx, PROB_MESSAGE_ON_MESSAGE, (long) this.hashCode(),
           new SendMessageAction(ctx),
-          new CloseConnectionAction(ctx))));
+          new CloseConnectionAction(ctx, "Bye!"))));
     bus.subscribe(MessageFromOtherNeedEvent.class, replyer);
     bus.subscribe(OpenFromOtherNeedEvent.class, replyer);
 

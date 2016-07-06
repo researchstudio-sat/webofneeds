@@ -91,6 +91,10 @@
 
     .topnav__button__icon {
       @include fixed-square($bigiconSize);
+
+      &.logo {
+        transform: rotate(180deg);
+      }
     }
 
     &.open {

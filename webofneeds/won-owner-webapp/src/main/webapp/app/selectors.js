@@ -4,7 +4,11 @@
 
 import { createSelector } from 'reselect';
 import Immutable from 'immutable';
-import { decodeUriComponentProperly } from './utils';
+import won from './won-es6';
+import {
+    decodeUriComponentProperly,
+    toDate,
+} from './utils';
 import { relativeTime } from './won-label-utils';
 
 export const selectConnections = state => state.getIn(['connections']);
@@ -170,6 +174,49 @@ export const selectOpenConnectionUri = createSelector(
         } else {
             return undefined;
         }
+    }
+);
+
+export const selectOpenConnection = createSelector(
+    selectOpenConnectionUri, selectConnections,
+    (uri, connections) =>
+        connections.get(uri)
+);
+
+export const selectEventsOfOpenConnection = createSelector(
+    selectOpenConnection, selectEvents,
+    (connection, allEvents) => connection && connection
+        .get('hasEvents')
+        .map(eventUri => allEvents.get(eventUri))
+);
+
+export const selectConnectMessageOfOpenConnection = createSelector(
+    selectEventsOfOpenConnection,
+    events => events && events
+        .filter(event =>
+            event.getIn(['hasCorrespondingRemoteMessage', 'hasMessageType']) === won.WONMSG.connectMessage ||
+            event.get('hasMessageType') === won.WONMSG.connectMessage
+        )
+        .first()
+)
+
+export const selectRequestTimestampOfOpenConnection = createSelector(
+    selectConnectMessageOfOpenConnection,
+    connectMsg => {
+
+        if(!connectMsg) return;
+
+        let timestamp;
+        if (connectMsg.get('type') === won.WONMSG.FromExternal) {
+            timestamp = connectMsg.get('hasReceivedTimestamp');
+        } else if (connectMsg.getIn(['hasCorrespondingRemoteMessage', 'type']) === won.WONMSG.FromExternal) {
+            timestamp = connectMsg.getIn(['hasCorrespondingRemoteMessage', 'hasReceivedTimestamp'])
+        } else {
+            throw new Error("Encountered connect message of unexpected " +
+                "format (neither the message nor it's counterpart were " +
+                "`FromExternal`, thus a the one our own node created)." );
+        }
+        return toDate(timestamp)
     }
 );
 

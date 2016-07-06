@@ -2,10 +2,23 @@
 
 import angular from 'angular';
 import extendedGalleryModule from '../components/extended-gallery';
-import { labels } from '../won-label-utils';
-import {attach} from '../utils.js'
+import {
+    labels,
+    relativeTime
+} from '../won-label-utils';
+import {
+    attach,
+    toDate,
+} from '../utils.js'
 import { actionCreators }  from '../actions/actions';
-import { selectOpenConnectionUri, displayingOverview } from '../selectors';
+import {
+    selectOpenConnectionUri,
+    displayingOverview,
+    selectEventsOfOpenConnection,
+    selectLastUpdateTime,
+    selectOpenConnection,
+    selectConnectMessageOfOpenConnection,
+} from '../selectors';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
@@ -20,7 +33,7 @@ function genComponentConf() {
                         {{self.theirNeed.get('title')}}
                     </div>
                     <div class="or__header__title__topline__date">
-                        {{self.theirNeed.get('creationDate')}}
+                        {{self.timestamp}}
                     </div>
                 </div>
                 <div class="or__header__title__subtitle">
@@ -38,10 +51,13 @@ function genComponentConf() {
             </div>
         </div>
         <div class="or__content">
+            <!--
             <div class="or__content__images" ng-show="self.theirNeed.get('images')">
                 <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.theirNeed.get('images')" class="vertical"></won-extended-gallery>
             </div>
+            -->
             <div class="or__content__description">
+                <!--
                 <div class="or__content__description__location">
                     <img class="or__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_location"/>
                     <span>Vienna area</span>
@@ -50,9 +66,16 @@ function genComponentConf() {
                     <img class="or__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_time"/>
                     <span>Available until 5th May</span>
                 </div>
-                <div class="or__content__description__text">
-                    <img class="or__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_description"/>
-                    <span>These lovley Chairs need a new home since I am moving These are the first X chars of the message et eaquuntiore dolluptaspid quam que quatur quisinia aspe sus voloreiusa plis Sae quatectibus eumendi bla volupita dolupta el et andunt …</span>
+                -->
+                <div class="or__content__description__text"
+                    ng-show="!!self.theirNeed.get('description') || !!self.textMsg">
+                    <img
+                        class="or__content__description__indicator"
+                        src="generated/icon-sprite.svg#ico16_indicator_description"/>
+                    <span>
+                        <p>{{ self.theirNeed.get('description') }}</p>
+                        <p>{{ self.textMsg }}</p>
+                    </span>
                 </div>
             </div>
         </div>
@@ -76,19 +99,34 @@ function genComponentConf() {
             this.labels = labels;
             const selectFromState = (state) => {
                 const connectionUri = selectOpenConnectionUri(state);
-                const theirNeedUri = state.getIn(['connections', connectionUri, 'hasRemoteNeed']);
+                const connection = selectOpenConnection(state);
+                const connectionState = connection && connection.get('hasConnectionState');
+                const theirNeedUri = connection && connection.get('hasRemoteNeed');
+                const theirNeed = state.getIn(['needs','theirNeeds', theirNeedUri]);
+                const connectMsg = selectConnectMessageOfOpenConnection(state);
 
-                const connectionState = state.getIn(['connections', connectionUri, 'hasConnectionState']);
-                const isSentRequest = connectionState === won.WON.RequestSent;
-                const isReceivedRequest = connectionState === won.WON.RequestReceived;
 
                 return {
-                    isSentRequest,
-                    isReceivedRequest,
-                    isOverview: displayingOverview(state),
+                    theirNeed,
+
                     connectionUri: connectionUri,
-                    connection: state.getIn(['connections', connectionUri]),
-                    theirNeed: state.getIn(['needs','theirNeeds', theirNeedUri]),
+                    isSentRequest: connectionState === won.WON.RequestSent,
+                    isReceivedRequest: connectionState === won.WON.RequestReceived,
+
+                    isOverview: displayingOverview(state),
+                    connection: selectOpenConnection(state),
+
+                    timestamp: theirNeed && relativeTime(
+                        selectLastUpdateTime(state),
+                        theirNeed.get('creationDate')
+                    ),
+
+                    textMsg: connectMsg && (
+                        connectMsg.get('hasTextMessage') ||
+                        connectMsg.getIn(['hasCorrespondingRemoteMessage', 'hasTextMessage'])
+                    ),
+
+
                 }
             };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);

@@ -22,7 +22,8 @@ function genComponentConf() {
                     <won-square-image
                         ng-class="{'inactive' : !self.isActive}"
                         src="self.post.get('titleImgSrc')"
-                        title="self.post.get('title')">
+                        title="self.post.get('title')"
+                        uri="self.post.get('uri')">
                     </won-square-image>
                 </div>
 

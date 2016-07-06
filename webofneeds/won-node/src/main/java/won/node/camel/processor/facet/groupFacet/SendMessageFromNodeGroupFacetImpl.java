@@ -58,7 +58,7 @@ public class SendMessageFromNodeGroupFacetImpl extends AbstractFromOwnerCamelPro
             forwardedMessageURI, wonMessage,
             con.getConnectionURI(), con.getNeedURI(), wonMessage.getReceiverNodeURI(),
             con.getRemoteConnectionURI(), con.getRemoteNeedURI(), remoteWonNodeUri);
-          sendSystemMessageToRemoteNode(newWonMessage);
+          sendSystemMessage(newWonMessage);
         }
       } catch (Exception e) {
         logger.warn("caught Exception:", e);

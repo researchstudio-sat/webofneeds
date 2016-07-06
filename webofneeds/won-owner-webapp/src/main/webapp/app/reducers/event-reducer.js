@@ -14,7 +14,9 @@ const initialState = Immutable.fromJS({
 
 export default function(state = initialState, action = {}) {
     switch(action.type) {
-
+        case actionTypes.logout:
+            return initialState;
+        
         case actionTypes.initialPageLoad:
         case actionTypes.login:
             const allPreviousEvents = action.payload.get('events');

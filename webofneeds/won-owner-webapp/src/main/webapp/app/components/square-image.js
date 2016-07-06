@@ -14,9 +14,9 @@ function genComponentConf() {
 
         generateHexColor(title) {
             var hash = 0;
-            if(this.title){
-                for (var i = 0; i < this.title.length; i++) {
-                    hash = this.title.charCodeAt(i) + ((hash << 5) - hash);
+            if(this.uri){
+                for (var i = 0; i < this.uri.length; i++) {
+                    hash = this.uri.charCodeAt(i) + ((hash << 5) - hash);
                 }
             }
 
@@ -40,7 +40,8 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {src: "=",
-                title: "="},
+                title: "=",
+                uri: "="},
         template: template
     }
 }

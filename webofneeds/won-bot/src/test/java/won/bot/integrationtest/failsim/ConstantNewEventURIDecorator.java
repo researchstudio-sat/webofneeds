@@ -16,7 +16,7 @@
 
 package won.bot.integrationtest.failsim;
 
-import won.bot.framework.events.EventListenerContext;
+import won.bot.framework.eventbot.EventListenerContext;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.service.impl.WonNodeInformationServiceDecorator;
 

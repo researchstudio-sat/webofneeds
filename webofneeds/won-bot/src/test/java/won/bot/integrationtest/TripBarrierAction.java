@@ -16,9 +16,9 @@
 
 package won.bot.integrationtest;
 
-import won.bot.framework.events.event.Event;
-import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.BaseEventBotAction;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.BaseEventBotAction;
 
 import java.util.concurrent.CyclicBarrier;
 

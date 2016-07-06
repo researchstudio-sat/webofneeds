@@ -9,10 +9,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: ypanchenko
@@ -27,34 +24,38 @@ public class WonMessageValidator
 
 
   public WonMessageValidator() {
-
-    dirToValidator.put(resourceDir + "01_basic/", new ArrayList<WonSparqlValidator>());
-    dirToValidator.put(resourceDir + "02_prop/", new ArrayList<WonSparqlValidator>());
-    dirToValidator.put(resourceDir + "03_chain/", new ArrayList<WonSparqlValidator>());
-    dirToValidator.put(resourceDir + "04_uri/", new ArrayList<WonSparqlValidator>());
-    dirToValidator.put(resourceDir + "05_sign/", new ArrayList<WonSparqlValidator>());
+    Map validatorDirs = new HashMap<>();
+    String[] dirs = {
+      resourceDir + "01_basic/",
+      resourceDir + "02_prop/",
+      resourceDir + "03_chain/",
+      resourceDir + "04_uri/",
+      resourceDir + "05_sign/"
+    };
     PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
-    for (String dir : dirToValidator.keySet()) {
+    for (String dir : dirs) {
       try {
-        loadResources(resolver, dir, dirToValidator.get(dir));
+        List validators = loadResources(resolver, dir);
+        validatorDirs.put(dir, Collections.unmodifiableList(validators));
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
     }
-
+    this.dirToValidator = Collections.unmodifiableMap(validatorDirs);
   }
 
-  private void loadResources(PathMatchingResourcePatternResolver resolver, String dirString,
-                             List<WonSparqlValidator> loadTo) throws IOException {
-
+  private List<WonSparqlValidator> loadResources(PathMatchingResourcePatternResolver resolver, String dirString)
+    throws IOException {
+    List validators = new ArrayList<WonSparqlValidator>();
     Resource[] resources = resolver.getResources("classpath:" + dirString + "*.rq");
     for (Resource resource : resources) {
       String queryString = loadQueryFromResource(resource);
       Query constraint = QueryFactory.create(queryString);
       WonSparqlValidator validator = new WonSparqlValidator(constraint, resource.getFilename());
-      loadTo.add(validator);
+      validators.add(validator);
     }
+    return validators;
   }
 
   private String loadQueryFromResource(final Resource resource) {
@@ -89,7 +90,7 @@ public class WonMessageValidator
     for (String dir : dirToValidator.keySet()) {
       List<WonSparqlValidator> validators = dirToValidator.get(dir);
       for (WonSparqlValidator validator : validators) {
-        if (!validator.validate(input)) {
+        if (!validator.validate(input).isValid()) {
           return false;
         }
       }
@@ -103,9 +104,11 @@ public class WonMessageValidator
     for (String dir : dirToValidator.keySet()) {
       List<WonSparqlValidator> validators = dirToValidator.get(dir);
       for (WonSparqlValidator validator : validators) {
-        if (!validator.validate(input)) {
+        WonSparqlValidator.ValidationResult result = validator.validate(input);
+        if (!result.isValid()) {
           causePlaceholder.append(dir);
           causePlaceholder.append(validator.getName());
+          causePlaceholder.append(": ").append(result.getErrorMessage());
           return false;
         }
       }

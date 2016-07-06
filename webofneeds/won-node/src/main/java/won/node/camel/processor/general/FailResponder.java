@@ -76,7 +76,7 @@ public class FailResponder extends AbstractCamelProcessor
       logger.debug("Sending FailureResponse {}", newMessageURI);
       Model errorMessageContent = WonRdfUtils.MessageUtils.textMessage(errormessage);
       RdfUtils.replaceBaseURI(errorMessageContent, newMessageURI.toString());
-      WonMessage responseMessage = new WonMessageBuilder()
+      WonMessage responseMessage = WonMessageBuilder
               .setPropertiesForNodeResponse(originalMessage, false,newMessageURI)
               .addContent(
                 errorMessageContent,
@@ -87,7 +87,7 @@ public class FailResponder extends AbstractCamelProcessor
         String ownerApplicationId = (String) exchange.getIn().getHeader(WonCamelConstants.OWNER_APPLICATION_ID);
         sendSystemMessageToOwner(responseMessage, ownerApplicationId);
       } else if (WonMessageDirection.FROM_EXTERNAL == originalMessage.getEnvelopeType()){
-        sendSystemMessageToRemoteNode(responseMessage);
+        sendSystemMessage(responseMessage);
       } else {
         logger.info(String.format("cannot route failure message for direction of original message, " +
             "expected FROM_OWNER or FROM_EXTERNAL, but found %s. Original cause is logged.",

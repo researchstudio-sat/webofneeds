@@ -71,8 +71,7 @@ const rdfstore = window.rdfstore;
 
     var privateData = {};
 
-    won.ld_reset = function() {
-        privateData = {};
+    won.clearStore = function () {
         //create an rdfstore-js based store as a cache for rdf data.
         privateData.store =  rdfstore.create();
         window.store4dbg = privateData.store; //TODO deletme
@@ -88,7 +87,7 @@ const rdfstore = window.rdfstore;
     }
     const CACHE_ITEM_STATE = { OK: 1, DIRTY: 2, UNRESOLVABLE: 3, FETCHING: 4};
 
-    won.ld_reset();
+    won.clearStore();
 
 
     var createNameNodeInStore = function(uri){
@@ -132,7 +131,7 @@ const rdfstore = window.rdfstore;
                 if (failures + successes >= numPromises) deferred.resolve(results);
             }, function(reason) {
                 failures ++;
-                console.log("linkeddata-service-won.js: warning: promise failed. Reason " + JSON.stringify(reason));
+                //console.log("linkeddata-service-won.js: warning: promise failed. Reason " + JSON.stringify(reason));
                 if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
                 results[key] = null;
                 handler(key, reason);
@@ -188,14 +187,14 @@ const rdfstore = window.rdfstore;
             var deferred = q.defer();
             if (this.updateInProgress || this.blockedUpdaters.length > 0){
                 //updates are already in progress or are waiting. block.
-                console.log("linkeddata-service-won.js: rul:read:block:  " + this.uri + " " + this.getLockStatusString());
+                //console.log("linkeddata-service-won.js: rul:read:block:  " + this.uri + " " + this.getLockStatusString());
                 this.blockedReaders.push(deferred);
                 this.grantLockToUpdaters();
             } else {
                 //nobody wishes to update the resource, the caller may read it
                 //add the deferred execution to the blocked list, just in case
                 //there are others blocket there, and then grant access to all
-                console.log("linkeddata-service-won.js: rul:read:grant:  " + this.uri + " " + this.getLockStatusString());
+                //console.log("linkeddata-service-won.js: rul:read:grant:  " + this.uri + " " + this.getLockStatusString());
                 this.blockedReaders.push(deferred);
                 this.grantLockToReaders();
             }
@@ -206,10 +205,10 @@ const rdfstore = window.rdfstore;
 
             if (this.activeReaderCount > 0 ) {
                 //readers are present, we have to wait till they are done
-                console.log("linkeddata-service-won.js: rul:updt:block:  " + this.uri + " " + this.getLockStatusString());
+                //console.log("linkeddata-service-won.js: rul:updt:block:  " + this.uri + " " + this.getLockStatusString());
                 this.blockedUpdaters.push(deferred);
             } else {
-                console.log("linkeddata-service-won.js: rul:updt:grant:  " + this.uri + " " + this.getLockStatusString());
+                //console.log("linkeddata-service-won.js: rul:updt:grant:  " + this.uri + " " + this.getLockStatusString());
                 //add the deferred update to the list of blocked updates just
                 //in case there are more, then grant the lock to all of them
                 this.blockedUpdaters.push(deferred);
@@ -219,7 +218,7 @@ const rdfstore = window.rdfstore;
             return deferred.promise;
         },
         releaseReadLock: function(){
-            console.log("linkeddata-service-won.js: rul:read:release:" + this.uri + " " + this.getLockStatusString());
+            //console.log("linkeddata-service-won.js: rul:read:release:" + this.uri + " " + this.getLockStatusString());
             this.activeReaderCount --;
             if (this.activeReaderCount < 0){
                 throw {message: "Released a read lock that was never acquired"}
@@ -229,7 +228,7 @@ const rdfstore = window.rdfstore;
             }
         },
         releaseUpdateLock: function(){
-            console.log("linkeddata-service-won.js: rul:updt:release:" + this.uri + " " + this.getLockStatusString());
+            //console.log("linkeddata-service-won.js: rul:updt:release:" + this.uri + " " + this.getLockStatusString());
             this.activeUpdaterCount --;
             if (this.activeUpdaterCount < 0){
                 throw {message: "Released an update lock that was never acquired"}
@@ -241,7 +240,7 @@ const rdfstore = window.rdfstore;
         },
         grantLockToUpdaters: function() {
             if (this.blockedUpdaters.length > 0 && ! this.updateInProgress) {
-                console.log("linkeddata-service-won.js: rul:updt:all:    " + this.uri + " " + this.getLockStatusString());
+                //console.log("linkeddata-service-won.js: rul:updt:all:    " + this.uri + " " + this.getLockStatusString());
                 //there are blocked updaters. let them proceed.
                 this.updateInProgress = true;
                 for (var i = 0; i < this.blockedUpdaters.length; i++) {
@@ -255,7 +254,7 @@ const rdfstore = window.rdfstore;
         },
         grantLockToReaders: function() {
             if (this.blockedReaders.length > 0) {
-                console.log("linkeddata-service-won.js: rul:readers:all: " + this.uri + " " + this.getLockStatusString());
+                //console.log("linkeddata-service-won.js: rul:readers:all: " + this.uri + " " + this.getLockStatusString());
                 //there are blocked readers. let them proceed.
                 for (var i = 0; i < this.blockedReaders.length; i++) {
                     var deferredRead = this.blockedReaders[i];
@@ -269,7 +268,6 @@ const rdfstore = window.rdfstore;
 
     };
 
-
     /**
      * We got the rdf but didn't know the uri of the resource
      * first (e.g. due to server-side bundling like http-2)
@@ -279,7 +277,7 @@ const rdfstore = window.rdfstore;
      * @param uri
      */
     var cacheItemInsertOrOverwrite = function(uri){
-        console.log("linkeddata-service-won.js: add to cache:    " + uri);
+        //console.log("linkeddata-service-won.js: add to cache:    " + uri);
         privateData.cacheStatus[uri] = {
             timestamp: new Date().getTime(),
             state: CACHE_ITEM_STATE.OK
@@ -295,7 +293,7 @@ const rdfstore = window.rdfstore;
             ret = entry.state === state;
         }
         var retStr = (ret + "     ").substr(0,5);
-        console.log("linkeddata-service-won.js: cacheSt: " + nameOfState + ":" +retStr + "   " + uri);
+        //console.log("linkeddata-service-won.js: cacheSt: " + nameOfState + ":" +retStr + "   " + uri);
         return ret;
     }
 
@@ -311,7 +309,7 @@ const rdfstore = window.rdfstore;
                 entry.state === CACHE_ITEM_STATE.FETCHING;
         }
         var retStr = (ret + "     ").substr(0,5);
-        console.log("linkeddata-service-won.js: cacheSt: OK or Unresolvable:" +retStr + "   " + uri);
+        //console.log("linkeddata-service-won.js: cacheSt: OK or Unresolvable:" +retStr + "   " + uri);
         return ret;
     }
 
@@ -346,14 +344,14 @@ const rdfstore = window.rdfstore;
         var entry = privateData.cacheStatus[uri];
         if (typeof entry === 'undefined') {
             const message = "Trying to mark unloaded uri " + uri +" as accessed";
-            console.error(message);
+            //console.error(message);
             throw { message }
         } else if (entry.state === CACHE_ITEM_STATE.DIRTY){
             const message = "Trying to mark uri " + uri +" as accessed, but it is already dirty";
-            console.error(message);
+            //console.error(message);
             throw { message };
         }
-        console.log("linkeddata-service-won.js: mark accessed:   " + uri);
+        //console.log("linkeddata-service-won.js: mark accessed:   " + uri);
         privateData.cacheStatus[uri].timestamp = new Date().getTime();
     }
 
@@ -362,17 +360,17 @@ const rdfstore = window.rdfstore;
         if (typeof entry === 'undefined') {
             return;
         }
-        console.log("linkeddata-service-won.js: mark dirty:      " + uri);
+        //console.log("linkeddata-service-won.js: mark dirty:      " + uri);
         privateData.cacheStatus[uri].state = CACHE_ITEM_STATE.DIRTY;
     }
 
     var cacheItemMarkUnresolvable = function cacheItemMarkUnresolvable(uri){
-        console.log("linkeddata-service-won.js: mark unres:      " + uri);
+        //console.log("linkeddata-service-won.js: mark unres:      " + uri);
         privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.UNRESOLVABLE};
     }
 
     var cacheItemMarkFetching = function cacheItemMarkFetching(uri){
-        console.log("linkeddata-service-won.js: mark fetching:   " + uri);
+        //console.log("linkeddata-service-won.js: mark fetching:   " + uri);
         privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.FETCHING};
     }
 
@@ -460,7 +458,7 @@ const rdfstore = window.rdfstore;
 
     var getReadUpdateLocksPerUris = function(uris){
         var locks = [];
-        console.log("uris",uris);
+        //console.log("uris",uris);
         uris.map(
             function(uri){
                 locks.push(getReadUpdateLockPerUri(uri));
@@ -502,7 +500,7 @@ const rdfstore = window.rdfstore;
         if(rejectionMessage) {
             // observation: the error happens for #hasRemoteConnection property of suggested connection, but this
             // property is really not there (and should not be), so in that case it's not an error...
-            console.log(rejectionMessage);
+            //console.log(rejectionMessage);
             // TODO: this q.reject seems to have no effect
             q.reject(rejectionMessage)
             return true;
@@ -536,7 +534,7 @@ const rdfstore = window.rdfstore;
         } else {
             // observation: the error happens for #hasRemoteConnection property of suggested connection, but this
             // property is really not there (and should not be), so in that case it's not an error...
-            console.error(options.message + " " + errorMessage);
+            //console.error(options.message + " " + errorMessage);
             return options.message + " " + errorMessage;
         }
     }
@@ -547,10 +545,10 @@ const rdfstore = window.rdfstore;
      * The uri is used for cache control.
      */
     won.addJsonLdData = function(uri, data) {
-        console.log("linkeddata-service-won.js: storing jsonld data for uri: " + uri);
+        //console.log("linkeddata-service-won.js: storing jsonld data for uri: " + uri);
         privateData.store.load("application/ld+json", data, function (success, results) {
             //privateData.store.load("application/ld+json", data, function (success, results) {
-            console.log("linkeddata-service-won.js: added jsonld data to rdf store, success: " + success);
+            //console.log("linkeddata-service-won.js: added jsonld data to rdf store, success: " + success);
             if (success) {
                 cacheItemInsertOrOverwrite(uri);
             }
@@ -635,7 +633,7 @@ const rdfstore = window.rdfstore;
     won.ensureLoaded = function(uri, requesterWebId, deep = false, layerSize = 0) {
         if (!uri) { throw {message : "ensureLoaded: uri must not be null"}; }
 
-        console.log("linkeddata-service-won.js: ensuring loaded: " +uri);
+        //console.log("linkeddata-service-won.js: ensuring loaded: " +uri);
 
         //we also allow unresolvable resources, so as to avoid re-fetching them.
         //we also allow resources that are currently being fetched.
@@ -661,7 +659,7 @@ const rdfstore = window.rdfstore;
                         return selectLoadedResourcesFromDataset(
                             dataset
                         ).then(allLoadedResources => {
-                                console.log('linkeddata-service-won.js: ensuring loaded deep: ', allLoadedResources);
+                                //console.log('linkeddata-service-won.js: ensuring loaded deep: ', allLoadedResources);
                                 allLoadedResources.forEach(resourceUri =>
                                         cacheItemInsertOrOverwrite(resourceUri)
                                 )
@@ -691,7 +689,7 @@ const rdfstore = window.rdfstore;
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "fetch: uri must not be null"};
         }
-        console.log("linkeddata-service-won.js: fetch announced: " + uri);
+        //console.log("linkeddata-service-won.js: fetch announced: " + uri);
         const lock = getReadUpdateLockPerUri(uri);
         return lock.acquireUpdateLock().then(
                 () => loadFromOwnServerIntoCache(uri, requesterWebId, deep, layerSize)
@@ -782,7 +780,7 @@ const rdfstore = window.rdfstore;
                     if (Object.keys(dataset).length === 0) {
                         reject("failed to load " + uri);
                     } else {
-                        console.log("linkeddata-service-won.js: fetched:         " + uri)
+                        //console.log("linkeddata-service-won.js: fetched:         " + uri)
                         Promise.resolve()
                             .then(() =>
                                 won.deleteNode(uri)) //remove any remaining stale data
@@ -1535,7 +1533,7 @@ const rdfstore = window.rdfstore;
                 return lock.acquireReadLock();
             })
             .then(() => {
-                console.log("linkeddata-service-won.js: getNode:" + uri);
+                //console.log("linkeddata-service-won.js: getNode:" + uri);
                 return new Promise((resolve, reject) => {
                     privateData.store.node(uri, function (success, graph) {
                         if(!success) {
@@ -1553,9 +1551,9 @@ const rdfstore = window.rdfstore;
                              * away, when we'll get around to update the store to the
                              * newest version.
                              */
-                            console.log('linkeddata-service-won.js: warn: could not ' +
+                            /*console.log('linkeddata-service-won.js: warn: could not ' +
                                 'load any attributes for node with uri: ', uri,
-                                '. Trying sparql-query + result.filter workaround.');
+                                '. Trying sparql-query + result.filter workaround.');*/
                             privateData.store.graph((success, entireGraph) => {
                                 resolve(entireGraph.triples.filter(t => t.subject.nominalValue === uri))
                             })
@@ -1599,7 +1597,7 @@ const rdfstore = window.rdfstore;
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "deleteNode: uri must not be null"};
         }
-        console.log("linkeddata-service-won.js: deleting node:   " + uri);
+        //console.log("linkeddata-service-won.js: deleting node:   " + uri);
         const query = "delete where {<"+uri+"> ?anyP ?anyO}";
         //var query = "select ?anyO where {<"+uri+"> ?anyP ?anyO}";
         return new Promise((resolve, reject) => {
@@ -1694,7 +1692,7 @@ const rdfstore = window.rdfstore;
 
         var executeQuery = function executeQuery(query, baseUri, relevantResources){
             query = query.replace(/\:\:baseUri\:\:/g, baseUri);
-            console.log("linkeddata-service-won.js: executing query: \n"+query);
+            //console.log("linkeddata-service-won.js: executing query: \n"+query);
             var locks = getReadUpdateLocksPerUris(relevantResources);
             var promises = acquireReadLocks(locks);
             return q.all(promises).then(
@@ -1709,7 +1707,7 @@ const rdfstore = window.rdfstore;
                         });
                         return resultObject.results;
                     } catch (e) {
-                        console.log("linkeddata-service-won.js: Could not execute query. Reason: " + e);
+                        //console.log("linkeddata-service-won.js: Could not execute query. Reason: " + e);
                         return q.reject("Could not execute query. Reason: " + e);
                     } finally {
                         //release the read locks
@@ -1724,7 +1722,7 @@ const rdfstore = window.rdfstore;
         }
 
         var resolvePropertyPathsFromBaseUri = function resolvePropertyPathsFromBaseUri(propertyPaths, baseUri, relevantResources){
-            console.log("linkeddata-service-won.js: resolving " + propertyPaths.length + " property paths on baseUri " + baseUri);
+            //console.log("linkeddata-service-won.js: resolving " + propertyPaths.length + " property paths on baseUri " + baseUri);
             var locks = getReadUpdateLocksPerUris(relevantResources);
             var promises = acquireReadLocks(locks);
             return q.all(promises).then(
@@ -1733,7 +1731,7 @@ const rdfstore = window.rdfstore;
                         var resolvedUris = [];
                         propertyPaths.map(
                             function(propertyPath){
-                                console.log("linkeddata-service-won.js: resolving property path: " + propertyPath.propertyPath);
+                                //console.log("linkeddata-service-won.js: resolving property path: " + propertyPath.propertyPath);
                                 var foundUris = won.resolvePropertyPathFromBaseUri(
                                         baseUri,
                                         propertyPath.propertyPath,
@@ -1741,11 +1739,11 @@ const rdfstore = window.rdfstore;
 
                                 //resolve all property paths, add to 'resolvedUris'
                                 Array.prototype.push.apply(resolvedUris, foundUris);
-                                console.log("linkeddata-service-won.js: resolved to " + foundUris.length + " resources (total " + resolvedUris.length+")");
+                                //console.log("linkeddata-service-won.js: resolved to " + foundUris.length + " resources (total " + resolvedUris.length+")");
                         });
                         return resolvedUris;
                     }catch(e){
-                        console.log(e)
+                        console.error(e)
                     } finally {
                         //release the read locks
                         locks.map(
@@ -1761,13 +1759,13 @@ const rdfstore = window.rdfstore;
             if (won.isNull(recursionData.depth)){
                 recursionData.depth = 0;
             }
-            console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute depth=" + recursionData.depth + ", resolvedUris=" + JSON.stringify(resolvedUris)+", relevantResources=" + JSON.stringify(relevantResources));
+            //console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute depth=" + recursionData.depth + ", resolvedUris=" + JSON.stringify(resolvedUris)+", relevantResources=" + JSON.stringify(relevantResources));
             recursionData.depth++;
             if (won.containsAll(relevantResources, resolvedUris) || recursionData.depth >= MAX_RECURSIONS) {
-                console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute crawling done");
+                //console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute crawling done");
                 return executeQuery(crawlableQuery.query, baseUri, relevantResources);
             } else {
-                console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute resolving property paths ...");
+                //console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute resolving property paths ...");
                 Array.prototype.push.apply(relevantResources, resolvedUris);
                 var loadedPromises = relevantResources.map(function(x){ return won.ensureLoaded(x, requesterWebId)});
                 return q.all(loadedPromises)

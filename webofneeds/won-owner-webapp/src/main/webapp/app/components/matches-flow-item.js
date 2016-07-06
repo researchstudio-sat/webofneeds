@@ -13,7 +13,12 @@ const serviceDependencies = ['$q', '$ngRedux', '$scope', '$interval'];
 function genComponentConf() {
     let template = `
         <div ng-show="self.images" class="mfi__gallery">
-            <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.images" class="horizontal"></won-extended-gallery>
+            <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.images" class="horizontal" ng-show="self.images.length > 0"></won-extended-gallery>
+            <won-square-image 
+                title="self.connectionData.getIn(['remoteNeed','title'])"
+                uri="self.connectionData.getIn(['remoteNeed','uri'])"
+                ng-show="self.images.length == 0">
+            </won-square-image>
         </div>
         <div class="mfi__description clickable">
             <div class="mfi__description__topline">
@@ -26,7 +31,7 @@ function genComponentConf() {
                 </span>
                 <span class="mfi__description__subtitle__type">{{self.labels.type[self.connectionData.getIn(['remoteNeed','basicNeedType'])]}}</span>
             </div>
-            <div class="mfi__description__content">
+            <div class="mfi__description__content" ng-show="false"><!-- include once you have content in your needs that needs to be displayed here -->
                 <div class="mfi__description__content__location">
                     <img class="mfi__description__content__indicator" src="generated/icon-sprite.svg#ico16_indicator_location"/>
                     <span>Vienna area</span>
@@ -42,7 +47,11 @@ function genComponentConf() {
                 <div class="mfi__match__description__title">{{self.connectionData.getIn(['ownNeed','title'])}}</div>
                 <div class="mfi__match__description__type">{{self.labels.type[self.connectionData.getIn(['ownNeed','basicNeedType'])]}}</div>
             </div>
-            <won-square-image src="self.getRandomImage()" title="self.connectionData.getIn(['ownNeed','title'])"></won-square-image>
+            <won-square-image 
+                src="self.connectionData.getIn(['ownNeed','titleImgSrc'])" 
+                title="self.connectionData.getIn(['ownNeed','title'])"
+                uri="self.connectionData.getIn(['ownNeed','uri'])">
+            </won-square-image>
         </div>
         <won-feedback-grid connection-uri="self.connectionUri" ng-mouseleave="self.hideFeedback()" ng-if="self.feedbackVisible"/>
     `;
@@ -53,12 +62,7 @@ function genComponentConf() {
             this.labels = labels;
             this.feedbackVisible = false;
             this.maxThumbnails = 4;
-            this.images=[
-                "images/furniture1.png",
-                "images/furniture2.png",
-                "images/furniture3.png",
-                "images/furniture4.png",
-            ];
+            this.images=[];
 
             const selectFromState = (state) => {
                 return {
@@ -88,12 +92,6 @@ function genComponentConf() {
         toggleFeedback(){
             this.feedbackVisible = !this.feedbackVisible;
         }
-
-        getRandomImage(){
-            let i = Math.floor((Math.random()*4));
-            return this.images[2];
-        }
-
     }
     Controller.$inject = serviceDependencies;
 

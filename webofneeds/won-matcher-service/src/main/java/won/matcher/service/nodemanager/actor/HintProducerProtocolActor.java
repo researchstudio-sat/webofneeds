@@ -98,8 +98,7 @@ public class HintProducerProtocolActor extends UntypedProducerActor
     throws WonMessageBuilderException {
 
     URI wonNode = URI.create(hint.getFromWonNodeUri());
-    WonMessageBuilder builder = new WonMessageBuilder();
-    return builder
+    return WonMessageBuilder
       .setMessagePropertiesForHint(
         hint.getGeneratedEventUri(),
         URI.create(hint.getFromNeedUri()),

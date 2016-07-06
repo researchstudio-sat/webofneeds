@@ -27,7 +27,7 @@
     <logger name="won.bot.framework.bot" level="INFO"/>
     <logger name="won.bot.framework.component.needconsumer" level="INFO"/>
     <logger name="org.springframework.aop" level="INFO"/>
-    <logger name="won.bot.framework.events.listener" level="INFO"/>
+    <logger name="won.bot.framework.eventbot.listener" level="INFO"/>
     <!-- set to DEBUG to get monitoring stats in the log file -->
     <logger name="won.monitoring" level="INFO"/>
 
@@ -40,9 +40,9 @@
     <!-- END MSGTRACE -->
 
     <!-- SET to DEBUG to see bot events -->
-    <logger name="won.bot.framework.events.bus.impl.AsyncEventBusImpl" level="INFO"/>
+    <logger name="won.bot.framework.eventbot.bus.impl.AsyncEventBusImpl" level="INFO"/>
     <!-- SET to DEBUG to see bot event listeners -->
-    <logger name="won.bot.framework.events.listener" level="INFO"/>
+    <logger name="won.bot.framework.eventbot.listener" level="INFO"/>
 
     <!-- SET to DEBUG to see more info about need creation -->
     <logger name="won.bot.framework.component.needproducer" level="INFO"/>

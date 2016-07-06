@@ -47,7 +47,7 @@ public class ResponseResenderProcessor extends AbstractCamelProcessor
     if (WonMessageDirection.FROM_OWNER == originalMessage.getEnvelopeType()){
       sendSystemMessageToOwner(responseMessage);
     } else if (WonMessageDirection.FROM_EXTERNAL == originalMessage.getEnvelopeType()){
-      sendSystemMessageToRemoteNode(responseMessage);
+      sendSystemMessage(responseMessage);
     } else {
       logger.info(String.format("cannot resend response message for direction of original message, " +
                                   "expected FROM_OWNER or FROM_EXTERNAL, but found %s. Original cause is logged.",

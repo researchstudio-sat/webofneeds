@@ -1,16 +1,26 @@
 package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.impl.*;
-import won.bot.framework.events.bus.EventBus;
-import won.bot.framework.events.event.impl.*;
-import won.bot.framework.events.filter.impl.FinishedEventFilter;
-import won.bot.framework.events.filter.impl.NeedUriInNamedListFilter;
-import won.bot.framework.events.listener.BaseEventListener;
-import won.bot.framework.events.listener.impl.ActionOnEventListener;
-import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
-import won.bot.framework.events.listener.impl.WaitForNEventsListener;
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.impl.facet.TwoPhaseCommitDeactivateOnCloseAction;
+import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.CreateNeedWithFacetsAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsOfGroupAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.ConnectFromListToListAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionAction;
+import won.bot.framework.eventbot.bus.EventBus;
+import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
+import won.bot.framework.eventbot.event.impl.listener.FinishedEvent;
+import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.eventbot.event.impl.needlifecycle.NeedDeactivatedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
+import won.bot.framework.eventbot.filter.impl.FinishedEventFilter;
+import won.bot.framework.eventbot.filter.impl.NeedUriInNamedListFilter;
+import won.bot.framework.eventbot.listener.BaseEventListener;
+import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
+import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
+import won.bot.framework.eventbot.listener.impl.WaitForNEventsListener;
 import won.protocol.model.FacetType;
 
 /**
@@ -70,7 +80,7 @@ public class StandardTwoPhaseCommitBot extends EventBot{
     this.needConnector = new ActionOnEventListener(
       ctx, "needConnector", new FinishedEventFilter(creationWaiter),
       new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
-        FacetType.CoordinatorFacet.getURI(), FacetType.ParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES),
+                                      FacetType.CoordinatorFacet.getURI(), FacetType.ParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi!"),
       1);
     bus.subscribe(FinishedEvent.class, this.needConnector);
 
@@ -79,7 +89,7 @@ public class StandardTwoPhaseCommitBot extends EventBot{
     // * connect events - so it responds with open
     // * open events - so it responds with open (if the open received was the first open, and we still need to accept the connection)
     this.autoOpener = new ActionOnEventListener(ctx,new NeedUriInNamedListFilter(ctx, URI_LIST_NAME_PARTICIPANT),
-      new OpenConnectionAction(ctx));
+      new OpenConnectionAction(ctx, "Hi!"));
     bus.subscribe(ConnectFromOtherNeedEvent.class, this.autoOpener);
 
     //after the last connect event, all connections are closed!
@@ -90,7 +100,7 @@ public class StandardTwoPhaseCommitBot extends EventBot{
     bus.subscribe(CloseFromOtherNeedEvent.class, this.participantDeactivator);
 
     coordinatorDeactivator = new ActionOnEventListener(ctx, "coordinatorDeactivator",
-      new FinishedEventFilter(participantDeactivator),new DeactivateAllNeedsOfGroupAction(ctx, URI_LIST_NAME_COORDINATOR),1);
+                                                       new FinishedEventFilter(participantDeactivator), new DeactivateAllNeedsOfGroupAction(ctx, URI_LIST_NAME_COORDINATOR), 1);
     bus.subscribe(FinishedEvent.class, coordinatorDeactivator);
 
     //add a listener that counts two NeedDeactivatedEvents and then tells the

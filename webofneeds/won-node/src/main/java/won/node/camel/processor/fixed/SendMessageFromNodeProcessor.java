@@ -43,7 +43,7 @@ public class SendMessageFromNodeProcessor extends AbstractCamelProcessor
 
   private WonMessage createMessageToSendToOwner(WonMessage wonMessage) {
     //create the message to send to the owner
-    return new WonMessageBuilder()
+    return WonMessageBuilder
       .setPropertiesForPassingMessageToOwner(wonMessage)
       .build();
   }

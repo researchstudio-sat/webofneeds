@@ -12,7 +12,11 @@ const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
             <div class="ril clickable" ng-click="self.toggleRequest()">
-                <won-square-image src="self.item.titleImgSrc" title="self.item[0].ownNeed.title"></won-square-image>
+                <won-square-image 
+                    src="self.item.titleImgSrc" 
+                    title="self.item[0].ownNeed.title"
+                    uri="self.item[0].ownNeed.uri">
+                </won-square-image>
                 <div class="ril__description">
                     <div class="ril__description__topline">
                         <div class="ril__description__topline__title">{{self.item[0].ownNeed.title}}</div>
@@ -36,7 +40,11 @@ function genComponentConf() {
                     ng-repeat="request in self.item"
                     ui-sref="{{::self.openRequestItemUrl()}}"
                     ng-click="self.openMessage(request)">
-                    <won-square-image src="request.titleImgSrc" title="request.remoteNeed.title"></won-square-image>
+                    <won-square-image 
+                        src="request.titleImgSrc" 
+                        title="request.remoteNeed.title"
+                        uri="request.remoteNeed.uri">
+                    </won-square-image>
                     <div class="mil__item__description">
                         <div class="mil__item__description__topline">
                             <div class="mil__item__description__topline__title">{{request.remoteNeed.title}}</div>

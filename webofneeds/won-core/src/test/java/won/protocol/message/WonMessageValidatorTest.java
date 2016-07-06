@@ -257,7 +257,7 @@ public class WonMessageValidatorTest
     StringBuilder message = new StringBuilder();
     boolean valid = validator.validate(invalidDataset, message);
     Assert.assertTrue("validation is expected to fail", !valid);
-    Assert.assertTrue(message.toString().contains("invalid_envelope_chain"));
+    Assert.assertTrue(message.toString().contains("validation/05_sign/invalid_from_owner_signer.rq"));
     // reset for further testing
     env2Model.add(stmtOld);
 
@@ -274,7 +274,7 @@ public class WonMessageValidatorTest
     // validate this invalid dataset
     valid = validator.validate(invalidDataset, message);
     Assert.assertTrue("validation is expected to fail", !valid);
-    Assert.assertTrue(message.toString().contains("invalid_envelope_chain"));
+    Assert.assertTrue(message.toString().contains("validation/05_sign/invalid_from_owner_signer.rq"));
     // reset for further testing
     env1Model.remove(stmtNew);
 
@@ -289,7 +289,7 @@ public class WonMessageValidatorTest
     // validate this invalid dataset
     valid = validator.validate(invalidDataset, message);
     Assert.assertTrue("validation is expected to fail", !valid);
-    Assert.assertTrue(message.toString().contains("invalid_envelope_chain"));
+    Assert.assertTrue(message.toString().contains("validation/05_sign/invalid_from_owner_signer.rq"));
     // reset for further testing
     env1Model.remove(stmtNew);
   }
@@ -315,7 +315,7 @@ public class WonMessageValidatorTest
     StringBuilder message = new StringBuilder();
     boolean valid = validator.validate(invalidDataset, message);
     Assert.assertTrue("validation is expected to fail", !valid);
-    Assert.assertTrue(message.toString().contains("invalid_content_chain"));
+    Assert.assertTrue(message.toString().contains("validation/05_sign/signature_chain.rq"));
     // reset for further testing
     env2Model.remove(stmtNew);
 
@@ -331,7 +331,7 @@ public class WonMessageValidatorTest
     // validate this invalid dataset
     valid = validator.validate(invalidDataset, message);
     Assert.assertTrue("validation is expected to fail", !valid);
-    Assert.assertTrue(message.toString().contains("invalid_content_chain"));
+    Assert.assertTrue(message.toString().contains("validation/05_sign/signature_chain.rq"));
     // reset for further testing
     env1Model.add(stmtOld);
   }

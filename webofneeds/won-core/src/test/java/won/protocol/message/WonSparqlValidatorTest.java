@@ -42,28 +42,28 @@ public class WonSparqlValidatorTest
   @Test
   public void testAskConstraintOnValidDataset() throws IOException {
     WonSparqlValidator validator = new WonSparqlValidator(askConstraint);
-    boolean valid = validator.validate(createMessageDataset);
+    boolean valid = validator.validate(createMessageDataset).isValid();
     Assert.assertTrue(valid);
   }
 
   @Test
   public void testAskConstraintOnInvalidDataset() throws IOException {
     WonSparqlValidator validator = new WonSparqlValidator(askConstraint);
-    boolean valid = validator.validate(createMessageDatasetInvalid);
+    boolean valid = validator.validate(createMessageDatasetInvalid).isValid();
     Assert.assertTrue(!valid);
   }
 
   @Test
   public void testSelectConstraintOnValidDataset() throws IOException {
     WonSparqlValidator validator = new WonSparqlValidator(selectConstraint);
-    boolean valid = validator.validate(createMessageDataset);
+    boolean valid = validator.validate(createMessageDataset).isValid();
     Assert.assertTrue(valid);
   }
 
   @Test
   public void testSelectConstraintOnInvalidDataset() throws IOException {
     WonSparqlValidator validator = new WonSparqlValidator(selectConstraint);
-    boolean valid = validator.validate(createMessageDatasetInvalid);
+    boolean valid = validator.validate(createMessageDatasetInvalid).isValid();
     Assert.assertTrue(!valid);
   }
 }

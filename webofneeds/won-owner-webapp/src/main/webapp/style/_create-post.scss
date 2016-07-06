@@ -1,6 +1,6 @@
 @import 'won-config';
 @import 'text';
-@import 'dynamic-textfield';
+@import 'needtextfield';
 .create-post {
   //@include flex-column;
   //max-width: 20rem;
@@ -38,7 +38,7 @@
       margin-right: $minContentPadding;
       margin-bottom: $minContentPadding;
     }
-    won-dynamic-textfield {
+    & need-textfield {
       flex-grow: 1;
       flex-basis: 10rem;
     }

@@ -1,24 +1,30 @@
 package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.events.EventListenerContext;
-import won.bot.framework.events.action.BaseEventBotAction;
-import won.bot.framework.events.action.impl.ConnectFromListToListAction;
-import won.bot.framework.events.action.impl.CreateNeedWithFacetsAction;
-import won.bot.framework.events.action.impl.DeactivateAllNeedsOfGroupAction;
-import won.bot.framework.events.action.impl.SignalWorkDoneAction;
-import won.bot.framework.events.bus.EventBus;
-import won.bot.framework.events.event.Event;
-import won.bot.framework.events.event.impl.*;
-import won.bot.framework.events.filter.impl.AcceptOnceFilter;
-import won.bot.framework.events.filter.impl.FinishedEventFilter;
-import won.bot.framework.events.filter.impl.OrFilter;
-import won.bot.framework.events.listener.BaseEventListener;
-import won.bot.framework.events.listener.baStateBots.BATestBotScript;
-import won.bot.framework.events.listener.baStateBots.BATestScriptListener;
-import won.bot.framework.events.listener.baStateBots.baCCMessagingBots.atomicBots.SecondPhaseStartedEvent;
-import won.bot.framework.events.listener.impl.ActionOnEventListener;
-import won.bot.framework.events.listener.impl.ActionOnceAfterNEventsListener;
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.ConnectFromListToListAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.CreateNeedWithFacetsAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsOfGroupAction;
+import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
+import won.bot.framework.eventbot.bus.EventBus;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
+import won.bot.framework.eventbot.event.impl.listener.FinishedEvent;
+import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherNeedEvent;
+import won.bot.framework.eventbot.filter.impl.AcceptOnceFilter;
+import won.bot.framework.eventbot.filter.impl.FinishedEventFilter;
+import won.bot.framework.eventbot.filter.impl.OrFilter;
+import won.bot.framework.eventbot.listener.BaseEventListener;
+import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
+import won.bot.framework.eventbot.listener.baStateBots.BATestScriptListener;
+import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.atomicBots.SecondPhaseStartedEvent;
+import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
+import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
 import won.protocol.model.FacetType;
 
 import java.net.URI;
@@ -148,7 +154,7 @@ public abstract class BAAtomicBaseBot extends EventBot{
       new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
                                       getCoordinatorFacetType().getURI(),
                                       getParticipantFacetType().getURI(), MILLIS_BETWEEN_MESSAGES,
-        scriptConnectHook));
+        scriptConnectHook,"Hi!"));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
     //for each group member, there are 2 listeners waiting for messages. when they are all finished, we're done.
     this.firstPhaseDoneListener = new ActionOnceAfterNEventsListener(

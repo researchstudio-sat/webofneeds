@@ -7,8 +7,12 @@ import { labels, updateRelativeTimestamps } from '../won-label-utils';
 const serviceDependencies = ['$scope', '$interval'];
 function genComponentConf() {
     let template = `
-            <div class="fi clickable">
-                <won-square-image src="self.item.get('titleImg')" title="self.item.get('title')"></won-square-image>
+            <div class="fi clickable" ui-sref="post({postUri: self.item.get('uri')})">
+                <won-square-image 
+                    src="self.item.get('titleImg')" 
+                    title="self.item.get('title')"
+                    uri="self.item.get('uri')">
+                </won-square-image>
                 <div class="fi__description">
                     <div class="fi__description__topline">
                         <div class="fi__description__topline__title">{{self.item.get('title')}}</div>
@@ -25,10 +29,18 @@ function genComponentConf() {
                 </div>
             </div>
             <div class="fmil">
-                <div class="fmil__item clickable" ng-repeat="cnct in self.connections.toArray() track by $index" ng-show="$index < self.maxNrOfItemsShown">
+                <div class="fmil__item clickable" 
+                ng-repeat="cnct in self.connections.toArray() track by $index" 
+                ng-show="$index < self.maxNrOfItemsShown" 
+                ui-sref="post({
+                            postUri: self.item.get('uri'), 
+                            connectionUri: cnct.getIn(['connection', 'uri']), 
+                            connectionType:  cnct.getIn(['connection', 'hasConnectionState'])
+                })">
                     <won-square-image
                         src="cnct.get('titleImg')"
-                        title="cnct.getIn(['remoteNeed','title'])">
+                        title="cnct.getIn(['remoteNeed','title'])"
+                        uri="cnct.getIn(['remoteNeed','uri'])">
                     </won-square-image>
                     <div class="fmil__item__description">
                         <div class="fmil__item__description__topline">
@@ -81,7 +93,6 @@ function genComponentConf() {
             window.fi4dbg = this;
 
             this.labels = labels;
-
             /*
             * TODO there's tick events now. use state.get('lastUpdateTime')
             * to calculate relative timestamps

@@ -97,6 +97,16 @@
 
         </plugins>
     </build>
+    <repositories>
+        <repository>
+            <id>eliza-repo</id>
+            <url>https://raw.github.com/fkleedorfer/eliza/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
   <dependencies>
       <!-- WON stuff -->
       <dependency>
@@ -231,5 +241,11 @@
           <scope>compile</scope>
       </dependency>
 
+      <!-- eliza for the debug bot -->
+      <dependency>
+        <groupId>codeanticode</groupId>
+        <artifactId>eliza</artifactId>
+        <version>1.0.1</version>
+      </dependency>
   </dependencies>
 </project>

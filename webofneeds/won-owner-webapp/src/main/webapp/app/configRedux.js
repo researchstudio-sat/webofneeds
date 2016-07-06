@@ -7,7 +7,9 @@ import thunk from 'redux-thunk';
 
 export default function configRedux($ngReduxProvider) {
     const loggingReducer = (state, action) => {
-        console.log('action:  ', action);
+        console.log('action:  ', action.type,
+            action.payload && action.payload.toJS? action.payload.toJS() : action.payload
+        );
         console.log('changing state from ',
             state && state.toJS?
                 state.toJS() : state);
