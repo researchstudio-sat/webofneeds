@@ -7,7 +7,10 @@ import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime, updateRelativeTimestamps   } from '../won-label-utils';
 import { createSelector } from 'reselect';
-import { selectAllByConnections } from '../selectors';
+import {
+    selectAllByConnections,
+    selectUnreadCountsByNeedAndType,
+} from '../selectors';
 
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
@@ -97,14 +100,29 @@ function genComponentConf() {
             //this.EVENT = won.EVENT;
 
             const selectFromState = (state) => {
+                const postUri = this.item.uri;
                 const allConnectionsByNeedUri = selectAllByConnections(state)
-                    .filter(conn => conn.getIn(['ownNeed', 'uri']) === this.item.uri);
+                    .filter(conn => conn.getIn(['ownNeed', 'uri']) === postUri);
+
+                const unreadCounts = selectUnreadCountsByNeedAndType(state).get(postUri);
+
 
                 return {
-                    hasConversations: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Connected).size > 0,
-                    hasRequests: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.RequestReceived).size > 0,
-                    hasMatches: allConnectionsByNeedUri.filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested).size > 0,
-                    WON: won.WON
+                    hasConversations: allConnectionsByNeedUri
+                        .filter(conn =>
+                            conn.getIn(['connection', 'hasConnectionState']) === won.WON.Connected
+                        ).size > 0,
+                    hasRequests: allConnectionsByNeedUri
+                        .filter(conn =>
+                            conn.getIn(['connection', 'hasConnectionState']) === won.WON.RequestReceived
+                        ).size > 0,
+                    hasMatches: allConnectionsByNeedUri
+                        .filter(conn =>
+                            conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested
+                        ).size > 0,
+                    WON: won.WON,
+                    unreadCounts,
+
                 };
             };
 
@@ -129,13 +147,13 @@ function genComponentConf() {
                 this.unreadCounts.get(type)
         }
         unreadMatchesCount() {
-            return this.unreadXCount(won.EVENT.HINT_RECEIVED)
+            return this.unreadXCount(won.WONMSG.hintMessage);
         }
         unreadRequestsCount() {
-            return this.unreadXCount(won.EVENT.CONNECT_RECEIVED)
+            return this.unreadXCount(won.WONMSG.connectMessage);
         }
         unreadConversationsCount() {
-            return this.unreadXCount(won.EVENT.WON_MESSAGE_RECEIVED)
+            return this.unreadXCount(won.WONMSG.connectionMessage);
         }
 
     }
@@ -148,7 +166,6 @@ function genComponentConf() {
         bindToController: true, //scope-bindings -> ctrl
         scope: {
             item: "=",
-            unreadCounts: "="
         },
         template: template
     }
