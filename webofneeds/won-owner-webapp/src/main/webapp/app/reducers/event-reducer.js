@@ -78,6 +78,7 @@ export default function(state = initialState, action = {}) {
 
         case actionTypes.messages.connectionMessageReceived:
         case actionTypes.messages.connectMessageReceived:
+        case actionTypes.messages.openMessageReceived:
         case actionTypes.messages.hintMessageReceived:
             //TODO events should be an object too
             var event = action.payload.events.filter(e => e.uri === action.payload.receivedEvent)[0];
