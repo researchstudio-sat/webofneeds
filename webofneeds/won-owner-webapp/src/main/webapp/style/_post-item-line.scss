@@ -5,7 +5,7 @@
 
 won-post-item-line {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: space-between;
   padding: 0.5rem 0;
   border-top: 0.1rem solid $won-line-gray;
@@ -23,7 +23,7 @@ won-post-item-line {
 
     &__topline{
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       justify-content: space-between;
 
       &__title{
@@ -33,6 +33,7 @@ won-post-item-line {
       &__creationdate {
         color: $won-subtitle-gray;
         font-size: $smallFontSize;
+        white-space: nowrap;
       }
     }
 
@@ -65,7 +66,7 @@ won-post-item-line {
 
     &__item {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       flex-direction: row;
       padding-right: 1em;
 
