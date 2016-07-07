@@ -20,6 +20,7 @@ import won.matcher.service.common.event.WonNodeEvent;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.service.crawler.actor.MasterCrawlerActor;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
+import won.matcher.service.nodemanager.service.HintDBService;
 import won.matcher.service.nodemanager.config.ActiveMqWonNodeConnectionFactory;
 import won.matcher.service.nodemanager.config.WonNodeControllerConfig;
 import won.matcher.service.nodemanager.pojo.WonNodeConnection;
@@ -68,6 +69,9 @@ public class WonNodeControllerActor extends UntypedActor
   LinkedDataSource linkedDataSource;
   @Autowired
   private MessagingContext messagingContext;
+
+  @Autowired
+  private HintDBService hintDatabase;
 
 
 
@@ -184,17 +188,31 @@ public class WonNodeControllerActor extends UntypedActor
 
     // send back hints to won nodes
     if (message instanceof HintEvent) {
-      sendHint((HintEvent) message);
+      processHint((HintEvent) message);
       return;
     } else if(message instanceof BulkHintEvent) {
       BulkHintEvent bulkHintEvent = (BulkHintEvent) message;
       for (HintEvent hint : bulkHintEvent.getHintEvents()) {
-        sendHint(hint);
+        processHint(hint);
       }
       return;
     }
 
     unhandled(message);
+  }
+
+  private void processHint(HintEvent hint) {
+
+    // hint duplicate filter
+    if (hintDatabase.mightHintSaved(hint)) {
+      log.warning("Hint " + hint + " is filtered out by duplicate filter!");
+      hintDatabase.saveHint(hint);
+      return;
+    }
+
+    // save the hint and send it to the won node controller which sends it to the responsible won node
+    hintDatabase.saveHint(hint);
+    sendHint(hint);
   }
 
   /**
@@ -214,7 +232,7 @@ public class WonNodeControllerActor extends UntypedActor
     URI eventUri = wonNodeInformationService.generateEventURI(URI.create(hint.getFromWonNodeUri()));
     hint.setGeneratedEventUri(eventUri);
     WonNodeConnection fromWonNodeConnection = crawlWonNodes.get(hint.getFromWonNodeUri());
-    log.debug("Send hint {} to won node {}", hint, hint.getFromWonNodeUri());
+    log.info("Send hint {} to won node {}", hint, hint.getFromWonNodeUri());
     fromWonNodeConnection.getHintProducer().tell(hint, getSelf());
   }
 
