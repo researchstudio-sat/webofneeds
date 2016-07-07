@@ -118,6 +118,18 @@ export function runMessagingAgent(redux) {
             }
         },
         function (events) {
+            const msgFromOwner = events['msg:FromOwner'];
+
+            /* Other clients or matcher initiated stuff: */
+            if(msgFromOwner && msgFromOwner.hasMessageType === won.WONMSG.openMessageCompacted) {
+                //someone accepted our contact request
+                redux.dispatch(actionCreators.messages__openMessageReceived(events));
+                return true;
+            } else {
+                return false;
+            }
+        },
+        function (events) {
             const msgFromExternal = events['msg:FromExternal'];
             const msgFromOwner = events['msg:FromOwner'];
 

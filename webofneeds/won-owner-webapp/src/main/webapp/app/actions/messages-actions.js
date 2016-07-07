@@ -236,8 +236,6 @@ export function connectMessageReceived(events) {
                         // where this is *just* a uri and everythinng else is in the state.
                         data.receivedEvent = eventOnOwn.uri;
                         data.updatedConnection = connectionData.uri;
-                        won.getNode(data.receivedEvent, data.ownNeed.uri).then(x =>
-                            console.log('aaaaaaaa ', x));
                         dispatch({
                             type: actionTypes.messages.connectMessageReceived,
                             payload: data
@@ -251,8 +249,28 @@ export function connectMessageReceived(events) {
 
 }
 
+function getConnectionDataAndDispatchAs(eventOnRemote, eventOnOwn) {
+    
 
 
+}
+
+
+export function openMessageReceived(event) {
+    return dispatch => {
+        const eventOnRemote = events['msg:FromOwner'];
+        const eventOnOwn = events['msg:FromExternal'];
+        eventOnRemote.eventType = messageTypeToEventType[eventOnRemote.hasMessageType].eventType;
+
+        /*
+        dispatch({
+            type: actionTypes.messages.openMessageReceived,
+            payload: undefined
+        })
+        */
+
+    }
+}
 export function hintMessageReceived(event) {
     return dispatch=> {
         event.eventType = messageTypeToEventType[event.hasMessageType].eventType;
