@@ -213,7 +213,7 @@ export function openMessageReceived(events) {
         const eventOnRemote = events['msg:FromOwner'];
         const eventOnOwn = events['msg:FromExternal'];
         eventOnRemote.eventType = messageTypeToEventType[eventOnRemote.hasMessageType].eventType;
-        won.invalidateCacheForNewMessage(eventOnOwn.hasReceiver)
+        won.invalidateCacheForNewMessage(eventOnOwn.hasReceiver || eventOnRemote.hasReceiver)
         .then(() =>
                 getConnectionData(eventOnRemote, eventOnOwn))
         .then(data => {
