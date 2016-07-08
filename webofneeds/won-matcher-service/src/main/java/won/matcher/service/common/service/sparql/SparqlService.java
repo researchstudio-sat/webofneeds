@@ -32,10 +32,12 @@ public class SparqlService
 {
   protected final Logger log = LoggerFactory.getLogger(getClass());
   protected String sparqlEndpoint;
+  //protected DatasetAccessor accessor;
 
   @Autowired
   public SparqlService(@Value("${uri.sparql.endpoint}")  String sparqlEndpoint) {
     this.sparqlEndpoint = sparqlEndpoint;
+    //accessor = DatasetAccessorFactory.createHTTP(sparqlEndpoint);
   }
 
   public String getSparqlEndpoint() {
@@ -48,12 +50,12 @@ public class SparqlService
    * @param graph named graph to be updated
    * @param model model that holds triples to set
    */
-  public void updateNamedGraph(String graph, Model model) {
+  public String createUpdateNamedGraphQuery(String graph, Model model) {
 
     StringWriter sw = new StringWriter();
     RDFDataMgr.write(sw, model, Lang.NTRIPLES);
     String query = "\nCLEAR GRAPH <" + graph + ">;\n" + "\nINSERT DATA { GRAPH <" + graph + "> { " + sw + "}};\n";
-    executeUpdateQuery(query);
+    return query;
   }
 
   /**
@@ -63,13 +65,22 @@ public class SparqlService
    */
   public void updateNamedGraphsOfDataset(Dataset ds) {
 
+    String query = "";
+
     Iterator<String> graphNames = ds.listNames();
     while (graphNames.hasNext()) {
 
       log.debug("Save dataset");
       String graphName = graphNames.next();
       Model model = ds.getNamedModel(graphName);
-      updateNamedGraph(graphName, model);
+      query += createUpdateNamedGraphQuery(graphName, model);
+
+      // Update can also be done with accessor - use put/add?
+      // accessor.add(graphName, model);
+    }
+
+    if (query != "") {
+      executeUpdateQuery(query);
     }
   }
 

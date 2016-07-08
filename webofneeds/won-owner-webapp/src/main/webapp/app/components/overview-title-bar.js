@@ -37,14 +37,14 @@ function genComponentConf() {
                         <a ui-sref="overviewIncomingRequests"
                             ng-class="{'disabled' : !self.hasRequests}">
                             Incoming Requests
-                            <span class="mtb__tabs__unread">{{ self.unreadRequests.size }}</span>
+                            <span class="mtb__tabs__unread">{{ self.nrOfUnreadIncomingRequests }}</span>
                         </a>
                     </li>
                     <li ng-class="{'mtb__tabs__selected' : self.selection == 3}">
                         <a ui-sref="overviewMatches()"
                             ng-class="{'disabled' : !self.hasMatches}">
                             Matches
-                            <span class="mtb__tabs__unread">{{ self.unreadMatches.size }}</span>
+                            <span class="mtb__tabs__unread">{{ self.nrOfUnreadMatches }}</span>
                         </a>
                     </li>
                 </ul>
@@ -60,6 +60,9 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
+            window.otb4dbg = this;
+            window.$ngRedux4dbg = this.$ngRedux;
+            window.getState4dbg = this.$ngRedux.getState;
 
             const selectFromState = (state) => {
                 const unreadCounts = selectUnreadCountsByType(state);
@@ -83,10 +86,10 @@ function genComponentConf() {
                                 return true
                             }
                         }).length > 0,
-                    unreadMessages: unreadCounts.get(won.WONMSG.connectionMessage),
-                    unreadIncomingRequests: unreadCounts.get(won.WONMSG.connectMessage),
-                    unreadSentRequests: unreadCounts.get(won.WONMSG.connectSentMessage),
-                    unreadMatches: unreadCounts.get(won.WONMSG.hintMessage),
+                    nrOfUnreadMessages: unreadCounts.get(won.WONMSG.connectionMessage),
+                    nrOfUnreadIncomingRequests: unreadCounts.get(won.WONMSG.connectMessage),
+                    nrOfUnreadSentRequests: unreadCounts.get(won.WONMSG.connectSentMessage),
+                    nrOfUnreadMatches: unreadCounts.get(won.WONMSG.hintMessage),
                     nrOfNeedsWithUnreadEvents: nrOfNeedsWithUnread > 0? nrOfNeedsWithUnread : undefined,
                 };
             };

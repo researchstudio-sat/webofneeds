@@ -7,6 +7,12 @@
 @mixin need-tab-bar($prefix, $tabBarWidth) {
   @include title-bar($prefix);
 
+  .#{$prefix}__titles__type {
+    color: #A7A7A7;
+    font-size: 0.8rem;
+  }
+
+
   > .#{$prefix}__inner {
 
     // #{$prefix} isn't using the tri-aligned that it inherits
@@ -15,40 +21,61 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-content: center;
+    align-items: center;
 
     > .#{$prefix}__inner__left {
-      @include flex-row;
+      display: flex;
+      flex-direction: row;
+      align-content: center;
+      align-items: center;
+      justify-content: flex-start;
 
       @include square-image(4.7rem, 0, 1rem, 0, 1rem);
-
-      .#{$prefix}__inner__left__titles {
-        @include flex-column;
-        align-items: flex-start;
-
-        margin: 1rem 0;
-
-        .#{$prefix}__inner__left__titles__type {
-          color: #A7A7A7;
-          font-size: 0.8rem;
-        }
-      }
     }
 
     > .#{$prefix}__inner__right {
       //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
       // or make won-tabs a parametrized mixin?
-      flex-basis: $tabBarWidth;
-      max-width: $tabBarWidth;
+      //flex-basis: $tabBarWidth;
+      //max-width: $tabBarWidth;
+      flex-grow: 1;
+      margin-top: 1rem;
 
-      @include flex-column-spaced;
-      align-items: flex-end;
 
-      padding-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: stretch;
+      //align-items: flex-end;
 
-      .#{$prefix}__tabs {
-        //TODO bad style. not bem.
-        align-self: stretch;
-        height: 100%;
+      //padding-top: 1rem;
+
+      > .#{$prefix}__inner__right__upper {
+        display: flex;
+        flex-direction: row;
+        align-content: center;
+        align-items: flex-start;
+        justify-content: space-between;
+
+        > .#{$prefix}__title {
+          align-self: flex-end;
+        }
+      }
+      > .#{$prefix}__inner__right__lower {
+        display: flex;
+        flex-direction: row;
+        align-content: center;
+        align-items: flex-start;
+        justify-content: flex-end;
+
+        > .#{$prefix}__titles__type {
+          /*align-self: flex-start;*/
+        }
+
+        > .#{$prefix}__tabs {
+          align-self: stretch;
+          //height: 100%;
+        }
       }
     }
   }
