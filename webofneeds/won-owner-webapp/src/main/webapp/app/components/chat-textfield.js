@@ -65,7 +65,7 @@ function genComponentConf() {
         }
         input() {
             const payload = {
-                value: this.medium.value(),
+                value: this.value(),
                 valid: this.valid(),
             };
             this.onInput(payload);
@@ -73,7 +73,7 @@ function genComponentConf() {
         }
         submit() {
             const payload = {
-                value: this.medium.value(),
+                value: this.value(),
                 valid: this.valid(),
             };
             this.onSubmit(payload);
@@ -82,10 +82,21 @@ function genComponentConf() {
             this.medium.clear(); // clear text
         }
         charactersLeft() {
-            return this.maxChars - this.medium.value().length;
+            return this.maxChars - this.value().length;
         }
         valid() {
             return !this.maxChars || this.charactersLeft() >= 0;
+        }
+        value() {
+            return this.medium
+                .value()
+                /*
+                 * the replace fixes odd behaviour of FF. it inserts
+                 * a `<br>` at the end after the first space is
+                 * typed -- unless the space is the first character
+                 * in the field.
+                 */
+                .replace(/<br>$/, '');
         }
 
         initMedium() {
