@@ -194,8 +194,10 @@ export const selectConnectMessageOfOpenConnection = createSelector(
     selectEventsOfOpenConnection,
     events => events && events
         .filter(event =>
-            event.getIn(['hasCorrespondingRemoteMessage', 'hasMessageType']) === won.WONMSG.connectMessage ||
-            event.get('hasMessageType') === won.WONMSG.connectMessage
+            event && (
+                event.getIn(['hasCorrespondingRemoteMessage', 'hasMessageType']) === won.WONMSG.connectMessage ||
+                event.get('hasMessageType') === won.WONMSG.connectMessage
+            )
         )
         .first()
 )
