@@ -7,12 +7,13 @@ import com.github.jsonldjava.utils.JsonUtils;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.RDF;
-import won.matcher.service.common.service.http.HttpService;
-import won.matcher.siren.config.SirenMatcherConfig;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import won.matcher.service.common.event.NeedEvent;
+import won.matcher.service.common.service.http.HttpService;
+import won.matcher.siren.config.SirenMatcherConfig;
 import won.protocol.vocabulary.SFSIG;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class NeedIndexer {
   @Autowired
   private HttpService httpService;
 
-  public void indexer_jsonld_format(Dataset dataset) throws IOException, JsonLdError {
+  public void indexer_jsonld_format(NeedEvent need, Dataset dataset) throws IOException, JsonLdError {
 
       ArrayList<String> jsonObjectsList = new ArrayList<String>();
 
@@ -63,6 +64,8 @@ public class NeedIndexer {
           }
       }
 
+
+
       String finalJSONFramedNeed = "{\"@graph\":[";
       boolean frameCreated = false;
       for (int i = 0; i < jsonObjectsList.size(); i++) {
@@ -78,6 +81,10 @@ public class NeedIndexer {
         }
       }
       finalJSONFramedNeed = finalJSONFramedNeed + "]}";
+
+      // add the uri of the need as id field to avoid multiple adding of needs but instead allow updates
+      String idField = need.getUri().toString();
+      finalJSONFramedNeed = "{\"id\":\"" + idField + "\"," + finalJSONFramedNeed.substring(1);
 
       String indexUri = config.getSolrServerUri();
       if (!indexUri.endsWith("/")) {
