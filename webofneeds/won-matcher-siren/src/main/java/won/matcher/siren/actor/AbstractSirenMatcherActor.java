@@ -160,7 +160,7 @@ public abstract class AbstractSirenMatcherActor extends UntypedActor
   protected void indexNeedEvent(NeedEvent needEvent, Dataset dataset) throws IOException, JsonLdError {
 
     log.info("Add need event content to solr index: " + needEvent);
-    needIndexer.indexer_jsonld_format(dataset);
+    needIndexer.indexer_jsonld_format(needEvent, dataset);
   }
 
 
