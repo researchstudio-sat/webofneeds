@@ -17,9 +17,13 @@
 * messages to the server via the service.
  */
 
-import { attach, delay, watchImmutableRdxState} from './utils';
+import won from './won-es6';
+import {attach,
+        delay,
+        watchImmutableRdxState,
+        checkHttpStatus } from './utils';
+import { actionTypes, actionCreators } from './actions/actions';
 //import './message-service'; //TODO still uses es5
-import { actionCreators }  from './actions/actions';
 import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from './won-message-utils';
 import SockJS from 'sockjs';
 import * as messages from './actions/messages-actions';
@@ -260,15 +264,26 @@ export function runMessagingAgent(redux) {
     let reconnectAttempts = 0;
     function onClose(e) {
         if(e.wasClean){
-            console.log('websocket closed.');
+            console.log('websocket closed. reconnectAttempts = ',reconnectAttempts);
         } else {
-            console.error('websocket closed.')
+            console.error('websocket closed. reconnectAttempts = ',reconnectAttempts);
         }
         if(unsubscribeWatch && typeof unsubscribeWatch === 'function')
             unsubscribeWatch();
 
         if (e.code === 1011 || reconnectAttempts > 5) {
             console.log('either your session timed out or you encountered an unexpected server condition. \n', e.reason);
+
+            fetch('rest/users/isSignedIn', {credentials: 'include'})
+                .then(checkHttpStatus) // will reject if not logged in
+                .then(() => {//logged in -- re-initiate route-change
+                    ws = newSock();
+                    reconnectAttempts = 0;
+
+                }).catch(error => {
+                    console.log("you lost the session we will call logout for you");
+                    redux.dispatch(actionCreators.logout)
+                });
         } else if (reconnectAttempts > 1) {
             setTimeout(() => {
                 ws = newSock();

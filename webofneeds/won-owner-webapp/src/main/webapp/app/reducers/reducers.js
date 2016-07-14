@@ -15,6 +15,7 @@ import needReducer from './need-reducer';
 import eventReducer from './event-reducer';
 import userReducer from './user-reducer';
 import matchReducer from './match-reducer';
+import toastReducer from './toast-reducer';
 import connectionReducer from './connection-reducer';
 
 /*
@@ -45,6 +46,7 @@ const reducers = {
     matches: matchReducer,
     postOverview:postsReducer,
     messages: messagesReducer,
+    toasts: toastReducer,
 
     // contains the Date.now() of the last action
     lastUpdateTime: (state = Date.now(), action = {}) => Date.now(),

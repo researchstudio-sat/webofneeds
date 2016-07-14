@@ -2,6 +2,7 @@
  * Created by ksinger on 20.08.2015.
  */
 ;
+import won from '../won-es6';
 import angular from 'angular';
 import loginComponent from 'app/components/login';
 import logoutComponent from 'app/components/logout';
@@ -61,6 +62,17 @@ function genTopnavConf() {
                 </div>
             </div>
         </nav>
+        <div class="topnav__toasts">
+            <div class="topnav__toasts__element" 
+            ng-class="{ 'info' : toast.get('type') === self.WON.infoToast,
+                        'warn' : toast.get('type') === self.WON.warnToast,
+                        'error' : toast.get('type') === self.WON.errorToast
+                      }"
+            ng-repeat="toast in self.toastsArray">
+                <img class="topnav__toasts__element__close clickable" ng-click="self.toasts__delete(toast)" src="generated/icon-sprite.svg#ico27_close"/>
+                <div class="topnav__toasts__element__text">{{toast.get('msg')}}</div>
+            </div>
+        </div>
     `;
 
     const serviceDependencies = ['$q', '$ngRedux', '$scope', /*injections as strings here*/];
@@ -71,8 +83,10 @@ function genTopnavConf() {
             window.tnc4dbg = this;
 
             const selectFromState = (state) => ({
+                WON: won.WON,
                 loggedIn: state.getIn(['user', 'loggedIn']),
-                email: state.getIn(['user','email'])
+                email: state.getIn(['user','email']),
+                toastsArray: state.getIn(['toasts']).toArray()
             });
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);

@@ -207,6 +207,9 @@ const actionHierarchy = {
     loginReset: INJ_DEFAULT,
     registerReset: INJ_DEFAULT,
     registerFailed: INJ_DEFAULT,
+    toasts: {
+        delete: INJ_DEFAULT
+    },
     config: {
         init: configInit,
         update: INJ_DEFAULT,
