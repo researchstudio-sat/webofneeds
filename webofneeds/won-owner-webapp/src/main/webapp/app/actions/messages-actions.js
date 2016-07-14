@@ -142,14 +142,15 @@ export function successfulOpen(event){
     return (dispatch, getState) => {
         const state = getState();
         console.log("got response for OPEN: " + event.hasMessageType);
-        let eventUri = null;
-        let receiverUri = null;
-        let isRemoteResponse = false;
-        //TODO maybe refactor these response message handling
         if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
-            console.log("messages waitingForAnswer", event);
-            eventUri = event.isRemoteResponseTo;
+            console.log("messages was in waitingForAnswer", event);
+
             dispatch(actionCreators.connections__accepted(event));
+            dispatch(actionCreators.router__stateGo("post", {
+                postUri: event.hasReceiverNeed,
+                connectionType: won.WON.Connected,
+                connectionUri: event.hasReceiver,
+            }));
         }
     }
 }
