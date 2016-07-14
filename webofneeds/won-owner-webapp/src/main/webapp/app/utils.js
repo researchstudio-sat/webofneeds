@@ -458,11 +458,46 @@ export function flattenObj(objOfObj) {
  * Takes a single uri or an array of uris, performs the lookup function on each
  * of them seperately, collects the results and builds an map/object
  * with the uris as keys and the results as values.
+ * If any call to the asyncLookupFunction fails, the corresponding
+ * key-value-pair will not be contained in the result.
  * @param uris
  * @param asyncLookupFunction
  * @return {*}
  */
 export function urisToLookupMap(uris, asyncLookupFunction) {
+    //make sure we have an array and not a single uri.
+    const urisAsArray = is('Array', uris) ? uris : [uris];
+    const asyncLookups = urisAsArray.map(uri =>
+        asyncLookupFunction(uri)
+        .catch(error => {
+            console.error({msg: `failed lookup for ${uri} in utils.js:urisToLookupMap`, error, urisAsArray, uris})
+            return undefined;
+        })
+    );
+    return Promise.all(asyncLookups).then( dataObjects => {
+        const lookupMap = {};
+        //make sure there's the same
+        for (let i = 0; i < uris.length; i++) {
+            if(dataObjects[i]) {
+                lookupMap[uris[i]] = dataObjects[i];
+            }
+        }
+        return lookupMap;
+    });
+}
+
+/**
+ * Takes a single uri or an array of uris, performs the lookup function on each
+ * of them seperately, collects the results and builds an map/object
+ * with the uris as keys and the results as values.
+ * Will throw an error if any of the asyncLookupFunction fails. If it
+ * doesn't fail, the result is guaranteed to have the same number of
+ * uri-value-pairs as uris where passed.
+ * @param uris
+ * @param asyncLookupFunction
+ * @return {*}
+ */
+export function urisToLookupMapStrict(uris, asyncLookupFunction) {
     //make sure we have an array and not a single uri.
     const urisAsArray = is('Array', uris) ? uris : [uris];
     const asyncLookups = urisAsArray.map(uri =>
@@ -479,6 +514,7 @@ export function urisToLookupMap(uris, asyncLookupFunction) {
         }
         return lookupMap;
     });
+
 }
 
 /**

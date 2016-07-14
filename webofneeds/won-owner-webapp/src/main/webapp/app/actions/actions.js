@@ -192,6 +192,7 @@ const actionHierarchy = {
         connectionMessageReceived: messages.connectionMessageReceived,
         connectMessageReceived: messages.connectMessageReceived,
         hintMessageReceived: messages.hintMessageReceived,
+        openMessageReceived: messages.openMessageReceived,
 
         waitingForAnswer: INJ_DEFAULT,
         /**
