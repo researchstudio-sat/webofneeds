@@ -110,6 +110,20 @@ export default reduceReducers( //passes on the state from one reducer to another
      */
      (state, action) => {
          switch(action.type) {
+
+             /**
+              * Add all actions that load connections
+              * and their events. The reducer here makes
+              * sure that no connections between two needs
+              * that both are owned by the user, remain
+              * in the state.
+              */
+             case actionTypes.initialPageLoad:
+             case actionTypes.login:
+             case actionTypes.messages.connectMessageReceived:
+             case actionTypes.messages.hintMessageReceived:
+                 return deleteCnctBetweenOwned(state);
+
              /*
               * TODO try to resolve a lot of the AC-dispatching so only
               * high-level actions are left there. avoid actions that
@@ -125,5 +139,45 @@ export default reduceReducers( //passes on the state from one reducer to another
     //-------------------- </cross-cutting-reducer> -------------------
 )
 
-
 window.ImmutableFoo = Immutable;
+
+function deleteCnctBetweenOwned(state) {
+    var cnctBetweenOwned = selectCnctUrisBetweenOwnedNeeds(state);
+    return cnctBetweenOwned.reduce(purgeConnection, state); //remove all those connections
+}
+
+function selectCnctUrisBetweenOwnedNeeds(state) {
+
+    const ownedNeedsUris = state
+        .getIn(['needs', 'ownNeeds'])
+        .keySeq().toSet();
+
+    const cnctBetweenOwned = state
+        .get('connections')
+        .filter(connection =>
+            ownedNeedsUris.contains(
+                connection.get('hasRemoteNeed')
+            )
+    );
+
+    return cnctBetweenOwned.keySeq().toSet();
+}
+
+function purgeConnection(state, cnctUri) {
+    const cnct = state.getIn(['connections', cnctUri]);
+    state = state.deleteIn(['connections', cnctUri]);
+    cnct.get('hasEvents').forEach(eventUri => {
+        state = state.deleteIn(['events', 'events', eventUri]);
+    })
+    const needUri = cnct.get('belongsToNeed');
+
+    const path = [
+        'needs', 'ownNeeds', needUri,
+        'hasConnections'
+    ];
+
+    state = state.updateIn(path, connections =>
+        connections && connections.delete(cnctUri)
+    );
+    return state;
+}
