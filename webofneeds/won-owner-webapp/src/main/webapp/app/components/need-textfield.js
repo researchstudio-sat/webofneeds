@@ -47,7 +47,7 @@ function genComponentConf() {
             this.mediumMountNg().bind('input', e => {
                 this.drafts__change__title({
                     draftId: this.draftId,
-                    title: this.medium.value()
+                    title: this.value(),
                 });
             });
         }
@@ -56,6 +56,18 @@ function genComponentConf() {
         }
         valid() {
             return this.charactersLeft() >= 0;
+        }
+
+        value() {
+            return this.medium
+                .value()
+                /*
+                 * the replace fixes odd behaviour of FF. it inserts
+                 * a `<br>` at the end after the first space is
+                 * typed -- unless the space is the first character
+                 * in the field.
+                 */
+                .replace(/<br>$/, '');
         }
 
         initMedium() {
@@ -77,11 +89,34 @@ function genComponentConf() {
                      'outerLevel': ['pre', 'blockquote', 'figure'],
                      'innerLevel': ['a', 'b', 'u', 'i', 'img', 'strong']
                      */
+                    //'outerLevel': [], //should disable all tags
+                    //'innerLevel': [], //should disable all tags
                 },
                 attributes: {
                     //remove: ['style', 'class'] //TODO does this remove the ng-class?
                     remove: ['style'] //TODO does this remove the ng-class?
                 },
+                /*
+                pasteAsText: true,
+                beforeInvokeElement: function () {
+                 //this = Medium.Element
+                     console.log('beforeInvokeElement: ', this)
+                 },
+                 beforeInsertHtml: function () {
+                 //this = Medium.Html
+                     console.log('beforeInsertHtml: ', this)
+                 },
+                 beforeAddTag: function (tag, shouldFocus, isEditable, afterElement) {
+                     console.log('beforeAddTag: ', this, arguments)
+                 },
+                 keyContext: null, //what does this do?
+                 pasteEventHandler: function(e) {
+                    //default paste event handler
+                    //enables paste (dunno why) but also breaks the inlineMode (suddenly there's <p> elements)
+                    console.log('pasteEventHandler: ', this, arguments)
+                 }
+                */
+
             });
 
             //remove the inline-styles placed by medium.js
