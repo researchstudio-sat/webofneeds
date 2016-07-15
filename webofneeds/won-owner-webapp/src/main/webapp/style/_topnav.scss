@@ -25,23 +25,19 @@
       box-shadow: 0.1rem 0.1rem 0.5rem rgba(0,0,0,0.3);
       min-height: 2rem;
 
+      background-position: 0.5rem 0.5rem;
+      background-size: $toastIconSize;
+      background-color: white;
+      background-repeat: no-repeat;
+
       &.warn {
-        background: url('icon-sprite.svg#ico16_indicator_warning')
-                    0.5rem 0.5rem/$toastIconSize
-                    white
-                    no-repeat;
+        background-image: url('icon-sprite.svg#ico16_indicator_warning');
       }
       &.error {
-        background: url('icon-sprite.svg#ico16_indicator_error')
-                    0.5rem 0.5rem/$toastIconSize
-                    white
-                    no-repeat;
+        background-image: url('icon-sprite.svg#ico16_indicator_error');
       }
       &.info {
-        background: url('icon-sprite.svg#ico16_indicator_info')
-                    0.5rem 0.5rem/$toastIconSize
-                    white
-                    no-repeat;
+        background-image: url('icon-sprite.svg#ico16_indicator_info');
       }
 
       &__text {

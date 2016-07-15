@@ -8,6 +8,12 @@ const initialState = Immutable.fromJS({
 
 export default function(allToasts = initialState, action = {}) {
     switch(action.type) {
+        case actionTypes.toasts.test:
+            allToasts = pushNewToast(allToasts, "Error Toast", won.WON.errorToast);
+            allToasts = pushNewToast(allToasts, "Warning Toast", won.WON.warnToast);
+            allToasts = pushNewToast(allToasts, "Info Toast", won.WON.infoToast);
+            return allToasts;
+
         case actionTypes.logout:
             return initialState;
 
