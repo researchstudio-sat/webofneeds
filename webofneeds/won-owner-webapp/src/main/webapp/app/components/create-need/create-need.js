@@ -10,6 +10,7 @@ import posttypeSelectModule from '../posttype-select';
 import labelledHrModule from '../labelled-hr';
 import needTextfieldModule from '../need-textfield';
 import imageDropzoneModule from '../image-dropzone';
+import locationPickerModule from '../location-picker';
 //import draftStoreModule from '../../stores/draft-store';
 import { attach } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
@@ -136,6 +137,7 @@ export default angular.module('won.owner.components.createNeed', [
         labelledHrModule,
         imageDropzoneModule,
         needTextfieldModule,
+        locationPickerModule,
     ])
     //.controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
     .controller('CreateNeedController', [...serviceDependencies, CreateNeedController])
