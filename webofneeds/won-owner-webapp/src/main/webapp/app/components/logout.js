@@ -7,7 +7,7 @@ import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 
 function genLogoutConf() {
-    let template = `<a class="wl__button" ng-click="self.open = !self.open">
+    let template = `<a class="wl__button clickable" ng-click="self.open = !self.open">
                         <span class="wl__button__caption">{{self.email}}</span>
                         <img src="generated/icon-sprite.svg#ico16_arrow_up" class="wl__button__carret">
                         <img src="generated/icon-sprite.svg#ico36_person" class="wl__button__icon">

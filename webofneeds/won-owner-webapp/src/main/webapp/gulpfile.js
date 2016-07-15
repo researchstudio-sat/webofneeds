@@ -12,9 +12,15 @@ var sourcemaps = require('gulp-sourcemaps');
 
 
 gulp.task('default', ['build']);
-gulp.task('build', ['bundlejs', 'sass', 'iconsprite']);
-gulp.task('watch', ['bundlejs', 'sass', 'iconsprite'], function() {
+gulp.task('build', ['sass', 'iconsprite', 'bundlejs']);
+gulp.task('watch', ['sass', 'iconsprite', 'bundlejs'], function() {
     gulp.watch('./app/**/*.js', ['bundlejs']);
+    gulp.watch('./style/**/*.scss', ['sass']);
+    gulp.watch('./style/**/_*.scss', ['sass']);
+    gulp.watch('./images/won-icons/**/*.svg', ['iconsprite']);
+});
+
+gulp.task('ui-watch', ['sass', 'iconsprite'], function() {
     gulp.watch('./style/**/*.scss', ['sass']);
     gulp.watch('./style/**/_*.scss', ['sass']);
     gulp.watch('./images/won-icons/**/*.svg', ['iconsprite']);

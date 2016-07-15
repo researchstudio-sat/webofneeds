@@ -90,6 +90,10 @@
     won.WON.Hint = won.WON.baseUri + "Hint";
     won.WON.HintCompacted = won.WON.prefix + ":Hint";
 
+    //TOAST TYPES
+    won.WON.infoToast = won.WON.baseUri + "InfoToast";
+    won.WON.warnToast = won.WON.baseUri + "WarnToast";
+    won.WON.errorToast = won.WON.baseUri + "ErrorToast";
 
 
     won.WON.hasGraph = won.WON.baseUri + "hasGraph";
