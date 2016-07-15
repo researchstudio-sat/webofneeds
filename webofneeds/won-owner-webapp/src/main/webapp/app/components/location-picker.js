@@ -1,6 +1,7 @@
 /**
  * Created by ksinger on 15.07.2016.
  */
+
 import won from '../won-es6';
 import angular from 'angular';
 import 'ng-redux';
@@ -15,6 +16,8 @@ function genComponentConf() {
     let template = `
 
 
+        <input type="text" class="lp__searchbox" placeholder="Search for location"/>
+        <img class="lp__mapmount" src="images/some_map_screenshot.png"alt=""/>
             `;
 
     class Controller {
