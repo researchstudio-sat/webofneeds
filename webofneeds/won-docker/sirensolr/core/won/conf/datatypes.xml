@@ -71,6 +71,11 @@
               words="stopwords.txt"
               enablePositionIncrements="true"
               />
+
+      <!-- synonym filtering doesn't work here in the index for our needs (title, description of type "text").
+      Therefore we only use query synonym filtering for now. See below -->
+      <!--<filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>-->
+
     </analyzer>
     <analyzer type="query">
       <tokenizer class="solr.WhitespaceTokenizerFactory"/>
@@ -91,6 +96,10 @@
               words="stopwords.txt"
               enablePositionIncrements="true"
               />
+
+      <!-- Only use synonym filtering on query level -->
+      <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>
+
     </analyzer>
   </datatype>
 
@@ -135,6 +144,7 @@
               words="stopwords.txt"
               enablePositionIncrements="true"
               />
+
     </analyzer>
     <analyzer type="query">
       <!-- whitespace tokenizer to not tokenize URI -->
