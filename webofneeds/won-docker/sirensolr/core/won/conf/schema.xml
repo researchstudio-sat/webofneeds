@@ -31,6 +31,9 @@
     <!-- The ID -->
     <field name="id" type="string" indexed="true" stored="true"/>
 
+    <!-- SIREn needs this field when we add need objects as json files and it creates the managed schema -->
+    <field name="_json_" type="concise"/>
+
   </fields>
 
   <!-- Field to use to determine and enforce document uniqueness. -->
@@ -88,6 +91,12 @@
       <analyzer type="index">
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
+
+        <!-- synonym filter seems to have no effect on need indexing and querying here.
+        It is not really clear why cause this entries are used in the generated managed-schema file.
+        We therefore have to use synonyms in the query process => see datatypes.xml =>
+        http://www.w3.org/2001/XMLSchema#string -->
+        <!--<filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>-->
       </analyzer>
       <analyzer type="query">
         <tokenizer class="solr.StandardTokenizerFactory"/>
