@@ -41,6 +41,41 @@
     & need-textfield {
       flex-grow: 1;
       flex-basis: 10rem;
+
+      .medium_title {
+        font-weight: 700;
+        padding-bottom: 1rem;
+      }
+    }
+  }
+
+  .cp__header {
+    width: 100%;
+    font-size: $mediumFontSize;
+    font-weight: 300;
+    padding-bottom: 1rem;
+
+    padding-left: 2.5rem;
+    background-position: 0 0.15rem;
+    background-size: 2rem;
+    background-repeat: no-repeat;
+
+    &.tags {
+      background-image: url('icon-sprite.svg#ico36_tags_circle_hi');
+    }
+  }
+
+  .cp__tags {
+    display: flex;
+    flex-wrap: wrap;
+    padding-bottom: 2rem;
+
+    .cp__tags__tag {
+      border-radius: 0.5rem;
+      background: $won-light-blue;
+      color: white;
+      margin: 0.25rem 0.25rem 0.25rem 0;
+      padding: 0.25rem 0.5rem;
     }
   }
 }
