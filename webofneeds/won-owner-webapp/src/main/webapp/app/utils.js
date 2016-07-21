@@ -567,3 +567,37 @@ export function toDate(ts) {
     return new Date(Number.parseInt(ts));
 }
 
+/**
+ * Searches the nominatim address-lookup service and
+ * returns a list with the search results.
+ */
+export function searchNominatim(searchStr) {
+    var url = "https://nominatim.openstreetmap.org/search/" +
+        encodeURIComponent(searchStr) + "?format=json";
+    console.log("About to query nominatim: " + url);
+    return fetch(url, {
+        method: 'get',
+        //credentials: "same-origin",
+        headers: { 'Accept': 'application/json' }
+    })
+        .then(resp => {
+            /*
+             * handle errors and read json-data
+             */
+            const errorMsg =
+                "GET to " + url + " failed with ("
+                + resp.status + "): " + resp.statusText +
+                "\n" + resp;
+            if(resp.status !== 200) {
+                throw new Error(errorMsg);
+            } else {
+                try {
+                    return resp.json();
+                } catch (jsonParseError) { // nominatim responded with an HTTP-200 with an error html-page m(
+                    const e = new Error(errorMsg)
+                    e.originalErr = jsonParseError;
+                    throw e;
+                }
+            }
+        });
+}
