@@ -31,12 +31,12 @@ function genComponentConf() {
                 </p>
 
                 <h2 class="post-info__heading"
-                    ng-show="self.post.get('description')">
+                    ng-show="self.post.get('textDescription')">
                     Description
                 </h2>
                 <p class="post-info__details"
-                    ng-show="self.post.get('description')">
-                    {{ self.post.get('description') }}
+                    ng-show="self.post.get('textDescription')">
+                    {{ self.post.get('textDescription') }}
                 </p>
                 <h2 class="post-info__heading"
                     ng-show="self.post.get('location')">
