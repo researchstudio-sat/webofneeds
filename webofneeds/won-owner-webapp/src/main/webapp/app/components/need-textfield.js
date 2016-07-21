@@ -21,9 +21,9 @@ function genComponentConf() {
                     ng-class="{ 'valid' : self.valid(), 'invalid' : !self.valid() }">
                 <div class="medium-mount"></div>
             </div>
-            <span class="wdt__charcount">
+            <!--span class="wdt__charcount">
                 {{ self.charactersLeft() }} characters left
-            </span>
+            </span-->
         </div>
     `;
 
@@ -34,7 +34,7 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             window.ntf4dbg = this;
 
-            this.characterLimit = 140; //TODO move to conf
+            //this.characterLimit = 140; //COMMENT BECAUSE WE DO NOT NEED IT FOR NOW TODO move to conf
 
             const selectFromState = (state) => ({
                 draftId: state.getIn(['router', 'currentParams', 'draftId'])
@@ -98,11 +98,11 @@ function genComponentConf() {
                 });
             });
         }
-        charactersLeft() {
+        /*charactersLeft() {
             return this.characterLimit - this.medium.value().length;
-        }
+        }*/
         valid() {
-            return this.charactersLeft() >= 0;
+            return true; //return this.charactersLeft() >= 0;
         }
 
         value() {
