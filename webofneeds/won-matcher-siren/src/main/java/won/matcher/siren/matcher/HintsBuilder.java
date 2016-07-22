@@ -78,6 +78,10 @@ public class HintsBuilder {
             // set the needUri in the hint event and let the matching service figure out to which won node it belongs
             bulkHintEvent.addHintEvent(new HintEvent(targetWonNode, targetNeedUri, wonNodeUri, needUri,
                                                      config.getSolrServerPublicUri(), score));
+
+            // also send the same hints to the other side (remote need and wonnode)
+            bulkHintEvent.addHintEvent(new HintEvent(wonNodeUri, needUri, targetWonNode, targetNeedUri,
+                                                     config.getSolrServerPublicUri(), score));
         }
 
         return bulkHintEvent;
