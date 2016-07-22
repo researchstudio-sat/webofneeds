@@ -1,6 +1,5 @@
 package won.matcher.siren.matcher;
 
-import won.matcher.siren.config.SirenMatcherConfig;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -10,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import won.matcher.siren.config.SirenMatcherConfig;
 
 /**
  * Created by soheilk on 25.08.2015.

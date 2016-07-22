@@ -89,21 +89,19 @@
     <!-- A general text field that is stored -->
     <fieldType name="text" class="solr.TextField" stored="true" multiValued="true">
       <analyzer type="index">
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.LowerCaseFilterFactory"/>
+          <tokenizer class="solr.StandardTokenizerFactory"/>
+          <filter class="solr.LowerCaseFilterFactory"/>
 
-        <!-- synonym filter seems to have no effect on need indexing and querying here.
-        It is not really clear why cause this entries are used in the generated managed-schema file.
-        We therefore have to use synonyms in the query process => see datatypes.xml =>
-        http://www.w3.org/2001/XMLSchema#string -->
-        <!--<filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>-->
+          <!-- synonym filter seems to have no effect on need indexing and querying here.
+          It is not really clear why cause this entries are used in the generated managed-schema file. -->
+          <!--<filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>-->
+
       </analyzer>
       <analyzer type="query">
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.LowerCaseFilterFactory"/>
+          <tokenizer class="solr.StandardTokenizerFactory"/>
+          <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
     </fieldType>
-
   </types>
 
 </schema>
