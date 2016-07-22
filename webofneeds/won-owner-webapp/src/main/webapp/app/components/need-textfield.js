@@ -21,9 +21,9 @@ function genComponentConf() {
                     ng-class="{ 'valid' : self.valid(), 'invalid' : !self.valid() }">
                 <div class="medium-mount"></div>
             </div>
-            <span class="wdt__charcount">
+            <!--span class="wdt__charcount">
                 {{ self.charactersLeft() }} characters left
-            </span>
+            </span-->
         </div>
     `;
 
@@ -34,7 +34,7 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             window.ntf4dbg = this;
 
-            this.characterLimit = 140; //TODO move to conf
+            //this.characterLimit = 140; //COMMENT BECAUSE WE DO NOT NEED IT FOR NOW TODO move to conf
 
             const selectFromState = (state) => ({
                 draftId: state.getIn(['router', 'currentParams', 'draftId'])
@@ -45,17 +45,64 @@ function genComponentConf() {
             this.initMedium();
 
             this.mediumMountNg().bind('input', e => {
+                var description;
+                var title;
+                var tags;
+
+                angular.element(".medium-mount p").removeClass("medium_title");
+
+                if(angular.element(".medium-mount p") && angular.element(".medium-mount p").length > 1){
+                    angular.element(".medium-mount p:first").addClass("medium_title");
+                    title  = angular.element(".medium-mount p.medium_title").text();
+
+                    if(angular.element(".medium-mount p:not('.medium_title')") && angular.element(".medium-mount p:not('.medium_title')").length > 0){
+                        description = "";
+                        angular.element(".medium-mount p:not('.medium_title')").each(function(){
+                            description += angular.element(this).text() +"\n";
+                        });
+                    }
+                }else {
+                    title  = angular.element(".medium-mount p:first").text();
+                    description = undefined;
+                }
+
+                //ADD TAGS
+                var titleTags = title? title.match(/#(\w+)/gi) : [];
+                var descriptionTags = description? description.match(/#(\w+)/gi) : [];
+
+                tags = angular.element.unique(
+                    angular.element.merge(
+                        titleTags ? titleTags : [],
+                        descriptionTags ? descriptionTags : []
+                    )
+                );
+
+                for(var i=0; i<tags.length; i++){
+                    tags[i] = tags[i].substr(1);
+                }
+
+                //SAVE TO STATE
+                this.drafts__change__description({
+                    draftId: this.draftId,
+                    description : description
+                });
+
                 this.drafts__change__title({
                     draftId: this.draftId,
-                    title: this.value(),
+                    title: title.replace("&nbsp;","") //TODO: MOVE THIS HACK TO VIEW LEVEL
+                });
+
+                this.drafts__change__tags({
+                    draftId: this.draftId,
+                    tags: tags && tags.length > 0? tags : undefined
                 });
             });
         }
-        charactersLeft() {
+        /*charactersLeft() {
             return this.characterLimit - this.medium.value().length;
-        }
+        }*/
         valid() {
-            return this.charactersLeft() >= 0;
+            return true; //return this.charactersLeft() >= 0;
         }
 
         value() {
@@ -78,8 +125,8 @@ function genComponentConf() {
                 modifier: 'auto',
                 placeholder: 'What',
                 autoHR: false, //if true, inserts <hr> after two empty lines
-                mode: Medium.inlineMode, // no newlines, no styling
-                //mode: Medium.partialMode, // allows newlines, no styling
+                //mode: Medium.inlineMode, // no newlines, no styling
+                mode: Medium.partialMode, // allows newlines, no styling
                 //maxLength: this.maxChars, // -1 would disable it
                 tags: {
                     /*

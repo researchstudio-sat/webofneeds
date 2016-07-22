@@ -43,6 +43,21 @@ export const draftsReducer = createReducer(
                 stateWithDraft.setIn([draftId, 'title'], title) :
                 stateWithDraft.deleteIn([draftId, 'title'])
         },
+
+        [actionTypes.drafts.change.description]: (drafts, {payload:{draftId, description}}) => {
+            const stateWithDraft = guaranteeDraftExistence(drafts, draftId);
+            return description ?
+                stateWithDraft.setIn([draftId, 'description'], description) :
+                stateWithDraft.deleteIn([draftId, 'description']);
+        },
+
+        [actionTypes.drafts.change.tags]: (drafts, {payload:{draftId, tags}}) => {
+            const stateWithDraft = guaranteeDraftExistence(drafts, draftId);
+            return tags ?
+                stateWithDraft.setIn([draftId, 'tags'], tags) :
+                stateWithDraft.deleteIn([draftId, 'tags']);
+        },
+
         /**
          * @param {*} draftId : the draft that's thumbnail has changed
          * @param {object} image : e.g. `{ name: 'somepic.png', type: 'image/png', data: 'iVBORw0...gAAI1=' }`

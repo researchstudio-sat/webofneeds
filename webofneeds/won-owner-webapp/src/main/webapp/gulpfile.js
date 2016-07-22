@@ -20,12 +20,6 @@ gulp.task('watch', ['sass', 'iconsprite', 'bundlejs'], function() {
     gulp.watch('./images/won-icons/**/*.svg', ['iconsprite']);
 });
 
-gulp.task('ui-watch', ['sass', 'iconsprite'], function() {
-    gulp.watch('./style/**/*.scss', ['sass']);
-    gulp.watch('./style/**/_*.scss', ['sass']);
-    gulp.watch('./images/won-icons/**/*.svg', ['iconsprite']);
-});
-
 gulp.task('bundlejs', function(){
     return gulp.src('app/app_jspm.js')
         .pipe(sourcemaps.init())
