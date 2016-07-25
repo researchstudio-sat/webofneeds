@@ -54,7 +54,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
      }
 
 
-    # count number of signature references
+    # count number of signature references (inside this dataset. references outside the dataset are not checked here)
     { SELECT (count(?ref) as ?numSignatureRefs)
         WHERE
         {
@@ -64,10 +64,12 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
               #?event rdfg:subGraphOf ?event .
 
               ?event msg:referencesSignature ?ref .
-              #?ref msg:hasSignatureGraph ?signature .
+              ?ref msg:hasSignatureGraph ?signature .
               #?ref msg:hasSignatureValue ?svalue .
               #?ref msg:hasSignedGraph ?signed .
             } .
+         #just check if the referenced graph is in the dataset, do not count the reference otherwise
+         GRAPH ?signature {?signature a signature:Signature}
         }
      }
 

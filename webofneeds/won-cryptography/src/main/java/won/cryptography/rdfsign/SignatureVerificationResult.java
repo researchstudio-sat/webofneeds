@@ -1,5 +1,7 @@
 package won.cryptography.rdfsign;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.protocol.message.SignatureReference;
 
 import java.util.*;
@@ -19,7 +21,7 @@ public class SignatureVerificationResult {
   private Map<String,String> signatureGraphNameToSignatureValue = new HashMap<>();
 
   private List<SignatureReference> signatureReferences = new ArrayList<>();
-
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   public void addSignedGraphName(String signedGraphName) {
     if (!signedGraphNameToSignatureGraphName.containsKey(signedGraphName)) {
@@ -66,16 +68,27 @@ public class SignatureVerificationResult {
     // check if all the graphs verify
     for (String sigName : signatureGraphNameToVerified.keySet()) {
       if (!signatureGraphNameToVerified.get(sigName)) {
+        message = "verification of signature " + sigName + " failed";
         verificationPassed = false;
         return verificationPassed;
       }
     }
     // check if referenced signature values are the same as verified signature values
-    if (!signatureReferencesValid()) {
-      verificationPassed = false;
-      return verificationPassed;
+    for (SignatureReference ref : signatureReferences) {
+      String actualSignatureValue = signatureGraphNameToSignatureValue.get(ref.getSignatureGraphUri());
+      if (actualSignatureValue == null){
+        //the signature is not part of the message - it must be a reference to another message!
+        logger.warn("cannot verify signature {} as it is not part of this message", ref.getSignatureGraphUri());
+        //for now: do not try to verify.
+        continue;
+      }
+      if (!ref.getSignatureValue().equals(actualSignatureValue)) {
+        message = "signature value of signature reference " + ref.getReferencerGraphUri() + " differs from actual " +
+          "value of signature " + ref.getSignatureGraphUri();
+        verificationPassed = false;
+        return verificationPassed;
+      }
     }
-
     verificationPassed = true;
     return verificationPassed;
   }
@@ -127,19 +140,6 @@ public class SignatureVerificationResult {
     return false;
   }
 
-  /**
-   * Checks if all signature values in references are equal to the signature values
-   * from corresponding signature graphs
-   * @return
-   */
-  private boolean signatureReferencesValid() {
-    for (SignatureReference ref : signatureReferences) {
-      if (!ref.getSignatureValue().equals(signatureGraphNameToSignatureValue.get(ref.getSignatureGraphUri()))) {
-        return false;
-      }
-    }
-    return true;
-  }
 
   public Set<String> getSignatureGraphNames() {
     return this.signatureGraphNameToSignatureValue.keySet();
