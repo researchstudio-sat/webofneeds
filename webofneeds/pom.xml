@@ -558,6 +558,11 @@
                 <version>${org.apache.commons.email.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.4</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
@@ -862,7 +867,7 @@
         <activemq.conf>classpath:</activemq.conf>
         <jms.version>1.1</jms.version>
         <xbean.version>3.14</xbean.version>   <!-- Check later if it is really needed-->
-        <siren.version>0.2.3-RC2</siren.version>
+        <siren.version>1.4</siren.version>
         <cglib.version>2.2.2</cglib.version>
         <com.google.guava.version>15.0</com.google.guava.version>
         <ch.qos.logback.version>1.0.13</ch.qos.logback.version>
