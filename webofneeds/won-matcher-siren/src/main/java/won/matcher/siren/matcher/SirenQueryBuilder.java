@@ -35,6 +35,8 @@ public class SirenQueryBuilder
 
     TwigQuery twigBasicNeedType = null;
 
+
+
     //First of all, we have to consider the BasicNeedType
     String matchNeedType = null;
     if (DEMAND.equals(needObject.getBasicNeedType().toLowerCase())) {
@@ -47,10 +49,9 @@ public class SirenQueryBuilder
       matchNeedType = CRITIQUE;
     }
 
-    if (matchNeedType != null) {
+    if (twigBasicNeedType != null) {
       twigBasicNeedType = builder.newTwig(WON.HAS_BASIC_NEED_TYPE.toString()).with(
         builder.newNode("'" + matchNeedType + "'").setAttribute("@id"));
-      
       topTwig.with(twigBasicNeedType);
     }
   }
@@ -83,32 +84,6 @@ public class SirenQueryBuilder
       log.warn("Cannot add more terms to the Solr query. Reached considered number of terms: " + consideredQueryTokens);
       return;
     }
-
-
-//    StringBuilder queryTerms = new StringBuilder();
-//    queryTerms.append(terms[0]);
-//    usedQueryTokens++;
-//    for (int i = 1; i < terms.length; i++) {
-//      if(usedQueryTokens < consideredQueryTokens) {
-//        queryTerms.append(" OR ").append(terms[i]);
-//      } else {
-//        log.warn("Cannot add more terms to the Solr query. Reached considered number of terms: " + consideredQueryTokens);
-//        return;
-//      }
-//    }
-
-
-
-//    for (String term : terms) {
-//      if(usedQueryTokens < consideredQueryTokens) {
-//        topTwig.optional(builder.newTwig(WON.HAS_CONTENT.toString()).with(
-//          builder.newNode(term).setAttribute(contentAttribute).setBoost(boost)));
-//        usedQueryTokens++;
-//      } else {
-//        log.warn("Cannot add more terms to the Solr query. Reached considered number of terms: " + consideredQueryTokens);
-//        return;
-//      }
-//    }
   }
 
   public String build() {
