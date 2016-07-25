@@ -34,10 +34,9 @@ import won.protocol.repository.MessageEventRepository;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static won.protocol.message.WonMessageType.CONNECT;
-import static won.protocol.message.WonMessageType.HINT_MESSAGE;
-import static won.protocol.message.WonMessageType.OPEN;
+import static won.protocol.message.WonMessageType.*;
 
 /**
  * Created by fkleedorfer on 22.07.2016.
@@ -55,6 +54,7 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
     //find all unreferenced messages for the current message's parent
     List<MessageEventPlaceholder> messageEventPlaceholders = messageEventRepository
       .findByParentURIAndReferencedByOtherMessage(message.getSenderURI());
+
     //initialize a variable for the result
     WonMessageType messageType = message.getMessageType();
     if (
@@ -69,6 +69,12 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
                                         .findByParentURIAndMessageType(message.getSenderNeedURI(), WonMessageType
                                           .CREATE_NEED));
     }
+    //the message should not sign itself, just in case:
+    messageEventPlaceholders = messageEventPlaceholders
+      .stream()
+      .filter(mep -> !message.getMessageURI().equals(mep.getMessageURI())).collect(
+        Collectors.toList());
+
     Dataset messageDataset = message.getCompleteDataset();
 
     for (MessageEventPlaceholder messageEventPlaceholder: messageEventPlaceholders){
