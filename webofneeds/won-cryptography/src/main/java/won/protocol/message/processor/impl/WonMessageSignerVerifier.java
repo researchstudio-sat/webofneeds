@@ -58,7 +58,7 @@ public class WonMessageSignerVerifier
     }
   }
 
-  private static void addSignatureReference(final String msgUri, final SignatureReference sigRef,
+  public static void addSignatureReference(final String msgUri, final SignatureReference sigRef,
                                             final String envUri, final Dataset msgDataset) {
 
     Model envelopeGraph = msgDataset.getNamedModel(envUri);
