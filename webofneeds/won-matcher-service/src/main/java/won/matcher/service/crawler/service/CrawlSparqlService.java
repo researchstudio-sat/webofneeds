@@ -148,10 +148,12 @@ public class CrawlSparqlService extends SparqlService
    * @return set of extracted URIs from the resource URI
    */
   public Set<String> extractURIs(String uri, String baseUri, Iterable<String> properties) {
-
     Set<String> extractedURIs = new HashSet<String>();
     for (String prop : properties) {
-
+      if (prop.trim().length()==0) {
+        continue;
+        //ignore empty strings
+      }
       // select URIs specified by property paths that have not already been crawled
       String queryTemplate = "\nSELECT ?obj WHERE { <%s> %s ?obj " +
         "FILTER NOT EXISTS { { <%s> <%s> '%s' } UNION { <%s> <%s> '%s'} " +
