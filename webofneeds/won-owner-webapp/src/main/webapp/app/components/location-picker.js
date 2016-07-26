@@ -93,8 +93,21 @@ function genComponentConf() {
 
         }
         doneTyping() {
-            console.log('TODO starting type-ahead search for: ' + this.textfield().value);
+            console.log('starting type-ahead search for: ' + this.textfield().value);
             //buffer for 1s before starting the search
+            searchNominatim(this.textfield().value)
+            .then( searchResults => {
+                console.log('location search results: ', searchResults);
+                this.$scope.$apply(() =>
+                    //this.searchResults = searchResults.map(nominatim2wonLocation)
+
+                    this.searchResults = scrubSearchResults(searchResults)
+                )
+            })
+
+        }
+        clickedSearchResult(location) {
+            console.log('selected location: ', location)
 
         }
 
@@ -131,6 +144,36 @@ function genComponentConf() {
         scope: {
         },
         template: template
+    }
+}
+
+
+function scrubSearchResults(searchResults) {
+
+    return Immutable.fromJS(
+            searchResults.map(nominatim2wonLocation)
+        )
+        /*
+         * filter "duplicate" results (e.g. "Wien"
+         *  -> 1x waterway, 1x boundary, 1x place)
+         */
+        .groupBy(r => r.get('name'))
+        .map(sameNamedResults => sameNamedResults.first())
+        .toList()
+        .toJS()
+}
+
+/**
+ * drop info not stored in rdf, thus info that we
+ * couldn't restore for previously used locations
+ */
+function nominatim2wonLocation(searchResult) {
+    return {
+        name: searchResult.display_name,
+        lon: searchResult.lon,
+        lat: searchResult.lat,
+        //importance: searchResult.importance,
+        boundingbox: searchResult.boundingbox, // TODO use this to set proper zoom
     }
 }
 
