@@ -88,12 +88,19 @@ function genComponentConf() {
                 .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
                 .openPopup();
 
+
+
+            this.map.on('click', this.onMapClick)
+
             // Force it to adapt to actual size
             // for some reason this doesn't happen by default
             // when the map is within a tag.
             // this.map.invalidateSize();
             // ^ doesn't work (needs to be done manually atm);
 
+        }
+        onMapClick(e) {
+            console.log('clicked map ', e);
         }
         doneTyping() {
             console.log('starting type-ahead search for: ' + this.textfield().value);
