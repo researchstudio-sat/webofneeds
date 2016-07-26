@@ -239,4 +239,10 @@
                                                          precisionStep="8"
                                                          type="date"/>
 
+  <!-- it is unclear why this does not convert our "http://www.w3.org/2001/XMLSchema#dateTime" correctly -->
+  <datatype name="http://www.w3.org/2001/XMLSchema#dateTime" class="com.sindicetech.siren.solr.schema.TrieDatatype"
+              precisionStep="8"
+              type="date"/>
+
+
 </datatypeConfig>

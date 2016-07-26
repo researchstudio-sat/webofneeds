@@ -34,6 +34,12 @@
     <!-- SIREn needs this field when we add need objects as json files and it creates the managed schema -->
     <field name="_json_" type="concise"/>
 
+    <!-- we are using fixed field here cause the dynamic generation of a date field didn't work => its not clear why.
+    We tried describing it as a custom datatype and have the according definition in datatypes.xml, but after
+    adding a document to the index the field type of that field is always (the default) TextField.
+    Check issues #705 -->
+    <field name="@graph.http://purl.org/dc/terms/created.@value" type="date"/>
+
   </fields>
 
   <!-- Field to use to determine and enforce document uniqueness. -->
@@ -56,6 +62,8 @@
 
     <!-- A multi-valued long field type that is stored -->
     <fieldType name="mv-long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0" stored="true" multiValued="true"/>
+
+    <fieldType name="date" class="solr.TrieDateField" precisionStep="8" type="date"/>
 
     <!--
       An example of SIREn field type.
@@ -82,26 +90,38 @@
       ':gb'. This is necessary if your scenario involves searching a keyword across all
       paths, e.g., lookup the keyword 'gb' in any nodes: { "node" : { "query" : "gb" } }.
     -->
-    <fieldType name="concise" class="com.sindicetech.siren.solr.schema.ConciseJsonField" omitNorms="true" stored="false"
-               attributeWildcard="true"
-               datatypeConfig="datatypes.xml"/>
 
-    <!-- A general text field that is stored -->
-    <fieldType name="text" class="solr.TextField" stored="true" multiValued="true">
-      <analyzer type="index">
-          <tokenizer class="solr.StandardTokenizerFactory"/>
-          <filter class="solr.LowerCaseFilterFactory"/>
 
-          <!-- synonym filter seems to have no effect on need indexing and querying here.
-          It is not really clear why cause this entries are used in the generated managed-schema file. -->
-          <!--<filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>-->
+      <fieldType name="concise" class="com.sindicetech.siren.solr.schema.ConciseJsonField" omitNorms="true"
+                 stored="false"
+                 attributeWildcard="true"
+                 datatypeConfig="datatypes.xml"/>
 
-      </analyzer>
-      <analyzer type="query">
-          <tokenizer class="solr.StandardTokenizerFactory"/>
-          <filter class="solr.LowerCaseFilterFactory"/>
-      </analyzer>
-    </fieldType>
+      <!--
+      <fieldType name="extended" class="com.sindicetech.siren.solr.schema.ExtendedJsonField"
+                 omitNorms="true"
+                 datatypeConfig="datatypes.xml"/>-->
+
+
+      <!-- A general text field that is stored -->
+      <fieldType name="text" class="solr.TextField" stored="true" multiValued="true">
+          <analyzer type="index">
+              <tokenizer class="solr.StandardTokenizerFactory"/>
+              <filter class="solr.LowerCaseFilterFactory"/>
+
+              <!-- synonym filter seems to have no effect on need indexing and querying here.
+              It is not really clear why cause this entries are used in the generated managed-schema file. -->
+              <!--<filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>-->
+
+          </analyzer>
+          <analyzer type="query">
+              <tokenizer class="solr.StandardTokenizerFactory"/>
+              <filter class="solr.LowerCaseFilterFactory"/>
+          </analyzer>
+      </fieldType>
+
+
+
   </types>
 
 </schema>
