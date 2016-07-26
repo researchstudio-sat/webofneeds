@@ -75,8 +75,8 @@ function genComponentConf() {
             }); //.setView([51.505, -0.09], 13);
 
             const baseMaps = {
-                "Default": secureOsm,
-                "Transport (Insecure)": transport,
+                "Detailed default map": secureOsm,
+                "Transport (Insecure!)": transport,
             }
 
             L.control.layers(baseMaps).addTo(this.map);
