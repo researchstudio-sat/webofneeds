@@ -101,6 +101,10 @@ function genComponentConf() {
         }
         onMapClick(e) {
             console.log('clicked map ', e);
+            searchNominatim(e.latlng.lat + ', ' + e.latlng.lng)
+            .then(searchResults =>
+                console.log('nearest address: ', searchResults)
+            );
         }
         doneTyping() {
             console.log('starting type-ahead search for: ' + this.textfield().value);
