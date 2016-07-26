@@ -67,10 +67,10 @@ function genComponentConf() {
                 attribution: 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest</a>, Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
             });
 
-            this.map = L.map('lp__mapmount',{
+            this.map = L.map(this.mapMount(),{
                 center: [51.505, -0.09],
                 zoom: 13,
-                layers: [secureOsm], //layers enabled from beginning on
+                layers: [secureOsm], //initially visible layers
 
             }); //.setView([51.505, -0.09], 13);
 
