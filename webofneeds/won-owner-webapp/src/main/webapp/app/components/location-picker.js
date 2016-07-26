@@ -68,11 +68,14 @@ function genComponentConf() {
             });
 
             this.map = L.map(this.mapMount(),{
-                center: [51.505, -0.09],
-                zoom: 13,
+                center: [37.44, -42.89], //centered on north-west africa
+                zoom: 1, //world-map
                 layers: [secureOsm], //initially visible layers
 
             }); //.setView([51.505, -0.09], 13);
+
+            //this.map.fitWorld() // shows every continent twice :|
+            this.map.fitBounds([[-80, -190],[80, 190]]); // fitWorld without repetition
 
             const baseMaps = {
                 "Detailed default map": secureOsm,
