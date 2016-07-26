@@ -64,7 +64,7 @@ function genComponentConf() {
 
             const transportSource = 'http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png';
             const transport = L.tileLayer(transportSource, {
-                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                attribution: 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest</a>, Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
             });
 
             this.map = L.map('lp__mapmount',{
