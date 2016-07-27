@@ -11,10 +11,10 @@
     if(!won) won = {};
 
     function hasModalities(args){
-        return hasPriceSpecification(args) || hasLocation(args) || hasTimeConstraint(args);
+        return hasPriceSpecification(args) || hasLocation(args) || hasTimeConstraint(args) || args.bounds;
     }
     function hasLocation(args) {
-        return (!isNaN(args.longitude) && !isNaN(args.latitude)) || args.address
+        return !isNaN(args.longitude) && !isNaN(args.latitude) && args.address;
     }
     function hasPriceSpecification(args){
         return false; //TODO price-specification not fully implemented yet
@@ -124,12 +124,24 @@
             graph.push({
                 '@id': '_:contentDescription',
                 '@type': 'won:NeedModality',
-                'won:hasLocationSpecification': (!hasLocation(args)? undefined : {
-                    '@id': '_:locationSpecification',
+                'won:hasLocation': (!hasLocation(args)? undefined : {
+                    '@id': '_:location',
                     '@type': 'geo:Point',
                     'geo:latitude': args.latitude.toFixed(6),
                     'geo:longitude': args.longitude.toFixed(6),
-                    'won:hasAddress': args.address //TODO add to onto
+                    'won:hasAddress': args.address,
+                }),
+                'won:hasBoundsNorthWest': (!args.bounds ? undefined : {
+                    '@id': '_:boundsNW',
+                    '@type': 'geo:Point',
+                    'geo:latitude': args.bounds[0][0].toFixed(6),
+                    'geo:longitude': args.bounds[0][1].toFixed(6),
+                }),
+                'won:hasBoundsSouthEast': (!args.bounds? undefined : {
+                    '@id': '_:boundsSE',
+                    '@type': 'geo:Point',
+                    'geo:latitude': args.bounds[1][0].toFixed(6),
+                    'geo:longitude': args.bounds[1][1].toFixed(6),
                 }),
                 'won:hasTimeSpecification': (!hasTimeConstraint(args)? undefined : {
                     '@id': '_:timeSpecification',
@@ -167,13 +179,14 @@
                     '@type':'@id'
                 },
 
+                //TODO probably an alias instead of an type declaration as it's intended here
                 'won:hasCurrency': 'xsd:string',
                 'won:hasLowerPriceLimit': 'xsd:float',
                 'won:hasUpperPriceLimit': 'xsd:float',
 
-                'geo:latitude': 'xsd:float',
-                'geo:longitude':'xsd:float',
-                'won:hasAddress': 'xsd:string',
+                //'geo:latitude': 'xsd:float',
+                //'geo:longitude':'xsd:float',
+                //'won:hasAddress': 'xsd:string',
 
                 'won:hasStartTime': 'xsd:dateTime',
                 'won:hasEndTime': 'xsd:dateTime',

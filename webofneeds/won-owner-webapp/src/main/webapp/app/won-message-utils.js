@@ -260,6 +260,10 @@ export function buildCreateMessage(need, wonNodeUri) {
         publishedContentUri: publishedContentUri, //mandatory
         tags: need.tags? need.tags.map(function(t) {return t.text}).join(',') : undefined,
         attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
+        longitude: need.location.lon,
+        latitude: need.location.lat,
+        address: need.location.name,
+        bounds: need.location.bounds,
     });
     const msgUri = wonNodeUri + '/event/' + getRandomPosInt(); //mandatory
     const msgJson = won.buildMessageRdf(contentRdf, {
