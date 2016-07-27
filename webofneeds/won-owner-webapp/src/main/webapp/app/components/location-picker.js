@@ -129,27 +129,32 @@ function genComponentConf() {
 
         }
 
-        textfieldNg() {
-            if(!this._textfield) {
-                this._textfield = this.$element.find('.lp__searchbox');
             }
-            return this._textfield;
-        }
 
-        textfield() {
-            return this.textfieldNg()[0];
         }
-
-        mapMountNg() {
-            if(!this._mapMount) {
-                this._mapMount = this.$element.find('.lp__mapmount');
             }
-            return this._mapMount;
         }
 
-        mapMount() {
-            return this.mapMountNg()[0];
+        elementNg(selector) {
+            if(!this._elementsNg) {
+                this._elementsNg = {};
+            }
+            if(!this._elementsNg[selector]) {
+                this._elementsNg[selector] = this.$element.find(selector);
+            }
+            return this._elementsNg[selector];
         }
+        element(selector) {
+            return this.elementNg(selector)[0];
+        }
+
+        textfieldNg() { return this.elementNg('.lp__searchbox'); }
+
+        textfield() { return this.element('.lp__searchbox'); }
+
+        mapMountNg() { return this.elementNg('.lp__mapmount'); }
+
+        mapMount() { return this.element('.lp__mapmount'); }
     }
     Controller.$inject = serviceDependencies;
 
