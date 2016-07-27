@@ -1,9 +1,7 @@
 package won.matcher.siren.matcher;
 
 import com.hp.hpl.jena.vocabulary.DC;
-import com.sindicetech.siren.qparser.tree.dsl.ConciseQueryBuilder;
-import com.sindicetech.siren.qparser.tree.dsl.ConciseTwigQuery;
-import com.sindicetech.siren.qparser.tree.dsl.TwigQuery;
+import com.sindicetech.siren.qparser.tree.dsl.*;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +14,7 @@ public class SirenQueryBuilder
 {
   private final Logger log = LoggerFactory.getLogger(getClass());
 
-  private ConciseTwigQuery topTwig;
+  private AbstractBooleanQuery topQuery;
   private ConciseQueryBuilder builder;
   private int consideredQueryTokens;
   private int usedQueryTokens;
@@ -31,11 +29,7 @@ public class SirenQueryBuilder
     this.consideredQueryTokens = consideredQueryTokens;
     usedQueryTokens = 0;
     builder = new ConciseQueryBuilder();
-    topTwig = builder.newTwig("@graph");
-
-    TwigQuery twigBasicNeedType = null;
-
-
+    topQuery =  builder.newBoolean();
 
     //First of all, we have to consider the BasicNeedType
     String matchNeedType = null;
@@ -49,11 +43,14 @@ public class SirenQueryBuilder
       matchNeedType = CRITIQUE;
     }
 
-    if (twigBasicNeedType != null) {
-      twigBasicNeedType = builder.newTwig(WON.HAS_BASIC_NEED_TYPE.toString()).with(
-        builder.newNode("'" + matchNeedType + "'").setAttribute("@id"));
-      topTwig.with(twigBasicNeedType);
-    }
+    TwigQuery twigBasicNeedType = builder.newTwig("@graph").with(builder.newTwig(WON.HAS_BASIC_NEED_TYPE.toString()).with(
+      builder.newNode("'" + matchNeedType + "'").setAttribute("@id")));
+    topQuery.with(twigBasicNeedType);
+
+    // retrieve only needs in state active
+    TwigQuery needState = builder.newTwig("@graph").with(builder.newTwig(WON.IS_IN_STATE.toString()).with(
+      builder.newNode("'" + WON.NEED_STATE_ACTIVE + "'").setAttribute("@id")));
+    topQuery.with(needState);
   }
 
   public void addTermsToTitleQuery(String[] terms, int boost)  throws QueryNodeException {
@@ -77,9 +74,8 @@ public class SirenQueryBuilder
     if (usedQueryTokens + terms.length <= consideredQueryTokens) {
       String queryTerms = String.join(" OR ", terms);
       usedQueryTokens += terms.length;
-
-      topTwig.optional(builder.newTwig(WON.HAS_CONTENT.toString()).with(
-        builder.newNode(queryTerms).setAttribute(contentAttribute).setBoost(boost)));
+      topQuery.optional(builder.newTwig("@graph").with(builder.newTwig(WON.HAS_CONTENT.toString()).with(
+        builder.newNode(queryTerms).setAttribute(contentAttribute).setBoost(boost))));
     } else {
       log.warn("Cannot add more terms to the Solr query. Reached considered number of terms: " + consideredQueryTokens);
       return;
@@ -87,7 +83,7 @@ public class SirenQueryBuilder
   }
 
   public String build() {
-   return topTwig.toString();
+   return topQuery.toString();
   }
 }
 
