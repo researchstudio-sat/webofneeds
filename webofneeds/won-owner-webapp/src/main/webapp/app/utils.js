@@ -587,7 +587,7 @@ export function reverseSearchNominatim(lat, lon, zoom) {
         "&format=json";
 
     if(!!zoom || zoom === 0) {
-       url += "&zoom=" + Math.max(0, zoom);
+       url += "&zoom=" + Math.max(0, Math.min(zoom, 18));
     }
     console.log("About to do reverse lookup on nominatim: " + url);
     return fetchJSON(url);
