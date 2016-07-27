@@ -130,6 +130,8 @@ function genComponentConf() {
                 location
             });
 
+            this.textfield().value = location.name; // use textfield to display result
+
             this.placeMarkers([location]);
             this.map.fitBounds(location.bounds, { animate: true });
             this.markers[0].openPopup();
