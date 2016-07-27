@@ -122,7 +122,13 @@ function genComponentConf() {
         selectedLocation(location) {
             this.searchResults = undefined; // picked one, can hide the rest if they were there
 
-            this.drafts__change__location({ location });
+            //TODO ? let locationWithOrigName = clone(location);
+            //TODO ? locationWithOrigName.name = this.textfield().value;
+
+            this.drafts__change__location({
+                draftId: this.draftId,
+                location
+            });
 
             this.placeMarkers([location]);
             this.map.fitBounds(location.bounds, { animate: true });
