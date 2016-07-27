@@ -121,7 +121,8 @@ function genComponentConf() {
         }
         selectedLocation(location) {
             this.searchResults = undefined; // picked one, can hide the rest if they were there
-            console.log('selected location: ', location);
+
+            this.drafts__change__location({ location });
 
             this.placeMarkers([location]);
             this.map.fitBounds(location.bounds, { animate: true });

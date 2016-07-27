@@ -129,6 +129,7 @@ const actionHierarchy = {
             type: INJ_DEFAULT,
             title: INJ_DEFAULT,
             thumbnail: INJ_DEFAULT,
+            location: INJ_DEFAULT,
         },
 
         delete: INJ_DEFAULT,
