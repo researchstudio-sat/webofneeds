@@ -572,9 +572,28 @@ export function toDate(ts) {
  * returns a list with the search results.
  */
 export function searchNominatim(searchStr) {
-    var url = "https://nominatim.openstreetmap.org/search/" +
-        encodeURIComponent(searchStr) + "?format=json";
+    var url = "https://nominatim.openstreetmap.org/search" +
+        "?q=" + encodeURIComponent(searchStr) +
+        "&format=json";
     console.log("About to query nominatim: " + url);
+    return fetchJSON(url);
+}
+
+
+export function reverseSearchNominatim(lat, lon, zoom) {
+    let url = "https://nominatim.openstreetmap.org/reverse" +
+        "?lat=" + lat +
+        "&lon=" + lon +
+        "&format=json";
+
+    if(!!zoom || zoom === 0) {
+       url += "&zoom=" + Math.max(0, zoom);
+    }
+    console.log("About to do reverse lookup on nominatim: " + url);
+    return fetchJSON(url);
+}
+
+function fetchJSON(url) {
     return fetch(url, {
         method: 'get',
         //credentials: "same-origin",

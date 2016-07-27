@@ -8,7 +8,11 @@ import Immutable from 'immutable'; // also exports itself as (window).L
 import 'leaflet';
 import 'ng-redux';
 //import { labels } from '../won-label-utils';
-import { attach, searchNominatim } from '../utils.js';
+import {
+    attach,
+    searchNominatim,
+    reverseSearchNominatim,
+} from '../utils.js';
 import { actionCreators }  from '../actions/actions';
 import { } from '../selectors';
 import { doneTypingBufferNg } from '../cstm-ng-utils'
