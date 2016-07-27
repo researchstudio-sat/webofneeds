@@ -154,8 +154,12 @@ function genComponentConf() {
                         console.log(currentLocation)
                         const lat = currentLocation.coords.latitude;
                         const lon = currentLocation.coords.longitude;
-                        // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
-                        const zoom = 13; //TODO calculate this from the accuracy metric
+                        const zoom = 13; // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
+
+                        // center map around current location
+                        this.map.setZoom(zoom);
+                        this.map.panTo([lat, lon]);
+
                         reverseSearchNominatim(lat, lon, zoom)
                             .then(searchResult => {
                                 const location = nominatim2wonLocation(searchResult);
