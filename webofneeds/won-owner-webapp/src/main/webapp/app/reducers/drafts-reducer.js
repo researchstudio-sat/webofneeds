@@ -60,6 +60,9 @@ export default function(drafts = initialState, action = {}) {
                 .first();
             return drafts.remove(draftId);
 
+        default:
+            return drafts;
+
         //TODO delete draft once it's completely empty
         //TODO init drafts from server
         //TODO isValidNeed function to check compliance to won-ontology (and throw errors early)
