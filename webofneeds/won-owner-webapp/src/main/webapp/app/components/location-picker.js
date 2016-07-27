@@ -12,19 +12,19 @@ import {
     attach,
     searchNominatim,
     reverseSearchNominatim,
+    clone,
 } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
-import { } from '../selectors';
+import { selectOpenDraft, selectRouterParams } from '../selectors';
 import { doneTypingBufferNg } from '../cstm-ng-utils'
 
 const serviceDependencies = ['$scope', '$ngRedux', '$element'];
 function genComponentConf() {
     let template = `
-
-
         <input type="text" class="lp__searchbox" placeholder="Search for location"/>
+        <span class="lp__verifiedLocation" ng-show="self.locationIsSaved()">[CHECK]</span>
         <ol>
-            <li ng-show="self.currentLocation && !self.searchResults">
+            <li ng-show="self.currentLocation && !self.searchResults && !self.locationIsSaved()">
                 <a href="" ng-click="self.selectedLocation(self.currentLocation)">
                     {{ self.currentLocation.name }}
                 </a>
@@ -47,9 +47,15 @@ function genComponentConf() {
             this.determineCurrentLocation();
 
             window.lp4dbg = this;
-            const selectFromState = (state)=>{
+            const selectFromState = state => {
+                const openDraft = selectOpenDraft(state);
+                const routerParams = selectRouterParams(state);
                 return {
-                };
+                    savedName: openDraft && openDraft.getIn(['location', 'name']),
+                    draftId: routerParams.get('draftId'),
+
+                    openDraft4dbg: openDraft,
+                }
             };
 
             doneTypingBufferNg(
@@ -101,6 +107,10 @@ function genComponentConf() {
             // this.map.invalidateSize();
             // ^ doesn't work (needs to be done manually atm);
 
+        }
+        locationIsSaved() {
+            return this.savedName &&
+                this.textfield().value === this.savedName;
         }
         placeMarkers(locations) {
             if(this.markers) {
