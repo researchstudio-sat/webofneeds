@@ -72,7 +72,7 @@ export default function(drafts = initialState, action = {}) {
 function update(drafts, draftId, field, value) {
     const stateWithDraft = guaranteeDraftExistence(drafts, draftId);
     return value ?
-        stateWithDraft.setIn([draftId, field], value) :
+        stateWithDraft.setIn([draftId, field], Immutable.fromJS(value)) :
         stateWithDraft.deleteIn([draftId, field])
 }
 
