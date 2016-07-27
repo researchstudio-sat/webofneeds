@@ -24,6 +24,8 @@ public class WONMSG
 
   private static Model m = ModelFactory.createDefaultModel();
 
+  public static final String PROTOCOL_VERSION_STRING = "protocolVersion";
+  public static final Property PROTOCOL_VERSION = m.createProperty(PROTOCOL_VERSION_STRING);
 
 
   public static final String TYPE_FROM_OWNER_STRING = BASE_URI+"FromOwner";
@@ -46,6 +48,7 @@ public class WONMSG
   public static final String TYPE_FAILURE_RESPONSE_STRING = BASE_URI+"FailureResponse";
   public static final String TYPE_SUCCESS_RESPONSE_STRING = BASE_URI+"SuccessResponse";
   // main types
+
   public static final Resource TYPE_CREATE = m.createResource(TYPE_CREATE_STRING);
   public static final Resource TYPE_CONNECT = m.createResource(TYPE_CONNECT_STRING);
   public static final Resource TYPE_DEACTIVATE = m.createResource(TYPE_DEACTIVATE_STRING);

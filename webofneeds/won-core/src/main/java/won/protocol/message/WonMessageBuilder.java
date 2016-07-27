@@ -1,5 +1,6 @@
 package won.protocol.message;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -117,6 +118,9 @@ public class WonMessageBuilder
     if (wonMessageType != null) {
       messageEventResource.addProperty(WONMSG.HAS_MESSAGE_TYPE_PROPERTY, wonMessageType.getResource());
     }
+
+    messageEventResource.addLiteral(WONMSG.PROTOCOL_VERSION, envelopeGraph.createTypedLiteral("1.0", XSDDatatype
+      .XSDstring));
 
     // add sender
     if (senderURI != null)
