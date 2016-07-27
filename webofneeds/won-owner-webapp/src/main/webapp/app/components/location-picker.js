@@ -258,12 +258,12 @@ function nominatim2wonLocation(searchResult) {
     const b = searchResult.boundingbox;
     return {
         name: searchResult.display_name,
-        lon: searchResult.lon,
-        lat: searchResult.lat,
+        lon: Number.parseFloat(searchResult.lon),
+        lat: Number.parseFloat(searchResult.lat),
         //importance: searchResult.importance,
         bounds: [
-            [ b[0], b[2] ], //north-western point
-            [ b[1], b[3] ] //south-eastern point
+            [ Number.parseFloat(b[0]), Number.parseFloat(b[2]) ], //north-western point
+            [ Number.parseFloat(b[1]), Number.parseFloat(b[3]) ] //south-eastern point
         ],
     }
 }
