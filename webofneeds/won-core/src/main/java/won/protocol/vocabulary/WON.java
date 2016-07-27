@@ -125,8 +125,8 @@ public class WON
   public static final Property HAS_UPPER_PRICE_LIMIT = m.createProperty(BASE_URI, "hasUpperPriceLimit");
   public static final Property HAS_CURRENCY = m.createProperty(BASE_URI, "hasCurrency");
 
-  public static final Property AVAILABLE_AT_LOCATION = m.createProperty(BASE_URI, "hasLocationSpecification");
-  public static final Resource LOCATION_SPECIFICATION = m.createResource(BASE_URI + "LocationSpecification");
+  public static final Property HAS_LOCATION = m.createProperty(BASE_URI, "hasLocation");
+  public static final Resource LOCATION_SPECIFICATION = m.createResource(BASE_URI + "Location");
   public static final Property IS_CONCEALED = m.createProperty(BASE_URI, "isConcealed");
   public static final Resource REGION = m.createResource(BASE_URI + "Region");
   public static final Property HAS_ISO_CODE = m.createProperty(BASE_URI, "hasISOCode");

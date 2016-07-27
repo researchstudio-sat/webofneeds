@@ -146,7 +146,7 @@ public class NeedPojo
     Statement needModality = need.getProperty(WON.HAS_NEED_MODALITY);
     if (needModality != null) {
 
-      Statement location = needModality.getResource().getProperty(WON.AVAILABLE_AT_LOCATION);
+      Statement location = needModality.getResource().getProperty(WON.HAS_LOCATION);
       if (location != null) {
         latitude = location.getProperty(GEO.LATITUDE).getDouble();
         longitude = location.getProperty(GEO.LONGITUDE).getDouble();
