@@ -172,21 +172,6 @@ function genComponentConf() {
             }
 
         }
-        useCurrentLocation() {
-            // TODO need to explicitely enable tracking for the site in chrome. not even an indicator in ff :|
-            // TODO add as 'locate-me'-icon-button next to or in the search field
-            if ("geolocation" in navigator) {
-
-                console.log("in locateMe if");
-                this.locateMeBtn().innerHTML = "[homing in]"; //TODO set spinner
-
-                /*
-                navigator.geolocation.getCurrentPosition(drawLocation, printGeolocationError, options);
-                */
-            } else {
-                alert("Sorry, your browser does not support geolocation! "); //TODO use toaster-msg
-            }
-        }
         elementNg(selector) {
             if(!this._elementsNg) {
                 this._elementsNg = {};
