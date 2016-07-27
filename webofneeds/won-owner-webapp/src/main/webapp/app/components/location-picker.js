@@ -19,7 +19,6 @@ import { doneTypingBufferNg } from '../cstm-ng-utils'
 
 const serviceDependencies = ['$scope', '$ngRedux', '$element'];
 function genComponentConf() {
-    //TODO input as text-input or contenteditable? need to overl
     let template = `
 
 
@@ -238,7 +237,6 @@ function nominatim2wonLocation(searchResult) {
             [ b[0], b[2] ], //north-western point
             [ b[1], b[3] ] //south-eastern point
         ],
-        //boundingbox: searchResult.boundingbox, // TODO use this to set proper zoom
     }
 }
 
