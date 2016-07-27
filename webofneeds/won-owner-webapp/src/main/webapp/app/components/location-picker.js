@@ -26,7 +26,7 @@ function genComponentConf() {
         <input type="text" class="lp__searchbox" placeholder="Search for location"/>
         <ol>
             <li ng-repeat="result in self.searchResults">
-                <a href="" ng-click="self.clickedSearchResult(result)">
+                <a href="" ng-click="self.selectedLocation(result)">
                     {{ result.name }}
                 </a>
             </li>
@@ -88,13 +88,7 @@ function genComponentConf() {
 
             L.control.layers(baseMaps).addTo(this.map);
 
-            L.marker([51.5, -0.09]).addTo(this.map)
-                .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-                .openPopup();
-
-
-
-            this.map.on('click', this.onMapClick)
+            this.map.on('click', e => onMapClick(e, this));
 
             // Force it to adapt to actual size
             // for some reason this doesn't happen by default
@@ -103,12 +97,30 @@ function genComponentConf() {
             // ^ doesn't work (needs to be done manually atm);
 
         }
-        onMapClick(e) {
-            console.log('clicked map ', e);
-            searchNominatim(e.latlng.lat + ', ' + e.latlng.lng)
-            .then(searchResults =>
-                console.log('nearest address: ', searchResults)
+        placeMarkers(locations) {
+            if(this.markers) {
+                //remove previously placed markers
+                for(let m of this.markers) {
+                    this.map.removeLayer(m);
+                }
+            }
+
+            this.markers = locations.map(location =>
+                L.marker([location.lat, location.lon])
+                .bindPopup(location.name)
             );
+
+            for(let m of this.markers) {
+                this.map.addLayer(m);
+            }
+        }
+        selectedLocation(location) {
+            this.searchResults = undefined; // picked one, can hide the rest if they were there
+            console.log('selected location: ', location);
+
+            this.placeMarkers([location]);
+            this.map.fitBounds(location.bounds, { animate: true });
+            this.markers[0].openPopup();
         }
         doneTyping() {
             console.log('starting type-ahead search for: ' + this.textfield().value);
@@ -116,16 +128,11 @@ function genComponentConf() {
             searchNominatim(this.textfield().value)
             .then( searchResults => {
                 console.log('location search results: ', searchResults);
-                this.$scope.$apply(() =>
-                    //this.searchResults = searchResults.map(nominatim2wonLocation)
-
-                    this.searchResults = scrubSearchResults(searchResults)
-                )
+                this.$scope.$apply(() => {
+                    this.searchResults = scrubSearchResults(searchResults);
+                    this.placeMarkers(searchResults);
+                })
             })
-
-        }
-        clickedSearchResult(location) {
-            console.log('selected location: ', location)
 
         }
 
@@ -191,13 +198,36 @@ function scrubSearchResults(searchResults) {
  * couldn't restore for previously used locations
  */
 function nominatim2wonLocation(searchResult) {
+    const b = searchResult.boundingbox;
     return {
         name: searchResult.display_name,
         lon: searchResult.lon,
         lat: searchResult.lat,
         //importance: searchResult.importance,
-        boundingbox: searchResult.boundingbox, // TODO use this to set proper zoom
+        bounds: [
+            [ b[0], b[2] ], //north-western point
+            [ b[1], b[3] ] //south-eastern point
+        ],
+        //boundingbox: searchResult.boundingbox, // TODO use this to set proper zoom
     }
+}
+
+function onMapClick(e, ctrl) {
+    //`this` is the mapcontainer here as leaflet
+    // apparently binds itself to the function.
+    // This code was moved out of the controller
+    // here to avoid confusion resulting from
+    // this binding.
+    console.log('clicked map ', e);
+    reverseSearchNominatim(
+        e.latlng.lat,
+        e.latlng.lng,
+        ctrl.map.getZoom()// - 1
+    ).then(searchResult => {
+        console.log('nearest address: ', searchResult);
+        const location = nominatim2wonLocation(searchResult);
+        ctrl.selectedLocation(location);
+    });
 }
 
 export default angular.module('won.owner.components.locationPicker', [
