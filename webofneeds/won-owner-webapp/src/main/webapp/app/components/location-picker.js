@@ -24,7 +24,7 @@ function genComponentConf() {
 
         <input type="text" class="lp__searchbox" placeholder="Search for location"/>
         <ol>
-            <li ng-show="self.currentLocation">
+            <li ng-show="self.currentLocation && !self.searchResults">
                 <a href="" ng-click="self.selectedLocation(self.currentLocation)">
                     {{ self.currentLocation.name }}
                 </a>
@@ -129,16 +129,21 @@ function genComponentConf() {
             this.markers[0].openPopup();
         }
         doneTyping() {
-            console.log('starting type-ahead search for: ' + this.textfield().value);
-            //buffer for 1s before starting the search
-            searchNominatim(this.textfield().value)
-            .then( searchResults => {
-                console.log('location search results: ', searchResults);
-                this.$scope.$apply(() => {
-                    this.searchResults = scrubSearchResults(searchResults);
-                    this.placeMarkers(searchResults);
+            const text = this.textfield().value;
+            console.log('starting type-ahead search for: ' + text);
+
+            if(!text) {
+                this.searchResults = undefined;
+            } else {
+                searchNominatim(text)
+                .then( searchResults => {
+                    console.log('location search results: ', searchResults);
+                    this.$scope.$apply(() => {
+                        this.searchResults = scrubSearchResults(searchResults);
+                        this.placeMarkers(searchResults);
+                    })
                 })
-            })
+            }
 
         }
         determineCurrentLocation() {
