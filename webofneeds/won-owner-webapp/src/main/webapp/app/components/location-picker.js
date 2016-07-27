@@ -282,6 +282,11 @@ function onMapClick(e, ctrl) {
     ).then(searchResult => {
         console.log('nearest address: ', searchResult);
         const location = nominatim2wonLocation(searchResult);
+
+        //use coords of original click though (to allow more detailed control)
+        location.lat = e.latlng.lat;
+        location.lon = e.latlng.lng;
+
         ctrl.selectedLocation(location);
     });
 }
