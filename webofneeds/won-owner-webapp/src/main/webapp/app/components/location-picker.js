@@ -25,6 +25,12 @@ function genComponentConf() {
 
         <input type="text" class="lp__searchbox" placeholder="Search for location"/>
         <ol>
+            <li ng-show="self.currentLocation">
+                <a href="" ng-click="self.selectedLocation(self.currentLocation)">
+                    {{ self.currentLocation.name }}
+                </a>
+                (current)
+            </li>
             <li ng-repeat="result in self.searchResults">
                 <a href="" ng-click="self.selectedLocation(result)">
                     {{ result.name }}
@@ -32,7 +38,6 @@ function genComponentConf() {
             </li>
         </ol>
         <div class="lp__mapmount" id="lp__mapmount" style="height:500px"></div>
-        <!--<img class="lp__mapmount" src="images/some_map_screenshot.png"alt=""/>-->
             `;
 
     class Controller {
@@ -40,17 +45,18 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
 
             this.initMap();
+            this.determineCurrentLocation();
 
             window.lp4dbg = this;
             const selectFromState = (state)=>{
                 return {
                 };
-            }
+            };
 
             doneTypingBufferNg(
                 e => this.doneTyping(e),
                 this.textfieldNg(), 1000
-            )
+            );
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
@@ -135,13 +141,52 @@ function genComponentConf() {
             })
 
         }
+        determineCurrentLocation() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    currentLocation => {
+
+                        console.log(currentLocation)
+                        const lat = currentLocation.coords.latitude;
+                        const lon = currentLocation.coords.longitude;
+                        // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
+                        const zoom = 13; //TODO calculate this from the accuracy metric
+                        reverseSearchNominatim(lat, lon, zoom)
+                            .then(searchResult => {
+                                const location = nominatim2wonLocation(searchResult);
+                                console.log('current location: ', location);
+                                this.$scope.$apply(() => { this.currentLocation = location });
+                            });
+                    },
+                    err => { //error handler
+                        if(err.code ===2 ) {
+                            alert("Position is unavailable!"); //TODO toaster
+                        }
+                    },
+                    { //options
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    });
 
             }
 
         }
+        useCurrentLocation() {
+            // TODO need to explicitely enable tracking for the site in chrome. not even an indicator in ff :|
+            // TODO add as 'locate-me'-icon-button next to or in the search field
+            if ("geolocation" in navigator) {
+
+                console.log("in locateMe if");
+                this.locateMeBtn().innerHTML = "[homing in]"; //TODO set spinner
+
+                /*
+                navigator.geolocation.getCurrentPosition(drawLocation, printGeolocationError, options);
+                */
+            } else {
+                alert("Sorry, your browser does not support geolocation! "); //TODO use toaster-msg
             }
         }
-
         elementNg(selector) {
             if(!this._elementsNg) {
                 this._elementsNg = {};
