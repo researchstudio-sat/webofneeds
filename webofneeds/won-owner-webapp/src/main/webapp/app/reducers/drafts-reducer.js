@@ -10,6 +10,7 @@ import { combineReducersStable } from '../redux-utils';
 
 const initialState = Immutable.fromJS({});
 
+
 export default function(drafts = initialState, action = {}) {
     switch (action.type) {
         case actionTypes.logout:
@@ -21,11 +22,7 @@ export default function(drafts = initialState, action = {}) {
          */
         case actionTypes.drafts.change.type:
             var { draftId, type } = action.payload;
-            //TODO use json-ld for state
-            var stateWithDraft = guaranteeDraftExistence(drafts, draftId);
-            return type ?
-                stateWithDraft.setIn([draftId, 'type'], type) :
-                stateWithDraft.deleteIn([draftId, 'type'])
+            return update(drafts, draftId, 'type', type);
 
         /**
          * @param {*} draftId : the draft that's title has changed
@@ -33,11 +30,11 @@ export default function(drafts = initialState, action = {}) {
          */
         case actionTypes.drafts.change.title:
             var {draftId, title} = action.payload;
-            //TODO use json-ld for state
-            var stateWithDraft = guaranteeDraftExistence(drafts, draftId);
-            return title ?
-                stateWithDraft.setIn([draftId, 'title'], title) :
-                stateWithDraft.deleteIn([draftId, 'title'])
+            return update(drafts, draftId, 'title', title);
+
+        case actionTypes.drafts.change.location:
+            var {draftId, location} = action.payload;
+            return update(drafts, draftId, 'location', location);
 
         /**
          * @param {*} draftId : the draft that's thumbnail has changed
@@ -67,6 +64,13 @@ export default function(drafts = initialState, action = {}) {
         //TODO init drafts from server
         //TODO isValidNeed function to check compliance to won-ontology (and throw errors early)
     }
+}
+
+function update(drafts, draftId, field, value) {
+    const stateWithDraft = guaranteeDraftExistence(drafts, draftId);
+    return value ?
+        stateWithDraft.setIn([draftId, field], value) :
+        stateWithDraft.deleteIn([draftId, field])
 }
 
 /**
