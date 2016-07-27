@@ -129,8 +129,12 @@ function genComponentConf() {
                 this.map.addLayer(m);
             }
         }
+        resetSearchResults() {
+            this.searchResults = undefined;
+            this.placeMarkers([]);
+        }
         selectedLocation(location) {
-            this.searchResults = undefined; // picked one, can hide the rest if they were there
+            this.resetSearchResults(); // picked one, can hide the rest if they were there
 
             //TODO ? let locationWithOrigName = clone(location);
             //TODO ? locationWithOrigName.name = this.textfield().value;
@@ -151,18 +155,16 @@ function genComponentConf() {
             console.log('starting type-ahead search for: ' + text);
 
             if(!text) {
-                this.searchResults = undefined;
+                this.$scope.$apply(() => { this.resetSearchResults(); });
             } else {
-                searchNominatim(text)
-                .then( searchResults => {
+                searchNominatim(text).then( searchResults => {
                     console.log('location search results: ', searchResults);
                     this.$scope.$apply(() => {
                         this.searchResults = scrubSearchResults(searchResults);
-                        this.placeMarkers(searchResults);
-                    })
-                })
+                    });
+                    this.placeMarkers(searchResults);
+                });
             }
-
         }
         determineCurrentLocation() {
             if ("geolocation" in navigator) {
@@ -286,8 +288,9 @@ function onMapClick(e, ctrl) {
         //use coords of original click though (to allow more detailed control)
         location.lat = e.latlng.lat;
         location.lon = e.latlng.lng;
-
-        ctrl.selectedLocation(location);
+        ctrl.$scope.$apply(() => {
+            ctrl.selectedLocation(location);
+        })
     });
 }
 
