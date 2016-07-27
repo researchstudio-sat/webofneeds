@@ -83,8 +83,8 @@ function genComponentConf() {
 
             const baseMaps = {
                 "Detailed default map": secureOsm,
-                "Transport (Insecure!)": transport,
-            }
+                "Transport (Insecurely loaded!)": transport,
+            };
 
             L.control.layers(baseMaps).addTo(this.map);
 
