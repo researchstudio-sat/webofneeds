@@ -7,7 +7,6 @@ import de.uni_koblenz.aggrimm.icp.crypto.sign.ontology.Ontology;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
-import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,6 @@ import won.cryptography.exception.KeyNotSupportedException;
 import won.cryptography.key.KeyInformationExtractor;
 import won.cryptography.key.KeyInformationExtractorBouncyCastle;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.CERT;
 import won.protocol.vocabulary.WONCRYPT;
 
@@ -141,8 +139,7 @@ public class WonKeysReaderWriter {
           ECNamedCurveParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(curveId);
           org.bouncycastle.math.ec.ECPoint ecPoint = ecSpec.getCurve()
                                                            .createPoint(new BigInteger(qx, 16), new BigInteger(qy, 16));
-          ECParameterSpec paramSpec = new ECParameterSpec(ecSpec.getCurve(), ecSpec.getG(), ecSpec.getN());
-          ECPublicKeySpec pubKeySpec = new ECPublicKeySpec(ecPoint, paramSpec);
+          ECPublicKeySpec pubKeySpec = new ECPublicKeySpec(ecPoint, ecSpec);
           // TODO add provider to RDF triples?
           KeyFactory keyFactory = KeyFactory.getInstance(algName, "BC");
           PublicKey key = keyFactory.generatePublic(pubKeySpec);
@@ -158,23 +155,19 @@ public class WonKeysReaderWriter {
   public Set<String> readKeyReferences(Dataset dataset)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
     Set<String> keyRefs = new HashSet<>();
-    readKeyReferences(dataset.getDefaultModel(), keyRefs);
     for (String name : RdfUtils.getModelNames(dataset)) {
-      readKeyReferences(dataset.getNamedModel(name), keyRefs);
+      readKeyReferences(dataset.getNamedModel(name), name, keyRefs);
     }
     return keyRefs;
   }
 
-  public void readKeyReferences(Model model, Set<String> keyRefs)
+  public void readKeyReferences(Model model, String modelName, Set<String> keyRefs)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-
-    if (WonRdfUtils.SignatureUtils.isSignature(model)) {
       Property typeProp = model.createProperty(Ontology.getSigIri(), "hasVerificationCertificate");
       StmtIterator si = model.listStatements(null, typeProp, RdfUtils.EMPTY_RDF_NODE);
       if (si.hasNext()) {
         keyRefs.add(si.next().getObject().asResource().getURI());
       }
-    }
   }
 
   public void writeToModel(Model model, Resource keySubject, WonEccPublicKey pubKey) {
