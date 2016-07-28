@@ -91,11 +91,10 @@ public class WonVerifier
       if (!dataset.containsNamedModel(wonSignatureData.getSignedGraphUri())) {
         logger.warn("cannot verify signature {} as it is not part of this message ", wonSignatureData.getSignatureUri());
         continue;
-        /*
-        TODO: fetch the external reference and check it here
-        verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(), "No signed graph found for signature " + wonSignatureData.getSignatureUri());
-        return verificationState.isVerificationPassed();
-        */
+        //TODO: fetch the external reference and check it here
+        //verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(), "No signed graph found for " +
+        //   "signature " + wonSignatureData.getSignatureUri());
+        //return verificationState.isVerificationPassed();
       }
 
       //is the signature there?
