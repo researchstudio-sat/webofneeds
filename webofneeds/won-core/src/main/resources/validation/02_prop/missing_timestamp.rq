@@ -21,7 +21,7 @@ ASK
   {
     GRAPH ?graph
     {
-            ?event msg:hasMessageType|msg:hasContent|msg:hasReceivedTimestamp|msg:hasSentTimestamp|msg:hasReceiver|msg:hasSender|msg:hasReceiverNeed|msg:hasSenderNeed|msg:hasReceiverNode|msg:hasSenderNode|msg:isResponseTo|msg:isRemoteResponseTo|msg:isResponseToMessageType|msg:referencesSignature ?propobj .
+            ?event msg:hasMessageType|msg:hasContent|msg:hasReceivedTimestamp|msg:hasSentTimestamp|msg:hasReceiver|msg:hasSender|msg:hasReceiverNeed|msg:hasSenderNeed|msg:hasReceiverNode|msg:hasSenderNode|msg:isResponseTo|msg:isRemoteResponseTo|msg:isResponseToMessageType|msg:containsSignature ?propobj .
             {
               ?event msg:hasReceivedTimestamp|msg:hasSentTimestamp ?timestamp
             }

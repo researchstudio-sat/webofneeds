@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.cryptography.rdfsign.SigningStage;
-import won.protocol.message.SignatureReference;
+import won.protocol.message.WonSignatureData;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -81,11 +81,11 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
       //generate signature references for them
       WonMessage msgToLinkTo = loadWonMessageforURI(messageEventPlaceholder.getMessageURI());
       SigningStage signingStage = new SigningStage(msgToLinkTo);
-      List<SignatureReference> signatureReferences = signingStage.getNotReferencedSignaturesAsReferences();
-      checkWellformedNess(message, msgToLinkTo, signatureReferences);
+      WonSignatureData wonSignatureData = signingStage.getOutermostSignature();
+      checkWellformedness(message, msgToLinkTo, wonSignatureData);
       //add them to to outermost envelope in the current message
       WonMessageSignerVerifier
-        .addSignatureReference(message.getMessageURI().toString(), signatureReferences.get(0), message
+        .addSignature(message.getMessageURI().toString(), wonSignatureData, message
         .getOuterEnvelopeGraphURI().toString(), messageDataset);
       //update the message that now is referenced
       //TODO: if at a later processing stage, the current message raises an error, this flag must be reset to false,
@@ -98,18 +98,12 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
     return new WonMessage(messageDataset);
   }
 
-  public void checkWellformedNess(final WonMessage message, final WonMessage msgToLinkTo, final List<SignatureReference> signatureReferences) {
+  public void checkWellformedness(final WonMessage message, final WonMessage msgToLinkTo, final WonSignatureData signatureReferences) {
     //there must be exactly one unreferenced signature, otherwise msgToLinkTo is not well formed
-    if (signatureReferences == null || signatureReferences.size() == 0){
+    if (signatureReferences == null){
       throw new IllegalStateException(String.format("Message %s is not well formed: found no unreferenced " +
                                                       "signatures while trying to link to it from message %s",
                                                     msgToLinkTo.getMessageURI(), message.getMessageURI()));
-    }
-    if (signatureReferences.size() > 1){
-      throw new IllegalStateException(String.format("Message %s is not well formed: found more than one " +
-                                                      "unreferenced signatures while trying to link to it from " +
-                                                      "message %s", msgToLinkTo.getMessageURI(), message
-        .getMessageURI()));
     }
   }
 

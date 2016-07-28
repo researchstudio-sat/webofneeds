@@ -1,7 +1,6 @@
 package won.cryptography.rdfsign;
 
 import com.hp.hpl.jena.query.Dataset;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,8 +52,9 @@ public class WonSignerTest
                                                                              new String[]{NEED_CORE_DATA_URI});
 
     // sign it
-    WonSigner signer = new WonSigner(testDataset, new SignatureAlgorithmFisteus2010());
-    signer.sign(keys.getPrivateKey(TestSigningUtils.needCertUri), TestSigningUtils.needCertUri, NEED_CORE_DATA_URI);
+    WonSigner signer = new WonSigner(testDataset);
+    signer.sign(keys.getPrivateKey(TestSigningUtils.needCertUri), TestSigningUtils.needCertUri,
+                keys.getPublicKey(TestSigningUtils.needCertUri), NEED_CORE_DATA_URI);
 
     // write for debugging
     //TestSigningUtils.writeToTempFile(testDataset);
@@ -86,8 +86,9 @@ public class WonSignerTest
                                                                                           EVENT_ENV1_URI});
 
     // sign it
-    WonSigner signer = new WonSigner(testDataset, new SignatureAlgorithmFisteus2010());
-    signer.sign(keys.getPrivateKey(TestSigningUtils.needCertUri), TestSigningUtils.needCertUri, new String[]{EVENT_ENV1_URI});
+    WonSigner signer = new WonSigner(testDataset);
+    signer.sign(keys.getPrivateKey(TestSigningUtils.needCertUri), TestSigningUtils.needCertUri, keys.getPublicKey
+      (TestSigningUtils.needCertUri), new String[]{EVENT_ENV1_URI});
 
     // write for debugging
     //TestSigningUtils.writeToTempFile(testDataset);
@@ -124,16 +125,16 @@ public class WonSignerTest
                                                                              });
 
     // sign it
-    WonSigner signer = new WonSigner(testDataset, new SignatureAlgorithmFisteus2010());
+    WonSigner signer = new WonSigner(testDataset);
     signer.sign(keys.getPrivateKey(TestSigningUtils.nodeCertUri), TestSigningUtils.nodeCertUri,
-                new String[]{EVENT_ENV2_URI});
+                keys.getPublicKey(TestSigningUtils.nodeCertUri), new String[]{EVENT_ENV2_URI});
 
     // write for debugging
     TestSigningUtils.writeToTempFile(testDataset);
     // verify
     WonVerifier verifier = new WonVerifier(testDataset);
     boolean verified = verifier.verify(keys.getPublicKeys());
-    SignatureVerificationResult result = verifier.getVerificationResult();
+    SignatureVerificationState result = verifier.getVerificationResult();
     Assert.assertTrue(result.getMessage(), verified);
 
     // extract names of the named graphs

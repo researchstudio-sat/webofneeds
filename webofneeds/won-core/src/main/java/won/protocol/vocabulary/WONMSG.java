@@ -24,7 +24,7 @@ public class WONMSG
 
   private static Model m = ModelFactory.createDefaultModel();
 
-  public static final String PROTOCOL_VERSION_STRING = "protocolVersion";
+  public static final String PROTOCOL_VERSION_STRING =  BASE_URI+"protocolVersion";
   public static final Property PROTOCOL_VERSION = m.createProperty(PROTOCOL_VERSION_STRING);
 
 
@@ -148,12 +148,14 @@ public class WONMSG
 
 
   // added to support referencing signatures from the envelope
-  public static final Property REFERENCES_SIGNATURE_PROPERTY = m.createProperty(BASE_URI, "referencesSignature");
+  public static final Property CONTAINS_SIGNATURE_PROPERTY = m.createProperty(BASE_URI, "containsSignature");
   // TODO maybe the three properties below could better belong to a separate ontology
   public static final Property HAS_SIGNED_GRAPH_PROPERTY = m.createProperty(BASE_URI, "hasSignedGraph");
   public static final Property HAS_SIGNATURE_VALUE_PROPERTY = m.createProperty(BASE_URI, "hasSignatureValue");
+  public static final Property HAS_HASH_PROPERTY = m.createProperty(BASE_URI, "hasHash");
   public static final Property HAS_SIGNATURE_GRAPH_PROPERTY = m.createProperty(BASE_URI, "hasSignatureGraph");
-
+  public static final Property HAS_PUBLIC_KEY_FINGERPRINT_PROPERTY = m.createProperty(BASE_URI,
+                                                                                      "hasPublicKeyFingerprint");
 
   public static final Property CONTENT_TYPE = m.createProperty(BASE_URI,"contentType");
 

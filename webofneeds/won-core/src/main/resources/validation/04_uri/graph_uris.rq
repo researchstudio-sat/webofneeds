@@ -24,12 +24,11 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
 
     ?numGraphs
     ?numContent
-    ?numContentSig
     ?numEnv
     ?numEnvelopeSig
 
 
-    (if(?numGraphs != (?numContent + ?numContentSig + ?numEnv + ?numEnvelopeSig), "FAIL", "OK")
+    (if(?numGraphs != (?numContent + ?numEnv + ?numEnvelopeSig), "FAIL", "OK")
     AS ?check)
 
   WHERE
@@ -53,7 +52,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
         GRAPH ?envelope
         {
           ?event msg:hasContent ?g .
-          FILTER(STRSTARTS(STR(?g), STR(?event) + "#") && STRLEN(STR(?event)) + 1 < STRLEN(STR(?g)))
+          FILTER(STRSTARTS(STR(?g), CONCAT(STR(?event),"#")) && STRLEN(STR(?event)) + 1 < STRLEN(STR(?g)))
         } .
       }
     }
@@ -66,27 +65,11 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
         {
           ?g rdf:type msg:EnvelopeGraph .
           ?g rdfg:subGraphOf ?event .
-          FILTER(STRSTARTS(STR(?g), STR(?event) + "#") && STRLEN(STR(?event)) + 1 < STRLEN(STR(?g)))
+          FILTER(STRSTARTS(STR(?g), CONCAT(STR(?event),"#")) && STRLEN(STR(?event)) + 1 < STRLEN(STR(?g)))
         } .
       }
     }
 
-    # correct signature graphs of content graphs that have correct uris
-    { SELECT (count(?g) as ?numContentSig)
-      WHERE
-      {
-        GRAPH ?g
-        {
-          ?g rdf:type signature:Signature .
-          ?g msg:hasSignedGraph ?signed .
-        } .
-        GRAPH ?envelope
-        {
-          ?event msg:hasContent ?signed .
-        } .
-        FILTER(STRSTARTS(STR(?g), STR(?event) + "#") && STRLEN(STR(?event)) + 1 < STRLEN(STR(?g)))
-      }
-    }
 
     # correct signature graphs of envelope graphs that have correct uris
     { SELECT (count(?g) as ?numEnvelopeSig)
@@ -102,7 +85,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
           ?signed rdf:type msg:EnvelopeGraph .
           ?signed rdfg:subGraphOf ?event .
         } .
-        FILTER(STRSTARTS(STR(?g), STR(?event) + "#") && STRLEN(STR(?event)) + 1 < STRLEN(STR(?g)))
+        FILTER(STRSTARTS(STR(?g), CONCAT(STR(?event),"#")) && STRLEN(STR(?event)) + 1 < STRLEN(STR(?g)))
       }
     }
 

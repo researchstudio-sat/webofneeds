@@ -14,85 +14,44 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
 
 # each signature graph should have required signature triples, including one link to envelope or content graph
 
-#ASK
-#{
   SELECT
 
     ?numSignatures
     ?numCorrectPropSignatures
-    ?numSignaturesTriples
 
 
-    (if(?numCorrectPropSignatures != ?numSignatures || (?numSignatures*11 != ?numSignaturesTriples), "FAIL", "OK") AS ?check)
+    (if(?numCorrectPropSignatures != ?numSignatures, "FAIL", "OK") AS
+    ?check)
 
   WHERE
   {
 
 
     # count number of signature graphs that have required properties
-    { SELECT (count(?g) as ?numCorrectPropSignatures)
+    { SELECT (count(distinct ?g) as ?numCorrectPropSignatures)
         WHERE
         {
-        GRAPH ?g
-            {
-              ?g rdf:type signature:Signature .
-              ?g signature:hasSignatureValue ?svalue .
-              ?g signature:hasVerificationCertificate ?signer .
-              ?g msg:hasSignedGraph ?signed .
 
-              ?g signature:hasGraphSigningMethod ?smethod .
-              ?smethod rdf:type signature:GraphSigningMethod .
-              ?smethod signature:hasDigestMethod ?digest .
-              ?smethod signature:hasGraphCanonicalizationMethod ?canon .
-              ?smethod signature:hasGraphDigestMethod ?gdigest .
-              ?smethod signature:hasGraphSerializationMethod ?gserial .
-              ?smethod signature:hasSignatureMethod ?sign .
+          ?g rdf:type signature:Signature .
+          ?g signature:hasSignatureValue ?svalue .
+          ?g signature:hasVerificationCertificate ?signer .
+          ?g msg:hasSignedGraph ?signed .
+          ?g msg:hasPublicKeyFingerprint ?fingerprint .
+          ?g msg:hasHash ?hash
+             }
 
-            } .
-
-        GRAPH ?signed
-            {
-                FILTER NOT EXISTS
-                    {  ?signed rdf:type signature:Signature . }
-            } .
-        }
-        #GROUP BY ?g
-        #HAVING (count(?signed) = 1)
      }
 
 
-     # count number of signature graphs
+     # count number of signatures
     {  SELECT (count(?g) as ?numSignatures) WHERE
      {
-       GRAPH ?g
-       {
-               ?g rdf:type signature:Signature .
-       } .
+		?g msg:hasSignedGraph ?signed .
      }
     }
 
 
-    # count number of signature triples
-    { SELECT (count(*) as ?numSignaturesTriples)
-        WHERE
-        {
-        GRAPH ?g
-            {
-              ?a rdf:type signature:Signature .
-              ?b ?c ?d .
-            } .
-        }
-        #GROUP BY ?g
-        #HAVING (count(?signed) = 1)
-     }
 
 
   }
 
-
-
-
-
-
-
-#}

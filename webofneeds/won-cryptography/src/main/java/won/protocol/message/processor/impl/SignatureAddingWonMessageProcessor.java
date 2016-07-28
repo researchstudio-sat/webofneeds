@@ -10,6 +10,7 @@ import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 
 import java.security.PrivateKey;
+import java.security.PublicKey;
 
 /**
  * User: ypanchenko
@@ -29,8 +30,9 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor
     // use default key for signing
     PrivateKey privateKey = cryptographyService.getDefaultPrivateKey();
     String webId = cryptographyService.getDefaultPrivateKeyAlias();
+    PublicKey publicKey = cryptographyService.getPublicKey(webId);
     try {
-      return processWithKey(message, webId, privateKey);
+      return processWithKey(message, webId, privateKey, publicKey);
     } catch (Exception e) {
       logger.error("Failed to sign", e);
       throw new WonMessageProcessingException("Failed to sign message " + message.getMessageURI().toString());
@@ -39,10 +41,11 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor
 
   public WonMessage processOnBehalfOfNeed(final WonMessage message) throws WonMessageProcessingException {
     // use senderNeed key for signing
-    PrivateKey privateKey = cryptographyService.getPrivateKey(
-      message.getSenderNeedURI().toString());
+    String alias = message.getSenderNeedURI().toString();
+    PrivateKey privateKey = cryptographyService.getPrivateKey(alias);
+    PublicKey publicKey = cryptographyService.getPublicKey(alias);
     try {
-      return processWithKey(message, message.getSenderNeedURI().toString(), privateKey);
+      return processWithKey(message, message.getSenderNeedURI().toString(), privateKey, publicKey);
     } catch (Exception e) {
       logger.error("Failed to sign", e);
       throw new WonMessageProcessingException("Failed to sign message " + message.getMessageURI().toString());
@@ -50,8 +53,8 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor
   }
 
   private WonMessage processWithKey(final WonMessage wonMessage, final String privateKeyUri,
-                                    final PrivateKey privateKey) throws Exception {
-    WonMessage signed = WonMessageSignerVerifier.sign(privateKey, privateKeyUri, wonMessage);
+                                    final PrivateKey privateKey, final PublicKey publicKey) throws Exception {
+    WonMessage signed = WonMessageSignerVerifier.sign(privateKey, publicKey, privateKeyUri, wonMessage);
     logger.debug("SIGNED with key " + privateKeyUri + ":\n" + WonMessageEncoder.encode(signed, Lang.TRIG));
     return signed;
   }

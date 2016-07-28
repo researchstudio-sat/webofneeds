@@ -47,8 +47,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
         GRAPH ?envelope
         {
           ?envelope msg:containsEnvelope ?g .
-          ?event msg:referencesSignature ?ref .
-          ?ref msg:hasSignatureGraph ?signature .
+          ?event msg:containsSignature ?ref .
           ?ref msg:hasSignedGraph ?g .
         } .
       }
@@ -70,8 +69,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
         GRAPH ?envelope
         {
           ?event msg:hasContent ?g .
-          ?event msg:referencesSignature ?ref .
-          ?ref msg:hasSignatureGraph ?signature .
+          ?event msg:containsSignature ?ref .
           ?ref msg:hasSignedGraph ?g .
         } .
       }

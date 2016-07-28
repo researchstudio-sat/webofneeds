@@ -2,19 +2,22 @@ package won.cryptography.rdfsign;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.RDF;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterface;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
-import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.message.SignatureReference;
+import won.protocol.message.WonSignatureData;
+import won.protocol.vocabulary.SFSIG;
 
-import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.Signature;
+import java.security.*;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 
@@ -37,9 +40,24 @@ public class WonSigner
   private Dataset dataset;
 
 
-  public WonSigner(Dataset dataset, SignatureAlgorithmInterface algorithm) {
+  public static final Model defaultGraphSigningMethod;
+  static{
+    //initialize a model with the triples indicating the default graph signing method, so we are not
+    //required to add it to every signature
+    defaultGraphSigningMethod = ModelFactory.createDefaultModel();
+    Resource bNode = defaultGraphSigningMethod.createResource();
+    bNode.addProperty(RDF.type, SFSIG.GRAPH_SIGNING_METHOD);
+    bNode.addProperty(SFSIG.HAS_DIGEST_METHOD, SFSIG.DIGEST_METHOD_SHA_256);
+    bNode.addProperty(SFSIG.HAS_GRAPH_CANONICALIZATION_METHOD, SFSIG.GRAPH_CANONICALIZATION_METHOD_Fisteus2010);
+    bNode.addProperty(SFSIG.HAS_GRAPH_DIGEST_METHOD, SFSIG.GRAPH_DIGEST_METHOD_Fisteus2010);
+    bNode.addProperty(SFSIG.HAS_GRAPH_SERIALIZATION_METHOD, SFSIG.GRAPH_SERIALIZATION_METHOD_TRIG);
+    bNode.addProperty(SFSIG.HAS_SIGNATURE_METHOD, SFSIG.SIGNATURE_METHOD_ECDSA);
+  }
+
+  public WonSigner(Dataset dataset) {
     this.dataset = dataset;
-    this.algorithm = algorithm;
+    //default algorithm: Fisteus2010
+    this.algorithm = new SignatureAlgorithmFisteus2010();
 
     Provider provider = new BouncyCastleProvider();
   }
@@ -57,35 +75,42 @@ public class WonSigner
    * @throws Exception
    */
   //TODO chng exceptions to won exceptions?
-  public List<SignatureReference> sign(PrivateKey privateKey, String cert, String ... graphsToSign) throws Exception {
+  public List<WonSignatureData> sign(PrivateKey privateKey, String cert, PublicKey publicKey, String...
+    graphsToSign) throws
+    Exception {
 
-    List<SignatureReference> sigRefs = new ArrayList<>(graphsToSign.length);
+    List<WonSignatureData> sigRefs = new ArrayList<>(graphsToSign.length);
+    MessageDigest md = MessageDigest.getInstance(ENV_HASH_ALGORITHM, SIGNING_ALGORITHM_PROVIDER);
+    String fingerprint = Base64.getEncoder().encodeToString(md.digest(publicKey.getEncoded()));
 
-    for (String name : graphsToSign) {
-      Model model = dataset.getNamedModel(name);
+    for (String signedGraphUri : graphsToSign) {
       //TODO should be generated in a more proper way and not here - check of the name already exists etc.
-      String sigName = name + "-sig";
+      String signatureUri = signedGraphUri + "-sig";
       // create GraphCollection with one NamedGraph that corresponds to this Model
-      GraphCollection inputGraph = ModelConverter.modelToGraphCollection(name, dataset);
+      GraphCollection inputGraph = ModelConverter.modelToGraphCollection(signedGraphUri, dataset);
       // sign the NamedGraph inside that GraphCollection
-      String sigValue = signNamedGraph(inputGraph, privateKey, cert);
-      // assemble resulting signature into the original Dataset
-      WonAssembler.assemble(inputGraph, dataset, sigName);
+      SignatureData sigValue = signNamedGraph(inputGraph, privateKey, cert);
+      String hash = new String(Base64
+                   .getEncoder().encodeToString(sigValue
+                                                  .getHash().toByteArray()));
 
-      SignatureReference sigRef = new SignatureReference(null, name, sigName, sigValue);
+      WonSignatureData sigRef = new WonSignatureData(signedGraphUri, signatureUri, sigValue.getSignature(), hash ,
+                                                     fingerprint,
+                                                     cert);
       sigRefs.add(sigRef);
     }
 
     return sigRefs;
   }
 
-  public List<SignatureReference> sign(PrivateKey privateKey, String cert, Collection<String> graphsToSign) throws
+  public List<WonSignatureData> sign(PrivateKey privateKey, String cert, PublicKey publicKey, Collection<String>
+    graphsToSign) throws
     Exception {
     String[] array = new String[graphsToSign.size()];
-    return sign(privateKey, cert, graphsToSign.toArray(array));
+    return sign(privateKey, cert, publicKey,graphsToSign.toArray(array));
   }
 
-  private String signNamedGraph(final GraphCollection inputWithOneNamedGraph, final PrivateKey privateKey, String cert)
+  private de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData signNamedGraph(final GraphCollection inputWithOneNamedGraph, final PrivateKey privateKey, String cert)
     throws Exception {
     this.algorithm.canonicalize(inputWithOneNamedGraph);
     this.algorithm.postCanonicalize(inputWithOneNamedGraph);
@@ -94,7 +119,7 @@ public class WonSigner
     return sign(inputWithOneNamedGraph, privateKey, cert);
   }
 
-  private String sign(GraphCollection gc, PrivateKey privateKey, String verificationCertificate) throws Exception {
+  private SignatureData sign(GraphCollection gc, PrivateKey privateKey, String verificationCertificate) throws Exception {
 
     if (verificationCertificate == null) {
       verificationCertificate = "\"cert\"";
@@ -115,15 +140,15 @@ public class WonSigner
 
     byte[] signatureBytes = sig.sign();
     //String signature = new BASE64Encoder().encode(signatureBytes);
-    String signature = Base64.encodeBase64String(signatureBytes);
+    String signature = Base64.getEncoder().encodeToString(signatureBytes);
 
 
     //Update Signature Data
-    sigData.setSignature("\"\"\"" + signature + "\"\"\"");
+    sigData.setSignature(signature);
     sigData.setSignatureMethod(privateKey.getAlgorithm().toLowerCase());
     sigData.setVerificationCertificate(verificationCertificate);
 
-    return signature;
+    return sigData;
   }
 
 }

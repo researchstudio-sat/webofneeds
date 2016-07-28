@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingKeys;
-import won.protocol.message.SignatureReference;
 
 /**
  * User: ypanchenko
@@ -54,16 +53,11 @@ public class WonVerifierTest
     WonVerifier verifier = new WonVerifier(testDataset);
     // TODO load public keys from certificate referenced from signatures
     boolean verified = verifier.verify(keys.getPublicKeys());
-    SignatureVerificationResult result = verifier.getVerificationResult();
+    SignatureVerificationState result = verifier.getVerificationResult();
 
     Assert.assertTrue(result.getMessage(), verified);
     Assert.assertEquals(1, result.getSignatureGraphNames().size());
     Assert.assertEquals(NEED_CORE_DATA_URI, result.getSignedGraphName(NEED_CORE_DATA_SIG_URI));
-    Assert.assertEquals(1, result.getVerifiedUnreferencedSignaturesAsReferences().size());
-    SignatureReference ref = result.getVerifiedUnreferencedSignaturesAsReferences().get(0);
-    Assert.assertEquals(null, ref.getReferencerGraphUri());
-    Assert.assertEquals(NEED_CORE_DATA_SIG_URI, ref.getSignatureGraphUri());
-    Assert.assertEquals(NEED_CORE_DATA_URI, ref.getSignedGraphUri());
 
     // modify a model and check that it does not verify..
     Model m = testDataset.getNamedModel(NEED_CORE_DATA_URI);
@@ -101,11 +95,10 @@ public class WonVerifierTest
     WonVerifier verifier = new WonVerifier(testDataset);
     // TODO load public keys from certificate referenced from signatures
     boolean verified = verifier.verify(keys.getPublicKeys());
-    SignatureVerificationResult result = verifier.getVerificationResult();
+    SignatureVerificationState result = verifier.getVerificationResult();
 
     Assert.assertTrue(result.getMessage(), verified);
     Assert.assertEquals(2, result.getSignatureGraphNames().size());
-    Assert.assertEquals(1, result.getVerifiedUnreferencedSignaturesAsReferences().size());
     Assert.assertEquals(NEED_CORE_DATA_URI, result.getSignedGraphName(NEED_CORE_DATA_SIG_URI));
     Assert.assertEquals(EVENT_ENV1_URI, result.getSignedGraphName(EVENT_ENV1_SIG_URI));
 
@@ -127,7 +120,7 @@ public class WonVerifierTest
     // verify
     WonVerifier verifier = new WonVerifier(testDataset);
     boolean verified = verifier.verify(keys.getPublicKeys());
-    SignatureVerificationResult result = verifier.getVerificationResult();
+    SignatureVerificationState result = verifier.getVerificationResult();
 
     Assert.assertTrue(result.getMessage(), verified);
     Assert.assertEquals(3, result.getSignatureGraphNames().size());
