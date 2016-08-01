@@ -23,7 +23,7 @@ public class WoNNeedReader {
 
         String title = "";
         try {
-            title = RdfUtils.findOnePropertyFromResource(dataset, null, DC.title).asLiteral().toString();
+            title = RdfUtils.findOnePropertyFromResource(dataset, null, DC.title).asLiteral().getString();
         } catch (IncorrectPropertyCountException e) {
             log.warn("Title not found in RDF dataset: " + e.toString());
         }
@@ -32,7 +32,7 @@ public class WoNNeedReader {
 
         String textDescription = "";
         try {
-            textDescription = RdfUtils.findOnePropertyFromResource(dataset, null, WON.HAS_TEXT_DESCRIPTION).asLiteral().toString();
+            textDescription = RdfUtils.findOnePropertyFromResource(dataset, null, WON.HAS_TEXT_DESCRIPTION).asLiteral().getString();
         } catch (IncorrectPropertyCountException e) {
             log.warn("Description not found in RDF dataset: " + e.toString());
         }
@@ -41,7 +41,7 @@ public class WoNNeedReader {
 
         String textTag = "";
         try {
-            textTag = RdfUtils.findOnePropertyFromResource(dataset, null, WON.HAS_TAG).asLiteral().toString();
+            textTag = RdfUtils.findOnePropertyFromResource(dataset, null, WON.HAS_TAG).asLiteral().getString();
         } catch (IncorrectPropertyCountException e) {
             log.debug("Tag not found in RDF dataset: " + e.toString());
         }

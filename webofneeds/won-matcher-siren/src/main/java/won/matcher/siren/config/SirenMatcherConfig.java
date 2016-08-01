@@ -22,23 +22,11 @@ public class SirenMatcherConfig
   @Value("${matcher.siren.query.maxHints}")
   private int maxHints;
 
-  @Value("${matcher.siren.query.title}")
-  private boolean useTitleQuery;
-
-  @Value("${matcher.siren.query.description}")
-  private boolean useDescriptionQuery;
-
-  @Value("${matcher.siren.query.titleDescription}")
-  private boolean useTitleDescriptionQuery;
-
   @Value("${matcher.siren.monitoring}")
   private boolean monitoringEnabled;
 
   @Value("${matcher.siren.query.consideredTokens}")
   private int consideredQueryTokens;
-
-  @Value("${matcher.siren.query.titleDescriptionTag}")
-  private boolean useTitleDescriptionTagQuery;
 
   @Value("${matcher.siren.index.commit}")
   private boolean commitIndexedNeedImmediately;
@@ -52,22 +40,6 @@ public class SirenMatcherConfig
 
   public int getConsideredQueryTokens() {
     return consideredQueryTokens;
-  }
-
-  public boolean isUseTitleQuery() {
-    return useTitleQuery;
-  }
-
-  public boolean isUseDescriptionQuery() {
-    return useDescriptionQuery;
-  }
-
-  public boolean isUseTitleDescriptionQuery() {
-    return useTitleDescriptionQuery;
-  }
-
-  public boolean isUseTitleDescriptionTagQuery() {
-    return useTitleDescriptionTagQuery;
   }
 
   public String getSolrServerUri() {
