@@ -16,7 +16,7 @@
 
 package won.bot.framework.eventbot.action.impl.debugbot;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.BaseNeedAndConnectionSpecificEvent;

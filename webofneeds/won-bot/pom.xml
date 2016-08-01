@@ -131,11 +131,6 @@
       </dependency>
       <dependency>
           <groupId>webofneeds</groupId>
-          <artifactId>won-matcher-solr</artifactId>
-          <version>${project.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>webofneeds</groupId>
           <artifactId>won-cryptography</artifactId>
           <version>${project.version}</version>
       </dependency>
@@ -149,14 +144,6 @@
           <artifactId>jena-arq</artifactId>
 
       </dependency>
-      <!-- Solr -->
-      <dependency>
-          <!-- in won-matcher-solr this has the 'magic scope' but here, we need it always -->
-          <artifactId>solr-solrj</artifactId>
-          <groupId>org.apache.solr</groupId>
-          <scope>compile</scope>
-      </dependency>
-
 
       <!-- SPRING stuff -->
       <dependency>
@@ -176,6 +163,10 @@
       <dependency>
           <groupId>org.apache.commons</groupId>
           <artifactId>commons-email</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
       </dependency>
       <dependency>
           <groupId>commons-io</groupId>

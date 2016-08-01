@@ -4,13 +4,19 @@ import opennlp.tools.postag.POSModel;
 import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.tokenize.Tokenizer;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.synonym.SynonymFilterFactory;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.util.FilesystemResourceLoader;
+import org.apache.lucene.util.Version;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.StringReader;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -20,12 +26,51 @@ import java.util.regex.Pattern;
 public class QueryNLPProcessor {
     Tokenizer tokenizer = SimpleTokenizer.INSTANCE;
     POSTaggerME posTagger = null;
+    SynonymFilterFactory synonymFilterfactory = null;
 
     public QueryNLPProcessor() throws IOException {
 
         InputStream modelIn = getClass().getClassLoader().getResourceAsStream("en-pos-maxent.bin");
         POSModel model = new POSModel(modelIn);
         posTagger = new POSTaggerME(model);
+
+        StringReader strReader = new StringReader("baby toy clothes");
+        Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);
+        TokenStream ts0 = analyzer.tokenStream("name", strReader);
+
+        Map<String, String> filterArgs = new HashMap<String, String>();
+        filterArgs.put("luceneMatchVersion", Version.LUCENE_4_9.toString());
+        filterArgs.put("synonyms", "synonyms.txt");
+        filterArgs.put("expand", "false");
+        synonymFilterfactory = new SynonymFilterFactory(filterArgs);
+        synonymFilterfactory.inform(new FilesystemResourceLoader());
+    }
+
+    public String[] retrieveSynonyms(String text) throws IOException {
+
+        // Synonyms are only added here before constructing the query because we didnt get
+        // solr synonyms activated (on indexing level).
+        // If we would activate query synonyms in solar then we do not have to send the synonyms to the solr server.
+        // However, if we are already using query synonyms we have here the possibility to boost them differently
+        // than the original terms.
+
+        List<String> synonymList = new ArrayList<String>();
+        StringReader strReader = new StringReader(text);
+        Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);
+        TokenStream ts0 = analyzer.tokenStream("name", strReader);
+        TokenStream ts = synonymFilterfactory.create(ts0);
+
+        CharTermAttribute termAttribute = ts.getAttribute(CharTermAttribute.class);
+        ts.reset();
+        while (ts.incrementToken()) {
+            String term = termAttribute.toString();
+            synonymList.add(term);
+        }
+        analyzer.close();
+
+        String[] synonyms = new String[synonymList.size()];
+        synonymList.toArray(synonyms);
+        return synonyms;
     }
 
     /**
