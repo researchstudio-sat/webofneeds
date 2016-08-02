@@ -334,6 +334,8 @@ public class WonRdfUtils
                                       Lang.TRIG) ,Lang.TRIG));
       return copied;
     }
+
+
   }
 
   public static class FacetUtils {

@@ -1,7 +1,5 @@
 package won.protocol.message;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.*;
@@ -66,6 +64,15 @@ public class WonMessage implements Serializable
 
   public Dataset getCompleteDataset(){
     return this.completeDataset;
+  }
+
+  public void addMesssageProperty(Property property, RDFNode value) {
+    getOuterEnvelopeGraph().getResource(getMessageURI().toString()).addProperty(property, value);
+  }
+
+  public void addMessageProperty(Property property, URI value){
+    RDFNode valueAsRdfNode = getOuterEnvelopeGraph().createResource(value.toString());
+    addMesssageProperty(property, valueAsRdfNode);
   }
 
   /**

@@ -21,9 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.cryptography.rdfsign.SigningStage;
-import won.protocol.message.WonSignatureData;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
+import won.protocol.message.WonSignatureData;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.message.processor.impl.WonMessageSignerVerifier;
@@ -31,6 +31,7 @@ import won.protocol.model.DatasetHolder;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.MessageEventRepository;
+import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.util.List;
@@ -87,6 +88,7 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
       WonMessageSignerVerifier
         .addSignature(message.getMessageURI().toString(), wonSignatureData, message
         .getOuterEnvelopeGraphURI().toString(), messageDataset);
+      message.addMessageProperty(WONMSG.HAS_PREVIOUS_MESSAGE_PROPERTY, msgToLinkTo.getMessageURI());
       //update the message that now is referenced
       //TODO: if at a later processing stage, the current message raises an error, this flag must be reset to false,
       // otherwise the current message may end up not being persisted but the previous message that is referenced here
@@ -95,7 +97,7 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
     }
     //persist the message
     messageEventRepository.save(messageEventPlaceholders);
-    return new WonMessage(messageDataset);
+    return message;
   }
 
   public void checkWellformedness(final WonMessage message, final WonMessage msgToLinkTo, final WonSignatureData signatureReferences) {
