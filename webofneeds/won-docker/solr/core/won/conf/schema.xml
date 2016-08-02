@@ -2,6 +2,47 @@
 <!-- Solr managed schema - automatically generated - DO NOT EDIT -->
 <schema name="example-data-driven-schema" version="1.6">
   <uniqueKey>id</uniqueKey>
+
+
+  <!-- Custom defined types -->
+
+  <!--standard text field with tokenization -->
+  <fieldType name="text_standard" class="solr.TextField" positionIncrementGap="100" multiValued="true">
+    <analyzer type="index">
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.StopFilterFactory" words="stopwords.txt" ignoreCase="true"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.StopFilterFactory" words="stopwords.txt" ignoreCase="true"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+    </analyzer>
+  </fieldType>
+
+  <!-- english stemming and synonyms on index enabled -->
+  <fieldType name="text_en_syn_stem" class="solr.TextField" positionIncrementGap="100">
+    <analyzer type="index">
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.StopFilterFactory" words="lang/stopwords_en.txt" ignoreCase="true"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+      <filter class="solr.SynonymFilterFactory" expand="false" ignoreCase="true" synonyms="synonyms_en.txt"/>
+      <filter class="solr.EnglishPossessiveFilterFactory"/>
+      <filter class="solr.KeywordMarkerFilterFactory" protected="protwords.txt"/>
+      <filter class="solr.PorterStemFilterFactory"/>
+    </analyzer>
+    <analyzer type="query">
+      <tokenizer class="solr.StandardTokenizerFactory"/>
+      <filter class="solr.StopFilterFactory" words="lang/stopwords_en.txt" ignoreCase="true"/>
+      <filter class="solr.LowerCaseFilterFactory"/>
+      <filter class="solr.EnglishPossessiveFilterFactory"/>
+      <filter class="solr.KeywordMarkerFilterFactory" protected="protwords.txt"/>
+      <filter class="solr.PorterStemFilterFactory"/>
+    </analyzer>
+  </fieldType>
+
+
+
   <fieldType name="ancestor_path" class="solr.TextField">
     <analyzer type="index">
       <tokenizer class="solr.KeywordTokenizerFactory"/>
@@ -402,9 +443,17 @@
   <field name="_graph.http___purl.org_dc_terms_created._value" type="tdates"/>
   <field name="_graph.http___purl.org_webofneeds_model_hasBasicNeedType._id" type="string"/>
   <field name="_graph.http___purl.org_webofneeds_model_isInState._id" type="string"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_dc_elements_1.1_title" type="text_general"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTag" type="text_general"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTextDescription" type="text_general"/>
+
+  <!--
+  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_dc_elements_1.1_title" type="text_standard"/>
+  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTag" type="text_standard"/>
+  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTextDescription" type="text_standard"/>
+  -->
+
+  <!-- Use stemming and synonyms on index for the content fields -->
+  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_dc_elements_1.1_title" type="text_en_syn_stem"/>
+  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTag" type="text_en_syn_stem"/>
+  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTextDescription" type="text_en_syn_stem"/>
 
   <!-- <field name="_graph._id" type="text_general"/>
   <field name="_graph._type" type="text_general"/>
