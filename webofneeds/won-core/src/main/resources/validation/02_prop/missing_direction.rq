@@ -22,7 +22,7 @@ ASK
     GRAPH ?graph
     {
             ?subj rdf:type ?obj .
-            ?subj msg:hasMessageType|msg:hasContent|msg:hasReceivedTimestamp|msg:hasSentTimestamp|msg:hasReceiver|msg:hasSender|msg:hasReceiverNeed|msg:hasSenderNeed|msg:hasReceiverNode|msg:hasSenderNode|msg:isResponseTo|msg:isRemoteResponseTo|msg:isResponseToMessageType|msg:containsSignature ?propobj
+            ?subj msg:hasMessageType|msg:hasContent|msg:hasReceivedTimestamp|msg:hasSentTimestamp|msg:hasReceiver|msg:hasSender|msg:hasReceiverNeed|msg:hasSenderNeed|msg:hasReceiverNode|msg:hasSenderNode|msg:isResponseTo|msg:isRemoteResponseTo|msg:isResponseToMessageType ?propobj
     } .
   }
   HAVING (?num < 1)

@@ -63,16 +63,17 @@ event:2100661890849016800error
             # !!!!!!!!!!!!ERROR: invalid event type
             a                         msg:FromNowhere ;
             # !!!!!!!!!!!!ERROR: no timestamp
-            msg:containsSignature   [ msg:hasSignatureGraph  <http://localhost:8080/won/resource/event/2100661890849016800#data-sig> ;
-                                        msg:hasSignatureValue  "MGQCMHTxwGWSzhYAa5+hDFelxLJe6XGN16DP1kcVOsTwWoK9MRJom4D6AcPz7xXI7nT4lwIwKHMkENo9LE4q3CKGcra4b+ceSvdVY+hLGxoz4OD4a7zMYUgeMbXZ+/fAJLejAZ99" ;
-                                        msg:hasSignedGraph     <http://localhost:8080/won/resource/event/2100661890849016800#data>
-                                      ] .
+            .
     
     <http://localhost:8080/won/resource/event/2100661890849016800#envelope-c2l9>
             a                     msg:EnvelopeGraph ;
             # !!!!!!!!!!!!ERROR: no reference from any envelope to more than 1 envelopes
             <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
-                    event:2100661890849016800 .
+                    event:2100661890849016800;
+     msg:containsSignature   [ msg:hasSignatureGraph  <http://localhost:8080/won/resource/event/2100661890849016800#data-sig> ;
+                                                                                       msg:hasSignatureValue  "MGQCMHTxwGWSzhYAa5+hDFelxLJe6XGN16DP1kcVOsTwWoK9MRJom4D6AcPz7xXI7nT4lwIwKHMkENo9LE4q3CKGcra4b+ceSvdVY+hLGxoz4OD4a7zMYUgeMbXZ+/fAJLejAZ99" ;
+                                                                                       msg:hasSignedGraph     <http://localhost:8080/won/resource/event/2100661890849016800#data>
+                                                                                     ] .
 }
 
 <http://localhost:8080/won/resource/event/2100661890849016800#data-sig> {

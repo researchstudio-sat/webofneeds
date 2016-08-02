@@ -121,7 +121,7 @@ public class SigningStage {
     }
 
     // find if it contains a signature references
-    it = msgEventResource.listProperties(WONMSG.CONTAINS_SIGNATURE_PROPERTY);
+    it = msgEnvelopeResource.listProperties(WONMSG.CONTAINS_SIGNATURE_PROPERTY);
     while (it.hasNext()) {
       Resource refObj = it.next().getObject().asResource();
       extractSignatureData(refObj.getURI(), refObj.getModel());

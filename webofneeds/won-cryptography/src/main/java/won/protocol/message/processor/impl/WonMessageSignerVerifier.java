@@ -76,9 +76,9 @@ public class WonMessageSignerVerifier
                                   final String graphUri, final Dataset msgDataset) {
 
     Model envelopeGraph = msgDataset.getNamedModel(graphUri);
-    Resource messageEventResource = envelopeGraph.createResource(msgUri);
+    Resource envelopeResource = envelopeGraph.createResource(graphUri);
     Resource sigNode = envelopeGraph.createResource(sigData.getSignatureUri());
-    messageEventResource.addProperty(WONMSG.CONTAINS_SIGNATURE_PROPERTY, sigNode);
+    envelopeResource.addProperty(WONMSG.CONTAINS_SIGNATURE_PROPERTY, sigNode);
     WonRdfUtils.SignatureUtils.addSignature(sigNode, sigData);
   }
 
