@@ -46,6 +46,8 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
     contentFactories =  new ArrayList<>();
     try {
       titleTerms = RdfUtils.findOnePropertyFromResource(need, null, DC.title).asLiteral().getString();
+      titleTerms = titleTerms.replaceAll("[^A-Za-z0-9 ]", " ");
+
     } catch (IncorrectPropertyCountException e) {
       log.warn("Title not found in RDF dataset: " + e.toString());
     }
@@ -53,12 +55,14 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
     try {
       descriptionTerms = RdfUtils.findOnePropertyFromResource(
         need, null, WON.HAS_TEXT_DESCRIPTION).asLiteral().getString();
+      descriptionTerms = descriptionTerms.replaceAll("[^A-Za-z0-9 ]", " ");
     } catch (IncorrectPropertyCountException e) {
       log.warn("Description not found in RDF dataset: " + e.toString());
     }
 
     try {
       tagTerms = RdfUtils.findOnePropertyFromResource(need, null, WON.HAS_TAG).asLiteral().getString();
+      tagTerms = tagTerms.replaceAll("[^A-Za-z0-9 ]", " ");
     } catch (IncorrectPropertyCountException e) {
       log.debug("Tags not found in RDF dataset: " + e.toString());
     }
