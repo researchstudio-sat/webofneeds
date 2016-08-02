@@ -28,6 +28,7 @@ public class BooleanQueryFactory extends SolrQueryFactory
       queryBuilder.append(") ");
       if (i < factories.length -1 ) {
         queryBuilder.append(operator.toString());
+        queryBuilder.append("\n");
       }
     }
 

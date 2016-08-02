@@ -21,12 +21,11 @@ import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.solr.config.SolrMatcherConfig;
-import won.matcher.solr.hints.HintsBuilder;
+import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.index.NeedIndexer;
 import won.matcher.solr.query.BasicNeedQueryFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Siren/Solr based abstract matcher with all implementations for querying as well as indexing needs.
@@ -41,7 +40,7 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
   private SolrMatcherConfig config;
 
   @Autowired
-  private HintsBuilder hintBuilder;
+  private HintBuilder hintBuilder;
 
   @Autowired
   private NeedIndexer needIndexer;
@@ -82,8 +81,11 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     SolrDocumentList docs = executeQuery(query);
 
     if (docs != null) {
+      log.debug("{} results found for query", docs.size());
       BulkHintEvent events = produceHints(docs, needEvent);
       publishHints(events, needEvent);
+    } else {
+      log.warning("No results found for query {}", query);
     }
 
     indexNeedEvent(needEvent, dataset);
@@ -97,18 +99,17 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
   protected SolrDocumentList executeQuery(String queryString) throws IOException, SolrServerException {
 
     SolrQuery query = new SolrQuery();
+    log.debug("query endpoint {} with query: {}", config.getSolrServerUri(), query);
     query.setQuery(queryString);
-    query.setFields("id", "score", "_graph.http___purl.org_webofneeds_model_hasWonNode._id");
+    query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD);
+    query.setRows(config.getMaxHints());
     QueryResponse response = solrClient.query(query);
     return response.getResults();
   }
 
   protected BulkHintEvent produceHints(SolrDocumentList docs, NeedEvent needEvent) {
 
-    ArrayList<SolrDocumentList> solrHintDocumentList = new ArrayList<SolrDocumentList>();
-    solrHintDocumentList.add(docs);
-    BulkHintEvent bulkHintEvent = hintBuilder.produceFinalNormalizeHints(
-      solrHintDocumentList, needEvent.getUri(), needEvent.getWonNodeUri());
+    BulkHintEvent bulkHintEvent = hintBuilder.generateHintsFromSearchResult(docs, needEvent);
     return bulkHintEvent;
   }
 

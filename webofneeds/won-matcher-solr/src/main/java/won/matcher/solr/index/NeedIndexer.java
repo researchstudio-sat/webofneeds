@@ -36,9 +36,9 @@ public class NeedIndexer {
   @Autowired
   private HttpService httpService;
 
+  // TODO: rework this whole indexing method
   public void indexer_jsonld_format(NeedEvent need, Dataset dataset) throws IOException, JsonLdError {
 
-    // TODO: rework this whole indexing method
     LinkedList<String> jsonObjectsList = new LinkedList<String>();
 
     Iterator<String> names = dataset.listNames();

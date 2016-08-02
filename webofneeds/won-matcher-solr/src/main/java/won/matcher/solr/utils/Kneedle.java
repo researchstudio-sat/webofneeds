@@ -24,6 +24,10 @@ public class Kneedle
 {
   private double sensitivity = 1.0;
 
+  public Kneedle() {
+    sensitivity = 1.0;
+  }
+
   public Kneedle(final double sensitivity) {
     this.sensitivity = sensitivity;
   }

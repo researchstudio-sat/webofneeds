@@ -39,6 +39,4 @@ public class KneedleTest
     Assert.assertArrayEquals(new int[]{1, 4, 7}, knees);
   }
 
-
-
 }

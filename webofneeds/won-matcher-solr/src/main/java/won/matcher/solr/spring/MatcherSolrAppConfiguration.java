@@ -63,20 +63,6 @@ public class MatcherSolrAppConfiguration
     return system;
   }
 
-
-  /*
-     HttpSolrServer is thread-safe and if you are using the following constructor,
-     you *MUST* re-use the same instance for all requests.  If instances are created on
-     the fly, it can cause a connection leak. The recommended practice is to keep a
-     static instance of HttpSolrServer per solr server url and share it for all requests.
-     See https://issues.apache.org/jira/browse/SOLR-861 for more details
- */
-//  @Bean
-//  public SolrServer getSolrServerInstance() {
-//    return new HttpSolrServer(matcherConfig.getSolrServerUri());
-//  }
-
-
   //To resolve ${} in @Value
   //found in http://www.mkyong.com/spring/spring-propertysources-example/
   @Bean

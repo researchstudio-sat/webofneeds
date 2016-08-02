@@ -31,6 +31,12 @@ public class SolrMatcherConfig
   @Value("${matcher.solr.query.scoreThreshold}")
   private float scoreThreshold;
 
+  @Value("${matcher.solr.query.cutAfterIthElbowInScore}")
+  private int cutAfterIthElbowInScore;
+
+  @Value("${matcher.solr.createHintsForBothNeeds}")
+  private boolean createHintsForBothNeeds;
+
   public float getScoreThreshold() {
     return scoreThreshold;
   }
@@ -39,7 +45,7 @@ public class SolrMatcherConfig
     return solrServerUri;
   }
 
-  public long getMaxHints() {
+  public int getMaxHints() {
     return maxHints;
   }
 
@@ -55,4 +61,11 @@ public class SolrMatcherConfig
     return monitoringEnabled;
   }
 
+  public boolean isCreateHintsForBothNeeds() {
+    return createHintsForBothNeeds;
+  }
+
+  public int getCutAfterIthElbowInScore() {
+    return cutAfterIthElbowInScore;
+  }
 }
