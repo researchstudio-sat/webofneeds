@@ -116,13 +116,13 @@ docker ${docker_options} run --name=matcher_service -d -e "node.host=${deploy_ho
 -e "JMEM_OPTS=-Xmx250m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/matcher_service:${deploy_image_tag_name}
 
-# siren solr server
+# solr server
 echo run solr server container
-docker ${docker_options} pull webofneeds/sirensolr
-if ! docker ${docker_options} run --name=sirensolr -d -p 7071:8080 -p 8984:8983 --env CATALINA_OPTS="-Xmx200m \
-     -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" webofneeds/sirensolr; then
+docker ${docker_options} pull webofneeds/solr
+if ! docker ${docker_options} run --name=solr -d -p 7071:8080 -p 8984:8983 --env CATALINA_OPTS="-Xmx200m \
+     -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" webofneeds/solr; then
   echo solr server container already available, restart old container
-  docker ${docker_options} restart sirensolr
+  docker ${docker_options} restart solr
 fi
 
 
@@ -151,13 +151,13 @@ docker ${docker_options} run --name=owner -d -e "node.default.host=$public_node_
 -e "db.sql.user=won" -e "db.sql.password=won" \
 webofneeds/owner:${deploy_image_tag_name}
 
-# siren matcher
-echo run siren matcher container
-docker ${docker_options} stop matcher_siren || echo 'No docker container found to stop with name: matcher_siren'
-docker ${docker_options} rm matcher_siren || echo 'No docker container found to remove with name: matcher_siren'
-docker ${docker_options} run --name=matcher_siren -d -e "node.host=${deploy_host}" \
+# solr matcher
+echo run solr matcher container
+docker ${docker_options} stop matcher_solr || echo 'No docker container found to stop with name: matcher_solr'
+docker ${docker_options} rm matcher_solr || echo 'No docker container found to remove with name: matcher_solr'
+docker ${docker_options} run --name=matcher_solr -d -e "node.host=${deploy_host}" \
 -e "cluster.seed.host=${deploy_host}" -e "cluster.seed.port=2561" -e "cluster.local.port=2562" \
--e "matcher.siren.uri.solr.server=http://${deploy_host}:8984/solr/won/" \
--e "matcher.siren.uri.solr.server.public=http://${deploy_host}:8984/solr/#/won/" \
+-e "matcher.solr.uri.solr.server=http://${deploy_host}:8984/solr/won/" \
+-e "matcher.solr.uri.solr.server.public=http://${deploy_host}:8984/solr/#/won/" \
 -p 2562:2562 -e "JMEM_OPTS=-Xmx250m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
-webofneeds/matcher_siren:${deploy_image_tag_name}
+webofneeds/matcher_solr:${deploy_image_tag_name}

@@ -193,35 +193,35 @@
                         </configuration>
                     </execution>
 
-                    <!-- copy matcher siren resources -->
+                    <!-- copy matcher solrresources -->
                     <execution>
-                        <id>copy-matcher-siren-jar</id>
+                        <id>copy-matcher-solr-jar</id>
                         <phase>package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/matcher-siren</outputDirectory>
+                            <outputDirectory>${project.basedir}/matcher-solr</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/won-matcher-siren/target</directory>
+                                    <directory>${project.parent.basedir}/won-matcher-solr/target</directory>
                                     <includes>
-                                        <include>won-matcher-siren.jar</include>
+                                        <include>won-matcher-solr.jar</include>
                                     </includes>
                                 </resource>
                             </resources>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-matcher-siren-conf</id>
+                        <id>copy-matcher-solr-conf</id>
                         <phase>package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/matcher-siren/conf</outputDirectory>
+                            <outputDirectory>${project.basedir}/matcher-solr/conf</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/conf</directory>
