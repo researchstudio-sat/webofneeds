@@ -125,7 +125,7 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
   protected void indexNeedEvent(NeedEvent needEvent, Dataset dataset) throws IOException, JsonLdError {
 
     log.info("Add need event content to solr index: " + needEvent);
-    needIndexer.index(needEvent, dataset);
+    needIndexer.index(dataset);
   }
 
 

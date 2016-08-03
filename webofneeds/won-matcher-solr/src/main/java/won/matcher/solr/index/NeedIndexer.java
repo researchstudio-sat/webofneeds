@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.service.http.HttpService;
 import won.matcher.solr.config.SolrMatcherConfig;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
@@ -42,12 +42,18 @@ public class NeedIndexer {
   @Autowired
   private HttpService httpService;
 
-  public void index(NeedEvent need, Dataset dataset) throws IOException, JsonLdError {
+  public void index(Dataset dataset) throws IOException, JsonLdError {
 
     // serialize the need Dataset to jsonld
     Query query = QueryFactory.create(NEED_INDEX_QUERY) ;
     QueryExecution qexec = QueryExecutionFactory.create(query, dataset) ;
     Model needModel = qexec.execConstruct();
+    String needUri = WonRdfUtils.NeedUtils.getNeedURI(needModel).toString();
+    indexNeedModel(needModel, needUri);
+  }
+
+  public void indexNeedModel(Model needModel, String id) throws IOException, JsonLdError {
+
     StringWriter sw = new StringWriter();
     RDFDataMgr.write(sw, needModel, Lang.JSONLD);
     String jsonld = sw.toString();
@@ -57,7 +63,7 @@ public class NeedIndexer {
     Map<String, Object> framed = JsonLdProcessor.frame(jsonObject, frame, options);
 
     // add the uri of the need as id field to avoid multiple adding of needs but instead allow updates
-    framed.put("id", need.getUri().toString());
+    framed.put("id", id);
     sw = new StringWriter();
     JsonUtils.writePrettyPrint(sw, framed);
 
