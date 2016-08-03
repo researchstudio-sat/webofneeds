@@ -17,7 +17,7 @@ import won.matcher.solr.config.SolrMatcherConfig;
                  "file:${WON_CONFIG_DIR}/mail-dir-bot.properties",
                  "file:${WON_CONFIG_DIR}/need-dir-bot.properties"})
 @ComponentScan({"won.matcher.service.common.config", "won.matcher.service.common.service.http",
-                "won.matcher.solr.config", "won.matcher.solr.index"})
+                "won.matcher.solr.config", "won.matcher.solr.index", "won.matcher.solr.hints"})
 public class SolrTestAppConfiguration
 {
   @Autowired

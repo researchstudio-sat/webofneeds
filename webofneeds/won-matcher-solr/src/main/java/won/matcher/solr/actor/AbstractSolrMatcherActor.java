@@ -14,6 +14,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,7 @@ import won.matcher.service.common.event.NeedEvent;
 import won.matcher.solr.config.SolrMatcherConfig;
 import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.index.NeedIndexer;
-import won.matcher.solr.query.BasicNeedQueryFactory;
+import won.matcher.solr.query.DefaultNeedQueryFactory;
 
 import java.io.IOException;
 
@@ -68,16 +69,8 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
 
     Dataset dataset = deserializeNeed(needEvent);
 
-    BasicNeedQueryFactory needQuery = new BasicNeedQueryFactory(dataset);
-    needQuery.addTermsToTitleQuery(needQuery.getTitleTerms(), 4);
-    needQuery.addTermsToTitleQuery(needQuery.getTagTerms(), 2);
-    needQuery.addTermsToTagQuery(needQuery.getTagTerms(), 4);
-    needQuery.addTermsToTagQuery(needQuery.getTitleTerms(), 2);
-    needQuery.addTermsToDescriptionQuery(needQuery.getTitleTerms(), 1);
-    needQuery.addTermsToDescriptionQuery(needQuery.getTagTerms(), 1);
-    needQuery.addTermsToDescriptionQuery(needQuery.getDescriptionTerms(), 1);
-
-    String query = needQuery.createQuery();
+    DefaultNeedQueryFactory queryFactory = new DefaultNeedQueryFactory(dataset);
+    String query = queryFactory.createQuery();
     SolrDocumentList docs = executeQuery(query);
 
     if (docs != null) {
@@ -103,8 +96,15 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     query.setQuery(queryString);
     query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD);
     query.setRows(config.getMaxHints());
-    QueryResponse response = solrClient.query(query);
-    return response.getResults();
+
+    try {
+      QueryResponse response = solrClient.query(query);
+      return response.getResults();
+    } catch (SolrException e) {
+      log.warning("Exception {} thrown for query: {}", e, queryString);
+    }
+
+    return null;
   }
 
   protected BulkHintEvent produceHints(SolrDocumentList docs, NeedEvent needEvent) {

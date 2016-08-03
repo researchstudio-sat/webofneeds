@@ -28,16 +28,18 @@ public class HintBuilder
     @Autowired
     private SolrMatcherConfig config;
 
-    public BulkHintEvent generateHintsFromSearchResult(SolrDocumentList docs, NeedEvent need) {
+    public SolrDocumentList calculateMatchingResults(SolrDocumentList docs) {
 
-        if (docs == null || docs.size() == 0) {
-            return new BulkHintEvent();
+        SolrDocumentList newDocs = (SolrDocumentList) docs.clone();
+        SolrDocumentList matches = new SolrDocumentList();
+        if (newDocs == null || newDocs.size() == 0) {
+            return matches;
         } else {
-            log.debug("Received {} solr documents as query result", docs.size());
+            log.debug("Received {} solr documents as query result", newDocs.size());
         }
 
         // sort the documents according to their score value descending
-        docs.sort(new Comparator<SolrDocument>()
+        newDocs.sort(new Comparator<SolrDocument>()
         {
             @Override
             public int compare(final SolrDocument o1, final SolrDocument o2) {
@@ -50,35 +52,28 @@ public class HintBuilder
             }
         });
 
-        // apply the Kneedle algorithm to find knee/elbow points in the score values of the returned docs to cut there
+        // apply the Kneedle algorithm to find knee/elbow points in the score values of the returned newDocs to cut there
         Kneedle kneedle = new Kneedle();
-        double[] x = new double[docs.size() + 1];
-        double[] y = new double[docs.size() + 1];
-        for (int i = 0; i < docs.size(); i++) {
+        double[] x = new double[newDocs.size()];
+        double[] y = new double[newDocs.size()];
+        for (int i = 0; i < newDocs.size(); i++) {
             x[i] = i;
-            y[i] = Double.valueOf(docs.get(i).getFieldValue("score").toString());
+            y[i] = Double.valueOf(newDocs.get(i).getFieldValue("score").toString());
         }
-
-        // add one additional point at the end so that an elbow for the top element is found too
-        x[docs.size()] = docs.size();
-        y[docs.size()] = y[docs.size()-1];
         int[] elbows = kneedle.detectElbowPoints(x, y);
+
+
         double cutScoreLowerThan = 0.0;
         if (elbows.length >= config.getCutAfterIthElbowInScore()) {
-            cutScoreLowerThan = y[elbows[elbows.length - config.getCutAfterIthElbowInScore()]] / docs.getMaxScore();
+            cutScoreLowerThan = y[elbows[elbows.length - config.getCutAfterIthElbowInScore()]] / newDocs.getMaxScore();
             log.debug("Calculated elbow score point after {} elbows for document scores: {}",
                       config.getCutAfterIthElbowInScore(), cutScoreLowerThan);
         }
 
-        // generate hints from query result documents
-        BulkHintEvent bulkHintEvent = new BulkHintEvent();
-        for (int i = docs.size() - 1; i >= 0; i--) {
-
-            String needUri = docs.get(i).getFieldValue("id").toString();
-            String wonNodeUri = ((List) docs.get(i).getFieldValue(WON_NODE_SOLR_FIELD)).get(0).toString();
+        for (int i = newDocs.size() - 1; i >= 0; i--) {
 
             // normalize the score to a value between 0 and 1
-            double score = Double.valueOf(docs.get(i).getFieldValue("score").toString()) / docs.getMaxScore();
+            double score = Double.valueOf(newDocs.get(i).getFieldValue("score").toString()) / newDocs.getMaxScore();
 
             // if score is lower threshold or we arrived at the elbow point to cut after
             if (score < config.getScoreThreshold() || score <= (cutScoreLowerThan)) {
@@ -86,6 +81,24 @@ public class HintBuilder
                           score, config.getScoreThreshold());
                 break;
             }
+
+            SolrDocument newDoc = newDocs.get(i);
+            newDoc.put("normalized_score", score);
+            matches.add(newDoc);
+        }
+
+        return matches;
+    }
+
+    public BulkHintEvent generateHintsFromSearchResult(SolrDocumentList docs, NeedEvent need) {
+
+        // generate hints from query result documents
+        BulkHintEvent bulkHintEvent = new BulkHintEvent();
+        for (SolrDocument doc : docs) {
+
+            String needUri = doc.getFieldValue("id").toString();
+            String wonNodeUri = ((List) doc.getFieldValue(WON_NODE_SOLR_FIELD)).get(0).toString();
+            double score = Double.valueOf(doc.getFieldValue("normalized_score").toString());
 
             bulkHintEvent.addHintEvent(new HintEvent(need.getWonNodeUri(), need.getUri(), wonNodeUri, needUri,
                                                      config.getSolrServerPublicUri(), score));

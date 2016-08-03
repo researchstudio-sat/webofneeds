@@ -23,7 +23,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
     "_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTag";
 
   private final Logger log = LoggerFactory.getLogger(getClass());
-  private ArrayList<SolrQueryFactory> contentFactories;
+  protected ArrayList<SolrQueryFactory> contentFactories;
   private String titleTerms;
   private String descriptionTerms;
   private String tagTerms;
