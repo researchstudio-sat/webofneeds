@@ -812,8 +812,192 @@ const rdfstore = window.rdfstore;
         });
     };
 
+    window.selectNeedData4dbg = needUri => selectNeedData(needUri, privateData.store);
+    function selectNeedData(needUri, store) {
+        //returns everything attached to the need's content-node up to three levels deep
+        const query = `
+            prefix won: <http://purl.org/webofneeds/model#>
+            construct {<${needUri}> ?b ?c. ?c ?d ?e. ?e ?f ?g. ?g ?h ?i} where {
+                {
+                      <${needUri}> won:hasBasicNeedType ?c.
+                      <${needUri}> ?b ?c
+                }
+                UNION
+                {
+                      <${needUri}> won:hasContent ?c.
+                      <${needUri}> ?b ?c
+                }
+                UNION
+                {
+                      <${needUri}> won:hasContent ?c.
+                      ?c ?d ?e.
+                }
+                UNION
+                {
+                      <${needUri}> won:hasContent ?c.
+                      ?c ?d ?e.
+                      ?e ?f ?g.
+                }
+                UNION
+                {
+                      <${needUri}> won:hasContent ?c.
+                      ?c ?d ?e.
+                      ?e ?f ?g.
+                      ?g ?h ?i.
+                }
+            }
+            `
+        const needJsonLdP = new Promise((resolve, reject) =>
+            store.execute(query, (success, resultGraph) => {
+                if(!success) {
+                    reject('Failed selecting the triples of the need with the uri: ' + needUri);
+                }
+
+                const needJsonLd = triples2framedJson(needUri, resultGraph.triples, {
+                    /* frame */
+                    "@context": {
+                        "won" : "http://purl.org/webofneeds/model#"
+                    },
+                    "@type": "won:Need",
+                    "won:hasContent": {
+                        "@type": "won:NeedContent"
+                    }
+                });
+
+                resolve(needJsonLd);
+
+            })
+        )
+
+        return needJsonLdP;
+    }
+
+    function triples2framedJson(needUri, triples, frame) {
+        const jsonldjsQuads = {
+            // everything in our rdfstore is in the default-graph atm
+            '@default': triples.map(triple => ({
+                subject: rdfstorejsToJsonldjs(triple.subject),
+                predicate: rdfstorejsToJsonldjs(triple.predicate),
+                object: rdfstorejsToJsonldjs(triple.object),
+                //object.datatype: ? //TODO
+            }))
+        };
+
+        console.log('jsonldjsQuads: ', jsonldjsQuads);
+
+        const jsonLdP = new Promise((resolve, reject) => {
+            const context = frame['@context']? frame['@context'] : {}; //TODO
+            return jsonld.fromRDF(jsonldjsQuads, context, (err, complexJsonLd) => {
+                if (err) {
+                    reject("Couldn't parse quads to jsonld: " + JSON.stringify(err));
+                }
+                console.log('complexJsonLd: ', complexJsonLd);
+                //jsonld.compact(complexJsonLd, context, (err, compacted) => console.log('compacted: ', compacted));
+                //const frame = {'@context': context};
+                jsonld.frame(complexJsonLd, frame, (err, framed) => {
+                    if (err) {
+                        reject("Couldn't frame jsonld: " + JSON.stringify(err));
+                    }
+                    console.log('framed: ', framed);
+                    resolve(framed);
+                });
+            })
+
+        });
+
+        return jsonLdP;
+
+    }
+
     /**
-     * Loads the default data of the need with the specified URI into a js object.
+     * Receives a subject, predicate or object in rdfstorejs-style
+     * and returns it's pendant in jsonldjs-style.
+     * @param element
+     * @return {{value: *, type: undefined}}
+     */
+    function rdfstorejsToJsonldjs(element){
+        const result = {
+            value: element.nominalValue,
+            type: undefined,
+        };
+
+        switch(element.interfaceName) {
+            case "Literal":
+                result.type = "literal"
+                break;
+            case "NamedNode":
+                result.type = "IRI"
+                break;
+            case "BlankNode":
+                result.type = "blank node"
+                break;
+            default:
+                throw new Exception("Encountered triple with object of unknown type: "
+                    + t.object.interfaceName + "\n" +
+                    t.subject.nominalValue + " " +
+                    t.predicate.nominalValue + " " +
+                    t.object.nominalValue + " "
+                );
+        }
+
+        return result;
+    }
+
+
+
+    /**
+     *
+     * NOTE: this function assumes an acyclic graph!!
+     * @param rootUri
+     * @param triples
+     * @return {{}}
+     */
+    function triples2jsonNaive(rootUri, triples) {
+        const resultJson = {};
+        const rootTriples = triples.filter(t => t.subject.nominalValue === rootUri);
+        for(var t of rootTriples) {
+            const predicate = won.getLocalName(t.predicate.nominalValue);
+            switch(t.object.interfaceName) {
+                case "Literal":
+                    // This is the simple case. we can just add it to our result object
+                    var literal = t.object.nominalValue;
+                    resultJson[predicate] = literal;
+                    break;
+
+                case "NamedNode":
+                    var namedNodeUri = t.object.nominalValue;
+                    var isUsedAsSubject = (triples.filter(t_ => t_.subject.nominalValue === namedNodeUri).length > 0);
+                    if(isUsedAsSubject) {
+                        // treat like blank node
+                        resultJson[predicate] = triples2json(namedNodeUri, triples);
+                    } else {
+                        // treat like literal node
+                        resultJson[predicate] = namedNodeUri;
+                    }
+                    break;
+
+                case "BlankNode":
+                    var blankNodeUri = t.object.nominalValue;
+                    resultJson[predicate] = triples2json(blankNodeUri, triples);
+                    break;
+
+                default:
+                    throw new Exception("Encountered triple with object of unknown type: "
+                        + t.object.interfaceName + "\n" +
+                        t.subject.nominalValue + " " +
+                        t.predicate.nominalValue + " " +
+                        t.object.nominalValue + " "
+                    );
+            }
+        }
+
+        return resultJson;
+    }
+
+    /**
+     * @deprecated doesn't return need modalities (e.g. location) properly due to changed rdf-structure
+     * Loads the default data of the need with the specified URI into a js object. See
+     * <https://github.com/researchstudio-sat/webofneeds/issues/688#issuecomment-235901339>
      * @return the object or null if no data is found for that URI in the local datastore
      */
     function getNeedData(needUri) {
