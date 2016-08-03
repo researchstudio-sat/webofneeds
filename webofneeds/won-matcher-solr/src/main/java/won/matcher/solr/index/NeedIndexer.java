@@ -4,31 +4,37 @@ import com.github.jsonldjava.core.JsonLdError;
 import com.github.jsonldjava.core.JsonLdOptions;
 import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.utils.JsonUtils;
-import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.vocabulary.RDF;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.service.http.HttpService;
 import won.matcher.solr.config.SolrMatcherConfig;
-import won.protocol.vocabulary.SFSIG;
+import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 
 /**
- * Created by soheilk on 02.09.2015.
+ * Created by hfriedrich on 03.08.2016.
  */
 @Component
 @Scope("prototype")
 public class NeedIndexer {
+
+  private final Logger log = LoggerFactory.getLogger(getClass());
+
+  // SPARQL query to contruct a need object out of the dataset, use all graphs that reference "won:Need"
+  private static final String NEED_INDEX_QUERY =
+    "prefix won: <http://purl.org/webofneeds/model#> construct { ?a ?b ?c .} where { " +
+      "GRAPH ?graph { ?need a won:Need. } GRAPH ?graph2 { ?need ?x ?y. ?a ?b ?c. } }";
 
   @Autowired
   private SolrMatcherConfig config;
@@ -36,56 +42,27 @@ public class NeedIndexer {
   @Autowired
   private HttpService httpService;
 
-  // TODO: rework this whole indexing method
-  public void indexer_jsonld_format(NeedEvent need, Dataset dataset) throws IOException, JsonLdError {
+  public void index(NeedEvent need, Dataset dataset) throws IOException, JsonLdError {
 
-    LinkedList<String> jsonObjectsList = new LinkedList<String>();
-
-    Iterator<String> names = dataset.listNames();
-    while (names.hasNext()) {
-        String name = names.next();
-        StringWriter sw = new StringWriter();
-        Model model = dataset.getNamedModel(name);
-
-        // Add this if you want to exclude one of the graphs, e.g. info graph  => !name.contains("info")&& <=
-        if (!model.contains(model.getResource(name), RDF.type, model.getProperty(SFSIG.SIGNATURE.toString()))) {
-            RDFDataMgr.write(sw, dataset.getNamedModel(name), Lang.JSONLD);
-            String jsonld = sw.toString();
-            Object jsonObject = JsonUtils.fromString(jsonld);
-
-            Object frame = JsonUtils.fromString("{\n" + //contextString +
-                    "  \"@type\": \"http://purl.org/webofneeds/model#Need\"\n" +
-                    "}");
-            JsonLdOptions options = new JsonLdOptions();
-
-            Map<String, Object> framed = JsonLdProcessor.frame(jsonObject, frame, options);
-            Object graph = framed.get("@graph");
-
-            String prettyFramedGraphString = JsonUtils.toPrettyString(graph);
-            jsonObjectsList.add(prettyFramedGraphString);
-        }
-    }
-
-    String finalJSONFramedNeed = "{\"@graph\":[";
-    boolean frameCreated = false;
-    for (String jsonObjects : jsonObjectsList) {
-      if (jsonObjects.length()>5) {
-        if (frameCreated) {
-          finalJSONFramedNeed = finalJSONFramedNeed + ",";
-        }
-        String string = jsonObjects;
-        string = string.substring(1);
-        string = string.substring(0, string.length() - 1);
-        finalJSONFramedNeed = finalJSONFramedNeed + string;
-        frameCreated = true;
-      }
-    }
-    finalJSONFramedNeed = finalJSONFramedNeed + "]}";
+    // serialize the need Dataset to jsonld
+    Query query = QueryFactory.create(NEED_INDEX_QUERY) ;
+    QueryExecution qexec = QueryExecutionFactory.create(query, dataset) ;
+    Model needModel = qexec.execConstruct();
+    StringWriter sw = new StringWriter();
+    RDFDataMgr.write(sw, needModel, Lang.JSONLD);
+    String jsonld = sw.toString();
+    Object jsonObject = JsonUtils.fromString(jsonld);
+    Object frame = JsonUtils.fromString(" {\"@type\": \""+ WON.NEED + "\"} ");
+    JsonLdOptions options = new JsonLdOptions();
+    Map<String, Object> framed = JsonLdProcessor.frame(jsonObject, frame, options);
 
     // add the uri of the need as id field to avoid multiple adding of needs but instead allow updates
-    String idField = need.getUri().toString();
-    finalJSONFramedNeed = "{\"id\":\"" + idField + "\"," + finalJSONFramedNeed.substring(1);
+    framed.put("id", need.getUri().toString());
+    sw = new StringWriter();
+    JsonUtils.writePrettyPrint(sw, framed);
 
+    // post the need to the solr index
+    String needJson = sw.toString();
     String indexUri = config.getSolrServerUri();
     if (!indexUri.endsWith("/")) {
       indexUri += "/";
@@ -94,6 +71,7 @@ public class NeedIndexer {
     if (config.isCommitIndexedNeedImmediately()) {
       indexUri += "?commit=" + config.isCommitIndexedNeedImmediately();
     }
-    httpService.postJsonRequest(indexUri, finalJSONFramedNeed);
+    log.debug("Post needto solr index. \n Solr URI: {} \n Need (JSON): {}", indexUri, needJson);
+    httpService.postJsonRequest(indexUri, needJson);
   }
 }
