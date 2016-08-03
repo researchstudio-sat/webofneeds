@@ -885,25 +885,22 @@ const rdfstore = window.rdfstore;
 
         console.log('jsonldjsQuads: ', jsonldjsQuads);
 
-        const jsonLdP = new Promise((resolve, reject) => {
-            const context = frame['@context']? frame['@context'] : {}; //TODO
-            return jsonld.fromRDF(jsonldjsQuads, context, (err, complexJsonLd) => {
-                if (err) {
-                    reject("Couldn't parse quads to jsonld: " + JSON.stringify(err));
-                }
-                console.log('complexJsonLd: ', complexJsonLd);
-                //jsonld.compact(complexJsonLd, context, (err, compacted) => console.log('compacted: ', compacted));
-                //const frame = {'@context': context};
-                jsonld.frame(complexJsonLd, frame, (err, framed) => {
-                    if (err) {
-                        reject("Couldn't frame jsonld: " + JSON.stringify(err));
-                    }
-                    console.log('framed: ', framed);
-                    resolve(framed);
-                });
-            })
+        const context = frame['@context']? frame['@context'] : {}; //TODO
 
-        });
+        const jsonLdP = jsonld.promises
+            .fromRDF(jsonldjsQuads, context)
+            .then(complexJsonLd => {
+                console.log('complexJsonLd: ', complexJsonLd);
+                return jsonld.promises.frame(complexJsonLd, frame);
+            })
+            .then(framed => {
+                console.log('framed: ', framed);
+                return framed;
+            })
+            .catch(err => {
+                console.error(err);
+                throw err;
+            });
 
         return jsonLdP;
 
