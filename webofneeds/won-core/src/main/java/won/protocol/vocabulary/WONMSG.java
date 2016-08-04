@@ -24,6 +24,8 @@ public class WONMSG
 
   private static Model m = ModelFactory.createDefaultModel();
 
+  public static final String PROTOCOL_VERSION_STRING =  BASE_URI+"protocolVersion";
+  public static final Property PROTOCOL_VERSION = m.createProperty(PROTOCOL_VERSION_STRING);
 
 
   public static final String TYPE_FROM_OWNER_STRING = BASE_URI+"FromOwner";
@@ -46,6 +48,7 @@ public class WONMSG
   public static final String TYPE_FAILURE_RESPONSE_STRING = BASE_URI+"FailureResponse";
   public static final String TYPE_SUCCESS_RESPONSE_STRING = BASE_URI+"SuccessResponse";
   // main types
+
   public static final Resource TYPE_CREATE = m.createResource(TYPE_CREATE_STRING);
   public static final Resource TYPE_CONNECT = m.createResource(TYPE_CONNECT_STRING);
   public static final Resource TYPE_DEACTIVATE = m.createResource(TYPE_DEACTIVATE_STRING);
@@ -145,12 +148,14 @@ public class WONMSG
 
 
   // added to support referencing signatures from the envelope
-  public static final Property REFERENCES_SIGNATURE_PROPERTY = m.createProperty(BASE_URI, "referencesSignature");
+  public static final Property CONTAINS_SIGNATURE_PROPERTY = m.createProperty(BASE_URI, "containsSignature");
   // TODO maybe the three properties below could better belong to a separate ontology
   public static final Property HAS_SIGNED_GRAPH_PROPERTY = m.createProperty(BASE_URI, "hasSignedGraph");
   public static final Property HAS_SIGNATURE_VALUE_PROPERTY = m.createProperty(BASE_URI, "hasSignatureValue");
+  public static final Property HAS_HASH_PROPERTY = m.createProperty(BASE_URI, "hasHash");
   public static final Property HAS_SIGNATURE_GRAPH_PROPERTY = m.createProperty(BASE_URI, "hasSignatureGraph");
-
+  public static final Property HAS_PUBLIC_KEY_FINGERPRINT_PROPERTY = m.createProperty(BASE_URI,
+                                                                                      "hasPublicKeyFingerprint");
 
   public static final Property CONTENT_TYPE = m.createProperty(BASE_URI,"contentType");
 

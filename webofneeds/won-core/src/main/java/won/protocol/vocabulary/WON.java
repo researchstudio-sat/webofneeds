@@ -30,11 +30,14 @@ import won.protocol.model.NeedState;
 public class WON
 {
   public static final String BASE_URI = "http://purl.org/webofneeds/model#";
+
   private static Model m = ModelFactory.createDefaultModel();
 
 
   public static final Resource NEED = m.createResource(BASE_URI + "Need");
   public static final Property HAS_WON_NODE = m.createProperty(BASE_URI, "hasWonNode");
+  public static final Property HAS_DEFAULT_GRAPH_SIGNING_METHOD = m.createProperty(BASE_URI,
+                                                                                   "hasDefaultGraphSigningMethod");
   public static final Property HAS_NEED_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasNeedProtocolEndpoint");
   public static final Property HAS_MATCHER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasMatcherProtocolEndpoint");
   public static final Property HAS_OWNER_PROTOCOL_ENDPOINT = m.createProperty(BASE_URI, "hasOwnerProtocolEndpoint");

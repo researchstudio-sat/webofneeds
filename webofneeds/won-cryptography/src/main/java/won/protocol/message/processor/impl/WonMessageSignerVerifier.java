@@ -1,13 +1,16 @@
 package won.protocol.message.processor.impl;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
-import won.cryptography.rdfsign.*;
-import won.protocol.message.SignatureReference;
+import won.cryptography.rdfsign.SignatureVerificationState;
+import won.cryptography.rdfsign.SigningStage;
+import won.cryptography.rdfsign.WonSigner;
+import won.cryptography.rdfsign.WonVerifier;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonSignatureData;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
 import java.security.PrivateKey;
@@ -22,23 +25,25 @@ import java.util.Map;
 public class WonMessageSignerVerifier
 {
 
-  public static WonMessage sign(PrivateKey privateKey, String privateKeyUri, WonMessage message) throws Exception {
+  public static WonMessage sign(PrivateKey privateKey, PublicKey publicKey, String privateKeyUri, WonMessage message)
+    throws
+    Exception {
 
     Dataset msgDataset = message.getCompleteDataset();
     SigningStage sigStage = new SigningStage(message);
 
     addUnreferencedSigReferences(msgDataset, sigStage);
 
-    WonSigner signer = new WonSigner(msgDataset, new SignatureAlgorithmFisteus2010());
-    signContents(msgDataset, sigStage, signer, privateKey, privateKeyUri);
-    signEnvelopes(msgDataset, sigStage, signer, privateKey, privateKeyUri);
+    WonSigner signer = new WonSigner(msgDataset);
+    signContents(msgDataset, sigStage, signer, privateKey, privateKeyUri, publicKey);
+    signEnvelopes(msgDataset, sigStage, signer, privateKey, privateKeyUri, publicKey);
 
     return new WonMessage(msgDataset);
   }
 
   /**
    * If the provided signing stage has unsigned content graphs, sign them, add signature graphs
-   * to the dataset, and add signature references of those signatures into the envelope graph
+   * to the dataset, and add signatures to the envelope graph
    * that has contains envelope property referencing signed by that signature envelope graph
    * @param msgDataset
    * @param sigStage
@@ -48,35 +53,40 @@ public class WonMessageSignerVerifier
    */
   private static void signEnvelopes(final Dataset msgDataset, final SigningStage sigStage,
                                     final WonSigner signer, final PrivateKey privateKey,
-                                    final String privateKeyUri) throws Exception {
-    SignatureReference sigRef = null;
+                                    final String privateKeyUri, final PublicKey publicKey) throws Exception {
+
+    List<String> envUris = sigStage.getUnsignedEnvUrisOrderedByContainment();
+    WonSignatureData wonSignatureData = null;
+    String outerEnvUri = null;
     for (String envUri : sigStage.getUnsignedEnvUrisOrderedByContainment()) {
-      if (sigRef != null) {
-        addSignatureReference(sigStage.getMessageUri(envUri), sigRef, envUri, msgDataset);
+      if (wonSignatureData != null) {
+        //this is the signature of the envelope we signed in the last iteration.
+        //add it to the current one:
+        addSignature(sigStage.getMessageUri(envUri), wonSignatureData, envUri, msgDataset);
       }
-      sigRef = signer.sign(privateKey, privateKeyUri, envUri).get(0);
+      wonSignatureData = signer.sign(privateKey, privateKeyUri, publicKey, envUri).get(0);
+      outerEnvUri = envUri;
     }
+    //this is the signature of the outermost envelopoe. put it in a new graph.
+    msgDataset.addNamedModel(wonSignatureData.getSignatureUri(), ModelFactory.createDefaultModel());
+    addSignature(sigStage.getMessageUri(outerEnvUri), wonSignatureData, wonSignatureData.getSignatureUri(), msgDataset);
   }
 
-  private static void addSignatureReference(final String msgUri, final SignatureReference sigRef,
-                                            final String envUri, final Dataset msgDataset) {
+  public static void addSignature(final String msgUri, final WonSignatureData sigData,
+                                  final String graphUri, final Dataset msgDataset) {
 
-    Model envelopeGraph = msgDataset.getNamedModel(envUri);
+    Model envelopeGraph = msgDataset.getNamedModel(graphUri);
     Resource messageEventResource = envelopeGraph.createResource(msgUri);
-    Resource bnode = envelopeGraph.createResource(AnonId.create());
-    messageEventResource.addProperty(
-      WONMSG.REFERENCES_SIGNATURE_PROPERTY,
-      bnode);
-    bnode.addProperty(WONMSG.HAS_SIGNATURE_GRAPH_PROPERTY,
-                      envelopeGraph.createResource(sigRef.getSignatureGraphUri()));
-    bnode.addProperty(WONMSG.HAS_SIGNED_GRAPH_PROPERTY,
-                      envelopeGraph.createResource(sigRef.getSignedGraphUri()));
-    bnode.addProperty(WONMSG.HAS_SIGNATURE_VALUE_PROPERTY,
-                      envelopeGraph.createLiteral(sigRef.getSignatureValue()));
+    Resource sigNode = envelopeGraph.createResource(sigData.getSignatureUri());
+    messageEventResource.addProperty(WONMSG.CONTAINS_SIGNATURE_PROPERTY, sigNode);
+    WonRdfUtils.SignatureUtils.addSignature(sigNode, sigData);
   }
+
+
 
   /**
-   * If the provided signing stage has unsigned content graphs, sign them, add signature graphs
+   * If the provided signing stage has unsigned content graphs, sign them.
+   * This adds the signature triples to the graph, add signature graphs
    * to the dataset, and add signature references of those signatures into the envelope graph
    * that has has content property referencing signed by that signature content graph
    * @param msgDataset
@@ -87,17 +97,17 @@ public class WonMessageSignerVerifier
    */
   private static void signContents(final Dataset msgDataset, final SigningStage sigStage,
                                    final WonSigner signer, final PrivateKey privateKey,
-                                   final String privateKeyUri) throws Exception {
-    List<SignatureReference> sigRefs = signer.sign(privateKey, privateKeyUri, sigStage.getUnsignedContentUris());
-    for (SignatureReference sigRef : sigRefs) {
+                                   final String privateKeyUri, final PublicKey publicKey) throws Exception {
+    List<WonSignatureData> sigRefs = signer.sign(privateKey, privateKeyUri, publicKey, sigStage.getUnsignedContentUris());
+    for (WonSignatureData sigRef : sigRefs) {
       String envUri = sigStage.getEnvelopeUriContainingContent(sigRef.getSignedGraphUri());
-      addSignatureReference(sigStage.getMessageUri(envUri), sigRef, envUri, msgDataset);
+      addSignature(sigStage.getMessageUri(envUri), sigRef, envUri, msgDataset);
     }
   }
 
   /**
    * If the provided signing stage has signature graphs that are not referenced from any envelope graphs, they
-   * should be added to the innermost not-signed envelope graph of the dataset
+   * should be moved to the innermost not-signed envelope graph. The signature graph is to be deleted.
    * @param msgDataset
    * @param sigStage
    */
@@ -110,12 +120,14 @@ public class WonMessageSignerVerifier
     } else {
       innemostUnsignedEnvUri = envUris.get(0);
     }
-    for (SignatureReference sigRef : sigStage.getNotReferencedSignaturesAsReferences()) {
-      addSignatureReference(sigStage.getMessageUri(innemostUnsignedEnvUri), sigRef, innemostUnsignedEnvUri, msgDataset);
+    WonSignatureData sigRef = sigStage.getOutermostSignature();
+    if (sigRef != null) {
+      addSignature(sigStage.getMessageUri(innemostUnsignedEnvUri), sigRef, innemostUnsignedEnvUri, msgDataset);
+      msgDataset.removeNamedModel(sigRef.getSignatureUri());
     }
   }
 
-  public static SignatureVerificationResult verify(Map<String,PublicKey> keys, WonMessage message) throws Exception {
+  public static SignatureVerificationState verify(Map<String,PublicKey> keys, WonMessage message) throws Exception {
     Dataset dataset = message.getCompleteDataset();
     WonVerifier verifier = new WonVerifier(dataset);
     verifier.verify(keys);

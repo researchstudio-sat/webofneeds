@@ -1,13 +1,14 @@
 package won.cryptography.rdfsign;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.*;
-import won.protocol.message.SignatureReference;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonSignatureData;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.RDFG;
-import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WONMSG;
 
 import java.util.*;
@@ -31,11 +32,12 @@ public class SigningStage {
   private Map<String,String> envUriToContainedInItEnvUri = new HashMap<>();
   private Map<String,String> graphUriToSigUri = new HashMap<>();
   private Map<String,String> sigUriToReferencingItEnvUri = new HashMap<>();
-  private Map<String,SignatureReference> sigUriToSigReference = new HashMap<>();
+  private Map<String,WonSignatureData> sigUriToSigReference = new HashMap<>();
 
   private List<String> envOrderedByContainment = new ArrayList<>();
   private String messageUri;
   private Map<String,String> graphUriToItsMessageUri = new HashMap<>();
+  private String outermostSignatureUri = null;
 
   public SigningStage(WonMessage message) {
     extractData(message);
@@ -56,7 +58,11 @@ public class SigningStage {
       Model model = dataset.getNamedModel(uri);
       if (message.isEnvelopeGraph(uri, model)) {
         extractEnvelopeData(uri, model, message);
-      } else if (WonRdfUtils.SignatureUtils.isSignature(model)) {
+      } else if (WonRdfUtils.SignatureUtils.isSignature(model, uri)) {
+        if (outermostSignatureUri != null){
+          throw new IllegalStateException("Found more than one signature graph");
+        }
+        outermostSignatureUri = uri;
         extractSignatureData(uri, model);
       } else { // should be content
         extractContentData(uri);
@@ -83,20 +89,10 @@ public class SigningStage {
   }
 
   private void extractSignatureData(final String uri, final Model model) {
-    String signedGraphUri = null;
-    String signatureValue = null;
-    Resource resource = model.getResource(uri);
-    NodeIterator ni = model.listObjectsOfProperty(resource, WONMSG.HAS_SIGNED_GRAPH_PROPERTY);
-    if (ni.hasNext()) {
-      signedGraphUri = ni.next().asResource().getURI();
-    }
-    NodeIterator ni2 = model.listObjectsOfProperty(resource, SFSIG.HAS_SIGNATURE_VALUE);
-    if (ni2.hasNext()) {
-      signatureValue = ni2.next().asLiteral().toString();
-    }
-    if (signedGraphUri != null && signatureValue != null) {
-      graphUriToSigUri.put(signedGraphUri, uri);
-      sigUriToSigReference.put(uri, new SignatureReference(signedGraphUri, uri, signatureValue));
+    WonSignatureData wonSignatureData = WonRdfUtils.SignatureUtils.extractWonSignatureData(uri,model);
+    if (wonSignatureData != null && wonSignatureData.getSignatureValue() != null) {
+      graphUriToSigUri.put(wonSignatureData.getSignedGraphUri(), uri);
+      sigUriToSigReference.put(uri, wonSignatureData);
     }
   }
 
@@ -124,15 +120,11 @@ public class SigningStage {
       envUriToContainedInItEnvUri.put(envelopeGraphUri, it.nextStatement().getObject().asResource().getURI());
     }
 
-    // find if it contains signature references
-    it = msgEventResource.listProperties(WONMSG.REFERENCES_SIGNATURE_PROPERTY);
+    // find if it contains a signature references
+    it = msgEventResource.listProperties(WONMSG.CONTAINS_SIGNATURE_PROPERTY);
     while (it.hasNext()) {
       Resource refObj = it.next().getObject().asResource();
-      NodeIterator sigGraphIter = envelopeGraph.listObjectsOfProperty(refObj,
-                                                                      WONMSG.HAS_SIGNATURE_GRAPH_PROPERTY);
-      if (sigGraphIter.hasNext()) {
-        sigUriToReferencingItEnvUri.put(sigGraphIter.next().asResource().getURI(), envelopeGraphUri);
-      }
+      extractSignatureData(refObj.getURI(), refObj.getModel());
     }
   }
 
@@ -167,14 +159,7 @@ public class SigningStage {
   }
 
 
-  public List<SignatureReference> getNotReferencedSignaturesAsReferences() {
-    List<SignatureReference> refs = new ArrayList<>();
-
-    for (String sigUri : sigUriToSigReference.keySet()) {
-      if (!sigUriToReferencingItEnvUri.containsKey(sigUri)) {
-        refs.add(sigUriToSigReference.get(sigUri));
-      }
-    }
-    return refs;
+  public WonSignatureData getOutermostSignature() {
+   return sigUriToSigReference.get(outermostSignatureUri);
   }
 }

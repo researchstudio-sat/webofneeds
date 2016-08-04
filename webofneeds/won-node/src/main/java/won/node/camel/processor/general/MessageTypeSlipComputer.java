@@ -127,6 +127,9 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
     if (allowNoMatchingProcessor) {
       return null;
     }
+    logger.debug("unexpected combination of messageType {} and direction {} encountered " +
+                   "- this causes an exception,which triggers a FailureResponse",
+                 messageType, direction);
     throw new WonMessageProcessingException(String.format("unexpected combination of messageType %s " +
       "and direction %s encountered", messageType, direction));
   }

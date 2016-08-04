@@ -118,6 +118,8 @@ public class WonMessageBuilder
       messageEventResource.addProperty(WONMSG.HAS_MESSAGE_TYPE_PROPERTY, wonMessageType.getResource());
     }
 
+    messageEventResource.addLiteral(WONMSG.PROTOCOL_VERSION, envelopeGraph.createTypedLiteral("1.0"));
+
     // add sender
     if (senderURI != null)
       messageEventResource.addProperty(

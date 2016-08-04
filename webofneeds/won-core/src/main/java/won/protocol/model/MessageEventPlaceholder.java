@@ -13,6 +13,8 @@ import java.util.Date;
 public class MessageEventPlaceholder
 {
 
+
+
   public MessageEventPlaceholder() {}
 
   public MessageEventPlaceholder(URI parentURI, WonMessage wonMessage){
@@ -27,6 +29,7 @@ public class MessageEventPlaceholder
     this.receiverNodeURI = wonMessage.getReceiverNodeURI();
     this.creationDate = new Date();
     this.correspondingRemoteMessageURI = wonMessage.getCorrespondingRemoteMessageURI();
+    this.referencedByOtherMessage = false;
   }
 
   @Id
@@ -62,7 +65,8 @@ public class MessageEventPlaceholder
   private URI correspondingRemoteMessageURI;
   @Column(name = "responseMessageURI")
   private URI responseMessageURI;
-
+  @Column(name = "referencedByOtherMessage")
+  private boolean referencedByOtherMessage;
 
   @XmlTransient
   public Long getId() {
@@ -159,6 +163,14 @@ public class MessageEventPlaceholder
 
   public void setCorrespondingRemoteMessageURI(final URI correspondingRemoteMessageURI) {
     this.correspondingRemoteMessageURI = correspondingRemoteMessageURI;
+  }
+
+  public boolean isReferencedByOtherMessage() {
+    return referencedByOtherMessage;
+  }
+
+  public void setReferencedByOtherMessage(final boolean referencedByOtherMessage) {
+    this.referencedByOtherMessage = referencedByOtherMessage;
   }
 
   public URI getResponseMessageURI() {

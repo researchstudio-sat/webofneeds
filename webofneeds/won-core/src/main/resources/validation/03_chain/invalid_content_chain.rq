@@ -28,7 +28,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
     (if((?ttlContents*2+?ttlEnvelopes*2)!=?ttlGraphs, "a content is not referenced from an envelope", "OK") AS
     ?contentNotReferencedCheck)
 
-    (if(?numOfMultiRefContent>0 || ((?ttlContents*2+?ttlEnvelopes*2)!=?ttlGraphs), "FAIL", "OK") AS ?check)
+    (if(?numOfMultiRefContent>0 || ((?ttlContents + ?ttlEnvelopes + 1)!=?ttlGraphs), "FAIL", "OK") AS ?check)
 
   WHERE
   {

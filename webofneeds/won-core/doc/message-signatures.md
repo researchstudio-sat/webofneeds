@@ -66,7 +66,7 @@ way we chain the content and envelopes when composing the message.
 ### Signature chaining
 Signatures are chained in a message in parallel to the message envelopes chaining. Generally, a WoN message is 
 composed in a chained manner: existing envelopes and payload graphs are referenced from the newly added envelopes, 
-including reference to the signatures of those graphs. Signatures are referenced by **msg:referencesSignature** 
+including reference to the signatures of those graphs. Signatures are referenced by **msg:containsSignature** 
 relation. The outermost envelope graph is the one that must be verified first by the recipient to 
 determine how to process the message further, working 'inward' from there. An example below contains two envelopes 
 and two signatures:
@@ -139,7 +139,7 @@ and two signatures:
     event:n8s7pk2y0nxdyg20s0rc
             a                         msg:FromSystem ;
             msg:hasReceivedTimestamp  "1458127303119"^^xsd:long ;
-            msg:referencesSignature   [ msg:hasSignatureGraph  <https://localhost8889/won/resource/event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d-sig> ;
+            msg:containsSignature   [ msg:hasSignatureGraph  <https://localhost8889/won/resource/event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d-sig> ;
                                         msg:hasSignatureValue  "MGUCMAfOwjpbp8F+YCDhYAfEzHYdjlBG+qvvLzZGusoxr31xjm8BlKVR230M2PS4s8tylwIxAMgCWkHPZTvy5bCVd6+3WNikkCSeCNNR/Jck+LPYU8vCfughKrXTaTrAWOTnX0e9hw==" ;
                                         msg:hasSignedGraph     <https://localhost8889/won/resource/event/n8s7pk2y0nxdyg20s0rc#envelope-cw1d>
                                       ] .
