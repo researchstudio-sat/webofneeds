@@ -815,36 +815,54 @@ const rdfstore = window.rdfstore;
 
     window.selectNeedData4dbg = needUri => selectNeedData(needUri, privateData.store);
     function selectNeedData(needUri, store) {
-        //returns the need and everything attached to the need's content-node up to three levels deep
+        //returns the need and everything attached to the need's content-, connectsions- and event-node up to a varying depth
+        //TODO include eventUris and connectionUris but nothing deeper
         const query = `
             prefix won: <http://purl.org/webofneeds/model#>
+            prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             construct {<${needUri}> ?b ?c. ?c ?d ?e. ?e ?f ?g. ?g ?h ?i} where {
                 {
-                      <${needUri}> won:hasBasicNeedType ?c.
-                      <${needUri}> ?b ?c
+                    <${needUri}> won:hasBasicNeedType ?c.
+                    <${needUri}> ?b ?c
                 }
+
                 UNION
+
                 {
-                      <${needUri}> won:hasContent ?c.
-                      <${needUri}> ?b ?c
+                    <${needUri}> won:hasConnections ?c.
+                    <${needUri}> ?b ?c.
+                } UNION {
+                    <${needUri}> won:hasConnections ?c.
+                    ?c ?d ?e
                 }
+
                 UNION
+
                 {
-                      <${needUri}> won:hasContent ?c.
-                      ?c ?d ?e.
+                    <${needUri}> won:hasEventContainer ?c.
+                    <${needUri}> ?b ?c.
+                } UNION {
+                    <${needUri}> won:hasEventContainer ?c.
+                    ?c ?d ?e
                 }
+
                 UNION
+
                 {
-                      <${needUri}> won:hasContent ?c.
-                      ?c ?d ?e.
-                      ?e ?f ?g.
-                }
-                UNION
-                {
-                      <${needUri}> won:hasContent ?c.
-                      ?c ?d ?e.
-                      ?e ?f ?g.
-                      ?g ?h ?i.
+                    <${needUri}> won:hasContent ?c.
+                    <${needUri}> ?b ?c
+                } UNION {
+                    <${needUri}> won:hasContent ?c.
+                    ?c ?d ?e.
+                } UNION {
+                    <${needUri}> won:hasContent ?c.
+                    ?c ?d ?e.
+                    ?e ?f ?g.
+                } UNION {
+                    <${needUri}> won:hasContent ?c.
+                    ?c ?d ?e.
+                    ?e ?f ?g.
+                    ?g ?h ?i.
                 }
             }
             `
