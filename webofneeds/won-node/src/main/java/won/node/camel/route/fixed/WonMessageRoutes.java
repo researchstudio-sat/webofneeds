@@ -72,7 +72,7 @@ public class WonMessageRoutes  extends RouteBuilder
       .to("bean:referenceAdder")
       .to("bean:signatureAdder")
       .to("bean:persister")
-      .to("bean:wrapperFromSystem")
+      .to("bean:wrapperFromSystem") //TODO delete
       //route to message processing logic
       .to("seda:OwnerProtocolLogic");
 
@@ -85,8 +85,7 @@ public class WonMessageRoutes  extends RouteBuilder
       .routeId("SystemMessageToOwner")
       .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
         //TODO: as soon as messages are signed when they reach this route, perform signature/wellformedness checks here?
-      .to("bean:wrapperFromSystem")
-      .to("bean:referenceAdder")
+      .to("bean:wrapperFromSystem") //TODO delete
       .to("bean:signatureAdder")
               //route to message processing logic
       .to("bean:persister")
@@ -219,7 +218,6 @@ public class WonMessageRoutes  extends RouteBuilder
      * because its URI says it lives on the recipient node. The recipient will persist it.
      */
     from("seda:NeedProtocolOut?concurrentConsumers=2").routeId("Node2NodeRoute")
-            .to("bean:referenceAdder")
             .to("bean:signatureAdder")
             .to("bean:needProtocolOutgoingMessagesProcessor");
 
