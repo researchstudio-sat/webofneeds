@@ -857,8 +857,22 @@ const rdfstore = window.rdfstore;
                 const needJsonLdP = triples2framedJson(needUri, resultGraph.triples, {
                     /* frame */
                     "@context": {
-                        "won" : "http://purl.org/webofneeds/model#"
-                        //TODO use full context from need
+                        "msg" : "http://purl.org/webofneeds/message#",
+                        "conn" : "https://satsrv04.researchstudio.at:8889/won/resource/connection/",
+                        "woncrypt" : "http://purl.org/webofneeds/woncrypt#",
+                        "need" : "https://satsrv04.researchstudio.at:8889/won/resource/need/",
+                        "xsd" : "http://www.w3.org/2001/XMLSchema#",
+                        "cert" : "http://www.w3.org/ns/auth/cert#",
+                        "rdfs" : "http://www.w3.org/2000/01/rdf-schema#",
+                        "local" : "https://satsrv04.researchstudio.at:8889/won/resource/",
+                        "sig" : "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#",
+                        "geo" : "http://www.w3.org/2003/01/geo/wgs84_pos#",
+                        "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                        "won" : "http://purl.org/webofneeds/model#",
+                        "ldp" : "http://www.w3.org/ns/ldp#",
+                        "event" : "https://satsrv04.researchstudio.at:8889/won/resource/event/",
+                        "sioc" : "http://rdfs.org/sioc/ns#",
+                        "dc" : "http://purl.org/dc/elements/1.1/"
                     },
                     "won:hasContent": {
                         "@type": "won:NeedContent"
