@@ -16,8 +16,6 @@
 
 package won.bot.framework.bot;
 
-import com.sun.jndi.toolkit.url.Uri;
-
 import java.net.URI;
 import java.util.List;
 
