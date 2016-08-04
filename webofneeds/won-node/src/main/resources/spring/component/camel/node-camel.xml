@@ -130,29 +130,46 @@
   <!-- won-specific processors -->
   <!-- start of the pipeline -->
   <bean name="wonMessageIntoCamelProcessor" class="won.protocol.message.processor.camel.WonMessageIntoCamelProcessor" />
-  <!-- wrapping the messages for storage on node -->
-  <bean name="wrapperFromOwner" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+
+    <bean name="receivedTimestampAdder"
+              class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg>
+            <bean class="won.node.camel.processor.general.ReceivedTimestampAddingWonMessageProcessor" />
+        </constructor-arg>
+    </bean>
+
+  <bean name="directionFromOwnerAdder"
+        class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
     <constructor-arg>
-      <bean class="won.node.camel.processor.general.MessageWrappingWonMessageProcessor">
+      <bean class="won.node.camel.processor.general.DirectionAddingWonMessageProcessor">
         <constructor-arg name="direction" value="FROM_OWNER" />
       </bean>
     </constructor-arg>
   </bean>
-  <bean name="wrapperFromExternal" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+  <bean name="directionFromExternalAdder"
+        class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
     <constructor-arg>
-      <bean class="won.node.camel.processor.general.MessageWrappingWonMessageProcessor">
+      <bean class="won.node.camel.processor.general.DirectionAddingWonMessageProcessor">
         <constructor-arg name="direction" value="FROM_EXTERNAL" />
       </bean>
     </constructor-arg>
   </bean>
-  <!-- wrapping the messages for storage on node -->
-  <bean name="wrapperFromSystem" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+
+  <bean name="directionFromSystemAdder"
+        class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
     <constructor-arg>
-      <bean class="won.node.camel.processor.general.MessageWrappingWonMessageProcessor">
+      <bean class="won.node.camel.processor.general.DirectionAddingWonMessageProcessor">
         <constructor-arg name="direction" value="FROM_SYSTEM" />
       </bean>
     </constructor-arg>
   </bean>
+    <!-- wrapping the messages for storage on node -->
+    <bean name="envelopeAdder"
+          class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg>
+            <bean class="won.node.camel.processor.general.EnvelopeAddingWonMessageProcessor"/>
+        </constructor-arg>
+    </bean>
   <!-- processor for checking if message event, create need, or create connection uri is well-formed -->
   <bean name="uriNodePathChecker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
      <constructor-arg>
