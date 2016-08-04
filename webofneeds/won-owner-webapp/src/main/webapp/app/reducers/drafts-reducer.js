@@ -36,6 +36,14 @@ export default function(drafts = initialState, action = {}) {
             var {draftId, location} = action.payload;
             return update(drafts, draftId, 'location', location);
 
+        case actionTypes.drafts.change.description: 
+            var {draftId, description} = action.payload
+            return update(drafts, draftId, 'description', description);
+    
+        case actionTypes.drafts.change.tags: 
+            var {draftId, tags} = action.payload;
+            return update(drafts, draftId, 'tags', tags);
+
         /**
          * @param {*} draftId : the draft that's thumbnail has changed
          * @param {object} image : e.g. `{ name: 'somepic.png', type: 'image/png', data: 'iVBORw0...gAAI1=' }`

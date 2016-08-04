@@ -108,30 +108,32 @@ public abstract class AbstractSirenMatcherActor extends UntypedActor
     tagTerms = qNLPP.extractWordTokens(needObject.getNeedTag());
   }
 
-  protected String buildSirenQuery(NeedObject needObject, String[] titleTerms,
-                                   String[] descriptionTerms, String[] tagTerms)
-    throws IOException, QueryNodeException {
+  protected String buildSirenQuery(NeedObject needObject, String[] titleTerms, String[] descriptionTerms,
+                                   String[] tagTerms) throws IOException, QueryNodeException {
 
     SirenQueryBuilder queryBuilder = new SirenQueryBuilder(needObject, config.getConsideredQueryTokens());
-    String solrQuery = null;
 
-    if (config.isUseTitleQuery()) {
-      queryBuilder.addTitleTerms(titleTerms);
-      solrQuery = queryBuilder.build();
-    } else if (config.isUseDescriptionQuery()) {
-      queryBuilder.addDescriptionTerms(descriptionTerms);
-      solrQuery = queryBuilder.build();
-    } else if (config.isUseTitleDescriptionQuery()) {
-      queryBuilder.addTitleTerms(titleTerms);
-      queryBuilder.addDescriptionTerms(descriptionTerms);
-      solrQuery = queryBuilder.build();
-    } else if (config.isUseTitleDescriptionTagQuery()) {
-      queryBuilder.addTitleTerms(titleTerms);
-      queryBuilder.addTagTerms(tagTerms);
-      queryBuilder.addDescriptionTerms(descriptionTerms);
-      solrQuery = queryBuilder.build();
-    }
+    String[] tagSynonyms = qNLPP.retrieveSynonyms(String.join(" ", tagTerms));
+    String[] titleSynonyms = qNLPP.retrieveSynonyms(String.join(" ", titleTerms));
 
+    // build the query and boost the components differently
+    queryBuilder.addTermsToTitleQuery(titleTerms, 16);
+    queryBuilder.addTermsToTitleQuery(tagTerms, 8);
+    queryBuilder.addTermsToTitleQuery(tagSynonyms, 4);
+    queryBuilder.addTermsToTitleQuery(titleSynonyms, 2);
+
+    queryBuilder.addTermsToTagQuery(tagTerms, 16);
+    queryBuilder.addTermsToTagQuery(titleTerms, 8);
+    queryBuilder.addTermsToTagQuery(tagSynonyms, 4);
+    queryBuilder.addTermsToTagQuery(titleSynonyms, 2);
+
+    queryBuilder.addTermsToDescriptionQuery(titleTerms, 8);
+    queryBuilder.addTermsToDescriptionQuery(tagTerms, 8);
+    queryBuilder.addTermsToDescriptionQuery(descriptionTerms, 2);
+    queryBuilder.addTermsToDescriptionQuery(tagSynonyms, 4);
+    queryBuilder.addTermsToDescriptionQuery(titleSynonyms, 2);
+
+    String solrQuery = queryBuilder.build();
     return solrQuery;
   }
 

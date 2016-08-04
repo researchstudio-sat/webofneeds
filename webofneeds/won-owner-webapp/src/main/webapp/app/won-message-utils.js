@@ -256,9 +256,9 @@ export function buildCreateMessage(need, wonNodeUri) {
     const contentRdf = won.buildNeedRdf({
         type : won.toCompacted(need.type), //mandatory
         title: need.title, //mandatory
-        description: need.textDescription,
+        description: need.description,
         publishedContentUri: publishedContentUri, //mandatory
-        tags: need.tags? need.tags.map(function(t) {return t.text}).join(',') : undefined,
+        tags: need.tags? need.tags.join(',') : undefined,
         attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
         longitude: need.location.lon,
         latitude: need.location.lat,

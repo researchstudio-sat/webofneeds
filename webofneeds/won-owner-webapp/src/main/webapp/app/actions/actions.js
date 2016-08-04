@@ -128,6 +128,8 @@ const actionHierarchy = {
         change: { // A draft has changed. Pass along the draftURI and the respective data.
             type: INJ_DEFAULT,
             title: INJ_DEFAULT,
+            description: INJ_DEFAULT,
+            tags: INJ_DEFAULT,
             thumbnail: INJ_DEFAULT,
             location: INJ_DEFAULT,
         },

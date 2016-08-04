@@ -52,6 +52,15 @@
             <artifactId>jena-arq</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.github.jsonld-java</groupId>
             <artifactId>jsonld-java</artifactId>
             <version>0.6.0</version>
@@ -105,7 +114,7 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>4.10.4</version>
+            <version>4.9.1</version>
         </dependency>
         <dependency>
             <!-- NOTE: the version of solrj MUST be the same as the version of solr
@@ -116,6 +125,7 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
+
 
     </dependencies>
 

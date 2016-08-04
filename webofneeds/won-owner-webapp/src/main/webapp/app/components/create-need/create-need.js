@@ -63,6 +63,7 @@ class CreateNeedController {
             const draftId = state.getIn(['router', 'currentParams', 'draftId']);
             return {
                 draftId,
+                tags: state.getIn(['drafts', draftId, 'tags']),
                 pendingPublishing: state.hasIn(['drafts', draftId, 'pendingPublishingAs']),
                 userHasSelectedType: state.hasIn(['drafts', draftId, 'type']),
             }
