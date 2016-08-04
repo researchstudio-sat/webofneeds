@@ -177,6 +177,13 @@
       <bean class="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor" />
     </constructor-arg>
   </bean>
+    <!-- referencing prevoiusly unrerferenced messages -->
+    <bean id="referenceToUnreferencedMessageAdder"
+          class="won.node.camel.processor.general.ReferenceToUnreferencedMessageAddingProcessor" >
+    </bean>
+    <bean name="referenceAdder" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+        <constructor-arg ref="referenceToUnreferencedMessageAdder" />
+    </bean>
     <!-- signing messages -->
     <bean id="signatureAddingProcessor" class="won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor">
         <property name="cryptographyService" ref="cryptographyService" />

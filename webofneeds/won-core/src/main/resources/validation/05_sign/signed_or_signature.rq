@@ -22,14 +22,14 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
   ?numCorrectSignatures
 
 
-    (if((?numCorrectSignatures*2) != ?numGraphs || ?numCorrectSignatures < 1, "FAIL", "OK") AS ?check)
+    (if(?numCorrectSignatures = 1 && ?numGraphs >= 2, "OK", "FAIL") AS ?check)
 
   WHERE
   {
 
 
     # count number of signature graphs that have corresponding signed graph
-    { SELECT (count(?g) as ?numCorrectSignatures)
+    { SELECT (count(distinct ?g) as ?numCorrectSignatures)
         WHERE
         {
         GRAPH ?g
@@ -40,8 +40,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
 
         GRAPH ?signed
             {
-                FILTER NOT EXISTS
-                    {  ?signed rdf:type signature:Signature . }
+               ?a ?b ?c
             } .
         }
      }

@@ -50,10 +50,14 @@ public class WonMessageValidator
     List validators = new ArrayList<WonSparqlValidator>();
     Resource[] resources = resolver.getResources("classpath:" + dirString + "*.rq");
     for (Resource resource : resources) {
-      String queryString = loadQueryFromResource(resource);
-      Query constraint = QueryFactory.create(queryString);
-      WonSparqlValidator validator = new WonSparqlValidator(constraint, resource.getFilename());
-      validators.add(validator);
+      try {
+        String queryString = loadQueryFromResource(resource);
+        Query constraint = QueryFactory.create(queryString);
+        WonSparqlValidator validator = new WonSparqlValidator(constraint, resource.getFilename());
+        validators.add(validator);
+      } catch (Exception e){
+        throw new IllegalStateException("Error loading query from resource " + resource.toString(), e);
+      }
     }
     return validators;
   }

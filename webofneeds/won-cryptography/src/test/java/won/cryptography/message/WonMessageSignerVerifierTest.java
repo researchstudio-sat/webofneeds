@@ -6,7 +6,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import won.cryptography.rdfsign.SignatureVerificationResult;
+import won.cryptography.rdfsign.SignatureVerificationState;
 import won.cryptography.service.KeyStoreService;
 import won.cryptography.utils.TestSigningUtils;
 import won.protocol.message.WonMessage;
@@ -80,7 +80,7 @@ public class WonMessageSignerVerifierTest
     Dataset testDataset = TestSigningUtils.prepareTestDataset(RESOURCE_FILE_SIG);
     WonMessage testMsg = new WonMessage(testDataset);
     // verify
-    SignatureVerificationResult result = WonMessageSignerVerifier.verify(pubKeysMap, testMsg);
+    SignatureVerificationState result = WonMessageSignerVerifier.verify(pubKeysMap, testMsg);
 
     Assert.assertTrue(result.getMessage(), result.isVerificationPassed());
     Assert.assertEquals(3, result.getSignatureGraphNames().size());
@@ -98,7 +98,8 @@ public class WonMessageSignerVerifierTest
     WonMessage testMsg = new WonMessage(testDataset);
 
     // sign
-    testMsg = WonMessageSignerVerifier.sign(needKey, TestSigningUtils.needCertUri, testMsg);
+    testMsg = WonMessageSignerVerifier.sign(needKey,  pubKeysMap.get(TestSigningUtils.nodeCertUri), TestSigningUtils
+      .needCertUri, testMsg);
 
     // pretend msg was serialized and deserialized in between
     //pretend it was serialized and deserialized
@@ -106,7 +107,7 @@ public class WonMessageSignerVerifierTest
     testMsg = new WonMessage(RdfUtils.readDatasetFromString(datasetString, Lang.TRIG));
 
     // verify
-    SignatureVerificationResult result = WonMessageSignerVerifier.verify(pubKeysMap, testMsg);
+    SignatureVerificationState result = WonMessageSignerVerifier.verify(pubKeysMap, testMsg);
 
     Assert.assertTrue(result.isVerificationPassed());
     Assert.assertEquals(2, result.getSignatureGraphNames().size());
@@ -126,7 +127,8 @@ public class WonMessageSignerVerifierTest
     WonMessage testMsg = new WonMessage(testDataset);
 
     // sign
-    testMsg = WonMessageSignerVerifier.sign(nodeKey, TestSigningUtils.nodeCertUri, testMsg);
+    testMsg = WonMessageSignerVerifier.sign(nodeKey, pubKeysMap.get(TestSigningUtils.nodeCertUri), TestSigningUtils
+      .nodeCertUri, testMsg);
 
     // pretend msg was serialized and deserialized in between
     //pretend it was serialized and deserialized
@@ -134,7 +136,7 @@ public class WonMessageSignerVerifierTest
     testMsg = new WonMessage(RdfUtils.readDatasetFromString(datasetString, Lang.TRIG));
 
     // verify
-    SignatureVerificationResult result = WonMessageSignerVerifier.verify(pubKeysMap, testMsg);
+    SignatureVerificationState result = WonMessageSignerVerifier.verify(pubKeysMap, testMsg);
 
     Assert.assertTrue(result.getMessage(), result.isVerificationPassed());
     Assert.assertEquals(3, result.getSignatureGraphNames().size());

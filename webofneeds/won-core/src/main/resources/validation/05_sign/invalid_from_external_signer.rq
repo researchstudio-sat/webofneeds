@@ -21,6 +21,8 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
 #{
   SELECT
 
+    ?type
+
     ?correctExtLeafEnvNum
     ?correctExtLeafClosestEnvNum
 
@@ -31,14 +33,25 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
     ?correctExtRestEnvNum
 
 
-    (if(?correctExtLeafEnvNum != ?extLeafEnvNum ||
-    ?correctExtLeafClosestEnvNum != ?extLeafClosestEnvNum  ||
-    ?correctExtRestEnvNum != ?extRestEnvNum, "FAIL", "OK") AS ?check)
+    (if(bound(?type) && ?type = msg:HintMessage || (
+    ?correctExtLeafEnvNum = ?extLeafEnvNum &&
+    ?correctExtLeafClosestEnvNum = ?extLeafClosestEnvNum  &&
+    ?correctExtRestEnvNum = ?extRestEnvNum), "OK", "FAIL") AS ?check)
 
 
   WHERE
   {
-
+    {SELECT ?type
+    	WHERE
+     	{
+          graph ?g{
+            optional {
+            	?g rdfg:subGraphOf ?event.
+                   ?event msg:hasMessageType ?type.
+            	   ?event a msg:FromExternal}
+           }
+        }
+    }
 
     # count fromExternal leaf envelopes that have correct (sender node) signer
     {SELECT
@@ -60,7 +73,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
           FILTER NOT EXISTS
               {  ?env msg:containsEnvelope ?g3 . }
       } .
-      GRAPH ?envsig
+      GRAPH ?g2
       {
           ?envsig a signature:Signature .
           ?envsig msg:hasSignedGraph ?env .
@@ -111,7 +124,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       {
           ?otherevent msg:hasSenderNode    ?envsigner
       } .
-      GRAPH ?envsig
+      GRAPH ?g5
       {
           ?envsig a signature:Signature .
           ?envsig msg:hasSignedGraph ?g .
@@ -173,7 +186,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
       {
          ?leafevent a msg:FromExternal .
       } .
-      GRAPH ?envsig
+      GRAPH ?g5
       {
           ?envsig a signature:Signature .
           ?envsig msg:hasSignedGraph ?g .

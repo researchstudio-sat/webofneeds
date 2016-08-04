@@ -21,7 +21,7 @@ import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.cryptography.rdfsign.SignatureVerificationResult;
+import won.cryptography.rdfsign.SignatureVerificationState;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -60,7 +60,7 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
 
 
 
-    SignatureVerificationResult result = null;
+    SignatureVerificationState result = null;
     try {
       // obtain public keys
       Map<String,PublicKey> keys = getRequiredPublicKeys(message.getCompleteDataset());
@@ -73,14 +73,14 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
 
     } catch (Exception e) {
       //TODO SignatureProcessingException?
-      throw new WonMessageProcessingException("Error by signature verification of "
+      throw new WonMessageProcessingException("Could not verify message "
                                                 + message.getMessageURI(), e);
     }
     // throw exception if the verification fails:
     if (!result.isVerificationPassed()) {
       //TODO SignatureProcessingException?
       throw new WonMessageProcessingException(
-        new SignatureException("Error by signature verification of " + message.getMessageURI()
+        new SignatureException("Could not verify message " + message.getMessageURI()
                                  + ": " + result.getMessage()));
     }
     return message;

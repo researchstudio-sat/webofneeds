@@ -82,7 +82,7 @@
             msg:hasMessageType       msg:CreateMessage ;
             msg:hasReceiverNode      <http://localhost:8080/won/resource> ;
             msg:hasSenderNeed        need:3144709509622353000 ;
-            msg:referencesSignature  [ msg:hasSignatureGraph  <http://localhost:8080/won/resource/need/3144709509622353000/core/#data-sig> ;
+            msg:containsSignature  [ msg:hasSignatureGraph  <http://localhost:8080/won/resource/need/3144709509622353000/core/#data-sig> ;
                                        msg:hasSignatureValue  "MGQCMApLBtpACkkLTNTTW6pHl7Uu8Nv9z2WTr1CGKfBIOwTtM7/cyNf42LAWVCj+w+Vr0gIwNFN8kS3fRY3H37Kw1G+sHYwxhNKE+zzXG6eDadKAjrPa0VbvzZtUx7iDh4z/Uctf" ;
                                        msg:hasSignedGraph     <http://localhost:8080/won/resource/need/3144709509622353000/core/#data>
                                      ] .

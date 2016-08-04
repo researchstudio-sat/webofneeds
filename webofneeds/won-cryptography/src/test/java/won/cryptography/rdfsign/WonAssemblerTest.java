@@ -82,7 +82,7 @@ public class WonAssemblerTest
     mockSigData.setGraphDigestMethod("blahblahGraphDigestMethod");
     mockSigData.setSerializationMethod("blahblahSerializationmethod");
     mockSigData.setSignatureMethod("blahblahSigMathod");
-    //mockSigData.setVerificationCertificate("\"blahblahVerificationCertificate\"");
+    //mockSigData.setVerificationCertificateUri("\"blahblahVerificationCertificate\"");
     mockSigData.setVerificationCertificate("<http://localhost:8080/blahblah/certificate>");
 
     return mockSigData;

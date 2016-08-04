@@ -83,7 +83,7 @@
             a                    msg:OwnerToNodeEnvelope ;
             msg:hasContent       <http://localhost:8080/won/resource/need/3144709509622353000/core/#data> ;
 
-            msg:referencesSignature     [
+            msg:containsSignature     [
                 msg:hasSignedGraph <http://localhost:8080/won/resource/need/3144709509622353000/core/#data> ;
                 msg:hasSignatureValue "MGQCMEss5VjkZYJiNWOMwMx3wXGH5VbhpcLncxjkii1nhH1HmiIlYmc4A1cFT7rp9/QzGwIwKJ17LBVzhThQSyc/ZdzTa5jza8Dzq2IutKXX8urDqr1vTBiehpryhYxLI9OWdpnl" ;
                 msg:hasSignatureGraph <http://localhost:8080/won/resource/need/3144709509622353000/core/#data-sig>
@@ -130,7 +130,7 @@
     event:7719577021233193000
             a                 msg:NodeToNodeEnvelope ;
 
-            msg:referencesSignature     [
+            msg:containsSignature     [
                             msg:hasSignedGraph <http://localhost:8080/won/resource/event/7719577021233193000#data> ;
                             msg:hasSignatureValue "MGUCMDxGzPJ9yMljEPOnf/3KbPdWIi+PG7GB3IIp6XHZBJKS6UY5ba2+bWqHR0gmtUfJ/gIxAIuiO0nsZuGMFtoMObJATdLGyd8TSQlDhz32xAtx34qNYsnh9kdwORistAPdhvwEng==" ;
                             msg:hasSignatureGraph <http://localhost:8080/won/resource/event/7719577021233193000#data-sig>

@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonSignatureData;
 import won.protocol.model.Facet;
 import won.protocol.model.Match;
 import won.protocol.model.NeedState;
@@ -52,13 +53,9 @@ public class WonRdfUtils
       return false;
     }
 
-    public static boolean isSignature(Model model) {
+    public static boolean isSignature(Model model, String modelName) {
       // TODO check the presence of all the required triples
-      StmtIterator si = model.listStatements(null, RDF.type, SFSIG.SIGNATURE);
-      if (si.hasNext()) {
-        return true;
-      }
-      return false;
+      return model.contains(model.getResource(modelName), RDF.type, SFSIG.SIGNATURE);
     }
 
     public static String getSignedGraphUri(String signatureGraphUri, Model signatureGraph) {
@@ -79,6 +76,48 @@ public class WonRdfUtils
         signatureValue = ni2.next().asLiteral().toString();
       }
       return signatureValue;
+    }
+
+    public static WonSignatureData extractWonSignatureData(final String uri, final Model model) {
+      return extractWonSignatureData(model.getResource(uri));
+    }
+
+    public static WonSignatureData extractWonSignatureData(final Resource resource) {
+      Statement stmt = resource.getRequiredProperty(WONMSG.HAS_SIGNED_GRAPH_PROPERTY);
+      String signedGraphUri = stmt.getObject().asResource().getURI();
+      stmt = resource.getRequiredProperty(SFSIG.HAS_SIGNATURE_VALUE);
+      String signatureValue = stmt.getObject().asLiteral().getString();
+      stmt = resource.getRequiredProperty(WONMSG.HAS_HASH_PROPERTY);
+      String hash = stmt.getObject().asLiteral().getString();
+      stmt = resource.getRequiredProperty(WONMSG.HAS_PUBLIC_KEY_FINGERPRINT_PROPERTY);
+      String fingerprint = stmt.getObject().asLiteral().getString();
+      stmt = resource.getRequiredProperty(SFSIG.HAS_VERIFICATION_CERT);
+      String cert = stmt.getObject().asResource().getURI();
+      return new WonSignatureData(signedGraphUri, resource.getURI(), signatureValue, hash, fingerprint,
+                                  cert);
+    }
+
+    /**
+     * Adds the triples holding the signature data to the model of the specified resource, using the resource as the
+     * subject.
+     * @param subject
+     * @param wonSignatureData
+     */
+    public static void addSignature(Resource subject, WonSignatureData wonSignatureData){
+      assert wonSignatureData.getHash() != null;
+      assert wonSignatureData.getSignatureValue() != null;
+      assert wonSignatureData.getPublicKeyFingerprint() != null;
+      assert wonSignatureData.getSignedGraphUri() != null;
+      assert wonSignatureData.getVerificationCertificateUri() != null;
+      Model containingGraph = subject.getModel();
+      subject.addProperty(RDF.type, SFSIG.SIGNATURE);
+      subject.addProperty(WONMSG.HAS_HASH_PROPERTY, wonSignatureData.getHash());
+      subject.addProperty(SFSIG.HAS_SIGNATURE_VALUE, wonSignatureData.getSignatureValue());
+      subject.addProperty(WONMSG.HAS_SIGNED_GRAPH_PROPERTY,
+                          containingGraph.createResource(wonSignatureData.getSignedGraphUri()));
+      subject.addProperty(WONMSG.HAS_PUBLIC_KEY_FINGERPRINT_PROPERTY, wonSignatureData.getPublicKeyFingerprint());
+      subject.addProperty(SFSIG.HAS_VERIFICATION_CERT, containingGraph.createResource(wonSignatureData
+                                                                                        .getVerificationCertificateUri()));
     }
   }
 

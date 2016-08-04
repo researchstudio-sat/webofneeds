@@ -19,6 +19,13 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
 
   List<URI> getMessageURIsByParentURI(URI parentURI);
 
+  List<MessageEventPlaceholder> findByParentURIAndMessageType(URI parentURI, WonMessageType messageType);
+
+  @Query("select msg from MessageEventPlaceholder msg where msg.parentURI = :parent and " +
+    "referencedByOtherMessage = false")
+  List<MessageEventPlaceholder> findByParentURIAndReferencedByOtherMessage(
+    @Param("parent") URI parentURI);
+
   @Query("select messageURI from MessageEventPlaceholder msg where msg.parentURI = :parent")
   Slice<URI> getMessageURIsByParentURI(@Param("parent") URI parentURI, Pageable pageable);
 
