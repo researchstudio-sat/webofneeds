@@ -18,6 +18,10 @@ import { actionCreators }  from '../actions/actions';
 import { selectOpenDraft, selectRouterParams } from '../selectors';
 import { doneTypingBufferNg } from '../cstm-ng-utils'
 
+//TODO 4dbg deleteme
+import jsonld from 'jsonld';
+window.jsonld = jsonld;
+
 const serviceDependencies = ['$scope', '$ngRedux', '$element'];
 function genComponentConf() {
     let template = `
@@ -300,4 +304,8 @@ export default angular.module('won.owner.components.locationPicker', [
     .name;
 
 
+
+
 window.searchNominatim4dbg = searchNominatim;
+window.reverseSearchNominatim4dbg = reverseSearchNominatim;
+window.nominatim2wonLocation4dbg = nominatim2wonLocation;
