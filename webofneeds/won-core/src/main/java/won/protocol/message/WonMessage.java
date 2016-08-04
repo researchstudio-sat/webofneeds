@@ -66,13 +66,36 @@ public class WonMessage implements Serializable
     return this.completeDataset;
   }
 
-  public void addMesssageProperty(Property property, RDFNode value) {
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param value
+   */
+  public void addMessageProperty(Property property, RDFNode value) {
+    if (logger.isDebugEnabled()){
+      logger.debug("adding property {}, value {}, to message {} in envelope {}",
+                   new Object[]{property, value, getMessageURI(), getOuterEnvelopeGraphURI()});
+    }
     getOuterEnvelopeGraph().getResource(getMessageURI().toString()).addProperty(property, value);
   }
 
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param uri the object of the property, assumed to be an uri
+   */
+  public void addMessageProperty(Property property, String uri){
+    RDFNode valueAsRdfNode = getOuterEnvelopeGraph().createResource(uri);
+    addMessageProperty(property, valueAsRdfNode);
+  }
+
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param value
+   */
   public void addMessageProperty(Property property, URI value){
-    RDFNode valueAsRdfNode = getOuterEnvelopeGraph().createResource(value.toString());
-    addMesssageProperty(property, valueAsRdfNode);
+    addMessageProperty(property, value.toString());
   }
 
   /**
