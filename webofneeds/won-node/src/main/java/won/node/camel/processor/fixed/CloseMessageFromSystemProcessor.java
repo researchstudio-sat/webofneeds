@@ -70,13 +70,11 @@ public class CloseMessageFromSystemProcessor extends AbstractCamelProcessor
       }
       //put it into the 'outbound message' header (so the persister doesn't pick up the wrong one).
       exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
+      //set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
+      wonMessage.addMessageProperty(WONMSG.SENDER_PROPERTY, con.getConnectionURI());
       //add the information about the corresponding message to the local one
-      wonMessage = WonMessageBuilder.wrap(wonMessage)
-        .setSenderURI(con.getConnectionURI())
-        .setCorrespondingRemoteMessageURI(newWonMessage.getMessageURI())
-        .build();
-      //replace the local message in the header with its updated version so the persister will pick it up later
-      message.setHeader(WonCamelConstants.MESSAGE_HEADER,wonMessage);
+      wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, newWonMessage.getMessageURI());
+      //the persister will pick it up later
     }
 
     //because the FromSystem message is now in the message header, it will be

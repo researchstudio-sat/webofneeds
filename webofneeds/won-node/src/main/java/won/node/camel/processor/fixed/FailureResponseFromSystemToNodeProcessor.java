@@ -42,13 +42,9 @@ public class FailureResponseFromSystemToNodeProcessor extends AbstractCamelProce
     //put it into the 'outbound message' header (so the persister doesn't pick up the wrong one).
     exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
     //add the information about the corresponding message to the local one
-    wonMessage = WonMessageBuilder
-            .wrap(wonMessage)
-            .setCorrespondingRemoteMessageURI(newWonMessage.getMessageURI())
-            .build();
+    wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, newWonMessage.getMessageURI());
+    //the persister will pick it up later
 
-    //put it into the header so the persister will pick it up later
-    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, wonMessage);
   }
 
   private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage) {
@@ -60,4 +56,6 @@ public class FailureResponseFromSystemToNodeProcessor extends AbstractCamelProce
                             .generateEventURI(wonMessage.getReceiverNodeURI()))
             .build();
   }
+
+
 }

@@ -40,13 +40,11 @@ public class CloseMessageFromOwnerProcessor extends AbstractFromOwnerCamelProces
       final WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage);
       //put it into the 'outbound message' header (so the persister doesn't pick up the wrong one).
       message.setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
+      //set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
+      wonMessage.addMessageProperty(WONMSG.SENDER_PROPERTY, con.getConnectionURI());
       //add the information about the corresponding message to the local one
-      wonMessage = WonMessageBuilder.wrap(wonMessage)
-        .setSenderURI(con.getConnectionURI()) //TODO: check if the sender URI is duplicated in the wrapped message
-        .setCorrespondingRemoteMessageURI(newWonMessage.getMessageURI())
-        .build();
-      //put it into the header so the persister will pick it up later
-      message.setHeader(WonCamelConstants.MESSAGE_HEADER,wonMessage);
+      wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, newWonMessage.getMessageURI());
+      //the persister will pick it up later from the header
     }
   }
 
