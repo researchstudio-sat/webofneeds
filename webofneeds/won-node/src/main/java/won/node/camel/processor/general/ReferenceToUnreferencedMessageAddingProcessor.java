@@ -73,7 +73,8 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
     //the message should not sign itself, just in case:
     messageEventPlaceholders = messageEventPlaceholders
       .stream()
-      .filter(mep -> !message.getMessageURI().equals(mep.getMessageURI())).collect(
+      .filter(mep -> !message.getMessageURI().equals(mep.getMessageURI()) && ! mep.getMessageURI().equals(message.getCorrespondingRemoteMessageURI()))
+      .collect(
         Collectors.toList());
 
     Dataset messageDataset = message.getCompleteDataset();
@@ -86,8 +87,8 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
       checkWellformedness(message, msgToLinkTo, wonSignatureData);
       //add them to to outermost envelope in the current message
       WonMessageSignerVerifier
-        .addSignature(message.getMessageURI().toString(), wonSignatureData, message
-        .getOuterEnvelopeGraphURI().toString(), messageDataset);
+        .addSignature(wonSignatureData, message
+        .getOuterEnvelopeGraphURI().toString(), messageDataset, true);
       message.addMessageProperty(WONMSG.HAS_PREVIOUS_MESSAGE_PROPERTY, msgToLinkTo.getMessageURI());
       //update the message that now is referenced
       //TODO: if at a later processing stage, the current message raises an error, this flag must be reset to false,
