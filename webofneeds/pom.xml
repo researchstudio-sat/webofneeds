@@ -600,10 +600,17 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <!-- Math -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-math3</artifactId>
                 <version>3.6.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.la4j</groupId>
+                <artifactId>la4j</artifactId>
+                <version>0.5.5</version>
             </dependency>
 
             <!-- CACHING -->
