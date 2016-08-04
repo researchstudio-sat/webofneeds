@@ -54,7 +54,7 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
   public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
     //find all unreferenced messages for the current message's parent
     List<MessageEventPlaceholder> messageEventPlaceholders = messageEventRepository
-      .findByParentURIAndReferencedByOtherMessage(message.getSenderURI());
+      .findByParentURIAndNotReferencedByOtherMessage(message.getSenderURI());
 
     //initialize a variable for the result
     WonMessageType messageType = message.getMessageType();

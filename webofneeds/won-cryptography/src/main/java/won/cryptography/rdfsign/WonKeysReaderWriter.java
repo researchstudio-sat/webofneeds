@@ -156,12 +156,12 @@ public class WonKeysReaderWriter {
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
     Set<String> keyRefs = new HashSet<>();
     for (String name : RdfUtils.getModelNames(dataset)) {
-      readKeyReferences(dataset.getNamedModel(name), name, keyRefs);
+      readKeyReferences(dataset.getNamedModel(name), keyRefs);
     }
     return keyRefs;
   }
 
-  public void readKeyReferences(Model model, String modelName, Set<String> keyRefs)
+  public void readKeyReferences(Model model, Set<String> keyRefs)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
       Property typeProp = model.createProperty(Ontology.getSigIri(), "hasVerificationCertificate");
       StmtIterator si = model.listStatements(null, typeProp, RdfUtils.EMPTY_RDF_NODE);
