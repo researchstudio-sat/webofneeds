@@ -21,7 +21,8 @@ import {
     checkHttpStatus,
     entries,
     urisToLookupMap,
-    is
+    is,
+    clone,
 } from '../utils';
 import * as q from 'q';
 
@@ -814,7 +815,7 @@ const rdfstore = window.rdfstore;
 
     window.selectNeedData4dbg = needUri => selectNeedData(needUri, privateData.store);
     function selectNeedData(needUri, store) {
-        //returns everything attached to the need's content-node up to three levels deep
+        //returns the need and everything attached to the need's content-node up to three levels deep
         const query = `
             prefix won: <http://purl.org/webofneeds/model#>
             construct {<${needUri}> ?b ?c. ?c ?d ?e. ?e ?f ?g. ?g ?h ?i} where {
@@ -853,21 +854,31 @@ const rdfstore = window.rdfstore;
                     reject('Failed selecting the triples of the need with the uri: ' + needUri);
                 }
 
-                const needJsonLd = triples2framedJson(needUri, resultGraph.triples, {
+                const needJsonLdP = triples2framedJson(needUri, resultGraph.triples, {
                     /* frame */
                     "@context": {
                         "won" : "http://purl.org/webofneeds/model#"
+                        //TODO use full context from need
                     },
-                    "@type": "won:Need",
                     "won:hasContent": {
                         "@type": "won:NeedContent"
                     }
                 });
 
-                resolve(needJsonLd);
-
+                resolve(needJsonLdP);
             })
-        )
+        ).then(needJsonLd => {
+            // usually the need-data will be in a single object in the '@graph' array.
+            // We can flatten this and still have valid json-ld
+            const simplified = needJsonLd['@graph'][0];
+            if(!simplified) {
+                //doesn't contain graph. probably already simplified.
+                return needJsonLd;
+            } else {
+                simplified['@context'] = needJsonLd['@context'];
+                return simplified;
+            }
+        });
 
         return needJsonLdP;
     }
@@ -885,13 +896,19 @@ const rdfstore = window.rdfstore;
 
         console.log('jsonldjsQuads: ', jsonldjsQuads);
 
-        const context = frame['@context']? frame['@context'] : {}; //TODO
+        const context = frame['@context']? clone(frame['@context']) : {}; //TODO
+        context.useNativeTypes = true; //do some of the parsing from strings to numbers
 
         const jsonLdP = jsonld.promises
             .fromRDF(jsonldjsQuads, context)
             .then(complexJsonLd => {
-                console.log('complexJsonLd: ', complexJsonLd);
-                return jsonld.promises.frame(complexJsonLd, frame);
+                //the framing algorithm expeds an js-object with an `@graph`-property
+                const complexJsonLd_ = complexJsonLd['@graph'] ?
+                    complexJsonLd :
+                    {'@graph': complexJsonLd};
+
+                console.log('complexJsonLd_: ', complexJsonLd_);
+                return jsonld.promises.frame(complexJsonLd_, frame);
             })
             .then(framed => {
                 console.log('framed: ', framed);
