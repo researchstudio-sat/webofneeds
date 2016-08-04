@@ -62,23 +62,34 @@ public class WonMessageSignerVerifier
       if (wonSignatureData != null) {
         //this is the signature of the envelope we signed in the last iteration.
         //add it to the current one:
-        addSignature(sigStage.getMessageUri(envUri), wonSignatureData, envUri, msgDataset);
+        addSignature(wonSignatureData, envUri, msgDataset, true);
       }
       wonSignatureData = signer.sign(privateKey, privateKeyUri, publicKey, envUri).get(0);
       outerEnvUri = envUri;
     }
     //this is the signature of the outermost envelopoe. put it in a new graph.
     msgDataset.addNamedModel(wonSignatureData.getSignatureUri(), ModelFactory.createDefaultModel());
-    addSignature(sigStage.getMessageUri(outerEnvUri), wonSignatureData, wonSignatureData.getSignatureUri(), msgDataset);
+    addSignature(wonSignatureData, wonSignatureData.getSignatureUri(), msgDataset, false);
   }
 
-  public static void addSignature(final String msgUri, final WonSignatureData sigData,
-                                  final String graphUri, final Dataset msgDataset) {
+  /**
+   * Adds the signature to the specified graph.
+   * @param sigData
+   * @param graphUri
+   * @param msgDataset
+   * @param graphIsEnvelope if true, a msg:containsSignature property is added to the graph URI
+   */
+  public static void addSignature(final WonSignatureData sigData,
+                                  final String graphUri, final Dataset msgDataset, boolean
+                                    graphIsEnvelope) {
 
     Model envelopeGraph = msgDataset.getNamedModel(graphUri);
     Resource envelopeResource = envelopeGraph.createResource(graphUri);
     Resource sigNode = envelopeGraph.createResource(sigData.getSignatureUri());
-    envelopeResource.addProperty(WONMSG.CONTAINS_SIGNATURE_PROPERTY, sigNode);
+    if (graphIsEnvelope) {
+      //only connect envelope to signature. pure signature graphs are not connected this way.
+      envelopeResource.addProperty(WONMSG.CONTAINS_SIGNATURE_PROPERTY, sigNode);
+    }
     WonRdfUtils.SignatureUtils.addSignature(sigNode, sigData);
   }
 
@@ -101,7 +112,7 @@ public class WonMessageSignerVerifier
     List<WonSignatureData> sigRefs = signer.sign(privateKey, privateKeyUri, publicKey, sigStage.getUnsignedContentUris());
     for (WonSignatureData sigRef : sigRefs) {
       String envUri = sigStage.getEnvelopeUriContainingContent(sigRef.getSignedGraphUri());
-      addSignature(sigStage.getMessageUri(envUri), sigRef, envUri, msgDataset);
+      addSignature(sigRef, envUri, msgDataset,true);
     }
   }
 
@@ -122,7 +133,7 @@ public class WonMessageSignerVerifier
     }
     WonSignatureData sigRef = sigStage.getOutermostSignature();
     if (sigRef != null) {
-      addSignature(sigStage.getMessageUri(innemostUnsignedEnvUri), sigRef, innemostUnsignedEnvUri, msgDataset);
+      addSignature(sigRef, innemostUnsignedEnvUri, msgDataset,true);
       msgDataset.removeNamedModel(sigRef.getSignatureUri());
     }
   }
