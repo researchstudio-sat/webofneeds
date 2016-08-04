@@ -84,13 +84,24 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
         }
         messageType = origType.getURI();
       } else if (WonMessageType.FAILURE_RESPONSE.isIdentifiedBy(messageType)){
-        method ="onFailureResponse";
+
+        WonMessageType isResponseToType = message.getIsResponseToMessageType();
+        if (WonMessageType.FAILURE_RESPONSE == isResponseToType
+          || WonMessageType.SUCCESS_RESPONSE == isResponseToType) {
+          //exception from the exception: if we're handling a FailureResponse
+          // to a response - in that case, don't compute a slip value - no bean
+          // will specially process this.
+          return null;
+        }
+        method = "onFailureResponse";
         direction = URI.create(WonMessageDirection.FROM_OWNER.getResource().toString());
         WonMessageType origType = message.getIsResponseToMessageType();
         if (origType == null) {
-          throw new MissingMessagePropertyException(URI.create(WONMSG.IS_RESPONSE_TO_MESSAGE_TYPE.getURI().toString()));
+          throw new MissingMessagePropertyException(
+            URI.create(WONMSG.IS_RESPONSE_TO_MESSAGE_TYPE.getURI().toString()));
         }
         messageType = origType.getURI();
+
       }
     }
     try {
