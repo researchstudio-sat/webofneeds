@@ -31,7 +31,6 @@ public class SigningStage {
   private Map<String,String> contentUriToContainingItEnvUri = new HashMap<>();
   private Map<String,String> envUriToContainedInItEnvUri = new HashMap<>();
   private Map<String,String> graphUriToSigUri = new HashMap<>();
-  private Map<String,String> sigUriToReferencingItEnvUri = new HashMap<>();
   private Map<String,WonSignatureData> sigUriToSigReference = new HashMap<>();
 
   private List<String> envOrderedByContainment = new ArrayList<>();

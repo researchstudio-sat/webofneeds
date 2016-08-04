@@ -9,12 +9,15 @@ import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterf
 import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.message.WonSignatureData;
 import won.protocol.vocabulary.SFSIG;
 
+import java.io.StringWriter;
 import java.security.*;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -85,6 +88,11 @@ public class WonSigner
 
     for (String signedGraphUri : graphsToSign) {
       //TODO should be generated in a more proper way and not here - check of the name already exists etc.
+      if (logger.isDebugEnabled()){
+        StringWriter sw = new StringWriter();
+        RDFDataMgr.write(sw, dataset.getNamedModel(signedGraphUri), Lang.TRIG);
+        logger.debug("signing graph {} with content: {}", graphsToSign, sw.toString());
+      }
       String signatureUri = signedGraphUri + "-sig";
       // create GraphCollection with one NamedGraph that corresponds to this Model
       GraphCollection inputGraph = ModelConverter.modelToGraphCollection(signedGraphUri, dataset);
