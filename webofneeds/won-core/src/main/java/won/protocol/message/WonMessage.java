@@ -99,6 +99,51 @@ public class WonMessage implements Serializable
   }
 
   /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param value
+   */
+  public void addMessageProperty(Property property, long value){
+    addMessageProperty(property, getOuterEnvelopeGraph().createTypedLiteral(value));
+  }
+
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param value
+   */
+  public void addMessageProperty(Property property, int value){
+    addMessageProperty(property, getOuterEnvelopeGraph().createTypedLiteral(value));
+  }
+
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param value
+   */
+  public void addMessageProperty(Property property, double value){
+    addMessageProperty(property, getOuterEnvelopeGraph().createTypedLiteral(value));
+  }
+
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param value
+   */
+  public void addMessageProperty(Property property, float value){
+    addMessageProperty(property, getOuterEnvelopeGraph().createTypedLiteral(value));
+  }
+
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param value
+   */
+  public void addMessageProperty(Property property, boolean value){
+    addMessageProperty(property, getOuterEnvelopeGraph().createTypedLiteral(value));
+  }
+
+  /**
    * Creates a copy of the message dataset where all traces
    * of the envelope graph are deleted.
    * @return
