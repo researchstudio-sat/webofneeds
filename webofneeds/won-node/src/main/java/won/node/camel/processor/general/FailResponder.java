@@ -18,14 +18,18 @@ package won.node.camel.processor.general;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.camel.Exchange;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
+import java.io.StringWriter;
 import java.net.URI;
 
 /**
@@ -71,6 +75,19 @@ public class FailResponder extends AbstractCamelProcessor
           logger.debug("stacktrace of caught exception:", exception);
         }
         logger.debug("original message: {}", RdfUtils.toString(originalMessage.getCompleteDataset()));
+      }
+      if (WonMessageType.FAILURE_RESPONSE == originalMessage.getMessageType() && WonMessageType.FAILURE_RESPONSE ==
+        originalMessage.getIsResponseToMessageType()){
+        //do not throw failures back and forth. If the original message is already a failure message
+        //that indicates a problem processing a failure message, log this and stop.
+        logger.info("Encountered an error processing a FailureResponse for a FailureResponse. The FailureResponse is " +
+                      "logged at debug level. Its message URI is {}", originalMessage.getMessageURI(),exception);
+        if (logger.isDebugEnabled()){
+          StringWriter sw = new StringWriter();
+          RDFDataMgr.write(sw, originalMessage.getCompleteDataset(), Lang.TRIG);
+          logger.debug("FailureResponse to FailureResponse that raised the error:\n{}",sw.toString());
+        }
+        return;
       }
       URI newMessageURI = this.wonNodeInformationService.generateEventURI();
       logger.debug("Sending FailureResponse {}", newMessageURI);
