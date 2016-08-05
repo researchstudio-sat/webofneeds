@@ -93,8 +93,10 @@ public class HintBuilder
     public BulkHintEvent generateHintsFromSearchResult(SolrDocumentList docs, NeedEvent need) {
 
         // generate hints from query result documents
+        SolrDocumentList newDocs = calculateMatchingResults(docs);
+
         BulkHintEvent bulkHintEvent = new BulkHintEvent();
-        for (SolrDocument doc : docs) {
+        for (SolrDocument doc : newDocs) {
 
             String needUri = doc.getFieldValue("id").toString();
             String wonNodeUri = ((List) doc.getFieldValue(WON_NODE_SOLR_FIELD)).get(0).toString();
