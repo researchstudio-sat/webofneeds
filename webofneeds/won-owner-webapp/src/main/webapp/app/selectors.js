@@ -244,7 +244,7 @@ export const selectOpenPost = createSelector(
     (openPostUri, ownNeeds, theirNeeds, lastUpdateTime) => {
         let post = ownNeeds.get(openPostUri) || theirNeeds.get(openPostUri);
         if(post) {
-            const timestamp = relativeTime(lastUpdateTime, post.get('creationDate'));
+            const timestamp = relativeTime(lastUpdateTime, post.get('dct:created'));
             post = post.set('friendlyTimestamp', timestamp);
         }
         return post;
