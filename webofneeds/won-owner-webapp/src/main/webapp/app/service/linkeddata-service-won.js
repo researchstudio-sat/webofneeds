@@ -820,7 +820,15 @@ const rdfstore = window.rdfstore;
         const query = `
             prefix won: <http://purl.org/webofneeds/model#>
             prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            construct {<${needUri}> ?b ?c. ?c ?d ?e. ?e ?f ?g. ?g ?h ?i} where {
+            construct {
+                <${needUri}> ?b ?c.
+                ?c ?d ?e.
+                ?e ?f ?g.
+                ?g ?h ?i.
+                ?i ?j ?k.
+                ?k ?l ?m.
+
+            } where {
                 {
                     <${needUri}> won:hasBasicNeedType ?c.
                     <${needUri}> ?b ?c
@@ -863,6 +871,19 @@ const rdfstore = window.rdfstore;
                     ?c ?d ?e.
                     ?e ?f ?g.
                     ?g ?h ?i.
+                } UNION {
+                    <${needUri}> won:hasContent ?c.
+                    ?c ?d ?e.
+                    ?e ?f ?g.
+                    ?g ?h ?i.
+                    ?i ?j ?k.
+                } UNION {
+                    <${needUri}> won:hasContent ?c.
+                    ?c ?d ?e.
+                    ?e ?f ?g.
+                    ?g ?h ?i.
+                    ?i ?j ?k.
+                    ?k ?l ?m.
                 }
             }
             `
@@ -890,7 +911,8 @@ const rdfstore = window.rdfstore;
                         "ldp" : "http://www.w3.org/ns/ldp#",
                         "event" : "https://satsrv04.researchstudio.at:8889/won/resource/event/",
                         "sioc" : "http://rdfs.org/sioc/ns#",
-                        "dc" : "http://purl.org/dc/elements/1.1/"
+                        "dc" : "http://purl.org/dc/elements/1.1/",
+                        "s" : "http://schema.org/",
                     },
                     "won:hasContent": {
                         "@type": "won:NeedContent"

@@ -125,23 +125,28 @@
                 '@id': '_:contentDescription',
                 '@type': 'won:NeedModality',
                 'won:hasLocation': (!hasLocation(args)? undefined : {
-                    '@id': '_:location',
-                    '@type': 'geo:Point',
-                    'geo:latitude': args.latitude.toFixed(6),
-                    'geo:longitude': args.longitude.toFixed(6),
-                    'won:hasAddress': args.address,
-                }),
-                'won:hasBoundsNorthWest': (!args.bounds ? undefined : {
-                    '@id': '_:boundsNW',
-                    '@type': 'geo:Point',
-                    'geo:latitude': args.bounds[0][0].toFixed(6),
-                    'geo:longitude': args.bounds[0][1].toFixed(6),
-                }),
-                'won:hasBoundsSouthEast': (!args.bounds? undefined : {
-                    '@id': '_:boundsSE',
-                    '@type': 'geo:Point',
-                    'geo:latitude': args.bounds[1][0].toFixed(6),
-                    'geo:longitude': args.bounds[1][1].toFixed(6),
+                    '@type': 's:Place',
+                    's:geo' : {
+                        '@id': '_:location',
+                        '@type': 's:GeoCoordinates',
+                        's:latitude': args.latitude.toFixed(6),
+                        's:longitude': args.longitude.toFixed(6),
+                    },
+                    's:name': args.address,
+                    'won:hasBoundingBox':(!args.bounds ? undefined : {
+                        'won:hasNorthWestCorner': {
+                            '@id': '_:boundsNW',
+                            '@type': 's:GeoCoordinates',
+                            's:latitude': args.bounds[0][0].toFixed(6),
+                            's:longitude': args.bounds[0][1].toFixed(6),
+                        },
+                        'won:hasSouthEastCorner': {
+                            '@id': '_:boundsSE',
+                            '@type': 's:GeoCoordinates',
+                            's:latitude': args.bounds[1][0].toFixed(6),
+                            's:longitude': args.bounds[1][1].toFixed(6),
+                        },
+                    }),
                 }),
                 'won:hasTimeSpecification': (!hasTimeConstraint(args)? undefined : {
                     '@id': '_:timeSpecification',
