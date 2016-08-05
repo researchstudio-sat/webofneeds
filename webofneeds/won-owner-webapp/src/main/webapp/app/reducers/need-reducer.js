@@ -30,37 +30,48 @@ export default function(allNeeds = initialState, action = {}) {
         case actionTypes.initialPageLoad:
         case actionTypes.login:
             let ownNeeds = action.payload.get('ownNeeds');
-            ownNeeds = ownNeeds? ownNeeds.map(need => connectionListToSet(need)) : Immutable.Set();
+            ownNeeds = ownNeeds? ownNeeds : Immutable.Set();
             let theirNeeds = action.payload.get('theirNeeds');
-            theirNeeds = theirNeeds? theirNeeds.map(need => connectionListToSet(need)) : Immutable.Set();
+            theirNeeds = theirNeeds? theirNeeds : Immutable.Set();
+            const stateWithOwnNeeds = ownNeeds.reduce(
+                (updatedState, ownNeed) => addOwnNeed(updatedState, ownNeed),
+                allNeeds
+            );
+            const stateWithOwnAndTheirNeeds = theirNeeds.reduce(
+                (updatedState, theirNeed) => addTheirNeed(updatedState, theirNeed),
+                stateWithOwnNeeds
+
+            );
+            return stateWithOwnAndTheirNeeds;
+            /*
             return allNeeds
                 .mergeIn(['ownNeeds'], ownNeeds)
                 .mergeIn(['theirNeeds'], theirNeeds);
+                */
 
         case actionTypes.router.accessedNonLoadedPost:
             const theirNeed = action.payload.get('theirNeed');
-            return allNeeds.setIn(
-                ['theirNeeds', theirNeed.get('uri')],
-                connectionListToSet(theirNeed)
-            );
+            return addTheirNeed(allNeeds, theirNeed);
 
         case actionTypes.needs.fetch:
             //TODO needs supplied by this action don't have a list of already associated connections
             return action.payload.reduce(
-                (updatedState, ownNeed) =>
-                    setIfNew(updatedState, ['ownNeeds', ownNeed.uri], ownNeed),
+                (updatedState, ownNeed) => addOwnNeed(updatedState, ownNeed),
                 allNeeds
             );
 
         case actionTypes.needs.reopen:
-            return allNeeds.setIn(["ownNeeds", action.payload.ownNeedUri, 'state'], won.WON.Active);
+            return allNeeds.setIn([
+                "ownNeeds", action.payload.ownNeedUri, 'won:isInState'
+            ], won.WON.ActiveCompacted);
 
         case actionTypes.needs.close:
-            return allNeeds.setIn(["ownNeeds", action.payload.ownNeedUri, 'state'], won.WON.Inactive);
+            return allNeeds.setIn([
+                "ownNeeds", action.payload.ownNeedUri, 'won:isInState'
+            ], won.WON.InactiveCompacted);
 
         case actionTypes.needs.received:
-            const ownNeed = action.payload;
-            return setIfNew(allNeeds, ['ownNeeds', ownNeed.uri], ownNeed)
+            return addOwnNeed(allNeeds, action.payload);
 
         case actionTypes.connections.load:
             return action.payload.reduce(
@@ -77,37 +88,54 @@ export default function(allNeeds = initialState, action = {}) {
     }
 }
 
-function connectionListToSet(need) {
-    return need.update('hasConnections', hasConnections => Immutable.Set(hasConnections));
-}
-
-function needToImmutable(need) {
-    return Immutable
-        .fromJS(need)
-        .set('hasConnections', Immutable.Set(need.hasConnections))
-}
-
 function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
     const {ownNeed, remoteNeed, connection} = connectionWithRelatedData;
-    //guarantee that own need is in the state
-    const stateWithOwnNeed = setIfNew(
-        state,
-        ['ownNeeds', ownNeed.uri],
-        needToImmutable(ownNeed));
+    const stateWithOwnNeed = addOwnNeed(state, ownNeed); // guarantee that ownNeed is in state
+    const stateWithBothNeeds = addTheirNeed(stateWithOwnNeed, remoteNeed); // guarantee that remoteNeed is in state
+    return addConnection(stateWithBothNeeds, ownNeed['@id'], connection.uri);
+}
 
-    const stateWithBothNeeds = setIfNew(
-        stateWithOwnNeed,
-        ['theirNeeds', remoteNeed.uri],
-        needToImmutable(remoteNeed));
+function addOwnNeed(allNeeds, ownNeed) {
+    const ownNeed_ = Immutable.fromJS(ownNeed);
+    return setIfNew(allNeeds, ['ownNeeds', ownNeed_.get('@id')], ownNeed_);
+}
 
-    /* TODO | what if we get the connection while not online?
-     * TODO | doing this here doesn't guarantee synchronicity with the rdf
-     * TODO | unless we fetch all connections onLoad and onLogin
-     */
-    return stateWithBothNeeds.updateIn(
-        ['ownNeeds', ownNeed.uri, 'hasConnections'],
-        connections => connections.add(connection.uri)
-    );
+function addTheirNeed(allNeeds, theirNeed) {
+    const theirNeed_ = Immutable.fromJS(theirNeed);
+    return setIfNew(allNeeds, ['theirNeeds', theirNeed_.get('@id')], theirNeed_);
+}
+
+/**
+ * Add's the connectionUri to the needs connections. Makes
+ * sure the same uri doesn't get added twice.
+ * NOTE: As this function goes through all previous connections
+ * to make sure that there are no duplicates, avoid using it
+ * when adding a bunch of connections at once.
+ * @param state
+ * @param needUri
+ * @param connectionUri
+ * @return {*}
+ */
+function addConnection(state, needUri, connectionUri) {
+    const pathToConnections = ['ownNeeds', needUri, 'won:hasConnections', 'rdfs:member'];
+    if(!state.getIn(pathToConnections)) {
+        //make sure the rdfs:member array exists
+        state = state.setIn(pathToConnections, Immutable.List());
+    }
+    const connections = state.getIn(pathToConnections);
+    if( connections.filter(c => c.get('@id') === connectionUri).size > 0) {
+        // connection's already been added to the need before
+        return state;
+    } else {
+        // new connection, add it to the need
+        return state.updateIn(
+            pathToConnections,
+            connections => connections.push(
+                Immutable.fromJS({ '@id': connectionUri })
+            )
+        );
+
+    }
 }
 
 function setIfNew(state, path, obj){
@@ -115,6 +143,6 @@ function setIfNew(state, path, obj){
         //we've seen this need before, no need to overwrite it
         val :
         //it's the first time we see this need -> add it
-        needToImmutable(obj))
+        Immutable.fromJS(obj))
 }
 

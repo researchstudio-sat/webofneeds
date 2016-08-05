@@ -457,11 +457,11 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
 
         const allTheirNeedsPromise =
             allConnectionsPromise.then(connections => {
-                const theirNeedUris = [];
+                const theirNeedUris = []
                 for(const [connectionUri, connection] of entries(connections)) {
                     theirNeedUris.push(connection.hasRemoteNeed);
                 }
-                return theirNeedUris;
+                return Immutable.Set(theirNeedUris).toArray();
             })
                 .then(theirNeedUris =>
                     urisToLookupMap(theirNeedUris, won.getNeed));

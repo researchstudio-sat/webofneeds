@@ -796,21 +796,15 @@ const rdfstore = window.rdfstore;
         });
     };
 
-    /**
-     * @param needUri
-     * @return {*} the same as getNeed but also resolves
-     * the connectionContainer to the connectionUris
-     * contained within.
-     */
     won.getNeed =
     won.getNeedWithConnectionUris = function(needUri) {
         return Promise.all([
-            getNeedData(needUri),
-            won.getconnectionUrisOfNeed(needUri)]
-        ).then(([need, connectionUris]) => {
-            need.hasConnections = connectionUris;
-            return need;
-        });
+            // make sure need and its connection-container are loaded
+            won.ensureLoaded(needUri),
+            won.getConnectionUrisOfNeed(needUri),
+        ]).then(() =>
+            selectNeedData(needUri, privateData.store)
+        )
     };
 
     window.selectNeedData4dbg = needUri => selectNeedData(needUri, privateData.store);
@@ -1065,6 +1059,24 @@ const rdfstore = window.rdfstore;
         return resultJson;
     }
 
+
+    /**
+     * @deprecated
+     * @param needUri
+     * @return {*} the same as getNeed but also resolves
+     * the connectionContainer to the connectionUris
+     * contained within.
+     */
+    won.getNeedOld =
+    won.getNeedWithConnectionUrisOld = function(needUri) {
+        return Promise.all([
+            getNeedData(needUri),
+            won.getconnectionUrisOfNeed(needUri)]
+        ).then(([need, connectionUris]) => {
+            need.hasConnections = connectionUris;
+            return need;
+        });
+    };
     /**
      * @deprecated doesn't return need modalities (e.g. location) properly due to changed rdf-structure
      * Loads the default data of the need with the specified URI into a js object. See
