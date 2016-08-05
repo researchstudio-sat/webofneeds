@@ -835,6 +835,9 @@ const rdfstore = window.rdfstore;
                 } UNION {
                     <${needUri}> dct:created ?c.
                     <${needUri}> ?b ?c
+                } UNION {
+                    <${needUri}> won:isInState ?c.
+                    <${needUri}> ?b ?c
                 }
 
                 UNION
