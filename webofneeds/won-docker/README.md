@@ -7,9 +7,9 @@ the webofneeds applications as docker containers. There are images for the follo
 * owner: the owner application (~667 MB)
 * postgres: postgres database for the wonnode and owner (~100 MB)
 * matcher-service: a general matcher service (~297 MB)
-* matcher-siren: a matcher that uses siren to match needs (~309 MB)
+* matcher-solr: a matcher that uses solr search index to match needs (~309 MB)
 * bigdata: a RDF store that is used by the matcher-service to store rdf data (~365 MB)
-* sirensolr: a solr server with siren plugin used by the matcher-siren (~219 MB)
+* solr: a solr server with used by the matcher-solr (~219 MB)
 * gencert: a tool that can generate certificates for wonnode and owner application (~496 MB)
 
 These components can be deployed on different servers (for an example see [deploy_master.sh](deploy_master.sh)) or on

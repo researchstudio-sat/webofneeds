@@ -1,17 +1,14 @@
 package won.matcher.service.common.service.http;
 
-import com.hp.hpl.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import won.protocol.rest.RdfDatasetConverter;
 
 /**
  * Service to use HTTP to request resources
@@ -20,6 +17,7 @@ import won.protocol.rest.RdfDatasetConverter;
  * Date: 04.05.2015
  */
 @Component
+@Scope("prototype")
 public class HttpService
 {
   private final Logger log = LoggerFactory.getLogger(getClass());

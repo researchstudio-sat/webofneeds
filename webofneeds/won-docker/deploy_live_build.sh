@@ -18,15 +18,15 @@ if [ "$GENERATE_NEW_CERTIFICATES" = true ] ; then
   docker -H satcluster01:2375 rm postgres || echo 'No docker container found to remove with name: postgres'
   docker -H satcluster01:2375 stop bigdata || echo 'No docker container found to stop with name: bigdata'
   docker -H satcluster01:2375 rm bigdata || echo 'No docker container found to remove with name: bigdata'
-  docker -H satcluster01:2375 stop sirensolr || echo 'No docker container found to stop with name: sirensolr'
-  docker -H satcluster01:2375 rm sirensolr || echo 'No docker container found to remove with name: sirensolr'
+  docker -H satcluster01:2375 stop solr || echo 'No docker container found to stop with name: solr'
+  docker -H satcluster01:2375 rm solr || echo 'No docker container found to remove with name: solr'
 fi
 
 echo start docker build of images:
 docker -H satcluster01:2375 build -t webofneeds/wonnode:live $WORKSPACE/webofneeds/won-docker/wonnode/
 docker -H satcluster01:2375 build -t webofneeds/owner:live $WORKSPACE/webofneeds/won-docker/owner/
 docker -H satcluster01:2375 build -t webofneeds/matcher_service:live $WORKSPACE/webofneeds/won-docker/matcher-service/
-docker -H satcluster01:2375 build -t webofneeds/matcher_siren:live $WORKSPACE/webofneeds/won-docker/matcher-siren/
+docker -H satcluster01:2375 build -t webofneeds/matcher_solr:live $WORKSPACE/webofneeds/won-docker/matcher-solr/
 docker -H satcluster01:2375 build -t webofneeds/gencert:live $WORKSPACE/webofneeds/won-docker/gencert/
 
 
@@ -88,4 +88,4 @@ docker -H satcluster01:2375 push webofneeds/gencert:live
 docker -H satcluster01:2375 push webofneeds/wonnode:live
 docker -H satcluster01:2375 push webofneeds/owner:live
 docker -H satcluster01:2375 push webofneeds/matcher_service:live
-docker -H satcluster01:2375 push webofneeds/matcher_siren:live
+docker -H satcluster01:2375 push webofneeds/matcher_solr:live

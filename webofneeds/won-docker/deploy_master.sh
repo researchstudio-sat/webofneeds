@@ -12,8 +12,8 @@
 # - start owner on satsrv05 (with proxy on satsrv07) => https://satsrv07/
 # - start bigdata rdf store on satsrv06 for matcher service
 # - start matcher service on satsrv06 and connect with wonnodes on satsrv04 and proxied wonnode on satsrv05
-# - start siren solr server on satsrv06 as a need index
-# - start siren matcher on satsrv06 as a matcher and connect to matcher service
+# - start solr server on satsrv06 as a need index
+# - start solr matcher on satsrv06 as a matcher and connect to matcher service
 #
 # The databases (postgres), rdf-stores (bigdata) and indices (solr) are kept between deployments and are only
 # deleted and created new if the certificate changes and the postgres db has to be recreated.
@@ -48,8 +48,8 @@ if [ "$GENERATE_NEW_CERTIFICATES" = true ] ; then
   docker -H satsrv05:2375 rm postgres_master || echo 'No docker container found to remove with name: postgres_master'
   docker -H satsrv06:2375 stop bigdata_master || echo 'No docker container found to stop with name: bigdata_master'
   docker -H satsrv06:2375 rm bigdata_master || echo 'No docker container found to remove with name: bigdata_master'
-  docker -H satsrv06:2375 stop sirensolr_master || echo 'No docker container found to stop with name: sirensolr_master'
-  docker -H satsrv06:2375 rm sirensolr_master || echo 'No docker container found to remove with name: sirensolr_master'
+  docker -H satsrv06:2375 stop solr_master || echo 'No docker container found to stop with name: solr_master'
+  docker -H satsrv06:2375 rm solr_master || echo 'No docker container found to remove with name: solr_master'
 fi
 
 # build won docker images and deploy to sat cluster
@@ -181,13 +181,13 @@ docker -H satsrv06:2375 run --name=matcher_service_master -d -e "node.host=satsr
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/matcher_service:master
 
-# siren solr server
-docker -H satsrv06:2375 pull webofneeds/sirensolr
+# solr server
+docker -H satsrv06:2375 pull webofneeds/solr
 echo try to start new solr server container
-if ! docker -H satsrv06:2375 run --name=sirensolr_master -d -p 7070:8080 -p 8983:8983 \
---env CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" -m 350m webofneeds/sirensolr; then
+if ! docker -H satsrv06:2375 run --name=solr_master -d -p 7070:8080 -p 8983:8983 \
+--env CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" -m 350m webofneeds/solr; then
   echo solr server container already available, restart old container
-  docker -H satsrv06:2375 restart sirensolr_master
+  docker -H satsrv06:2375 restart solr_master
 fi
 
 
@@ -234,17 +234,17 @@ webofneeds/owner:master
 
 sleep 10
 
-# siren matcher
-docker -H satsrv06:2375 build -t webofneeds/matcher_siren:master $WORKSPACE/webofneeds/won-docker/matcher-siren/
-docker -H satsrv06:2375 stop matcher_siren_master || echo 'No docker container found to stop with name: matcher_siren_master'
-docker -H satsrv06:2375 rm matcher_siren_master || echo 'No docker container found to remove with name: matcher_siren_master'
-docker -H satsrv06:2375 run --name=matcher_siren_master -d -e "node.host=satsrv06.researchstudio.at" \
+# solr matcher
+docker -H satsrv06:2375 build -t webofneeds/matcher_solr:master $WORKSPACE/webofneeds/won-docker/matcher-solr/
+docker -H satsrv06:2375 stop matcher_solr_master || echo 'No docker container found to stop with name: matcher_solr_master'
+docker -H satsrv06:2375 rm matcher_solr_master || echo 'No docker container found to remove with name: matcher_solr_master'
+docker -H satsrv06:2375 run --name=matcher_solr_master -d -e "node.host=satsrv06.researchstudio.at" \
 -e "cluster.seed.host=satsrv06.researchstudio.at" -e "cluster.seed.port=2551" -e "cluster.local.port=2552" \
--e "matcher.siren.uri.solr.server=http://satsrv06.researchstudio.at:8983/solr/won/" \
--e "matcher.siren.uri.solr.server.public=http://satsrv06.researchstudio.at:8983/solr/#/won/" \
+-e "matcher.solr.uri.solr.server=http://satsrv06.researchstudio.at:8983/solr/won/" \
+-e "matcher.solr.uri.solr.server.public=http://satsrv06.researchstudio.at:8983/solr/#/won/" \
 -p 2552:2552 \
 -e "JMEM_OPTS=-Xmx200m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError" \
--m 350m webofneeds/matcher_siren:master
+-m 350m webofneeds/matcher_solr:master
 
 
 
@@ -254,11 +254,11 @@ docker -H localhost:2375 build -t webofneeds/gencert:master $WORKSPACE/webofneed
 docker -H localhost:2375 build -t webofneeds/wonnode:master $WORKSPACE/webofneeds/won-docker/wonnode/
 docker -H localhost:2375 build -t webofneeds/owner:master $WORKSPACE/webofneeds/won-docker/owner/
 docker -H localhost:2375 build -t webofneeds/matcher_service:master $WORKSPACE/webofneeds/won-docker/matcher-service/
-docker -H localhost:2375 build -t webofneeds/matcher_siren:master $WORKSPACE/webofneeds/won-docker/matcher-siren/
+docker -H localhost:2375 build -t webofneeds/matcher_solr:master $WORKSPACE/webofneeds/won-docker/matcher-solr/
 # push:
 docker -H localhost:2375 login -u heikofriedrich
 docker -H localhost:2375 push webofneeds/gencert:master
 docker -H localhost:2375 push webofneeds/wonnode:master
 docker -H localhost:2375 push webofneeds/owner:master
 docker -H localhost:2375 push webofneeds/matcher_service:master
-docker -H localhost:2375 push webofneeds/matcher_siren:master
+docker -H localhost:2375 push webofneeds/matcher_solr:master
