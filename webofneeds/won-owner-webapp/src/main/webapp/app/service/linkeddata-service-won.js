@@ -815,8 +815,7 @@ const rdfstore = window.rdfstore;
 
     window.selectNeedData4dbg = needUri => selectNeedData(needUri, privateData.store);
     function selectNeedData(needUri, store) {
-        //returns the need and everything attached to the need's content-, connectsions- and event-node up to a varying depth
-        //TODO include eventUris and connectionUris but nothing deeper
+        // this query returns the need and everything attached to the need's content-, connectsions- and event-node up to a varying depth
         const query = `
             prefix won: <http://purl.org/webofneeds/model#>
             prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
