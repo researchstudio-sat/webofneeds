@@ -819,6 +819,7 @@ const rdfstore = window.rdfstore;
         const query = `
             prefix won: <http://purl.org/webofneeds/model#>
             prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            prefix dct: <http://purl.org/dc/terms/>
             construct {
                 <${needUri}> ?b ?c.
                 ?c ?d ?e.
@@ -830,6 +831,9 @@ const rdfstore = window.rdfstore;
             } where {
                 {
                     <${needUri}> won:hasBasicNeedType ?c.
+                    <${needUri}> ?b ?c
+                } UNION {
+                    <${needUri}> dct:created ?c.
                     <${needUri}> ?b ?c
                 }
 
@@ -907,6 +911,7 @@ const rdfstore = window.rdfstore;
                         "ldp" : "http://www.w3.org/ns/ldp#",
                         "sioc" : "http://rdfs.org/sioc/ns#",
                         "dc" : "http://purl.org/dc/elements/1.1/",
+                        "dct": "http://purl.org/dc/terms/",
                         "s" : "http://schema.org/",
                     },
                     "won:hasContent": {
