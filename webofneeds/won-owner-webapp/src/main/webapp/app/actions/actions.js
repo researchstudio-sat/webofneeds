@@ -294,8 +294,8 @@ export function draftsPublish(draft, nodeUri) {
  * @return {*}
  */
 export function getConnectionRelatedData(needUri, remoteNeedUri, connectionUri) {
-    const remoteNeed = won.getNeed(remoteNeedUri);
-    const ownNeed = won.getNeed(needUri);
+    const remoteNeed = won.getTheirNeed(remoteNeedUri);
+    const ownNeed = won.getNeedWithConnectionUris(needUri);
     const connection = won.getConnection(connectionUri);
     const events = won.getEventsOfConnection(connectionUri, needUri)
         .then(eventsLookup => {

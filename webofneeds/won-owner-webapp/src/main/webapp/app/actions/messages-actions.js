@@ -171,7 +171,7 @@ export function successfulCreate(event) {
                 eventData.eventType = won.EVENT.NEED_CREATED;
                 setCommStateFromResponseForLocalNeedMessage(eventData);
                 eventData.needURI = needURI;
-                won.getNeed(needURI).then((need) => {
+                won.getNeedWithConnectionUris(needURI).then((need) => {
                     console.log("Dispatching action " + won.EVENT.NEED_CREATED);
                     dispatch(actionCreators.drafts__publishSuccessful({
                         publishEventUri: event.isResponseTo,

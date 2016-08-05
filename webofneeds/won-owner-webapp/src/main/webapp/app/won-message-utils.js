@@ -368,7 +368,7 @@ function wellFormedPayload(payload) {
 }
 
 export function fetchDataForNonOwnedNeedOnly(needUri) {
-    return won.getNeed(needUri)
+    return won.getNeedWithConnectionUris(needUri)
     .then(need =>
             emptyDataset
                 .setIn(['theirNeeds', needUri], Immutable.fromJS(need))
@@ -464,7 +464,7 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
                 return Immutable.Set(theirNeedUris).toArray();
             })
                 .then(theirNeedUris =>
-                    urisToLookupMap(theirNeedUris, won.getNeed));
+                    urisToLookupMap(theirNeedUris, won.getTheirNeed));
 
         //dispatch to the curried-in action as soon as any part of the data arrives
         allOwnNeedsPromise.then(ownNeeds => dispatchWellFormed({ownNeeds}));

@@ -796,7 +796,13 @@ const rdfstore = window.rdfstore;
         });
     };
 
-    won.getNeed =
+    /**
+     * Loads and returns a need and in a
+     * follow-up http-request the connection-uris
+     * belonging to it.
+     * @type {Function}
+     */
+    won.getOwnNeed =
     won.getNeedWithConnectionUris = function(needUri) {
         return Promise.all([
             // make sure need and its connection-container are loaded
@@ -805,6 +811,17 @@ const rdfstore = window.rdfstore;
         ]).then(() =>
             selectNeedData(needUri, privateData.store)
         )
+    };
+
+    /**
+     * Loads the need-data without following up
+     * with a request for the connection-container
+     * to get the connection-uris. Thus it's faster.
+     */
+    won.getTheirNeed =
+    won.getNeed = function(needUri) {
+        return won.ensureLoaded(needUri)
+            .then(() => selectNeedData(needUri, privateData.store));
     };
 
     window.selectNeedData4dbg = needUri => selectNeedData(needUri, privateData.store);
@@ -1595,7 +1612,7 @@ const rdfstore = window.rdfstore;
                                             return q.all(
                                                 [won.getNodeWithAttributes(eventUriResult[0].eventUri.value, requesterWebId),
                                                  won.getNodeWithAttributes(conData.connection.value),
-                                                 won.getNeed(conData.remoteNeed.value)
+                                                 won.getTheirNeed(conData.remoteNeed.value)
                                                 ]
                                             )
                                         }
@@ -1928,9 +1945,9 @@ const rdfstore = window.rdfstore;
                             return;
                         }
                         let needs = []
-                        let ownNeedPromise = won.getNeed(needUri);
+                        let ownNeedPromise = won.getNeedWithConnectionUris(needUri);
                         needs.push(ownNeedPromise);
-                        let remoteNeedPromise = won.getNeed(results[0].remoteNeed.value)
+                        let remoteNeedPromise = won.getTheirNeed(results[0].remoteNeed.value)
                          needs.push(remoteNeedPromise)
                         Q.all(needs).then(function(needData){
                             resultObject.ownNeed = needData[0]
