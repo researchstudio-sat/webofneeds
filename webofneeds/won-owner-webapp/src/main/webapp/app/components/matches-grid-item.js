@@ -23,7 +23,7 @@ function genComponentConf() {
                         <span class="mgi__description__post__text__subtitle__group" ng-show="self.connectionData.get('group')">
                             <img src="generated/icon-sprite.svg#ico36_group" class="mgi__description__post__text__subtitle__group__icon">{{self.connectionData.get('group')}}<span class="mgi__description__post__text__subtitle__group__dash"> &ndash; </span>
                         </span>
-                        <span class="mgi__description__post__text__subtitle__type">{{self.labels.type[self.connectionData.getIn(['remoteNeed','basicNeedType'])]}}</span>
+                        <span class="mgi__description__post__text__subtitle__type">{{self.labels.type[self.connectionData.getIn(['remoteNeed','won:hasBasicNeedType','@id'])]}}</span>
                     </div>
                 </div>
             </div>
@@ -43,7 +43,7 @@ function genComponentConf() {
         <div class="mgi__match clickable" ng-if="!self.feedbackVisible" ng-click="self.showFeedback()" ng-mouseenter="self.showFeedback()">
             <div class="mgi__match__description">
                 <div class="mgi__match__description__title">{{self.ownNeed.get('title')}}</div>
-                <div class="mgi__match__description__type">{{self.labels.type[self.ownNeed.get('basicNeedType')]}}</div>
+                <div class="mgi__match__description__type">{{self.labels.type[self.ownNeed.getIn(['won:hasBasicNeedType', '@id'])]}}</div>
             </div>
             <won-square-image 
                 src="self.connectionData.getIn(['ownNeed','titleImgSrc'])" 

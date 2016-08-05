@@ -20,13 +20,13 @@ function genComponentConf() {
                 <won-square-image  
                     ng-class="{'inactive' : !self.isActive()}" 
                     src="self.ownNeed.get('titleImgSrc')"
-                    title="self.ownNeed.get('title')"
+                    title="self.ownNeed.getIn(['won:hasContent','dc:title'])"
                     uri="self.needUri">
                 </won-square-image>
             </a>
             <a class="pil__description clickable" ui-sref="post({postUri: self.needUri})">
                 <div class="pil__description__topline">
-                    <div class="pil__description__topline__title">{{self.ownNeed.get('title')}}</div>
+                    <div class="pil__description__topline__title">{{self.ownNeed.get(['won:hasContent','dc:title'])}}</div>
                     <div class="pil__description__topline__creationdate">{{self.creationDate}}</div>
                 </div>
                 <div class="pil__description__subtitle">
@@ -37,7 +37,7 @@ function genComponentConf() {
                          <span class="pil__description__subtitle__group__dash"> &ndash; </span>
                     </span>
                     <span class="pil__description__subtitle__type">
-                         {{self.labels.type[self.ownNeed.get('basicNeedType')]}}
+                         {{self.labels.type[self.ownNeed.getIn(['won:basicNeedType', '@id'])]}}
                     </span>
                 </div>
             </a>
@@ -145,13 +145,13 @@ function genComponentConf() {
             updateRelativeTimestamps(
                 this.$scope,
                 this.$interval,
-                this.ownNeed.get('creationDate'),
+                this.ownNeed.get('dct:created'),
                 t => this.creationDate = t);
 
         }
 
         isActive() {
-            return this.ownNeed.get('state') === won.WON.Active;
+            return this.ownNeed.getIn(['won:isInState','@id']) === won.WON.ActiveCompacted;
         }
 
         unreadXCount(type) {

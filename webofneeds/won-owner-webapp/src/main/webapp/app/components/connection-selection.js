@@ -57,7 +57,7 @@ function genComponentConf() {
                             <span class="conn__item__description__subtitle__type">
                                 {{
                                    self.labels.type[
-                                        self.allByConnections.getIn([connectionUri, 'remoteNeed', 'basicNeedType'])
+                                        self.allByConnections.getIn([connectionUri, 'remoteNeed', 'won:hasBasicNeedType', '@id'])
                                    ]
                                 }}
                             </span>

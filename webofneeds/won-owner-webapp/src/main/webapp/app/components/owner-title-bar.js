@@ -34,7 +34,7 @@ function genComponentConf() {
                     <div class ="ntb__inner__right__upper">
                         <hgroup>
                             <h1 class="ntb__title">{{self.post.get('title')}}</h1>
-                            <div class="ntb__titles__type">{{self.labels.type[self.post.get('basicNeedType')]}}</div>
+                            <div class="ntb__titles__type">{{self.labels.type[self.post.getIn(['won:hasBasicNeedType','@id'])]}}</div>
                         </hgroup>
                         <img
                             class="ntb__icon clickable"

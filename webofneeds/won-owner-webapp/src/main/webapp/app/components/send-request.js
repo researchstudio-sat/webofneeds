@@ -28,7 +28,7 @@ function genComponentConf() {
                     <span class="sr__header__title__subtitle__group" ng-show="self.theirNeed.get('group')">
                         <img src="generated/icon-sprite.svg#ico36_group" class="sr__header__title__subtitle__group__icon">{{self.theirNeed.get('group')}}<span class="sr__header__title__subtitle__group__dash"> &ndash; </span>
                     </span>
-                    <span class="sr__header__title__subtitle__type">{{self.labels.type[self.theirNeed.get('basicNeedType')]}}</span>
+                    <span class="sr__header__title__subtitle__type">{{self.labels.type[self.theirNeed.getIn(['won:hasBasicNeedType','@id'])]}}</span>
                 </div>
             </div>
         </div>

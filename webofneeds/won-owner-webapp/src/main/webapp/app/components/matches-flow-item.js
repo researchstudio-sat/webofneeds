@@ -29,7 +29,7 @@ function genComponentConf() {
                 <span class="mfi__description__subtitle__group" ng-show="self.connection.get('group')">
                     <img src="generated/icon-sprite.svg#ico36_group" class="mfi__description__subtitle__group__icon">{{self.connectionData.get('group')}}<span class="mfi__description__subtitle__group__dash"> &ndash; </span>
                 </span>
-                <span class="mfi__description__subtitle__type">{{self.labels.type[self.connectionData.getIn(['remoteNeed','basicNeedType'])]}}</span>
+                <span class="mfi__description__subtitle__type">{{self.labels.type[self.connectionData.getIn(['remoteNeed','won:hasBasicNeedType', '@id'])]}}</span>
             </div>
             <div class="mfi__description__content" ng-show="false"><!-- include once you have content in your needs that needs to be displayed here -->
                 <div class="mfi__description__content__location">
@@ -45,7 +45,7 @@ function genComponentConf() {
         <div class="mfi__match clickable" ng-if="!self.feedbackVisible" ng-click="self.showFeedback()" ng-mouseenter="self.showFeedback()" >
             <div class="mfi__match__description">
                 <div class="mfi__match__description__title">{{self.connectionData.getIn(['ownNeed','title'])}}</div>
-                <div class="mfi__match__description__type">{{self.labels.type[self.connectionData.getIn(['ownNeed','basicNeedType'])]}}</div>
+                <div class="mfi__match__description__type">{{self.labels.type[self.connectionData.getIn(['ownNeed','won:hasBasicNeedType','@id'])]}}</div>
             </div>
             <won-square-image 
                 src="self.connectionData.getIn(['ownNeed','titleImgSrc'])" 

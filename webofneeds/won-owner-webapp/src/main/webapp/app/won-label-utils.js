@@ -3,10 +3,10 @@ import won from './won-es6';
 
 export const labels = Object.freeze({
     type: {
-        [won.WON.BasicNeedTypeDemand]: 'I want to have something',
-        [won.WON.BasicNeedTypeSupply]: 'I offer something',
-        [won.WON.BasicNeedTypeDotogether]: 'I want to do something together',
-        [won.WON.BasicNeedTypeCritique]: 'I want to change something',
+        [won.WON.BasicNeedTypeDemandCompacted]: 'I want to have something',
+        [won.WON.BasicNeedTypeSupplyCompacted]: 'I offer something',
+        [won.WON.BasicNeedTypeDotogetherCompacted]: 'I want to do something together',
+        [won.WON.BasicNeedTypeCritiqueCompacted]: 'I want to change something',
     }
 });
 

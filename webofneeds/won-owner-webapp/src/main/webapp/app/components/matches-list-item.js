@@ -36,7 +36,7 @@ function genComponentConf() {
                             </span>
                         </span>
                         <span class="mli__description__subtitle__type">
-                            {{self.labels.type[self.item[0].ownNeed.basicNeedType]}}
+                            {{self.labels.type[self.item[0].ownNeed['won:hasBasicNeedType']['@id']]}}
                         </span>
                     </div>
                 </div>

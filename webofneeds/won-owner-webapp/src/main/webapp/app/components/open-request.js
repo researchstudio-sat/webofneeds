@@ -45,7 +45,7 @@ function genComponentConf() {
                         <span class="or__header__title__subtitle__group__dash"> &ndash; </span>
                     </span>
                     <span class="or__header__title__subtitle__type">
-                        {{self.labels.type[self.theirNeed.get('basicNeedType')]}}
+                        {{self.labels.type[self.theirNeed.getIn(['won:hasBasicNeedType','@id'])]}}
                     </span>
                 </div>
             </div>

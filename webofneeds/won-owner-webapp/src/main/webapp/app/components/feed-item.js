@@ -24,7 +24,7 @@ function genComponentConf() {
                             <img src="generated/icon-sprite.svg#ico36_group" class="fi__description__subtitle__group__icon">{{self.item.group}}<span class="fi__description__subtitle__group__dash"> &ndash; </span>
                         </span>
                         -->
-                        <span class="fi__description__subtitle__type">{{self.labels.type[self.item.get('basicNeedType')]}}</span>
+                        <span class="fi__description__subtitle__type">{{self.labels.type[self.item.getIn(['won:hasBasicNeedType','@id'])]}}</span>
                     </div>
                 </div>
             </div>
