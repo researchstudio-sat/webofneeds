@@ -78,6 +78,8 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     if (needModality != null) {
       copyValuesFromNeedModality(needModality);
     }
+    this.setDoNotMatch(needResource.hasProperty(WON.HAS_FLAG, WON.DO_NOT_MATCH));
+    this.setUsedForTesting(needResource.hasProperty(WON.HAS_FLAG, WON.USED_FOR_TESTING));
   }
 
   private void copyValuesFromNeedModality(final Resource needModality)
@@ -274,6 +276,12 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     addNeedContent(needModel, needResource);
     // need modalities
     addNeedModality(needModel, needResource);
+    if (isDoNotMatch()){
+      needResource.addProperty(WON.HAS_FLAG, WON.DO_NOT_MATCH);
+    }
+    if (isUsedForTesting()){
+      needResource.addProperty(WON.HAS_FLAG, WON.USED_FOR_TESTING);
+    }
     return needModel;
   }
 
