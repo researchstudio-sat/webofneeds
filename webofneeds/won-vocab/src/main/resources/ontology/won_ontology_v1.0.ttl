@@ -153,6 +153,16 @@ xsd:duration rdf:type rdfs:Datatype .
             
             rdfs:range :NeedContent .
 
+###  http://purl.org/webofneeds/model#hasContent
+
+:hasFlag rdf:type owl:ObjectProperty ;
+
+            rdfs:comment "Flags for the Need"@en ;
+
+            rdfs:isDefinedBy <http://purl.org/webofneeds/model> ;
+
+            rdfs:domain :Need.
+
 
 
 ###  http://purl.org/webofneeds/model#hasContentDescription
@@ -734,7 +744,15 @@ gr:QuantitativeValue rdf:type owl:Class .
                
                rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
+###  http://purl.org/webofneeds/model#DoNotMatch
 
+:DoNotMatch rdfs:comment "Flag indicating the need should not be matched. It should not receive hints nor should other needs receive hints pointing them to this one."@en ;
+               rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+
+###  http://purl.org/webofneeds/model#UsedForTesting
+
+:UsedForTesting rdfs:comment "Flag indicating the need has been created for testing purposes. It should only be matched with other needs flagged with UsedForTesting. The flag is intended to separate real-world needs from those generated for testing the system, so that users aren't spammed or misled.."@en ;
+               rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 ###  http://purl.org/webofneeds/model#Connection
 
