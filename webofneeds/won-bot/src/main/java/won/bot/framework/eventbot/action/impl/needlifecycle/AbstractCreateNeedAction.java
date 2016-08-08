@@ -45,10 +45,10 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
 
   /**
    * Creates a need with the specified facets.
-   * If no facet is specified, the ownerFacet will be used.
+   * If no facet is specified, the ownerFacet will be used, Flag 'UsedForTesting' will be set.
    */
   public AbstractCreateNeedAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
-    this(eventListenerContext, uriListName, true, true, facets);
+    this(eventListenerContext, uriListName, true, false, facets);
   }
 
   /**
