@@ -53,21 +53,22 @@ public class HintBuilder
         });
 
         // apply the Kneedle algorithm to find knee/elbow points in the score values of the returned newDocs to cut there
-        Kneedle kneedle = new Kneedle();
-        double[] x = new double[newDocs.size()];
-        double[] y = new double[newDocs.size()];
-        for (int i = 0; i < newDocs.size(); i++) {
-            x[i] = i;
-            y[i] = Double.valueOf(newDocs.get(i).getFieldValue("score").toString());
-        }
-        int[] elbows = kneedle.detectElbowPoints(x, y);
-
-
         double cutScoreLowerThan = 0.0;
-        if (elbows.length >= config.getCutAfterIthElbowInScore()) {
-            cutScoreLowerThan = y[elbows[elbows.length - config.getCutAfterIthElbowInScore()]];
-            log.debug("Calculated elbow score point after {} elbows for document scores: {}",
-                      config.getCutAfterIthElbowInScore(), cutScoreLowerThan);
+        if (newDocs.size() > 1) {
+            Kneedle kneedle = new Kneedle();
+            double[] x = new double[newDocs.size()];
+            double[] y = new double[newDocs.size()];
+            for (int i = 0; i < newDocs.size(); i++) {
+                x[i] = i;
+                y[i] = Double.valueOf(newDocs.get(i).getFieldValue("score").toString());
+            }
+            int[] elbows = kneedle.detectElbowPoints(x, y);
+
+            if (elbows.length >= config.getCutAfterIthElbowInScore()) {
+                cutScoreLowerThan = y[elbows[elbows.length - config.getCutAfterIthElbowInScore()]];
+                log.debug("Calculated elbow score point after {} elbows for document scores: {}",
+                          config.getCutAfterIthElbowInScore(), cutScoreLowerThan);
+            }
         }
 
         for (int i = newDocs.size() - 1; i >= 0; i--) {
