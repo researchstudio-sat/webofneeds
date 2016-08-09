@@ -43,13 +43,9 @@ public class SuccessResponseFromSystemToNodeProcessor extends AbstractCamelProce
     exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
 
     //add the information about the corresponding message to the local one
-    wonMessage = WonMessageBuilder
-            .wrap(wonMessage)
-            .setCorrespondingRemoteMessageURI(newWonMessage.getMessageURI())
-            .build();
+    wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, newWonMessage.getMessageURI());
 
-    //put it into the header so the persister will pick it up later
-    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER,wonMessage);
+    //the persister will pick it up later
   }
 
   private WonMessage createMessageToSendToRemoteNode(WonMessage wonMessage) {

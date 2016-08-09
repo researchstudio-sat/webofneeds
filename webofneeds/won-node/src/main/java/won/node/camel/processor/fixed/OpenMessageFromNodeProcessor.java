@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
@@ -52,20 +51,8 @@ public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor
     con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
     connectionRepository.save(con);
 
-    WonMessage newWonMessage = createMessageToSendToOwner(wonMessage, con.getConnectionURI());
-    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER,newWonMessage);
+    //set the receiver to the local connection uri
+    wonMessage.addMessageProperty(WONMSG.RECEIVER_PROPERTY, con.getConnectionURI());
   }
-
-  private WonMessage createMessageToSendToOwner(WonMessage wonMessage, URI localConnectionURI) {
-    //create the message to send to the owner
-    WonMessageBuilder builder = WonMessageBuilder
-      .setPropertiesForPassingMessageToOwner(wonMessage);
-    if (wonMessage.getReceiverURI() == null){
-      //if we just created a new connection, add the connection URI as the receiverURI
-      builder.setReceiverURI(localConnectionURI);
-    }
-    return builder.build();
-  }
-
 
 }

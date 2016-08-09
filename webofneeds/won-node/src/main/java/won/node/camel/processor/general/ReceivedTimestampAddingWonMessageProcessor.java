@@ -17,25 +17,22 @@
 package won.node.camel.processor.general;
 
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
-import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
+import won.protocol.vocabulary.WONMSG;
+
+import java.util.Date;
 
 /**
  * Wraps the wonMessage, adding the direction property.
  */
-public class MessageWrappingWonMessageProcessor implements WonMessageProcessor {
+public class ReceivedTimestampAddingWonMessageProcessor implements WonMessageProcessor {
 
-  WonMessageDirection direction;
-
-  public MessageWrappingWonMessageProcessor(WonMessageDirection direction) {
-    this.direction = direction;
-  }
 
   @Override
   public WonMessage process(WonMessage message) throws WonMessageProcessingException {
-   return WonMessageBuilder.wrapMessageReceivedByNode(message, direction);
+    message.addMessageProperty(WONMSG.HAS_RECEIVED_TIMESTAMP, new Date().getTime());
+    return message;
   }
 
 }

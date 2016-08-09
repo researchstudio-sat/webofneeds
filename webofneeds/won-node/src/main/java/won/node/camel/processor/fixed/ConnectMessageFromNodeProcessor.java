@@ -7,7 +7,6 @@ import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.model.Connection;
@@ -57,20 +56,9 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor
     con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));
     connectionRepository.save(con);
 
+    //set the receiver to the newly generated connection uri
+    wonMessage.addMessageProperty(WONMSG.RECEIVER_PROPERTY, con.getConnectionURI());
 
-    //build message to send to owner, put in header
-    final WonMessage newWonMessage = createMessageToSendToOwner(wonMessage, con);
-    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, newWonMessage);
   }
-
-  private WonMessage createMessageToSendToOwner(WonMessage wonMessage, Connection con) {
-    //create the message to send to the owner
-    return WonMessageBuilder
-      .setPropertiesForPassingMessageToOwner(wonMessage)
-      //set the uri of the newly created connection as receiver
-      .setReceiverURI(con.getConnectionURI())
-      .build();
-  }
-
 
 }

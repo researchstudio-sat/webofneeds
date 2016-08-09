@@ -31,7 +31,6 @@ public class SigningStage {
   private Map<String,String> contentUriToContainingItEnvUri = new HashMap<>();
   private Map<String,String> envUriToContainedInItEnvUri = new HashMap<>();
   private Map<String,String> graphUriToSigUri = new HashMap<>();
-  private Map<String,String> sigUriToReferencingItEnvUri = new HashMap<>();
   private Map<String,WonSignatureData> sigUriToSigReference = new HashMap<>();
 
   private List<String> envOrderedByContainment = new ArrayList<>();
@@ -121,7 +120,7 @@ public class SigningStage {
     }
 
     // find if it contains a signature references
-    it = msgEventResource.listProperties(WONMSG.CONTAINS_SIGNATURE_PROPERTY);
+    it = msgEnvelopeResource.listProperties(WONMSG.CONTAINS_SIGNATURE_PROPERTY);
     while (it.hasNext()) {
       Resource refObj = it.next().getObject().asResource();
       extractSignatureData(refObj.getURI(), refObj.getModel());
