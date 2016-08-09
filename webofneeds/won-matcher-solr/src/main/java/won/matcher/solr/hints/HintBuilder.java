@@ -65,25 +65,22 @@ public class HintBuilder
 
         double cutScoreLowerThan = 0.0;
         if (elbows.length >= config.getCutAfterIthElbowInScore()) {
-            cutScoreLowerThan = y[elbows[elbows.length - config.getCutAfterIthElbowInScore()]] / newDocs.getMaxScore();
+            cutScoreLowerThan = y[elbows[elbows.length - config.getCutAfterIthElbowInScore()]];
             log.debug("Calculated elbow score point after {} elbows for document scores: {}",
                       config.getCutAfterIthElbowInScore(), cutScoreLowerThan);
         }
 
         for (int i = newDocs.size() - 1; i >= 0; i--) {
 
-            // normalize the score to a value between 0 and 1
-            double score = Double.valueOf(newDocs.get(i).getFieldValue("score").toString()) / newDocs.getMaxScore();
-
             // if score is lower threshold or we arrived at the elbow point to cut after
-            if (score < config.getScoreThreshold() || score <= (cutScoreLowerThan)) {
+            double score = Double.valueOf(newDocs.get(i).getFieldValue("score").toString());
+            if (score < config.getScoreThreshold() || score <= cutScoreLowerThan) {
                 log.debug("cut result documents, current score is {}, score threshold is {}",
                           score, config.getScoreThreshold());
                 break;
             }
 
             SolrDocument newDoc = newDocs.get(i);
-            newDoc.put("normalized_score", score);
             matches.add(newDoc);
         }
 
@@ -100,7 +97,16 @@ public class HintBuilder
 
             String needUri = doc.getFieldValue("id").toString();
             String wonNodeUri = ((List) doc.getFieldValue(WON_NODE_SOLR_FIELD)).get(0).toString();
-            double score = Double.valueOf(doc.getFieldValue("normalized_score").toString());
+
+            // normalize the final score
+            double score = Double.valueOf(doc.getFieldValue("normalized_score").toString()) *
+              config.getScoreNormalizationFactor();
+
+            if (score > 1.0) {
+                score = 1.0;
+            } else if (score < 0.0) {
+                score = 0.0;
+            }
 
             bulkHintEvent.addHintEvent(new HintEvent(need.getWonNodeUri(), need.getUri(), wonNodeUri, needUri,
                                                      config.getSolrServerPublicUri(), score));

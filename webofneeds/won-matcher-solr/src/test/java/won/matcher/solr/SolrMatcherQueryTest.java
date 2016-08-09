@@ -80,9 +80,9 @@ public class SolrMatcherQueryTest
         for (SolrDocument doc : newDocs) {
           String title = doc.getFieldValue("_graph.http___purl.org_webofneeds_model_hasContent.http___purl" +
                                        ".org_dc_elements_1.1_title").toString();
-          String score = doc.getFieldValue("normalized_score").toString();
+          String score = doc.getFieldValue("score").toString();
           String matchedNeedId = doc.getFieldValue("id").toString();
-          System.out.println("Normalized Score: " + score + ", Title: " + title + ", Id: " + matchedNeedId);
+          System.out.println("Score: " + score + ", Title: " + title + ", Id: " + matchedNeedId);
         }
 
         System.out.println("All docs: ");

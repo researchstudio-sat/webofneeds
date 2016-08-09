@@ -28,7 +28,7 @@ public class SolrMatcherConfig
   @Value("${matcher.solr.index.commit}")
   private boolean commitIndexedNeedImmediately;
 
-  @Value("${matcher.solr.query.scoreThreshold}")
+  @Value("${matcher.solr.query.score.threshold}")
   private float scoreThreshold;
 
   @Value("${matcher.solr.query.cutAfterIthElbowInScore}")
@@ -36,6 +36,9 @@ public class SolrMatcherConfig
 
   @Value("${matcher.solr.createHintsForBothNeeds}")
   private boolean createHintsForBothNeeds;
+
+  @Value("${matcher.solr.query.score.normalizationFactor}")
+  private float scoreNormalizationFactor;
 
   public float getScoreThreshold() {
     return scoreThreshold;
@@ -67,5 +70,9 @@ public class SolrMatcherConfig
 
   public int getCutAfterIthElbowInScore() {
     return cutAfterIthElbowInScore;
+  }
+
+  public float getScoreNormalizationFactor() {
+    return scoreNormalizationFactor;
   }
 }
