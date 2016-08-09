@@ -25,6 +25,12 @@
         </dependency>
         <dependency>
             <groupId>webofneeds</groupId>
+            <artifactId>won-matcher-utils</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>webofneeds</groupId>
             <artifactId>won-bot</artifactId>
             <scope>test</scope>
             <version>${project.version}</version>

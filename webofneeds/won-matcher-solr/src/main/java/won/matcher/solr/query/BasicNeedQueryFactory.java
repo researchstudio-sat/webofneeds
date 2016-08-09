@@ -47,6 +47,9 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
     try {
       titleTerms = RdfUtils.findOnePropertyFromResource(need, null, DC.title).asLiteral().getString();
       titleTerms = titleTerms.replaceAll("[^A-Za-z0-9 ]", " ");
+      titleTerms = titleTerms.replaceAll("NOT", " ");
+      titleTerms = titleTerms.replaceAll("AND", " ");
+      titleTerms = titleTerms.replaceAll("OR", " ");
 
     } catch (IncorrectPropertyCountException e) {
       log.warn("Title not found in RDF dataset: " + e.toString());
@@ -56,6 +59,9 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
       descriptionTerms = RdfUtils.findOnePropertyFromResource(
         need, null, WON.HAS_TEXT_DESCRIPTION).asLiteral().getString();
       descriptionTerms = descriptionTerms.replaceAll("[^A-Za-z0-9 ]", " ");
+      descriptionTerms = descriptionTerms.replaceAll("NOT", " ");
+      descriptionTerms = descriptionTerms.replaceAll("AND", " ");
+      descriptionTerms = descriptionTerms.replaceAll("OR", " ");
     } catch (IncorrectPropertyCountException e) {
       log.warn("Description not found in RDF dataset: " + e.toString());
     }
@@ -63,6 +69,10 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
     try {
       tagTerms = RdfUtils.findOnePropertyFromResource(need, null, WON.HAS_TAG).asLiteral().getString();
       tagTerms = tagTerms.replaceAll("[^A-Za-z0-9 ]", " ");
+      tagTerms = tagTerms.replaceAll("[^A-Za-z0-9 ]", " ");
+      tagTerms = tagTerms.replaceAll("NOT", " ");
+      tagTerms = tagTerms.replaceAll("AND", " ");
+      tagTerms = tagTerms.replaceAll("OR", " ");
     } catch (IncorrectPropertyCountException e) {
       log.debug("Tags not found in RDF dataset: " + e.toString());
     }
@@ -70,7 +80,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
 
   public void addTermsToTitleQuery(String terms, double boost) {
 
-    if (terms != null && terms != "") {
+    if (terms != null && !terms.trim().isEmpty()) {
       SolrQueryFactory qf = new MatchFieldQuery(NEED_TITLE_SOLR_FIELD, terms);
       qf.setBoost(boost);
       contentFactories.add(qf);
@@ -79,7 +89,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
 
   public void addTermsToDescriptionQuery(String terms, double boost) {
 
-    if (terms != null && terms != "") {
+    if (terms != null && !terms.trim().isEmpty()) {
       SolrQueryFactory qf = new MatchFieldQuery(NEED_DESCRIPTION_SOLR_FIELD, terms);
       qf.setBoost(boost);
       contentFactories.add(qf);
@@ -88,7 +98,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
 
   public void addTermsToTagQuery(String terms, double boost) {
 
-    if (terms != null && terms != "") {
+    if (terms != null && !terms.trim().isEmpty()) {
       SolrQueryFactory qf = new MatchFieldQuery(NEED_TAG_SOLR_FIELD, terms);
       qf.setBoost(boost);
       contentFactories.add(qf);
