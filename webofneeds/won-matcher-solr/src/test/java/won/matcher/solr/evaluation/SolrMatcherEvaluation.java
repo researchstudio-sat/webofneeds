@@ -26,6 +26,17 @@ import java.util.Map;
 
 /**
  * Created by hfriedrich on 05.08.2016.
+ *
+ * This class can be used to do evaluation of the quality of matching of Solr querying.
+ * It reads needs mail files from supply and demand directories on the hard drive. Subject will be
+ * mapped to title and content will be mapped to description. These needs can be written to the Solr index and queried.
+ * The class uses a solr query executor that defines the Solr query to test for matching.
+ * The class can build to tensors that can be used by the "wonpreprocessing" project to evaluate the quality of the
+ * matching.
+ * The connection tensor has all ground truth connections between all needs (read from the connections file).
+ * The prediction tensor has all computed matches between all needs using the solr querying.
+ * These tensor slices can be compared by the "wonpreprocessing" project to compute statistical evaluation measures
+ * like precision, recall, accuracy and f-score.
  */
 @Component
 public class SolrMatcherEvaluation

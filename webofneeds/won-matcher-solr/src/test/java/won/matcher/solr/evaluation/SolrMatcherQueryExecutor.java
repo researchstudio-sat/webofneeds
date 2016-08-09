@@ -21,6 +21,8 @@ import java.util.List;
 
 /**
  * Created by hfriedrich on 08.08.2016.
+ *
+ * Execute test queries and do matching for Solr evaluation.
  */
 @Component
 public class SolrMatcherQueryExecutor
