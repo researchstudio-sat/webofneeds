@@ -111,6 +111,10 @@ public interface NeedBuilder<T>
 
   public NeedBuilder<T> setState(String stateURI);
 
+  public NeedBuilder<T> setDoNotMatch(boolean doNotMatch);
+
+  public NeedBuilder<T> setUsedForTesting(boolean usedForTesting);
+
   /**
    * Set RDF content in Turtle format.
    *

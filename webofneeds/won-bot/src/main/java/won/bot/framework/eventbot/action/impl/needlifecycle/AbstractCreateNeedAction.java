@@ -25,6 +25,7 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.FacetType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -38,12 +39,23 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
 
   protected List<URI> facets;
   protected String uriListName;
+  //indicates if the won:DoNotMatch flag is to be set
+  protected boolean usedForTesting;
+  protected boolean doNotMatch;
+
+  /**
+   * Creates a need with the specified facets.
+   * If no facet is specified, the ownerFacet will be used, Flag 'UsedForTesting' will be set.
+   */
+  public AbstractCreateNeedAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
+    this(eventListenerContext, uriListName, true, false, facets);
+  }
 
   /**
    * Creates a need with the specified facets.
    * If no facet is specified, the ownerFacet will be used.
    */
-  public AbstractCreateNeedAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
+  public AbstractCreateNeedAction(EventListenerContext eventListenerContext, String uriListName, final boolean usedForTesting, final boolean doNotMatch, URI... facets) {
     super(eventListenerContext);
     if (facets == null || facets.length == 0) {
       //add the default facet if none is present.
@@ -53,6 +65,8 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
       this.facets = Arrays.asList(facets);
     }
     this.uriListName = uriListName;
+    this.doNotMatch = doNotMatch;
+    this.usedForTesting = usedForTesting;
   }
 
   /**
@@ -68,6 +82,12 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
                                         Model needModel)
           throws WonMessageBuilderException {
 
+    if (doNotMatch){
+      needModel.getResource(needURI.toString()).addProperty(WON.HAS_FLAG, WON.DO_NOT_MATCH);
+    }
+    if (usedForTesting){
+      needModel.getResource(needURI.toString()).addProperty(WON.HAS_FLAG, WON.USED_FOR_TESTING);
+    }
     RdfUtils.replaceBaseURI(needModel, needURI.toString());
 
     return WonMessageBuilder.setMessagePropertiesForCreate(
@@ -77,5 +97,13 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
                     wonNodeURI)
             .addContent(needModel, null)
             .build();
+  }
+
+  public void setUsedForTesting(final boolean usedForTesting) {
+    this.usedForTesting = usedForTesting;
+  }
+
+  public void setDoNotMatch(final boolean doNotMatch) {
+    this.doNotMatch = doNotMatch;
   }
 }

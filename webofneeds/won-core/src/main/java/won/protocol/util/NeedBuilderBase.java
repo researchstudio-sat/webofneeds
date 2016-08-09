@@ -71,13 +71,15 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   private String availableAtLocationLongitudeString;
   private String availableAtLocationRegion;
   private Model contentDescription;
-
+  private boolean doNotMatch;
+  private boolean usedForTesting = false;
 
   //pattern for finding hashtags in title and description
   private static final Pattern PATTERN_HASHTAG = Pattern.compile("#\\w+");
 
   private static final String PRICE_SEPARATOR = "-";
   private static final String DATE_SEPARATOR = "/";
+
 
   @Override
   public <O> void copyValuesToBuilder(final NeedBuilder<O> otherNeedBuilder)
@@ -619,6 +621,24 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
     this.stateURI = null;
     this.stateNS = null;
     this.stateURIString = stateURI;
+    return this;
+  }
+
+  public boolean isDoNotMatch() {
+    return doNotMatch;
+  }
+
+  public NeedBuilder<T> setDoNotMatch(final boolean doNotMatch) {
+    this.doNotMatch = doNotMatch;
+    return this;
+  }
+
+  public boolean isUsedForTesting(){
+    return usedForTesting;
+  }
+
+  public NeedBuilder<T> setUsedForTesting(boolean usedForTesting) {
+    this.usedForTesting = usedForTesting;
     return this;
   }
 }

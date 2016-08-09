@@ -43,6 +43,11 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction
     super(eventListenerContext, uriListName, facets);
   }
 
+  public CreateNeedWithFacetsAction(final EventListenerContext eventListenerContext, final String uriListName,
+                                    final boolean usedForTesting, final boolean doNotMatch, final URI... facets) {
+    super(eventListenerContext, uriListName, usedForTesting, doNotMatch, facets);
+  }
+
   public CreateNeedWithFacetsAction(EventListenerContext eventListenerContext, URI... facets) {
     super(eventListenerContext, facets);
   }
