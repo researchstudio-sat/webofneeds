@@ -5,7 +5,12 @@ import squareImageModule from '../components/square-image';
 import { attach, mapToMatches, decodeUriComponentProperly } from '../utils';
 import won from '../won-es6';
 import { labels } from '../won-label-utils';
-import { selectUnreadEventsByNeedAndType, selectAllByConnections } from '../selectors';
+import {
+    selectUnreadEventsByNeedAndType,
+    selectAllByConnections,
+    selectOpenPost,
+    selectOpenPostUri,
+} from '../selectors';
 import { actionCreators }  from '../actions/actions';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
@@ -22,8 +27,8 @@ function genComponentConf() {
                     <won-square-image
                         ng-class="{'inactive' : !self.isActive}"
                         src="self.post.get('titleImgSrc')"
-                        title="self.post.get('title')"
-                        uri="self.post.get('uri')">
+                        title="self.post.getIn(['won:hasContent','dc:title'])"
+                        uri="self.post.get('@id')">
                     </won-square-image>
                 </div>
 
@@ -33,7 +38,7 @@ function genComponentConf() {
 
                     <div class ="ntb__inner__right__upper">
                         <hgroup>
-                            <h1 class="ntb__title">{{self.post.get('title')}}</h1>
+                            <h1 class="ntb__title">{{ self.post.getIn(['won:hasContent','dc:title']) }}</h1>
                             <div class="ntb__titles__type">{{self.labels.type[self.post.getIn(['won:hasBasicNeedType','@id'])]}}</div>
                         </hgroup>
                         <img
@@ -116,9 +121,8 @@ function genComponentConf() {
                 const unreadCounts = selectUnreadEventsByNeedAndType(state);
                 const connectionsDeprecated = selectAllByConnections(state).toJS(); //TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
 
-                const encodedPostUri = state.getIn(['router', 'currentParams', 'postUri']) ||
-                    state.getIn(['router', 'currentParams', 'myUri']) ; // TODO old parameter
-                const postUri = decodeURIComponent(encodedPostUri);
+                const postUri = selectOpenPostUri(state);
+                const post = selectOpenPost(state);
 
                 const connectionTypeInParams = decodeUriComponentProperly(state.getIn(['router', 'currentParams', 'connectionType']));
 
@@ -126,36 +130,32 @@ function genComponentConf() {
                     selectedTab: connectionTypeInParams || 'Info',
                     WON: won.WON,
                     postUri: postUri,
-                    post: state.getIn(['needs','ownNeeds', postUri]),
+                    post: post,
                     hasIncomingRequests: state.getIn(['connections'])
                         .filter(conn =>
                             conn.get('hasConnectionState') === won.WON.RequestReceived
                             && conn.get('belongsToNeed') === postUri
                         ).size > 0,
-                    hasSentRequests: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.RequestSent && conn.ownNeed.uri === postUri){
-                                return true
-                            }
-                        }).length > 0,
-                    hasMatches: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>{
-                            if(conn.connection.hasConnectionState===won.WON.Suggested && conn.ownNeed.uri === postUri){
-                                return true
-                            }
-                        }).length > 0,
-                    hasMessages: Object.keys(connectionsDeprecated) //TODO immutable maps have a `.filter(...)` https://facebook.github.io/immutable-js/docs/
-                        .map(key => connectionsDeprecated[key])
-                        .filter(conn=>{
-                            return conn.connection.hasConnectionState===won.WON.Connected && conn.ownNeed.uri === postUri
-                        }).length > 0,
+                    hasSentRequests: state.getIn(['connections'])
+                        .filter(conn =>
+                        conn.get('hasConnectionState') === won.WON.RequestSent
+                        && conn.get('belongsToNeed') === postUri
+                    ).size > 0,
+                    hasMatches: state.getIn(['connections'])
+                        .filter(conn =>
+                        conn.get('hasConnectionState') === won.WON.Suggested
+                        && conn.get('belongsToNeed') === postUri
+                    ).size > 0,
+                    hasMessages: state.getIn(['connections'])
+                        .filter(conn =>
+                        conn.get('hasConnectionState') === won.WON.Connected
+                        && conn.get('belongsToNeed') === postUri
+                    ).size > 0,
                     unreadMessages: unreadCounts.getIn([postUri, won.WONMSG.connectionMessage]),
                     unreadIncomingRequests: unreadCounts.getIn([postUri, won.WONMSG.connectMessage]),
                     unreadSentRequests: unreadCounts.getIn([postUri, won.WONMSG.connectSentMessage]),
                     unreadMatches: unreadCounts.getIn([postUri, won.WONMSG.hintMessage]),
-                    isActive: state.getIn(['needs','ownNeeds', postUri, 'state']) === won.WON.Active
+                    isActive: post && post.getIn(['won:isInState', '@id']) === won.WON.ActiveCompacted,
                 };
             };
 
