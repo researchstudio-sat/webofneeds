@@ -35,7 +35,7 @@ public class HintBuilder
         if (newDocs == null || newDocs.size() == 0) {
             return matches;
         } else {
-            log.debug("Received {} solr documents as query result", newDocs.size());
+            log.info("Received {} solr documents as query result", newDocs.size());
         }
 
         // sort the documents according to their score value descending
@@ -66,7 +66,7 @@ public class HintBuilder
 
             if (elbows.length >= config.getCutAfterIthElbowInScore()) {
                 cutScoreLowerThan = y[elbows[elbows.length - config.getCutAfterIthElbowInScore()]];
-                log.debug("Calculated elbow score point after {} elbows for document scores: {}",
+                log.info("Calculated elbow score point after {} elbows for document scores: {}",
                           config.getCutAfterIthElbowInScore(), cutScoreLowerThan);
             }
         }
@@ -76,7 +76,7 @@ public class HintBuilder
             // if score is lower threshold or we arrived at the elbow point to cut after
             double score = Double.valueOf(newDocs.get(i).getFieldValue("score").toString());
             if (score < config.getScoreThreshold() || score <= cutScoreLowerThan) {
-                log.debug("cut result documents, current score is {}, score threshold is {}",
+                log.info("cut result documents, current score is {}, score threshold is {}",
                           score, config.getScoreThreshold());
                 break;
             }
