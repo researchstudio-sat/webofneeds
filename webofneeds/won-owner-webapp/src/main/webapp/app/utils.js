@@ -660,3 +660,22 @@ export function clone(obj) {
 
     throw new Error("Unable to copy obj! Its type isn't supported.");
 }
+
+/**
+ * Tries to look up a property-path on a nested object-structure.
+ * Where `obj.x.y` would throw an exception if `x` wasn't defined
+ * `get(obj, ['x','y'])` would return undefined.
+ * @param obj
+ * @param path
+ * @return {*}
+ */
+export function getIn(obj, path) {
+    switch(path.length){
+        case 0:
+            return undefined;
+        case 1:
+            return obj[path[0]];
+        default:
+            return obj[path[0]] && getIn( obj[path[0]] , path.slice(1) )
+    }
+}

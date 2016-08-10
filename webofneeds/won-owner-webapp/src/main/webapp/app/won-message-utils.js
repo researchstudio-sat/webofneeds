@@ -14,6 +14,7 @@ import {
     flatten,
     entries,
     is,
+    getIn,
 } from './utils';
 
 import jsonld from 'jsonld';
@@ -260,10 +261,10 @@ export function buildCreateMessage(need, wonNodeUri) {
         publishedContentUri: publishedContentUri, //mandatory
         tags: need.tags? need.tags.join(',') : undefined,
         attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
-        longitude: need.location.lon,
-        latitude: need.location.lat,
-        address: need.location.name,
-        bounds: need.location.bounds,
+        longitude: getIn(need, ['location', 'lon']),
+        latitude: getIn(need, ['location', 'lat']),
+        address: getIn(need, ['location', 'name']),
+        bounds: getIn(need, ['location', 'bounds']),
     });
     const msgUri = wonNodeUri + '/event/' + getRandomPosInt(); //mandatory
     const msgJson = won.buildMessageRdf(contentRdf, {
