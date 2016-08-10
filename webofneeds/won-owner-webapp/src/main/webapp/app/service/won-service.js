@@ -464,7 +464,7 @@ angular.module('won.owner').factory('wonService', function (
             title: need.title, //mandatory
             description: need.textDescription, //mandatory
             publishedContentUri: publishedContentUri, //mandatory
-            tags: need.tags.map(function(t) {return t.text}).join(','),
+            tags: need.tags.map(function(t) {return t.text}).join(','), //TODO: DO TAGS IN A DIFFERENT FORM
             attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
         });
         var msgUri = wonNodeUri + '/event/' + utilService.getRandomPosInt(); //mandatory

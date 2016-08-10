@@ -37,7 +37,7 @@ function genComponentConf() {
                 <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.theirNeed.get('images')" class="vertical"></won-extended-gallery>
             </div>
             <div class="sr__content__description"
-                ng-show="self.theirNeed.get('location') || self.theirNeed.get('deadline') || self.theirNeed.get('description')">
+                ng-show="self.theirNeed.get('location') || self.theirNeed.get('deadline') || self.theirNeed.get('textDescription')">
                     <div class="sr__content__description__location" ng-show="self.theirNeed.get('location')">
                         <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_location"/>
                         <span>{{ self.theirNeed.get('location') }}</span>
@@ -46,9 +46,9 @@ function genComponentConf() {
                         <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_time"/>
                         <span>{{ self.theirNeed.get('deadline') }} </span>
                     </div>
-                    <div class="sr__content__description__text" ng-show="self.theirNeed.get('description')">
+                    <div class="sr__content__description__text" ng-show="self.theirNeed.get('textDescription')">
                         <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_description"/>
-                        <span>{{ self.theirNeed.get('description') }} </span>
+                        <span>{{ self.theirNeed.get('textDescription') }} </span>
                     </div>
             </div>
         </div>
