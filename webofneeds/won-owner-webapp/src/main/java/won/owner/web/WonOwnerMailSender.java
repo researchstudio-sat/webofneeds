@@ -54,6 +54,7 @@ public class WonOwnerMailSender {
   private static final String SUBJECT_CONVERSATION_MESSAGE = "new message";
   private static final String SUBJECT_CONNECT = "new conversation request";
   private static final String SUBJECT_MATCH = "new match";
+  private static final String SUBJECT_CLOSE = "conversation closed";
 
 
   @Autowired
@@ -102,6 +103,8 @@ public class WonOwnerMailSender {
     String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
     Dataset needDataset =  linkedDataSource.getDataForResource(URI.create(remoteNeed));
     String remoteNeedTitle = WonRdfUtils.NeedUtils.getNeedTitle(needDataset, URI.create(remoteNeed));
+    Dataset localNeedDataset =  linkedDataSource.getDataForResource(URI.create(localNeed));
+    String localNeedTitle = WonRdfUtils.NeedUtils.getNeedTitle(localNeedDataset, URI.create(localNeed));
     String linkLocalNeed = ownerAppLink + OWNER_LOCAL_NEED_LINK + localNeed;
     String linkRemoteNeed = uriService.getOwnerProtocolOwnerURI() + OWNER_REMOTE_NEED_LINK + remoteNeed;
     String linkConnection = ownerAppLink + String.format(OWNER_CONNECTION_LINK,localNeed, localConnection, ConnectionState.CONNECTED.getURI().toString());
@@ -112,7 +115,9 @@ public class WonOwnerMailSender {
     "<div>" +
       NOTIFICATION_START_HTML +
       "<p>The owner of '<a href=\"" + linkRemoteNeed + "\">" + remoteNeedTitle + "</a>'" +
-      "   sent <a href=\"" + linkLocalNeed + "\">you</a> a message. They wrote:" +
+      "   sent you a message via " +
+      "your posting <a href=\"" + linkLocalNeed + "\">"+ localNeedTitle+ "</a>. " +
+      "They wrote:" +
       "</p>" +
       "<p style=\"border-left:thick solid #808080;\">" +
       "   <span style=\"margin-left:5px;color:#808080;\">" + textMsg + "</span>" +
@@ -135,6 +140,8 @@ public class WonOwnerMailSender {
     String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
     Dataset needDataset =  linkedDataSource.getDataForResource(URI.create(remoteNeed));
     String remoteNeedTitle = WonRdfUtils.NeedUtils.getNeedTitle(needDataset, URI.create(remoteNeed));
+    Dataset localNeedDataset =  linkedDataSource.getDataForResource(URI.create(localNeed));
+    String localNeedTitle = WonRdfUtils.NeedUtils.getNeedTitle(localNeedDataset, URI.create(localNeed));
     String linkLocalNeed = ownerAppLink + OWNER_LOCAL_NEED_LINK + localNeed;
     String linkRemoteNeed = uriService.getOwnerProtocolOwnerURI() + OWNER_REMOTE_NEED_LINK + remoteNeed;
     String linkConnection = ownerAppLink + String.format(OWNER_CONNECTION_LINK,
@@ -155,7 +162,8 @@ public class WonOwnerMailSender {
       "<div>" +
         NOTIFICATION_START_HTML +
         "<p>The owner of '<a href=\"" + linkRemoteNeed + "\">" + remoteNeedTitle + "</a>'" +
-        "   wants to contact <a href=\"" + linkLocalNeed + "\">you</a>. " +
+        "   wants to start a conversation with " +
+        "you via your posting <a href=\"" + linkLocalNeed + "\">"+ localNeedTitle+ "</a>. " +
         theyWrote +
         "<p><a href=\"" + linkConnection + "\">[Click here to pick up the conversation]</a></p>" +
         NOTIFICATION_END_HTML +
@@ -174,6 +182,8 @@ public class WonOwnerMailSender {
     String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
     Dataset needDataset =  linkedDataSource.getDataForResource(URI.create(remoteNeed));
     String remoteNeedTitle = WonRdfUtils.NeedUtils.getNeedTitle(needDataset, URI.create(remoteNeed));
+    Dataset localNeedDataset =  linkedDataSource.getDataForResource(URI.create(localNeed));
+    String localNeedTitle = WonRdfUtils.NeedUtils.getNeedTitle(localNeedDataset, URI.create(localNeed));
     String linkLocalNeed = ownerAppLink + OWNER_LOCAL_NEED_LINK + localNeed;
     String linkRemoteNeed = uriService.getOwnerProtocolOwnerURI() + OWNER_REMOTE_NEED_LINK + remoteNeed;
     String linkConnection = ownerAppLink + String.format(OWNER_CONNECTION_LINK,
@@ -194,16 +204,17 @@ public class WonOwnerMailSender {
       "<div>" +
         NOTIFICATION_START_HTML +
         "<p>The owner of '<a href=\"" + linkRemoteNeed + "\">" + remoteNeedTitle + "</a>'" +
-        "   closed the connection to <a href=\"" + linkLocalNeed + "\">you</a>. " +
+        "   closed the conversation with " +
+        "your posting <a href=\"" + linkLocalNeed + "\">"+ localNeedTitle+ "</a>. " +
         theyWrote +
         "<p><a href=\"" + linkConnection + "\">[Click here to view the conversation]</a></p>" +
         NOTIFICATION_END_HTML +
         "</div>";
 
 
-    logger.debug("sending " + SUBJECT_CONNECT + " to " + toEmail);
+    logger.debug("sending " + SUBJECT_CLOSE + " to " + toEmail);
 
-    this.wonMailSender.sendHtmlMessage(toEmail, SUBJECT_CONNECT, body);
+    this.wonMailSender.sendHtmlMessage(toEmail, SUBJECT_CLOSE, body);
 
   }
 
@@ -213,6 +224,8 @@ public class WonOwnerMailSender {
     String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
     Dataset needDataset =  linkedDataSource.getDataForResource(URI.create(remoteNeed));
     String remoteNeedTitle = WonRdfUtils.NeedUtils.getNeedTitle(needDataset, URI.create(remoteNeed));
+    Dataset localNeedDataset =  linkedDataSource.getDataForResource(URI.create(localNeed));
+    String localNeedTitle = WonRdfUtils.NeedUtils.getNeedTitle(localNeedDataset, URI.create(localNeed));
     String linkLocalNeed = ownerAppLink + OWNER_LOCAL_NEED_LINK + localNeed;
     String linkRemoteNeed = uriService.getOwnerProtocolOwnerURI() + OWNER_REMOTE_NEED_LINK + remoteNeed;
     String linkConnection = ownerAppLink + String.format(OWNER_CONNECTION_LINK, localNeed, localConnection,
@@ -223,7 +236,8 @@ public class WonOwnerMailSender {
       "<div>" +
         NOTIFICATION_START_HTML +
         "<p>The posting '<a href=\"" + linkRemoteNeed + "\">" + remoteNeedTitle + "</a>'" +
-        "   might be interesting for <a href=\"" + linkLocalNeed + "\">you</a>. " +
+        "   might be interesting for "+
+        "your posting <a href=\"" + linkLocalNeed + "\">"+ localNeedTitle+ "</a>. " +
         "</p>" +
         "<p><a href=\"" + linkConnection + "\">[Click here to request a conversation]</a></p>" +
         NOTIFICATION_END_HTML +
