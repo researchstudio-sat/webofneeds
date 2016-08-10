@@ -258,7 +258,7 @@ export function buildCreateMessage(need, wonNodeUri) {
         title: need.title, //mandatory
         description: need.description,
         publishedContentUri: publishedContentUri, //mandatory
-        tags: need.tags? need.tags.join(',') : undefined,
+        tags: need.tags,
         attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
     });
     const msgUri = wonNodeUri + '/event/' + getRandomPosInt(); //mandatory
