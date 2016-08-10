@@ -20,6 +20,10 @@ export const labels = Object.freeze({
  * @param previous
  */
 export function relativeTime(now, previous) {
+    if(!now || !previous) {
+        return undefined;
+    }
+
     now = new Date(now);
     previous = new Date(previous);
     const elapsed = now - previous; // in ms

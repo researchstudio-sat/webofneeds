@@ -6,7 +6,10 @@
 import won from '../won-es6';
 import angular from 'angular';
 import squareImageModule from './square-image';
-import { labels } from '../won-label-utils';
+import {
+    labels,
+    relativeTime,
+} from '../won-label-utils';
 import { attach, decodeUriComponentProperly } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
 import {
@@ -14,6 +17,9 @@ import {
     selectAllByConnections,
     selectOpenPost,
     selectOpenPostUri,
+    selectTimestamp,
+    selectLastUpdatedPerConnection,
+    selectLastUpdateTime,
 } from '../selectors';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
@@ -47,7 +53,7 @@ function genComponentConf() {
                                 }}
                             </div>
                             <div class="conn__item__description__topline__date">
-                                TODO DATE {{ self.allByConnections.getIn([connectionUri, 'connection', 'timestamp']) }}
+                                {{ self.lastUpdated.get(connectionUri) }}
                             </div>
                             <img
                                 class="conn__item__description__topline__icon"
@@ -119,27 +125,12 @@ function genComponentConf() {
                     .map(conn => conn.getIn(['connection','uri']))
                     .toList().toJS();
 
-                //TODO move to event-reducer
-                const selectTimestamp = (event, connectionUri) => {
-                    if(event.get('hasReceiver') === connectionUri) {
-                        return event.get('hasReceivedTimestamp');
-                    } else if(event.get('hasSender') === connectionUri) {
-                        return event.get('hasSentTimestamp');
-                    } else {
-                        throw new Error("Can't determine timestamp as the connectionUri " +
-                            connectionUri + " isn't occuring in the event ", event);
-                    }
-                };
-
-                const timestampsByConnection = allByConnections.map(c =>
-                    c.get('events')
-                        .map( e => selectTimestamp(e, c.getIn(['connection','uri']) ))
-                        .filter(ts => ts) // don't use events without timestamp
-                        .map(ts => Number.parseInt(ts))
-                        .max()
-                ).toJS();
+                const lastStateUpdate = selectLastUpdateTime(state);
 
                 return {
+                    lastUpdated:
+                        selectLastUpdatedPerConnection(state)
+                        .map(ts => relativeTime(lastStateUpdate, ts)),
                     connectionUris,
                     allByConnections,
                     openConversationUri: openConnectionUri,

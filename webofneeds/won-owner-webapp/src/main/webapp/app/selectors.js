@@ -260,6 +260,35 @@ export const displayingOverview = createSelector(
     postUri => !postUri //if there's a postUri, this is almost certainly a detail view
 )
 
+export const selectLastUpdatedPerConnection = createSelector(
+    selectAllByConnections,
+    allByConnections => allByConnections.map(connectionAndRelated =>
+        connectionAndRelated.get('events')
+        .map( event =>
+                selectTimestamp(event, connectionAndRelated.getIn(['connection','uri']) )
+        )
+        /*
+         * don't use events without timestamp
+         * NOTE if there's no events with timestamps
+         * for the connection:
+         * `Immutable.List([]).max() === undefined`
+         */
+        .filter(timestamp => timestamp)
+        .map(timestamp => Number.parseInt(timestamp))
+        .max()
+    )
+);
+
+export function selectTimestamp(event, connectionUri) {
+    if(event.get('hasReceiver') === connectionUri) {
+        return event.get('hasReceivedTimestamp');
+    } else if(event.get('hasSender') === connectionUri) {
+        return event.get('hasSentTimestamp');
+    } else {
+        return undefined;
+    }
+};
+
 
 window.selectAllByConnections4dbg = selectAllByConnections;
 window.allByConnection4db = allByConnection;
