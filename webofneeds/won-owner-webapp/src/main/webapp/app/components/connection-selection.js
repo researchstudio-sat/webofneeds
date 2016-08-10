@@ -9,7 +9,12 @@ import squareImageModule from './square-image';
 import { labels } from '../won-label-utils';
 import { attach, decodeUriComponentProperly } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
-import { selectOpenConnectionUri, selectAllByConnections } from '../selectors';
+import {
+    selectOpenConnectionUri,
+    selectAllByConnections,
+    selectOpenPost,
+    selectOpenPostUri,
+} from '../selectors';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
@@ -24,18 +29,25 @@ function genComponentConf() {
                     <won-square-image
                         src="request.titleImgSrc"
                         class="clickable"
-                        title="self.allByConnections.getIn([connectionUri, 'remoteNeed', 'title'])"
-                        uri="self.allByConnections.getIn([connectionUri, 'remoteNeed', 'uri'])"
+                        title="self.allByConnections.getIn([
+                            connectionUri, 'remoteNeed',
+                            'won:hasContent', 'dc:title'])"
+                        uri="self.allByConnections.getIn([connectionUri, 'remoteNeed', '@id'])"
                         ng-click="self.setOpen(connectionUri)">
                     </won-square-image>
                     <div class="conn__item__description">
                         <div class="conn__item__description__topline">
                             <div class="conn__item__description__topline__title clickable"
                                         ng-click="self.setOpen(connectionUri)">
-                                {{ self.allByConnections.getIn([connectionUri, 'remoteNeed', 'title']) }}
+                                {{
+                                  self.allByConnections.getIn([
+                                    connectionUri, 'remoteNeed',
+                                    'won:hasContent', 'dc:title'
+                                  ])
+                                }}
                             </div>
                             <div class="conn__item__description__topline__date">
-                                {{ self.allByConnections.getIn([connectionUri, 'connection', 'timestamp']) }}
+                                TODO DATE {{ self.allByConnections.getIn([connectionUri, 'connection', 'timestamp']) }}
                             </div>
                             <img
                                 class="conn__item__description__topline__icon"
@@ -88,17 +100,10 @@ function genComponentConf() {
             const self = this;
 
             const selectFromState = (state)=>{
-                const encodedPostUri = state.getIn(['router', 'currentParams', 'postUri']) ||
-                    state.getIn(['router', 'currentParams', 'myUri']) ; // TODO old parameter
-                const postUri = decodeURIComponent(encodedPostUri);
-
-                const encodedConnectionUri = state.getIn(['router', 'currentParams', 'connectionUri']) ||
-                    state.getIn(['router', 'currentParams', 'openConversation']); // TODO old parameter
-
+                const postUri = selectOpenPostUri(state);
                 const openConnectionUri = selectOpenConnectionUri(state);
                 const allByConnections = selectAllByConnections(state);
-                const post = state.getIn(['needs','ownNeeds', postUri]);
-                const postJS = post? post.toJS() : {};
+                const post = selectOpenPost(state);
 
                 const connectionTypeInParams = decodeUriComponentProperly(
                         state.getIn(['router', 'currentParams', 'connectionType'])
@@ -109,16 +114,36 @@ function genComponentConf() {
                 const connectionUris = allByConnections
                     .filter(conn =>
                         conn.getIn(['connection', 'hasConnectionState']) === connectionType &&
-                        conn.getIn(['ownNeed', 'uri']) === postUri
+                        conn.getIn(['ownNeed', '@id']) === postUri
                     )
                     .map(conn => conn.getIn(['connection','uri']))
                     .toList().toJS();
+
+                //TODO move to event-reducer
+                const selectTimestamp = (event, connectionUri) => {
+                    if(event.get('hasReceiver') === connectionUri) {
+                        return event.get('hasReceivedTimestamp');
+                    } else if(event.get('hasSender') === connectionUri) {
+                        return event.get('hasSentTimestamp');
+                    } else {
+                        throw new Error("Can't determine timestamp as the connectionUri " +
+                            connectionUri + " isn't occuring in the event ", event);
+                    }
+                };
+
+                const timestampsByConnection = allByConnections.map(c =>
+                    c.get('events')
+                        .map( e => selectTimestamp(e, c.getIn(['connection','uri']) ))
+                        .filter(ts => ts) // don't use events without timestamp
+                        .map(ts => Number.parseInt(ts))
+                        .max()
+                ).toJS();
 
                 return {
                     connectionUris,
                     allByConnections,
                     openConversationUri: openConnectionUri,
-                    post: postJS,
+                    post: post? post.toJS() : {},
                 };
             }
 
