@@ -35,7 +35,7 @@ public class HintBuilder
         if (newDocs == null || newDocs.size() == 0) {
             return matches;
         } else {
-            log.debug("Received {} solr documents as query result", newDocs.size());
+            log.info("Received {} solr documents as query result", newDocs.size());
         }
 
         // sort the documents according to their score value descending
@@ -53,37 +53,35 @@ public class HintBuilder
         });
 
         // apply the Kneedle algorithm to find knee/elbow points in the score values of the returned newDocs to cut there
-        Kneedle kneedle = new Kneedle();
-        double[] x = new double[newDocs.size()];
-        double[] y = new double[newDocs.size()];
-        for (int i = 0; i < newDocs.size(); i++) {
-            x[i] = i;
-            y[i] = Double.valueOf(newDocs.get(i).getFieldValue("score").toString());
-        }
-        int[] elbows = kneedle.detectElbowPoints(x, y);
-
-
         double cutScoreLowerThan = 0.0;
-        if (elbows.length >= config.getCutAfterIthElbowInScore()) {
-            cutScoreLowerThan = y[elbows[elbows.length - config.getCutAfterIthElbowInScore()]] / newDocs.getMaxScore();
-            log.debug("Calculated elbow score point after {} elbows for document scores: {}",
-                      config.getCutAfterIthElbowInScore(), cutScoreLowerThan);
+        if (newDocs.size() > 1) {
+            Kneedle kneedle = new Kneedle();
+            double[] x = new double[newDocs.size()];
+            double[] y = new double[newDocs.size()];
+            for (int i = 0; i < newDocs.size(); i++) {
+                x[i] = i;
+                y[i] = Double.valueOf(newDocs.get(i).getFieldValue("score").toString());
+            }
+            int[] elbows = kneedle.detectElbowPoints(x, y);
+
+            if (elbows.length >= config.getCutAfterIthElbowInScore()) {
+                cutScoreLowerThan = y[elbows[elbows.length - config.getCutAfterIthElbowInScore()]];
+                log.info("Calculated elbow score point after {} elbows for document scores: {}",
+                          config.getCutAfterIthElbowInScore(), cutScoreLowerThan);
+            }
         }
 
         for (int i = newDocs.size() - 1; i >= 0; i--) {
 
-            // normalize the score to a value between 0 and 1
-            double score = Double.valueOf(newDocs.get(i).getFieldValue("score").toString()) / newDocs.getMaxScore();
-
             // if score is lower threshold or we arrived at the elbow point to cut after
-            if (score < config.getScoreThreshold() || score <= (cutScoreLowerThan)) {
-                log.debug("cut result documents, current score is {}, score threshold is {}",
+            double score = Double.valueOf(newDocs.get(i).getFieldValue("score").toString());
+            if (score < config.getScoreThreshold() || score <= cutScoreLowerThan) {
+                log.info("cut result documents, current score is {}, score threshold is {}",
                           score, config.getScoreThreshold());
                 break;
             }
 
             SolrDocument newDoc = newDocs.get(i);
-            newDoc.put("normalized_score", score);
             matches.add(newDoc);
         }
 
@@ -100,7 +98,15 @@ public class HintBuilder
 
             String needUri = doc.getFieldValue("id").toString();
             String wonNodeUri = ((List) doc.getFieldValue(WON_NODE_SOLR_FIELD)).get(0).toString();
-            double score = Double.valueOf(doc.getFieldValue("normalized_score").toString());
+
+            // normalize the final score
+            double score = Double.valueOf(doc.getFieldValue("score").toString()) * config.getScoreNormalizationFactor();
+
+            if (score > 1.0) {
+                score = 1.0;
+            } else if (score < 0.0) {
+                score = 0.0;
+            }
 
             bulkHintEvent.addHintEvent(new HintEvent(need.getWonNodeUri(), need.getUri(), wonNodeUri, needUri,
                                                      config.getSolrServerPublicUri(), score));
