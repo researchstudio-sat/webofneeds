@@ -9,7 +9,11 @@ import angular from 'angular';
 import { attach, } from '../utils';
 import won from '../won-es6';
 import {
+    relativeTime,
+} from '../won-label-utils';
+import {
     selectOpenPost,
+    selectLastUpdateTime,
 } from '../selectors';
 import { actionCreators }  from '../actions/actions';
 
@@ -23,21 +27,24 @@ function genComponentConf() {
             </won-gallery>
 
             <div class="post-info__inner__right">
-                <h2 class="post-info__heading" ng-show="self.post.get('friendlyTimestamp')">
+                <h2 class="post-info__heading" ng-show="self.friendlyTimestamp">
                     Created
                 </h2>
-                <p class="post-info__details" ng-show="self.post.get('friendlyTimestamp')">
-                    {{ self.post.get('friendlyTimestamp') }}
+                <p class="post-info__details" ng-show="self.friendlyTimestamp">
+                    {{ self.friendlyTimestamp }}
                 </p>
 
                 <h2 class="post-info__heading"
-                    ng-show="self.post.get('textDescription')">
+                    ng-show="self.post.getIn(['won:hasContent','won:hasTextDescription'])">
                     Description
                 </h2>
                 <p class="post-info__details"
-                    ng-show="self.post.get('textDescription')">
-                    {{ self.post.get('textDescription') }}
+                    ng-show="self.post.getIn(['won:hasContent','won:hasTextDescription'])">
+                    {{ self.post.getIn(['won:hasContent','won:hasTextDescription'])}}
                 </p>
+
+                <!-- TODO tags -->
+
                 <h2 class="post-info__heading"
                     ng-show="self.post.get('location')">
                     Location
@@ -55,9 +62,16 @@ function genComponentConf() {
         constructor() {
             attach(this, serviceDependencies, arguments);
 
-            const selectFromState = (state)=>({
-                post: selectOpenPost(state),
-            });
+            const selectFromState = (state) => {
+                const post = selectOpenPost(state);
+                return {
+                    post: post,
+                    friendlyTimestamp: relativeTime(
+                        selectLastUpdateTime(state),
+                        post && post.get('dct:created')
+                    ),
+                }
+            };
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
