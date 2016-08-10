@@ -115,7 +115,7 @@ function genComponentConf() {
                 const need = ownNeeds? ownNeeds.get(this.needUri) : undefined;
 
                 const allConnectionsByNeedUri = selectAllByConnections(state)
-                    .filter(conn => conn.getIn(['ownNeed', 'uri']) === this.needUri);
+                    .filter(conn => conn.getIn(['ownNeed', '@id']) === this.needUri);
 
                 const unreadCounts = selectUnreadCountsByNeedAndType(state).get(this.needUri);
 

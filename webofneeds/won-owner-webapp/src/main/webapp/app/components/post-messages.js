@@ -19,7 +19,7 @@ function genComponentConf() {
                      src="generated/icon-sprite.svg#ico36_close"/>
             </a>
             <div class="pm__header__title">
-                Conversation about "{{ self.connectionData.getIn(['remoteNeed', 'title']) }}"
+                Conversation about "{{ self.connectionData.getIn(['remoteNeed', 'won:hasContent', 'dc:title']) }}"
             </div>
             <div class="pm__header__options">
                 Options
@@ -33,12 +33,12 @@ function genComponentConf() {
             <div
                 class="pm__content__message"
                 ng-repeat="message in self.chatMessages"
-                ng-class="message.get('hasSenderNeed') == self.connectionData.getIn(['ownNeed', 'uri']) ? 'right' : 'left'">
+                ng-class="message.get('hasSenderNeed') == self.connectionData.getIn(['ownNeed', '@id']) ? 'right' : 'left'">
                     <won-square-image
-                        title="self.connectionData.getIn(['remoteNeed', 'title'])"
+                        title="self.connectionData.getIn(['remoteNeed', 'won:hasContent', 'dc:title'])"
                         src="self.connectionData.getIn(['remoteNeed', 'titleImgSrc'])"
-                        uri="self.connectionData.getIn(['remoteNeed', 'uri'])"
-                        ng-show="message.get('hasSenderNeed') != self.connectionData.getIn(['ownNeed', 'uri'])">
+                        uri="self.connectionData.getIn(['remoteNeed', '@id'])"
+                        ng-show="message.get('hasSenderNeed') != self.connectionData.getIn(['ownNeed', '@id'])">
                     </won-square-image>
                     <div class="pm__content__message__content">
                         <div class="pm__content__message__content__text">
