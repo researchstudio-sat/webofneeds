@@ -100,8 +100,7 @@ public class HintBuilder
             String wonNodeUri = ((List) doc.getFieldValue(WON_NODE_SOLR_FIELD)).get(0).toString();
 
             // normalize the final score
-            double score = Double.valueOf(doc.getFieldValue("normalized_score").toString()) *
-              config.getScoreNormalizationFactor();
+            double score = Double.valueOf(doc.getFieldValue("score").toString()) * config.getScoreNormalizationFactor();
 
             if (score > 1.0) {
                 score = 1.0;
