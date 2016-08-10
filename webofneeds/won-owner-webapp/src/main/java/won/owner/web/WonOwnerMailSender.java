@@ -26,8 +26,8 @@ public class WonOwnerMailSender {
   LinkedDataSource linkedDataSource;
 
   private static final String OWNER_REMOTE_NEED_LINK = "/#post/?postUri=";
-  private static final String OWNER_CONNECTION_LINK = "&connectionUri=";
-  private static final String OWNER_LOCAL_NEED_LINK = "/#/post/?postUri=%s&connectionType=%s";
+  private static final String OWNER_CONNECTION_LINK = "/#post/?postUri=%s&connectionUri=%s&connectionType=%s";
+  private static final String OWNER_LOCAL_NEED_LINK = "/#/post/?postUri=";
 
   private static final String NOTIFICATION_END = "\n\n\n" +
     "Sincerely yours,\nOwner application team" +
