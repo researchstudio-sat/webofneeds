@@ -265,7 +265,7 @@ export const selectLastUpdatedPerConnection = createSelector(
     allByConnections => allByConnections.map(connectionAndRelated =>
         connectionAndRelated.get('events')
         .map( event =>
-                selectTimestamp(event, connectionAndRelated.getIn(['connection','uri']) )
+            selectTimestamp(event, connectionAndRelated.getIn(['connection','uri']) )
         )
         /*
          * don't use events without timestamp
