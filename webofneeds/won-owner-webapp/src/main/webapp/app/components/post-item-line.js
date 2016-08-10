@@ -26,8 +26,8 @@ function genComponentConf() {
             </a>
             <a class="pil__description clickable" ui-sref="post({postUri: self.needUri})">
                 <div class="pil__description__topline">
-                    <div class="pil__description__topline__title">{{self.ownNeed.get(['won:hasContent','dc:title'])}}</div>
-                    <div class="pil__description__topline__creationdate">{{self.creationDate}}</div>
+                    <div class="pil__description__topline__title">{{self.ownNeed.getIn(['won:hasContent','dc:title'])}}</div>
+                    <div class="pil__description__topline__creationdate">{{self.relativeCreationDate}}</div>
                 </div>
                 <div class="pil__description__subtitle">
                     <span class="pil__description__subtitle__group" ng-show="self.ownNeed.get('group')">
@@ -37,7 +37,7 @@ function genComponentConf() {
                          <span class="pil__description__subtitle__group__dash"> &ndash; </span>
                     </span>
                     <span class="pil__description__subtitle__type">
-                         {{self.labels.type[self.ownNeed.getIn(['won:basicNeedType', '@id'])]}}
+                         {{self.labels.type[self.ownNeed.getIn(['won:hasBasicNeedType', '@id'])]}}
                     </span>
                 </div>
             </a>
@@ -121,6 +121,7 @@ function genComponentConf() {
 
 
                 return {
+                    relativeCreationDate: relativeTime(state.get('lastUpdateTime'), need.get('dct:created')),
                     hasConversations: allConnectionsByNeedUri
                         .filter(conn =>
                             conn.getIn(['connection', 'hasConnectionState']) === won.WON.Connected
