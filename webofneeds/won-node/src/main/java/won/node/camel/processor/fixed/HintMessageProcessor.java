@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
@@ -63,18 +62,12 @@ public class HintMessageProcessor extends AbstractCamelProcessor
       needURIFromWonMessage, otherNeedURIFromWonMessage,
       null, facet, ConnectionState.SUGGESTED, ConnectionEventType.MATCHER_HINT);
     //build message to send to owner, put in header
-    final WonMessage newWonMessage = createMessageToSendToOwner(wonMessage, con);
-    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER, newWonMessage);
+    //set the receiver to the newly generated connection uri
+    wonMessage.addMessageProperty(WONMSG.RECEIVER_PROPERTY, con.getConnectionURI());
+
   }
 
-  private WonMessage createMessageToSendToOwner(WonMessage wonMessage, Connection con) {
-    //create the message to send to the owner
-    return WonMessageBuilder
-      .setPropertiesForPassingMessageToOwner(wonMessage)
-        //set the uri of the newly created connection as receiver
-      .setReceiverURI(con.getConnectionURI())
-      .build();
-  }
+
 
 
 }

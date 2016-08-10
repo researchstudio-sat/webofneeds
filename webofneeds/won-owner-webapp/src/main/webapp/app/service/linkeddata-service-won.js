@@ -1349,7 +1349,7 @@ const rdfstore = window.rdfstore;
      * @return {*} the data of all connection-nodes referenced by that need
      */
     won.getConnectionsOfNeed = (needUri, requesterWebId = needUri) =>
-        won.getConnectionUrisOfNeed(needUri)
+        won.getConnectionUrisOfNeed(needUri, requesterWebId)
         .then(connectionUris =>
             urisToLookupMap(
                 connectionUris,
@@ -1361,25 +1361,11 @@ const rdfstore = window.rdfstore;
     /*
      * Loads all URIs of a need's connections.
      */
-    won.getConnectionUrisOfNeed = (needUri) =>
-        won.getNode(needUri)
-            .then(need =>
-                won.getNode(need.hasConnections)
-            )
-            .then(connectionContainer => {
-                /*
-                 * if there's only a single rdfs:member in the event
-                 * container, getNode will not return an array, so we
-                 * need to make sure it's one from here on out.
-                 */
-                return is('String', connectionContainer.member) ?
-                    [connectionContainer.member] :
-                    connectionContainer.member
-            })
-            .catch(error => {
-                error.message = "Failed to fetch connection uris for need <" + needUri + "> because of:\n" + error.message;
-                throw(error);
-            });
+    won.getConnectionUrisOfNeed = (needUri, requesterWebId) =>
+        won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri, requesterWebId)
+            .then(
+                (result) =>  result.map( x => x.connection.value));
+
 
     /**
      *

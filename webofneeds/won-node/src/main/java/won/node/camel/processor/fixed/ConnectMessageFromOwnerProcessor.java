@@ -51,17 +51,13 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
     connectionRepository.save(con);
     //prepare the message to pass to the remote node
     final WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage, con);
+    //set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
+    wonMessage.addMessageProperty(WONMSG.SENDER_PROPERTY, con.getConnectionURI());
     //add the information about the new local connection to the original message
-    wonMessage = WonMessageBuilder
-      .wrap(wonMessage)
-      .setSenderURI(con.getConnectionURI())
-      .setCorrespondingRemoteMessageURI(newWonMessage.getMessageURI())
-      .build();
+    wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, newWonMessage.getMessageURI());
+    //the persister will pick it up later
 
-    //put it into the header so the persister will pick it up later
-    message.setHeader(WonCamelConstants.MESSAGE_HEADER,wonMessage);
-
-    //put it into the 'modified message' header (so the persister doesn't pick up the wrong one).
+    //put the new message into the 'modified message' header (so the persister doesn't pick up the wrong one).
     message.setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER, newWonMessage);
   }
 

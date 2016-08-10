@@ -617,6 +617,7 @@ public class WonMessageBuilder
       .setWonMessageDirection(WonMessageDirection.FROM_EXTERNAL);
   }
 
+  @Deprecated
   public static WonMessageBuilder setPropertiesForPassingMessageToOwner(final WonMessage externalMsg){
     return WonMessageBuilder.wrap(externalMsg)
       .setReceivedTimestamp(new Date().getTime());
@@ -890,12 +891,6 @@ public class WonMessageBuilder
 
 
 
-  public static WonMessage wrapMessageReceivedByNode(final WonMessage wonMessage, WonMessageDirection direction){
-    WonMessageBuilder builder = wrap(wonMessage)
-      .setWonMessageDirection(direction)
-      .setReceivedTimestamp(new Date().getTime());
-    return builder.build();
-  }
 
   public static WonMessage forwardReceivedNodeToNodeMessageAsNodeToNodeMessage(final URI newMessageUri, final WonMessage wonMessage,
                                                                                final URI connectionURI, final URI needURI, final URI wonNodeUri,

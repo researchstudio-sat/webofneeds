@@ -23,7 +23,7 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
 
   @Query("select msg from MessageEventPlaceholder msg where msg.parentURI = :parent and " +
     "referencedByOtherMessage = false")
-  List<MessageEventPlaceholder> findByParentURIAndReferencedByOtherMessage(
+  List<MessageEventPlaceholder> findByParentURIAndNotReferencedByOtherMessage(
     @Param("parent") URI parentURI);
 
   @Query("select messageURI from MessageEventPlaceholder msg where msg.parentURI = :parent")

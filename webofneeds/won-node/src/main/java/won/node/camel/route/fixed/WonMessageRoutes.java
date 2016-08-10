@@ -46,7 +46,9 @@ public class WonMessageRoutes  extends RouteBuilder
           .to("bean:uriNodePathChecker")
           .to("bean:uriInUseChecker")
           .to("bean:signatureChecker")
-          .to("bean:wrapperFromOwner")
+          .to("bean:envelopeAdder")
+          .to("bean:directionFromOwnerAdder")
+          .to("bean:receivedTimestampAdder")
           //route to msg processing logic
           .to("seda:OwnerProtocolLogic");
 
@@ -69,10 +71,7 @@ public class WonMessageRoutes  extends RouteBuilder
       .to("bean:wonMessageIntoCamelProcessor")
       .routeId("SystemMessageIn")
       .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
-      .to("bean:referenceAdder")
-      .to("bean:signatureAdder")
-      .to("bean:persister")
-      .to("bean:wrapperFromSystem")
+      .to("bean:receivedTimestampAdder")
       //route to message processing logic
       .to("seda:OwnerProtocolLogic");
 
@@ -85,8 +84,7 @@ public class WonMessageRoutes  extends RouteBuilder
       .routeId("SystemMessageToOwner")
       .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
         //TODO: as soon as messages are signed when they reach this route, perform signature/wellformedness checks here?
-      .to("bean:wrapperFromSystem")
-      .to("bean:referenceAdder")
+      .to("bean:receivedTimestampAdder")
       .to("bean:signatureAdder")
               //route to message processing logic
       .to("bean:persister")
@@ -186,7 +184,9 @@ public class WonMessageRoutes  extends RouteBuilder
             .to("bean:uriNodePathChecker")
             .to("bean:uriInUseChecker")
             .to("bean:signatureChecker")
-            .to("bean:wrapperFromExternal")
+            .to("bean:envelopeAdder")
+            .to("bean:directionFromExternalAdder")
+            .to("bean:receivedTimestampAdder")
             //call the default implementation, which may alter the message.
             .routingSlip(method("fixedMessageProcessorSlip"))
             .to("bean:referenceAdder")
@@ -219,7 +219,6 @@ public class WonMessageRoutes  extends RouteBuilder
      * because its URI says it lives on the recipient node. The recipient will persist it.
      */
     from("seda:NeedProtocolOut?concurrentConsumers=2").routeId("Node2NodeRoute")
-            .to("bean:referenceAdder")
             .to("bean:signatureAdder")
             .to("bean:needProtocolOutgoingMessagesProcessor");
 
@@ -235,7 +234,9 @@ public class WonMessageRoutes  extends RouteBuilder
           //TODO as soon as Matcher can sign his messages, perform here .to("bean:wellformednessChecker") and .to("bean:signatureChecker")
           .to("bean:uriNodePathChecker")
           .to("bean:uriInUseChecker")
-          .to("bean:wrapperFromExternal")
+          .to("bean:envelopeAdder")
+          .to("bean:directionFromExternalAdder")
+          .to("bean:receivedTimestampAdder")
           .to("bean:hintMessageProcessor?method=process")
           .to("bean:referenceAdder")
           .to("bean:signatureAdder")

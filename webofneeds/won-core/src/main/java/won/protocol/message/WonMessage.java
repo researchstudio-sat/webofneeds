@@ -1,7 +1,5 @@
 package won.protocol.message;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.*;
@@ -66,6 +64,83 @@ public class WonMessage implements Serializable
 
   public Dataset getCompleteDataset(){
     return this.completeDataset;
+  }
+
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param value
+   */
+  public void addMessageProperty(Property property, RDFNode value) {
+    if (logger.isDebugEnabled()){
+      logger.debug("adding property {}, value {}, to message {} in envelope {}",
+                   new Object[]{property, value, getMessageURI(), getOuterEnvelopeGraphURI()});
+    }
+    getOuterEnvelopeGraph().getResource(getMessageURI().toString()).addProperty(property, value);
+  }
+
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param uri the object of the property, assumed to be an uri
+   */
+  public void addMessageProperty(Property property, String uri){
+    RDFNode valueAsRdfNode = getOuterEnvelopeGraph().createResource(uri);
+    addMessageProperty(property, valueAsRdfNode);
+  }
+
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param value
+   */
+  public void addMessageProperty(Property property, URI value){
+    addMessageProperty(property, value.toString());
+  }
+
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param value
+   */
+  public void addMessageProperty(Property property, long value){
+    addMessageProperty(property, getOuterEnvelopeGraph().createTypedLiteral(value));
+  }
+
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param value
+   */
+  public void addMessageProperty(Property property, int value){
+    addMessageProperty(property, getOuterEnvelopeGraph().createTypedLiteral(value));
+  }
+
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param value
+   */
+  public void addMessageProperty(Property property, double value){
+    addMessageProperty(property, getOuterEnvelopeGraph().createTypedLiteral(value));
+  }
+
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param value
+   */
+  public void addMessageProperty(Property property, float value){
+    addMessageProperty(property, getOuterEnvelopeGraph().createTypedLiteral(value));
+  }
+
+  /**
+   * Adds a property to the message resource in the outermost envelope.
+   * @param property
+   * @param value
+   */
+  public void addMessageProperty(Property property, boolean value){
+    addMessageProperty(property, getOuterEnvelopeGraph().createTypedLiteral(value));
   }
 
   /**

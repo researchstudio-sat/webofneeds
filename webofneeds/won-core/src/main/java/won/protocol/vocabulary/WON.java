@@ -160,7 +160,17 @@ public class WON
   public static final Resource CONNECTION_STATE_CONNECTED = m.createResource(ConnectionState.CONNECTED.getURI().toString());
   public static final Resource CONNECTION_STATE_CLOSED = m.createResource(ConnectionState.CLOSED.getURI().toString());
 
+  //adds a flag to a need
+  public static final Property HAS_FLAG = m.createProperty(BASE_URI+"hasFlag");
+
+  //the doNotMatch flag: need does not want matching
+  public static final Resource DO_NOT_MATCH = m.createResource(BASE_URI+"DoNotMatch");
+
+  //the usedForTesting flag: need is not a real need, only match with other needs flagged with usedForTesting
+  public static final Resource USED_FOR_TESTING= m.createResource(BASE_URI+"UsedForTesting");
+
   public static final Property HAS_GRAPH = m.createProperty(BASE_URI,"hasGraph");
+
 
   //search result model
   public static final Resource Match = m.createResource(BASE_URI + "Match");

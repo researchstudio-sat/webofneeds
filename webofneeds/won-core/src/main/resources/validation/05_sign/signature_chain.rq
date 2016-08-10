@@ -25,31 +25,33 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
     ?contentChainSize
     ?parallelContentSigChainSize
 
-    (if(?envChainSize != ?parallelEnvSigChainSize || ?contentChainSize != ?parallelContentSigChainSize, "FAIL", "OK")
+    (if(?envChainSize != ?parallelEnvSigChainSize || ?contentChainSize != ?parallelContentSigChainSize, "FAIL",
+    "OK")
     AS ?check)
 
   WHERE
   {
 
-    { SELECT (count(?g) as ?envChainSize)
+    { SELECT (count(distinct ?envelope) as ?envChainSize)
       WHERE
       {
         GRAPH ?envelope
         {
-          ?envelope msg:containsEnvelope ?g .
+          ?envelope a msg:EnvelopeGraph .
         } .
       }
     }
 
-    { SELECT (count(?g) as ?parallelEnvSigChainSize)
+    { SELECT (count(?g2) as ?parallelEnvSigChainSize)
       WHERE
       {
         GRAPH ?envelope
         {
-          ?envelope msg:containsEnvelope ?g .
-          ?event msg:containsSignature ?ref .
-          ?ref msg:hasSignedGraph ?g .
-        } .
+          ?envelope a msg:EnvelopeGraph .
+        }
+        GRAPH ?g2 {
+          ?signature msg:hasSignedGraph ?envelope .
+        }
       }
     }
 
@@ -69,7 +71,7 @@ prefix ldp:   <http://www.w3.org/ns/ldp#>
         GRAPH ?envelope
         {
           ?event msg:hasContent ?g .
-          ?event msg:containsSignature ?ref .
+          ?envelope msg:containsSignature ?ref .
           ?ref msg:hasSignedGraph ?g .
         } .
       }

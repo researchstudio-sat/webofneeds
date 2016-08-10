@@ -51,11 +51,6 @@ public class WonAssembler
 
   }
 
-
-  public static void addSignature(Dataset dataset, SignatureData signatureData){
-
-  }
-
   /**
    * Assumes that namedSignedGraph is GraphCollection containing exactly one named graph
    * that is part of the Dataset graphOrigin, and that for this named graph the signature

@@ -37,15 +37,13 @@ public class SendMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
       throw new IllegalMessageForConnectionStateException(connectionUri, "CONNECTION_MESSAGE", con.getState());
     }
     WonMessage newWonMessage = createMessageToSendToRemoteNode(wonMessage, con);
-    //add the information about the remote message to the locally stored one
-    WonMessageBuilder builder = WonMessageBuilder.wrap(wonMessage)
-            .setCorrespondingRemoteMessageURI(newWonMessage.getMessageURI());
     if (wonMessage.getReceiverURI() == null){
-       builder.setReceiverURI(con.getRemoteConnectionURI());
+      //set the sender uri in the envelope TODO: TwoMsgs: do not set sender here
+      wonMessage.addMessageProperty(WONMSG.RECEIVER_PROPERTY, con.getRemoteConnectionURI());
     }
-    wonMessage = builder.build();
-    //put it into the header so the persister will pick it up later
-    message.setHeader(WonCamelConstants.MESSAGE_HEADER,wonMessage);
+    //add the information about the remote message to the locally stored one
+    wonMessage.addMessageProperty(WONMSG.HAS_CORRESPONDING_REMOTE_MESSAGE, newWonMessage.getMessageURI());
+    //the persister will pick it up later
 
     exchange.getIn().setHeader(WonCamelConstants.OUTBOUND_MESSAGE_HEADER,newWonMessage);
   }

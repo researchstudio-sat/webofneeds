@@ -83,6 +83,10 @@ public class DirectoryBasedNeedProducer implements NeedProducer
     return readModelFromFileWithIndex(fileIndexToUse);
   }
 
+  public synchronized String getCurrentFileName() {
+    return files[fileIndex].getName();
+  }
+
   private boolean isCurrentFileReadable()
   {
     return this.files[this.fileIndex].isFile() && this.files[this.fileIndex].canRead();

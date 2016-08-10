@@ -85,7 +85,8 @@ public class DebugBot extends EventBot
     bus.subscribe(ActEvent.class, this.matcherRegistrator);
 
     //create the echo need for debug initial connect - if we're not reacting to the creation of our own echo need.
-    CreateDebugNeedWithFacetsAction needForInitialConnectAction = new CreateDebugNeedWithFacetsAction(ctx, NAME_NEEDS);
+    CreateDebugNeedWithFacetsAction needForInitialConnectAction =
+      new CreateDebugNeedWithFacetsAction(ctx,NAME_NEEDS,true,true);
     needForInitialConnectAction.setIsInitialForConnect(true);
 
     ActionOnEventListener initialConnector = new ActionOnEventListener(
@@ -96,7 +97,7 @@ public class DebugBot extends EventBot
     bus.subscribe(NeedCreatedEventForMatcher.class, initialConnector);
 
     //create the echo need for debug initial hint - if we're not reacting to the creation of our own echo need.
-    CreateDebugNeedWithFacetsAction initialHinter = new CreateDebugNeedWithFacetsAction(ctx, NAME_NEEDS);
+    CreateDebugNeedWithFacetsAction initialHinter = new CreateDebugNeedWithFacetsAction(ctx, NAME_NEEDS, true, true);
     initialHinter.setIsInitialForHint(true);
     ActionOnEventListener needForInitialHintListener = new ActionOnEventListener(
       ctx, new NotFilter(new NeedUriInNamedListFilter(ctx, NAME_NEEDS)), initialHinter);
@@ -170,7 +171,7 @@ public class DebugBot extends EventBot
     // events)
     needCreator = new ActionOnEventListener(
       ctx,
-      new CreateDebugNeedWithFacetsAction(ctx,NAME_NEEDS)
+      new CreateDebugNeedWithFacetsAction(ctx,NAME_NEEDS, true, true)
     );
     bus.subscribe(HintDebugCommandEvent.class, needCreator);
     bus.subscribe(ConnectDebugCommandEvent.class, needCreator);

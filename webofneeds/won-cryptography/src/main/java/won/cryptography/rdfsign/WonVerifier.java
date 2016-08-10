@@ -7,6 +7,8 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.SignatureAlgorithmInterface;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.algorithm.algorithm.SignatureAlgorithmFisteus2010;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.Provider;
@@ -141,6 +144,12 @@ public class WonVerifier
         verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(), "Computed hash value " +
           hashString + " differs from value " + wonSignatureData.getHash() +
           " found in signature " + wonSignatureData.getSignatureUri());
+        if (logger.isDebugEnabled()) {
+          StringWriter sw = new StringWriter();
+          RDFDataMgr.write(sw, dataset.getNamedModel(wonSignatureData.getSignedGraphUri()), Lang.TRIG);
+          logger.debug("wrong signature hash for graph {} with content: {}",
+                       wonSignatureData.getSignedGraphUri(), sw.toString());
+        }
         return verificationState.isVerificationPassed();
       }
 

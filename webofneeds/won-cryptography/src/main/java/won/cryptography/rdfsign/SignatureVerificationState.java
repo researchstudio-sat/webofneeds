@@ -30,8 +30,6 @@ public class SignatureVerificationState
     }
   }
 
-//TODO: check hash!
-
   public void addSignatureData(WonSignatureData wonSignatureData) {
     signatures.add(wonSignatureData);
     if (!signedGraphNameToSignatureGraphName.containsKey(wonSignatureData.getSignedGraphUri())) {

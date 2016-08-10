@@ -7,7 +7,6 @@ import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.model.Connection;
@@ -36,16 +35,6 @@ public class SendMessageFromNodeProcessor extends AbstractCamelProcessor
     if (con.getState() != ConnectionState.CONNECTED) {
       throw new IllegalMessageForConnectionStateException(connectionUri, "CONNECTION_MESSAGE", con.getState());
     }
-    WonMessage newWonMessage = createMessageToSendToOwner(wonMessage);
-
-    exchange.getIn().setHeader(WonCamelConstants.MESSAGE_HEADER,newWonMessage);
-  }
-
-  private WonMessage createMessageToSendToOwner(WonMessage wonMessage) {
-    //create the message to send to the owner
-    return WonMessageBuilder
-      .setPropertiesForPassingMessageToOwner(wonMessage)
-      .build();
   }
 
 

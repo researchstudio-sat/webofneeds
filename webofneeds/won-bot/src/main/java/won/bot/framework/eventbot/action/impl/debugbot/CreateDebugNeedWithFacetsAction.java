@@ -59,12 +59,9 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
   private boolean isInitialForHint;
   private boolean isInitialForConnect;
 
-  public CreateDebugNeedWithFacetsAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
-    super(eventListenerContext, uriListName, facets);
-  }
-
-  public CreateDebugNeedWithFacetsAction(EventListenerContext eventListenerContext, URI... facets) {
-    super(eventListenerContext, facets);
+  public CreateDebugNeedWithFacetsAction(final EventListenerContext eventListenerContext, final String uriListName,
+                                         final boolean usedForTesting, final boolean doNotMatch, final URI... facets) {
+    super(eventListenerContext, uriListName, usedForTesting, doNotMatch, facets);
   }
 
   @Override

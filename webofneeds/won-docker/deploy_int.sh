@@ -12,8 +12,8 @@
 # - start owner on satsrv05 (with proxy on satsrv06) => https://satsrv06/
 # - start bigdata rdf store on satsrv06 for matcher service
 # - start matcher service on satsrv06 and connect with wonnodes on satsrv04 and proxied wonnode on satsrv05
-# - start siren solr server on satsrv06 as a need index
-# - start siren matcher on satsrv06 as a matcher and connect to matcher service
+# - start solr server on satsrv06 as a need index
+# - start solr matcher on satsrv06 as a matcher and connect to matcher service
 # - start debug bot on satsrv06
 ##############################################################################################################
 
@@ -182,14 +182,14 @@ docker -H satsrv06:2375 run --name=matcher_service_int -d -e "node.host=satsrv06
 -m 350m \
 webofneeds/matcher_service:int
 
-# siren solr server
-docker -H satsrv06:2375 pull webofneeds/sirensolr
-docker -H satsrv06:2375 stop sirensolr_int || echo 'No docker container found to stop with name: sirensolr_int'
-docker -H satsrv06:2375 rm sirensolr_int || echo 'No docker container found to remove with name: sirensolr_int'
-docker -H satsrv06:2375 run --name=sirensolr_int -d -p 7071:8080 -p 8984:8983 \
+# solr server
+docker -H satsrv06:2375 pull webofneeds/solr
+docker -H satsrv06:2375 stop solr_int || echo 'No docker container found to stop with name: solr_int'
+docker -H satsrv06:2375 rm solr_int || echo 'No docker container found to remove with name: solr_int'
+docker -H satsrv06:2375 run --name=solr_int -d -p 7071:8080 -p 8984:8983 \
 -p 9012:9012 \
 -e CATALINA_OPTS="-Xmx200m  -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError -Dcom.sun.management.jmxremote.port=9012 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9012 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
--m 350m webofneeds/sirensolr
+-m 350m webofneeds/solr
 
 # expect OWNER won-mail-sender host, user and password (i.e. configuration for no-replay won-owner-app-email-account) be
 # set as environment variables, e.g. MAIL_USER=changeuser MAIL_PASS=changepass MAIL_HOST=smtp.changehost.com
@@ -244,14 +244,14 @@ webofneeds/owner:int
 
 sleep 10
 
-# siren matcher
-docker -H satsrv06:2375 build -t webofneeds/matcher_siren:int $WORKSPACE/webofneeds/won-docker/matcher-siren/
-docker -H satsrv06:2375 stop matcher_siren_int || echo 'No docker container found to stop with name: matcher_siren_int'
-docker -H satsrv06:2375 rm matcher_siren_int || echo 'No docker container found to remove with name: matcher_siren_int'
-docker -H satsrv06:2375 run --name=matcher_siren_int -d -e "node.host=satsrv06.researchstudio.at" \
+# solr matcher
+docker -H satsrv06:2375 build -t webofneeds/matcher_solr:int $WORKSPACE/webofneeds/won-docker/matcher-solr/
+docker -H satsrv06:2375 stop matcher_solr_int || echo 'No docker container found to stop with name: matcher_solr_int'
+docker -H satsrv06:2375 rm matcher_solr_int || echo 'No docker container found to remove with name: matcher_solr_int'
+docker -H satsrv06:2375 run --name=matcher_solr_int -d -e "node.host=satsrv06.researchstudio.at" \
 -e "cluster.seed.host=satsrv06.researchstudio.at" -e "cluster.seed.port=2561" -e "cluster.local.port=2562" \
--e "matcher.siren.uri.solr.server=http://satsrv06.researchstudio.at:8984/solr/won/" \
--e "matcher.siren.uri.solr.server.public=http://satsrv06.researchstudio.at:8984/solr/#/won/" \
+-e "matcher.solr.uri.solr.server=http://satsrv06.researchstudio.at:8984/solr/won/" \
+-e "matcher.solr.uri.solr.server.public=http://satsrv06.researchstudio.at:8984/solr/#/won/" \
 -p 9011:9011 -p 62914:62914 \
 -e "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62914,server=y,suspend=n
 -Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false
@@ -259,7 +259,7 @@ docker -H satsrv06:2375 run --name=matcher_siren_int -d -e "node.host=satsrv06.r
 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m \
--p 2562:2562 webofneeds/matcher_siren:int
+-p 2562:2562 webofneeds/matcher_solr:int
 
 
 sleep 20
