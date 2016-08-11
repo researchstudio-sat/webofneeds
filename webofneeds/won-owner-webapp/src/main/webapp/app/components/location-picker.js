@@ -18,7 +18,7 @@ import { actionCreators }  from '../actions/actions';
 import { selectOpenDraft, selectRouterParams } from '../selectors';
 import {
     doneTypingBufferNg,
-    Elements,
+    DomCache,
 } from '../cstm-ng-utils'
 
 import {
@@ -53,6 +53,7 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
+            this.domCache = new DomCache(this.$element);
 
             this.map = initLeaflet(this.mapMount());
             this.map.on('click', e => onMapClick(e, this));
@@ -70,7 +71,6 @@ function genComponentConf() {
                 }
             };
 
-            this.elements = new Elements(this.$element);
 
             doneTypingBufferNg(
                 e => this.doneTyping(e),
@@ -175,13 +175,13 @@ function genComponentConf() {
 
         }
 
-        textfieldNg() { return this.elements.ng('.lp__searchbox'); }
+        textfieldNg() { return this.domCache.ng('.lp__searchbox'); }
 
-        textfield() { return this.elements.dom('.lp__searchbox'); }
+        textfield() { return this.domCache.dom('.lp__searchbox'); }
 
-        mapMountNg() { return this.elements.ng('.lp__mapmount'); }
+        mapMountNg() { return this.domCache.ng('.lp__mapmount'); }
 
-        mapMount() { return this.elements.dom('.lp__mapmount'); }
+        mapMount() { return this.domCache.dom('.lp__mapmount'); }
     }
     Controller.$inject = serviceDependencies;
 

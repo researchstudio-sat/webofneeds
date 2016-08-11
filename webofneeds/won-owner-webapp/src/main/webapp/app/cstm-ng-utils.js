@@ -41,7 +41,7 @@ export function doneTypingBufferNg(listenerCallback, ngElement, doneTypingInterv
 /**
  * a class for caching dom-query results.
  */
-export class Elements {
+export class DomCache {
     constructor($element) {
         this._elementsNg = {};
         this.$element = $element;
