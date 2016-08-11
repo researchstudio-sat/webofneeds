@@ -8,6 +8,7 @@ import { attach, is, delay, toDate } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime } from '../won-label-utils';
 import { selectAllByConnections, selectOpenConnectionUri } from '../selectors';
+import { selectTimestamp } from '../won-utils'
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
@@ -187,6 +188,7 @@ function selectChatMessages(state) {
         return Immutable.List();
 
     } else {
+        const timestamp = (event) => toDate(selectTimestamp(event, connectionUri))
 
         const chatMessages = connectionData.get('events')
 
@@ -210,7 +212,7 @@ function selectChatMessages(state) {
 
             /* sort them so the latest get shown last */
             .sort((event1, event2) =>
-                selectTimestamp(event1) - selectTimestamp(event2)
+                timestamp(event1) - timestamp(event2)
             )
             /*
              * sort so the latest, optimistic/unconfirmed
@@ -236,7 +238,7 @@ function selectChatMessages(state) {
                     'humanReadableTimestamp',
                     relativeTime(
                         state.get('lastUpdateTime'),
-                        selectTimestamp(event)
+                        timestamp(event)
                     )
                 )
             );
@@ -244,11 +246,4 @@ function selectChatMessages(state) {
         return chatMessages;
     }
 
-}
-function selectTimestamp(event) {
-    if(event.get('hasReceivedTimestamp')) {
-        return toDate(event.get('hasReceivedTimestamp'));
-    } else if(event.get('hasSentTimestamp')) {
-        return toDate(event.get('hasSentTimestamp')) ;
-    }
 }

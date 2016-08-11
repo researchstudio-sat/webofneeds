@@ -59,7 +59,7 @@ import {
 
 import {
     selectConnectionUris,
-} from '../selectors';
+} from '../won-utils';
 
 // </utils>
 
@@ -352,8 +352,7 @@ export function needsOpen(needUri) {
                     payload: {
                         ownNeedUri: needUri,
                         affectedConnections: selectConnectionUris(
-                                getState()
-                                .getIn(['needs', 'ownNeeds', needUri])
+                                getState().getIn(['needs', 'ownNeeds', needUri])
                             )
                     }
                 })
@@ -381,8 +380,7 @@ export function needsClose(needUri) {
                 payload: {
                     ownNeedUri: needUri,
                     affectedConnections: selectConnectionUris(
-                        getState()
-                        .getIn(['needs', 'ownNeeds', needUri])
+                        getState().getIn(['needs', 'ownNeeds', needUri])
                     )
                 }
             })

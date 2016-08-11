@@ -17,10 +17,13 @@ import {
     selectAllByConnections,
     selectOpenPost,
     selectOpenPostUri,
-    selectTimestamp,
     selectLastUpdatedPerConnection,
     selectLastUpdateTime,
 } from '../selectors';
+
+import {
+    selectTimestamp,
+} from '../won-utils'
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {

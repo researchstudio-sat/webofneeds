@@ -48,3 +48,18 @@ export function initLeaflet(mapMount) {
 
     return map;
 }
+export function selectTimestamp(event, connectionUri) {
+    if(event.get('hasReceiver') === connectionUri) {
+        return event.get('hasReceivedTimestamp');
+    } else if(event.get('hasSender') === connectionUri) {
+        return event.get('hasSentTimestamp');
+    } else {
+        return undefined;
+    }
+};
+
+export function selectConnectionUris(need) {
+    return need
+        .getIn(['won:hasConnections', 'rdfs:member'])
+        .map(c => c.get('@id'));
+}
