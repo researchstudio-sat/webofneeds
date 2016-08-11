@@ -84,8 +84,9 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     String query = queryFactory.createQuery();
 
     // if need is usedForTesting then use the solrTestClient (with points to another index instead the standard Client)
-    boolean useForTesting = WonRdfUtils.NeedUtils.hasFlag(dataset, needEvent.getUri(), WON.USED_FOR_TESTING);
-    SolrDocumentList docs = executeQuery(query, useForTesting);
+    boolean usedForTesting = WonRdfUtils.NeedUtils.hasFlag(dataset, needEvent.getUri(), WON.USED_FOR_TESTING);
+    log.info("query Solr endpoint {} for need {}", config.getSolrEndpointUri(usedForTesting), needEvent);
+    SolrDocumentList docs = executeQuery(query, usedForTesting);
 
     if (docs != null) {
       log.debug("{} results found for query", docs.size());
@@ -107,14 +108,13 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     SolrServerException {
 
     SolrQuery query = new SolrQuery();
-    log.info("query Solr endpoint {}", config.getSolrEndpointUri(usedForTesting));
     log.debug("use query: {}", queryString);
     query.setQuery(queryString);
     query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD);
     query.setRows(config.getMaxHints());
 
     try {
-      SolrClient solr = (usedForTesting ? solrClient : solrTestClient);
+      SolrClient solr = (usedForTesting ? solrTestClient : solrClient);
       QueryResponse response = solr.query(query);
       return response.getResults();
     } catch (SolrException e) {

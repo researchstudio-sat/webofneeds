@@ -89,9 +89,9 @@ public class HintBuilder
 
         // generate hints from query result documents
         BulkHintEvent bulkHintEvent = new BulkHintEvent();
-        log.info("Received {} matches as query result", (docs != null) ? docs.size() : 0);
+        log.info("Received {} matches as query result for need {}", (docs != null) ? docs.size() : 0, need);
         SolrDocumentList newDocs = calculateMatchingResults(docs);
-        log.info("Cut down result to {} matches", newDocs.size());
+        log.info("Cut down result to {} matches for need query result {}", newDocs.size(), need);
 
         for (SolrDocument doc : newDocs) {
 
