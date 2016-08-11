@@ -240,8 +240,8 @@ docker -H satsrv06:2375 stop matcher_solr_master || echo 'No docker container fo
 docker -H satsrv06:2375 rm matcher_solr_master || echo 'No docker container found to remove with name: matcher_solr_master'
 docker -H satsrv06:2375 run --name=matcher_solr_master -d -e "node.host=satsrv06.researchstudio.at" \
 -e "cluster.seed.host=satsrv06.researchstudio.at" -e "cluster.seed.port=2551" -e "cluster.local.port=2552" \
--e "matcher.solr.uri.solr.server=http://satsrv06.researchstudio.at:8983/solr/won/" \
--e "matcher.solr.uri.solr.server.public=http://satsrv06.researchstudio.at:8983/solr/#/won/" \
+-e "matcher.solr.uri.solr.server=http://satsrv06.researchstudio.at:8983/solr/" \
+-e "matcher.solr.uri.solr.server.public=http://satsrv06.researchstudio.at:8983/solr/" \
 -p 2552:2552 \
 -e "JMEM_OPTS=-Xmx200m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/matcher_solr:master

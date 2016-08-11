@@ -37,7 +37,7 @@ public class SolrMatcherQueryTest
     SolrMatcherConfig config = ctx.getBean(SolrMatcherConfig.class);
     HintBuilder hintBuilder = ctx.getBean(HintBuilder.class);
 
-    SolrClient solrClient = new HttpSolrClient.Builder(config.getSolrServerUri()).build();
+    SolrClient solrClient = new HttpSolrClient.Builder(config.getSolrEndpointUri(true)).build();
 
     // set the options of the need producer (e.g. if it should exhaust) in the SolrNeedIndexerAppConfiguration file
     NeedProducer needProducer = ctx.getBean(RoundRobinCompositeNeedProducer.class);

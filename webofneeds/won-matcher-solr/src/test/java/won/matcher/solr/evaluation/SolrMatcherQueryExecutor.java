@@ -37,7 +37,7 @@ public class SolrMatcherQueryExecutor
 
   @PostConstruct
   public void init() {
-    solrClient = new HttpSolrClient.Builder(config.getSolrServerUri()).build();
+    solrClient = new HttpSolrClient.Builder(config.getSolrEndpointUri(true)).build();
   }
 
   public List<String> computeMatchingNeeds(Dataset need) throws IOException, SolrServerException {
