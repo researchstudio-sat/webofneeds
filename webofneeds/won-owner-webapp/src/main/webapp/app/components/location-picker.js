@@ -18,6 +18,10 @@ import { actionCreators }  from '../actions/actions';
 import { selectOpenDraft, selectRouterParams } from '../selectors';
 import { doneTypingBufferNg } from '../cstm-ng-utils'
 
+import {
+    initLeaflet,
+} from '../won-utils';
+
 //TODO 4dbg deleteme
 import jsonld from 'jsonld';
 window.jsonld = jsonld;
@@ -72,45 +76,8 @@ function genComponentConf() {
 
         }
         initMap() {
-            // Leaflet + JS-Bundling fix:
-            L.Icon.Default.imagePath = 'images/map-images/';
-            //TODO replace with own icons
-
-            const secureOsmSource = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' // secure osm.org
-            const secureOsm = L.tileLayer(secureOsmSource, {
-                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            });
-
-            const transportSource = 'http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png';
-            const transport = L.tileLayer(transportSource, {
-                attribution: 'Maps &copy; <a href="http://www.thunderforest.com">Thunderforest</a>, Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-            });
-
-            this.map = L.map(this.mapMount(),{
-                center: [37.44, -42.89], //centered on north-west africa
-                zoom: 1, //world-map
-                layers: [secureOsm], //initially visible layers
-
-            }); //.setView([51.505, -0.09], 13);
-
-            //this.map.fitWorld() // shows every continent twice :|
-            this.map.fitBounds([[-80, -190],[80, 190]]); // fitWorld without repetition
-
-            const baseMaps = {
-                "Detailed default map": secureOsm,
-                "Transport (Insecurely loaded!)": transport,
-            };
-
-            L.control.layers(baseMaps).addTo(this.map);
-
+            this.map = initLeaflet(this.mapMount());
             this.map.on('click', e => onMapClick(e, this));
-
-            // Force it to adapt to actual size
-            // for some reason this doesn't happen by default
-            // when the map is within a tag.
-            // this.map.invalidateSize();
-            // ^ doesn't work (needs to be done manually atm);
-
         }
         locationIsSaved() {
             return this.savedName &&
