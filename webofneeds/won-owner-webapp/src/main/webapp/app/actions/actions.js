@@ -57,6 +57,10 @@ import {
     buildOpenNeedMessage
 } from '../won-message-utils';
 
+import {
+    selectConnectionUris,
+} from '../selectors';
+
 // </utils>
 
 // <action-creators>
@@ -347,7 +351,10 @@ export function needsOpen(needUri) {
                     type: actionTypes.needs.reopen,
                     payload: {
                         ownNeedUri: needUri,
-                        affectedConnections: getState().getIn(['needs', 'ownNeeds', needUri, 'hasConnections'])
+                        affectedConnections: selectConnectionUris(
+                                getState()
+                                .getIn(['needs', 'ownNeeds', needUri])
+                            )
                     }
                 })
         )
@@ -373,7 +380,10 @@ export function needsClose(needUri) {
                 type: actionTypes.needs.close,
                 payload: {
                     ownNeedUri: needUri,
-                    affectedConnections: getState().getIn(['needs', 'ownNeeds', needUri, 'hasConnections'])
+                    affectedConnections: selectConnectionUris(
+                        getState()
+                        .getIn(['needs', 'ownNeeds', needUri])
+                    )
                 }
             })
         )

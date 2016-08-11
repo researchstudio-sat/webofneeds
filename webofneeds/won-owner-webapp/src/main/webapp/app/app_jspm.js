@@ -83,7 +83,7 @@ app.filter('filterByNeedState', function(){
     return function(needs,state){
         var filtered =[];
         angular.forEach(needs,function(need){
-            if(need.state == state){
+            if(need['won:isInState']['@id'] == state){
                 filtered.push(need);
             }
         })

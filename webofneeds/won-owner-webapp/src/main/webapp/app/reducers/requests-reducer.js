@@ -20,9 +20,9 @@ export default createReducer(
     initialState,
     {
         [actionTypes.requests.incomingReceived]:(state,action)=>{
-            let byNeed = state.getIn(['incomingRequestsByNeed',action.payload.ownNeed.uri])
+            let byNeed = state.getIn(['incomingRequestsByNeed',action.payload.ownNeed['@id']])
             if(!byNeed){
-                state.setIn(['incomingRequestsByNeed',action.payload.ownNeed.uri],[action.payload])
+                state.setIn(['incomingRequestsByNeed',action.payload.ownNeed['@id']],[action.payload])
             }else{
 
             }

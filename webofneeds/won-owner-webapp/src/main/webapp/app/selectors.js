@@ -289,6 +289,12 @@ export function selectTimestamp(event, connectionUri) {
     }
 };
 
+export function selectConnectionUris(need) {
+   return need
+       .getIn(['won:hasConnections', 'rdfs:member'])
+       .map(c => c.get('@id'));
+}
+
 
 window.selectAllByConnections4dbg = selectAllByConnections;
 window.allByConnection4db = allByConnection;

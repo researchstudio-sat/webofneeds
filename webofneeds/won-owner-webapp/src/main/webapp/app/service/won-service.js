@@ -442,12 +442,12 @@ angular.module('won.owner').factory('wonService', function (
 
     }
 
-    function buildCreateMessage(need) {
+    function buildCreateMessage(needData) {
 
         var wonNodeUri = wonService.getDefaultWonNodeUri();
         var publishedContentUri = wonNodeUri + '/need/' + utilService.getRandomPosInt();
 
-        var imgs = need.images;
+        var imgs = needData.images;
         var attachmentUris = []
         if(imgs) {
             imgs.forEach(function(img) { img.uri = wonNodeUri + '/attachment/' + utilService.getRandomPosInt(); })
@@ -460,11 +460,11 @@ angular.module('won.owner').factory('wonService', function (
         //      this would break idempotency unless a seed is passed as well (!)
 
         var contentRdf = won.buildNeedRdf({
-            type : won.toCompacted(need.basicNeedType), //mandatory
-            title: need.title, //mandatory
-            description: need.textDescription, //mandatory
+            type : won.toCompacted(needData.basicNeedType), //mandatory
+            title: needData.title, //mandatory
+            description: needData.textDescription, //mandatory
             publishedContentUri: publishedContentUri, //mandatory
-            tags: need.tags.map(function(t) {return t.text}).join(','),
+            tags: needData.tags.map(function(t) {return t.text}).join(','),
             attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
         });
         var msgUri = wonNodeUri + '/event/' + utilService.getRandomPosInt(); //mandatory
