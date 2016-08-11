@@ -9,6 +9,11 @@ import {
     decodeUriComponentProperly,
     toDate,
 } from './utils';
+
+import {
+    selectTimestamp,
+} from './won-utils';
+
 import { relativeTime } from './won-label-utils';
 
 export const selectConnections = state => state.getIn(['connections']);
