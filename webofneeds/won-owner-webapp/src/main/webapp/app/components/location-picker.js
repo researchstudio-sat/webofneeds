@@ -43,7 +43,7 @@ function genComponentConf() {
             </li>
             <li ng-show="!self.searchResults && !self.locationIsSaved()"
                 ng-repeat="previousLocation in self.previousLocations">
-                    <a href=""><!-- ng-click="self.selectedLocation(previousLocation)">-->
+                    <a href="" ng-click="self.selectedPrevious(previousLocation)">
                         {{ previousLocation.get('s:name') }}
                     </a>
                     (previous)
@@ -126,6 +126,9 @@ function genComponentConf() {
             this.searchResults = undefined;
             this.placeMarkers([]);
         }
+        selectedPrevious(previousLocation) {
+            this.selectedLocation(jsonLd2draftLocation(previousLocation));
+        }
         selectedLocation(location) {
             this.resetSearchResults(); // picked one, can hide the rest if they were there
 
@@ -172,7 +175,7 @@ function genComponentConf() {
 
                         reverseSearchNominatim(lat, lon, zoom)
                             .then(searchResult => {
-                                const location = nominatim2wonLocation(searchResult);
+                                const location = nominatim2draftLocation(searchResult);
                                 console.log('current location: ', location);
                                 this.$scope.$apply(() => { this.currentLocation = location });
                             });
@@ -218,7 +221,7 @@ function genComponentConf() {
 function scrubSearchResults(searchResults) {
 
     return Immutable.fromJS(
-            searchResults.map(nominatim2wonLocation)
+            searchResults.map(nominatim2draftLocation)
         )
         /*
          * filter "duplicate" results (e.g. "Wien"
@@ -230,11 +233,33 @@ function scrubSearchResults(searchResults) {
         .toJS()
 }
 
+function jsonLd2draftLocation(location) {
+    // payload uses the json-ld format
+    const nw = location.getIn(['won:hasBoundingBox', 'won:hasNorthWestCorner']);
+    const se = location.getIn(['won:hasBoundingBox', 'won:hasSouthEastCorner']);
+    return  {
+        name: location.get('s:name'),
+        lon: Number.parseFloat(location.getIn(['s:geo', 's:longitude'])),
+        lat: Number.parseFloat(location.getIn(['s:geo', 's:latitude'])),
+        //importance: searchResult.importance,
+        bounds: [
+            [
+                Number.parseFloat(nw.get('s:latitude')),
+                Number.parseFloat(nw.get('s:longitude')),
+            ],
+            [
+                Number.parseFloat(se.get('s:latitude')),
+                Number.parseFloat(se.get('s:longitude')),
+            ]
+        ]
+    }
+}
+
 /**
  * drop info not stored in rdf, thus info that we
  * couldn't restore for previously used locations
  */
-function nominatim2wonLocation(searchResult) {
+function nominatim2draftLocation(searchResult) {
     const b = searchResult.boundingbox;
     return {
         name: searchResult.display_name,
@@ -261,7 +286,7 @@ function onMapClick(e, ctrl) {
         ctrl.map.getZoom()// - 1
     ).then(searchResult => {
         console.log('nearest address: ', searchResult);
-        const location = nominatim2wonLocation(searchResult);
+        const location = nominatim2draftLocation(searchResult);
 
         //use coords of original click though (to allow more detailed control)
         location.lat = e.latlng.lat;
@@ -282,4 +307,4 @@ export default angular.module('won.owner.components.locationPicker', [
 
 window.searchNominatim4dbg = searchNominatim;
 window.reverseSearchNominatim4dbg = reverseSearchNominatim;
-window.nominatim2wonLocation4dbg = nominatim2wonLocation;
+window.nominatim2wonLocation4dbg = nominatim2draftLocation;
