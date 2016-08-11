@@ -14,12 +14,12 @@ function genComponentConf() {
             <div class="ril clickable" ng-click="self.toggleRequest()">
                 <won-square-image 
                     src="self.item.titleImgSrc" 
-                    title="self.item[0].ownNeed.title"
-                    uri="self.item[0].ownNeed.uri">
+                    title="self.item[0].ownNeed['won:hasContent']['dc:title']"
+                    uri="self.item[0].ownNeed['@id']">
                 </won-square-image>
                 <div class="ril__description">
                     <div class="ril__description__topline">
-                        <div class="ril__description__topline__title">{{self.item[0].ownNeed.title}}</div>
+                        <div class="ril__description__topline__title">{{self.item[0].ownNeed['won:hasContent']['dc:title']}}</div>
                         <div class="ril__description__topline__messagecount">{{self.item.length}}</div>
                     </div>
                     <div class="ril__description__subtitle">
@@ -48,12 +48,12 @@ function genComponentConf() {
                     ng-click="self.openMessage(request)">
                     <won-square-image 
                         src="request.titleImgSrc" 
-                        title="request.remoteNeed.title"
-                        uri="request.remoteNeed.uri">
+                        title="request.remoteNeed['won:hasContent']['dc:title']"
+                        uri="request.remoteNeed['@id']">
                     </won-square-image>
                     <div class="mil__item__description">
                         <div class="mil__item__description__topline">
-                            <div class="mil__item__description__topline__title">{{request.remoteNeed.title}}</div>
+                            <div class="mil__item__description__topline__title">{{request.remoteNeed['won:hasContent']['dc:title']}}</div>
                             <div class="mil__item__description__topline__date">{{request.timeStamp}}</div>
                         </div>
                         <div class="mil__item__description__subtitle">

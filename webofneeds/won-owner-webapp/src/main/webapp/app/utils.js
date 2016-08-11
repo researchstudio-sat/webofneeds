@@ -249,11 +249,11 @@ export function mapToMatches(connections){
 
         Object.keys(connections).forEach(function(key){
 
-            if(!needMap[connections[key].ownNeed.uri]){
+            if(!needMap[connections[key].ownNeed['@id']]){
                 let connectionsArr = [connections[key]]
-                needMap[connections[key].ownNeed.uri]=connectionsArr
+                needMap[connections[key].ownNeed['@id']]=connectionsArr
             }else{
-                needMap[connections[key].ownNeed.uri].push(connections[key])
+                needMap[connections[key].ownNeed['@id']].push(connections[key])
             }
         }.bind(this))
     }
