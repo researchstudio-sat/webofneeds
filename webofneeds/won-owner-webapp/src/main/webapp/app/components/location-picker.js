@@ -16,7 +16,10 @@ import {
 } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
 import { selectOpenDraft, selectRouterParams } from '../selectors';
-import { doneTypingBufferNg } from '../cstm-ng-utils'
+import {
+    doneTypingBufferNg,
+    Elements,
+} from '../cstm-ng-utils'
 
 import {
     initLeaflet,
@@ -66,6 +69,8 @@ function genComponentConf() {
                     openDraft4dbg: openDraft,
                 }
             };
+
+            this.elements = new Elements(this.$element);
 
             doneTypingBufferNg(
                 e => this.doneTyping(e),
@@ -169,26 +174,14 @@ function genComponentConf() {
             }
 
         }
-        elementNg(selector) {
-            if(!this._elementsNg) {
-                this._elementsNg = {};
-            }
-            if(!this._elementsNg[selector]) {
-                this._elementsNg[selector] = this.$element.find(selector);
-            }
-            return this._elementsNg[selector];
-        }
-        element(selector) {
-            return this.elementNg(selector)[0];
-        }
 
-        textfieldNg() { return this.elementNg('.lp__searchbox'); }
+        textfieldNg() { return this.elements.ng('.lp__searchbox'); }
 
-        textfield() { return this.element('.lp__searchbox'); }
+        textfield() { return this.elements.dom('.lp__searchbox'); }
 
-        mapMountNg() { return this.elementNg('.lp__mapmount'); }
+        mapMountNg() { return this.elements.ng('.lp__mapmount'); }
 
-        mapMount() { return this.element('.lp__mapmount'); }
+        mapMount() { return this.elements.dom('.lp__mapmount'); }
     }
     Controller.$inject = serviceDependencies;
 
