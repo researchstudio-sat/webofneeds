@@ -46,10 +46,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
     contentFactories =  new ArrayList<>();
     try {
       titleTerms = RdfUtils.findOnePropertyFromResource(need, null, DC.title).asLiteral().getString();
-      titleTerms = titleTerms.replaceAll("[^A-Za-z0-9 ]", " ");
-      titleTerms = titleTerms.replaceAll("NOT", " ");
-      titleTerms = titleTerms.replaceAll("AND", " ");
-      titleTerms = titleTerms.replaceAll("OR", " ");
+      titleTerms = filterCharsAndKeyWords(titleTerms);
 
     } catch (IncorrectPropertyCountException e) {
       log.warn("Title not found in RDF dataset: " + e.toString());
@@ -58,21 +55,14 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
     try {
       descriptionTerms = RdfUtils.findOnePropertyFromResource(
         need, null, WON.HAS_TEXT_DESCRIPTION).asLiteral().getString();
-      descriptionTerms = descriptionTerms.replaceAll("[^A-Za-z0-9 ]", " ");
-      descriptionTerms = descriptionTerms.replaceAll("NOT", " ");
-      descriptionTerms = descriptionTerms.replaceAll("AND", " ");
-      descriptionTerms = descriptionTerms.replaceAll("OR", " ");
+      descriptionTerms = filterCharsAndKeyWords(descriptionTerms);
     } catch (IncorrectPropertyCountException e) {
       log.warn("Description not found in RDF dataset: " + e.toString());
     }
 
     try {
       tagTerms = RdfUtils.findOnePropertyFromResource(need, null, WON.HAS_TAG).asLiteral().getString();
-      tagTerms = tagTerms.replaceAll("[^A-Za-z0-9 ]", " ");
-      tagTerms = tagTerms.replaceAll("[^A-Za-z0-9 ]", " ");
-      tagTerms = tagTerms.replaceAll("NOT", " ");
-      tagTerms = tagTerms.replaceAll("AND", " ");
-      tagTerms = tagTerms.replaceAll("OR", " ");
+      tagTerms = filterCharsAndKeyWords(tagTerms);
     } catch (IncorrectPropertyCountException e) {
       log.debug("Tags not found in RDF dataset: " + e.toString());
     }
@@ -103,6 +93,17 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
       qf.setBoost(boost);
       contentFactories.add(qf);
     }
+  }
+
+  private String filterCharsAndKeyWords(String text) {
+
+    // filter all special characters and number
+    text = text.replaceAll("[^A-Za-z ]", " ");
+    text = text.replaceAll("[^A-Za-z ]", " ");
+    text = text.replaceAll("NOT", " ");
+    text = text.replaceAll("AND", " ");
+    text = text.replaceAll("OR", " ");
+    return text;
   }
 
   @Override

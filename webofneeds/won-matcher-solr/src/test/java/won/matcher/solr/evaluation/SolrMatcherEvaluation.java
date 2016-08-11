@@ -135,7 +135,7 @@ public class SolrMatcherEvaluation
   public void indexNeeds() throws IOException, JsonLdError {
 
     for (Dataset need : needFileDatasetMap.values()) {
-      needIndexer.indexNeedModel(need.getDefaultModel(), createNeedId(DatasetFactory.create(need)));
+      needIndexer.indexNeedModel(need.getDefaultModel(), createNeedId(DatasetFactory.create(need)), true);
     }
   }
 

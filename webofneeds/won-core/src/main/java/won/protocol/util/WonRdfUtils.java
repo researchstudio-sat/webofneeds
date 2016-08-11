@@ -715,6 +715,35 @@ public class WonRdfUtils
       return titleString;
     }
 
+    /**
+     * Checks if the need has set a certain flag set
+     *
+     * @param dataset need dataset
+     * @param needURI URI of the need
+     * @param flag Resource flag to be tested
+     * @return true if flag is there, false otherwise
+     */
+    public static boolean hasFlag(Dataset dataset, String needURI, Resource flag) {
+      Boolean ret = RdfUtils.findFirst(dataset, new RdfUtils.ModelVisitor<Boolean>()
+      {
+        @Override
+        public Boolean visit(Model model) {
+          Resource needResource = model.getResource(needURI);
+          boolean test = needResource.hasProperty(WON.HAS_FLAG, flag);
+          if (test) {
+            return true;
+          } else {
+            return null;
+          }
+        }
+      });
+
+      if (ret == null) {
+        ret = false;
+      }
+
+      return ret;
+    }
   }
 
   private static Model createModelWithBaseResource() {
