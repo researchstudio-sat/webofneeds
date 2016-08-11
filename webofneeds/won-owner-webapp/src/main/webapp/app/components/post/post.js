@@ -10,7 +10,6 @@ import postMessagesModule from '../post-messages';
 import { attach, mapToMatches, decodeUriComponentProperly } from '../../utils';
 import won from '../../won-es6';
 import { actionCreators }  from '../../actions/actions';
-import openConversationModule from '../open-conversation';
 import openRequestModule from '../open-request';
 import connectionSelectionModule from '../connection-selection';
 import postInfoModule from '../post-info';
