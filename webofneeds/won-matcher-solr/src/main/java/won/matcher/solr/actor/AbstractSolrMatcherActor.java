@@ -107,8 +107,8 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     SolrServerException {
 
     SolrQuery query = new SolrQuery();
-    log.info("query endpoint {}", config.getSolrEndpointUri(usedForTesting));
-    log.debug("use query: {}", query);
+    log.info("query Solr endpoint {}", config.getSolrEndpointUri(usedForTesting));
+    log.debug("use query: {}", queryString);
     query.setQuery(queryString);
     query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD);
     query.setRows(config.getMaxHints());
