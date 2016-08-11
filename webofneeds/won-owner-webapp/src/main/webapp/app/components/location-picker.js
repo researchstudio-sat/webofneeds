@@ -15,7 +15,11 @@ import {
     clone,
 } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
-import { selectOpenDraft, selectRouterParams } from '../selectors';
+import {
+    selectOpenDraft,
+    selectRouterParams,
+    selectOwnNeeds,
+} from '../selectors';
 import {
     doneTypingBufferNg,
     DomCache,
@@ -36,6 +40,13 @@ function genComponentConf() {
                     {{ self.currentLocation.name }}
                 </a>
                 (current)
+            </li>
+            <li ng-show="!self.searchResults && !self.locationIsSaved()"
+                ng-repeat="previousLocation in self.previousLocations">
+                    <a href=""><!-- ng-click="self.selectedLocation(previousLocation)">-->
+                        {{ previousLocation.get('s:name') }}
+                    </a>
+                    (previous)
             </li>
             <li ng-repeat="result in self.searchResults">
                 <a href="" ng-click="self.selectedLocation(result)">
@@ -59,9 +70,22 @@ function genComponentConf() {
             const selectFromState = state => {
                 const openDraft = selectOpenDraft(state);
                 const routerParams = selectRouterParams(state);
+                const ownNeeds = selectOwnNeeds(state);
+                const previousLocations = ownNeeds && ownNeeds.map(n =>
+                        n.getIn(['won:hasContent', 'won:hasContentDescription', 'won:hasLocation'])
+                    )
+                    .filter(location => location) //remove entries from needs without locations
+
+                    //eliminate duplicates in name
+                    .groupBy(location => location.get('s:name'))
+                    .map(group => group.first())
+
+                    .toArray();
+
                 return {
                     savedName: openDraft && openDraft.getIn(['location', 'name']),
                     draftId: routerParams.get('draftId'),
+                    previousLocations: previousLocations,
 
                     openDraft4dbg: openDraft,
                 }
