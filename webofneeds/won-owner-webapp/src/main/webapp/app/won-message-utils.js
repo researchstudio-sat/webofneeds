@@ -18,7 +18,6 @@ import {
 } from './utils';
 
 import jsonld from 'jsonld';
-window.jsonld4Dbg = jsonld;
 
 /*
     fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along

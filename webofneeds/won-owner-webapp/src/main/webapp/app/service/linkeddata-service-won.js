@@ -28,6 +28,7 @@ import * as q from 'q';
 
 import '../../scripts/rdfstore-js/rdf_store';
 const rdfstore = window.rdfstore;
+import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom jsonld
 
 (function(){
     if(!won) won = {};
