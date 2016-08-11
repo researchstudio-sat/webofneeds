@@ -5,7 +5,7 @@
 import won from '../won-es6';
 import angular from 'angular';
 import Immutable from 'immutable'; // also exports itself as (window).L
-import 'leaflet';
+import L from '../leaflet-bundleable';
 import 'ng-redux';
 //import { labels } from '../won-label-utils';
 import {
