@@ -25,10 +25,6 @@ import {
     initLeaflet,
 } from '../won-utils';
 
-//TODO 4dbg deleteme
-import jsonld from 'jsonld';
-window.jsonld = jsonld;
-
 const serviceDependencies = ['$scope', '$ngRedux', '$element'];
 function genComponentConf() {
     let template = `
