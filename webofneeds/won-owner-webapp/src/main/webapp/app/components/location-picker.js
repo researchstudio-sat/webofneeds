@@ -29,32 +29,41 @@ import {
     initLeaflet,
 } from '../won-utils';
 
-const serviceDependencies = ['$scope', '$ngRedux', '$element'];
+const serviceDependencies = ['$scope', '$ngRedux', '$element', '$sce'];
 function genComponentConf() {
     let template = `
         <input type="text" class="lp__searchbox" placeholder="Search for location"/>
         <span class="lp__verifiedLocation" ng-show="self.locationIsSaved()">[CHECK]</span>
         <ol>
-            <li ng-show="self.currentLocation && !self.searchResults && !self.locationIsSaved()">
-                <a href="" ng-click="self.selectedLocation(self.currentLocation)">
-                    {{ self.currentLocation.name }}
+            <li ng-show="
+                !self.locationIsSaved() && self.currentLocation &&
+                (
+                    !self.lastSearchedFor ||
+                    ([self.currentLocation] | filter:self.lastSearchedFor).length > 0
+                )
+            ">
+                <a href=""
+                    ng-click="self.selectedLocation(self.currentLocation)"
+                    ng-bind-html="self.highlight(self.currentLocation.name, self.lastSearchedFor)">
                 </a>
                 (current)
             </li>
-            <li ng-show="!self.searchResults && !self.locationIsSaved()"
-                ng-repeat="previousLocation in self.previousLocations">
-                    <a href="" ng-click="self.selectedPrevious(previousLocation)">
-                        {{ previousLocation.get('s:name') }}
+            <li ng-show="!self.locationIsSaved()"
+                ng-repeat="previousLocation in self.previousLocations | filter:self.lastSearchedFor">
+                    <a href=""
+                        ng-click="self.selectedLocation(previousLocation)"
+                        ng-bind-html="self.highlight(previousLocation.name, self.lastSearchedFor)">
                     </a>
                     (previous)
             </li>
             <li ng-repeat="result in self.searchResults">
-                <a href="" ng-click="self.selectedLocation(result)">
-                    {{ result.name }}
+                <a href=""
+                    ng-click="self.selectedLocation(result)"
+                    ng-bind-html="self.highlight(result.name, self.lastSearchedFor)">
                 </a>
             </li>
         </ol>
-        <div class="lp__mapmount" id="lp__mapmount" style="height:500px"></div>
+        <div class="lp__mapmount" id="lp__mapmount"></div>
             `;
 
     class Controller {
@@ -80,6 +89,7 @@ function genComponentConf() {
                     .groupBy(location => location.get('s:name'))
                     .map(group => group.first())
 
+                    .map(location => jsonLd2draftLocation(location))
                     .toArray();
 
                 return {
@@ -100,6 +110,27 @@ function genComponentConf() {
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
 
+        }
+
+        /**
+         * Taken from <http://stackoverflow.com/questions/15519713/highlighting-a-filtered-result-in-angularjs>
+         * @param text
+         * @param search
+         * @return {*}
+         */
+        highlight(text, search) {
+            if(!text) {
+                text = "";
+            }
+            if(!search) {
+                return this.$sce.trustAsHtml(text);
+            }
+            return this.$sce.trustAsHtml(
+                text.replace(
+                    new RegExp(search, 'gi'),
+                    '<span class="highlightedText">$&</span>'
+                )
+            );
         }
         locationIsSaved() {
             return this.savedName &&
@@ -124,10 +155,8 @@ function genComponentConf() {
         }
         resetSearchResults() {
             this.searchResults = undefined;
+            this.lastSearchedFor = undefined;
             this.placeMarkers([]);
-        }
-        selectedPrevious(previousLocation) {
-            this.selectedLocation(jsonLd2draftLocation(previousLocation));
         }
         selectedLocation(location) {
             this.resetSearchResults(); // picked one, can hide the rest if they were there
@@ -153,7 +182,9 @@ function genComponentConf() {
                 searchNominatim(text).then( searchResults => {
                     console.log('location search results: ', searchResults);
                     this.$scope.$apply(() => {
-                        this.searchResults = scrubSearchResults(searchResults);
+                        this.searchResults = scrubSearchResults(searchResults, text);
+                        //this.lastSearchedFor = { name: text };
+                        this.lastSearchedFor = text;
                     });
                     this.placeMarkers(searchResults);
                 });
