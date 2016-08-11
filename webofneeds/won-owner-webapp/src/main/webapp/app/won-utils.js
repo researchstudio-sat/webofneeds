@@ -9,10 +9,6 @@ export function initLeaflet(mapMount) {
         throw new Exception("Tried to initialize a leaflet widget while leaflet wasn't loaded.");
     }
 
-    // Leaflet + JS-Bundling fix:
-    L.Icon.Default.imagePath = 'images/map-images/';
-    //TODO replace with own icons
-
     const baseMaps = initLeafletBaseMaps();
 
     const map = L.map(mapMount,{
