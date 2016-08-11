@@ -51,7 +51,8 @@ function genComponentConf() {
         constructor() {
             attach(this, serviceDependencies, arguments);
 
-            this.initMap();
+            this.map = initLeaflet(this.mapMount());
+            this.map.on('click', e => onMapClick(e, this));
             this.determineCurrentLocation();
 
             window.lp4dbg = this;
@@ -74,10 +75,6 @@ function genComponentConf() {
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
 
-        }
-        initMap() {
-            this.map = initLeaflet(this.mapMount());
-            this.map.on('click', e => onMapClick(e, this));
         }
         locationIsSaved() {
             return this.savedName &&
