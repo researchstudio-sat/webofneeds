@@ -14,10 +14,10 @@ import {
     flatten,
     entries,
     is,
+    getIn,
 } from './utils';
 
 import jsonld from 'jsonld';
-window.jsonld4Dbg = jsonld;
 
 /*
     fetch('rest/users/isSignedIn', {credentials: 'include'}) //TODO send credentials along
@@ -222,7 +222,7 @@ export function buildOpenMessage(msgToOpenFor, textMessage){
 
 /**
  *
- * @param need
+ * @param needData
  * @param wonNodeUri
  * @return {{
  *    message: (
@@ -238,13 +238,13 @@ export function buildOpenMessage(msgToOpenFor, textMessage){
  *    needUri: string
  * }}
  */
-export function buildCreateMessage(need, wonNodeUri) {
-    if(!need.type || !need.title)
-        throw new Error('Tried to create post without type or title. ', need);
+export function buildCreateMessage(needData, wonNodeUri) {
+    if(!needData.type || !needData.title)
+        throw new Error('Tried to create post without type or title. ', needData);
 
     const publishedContentUri = wonNodeUri + '/need/' + getRandomPosInt();
 
-    const imgs = need.images;
+    const imgs = needData.images;
     let attachmentUris = []
     if(imgs) {
         imgs.forEach(function(img) { img.uri = wonNodeUri + '/attachment/' + getRandomPosInt(); })
@@ -254,12 +254,16 @@ export function buildCreateMessage(need, wonNodeUri) {
     //if type === create -> use needBuilder as well
 
     const contentRdf = won.buildNeedRdf({
-        type : won.toCompacted(need.type), //mandatory
-        title: need.title, //mandatory
-        description: need.description,
+        type : won.toCompacted(needData.type), //mandatory
+        title: needData.title, //mandatory
+        description: needData.description,
         publishedContentUri: publishedContentUri, //mandatory
-        tags: need.tags? need.tags.join(',') : undefined,
+        tags: needData.tags? needData.tags.join(',') : undefined,
         attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
+        longitude: getIn(needData, ['location', 'lon']),
+        latitude: getIn(needData, ['location', 'lat']),
+        address: getIn(needData, ['location', 'name']),
+        bounds: getIn(needData, ['location', 'bounds']),
     });
     const msgUri = wonNodeUri + '/event/' + getRandomPosInt(); //mandatory
     const msgJson = won.buildMessageRdf(contentRdf, {
@@ -364,7 +368,7 @@ function wellFormedPayload(payload) {
 }
 
 export function fetchDataForNonOwnedNeedOnly(needUri) {
-    return won.getNeed(needUri)
+    return won.getNeedWithConnectionUris(needUri)
     .then(need =>
             emptyDataset
                 .setIn(['theirNeeds', needUri], Immutable.fromJS(need))
@@ -453,14 +457,14 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
 
         const allTheirNeedsPromise =
             allConnectionsPromise.then(connections => {
-                const theirNeedUris = [];
+                const theirNeedUris = []
                 for(const [connectionUri, connection] of entries(connections)) {
                     theirNeedUris.push(connection.hasRemoteNeed);
                 }
-                return theirNeedUris;
+                return Immutable.Set(theirNeedUris).toArray();
             })
                 .then(theirNeedUris =>
-                    urisToLookupMap(theirNeedUris, won.getNeed));
+                    urisToLookupMap(theirNeedUris, won.getTheirNeed));
 
         //dispatch to the curried-in action as soon as any part of the data arrives
         allOwnNeedsPromise.then(ownNeeds => dispatchWellFormed({ownNeeds}));
@@ -516,3 +520,4 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
      }
      */
 }
+

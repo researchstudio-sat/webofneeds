@@ -20,8 +20,10 @@
         </div>
         <div class="cp__tags" ng-show="self.tags">
             <div class="cp__header tags">Tags</div>
-            <span class="cp__tags__tag" ng-repeat="tag in self.tags">{{tag}}</span>
+            <span class="cp__tags__tag" ng-repeat="tag in self.tags.toJS()">{{tag}}</span>
         </div>
+
+        <won-location-picker></won-location-picker>
 
         <!--
         <div>

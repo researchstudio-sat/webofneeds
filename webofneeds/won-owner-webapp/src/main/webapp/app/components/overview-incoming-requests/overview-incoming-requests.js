@@ -27,7 +27,8 @@ class IncomingRequestsController {
                     incomingRequests: Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
                         .filter(conn=>
-                            conn.connection.hasConnectionState === won.WON.RequestReceived && state.getIn(['events', conn.connection.uri]) !== undefined
+                            conn.connection.hasConnectionState === won.WON.RequestReceived &&
+                            state.getIn(['events', conn.connection.uri]) !== undefined
                         ),
                     incomingRequestsOfNeed: mapToMatches(Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
@@ -44,12 +45,13 @@ class IncomingRequestsController {
                     incomingRequests: Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
                         .filter(conn=>
-                            conn.connection.hasConnectionState === won.WON.RequestReceived && state.getIn(['events', conn.connection.uri]) !== undefined && conn.ownNeed.uri === postId
+                            conn.connection.hasConnectionState === won.WON.RequestReceived &&
+                            state.getIn(['events', conn.connection.uri]) !== undefined && conn.ownNeed['@id'] === postId
                         ),
                     incomingRequestsOfNeed: mapToMatches(Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
                         .filter(conn=>
-                            conn.connection.hasConnectionState === won.WON.RequestReceived && conn.ownNeed.uri === postId
+                            conn.connection.hasConnectionState === won.WON.RequestReceived && conn.ownNeed['@id'] === postId
                         )
                     )
                 };

@@ -7,11 +7,11 @@
     <div class="opc__inner">
         <div class="title clickable" ng-click="self.activePostsOpen = !self.activePostsOpen">
             Active Posts
-            <span class="title__counter">{{self.posts.size}}</span>
+            <span class="title__counter">{{self.activePostsCount}}</span>
         </div>
         <won-post-item-line ng-show="self.activePostsOpen"
-                            need-uri="item.uri"
-                            ng-repeat="item in self.posts |filterByNeedState: 'http://purl.org/webofneeds/model#Active'">
+                            need-uri="item['@id']"
+                            ng-repeat="item in self.activePosts">
         </won-post-item-line>
         <!--
         <div class="title clickable"
@@ -28,11 +28,11 @@
         <div class="title clickable"
              ng-click="self.closedPostsOpen = !self.closedPostsOpen">
             Closed
-            <span class="title__counter">{{self.closedPosts.length}}</span>
+            <span class="title__counter">{{self.inactivePostsCount}}</span>
         </div>
         <won-post-item-line ng-show="self.closedPostsOpen"
-                            need-uri="item.uri"
-                            ng-repeat="item in self.posts |filterByNeedState: 'http://purl.org/webofneeds/model#Inactive'">
+                            need-uri="item['@id']"
+                            ng-repeat="item in self.inactivePosts">
         </won-post-item-line>
     </div>
 </main>

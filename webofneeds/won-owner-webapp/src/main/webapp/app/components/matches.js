@@ -49,6 +49,7 @@ let template = `
         <div ng-if="self.layout === 'list'" class="omc__content__list">
             <won-matches-list-item
                     item="item"
+                    connection-uri="item.connection.uri"
                     ng-repeat="(key,item) in self.matchesOfNeed">
             </won-matches-list-item>
         </div>
@@ -89,7 +90,7 @@ class Controller {
                     .toList();
             } else { // post-owner view
                 matchesByConnectionUri = allMatchesByConnections
-                    .filter(conn => conn.getIn(['ownNeed', 'uri']) === postUri)
+                    .filter(connectionRelated => connectionRelated.getIn(['ownNeed', '@id']) === postUri)
                     .toList();
             }
 

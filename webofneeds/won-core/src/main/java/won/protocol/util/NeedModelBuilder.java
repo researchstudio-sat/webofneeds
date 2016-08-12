@@ -93,7 +93,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
         this.addInterval(toInterval((Resource) timeSpec));
       }
     }
-    Resource locationResource = needModality.getPropertyResourceValue(WON.AVAILABLE_AT_LOCATION);
+    Resource locationResource = needModality.getPropertyResourceValue(WON.HAS_LOCATION);
     if (locationResource != null) {
       Float latitude = extractFloatFromObject(locationResource.getProperty(GEO.LATITUDE));
       Float longitude = extractFloatFromObject(locationResource.getProperty(GEO.LONGITUDE));
@@ -309,7 +309,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
       Resource location = needModel.createResource(GEO.POINT)
           .addProperty(GEO.LATITUDE, getAvailableAtLocationLatitude().toString(), XSDDatatype.XSDfloat)
           .addProperty(GEO.LONGITUDE, getAvailableAtLocationLongitude().toString(), XSDDatatype.XSDfloat);
-      needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_LOCATION, location));
+      needModel.add(needModel.createStatement(needModality, WON.HAS_LOCATION, location));
     }
 
     // time constraint - in a simplified manner: no recurrence!

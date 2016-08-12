@@ -7,7 +7,8 @@ import { attach } from '../../utils';
 import {
     selectConnectionsByNeed,
     selectUnreadCountsByNeedAndType,
-    selectUnreadEvents
+    selectUnreadEvents,
+    selectOwnNeeds,
 } from '../../selectors';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
@@ -16,39 +17,26 @@ class FeedController {
         attach(this, serviceDependencies, arguments);
         this.selection = 0;
 
-
         const selectFromState = (state) => {
-
-
-            /*
-            const unreadEventUris = state
-                .getIn(['events', 'unreadEventUris'])
-                .map(event => event.get('uri'))
-                .toSet();
-                */
-            //const events = state.getIn(['events', 'events']);
-            //unreadEventUris.map(eventUri => events.get(eventUri));
 
             const unreadEvents = selectUnreadEvents(state);
 
             window.selectUnread4dbg = selectUnreadEvents;
 
-            const eventsByConnection = state.getIn(['events', 'events'])
-
-            const connectionsByNeed = state.getIn(['needs', 'ownNeeds'])
-                .map(ownNeed => ownNeed.get('hasConnections'));
             //TODO attach events
 
             // sort by newest event (excluding matches)
 
             // wenn sich die sortierung aufgrund neuer events verändern wuerde, wird ein button/link angezeigt ("new messages/requests. click to update")
             // always show latest message in a line
+            const ownNeeds = selectOwnNeeds(state);
 
             return {
                 unreadEvents4dbg: unreadEvents,
                 state4dbg: state,
 
-                posts: state.getIn(["needs", "ownNeeds"]),
+                ownNeedUris: ownNeeds && ownNeeds.filter(n => n.getIn([won.WON.isInStateCompacted, "@id"]) === won.WON.ActiveCompacted).map(n => n.get('@id')).toArray(),
+
                 connectionsByNeed: selectConnectionsByNeed(state),
                 unreadCountsByNeedAndType: selectUnreadCountsByNeedAndType(state),
             }

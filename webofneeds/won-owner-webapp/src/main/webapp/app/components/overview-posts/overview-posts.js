@@ -5,7 +5,11 @@ import overviewTitleBarModule from '../overview-title-bar';
 import postItemLineModule from '../post-item-line';
 import { actionCreators }  from '../../actions/actions';
 import { attach } from '../../utils';
-import { selectUnreadEvents, selectUnreadCountsByNeedAndType } from '../../selectors';
+import {
+    selectUnreadEvents,
+    selectUnreadCountsByNeedAndType,
+    selectOwnNeeds,
+} from '../../selectors';
 import won from '../../won-es6';
 
 const ZERO_UNSEEN = Object.freeze({
@@ -49,9 +53,18 @@ class OverviewPostsController {
 
 
 
-            const ownNeeds = state.getIn(["needs", "ownNeeds"]);
+            const ownNeeds = selectOwnNeeds(state);
+            const activePosts = ownNeeds.filter(post =>
+                post.getIn(['won:isInState', '@id']) === won.WON.ActiveCompacted
+            );
+            const inactivePosts = ownNeeds.filter(post =>
+                post.getIn(['won:isInState', '@id']) === won.WON.InctiveCompacted
+            );
             return {
-                posts: ownNeeds? ownNeeds.toJS() : {}, //TODO pass in the immutablejs-object directly
+                activePosts: activePosts? activePosts.toJS() : {},
+                activePostsCount: activePosts? activePosts.size : 0,
+                inactivePosts: inactivePosts? inactivePosts.toJS() : {},
+                inactivePostsCount: inactivePosts? inactivePosts.size : 0,
                 unreadEvents,
                 unreadCounts: selectUnreadCountsByNeedAndType(state),
                 //unreadMatchEventsOfNeed: unseenMatchesCounts,

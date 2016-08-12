@@ -6,11 +6,9 @@
     <div class="fc__inner">
         <h1 class="title">Recent activities</h1>
 
-        <won-feed-item ng-repeat="item in self.posts.toArray()"
-                       item="item"
-                       ng-show="self.connectionsByNeed.get(item.get('uri'))"
-                       connections="self.connectionsByNeed.get(item.get('uri'))"
-                       unread-counts="self.unreadCountsByNeedAndType.get(item.get('uri'))">
+        <won-feed-item ng-repeat="uri in self.ownNeedUris"
+                       need-uri="uri"
+                       ng-show="uri">
         </won-feed-item>
 
     </div>

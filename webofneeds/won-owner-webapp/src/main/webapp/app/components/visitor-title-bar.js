@@ -27,7 +27,7 @@ function genComponentConf() {
                     <div class="vtb__inner__left__titles">
                         <h1 class="vtb__title">{{self.post.get('title')}}</h1>
                         <div class="vtb__inner__left__titles__type">
-                            {{self.labels.type[self.post.get('basicNeedType')]}}
+                            {{self.labels.type[self.post.getIn(['won:hasBasicNeedType','@id'])]}}
                         </div>
                     </div>
                 </div>

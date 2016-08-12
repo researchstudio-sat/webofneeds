@@ -21,35 +21,40 @@ function genComponentConf() {
         <div class="sr__header">
             <div class="sr__header__title">
                 <div class="sr__header__title__topline">
-                    <div class="sr__header__title__topline__title">{{self.theirNeed.get('title')}}</div>
+                    <div class="sr__header__title__topline__title">{{self.theirNeed.getIn(['won:hasContent', 'dc:title'])}}</div>
                     <div class="sr__header__title__topline__date">{{self.theirCreationDate}}</div>
                 </div>
                 <div class="sr__header__title__subtitle">
                     <span class="sr__header__title__subtitle__group" ng-show="self.theirNeed.get('group')">
                         <img src="generated/icon-sprite.svg#ico36_group" class="sr__header__title__subtitle__group__icon">{{self.theirNeed.get('group')}}<span class="sr__header__title__subtitle__group__dash"> &ndash; </span>
                     </span>
-                    <span class="sr__header__title__subtitle__type">{{self.labels.type[self.theirNeed.get('basicNeedType')]}}</span>
+                    <span class="sr__header__title__subtitle__type">{{self.labels.type[self.theirNeed.getIn(['won:hasBasicNeedType','@id'])]}}</span>
                 </div>
             </div>
         </div>
-        <div class="sr__content">
-            <div class="sr__content__images" ng-show="self.theirNeed.get('images')">
-                <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.theirNeed.get('images')" class="vertical"></won-extended-gallery>
-            </div>
-            <div class="sr__content__description"
-                ng-show="self.theirNeed.get('location') || self.theirNeed.get('deadline') || self.theirNeed.get('description')">
-                    <div class="sr__content__description__location" ng-show="self.theirNeed.get('location')">
-                        <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_location"/>
-                        <span>{{ self.theirNeed.get('location') }}</span>
-                    </div>
-                    <div class="sr__content__description__datetime" ng-show="self.theirNeed.get('deadline')">
-                        <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_time"/>
-                        <span>{{ self.theirNeed.get('deadline') }} </span>
-                    </div>
-                    <div class="sr__content__description__text" ng-show="self.theirNeed.get('description')">
-                        <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_description"/>
-                        <span>{{ self.theirNeed.get('description') }} </span>
-                    </div>
+        <div class="sr__content"
+            ng-show="
+                self.theirNeed.get('location') ||
+                self.theirNeed.get('deadline') ||
+                self.theirNeed.get('images') ||
+                self.theirNeed.getIn(['won:hasContent','won:hasTextDescription'])
+            ">
+                <div class="sr__content__images" ng-show="self.theirNeed.get('images')">
+                    <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.theirNeed.get('images')" class="vertical"></won-extended-gallery>
+                </div>
+                <div class="sr__content__description">
+                        <div class="sr__content__description__location" ng-show="self.theirNeed.get('location')">
+                            <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_location"/>
+                            <span>{{ self.theirNeed.get('location') }}</span>
+                        </div>
+                        <div class="sr__content__description__datetime" ng-show="self.theirNeed.get('deadline')">
+                            <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_time"/>
+                            <span>{{ self.theirNeed.get('deadline') }} </span>
+                        </div>
+                        <div class="sr__content__description__text" ng-show="self.theirNeed.getIn(['won:hasContent','won:hasTextDescription'])">
+                            <img class="sr__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_description"/>
+                            <span>{{ self.theirNeed.getIn(['won:hasContent','won:hasTextDescription']) }}</span>
+                        </div>
             </div>
         </div>
         <div class="sr__footer">
@@ -80,7 +85,7 @@ function genComponentConf() {
                     connection: state.getIn(['connections', connectionUri]),
                     theirNeed,
                     theirCreationDate: theirNeed ?
-                        relativeTime(selectLastUpdateTime(state, theirNeed.get('creationDate'))) :
+                        relativeTime(selectLastUpdateTime(state, theirNeed.get('dct:created'))) :
                         undefined,
                 }
             };

@@ -249,11 +249,11 @@ export function mapToMatches(connections){
 
         Object.keys(connections).forEach(function(key){
 
-            if(!needMap[connections[key].ownNeed.uri]){
+            if(!needMap[connections[key].ownNeed['@id']]){
                 let connectionsArr = [connections[key]]
-                needMap[connections[key].ownNeed.uri]=connectionsArr
+                needMap[connections[key].ownNeed['@id']]=connectionsArr
             }else{
-                needMap[connections[key].ownNeed.uri].push(connections[key])
+                needMap[connections[key].ownNeed['@id']].push(connections[key])
             }
         }.bind(this))
     }
@@ -563,7 +563,122 @@ export function decodeUriComponentProperly(encodedUri) {
         return decodeURIComponent(encodedUri);
 }
 
-export function toDate(ts) {
-    return new Date(Number.parseInt(ts));
+export function msStringToDate(ts) {
+    if(is('String', ts)) {
+        ts = Number.parseInt(ts);
+    }
+    return new Date(ts);
 }
 
+/**
+ * Searches the nominatim address-lookup service and
+ * returns a list with the search results.
+ */
+export function searchNominatim(searchStr) {
+    var url = "https://nominatim.openstreetmap.org/search" +
+        "?q=" + encodeURIComponent(searchStr) +
+        "&format=json";
+    console.log("About to query nominatim: " + url);
+    return fetchJSON(url);
+}
+
+
+export function reverseSearchNominatim(lat, lon, zoom) {
+    let url = "https://nominatim.openstreetmap.org/reverse" +
+        "?lat=" + lat +
+        "&lon=" + lon +
+        "&format=json";
+
+    if(!isNaN(zoom)) {
+       url += "&zoom=" + Math.max(0, Math.min(zoom, 18));
+    }
+    console.log("About to do reverse lookup on nominatim: " + url);
+    return fetchJSON(url);
+}
+
+function fetchJSON(url) {
+    return fetch(url, {
+        method: 'get',
+        //credentials: "same-origin",
+        headers: { 'Accept': 'application/json' }
+    })
+        .then(resp => {
+            /*
+             * handle errors and read json-data
+             */
+            const errorMsg =
+                "GET to " + url + " failed with ("
+                + resp.status + "): " + resp.statusText +
+                "\n" + resp;
+            if(resp.status !== 200) {
+                throw new Error(errorMsg);
+            } else {
+                try {
+                    return resp.json();
+                } catch (jsonParseError) { // nominatim responded with an HTTP-200 with an error html-page m(
+                    const e = new Error(errorMsg)
+                    e.originalErr = jsonParseError;
+                    throw e;
+                }
+            }
+        });
+}
+
+/**
+ * Deep clone. Don't feed it recurrent structures!
+ * Thanks to A. Levy at <http://stackoverflow.com/questions/728360/how-do-i-correctly-clone-a-javascript-object>
+ * @param obj
+ * @return {*}
+ */
+export function clone(obj) {
+    var copy;
+
+    // Handle the 3 simple types, and null or undefined
+    if (null == obj || "object" != typeof obj) return obj;
+
+    // Handle Date
+    if (obj instanceof Date) {
+        copy = new Date();
+        copy.setTime(obj.getTime());
+        return copy;
+    }
+
+    // Handle Array
+    if (obj instanceof Array) {
+        copy = [];
+        for (var i = 0, len = obj.length; i < len; i++) {
+            copy[i] = clone(obj[i]);
+        }
+        return copy;
+    }
+
+    // Handle Object
+    if (obj instanceof Object) {
+        copy = {};
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
+        }
+        return copy;
+    }
+
+    throw new Error("Unable to copy obj! Its type isn't supported.");
+}
+
+/**
+ * Tries to look up a property-path on a nested object-structure.
+ * Where `obj.x.y` would throw an exception if `x` wasn't defined
+ * `get(obj, ['x','y'])` would return undefined.
+ * @param obj
+ * @param path
+ * @return {*}
+ */
+export function getIn(obj, path) {
+    switch(path.length){
+        case 0:
+            return undefined;
+        case 1:
+            return obj[path[0]];
+        default:
+            return obj[path[0]] && getIn( obj[path[0]] , path.slice(1) )
+    }
+}

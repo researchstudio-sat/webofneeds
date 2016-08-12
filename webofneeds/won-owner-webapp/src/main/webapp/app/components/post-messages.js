@@ -4,10 +4,11 @@ import angular from 'angular';
 import Immutable from 'immutable';
 import squareImageModule from './square-image';
 import chatTextFieldModule from './chat-textfield';
-import { attach, is, delay, toDate } from '../utils.js'
+import { attach, is, delay, msStringToDate } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime } from '../won-label-utils';
 import { selectAllByConnections, selectOpenConnectionUri } from '../selectors';
+import { selectTimestamp } from '../won-utils'
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
@@ -19,7 +20,7 @@ function genComponentConf() {
                      src="generated/icon-sprite.svg#ico36_close"/>
             </a>
             <div class="pm__header__title">
-                Conversation about "{{ self.connectionData.getIn(['remoteNeed', 'title']) }}"
+                Conversation about "{{ self.connectionData.getIn(['remoteNeed', 'won:hasContent', 'dc:title']) }}"
             </div>
             <div class="pm__header__options">
                 Options
@@ -33,12 +34,12 @@ function genComponentConf() {
             <div
                 class="pm__content__message"
                 ng-repeat="message in self.chatMessages"
-                ng-class="message.get('hasSenderNeed') == self.connectionData.getIn(['ownNeed', 'uri']) ? 'right' : 'left'">
+                ng-class="message.get('hasSenderNeed') == self.connectionData.getIn(['ownNeed', '@id']) ? 'right' : 'left'">
                     <won-square-image
-                        title="self.connectionData.getIn(['remoteNeed', 'title'])"
+                        title="self.connectionData.getIn(['remoteNeed', 'won:hasContent', 'dc:title'])"
                         src="self.connectionData.getIn(['remoteNeed', 'titleImgSrc'])"
-                        uri="self.connectionData.getIn(['remoteNeed', 'uri'])"
-                        ng-show="message.get('hasSenderNeed') != self.connectionData.getIn(['ownNeed', 'uri'])">
+                        uri="self.connectionData.getIn(['remoteNeed', '@id'])"
+                        ng-show="message.get('hasSenderNeed') != self.connectionData.getIn(['ownNeed', '@id'])">
                     </won-square-image>
                     <div class="pm__content__message__content">
                         <div class="pm__content__message__content__text">
@@ -182,11 +183,15 @@ export default angular.module('won.owner.components.postMessages', [
 function selectChatMessages(state) {
     const connectionUri = selectOpenConnectionUri(state);
     const connectionData = selectAllByConnections(state).get(connectionUri);
+    const ownNeedUri = connectionData && connectionData.getIn(['ownNeed', '@id']);
 
     if (!connectionData || !connectionData.get('events')) {
         return Immutable.List();
 
     } else {
+        const timestamp = (event) =>
+            //msStringToDate(selectTimestamp(event, connectionUri))
+            msStringToDate(selectTimestamp(event))
 
         const chatMessages = connectionData.get('events')
 
@@ -210,7 +215,7 @@ function selectChatMessages(state) {
 
             /* sort them so the latest get shown last */
             .sort((event1, event2) =>
-                selectTimestamp(event1) - selectTimestamp(event2)
+                timestamp(event1) - timestamp(event2)
             )
             /*
              * sort so the latest, optimistic/unconfirmed
@@ -236,7 +241,7 @@ function selectChatMessages(state) {
                     'humanReadableTimestamp',
                     relativeTime(
                         state.get('lastUpdateTime'),
-                        selectTimestamp(event)
+                        timestamp(event)
                     )
                 )
             );
@@ -244,11 +249,4 @@ function selectChatMessages(state) {
         return chatMessages;
     }
 
-}
-function selectTimestamp(event) {
-    if(event.get('hasReceivedTimestamp')) {
-        return toDate(event.get('hasReceivedTimestamp'));
-    } else if(event.get('hasSentTimestamp')) {
-        return toDate(event.get('hasSentTimestamp')) ;
-    }
 }

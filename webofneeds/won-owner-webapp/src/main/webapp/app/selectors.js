@@ -7,8 +7,13 @@ import Immutable from 'immutable';
 import won from './won-es6';
 import {
     decodeUriComponentProperly,
-    toDate,
+    msStringToDate,
 } from './utils';
+
+import {
+    selectTimestamp,
+} from './won-utils';
+
 import { relativeTime } from './won-label-utils';
 
 export const selectConnections = state => state.getIn(['connections']);
@@ -16,6 +21,8 @@ export const selectEvents = state => state.getIn(['events', 'events']);
 export const selectOwnNeeds = state => state.getIn(['needs', 'ownNeeds']);
 export const selectTheirNeeds = state => state.getIn(['needs', 'theirNeeds']);
 export const selectLastUpdateTime = state => state.get('lastUpdateTime');
+export const selectRouterParams = state => state.getIn(['router', 'currentParams']);
+export const selectDrafts = state => state.get('drafts');
 
 export const selectUnreadEventUris = state => state
     .getIn(['events', 'unreadEventUris']);
@@ -140,10 +147,15 @@ export const selectConnectionsByNeed = createSelector(
     selectAllByConnections,
         connections => connections
         .map(cnct => Immutable.fromJS(cnct)) //TODO this is a workaround. atm connections aren't ImmutableJS-objects
-        .groupBy(cnct => cnct.getIn(['ownNeed', 'uri']))
+        .groupBy(cnct => cnct.getIn(['ownNeed', '@id']))
 );
 
-const selectRouterParams = state => state.getIn(['router', 'currentParams']);
+
+export const selectOpenDraft = createSelector(
+    selectRouterParams, selectDrafts,
+    (routerParams, drafts) =>
+        drafts.get(routerParams.get('draftId'))
+);
 
 export const selectOpenConnectionUri = createSelector(
     selectRouterParams,
@@ -218,7 +230,7 @@ export const selectRequestTimestampOfOpenConnection = createSelector(
                 "format (neither the message nor it's counterpart were " +
                 "`FromExternal`, thus a the one our own node created)." );
         }
-        return toDate(timestamp)
+        return msStringToDate(timestamp)
     }
 );
 
@@ -237,7 +249,7 @@ export const selectOpenPost = createSelector(
     (openPostUri, ownNeeds, theirNeeds, lastUpdateTime) => {
         let post = ownNeeds.get(openPostUri) || theirNeeds.get(openPostUri);
         if(post) {
-            const timestamp = relativeTime(lastUpdateTime, post.get('creationDate'));
+            const timestamp = relativeTime(lastUpdateTime, post.get('dct:created'));
             post = post.set('friendlyTimestamp', timestamp);
         }
         return post;
@@ -253,6 +265,25 @@ export const displayingOverview = createSelector(
     postUri => !postUri //if there's a postUri, this is almost certainly a detail view
 )
 
+export const selectLastUpdatedPerConnection = createSelector(
+    selectAllByConnections,
+    allByConnections => allByConnections.map(connectionAndRelated =>
+        connectionAndRelated.get('events')
+        .map( event =>
+            //selectTimestamp(event, connectionAndRelated.getIn(['connection','uri']) )
+            selectTimestamp(event)
+        )
+        /*
+         * don't use events without timestamp
+         * NOTE if there's no events with timestamps
+         * for the connection:
+         * `Immutable.List([]).max() === undefined`
+         */
+        .filter(timestamp => timestamp)
+        .map(timestamp => Number.parseInt(timestamp))
+        .max()
+    )
+);
 
 window.selectAllByConnections4dbg = selectAllByConnections;
 window.allByConnection4db = allByConnection;

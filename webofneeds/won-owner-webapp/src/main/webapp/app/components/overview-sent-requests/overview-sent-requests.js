@@ -51,14 +51,14 @@ class SentRequestsController {
                     sentRequests: Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
                         .filter(conn=> {
-                            if (conn.connection.hasConnectionState === won.WON.RequestSent && state.getIn(['events', conn.connection.uri]) !== undefined && conn.ownNeed.uri === postId) {
+                            if (conn.connection.hasConnectionState === won.WON.RequestSent && state.getIn(['events', conn.connection.uri]) !== undefined && conn.ownNeed['@id'] === postId) {
                                 return true
                             }
                         }),
                     sentRequestsOfNeed: mapToMatches(Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
                         .filter(conn=> {
-                            if (conn.connection.hasConnectionState === won.WON.RequestSent && conn.ownNeed.uri === postId) {
+                            if (conn.connection.hasConnectionState === won.WON.RequestSent && conn.ownNeed['@id'] === postId) {
                                 return true
                             }
                         }))

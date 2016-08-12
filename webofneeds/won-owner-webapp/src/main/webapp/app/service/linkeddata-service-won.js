@@ -21,12 +21,14 @@ import {
     checkHttpStatus,
     entries,
     urisToLookupMap,
-    is
+    is,
+    clone,
 } from '../utils';
 import * as q from 'q';
 
 import '../../scripts/rdfstore-js/rdf_store';
 const rdfstore = window.rdfstore;
+import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom jsonld
 
 (function(){
     if(!won) won = {};
@@ -796,101 +798,283 @@ const rdfstore = window.rdfstore;
     };
 
     /**
-     * @param needUri
-     * @return {*} the same as getNeed but also resolves
-     * the connectionContainer to the connectionUris
-     * contained within.
+     * Loads and returns a need and in a
+     * follow-up http-request the connection-uris
+     * belonging to it.
+     * @type {Function}
      */
-    won.getNeed =
+    won.getOwnNeed =
     won.getNeedWithConnectionUris = function(needUri) {
         return Promise.all([
-            getNeedData(needUri),
-            won.getconnectionUrisOfNeed(needUri)]
-        ).then(([need, connectionUris]) => {
-            need.hasConnections = connectionUris;
-            return need;
-        });
+            // make sure need and its connection-container are loaded
+            won.ensureLoaded(needUri),
+            won.getConnectionUrisOfNeed(needUri),
+        ]).then(() =>
+            selectNeedData(needUri, privateData.store)
+        )
     };
 
     /**
-     * Loads the default data of the need with the specified URI into a js object.
-     * @return the object or null if no data is found for that URI in the local datastore
+     * Loads the need-data without following up
+     * with a request for the connection-container
+     * to get the connection-uris. Thus it's faster.
      */
-    function getNeedData(needUri) {
-        if (typeof needUri === 'undefined' || needUri == null  ){
-            throw {message : "getNeed: uri must not be null"};
+    won.getTheirNeed =
+    won.getNeed = function(needUri) {
+        return won.ensureLoaded(needUri)
+            .then(() => selectNeedData(needUri, privateData.store));
+    };
+
+    window.selectNeedData4dbg = needUri => selectNeedData(needUri, privateData.store);
+    function selectNeedData(needUri, store) {
+        // this query returns the need and everything attached to the need's content-, connectsions- and event-node up to a varying depth
+        const query = `
+            prefix won: <http://purl.org/webofneeds/model#>
+            prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            prefix dct: <http://purl.org/dc/terms/>
+            construct {
+                <${needUri}> ?b ?c.
+                ?c ?d ?e.
+                ?e ?f ?g.
+                ?g ?h ?i.
+                ?i ?j ?k.
+                ?k ?l ?m.
+
+            } where {
+                {
+                    <${needUri}> won:hasBasicNeedType ?c.
+                    <${needUri}> ?b ?c
+                } UNION {
+                    <${needUri}> dct:created ?c.
+                    <${needUri}> ?b ?c
+                } UNION {
+                    <${needUri}> won:isInState ?c.
+                    <${needUri}> ?b ?c
+                }
+
+                UNION
+
+                {
+                    <${needUri}> won:hasConnections ?c.
+                    <${needUri}> ?b ?c.
+                } UNION {
+                    <${needUri}> won:hasConnections ?c.
+                    ?c ?d ?e
+                }
+
+                UNION
+
+                {
+                    <${needUri}> won:hasEventContainer ?c.
+                    <${needUri}> ?b ?c.
+                } UNION {
+                    <${needUri}> won:hasEventContainer ?c.
+                    ?c ?d ?e
+                }
+
+                UNION
+
+                {
+                    <${needUri}> won:hasContent ?c.
+                    <${needUri}> ?b ?c
+                } UNION {
+                    <${needUri}> won:hasContent ?c.
+                    ?c ?d ?e.
+                } UNION {
+                    <${needUri}> won:hasContent ?c.
+                    ?c ?d ?e.
+                    ?e ?f ?g.
+                } UNION {
+                    <${needUri}> won:hasContent ?c.
+                    ?c ?d ?e.
+                    ?e ?f ?g.
+                    ?g ?h ?i.
+                } UNION {
+                    <${needUri}> won:hasContent ?c.
+                    ?c ?d ?e.
+                    ?e ?f ?g.
+                    ?g ?h ?i.
+                    ?i ?j ?k.
+                } UNION {
+                    <${needUri}> won:hasContent ?c.
+                    ?c ?d ?e.
+                    ?e ?f ?g.
+                    ?g ?h ?i.
+                    ?i ?j ?k.
+                    ?k ?l ?m.
+                }
+            }
+            `
+        const needJsonLdP = new Promise((resolve, reject) =>
+            store.execute(query, (success, resultGraph) => {
+                if(!success) {
+                    reject('Failed selecting the triples of the need with the uri: ' + needUri);
+                }
+
+                const needJsonLdP = triples2framedJson(needUri, resultGraph.triples, {
+                    /* frame */
+                    "@context": {
+                        "msg" : "http://purl.org/webofneeds/message#",
+                        "woncrypt" : "http://purl.org/webofneeds/woncrypt#",
+                        "xsd" : "http://www.w3.org/2001/XMLSchema#",
+                        "cert" : "http://www.w3.org/ns/auth/cert#",
+                        "rdfs" : "http://www.w3.org/2000/01/rdf-schema#",
+                        "sig" : "http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#",
+                        "geo" : "http://www.w3.org/2003/01/geo/wgs84_pos#",
+                        "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                        "won" : "http://purl.org/webofneeds/model#",
+                        "ldp" : "http://www.w3.org/ns/ldp#",
+                        "sioc" : "http://rdfs.org/sioc/ns#",
+                        "dc" : "http://purl.org/dc/elements/1.1/",
+                        "dct": "http://purl.org/dc/terms/",
+                        "s" : "http://schema.org/",
+                    },
+                    "won:hasContent": {
+                        "@type": "won:NeedContent"
+                    }
+                });
+
+                resolve(needJsonLdP);
+            })
+        ).then(needJsonLd => {
+            // usually the need-data will be in a single object in the '@graph' array.
+            // We can flatten this and still have valid json-ld
+            const simplified = needJsonLd['@graph'][0];
+            if(!simplified) {
+                //doesn't contain graph. probably already simplified.
+                return needJsonLd;
+            } else {
+                simplified['@context'] = needJsonLd['@context'];
+                return simplified;
+            }
+        });
+
+        return needJsonLdP;
+    }
+
+    function triples2framedJson(needUri, triples, frame) {
+        const jsonldjsQuads = {
+            // everything in our rdfstore is in the default-graph atm
+            '@default': triples.map(triple => ({
+                subject: rdfstorejsToJsonldjs(triple.subject),
+                predicate: rdfstorejsToJsonldjs(triple.predicate),
+                object: rdfstorejsToJsonldjs(triple.object),
+                //object.datatype: ? //TODO
+            }))
+        };
+
+        console.log('jsonldjsQuads: ', jsonldjsQuads);
+
+        const context = frame['@context']? clone(frame['@context']) : {}; //TODO
+        context.useNativeTypes = true; //do some of the parsing from strings to numbers
+
+        const jsonLdP = jsonld.promises
+            .fromRDF(jsonldjsQuads, context)
+            .then(complexJsonLd => {
+                //the framing algorithm expeds an js-object with an `@graph`-property
+                const complexJsonLd_ = complexJsonLd['@graph'] ?
+                    complexJsonLd :
+                    {'@graph': complexJsonLd};
+
+                console.log('complexJsonLd_: ', complexJsonLd_);
+                return jsonld.promises.frame(complexJsonLd_, frame);
+            })
+            .then(framed => {
+                console.log('framed: ', framed);
+                return framed;
+            })
+            .catch(err => {
+                console.error(err);
+                throw err;
+            });
+
+        return jsonLdP;
+
+    }
+
+    /**
+     * Receives a subject, predicate or object in rdfstorejs-style
+     * and returns it's pendant in jsonldjs-style.
+     * @param element
+     * @return {{value: *, type: undefined}}
+     */
+    function rdfstorejsToJsonldjs(element){
+        const result = {
+            value: element.nominalValue,
+            type: undefined,
+        };
+
+        switch(element.interfaceName) {
+            case "Literal":
+                result.type = "literal"
+                break;
+            case "NamedNode":
+                result.type = "IRI"
+                break;
+            case "BlankNode":
+                result.type = "blank node"
+                break;
+            default:
+                throw new Exception("Encountered triple with object of unknown type: "
+                    + t.object.interfaceName + "\n" +
+                    t.subject.nominalValue + " " +
+                    t.predicate.nominalValue + " " +
+                    t.object.nominalValue + " "
+                );
         }
-       return won.ensureLoaded(needUri).then(
-           function() {
-               var lock = getReadUpdateLockPerUri(needUri);
-               return lock.acquireReadLock().then(
-                   function () {
-                       try {
-                           var resultObject = null;
-                           var query =
-                               "prefix " + won.WONMSG.prefix + ": <" + won.WONMSG.baseUri + "> \n" +
-                               "prefix " + won.WON.prefix + ": <" + won.WON.baseUri + "> \n" +
-                               "prefix " + "dc" + ": <" + "http://purl.org/dc/elements/1.1/>\n" +
-                               "prefix " + "geo" + ": <" + "http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
-                               "prefix " + "rdfs" + ": <" + "http://www.w3.org/2000/01/rdf-schema#>\n" +
-                               "select ?basicNeedType ?title ?tags ?textDescription ?creationDate ?endTime ?recurInfinite ?recursIn ?startTime ?state where { " +
-                               //TODO: add as soon as named graphs are handled by the rdf store
-                               //
-                               //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?coreURI ."+
-                               //                "<" + uri + ">" + won.WON.hasGraphCompacted + " ?metaURI ."+
-                               //                "GRAPH ?coreURI {"+,
-                               "<" + needUri + "> " + won.WON.isInStateCompacted + " ?state .\n" +
-                               "<" + needUri + "> " + won.WON.hasBasicNeedTypeCompacted + " ?basicNeedType .\n" +
-                               "<" + needUri + "> " + won.WON.hasContentCompacted + " ?content .\n" +
-                               "?content dc:title ?title .\n" +
-                               "OPTIONAL {?content " + won.WON.hasTagCompacted + " ?tags .}\n" +
-                               "OPTIONAL {?content " + "geo:latitude" + " ?latitude .}\n" +
-                               "OPTIONAL {?content " + "geo:longitude" + " ?longitude .}\n" +
-                               "OPTIONAL {?content " + won.WON.hasEndTimeCompacted + " ?endTime .}\n" +
-                               "OPTIONAL {?content " + won.WON.hasRecurInfiniteTimesCompacted + " ?recurInfinite .}\n" +
-                               "OPTIONAL {?content " + won.WON.hasRecursInCompacted + " ?recursIn .}\n" +
-                               "OPTIONAL {?content " + won.WON.hasStartTimeCompacted + " ?startTime .}\n" +
-                               "OPTIONAL {?content " + won.WON.hasTextDescriptionCompacted + " ?textDescription .}\n" +
-                               //TODO: add as soon as named graphs are handled by the rdf store
-                               //                "}" +
-                               //                "GRAPH ?metaURI {" +
-                               "<" + needUri + "> " + " <" + "http://purl.org/dc/terms/created" + "> " + "?creationDate" +
-                               " .\n" +
-                               "<" + needUri + "> " + won.WON.hasConnectionsCompacted + " ?connections .\n" +
-                               "<" + needUri + "> " + won.WON.hasWonNodeCompacted + " ?wonNode .\n" +
-                               "OPTIONAL {<" + needUri + "> " + won.WON.hasEventContainerCompacted + " ?eventContainer" +
-                               " .}\n" +
-                               // if the triple below is used, we get > 1 result items, because usually here will be
-                               // at least 2 events - need created and success response - therefore, it can be removed
-                               // since we don't select ?event anyway here in this query:
-                               //"OPTIONAL {?eventContainer " + "rdfs:member" + " ?event .}\n" +
-                               //TODO: add as soon as named graphs are handled by the rdf store
-                               //                "}" +
-                               "}";
-                           resultObject = {};
-                           privateData.store.execute(query, [], [], function (success, results) {
-                               if (rejectIfFailed(success, results, {message: "Could not load need " + needUri + ".", allowNone: false, allowMultiple: false})) {
-                                   return;
-                               }
-                               var result = results[0];
-                               resultObject.uri = needUri;
-                               resultObject.basicNeedType = getSafeValue(result.basicNeedType);
-                               resultObject.title = getSafeValue(result.title);
-                               resultObject.tags = getSafeValue(result.tags);
-                               resultObject.textDescription = getSafeValue(result.textDescription);
-                               resultObject.creationDate = getSafeValue(result.creationDate);
-                               resultObject.state = getSafeValue(result.state);
-                           });
-                           return resultObject;
-                       } catch (e) {
-                           return q.reject("could not load need " + needUri + ". Reason: " + e);
-                       } finally {
-                           //we don't need to release after a promise resolves because
-                           //this function isn't deferred.
-                           lock.releaseReadLock();
-                       }
-                   })
-               });
+
+        return result;
+    }
+
+
+
+    /**
+     *
+     * NOTE: this function assumes an acyclic graph!!
+     * @param rootUri
+     * @param triples
+     * @return {{}}
+     */
+    function triples2jsonNaive(rootUri, triples) {
+        const resultJson = {};
+        const rootTriples = triples.filter(t => t.subject.nominalValue === rootUri);
+        for(var t of rootTriples) {
+            const predicate = won.getLocalName(t.predicate.nominalValue);
+            switch(t.object.interfaceName) {
+                case "Literal":
+                    // This is the simple case. we can just add it to our result object
+                    var literal = t.object.nominalValue;
+                    resultJson[predicate] = literal;
+                    break;
+
+                case "NamedNode":
+                    var namedNodeUri = t.object.nominalValue;
+                    var isUsedAsSubject = (triples.filter(t_ => t_.subject.nominalValue === namedNodeUri).length > 0);
+                    if(isUsedAsSubject) {
+                        // treat like blank node
+                        resultJson[predicate] = triples2json(namedNodeUri, triples);
+                    } else {
+                        // treat like literal node
+                        resultJson[predicate] = namedNodeUri;
+                    }
+                    break;
+
+                case "BlankNode":
+                    var blankNodeUri = t.object.nominalValue;
+                    resultJson[predicate] = triples2json(blankNodeUri, triples);
+                    break;
+
+                default:
+                    throw new Exception("Encountered triple with object of unknown type: "
+                        + t.object.interfaceName + "\n" +
+                        t.subject.nominalValue + " " +
+                        t.predicate.nominalValue + " " +
+                        t.object.nominalValue + " "
+                    );
+            }
+        }
+
+        return resultJson;
     }
 
     /**
@@ -1314,7 +1498,7 @@ const rdfstore = window.rdfstore;
                                             return q.all(
                                                 [won.getNodeWithAttributes(eventUriResult[0].eventUri.value, requesterWebId),
                                                  won.getNodeWithAttributes(conData.connection.value),
-                                                 won.getNeed(conData.remoteNeed.value)
+                                                 won.getTheirNeed(conData.remoteNeed.value)
                                                 ]
                                             )
                                         }
@@ -1647,9 +1831,9 @@ const rdfstore = window.rdfstore;
                             return;
                         }
                         let needs = []
-                        let ownNeedPromise = won.getNeed(needUri);
+                        let ownNeedPromise = won.getNeedWithConnectionUris(needUri);
                         needs.push(ownNeedPromise);
-                        let remoteNeedPromise = won.getNeed(results[0].remoteNeed.value)
+                        let remoteNeedPromise = won.getTheirNeed(results[0].remoteNeed.value)
                          needs.push(remoteNeedPromise)
                         Q.all(needs).then(function(needData){
                             resultObject.ownNeed = needData[0]
