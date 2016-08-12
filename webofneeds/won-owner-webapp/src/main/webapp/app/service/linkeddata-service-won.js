@@ -1126,45 +1126,28 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getWonNodeUriOfNeed: needUri must not be null"};
         }
-        //return won.getNode(needUri).then(need => need[won.WON.hasWonNode]);
-        return won.getUniqueObjectOfProperty(needUri, won.WON.hasWonNode)
-            .then(
-                function(result){return result;},
-                function(reason) { return q.reject("could not get WonNodeUri of Need " + needUri + ". Reason: " + reason)});
+        return won.getNode(needUri).then(need => need.hasWonNode);
     }
 
     won.getNeedUriOfConnection = function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getNeedUriOfConnection: connectionUri must not be null"};
         }
-        return won.getUniqueObjectOfProperty(connectionUri, won.WON.belongsToNeed)
-            .then(
-                function(result) {
-                    return result;
-                },
-                function(reason) {
-                    return q.reject("could not get need uri of connection " + connectionUri + ". Reason: " + reason)
-                });
+        return won.getNode(connectionUri).then(connection => connection.belongsToNeed);
     }
 
     won.getRemoteConnectionUriOfConnection = function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getRemoteConnectionUriOfConnection: connectionUri must not be null"};
         }
-        return won.getUniqueObjectOfProperty(connectionUri, won.WON.hasRemoteConnection)
-            .then(
-                function(result){return result;},
-                function(reason) { return q.reject("could not get remote connection uri of connection " + connectionUri + ". Reason: " + reason)});
+        return won.getNode(connectionUri).then(connection => connection.hasRemoteConnection)
     }
 
     won.getRemoteneedUriOfConnection = function(connectionUri){
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "getRemoteneedUriOfConnection: connectionUri must not be null"};
         }
-        return won.getUniqueObjectOfProperty(connectionUri, won.WON.hasRemoteNeed)
-            .then(
-                function(result){return result;},
-                function(reason) { return q.reject("could not get remote need uri of connection " + connectionUri + ". Reason: " + reason)});
+        return won.getNode(connectionUri).then(connection => connection.hasRemoteNeed);
     }
 
     won.getEnvelopeDataForNeed=function(needUri){
