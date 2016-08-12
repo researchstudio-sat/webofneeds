@@ -147,7 +147,7 @@ export const selectConnectionsByNeed = createSelector(
     selectAllByConnections,
         connections => connections
         .map(cnct => Immutable.fromJS(cnct)) //TODO this is a workaround. atm connections aren't ImmutableJS-objects
-        .groupBy(cnct => cnct.getIn(['ownNeed', 'uri']))
+        .groupBy(cnct => cnct.getIn(['ownNeed', '@id']))
 );
 
 
