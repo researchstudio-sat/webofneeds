@@ -2,7 +2,11 @@
  * Created by syim on 11.12.2015.
  */
 import { actionTypes } from '../actions/actions';
-import { repeatVar } from '../utils';
+import {
+    repeatVar,
+    getIn,
+    contains,
+} from '../utils';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
 import { combineReducersStable } from '../redux-utils';
@@ -21,6 +25,26 @@ export default function(state = initialState, action = {}) {
         case actionTypes.login:
             const allPreviousEvents = action.payload.get('events');
             return state.mergeIn(['events'], allPreviousEvents);
+
+        case '@@reduxUiRouter/$stateChangeSuccess':
+            var uiRouterState = getIn(action, ['payload', 'currentState', 'name']);
+            var connectionUri = getIn(action, ['payload', 'currentParams', 'connectionUri']);
+
+            if(contains(['post','overviewIncomingRequests','overviewMatches'], uiRouterState)) {
+                    if(connectionUri ) {
+                        const seenUris = state
+                            .get('unreadEventUris')
+                            .map(uri => state.getIn(['events', uri]))
+                            .filter(e =>
+                                e.get('hasReceiver') === connectionUri ||
+                                e.get('hasSender') === connectionUri
+                            )
+                            .map(e => e.get('uri'))
+                            .toSet();
+                        return state.update('unreadEventUris',
+                            unread => unread.subtract(seenUris));
+                    }
+            }
 
         case actionTypes.events.read:
             return state.update('unreadEventUris',
