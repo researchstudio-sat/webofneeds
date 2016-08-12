@@ -4,11 +4,14 @@
 # use java as a base image
 FROM solr:6.1.0
 
-# add the won core to the solr instance, changed one important field in the solrconfig.xml:
-# <str name="defaultFieldType">text_general</str>
-# changed to text_general so that all default fields are tokenized by default.
-# This is important for our querying
+# add the won core to the solr instance
 ADD ./core/won /opt/solr/server/solr/won
+
+# also add a duplicate of this core for testing purpose
+ADD ./core/wontest  /opt/solr/server/solr/wontest
+ADD ./core/won/conf /opt/solr/server/solr/wontest/conf
+ADD ./core/won/data /opt/solr/server/solr/wontest/data
 
 USER root
 RUN chmod -R +wx /opt/solr/server/solr/won
+RUN chmod -R +wx /opt/solr/server/solr/wontest

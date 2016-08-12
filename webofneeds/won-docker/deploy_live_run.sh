@@ -157,7 +157,7 @@ docker ${docker_options} stop matcher_solr || echo 'No docker container found to
 docker ${docker_options} rm matcher_solr || echo 'No docker container found to remove with name: matcher_solr'
 docker ${docker_options} run --name=matcher_solr -d -e "node.host=${deploy_host}" \
 -e "cluster.seed.host=${deploy_host}" -e "cluster.seed.port=2561" -e "cluster.local.port=2562" \
--e "matcher.solr.uri.solr.server=http://${deploy_host}:8984/solr/won/" \
--e "matcher.solr.uri.solr.server.public=http://${deploy_host}:8984/solr/#/won/" \
+-e "matcher.solr.uri.solr.server=http://${deploy_host}:8984/solr/" \
+-e "matcher.solr.uri.solr.server.public=http://${deploy_host}:8984/solr/" \
 -p 2562:2562 -e "JMEM_OPTS=-Xmx250m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/matcher_solr:${deploy_image_tag_name}

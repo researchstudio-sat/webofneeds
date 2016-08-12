@@ -16,6 +16,12 @@ public class SolrMatcherConfig
   @Value("${matcher.solr.uri.solr.server}")
   private String solrServerUri;
 
+  @Value("${matcher.solr.core}")
+  private String solrCore;
+
+  @Value("${matcher.solr.test.core}")
+  private String solrTestCore;
+
   @Value("${matcher.solr.uri.solr.server.public}")
   private String solrServerPublicUri;
 
@@ -75,4 +81,27 @@ public class SolrMatcherConfig
   public float getScoreNormalizationFactor() {
     return scoreNormalizationFactor;
   }
+
+  public String getSolrCore() {
+    return solrCore;
+  }
+
+  public String getSolrTestCore() {
+    return solrTestCore;
+  }
+
+  public String getSolrEndpointUri(boolean useTestCore) {
+    String server = getSolrServerUri();
+    if (!server.endsWith("/")) {
+      server += "/";
+    }
+
+    String core = server + (useTestCore ? getSolrTestCore() : getSolrCore());
+    if (!core.endsWith("/")) {
+      core += "/";
+    }
+
+    return core;
+  }
+
 }

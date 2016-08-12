@@ -250,8 +250,8 @@ docker -H satsrv06:2375 stop matcher_solr_int || echo 'No docker container found
 docker -H satsrv06:2375 rm matcher_solr_int || echo 'No docker container found to remove with name: matcher_solr_int'
 docker -H satsrv06:2375 run --name=matcher_solr_int -d -e "node.host=satsrv06.researchstudio.at" \
 -e "cluster.seed.host=satsrv06.researchstudio.at" -e "cluster.seed.port=2561" -e "cluster.local.port=2562" \
--e "matcher.solr.uri.solr.server=http://satsrv06.researchstudio.at:8984/solr/won/" \
--e "matcher.solr.uri.solr.server.public=http://satsrv06.researchstudio.at:8984/solr/#/won/" \
+-e "matcher.solr.uri.solr.server=http://satsrv06.researchstudio.at:8984/solr/" \
+-e "matcher.solr.uri.solr.server.public=http://satsrv06.researchstudio.at:8984/solr/" \
 -p 9011:9011 -p 62914:62914 \
 -e "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62914,server=y,suspend=n
 -Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false

@@ -443,6 +443,7 @@
   <field name="_graph.http___purl.org_dc_terms_created._value" type="tdates"/>
   <field name="_graph.http___purl.org_webofneeds_model_hasBasicNeedType._id" type="string"/>
   <field name="_graph.http___purl.org_webofneeds_model_isInState._id" type="string"/>
+  <field name="_graph.http___purl.org_webofneeds_model_hasFlag._id" type="string" multiValued="true"/>
 
   <!--
   <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_dc_elements_1.1_title" type="text_standard"/>

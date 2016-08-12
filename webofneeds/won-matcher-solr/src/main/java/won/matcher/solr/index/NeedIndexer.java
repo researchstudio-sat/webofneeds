@@ -49,10 +49,13 @@ public class NeedIndexer {
     QueryExecution qexec = QueryExecutionFactory.create(query, dataset) ;
     Model needModel = qexec.execConstruct();
     String needUri = WonRdfUtils.NeedUtils.getNeedURI(needModel).toString();
-    indexNeedModel(needModel, needUri);
+
+    // check if test index should be used for need
+    boolean usedForTesting = WonRdfUtils.NeedUtils.hasFlag(dataset, needUri, WON.USED_FOR_TESTING);
+    indexNeedModel(needModel, needUri, usedForTesting);
   }
 
-  public void indexNeedModel(Model needModel, String id) throws IOException, JsonLdError {
+  public void indexNeedModel(Model needModel, String id, boolean useTestCore) throws IOException, JsonLdError {
 
     StringWriter sw = new StringWriter();
     RDFDataMgr.write(sw, needModel, Lang.JSONLD);
@@ -66,13 +69,10 @@ public class NeedIndexer {
     framed.put("id", id);
     sw = new StringWriter();
     JsonUtils.writePrettyPrint(sw, framed);
+    String needJson = sw.toString();
 
     // post the need to the solr index
-    String needJson = sw.toString();
-    String indexUri = config.getSolrServerUri();
-    if (!indexUri.endsWith("/")) {
-      indexUri += "/";
-    }
+    String indexUri = config.getSolrEndpointUri(useTestCore);
     indexUri += "update/json/docs";
     if (config.isCommitIndexedNeedImmediately()) {
       indexUri += "?commit=" + config.isCommitIndexedNeedImmediately();

@@ -210,17 +210,20 @@ public class WonWebSocketHandler
     User user = getUserForWonMessage(wonMessage);
 
     Set<WebSocketSession> webSocketSessions = findWebSocketSessionsForWonMessage(wonMessage, needUri, user);
+
+    //check if we can deliver the message. If not, send email.
     if (webSocketSessions.size() == 0) {
       logger.info("cannot deliver message of type {} for need {}, receiver {}: no websocket session found",
         new Object[]{wonMessage.getMessageType(),
                      wonMessage.getReceiverNeedURI(),
                      wonMessage.getReceiverURI()});
+      // send per email notifications if it applies:
+      notifyPerEmail(user, needUri, wonMessage);
+      return wonMessage;
     }
     for (WebSocketSession session : webSocketSessions) {
       sendMessageForSession(wonMessage, webSocketMessage, session, needUri, user);
     }
-    // send per email notifications if it applies:
-    notifyPerEmail(user, needUri, wonMessage);
     return wonMessage;
   }
 
@@ -242,30 +245,37 @@ public class WonWebSocketHandler
         case OPEN:
           if (userNeed.isConversations()) {
             emailSender.sendConversationNotificationHtmlMessage(
-              user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), textMsg);
+              user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), wonMessage.getReceiverURI().toString(), textMsg);
           }
           return;
         case CONNECTION_MESSAGE:
           if (userNeed.isConversations()) {
             emailSender.sendConversationNotificationHtmlMessage(
-              user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), textMsg);
+              user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), wonMessage.getReceiverURI().toString(), textMsg);
           }
           return;
         case CONNECT:
           if (userNeed.isRequests()) {
             emailSender.sendConnectNotificationHtmlMessage(
-              user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), textMsg);
+              user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), wonMessage.getReceiverURI().toString(), textMsg);
           }
           return;
         case HINT_MESSAGE:
           if (userNeed.isMatches()) {
             String remoteNeedUri = WonRdfUtils.MessageUtils.toMatch(wonMessage).getToNeed().toString();
-            emailSender.sendHintNotificationMessageHtml(user.getEmail(), needUri.toString(), remoteNeedUri);
+            emailSender.sendHintNotificationMessageHtml(user.getEmail(), needUri.toString(), remoteNeedUri,wonMessage
+              .getReceiverURI().toString());
           }
           return;
-        //TODO close message can be of either type depending of state of the connection...
+
         case CLOSE:
-          //TODO
+          //a close message is only received for an established connection. If the user
+          //wants to be notified of requests, they will get closes as well
+          if (userNeed.isRequests()) {
+            emailSender.sendCloseNotificationHtmlMessage(
+              user.getEmail(), needUri.toString(), wonMessage.getSenderNeedURI().toString(), wonMessage
+                .getReceiverURI().toString(), textMsg);
+          }
           return;
         default:
           return;
