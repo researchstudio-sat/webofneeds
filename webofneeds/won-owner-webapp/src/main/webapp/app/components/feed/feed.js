@@ -35,9 +35,8 @@ class FeedController {
                 unreadEvents4dbg: unreadEvents,
                 state4dbg: state,
 
-                ownNeedUris: ownNeeds && ownNeeds.map(n => n.get('@id')).toArray(),
+                ownNeedUris: ownNeeds && ownNeeds.filter(n => n.getIn([won.WON.isInStateCompacted, "@id"]) === won.WON.ActiveCompacted).map(n => n.get('@id')).toArray(),
 
-                posts: state.getIn(["needs", "ownNeeds"]),
                 connectionsByNeed: selectConnectionsByNeed(state),
                 unreadCountsByNeedAndType: selectUnreadCountsByNeedAndType(state),
             }
