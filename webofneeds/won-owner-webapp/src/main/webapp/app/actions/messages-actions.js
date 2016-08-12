@@ -11,6 +11,7 @@ import Immutable from 'immutable';
 
 import {
     checkHttpStatus,
+    contains,
 } from '../utils';
 
 import {
@@ -255,8 +256,19 @@ function getConnectionData(eventOnRemote, eventOnOwn) {
                 connectionData.uri
             )
             .then(data => {
-                //making sure it's the same thing. trying to approach a point,
-                // where this is *just* a uri and everythinng else is in the state.
+                // if data.events doesn't contain the arguments-events, add them
+                const eventUris = data.events.map(e => e.uri);
+                if( ! contains(eventUris, eventOnOwn.uri)) {
+                    data.events.push(eventOnOwn);
+                    /*TODO resolve hasCorrespondingRemoteMesage.
+                     * Problem: runs into same race condition again
+                     * that motivated these if-clause.
+                     */
+                }
+                if( ! contains(eventUris, eventOnRemote.uri)) {
+                    data.events.push(eventOnRemote);
+                }
+
                 data.receivedEvent = eventOnOwn.uri;
                 data.updatedConnection = connectionData.uri;
                 return data
