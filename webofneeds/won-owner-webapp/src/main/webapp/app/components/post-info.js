@@ -90,8 +90,13 @@ function genComponentConf() {
 
             this.$scope.$watch(
                 'self.location',
-                (location, mapAlreadyInitialized) =>
-                    !mapAlreadyInitialized && this.updateMap(location)
+                (location, previousLocationValue) => {
+                    console.log('in location watch: ', location, previousLocationValue);
+                    if(!this._mapHasBeenAutoCentered) {
+                        this.updateMap(location)
+                        this._mapHasBeenAutoCentered = true;
+                    }
+                }
             );
 
 
