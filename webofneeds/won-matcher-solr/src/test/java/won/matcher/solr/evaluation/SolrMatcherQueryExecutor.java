@@ -37,12 +37,11 @@ public class SolrMatcherQueryExecutor
 
   @PostConstruct
   public void init() {
-    solrClient = new HttpSolrClient.Builder(config.getSolrServerUri()).build();
+    solrClient = new HttpSolrClient.Builder(config.getSolrEndpointUri(true)).build();
   }
 
-  public List<String> computeMatchingNeeds(Dataset need) throws IOException, SolrServerException {
+  public SolrDocumentList computeAllRetrievedDocuments(Dataset need) throws IOException, SolrServerException {
 
-    List<String> matchedNeeds = new LinkedList<>();
     SolrQuery query = new SolrQuery();
     query.setQuery(createQuery(need));
     query.setFields("id", "score",
@@ -52,8 +51,20 @@ public class SolrMatcherQueryExecutor
 
     QueryResponse response = solrClient.query(query);
     SolrDocumentList docs = response.getResults();
-    SolrDocumentList newDocs = hintBuilder.calculateMatchingResults(docs);
-    for (SolrDocument doc : newDocs) {
+    return docs;
+  }
+
+  public SolrDocumentList computeMatchingSolrDocuments(SolrDocumentList docs) {
+    return hintBuilder.calculateMatchingResults(docs);
+  }
+
+  public List<String> computeMatchingNeeds(Dataset need) throws IOException, SolrServerException {
+
+    SolrDocumentList docs = computeAllRetrievedDocuments(need);
+    SolrDocumentList matchedDocs = computeMatchingSolrDocuments(docs);
+
+    List<String> matchedNeeds = new LinkedList<>();
+    for (SolrDocument doc : matchedDocs) {
       String matchedNeedId = doc.getFieldValue("id").toString();
       matchedNeeds.add(matchedNeedId);
     }

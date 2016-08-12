@@ -25,6 +25,8 @@ import won.matcher.solr.config.SolrMatcherConfig;
 import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.index.NeedIndexer;
 import won.matcher.solr.query.DefaultNeedQueryFactory;
+import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
 
@@ -47,10 +49,12 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
   private NeedIndexer needIndexer;
 
   SolrClient solrClient;
+  SolrClient solrTestClient;
 
   @Override
   public void preStart() {
-    solrClient = new HttpSolrClient.Builder(config.getSolrServerUri()).build();
+    solrClient = new HttpSolrClient.Builder(config.getSolrEndpointUri(false)).build();
+    solrTestClient = new HttpSolrClient.Builder(config.getSolrEndpointUri(true)).build();
   }
 
   @Override
@@ -67,11 +71,22 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
   protected void processNeedEvent(NeedEvent needEvent)
     throws IOException, SolrServerException, JsonLdError {
 
+    log.info("Need event received {}", needEvent);
     Dataset dataset = deserializeNeed(needEvent);
+
+    // check if the need has doNotMatch flag, then do not use it for querying or indexing
+    if (WonRdfUtils.NeedUtils.hasFlag(dataset, needEvent.getUri(), WON.DO_NOT_MATCH)) {
+      log.info("Discard received need cause of doNotMatch flag: {}", needEvent);
+      return;
+    }
 
     DefaultNeedQueryFactory queryFactory = new DefaultNeedQueryFactory(dataset);
     String query = queryFactory.createQuery();
-    SolrDocumentList docs = executeQuery(query);
+
+    // if need is usedForTesting then use the solrTestClient (with points to another index instead the standard Client)
+    boolean usedForTesting = WonRdfUtils.NeedUtils.hasFlag(dataset, needEvent.getUri(), WON.USED_FOR_TESTING);
+    log.info("query Solr endpoint {} for need {}", config.getSolrEndpointUri(usedForTesting), needEvent);
+    SolrDocumentList docs = executeQuery(query, usedForTesting);
 
     if (docs != null) {
       log.debug("{} results found for query", docs.size());
@@ -89,16 +104,18 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     return dataset;
   }
 
-  protected SolrDocumentList executeQuery(String queryString) throws IOException, SolrServerException {
+  protected SolrDocumentList executeQuery(String queryString, boolean usedForTesting) throws IOException,
+    SolrServerException {
 
     SolrQuery query = new SolrQuery();
-    log.debug("query endpoint {} with query: {}", config.getSolrServerUri(), query);
+    log.debug("use query: {}", queryString);
     query.setQuery(queryString);
     query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD);
     query.setRows(config.getMaxHints());
 
     try {
-      QueryResponse response = solrClient.query(query);
+      SolrClient solr = (usedForTesting ? solrTestClient : solrClient);
+      QueryResponse response = solr.query(query);
       return response.getResults();
     } catch (SolrException e) {
       log.warning("Exception {} thrown for query: {}", e, queryString);
@@ -124,10 +141,9 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
 
   protected void indexNeedEvent(NeedEvent needEvent, Dataset dataset) throws IOException, JsonLdError {
 
-    log.info("Add need event content to solr index: " + needEvent);
+    log.info("Add need event content {} to solr index", needEvent);
     needIndexer.index(dataset);
   }
-
 
   @Override
   public SupervisorStrategy supervisorStrategy() {

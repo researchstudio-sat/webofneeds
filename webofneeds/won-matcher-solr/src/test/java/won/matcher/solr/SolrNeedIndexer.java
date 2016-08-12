@@ -35,7 +35,7 @@ public class SolrNeedIndexer
     int needs = 0;
     while (!needProducer.isExhausted()) {
       // indexer.indexNeedModel(needModel, UUID.randomUUID().toString());
-      indexer.indexNeedModel(needModel, SolrMatcherEvaluation.createNeedId(DatasetFactory.create(needModel)));
+      indexer.indexNeedModel(needModel, SolrMatcherEvaluation.createNeedId(DatasetFactory.create(needModel)), true);
       needs++;
 
       if (needs % 100 == 0) {
