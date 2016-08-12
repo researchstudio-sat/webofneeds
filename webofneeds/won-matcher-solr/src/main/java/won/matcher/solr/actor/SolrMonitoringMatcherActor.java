@@ -50,13 +50,13 @@ public class SolrMonitoringMatcherActor extends AbstractSolrMatcherActor
   }
 
   @Override
-  protected SolrDocumentList executeQuery(SolrMatcherQueryExecutor queryExecutor, String queryString)
-    throws IOException, SolrServerException {
+  protected SolrDocumentList executeQuery(SolrMatcherQueryExecutor queryExecutor, String queryString,
+                                          String... filterQueries) throws IOException, SolrServerException {
 
     Stopwatch stopwatch = SimonManager.getStopwatch("executeQuery");
     Split split = stopwatch.start();
 
-    SolrDocumentList docs = super.executeQuery(queryExecutor, queryString);
+    SolrDocumentList docs = super.executeQuery(queryExecutor, queryString, filterQueries);
 
     split.stop();
     return docs;

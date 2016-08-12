@@ -23,6 +23,8 @@ import won.matcher.solr.query.DefaultMatcherQueryExecuter;
 import won.matcher.solr.query.SolrMatcherQueryExecutor;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
 import won.matcher.solr.query.factory.DefaultNeedQueryFactory;
+import won.matcher.solr.query.factory.NeedStateQueryFactory;
+import won.matcher.solr.query.factory.NeedTypeQueryFactory;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
@@ -82,8 +84,13 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     DefaultNeedQueryFactory needQueryFactory = new DefaultNeedQueryFactory(dataset);
     String queryString = needQueryFactory.createQuery();
 
+    // add filters to the query (more filters for date intervals and location can be added here too)
+    String[] filterQueries = new String[2];
+    filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
+    filterQueries[1] = new NeedTypeQueryFactory(dataset).createQuery();
+
     log.info("query Solr endpoint {} for need {}", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-    SolrDocumentList docs = executeQuery(queryExecutor, queryString);
+    SolrDocumentList docs = executeQuery(queryExecutor, queryString, filterQueries);
 
     if (docs != null) {
       BulkHintEvent events = produceHints(docs, needEvent);
@@ -100,10 +107,10 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     return dataset;
   }
 
-  protected SolrDocumentList executeQuery(SolrMatcherQueryExecutor queryExecutor, String queryString)
-    throws IOException, SolrServerException {
+  protected SolrDocumentList executeQuery(SolrMatcherQueryExecutor queryExecutor, String queryString,
+                                          String... filterQueries) throws IOException, SolrServerException {
 
-    return queryExecutor.executeNeedQuery(queryString);
+    return queryExecutor.executeNeedQuery(queryString, filterQueries);
   }
 
   protected BulkHintEvent produceHints(SolrDocumentList docs, NeedEvent needEvent) {

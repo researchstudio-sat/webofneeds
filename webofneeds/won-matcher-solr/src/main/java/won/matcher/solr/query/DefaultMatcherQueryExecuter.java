@@ -37,13 +37,14 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor
   }
 
   @Override
-  public SolrDocumentList executeNeedQuery(String queryString) throws IOException,
-    SolrServerException {
+  public SolrDocumentList executeNeedQuery(String queryString, String... filterQueries)
+    throws IOException, SolrServerException {
 
     SolrQuery query = new SolrQuery();
-    log.debug("use query: {}", queryString);
+    log.debug("use query: {} with filters {}", queryString, filterQueries);
     query.setQuery(queryString);
     query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD, BasicNeedQueryFactory.NEED_TITLE_SOLR_FIELD);
+    query.setFilterQueries(filterQueries);
     query.setRows(config.getMaxHints());
 
     try {
@@ -55,4 +56,5 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor
 
     return null;
   }
+
 }

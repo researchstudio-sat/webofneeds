@@ -111,15 +111,9 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
   protected String makeQueryString() {
 
     SolrQueryFactory[] factoryArray = new SolrQueryFactory[contentFactories.size()];
-    BooleanQueryFactory contentShouldQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR, contentFactories
-      .toArray(factoryArray));
+    BooleanQueryFactory contentQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR,
+                                                               contentFactories.toArray(factoryArray));
 
-    BooleanQueryFactory mustQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.AND, new
-      NeedTypeQueryFactory(needDataset), new NeedStateQueryFactory(needDataset));
-
-    BooleanQueryFactory topQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.AND, mustQuery,
-                                                           contentShouldQuery);
-
-    return topQuery.createQuery();
+    return contentQuery.createQuery();
   }
 }

@@ -9,21 +9,14 @@ public class TestNeedQueryFactory extends BasicNeedQueryFactory
 {
   public TestNeedQueryFactory(final Dataset need) {
     super(need);
-  }
 
-  @Override
-  protected String makeQueryString() {
-
-    SolrQueryFactory[] factoryArray = new SolrQueryFactory[contentFactories.size()];
-    BooleanQueryFactory contentShouldQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR, contentFactories
-      .toArray(factoryArray));
-
-    BooleanQueryFactory mustQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.AND, new
-      NeedTypeQueryFactory(needDataset));
-
-    BooleanQueryFactory topQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.AND, mustQuery,
-                                                           contentShouldQuery);
-
-    return topQuery.createQuery();
+    addTermsToTitleQuery(getTitleTerms(), 4);
+    addTermsToTitleQuery(getTagTerms(), 2);
+    addTermsToTagQuery(getTagTerms(), 4);
+    addTermsToTagQuery(getTitleTerms(), 2);
+    addTermsToDescriptionQuery(getTitleTerms(), 2);
+    addTermsToDescriptionQuery(getTagTerms(), 2);
+    addTermsToDescriptionQuery(getDescriptionTerms(), 1);
   }
 }
+

@@ -12,6 +12,7 @@ import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.needproducer.impl.RoundRobinCompositeNeedProducer;
 import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
+import won.matcher.solr.query.factory.NeedTypeQueryFactory;
 import won.matcher.solr.query.factory.TestNeedQueryFactory;
 import won.matcher.solr.spring.SolrTestAppConfiguration;
 
@@ -30,6 +31,7 @@ public class SolrMatcherQueryTest
       new AnnotationConfigApplicationContext(SolrTestAppConfiguration.class);
 
     HintBuilder hintBuilder = ctx.getBean(HintBuilder.class);
+    //DefaultMatcherQueryExecuter queryExecutor = ctx.getBean(DefaultMatcherQueryExecuter.class);
     TestMatcherQueryExecutor queryExecutor = ctx.getBean(TestMatcherQueryExecutor.class);
 
     // set the options of the need producer (e.g. if it should exhaust) in the SolrNeedIndexerAppConfiguration file
@@ -42,18 +44,11 @@ public class SolrMatcherQueryTest
       try {
 
         TestNeedQueryFactory needQuery = new TestNeedQueryFactory(ds);
-        needQuery.addTermsToTitleQuery(needQuery.getTitleTerms(), 4);
-        needQuery.addTermsToTitleQuery(needQuery.getTagTerms(), 2);
-        needQuery.addTermsToTagQuery(needQuery.getTagTerms(), 4);
-        needQuery.addTermsToTagQuery(needQuery.getTitleTerms(), 2);
-        needQuery.addTermsToDescriptionQuery(needQuery.getTitleTerms(), 2);
-        needQuery.addTermsToDescriptionQuery(needQuery.getTagTerms(), 2);
-        needQuery.addTermsToDescriptionQuery(needQuery.getDescriptionTerms(), 1);
 
         String query = needQuery.createQuery();
         System.out.println("execute query: " + query);
 
-        SolrDocumentList docs = queryExecutor.executeNeedQuery(query);
+        SolrDocumentList docs = queryExecutor.executeNeedQuery(query, new NeedTypeQueryFactory(ds).createQuery());
         SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
 
         System.out.println("Found docs: " + docs.size() + ", keep docs: " + matchedDocs.size());

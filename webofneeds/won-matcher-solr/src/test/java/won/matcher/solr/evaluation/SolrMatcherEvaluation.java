@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.index.NeedIndexer;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
+import won.matcher.solr.query.factory.NeedTypeQueryFactory;
 import won.matcher.solr.query.factory.TestNeedQueryFactory;
 import won.matcher.utils.tensor.TensorMatchingData;
 import won.protocol.exception.IncorrectPropertyCountException;
@@ -199,15 +200,10 @@ public class SolrMatcherEvaluation
   private List<String> computeMatchingNeeds(Dataset need) throws IOException, SolrServerException {
 
     TestNeedQueryFactory needQuery = new TestNeedQueryFactory(need);
-    needQuery.addTermsToTitleQuery(needQuery.getTitleTerms(), 4);
-    needQuery.addTermsToTitleQuery(needQuery.getTagTerms(), 2);
-    needQuery.addTermsToTagQuery(needQuery.getTagTerms(), 4);
-    needQuery.addTermsToTagQuery(needQuery.getTitleTerms(), 2);
-    needQuery.addTermsToDescriptionQuery(needQuery.getTitleTerms(), 2);
-    needQuery.addTermsToDescriptionQuery(needQuery.getTagTerms(), 2);
-    needQuery.addTermsToDescriptionQuery(needQuery.getDescriptionTerms(), 1);
 
-    SolrDocumentList docs = queryExecutor.executeNeedQuery(needQuery.createQuery());
+    SolrDocumentList docs = queryExecutor.executeNeedQuery(
+      needQuery.createQuery(), new NeedTypeQueryFactory(need).createQuery());
+
     SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
 
     List<String> matchedNeeds = new LinkedList<>();
