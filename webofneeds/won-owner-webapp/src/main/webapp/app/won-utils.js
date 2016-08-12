@@ -54,14 +54,17 @@ export function initLeafletBaseMaps() {
     return baseMaps;
 }
 
-export function selectTimestamp(event, connectionUri) {
-    if(event.get('hasReceiver') === connectionUri) {
-        return event.get('hasReceivedTimestamp');
-    } else if(event.get('hasSender') === connectionUri) {
-        return event.get('hasSentTimestamp');
-    } else {
-        return undefined;
-    }
+export function selectTimestamp(event, ownNeedUri) {
+    /*
+     * the "outer" event is from our own event
+     * container. The receivedTimestamp there
+     * should have been placed by our own node.
+     *
+     * The exception are events that haven't
+     * been confirmed yet. They don't have the
+     * timestamp.
+     */
+    return event.get('hasReceivedTimestamp');
 };
 
 export function selectConnectionUris(need) {

@@ -7,7 +7,7 @@ import Immutable from 'immutable';
 import won from './won-es6';
 import {
     decodeUriComponentProperly,
-    toDate,
+    msStringToDate,
 } from './utils';
 
 import {
@@ -230,7 +230,7 @@ export const selectRequestTimestampOfOpenConnection = createSelector(
                 "format (neither the message nor it's counterpart were " +
                 "`FromExternal`, thus a the one our own node created)." );
         }
-        return toDate(timestamp)
+        return msStringToDate(timestamp)
     }
 );
 
@@ -270,7 +270,8 @@ export const selectLastUpdatedPerConnection = createSelector(
     allByConnections => allByConnections.map(connectionAndRelated =>
         connectionAndRelated.get('events')
         .map( event =>
-            selectTimestamp(event, connectionAndRelated.getIn(['connection','uri']) )
+            //selectTimestamp(event, connectionAndRelated.getIn(['connection','uri']) )
+            selectTimestamp(event)
         )
         /*
          * don't use events without timestamp

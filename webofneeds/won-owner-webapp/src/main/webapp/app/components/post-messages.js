@@ -4,7 +4,7 @@ import angular from 'angular';
 import Immutable from 'immutable';
 import squareImageModule from './square-image';
 import chatTextFieldModule from './chat-textfield';
-import { attach, is, delay, toDate } from '../utils.js'
+import { attach, is, delay, msStringToDate } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime } from '../won-label-utils';
 import { selectAllByConnections, selectOpenConnectionUri } from '../selectors';
@@ -183,12 +183,15 @@ export default angular.module('won.owner.components.postMessages', [
 function selectChatMessages(state) {
     const connectionUri = selectOpenConnectionUri(state);
     const connectionData = selectAllByConnections(state).get(connectionUri);
+    const ownNeedUri = connectionData && connectionData.getIn(['ownNeed', '@id']);
 
     if (!connectionData || !connectionData.get('events')) {
         return Immutable.List();
 
     } else {
-        const timestamp = (event) => toDate(selectTimestamp(event, connectionUri))
+        const timestamp = (event) =>
+            //msStringToDate(selectTimestamp(event, connectionUri))
+            msStringToDate(selectTimestamp(event))
 
         const chatMessages = connectionData.get('events')
 

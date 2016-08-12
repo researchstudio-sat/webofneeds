@@ -8,7 +8,7 @@ import {
 } from '../won-label-utils';
 import {
     attach,
-    toDate,
+    msStringToDate,
 } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
 import {

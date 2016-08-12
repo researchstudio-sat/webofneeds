@@ -563,8 +563,11 @@ export function decodeUriComponentProperly(encodedUri) {
         return decodeURIComponent(encodedUri);
 }
 
-export function toDate(ts) {
-    return new Date(Number.parseInt(ts));
+export function msStringToDate(ts) {
+    if(is('String', ts)) {
+        ts = Number.parseInt(ts);
+    }
+    return new Date(ts);
 }
 
 /**

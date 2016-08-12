@@ -21,12 +21,18 @@ export const labels = Object.freeze({
  */
 export function relativeTime(now, previous) {
     if(!now || !previous) {
-        return undefined;
+            return undefined;
     }
 
     now = new Date(now);
     previous = new Date(previous);
     const elapsed = now - previous; // in ms
+
+    if(isNaN(elapsed)) {
+        // one of two dates was invalid
+        return undefined;
+    }
+
 
     const msPerMinute = 60 * 1000;
     const msPerHour = msPerMinute * 60;
