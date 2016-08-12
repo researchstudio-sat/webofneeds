@@ -15,7 +15,7 @@ const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 function genComponentConf() {
     let template = `
         <div class="pm__header">
-            <a ui-sref="postConversations({openConversation : null})">
+            <a ui-sref="post({connectionUri : null})">
                 <img class="pm__header__icon clickable"
                      src="generated/icon-sprite.svg#ico36_close"/>
             </a>
