@@ -69,13 +69,21 @@ function genComponentConf() {
                 </div>
                 -->
                 <div class="or__content__description__text"
-                    ng-show="!!self.theirNeed.getIn(['won:hasContent','won:hasTextDescription']) || !!self.textMsg">
+                    ng-show="!!self.textMsg">
+                    <img
+                        class="or__content__description__indicator"
+                        src="generated/icon-sprite.svg#ico16_indicator_description"/>
+                    <span>
+                        <p>{{ self.textMsg }}</p>
+                    </span>
+                </div>
+                <div class="or__content__description__text"
+                    ng-show="!!self.theirNeed.getIn(['won:hasContent','won:hasTextDescription'])">
                     <img
                         class="or__content__description__indicator"
                         src="generated/icon-sprite.svg#ico16_indicator_description"/>
                     <span>
                         <p>{{ self.theirNeed.getIn(['won:hasContent','won:hasTextDescription']) }}</p>
-                        <p>{{ self.textMsg }}</p>
                     </span>
                 </div>
             </div>
