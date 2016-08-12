@@ -39,6 +39,14 @@ function genComponentConf() {
                     {{ self.post.get('textDescription') }}
                 </p>
                 <h2 class="post-info__heading"
+                    ng-show="self.post.get('tags')">
+                    Description
+                </h2>
+                <p class="post-info__details"
+                    ng-show="self.post.get('tags')">
+                    {{ self.post.get('tags') }}
+                </p>
+                <h2 class="post-info__heading"
                     ng-show="self.post.get('location')">
                     Location
                 </h2>
