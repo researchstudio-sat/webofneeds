@@ -28,7 +28,7 @@ public class HintBuilder
     @Autowired
     private SolrMatcherConfig config;
 
-    public SolrDocumentList calculateMatchingResults(SolrDocumentList docs) {
+    public SolrDocumentList calculateMatchingResults(final SolrDocumentList docs) {
 
         SolrDocumentList matches = new SolrDocumentList();
         if (docs == null || docs.size() == 0) {
@@ -36,7 +36,8 @@ public class HintBuilder
         }
 
         // sort the documents according to their score value descending
-        docs.sort(new Comparator<SolrDocument>()
+        SolrDocumentList sortedDocs = (SolrDocumentList) docs.clone();
+        sortedDocs.sort(new Comparator<SolrDocument>()
         {
             @Override
             public int compare(final SolrDocument o1, final SolrDocument o2) {
@@ -51,13 +52,13 @@ public class HintBuilder
 
         // apply the Kneedle algorithm to find knee/elbow points in the score values of the returned docs to cut there
         double cutScoreLowerThan = 0.0;
-        if (docs.size() > 1) {
+        if (sortedDocs.size() > 1) {
             Kneedle kneedle = new Kneedle();
-            double[] x = new double[docs.size()];
-            double[] y = new double[docs.size()];
-            for (int i = 0; i < docs.size(); i++) {
+            double[] x = new double[sortedDocs.size()];
+            double[] y = new double[sortedDocs.size()];
+            for (int i = 0; i < sortedDocs.size(); i++) {
                 x[i] = i;
-                y[i] = Double.valueOf(docs.get(i).getFieldValue("score").toString());
+                y[i] = Double.valueOf(sortedDocs.get(i).getFieldValue("score").toString());
             }
             int[] elbows = kneedle.detectElbowPoints(x, y);
 
@@ -68,24 +69,24 @@ public class HintBuilder
             }
         }
 
-        for (int i = docs.size() - 1; i >= 0; i--) {
+        for (int i = sortedDocs.size() - 1; i >= 0; i--) {
 
             // if score is lower threshold or we arrived at the elbow point to cut after
-            double score = Double.valueOf(docs.get(i).getFieldValue("score").toString());
+            double score = Double.valueOf(sortedDocs.get(i).getFieldValue("score").toString());
             if (score < config.getScoreThreshold() || score <= cutScoreLowerThan) {
                 log.debug("cut result documents, current score is {}, score threshold is {}",
                           score, config.getScoreThreshold());
                 break;
             }
 
-            SolrDocument newDoc = docs.get(i);
+            SolrDocument newDoc = sortedDocs.get(i);
             matches.add(newDoc);
         }
 
         return matches;
     }
 
-    public BulkHintEvent generateHintsFromSearchResult(SolrDocumentList docs, NeedEvent need) {
+    public BulkHintEvent generateHintsFromSearchResult(final SolrDocumentList docs, final NeedEvent need) {
 
         // generate hints from query result documents
         BulkHintEvent bulkHintEvent = new BulkHintEvent();

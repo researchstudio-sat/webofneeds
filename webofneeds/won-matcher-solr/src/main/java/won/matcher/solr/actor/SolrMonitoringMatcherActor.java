@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.service.common.event.NeedEvent;
+import won.matcher.solr.query.SolrMatcherQueryExecutor;
 
 import java.io.IOException;
 
@@ -49,13 +50,13 @@ public class SolrMonitoringMatcherActor extends AbstractSolrMatcherActor
   }
 
   @Override
-  protected SolrDocumentList executeQuery(String query, boolean usedForTesting) throws SolrServerException,
-    IOException {
+  protected SolrDocumentList executeQuery(SolrMatcherQueryExecutor queryExecutor, String queryString)
+    throws IOException, SolrServerException {
 
     Stopwatch stopwatch = SimonManager.getStopwatch("executeQuery");
     Split split = stopwatch.start();
 
-    SolrDocumentList docs = super.executeQuery(query, usedForTesting);
+    SolrDocumentList docs = super.executeQuery(queryExecutor, queryString);
 
     split.stop();
     return docs;

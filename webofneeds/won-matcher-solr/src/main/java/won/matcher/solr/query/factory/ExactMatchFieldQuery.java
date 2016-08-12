@@ -1,12 +1,12 @@
-package won.matcher.solr.query;
+package won.matcher.solr.query.factory;
 
 /**
  * Created by hfriedrich on 01.08.2016.
  */
 public class ExactMatchFieldQuery extends SolrQueryFactory
 {
-  private String fieldName;
-  private String value;
+  protected String fieldName;
+  protected String value;
 
    public ExactMatchFieldQuery(String fieldName, String value) {
      this.value = value;
@@ -15,6 +15,10 @@ public class ExactMatchFieldQuery extends SolrQueryFactory
 
   @Override
   protected String makeQueryString() {
+
+    if (fieldName == null || value == null) {
+      throw new NullPointerException("fieldName or value may not be null");
+    }
     return String.join("", fieldName, " : \"", value, "\"");
   }
 }

@@ -7,9 +7,14 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.DC;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.index.NeedIndexer;
+import won.matcher.solr.query.TestMatcherQueryExecutor;
+import won.matcher.solr.query.factory.TestNeedQueryFactory;
 import won.matcher.utils.tensor.TensorMatchingData;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.util.RdfUtils;
@@ -42,7 +47,7 @@ import java.util.Map;
 public class SolrMatcherEvaluation
 {
   @Autowired
-  SolrMatcherQueryExecutor queryExecutor;
+  TestMatcherQueryExecutor queryExecutor;
 
   @Autowired
   NeedIndexer needIndexer;
@@ -52,6 +57,9 @@ public class SolrMatcherEvaluation
 
   @Autowired
   private MailDirNeedProducer supplyNeedProducer;
+
+  @Autowired
+  HintBuilder hintBuilder;
 
   private String outputDir;
   private String connectionsFile;
@@ -174,7 +182,7 @@ public class SolrMatcherEvaluation
   public void buildPredictionTensor() throws IOException, SolrServerException {
 
     for (Dataset need : needFileDatasetMap.values()) {
-      for (String match : queryExecutor.computeMatchingNeeds(need)) {
+      for (String match : computeMatchingNeeds(need)) {
         if (!matchingDataPredictions.getNeeds().contains(createNeedId(need)) ||
           !matchingDataPredictions.getNeeds().contains(match)) {
             throw new IOException("No need found in input directory for connection specified in connection file:  \n" +
@@ -186,6 +194,29 @@ public class SolrMatcherEvaluation
 
     // output the tensor data
     matchingDataPredictions.writeOutputFiles(outputDir + "/predictions");
+  }
+
+  private List<String> computeMatchingNeeds(Dataset need) throws IOException, SolrServerException {
+
+    TestNeedQueryFactory needQuery = new TestNeedQueryFactory(need);
+    needQuery.addTermsToTitleQuery(needQuery.getTitleTerms(), 4);
+    needQuery.addTermsToTitleQuery(needQuery.getTagTerms(), 2);
+    needQuery.addTermsToTagQuery(needQuery.getTagTerms(), 4);
+    needQuery.addTermsToTagQuery(needQuery.getTitleTerms(), 2);
+    needQuery.addTermsToDescriptionQuery(needQuery.getTitleTerms(), 2);
+    needQuery.addTermsToDescriptionQuery(needQuery.getTagTerms(), 2);
+    needQuery.addTermsToDescriptionQuery(needQuery.getDescriptionTerms(), 1);
+
+    SolrDocumentList docs = queryExecutor.executeNeedQuery(needQuery.createQuery());
+    SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
+
+    List<String> matchedNeeds = new LinkedList<>();
+    for (SolrDocument doc : matchedDocs) {
+      String matchedNeedId = doc.getFieldValue("id").toString();
+      matchedNeeds.add(matchedNeedId);
+    }
+
+    return matchedNeeds;
   }
 
   public void setOutputDir(String outputDir) {

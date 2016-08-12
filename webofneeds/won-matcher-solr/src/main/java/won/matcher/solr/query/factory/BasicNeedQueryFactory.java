@@ -1,4 +1,4 @@
-package won.matcher.solr.query;
+package won.matcher.solr.query.factory;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.vocabulary.DC;
@@ -15,11 +15,11 @@ import java.util.ArrayList;
  */
 public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
 {
-  private static final String NEED_TITLE_SOLR_FIELD =
+  public static final String NEED_TITLE_SOLR_FIELD =
     "_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_dc_elements_1.1_title";
-  private static final String NEED_DESCRIPTION_SOLR_FIELD =
+  public static final String NEED_DESCRIPTION_SOLR_FIELD =
     "_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTextDescription";
-  private static final String NEED_TAG_SOLR_FIELD =
+  public static final String NEED_TAG_SOLR_FIELD =
     "_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTag";
 
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -103,6 +103,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
     text = text.replaceAll("NOT", " ");
     text = text.replaceAll("AND", " ");
     text = text.replaceAll("OR", " ");
+    text = text.replaceAll("\\s+", " ");
     return text;
   }
 

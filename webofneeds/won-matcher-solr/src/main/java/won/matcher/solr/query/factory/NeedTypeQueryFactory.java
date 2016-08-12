@@ -1,4 +1,4 @@
-package won.matcher.solr.query;
+package won.matcher.solr.query.factory;
 
 import com.hp.hpl.jena.query.Dataset;
 import won.protocol.util.RdfUtils;

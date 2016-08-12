@@ -452,9 +452,12 @@
   -->
 
   <!-- Use stemming and synonyms on index for the content fields -->
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_dc_elements_1.1_title" type="text_en_syn_stem"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTag" type="text_en_syn_stem"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTextDescription" type="text_en_syn_stem"/>
+  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_dc_elements_1.1_title"
+         type="text_en_syn_stem" termVectors="true"/>
+  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTag"
+         type="text_en_syn_stem" termVectors="true"/>
+  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTextDescription"
+         type="text_en_syn_stem" termVectors="true"/>
 
   <!-- <field name="_graph._id" type="text_general"/>
   <field name="_graph._type" type="text_general"/>
