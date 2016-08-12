@@ -96,7 +96,9 @@ function genComponentConf() {
                  * typed -- unless the space is the first character
                  * in the field.
                  */
-                .replace(/<br>$/, '');
+                .replace(/<br>$/, '')
+                .replace('&nbsp;','')
+                .trim();
         }
 
         initMedium() {
