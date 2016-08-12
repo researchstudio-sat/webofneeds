@@ -263,7 +263,7 @@ export function runMessagingAgent(redux) {
             }
 
             if(!messageProcessed){
-                console.warn("MESSAGE WAS PROCESSED DUE TO MISSING IMPLEMENTATION: ", events);
+                console.warn("MESSAGE WASN'T PROCESSED DUE TO MISSING HANDLER FOR ITS TYPE: ", events);
             }
         })
     };
