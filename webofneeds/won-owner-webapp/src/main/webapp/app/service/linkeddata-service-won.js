@@ -59,6 +59,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                 '&';
         }
 
+        // The owner hands this part -- the one in the `uri=` paramater -- directly to the node.
         let queryOnNode = dataUri;
         if(queryParams) {
             let firstParam = true;
