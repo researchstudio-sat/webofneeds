@@ -42,7 +42,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * @param dataUri
      * @param requesterWebId: the WebID used to access the ressource (used
      *          by the owner-server to pick the right key-pair)
-     * @param params a config object whose fields get appended as get parameters.
+     * @param queryParams a config object whose fields get appended as get parameters.
      *               important parameters include:
      *                 * deep: 'true' to automatically resolve containers (e.g.
      *                         the event-container)
@@ -50,11 +50,11 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      *                   [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
      * @returns {string}
      */
-    function queryString(dataUri, requesterWebId, params) {
+    function queryString(dataUri, requesterWebId, queryParams) {
         let queryOnNode = dataUri;
-        if(params) {
+        if(queryParams) {
             let firstParam = true;
-            for(let [paramName, paramValue] of entries(params)) {
+            for(let [paramName, paramValue] of entries(queryParams)) {
                 queryOnNode = queryOnNode + (firstParam? '?' : '&');
                 firstParam = false;
                 queryOnNode = queryOnNode + paramName + '=' + paramValue;
@@ -650,12 +650,12 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
          * Atm we risk running parallel requests.
          */
         //uri isn't loaded or needs to be refrehed. fetch it.
-        const requestParams = {};
-        if(deep) requestParams.deep = 'true';
-        if(layerSize) requestParams['layer-size'] = layerSize;
+        const queryParams = {};
+        if(deep) queryParams.deep = 'true';
+        if(layerSize) queryParams['layer-size'] = layerSize;
 
         cacheItemMarkFetching(uri);
-        return won.fetch(uri, requesterWebId, requestParams)
+        return won.fetch(uri, { requesterWebId, queryParams } )
             .then(
                 (dataset) => {
                     if(!deep) {
@@ -683,19 +683,17 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * Fetches the rdf-node with the given uri from
      * the standard API_ENDPOINT.
      * @param uri
-     * @param requesterWebId: the WebID used to access the ressource (used
-     *          by the owner-server to pick the right key-pair)
-     * @param queryParams GET-params as documented for `queryString`
+     * @param params: see `loadFromOwnServerIntoCache`
      * @returns {*}
      */
-    won.fetch = function(uri, requesterWebId, queryParams) {
+    won.fetch = function(uri, params) {
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "fetch: uri must not be null"};
         }
         //console.log("linkeddata-service-won.js: fetch announced: " + uri);
         const lock = getReadUpdateLockPerUri(uri);
         return lock.acquireUpdateLock().then(
-                () => loadFromOwnServerIntoCache(uri, requesterWebId, queryParams)
+                () => loadFromOwnServerIntoCache(uri, params)
             ).then(dataset => {
                 lock.releaseUpdateLock();
                 return dataset;
@@ -765,24 +763,34 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     /**
      *
      * @param uri the uri of the ressource
-     * @param requesterWebId: the WebID used to access the ressource (used
-     *          by the owner-server to pick the right key-pair)
-     * @param queryParams GET-params as documented for `queryString`
+     * @param params: optional paramters
+     *        * requesterWebId: the WebID used to access the ressource (used
+     *            by the owner-server to pick the right key-pair)
+     *        * queryParams: GET-params as documented for `queryString`
+     *        * pagingSize: if specified the server will return the first
+     *            page (unless e.g. `queryParams.p=2` is specified when
+     *            it will return the second page of size N)
      * @return {Promise}
      */
-    function loadFromOwnServerIntoCache(uri, requesterWebId, queryParams) {
+    function loadFromOwnServerIntoCache(uri, params) { //requesterWebId, queryParams) {
         return new Promise((resolve, reject) => {
-            console.log("linkeddata-service-won.js: fetching:        " + uri);
 
-            let requestUri = queryString(uri, requesterWebId, queryParams);
+            let requestUri = queryString(uri, params.requesterWebId, params.queryParams);
             const find = '%3A';
-            const re = new RegExp(find, 'g');
-            requestUri = requestUri.replace(re, ':');
+            const re = new RegExp(find, 'g'); //?
+            requestUri = requestUri.replace(re, ':'); //??
+
+            console.log("linkeddata-service-won.js: fetching:        " + requestUri);
 
             fetch(requestUri, {
                 method: 'get',
                 credentials: "same-origin",
-                headers: { 'Accept': 'application/ld+json' }
+                headers: {
+                    'Accept': 'application/ld+json',
+                    'Prefer': params.pagingSize?
+                        `return=representation; max-member-count="${ params.pagingSize }"` :
+                        undefined,
+                }
             })
             .then(dataset =>
                 dataset.json())
