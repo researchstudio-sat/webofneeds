@@ -776,9 +776,11 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         return new Promise((resolve, reject) => {
 
             let requestUri = queryString(uri, params.requesterWebId, params.queryParams);
+
+            // server can't resolve uri-encoded colons. revert the encoding done in `queryString`.
             const find = '%3A';
-            const re = new RegExp(find, 'g'); //?
-            requestUri = requestUri.replace(re, ':'); //??
+            const re = new RegExp(find, 'g');
+            requestUri = requestUri.replace(re, ':');
 
             console.log("linkeddata-service-won.js: fetching:        " + requestUri);
 
