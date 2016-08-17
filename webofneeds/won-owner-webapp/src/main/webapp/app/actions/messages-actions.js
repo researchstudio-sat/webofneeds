@@ -11,7 +11,7 @@ import Immutable from 'immutable';
 
 import {
     checkHttpStatus,
-    contains,
+    clone,
 } from '../utils';
 
 import {
@@ -246,6 +246,16 @@ export function connectMessageReceived(events) {
 
 }
 
+/**
+ * @deprecated due to the reason given in the TODO.
+ * TODO this function indirectly fetches the entire
+ * connection again! It should be enough to just
+ * use the two events we get in most cases and make
+ * the reducers correspondingly smarter.
+ * @param eventOnRemote
+ * @param eventOnOwn
+ * @return {*}
+ */
 function getConnectionData(eventOnRemote, eventOnOwn) {
     return won
         .getConnectionWithOwnAndRemoteNeed(eventOnRemote.hasReceiverNeed, eventOnRemote.hasSenderNeed)
@@ -256,21 +266,22 @@ function getConnectionData(eventOnRemote, eventOnOwn) {
                 connectionData.uri
             )
             .then(data => {
-                // if data.events doesn't contain the arguments-events, add them
-                const eventUris = data.events.map(e => e.uri);
-                if( ! contains(eventUris, eventOnOwn.uri)) {
-                    data.events.push(eventOnOwn);
-                    /*TODO resolve hasCorrespondingRemoteMesage.
-                     * Problem: runs into same race condition again
-                     * that motivated these if-clause.
+                if(data.events.filter(e => e.uri === eventOnOwn.uri).length === 0) {
+                    //
+                    /*
+                     * if data.events doesn't contain the arguments-events,
+                     * add them. they might not be contained in the events-list
+                     * due to a race condition, i.e. if data hasn't been
+                     * stored on the node when the query resolves.
                      */
-                }
-                if( ! contains(eventUris, eventOnRemote.uri)) {
-                    data.events.push(eventOnRemote);
+                    const eventOnOwn_ = clone(eventOnOwn);
+                    eventOnOwn_.hasCorrespondingRemoteMessage = clone(eventOnRemote);
+                    data.events.push( eventOnOwn_ );
                 }
 
                 data.receivedEvent = eventOnOwn.uri;
                 data.updatedConnection = connectionData.uri;
+
                 return data
 
             })
