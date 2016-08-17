@@ -682,3 +682,7 @@ export function getIn(obj, path) {
             return obj[path[0]] && getIn( obj[path[0]] , path.slice(1) )
     }
 }
+
+export function contains(arr, el) {
+    return arr.indexOf(el) > 0;
+}
