@@ -51,6 +51,14 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * @returns {string}
      */
     function queryString(dataUri, requesterWebId, queryParams) {
+        let queryOnOwner = '/owner/rest/linked-data/?';
+        if(requesterWebId) {
+            queryOnOwner +=
+                'requester=' +
+                encodeURIComponent(requesterWebId) +
+                '&';
+        }
+
         let queryOnNode = dataUri;
         if(queryParams) {
             let firstParam = true;
@@ -60,13 +68,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                 queryOnNode = queryOnNode + paramName + '=' + paramValue;
             }
         }
-        let queryOnOwner = '/owner/rest/linked-data/?';
-        if(requesterWebId) {
-            queryOnOwner +=
-                'requester=' +
-                encodeURIComponent(requesterWebId) +
-                '&';
-        }
+
         let query = queryOnOwner +
             'uri=' + encodeURIComponent(queryOnNode);
 
