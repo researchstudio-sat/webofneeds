@@ -32,6 +32,7 @@ System.config({
     "jquery": "github:components/jquery@2.1.4",
     "js-md5": "bower:js-md5@1.1.0",
     "jsonld": "npm:jsonld@0.4.2",
+    "leaflet": "npm:leaflet@0.7.7",
     "ng-clip": "bower:ng-clip@0.2.6",
     "ng-redux": "npm:ng-redux@3.1.1",
     "ng-scrollbar": "bower:ng-scrollbar@0.0.6",

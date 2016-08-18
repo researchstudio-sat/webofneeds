@@ -2,9 +2,17 @@
 
 import angular from 'angular';
 import squareImageModule from './square-image';
-import { labels } from '../won-label-utils';
+import {
+    labels,
+    relativeTime,
+} from '../won-label-utils';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
+import {
+    selectLastUpdateTime,
+    selectLastUpdatedPerConnection,
+
+} from '../selectors'
 //import won from '../won-es6';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
@@ -13,13 +21,13 @@ function genComponentConf() {
         <div class="mli clickable" ng-click="self.toggleMatches()">
                 <won-square-image
                     src="self.item.titleImgSrc"
-                    title="self.item[0].ownNeed.title"
-                    uri="self.item[0].ownNeed.uri">
+                    title="self.item[0].ownNeed['won:hasContent']['dc:title']"
+                    uri="self.item[0].ownNeed['@id']">
                 </won-square-image>
                 <div class="mli__description">
                     <div class="mli__description__topline">
                         <div class="mli__description__topline__title">
-                            {{self.item[0].ownNeed.title}}
+                            {{self.item[0].ownNeed['won:hasContent']['dc:title']}}
                         </div>
                         <div class="mli__description__topline__matchcount">
                             {{self.item.length}}
@@ -36,7 +44,11 @@ function genComponentConf() {
                             </span>
                         </span>
                         <span class="mli__description__subtitle__type">
-                            {{self.labels.type[self.item[0].ownNeed.basicNeedType]}}
+                            {{
+                                self.labels.type[
+                                    self.item[0].ownNeed['won:hasBasicNeedType']['@id']
+                                ]
+                            }}
                         </span>
                     </div>
                 </div>
@@ -57,16 +69,16 @@ function genComponentConf() {
                     <div class="smli__item__header">
                         <won-square-image
                             src="match.images[0].src"
-                            title="match.remoteNeed.title"
-                            uri="match.remoteNeed.uri">
+                            title="match.remoteNeed['won:hasContent']['dc:title']"
+                            uri="match.remoteNeed['@id']">
                         </won-square-image>
                         <div class="smli__item__header__text">
                             <div class="smli__item__header__text__topline">
                                 <div class="smli__item__header__text__topline__title">
-                                    {{match.remoteNeed.title}}
+                                    {{match.remoteNeed['won:hasContent']['dc:title']}}
                                 </div>
                                 <div class="smli__item__header__text__topline__date">
-                                    {{match.remoteNeed.timeStamp}}
+                                    {{ self.relativeTime(self.lastUpdated, match.remoteNeed['dct:created']) }}
                                 </div>
                             </div>
                             <div class="smli__item__header__text__subtitle">
@@ -79,7 +91,7 @@ function genComponentConf() {
                                              </span>
                                 </span>
                                 <span class="smli__item__header__text__subtitle__type">
-                                    {{self.labels.type[match.remoteNeed.basicNeedType]}}
+                                    {{ self.labels.type[ match.remoteNeed['won:hasBasicNeedType']['@id'] ] }}
                                 </span>
                             </div>
                         </div>
@@ -115,8 +127,13 @@ function genComponentConf() {
 
             this.maxThumbnails = 4;
             this.labels = labels;
+            this.relativeTime = relativeTime;
 
-            const selectFromState = (state) => ({ });
+            const selectFromState = (state) => {
+                return {
+                    lastUpdated: selectLastUpdateTime(state),
+                }
+            };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
         }
@@ -132,7 +149,10 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: { item: '=' },
+        scope: {
+            connectionUri: '=',
+            item: '='
+        },
         template: template
     }
 }

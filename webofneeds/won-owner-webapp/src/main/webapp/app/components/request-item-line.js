@@ -14,19 +14,25 @@ function genComponentConf() {
             <div class="ril clickable" ng-click="self.toggleRequest()">
                 <won-square-image 
                     src="self.item.titleImgSrc" 
-                    title="self.item[0].ownNeed.title"
-                    uri="self.item[0].ownNeed.uri">
+                    title="self.item[0].ownNeed['won:hasContent']['dc:title']"
+                    uri="self.item[0].ownNeed['@id']">
                 </won-square-image>
                 <div class="ril__description">
                     <div class="ril__description__topline">
-                        <div class="ril__description__topline__title">{{self.item[0].ownNeed.title}}</div>
+                        <div class="ril__description__topline__title">{{self.item[0].ownNeed['won:hasContent']['dc:title']}}</div>
                         <div class="ril__description__topline__messagecount">{{self.item.length}}</div>
                     </div>
                     <div class="ril__description__subtitle">
                         <span class="ril__description__subtitle__group" ng-show="self.item.group">
                             <img src="generated/icon-sprite.svg#ico36_group" class="ril__description__subtitle__group__icon">{{self.item.group}}<span class="ril__description__subtitle__group__dash"> &ndash; </span>
                         </span>
-                        <span class="ril__description__subtitle__type">{{self.labels.type[self.item[0].ownNeed.basicNeedType]}}</span>
+                        <span class="ril__description__subtitle__type">
+                            {{
+                                self.labels.type[
+                                    self.item[0].ownNeed['won:hasBasicNeedType']['@id']
+                                ]
+                            }}
+                        </span>
                     </div>
                 </div>
                 <div class="ril__carret">
@@ -42,19 +48,19 @@ function genComponentConf() {
                     ng-click="self.openMessage(request)">
                     <won-square-image 
                         src="request.titleImgSrc" 
-                        title="request.remoteNeed.title"
-                        uri="request.remoteNeed.uri">
+                        title="request.remoteNeed['won:hasContent']['dc:title']"
+                        uri="request.remoteNeed['@id']">
                     </won-square-image>
                     <div class="mil__item__description">
                         <div class="mil__item__description__topline">
-                            <div class="mil__item__description__topline__title">{{request.remoteNeed.title}}</div>
+                            <div class="mil__item__description__topline__title">{{request.remoteNeed['won:hasContent']['dc:title']}}</div>
                             <div class="mil__item__description__topline__date">{{request.timeStamp}}</div>
                         </div>
                         <div class="mil__item__description__subtitle">
                             <span class="mil__item__description__subtitle__group" ng-show="request.group">
                                 <img src="generated/icon-sprite.svg#ico36_group" class="mil__item__description__subtitle__group__icon">{{request.group}}<span class="mil__item__description__subtitle__group__dash"> &ndash; </span>
                             </span>
-                            <span class="mil__item__description__subtitle__type">{{self.labels.type[self.item[0].remoteNeed.basicNeedType]}}</span>
+                            <span class="mil__item__description__subtitle__type">{{self.labels.type[self.item[0].remoteNeed['won:hasBasicNeedType']['@id']]}}</span>
                         </div>
                         <div class="mil__item__description__message">
                             <span class="mil__item__description__message__indicator" ng-show="!self.read(request)"/>{{request.message}}

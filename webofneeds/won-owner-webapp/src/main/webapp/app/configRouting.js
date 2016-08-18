@@ -111,7 +111,7 @@ function postViewEnsureLoaded($ngRedux, encodedPostUri) {
          * the `initiaPageLoad` didn't load this need yet. Also
          * we can be sure it's not your need and load it as `theirNeed`.
          */
-        won.getNeed(postUri)
+        won.getNeedWithConnectionUris(postUri)
             .then(need =>
                 $ngRedux.dispatch({
                     type: actionTypes.router.accessedNonLoadedPost,

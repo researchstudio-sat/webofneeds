@@ -8,7 +8,7 @@ import {
 } from '../won-label-utils';
 import {
     attach,
-    toDate,
+    msStringToDate,
 } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
 import {
@@ -18,6 +18,7 @@ import {
     selectLastUpdateTime,
     selectOpenConnection,
     selectConnectMessageOfOpenConnection,
+    selectLastUpdatedPerConnection,
 } from '../selectors';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
@@ -30,7 +31,7 @@ function genComponentConf() {
             <div class="or__header__title">
                 <div class="or__header__title__topline">
                     <div class="or__header__title__topline__title">
-                        {{self.theirNeed.get('title')}}
+                        {{self.theirNeed.getIn(['won:hasContent','dc:title'])}}
                     </div>
                     <div class="or__header__title__topline__date">
                         {{self.timestamp}}
@@ -45,7 +46,7 @@ function genComponentConf() {
                         <span class="or__header__title__subtitle__group__dash"> &ndash; </span>
                     </span>
                     <span class="or__header__title__subtitle__type">
-                        {{self.labels.type[self.theirNeed.get('basicNeedType')]}}
+                        {{self.labels.type[self.theirNeed.getIn(['won:hasBasicNeedType','@id'])]}}
                     </span>
                 </div>
             </div>
@@ -68,18 +69,26 @@ function genComponentConf() {
                 </div>
                 -->
                 <div class="or__content__description__text"
-                    ng-show="!!self.theirNeed.get('description') || !!self.textMsg">
+                    ng-show="!!self.textMsg">
                     <img
                         class="or__content__description__indicator"
                         src="generated/icon-sprite.svg#ico16_indicator_description"/>
                     <span>
-                        <p>{{ self.theirNeed.get('description') }}</p>
                         <p>{{ self.textMsg }}</p>
+                    </span>
+                </div>
+                <div class="or__content__description__text"
+                    ng-show="!!self.theirNeed.getIn(['won:hasContent','won:hasTextDescription'])">
+                    <img
+                        class="or__content__description__indicator"
+                        src="generated/icon-sprite.svg#ico16_indicator_description"/>
+                    <span>
+                        <p>{{ self.theirNeed.getIn(['won:hasContent','won:hasTextDescription']) }}</p>
                     </span>
                 </div>
             </div>
         </div>
-        <div class="or__footer" ng-show="::(self.isReceivedRequest)">
+        <div class="or__footer" ng-show="self.isReceivedRequest">
             <input type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
             <div class="flexbuttons">
                 <button
@@ -105,6 +114,8 @@ function genComponentConf() {
                 const theirNeed = state.getIn(['needs','theirNeeds', theirNeedUri]);
                 const connectMsg = selectConnectMessageOfOpenConnection(state);
 
+                const lastUpdatedPerConnection = selectLastUpdatedPerConnection(state)
+
 
                 return {
                     theirNeed,
@@ -118,7 +129,8 @@ function genComponentConf() {
 
                     timestamp: theirNeed && relativeTime(
                         selectLastUpdateTime(state),
-                        theirNeed.get('creationDate')
+                        //theirNeed.get('dct:created')
+                        lastUpdatedPerConnection && lastUpdatedPerConnection.get(connectionUri)
                     ),
 
                     textMsg: connectMsg && (
@@ -135,7 +147,9 @@ function genComponentConf() {
 
         closeRequestItemUrl() {
             if(this.isOverview)
-                return this.isSentRequest ? "overviewSentRequests({connectionUri: null})" : "overviewIncomingRequests({connectionUri: null})";
+                return this.isSentRequest ?
+                    "overviewSentRequests({connectionUri: null})" :
+                    "overviewIncomingRequests({connectionUri: null})";
             else
                 return "post({connectionUri: null})";
         }

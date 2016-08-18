@@ -6,10 +6,24 @@
 import won from '../won-es6';
 import angular from 'angular';
 import squareImageModule from './square-image';
-import { labels } from '../won-label-utils';
+import {
+    labels,
+    relativeTime,
+} from '../won-label-utils';
 import { attach, decodeUriComponentProperly } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
-import { selectOpenConnectionUri, selectAllByConnections } from '../selectors';
+import {
+    selectOpenConnectionUri,
+    selectAllByConnections,
+    selectOpenPost,
+    selectOpenPostUri,
+    selectLastUpdatedPerConnection,
+    selectLastUpdateTime,
+} from '../selectors';
+
+import {
+    selectTimestamp,
+} from '../won-utils'
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
@@ -24,18 +38,25 @@ function genComponentConf() {
                     <won-square-image
                         src="request.titleImgSrc"
                         class="clickable"
-                        title="self.allByConnections.getIn([connectionUri, 'remoteNeed', 'title'])"
-                        uri="self.allByConnections.getIn([connectionUri, 'remoteNeed', 'uri'])"
+                        title="self.allByConnections.getIn([
+                            connectionUri, 'remoteNeed',
+                            'won:hasContent', 'dc:title'])"
+                        uri="self.allByConnections.getIn([connectionUri, 'remoteNeed', '@id'])"
                         ng-click="self.setOpen(connectionUri)">
                     </won-square-image>
                     <div class="conn__item__description">
                         <div class="conn__item__description__topline">
                             <div class="conn__item__description__topline__title clickable"
                                         ng-click="self.setOpen(connectionUri)">
-                                {{ self.allByConnections.getIn([connectionUri, 'remoteNeed', 'title']) }}
+                                {{
+                                  self.allByConnections.getIn([
+                                    connectionUri, 'remoteNeed',
+                                    'won:hasContent', 'dc:title'
+                                  ])
+                                }}
                             </div>
                             <div class="conn__item__description__topline__date">
-                                {{ self.allByConnections.getIn([connectionUri, 'connection', 'timestamp']) }}
+                                {{ self.lastUpdated.get(connectionUri) }}
                             </div>
                             <img
                                 class="conn__item__description__topline__icon"
@@ -57,7 +78,7 @@ function genComponentConf() {
                             <span class="conn__item__description__subtitle__type">
                                 {{
                                    self.labels.type[
-                                        self.allByConnections.getIn([connectionUri, 'remoteNeed', 'basicNeedType'])
+                                        self.allByConnections.getIn([connectionUri, 'remoteNeed', 'won:hasBasicNeedType', '@id'])
                                    ]
                                 }}
                             </span>
@@ -88,17 +109,10 @@ function genComponentConf() {
             const self = this;
 
             const selectFromState = (state)=>{
-                const encodedPostUri = state.getIn(['router', 'currentParams', 'postUri']) ||
-                    state.getIn(['router', 'currentParams', 'myUri']) ; // TODO old parameter
-                const postUri = decodeURIComponent(encodedPostUri);
-
-                const encodedConnectionUri = state.getIn(['router', 'currentParams', 'connectionUri']) ||
-                    state.getIn(['router', 'currentParams', 'openConversation']); // TODO old parameter
-
+                const postUri = selectOpenPostUri(state);
                 const openConnectionUri = selectOpenConnectionUri(state);
                 const allByConnections = selectAllByConnections(state);
-                const post = state.getIn(['needs','ownNeeds', postUri]);
-                const postJS = post? post.toJS() : {};
+                const post = selectOpenPost(state);
 
                 const connectionTypeInParams = decodeUriComponentProperly(
                         state.getIn(['router', 'currentParams', 'connectionType'])
@@ -109,16 +123,21 @@ function genComponentConf() {
                 const connectionUris = allByConnections
                     .filter(conn =>
                         conn.getIn(['connection', 'hasConnectionState']) === connectionType &&
-                        conn.getIn(['ownNeed', 'uri']) === postUri
+                        conn.getIn(['ownNeed', '@id']) === postUri
                     )
                     .map(conn => conn.getIn(['connection','uri']))
                     .toList().toJS();
 
+                const lastStateUpdate = selectLastUpdateTime(state);
+
                 return {
+                    lastUpdated:
+                        selectLastUpdatedPerConnection(state)
+                        .map(ts => relativeTime(lastStateUpdate, ts)),
                     connectionUris,
                     allByConnections,
                     openConversationUri: openConnectionUri,
-                    post: postJS,
+                    post: post? post.toJS() : {},
                 };
             }
 

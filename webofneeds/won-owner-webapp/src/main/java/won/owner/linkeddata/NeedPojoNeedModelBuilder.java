@@ -142,7 +142,7 @@ public class NeedPojoNeedModelBuilder extends NeedBuilderBase<Model>
                                    .addProperty(GEO.LATITUDE, Double.toString(this.getAvailableAtLocationLatitude()))
                                    .addProperty(GEO.LONGITUDE, Double.toString(this.getAvailableAtLocationLongitude()));
 
-      needModel.add(needModel.createStatement(needModality, WON.AVAILABLE_AT_LOCATION, location));
+      needModel.add(needModel.createStatement(needModality, WON.HAS_LOCATION, location));
     }
 
     // time constraint

@@ -7,7 +7,7 @@ import { repeatVar } from '../utils';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs';
 import { combineReducersStable } from '../redux-utils';
-import { draftsReducer } from './drafts-reducer';
+import draftsReducer from './drafts-reducer';
 import { messagesReducer } from './message-reducers';
 import reduceReducers from 'reduce-reducers';
 import postsReducer from './posts-reducer';

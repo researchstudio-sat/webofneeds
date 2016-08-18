@@ -3,10 +3,10 @@ import won from './won-es6';
 
 export const labels = Object.freeze({
     type: {
-        [won.WON.BasicNeedTypeDemand]: 'I want to have something',
-        [won.WON.BasicNeedTypeSupply]: 'I offer something',
-        [won.WON.BasicNeedTypeDotogether]: 'I want to do something together',
-        [won.WON.BasicNeedTypeCritique]: 'I want to change something',
+        [won.WON.BasicNeedTypeDemandCompacted]: 'I want to have something',
+        [won.WON.BasicNeedTypeSupplyCompacted]: 'I offer something',
+        [won.WON.BasicNeedTypeDotogetherCompacted]: 'I want to do something together',
+        [won.WON.BasicNeedTypeCritiqueCompacted]: 'I want to change something',
     }
 });
 
@@ -20,9 +20,19 @@ export const labels = Object.freeze({
  * @param previous
  */
 export function relativeTime(now, previous) {
+    if(!now || !previous) {
+            return undefined;
+    }
+
     now = new Date(now);
     previous = new Date(previous);
     const elapsed = now - previous; // in ms
+
+    if(isNaN(elapsed)) {
+        // one of two dates was invalid
+        return undefined;
+    }
+
 
     const msPerMinute = 60 * 1000;
     const msPerHour = msPerMinute * 60;

@@ -89,7 +89,7 @@ function genComponentConf() {
 
                 this.drafts__change__title({
                     draftId: this.draftId,
-                    title: title.replace("&nbsp;","") //TODO: MOVE THIS HACK TO VIEW LEVEL
+                    title: title.replace("&nbsp;","").trim() //TODO: MOVE THIS HACK TO VIEW LEVEL
                 });
 
                 this.drafts__change__tags({

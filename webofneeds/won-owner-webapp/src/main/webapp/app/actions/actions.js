@@ -57,6 +57,10 @@ import {
     buildOpenNeedMessage
 } from '../won-message-utils';
 
+import {
+    selectConnectionUris,
+} from '../won-utils';
+
 // </utils>
 
 // <action-creators>
@@ -131,6 +135,7 @@ const actionHierarchy = {
             description: INJ_DEFAULT,
             tags: INJ_DEFAULT,
             thumbnail: INJ_DEFAULT,
+            location: INJ_DEFAULT,
         },
 
         delete: INJ_DEFAULT,
@@ -293,8 +298,8 @@ export function draftsPublish(draft, nodeUri) {
  * @return {*}
  */
 export function getConnectionRelatedData(needUri, remoteNeedUri, connectionUri) {
-    const remoteNeed = won.getNeed(remoteNeedUri);
-    const ownNeed = won.getNeed(needUri);
+    const remoteNeed = won.getTheirNeed(remoteNeedUri);
+    const ownNeed = won.getNeedWithConnectionUris(needUri);
     const connection = won.getConnection(connectionUri);
     const events = won.getEventsOfConnection(connectionUri, needUri)
         .then(eventsLookup => {
@@ -346,7 +351,9 @@ export function needsOpen(needUri) {
                     type: actionTypes.needs.reopen,
                     payload: {
                         ownNeedUri: needUri,
-                        affectedConnections: getState().getIn(['needs', 'ownNeeds', needUri, 'hasConnections'])
+                        affectedConnections: selectConnectionUris(
+                                getState().getIn(['needs', 'ownNeeds', needUri])
+                            )
                     }
                 })
         )
@@ -372,7 +379,9 @@ export function needsClose(needUri) {
                 type: actionTypes.needs.close,
                 payload: {
                     ownNeedUri: needUri,
-                    affectedConnections: getState().getIn(['needs', 'ownNeeds', needUri, 'hasConnections'])
+                    affectedConnections: selectConnectionUris(
+                        getState().getIn(['needs', 'ownNeeds', needUri])
+                    )
                 }
             })
         )

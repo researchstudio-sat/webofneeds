@@ -75,6 +75,7 @@ won-post-item-line {
       }
 
       &__caption {
+        line-height: $bigiconSize;
         padding-left: 0.5em;
         min-width: 0.5rem;
         color: black;

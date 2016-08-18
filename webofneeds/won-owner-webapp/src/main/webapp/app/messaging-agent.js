@@ -263,7 +263,7 @@ export function runMessagingAgent(redux) {
             }
 
             if(!messageProcessed){
-                console.warn("MESSAGE WAS PROCESSED DUE TO MISSING IMPLEMENTATION: ", events);
+                console.warn("MESSAGE WASN'T PROCESSED DUE TO MISSING HANDLER FOR ITS TYPE: ", events);
             }
         })
     };
@@ -294,7 +294,7 @@ export function runMessagingAgent(redux) {
 
                 }).catch(error => {
                     console.log("you lost the session we will call logout for you");
-                    redux.dispatch(actionCreators.logout)
+                    redux.dispatch(actionCreators.logout())
                 });
         } else if (reconnectAttempts > 1) {
             setTimeout(() => {
