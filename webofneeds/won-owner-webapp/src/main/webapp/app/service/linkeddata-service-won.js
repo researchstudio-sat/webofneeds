@@ -712,6 +712,20 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
             });
     };
 
+    function fetchesPartialRessource(requestParams) {
+        if(requestParams.pagingSize) {
+                return true;
+            } else {
+                const qp = requestParams.queryParams || requestParams;
+                return !!(qp['p'] ||
+                          qp['resumebefore'] ||
+                          qp['resumeafter'] ||
+                          qp['type'] ||
+                          qp['state'] ||
+                          qp['timeof']);
+            }
+    };
+
     function selectLoadedResourcesFromDataset(dataset) {
         /*
          * create a temporary store to load the dataset into
