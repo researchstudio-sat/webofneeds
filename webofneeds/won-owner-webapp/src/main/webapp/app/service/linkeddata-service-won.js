@@ -23,6 +23,7 @@ import {
     urisToLookupMap,
     is,
     clone,
+    contains,
     camel2Hyphen,
 } from '../utils';
 import * as q from 'q';
@@ -35,22 +36,23 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     if(!won) won = {};
 
 
+    const legitQueryParameters = ['p', 'resumebefore', 'resumeafter', 'type', 'state', 'timeof'];
     /**
      * This function is used to generate the query-strings.
      * Should anything about the way the API is accessed changed,
      * adapt this function.
      * @param dataUri
-     * @param requesterWebId: the WebID used to access the ressource (used
-     *          by the owner-server to pick the right key-pair)
      * @param queryParams a config object whose fields get appended as get parameters.
      *               important parameters include:
+     *                 * requesterWebId: the WebID used to access the ressource (used
+     *                         by the owner-server to pick the right key-pair)
      *                 * deep: 'true' to automatically resolve containers (e.g.
      *                         the event-container)
      *                 * paging parameters as found
      *                   [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
      * @returns {string}
      */
-    function queryString(dataUri, requesterWebId, queryParams) {
+    function queryString(dataUri, requesterWebId, queryParams = {}) {
         let queryOnOwner = '/owner/rest/linked-data/?';
         if(requesterWebId) {
             queryOnOwner +=
@@ -61,10 +63,10 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
 
         // The owner hands this part -- the one in the `uri=` paramater -- directly to the node.
         let queryOnNode = dataUri;
-        if(queryParams) {
-            let firstParam = true;
-            for(let [paramName, paramValue] of entries(queryParams)) {
-                queryOnNode = queryOnNode + (firstParam? '?' : '&');
+        let firstParam = true;
+        for(let [paramName, paramValue] of entries(queryParams)) {
+            if(contains(legitQueryParameters, paramName)) {
+                queryOnNode = queryOnNode + (firstParam ? '?' : '&');
                 firstParam = false;
                 queryOnNode = queryOnNode + paramName + '=' + paramValue;
             }
@@ -659,12 +661,12 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
          * Atm we risk running parallel requests.
          */
         //uri isn't loaded or needs to be refrehed. fetch it.
-        const queryParams = {};
+        const queryParams = { requesterWebId };
         if(deep) queryParams.deep = 'true';
         if(layerSize) queryParams['layer-size'] = layerSize;
 
         cacheItemMarkFetching(uri);
-        return won.fetch(uri, { requesterWebId, queryParams } )
+        return won.fetch(uri, queryParams )
             .then(
                 (dataset) => {
                     if(!deep) {
@@ -798,7 +800,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     function loadFromOwnServerIntoCache(uri, params) { //requesterWebId, queryParams) {
         return new Promise((resolve, reject) => {
 
-            let requestUri = queryString(uri, params.requesterWebId, params.queryParams);
+            let requestUri = queryString(uri, params.requesterWebId, params);
 
             console.log("linkeddata-service-won.js: fetching:        " + requestUri);
 
