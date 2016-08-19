@@ -97,12 +97,22 @@ function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
 
 function addOwnNeed(allNeeds, ownNeed) {
     const ownNeed_ = Immutable.fromJS(ownNeed);
-    return setIfNew(allNeeds, ['ownNeeds', ownNeed_.get('@id')], ownNeed_);
+    if(ownNeed_.get('@id')) {
+        return setIfNew(allNeeds, ['ownNeeds', ownNeed_.get('@id')], ownNeed_);
+    } else {
+        return allNeeds;
+    }
+    //return setIfNew(allNeeds, ['ownNeeds', ownNeed_.get('@id')], ownNeed_);
 }
 
 function addTheirNeed(allNeeds, theirNeed) {
     const theirNeed_ = Immutable.fromJS(theirNeed);
-    return setIfNew(allNeeds, ['theirNeeds', theirNeed_.get('@id')], theirNeed_);
+    //return setIfNew(allNeeds, ['theirNeeds', theirNeed_.get('@id')], theirNeed_);
+    if(theirNeed.get('@id')) {
+        return setIfNew(allNeeds, ['theirNeeds', theirNeed_.get('@id')], theirNeed_);
+    } else {
+        return allNeeds;
+    }
 }
 
 /**
