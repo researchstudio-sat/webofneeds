@@ -23,6 +23,7 @@ import {
     urisToLookupMap,
     is,
     clone,
+    camel2Hyphen,
 } from '../utils';
 import * as q from 'q';
 
@@ -39,36 +40,43 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * Should anything about the way the API is accessed changed,
      * adapt this function.
      * @param dataUri
-     * @param requesterWebId the auth-token for the post (NOT the sessionId-cookie)
-     * @deep if true, a query with this string will cause connections and events
-     * of a need to be queried along with it in one big request.
-     * @layerSize if you only want to fetch the latest N events of every connection
-     *  and N connections with latest updates.
+     * @param requesterWebId: the WebID used to access the ressource (used
+     *          by the owner-server to pick the right key-pair)
+     * @param queryParams a config object whose fields get appended as get parameters.
+     *               important parameters include:
+     *                 * deep: 'true' to automatically resolve containers (e.g.
+     *                         the event-container)
+     *                 * paging parameters as found
+     *                   [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
      * @returns {string}
      */
-    function queryString(dataUri, requesterWebId, deep, layerSize) {
-        /*
-        e.g. a full query with everything set might look like:
-        https://192.168.124.53:8443/owner/rest/linked-data/
-        ?uri=https://192.168.124.53:8443/won/resource/need/6384164629658481000/deep
-        &layer-size=5
-        &requester=https://192.168.124.53:8443/won/resource/need/6384164629658481000
-        */
-        let requestUri = '/owner/rest/linked-data/?uri=' + encodeURIComponent(dataUri);
-        if (deep) {
-            requestUri = requestUri + '/deep';
+    function queryString(dataUri, requesterWebId, queryParams) {
+        let queryOnOwner = '/owner/rest/linked-data/?';
+        if(requesterWebId) {
+            queryOnOwner +=
+                'requester=' +
+                encodeURIComponent(requesterWebId) +
+                '&';
         }
-        if (layerSize) {
-            /*
-             * the ? is because this parameter is still part of the`uri`-parameter
-             * that is passed on to the node.
-             */
-            requestUri = requestUri + '?layer-size=' + layerSize;
+
+        // The owner hands this part -- the one in the `uri=` paramater -- directly to the node.
+        let queryOnNode = dataUri;
+        if(queryParams) {
+            let firstParam = true;
+            for(let [paramName, paramValue] of entries(queryParams)) {
+                queryOnNode = queryOnNode + (firstParam? '?' : '&');
+                firstParam = false;
+                queryOnNode = queryOnNode + paramName + '=' + paramValue;
+            }
         }
-        if (requesterWebId) {
-            requestUri = requestUri + '&requester=' + encodeURIComponent(requesterWebId);
-        }
-        return requestUri;
+
+        let query = queryOnOwner +
+            'uri=' + encodeURIComponent(queryOnNode);
+
+        // server can't resolve uri-encoded colons. revert the encoding done in `queryString`.
+        query = query.replace(new RegExp('%3A', 'g'), ':');
+
+        return query;
     }
 
     var privateData = {};
@@ -650,8 +658,12 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
          * Atm we risk running parallel requests.
          */
         //uri isn't loaded or needs to be refrehed. fetch it.
+        const queryParams = {};
+        if(deep) queryParams.deep = 'true';
+        if(layerSize) queryParams['layer-size'] = layerSize;
+
         cacheItemMarkFetching(uri);
-        return won.fetch(uri, requesterWebId, deep, layerSize)
+        return won.fetch(uri, { requesterWebId, queryParams } )
             .then(
                 (dataset) => {
                     if(!deep) {
@@ -679,22 +691,17 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * Fetches the rdf-node with the given uri from
      * the standard API_ENDPOINT.
      * @param uri
-     * @param requesterWebId the auth-token for the post (NOT the sessionId-cookie)
-     * Usually the uri of the need that `uri` belongs to.
-     * @deep if true, a query with this string will cause connections and events
-     * of a need to be queried along with it in one big request.
-     * @layerSize if you only want to fetch the latest N events of every connection
-     *  and N connections with latest updates.
+     * @param params: see `loadFromOwnServerIntoCache`
      * @returns {*}
      */
-    won.fetch = function(uri, requesterWebId, deep = false, layerSize = 0) {
+    won.fetch = function(uri, params) {
         if (typeof uri === 'undefined' || uri == null  ){
             throw {message : "fetch: uri must not be null"};
         }
         //console.log("linkeddata-service-won.js: fetch announced: " + uri);
         const lock = getReadUpdateLockPerUri(uri);
         return lock.acquireUpdateLock().then(
-                () => loadFromOwnServerIntoCache(uri, requesterWebId, deep, layerSize)
+                () => loadFromOwnServerIntoCache(uri, params)
             ).then(dataset => {
                 lock.releaseUpdateLock();
                 return dataset;
@@ -760,20 +767,36 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         return allLoadedResourcesP;
     }
 
-    function loadFromOwnServerIntoCache(uri, requesterWebId, deep, layerSize) {
-        return new Promise((resolve, reject) => {
-            console.log("linkeddata-service-won.js: fetching:        " + uri);
 
-            let requestUri = queryString(uri, requesterWebId, deep, layerSize);
-            const find = '%3A';
-            const re = new RegExp(find, 'g');
-            requestUri = requestUri.replace(re, ':');
+    /**
+     *
+     * @param uri the uri of the ressource
+     * @param params: optional paramters
+     *        * requesterWebId: the WebID used to access the ressource (used
+     *            by the owner-server to pick the right key-pair)
+     *        * queryParams: GET-params as documented for `queryString`
+     *        * pagingSize: if specified the server will return the first
+     *            page (unless e.g. `queryParams.p=2` is specified when
+     *            it will return the second page of size N)
+     * @return {Promise}
+     */
+    function loadFromOwnServerIntoCache(uri, params) { //requesterWebId, queryParams) {
+        return new Promise((resolve, reject) => {
+
+            let requestUri = queryString(uri, params.requesterWebId, params.queryParams);
+
+            console.log("linkeddata-service-won.js: fetching:        " + requestUri);
 
             fetch(requestUri, {
-                    method: 'get',
-                    credentials: "same-origin",
-                    headers: { 'Accept': 'application/ld+json' }
-                })
+                method: 'get',
+                credentials: "same-origin",
+                headers: {
+                    'Accept': 'application/ld+json',
+                    'Prefer': params.pagingSize?
+                        `return=representation; max-member-count="${ params.pagingSize }"` :
+                        undefined,
+                }
+            })
             .then(dataset =>
                 dataset.json())
             .then(
