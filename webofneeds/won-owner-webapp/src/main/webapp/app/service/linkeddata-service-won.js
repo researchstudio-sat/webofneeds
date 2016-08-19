@@ -374,9 +374,10 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         privateData.cacheStatus[uri].state = CACHE_ITEM_STATE.DIRTY;
     }
 
-    var cacheItemMarkUnresolvable = function cacheItemMarkUnresolvable(uri){
+    var cacheItemMarkUnresolvable = function cacheItemMarkUnresolvable(uri, reason){
         //console.log("linkeddata-service-won.js: mark unres:      " + uri);
         privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.UNRESOLVABLE};
+        console.error("Couldn't resolve " + uri + ". reason: " + JSON.stringify(reason));
     }
 
     var cacheItemMarkFetching = function cacheItemMarkFetching(uri){
@@ -682,7 +683,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                         )
                     }
                 },
-                reason => cacheItemMarkUnresolvable(uri)
+                reason => cacheItemMarkUnresolvable(uri, reason)
             )
 
     };
