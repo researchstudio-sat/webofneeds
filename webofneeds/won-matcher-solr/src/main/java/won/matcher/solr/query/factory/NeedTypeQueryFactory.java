@@ -16,15 +16,13 @@ public class NeedTypeQueryFactory extends NeedDatasetQueryFactory
 
   private static final String NEED_TYPE_SOLR_FIELD = "_graph.http___purl.org_webofneeds_model_hasBasicNeedType._id";
 
+  private String matchNeedType;
+
   public NeedTypeQueryFactory(final Dataset need) {
     super(need);
-  }
-
-  @Override
-  protected String makeQueryString() {
 
     String basicNeedType = RdfUtils.findOnePropertyFromResource(needDataset, null, WON.HAS_BASIC_NEED_TYPE).asResource().toString();
-    String matchNeedType = null;
+    matchNeedType = null;
     if (DEMAND.equalsIgnoreCase(basicNeedType)) {
       matchNeedType = SUPPLY;
     } else if (SUPPLY.equalsIgnoreCase(basicNeedType)) {
@@ -34,7 +32,11 @@ public class NeedTypeQueryFactory extends NeedDatasetQueryFactory
     } else if (CRITIQUE.equalsIgnoreCase(basicNeedType)) {
       matchNeedType = CRITIQUE;
     }
-    return new ExactMatchFieldQuery(NEED_TYPE_SOLR_FIELD, matchNeedType).createQuery();
+  }
+
+  @Override
+  protected String makeQueryString() {
+    return new ExactMatchFieldQueryFactory(NEED_TYPE_SOLR_FIELD, matchNeedType).createQuery();
   }
 
 }

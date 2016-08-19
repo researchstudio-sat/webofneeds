@@ -71,7 +71,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
   public void addTermsToTitleQuery(String terms, double boost) {
 
     if (terms != null && !terms.trim().isEmpty()) {
-      SolrQueryFactory qf = new MatchFieldQuery(NEED_TITLE_SOLR_FIELD, terms);
+      SolrQueryFactory qf = new MatchFieldQueryFactory(NEED_TITLE_SOLR_FIELD, terms);
       qf.setBoost(boost);
       contentFactories.add(qf);
     }
@@ -80,7 +80,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
   public void addTermsToDescriptionQuery(String terms, double boost) {
 
     if (terms != null && !terms.trim().isEmpty()) {
-      SolrQueryFactory qf = new MatchFieldQuery(NEED_DESCRIPTION_SOLR_FIELD, terms);
+      SolrQueryFactory qf = new MatchFieldQueryFactory(NEED_DESCRIPTION_SOLR_FIELD, terms);
       qf.setBoost(boost);
       contentFactories.add(qf);
     }
@@ -89,7 +89,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
   public void addTermsToTagQuery(String terms, double boost) {
 
     if (terms != null && !terms.trim().isEmpty()) {
-      SolrQueryFactory qf = new MatchFieldQuery(NEED_TAG_SOLR_FIELD, terms);
+      SolrQueryFactory qf = new MatchFieldQueryFactory(NEED_TAG_SOLR_FIELD, terms);
       qf.setBoost(boost);
       contentFactories.add(qf);
     }

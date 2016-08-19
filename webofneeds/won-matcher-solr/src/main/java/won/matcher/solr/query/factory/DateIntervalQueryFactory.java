@@ -1,18 +1,21 @@
 package won.matcher.solr.query.factory;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Created by hfriedrich on 12.08.2016.
  */
-public class DateIntervalQueryFactory extends MatchFieldQuery
+public class DateIntervalQueryFactory extends MatchFieldQueryFactory
 {
   public DateIntervalQueryFactory(final String fieldName, final String value) {
     super(fieldName, value);
   }
 
-  public DateIntervalQueryFactory(final String fieldName, final Date date1, final Date date2) {
+  public DateIntervalQueryFactory(final String fieldName, final ZonedDateTime dateTime1, final ZonedDateTime dateTime2) {
+
     this.fieldName = fieldName;
-    this.value = "[" + date1.toString() + " TO " + date2.toString() + "]";
+    this.value = "[" + dateTime1.format(DateTimeFormatter.ISO_DATE_TIME) + " TO " +
+      dateTime2.format(DateTimeFormatter.ISO_DATE_TIME) + "]";
   }
 }

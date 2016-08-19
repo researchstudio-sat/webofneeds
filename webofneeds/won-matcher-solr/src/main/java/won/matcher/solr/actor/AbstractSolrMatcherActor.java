@@ -11,6 +11,7 @@ import com.hp.hpl.jena.query.Dataset;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
@@ -22,6 +23,7 @@ import won.matcher.solr.index.NeedIndexer;
 import won.matcher.solr.query.DefaultMatcherQueryExecuter;
 import won.matcher.solr.query.SolrMatcherQueryExecutor;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
+import won.matcher.solr.query.factory.CreationDateQueryFactory;
 import won.matcher.solr.query.factory.DefaultNeedQueryFactory;
 import won.matcher.solr.query.factory.NeedStateQueryFactory;
 import won.matcher.solr.query.factory.NeedTypeQueryFactory;
@@ -29,6 +31,7 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Siren/Solr based abstract matcher with all implementations for querying as well as indexing needs.
@@ -49,6 +52,7 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
   private NeedIndexer needIndexer;
 
   @Autowired
+  @Qualifier("defaultMatcherQueryExecuter")
   DefaultMatcherQueryExecuter defaultQueryExecuter;
 
   @Autowired
@@ -84,10 +88,11 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     DefaultNeedQueryFactory needQueryFactory = new DefaultNeedQueryFactory(dataset);
     String queryString = needQueryFactory.createQuery();
 
-    // add filters to the query (more filters for date intervals and location can be added here too)
-    String[] filterQueries = new String[2];
+    // add filters to the query: right need type, need status active, creation date overlap 1 month
+    String[] filterQueries = new String[3];
     filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
     filterQueries[1] = new NeedTypeQueryFactory(dataset).createQuery();
+    filterQueries[2] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
 
     log.info("query Solr endpoint {} for need {}", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
     SolrDocumentList docs = executeQuery(queryExecutor, queryString, filterQueries);
