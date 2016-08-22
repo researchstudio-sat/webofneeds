@@ -110,10 +110,12 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
   @Override
   protected String makeQueryString() {
 
+    // add the term queries of the title, description and tags fields
     SolrQueryFactory[] factoryArray = new SolrQueryFactory[contentFactories.size()];
     BooleanQueryFactory contentQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR,
                                                                contentFactories.toArray(factoryArray));
 
-    return contentQuery.createQuery();
+    // add a multiplicative boost for the closer geographical distances
+    return new GeoDistBoostQueryFactory(needDataset).createQuery() + contentQuery.createQuery();
   }
 }

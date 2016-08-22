@@ -45,9 +45,15 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor
     log.debug("use query: {} with filters {}", queryString, filterQueries);
     query.setQuery(queryString);
     query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD, BasicNeedQueryFactory.NEED_TITLE_SOLR_FIELD);
-    query.setFilterQueries(filterQueries);
     query.setRows(config.getMaxHints());
-    query.add(params);
+
+    if (filterQueries != null) {
+      query.setFilterQueries(filterQueries);
+    }
+
+    if (params != null) {
+      query.add(params);
+    }
 
     try {
       QueryResponse response = solrClient.query(query);

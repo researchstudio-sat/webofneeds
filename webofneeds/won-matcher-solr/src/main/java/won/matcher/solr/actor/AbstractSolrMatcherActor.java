@@ -83,6 +83,8 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     boolean usedForTesting = WonRdfUtils.NeedUtils.hasFlag(dataset, needEvent.getUri(), WON.USED_FOR_TESTING);
     SolrMatcherQueryExecutor queryExecutor = (usedForTesting ? testQueryExecuter : defaultQueryExecuter);
 
+    // default query matches content terms (of fields title, description and tags) with different weights
+    // and gives an additional multiplicative boost for geographically closer needs
     DefaultNeedQueryFactory needQueryFactory = new DefaultNeedQueryFactory(dataset);
     String queryString = needQueryFactory.createQuery();
 
@@ -91,11 +93,10 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
     filterQueries[1] = new NeedTypeQueryFactory(dataset).createQuery();
     filterQueries[2] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
-    LocationParamsFactory locationParamFactory = new LocationParamsFactory(dataset);
 
     log.info("query Solr endpoint {} for need {}", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
     SolrDocumentList docs = executeQuery(
-      queryExecutor, queryString, locationParamFactory.createParams(), filterQueries);
+      queryExecutor, queryString, null, filterQueries);
 
     if (docs != null) {
       BulkHintEvent events = produceHints(docs, needEvent);
