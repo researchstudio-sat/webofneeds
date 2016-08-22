@@ -52,7 +52,14 @@ function genComponentConf() {
                     {{ self.post.getIn(['won:hasContent','won:hasTextDescription'])}}
                 </p>
 
-                <!-- TODO tags -->
+                <h2 class="post-info__heading"
+                    ng-show="self.post.getIn(['won:hasContent','won:hasTag'])">
+                    Tags
+                </h2>
+                <div class="post-info__details post-info__tags"
+                    ng-show="self.post.getIn(['won:hasContent','won:hasTag'])">
+                        <span class="post-info__tags__tag" ng-repeat="tag in self.post.getIn(['won:hasContent','won:hasTag']).toJS()">{{tag}}</span>
+                </div>
 
                 <h2 class="post-info__heading"
                     ng-show="self.location">
