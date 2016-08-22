@@ -48,7 +48,7 @@ public class SolrMatcherQueryTest
         String query = needQuery.createQuery();
         System.out.println("execute query: " + query);
 
-        SolrDocumentList docs = queryExecutor.executeNeedQuery(query, new NeedTypeQueryFactory(ds).createQuery());
+        SolrDocumentList docs = queryExecutor.executeNeedQuery(query, null, new NeedTypeQueryFactory(ds).createQuery());
         SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
 
         System.out.println("Found docs: " + docs.size() + ", keep docs: " + matchedDocs.size());

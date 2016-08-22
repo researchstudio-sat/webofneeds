@@ -10,6 +10,7 @@ import com.github.jsonldjava.core.JsonLdError;
 import com.hp.hpl.jena.query.Dataset;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.SolrParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -23,10 +24,7 @@ import won.matcher.solr.index.NeedIndexer;
 import won.matcher.solr.query.DefaultMatcherQueryExecuter;
 import won.matcher.solr.query.SolrMatcherQueryExecutor;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
-import won.matcher.solr.query.factory.CreationDateQueryFactory;
-import won.matcher.solr.query.factory.DefaultNeedQueryFactory;
-import won.matcher.solr.query.factory.NeedStateQueryFactory;
-import won.matcher.solr.query.factory.NeedTypeQueryFactory;
+import won.matcher.solr.query.factory.*;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
@@ -93,9 +91,11 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
     filterQueries[1] = new NeedTypeQueryFactory(dataset).createQuery();
     filterQueries[2] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
+    LocationParamsFactory locationParamFactory = new LocationParamsFactory(dataset);
 
     log.info("query Solr endpoint {} for need {}", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-    SolrDocumentList docs = executeQuery(queryExecutor, queryString, filterQueries);
+    SolrDocumentList docs = executeQuery(
+      queryExecutor, queryString, locationParamFactory.createParams(), filterQueries);
 
     if (docs != null) {
       BulkHintEvent events = produceHints(docs, needEvent);
@@ -112,10 +112,10 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     return dataset;
   }
 
-  protected SolrDocumentList executeQuery(SolrMatcherQueryExecutor queryExecutor, String queryString,
+  protected SolrDocumentList executeQuery(SolrMatcherQueryExecutor queryExecutor, String queryString, SolrParams params,
                                           String... filterQueries) throws IOException, SolrServerException {
 
-    return queryExecutor.executeNeedQuery(queryString, filterQueries);
+    return queryExecutor.executeNeedQuery(queryString, params, filterQueries);
   }
 
   protected BulkHintEvent produceHints(SolrDocumentList docs, NeedEvent needEvent) {

@@ -7,6 +7,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrException;
+import org.apache.solr.common.params.SolrParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor
   }
 
   @Override
-  public SolrDocumentList executeNeedQuery(String queryString, String... filterQueries)
+  public SolrDocumentList executeNeedQuery(String queryString, SolrParams params, String... filterQueries)
     throws IOException, SolrServerException {
 
     SolrQuery query = new SolrQuery();
@@ -46,6 +47,7 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor
     query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD, BasicNeedQueryFactory.NEED_TITLE_SOLR_FIELD);
     query.setFilterQueries(filterQueries);
     query.setRows(config.getMaxHints());
+    query.add(params);
 
     try {
       QueryResponse response = solrClient.query(query);

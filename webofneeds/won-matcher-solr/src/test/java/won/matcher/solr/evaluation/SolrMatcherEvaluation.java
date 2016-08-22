@@ -202,7 +202,7 @@ public class SolrMatcherEvaluation
     TestNeedQueryFactory needQuery = new TestNeedQueryFactory(need);
 
     SolrDocumentList docs = queryExecutor.executeNeedQuery(
-      needQuery.createQuery(), new NeedTypeQueryFactory(need).createQuery());
+      needQuery.createQuery(), null, new NeedTypeQueryFactory(need).createQuery());
 
     SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
 

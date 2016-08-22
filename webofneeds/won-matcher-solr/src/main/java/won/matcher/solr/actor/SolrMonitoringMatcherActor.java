@@ -4,6 +4,7 @@ import com.github.jsonldjava.core.JsonLdError;
 import com.hp.hpl.jena.query.Dataset;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.SolrParams;
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
@@ -50,13 +51,13 @@ public class SolrMonitoringMatcherActor extends AbstractSolrMatcherActor
   }
 
   @Override
-  protected SolrDocumentList executeQuery(SolrMatcherQueryExecutor queryExecutor, String queryString,
+  protected SolrDocumentList executeQuery(SolrMatcherQueryExecutor queryExecutor, String queryString, SolrParams params,
                                           String... filterQueries) throws IOException, SolrServerException {
 
     Stopwatch stopwatch = SimonManager.getStopwatch("executeQuery");
     Split split = stopwatch.start();
 
-    SolrDocumentList docs = super.executeQuery(queryExecutor, queryString, filterQueries);
+    SolrDocumentList docs = super.executeQuery(queryExecutor, queryString, params, filterQueries);
 
     split.stop();
     return docs;

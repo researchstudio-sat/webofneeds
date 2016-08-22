@@ -744,6 +744,29 @@ public class WonRdfUtils
 
       return ret;
     }
+
+    public static Float getLocationLatitude(Model need, URI needUri) {
+      Path propertyPath = PathParser.parse("won:hasContent/won:hasContentDescription/won:hasLocation/<s:geo>/<s:latitude>",
+                                           DefaultPrefixUtils.getDefaultPrefixes());
+      Float latitude = null;
+      String lat = RdfUtils.getStringPropertyForPropertyPath(need, needUri, propertyPath);
+      if (lat != null) {
+        latitude = new Float(lat);
+      }
+      return latitude;
+    }
+
+    public static Float getLocationLongitude(Model need, URI needUri) {
+      Path propertyPath = PathParser.parse("won:hasContent/won:hasContentDescription/won:hasLocation/<s:geo>/<s:longitude>",
+                                           DefaultPrefixUtils.getDefaultPrefixes());
+      Float longitude = null;
+      String lon = RdfUtils.getStringPropertyForPropertyPath(need, needUri, propertyPath);
+      if (lon != null) {
+        longitude = new Float(lon);
+      }
+      return longitude;
+    }
+
   }
 
   private static Model createModelWithBaseResource() {

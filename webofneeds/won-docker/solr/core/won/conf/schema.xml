@@ -440,10 +440,10 @@
   <fieldType name="tlongs" class="solr.TrieLongField" positionIncrementGap="0" docValues="true" multiValued="true" precisionStep="8"/>
 
   <!-- define the fields we query fixed and let the other be created dynamically -->
-  <field name="_graph.http___purl.org_dc_terms_created._value" type="tdates"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasBasicNeedType._id" type="string"/>
-  <field name="_graph.http___purl.org_webofneeds_model_isInState._id" type="string"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasFlag._id" type="string" multiValued="true"/>
+  <field name="_graph.http___purl.org_dc_terms_created._value" type="tdates" indexed="true" stored="true"/>
+  <field name="_graph.http___purl.org_webofneeds_model_hasBasicNeedType._id" type="string" indexed="true" stored="true"/>
+  <field name="_graph.http___purl.org_webofneeds_model_isInState._id" type="string" indexed="true" stored="true"/>
+  <field name="_graph.http___purl.org_webofneeds_model_hasFlag._id" type="string" multiValued="true" indexed="true" stored="true"/>
 
   <!--
   <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_dc_elements_1.1_title" type="text_standard"/>
@@ -453,11 +453,14 @@
 
   <!-- Use stemming and synonyms on index for the content fields -->
   <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_dc_elements_1.1_title"
-         type="text_en_syn_stem" termVectors="true"/>
+         type="text_en_syn_stem" termVectors="true" indexed="true" stored="true"/>
   <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTag"
-         type="text_en_syn_stem" termVectors="true"/>
+         type="text_en_syn_stem" termVectors="true" indexed="true" stored="true"/>
   <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTextDescription"
-         type="text_en_syn_stem" termVectors="true"/>
+         type="text_en_syn_stem" termVectors="true" indexed="true" stored="true"/>
+
+  <!-- location fields for spatial queries -->
+  <field name="need_location" type="location" indexed="true" stored="true"/>
 
   <!-- <field name="_graph._id" type="text_general"/>
   <field name="_graph._type" type="text_general"/>
