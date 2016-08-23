@@ -689,7 +689,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         return won.fetch(uri, fetchParams )
             .then(
                 (dataset) => {
-                    if(! (fetchParams && fetchParams.deep) ) {
+                    if( !(fetchParams && fetchParams.deep) ) {
                         cacheItemInsertOrOverwrite(uri);
                         return uri;
                     } else {
