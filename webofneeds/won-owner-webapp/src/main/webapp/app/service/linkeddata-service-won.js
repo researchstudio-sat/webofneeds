@@ -863,9 +863,20 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                         //console.log("linkeddata-service-won.js: fetched:         " + uri)
                         Promise.resolve()
                             .then(() =>
-                                won.deleteNode(uri)) //remove any remaining stale data
+                                fetchesPartialRessource(params) ?
+                                    /* as paging is only used for containers
+                                     * and they don't lose entries, we can
+                                     * simply merge on top of the already
+                                     * loaded triples below. So we skip removing
+                                     * the previously loaded data here:
+                                     */
+                                    undefined : //NOP
+                                    /* remove any remaining stale data: */
+                                    won.deleteNode(uri)
+                            )
                             .then(() =>
-                                won.addJsonLdData(uri, dataset))
+                                won.addJsonLdData(uri, dataset)
+                            )
                             .then(() =>
                                 resolve(dataset));
                     }
