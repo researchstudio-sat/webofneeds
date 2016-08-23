@@ -57,12 +57,12 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      *           [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
      * @returns {string}
      */
-    function queryString(dataUri, requesterWebId, queryParams = {}) {
+    function queryString(dataUri, queryParams = {}) {
         let queryOnOwner = '/owner/rest/linked-data/?';
-        if(requesterWebId) {
+        if(queryParams.requesterWebId) {
             queryOnOwner +=
                 'requester=' +
-                encodeURIComponent(requesterWebId) +
+                encodeURIComponent(queryParams.requesterWebId) +
                 '&';
         }
 
@@ -838,7 +838,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     function loadFromOwnServerIntoCache(uri, params) { //requesterWebId, queryParams) {
         return new Promise((resolve, reject) => {
 
-            let requestUri = queryString(uri, params.requesterWebId, params);
+            let requestUri = queryString(uri, params);
 
             console.log("linkeddata-service-won.js: fetching:        " + requestUri);
 
