@@ -558,15 +558,24 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * The uri is used for cache control.
      */
     won.addJsonLdData = function(uri, data) {
-        //console.log("linkeddata-service-won.js: storing jsonld data for uri: " + uri);
-        privateData.store.load("application/ld+json", data, function (success, results) {
-            //privateData.store.load("application/ld+json", data, function (success, results) {
-            //console.log("linkeddata-service-won.js: added jsonld data to rdf store, success: " + success);
-            if (success) {
-                cacheItemInsertOrOverwrite(uri);
-            }
-        });
-    }
+        return new Promise((resolve, reject) =>
+            //console.log("linkeddata-service-won.js: storing jsonld data for uri: " + uri);
+            privateData.store.load("application/ld+json", data, function (success, results) {
+                //privateData.store.load("application/ld+json", data, function (success, results) {
+                //console.log("linkeddata-service-won.js: added jsonld data to rdf store, success: " + success);
+                if (success) {
+                    //TODO if this was a partial fetch, only mark
+                    // as OK if all requests to the ressource have
+                    // finished.
+                    cacheItemInsertOrOverwrite(uri);
+                    resolve(uri);
+                } else {
+                    reject('Failed to store json-ld data for ' + uri);
+                }
+
+            })
+        );
+    };
 
 
     /**
