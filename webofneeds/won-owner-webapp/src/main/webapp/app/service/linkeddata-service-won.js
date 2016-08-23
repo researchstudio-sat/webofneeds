@@ -680,11 +680,6 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
             console.log('won.ensureLoaded: loading partial ressource ', fetchParams);
         }
 
-        /*
-         * TODO we can't mark all resources as fetching when doing
-         * a deep request. We need to find a way to deal with this.
-         * Atm we risk running parallel requests.
-         */
         cacheItemMarkFetching(uri);
         return won.fetch(uri, fetchParams )
             .then(
@@ -698,9 +693,6 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                         ).then(allLoadedResources => {
                                 //console.log('linkeddata-service-won.js: ensuring loaded deep: ', allLoadedResources);
                                 allLoadedResources.forEach(resourceUri =>
-                                        //TODO if this was a partial fetch, only mark
-                                        // as OK if all requests to the ressource have
-                                        // finished.
                                         cacheItemInsertOrOverwrite(resourceUri)
                                 )
                                 return allLoadedResources;
