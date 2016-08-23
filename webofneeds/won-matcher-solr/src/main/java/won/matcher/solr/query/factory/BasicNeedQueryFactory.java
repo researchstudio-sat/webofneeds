@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.util.ArrayList;
@@ -61,8 +62,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
     }
 
     try {
-      tagTerms = RdfUtils.findOnePropertyFromResource(need, null, WON.HAS_TAG).asLiteral().getString();
-      tagTerms = filterCharsAndKeyWords(tagTerms);
+      tagTerms = "\"" + String.join("\" \"", WonRdfUtils.NeedUtils.getTags(need)) + "\"";
     } catch (IncorrectPropertyCountException e) {
       log.debug("Tags not found in RDF dataset: " + e.toString());
     }

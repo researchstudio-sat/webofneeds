@@ -767,6 +767,25 @@ public class WonRdfUtils
       return longitude;
     }
 
+    public static List<String> getTags(Dataset needDataset) {
+
+      List<String> tags = new LinkedList<>();
+      Model model = NeedUtils.getNeedModelFromNeedDataset(needDataset);
+      URI needURI = NeedUtils.getNeedURI(needDataset);
+      Resource needContent = model.getResource(needURI.toString()).getProperty(WON.HAS_CONTENT).getResource();
+
+      StmtIterator it = needContent.listProperties(WON.HAS_TAG);
+      while (it.hasNext()) {
+        Statement stmt = it.next();
+        RDFNode obj = stmt.getObject();
+        if (obj.isLiteral()) {
+          tags.add(obj.asLiteral().getString());
+        }
+      }
+
+      return tags;
+    }
+
   }
 
   private static Model createModelWithBaseResource() {

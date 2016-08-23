@@ -445,19 +445,15 @@
   <field name="_graph.http___purl.org_webofneeds_model_isInState._id" type="string" indexed="true" stored="true"/>
   <field name="_graph.http___purl.org_webofneeds_model_hasFlag._id" type="string" multiValued="true" indexed="true" stored="true"/>
 
-  <!--
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_dc_elements_1.1_title" type="text_standard"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTag" type="text_standard"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTextDescription" type="text_standard"/>
-  -->
-
-  <!-- Use stemming and synonyms on index for the content fields -->
+  <!-- Use stemming and synonyms on index for the content fields title and description-->
   <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_dc_elements_1.1_title"
-         type="text_en_syn_stem" termVectors="true" indexed="true" stored="true"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTag"
          type="text_en_syn_stem" termVectors="true" indexed="true" stored="true"/>
   <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTextDescription"
          type="text_en_syn_stem" termVectors="true" indexed="true" stored="true"/>
+
+  <!-- Do not use stemming or synonyms for multivalued tags field -->
+  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTag"
+         type="text_standard" termVectors="true" multiValued="true" indexed="true" stored="true"/>
 
   <!-- location fields for spatial queries -->
   <field name="need_location" type="location" indexed="true" stored="true"/>
