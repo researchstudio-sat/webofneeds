@@ -275,44 +275,48 @@ public interface LinkedDataService
 
   /**
    * Returns paged resource containing all event uris belonging to the specified connection.
-   *
+   * If deep is true, the event dataset is added to the result.
    * @param connectionUri connection parent of the events
    * @param pageNum number of the page to be returned
    * @param preferedSize preferred number of uris per page, null means use default
    * @param messageType message type, null means all types
+   * @param deep
    * @return
    * @throws NoSuchConnectionException
    */
   public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIs(
-    final URI connectionUri, final int pageNum, Integer preferedSize, WonMessageType messageType) throws
+    final URI connectionUri, final int pageNum, Integer preferedSize, WonMessageType messageType, boolean deep) throws
     NoSuchConnectionException;
+
 
   /**
    * Returns a dataset containing all event uris belonging to the specified connection that were created after the
-   * specified event uri.
+   * specified event uri. If deep is true, the event dataset is added to the result.
    * @param connectionUri connection parent of the events
    * @param msgURI message to follow (in message creation time)
    * @param preferedSize preferred number of uris per page, null means use default
    * @param msgType message type, null means all types
+   * @param deep
    * @return
    * @throws NoSuchConnectionException
    */
   public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIsAfter(
-    final URI connectionUri, final URI msgURI, Integer preferedSize, WonMessageType msgType) throws
+    final URI connectionUri, final URI msgURI, Integer preferedSize, WonMessageType msgType, boolean deep) throws
     NoSuchConnectionException;
 
   /**
    * Returns a dataset containing all event uris belonging to the specified connection that were created before the
-   * specified event uri.
+   * specified event uri. If deep is true, the event dataset is added to the result.
    * @param connectionUri connection parent of the events
    * @param msgURI message to precede (in message creation time)
    * @param preferedSize preferred number of uris per page, null means use default
    * @param msgType message type, null means all types
+   * @param deep
    * @return
    * @throws NoSuchConnectionException
    */
   public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIsBefore(
-    final URI connectionUri, final URI msgURI, Integer preferedSize, WonMessageType msgType) throws
+    final URI connectionUri, final URI msgURI, Integer preferedSize, WonMessageType msgType, boolean deep) throws
     NoSuchConnectionException;
 
   public Dataset getNodeDataset();

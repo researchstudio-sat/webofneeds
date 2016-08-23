@@ -435,17 +435,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return eventsContainerDataset;
   }
 
-
   @Override
-  public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIs(final URI connectionUri, final int
-    pageNum, Integer preferedSize, WonMessageType msgType) throws
-    NoSuchConnectionException
-  {
-    Slice<URI> slice = needInformationService.listConnectionEventURIs(connectionUri, pageNum,
-                                                                      preferedSize, msgType);
-    return toContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice);
-  }
-
   public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIs(final URI connectionUri, final int
     pageNum, Integer preferedSize, WonMessageType msgType, boolean deep) throws
     NoSuchConnectionException
@@ -454,35 +444,35 @@ public class LinkedDataServiceImpl implements LinkedDataService
                                                                       preferedSize, msgType);
     NeedInformationService.PagedResource<Dataset,URI> containerPage = toContainerPage(
       this.uriService.createEventsURIForConnection(connectionUri).toString(), slice);
-    if (deep) {
-      for (URI eventUri : slice.getContent()) {
-        Dataset eventDataset = getDatasetForUri(eventUri);
-        RdfUtils.addDatasetToDataset(containerPage.getContent(), eventDataset);
-      }
-    }
+    if (deep) addEventData(slice, containerPage);
     return containerPage;
   }
 
+
+
   @Override
   public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIsAfter(
-    final URI connectionUri, final URI msgURI, Integer preferedSize, WonMessageType msgType) throws
+    final URI connectionUri, final URI msgURI, Integer preferedSize, WonMessageType msgType, boolean deep) throws
     NoSuchConnectionException
   {
     Slice<URI> slice = needInformationService.listConnectionEventURIsAfter(
       connectionUri, msgURI, preferedSize, msgType);
-    return toContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice);
+    NeedInformationService.PagedResource<Dataset,URI> containerPage = toContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice);
+    if (deep) addEventData(slice, containerPage);
+    return containerPage;
   }
 
   @Override
   public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIsBefore(
-    final URI connectionUri, final URI msgURI, Integer preferedSize, WonMessageType msgType) throws
+    final URI connectionUri, final URI msgURI, Integer preferedSize, WonMessageType msgType, boolean deep) throws
     NoSuchConnectionException
   {
 
     Slice<URI> slice = needInformationService.listConnectionEventURIsBefore(
       connectionUri, msgURI, preferedSize, msgType);
-    return toContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice);
-
+    NeedInformationService.PagedResource<Dataset,URI> containerPage = toContainerPage(this.uriService.createEventsURIForConnection(connectionUri).toString(), slice);
+    if (deep) addEventData(slice, containerPage);
+    return containerPage;
   }
 
   @Override
@@ -518,6 +508,13 @@ public class LinkedDataServiceImpl implements LinkedDataService
       //RdfUtils.replaceBaseResource(additionalDataModel, additionalData);
       model.add(model.createStatement(targetResource, WON.HAS_ADDITIONAL_DATA, additionalData));
       model.add(additionalDataModel);
+    }
+  }
+
+  public void addEventData(final Slice<URI> slice, final NeedInformationService.PagedResource<Dataset, URI> containerPage) {
+    for (URI eventUri : slice.getContent()) {
+      Dataset eventDataset = getDatasetForUri(eventUri);
+      RdfUtils.addDatasetToDataset(containerPage.getContent(), eventDataset);
     }
   }
 
