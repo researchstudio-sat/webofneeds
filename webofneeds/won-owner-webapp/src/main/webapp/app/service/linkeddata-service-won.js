@@ -41,7 +41,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
      * @type {string[]}
      */
-    const legitQueryParameters = ['p', 'resumebefore', 'resumeafter', 'type', 'state', 'timeof'];
+    const legitQueryParameters = ['p', 'resumebefore', 'resumeafter', 'type', 'state', 'timeof', 'deep'];
     /**
      * This function is used to generate the query-strings.
      * Should anything about the way the API is accessed changed,
