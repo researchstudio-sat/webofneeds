@@ -644,24 +644,35 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     /**
      * Fetches the linked data for the specified URI and saves it in the local triple-store.
      * @param uri
-     * @param requesterWebId the auth-token for the post (NOT the sessionId-cookie).
-     * Usually the uri of the need that `uri` belongs to.
-     * @deep if true, a query with this string will cause connections and events
-     * of a need to be queried along with it in one big request.
-     * @layerSize if you only want to fetch the latest N events of every connection
-     *  and N connections with latest updates.
+     *  @param fetchParams: optional paramters
+     *        * requesterWebId: the WebID used to access the ressource (used
+     *            by the owner-server to pick the right key-pair)
+     *        * queryParams: GET-params as documented for `queryString`
+     *        * pagingSize: if specified the server will return the first
+     *            page (unless e.g. `queryParams.p=2` is specified when
+     *            it will return the second page of size N)
      * @return {*}
      */
-    won.ensureLoaded = function(uri, requesterWebId, deep = false, layerSize = 0) {
+    won.ensureLoaded = function(uri, fetchParams = {}) {
         if (!uri) { throw {message : "ensureLoaded: uri must not be null"}; }
 
         //console.log("linkeddata-service-won.js: ensuring loaded: " +uri);
 
-        //we also allow unresolvable resources, so as to avoid re-fetching them.
-        //we also allow resources that are currently being fetched.
-        if (cacheItemIsOkOrUnresolvableOrFetching(uri)){
-            cacheItemMarkAccessed(uri);
-            return Promise.resolve(uri);
+        /*
+         * we also allow unresolvable resources, so as to avoid re-fetching them.
+         * we also allow resources that are currently being fetched.
+         * as containers (lists in rdf) are inherently prone to change and will
+         * usually be accessed using some sort of paging, we skip them here
+         * and thus always reload them.
+         */
+        if (!fetchesPartialRessource(fetchParams) &&
+            cacheItemIsOkOrUnresolvableOrFetching(uri)) {
+                cacheItemMarkAccessed(uri);
+                return Promise.resolve(uri);
+        }
+
+        if(fetchesPartialRessource(fetchParams)) {
+            console.log('won.ensureLoaded: loading partial ressource ', fetchParams);
         }
 
         /*
@@ -669,17 +680,12 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
          * a deep request. We need to find a way to deal with this.
          * Atm we risk running parallel requests.
          */
-        //uri isn't loaded or needs to be refrehed. fetch it.
-        const queryParams = { requesterWebId };
-        if(deep) queryParams.deep = 'true';
-        if(layerSize) queryParams['layer-size'] = layerSize;
-
         cacheItemMarkFetching(uri);
-        return won.fetch(uri, queryParams )
+        return won.fetch(uri, fetchParams )
             .then(
                 (dataset) => {
-                    if(!deep) {
-                        cacheItemInsertOrOverwrite(uri)
+                    if(! (fetchParams && fetchParams.deep) ) {
+                        cacheItemInsertOrOverwrite(uri);
                         return uri;
                     } else {
                         return selectLoadedResourcesFromDataset(
@@ -687,6 +693,9 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                         ).then(allLoadedResources => {
                                 //console.log('linkeddata-service-won.js: ensuring loaded deep: ', allLoadedResources);
                                 allLoadedResources.forEach(resourceUri =>
+                                        //TODO if this was a partial fetch, only mark
+                                        // as OK if all requests to the ressource have
+                                        // finished.
                                         cacheItemInsertOrOverwrite(resourceUri)
                                 )
                                 return allLoadedResources;
@@ -697,6 +706,21 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                 reason => cacheItemMarkUnresolvable(uri, reason)
             )
 
+    };
+
+    function fetchesPartialRessource(requestParams) {
+        if(!requestParams) {
+            return false;
+        } else if(requestParams.pagingSize) {
+            return true;
+        } else {
+            return !!(requestParams['p'] ||
+                requestParams['resumebefore'] ||
+                requestParams['resumeafter'] ||
+                requestParams['type'] ||
+                requestParams['state'] ||
+                requestParams['timeof']);
+        }
     };
 
     /**
@@ -1392,7 +1416,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
             throw {message : "getAllConnectioneventUris: connectionUri must not be null"};
         }
         //TODO ensure that the eventcontainer is loaded
-        return won.ensureLoaded(connectionUri, requesterWebId).then(
+        return won.ensureLoaded(connectionUri, { requesterWebId }).then(
             function(){
                var lock = getReadUpdateLockPerUri(connectionUri);
                return lock.acquireReadLock().then(
@@ -1436,7 +1460,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "crawlConnectionData: connectionUri must not be null"};
         }
-        return won.ensureLoaded(connectionUri, requesterWebId).then(
+        return won.ensureLoaded(connectionUri, { requesterWebId }).then(
             function(){
                 return won.getAllConnectioneventUris(connectionUri, requesterWebId).then(
                     function(uris){
@@ -1728,7 +1752,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
 
         let releaseLock = undefined;
 
-        const nodePromise = won.ensureLoaded(uri, requesterWebId)
+        const nodePromise = won.ensureLoaded(uri, { requesterWebId })
             .then(() => {
                 const lock = getReadUpdateLockPerUri(uri);
                 releaseLock = () => lock.releaseReadLock();
@@ -1969,7 +1993,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
             } else {
                 //console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute resolving property paths ...");
                 Array.prototype.push.apply(relevantResources, resolvedUris);
-                var loadedPromises = relevantResources.map(function(x){ return won.ensureLoaded(x, requesterWebId)});
+                var loadedPromises = relevantResources.map(x => won.ensureLoaded(x, { requesterWebId }) );
                 return q.all(loadedPromises)
                     .then(
                         function (x) {
