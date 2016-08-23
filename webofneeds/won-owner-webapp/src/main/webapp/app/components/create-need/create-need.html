@@ -18,12 +18,18 @@
 
             <need-textfield></need-textfield>
         </div>
+
+        <hr ng-show="self.tags"/>
         <div class="cp__tags" ng-show="self.tags">
             <div class="cp__header tags">Tags</div>
             <span class="cp__tags__tag" ng-repeat="tag in self.tags.toJS()">{{tag}}</span>
         </div>
 
-        <won-location-picker></won-location-picker>
+        <hr ng-show="self.isValid()"/>
+        <div class="cp__location" ng-show="self.isValid()">
+            <div class="cp__header location">Location</div>
+            <won-location-picker></won-location-picker>
+        </div>
 
         <!--
         <div>
@@ -39,21 +45,13 @@
         </div>
 
         <won-labelled-hr label="::undefined"></won-labelled-hr>
-
-        <div class="cp__more-detail--folded-out">
+        -->
+        <!--<div class="cp__more-detail--folded-out" ng-show="self.isValid()">
             <div class="cp__more-detail__item">
                 <img src="generated/icon-sprite.svg#ico36_plus_circle_hi" class="cp__icon">
                 <a href="javascript:void(0)">Add more Detail</a>
             </div>
             <ul>
-                <li>
-                    <img src="generated/icon-sprite.svg#ico36_description_circle" class="cp__icon">
-                    <a href="javascript:void(0)">Description</a>
-                </li>
-                <li>
-                    <img src="generated/icon-sprite.svg#ico36_tags_circle" class="cp__icon">
-                    <a href="javascript:void(0)">Tags</a>
-                </li>
                 <li>
                     <img src="generated/icon-sprite.svg#ico36_media_circle" class="cp__icon">
                     <a href="javascript:void(0)">Image or Media</a>
@@ -75,10 +73,9 @@
                     <a href="javascript:void(0)">Manage Notifications</a>
                 </li>
             </ul>
-        </div>
+        </div>-->
 
-        <won-labelled-hr label="::'or'"></won-labelled-hr>
-        -->
+        <won-labelled-hr label="::'or'" ng-show="self.isValid()"></won-labelled-hr>
 
         <button type="submit" class="won-button--filled red"
                 ng-show="self.isValid()"

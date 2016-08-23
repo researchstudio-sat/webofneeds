@@ -20,6 +20,7 @@ import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.Map;
 
 /**
@@ -30,6 +31,8 @@ import java.util.Map;
 public class NeedIndexer {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
+
+  public static final String SOLR_LOCATION_COORDINATES_FIELD = "need_location";
 
   // SPARQL query to contruct a need object out of the dataset, use all graphs that reference "won:Need"
   private static final String NEED_INDEX_QUERY =
@@ -45,8 +48,8 @@ public class NeedIndexer {
   public void index(Dataset dataset) throws IOException, JsonLdError {
 
     // serialize the need Dataset to jsonld
-    Query query = QueryFactory.create(NEED_INDEX_QUERY) ;
-    QueryExecution qexec = QueryExecutionFactory.create(query, dataset) ;
+    Query query = QueryFactory.create(NEED_INDEX_QUERY);
+    QueryExecution qexec = QueryExecutionFactory.create(query, dataset);
     Model needModel = qexec.execConstruct();
     String needUri = WonRdfUtils.NeedUtils.getNeedURI(needModel).toString();
 
@@ -57,6 +60,7 @@ public class NeedIndexer {
 
   public void indexNeedModel(Model needModel, String id, boolean useTestCore) throws IOException, JsonLdError {
 
+    // create the json from rdf model
     StringWriter sw = new StringWriter();
     RDFDataMgr.write(sw, needModel, Lang.JSONLD);
     String jsonld = sw.toString();
@@ -67,6 +71,16 @@ public class NeedIndexer {
 
     // add the uri of the need as id field to avoid multiple adding of needs but instead allow updates
     framed.put("id", id);
+
+    // add latitude and longitude values in one field for Solr spatial queries
+    URI needUri = WonRdfUtils.NeedUtils.getNeedURI(needModel);
+    Float longitude = WonRdfUtils.NeedUtils.getLocationLongitude(needModel, needUri);
+    Float latitude = WonRdfUtils.NeedUtils.getLocationLatitude(needModel, needUri);
+    if (latitude != null && longitude != null) {
+      framed.put(SOLR_LOCATION_COORDINATES_FIELD, latitude.toString() + "," + longitude.toString());
+    }
+
+    // write the final json string
     sw = new StringWriter();
     JsonUtils.writePrettyPrint(sw, framed);
     String needJson = sw.toString();

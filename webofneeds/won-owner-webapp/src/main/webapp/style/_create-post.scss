@@ -4,6 +4,12 @@
 @import 'locationpicker';
 
 .create-post {
+  hr {
+    border: 0;
+    border-top: $thinBorder solid $won-line-gray;
+    width: 100%;
+  }
+
   //@include flex-column;
   //max-width: 20rem;
   width: 100%;
@@ -53,10 +59,10 @@
 
   .cp__header {
     width: 100%;
+    box-sizing: border-box;
     font-size: $mediumFontSize;
     font-weight: 300;
     padding-bottom: 1rem;
-
     padding-left: 2.5rem;
     background-position: 0 0.15rem;
     background-size: 2rem;
@@ -65,12 +71,15 @@
     &.tags {
       background-image: url('icon-sprite.svg#ico36_tags_circle_hi');
     }
+
+    &.location {
+      background-image: url('icon-sprite.svg#ico36_area_circle_hi');
+    }
   }
 
   .cp__tags {
     display: flex;
     flex-wrap: wrap;
-    padding-bottom: 2rem;
 
     .cp__tags__tag {
       border-radius: 0.5rem;
