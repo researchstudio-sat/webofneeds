@@ -36,6 +36,11 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     if(!won) won = {};
 
 
+    /**
+     * paging parameters as found
+     * [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
+     * @type {string[]}
+     */
     const legitQueryParameters = ['p', 'resumebefore', 'resumeafter', 'type', 'state', 'timeof'];
     /**
      * This function is used to generate the query-strings.
@@ -644,7 +649,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     /**
      * Fetches the linked data for the specified URI and saves it in the local triple-store.
      * @param uri
-     *  @param fetchParams: optional paramters
+     * @param fetchParams: optional paramters
      *        * requesterWebId: the WebID used to access the ressource (used
      *            by the owner-server to pick the right key-pair)
      *        * queryParams: GET-params as documented for `queryString`
@@ -1148,51 +1153,6 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         }
 
         return resultJson;
-    }
-
-    /**
-     * Utility method that first ensures the resourceURI is locally loaded, then fetches the object of the
-     * specified property, which must be present only once.
-     * @param resourceURI
-     * @param propertyURI
-     * @returns {*}
-     */
-    won.getUniqueObjectOfProperty = function(resourceURI, propertyURI){
-        if (typeof resourceURI === 'undefined' || resourceURI == null  ){
-            throw {message : "getUniqueObjectOfProperty: resourceURI must not be null"};
-        }
-        if (typeof propertyURI === 'undefined' || propertyURI == null  ){
-            throw {message : "getUniqueObjectOfProperty: propertyURI must not be null"};
-        }
-        return won.ensureLoaded(resourceURI).then(
-            function(){
-                var lock = getReadUpdateLockPerUri(resourceURI);
-                return lock.acquireReadLock().then(
-                    function () {
-                        try {
-                            var resultData = {};
-                            privateData.store.node(resourceURI, function (success, graph) {
-                                if (rejectIfFailed(success, graph,{message : "Error loading object of property " + propertyURI + " of resource " + resourceURI + ".", allowNone : false, allowMultiple: true})){
-                                    return;
-                                }
-                                var results = graph.match(resourceURI, propertyURI, null);
-                                if (rejectIfFailed(success, results,{message : "Error loading object of property " + propertyURI + " of resource " + resourceURI + ".", allowNone : false, allowMultiple: false})){
-                                    return;
-                                }
-                                resultData.result = results.triples[0].object.nominalValue;
-                            });
-                            return resultData.result;
-                        } catch (e) {
-                            return q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI + ". Reason: " + e);
-                        } finally {
-                            //we don't need to release after a promise resolves because
-                            //this function isn't deferred.
-                            lock.releaseReadLock();
-                        }
-                        return q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI);
-                    }
-                );
-            })
     }
 
     won.getWonNodeUriOfNeed = function(needUri){
