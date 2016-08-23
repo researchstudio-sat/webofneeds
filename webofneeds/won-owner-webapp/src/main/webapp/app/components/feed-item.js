@@ -75,7 +75,7 @@ function genComponentConf() {
                             </div>
                         </div>
 
-                        <div class="fmil__item__description__message">Placeholder. This is a {{ cnct.getIn(['connection', 'hasConnectionState']) }}</div>
+                        <div class="fmil__item__description__message">{{ self.getTextForConnectionState(cnct.getIn(['connection', 'hasConnectionState'])) }}</div>
                     </div>
                 </div>
                 <div class="fmil__more clickable"
@@ -107,7 +107,7 @@ function genComponentConf() {
                 </div>
             </div>
             `;
-
+    
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
@@ -149,6 +149,13 @@ function genComponentConf() {
         }
         unreadRequestsCount() {
             return this.unreadXCount(won.EVENT.CONNECT_RECEIVED)
+        }
+        getTextForConnectionState(state){
+            let stateText = this.labels.connectionState[state];
+            if (!stateText) {
+                stateText = "unknown connection state";
+            }
+            return stateText;
         }
     }
     Controller.$inject = serviceDependencies;

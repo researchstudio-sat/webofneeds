@@ -1,12 +1,20 @@
 ;
 import won from './won-es6';
+import {deepFreeze} from './utils';
 
-export const labels = Object.freeze({
+export const labels = deepFreeze({
     type: {
         [won.WON.BasicNeedTypeDemandCompacted]: 'I want to have something',
         [won.WON.BasicNeedTypeSupplyCompacted]: 'I offer something',
         [won.WON.BasicNeedTypeDotogetherCompacted]: 'I want to do something together',
         [won.WON.BasicNeedTypeCritiqueCompacted]: 'I want to change something',
+    },
+    connectionState: {
+        [won.WON.Suggested]: 'Conversation suggested. You can send a request.',
+        [won.WON.RequestSent]: 'Conversation requested by you. Close the connection if not interested.',
+        [won.WON.RequestReceived]: 'Conversation requested. You can accept or deny this request.',
+        [won.WON.Connected]: 'Conversation open. You can exchange messages with your counterpart.',
+        [won.WON.Closed]: 'Conversation closed. You can reopen it.',
     }
 });
 
