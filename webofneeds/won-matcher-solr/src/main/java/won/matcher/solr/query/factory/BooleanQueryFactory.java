@@ -1,4 +1,4 @@
-package won.matcher.solr.query;
+package won.matcher.solr.query.factory;
 
 /**
  * Created by hfriedrich on 01.08.2016.

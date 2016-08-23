@@ -17,7 +17,7 @@ import org.springframework.context.annotation.PropertySource;
                  "file:${WON_CONFIG_DIR}/need-dir-bot.properties"})
 @ComponentScan({"won.matcher.service.common.config", "won.matcher.service.common.service.http",
                 "won.matcher.solr.config", "won.matcher.solr.index", "won.matcher.solr.hints",
-                "won.matcher.solr.evaluation"})
+                "won.matcher.solr.evaluation", "won.matcher.solr.query"})
 public class SolrTestAppConfiguration
 {
 }

@@ -1,4 +1,4 @@
-package won.matcher.solr.query;
+package won.matcher.solr.query.factory;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.vocabulary.DC;
@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.util.ArrayList;
@@ -15,11 +16,11 @@ import java.util.ArrayList;
  */
 public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
 {
-  private static final String NEED_TITLE_SOLR_FIELD =
+  public static final String NEED_TITLE_SOLR_FIELD =
     "_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_dc_elements_1.1_title";
-  private static final String NEED_DESCRIPTION_SOLR_FIELD =
+  public static final String NEED_DESCRIPTION_SOLR_FIELD =
     "_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTextDescription";
-  private static final String NEED_TAG_SOLR_FIELD =
+  public static final String NEED_TAG_SOLR_FIELD =
     "_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTag";
 
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -61,8 +62,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
     }
 
     try {
-      tagTerms = RdfUtils.findOnePropertyFromResource(need, null, WON.HAS_TAG).asLiteral().getString();
-      tagTerms = filterCharsAndKeyWords(tagTerms);
+      tagTerms = "\"" + String.join("\" \"", WonRdfUtils.NeedUtils.getTags(need)) + "\"";
     } catch (IncorrectPropertyCountException e) {
       log.debug("Tags not found in RDF dataset: " + e.toString());
     }
@@ -71,7 +71,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
   public void addTermsToTitleQuery(String terms, double boost) {
 
     if (terms != null && !terms.trim().isEmpty()) {
-      SolrQueryFactory qf = new MatchFieldQuery(NEED_TITLE_SOLR_FIELD, terms);
+      SolrQueryFactory qf = new MatchFieldQueryFactory(NEED_TITLE_SOLR_FIELD, terms);
       qf.setBoost(boost);
       contentFactories.add(qf);
     }
@@ -80,7 +80,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
   public void addTermsToDescriptionQuery(String terms, double boost) {
 
     if (terms != null && !terms.trim().isEmpty()) {
-      SolrQueryFactory qf = new MatchFieldQuery(NEED_DESCRIPTION_SOLR_FIELD, terms);
+      SolrQueryFactory qf = new MatchFieldQueryFactory(NEED_DESCRIPTION_SOLR_FIELD, terms);
       qf.setBoost(boost);
       contentFactories.add(qf);
     }
@@ -89,7 +89,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
   public void addTermsToTagQuery(String terms, double boost) {
 
     if (terms != null && !terms.trim().isEmpty()) {
-      SolrQueryFactory qf = new MatchFieldQuery(NEED_TAG_SOLR_FIELD, terms);
+      SolrQueryFactory qf = new MatchFieldQueryFactory(NEED_TAG_SOLR_FIELD, terms);
       qf.setBoost(boost);
       contentFactories.add(qf);
     }
@@ -103,22 +103,19 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
     text = text.replaceAll("NOT", " ");
     text = text.replaceAll("AND", " ");
     text = text.replaceAll("OR", " ");
+    text = text.replaceAll("\\s+", " ");
     return text;
   }
 
   @Override
   protected String makeQueryString() {
 
+    // add the term queries of the title, description and tags fields
     SolrQueryFactory[] factoryArray = new SolrQueryFactory[contentFactories.size()];
-    BooleanQueryFactory contentShouldQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR, contentFactories
-      .toArray(factoryArray));
+    BooleanQueryFactory contentQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR,
+                                                               contentFactories.toArray(factoryArray));
 
-    BooleanQueryFactory mustQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.AND, new
-      NeedTypeQueryFactory(needDataset), new NeedStateQueryFactory(needDataset));
-
-    BooleanQueryFactory topQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.AND, mustQuery,
-                                                           contentShouldQuery);
-
-    return topQuery.createQuery();
+    // add a multiplicative boost for the closer geographical distances
+    return new GeoDistBoostQueryFactory(needDataset).createQuery() + contentQuery.createQuery();
   }
 }

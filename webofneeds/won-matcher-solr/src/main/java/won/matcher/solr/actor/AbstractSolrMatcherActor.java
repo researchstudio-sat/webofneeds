@@ -8,14 +8,11 @@ import akka.event.LoggingAdapter;
 import akka.japi.Function;
 import com.github.jsonldjava.core.JsonLdError;
 import com.hp.hpl.jena.query.Dataset;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrException;
+import org.apache.solr.common.params.SolrParams;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
@@ -24,11 +21,15 @@ import won.matcher.service.common.event.NeedEvent;
 import won.matcher.solr.config.SolrMatcherConfig;
 import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.index.NeedIndexer;
-import won.matcher.solr.query.DefaultNeedQueryFactory;
+import won.matcher.solr.query.DefaultMatcherQueryExecuter;
+import won.matcher.solr.query.SolrMatcherQueryExecutor;
+import won.matcher.solr.query.TestMatcherQueryExecutor;
+import won.matcher.solr.query.factory.*;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Siren/Solr based abstract matcher with all implementations for querying as well as indexing needs.
@@ -48,14 +49,12 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
   @Autowired
   private NeedIndexer needIndexer;
 
-  SolrClient solrClient;
-  SolrClient solrTestClient;
+  @Autowired
+  @Qualifier("defaultMatcherQueryExecuter")
+  DefaultMatcherQueryExecuter defaultQueryExecuter;
 
-  @Override
-  public void preStart() {
-    solrClient = new HttpSolrClient.Builder(config.getSolrEndpointUri(false)).build();
-    solrTestClient = new HttpSolrClient.Builder(config.getSolrEndpointUri(true)).build();
-  }
+  @Autowired
+  TestMatcherQueryExecutor testQueryExecuter;
 
   @Override
   public void onReceive(final Object o) throws Exception {
@@ -80,20 +79,32 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
       return;
     }
 
-    DefaultNeedQueryFactory queryFactory = new DefaultNeedQueryFactory(dataset);
-    String query = queryFactory.createQuery();
-
-    // if need is usedForTesting then use the solrTestClient (with points to another index instead the standard Client)
+    // check if need is usedForTesting only
     boolean usedForTesting = WonRdfUtils.NeedUtils.hasFlag(dataset, needEvent.getUri(), WON.USED_FOR_TESTING);
-    log.info("query Solr endpoint {} for need {}", config.getSolrEndpointUri(usedForTesting), needEvent);
-    SolrDocumentList docs = executeQuery(query, usedForTesting);
+    SolrMatcherQueryExecutor queryExecutor = (usedForTesting ? testQueryExecuter : defaultQueryExecuter);
+
+    // default query matches content terms (of fields title, description and tags) with different weights
+    // and gives an additional multiplicative boost for geographically closer needs
+    DefaultNeedQueryFactory needQueryFactory = new DefaultNeedQueryFactory(dataset);
+    String queryString = needQueryFactory.createQuery();
+
+    // add filters to the query: right need type, need status active, creation date overlap 1 month,
+    // geographical distance < 50 km
+    String[] filterQueries = new String[4];
+    filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
+    filterQueries[1] = new NeedTypeQueryFactory(dataset).createQuery();
+    filterQueries[2] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
+    filterQueries[3] = new GeoDistFilterQueryFactory(dataset, 50.0).createQuery();
+
+    log.info("query Solr endpoint {} for need {}", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
+    SolrDocumentList docs = executeQuery(
+      queryExecutor, queryString, null, filterQueries);
 
     if (docs != null) {
-      log.debug("{} results found for query", docs.size());
       BulkHintEvent events = produceHints(docs, needEvent);
       publishHints(events, needEvent);
     } else {
-      log.warning("No results found for query {}", query);
+      log.warning("No results found for query of need ", needEvent);
     }
 
     indexNeedEvent(needEvent, dataset);
@@ -104,24 +115,10 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     return dataset;
   }
 
-  protected SolrDocumentList executeQuery(String queryString, boolean usedForTesting) throws IOException,
-    SolrServerException {
+  protected SolrDocumentList executeQuery(SolrMatcherQueryExecutor queryExecutor, String queryString, SolrParams params,
+                                          String... filterQueries) throws IOException, SolrServerException {
 
-    SolrQuery query = new SolrQuery();
-    log.debug("use query: {}", queryString);
-    query.setQuery(queryString);
-    query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD);
-    query.setRows(config.getMaxHints());
-
-    try {
-      SolrClient solr = (usedForTesting ? solrTestClient : solrClient);
-      QueryResponse response = solr.query(query);
-      return response.getResults();
-    } catch (SolrException e) {
-      log.warning("Exception {} thrown for query: {}", e, queryString);
-    }
-
-    return null;
+    return queryExecutor.executeNeedQuery(queryString, params, filterQueries);
   }
 
   protected BulkHintEvent produceHints(SolrDocumentList docs, NeedEvent needEvent) {

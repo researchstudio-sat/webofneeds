@@ -1,4 +1,4 @@
-package won.matcher.solr.query;
+package won.matcher.solr.query.factory;
 
 import com.hp.hpl.jena.query.Dataset;
 import won.protocol.vocabulary.WON;
@@ -16,6 +16,6 @@ public class NeedStateQueryFactory extends NeedDatasetQueryFactory
 
   @Override
   protected String makeQueryString() {
-    return new ExactMatchFieldQuery(NEED_STATE_SOLR_FIELD, WON.NEED_STATE_ACTIVE.toString()).createQuery();
+    return new ExactMatchFieldQueryFactory(NEED_STATE_SOLR_FIELD, WON.NEED_STATE_ACTIVE.toString()).createQuery();
   }
 }
