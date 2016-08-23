@@ -48,13 +48,13 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * adapt this function.
      * @param dataUri
      * @param queryParams a config object whose fields get appended as get parameters.
-     *               important parameters include:
-     *                 * requesterWebId: the WebID used to access the ressource (used
-     *                         by the owner-server to pick the right key-pair)
-     *                 * deep: 'true' to automatically resolve containers (e.g.
-     *                         the event-container)
-     *                 * paging parameters as found
-     *                   [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
+     *     important parameters include:
+     *         * requesterWebId: the WebID used to access the ressource (used
+     *                 by the owner-server to pick the right key-pair)
+     *         * deep: 'true' to automatically resolve containers (e.g.
+     *                 the event-container)
+     *         * paging parameters as found
+     *           [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
      * @returns {string}
      */
     function queryString(dataUri, requesterWebId, queryParams = {}) {
