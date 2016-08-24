@@ -49,6 +49,7 @@ public class MessageEventPlaceholder
   private URI parentURI;
 
   @Column(name = "messageType")
+  @Enumerated( EnumType.STRING)
   private WonMessageType messageType; // ConnectMessage, CreateMessage, NeedStateMessage
 
   @Column(name = "senderURI")

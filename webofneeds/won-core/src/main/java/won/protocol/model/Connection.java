@@ -61,7 +61,7 @@ public class Connection
 
   /* The state of the connection */
   @Column( name = "state")
-  @Convert ( converter = ConnectionStateConverter.class)
+  @Enumerated ( EnumType.STRING )
   private ConnectionState state;
 
   @Override

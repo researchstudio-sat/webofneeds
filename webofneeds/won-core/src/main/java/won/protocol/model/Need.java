@@ -45,7 +45,7 @@ public class Need
 
   /* The state of the need */
   @Column( name = "state")
-  @Convert( converter = NeedStateConverter.class)
+  @Enumerated ( EnumType.STRING )
   private NeedState state;
 
   /* The owner protocol endpoint URI where the owner of the need can be reached */
