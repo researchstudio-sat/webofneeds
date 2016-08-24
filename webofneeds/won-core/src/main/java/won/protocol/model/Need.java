@@ -37,20 +37,26 @@ public class Need
   @GeneratedValue
   @Column( name = "id" )
   private Long id;
+
   /* The URI of the need */
   @Column( name = "needURI", unique = true)
+  @Convert( converter = URIConverter.class)
   protected URI needURI;
+
   /* The state of the need */
   @Column( name = "state")
+  @Convert( converter = NeedStateConverter.class)
   private NeedState state;
 
   /* The owner protocol endpoint URI where the owner of the need can be reached */
   @Column( name = "ownerURI" )
+  @Convert( converter = URIConverter.class)
   private URI ownerURI;
 
-    /* The need protocol endpoint URI where the won node of the need can be reached */
-    @Column(name="wonNodeURI")
-    private URI wonNodeURI;
+  /* The need protocol endpoint URI where the won node of the need can be reached */
+  @Column(name="wonNodeURI")
+  @Convert( converter = URIConverter.class)
+  private URI wonNodeURI;
 
   /* The creation date of the need */
   @Temporal(TemporalType.TIMESTAMP)

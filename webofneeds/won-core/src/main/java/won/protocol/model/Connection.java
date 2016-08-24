@@ -32,24 +32,36 @@ public class Connection
   @GeneratedValue
   @Column( name = "id" )
   private Long id;
+
   /* The public URI of this connection */
   @Column( name = "connectionURI", unique = true)
+  @Convert( converter = URIConverter.class )
   private URI connectionURI;
+
   /* The uri of the connection's need object */
   @Column( name = "needURI")
+  @Convert( converter = URIConverter.class )
   private URI needURI;
+
   /* The uri of the facet's type */
   @Column( name = "typeURI")
+  @Convert( converter = URIConverter.class )
   private URI typeURI;
+
   /* The URI of the remote connection */
   /* Caution: on the owner side, the remote connection URI is never known. */
   @Column( name = "remoteConnectionURI")
+  @Convert( converter = URIConverter.class )
   private URI remoteConnectionURI;
+
   /* The URI of the remote need */
   @Column( name = "remoteNeedURI")
+  @Convert( converter = URIConverter.class )
   private URI remoteNeedURI;
+
   /* The state of the connection */
   @Column( name = "state")
+  @Convert ( converter = ConnectionStateConverter.class)
   private ConnectionState state;
 
   @Override

@@ -35,36 +35,57 @@ public class MessageEventPlaceholder
   @Id
   @GeneratedValue
   @Column( name = "id" )
+  @Convert( converter = URIConverter.class)
   private Long id;
 
   @Column(name = "messageURI")
+  @Convert( converter = URIConverter.class)
   private URI messageURI;
 
   // this URI refers to the need (in case of create, de-/activate) or connection (in case of hint, open,
   // close, etc.)
   @Column(name = "parentURI")
+  @Convert( converter = URIConverter.class)
   private URI parentURI;
 
   @Column(name = "messageType")
   private WonMessageType messageType; // ConnectMessage, CreateMessage, NeedStateMessage
+
   @Column(name = "senderURI")
+  @Convert( converter = URIConverter.class)
   private URI senderURI;
+
   @Column(name = "senderNeedURI")
+  @Convert( converter = URIConverter.class)
   private URI senderNeedURI;
+
   @Column(name = "senderNodeURI")
+  @Convert( converter = URIConverter.class)
   private URI senderNodeURI;
+
   @Column(name = "receiverURI")
+  @Convert( converter = URIConverter.class)
   private URI receiverURI;
+
   @Column(name = "receiverNeedURI")
+  @Convert( converter = URIConverter.class)
   private URI receiverNeedURI;
+
   @Column(name = "receiverNodeURI")
+  @Convert( converter = URIConverter.class)
   private URI receiverNodeURI;
+
   @Column(name = "creationDate")
   private Date creationDate;
+
   @Column(name = "correspondingRemoteMessageURI")
+  @Convert( converter = URIConverter.class)
   private URI correspondingRemoteMessageURI;
+
   @Column(name = "responseMessageURI")
+  @Convert( converter = URIConverter.class)
   private URI responseMessageURI;
+
   @Column(name = "referencedByOtherMessage")
   private boolean referencedByOtherMessage;
 
@@ -205,4 +226,6 @@ public class MessageEventPlaceholder
     result = 31 * result + (receiverURI != null ? receiverURI.hashCode() : 0);
     return result;
   }
+
+
 }
