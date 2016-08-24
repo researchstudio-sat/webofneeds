@@ -11,7 +11,7 @@ export const labels = deepFreeze({
     },
     connectionState: {
         [won.WON.Suggested]: 'Conversation suggested. You can send a request.',
-        [won.WON.RequestSent]: 'Conversation requested by you. Close the connection if not interested.',
+        [won.WON.RequestSent]: 'Conversation requested by you. Close the connection if no longer interested.',
         [won.WON.RequestReceived]: 'Conversation requested. You can accept or deny this request.',
         [won.WON.Connected]: 'Conversation open. You can exchange messages with your counterpart.',
         [won.WON.Closed]: 'Conversation closed. You can reopen it.',
