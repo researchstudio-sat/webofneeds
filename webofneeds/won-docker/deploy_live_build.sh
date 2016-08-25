@@ -28,6 +28,7 @@ docker -H satcluster01:2375 build -t webofneeds/owner:live $WORKSPACE/webofneeds
 docker -H satcluster01:2375 build -t webofneeds/matcher_service:live $WORKSPACE/webofneeds/won-docker/matcher-service/
 docker -H satcluster01:2375 build -t webofneeds/matcher_solr:live $WORKSPACE/webofneeds/won-docker/matcher-solr/
 docker -H satcluster01:2375 build -t webofneeds/gencert:live $WORKSPACE/webofneeds/won-docker/gencert/
+docker -H satcluster02:2375 build -t webofneeds/letsencrypt:live $WORKSPACE/webofneeds/won-docker/letsencrypt/
 
 
 # create a password file for the certificates, variable ${won_certificate_passwd} must be set from outside the script
@@ -67,10 +68,35 @@ rsync ~/won-server-certs/* root@satcluster02:$base_folder/won-server-certs/
 
 # copy the nginx.conf file to the proxy server
 rsync $WORKSPACE/webofneeds/won-docker/nginx/nginx.conf root@satcluster02:$base_folder/nginx.conf
+rsync $WORKSPACE/webofneeds/won-docker/nginx/nginx-http-only.conf root@satcluster02:$base_folder/nginx-http-only.conf
 
-echo run nginx proxy server
-if ! docker -H satcluster02:2375 run --name=nginx -v $base_folder/won-server-certs:/etc/nginx/won-server-certs/ \
--v $base_folder/nginx.conf:/etc/nginx/nginx.conf -d -p 80:80 -p 443:443 -p 61617:61617 nginx; then
+
+# start the letsencrypt ssl certificate request cron job container, executes cron job requests/renewals every 12 hours
+docker -H satcluster02:2375 stop letsencrypt || echo 'No docker container found to stop with name: letsencrypt'
+docker -H satcluster02:2375 rm letsencrypt || echo 'No docker container found to remove with name: letsencrypt'
+docker -H satcluster02:2375 run --name=letsencrypt -d -v /home/install/letsencrypt/acme-challenge:/usr/share/nginx/html/ \
+-v /home/install/letsencrypt/certs:/etc/letsencrypt/ webofneeds/letsencrypt:live
+
+# bootstrap code: if no nginx is running yet start it up in htt-only mode to generate a first letsencrypt certificate.
+# Then shut it down and start the nginx in normal (ssl) mode with the letsencrypt certificate
+if docker -H satcluster02:2375 run --name=nginx_http_only \
+-v /home/install/nginx-http-only.conf:/etc/nginx/nginx.conf \
+-v /home/install/letsencrypt/acme-challenge:/usr/share/nginx/html/ -d -p 80:80 nginx; then
+  echo bootstrap: no nginx proxy was running on this server, started nginx in http-only mode and try to retrieve an letsencrypt certificate
+
+  # start the letsencrypt container with CMD to execute the certificate challenge once
+  docker -H satcluster02:2375 exec letsencrypt bash //usr/local/bin/certificate-request-and-renew.sh
+fi
+
+# stop and remove the nginx http-only container if it is there
+docker -H satcluster02:2375 stop nginx_http_only || echo 'No docker container found to stop with name: nginx_http_only'
+docker -H satcluster02:2375 rm nginx_http_only || echo 'No docker container found to remove with name: nginx_http_only'
+
+echo run nginx proxy server with letsencrypt ssl certificate
+if ! docker -H satcluster02:2375 run --name=nginx -v $base_folder/letsencrypt/certs:/etc/letsencrypt/ \
+-v $base_folder/nginx.conf:/etc/nginx/nginx.conf \
+-v $base_folder/letsencrypt/acme-challenge:/usr/share/nginx/html/ \
+-d -p 80:80 -p 443:443 -p 61617:61617 nginx; then
   echo nginx container already available, restart old container
   docker -H satcluster02:2375 restart nginx
 fi
@@ -89,3 +115,4 @@ docker -H satcluster01:2375 push webofneeds/wonnode:live
 docker -H satcluster01:2375 push webofneeds/owner:live
 docker -H satcluster01:2375 push webofneeds/matcher_service:live
 docker -H satcluster01:2375 push webofneeds/matcher_solr:live
+docker -H satcluster01:2375 push webofneeds/letsencrypt:live
