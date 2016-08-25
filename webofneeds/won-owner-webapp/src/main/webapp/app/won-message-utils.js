@@ -442,6 +442,8 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
             .then(connectionUris => //delivers an obj<idx, string>
                 urisToLookupMap(connectionUris, won.getConnection));
 
+        /*
+        // STARTING with selective loading
         const allEventsPromise = allConnectionUrisPromise
             .then(connectionUris => //expects an array
                 urisToLookupMap(connectionUris, connectionUri =>
@@ -454,6 +456,7 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
                 //eventsPerConnection[connectionUri][eventUri]
                 flattenObj(eventsOfConnections)
         );
+        */
 
         const allTheirNeedsPromise =
             allConnectionsPromise.then(connections => {
@@ -469,20 +472,20 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
         //dispatch to the curried-in action as soon as any part of the data arrives
         allOwnNeedsPromise.then(ownNeeds => dispatchWellFormed({ownNeeds}));
         allConnectionsPromise.then(connections => dispatchWellFormed({connections}));
-        allEventsPromise.then(events => dispatchWellFormed({events}));
+        //allEventsPromise.then(events => dispatchWellFormed({events})); // STARTING with selective loading
         allTheirNeedsPromise.then(theirNeeds => dispatchWellFormed({theirNeeds}));
 
         return Promise.all([
             allOwnNeedsPromise,
             allConnectionsPromise,
-            allEventsPromise,
+            //allEventsPromise, // STARTING with selective loading
             allTheirNeedsPromise
         ]);
     });
 
     return allDataRawPromise
         .then(([ ownNeeds, connections, events, theirNeeds ]) =>
-            wellFormedPayload({ ownNeeds, connections, events, theirNeeds, })
+            wellFormedPayload({ ownNeeds, connections, /* events, STARTING with selective loading*/ theirNeeds, })
         );
 
     /**
