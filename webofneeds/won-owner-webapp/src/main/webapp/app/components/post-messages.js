@@ -79,6 +79,23 @@ function genComponentConf() {
 
             this.scrollContainerNg().bind('scroll', e => this.onScroll(e));
 
+
+
+
+            console.log('post-messages.js: executing constructor.');
+            // the connection has finished initializing. Or not? Not indeed,
+            // the caching mechanisms should de-dupe the requests.
+            const state = self.$ngRedux.getState();
+            const connectionUri = selectOpenConnectionUri(state);
+            const connection = state.getIn(['connections', connectionUri]);
+            const chatMessages = selectChatMessages(state);
+            if(connectionUri) {
+                console.log('post-messages.js: testing for selective loading. ',
+                    connectionUri, connection, chatMessages);
+                console.log('post-messages.js: calling crawlable query soon. ');
+                //TODO determine first if component is actually visible (angular calls the constructor long before that)
+            }
+
             //this.postmsg = this;
             const selectFromState = state => {
 
@@ -86,7 +103,6 @@ function genComponentConf() {
                 //scroll to bottom directly after rendering, if snapped
                 delay(0).then(() => {
                     self.updateScrollposition();
-                    console.log('pm - delay ', self._snapBottom, self.chatMessages.length)
                 });
 
                 const connectionUri = selectOpenConnectionUri(state);
