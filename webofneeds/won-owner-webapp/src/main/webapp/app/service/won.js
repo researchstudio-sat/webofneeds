@@ -297,6 +297,19 @@
     won.UNREAD.GROUP.ALL="all";
     won.UNREAD.GROUP.BYNEED="byNeed";
 
+
+    won.messageType2EventType = {
+        [won.WONMSG.hintMessageCompacted] :  won.EVENT.HINT_RECEIVED,
+        [won.WONMSG.connectMessageCompacted] :  won.EVENT.CONNECT_RECEIVED,
+        [won.WONMSG.connectSentMessageCompacted] :  won.EVENT.CONNECT_SENT,
+        [won.WONMSG.openMessageCompacted] :  won.EVENT.OPEN_RECEIVED,
+        [won.WONMSG.closeMessageCompacted] :  won.EVENT.CLOSE_RECEIVED,
+        [won.WONMSG.closeNeedMessageCompacted] :  won.EVENT.CLOSE_NEED_RECEIVED,
+        [won.WONMSG.connectionMessageCompacted] :  won.EVENT.CONNECTION_MESSAGE_RECEIVED,
+        [won.WONMSG.needStateMessageCompacted] :  won.EVENT.NEED_STATE_MESSAGE_RECEIVED,
+        [won.WONMSG.errorMessageCompacted] :  won.EVENT.NOT_TRANSMITTED ,
+    };
+
     //UTILS
     var UNSET_URI= "no:uri";
 

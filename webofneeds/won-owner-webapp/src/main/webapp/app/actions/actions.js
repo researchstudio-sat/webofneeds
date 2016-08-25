@@ -196,7 +196,7 @@ const actionHierarchy = {
             success: messages.successfulCloseNeed,
             failure: messages.failedCloseNeed
         },
-        connectionMessageReceived: messages.connectionMessageReceived,
+        connectionMessageReceived: INJ_DEFAULT,
         connectMessageReceived: messages.connectMessageReceived,
         hintMessageReceived: messages.hintMessageReceived,
         openMessageReceived: messages.openMessageReceived,
@@ -319,6 +319,9 @@ export function getConnectionRelatedData(needUri, remoteNeedUri, connectionUri) 
         }));
 }
 
+/**
+ * @deprecated use won.messageType2EventType instead
+ */
 export const messageTypeToEventType = deepFreeze({
     [won.WONMSG.hintMessageCompacted] : {eventType: won.EVENT.HINT_RECEIVED},
     [won.WONMSG.connectMessageCompacted] : {eventType: won.EVENT.CONNECT_RECEIVED},

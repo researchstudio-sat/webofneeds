@@ -194,23 +194,6 @@ export function successfulCreate(event) {
     }
 }
 
-export function connectionMessageReceived(events) {
-    return dispatch => {
-        const eventOnRemote = events['msg:FromOwner'];
-        const eventOnOwn = events['msg:FromExternal'];
-        eventOnRemote.eventType = messageTypeToEventType[eventOnRemote.hasMessageType].eventType;
-        //TODO data.hasReceiver, the connectionUri is undefined in the response message
-        won.invalidateCacheForNewMessage(eventOnOwn.hasReceiver)
-        .then(() => getConnectionData(eventOnRemote, eventOnOwn))
-        .then(data =>
-            dispatch({
-                type: actionTypes.messages.connectionMessageReceived,
-                payload: data
-            })
-        )
-    }
-}
-
 export function openMessageReceived(events) {
     return dispatch => {
         const eventOnRemote = events['msg:FromOwner'];

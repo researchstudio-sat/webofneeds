@@ -80,6 +80,12 @@ export default function(connections = initialState, action = {}) {
             );
 
         case actionTypes.messages.connectionMessageReceived:
+            var eventOnOwn = action.payload.events['msg:FromExternal'];
+            return connections.updateIn(
+                [eventOnOwn.hasReceiver, 'hasEvents'],
+                eventUris => eventUris.add(eventOnOwn.uri)
+            );
+
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.openMessageReceived:
         case actionTypes.messages.hintMessageReceived:
@@ -95,7 +101,7 @@ export default function(connections = initialState, action = {}) {
 }
 
 function storeConnections(connections, connectionsToStore) {
-    if(connectionsToStore) {
+    if(connectionsToStore && connectionsToStore.size > 0) {
         const connectionsWithEventSets = connectionsToStore.map(connection =>
                 //make sure hasEvents are sets
                 connection.update('hasEvents', events => Immutable.Set(events))
@@ -119,7 +125,7 @@ function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
     console.log(connectionWithRelatedData);
 
     //make sure we have a set of events (as opposed to a list with redundancies)
-    const events = Immutable.Set(connectionWithRelatedData.connection.hasEvents)
+    const events = Immutable.Set(connectionWithRelatedData.connection.hasEvents);
     const connection = Immutable
         .fromJS(connectionWithRelatedData.connection)
         .set('hasEvents', events);
