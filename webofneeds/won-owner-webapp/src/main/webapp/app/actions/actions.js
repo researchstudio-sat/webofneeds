@@ -319,21 +319,6 @@ export function getConnectionRelatedData(needUri, remoteNeedUri, connectionUri) 
         }));
 }
 
-/**
- * @deprecated use won.messageType2EventType instead
- */
-export const messageTypeToEventType = deepFreeze({
-    [won.WONMSG.hintMessageCompacted] : {eventType: won.EVENT.HINT_RECEIVED},
-    [won.WONMSG.connectMessageCompacted] : {eventType: won.EVENT.CONNECT_RECEIVED},
-    [won.WONMSG.connectSentMessageCompacted] : {eventType: won.EVENT.CONNECT_SENT},
-    [won.WONMSG.openMessageCompacted] : {eventType: won.EVENT.OPEN_RECEIVED},
-    [won.WONMSG.closeMessageCompacted] : {eventType: won.EVENT.CLOSE_RECEIVED},
-    [won.WONMSG.closeNeedMessageCompacted] : {eventType: won.EVENT.CLOSE_NEED_RECEIVED},
-    [won.WONMSG.connectionMessageCompacted] : {eventType: won.EVENT.CONNECTION_MESSAGE_RECEIVED},
-    [won.WONMSG.needStateMessageCompacted] : {eventType: won.EVENT.NEED_STATE_MESSAGE_RECEIVED},
-    [won.WONMSG.errorMessageCompacted] : {eventType: won.EVENT.NOT_TRANSMITTED }
-});
-
 export function needsOpen(needUri) {
     return (dispatch, getState) => {
         const state = getState();
