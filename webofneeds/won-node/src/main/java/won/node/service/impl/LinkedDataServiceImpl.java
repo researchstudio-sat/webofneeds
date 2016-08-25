@@ -21,6 +21,7 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -36,11 +37,9 @@ import won.cryptography.service.CryptographyService;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessageType;
-import won.protocol.model.Connection;
-import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.model.Need;
-import won.protocol.model.NeedState;
+import won.protocol.model.*;
 import won.protocol.repository.MessageEventRepository;
+import won.protocol.repository.NeedRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
@@ -80,6 +79,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private RDFStorageService rdfStorage;
   @Autowired
   private MessageEventRepository messageEventRepository;
+  @Autowired
+  private NeedRepository needRepository;
 
   //TODO: used to access/create event URIs for connection model rendering. Could be removed if events knew their URIs.
   private URIService uriService;
@@ -119,7 +120,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     for (URI needURI : uris) {
       model.add(model.createStatement(needListPageResource, RDFS.member, model.createResource(needURI.toString())));
     }
-    Dataset ret = newDatasetWithNamedModel(createDataGraphUri(needListPageResource), model);
+    Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(needListPageResource), model);
     addBaseUriAndDefaultPrefixes(ret);
     return ret;
   }
@@ -224,7 +225,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
       showNodePageResource = model.createResource(this.resourceURIPrefix);
       addNeedList(model, showNodePageResource);
       addProtocolEndpoints(model, showNodePageResource);
-      Dataset ret = newDatasetWithNamedModel(createDataGraphUri(showNodePageResource), model);
+      Dataset ret = newDatasetWithNamedModel(createDataGraphUriFromResource(showNodePageResource), model);
       addBaseUriAndDefaultPrefixes(ret);
       addPublicKey(model, showNodePageResource);
       return ret;
@@ -296,7 +297,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
       addAdditionalData(model, connection.getConnectionURI(), connectionResource);
     }
 
-    return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUri(connectionResource), model));
+    return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUriFromResource(connectionResource), model));
   }
 
 
@@ -308,6 +309,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     if (deep) {
       addDeepConnectionData(containerPage.getContent(), uris);
     }
+
     return containerPage.getContent();
   }
 
@@ -346,14 +348,18 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return containerPage;
   }
 
-  @Override
-  public Dataset listConnectionURIs(final URI needURI, boolean deep)
+    @Override
+    public Dataset listConnectionURIs(final URI needURI, boolean deep, boolean addMetadata)
     throws NoSuchNeedException, NoSuchConnectionException {
     List<URI> uris = new ArrayList<URI>(needInformationService.listConnectionURIs(needURI));
-    NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
-      this.uriService.createConnectionsURIForNeed(needURI).toString(), new SliceImpl<URI>(uris));
+    URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
+    NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(connectionsUri.toString(), new
+      SliceImpl<URI>(uris));
     if (deep) {
       addDeepConnectionData(containerPage.getContent(), uris);
+    }
+    if (addMetadata){
+      addConnectionMetadata(containerPage.getContent(), needURI, connectionsUri);
     }
     return containerPage.getContent();
   }
@@ -361,44 +367,84 @@ public class LinkedDataServiceImpl implements LinkedDataService
   @Override
   public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIs(
     final int page, final URI needURI, final Integer preferredSize, final WonMessageType messageType, final Date
-    timeSpot, boolean deep)
+    timeSpot, boolean deep, boolean addMetadata)
     throws NoSuchNeedException, NoSuchConnectionException {
     Slice<URI> slice = needInformationService.listConnectionURIs(needURI, page, preferredSize, messageType, timeSpot);
-    NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
-      this.uriService.createConnectionsURIForNeed(needURI).toString(), slice);
+    URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
+    NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(connectionsUri.toString(), slice);
     if (deep) {
       addDeepConnectionData(containerPage.getContent(), slice.getContent());
+    }
+    if (addMetadata){
+      addConnectionMetadata(containerPage.getContent(), needURI, connectionsUri);
     }
     return containerPage;
   }
 
   @Override
   public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsBefore(final URI needURI, URI
-    beforeEventURI, final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep)
+    beforeEventURI, final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep,
+                                                                                     boolean addMetadata)
     throws NoSuchNeedException, NoSuchConnectionException {
     Slice<URI> slice = needInformationService.listConnectionURIsBefore(
       needURI, beforeEventURI, preferredSize, messageType, timeSpot);
-    NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
-      this.uriService.createConnectionsURIForNeed(needURI).toString(), slice);
+    URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
+    NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(connectionsUri.toString(), slice);
     if (deep) {
       addDeepConnectionData(containerPage.getContent(), slice.getContent());
+    }
+    if (addMetadata){
+      addConnectionMetadata(containerPage.getContent(), needURI, connectionsUri);
     }
     return containerPage;
   }
 
   @Override
   public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsAfter(final URI needURI, URI
-    resumeConnURI, final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep)
+    resumeConnURI, final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep,
+                                                                                    boolean addMetadata)
     throws NoSuchNeedException, NoSuchConnectionException {
     Slice<URI> slice = needInformationService.listConnectionURIsAfter(
       needURI, resumeConnURI, preferredSize, messageType, timeSpot);
+    URI connectionsUri = this.uriService.createConnectionsURIForNeed(needURI);
     NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
-      this.uriService.createConnectionsURIForNeed(needURI).toString(), slice);
+      connectionsUri.toString(), slice);
     if (deep) {
       addDeepConnectionData(containerPage.getContent(), slice.getContent());
     }
+    if (addMetadata){
+      addConnectionMetadata(containerPage.getContent(), needURI, connectionsUri);
+    }
     return containerPage;
   }
+
+  private void addConnectionMetadata(final Dataset content, URI needURI, URI containerURI) {
+    Model model = content.getNamedModel(createDataGraphUriFromUri(containerURI) );
+    List<Object[]> connectionCountsPerState =  needRepository.getCountsPerConnectionState(needURI);
+    Resource containerResource = model.getResource(containerURI.toString());
+    for (Object[] countForState : connectionCountsPerState){
+      ConnectionState stateName = (ConnectionState) countForState[0];
+      Long count = (Long) countForState[1];
+      Property countProperty = getRdfPropertyForState(stateName);
+      if (countProperty == null) {
+        logger.warn("did not recognize connection state " + stateName);
+        continue;
+      }
+      containerResource.addProperty(countProperty, Integer.toString(count.intValue()), XSDDatatype.XSDint);
+    }
+  }
+
+  private Property getRdfPropertyForState(ConnectionState state) {
+    switch (state){
+      case SUGGESTED: return WON.HAS_SUGGESTED_COUNT;
+      case REQUEST_RECEIVED: return WON.HAS_REQUEST_RECEIVED_COUNT;
+      case REQUEST_SENT: return WON.HAS_REQUEST_SENT_COUNT;
+      case CONNECTED: return WON.HAS_CONNECTED_COUNT;
+      case CLOSED: return WON.HAS_CLOSED_COUNT;
+    }
+    return null;
+  }
+
 
   @Override
   public Dataset listConnectionEventURIs(final URI connectionUri) throws
@@ -420,7 +466,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
                                                    WON.EVENT_CONTAINER);
     // add the events with the new format (only the URI, no content)
     List<MessageEventPlaceholder> connectionEvents = messageEventRepository.findByParentURI(connectionUri);
-    Dataset eventsContainerDataset = newDatasetWithNamedModel(createDataGraphUri(eventContainer), model);
+    Dataset eventsContainerDataset = newDatasetWithNamedModel(createDataGraphUriFromResource(eventContainer), model);
     addBaseUriAndDefaultPrefixes(eventsContainerDataset);
     for (MessageEventPlaceholder event : connectionEvents) {
       model.add(model.createStatement(eventContainer,
@@ -484,8 +530,12 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return result;
   }
 
-  private String createDataGraphUri(Resource needListPageResource) {
+  private String createDataGraphUriFromResource(Resource needListPageResource) {
     URI uri = URI.create(needListPageResource.getURI());
+    return createDataGraphUriFromUri(uri);
+  }
+
+  private String createDataGraphUriFromUri(final URI uri) {
     try {
       URI ret = new URI(uri.getScheme(), uri.getHost(), uri.getPath(), uri.getQuery(), "data");
       return ret.toString();
@@ -608,7 +658,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     for (URI needURI : uris) {
       model.add(model.createStatement(needListPageResource, RDFS.member, model.createResource(needURI.toString())));
     }
-    Dataset dataset = newDatasetWithNamedModel(createDataGraphUri(needListPageResource), model);
+    Dataset dataset = newDatasetWithNamedModel(createDataGraphUriFromResource(needListPageResource), model);
     addBaseUriAndDefaultPrefixes(dataset);
     NeedInformationService.PagedResource<Dataset,URI> containerPage = new NeedInformationService.PagedResource
       (dataset, resumeBefore, resumeAfter);

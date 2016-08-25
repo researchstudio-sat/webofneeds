@@ -160,10 +160,12 @@ public interface LinkedDataService
   /**
    * Returns a model containing all connection uris belonging to the specified need.
    * @param needURI
+   * @param addMetadata - if true, a metadata graph is added to the dataset containing counts by connection state
+   * @param deep - if true, connection data is added (not only connection URIs)
    * @return
    * @throws NoSuchNeedException
    */
-  public Dataset listConnectionURIs(final URI needURI, boolean deep)
+  public Dataset listConnectionURIs(final URI needURI, boolean deep, final boolean addMetadata)
     throws NoSuchNeedException, NoSuchConnectionException;
 
   /**
@@ -172,17 +174,18 @@ public interface LinkedDataService
    * @param page number
    * @param preferredSize preferred number of connection uris per page (null means use default)
    * @param needURI local need the connections of which are retrieved
-   * @param deep if true, the resource data of those connection uris is also part of the resource
    * @param messageType the event type that should be used for defining connection latest activity; null => all event
    *                    types
    * @param timeSpot time at which we want the list state to be fixed
+   * @param deep if true, the resource data of those connection uris is also part of the resource
+   * @param addMetadata - if true, a metadata graph is added to the dataset containing counts by connection state
    * @return
    * @throws NoSuchNeedException when specified need is not found
    * @throws NoSuchConnectionException only in case deep is set to true and connection data for a member connection
    * uri cannot be retrieved.
    */
   public NeedInformationService.PagedResource<Dataset,URI> listConnectionURIs(
-    int page, URI needURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep)
+    int page, URI needURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep, boolean addMetadata)
     throws NoSuchNeedException, NoSuchConnectionException;
 
   /**
@@ -197,13 +200,15 @@ public interface LinkedDataService
    *                    types
    * @param timeSpot time at which we want the list state to be fixed
    * @param deep if true, the resource data of those connection uris is also part of the resource
+   * @param addMetadata - if true, a metadata graph is added to the dataset containing counts by connection state
    * @return
    * @throws NoSuchNeedException when specified need is not found
    * @throws NoSuchConnectionException only in case deep is set to true and connection data for a member connection
    * uri cannot be retrieved.
    */
   public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsBefore(
-    URI needURI, URI resumeConnURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep)
+    URI needURI, URI resumeConnURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep,
+    boolean addMetadata)
     throws NoSuchNeedException, NoSuchConnectionException;
 
   /**
@@ -217,13 +222,15 @@ public interface LinkedDataService
    *                    types
    * @param timeSpot time at which we want the list state to be fixed
    * @param deep if true, the resource data of those connection uris is also part of the resource
+   * @param addMetadata - if true, a metadata graph is added to the dataset containing counts by connection state
    * @return
    * @throws NoSuchNeedException when specified need is not found
    * @throws NoSuchConnectionException only in case deep is set to true and connection data for a member connection
    * uri cannot be retrieved.
    */
   public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsAfter(
-    URI needURI, URI resumeConnURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep)
+    URI needURI, URI resumeConnURI, Integer preferredSize, WonMessageType messageType, Date timeSpot, boolean deep,
+    boolean addMetadata)
     throws NoSuchNeedException, NoSuchConnectionException;
 
 
