@@ -670,13 +670,13 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
          * usually be accessed using some sort of paging, we skip them here
          * and thus always reload them.
          */
-        if (!fetchesPartialRessource(fetchParams) &&
-            cacheItemIsOkOrUnresolvableOrFetching(uri)) {
-                cacheItemMarkAccessed(uri);
-                return Promise.resolve(uri);
+        const partialFetch = !fetchesPartialRessource(fetchParams);
+        if ( cacheItemIsOkOrUnresolvableOrFetching(uri) ) {
+            cacheItemMarkAccessed(uri);
+            return Promise.resolve(uri);
         }
 
-        if(fetchesPartialRessource(fetchParams)) {
+        if(partialFetch) {
             console.log('won.ensureLoaded: loading partial ressource ', fetchParams);
         }
 
@@ -685,16 +685,20 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
             .then(
                 (dataset) => {
                     if( !(fetchParams && fetchParams.deep) ) {
-                        cacheItemInsertOrOverwrite(uri);
+                        if(!partialFetch) {
+                            cacheItemInsertOrOverwrite(uri);
+                        }
                         return uri;
                     } else {
                         return selectLoadedResourcesFromDataset(
                             dataset
                         ).then(allLoadedResources => {
                                 //console.log('linkeddata-service-won.js: ensuring loaded deep: ', allLoadedResources);
-                                allLoadedResources.forEach(resourceUri =>
+                                allLoadedResources.forEach(resourceUri => {
+                                    if (! (partialFetch && resourceUri === uri) ) {
                                         cacheItemInsertOrOverwrite(resourceUri)
-                                )
+                                    }
+                                })
                                 return allLoadedResources;
                             }
                         )
