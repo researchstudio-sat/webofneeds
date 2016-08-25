@@ -31,10 +31,7 @@
     <title>Linked Data Page View</title>
 </head>
 <body>
-    <h1>This is linked data. Don't Panic!</h1>
     <h2>This page describes the resource with this URI: ${resourceURI}</h2>
-
-    Description of the Resource (human readable):
     <div style="background-color:#C9C9E0">
     <pre>
 <%
@@ -48,6 +45,6 @@
     </pre>
     </div>
     <hr>
-If you can handle it, you may want to see the <a href="${dataURI}">machine-readable form</a>
+<a href="${dataURI}">Machine-readable form</a> (with content negotiation via Accept: header)
 </body>
 </html>
