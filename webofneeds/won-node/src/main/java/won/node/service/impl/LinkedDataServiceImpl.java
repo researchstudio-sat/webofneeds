@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.NoSuchMessageException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
@@ -270,7 +271,9 @@ public class LinkedDataServiceImpl implements LinkedDataService
       blankNodeUriSpec.addProperty(WON.HAS_EVENT_URI_PREFIX, model.createLiteral(this.eventResourceURIPrefix));
   }
 
-  public Dataset getConnectionDataset(final URI connectionUri, final boolean includeEventContainer) throws
+  @Override
+  public Dataset getConnectionDataset(final URI connectionUri, final boolean includeEventContainer, final boolean
+    includeLatestEvent) throws
     NoSuchConnectionException
   {
     Connection connection = needInformationService.readConnection(connectionUri);
@@ -289,15 +292,31 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
     // add WON node link
     connectionResource.addProperty(WON.HAS_WON_NODE, model.createResource(this.resourceURIPrefix));
-
+    Dataset eventDataset = null;
     if (includeEventContainer) {
       //create event container and attach it to the member
       Resource eventContainer = model.createResource(connection.getConnectionURI().toString()+"/events");
       connectionResource.addProperty(WON.HAS_EVENT_CONTAINER, eventContainer);
+      eventContainer.addProperty(RDF.type, WON.EVENT_CONTAINER);
+      if (includeLatestEvent) {
+        //we add the latest event in the connection
+        Slice<URI> latestEvents =
+          messageEventRepository.getMessageURIsByParentURI(connectionUri, new PageRequest(0, 1));
+        if (latestEvents.hasContent()) {
+          URI eventURI = latestEvents.getContent().get(0);
+          //add the event's dataset
+          eventDataset = getDatasetForUri(eventURI);
+          //connect the event to its container
+          eventContainer.addProperty(RDFS.member, model.getResource(eventURI.toString()));
+        }
+      }
       addAdditionalData(model, connection.getConnectionURI(), connectionResource);
     }
 
-    return addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUriFromResource(connectionResource), model));
+    Dataset connectionDataset = addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUriFromResource
+                                                                       (connectionResource), model));
+    RdfUtils.addDatasetToDataset(connectionDataset, eventDataset);
+    return connectionDataset;
   }
 
 
@@ -669,7 +688,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     //add the connection model for each connection URI
     for (URI connectionURI : connectionURIs) {
       Dataset connectionDataset =
-        getConnectionDataset(connectionURI, true);
+        getConnectionDataset(connectionURI, true, true);
       RdfUtils.addDatasetToDataset(dataset, connectionDataset);
     }
   }

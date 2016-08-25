@@ -256,12 +256,14 @@ public interface LinkedDataService
   /**
    * Returns a model describing the connection with the specified URI.
    * @param connectionUri
+   * @param includeEventContainer adds the event container
+   * @param includeLatestEvent adds the latest event to the event container
    * @return
    * @throws NoSuchConnectionException
    */
-  public Dataset getConnectionDataset(final URI connectionUri, boolean includeEventContainer) throws
+  Dataset getConnectionDataset(URI connectionUri, boolean includeEventContainer, boolean
+    includeLatestEvent) throws
     NoSuchConnectionException;
-
   /**
    * Returns a dataset containing all event uris belonging to the specified connection.
    * @param connectionUri
