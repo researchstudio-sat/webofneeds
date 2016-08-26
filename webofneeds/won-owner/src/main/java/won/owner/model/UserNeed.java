@@ -20,6 +20,7 @@ import won.protocol.model.URIConverter;
 
 import javax.persistence.*;
 import java.net.URI;
+import java.util.Date;
 
 /**
  * Entity wrapping a uri identifying a user's need.
@@ -45,8 +46,19 @@ public class UserNeed
   @Column( name = "conversations")
   private boolean conversations = true;
 
+  /* The creation date of the (as observed by the owner app) */
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column( name = "creationDate", nullable = false)
+  private Date creationDate;
+
+
 
   public UserNeed() {
+  }
+
+  @PrePersist
+  protected void onCreate() {
+    creationDate = new Date();
   }
 
   public UserNeed(URI uri) {
@@ -91,5 +103,13 @@ public class UserNeed
 
   public void setConversations(final boolean conversations) {
     this.conversations = conversations;
+  }
+
+  public Date getCreationDate() {
+    return creationDate;
+  }
+
+  public void setCreationDate(final Date creationDate) {
+    this.creationDate = creationDate;
   }
 }

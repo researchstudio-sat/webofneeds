@@ -11,6 +11,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
+
 /**
  * User: Gabriel
  * Date: 02.11.12
@@ -47,4 +48,8 @@ public interface NeedRepository extends WonRepository<Need> {
   Slice<URI> getNeedURIsAfter(@Param("referenceDate") Date referenceDate,
                               @Param("needState") NeedState needState,
                               Pageable pageable);
+
+  @Query("select state, count(*) from Connection where needURI = :need group by state")
+  List<Object[]> getCountsPerConnectionState(@Param("need") URI needURI);
+
 }
