@@ -1,0 +1,1 @@
+certbot certonly --webroot -w /usr/share/nginx/html -d www.matchat.org --email florian.kleedorfer@researchstudio.at -t --noninteractive --agree-tos

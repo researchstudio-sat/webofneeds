@@ -33,9 +33,11 @@ public class WonNode {
     private Long id;
 
     @Column( name = "wonNodeURI", unique = true )
+    @Convert( converter = URIConverter.class)
     private URI wonNodeURI;
 
     @Column( name = "brokerURI")
+    @Convert( converter = URIConverter.class)
     private URI brokerURI;
 
     @Column(name = "ownerProtocolEndpoint")

@@ -20,16 +20,25 @@ public class BAState
   private Long id;
   /* The URI of the coordinator */
   @Column( name = "coordinatorURI" )
+  @Convert( converter = URIConverter.class )
   private URI coordinatorURI;
+
   /* The URI of the participant */
   @Column( name = "participantURI")
+  @Convert( converter = URIConverter.class )
   private URI participantURI;
+
   /* The state of the need */
   @Column( name = "baStateURI")
+  @Convert( converter = URIConverter.class )
   private URI baStateURI;
+
   @Column( name = "facetTypeURI")
+  @Convert( converter = URIConverter.class )
   private URI facetTypeURI;
+
   @Column( name = "baPhase")
+  @Convert( converter = URIConverter.class )
   private URI baPhaseURI;
 
   @Override

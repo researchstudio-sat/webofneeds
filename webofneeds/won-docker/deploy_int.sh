@@ -118,12 +118,15 @@ docker -H satsrv04:2375 run --name=wonnode_int -d -e "uri.host=satsrv04.research
 "activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 -p 62911:62911 \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/wonnode_int:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/agent:/opt/agent/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9010:9010 \
--e "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62911,server=y,suspend=n
+-e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+-Dinspectit.agent.name=wonnode_int_satsrv04
+-Xdebug -Xrunjdwp:transport=dt_socket,address=62911,server=y,suspend=n
 -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false
 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010
 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
@@ -141,12 +144,15 @@ docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv06.research
 -e "activemq.broker.port=61617" -p 8889:8443 -p 61617:61617 -p 62911:62911 \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/wonnode_int:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/agent:/opt/agent/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9010:9010 \
--e "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62911,server=y,suspend=n
+-e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+-Dinspectit.agent.name=wonnode_int_satsrv05
+-Xdebug -Xrunjdwp:transport=dt_socket,address=62911,server=y,suspend=n
 -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false
 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010
 -Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
@@ -173,8 +179,11 @@ docker -H satsrv06:2375 run --name=matcher_service_int -d -e "node.host=satsrv06
 -e "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8889/won/resource,https://satsrv06.researchstudio.at/won/resource" \
 -e "cluster.local.port=2561" -e "cluster.seed.port=2561" -p 2561:2561 -p 62913:62913 \
 -v $base_folder/won-client-certs/matcher_service_int:/usr/src/matcher-service/client-certs/ \
+-v $base_folder/agent:/opt/agent/ \
 -p 9010:9010 \
--e "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62913,server=y,suspend=n
+-e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+-Dinspectit.agent.name=matcher_service_int_satsrv06
+-Xdebug -Xrunjdwp:transport=dt_socket,address=62913,server=y,suspend=n
 -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false
 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010
 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
@@ -205,12 +214,15 @@ docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.r
 -e "node.default.http.port=8889" -p 8082:8443 -p 62912:62912 \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/owner_int:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/agent:/opt/agent/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv04:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9011:9011 \
--e "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62912,server=y,suspend=n
+-e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+-Dinspectit.agent.name=owner_int_satsrv04
+-Xdebug -Xrunjdwp:transport=dt_socket,address=62912,server=y,suspend=n
 -Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false
 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011
 -Djava.rmi.server.hostname=satsrv04.researchstudio.at" \
@@ -229,12 +241,15 @@ docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv06.r
 -e "uri.prefix.node.default=https://satsrv06.researchstudio.at/won" \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/owner_int:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/agent:/opt/agent/ \
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satsrv05:5433/won_owner" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9011:9011 \
--e "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62912,server=y,suspend=n
+-e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+-Dinspectit.agent.name=owner_int_satsrv05
+-Xdebug -Xrunjdwp:transport=dt_socket,address=62912,server=y,suspend=n
 -Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false
 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011
 -Djava.rmi.server.hostname=satsrv05.researchstudio.at" \
@@ -253,7 +268,10 @@ docker -H satsrv06:2375 run --name=matcher_solr_int -d -e "node.host=satsrv06.re
 -e "matcher.solr.uri.solr.server=http://satsrv06.researchstudio.at:8984/solr/" \
 -e "matcher.solr.uri.solr.server.public=http://satsrv06.researchstudio.at:8984/solr/" \
 -p 9011:9011 -p 62914:62914 \
--e "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62914,server=y,suspend=n
+-v $base_folder/agent:/opt/agent/ \
+-e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+-Dinspectit.agent.name=matcher_solr_int_satsrv06
+-Xdebug -Xrunjdwp:transport=dt_socket,address=62914,server=y,suspend=n
 -Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false
 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011
 -Djava.rmi.server.hostname=satsrv06.researchstudio.at" \
