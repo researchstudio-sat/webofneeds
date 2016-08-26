@@ -197,7 +197,7 @@ public class
   public String showConnectionPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
     try {
       URI connectionURI = uriService.createConnectionURIForId(identifier);
-      Dataset rdfDataset = linkedDataService.getConnectionDataset(connectionURI, true);
+      Dataset rdfDataset = linkedDataService.getConnectionDataset(connectionURI, true, true);
       model.addAttribute("rdfDataset", rdfDataset);
       model.addAttribute("resourceURI", connectionURI.toString());
       model.addAttribute("dataURI", uriService.toDataURIIfPossible(connectionURI).toString());
@@ -460,23 +460,6 @@ public class
       return "notFoundView"; //TODO: should display an error view
     }
   }
-
-  /**
-   * @deprecated  functionality moved to @see won.protocol.service.LinkedDataServiceImpl#addDeepConnectionData()
-  */
-  @Deprecated
-    private void addDeepConnectionData(String needUri, Dataset dataset) throws NoSuchConnectionException {
-        //add the connection model to each connection
-        //TODO: use a more principled way to find the connections resource!
-        Resource connectionsResource = dataset.getDefaultModel().getResource(needUri + "/connections/");
-        NodeIterator it = dataset.getDefaultModel().listObjectsOfProperty(connectionsResource, RDFS.member);
-        while (it.hasNext()){
-            RDFNode node = it.next();
-            Dataset connectionDataset =
-                    this.linkedDataService.getConnectionDataset(URI.create(node.asResource().getURI()), false); //do not include event data
-            RdfUtils.addDatasetToDataset(dataset, connectionDataset);
-        }
-    }
 
   /**
    * If the HTTP 'Accept' header is an RDF MIME type
@@ -858,7 +841,7 @@ public class
     logger.debug("readConnection() called");
     URI connectionUri = URI.create(this.connectionResourceURIPrefix + "/" + identifier);
     try {
-      Dataset model = linkedDataService.getConnectionDataset(connectionUri, true);
+      Dataset model = linkedDataService.getConnectionDataset(connectionUri, true, true);
       //TODO: connection information does change over time. The immutable connection information should never expire, the mutable should
       HttpHeaders headers =new HttpHeaders();
       addCORSHeader(headers);
