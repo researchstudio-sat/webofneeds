@@ -134,8 +134,11 @@ docker -H satsrv04:2375 run --name=wonnode_master -d -e "uri.host=satsrv04.resea
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/wonnode_master:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/agent:/opt/agent/ \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 8888:8443 -p 61616:61616 \
+-e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+-Dinspectit.agent.name=wonnode_master_satsrv04" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/wonnode:master
 
@@ -153,8 +156,11 @@ docker -H satsrv05:2375 run --name=wonnode_master -d -e "uri.host=satsrv07.resea
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/wonnode_master:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/agent:/opt/agent/ \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 8888:8443 -p 61616:61616 \
+-e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+-Dinspectit.agent.name=wonnode_master_satsrv05" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/wonnode:master
 
@@ -208,8 +214,11 @@ docker -H satsrv04:2375 run --name=owner_master -d -e "node.default.host=satsrv0
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/owner_master:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/agent:/opt/agent/ \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 8081:8443 \
+-e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+-Dinspectit.agent.name=owner_master_satsrv04" \
 -e "JMEM_OPTS=-Xmx1000m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/owner:master
 
@@ -227,8 +236,11 @@ docker -H satsrv05:2375 run --name=owner_master -d -e "node.default.host=satsrv0
 -e "db.sql.user=won" -e "db.sql.password=won" \
 -v $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/owner_master:/usr/local/tomcat/won/client-certs/ \
+-v $base_folder/agent:/opt/agent/ \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 8081:8443 \
+-e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+-Dinspectit.agent.name=owner_master_satsrv05" \
 -e "JMEM_OPTS=-Xmx1000m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/owner:master
 
