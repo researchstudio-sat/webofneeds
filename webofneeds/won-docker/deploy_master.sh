@@ -183,7 +183,10 @@ docker -H satsrv06:2375 run --name=matcher_service_master -d -e "node.host=satsr
 -e "uri.sparql.endpoint=http://satsrv06.researchstudio.at:9999/bigdata/namespace/kb/sparql" \
 -e "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8888/won/resource,https://satsrv07.researchstudio.at/won/resource" \
 -v $base_folder/won-client-certs/matcher_service_master:/usr/src/matcher-service/client-certs/ \
+-v $base_folder/agent:/opt/agent/ \
 -e "cluster.local.port=2551" -e "cluster.seed.port=2551" -p 2551:2551 \
+-e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+-Dinspectit.agent.name=matcher_service_master_satsrv06" \
 -e "JMEM_OPTS=-Xmx170m -XX:MaxMetaspaceSize=160m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/matcher_service:master
 
@@ -255,6 +258,9 @@ docker -H satsrv06:2375 run --name=matcher_solr_master -d -e "node.host=satsrv06
 -e "matcher.solr.uri.solr.server=http://satsrv06.researchstudio.at:8983/solr/" \
 -e "matcher.solr.uri.solr.server.public=http://satsrv06.researchstudio.at:8983/solr/" \
 -p 2552:2552 \
+-v $base_folder/agent:/opt/agent/ \
+-e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+-Dinspectit.agent.name=matcher_solr_master_satsrv06" \
 -e "JMEM_OPTS=-Xmx200m -XX:MaxMetaspaceSize=150m -XX:+HeapDumpOnOutOfMemoryError" \
 -m 350m webofneeds/matcher_solr:master
 
