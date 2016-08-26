@@ -17,7 +17,6 @@ import {
     actionTypes,
     actionCreators,
     getConnectionRelatedData,
-    messageTypeToEventType
 } from './actions';
 
 import {

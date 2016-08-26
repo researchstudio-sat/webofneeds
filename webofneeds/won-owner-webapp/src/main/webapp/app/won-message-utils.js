@@ -426,7 +426,7 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
     dispatchWellFormed = (payload) => curriedDispatch(wellFormedPayload(payload));
 
     const allLoadedPromise = Promise.all(
-        ownNeedUris.map(uri => won.ensureLoaded(uri, uri, deep = true))
+        ownNeedUris.map(uri => won.ensureLoaded(uri, { requesterWebId: uri, deep: true }))
     );
 
     const allDataRawPromise = allLoadedPromise.then(() => {

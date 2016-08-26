@@ -23,6 +23,7 @@ import {
     urisToLookupMap,
     is,
     clone,
+    contains,
     camel2Hyphen,
 } from '../utils';
 import * as q from 'q';
@@ -36,35 +37,41 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
 
 
     /**
+     * paging parameters as found
+     * [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
+     * @type {string[]}
+     */
+    const legitQueryParameters = ['p', 'resumebefore', 'resumeafter', 'type', 'state', 'timeof', 'deep'];
+    /**
      * This function is used to generate the query-strings.
      * Should anything about the way the API is accessed changed,
      * adapt this function.
      * @param dataUri
-     * @param requesterWebId: the WebID used to access the ressource (used
-     *          by the owner-server to pick the right key-pair)
      * @param queryParams a config object whose fields get appended as get parameters.
-     *               important parameters include:
-     *                 * deep: 'true' to automatically resolve containers (e.g.
-     *                         the event-container)
-     *                 * paging parameters as found
-     *                   [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
+     *     important parameters include:
+     *         * requesterWebId: the WebID used to access the ressource (used
+     *                 by the owner-server to pick the right key-pair)
+     *         * deep: 'true' to automatically resolve containers (e.g.
+     *                 the event-container)
+     *         * paging parameters as found
+     *           [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
      * @returns {string}
      */
-    function queryString(dataUri, requesterWebId, queryParams) {
+    function queryString(dataUri, queryParams = {}) {
         let queryOnOwner = '/owner/rest/linked-data/?';
-        if(requesterWebId) {
+        if(queryParams.requesterWebId) {
             queryOnOwner +=
                 'requester=' +
-                encodeURIComponent(requesterWebId) +
+                encodeURIComponent(queryParams.requesterWebId) +
                 '&';
         }
 
         // The owner hands this part -- the one in the `uri=` paramater -- directly to the node.
         let queryOnNode = dataUri;
-        if(queryParams) {
-            let firstParam = true;
-            for(let [paramName, paramValue] of entries(queryParams)) {
-                queryOnNode = queryOnNode + (firstParam? '?' : '&');
+        let firstParam = true;
+        for(let [paramName, paramValue] of entries(queryParams)) {
+            if(contains(legitQueryParameters, paramName)) {
+                queryOnNode = queryOnNode + (firstParam ? '?' : '&');
                 firstParam = false;
                 queryOnNode = queryOnNode + paramName + '=' + paramValue;
             }
@@ -374,9 +381,10 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         privateData.cacheStatus[uri].state = CACHE_ITEM_STATE.DIRTY;
     }
 
-    var cacheItemMarkUnresolvable = function cacheItemMarkUnresolvable(uri){
+    var cacheItemMarkUnresolvable = function cacheItemMarkUnresolvable(uri, reason){
         //console.log("linkeddata-service-won.js: mark unres:      " + uri);
         privateData.cacheStatus[uri] = {timestamp: new Date().getTime(), state: CACHE_ITEM_STATE.UNRESOLVABLE};
+        console.error("Couldn't resolve " + uri + ". reason: " + JSON.stringify(reason));
     }
 
     var cacheItemMarkFetching = function cacheItemMarkFetching(uri){
@@ -555,15 +563,24 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * The uri is used for cache control.
      */
     won.addJsonLdData = function(uri, data) {
-        //console.log("linkeddata-service-won.js: storing jsonld data for uri: " + uri);
-        privateData.store.load("application/ld+json", data, function (success, results) {
-            //privateData.store.load("application/ld+json", data, function (success, results) {
-            //console.log("linkeddata-service-won.js: added jsonld data to rdf store, success: " + success);
-            if (success) {
-                cacheItemInsertOrOverwrite(uri);
-            }
-        });
-    }
+        return new Promise((resolve, reject) =>
+            //console.log("linkeddata-service-won.js: storing jsonld data for uri: " + uri);
+            privateData.store.load("application/ld+json", data, function (success, results) {
+                //privateData.store.load("application/ld+json", data, function (success, results) {
+                //console.log("linkeddata-service-won.js: added jsonld data to rdf store, success: " + success);
+                if (success) {
+                    //TODO if this was a partial fetch, only mark
+                    // as OK if all requests to the ressource have
+                    // finished.
+                    cacheItemInsertOrOverwrite(uri);
+                    resolve(uri);
+                } else {
+                    reject('Failed to store json-ld data for ' + uri);
+                }
+
+            })
+        );
+    };
 
 
     /**
@@ -632,59 +649,79 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     /**
      * Fetches the linked data for the specified URI and saves it in the local triple-store.
      * @param uri
-     * @param requesterWebId the auth-token for the post (NOT the sessionId-cookie).
-     * Usually the uri of the need that `uri` belongs to.
-     * @deep if true, a query with this string will cause connections and events
-     * of a need to be queried along with it in one big request.
-     * @layerSize if you only want to fetch the latest N events of every connection
-     *  and N connections with latest updates.
+     * @param fetchParams: optional paramters
+     *        * requesterWebId: the WebID used to access the ressource (used
+     *            by the owner-server to pick the right key-pair)
+     *        * queryParams: GET-params as documented for `queryString`
+     *        * pagingSize: if specified the server will return the first
+     *            page (unless e.g. `queryParams.p=2` is specified when
+     *            it will return the second page of size N)
      * @return {*}
      */
-    won.ensureLoaded = function(uri, requesterWebId, deep = false, layerSize = 0) {
+    won.ensureLoaded = function(uri, fetchParams = {}) {
         if (!uri) { throw {message : "ensureLoaded: uri must not be null"}; }
 
         //console.log("linkeddata-service-won.js: ensuring loaded: " +uri);
 
-        //we also allow unresolvable resources, so as to avoid re-fetching them.
-        //we also allow resources that are currently being fetched.
-        if (cacheItemIsOkOrUnresolvableOrFetching(uri)){
+        /*
+         * we also allow unresolvable resources, so as to avoid re-fetching them.
+         * we also allow resources that are currently being fetched.
+         * as containers (lists in rdf) are inherently prone to change and will
+         * usually be accessed using some sort of paging, we skip them here
+         * and thus always reload them.
+         */
+        const partialFetch = !fetchesPartialRessource(fetchParams);
+        if ( cacheItemIsOkOrUnresolvableOrFetching(uri) ) {
             cacheItemMarkAccessed(uri);
             return Promise.resolve(uri);
         }
 
-        /*
-         * TODO we can't mark all resources as fetching when doing
-         * a deep request. We need to find a way to deal with this.
-         * Atm we risk running parallel requests.
-         */
-        //uri isn't loaded or needs to be refrehed. fetch it.
-        const queryParams = {};
-        if(deep) queryParams.deep = 'true';
-        if(layerSize) queryParams['layer-size'] = layerSize;
+        if(partialFetch) {
+            console.log('won.ensureLoaded: loading partial ressource ', fetchParams);
+        }
 
         cacheItemMarkFetching(uri);
-        return won.fetch(uri, { requesterWebId, queryParams } )
+        return won.fetch(uri, fetchParams )
             .then(
                 (dataset) => {
-                    if(!deep) {
-                        cacheItemInsertOrOverwrite(uri)
+                    if( !(fetchParams && fetchParams.deep) ) {
+                        if(!partialFetch) {
+                            cacheItemInsertOrOverwrite(uri);
+                        }
                         return uri;
                     } else {
                         return selectLoadedResourcesFromDataset(
                             dataset
                         ).then(allLoadedResources => {
                                 //console.log('linkeddata-service-won.js: ensuring loaded deep: ', allLoadedResources);
-                                allLoadedResources.forEach(resourceUri =>
+                                allLoadedResources.forEach(resourceUri => {
+                                    if (! (partialFetch && resourceUri === uri) ) {
                                         cacheItemInsertOrOverwrite(resourceUri)
-                                )
+                                    }
+                                })
                                 return allLoadedResources;
                             }
                         )
                     }
                 },
-                reason => cacheItemMarkUnresolvable(uri)
+                reason => cacheItemMarkUnresolvable(uri, reason)
             )
 
+    };
+
+    function fetchesPartialRessource(requestParams) {
+        if(!requestParams) {
+            return false;
+        } else if(requestParams.pagingSize) {
+            return true;
+        } else {
+            return !!(requestParams['p'] ||
+                requestParams['resumebefore'] ||
+                requestParams['resumeafter'] ||
+                requestParams['type'] ||
+                requestParams['state'] ||
+                requestParams['timeof']);
+        }
     };
 
     /**
@@ -710,6 +747,20 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                 lock.releaseUpdateLock();
                 throw({msg: 'Failed to fetch ' + uri, causedBy: error});
             });
+    };
+
+    function fetchesPartialRessource(requestParams) {
+        if(requestParams.pagingSize) {
+                return true;
+            } else {
+                const qp = requestParams.queryParams || requestParams;
+                return !!(qp['p'] ||
+                          qp['resumebefore'] ||
+                          qp['resumeafter'] ||
+                          qp['type'] ||
+                          qp['state'] ||
+                          qp['timeof']);
+            }
     };
 
     function selectLoadedResourcesFromDataset(dataset) {
@@ -783,7 +834,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     function loadFromOwnServerIntoCache(uri, params) { //requesterWebId, queryParams) {
         return new Promise((resolve, reject) => {
 
-            let requestUri = queryString(uri, params.requesterWebId, params.queryParams);
+            let requestUri = queryString(uri, params);
 
             console.log("linkeddata-service-won.js: fetching:        " + requestUri);
 
@@ -808,9 +859,20 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                         //console.log("linkeddata-service-won.js: fetched:         " + uri)
                         Promise.resolve()
                             .then(() =>
-                                won.deleteNode(uri)) //remove any remaining stale data
+                                fetchesPartialRessource(params) ?
+                                    /* as paging is only used for containers
+                                     * and they don't lose entries, we can
+                                     * simply merge on top of the already
+                                     * loaded triples below. So we skip removing
+                                     * the previously loaded data here:
+                                     */
+                                    undefined : //NOP
+                                    /* remove any remaining stale data: */
+                                    won.deleteNode(uri)
+                            )
                             .then(() =>
-                                won.addJsonLdData(uri, dataset))
+                                won.addJsonLdData(uri, dataset)
+                            )
                             .then(() =>
                                 resolve(dataset));
                     }
@@ -1100,51 +1162,6 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         return resultJson;
     }
 
-    /**
-     * Utility method that first ensures the resourceURI is locally loaded, then fetches the object of the
-     * specified property, which must be present only once.
-     * @param resourceURI
-     * @param propertyURI
-     * @returns {*}
-     */
-    won.getUniqueObjectOfProperty = function(resourceURI, propertyURI){
-        if (typeof resourceURI === 'undefined' || resourceURI == null  ){
-            throw {message : "getUniqueObjectOfProperty: resourceURI must not be null"};
-        }
-        if (typeof propertyURI === 'undefined' || propertyURI == null  ){
-            throw {message : "getUniqueObjectOfProperty: propertyURI must not be null"};
-        }
-        return won.ensureLoaded(resourceURI).then(
-            function(){
-                var lock = getReadUpdateLockPerUri(resourceURI);
-                return lock.acquireReadLock().then(
-                    function () {
-                        try {
-                            var resultData = {};
-                            privateData.store.node(resourceURI, function (success, graph) {
-                                if (rejectIfFailed(success, graph,{message : "Error loading object of property " + propertyURI + " of resource " + resourceURI + ".", allowNone : false, allowMultiple: true})){
-                                    return;
-                                }
-                                var results = graph.match(resourceURI, propertyURI, null);
-                                if (rejectIfFailed(success, results,{message : "Error loading object of property " + propertyURI + " of resource " + resourceURI + ".", allowNone : false, allowMultiple: false})){
-                                    return;
-                                }
-                                resultData.result = results.triples[0].object.nominalValue;
-                            });
-                            return resultData.result;
-                        } catch (e) {
-                            return q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI + ". Reason: " + e);
-                        } finally {
-                            //we don't need to release after a promise resolves because
-                            //this function isn't deferred.
-                            lock.releaseReadLock();
-                        }
-                        return q.reject("could not load object of property " + propertyURI + " of resource " + resourceURI);
-                    }
-                );
-            })
-    }
-
     won.getWonNodeUriOfNeed = function(needUri){
         if (typeof needUri === 'undefined' || needUri == null  ){
             throw {message : "getWonNodeUriOfNeed: needUri must not be null"};
@@ -1366,7 +1383,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
             throw {message : "getAllConnectioneventUris: connectionUri must not be null"};
         }
         //TODO ensure that the eventcontainer is loaded
-        return won.ensureLoaded(connectionUri, requesterWebId).then(
+        return won.ensureLoaded(connectionUri, { requesterWebId }).then(
             function(){
                var lock = getReadUpdateLockPerUri(connectionUri);
                return lock.acquireReadLock().then(
@@ -1410,7 +1427,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         if (typeof connectionUri === 'undefined' || connectionUri == null  ){
             throw {message : "crawlConnectionData: connectionUri must not be null"};
         }
-        return won.ensureLoaded(connectionUri, requesterWebId).then(
+        return won.ensureLoaded(connectionUri, { requesterWebId }).then(
             function(){
                 return won.getAllConnectioneventUris(connectionUri, requesterWebId).then(
                     function(uris){
@@ -1702,7 +1719,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
 
         let releaseLock = undefined;
 
-        const nodePromise = won.ensureLoaded(uri, requesterWebId)
+        const nodePromise = won.ensureLoaded(uri, { requesterWebId })
             .then(() => {
                 const lock = getReadUpdateLockPerUri(uri);
                 releaseLock = () => lock.releaseReadLock();
@@ -1943,7 +1960,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
             } else {
                 //console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute resolving property paths ...");
                 Array.prototype.push.apply(relevantResources, resolvedUris);
-                var loadedPromises = relevantResources.map(function(x){ return won.ensureLoaded(x, requesterWebId)});
+                var loadedPromises = relevantResources.map(x => won.ensureLoaded(x, { requesterWebId }) );
                 return q.all(loadedPromises)
                     .then(
                         function (x) {

@@ -139,7 +139,7 @@ export function runMessagingAgent(redux) {
 
             /* Other clients or matcher initiated stuff: */
             if(msgFromExternal && msgFromOwner && msgFromOwner.hasMessageType === won.WONMSG.connectionMessageCompacted) {
-                redux.dispatch(actionCreators.messages__connectionMessageReceived(events));
+                redux.dispatch(actionCreators.messages__connectionMessageReceived({ events }));
                 return true;
             } else {
                 return false;
