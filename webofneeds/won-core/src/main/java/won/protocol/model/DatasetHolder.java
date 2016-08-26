@@ -44,6 +44,7 @@ public class DatasetHolder
   //the URI of the dataset
   @Id
   @Column( name = "datasetURI", unique = true)
+  @Convert( converter = URIConverter.class )
   private URI uri;
 
   //the model as a byte array

@@ -16,6 +16,8 @@
 
 package won.owner.model;
 
+import won.protocol.model.URIConverter;
+
 import javax.persistence.*;
 import java.net.URI;
 
@@ -31,6 +33,7 @@ public class UserNeed
   private Long id;
 
   @Column( name = "uri", unique = true)
+  @Convert( converter = URIConverter.class)
   private URI uri;
 
   @Column( name = "matches")

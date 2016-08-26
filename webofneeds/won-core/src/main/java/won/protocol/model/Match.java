@@ -31,14 +31,22 @@ public class Match
     @GeneratedValue
     @Column( name = "id")
     private long id;
+
     @Column( name = "fromNeed")
+    @Convert( converter = URIConverter.class)
     private URI fromNeed;
+
     @Column( name = "toNeed")
+    @Convert( converter = URIConverter.class)
     private URI toNeed;
+
     @Column( name = "score")
     private double score;
+
     @Column( name = "originator")
+    @Convert( converter = URIConverter.class)
     private URI originator;
+
     @Column( name = "eventId")
     private long eventId;
 
