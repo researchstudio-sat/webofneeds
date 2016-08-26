@@ -125,7 +125,7 @@ docker -H satsrv04:2375 run --name=wonnode_int -d -e "uri.host=satsrv04.research
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9010:9010 \
 -e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
--Dinspectit.agent.name=wonnode_int_satsrv04
+-Dinspectit.agent.name=int_satsrv04_wonnode
 -Xdebug -Xrunjdwp:transport=dt_socket,address=62911,server=y,suspend=n
 -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false
 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010
@@ -151,7 +151,7 @@ docker -H satsrv05:2375 run --name=wonnode_int -d -e "uri.host=satsrv06.research
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9010:9010 \
 -e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
--Dinspectit.agent.name=wonnode_int_satsrv05
+-Dinspectit.agent.name=int_satsrv05_wonnode
 -Xdebug -Xrunjdwp:transport=dt_socket,address=62911,server=y,suspend=n
 -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false
 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010
@@ -182,7 +182,7 @@ docker -H satsrv06:2375 run --name=matcher_service_int -d -e "node.host=satsrv06
 -v $base_folder/agent:/opt/agent/ \
 -p 9010:9010 \
 -e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
--Dinspectit.agent.name=matcher_service_int_satsrv06
+-Dinspectit.agent.name=int_satsrv06_matcher_service
 -Xdebug -Xrunjdwp:transport=dt_socket,address=62913,server=y,suspend=n
 -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false
 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010
@@ -221,7 +221,7 @@ docker -H satsrv04:2375 run --name=owner_int -d -e "node.default.host=satsrv04.r
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9011:9011 \
 -e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
--Dinspectit.agent.name=owner_int_satsrv04
+-Dinspectit.agent.name=int_satsrv04_owner
 -Xdebug -Xrunjdwp:transport=dt_socket,address=62912,server=y,suspend=n
 -Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false
 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011
@@ -248,7 +248,7 @@ docker -H satsrv05:2375 run --name=owner_int -d -e "node.default.host=satsrv06.r
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -p 9011:9011 \
 -e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
--Dinspectit.agent.name=owner_int_satsrv05
+-Dinspectit.agent.name=int_satsrv05_owner
 -Xdebug -Xrunjdwp:transport=dt_socket,address=62912,server=y,suspend=n
 -Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false
 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011
@@ -270,7 +270,7 @@ docker -H satsrv06:2375 run --name=matcher_solr_int -d -e "node.host=satsrv06.re
 -p 9011:9011 -p 62914:62914 \
 -v $base_folder/agent:/opt/agent/ \
 -e "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
--Dinspectit.agent.name=matcher_solr_int_satsrv06
+-Dinspectit.agent.name=int_satsrv06_matcher_solr
 -Xdebug -Xrunjdwp:transport=dt_socket,address=62914,server=y,suspend=n
 -Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false
 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011
