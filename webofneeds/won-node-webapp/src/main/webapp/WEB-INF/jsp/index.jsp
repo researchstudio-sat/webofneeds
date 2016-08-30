@@ -25,9 +25,7 @@ This is the index page of the WON node implementation.
 Useful links:
  </p>
 <ul>
-  <li><a href="/won/protocol/owner">Owner Protocol Web Services</a></li>
-  <li><a href="/won/protocol/matcher">Matcher Protocol Web Services</a></li>
-  <li><a href="/won/protocol/need">Need Protocol Web Services</a></li>
+  <li><a href="/won/resource/">WoN node descriptor</a></li>
   <li><a href="/won/resource/need/">needs as linked Data </a></li>
   <li><a href="/won/resource/connection/">connections as linked Data</a></li>
 </ul>
