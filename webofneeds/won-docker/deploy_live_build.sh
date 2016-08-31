@@ -6,7 +6,7 @@ base_folder=/home/install
 
 #won_certificate_passwd=changeit
 #WORKSPACE=/var/lib/jenkins/jobs/webofneeds-integration-test/workspace
-#GENERATE_NEW_CERTIFICATES=false
+#GENERATE_NEW_CERTIFICATES=true
 #MAIL_USER=
 #MAIL_PASS=
 #MAIL_HOST=
@@ -72,7 +72,7 @@ docker -H satcluster01:2375 run --name=gencert -e CN="www.matchat.org" \
 # if it is not already started
 ssh root@satcluster02 mkdir -p $base_folder/won-server-certs
 mkdir -p ~/won-server-certs
-rm ~/won-server-certs/*
+rm -f ~/won-server-certs/*
 rsync root@satcluster01:$base_folder/won-server-certs/* ~/won-server-certs/
 rsync ~/won-server-certs/* root@satcluster02:$base_folder/won-server-certs/
 
@@ -157,6 +157,8 @@ docker -H satcluster02:2375 rm wonnode || echo 'No docker container found to rem
 docker -H satcluster02:2375 run --name=wonnode -d -e "uri.host=$public_node_uri" -e "http.port=8443" \
 -e "uri.prefix=https://${public_node_uri}/won" \
 -e "activemq.broker.port=61616" -p 8443:8443 -p 61616:61616 \
+-v $base_folder/letsencrypt/certs/live/www.matchat.org/fullchain.pem:/usr/local/tomcat/conf/ssl/t-cert.pem \
+-v $base_folder/letsencrypt/certs/live/www.matchat.org/privkey.pem:/usr/local/tomcat/conf/ssl/t-key.pem \
 -v $base_folder/letsencrypt/certs:/usr/local/tomcat/conf/ssl/ \
 -v $base_folder/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/ \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
@@ -164,7 +166,6 @@ docker -H satcluster02:2375 run --name=wonnode -d -e "uri.host=$public_node_uri"
 -e "db.sql.jdbcDriverClass=org.postgresql.Driver" \
 -e "db.sql.jdbcUrl=jdbc:postgresql://satcluster02.researchstudio.at:5433/won_node" \
 -e "db.sql.user=won" -e "db.sql.password=won" \
--e "JMEM_OPTS=-Xmx400m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/wonnode:${deploy_image_tag_name}
 
 # bigdata
@@ -187,14 +188,12 @@ docker ${docker_options} run --name=matcher_service -d -e "node.host=satcluster0
 -e "wonNodeController.wonNode.crawl=https://${public_node_uri}/won/resource" \
 -e "cluster.local.port=2561" -e "cluster.seed.port=2561" -p 2561:2561 \
 -v $base_folder/won-client-certs/matcher_service:/usr/src/matcher-service/client-certs/ \
--e "JMEM_OPTS=-Xmx250m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
 webofneeds/matcher_service:${deploy_image_tag_name}
 
 # solr server
 echo run solr server container
 docker ${docker_options} pull webofneeds/solr
-if ! docker ${docker_options} run --name=solr -d -p 7071:8080 -p 8984:8983 --env CATALINA_OPTS="-Xmx200m \
-     -XX:MaxPermSize=150m -XX:+HeapDumpOnOutOfMemoryError" webofneeds/solr; then
+if ! docker ${docker_options} run --name=solr -d -p 7071:8080 -p 8984:8983 webofneeds/solr; then
   echo solr server container already available, restart old container
   docker ${docker_options} restart solr
 fi
@@ -231,9 +230,7 @@ docker ${docker_options} run --name=matcher_solr -d -e "node.host=satcluster01.r
 -e "cluster.seed.host=satcluster01.researchstudio.at" -e "cluster.seed.port=2561" -e "cluster.local.port=2562" \
 -e "matcher.solr.uri.solr.server=http://satcluster01.researchstudio.at:8984/solr/" \
 -e "matcher.solr.uri.solr.server.public=http://satcluster01.researchstudio.at:8984/solr/" \
--p 2562:2562 -e "JMEM_OPTS=-Xmx250m -XX:MaxMetaspaceSize=200m -XX:+HeapDumpOnOutOfMemoryError" \
-webofneeds/matcher_solr:${deploy_image_tag_name}
-
+-p 2562:2562 webofneeds/matcher_solr:${deploy_image_tag_name}
 
 
 # =====================================================================
