@@ -35,6 +35,7 @@ function genComponentConf() {
                 ng-click="self.openConversationOption()"/>
         </div>
         <div class="pm__content">
+            <div ng-show="self.eventsPending">Loading&hellip;</div>
             <div
                 class="pm__content__message"
                 ng-repeat="message in self.chatMessages"
@@ -87,6 +88,9 @@ function genComponentConf() {
 
 
             const loadStuff = () => {
+
+                this.eventsPending = true; // TODO should be determined in select
+
                 const state = this.$ngRedux.getState();
                 const connectionUri = selectOpenConnectionUri(state);
                 const connection = selectOpenConnection(state);
@@ -100,6 +104,7 @@ function genComponentConf() {
                 //requiringData AC
                 won.getEventsOfConnection(connectionUri, connection.get('belongsToNeed'))
                     .then(events => {
+                        this.eventsPending = false; // TODO should be determined in select
                         this.$ngRedux.dispatch({
                             type: 'requiredData',
                             payload: {
