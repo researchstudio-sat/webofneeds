@@ -97,6 +97,7 @@ function genComponentConf() {
                  * Check during every select?
                  */
 
+                if(this.eventsPending || this.eventsLoaded) return; // only start loading once.
                 this.eventsPending = true; // TODO should be determined in select
 
                 const state = this.$ngRedux.getState();
@@ -113,6 +114,7 @@ function genComponentConf() {
                 won.getEventsOfConnection(connectionUri, connection.get('belongsToNeed'))
                     .then(events => {
                         this.eventsPending = false; // TODO should be determined in select
+                        this.eventsLoaded = true;
                         this.$ngRedux.dispatch({
                             type: 'requiredData',
                             payload: {
