@@ -7,7 +7,11 @@ import chatTextFieldModule from './chat-textfield';
 import { attach, is, delay, msStringToDate } from '../utils.js'
 import { actionCreators }  from '../actions/actions';
 import { labels, relativeTime } from '../won-label-utils';
-import { selectAllByConnections, selectOpenConnectionUri } from '../selectors';
+import {
+    selectAllByConnections,
+    selectOpenConnectionUri,
+    selectOpenConnection,
+} from '../selectors';
 import { selectTimestamp } from '../won-utils'
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
@@ -82,18 +86,50 @@ function genComponentConf() {
 
 
 
-            console.log('post-messages.js: executing constructor.');
-            // the connection has finished initializing. Or not? Not indeed,
-            // the caching mechanisms should de-dupe the requests.
-            const state = self.$ngRedux.getState();
-            const connectionUri = selectOpenConnectionUri(state);
-            const connection = state.getIn(['connections', connectionUri]);
-            const chatMessages = selectChatMessages(state);
-            if(connectionUri) {
+            const loadStuff = () => {
+                const state = this.$ngRedux.getState();
+                const connectionUri = selectOpenConnectionUri(state);
+                const connection = selectOpenConnection(state);
                 console.log('post-messages.js: testing for selective loading. ',
                     connectionUri, connection, chatMessages);
                 console.log('post-messages.js: calling crawlable query soon. ');
                 //TODO determine first if component is actually visible (angular calls the constructor long before that)
+
+
+                //TODO only do this if the events aren't defined!
+                //requiringData AC
+                won.getEventsOfConnection(connectionUri, connection.get('belongsToNeed'))
+                    .then(events => {
+                        this.$ngRedux.dispatch({
+                            type: 'requiredData',
+                            payload: {
+                                events: Immutable.fromJS(events)
+                            }
+                        })
+
+                    })
+            }
+
+            //TODO delete unnecessary logging
+            //TODO call this when view is visible and the connection has been loaded (sometimes
+            // the view is faster, sometimes the connection)
+            console.log('post-messages.js: executing constructor.');
+            this.$scope.$watch('self.connection', (newCnct, oldCnct) => {
+                console.log('post-messages.js: in connection watch');
+                if(newCnct && newCnct !== oldCnct) {
+                    loadStuff();
+
+                }
+            });
+
+            // the connection has finished initializing. Or not? Not indeed,
+            // the caching mechanisms should de-dupe the requests.
+            const state = self.$ngRedux.getState();
+            const connectionUri = selectOpenConnectionUri(state);
+            const connection = selectOpenConnection(state);
+            const chatMessages = selectChatMessages(state);
+            if(connectionUri && connection) {
+                loadStuff();
             }
 
             //this.postmsg = this;
@@ -108,6 +144,8 @@ function genComponentConf() {
                 const connectionUri = selectOpenConnectionUri(state);
                 const chatMessages = selectChatMessages(state);
                 return {
+                    connectionUri,
+                    connection: selectOpenConnection(state),
                     lastUpdateTime: state.get('lastUpdateTime'),
                     connectionData: selectAllByConnections(state).get(connectionUri),
                     chatMessages: chatMessages && chatMessages.toArray(), //toArray needed as ng-repeat won't work otherwise :|

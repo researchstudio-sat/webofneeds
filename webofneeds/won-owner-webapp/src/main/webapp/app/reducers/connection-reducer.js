@@ -79,12 +79,16 @@ export default function(connections = initialState, action = {}) {
                 [msgFromOwner.uri, eventOnOwnNode.uri]
             );
 
+        case 'requiredData':
+            var loadedEvents = Immutable.fromJS(action.payload.events);
+            return loadedEvents.reduce((updatedConnections, event) => {
+                const cnctUri = event.get('hasReceiver') || event.getIn(['hasCorrespondingRemoteMessage', 'hasReceiver']);
+                return storeEventUri(updatedConnections, cnctUri, event.get('uri'));
+            }, connections);
+
         case actionTypes.messages.connectionMessageReceived:
             var eventOnOwn = action.payload.events['msg:FromExternal'];
-            return connections.updateIn(
-                [eventOnOwn.hasReceiver, 'hasEvents'],
-                eventUris => eventUris.add(eventOnOwn.uri)
-            );
+            return storeEventUri(connections, eventOnOwn.hasReceiver, eventOnOwn.uri);
 
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.openMessageReceived:
@@ -112,10 +116,21 @@ function storeConnections(connections, connectionsToStore) {
     }
 }
 
+function storeEventUri(connections, connectionUri, eventUri) {
+    return connections.updateIn(
+        [connectionUri, 'hasEvents'],
+        eventUris => eventUris?
+                eventUris.add(eventUri):
+                Immutable.Set([eventUri])
+    );
+}
+
 function storeEventUris(connections, connectionUri, eventUris) {
     return connections.updateIn(
         [connectionUri, 'hasEvents'],
-        events => events.merge(eventUris)
+        events => events ?
+            events.merge(eventUris) :
+            Immutable.Set(eventUris)
     );
 }
 
