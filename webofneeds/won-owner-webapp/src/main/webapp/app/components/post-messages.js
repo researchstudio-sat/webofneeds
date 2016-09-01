@@ -127,17 +127,19 @@ function genComponentConf() {
             //TODO call this when view is visible and the connection has been loaded (sometimes
             // the view is faster, sometimes the connection)
             console.log('post-messages.js: executing constructor.');
-            this.$scope.$watch('self.connection', (newCnct, oldCnct) => {
-                console.log('post-messages.js: in connection watch');
-                if(newCnct && newCnct !== oldCnct) {
-                    /*
-                     * the component was visible before the
-                     * connection had been loaded. But now
-                     * it's here.
-                     */
-                    loadStuff();
-                }
-            });
+            const eventWatchDeregister = this.$scope.$watch(
+                ({self}) => self.connection && self.connection.get('uri'),
+                (newCnctUri, oldCnctUri) => {
+                    console.log('post-messages.js: in connection watch', newCnctUri, oldCnctUri);
+                    if(newCnctUri && newCnctUri !== oldCnctUri) {
+                        /*
+                         * the component was visible before the
+                         * connection had been loaded. But now
+                         * it's here.
+                         */
+                        loadStuff();
+                    }
+                });
 
             // the connection has finished initializing. Or not? Not indeed,
             // the caching mechanisms should de-dupe the requests.
