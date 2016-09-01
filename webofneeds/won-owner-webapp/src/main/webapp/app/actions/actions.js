@@ -75,7 +75,6 @@ import {
     connectionsClose,
     connectionsConnect,
     connectionsFetch,
-    connectionsLoad,
     connectionsOpen,
     connectionsRate,
     connectionsChatMessage,
@@ -110,7 +109,6 @@ const actionHierarchy = {
     },
     connections:{
         fetch: connectionsFetch,
-        load: connectionsLoad,
         open: connectionsOpen,
         connect: connectionsConnect,
         accepted: INJ_DEFAULT,

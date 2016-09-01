@@ -85,28 +85,6 @@ export function connectionsFetch(data) {
     }
 }
 
-export function connectionsLoad(needUris) {
-    return dispatch => {
-        needUris.forEach(needUri =>
-                won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri)
-                    .then(function (connectionsOfNeed) {
-                        console.log("fetching connections");
-                        Promise.all(connectionsOfNeed.map(connection => getConnectionRelatedData(
-                            connection.need.value,
-                            connection.remoteNeed.value,
-                            connection.connection.value
-                        )))
-                            .then(connectionsWithRelatedData =>
-                                dispatch({
-                                    type: actionTypes.connections.load,
-                                    payload: connectionsWithRelatedData
-                                })
-                        );
-                    })
-        );
-    }
-}
-
 export function connectionsOpen(connectionUri,message) {
     return (dispatch, getState) => {
         const state = getState();
