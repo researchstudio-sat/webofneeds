@@ -35,7 +35,7 @@ function genComponentConf() {
                 ng-click="self.openConversationOption()"/>
         </div>
         <div class="pm__content">
-            <div ng-show="self.eventsPending">Loading&hellip;</div>
+            <div ng-show="self.eventsPending">[SPINNING-WHEEL] Loading&hellip;</div>
             <div
                 class="pm__content__message"
                 ng-repeat="message in self.chatMessages"
