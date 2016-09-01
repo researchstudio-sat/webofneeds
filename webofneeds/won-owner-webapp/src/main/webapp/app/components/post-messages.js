@@ -86,8 +86,16 @@ function genComponentConf() {
 
 
 
+            // TODO <HACK>
 
             const loadStuff = () => {
+                /*
+                 * TODO don't trigger this more than once! When the
+                 * events are there, there's no need to dispatch an
+                 * action again -- unless paging is involved of course.
+                 *
+                 * Check during every select?
+                 */
 
                 this.eventsPending = true; // TODO should be determined in select
 
@@ -122,8 +130,12 @@ function genComponentConf() {
             this.$scope.$watch('self.connection', (newCnct, oldCnct) => {
                 console.log('post-messages.js: in connection watch');
                 if(newCnct && newCnct !== oldCnct) {
+                    /*
+                     * the component was visible before the
+                     * connection had been loaded. But now
+                     * it's here.
+                     */
                     loadStuff();
-
                 }
             });
 
@@ -134,8 +146,13 @@ function genComponentConf() {
             const connection = selectOpenConnection(state);
             const chatMessages = selectChatMessages(state);
             if(connectionUri && connection) {
+                /*
+                 * The component has been created
+                 * after the connection had been loaded.
+                 */
                 loadStuff();
             }
+            // TODO </HACK>
 
             //this.postmsg = this;
             const selectFromState = state => {
