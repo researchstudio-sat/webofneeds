@@ -73,6 +73,8 @@ function genComponentConf() {
         </chat-textfield>
     `;
 
+
+
     class Controller {
         constructor(/* arguments = dependency injections */) {
             attach(this, serviceDependencies, arguments);
@@ -103,6 +105,9 @@ function genComponentConf() {
                 const state = this.$ngRedux.getState();
                 const connectionUri = selectOpenConnectionUri(state);
                 const connection = selectOpenConnection(state);
+
+                if(!connectionUri || !connection) return;
+
                 console.log('post-messages.js: testing for selective loading. ',
                     connectionUri, connection, chatMessages);
                 console.log('post-messages.js: calling crawlable query soon. ');
@@ -125,37 +130,31 @@ function genComponentConf() {
                     })
             }
 
+            /*
+             * If component has been created
+             * after the connection had been loaded
+             * we can already start loading events.
+             */
+            loadStuff();
+
             //TODO delete unnecessary logging
             //TODO call this when view is visible and the connection has been loaded (sometimes
             // the view is faster, sometimes the connection)
             console.log('post-messages.js: executing constructor.');
+            /*
+             * for the case that the component
+             * is visible before the connection
+             * has been loaded: set up a watch.
+             */
             const eventWatchDeregister = this.$scope.$watch(
                 ({self}) => self.connection && self.connection.get('uri'),
                 (newCnctUri, oldCnctUri) => {
                     console.log('post-messages.js: in connection watch', newCnctUri, oldCnctUri);
-                    if(newCnctUri && newCnctUri !== oldCnctUri) {
-                        /*
-                         * the component was visible before the
-                         * connection had been loaded. But now
-                         * it's here.
-                         */
-                        loadStuff();
-                    }
+                    loadStuff();
                 });
 
-            // the connection has finished initializing. Or not? Not indeed,
+
             // the caching mechanisms should de-dupe the requests.
-            const state = self.$ngRedux.getState();
-            const connectionUri = selectOpenConnectionUri(state);
-            const connection = selectOpenConnection(state);
-            const chatMessages = selectChatMessages(state);
-            if(connectionUri && connection) {
-                /*
-                 * The component has been created
-                 * after the connection had been loaded.
-                 */
-                loadStuff();
-            }
 
             // TODO pro-active loading!!!
 
