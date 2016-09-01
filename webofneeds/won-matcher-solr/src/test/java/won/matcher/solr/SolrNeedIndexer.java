@@ -19,8 +19,6 @@ import java.io.IOException;
  */
 public class SolrNeedIndexer
 {
-
-
   public static void main(String[] args) throws IOException, InterruptedException, JsonLdError {
 
     AnnotationConfigApplicationContext ctx =
@@ -34,7 +32,7 @@ public class SolrNeedIndexer
     Model needModel = needProducer.create();
     int needs = 0;
     while (!needProducer.isExhausted()) {
-      // indexer.indexNeedModel(needModel, UUID.randomUUID().toString());
+      //indexer.indexNeedModel(needModel, UUID.randomUUID().toString(), true);
       indexer.indexNeedModel(needModel, SolrMatcherEvaluation.createNeedId(DatasetFactory.create(needModel)), true);
       needs++;
 

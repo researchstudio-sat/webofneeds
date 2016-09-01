@@ -820,6 +820,7 @@
     </lst>
   </requestHandler>
 
+  <requestHandler name="/mlt" class="solr.MoreLikeThisHandler" />
 
   <!-- A Robust Example
        

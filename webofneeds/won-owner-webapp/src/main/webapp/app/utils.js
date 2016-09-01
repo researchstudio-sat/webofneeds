@@ -679,11 +679,10 @@ export function getIn(obj, path) {
         case 1:
             return obj[path[0]];
         default:
-            return obj[path[0]] && getIn( obj[path[0]] , path.slice(1) )
+            return obj && obj[path[0]] && getIn( obj[path[0]] , path.slice(1) )
     }
 }
 
 export function contains(arr, el) {
     return arr.indexOf(el) > 0;
 }
-

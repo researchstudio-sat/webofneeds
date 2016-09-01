@@ -197,7 +197,7 @@ public class
   public String showConnectionPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
     try {
       URI connectionURI = uriService.createConnectionURIForId(identifier);
-      Dataset rdfDataset = linkedDataService.getConnectionDataset(connectionURI, true);
+      Dataset rdfDataset = linkedDataService.getConnectionDataset(connectionURI, true, true);
       model.addAttribute("rdfDataset", rdfDataset);
       model.addAttribute("resourceURI", connectionURI.toString());
       model.addAttribute("dataURI", uriService.toDataURIIfPossible(connectionURI).toString());
@@ -216,6 +216,7 @@ public class
     @RequestParam(value="resumebefore", required=false) String beforeId,
     @RequestParam(value="resumeafter", required=false) String afterId,
     @RequestParam(value="type", required=false) String type,
+    @RequestParam(value="deep", required=false, defaultValue = "false") boolean deep,
     Model model, HttpServletResponse response) {
 
     try {
@@ -227,12 +228,12 @@ public class
 
       if (page == null && beforeId == null && afterId == null) {
         // all events, does not support type filtering for clients that do not support paging
-        rdfDataset = linkedDataService.listConnectionEventURIs(connectionURI);
+        rdfDataset = linkedDataService.listConnectionEventURIs(connectionURI, deep);
 
       } else if (page != null) {
         // a page having particular page number is requested
         NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionEventURIs
-          (connectionURI, page, null, msgType);
+          (connectionURI, page, null, msgType, deep);
         rdfDataset = resource.getContent();
 
       } else if (beforeId != null) {
@@ -240,7 +241,7 @@ public class
 
         URI referenceEvent = uriService.createEventURIForId(beforeId);
         NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionEventURIsBefore
-          (connectionURI, referenceEvent, null, msgType);
+          (connectionURI, referenceEvent, null, msgType, deep);
         rdfDataset = resource.getContent();
 
       }  else {
@@ -248,7 +249,7 @@ public class
 
         URI referenceEvent = uriService.createEventURIForId(afterId);
         NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionEventURIsAfter
-          (connectionURI, referenceEvent, null, msgType);
+          (connectionURI, referenceEvent, null, msgType, deep);
         rdfDataset = resource.getContent();
 
       }
@@ -426,20 +427,21 @@ public class
       WonMessageType eventsType = getMessageType(type);
       Dataset rdfDataset;
       if (page != null) {
-        rdfDataset = linkedDataService.listConnectionURIs(page, needURI, null, eventsType, dateParam.getDate(), deep)
+        rdfDataset = linkedDataService.listConnectionURIs(page, needURI, null, eventsType, dateParam.getDate(), deep,
+                                                          true)
                                       .getContent();
       } else if (beforeId != null) {
         URI connURI = uriService.createConnectionURIForId(beforeId);
         rdfDataset = linkedDataService.listConnectionURIsBefore(
-          needURI, connURI, null, eventsType, dateParam.getDate(), deep).getContent();
+          needURI, connURI, null, eventsType, dateParam.getDate(), deep, true).getContent();
       } else if (afterId != null) {
         URI connURI = uriService.createConnectionURIForId(afterId);
         rdfDataset = linkedDataService.listConnectionURIsAfter(
-          needURI, connURI, null, eventsType, dateParam.getDate(), deep).getContent();
+          needURI, connURI, null, eventsType, dateParam.getDate(), deep, true).getContent();
       } else {
         // all the connections of the need; does not support type and date filtering for clients that do not support
         // paging
-        rdfDataset = linkedDataService.listConnectionURIs(needURI, deep);
+        rdfDataset = linkedDataService.listConnectionURIs(needURI, deep, true);
       }
       model.addAttribute("rdfDataset", rdfDataset);
       model.addAttribute("resourceURI",
@@ -458,23 +460,6 @@ public class
       return "notFoundView"; //TODO: should display an error view
     }
   }
-
-  /**
-   * @deprecated  functionality moved to @see won.protocol.service.LinkedDataServiceImpl#addDeepConnectionData()
-  */
-  @Deprecated
-    private void addDeepConnectionData(String needUri, Dataset dataset) throws NoSuchConnectionException {
-        //add the connection model to each connection
-        //TODO: use a more principled way to find the connections resource!
-        Resource connectionsResource = dataset.getDefaultModel().getResource(needUri + "/connections/");
-        NodeIterator it = dataset.getDefaultModel().listObjectsOfProperty(connectionsResource, RDFS.member);
-        while (it.hasNext()){
-            RDFNode node = it.next();
-            Dataset connectionDataset =
-                    this.linkedDataService.getConnectionDataset(URI.create(node.asResource().getURI()), false); //do not include event data
-            RdfUtils.addDatasetToDataset(dataset, connectionDataset);
-        }
-    }
 
   /**
    * If the HTTP 'Accept' header is an RDF MIME type
@@ -856,7 +841,7 @@ public class
     logger.debug("readConnection() called");
     URI connectionUri = URI.create(this.connectionResourceURIPrefix + "/" + identifier);
     try {
-      Dataset model = linkedDataService.getConnectionDataset(connectionUri, true);
+      Dataset model = linkedDataService.getConnectionDataset(connectionUri, true, true);
       //TODO: connection information does change over time. The immutable connection information should never expire, the mutable should
       HttpHeaders headers =new HttpHeaders();
       addCORSHeader(headers);
@@ -880,7 +865,8 @@ public class
     @RequestParam(value="p", required=false) Integer page,
     @RequestParam(value="resumebefore", required=false) String beforeId,
     @RequestParam(value="resumeafter", required=false) String afterId,
-    @RequestParam(value="type", required=false) String type) {
+    @RequestParam(value="type", required=false) String type,
+    @RequestParam(value="deep", required = false, defaultValue = "false") boolean deep) {
 
     logger.debug("readConnection() called");
     Dataset rdfDataset = null;
@@ -896,11 +882,11 @@ public class
       if (preferedSize == null) {
         // client doesn't not support paging - return all members; does not support type filtering for clients that do
         // not support paging
-        rdfDataset = linkedDataService.listConnectionEventURIs(connectionUri);
+        rdfDataset = linkedDataService.listConnectionEventURIs(connectionUri, deep);
       } else  if (page == null && beforeId == null && afterId == null) {
         // client supports paging but didn't specify which page to return - return page with latest events
         NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionEventURIs
-          (connectionUri, 1, preferedSize, msgType);
+          (connectionUri, 1, preferedSize, msgType, deep); //TODO: does not respect preferredSize if deep is used
         rdfDataset = resource.getContent();
         addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
 
@@ -908,7 +894,7 @@ public class
         // a page having particular page number is requested
 
         NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionEventURIs
-          (connectionUri, page, preferedSize, msgType);
+          (connectionUri, page, preferedSize, msgType, deep);
         rdfDataset = resource.getContent();
         addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, page, passableMap);
 
@@ -917,7 +903,7 @@ public class
 
         URI referenceEvent = uriService.createEventURIForId(beforeId);
         NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionEventURIsBefore
-          (connectionUri, referenceEvent, preferedSize, msgType);
+          (connectionUri, referenceEvent, preferedSize, msgType, deep);
         rdfDataset = resource.getContent();
         addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
 
@@ -926,7 +912,7 @@ public class
 
         URI referenceEvent = uriService.createEventURIForId(afterId);
         NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionEventURIsAfter
-          (connectionUri, referenceEvent, preferedSize, msgType);
+          (connectionUri, referenceEvent, preferedSize, msgType, deep);
         rdfDataset = resource.getContent();
         addPagedResourceInSequenceHeader(headers, connectionEventsURI, resource, passableMap);
 
@@ -1084,16 +1070,16 @@ public class
       //if no preferred size provided by the client => the client does not support paging, return everything:
       if (preferedSize == null) {
         //does not support date and type filtering for clients that do not support paging
-        rdfDataset = linkedDataService.listConnectionURIs(needUri, deep);
+        rdfDataset = linkedDataService.listConnectionURIs(needUri, deep, true);
       // if no page or resume parameter is specified, display the latest connections:
       } else if (page == null && beforeId == null && afterId == null) {
         NeedInformationService.PagedResource<Dataset, URI> resource =
-          linkedDataService.listConnectionURIs(1, needUri, preferedSize, eventsType, dateParam.getDate(), deep);
+          linkedDataService.listConnectionURIs(1, needUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
         rdfDataset = resource.getContent();
         addPagedResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
       } else if (page != null) {
         NeedInformationService.PagedResource<Dataset, URI> resource =
-          linkedDataService.listConnectionURIs(page, needUri, preferedSize, eventsType, dateParam.getDate(), deep);
+          linkedDataService.listConnectionURIs(page, needUri, preferedSize, eventsType, dateParam.getDate(), deep, true);
         rdfDataset = resource.getContent();
         addPagedResourceInSequenceHeader(headers, connectionsURI, resource, page, passableQuery);
       } else {
@@ -1101,7 +1087,7 @@ public class
         if (beforeId != null) {
           URI resumeConnURI = uriService.createConnectionURIForId(beforeId);
           NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionURIsBefore(
-            needUri, resumeConnURI, preferedSize, eventsType, dateParam.getDate(), deep);
+            needUri, resumeConnURI, preferedSize, eventsType, dateParam.getDate(), deep, true);
           rdfDataset = resource.getContent();
           addPagedResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
 
@@ -1109,7 +1095,7 @@ public class
         } else { // if (afterId != null)
           URI resumeConnURI = uriService.createConnectionURIForId(afterId);
           NeedInformationService.PagedResource<Dataset,URI> resource = linkedDataService.listConnectionURIsAfter(
-            needUri, resumeConnURI, preferedSize, eventsType, dateParam.getDate(), deep);
+            needUri, resumeConnURI, preferedSize, eventsType, dateParam.getDate(), deep, true);
           rdfDataset = resource.getContent();
           addPagedResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
         }

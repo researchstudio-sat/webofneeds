@@ -4,13 +4,15 @@
 
 
 import  won from '../won-es6';
-import { actionTypes, actionCreators, getConnectionRelatedData, messageTypeToEventType } from './actions';
+import { actionTypes, actionCreators, getConnectionRelatedData } from './actions';
 import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from '../won-message-utils';
 
 import Immutable from 'immutable';
 
 import {
     checkHttpStatus,
+    contains,
+    clone,
 } from '../utils';
 
 import {
@@ -192,28 +194,11 @@ export function successfulCreate(event) {
     }
 }
 
-export function connectionMessageReceived(events) {
-    return dispatch => {
-        const eventOnRemote = events['msg:FromOwner'];
-        const eventOnOwn = events['msg:FromExternal'];
-        eventOnRemote.eventType = messageTypeToEventType[eventOnRemote.hasMessageType].eventType;
-        //TODO data.hasReceiver, the connectionUri is undefined in the response message
-        won.invalidateCacheForNewMessage(eventOnOwn.hasReceiver)
-        .then(() => getConnectionData(eventOnRemote, eventOnOwn))
-        .then(data =>
-            dispatch({
-                type: actionTypes.messages.connectionMessageReceived,
-                payload: data
-            })
-        )
-    }
-}
-
 export function openMessageReceived(events) {
     return dispatch => {
         const eventOnRemote = events['msg:FromOwner'];
         const eventOnOwn = events['msg:FromExternal'];
-        eventOnRemote.eventType = messageTypeToEventType[eventOnRemote.hasMessageType].eventType;
+        eventOnRemote.eventType = won.messageType2EventType[eventOnRemote.hasMessageType];
         won.invalidateCacheForNewMessage(eventOnOwn.hasReceiver || eventOnRemote.hasReceiver)
         .then(() =>
                 getConnectionData(eventOnRemote, eventOnOwn))
@@ -232,7 +217,7 @@ export function connectMessageReceived(events) {
     return dispatch => {
         const eventOnRemote = events['msg:FromOwner'];
         const eventOnOwn = events['msg:FromExternal'];
-        eventOnRemote.eventType = messageTypeToEventType[eventOnRemote.hasMessageType].eventType;
+        eventOnRemote.eventType = won.messageType2EventType[eventOnRemote.hasMessageType];
         won.invalidateCacheForNewConnection(eventOnOwn.hasReceiver, eventOnRemote.hasReceiverNeed)
         .then(() => getConnectionData(eventOnRemote, eventOnOwn))
         .then(data =>
@@ -245,6 +230,16 @@ export function connectMessageReceived(events) {
 
 }
 
+/**
+ * @deprecated due to the reason given in the TODO.
+ * TODO this function indirectly fetches the entire
+ * connection again! It should be enough to just
+ * use the two events we get in most cases and make
+ * the reducers correspondingly smarter.
+ * @param eventOnRemote
+ * @param eventOnOwn
+ * @return {*}
+ */
 function getConnectionData(eventOnRemote, eventOnOwn) {
     return won
         .getConnectionWithOwnAndRemoteNeed(eventOnRemote.hasReceiverNeed, eventOnRemote.hasSenderNeed)
@@ -255,10 +250,23 @@ function getConnectionData(eventOnRemote, eventOnOwn) {
                 connectionData.uri
             )
             .then(data => {
-                //making sure it's the same thing. trying to approach a point,
-                // where this is *just* a uri and everythinng else is in the state.
+
+                if(data.events.filter(e => e.uri === eventOnOwn.uri).length === 0) {
+                    //
+                    /*
+                     * if data.events doesn't contain the arguments-events,
+                     * add them. they might not be contained in the events-list
+                     * due to a race condition, i.e. if data hasn't been
+                     * stored on the node when the query resolves.
+                     */
+                    const eventOnOwn_ = clone(eventOnOwn);
+                    eventOnOwn_.hasCorrespondingRemoteMessage = clone(eventOnRemote);
+                    data.events.push( eventOnOwn_ );
+                }
+
                 data.receivedEvent = eventOnOwn.uri;
                 data.updatedConnection = connectionData.uri;
+
                 return data
 
             })
@@ -267,7 +275,7 @@ function getConnectionData(eventOnRemote, eventOnOwn) {
 
 export function hintMessageReceived(event) {
     return dispatch=> {
-        event.eventType = messageTypeToEventType[event.hasMessageType].eventType;
+        event.eventType = won.messageType2EventType[event.hasMessageType];
         won.invalidateCacheForNewConnection(event.hasReceiver, event.hasReceiverNeed)
             .then(() => {
                 let needUri = event.hasReceiverNeed;

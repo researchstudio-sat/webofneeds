@@ -258,7 +258,7 @@ export function buildCreateMessage(needData, wonNodeUri) {
         title: needData.title, //mandatory
         description: needData.description,
         publishedContentUri: publishedContentUri, //mandatory
-        tags: needData.tags? needData.tags.join(',') : undefined,
+        tags: needData.tags,
         attachmentUris: attachmentUris, //optional, should be same as in `attachments` below
         longitude: getIn(needData, ['location', 'lon']),
         latitude: getIn(needData, ['location', 'lat']),
@@ -426,7 +426,7 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
     dispatchWellFormed = (payload) => curriedDispatch(wellFormedPayload(payload));
 
     const allLoadedPromise = Promise.all(
-        ownNeedUris.map(uri => won.ensureLoaded(uri, uri, deep = true))
+        ownNeedUris.map(uri => won.ensureLoaded(uri, { requesterWebId: uri, deep: true }))
     );
 
     const allDataRawPromise = allLoadedPromise.then(() => {
@@ -457,7 +457,7 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
 
         const allTheirNeedsPromise =
             allConnectionsPromise.then(connections => {
-                const theirNeedUris = []
+                const theirNeedUris = [];
                 for(const [connectionUri, connection] of entries(connections)) {
                     theirNeedUris.push(connection.hasRemoteNeed);
                 }

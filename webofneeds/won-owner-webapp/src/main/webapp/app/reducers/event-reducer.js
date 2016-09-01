@@ -101,12 +101,24 @@ export default function(state = initialState, action = {}) {
 
 
         case actionTypes.messages.connectionMessageReceived:
+            var eventOnRemote = Immutable.fromJS(action.payload.events['msg:FromOwner']);
+            eventOnRemote = eventOnRemote.set(
+                    'eventType',
+                    won.messageType2EventType[eventOnRemote.get('hasMessageType')]
+            );
+            var event = Immutable.fromJS(action.payload.events['msg:FromExternal'])
+                .set( 'hasCorrespondingRemoteMessage', eventOnRemote );
+            var eventUri = event.get('uri');
+            return state
+                .update('unreadEventUris', unread => unread.add(eventUri))
+                .update('events', events => events.set(eventUri, event));
+
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.openMessageReceived:
         case actionTypes.messages.hintMessageReceived:
             //TODO events should be an object too
             var event = action.payload.events.filter(e => e.uri === action.payload.receivedEvent)[0];
-            event.unreadUri = action.payload.updatedConnection;
+            event.unreadUri = action.payload.updatedConnection; //TODO never read afaict
 
             var updatedState = state.update('unreadEventUris', unread => unread.add(event.uri));
             return storeConnectionRelatedData(updatedState, action.payload);

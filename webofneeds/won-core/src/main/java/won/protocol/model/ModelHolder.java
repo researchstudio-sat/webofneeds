@@ -44,6 +44,7 @@ public class ModelHolder
   //the URI of the model
   @Id
   @Column( name = "modelURI", unique = true)
+  @Convert( converter = URIConverter.class)
   private URI uri;
 
   //the model as a byte array
