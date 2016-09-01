@@ -21,6 +21,7 @@
 package won.owner.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import won.protocol.model.URIConverter;
 
 import javax.persistence.*;
 import java.net.URI;
@@ -44,6 +45,7 @@ public class Draft
 	private Long id;
 
   @Column( name = "draftURI", unique = true)
+  @Convert( converter = URIConverter.class)
   private URI draftURI;
 
   @Column( length=10000)

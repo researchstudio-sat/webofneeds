@@ -19,11 +19,15 @@ public class Facet {
     @GeneratedValue
     @Column( name = "id" )
     private Long id;
+
     /* The uri of the facet's need object */
     @Column( name = "needURI")
+    @Convert( converter = URIConverter.class)
     private URI needURI;
+
     /* The uri of the facet's type */
     @Column( name = "typeURI")
+    @Convert( converter = URIConverter.class)
     private URI typeURI;
 
     public Long getId() {

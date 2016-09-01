@@ -160,6 +160,18 @@ public class WON
   public static final Resource CONNECTION_STATE_CONNECTED = m.createResource(ConnectionState.CONNECTED.getURI().toString());
   public static final Resource CONNECTION_STATE_CLOSED = m.createResource(ConnectionState.CLOSED.getURI().toString());
 
+  public static final Property HAS_SUGGESTED_COUNT = m.createProperty(BASE_URI,
+                                                                                 "hasSuggestedCount");
+  public static final Property HAS_REQUEST_RECEIVED_COUNT = m.createProperty(BASE_URI,
+                                                                                 "hasRequestReceivedCount");
+  public static final Property HAS_REQUEST_SENT_COUNT = m.createProperty(BASE_URI,
+                                                                             "hasRequestSentCount");
+  public static final Property HAS_CONNECTED_COUNT = m.createProperty(BASE_URI,
+                                                                             "hasConnectedCount");
+  public static final Property HAS_CLOSED_COUNT = m.createProperty(BASE_URI,
+                                                                             "hasClosedCount");
+
+
   //adds a flag to a need
   public static final Property HAS_FLAG = m.createProperty(BASE_URI+"hasFlag");
 

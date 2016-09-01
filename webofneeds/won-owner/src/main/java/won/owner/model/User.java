@@ -41,6 +41,7 @@ public class User implements UserDetails{
 
 
   @OneToMany(fetch = FetchType.EAGER)
+	@OrderBy("creationDate desc")
   private List<UserNeed> userNeeds;
 
   @Column(name = "role")

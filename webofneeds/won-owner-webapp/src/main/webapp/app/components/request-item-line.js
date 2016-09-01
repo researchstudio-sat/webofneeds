@@ -103,7 +103,7 @@ function genComponentConf() {
         }
 
         openMessage(request) {
-            this.events__read(request.connection.uri)
+            //this.events__read(request.connection.uri)
         }
     
 

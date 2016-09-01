@@ -1,0 +1,2 @@
+# try to renew the certificate every 12 hours at a random time (--dry-run can be used for testing)
+0 */12 * * * perl -e 'sleep int(rand(3600))' && echo \ncronjob running at `date` >> /var/log/cron.log && /usr/local/bin/certificate-request-and-renew.sh >> /var/log/cron.log 2>&1
