@@ -152,6 +152,28 @@ function genComponentConf() {
                  */
                 loadStuff();
             }
+
+            // TODO pro-active loading!!!
+
+            // check in every select?
+            /*
+            use this approach if there's no flags or we need to check
+            outside of any component:
+            ```
+            const ensureLoaded = () => {
+                const state = self.$ngRedux.getState();
+                const connection = selectOpenConnection(state);
+                // pulled the eventsPending check to here, to avoid the expensive subset calculation
+                if(!self.eventsPending && !self.eventsLoaded && connection) {
+                    var desiredEvents = connection.get('hasEvents');
+                    var loadedEvents = state.getIn(['events','events']).keySeq();
+                    if(!desiredEvents.isSubset(loadedEvents)) {
+                        loadStuff();
+                    }
+                }
+            }
+            ```
+            */
             // TODO </HACK>
 
             //this.postmsg = this;
