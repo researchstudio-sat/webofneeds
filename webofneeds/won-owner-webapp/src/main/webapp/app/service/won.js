@@ -27,7 +27,7 @@
      *
      */
 
-    won.debugmode = true; //if you set this to true, the created needs will get flagged as debug needs in order to get matches and requests from the debugbot
+    won.debugmode = false; //if you set this to true, the created needs will get flagged as debug needs in order to get matches and requests from the debugbot
 
     won.WON = {};
     won.WON.baseUri = "http://purl.org/webofneeds/model#";
