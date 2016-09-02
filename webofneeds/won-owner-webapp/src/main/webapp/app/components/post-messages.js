@@ -117,7 +117,7 @@ function genComponentConf() {
                 //TODO only do self if the events aren't defined!
                 //requiringData AC
                 self.eventsPending = true; // TODO should be determined in select
-                won.getEventsOfConnection(connectionUri, connection.get('belongsToNeed'))
+                won.getEventsOfConnection(connectionUri, { requesterWebId: connection.get('belongsToNeed') })
                     .then(events => {
                         self.eventsPending = false; // TODO should be determined in select
                         self.eventsLoaded = true;

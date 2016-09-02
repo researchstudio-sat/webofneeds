@@ -1276,7 +1276,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         .then(connectionUris =>
             urisToLookupMap(
                 connectionUris,
-                uri => won.getConnection(uri, requesterWebId)
+                uri => won.getConnection(uri, { requesterWebId })
             )
         );
 
@@ -1334,7 +1334,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * @return {*} the most recent event for that connection as a full object.
      */
     won.getLatestEventOfConnection = (connectionUri, requesterWebId) =>
-        won.getEventsOfConnection(connectionUri, requesterWebId)
+        won.getEventsOfConnection(connectionUri, { requesterWebId })
             //find latest event:
             .then(eventsLookup => {
                 let latestEvent = {};
@@ -1350,23 +1350,23 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * Returns all events associated with a given connection
      * in a promise for an object of (eventUri -> eventData)
      * @param connectionUri
-     * @param requesterWebId
+     * @param fetchParams See `ensureLoaded`.
      */
-    won.getEventsOfConnection = function(connectionUri, requesterWebId) {
-        return won.getEventUrisOfConnection(connectionUri, requesterWebId)
+    won.getEventsOfConnection = function(connectionUri, fetchParams) {
+        return won.getEventUrisOfConnection(connectionUri, fetchParams)
             .then(eventUris => urisToLookupMap(eventUris,
-                    eventUri => won.getEvent(eventUri, requesterWebId))
+                    eventUri => won.getEvent(eventUri, fetchParams))
             )
     };
 
     /**
      * Returns the uris of all events associated with a given connection
      * @param connectionUri
-     * @param requesterWebId
+     * @param fetchParams See `ensureLoaded`.
      * @returns promise for an array strings (the uris)
      */
-    won.getEventUrisOfConnection = function(connectionUri, requesterWebId) {
-        return won.getConnection(connectionUri, requesterWebId)
+    won.getEventUrisOfConnection = function(connectionUri, fetchParams) {
+        return won.getConnection(connectionUri,  fetchParams)
             .then(connection => connection.hasEvents);
     }
 
@@ -1636,26 +1636,27 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * Maps `getNodeWithAttributes` over the list of uris and
      * collects the results.
      * @param uris array of strings
-     * @param requesterWebId map/object of (uri -> node's data)
+     * @param fetchParams See `ensureLoaded`.
      */
-    won.getNodes = function(uris, requesterWebId) {
-        return urisToLookupMap(uris, uri => won.getNode(uri, requesterWebId));
+    won.getNodes = function(uris, fetchParams) {
+        return urisToLookupMap(uris, uri => won.getNode(uri, fetchParams));
     };
 
     /**
      * @param connectionUri
-     * @param requesterWebId
+     * @param fetchParams See `ensureLoaded`.
      * @return {*} the connections predicates along with the uris of associated events
      */
-    won.getConnection = function(connectionUri, requesterWebId) {
+    won.getConnection = function(connectionUri, fetchParams) {
         if(!is('String', connectionUri)) {
             throw new Error('Tried to request connection infos for sthg that isn\'t an uri: ' + connectionUri);
         }
-        return won.getNode(connectionUri, requesterWebId)
+        const requesterWebId = fetchParams && fetchParams.requesterWebId;
+        return won.getNode(connectionUri, fetchParams)
             //add the eventUris
             .then(connection => Promise.all([
                 Promise.resolve(connection),
-                won.getNode(connection.hasEventContainer, requesterWebId)
+                won.getNode(connection.hasEventContainer, fetchParams)
             ]))
             .then( ([connection, eventContainer]) => {
                 /*
@@ -1671,7 +1672,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     };
 
     //aliases (formerly functions that were just pass-throughs)
-    won.getEvent = (uri, requesterWebId) => won.getNode(uri, requesterWebId)
+    won.getEvent = (uri, fetchParams) => won.getNode(uri, fetchParams)
             .then(event => {
                 // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
                 if(is('Array', event.hasReceivedTimestamp)) {
@@ -1688,7 +1689,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                     * we fetch it here.
                     */
                     return won
-                        .getNode(event.hasCorrespondingRemoteMessage, requesterWebId)
+                        .getNode(event.hasCorrespondingRemoteMessage, fetchParams)
                         .then(correspondingEvent => {
                            event.hasCorrespondingRemoteMessage = correspondingEvent;
                            return event;
@@ -1709,17 +1710,16 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * NOTE: Atm it ignores prefixes which might lead to clashes.
      *
      * @param eventUri
-     * @param requesterWebId
+     * @param fetchParams See `ensureLoaded`.
      */
-    won.getNode = function(uri, requesterWebId) {
+    won.getNode = function(uri, fetchParams) {
         if(!uri) {
             return Promise.reject({message : "getNode: uri must not be null"})
         }
 
-
         let releaseLock = undefined;
 
-        const nodePromise = won.ensureLoaded(uri, { requesterWebId })
+        const nodePromise = won.ensureLoaded(uri, fetchParams)
             .then(() => {
                 const lock = getReadUpdateLockPerUri(uri);
                 releaseLock = () => lock.releaseReadLock();
