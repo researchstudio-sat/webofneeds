@@ -1329,24 +1329,6 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     }
     
     /**
-     * @param connectionUri
-     * @param requesterWebId
-     * @return {*} the most recent event for that connection as a full object.
-     */
-    won.getLatestEventOfConnection = (connectionUri, requesterWebId) =>
-        won.getEventsOfConnection(connectionUri, { requesterWebId })
-            //find latest event:
-            .then(eventsLookup => {
-                let latestEvent = {};
-                for(let [eventUri, event] of entries(eventsLookup)) {
-                    const latestEventTime = Number.parseInt(latestEvent.hasReceivedTimestamp)
-                    const eventTime = Number.parseInt(event.hasReceivedTimestamp)
-                    latestEvent = latestEventTime >= eventTime ? latestEvent : event;
-                }
-                return latestEvent;
-            });
-
-    /**
      * Returns all events associated with a given connection
      * in a promise for an object of (eventUri -> eventData)
      * @param connectionUri
