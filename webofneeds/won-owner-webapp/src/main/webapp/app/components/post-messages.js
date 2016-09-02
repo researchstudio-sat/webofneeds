@@ -35,7 +35,10 @@ function genComponentConf() {
                 ng-click="self.openConversationOption()"/>
         </div>
         <div class="pm__content">
-            <div ng-show="self.eventsPending">[SPINNING-WHEEL] Loading&hellip;</div>
+            <img src="images/spinner/on_white.gif"
+                alt="Loading&hellip;"
+                ng-show="self.eventsPending"
+                class="hspinner"/>
             <div
                 class="pm__content__message"
                 ng-repeat="message in self.chatMessages"
