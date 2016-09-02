@@ -102,28 +102,26 @@ function genComponentConf() {
                  * Check during every select?
                  */
 
-                if(this.eventsPending || this.eventsLoaded) return; // only start loading once.
-                this.eventsPending = true; // TODO should be determined in select
+                if(self.eventsPending || self.eventsLoaded) return; // only start loading once.
 
-                const state = this.$ngRedux.getState();
+                const state = self.$ngRedux.getState();
                 const connectionUri = selectOpenConnectionUri(state);
                 const connection = selectOpenConnection(state);
 
                 if(!connectionUri || !connection) return;
 
-                console.log('post-messages.js: testing for selective loading. ',
-                    connectionUri, connection, chatMessages);
+                console.log('post-messages.js: testing for selective loading. ', connectionUri, connection);
                 console.log('post-messages.js: calling crawlable query soon. ');
                 //TODO determine first if component is actually visible (angular calls the constructor long before that)
 
-
-                //TODO only do this if the events aren't defined!
+                //TODO only do self if the events aren't defined!
                 //requiringData AC
+                self.eventsPending = true; // TODO should be determined in select
                 won.getEventsOfConnection(connectionUri, connection.get('belongsToNeed'))
                     .then(events => {
-                        this.eventsPending = false; // TODO should be determined in select
-                        this.eventsLoaded = true;
-                        this.$ngRedux.dispatch({
+                        self.eventsPending = false; // TODO should be determined in select
+                        self.eventsLoaded = true;
+                        self.$ngRedux.dispatch({
                             type: 'requiredData',
                             payload: {
                                 events: Immutable.fromJS(events)
