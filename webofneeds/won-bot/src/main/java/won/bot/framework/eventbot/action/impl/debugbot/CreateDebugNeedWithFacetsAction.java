@@ -89,15 +89,17 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
         }
         final URI reactingToNeedUri = reactingToNeedUriTmp;
         Path titlePath = PathParser.parse("won:hasContent/dc:title", DefaultPrefixUtils.getDefaultPrefixes());
-        Path usedForTestingPath = PathParser.parse("won:hasFlag", DefaultPrefixUtils.getDefaultPrefixes());
 
         String titleString = null;
         boolean createNeed = true;
 
         if (needDataset != null) {
             titleString = RdfUtils.getStringPropertyForPropertyPath(needDataset, reactingToNeedUri, titlePath);
-            createNeed = RdfUtils.getURIPropertyForPropertyPath(needDataset, reactingToNeedUri, usedForTestingPath).equals(WON.USED_FOR_TESTING);
+            createNeed = WonRdfUtils.NeedUtils.hasFlag(needDataset, reactingToNeedUri.toString(), WON.USED_FOR_TESTING)
+                         && !WonRdfUtils.NeedUtils.hasFlag(needDataset, reactingToNeedUri.toString(), WON.DO_NOT_MATCH);
         }
+
+        if (!createNeed) return; //if create need is false do not continue the debug need creation
 
         if (titleString != null){
             if (isInitialForConnect) {
@@ -110,8 +112,6 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
         } else {
             replyText = "Debug Need No. " + counter.increment();
         }
-
-        if (!createNeed) return; //if create need is false do not continue the debug need creation
 
         WonNodeInformationService wonNodeInformationService =
                 getEventListenerContext().getWonNodeInformationService();
