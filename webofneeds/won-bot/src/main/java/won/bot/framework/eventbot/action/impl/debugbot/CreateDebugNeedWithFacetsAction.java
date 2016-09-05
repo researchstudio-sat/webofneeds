@@ -44,65 +44,73 @@ import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.NeedModelBuilder;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.WON;
 
 import java.net.URI;
 
 /**
-* Creates a need with the specified facets.
-* If no facet is specified, the ownerFacet will be used.
-*/
+ * Creates a need with the specified facets.
+ * If no facet is specified, the ownerFacet will be used.
+ */
 public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
 {
 
-  private Counter counter = new CounterImpl("DebugNeedsCounter");
+    private Counter counter = new CounterImpl("DebugNeedsCounter");
 
-  private boolean isInitialForHint;
-  private boolean isInitialForConnect;
+    private boolean isInitialForHint;
+    private boolean isInitialForConnect;
 
-  public CreateDebugNeedWithFacetsAction(final EventListenerContext eventListenerContext, final String uriListName,
-                                         final boolean usedForTesting, final boolean doNotMatch, final URI... facets) {
-    super(eventListenerContext, uriListName, usedForTesting, doNotMatch, facets);
-  }
+    public CreateDebugNeedWithFacetsAction(final EventListenerContext eventListenerContext, final String uriListName,
+                                           final boolean usedForTesting, final boolean doNotMatch, final URI... facets) {
+        super(eventListenerContext, uriListName, usedForTesting, doNotMatch, facets);
+    }
 
-  @Override
+    @Override
     protected void doRun(Event event) throws Exception
     {
         String replyText = "";
         URI reactingToNeedUriTmp = null;
         Dataset needDataset = null;
         if (event instanceof NeedSpecificEvent) {
-          reactingToNeedUriTmp = ((NeedSpecificEvent) event).getNeedURI();
+            reactingToNeedUriTmp = ((NeedSpecificEvent) event).getNeedURI();
         } else {
-          logger.warn("could not process non-need specific event {}", event);
-          return;
+            logger.warn("could not process non-need specific event {}", event);
+            return;
         }
         if (event instanceof NeedCreatedEventForMatcher) {
-          needDataset = ((NeedCreatedEventForMatcher) event).getNeedData();
+            needDataset = ((NeedCreatedEventForMatcher) event).getNeedData();
         } else if (event instanceof HintDebugCommandEvent) {
-          reactingToNeedUriTmp = ((HintDebugCommandEvent) event).getRemoteNeedURI();
+            reactingToNeedUriTmp = ((HintDebugCommandEvent) event).getRemoteNeedURI();
         } else if (event instanceof ConnectDebugCommandEvent) {
-          reactingToNeedUriTmp = ((ConnectDebugCommandEvent) event).getRemoteNeedURI();
+            reactingToNeedUriTmp = ((ConnectDebugCommandEvent) event).getRemoteNeedURI();
         } else {
-          logger.error("CreateEchoNeedWithFacetsAction cannot handle " + event.getClass().getName());
-          return;
+            logger.error("CreateEchoNeedWithFacetsAction cannot handle " + event.getClass().getName());
+            return;
         }
         final URI reactingToNeedUri = reactingToNeedUriTmp;
         Path titlePath = PathParser.parse("won:hasContent/dc:title", DefaultPrefixUtils.getDefaultPrefixes());
 
         String titleString = null;
+        boolean createNeed = true;
+
         if (needDataset != null) {
-          titleString = RdfUtils.getStringPropertyForPropertyPath(needDataset, reactingToNeedUri, titlePath);
+            titleString = RdfUtils.getStringPropertyForPropertyPath(needDataset, reactingToNeedUri, titlePath);
+            createNeed = WonRdfUtils.NeedUtils.hasFlag(needDataset, reactingToNeedUri.toString(), WON.USED_FOR_TESTING)
+                         && !WonRdfUtils.NeedUtils.hasFlag(needDataset, reactingToNeedUri.toString(), WON.DO_NOT_MATCH);
         }
+
+        if (!createNeed) return; //if create need is false do not continue the debug need creation
+
         if (titleString != null){
-          if (isInitialForConnect) {
-            replyText = "Debugging with initial connect: " + titleString;
-          } else if (isInitialForHint) {
-            replyText = "Debugging with initial hint: " + titleString;
-          } else {
-            replyText = "Debugging: " + titleString;
-          }
+            if (isInitialForConnect) {
+                replyText = "Debugging with initial connect: " + titleString;
+            } else if (isInitialForHint) {
+                replyText = "Debugging with initial hint: " + titleString;
+            } else {
+                replyText = "Debugging: " + titleString;
+            }
         } else {
-          replyText = "Debug Need No. " + counter.increment();
+            replyText = "Debug Need No. " + counter.increment();
         }
 
         WonNodeInformationService wonNodeInformationService =
@@ -119,60 +127,60 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
                         .setFacetTypes(facets)
                         .build();
 
-      final Event origEvent = event;
+        final Event origEvent = event;
 
         logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
 
         WonMessage createNeedMessage = createWonMessage(wonNodeInformationService,
-          needURI, wonNodeUri, needModel);
-      //remember the need URI so we can react to success/failure responses
-      EventBotActionUtils.rememberInListIfNamePresent(getEventListenerContext(), needURI, uriListName);
+                needURI, wonNodeUri, needModel);
+        //remember the need URI so we can react to success/failure responses
+        EventBotActionUtils.rememberInListIfNamePresent(getEventListenerContext(), needURI, uriListName);
 
         EventListener successCallback = new EventListener()
         {
-          @Override
-          public void onEvent(Event event) throws Exception {
-            logger.debug("need creation successful, new need URI is {}", needURI);
-            if ((origEvent instanceof HintDebugCommandEvent) || isInitialForHint) {
-              getEventListenerContext().getEventBus()
-                                       .publish(new NeedCreatedEventForDebugHint(needURI, wonNodeUri, needModel, null));
-            } else if ((origEvent instanceof ConnectDebugCommandEvent) || isInitialForConnect) {
-              getEventListenerContext().getEventBus()
-                                       .publish(new NeedCreatedEventForDebugConnect(needURI, wonNodeUri, needModel, null));
-            } else {
-              getEventListenerContext().getEventBus()
-                                       .publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
+            @Override
+            public void onEvent(Event event) throws Exception {
+                logger.debug("need creation successful, new need URI is {}", needURI);
+                if ((origEvent instanceof HintDebugCommandEvent) || isInitialForHint) {
+                    getEventListenerContext().getEventBus()
+                            .publish(new NeedCreatedEventForDebugHint(needURI, wonNodeUri, needModel, null));
+                } else if ((origEvent instanceof ConnectDebugCommandEvent) || isInitialForConnect) {
+                    getEventListenerContext().getEventBus()
+                            .publish(new NeedCreatedEventForDebugConnect(needURI, wonNodeUri, needModel, null));
+                } else {
+                    getEventListenerContext().getEventBus()
+                            .publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
+                }
+                //put the mapping between the original and the reaction in to the context.
+                getEventListenerContext().getBotContext().put(reactingToNeedUri, needURI);
+                getEventListenerContext().getBotContext().put(needURI, reactingToNeedUri);
             }
-            //put the mapping between the original and the reaction in to the context.
-            getEventListenerContext().getBotContext().put(reactingToNeedUri, needURI);
-            getEventListenerContext().getBotContext().put(needURI, reactingToNeedUri);
-          }
         };
 
         EventListener failureCallback = new EventListener()
         {
-          @Override
-          public void onEvent(Event event) throws Exception {
-            String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
-            logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
-            EventBotActionUtils.removeFromListIfNamePresent(getEventListenerContext(), needURI, uriListName);
-            getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
-          }
+            @Override
+            public void onEvent(Event event) throws Exception {
+                String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
+                logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
+                EventBotActionUtils.removeFromListIfNamePresent(getEventListenerContext(), needURI, uriListName);
+                getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
+            }
         };
-      EventBotActionUtils.makeAndSubscribeResponseListener(
-        createNeedMessage, successCallback, failureCallback, getEventListenerContext());
+        EventBotActionUtils.makeAndSubscribeResponseListener(
+                createNeedMessage, successCallback, failureCallback, getEventListenerContext());
 
-      logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
-      getEventListenerContext().getWonMessageSender().sendWonMessage(createNeedMessage);
-      logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
+        logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
+        getEventListenerContext().getWonMessageSender().sendWonMessage(createNeedMessage);
+        logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
     }
 
 
-  public void setIsInitialForHint(final boolean isInitialForHint) {
-    this.isInitialForHint = isInitialForHint;
-  }
+    public void setIsInitialForHint(final boolean isInitialForHint) {
+        this.isInitialForHint = isInitialForHint;
+    }
 
-  public void setIsInitialForConnect(final boolean isInitialForConnect) {
-    this.isInitialForConnect = isInitialForConnect;
-  }
+    public void setIsInitialForConnect(final boolean isInitialForConnect) {
+        this.isInitialForConnect = isInitialForConnect;
+    }
 }
