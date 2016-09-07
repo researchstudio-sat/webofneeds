@@ -20,6 +20,10 @@
     font-weight: 300;
     padding: 5rem 1rem;
 
+    @media (max-width: $responsivenessBreakPoint) {
+      padding: 2rem 1rem;
+    }
+
     .title{ color: white; }
 
     .w__description {

@@ -15,6 +15,11 @@ won-flex-grid {
     width: 10rem;
     padding: 1rem 2rem;
 
+    @media (max-width: $responsivenessBreakPoint) {
+      padding: 1rem;
+      width: 8rem;
+    }
+
     .fgi__block {
       flex-direction: column;
       justify-content: space-between;
