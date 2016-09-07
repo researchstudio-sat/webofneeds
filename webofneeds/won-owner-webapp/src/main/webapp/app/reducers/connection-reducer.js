@@ -116,21 +116,27 @@ function storeConnections(connections, connectionsToStore) {
     }
 }
 
-function storeEventUri(connections, connectionUri, eventUri) {
+function storeEventUri(connections, connectionUri, newEventUri) {
+    if(!newEventUri) {
+        return connections;
+    }
     return connections.updateIn(
         [connectionUri, 'hasEvents'],
-        eventUris => eventUris?
-                eventUris.add(eventUri):
-                Immutable.Set([eventUri])
+        eventUris => eventUris && Immutable.Set.isSet(eventUris)?
+                eventUris.add(newEventUri):
+                Immutable.Set([newEventUri])
     );
 }
 
-function storeEventUris(connections, connectionUri, eventUris) {
+function storeEventUris(connections, connectionUri, newEventUris) {
+    if(!newEventUris) {
+        return connections;
+    }
     return connections.updateIn(
         [connectionUri, 'hasEvents'],
-        events => events ?
-            events.merge(eventUris) :
-            Immutable.Set(eventUris)
+        eventUris => eventUris && Immutable.Set.isSet(eventUris)?
+            eventUris.merge(newEventUris) :
+            Immutable.Set(newEventUris)
     );
 }
 
