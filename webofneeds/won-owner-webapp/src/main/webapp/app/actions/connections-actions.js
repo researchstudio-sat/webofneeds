@@ -92,7 +92,7 @@ export function connectionsOpen(connectionUri,message) {
         //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer();
-        won.getConnection(eventData.connection.uri).then(connection=> {
+        won.getConnectionWithEventUris(eventData.connection.uri).then(connection=> {
             let msgToOpenFor = {event: eventData, connection: connection};
             buildOpenMessage(msgToOpenFor, message).then(messageData=> {
                 console.log("built open message");
@@ -113,7 +113,7 @@ export function connectionsConnect(connectionUri,message) {
         //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer();
-        won.getConnection(eventData.connection.uri).then(connection=> {
+        won.getConnectionWithEventUris(eventData.connection.uri).then(connection=> {
             let msgToOpenFor = {event: eventData, connection: connection};
             buildConnectMessage(msgToOpenFor, message).then(messageData=> {
                 deferred.resolve(messageData);
@@ -132,7 +132,7 @@ export function connectionsClose(connectionUri) {
         //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer();
-        won.getConnection(eventData.connection.uri).then(connection=> {
+        won.getConnectionWithEventUris(eventData.connection.uri).then(connection=> {
             let msgToOpenFor = {event: eventData, connection: connection};
             buildCloseMessage(msgToOpenFor).then(messageData=> {
                 deferred.resolve(messageData);
@@ -154,7 +154,7 @@ export function connectionsRate(connectionUri,rating) {
         //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer();
-        won.getConnection(eventData.connection.uri).then(connection=> {
+        won.getConnectionWithEventUris(eventData.connection.uri).then(connection=> {
             let msgToRateFor = {event: eventData, connection: connection};
             buildRateMessage(msgToRateFor, rating).then(messageData=> {
                 deferred.resolve(messageData);

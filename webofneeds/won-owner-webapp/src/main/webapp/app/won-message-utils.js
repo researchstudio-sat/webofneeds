@@ -440,14 +440,14 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
 
         const allConnectionsPromise = allConnectionUrisPromise
             .then(connectionUris => //delivers an obj<idx, string>
-                urisToLookupMap(connectionUris, won.getConnection));
+                urisToLookupMap(connectionUris, won.getNode));
 
         /*
         // STARTING with selective loading
         const allEventsPromise = allConnectionUrisPromise
             .then(connectionUris => //expects an array
                 urisToLookupMap(connectionUris, connectionUri =>
-                        won.getConnection(connectionUri)
+                        won.getConnectionWithEventUris(connectionUri)
                             .then(connection =>
                                 won.getEventsOfConnection(connectionUri,connection.belongsToNeed)
                         )

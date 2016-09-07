@@ -1276,7 +1276,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         .then(connectionUris =>
             urisToLookupMap(
                 connectionUris,
-                uri => won.getConnection(uri, { requesterWebId })
+                uri => won.getConnectionWithEventUris(uri, { requesterWebId })
             )
         );
 
@@ -1348,7 +1348,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * @returns promise for an array strings (the uris)
      */
     won.getEventUrisOfConnection = function(connectionUri, fetchParams) {
-        return won.getConnection(connectionUri,  fetchParams)
+        return won.getConnectionWithEventUris(connectionUri,  fetchParams)
             .then(connection => connection.hasEvents);
     }
 
@@ -1629,7 +1629,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * @param fetchParams See `ensureLoaded`.
      * @return {*} the connections predicates along with the uris of associated events
      */
-    won.getConnection = function(connectionUri, fetchParams) {
+    won.getConnectionWithEventUris = function(connectionUri, fetchParams) {
         if(!is('String', connectionUri)) {
             throw new Error('Tried to request connection infos for sthg that isn\'t an uri: ' + connectionUri);
         }
@@ -1817,7 +1817,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                 let resultObject = {}
                 let data = Q.defer()
                 promises.push(data.promise)
-                won.getConnection(connection).then(function(connectionData){
+                won.getConnectionWithEventUris(connection).then(function(connectionData){
                     resultObject.connection = connectionData;
                     let query="prefix msg: <http://purl.org/webofneeds/message#> \n"+
                         "prefix won: <http://purl.org/webofneeds/model#> \n" +
