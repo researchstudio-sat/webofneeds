@@ -572,31 +572,6 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
 
 
     /**
-     * Adds the specified JSON-LD dataset to the store, identified by the specified uri.
-     * The uri is used for cache control.
-     */
-    won.addJsonLdData = function(uri, data) {
-        return new Promise((resolve, reject) =>
-            //console.log("linkeddata-service-won.js: storing jsonld data for uri: " + uri);
-            privateData.store.load("application/ld+json", data, function (success, results) {
-                //privateData.store.load("application/ld+json", data, function (success, results) {
-                //console.log("linkeddata-service-won.js: added jsonld data to rdf store, success: " + success);
-                if (success) {
-                    //TODO if this was a partial fetch, only mark
-                    // as OK if all requests to the ressource have
-                    // finished.
-                    cacheItemInsertOrOverwrite(uri);
-                    resolve(uri);
-                } else {
-                    reject('Failed to store json-ld data for ' + uri);
-                }
-
-            })
-        );
-    };
-
-
-    /**
      * Evaluates the specified property path via sparql on the default graph starting with the specified base uri.
      * Returns true if the query has at least one solution.
      * @param baseUri
@@ -714,6 +689,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                                     cacheItemInsertOrOverwrite(
                                         resourceUri,
                                         partialFetch && resourceUri === uri
+                                    )
                                 })
                                 return allLoadedResources;
                             }
@@ -848,55 +824,72 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * @return {Promise}
      */
     function loadFromOwnServerIntoCache(uri, params) { //requesterWebId, queryParams) {
-        return new Promise((resolve, reject) => {
+        let requestUri = queryString(uri, params);
 
-            let requestUri = queryString(uri, params);
+        console.log("linkeddata-service-won.js: fetching:        " + requestUri);
 
-            console.log("linkeddata-service-won.js: fetching:        " + requestUri);
-
-            fetch(requestUri, {
-                method: 'get',
-                credentials: "same-origin",
-                headers: {
-                    'Accept': 'application/ld+json',
-                    'Prefer': params.pagingSize?
-                        `return=representation; max-member-count="${ params.pagingSize }"` :
-                        undefined,
-                }
-            })
-            .then(dataset =>
-                dataset.json())
-            .then(
-                dataset => {
-                    //make sure we've got a non-empty dataset
-                    if (Object.keys(dataset).length === 0) {
-                        reject("failed to load " + uri);
-                    } else {
-                        //console.log("linkeddata-service-won.js: fetched:         " + uri)
-                        Promise.resolve()
-                            .then(() =>
-                                fetchesPartialRessource(params) ?
-                                    /* as paging is only used for containers
-                                     * and they don't lose entries, we can
-                                     * simply merge on top of the already
-                                     * loaded triples below. So we skip removing
-                                     * the previously loaded data here:
-                                     */
-                                    undefined : //NOP
-                                    /* remove any remaining stale data: */
-                                    won.deleteNode(uri)
-                            )
-                            .then(() =>
-                                won.addJsonLdData(uri, dataset)
-                            )
-                            .then(() =>
-                                resolve(dataset));
-                    }
-                  },
-                e =>  reject(`failed to load ${uri} due to reason: "${e}"`)
+        const datasetP = fetch(requestUri, {
+            method: 'get',
+            credentials: "same-origin",
+            headers: {
+                'Accept': 'application/ld+json',
+                'Prefer': params.pagingSize?
+                    `return=representation; max-member-count="${ params.pagingSize }"` :
+                    undefined,
+            }
+        })
+        .then(dataset =>
+            dataset.json())
+        .then( dataset =>
+            //make sure we've got a non-empty dataset
+            Object.keys(dataset).length === 0 ?
+                Promise.reject("failed to load " + uri + ": Object.keys(dataset).length == 0") :
+                dataset
+        )
+        .then(dataset =>
+            Promise.resolve()
+            .then(() =>
+                fetchesPartialRessource(params) ?
+                    /* as paging is only used for containers
+                     * and they don't lose entries, we can
+                     * simply merge on top of the already
+                     * loaded triples below. So we skip removing
+                     * the previously loaded data here:
+                     */
+                    undefined : //NOP
+                    /* remove any remaining stale data: */
+                    won.deleteNode(uri)
             )
-        });
+            .then(() =>
+                addJsonLdData(uri, dataset)
+            )
+            .then(() => dataset)
+        )
+        .catch(e =>
+            Promise.reject(`failed to load ${uri} due to reason: "${e}"`)
+        )
+
+        return datasetP;
     };
+
+    /**
+     * Adds the specified JSON-LD dataset to the store.
+     */
+    function addJsonLdData (uri, data) {
+        return new Promise((resolve, reject) =>
+            privateData.store.load("application/ld+json", data, function (success, results) {
+                if (success) {
+                    console.log('linkeddata-serice-won.js: finished storing triples ', data);
+                    resolve(uri);
+                } else {
+                    reject('Failed to store json-ld data for ' + uri);
+                }
+
+            })
+        );
+    };
+
+
 
     /**
      * Loads and returns a need and in a
@@ -1774,7 +1767,11 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                 releaseLock();
                 return node;
             })
-            .catch(releaseLock);
+            .catch(e => {
+                releaseLock();
+                throw new Exception("Couldn't get node " +
+                    uri + " with params " + fetchParams, e);
+            });
 
         return nodePromise;
     }
