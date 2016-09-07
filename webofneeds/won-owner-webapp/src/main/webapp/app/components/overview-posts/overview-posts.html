@@ -5,7 +5,9 @@
 </header>
 <main class="overviewpostscontent">
     <div class="opc__inner">
-        <div class="title clickable" ng-click="self.activePostsOpen = !self.activePostsOpen">
+        <div class="title clickable"
+            ng-click="self.activePostsOpen = !self.activePostsOpen"
+            ng-class="{'open' : self.activePostsOpen}">
             Active Posts
             <span class="title__counter">{{self.activePostsCount}}</span>
         </div>
@@ -26,7 +28,8 @@
         </won-post-item-line>
         -->
         <div class="title clickable"
-             ng-click="self.closedPostsOpen = !self.closedPostsOpen">
+             ng-click="self.closedPostsOpen = !self.closedPostsOpen"
+             ng-class="{'open' : self.closedPostsOpen}">
             Closed
             <span class="title__counter">{{self.inactivePostsCount}}</span>
         </div>
