@@ -1633,7 +1633,6 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         if(!is('String', connectionUri)) {
             throw new Error('Tried to request connection infos for sthg that isn\'t an uri: ' + connectionUri);
         }
-        const requesterWebId = fetchParams && fetchParams.requesterWebId;
         return won.getNode(connectionUri, fetchParams)
             //add the eventUris
             .then(connection => Promise.all([
