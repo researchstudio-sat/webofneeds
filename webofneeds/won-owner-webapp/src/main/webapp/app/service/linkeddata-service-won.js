@@ -683,7 +683,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
          * usually be accessed using some sort of paging, we skip them here
          * and thus always reload them.
          */
-        const partialFetch = !fetchesPartialRessource(fetchParams);
+        const partialFetch = fetchesPartialRessource(fetchParams);
         if ( cacheItemIsOkOrUnresolvableOrFetching(uri) ) {
             cacheItemMarkAccessed(uri);
             return Promise.resolve(uri);
