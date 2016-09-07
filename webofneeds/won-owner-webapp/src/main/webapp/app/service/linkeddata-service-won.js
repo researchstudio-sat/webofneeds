@@ -102,7 +102,16 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         privateData.readUpdateLocksPerUri = {}; //uri -> ReadUpdateLock
         privateData.cacheStatus = {} //uri -> {timestamp, cacheItemState}
     }
-    const CACHE_ITEM_STATE = { OK: 1, DIRTY: 2, UNRESOLVABLE: 3, FETCHING: 4};
+    /**
+     * OK: fully fetched
+     * DIRTY: has changed
+     * UNRESOLVABLE: sthg went wrong during fetching
+     * FETCHING: a request has been sent but not returned yet
+     * PARTIALLY_FETCHED: the request succeeded but only a part of the ressource was requested (i.e. ld-pagination was used)
+     * @type {{OK: number, DIRTY: number, UNRESOLVABLE: number, FETCHING: number, PARTIALLY_FETCHED: number}}
+     */
+    const CACHE_ITEM_STATE = { OK: 1, DIRTY: 2, UNRESOLVABLE: 3, FETCHING: 4, PARTIALLY_FETCHED: 5};
+
 
     won.clearStore();
 
@@ -293,11 +302,11 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      *
      * @param uri
      */
-    var cacheItemInsertOrOverwrite = function(uri){
+    var cacheItemInsertOrOverwrite = function(uri, partial){
         //console.log("linkeddata-service-won.js: add to cache:    " + uri);
         privateData.cacheStatus[uri] = {
             timestamp: new Date().getTime(),
-            state: CACHE_ITEM_STATE.OK
+            state: partial? CACHE_ITEM_STATE.PARTIALLY_FETCHED : CACHE_ITEM_STATE.OK
         };
     }
 
@@ -346,6 +355,10 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      */
     var cacheItemIsOk = function cacheItemIsOk(uri){
         return cacheItemIsInState(uri, CACHE_ITEM_STATE.OK, "loaded");
+    }
+
+    var cacheItemIsPartiallyFetched = function cacheItemIsOk(uri){
+        return cacheItemIsInState(uri, CACHE_ITEM_STATE.PARTIALLY_FETCHED, "partially loaded");
     }
 
     /**
@@ -685,19 +698,22 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
             .then(
                 (dataset) => {
                     if( !(fetchParams && fetchParams.deep) ) {
-                        if(!partialFetch) {
-                            cacheItemInsertOrOverwrite(uri);
-                        }
+                        cacheItemInsertOrOverwrite(uri, partialFetch);
                         return uri;
                     } else {
                         return selectLoadedResourcesFromDataset(
                             dataset
                         ).then(allLoadedResources => {
-                                //console.log('linkeddata-service-won.js: ensuring loaded deep: ', allLoadedResources);
                                 allLoadedResources.forEach(resourceUri => {
-                                    if (! (partialFetch && resourceUri === uri) ) {
-                                        cacheItemInsertOrOverwrite(resourceUri)
-                                    }
+                                    /*
+                                     * only mark root resource as partial.
+                                     * the other ressources should
+                                     * have been fetched fully during a
+                                     * request with the `deep`-flag
+                                     */
+                                    cacheItemInsertOrOverwrite(
+                                        resourceUri,
+                                        partialFetch && resourceUri === uri
                                 })
                                 return allLoadedResources;
                             }
