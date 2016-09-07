@@ -7,8 +7,6 @@
 
   background-color: white;
 
-  $responsivenessBreakPoint: 31rem;
-
   @include max-content-width($maxContentWidth, $minContentPadding, 'topnav');
 
   &__toasts {
