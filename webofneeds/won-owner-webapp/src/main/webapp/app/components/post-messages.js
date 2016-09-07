@@ -4,9 +4,18 @@ import angular from 'angular';
 import Immutable from 'immutable';
 import squareImageModule from './square-image';
 import chatTextFieldModule from './chat-textfield';
-import { attach, is, delay, msStringToDate } from '../utils.js'
+import {
+    attach,
+    is,
+    delay,
+    msStringToDate,
+    urisToLookupMap,
+} from '../utils.js'
 import { actionCreators }  from '../actions/actions';
-import { labels, relativeTime } from '../won-label-utils';
+import {
+    labels,
+    relativeTime,
+} from '../won-label-utils';
 import {
     selectAllByConnections,
     selectOpenConnectionUri,
@@ -117,18 +126,41 @@ function genComponentConf() {
                 //TODO only do self if the events aren't defined!
                 //requiringData AC
                 self.eventsPending = true; // TODO should be determined in select
-                won.getEventsOfConnection(connectionUri, { requesterWebId: connection.get('belongsToNeed') })
-                    .then(events => {
-                        self.eventsPending = false; // TODO should be determined in select
-                        self.eventsLoaded = true;
-                        self.$ngRedux.dispatch({
-                            type: 'requiredData',
-                            payload: {
-                                events: Immutable.fromJS(events)
-                            }
-                        })
+                const requesterWebId = connection.get('belongsToNeed');
 
+
+                const deletme = () =>
+                    store4dbg.node(connection.get('hasEventContainer'), (s,res) => {
+                        console.log('store4dbg.node: ', s, res);
+                        res.triples.forEach(t => console.log('store4dbg.node.triple: ', t.subject.nominalValue, ' -- ', t.predicate.nominalValue, ' -- ', t.object.nominalValue));
                     })
+                won.getNode(connection.get('hasEventContainer'), { requesterWebId, pagingSize: 5, deep: true})
+
+                .then(eventContainer => {
+                        console.log('store4dbg.eventContainer: ', eventContainer)
+                        deletme();
+                }) //TODO deletme; for debug
+                /*
+                .then(eventContainer =>
+                    urisToLookupMap(
+                        eventContainer.member,
+                        uri => won.getNode(uri, { requesterWebId })
+                    )
+                )
+                //.then(events => {}))
+                //won.getEventsOfConnection(connectionUri, { requesterWebId: connection.get('belongsToNeed'), pagingSize: 2 })
+                .then(events => {
+                    self.eventsPending = false; // TODO should be determined in select
+                    self.eventsLoaded = true;
+                    self.$ngRedux.dispatch({
+                        type: 'requiredData',
+                        payload: {
+                            events: Immutable.fromJS(events)
+                        }
+                    });
+
+                });
+                */
             }
 
             /*
