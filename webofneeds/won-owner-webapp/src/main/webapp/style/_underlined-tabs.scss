@@ -1,5 +1,6 @@
 @import 'flex-layout';
 @import 'sizing-utils';
+@import 'won-config';
 
 @mixin underlined-tabs($underlineColor) {
   @include flex-row-spaced;
@@ -8,6 +9,7 @@
 
   $verticalPadding: 1rem;
   $horizontalSpace: 1rem;
+  $horizontalSpaceMobile: 0.5rem;
   $selectedBorderWidth: 0.25rem;
 
   %tabs__selected {
@@ -46,9 +48,16 @@
     @include flex-bottom-center;
     margin-left: $horizontalSpace;
     margin-right: $horizontalSpace;
+
+    @media (max-width: $responsivenessBreakPoint) {
+      margin-left: $horizontalSpaceMobile;
+      margin-right: $horizontalSpaceMobile;
+    }
   }
-  li:first-of-type { margin-left: 0; }
-  li:last-of-type { margin-right: 0; }
-
-
+  li:first-of-type {
+    margin-left: 0;
+  }
+  li:last-of-type {
+    margin-right: 0;
+  }
 }
