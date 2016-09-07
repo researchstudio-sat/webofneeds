@@ -20,5 +20,10 @@
     }
   }
 
-  @include speech-bubble-top($won-light-gray, $won-line-gray, 1rem, $thinBorder, 50%);
+  @media (max-width: $responsivenessBreakPoint) {
+    @include speech-bubble-top($won-light-gray, $won-line-gray, 1rem, $thinBorder, 47%);
+  }
+  @media (min-width: $responsivenessBreakPoint) {
+    @include speech-bubble-top($won-light-gray, $won-line-gray, 1rem, $thinBorder, 50%);
+  }
 }
