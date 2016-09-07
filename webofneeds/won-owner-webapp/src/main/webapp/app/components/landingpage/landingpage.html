@@ -22,10 +22,6 @@
         <div class="title">How it works</div>
         <won-flex-grid items="::self.workGrid"></won-flex-grid>
     </div>
-    <div class="faq">
-        <div class="title">FAQs</div>
-        <won-accordion items="::self.questions"></won-accordion>
-    </div>
     <div class="try" ng-show="!self.loggedIn">
         <div class="title">Try it yourself!</div>
         <div class="sub title">We hope you like this beta version! Please note that we are experimenting a lot and
@@ -54,5 +50,9 @@
                 <button class="won-button--filled darkgray" ui-sref="createNeed({draftId: 0})">Continue without registration!</button>
             </div-->
         </div>
+    </div>
+    <div class="faq">
+        <div class="title">FAQs</div>
+        <won-accordion items="::self.questions"></won-accordion>
     </div>
 </main>
