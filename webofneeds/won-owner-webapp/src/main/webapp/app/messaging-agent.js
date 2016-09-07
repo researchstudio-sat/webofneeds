@@ -33,7 +33,6 @@ export function runMessagingAgent(redux) {
     console.log('Starting messaging agent.');
 
     /* TODOs
-     * + heartbeat? -> NOPE
      * + make it generic?
      *      + make the url a parameter?
      *      + extract the watch? / make the path a parameter?
@@ -49,6 +48,9 @@ export function runMessagingAgent(redux) {
     let ws = newSock();
     window.ws4dbg = ws;//TODO deletme
     let unsubscribeWatch = null;
+    let missedHeartbeats = 0;
+
+    setInterval(checkHeartbeat, 30000);
 
     function newSock() {
         const ws = new SockJS('/owner/msg', null, {debug: true});
@@ -56,8 +58,28 @@ export function runMessagingAgent(redux) {
         ws.onmessage = onMessage;
         ws.onerror = onError;
         ws.onclose = onClose;
+        ws.onheartbeat = onHeartbeat;
+        missedHeartbeats = 0;
+
         return ws;
     };
+
+    function onHeartbeat(e) {
+        console.log('heartbeat',e);
+        missedHeartbeats = 0;
+    }
+
+    function checkHeartbeat() {
+        console.log("checking heartbeat presence: ", missedHeartbeats);
+
+        if(++missedHeartbeats > 3) {
+            console.log("no heartbeat present invoking logout");
+            redux.dispatch(actionCreators.logout());
+        }else{
+            console.log("heartbeat present");
+        }
+    }
+
     function onOpen() {
         /* Set up message-queue watch */
         unsubscribeWatch = watchImmutableRdxState(
