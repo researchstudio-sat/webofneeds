@@ -1,5 +1,6 @@
 ;
 
+import  won from '../won-es6';
 import angular from 'angular';
 import overviewTitleBarModule from './overview-title-bar';
 import matchesFlowItemModule from './matches-flow-item';
