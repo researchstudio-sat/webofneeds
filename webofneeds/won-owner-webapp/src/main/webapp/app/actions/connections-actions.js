@@ -267,26 +267,42 @@ export function showLatestMessages(connectionUri, numberOfEvents){
  */
 export function showMoreMessages(connectionUri, numberOfEvents) {
     return (dispatch, getState) => {
-        // determine the oldest loaded event (TODO: better to traverse the chain and look for any holes)
 
         const state = getState();
+        const connectionUri = selectOpenConnectionUri(state);
+        const connection = selectOpenConnection(state);
+        const requesterWebId = connection.get('belongsToNeed');
         const events = selectEventsOfConnection(state, connectionUri);
 
+        /* TODO expand set of uris from latest chat message via daisy-chaining?
+         * they have multiple predecessors, i.e. success response and previous chat message
+         * and this way we can find holes in the loaded messages.
+         * Prob: when daisy-chaining: make sure to look into the correspondingRemoteMessage to get links between their messages
+         * store normalized and write a selector to get event+remote? (for old code)
+         * or look through *all* events here to find the event we're looking for.
+         */
+        // determine the oldest loaded event
         const sortedEvents = events.sort((e1, e2) =>
             msStringToDate(e1.get('hasReceivedTimestamp')) -
             msStringToDate(e2.get('hasReceivedTimestamp'))
         );
-
         const oldestEvent = sortedEvents.first();
         const latestEvent = sortedEvents.last();
+        const eventHashValue = oldestEvent
+                .get('uri')
+                .replace(/.*\/event\/(.*)/, '$1'); // everything following the `/event/`
 
-
-        // expand set of uris from latest chat message? (they have multiple predecessors, i.e. success response and previous chat message)
-
-        // when daisy-chaining: make sure to look into the correspondingRemoteMessage to get links between their messages
-
-        // TODO store normalized and write a selector to get event+remote? (for old code)
-        // or look through *all* events here to find the event we're looking for.
+        won.getNode(
+            connection.get('hasEventContainer'),
+            {
+                requesterWebId,
+                pagingSize: numOfEvts2pageSize(numberOfEvents),
+                deep: true,
+                resumebefore: eventHashValue,
+            }
+        ).then(eventContainer =>
+            console.log('showMoreMessages: ', eventContainer)
+        )
 
 
 

@@ -73,5 +73,5 @@ export function selectConnectionUris(need) {
 
 export function selectEventsOfConnection(state, connectionUri) {
     const eventUris = state.getIn(['connections', connectionUri, 'hasEvents']);
-    return eventUris.map(eventUri => state.getIn(['events', 'events', eventUri]));
+    return eventUris && eventUris.map(eventUri => state.getIn(['events', 'events', eventUri]));
 }
