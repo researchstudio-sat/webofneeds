@@ -50,6 +50,11 @@ function genComponentConf() {
                 alt="Loading&hellip;"
                 ng-show="self.connection.get('loadingEvents')"
                 class="hspinner"/>
+                <a ng-show="self.eventsLoaded"
+                    ng-click="self.connections__showMoreMessages(self.connectionUri, 3)"
+                    href="">
+                        show more
+                </a>
             <div
                 class="pm__content__message"
                 ng-repeat="message in self.chatMessages"
@@ -104,18 +109,20 @@ function genComponentConf() {
             const selectFromState = state => {
                 const connectionUri = selectOpenConnectionUri(state);
                 const connection = selectOpenConnection(state);
+                const eventUris = connection && connection.get('hasEvents');
+                const eventsLoaded = eventUris && eventUris.size > 0;
 
                 //TODO seems like rather bad practice to have sideffects here
                 //scroll to bottom directly after rendering, if snapped
                 delay(0).then(() => {
                     self.updateScrollposition();
                 });
+
                 //TODO more sideffects
-                const eventUris = connection && connection.get('hasEvents');
-                if (connection && !connection.get('loadingEvents') &&
-                    eventUris && eventUris.size === 0) {
+                if (connection && !connection.get('loadingEvents') && !eventsLoaded) {
                     //return; // only start loading once.
-                    self.connections__showLatestMessages(connectionUri, 3);
+                    //TODO super hacky using the 4dbg. same bug as documented further down.
+                    pm4dbg.connections__showLatestMessages(connectionUri, 3);
                 }
                 //if(connection && ) {
                     //self.connections__showLatestMessages(connectionUri, 3);
@@ -126,6 +133,7 @@ function genComponentConf() {
                 return {
                     connectionUri,
                     connection,
+                    eventsLoaded,
                     lastUpdateTime: state.get('lastUpdateTime'),
                     connectionData: selectAllByConnections(state).get(connectionUri),
                     chatMessages: chatMessages && chatMessages.toArray(), //toArray needed as ng-repeat won't work otherwise :|
@@ -278,6 +286,7 @@ export default angular.module('won.owner.components.postMessages', [
 
 //TODO refactor so that it always returns an array of immutable messages to
 // allow ng-repeat without giving up the cheaper digestion
+//TODO move this to selectors.js
 function selectChatMessages(state) {
     const connectionUri = selectOpenConnectionUri(state);
     const connectionData = selectAllByConnections(state).get(connectionUri);

@@ -2,8 +2,6 @@
  * Created by ksinger on 11.08.2016.
  */
 
-
-
 export function initLeaflet(mapMount) {
     if(!L) {
         throw new Exception("Tried to initialize a leaflet widget while leaflet wasn't loaded.");
@@ -71,4 +69,9 @@ export function selectConnectionUris(need) {
     return need
         .getIn(['won:hasConnections', 'rdfs:member'])
         .map(c => c.get('@id'));
+}
+
+export function selectEventsOfConnection(state, connectionUri) {
+    const eventUris = state.getIn(['connections', connectionUri, 'hasEvents']);
+    return eventUris.map(eventUri => state.getIn(['events', 'events', eventUri]));
 }

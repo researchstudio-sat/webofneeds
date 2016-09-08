@@ -15,9 +15,15 @@ import {
 } from '../selectors';
 
 import {
+    selectEventsOfConnection,
+    selectTimestamp,
+} from '../won-utils';
+
+import {
     checkHttpStatus,
     is,
     urisToLookupMap,
+    msStringToDate,
 } from '../utils';
 
 import {
@@ -248,6 +254,48 @@ export function showLatestMessages(connectionUri, numberOfEvents){
         });
     }
 }
+/**
+ * @param connectionUri
+ * @param numberOfEvents
+ *   The approximate number of chat-message
+ *   that the view needs. Note that the
+ *   actual number varies due the varying number
+ *   of success-responses the server includes and
+ *   because the API only accepts a count of
+ *   events that include the latter.
+ * @return {Function}
+ */
+export function showMoreMessages(connectionUri, numberOfEvents) {
+    return (dispatch, getState) => {
+        // determine the oldest loaded event (TODO: better to traverse the chain and look for any holes)
+
+        const state = getState();
+        const events = selectEventsOfConnection(state, connectionUri);
+
+        const sortedEvents = events.sort((e1, e2) =>
+            msStringToDate(e1.get('hasReceivedTimestamp')) -
+            msStringToDate(e2.get('hasReceivedTimestamp'))
+        );
+
+        const oldestEvent = sortedEvents.first();
+        const latestEvent = sortedEvents.last();
+
+
+        // expand set of uris from latest chat message? (they have multiple predecessors, i.e. success response and previous chat message)
+
+        // when daisy-chaining: make sure to look into the correspondingRemoteMessage to get links between their messages
+
+        // TODO store normalized and write a selector to get event+remote? (for old code)
+        // or look through *all* events here to find the event we're looking for.
+
+
+
+
+
+
+    }
+}
+
 function numOfEvts2pageSize(numberOfEvents) {
      // `*3*` to compensate for the *roughly* 2 additional success events per chat message
     return numberOfEvents * 3;

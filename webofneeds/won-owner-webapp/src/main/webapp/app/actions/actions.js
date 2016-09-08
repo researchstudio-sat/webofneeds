@@ -108,6 +108,7 @@ const actionHierarchy = {
         rate: cnct.connectionsRate,
         sendChatMessage: cnct.connectionsChatMessage,
         showLatestMessages: cnct.showLatestMessages,
+        showMoreMessages: cnct.showMoreMessages,
         reset:INJ_DEFAULT,
     },
     needs: {
