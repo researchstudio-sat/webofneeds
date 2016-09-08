@@ -48,7 +48,7 @@ function genComponentConf() {
         <div class="pm__content">
             <img src="images/spinner/on_white.gif"
                 alt="Loading&hellip;"
-                ng-show="self.eventsPending"
+                ng-show="self.connection.get('loadingEvents')"
                 class="hspinner"/>
             <div
                 class="pm__content__message"
