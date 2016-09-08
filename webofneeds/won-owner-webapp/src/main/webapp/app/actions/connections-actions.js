@@ -213,7 +213,7 @@ export function showLatestMessages(connectionUri, numberOfEvents){
             connection.get('hasEventContainer'),
             {
                 requesterWebId,
-                pagingSize: numberOfEvents * 3, // `*3*` to compensate for the 2 additional success events per chat message
+                pagingSize: numOfEvts2pageSize(numberOfEvents),
                 deep: true
             }
         )
@@ -247,4 +247,8 @@ export function showLatestMessages(connectionUri, numberOfEvents){
             })
         });
     }
+}
+function numOfEvts2pageSize(numberOfEvents) {
+     // `*3*` to compensate for the *roughly* 2 additional success events per chat message
+    return numberOfEvents * 3;
 }
