@@ -24,6 +24,7 @@ won-post-item-line {
 
   .pil__information {
     display: flex;
+    flex-grow: 1;
 
     .pil__description {
       color: black;

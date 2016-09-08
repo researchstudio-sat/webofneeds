@@ -14,7 +14,13 @@
   }
 
   .#{$prefix}__icon {
-    @include fixed-height(1.8rem);
+    @media (max-width: $responsivenessBreakPoint){
+      @include fixed-height(1rem);
+    }
+    @media (min-width: $responsivenessBreakPoint){
+      @include fixed-height(1.8rem);
+    }
+
     // assuming there's no icons that are wider than tall.
     // this assumption has to be made, to prevent chrome
     // from showing immensly wide svg-snippets (id-selected
@@ -25,6 +31,10 @@
 
   .#{$prefix}__title {
     font-size: $mediumFontSize;
+
+    @media (max-width: $responsivenessBreakPoint){
+      font-size: $normalFontSize;
+    }
     font-weight: 300;
   }
 
