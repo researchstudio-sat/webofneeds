@@ -129,26 +129,13 @@ function genComponentConf() {
                 const requesterWebId = connection.get('belongsToNeed');
 
 
-                const deletme = () =>
-                    store4dbg.node(connection.get('hasEventContainer'), (s,res) => {
-                        console.log('store4dbg.node: ', s, res);
-                        res.triples.forEach(t => console.log('store4dbg.node.triple: ', t.subject.nominalValue, ' -- ', t.predicate.nominalValue, ' -- ', t.object.nominalValue));
-                    })
                 won.getNode(connection.get('hasEventContainer'), { requesterWebId, pagingSize: 5, deep: true})
-
-                .then(eventContainer => {
-                        console.log('store4dbg.eventContainer: ', eventContainer)
-                        deletme();
-                }) //TODO deletme; for debug
-                /*
                 .then(eventContainer =>
                     urisToLookupMap(
                         eventContainer.member,
-                        uri => won.getNode(uri, { requesterWebId })
+                        uri => won.getEvent(uri, { requesterWebId })
                     )
                 )
-                //.then(events => {}))
-                //won.getEventsOfConnection(connectionUri, { requesterWebId: connection.get('belongsToNeed'), pagingSize: 2 })
                 .then(events => {
                     self.eventsPending = false; // TODO should be determined in select
                     self.eventsLoaded = true;
