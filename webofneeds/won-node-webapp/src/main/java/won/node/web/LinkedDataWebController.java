@@ -408,7 +408,7 @@ public class
   }
 
   //webmvc controller method
-  @RequestMapping("${uri.path.page.need}/{identifier}/connections/")
+  @RequestMapping("${uri.path.page.need}/{identifier}/connections")
   public String showConnectionURIListPage(
       @PathVariable String identifier,
       @RequestParam(value="p", required=false) Integer page,
@@ -1059,7 +1059,7 @@ public class
     Dataset rdfDataset = null;
     HttpHeaders headers = new HttpHeaders();
     Integer preferedSize = getPreferredSize(request);
-    URI connectionsURI = URI.create(needUri.toString() + "/connections/");
+    URI connectionsURI = URI.create(needUri.toString() + "/connections");
 
 
     try {

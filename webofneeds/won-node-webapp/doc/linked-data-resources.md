@@ -23,7 +23,7 @@ HTTP GET method is supported for all WoN data via the following resources:
 
   **connections of a need container** contains a list of all connections URIs of the particular need
   
-    Example: https://localhost:8443/won/resource/need/6666347806036328000/connections/
+    Example: https://localhost:8443/won/resource/need/6666347806036328000/connections
 
   **event** represents a communication event (message) between WoN resources that have identities 
   
