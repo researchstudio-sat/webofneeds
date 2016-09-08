@@ -167,12 +167,16 @@ function genComponentConf() {
 
 
                 won.getNode(connection.get('hasEventContainer'), { requesterWebId, pagingSize: 5, deep: true})
-                .then(eventContainer =>
-                    urisToLookupMap(
-                        eventContainer.member,
-                        uri => won.getEvent(uri, { requesterWebId })
+                .then(eventContainer => {
+                    const eventUris =  is('Array', eventContainer.member) ?
+                        eventContainer.member :
+                        [eventContainer.member];
+
+                    return urisToLookupMap(
+                        eventUris,
+                        uri => won.getEvent(uri, {requesterWebId})
                     )
-                )
+                })
                 .then(events => {
                     //self.eventsPending = false; // TODO should be determined in select
                     //self.eventsLoaded = true; //TODO derive this from the connection having events.
