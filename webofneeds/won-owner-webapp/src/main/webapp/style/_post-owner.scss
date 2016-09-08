@@ -15,6 +15,13 @@
     margin: 0.5rem;
   }
 
+
+  @media (max-width: $responsivenessBreakPoint){
+    .owner__messages.hidden {
+      display: none;
+    }
+  }
+
   .owner__openconversation{
     background: white;
     border: 0.1rem solid $won-line-gray;

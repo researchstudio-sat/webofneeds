@@ -27,6 +27,7 @@
             ng-show="self.showConnectionSelection && self.owningPost"
             connection-type="self.connectionType"
             selected-connection="::self.openConnection(connectionUri)"
+            ng-class="{'hidden' : self.connectionUri !== undefined}"
             >
     </won-connection-selection>
     <!-- /left column -->

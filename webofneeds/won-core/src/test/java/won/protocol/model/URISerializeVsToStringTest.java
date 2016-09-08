@@ -28,22 +28,44 @@ import java.net.URI;
 public class URISerializeVsToStringTest
 {
   public static void main(String[] args) throws IOException, ClassNotFoundException {
+    StopWatch readWatch = new StopWatch();
+    StopWatch writeWatch = new StopWatch();
+
     StopWatch stopWatch = new StopWatch();
 
     String myuri = "https://192.168.124.49:8443/won/resource/need/561548487155823600";
+
+    readWatch.start();
+    readWatch.suspend();
+
+    writeWatch.start();
+    writeWatch.suspend();
 
     stopWatch.start();
     stopWatch.suspend();
     for (int i = 0; i < 1000 * 1000;i++){
       String toParse = myuri + RandomStringUtils.randomAlphanumeric(10);
       stopWatch.resume();
+      readWatch.resume();
       URI theURI = URI.create(toParse);
+      readWatch.suspend();
+      writeWatch.resume();
       String anotherString = theURI.toString();
+      writeWatch.suspend();
       stopWatch.suspend();
     }
     System.out.println("test1 took " + stopWatch.getTime() + " millis");
+    System.out.println("write test2 took " + writeWatch.getTime() + " millis");
+    System.out.println("read test2 took " + readWatch.getTime() + " millis");
 
 
+    readWatch.reset();
+    readWatch.start();
+    readWatch.suspend();
+
+    writeWatch.reset();
+    writeWatch.start();
+    writeWatch.suspend();
 
     stopWatch.reset();
     stopWatch.start();
@@ -53,15 +75,23 @@ public class URISerializeVsToStringTest
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
       stopWatch.resume();
+
+      writeWatch.resume();
       oos.writeObject(theURI);
+      writeWatch.suspend();
+
       byte[] data = baos.toByteArray();
       stopWatch.suspend();
       ByteArrayInputStream bais = new ByteArrayInputStream(data);
       ObjectInputStream ois = new ObjectInputStream(bais);
       stopWatch.resume();
+      readWatch.resume();
       URI theSameURI = (URI) ois.readObject();
+      readWatch.suspend();
       stopWatch.suspend();
     }
     System.out.println("test2 took " + stopWatch.getTime() + " millis");
+    System.out.println("write test2 took " + writeWatch.getTime() + " millis");
+    System.out.println("read test2 took " + readWatch.getTime() + " millis");
   }
 }
