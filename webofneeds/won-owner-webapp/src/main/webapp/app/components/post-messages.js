@@ -160,7 +160,7 @@ function genComponentConf() {
                 //TODO only do self if the events aren't defined!
                 //requiringData AC
 
-                self.connections__showLatestEvents(Immutable.fromJS({ connectionUri, pending: true }));
+                self.connections__showLatestMessages(Immutable.fromJS({ connectionUri, pending: true }));
                 //self.eventsPending = true; // TODO should be determined in select
 
                 const requesterWebId = connection.get('belongsToNeed');
@@ -180,14 +180,14 @@ function genComponentConf() {
                 .then(events => {
                     //self.eventsPending = false; // TODO should be determined in select
                     //self.eventsLoaded = true; //TODO derive this from the connection having events.
-                    self.connections__showLatestEvents(Immutable.fromJS({
+                    self.connections__showLatestMessages(Immutable.fromJS({
                         connectionUri: connectionUri,
                         events: events,
                     }));
                 })
                 .catch(error => {
                     console.error('Failed loading the latest events: ', error);
-                    self.connections__showLatestEvents(Immutable.fromJS({
+                    self.connections__showLatestMessages(Immutable.fromJS({
                         connectionUri: connectionUri,
                         error: error,
                     }));

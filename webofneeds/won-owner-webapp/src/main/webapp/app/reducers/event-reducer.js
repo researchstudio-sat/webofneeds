@@ -113,7 +113,7 @@ export default function(state = initialState, action = {}) {
                 .update('unreadEventUris', unread => unread.add(eventUri))
                 .update('events', events => events.set(eventUri, event));
 
-        case actionTypes.connections.showLatestEvents:
+        case actionTypes.connections.showLatestMessages:
             var loadedEvents = action.payload.get('events');
             return state.update('events', events => events.merge(loadedEvents));
 

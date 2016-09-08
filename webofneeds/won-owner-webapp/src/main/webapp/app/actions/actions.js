@@ -115,7 +115,7 @@ const actionHierarchy = {
         close: connectionsClose,
         rate: connectionsRate,
         sendChatMessage: connectionsChatMessage,
-        showLatestEvents: INJ_DEFAULT,
+        showLatestMessages: INJ_DEFAULT,
         reset:INJ_DEFAULT,
     },
     needs: {

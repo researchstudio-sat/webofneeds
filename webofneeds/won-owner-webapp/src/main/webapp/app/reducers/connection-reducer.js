@@ -79,7 +79,7 @@ export default function(connections = initialState, action = {}) {
                 [msgFromOwner.uri, eventOnOwnNode.uri]
             );
 
-        case actionTypes.connections.showLatestEvents:
+        case actionTypes.connections.showLatestMessages:
             if(action.payload.get('pending')) {
                 return connections.update(
                     action.payload.get('connectionUri'),
