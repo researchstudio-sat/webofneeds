@@ -106,7 +106,8 @@
                 'won:hasContent': '_:n01',
                 'won:hasBasicNeedType': args.type,
                 'won:hasFacet': args.facet? args.facet : 'won:OwnerFacet',
-                'won:hasAttachment': (hasAttachmentUrls(args) ? attachmentUrisTyped : undefined)
+                'won:hasAttachment': (hasAttachmentUrls(args) ? attachmentUrisTyped : undefined),
+                'won:hasFlag': !!won.debugmode ? 'won:UsedForTesting' : undefined
             },
             {
                 '@id': '_:n01',
@@ -197,7 +198,11 @@
                 'won:hasEndTime': 'xsd:dateTime',
 
                 'won:hasFacet': {
-                    '@id': 'http://purl.org/webofneeds/model#hasFacet',
+                    '@id': won.WON.hasFacet,
+                    '@type': '@id'
+                },
+                'won:hasFlag': {
+                    '@id': won.WON.hasFlag,
                     '@type': '@id'
                 }
             }

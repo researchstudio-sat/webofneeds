@@ -26,36 +26,42 @@ const peopleGrid = [{imageSrc: 'images/face1.png', text: '"I have something to o
     {imageSrc: 'images/face4.png', text: '"I want to change something"'}];
 
 const questions = [
-    {title: "What are your terms of service?", detail: "Simple: don't use our software. It will probably get you in" +
-    " trouble. Go away. You have been warned. Don't blame us!"},
-    {title: "Is this website production-ready?", detail :"No. Do not use it for anything important to you."},
-    {title: "Is this website secure?", detail :"No. See below for more information."},
-    {title: "Can I post whatever I want here?", detail :"No. Make sure it is legal, and it pleases us. However, we" +
-    " will probably delete it anyway."},
-    {title: "How do I know who I am talking to?", detail: "If everything works as intended, you don't. Each need has" +
-    " its own cryptographic identity. It can be linked to other identities but we aren't doing that currently."},
-    {title: "So how do you prevent man-in-the-middle attacks?", detail: "We don't."},
-    {title: "Are you selling my data?", detail :"We'd love to, but nobody's buying. If you're interested, contact" +
-    " us. If you don't want us to sell your data tweet a rant to @webofneeds #wtfwonissellingmydata. And then set up" +
-    " your own server."},
     {title: "Do I need to register?", detail: "Currently, you have to register, but we're working on a feature to" +
-    " let you use the site without registering. Or, you can run your own server."},
+    " let you use the site without registering. You can also run your own server if you don't want to register here."},
     {title: "Is there a native mobile app?", detail: "No. The system is open source though. You can make one if" +
-    " you like. Maybe one that talks to your own server?"},
+    " you like. Maybe one that talks to your own server? Contact us if you would like support in doing that!"},
     {title: "Who can view my posts?", detail: "Anyone can view your posts. (That's the idea!) Post-level access" +
-    " control is definitely possible and interesting, but not anything we can do in the near future."},
+    " control is definitely possible and interesting, but we have not designed that, yet. Contact us if you would" +
+    " like to share your thoughts on how to do that."},
+    {title: "What about my privacy?", detail: "All the data you provide in a need description is" +
+    " public and unencrypted. All the messages in a conversation are unencrypted but only visible to us (operating" +
+    " the" +
+    " servers) and to you and your conversation partner."},
+    {title: "Will the people I talk to see my identity?", detail: "If everything" +
+    " works as intended, no. Each need has its own cryptographic identity. They will know that the person who" +
+    " wrote the posting is the one sending them messages. As long as you do not provide any" +
+    " information that identifies you, others will not easily find out who you really are. But please do not think" +
+    " that you are fully anonymous here. Even if you are behind a proxy or an anonymization network, there might be" +
+    " ways to de-anonymize you based on the data you provide."},
     {title: "I am offering goods/services on the Internet already. Can people find them here?",
         detail: "Yes! The idea is to have an open, decentralized infrastructure that makes it easy for anyone" +
         " to post what they seek or what they offer, and to find people to interact with. " +
         " You'll have to set up a WoN node or post your offerings to a service (like" +
         " matchat.org) that handles everything for you. We can help you with that."
     },
-    {title: "What about my personal data?", detail: "All the data you provide in a need description is" +
-" public and unencrypted. All the mesages in a conversation are unencrypted but only visible to us (operating the" +
-" servers) and to you and your conversation partner."},
+    {title: "Is this website production-ready?", detail :"No. Do not use it for anything important to you. It is a" +
+    " demonstrator of a research project and running on modest hardware. We're working on it, though."},
+    {title: "Is this website secure?", detail :"No. See below for more information."},
+    {title: "Can I post whatever I want here?", detail :"No. Make sure it is legal, unoffensive, and that it pleases" +
+    " us. We will delete any postings we do not like without prior notice, explanation, and there will be no way to" +
+    " restore the data."},
+    {title: "Are you selling my data?", detail :"We'd love to, but nobody's buying. If you're interested, contact" +
+    " us ;-) Seriously, you can expect us to use the data you provide here for scientific/research purposes, and if" +
+    " we are lucky, also for economic ones, while trying not to be evil. If you are not ok with that, and you would still" +
+    " like to try the system, please set up your own servers."},
     {title: "How is this different from the websites I already know?",
-        detail: "Two-way matching: The person searching for someting will find supply, the person offering something" +
-        " will find demands. Genericity: The process (post/match/chat) is very general and can be applied to a great" +
+        detail: "Two-way matching: The person searching for something will find supply, the person offering something" +
+        " will find demands. Genericity: The process (post/match/chat) is quite general and can be applied to a great" +
         " variety of cases. Here, we demonstrate a few, but we ask you to come up with more variations and build" +
         " your own applications on top of them. Openness: " +
         " If you want, you can set up your own website to host your own content using either our software or your" +
@@ -63,7 +69,8 @@ const questions = [
         " Someone else can still find your content and interact with it from here because the two websites speak" +
         " the same protocol. You can also set up your own matching service to provide better matches. In both" +
         " cases, We will be glad to help if you want to try!"},
-    {title: "How secure is this?", detail:"tl;dr: Probably not very secure at the moment. As a general rule, try" +
+    {title: "How secure is this system?", detail:"tl;dr: Probably not very secure at the moment. As a general rule," +
+    " try" +
     " not to post or write anything here you would not be happy to write on a postcard with your name on it." +
     " Here is how we" +
     " implemented it - in the bird's eye view: Your data is stored in clear text on our servers. The communication" +
@@ -79,12 +86,9 @@ const questions = [
     " The Owner Application creates a new key pair for every need you" +
     " create, so others should not be able to find out which needs are yours and which needs are from other" +
     " people. Note that this system has not had an independent security audit. If you are interested in" +
-    " assessing the security of our approach, please contact us."},
-    {title: "Protocols?", detail:"A protocol is a set of rules that allow systems to communicate."+
-    " Unfortunately, we do not have a formal protocol specification handy - they are still being experimented" +
-    " with." +
-    " Contact us if you wish to collaborate!"}
-
+    " assessing the security of our approach, or if you have feedback for us, please contact us."},
+    {title: "Is there a plug-in for [shop, marketplace, social network, forum] software X?", detail: "No." +
+    " If you have an idea for an integration, or if you would like to help with one, let us know."}
 ];
 
 class LandingpageController {

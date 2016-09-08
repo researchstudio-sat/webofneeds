@@ -27,6 +27,7 @@
      *
      */
 
+    won.debugmode = false; //if you set this to true, the created needs will get flagged as debug needs in order to get matches and requests from the debugbot
 
     won.WON = {};
     won.WON.baseUri = "http://purl.org/webofneeds/model#";
@@ -50,6 +51,8 @@
     won.WON.isInStateCompacted = won.WON.prefix+":isInState";
     won.WON.hasFacet= won.WON.baseUri+"hasFacet";
     won.WON.hasFacetCompacted= won.WON.prefix+":hasFacet";
+    won.WON.hasFlag= won.WON.baseUri+"hasFlag";
+    won.WON.hasFlagCompacted= won.WON.prefix+"hasFlag";
     won.WON.hasRemoteFacet= won.WON.baseUri+"hasRemoteFacet";
     won.WON.hasRemoteFacetCompacted= won.WON.prefix+":hasRemoteFacet";
 
@@ -167,6 +170,8 @@
     won.WON.searchResultPreview =  won.WON.baseUri + "preview";
     //todo: change to SearchResult
     won.WON.searchResult =  won.WON.baseUri + "Match";
+
+    won.WON.usedForTesting =  won.WON.prefix + "UserForTesting";
 
 
 

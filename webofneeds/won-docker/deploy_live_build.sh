@@ -39,6 +39,7 @@ docker -H satcluster01:2375 build -t webofneeds/matcher_service:live $WORKSPACE/
 docker -H satcluster01:2375 build -t webofneeds/matcher_solr:live $WORKSPACE/webofneeds/won-docker/matcher-solr/
 docker -H satcluster01:2375 build -t webofneeds/gencert:live $WORKSPACE/webofneeds/won-docker/gencert/
 docker -H satcluster02:2375 build -t webofneeds/letsencrypt:live $WORKSPACE/webofneeds/won-docker/letsencrypt/
+docker -H satcluster01:2375 build -t webofneeds/bots:live $WORKSPACE/webofneeds/won-docker/bots/
 
 
 # create a password file for the certificates, variable ${won_certificate_passwd} must be set from outside the script
@@ -113,7 +114,8 @@ fi
 
 # run the script to start webofneeds containers on host satcluster01
 docker_options="-H satcluster01:2375"
-public_node_uri=www.matchat.org
+public_owner_uri=www.matchat.org
+public_node_uri=node.matchat.org
 behind_proxy=true
 deploy_image_tag_name=live
 
@@ -157,9 +159,10 @@ docker -H satcluster02:2375 rm wonnode || echo 'No docker container found to rem
 docker -H satcluster02:2375 run --name=wonnode -d -e "uri.host=$public_node_uri" -e "http.port=8443" \
 -e "uri.prefix=https://${public_node_uri}/won" \
 -e "activemq.broker.port=61616" -p 8443:8443 -p 61616:61616 \
--v $base_folder/letsencrypt/certs/live/www.matchat.org/fullchain.pem:/usr/local/tomcat/conf/ssl/t-cert.pem \
--v $base_folder/letsencrypt/certs/live/www.matchat.org/privkey.pem:/usr/local/tomcat/conf/ssl/t-key.pem \
--v $base_folder/letsencrypt/certs:/usr/local/tomcat/conf/ssl/ \
+-v $base_folder/letsencrypt/certs/live/node.matchat.org/fullchain.pem:/usr/local/tomcat/conf/ssl/t-cert.pem \
+-v $base_folder/letsencrypt/certs/live/node.matchat.org/privkey.pem:/usr/local/tomcat/conf/ssl/t-key.pem \
+-v $base_folder/letsencrypt/certs/live/node.matchat.org/t-key-cert.pfx:/usr/local/tomcat/conf/ssl/t-key-cert.pfx \
+-v $base_folder/letsencrypt/certs/live/node.matchat.org/t-keystore.jks:/usr/local/tomcat/conf/ssl/t-keystore.jks \
 -v $base_folder/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/ \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -e "client.authentication.behind.proxy=$behind_proxy" \
@@ -210,8 +213,8 @@ docker ${docker_options} stop owner || echo 'No docker container found to stop w
 docker ${docker_options} rm owner || echo 'No docker container found to remove with name: owner'
 docker ${docker_options} run --name=owner -d -e "node.default.host=$public_node_uri" \
 -e "node.default.http.port=443" -p 8082:8443 \
--e "uri.host=$public_node_uri" -e "http.port=8082" \
--e "uri.prefix=https://$public_node_uri" \
+-e "uri.host=$public_owner_uri" -e "http.port=8082" \
+-e "uri.prefix=https://$public_owner_uri" \
 -e "uri.prefix.node.default=https://${public_node_uri}/won" \
 -e "CERTIFICATE_PASSWORD=${won_certificate_passwd}" \
 -e "email.from.won.user=${MAIL_USER}" -e "email.from.won.password=${MAIL_PASS}" -e "email.from.won.smtp.host=${MAIL_HOST}" \
@@ -231,6 +234,15 @@ docker ${docker_options} run --name=matcher_solr -d -e "node.host=satcluster01.r
 -e "matcher.solr.uri.solr.server=http://satcluster01.researchstudio.at:8984/solr/" \
 -e "matcher.solr.uri.solr.server.public=http://satcluster01.researchstudio.at:8984/solr/" \
 -p 2562:2562 webofneeds/matcher_solr:${deploy_image_tag_name}
+
+echo run solr matcher container
+docker ${docker_options} stop debug_bot || echo 'No docker container found to stop with name: debug_bot'
+docker ${docker_options} rm debug_bot || echo 'No docker container found to remove with name: debug_bot'
+docker ${docker_options} run --name=debug_bot -d \
+-e "node.default.host=$public_node_uri" -e "node.default.http.port=443" \
+-e "uri.prefix.node.default=https://${public_node_uri}/won" \
+-e "won.node.uris=https://${public_node_uri}/won/resource" \
+webofneeds/bots:live
 
 
 # =====================================================================
