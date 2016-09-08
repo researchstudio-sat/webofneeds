@@ -138,13 +138,20 @@ function genComponentConf() {
                  * Check during every select?
                  */
 
-                if(self.eventsPending || self.eventsLoaded) return; // only start loading once.
-
+                //if(!self.$ngRedux) return;
                 const state = self.$ngRedux.getState();
+
                 const connectionUri = selectOpenConnectionUri(state);
                 const connection = selectOpenConnection(state);
 
                 if(!connectionUri || !connection) return;
+
+                const eventUris = connection.get('hasEvents');
+                if(connection.get('loadingEvents') || !eventUris || eventUris.size > 0) return; // only start loading once.
+
+                //TODO a `return` here might be a race condition that results in this function never being called.
+                //TODO the delay solution is super-hacky (idle-waiting)
+                if(!self.connection__showLatestEvent) delay(100).then(loadStuff); // we tried to call this before the action-creators where attached.
 
                 console.log('post-messages.js: testing for selective loading. ', connectionUri, connection);
                 console.log('post-messages.js: calling crawlable query soon. ');
@@ -152,7 +159,10 @@ function genComponentConf() {
 
                 //TODO only do self if the events aren't defined!
                 //requiringData AC
-                self.eventsPending = true; // TODO should be determined in select
+
+                self.connections__showLatestEvents(Immutable.fromJS({ connectionUri, pending: true }));
+                //self.eventsPending = true; // TODO should be determined in select
+
                 const requesterWebId = connection.get('belongsToNeed');
 
 
@@ -164,9 +174,13 @@ function genComponentConf() {
                     )
                 )
                 .then(events => {
-                    self.eventsPending = false; // TODO should be determined in select
-                    self.eventsLoaded = true;
-                    self.connections__showLatestEvents({
+                    //self.eventsPending = false; // TODO should be determined in select
+                    //self.eventsLoaded = true; //TODO derive this from the connection having events.
+                    self.connections__showLatestEvents(Immutable.fromJS({
+                        connectionUri: connectionUri,
+                        events: events,
+                    }));
+                })
                         connectionUri: connectionUri,
                         events: Immutable.fromJS(events)
                     });
