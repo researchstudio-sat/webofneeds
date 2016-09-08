@@ -79,7 +79,7 @@ export default function(connections = initialState, action = {}) {
                 [msgFromOwner.uri, eventOnOwnNode.uri]
             );
 
-        case 'requiredData':
+        case actionTypes.connections.showLatestEvents:
             var loadedEvents = Immutable.fromJS(action.payload.events);
             return loadedEvents.reduce((updatedConnections, event) => {
                 const cnctUri = event.get('hasReceiver') || event.getIn(['hasCorrespondingRemoteMessage', 'hasReceiver']);

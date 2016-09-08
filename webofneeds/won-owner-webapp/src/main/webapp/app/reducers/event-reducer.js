@@ -113,7 +113,7 @@ export default function(state = initialState, action = {}) {
                 .update('unreadEventUris', unread => unread.add(eventUri))
                 .update('events', events => events.set(eventUri, event));
 
-        case 'requiredData':
+        case actionTypes.connections.showLatestEvents:
             var loadedEvents = Immutable.fromJS(action.payload.events);
             return state.update('events', events => events.merge(loadedEvents));
 

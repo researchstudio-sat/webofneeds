@@ -11,7 +11,9 @@ import {
     msStringToDate,
     urisToLookupMap,
 } from '../utils.js'
-import { actionCreators }  from '../actions/actions';
+import {
+    actionCreators
+}  from '../actions/actions';
 import {
     labels,
     relativeTime,
@@ -139,15 +141,11 @@ function genComponentConf() {
                 .then(events => {
                     self.eventsPending = false; // TODO should be determined in select
                     self.eventsLoaded = true;
-                    self.$ngRedux.dispatch({
-                        type: 'requiredData',
-                        payload: {
-                            events: Immutable.fromJS(events)
-                        }
+                    self.connections__showLatestEvents({
+                        connectionUri: connectionUri,
+                        events: Immutable.fromJS(events)
                     });
-
                 });
-                */
             }
 
             /*
