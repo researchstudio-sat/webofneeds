@@ -29,7 +29,6 @@ export function hierarchy2Creators(actionHierarchy) {
 
 export function createActionCreator(type) {
     return (payload) => {
-        console.debug('creating instance of actionType ', type, ' with payload: ', payload);
         return {type, payload};
     };
 }
