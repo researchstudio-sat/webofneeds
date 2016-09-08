@@ -215,7 +215,7 @@ export function showLatestMessages(connectionUri, numberOfEvents){
 
         const requesterWebId = connection.get('belongsToNeed');
 
-        won.getNode(
+        getEvents(
             connection.get('hasEventContainer'),
             {
                 requesterWebId,
@@ -223,16 +223,6 @@ export function showLatestMessages(connectionUri, numberOfEvents){
                 deep: true
             }
         )
-        .then(eventContainer => {
-            const eventUris =  is('Array', eventContainer.member) ?
-                eventContainer.member :
-                [eventContainer.member];
-
-            return urisToLookupMap(
-                eventUris,
-                    uri => won.getEvent(uri, {requesterWebId})
-            )
-        })
         .then(events =>
             dispatch({
                 type: actionTypes.connections.showLatestMessages,
@@ -253,6 +243,34 @@ export function showLatestMessages(connectionUri, numberOfEvents){
             })
         });
     }
+}
+
+//TODO replace the won.getEventsOfConnection with this version (and make sure it works
+// for all previous uses).
+/**
+ * Gets the events and uses the paging-parameters
+ * in a meaningful fashion.
+ * @param eventContainerUri
+ * @param params
+ * @return {*}
+ */
+function getEvents(eventContainerUri, params) {
+    const eventP = won
+        .getNode(eventContainerUri, params)
+        .then(eventContainer => is('Array', eventContainer.member) ?
+            eventContainer.member :
+            [eventContainer.member]
+        )
+        .then(eventUris => urisToLookupMap(
+            eventUris,
+            uri => won.getEvent(
+                uri,
+                { requesterWebId: params.requesterWebId }
+            )
+        ));
+
+    return eventP;
+
 }
 /**
  * @param connectionUri
@@ -292,7 +310,7 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
                 .get('uri')
                 .replace(/.*\/event\/(.*)/, '$1'); // everything following the `/event/`
 
-        won.getNode(
+        getEvents(
             connection.get('hasEventContainer'),
             {
                 requesterWebId,
@@ -300,8 +318,8 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
                 deep: true,
                 resumebefore: eventHashValue,
             }
-        ).then(eventContainer =>
-            console.log('showMoreMessages: ', eventContainer)
+        ).then(events =>
+            console.log('showMoreMessages: ', events)
         )
 
 
