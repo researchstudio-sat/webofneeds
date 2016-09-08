@@ -181,9 +181,12 @@ function genComponentConf() {
                         events: events,
                     }));
                 })
+                .catch(error => {
+                    console.error('Failed loading the latest events: ', error);
+                    self.connections__showLatestEvents(Immutable.fromJS({
                         connectionUri: connectionUri,
-                        events: Immutable.fromJS(events)
-                    });
+                        error: error,
+                    }));
                 });
             }
 
