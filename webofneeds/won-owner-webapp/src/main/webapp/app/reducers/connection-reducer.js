@@ -91,19 +91,24 @@ export default function(connections = initialState, action = {}) {
                     }
                 );
             } else if (action.payload.get('error')) {
-                return connections.setIn(
-                    [action.payload.connectionUri, 'failedLoadingEvents'],
-                    action.payload.get('error')
+                return connections.update(
+                    action.payload.get('connectionUri'),
+                    cnct => cnct
+                        .delete('loadingEvents')
+                        .set('failedLoadingEvents', action.payload.get('error'))
                 );
             } else /* success */ {
                 var loadedEvents = action.payload.get('events');
                 var connectionUri = action.payload.get('connectionUri');
-                var updatedConnections = connections.deleteIn(
-                    [action.payload.connectionUri, 'failedLoadingEvents']
+                var connectionsWithUpdatedFlags = connections.update(
+                    action.payload.get('connectionUri'),
+                    cnct => cnct
+                        .delete('loadingEvents')
+                        .delete('failedLoadingEvents')
                 );
                 return loadedEvents.reduce((cncts, event) =>
                     storeEventUri(cncts, connectionUri, event.get('uri')),
-                    updatedConnections
+                    connectionsWithUpdatedFlags
                 );
 
             }
