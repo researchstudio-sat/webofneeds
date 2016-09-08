@@ -114,6 +114,7 @@ export default function(state = initialState, action = {}) {
                 .update('events', events => events.set(eventUri, event));
 
         case actionTypes.connections.showLatestMessages:
+        case actionTypes.connections.showMoreMessages:
             var loadedEvents = action.payload.get('events');
             return state.update('events', events => events.merge(loadedEvents));
 

@@ -310,6 +310,12 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
                 .get('uri')
                 .replace(/.*\/event\/(.*)/, '$1'); // everything following the `/event/`
 
+
+        dispatch({
+            type: actionTypes.connections.showMoreMessages,
+            payload: Immutable.fromJS({connectionUri, pending: true}),
+        });
+
         getEvents(
             connection.get('hasEventContainer'),
             {
@@ -318,9 +324,26 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
                 deep: true,
                 resumebefore: eventHashValue,
             }
-        ).then(events =>
-            console.log('showMoreMessages: ', events)
         )
+        .then(events =>
+            dispatch({
+                type: actionTypes.connections.showMoreMessages,
+                payload: Immutable.fromJS({
+                    connectionUri: connectionUri,
+                    events: events,
+                })
+            })
+        )
+        .catch(error => {
+            console.error('Failed loading more events: ', error);
+            dispatch({
+                type: actionTypes.connections.showMoreMessages,
+                payload: Immutable.fromJS({
+                    connectionUri: connectionUri,
+                    error: error,
+                })
+            })
+        });
 
 
 

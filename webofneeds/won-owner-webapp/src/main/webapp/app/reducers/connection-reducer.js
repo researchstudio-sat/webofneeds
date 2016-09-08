@@ -80,6 +80,7 @@ export default function(connections = initialState, action = {}) {
             );
 
         case actionTypes.connections.showLatestMessages:
+        case actionTypes.connections.showMoreMessages:
             if(action.payload.get('pending')) {
                 return connections.update(
                     action.payload.get('connectionUri'),
