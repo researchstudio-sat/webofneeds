@@ -18,11 +18,11 @@ Paging is supported for the following container resources:
 
   **connections of a need container**
   
-    Example: https://localhost:8443/won/resource/need/6666347806036328000/connections/
+    Example: https://localhost:8443/won/resource/need/6666347806036328000/connections
 
   **events of a connection container**
   
-    Example: https://localhost:8443/won/resource/connection/a4qyk5jl1twz34b4umjt/events/
+    Example: https://localhost:8443/won/resource/connection/a4qyk5jl1twz34b4umjt/events
 
 
 ## How client can trigger the paging of the WoN container resource
@@ -83,9 +83,9 @@ This parameter is supported only for connections container.
 
 **need connections container**
 
-    https://localhost:8443/won/resource/need/6666347806036328000/connections/
+    https://localhost:8443/won/resource/need/6666347806036328000/connections
     https://localhost:8443/won/resource/need/6666347806036328000/connections?timeof=2016-02-23T14:45:20.273&deep=true
-    https://localhost:8443/won/resource/need/6666347806036328000/connections/?resumebefore=mea3rcm1s0uj25h4r78q&timeof=2016-02-23T14:45:20.273&type=OPEN
+    https://localhost:8443/won/resource/need/6666347806036328000/connections?resumebefore=mea3rcm1s0uj25h4r78q&timeof=2016-02-23T14:45:20.273&type=OPEN
     
 **connection events container**
 

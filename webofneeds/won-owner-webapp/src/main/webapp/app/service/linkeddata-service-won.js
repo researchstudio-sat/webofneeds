@@ -473,7 +473,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     won.invalidateCacheForNeed = function(needUri){
         if (needUri != null) {
             cacheItemMarkDirty(needUri);
-            cacheItemMarkDirty(needUri+'/connections/')
+            cacheItemMarkDirty(needUri+'/connections')
         }
         return Promise.resolve(true); //return a promise for chaining
     }

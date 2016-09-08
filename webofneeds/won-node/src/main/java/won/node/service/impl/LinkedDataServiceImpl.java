@@ -174,7 +174,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   Resource needResource = metaModel.getResource(needUri.toString());
 
   // add connections
-  Resource connectionsContainer = metaModel.createResource(need.getNeedURI().toString() + "/connections/");
+  Resource connectionsContainer = metaModel.createResource(need.getNeedURI().toString() + "/connections");
   metaModel.add(metaModel.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
 
   // add need event container
