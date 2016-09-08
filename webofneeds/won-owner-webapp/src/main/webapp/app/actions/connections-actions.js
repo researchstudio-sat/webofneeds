@@ -3,14 +3,21 @@
  */
 
 import  won from '../won-es6';
+import Immutable from 'immutable';
 
 
 import { getRandomPosInt } from '../utils';
 
-import { selectAllByConnections } from '../selectors';
+import {
+    selectAllByConnections,
+    selectOpenConnectionUri,
+    selectOpenConnection,
+} from '../selectors';
 
 import {
     checkHttpStatus,
+    is,
+    urisToLookupMap,
 } from '../utils';
 
 import {
@@ -163,5 +170,81 @@ export function connectionsRate(connectionUri,rating) {
         deferred.promise.then((action)=> {
             dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
         })
+    }
+}
+
+/**
+ * @param connectionUri
+ * @param numberOfEvents
+ *   The approximate number of chat-message
+ *   that the view needs. Note that the
+ *   actual number varies due the varying number
+ *   of success-responses the server includes and
+ *   because the API only accepts a count of
+ *   events that include the latter.
+ * @return {Function}
+ */
+export function showLatestMessages(connectionUri, numberOfEvents){
+    return (dispatch, getState) => {
+        const state = getState();
+        const connectionUri = selectOpenConnectionUri(state);
+        const connection = selectOpenConnection(state);
+
+        if (!connectionUri || !connection) return;
+
+        const eventUris = connection.get('hasEvents');
+        if (connection.get('loadingEvents') || !eventUris || eventUris.size > 0) return; // only start loading once.
+
+        //TODO a `return` here might be a race condition that results in this function never being called.
+        //TODO the delay solution is super-hacky (idle-waiting)
+        // -----> if(!self.connection__showLatestEvent) delay(100).then(loadStuff); // we tried to call this before the action-creators where attached.
+
+        console.log('connections-actions.js: testing for selective loading. ', connectionUri, connection);
+        //TODO determine first if component is actually visible (angular calls the constructor long before that)
+
+        dispatch({
+            type: actionTypes.connections.showLatestMessages,
+            payload: Immutable.fromJS({connectionUri, pending: true}),
+        });
+
+        const requesterWebId = connection.get('belongsToNeed');
+
+        won.getNode(
+            connection.get('hasEventContainer'),
+            {
+                requesterWebId,
+                pagingSize: numberOfEvents * 3, // `*3*` to compensate for the 2 additional success events per chat message
+                deep: true
+            }
+        )
+        .then(eventContainer => {
+            const eventUris =  is('Array', eventContainer.member) ?
+                eventContainer.member :
+                [eventContainer.member];
+
+            return urisToLookupMap(
+                eventUris,
+                    uri => won.getEvent(uri, {requesterWebId})
+            )
+        })
+        .then(events =>
+            dispatch({
+                type: actionTypes.connections.showLatestMessages,
+                payload: Immutable.fromJS({
+                    connectionUri: connectionUri,
+                    events: events,
+                })
+            })
+        )
+        .catch(error => {
+            console.error('Failed loading the latest events: ', error);
+            dispatch({
+                type: actionTypes.connections.showLatestMessages,
+                payload: Immutable.fromJS({
+                    connectionUri: connectionUri,
+                    error: error,
+                })
+            })
+        });
     }
 }

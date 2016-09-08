@@ -102,18 +102,30 @@ function genComponentConf() {
 
             //this.postmsg = this;
             const selectFromState = state => {
+                const connectionUri = selectOpenConnectionUri(state);
+                const connection = selectOpenConnection(state);
 
                 //TODO seems like rather bad practice to have sideffects here
                 //scroll to bottom directly after rendering, if snapped
                 delay(0).then(() => {
                     self.updateScrollposition();
                 });
+                //TODO more sideffects
+                const eventUris = connection && connection.get('hasEvents');
+                if (connection && !connection.get('loadingEvents') &&
+                    eventUris && eventUris.size === 0) {
+                    //return; // only start loading once.
+                    self.connections__showLatestMessages(connectionUri, 3);
+                }
+                //if(connection && ) {
+                    //self.connections__showLatestMessages(connectionUri, 3);
+                //}
 
-                const connectionUri = selectOpenConnectionUri(state);
+
                 const chatMessages = selectChatMessages(state);
                 return {
                     connectionUri,
-                    connection: selectOpenConnection(state),
+                    connection,
                     lastUpdateTime: state.get('lastUpdateTime'),
                     connectionData: selectAllByConnections(state).get(connectionUri),
                     chatMessages: chatMessages && chatMessages.toArray(), //toArray needed as ng-repeat won't work otherwise :|
@@ -129,69 +141,15 @@ function genComponentConf() {
 
             // TODO <HACK>
 
-            const loadStuff = () => {
-                /*
-                 * TODO don't trigger this more than once! When the
-                 * events are there, there's no need to dispatch an
-                 * action again -- unless paging is involved of course.
-                 *
-                 * Check during every select?
-                 */
-
-                //if(!self.$ngRedux) return;
-                const state = self.$ngRedux.getState();
-
-                const connectionUri = selectOpenConnectionUri(state);
-                const connection = selectOpenConnection(state);
-
-                if(!connectionUri || !connection) return;
-
-                const eventUris = connection.get('hasEvents');
-                if(connection.get('loadingEvents') || !eventUris || eventUris.size > 0) return; // only start loading once.
-
+            const loadStuffAC = () => {
                 //TODO a `return` here might be a race condition that results in this function never being called.
                 //TODO the delay solution is super-hacky (idle-waiting)
-                if(!self.connection__showLatestEvent) delay(100).then(loadStuff); // we tried to call this before the action-creators where attached.
-
-                console.log('post-messages.js: testing for selective loading. ', connectionUri, connection);
-                console.log('post-messages.js: calling crawlable query soon. ');
-                //TODO determine first if component is actually visible (angular calls the constructor long before that)
-
-                //TODO only do self if the events aren't defined!
-                //requiringData AC
-
-                self.connections__showLatestMessages(Immutable.fromJS({ connectionUri, pending: true }));
-                //self.eventsPending = true; // TODO should be determined in select
-
-                const requesterWebId = connection.get('belongsToNeed');
-
-
-                won.getNode(connection.get('hasEventContainer'), { requesterWebId, pagingSize: 5, deep: true})
-                .then(eventContainer => {
-                    const eventUris =  is('Array', eventContainer.member) ?
-                        eventContainer.member :
-                        [eventContainer.member];
-
-                    return urisToLookupMap(
-                        eventUris,
-                        uri => won.getEvent(uri, {requesterWebId})
-                    )
-                })
-                .then(events => {
-                    //self.eventsPending = false; // TODO should be determined in select
-                    //self.eventsLoaded = true; //TODO derive this from the connection having events.
-                    self.connections__showLatestMessages(Immutable.fromJS({
-                        connectionUri: connectionUri,
-                        events: events,
-                    }));
-                })
-                .catch(error => {
-                    console.error('Failed loading the latest events: ', error);
-                    self.connections__showLatestMessages(Immutable.fromJS({
-                        connectionUri: connectionUri,
-                        error: error,
-                    }));
-                });
+                if(!self.connection__showLatestMessages) delay(100).then(loadStuffAC); // we tried to call this before the action-creators where attached.
+                const state = self.$ngRedux.getState();
+                const connectionUri = selectOpenConnectionUri(state);
+                if(!connectionUri) return;
+                //self.connection__showLatestMessages(connectionUri, 2); //<-- has scoping issues. somehow it's not defined as function when the code runs. when breaking here, it is one though. mysterious.
+                pm4dbg.connections__showLatestMessages(pm4dbg.connectionUri, 3) // TODO, using 4dbg-variable. yes, this has become that hacky.
             }
 
             /*
@@ -199,7 +157,7 @@ function genComponentConf() {
              * after the connection had been loaded
              * we can already start loading events.
              */
-            loadStuff();
+            //loadStuffAC();
 
             //TODO delete unnecessary logging
             //TODO call this when view is visible and the connection has been loaded (sometimes
@@ -214,7 +172,7 @@ function genComponentConf() {
                 ({self}) => self.connection && self.connection.get('uri'),
                 (newCnctUri, oldCnctUri) => {
                     console.log('post-messages.js: in connection watch', newCnctUri, oldCnctUri);
-                    loadStuff();
+                    //loadStuffAC();
                 });
 
 
