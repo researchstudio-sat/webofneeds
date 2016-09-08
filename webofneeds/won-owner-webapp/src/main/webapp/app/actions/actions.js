@@ -71,15 +71,7 @@ import {
     accountRegister,
 } from './account-actions';
 
-import {
-    connectionsClose,
-    connectionsConnect,
-    connectionsFetch,
-    connectionsOpen,
-    connectionsRate,
-    connectionsChatMessage,
-} from './connections-actions';
-
+import * as cnct from './connections-actions';
 import * as messages from './messages-actions';
 
 import {
@@ -108,14 +100,13 @@ const actionHierarchy = {
         add:INJ_DEFAULT,
     },
     connections:{
-        fetch: connectionsFetch,
-        open: connectionsOpen,
-        connect: connectionsConnect,
+        fetch: cnct.connectionsFetch,
+        open: cnct.connectionsOpen,
+        connect: cnct.connectionsConnect,
         accepted: INJ_DEFAULT,
-        close: connectionsClose,
-        rate: connectionsRate,
-        sendChatMessage: connectionsChatMessage,
-        showLatestMessages: INJ_DEFAULT,
+        close: cnct.connectionsClose,
+        rate: cnct.connectionsRate,
+        sendChatMessage: cnct.connectionsChatMessage,
         reset:INJ_DEFAULT,
     },
     needs: {
