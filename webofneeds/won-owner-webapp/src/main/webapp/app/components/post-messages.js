@@ -100,6 +100,31 @@ function genComponentConf() {
 
             this.scrollContainerNg().bind('scroll', e => this.onScroll(e));
 
+            //this.postmsg = this;
+            const selectFromState = state => {
+
+                //TODO seems like rather bad practice to have sideffects here
+                //scroll to bottom directly after rendering, if snapped
+                delay(0).then(() => {
+                    self.updateScrollposition();
+                });
+
+                const connectionUri = selectOpenConnectionUri(state);
+                const chatMessages = selectChatMessages(state);
+                return {
+                    connectionUri,
+                    connection: selectOpenConnection(state),
+                    lastUpdateTime: state.get('lastUpdateTime'),
+                    connectionData: selectAllByConnections(state).get(connectionUri),
+                    chatMessages: chatMessages && chatMessages.toArray(), //toArray needed as ng-repeat won't work otherwise :|
+                    state4dbg: state,
+                }
+            };
+
+            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
+            this.$scope.$on('$destroy', disconnect);
+
+            this.snapToBottom();
 
 
             // TODO <HACK>
@@ -197,31 +222,6 @@ function genComponentConf() {
             */
             // TODO </HACK>
 
-            //this.postmsg = this;
-            const selectFromState = state => {
-
-                //TODO seems like rather bad practice to have sideffects here
-                //scroll to bottom directly after rendering, if snapped
-                delay(0).then(() => {
-                    self.updateScrollposition();
-                });
-
-                const connectionUri = selectOpenConnectionUri(state);
-                const chatMessages = selectChatMessages(state);
-                return {
-                    connectionUri,
-                    connection: selectOpenConnection(state),
-                    lastUpdateTime: state.get('lastUpdateTime'),
-                    connectionData: selectAllByConnections(state).get(connectionUri),
-                    chatMessages: chatMessages && chatMessages.toArray(), //toArray needed as ng-repeat won't work otherwise :|
-                    state4dbg: state,
-                }
-            };
-
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
-
-            this.snapToBottom();
         }
 
         snapToBottom() {
