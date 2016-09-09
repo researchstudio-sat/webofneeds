@@ -3,12 +3,14 @@
     <won-topnav></won-topnav>
     <won-owner-title-bar
             selection="self.selection"
-            ng-show="self.owningPost">
+            ng-show="self.owningPost"
+            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.showConversationDetails}">
     </won-owner-title-bar>
     <won-visitor-title-bar
             selection="::1"
             item="self.post"
-            ng-show="!self.owningPost">
+            ng-show="!self.owningPost"
+            ng-class="{'hidden' : (self.connectionUri !== undefined) && self.showConversationDetails}">
     </won-visitor-title-bar>
 </header>
 <main class="ownerpostcontent">

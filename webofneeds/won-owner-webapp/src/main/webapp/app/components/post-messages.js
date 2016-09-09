@@ -14,21 +14,23 @@ const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
 function genComponentConf() {
     let template = `
-        <div class="pm__header">
-            <a ui-sref="post({connectionUri : null})">
-                <img class="pm__header__icon clickable"
-                     src="generated/icon-sprite.svg#ico36_close"/>
-            </a>
-            <div class="pm__header__title">
-                Conversation about "{{ self.connectionData.getIn(['remoteNeed', 'won:hasContent', 'dc:title']) }}"
+        <div>
+            <div class="pm__header">
+                <a ui-sref="post({connectionUri : null})">
+                    <img class="pm__header__icon clickable"
+                         src="generated/icon-sprite.svg#ico36_close"/>
+                </a>
+                <div class="pm__header__title">
+                    {{ self.connectionData.getIn(['remoteNeed', 'won:hasContent', 'dc:title']) }}
+                </div>
+                <div class="pm__header__options">
+                    Options
+                </div>
+                <img
+                    class="pm__header__options__icon clickable"
+                    src="generated/icon-sprite.svg#ico_settings"
+                    ng-click="self.openConversationOption()"/>
             </div>
-            <div class="pm__header__options">
-                Options
-            </div>
-            <img
-                class="pm__header__options__icon clickable"
-                src="generated/icon-sprite.svg#ico_settings"
-                ng-click="self.openConversationOption()"/>
         </div>
         <div class="pm__content">
             <div
@@ -58,14 +60,16 @@ function genComponentConf() {
                     </div>
             </div>
         </div>
-        <chat-textfield
-            class="pm__footer"
-            placeholder="::'Your Message'"
-            on-input="::self.input(value)"
-            on-submit="::self.send()"
-            submit-button-label="::'Send'"
-            >
-        </chat-textfield>
+        <div>
+            <chat-textfield
+                class="pm__footer"
+                placeholder="::'Your Message'"
+                on-input="::self.input(value)"
+                on-submit="::self.send()"
+                submit-button-label="::'Send'"
+                >
+            </chat-textfield>
+        </div>
     `;
 
     class Controller {
