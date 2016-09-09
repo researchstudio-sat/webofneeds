@@ -38,6 +38,7 @@
     <!-- Conversations: -->
     <div
         class="post-messages"
+        ng-class="{'post-messages--connected': self.showConversationDetails}"
         ng-show="self.showConversationDetails && self.owningPost">
             <div class="post-messages__inner">
                 <won-post-messages></won-post-messages>
