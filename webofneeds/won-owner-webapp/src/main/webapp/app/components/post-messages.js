@@ -16,7 +16,7 @@ function genComponentConf() {
     let template = `
         <div>
             <div class="pm__header">
-                <a ui-sref="post({connectionUri : null})">
+                <a ui-sref="{connectionUri : null}">
                     <img class="pm__header__icon clickable"
                          src="generated/icon-sprite.svg#ico36_close"/>
                 </a>
