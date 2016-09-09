@@ -89,7 +89,7 @@ function genComponentConf() {
         }
 
         openRequestItemUrl() {
-            return this.currentPage === "overviewSentRequests" ? "overviewSentRequests({connectionUri: request.connection.uri})" : "overviewIncomingRequests({connectionUri: request.connection.uri})";
+            return "{connectionUri: request.connection.uri}";
         }
 
         read(request){

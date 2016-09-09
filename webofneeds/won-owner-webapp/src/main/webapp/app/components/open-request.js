@@ -94,7 +94,7 @@ function genComponentConf() {
             <div class="flexbuttons">
                 <button
                     class="won-button--filled black"
-                    ui-sref="{{ self.isOverview? 'overviewIncomingRequests({connectionUri: null})' : 'post({connectionUri: null})' }}"
+                    ui-sref="{connectionUri: null}"
                     ng-click="self.closeRequest()">Decline</button>
                 <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Accept</button>
             </div>
@@ -147,12 +147,7 @@ function genComponentConf() {
         }
 
         closeRequestItemUrl() {
-            if(this.isOverview)
-                return this.isSentRequest ?
-                    "overviewSentRequests({connectionUri: null})" :
-                    "overviewIncomingRequests({connectionUri: null})";
-            else
-                return "post({connectionUri: null})";
+            return "{connectionUri: null}";
         }
 
         openRequest(message){

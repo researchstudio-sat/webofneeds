@@ -63,7 +63,7 @@ function genComponentConf() {
                 <div class="smli__item clickable"
                         ng-class="{'selected' : self.openRequest === match}"
                         ng-repeat="match in self.item"
-                        ui-sref="overviewMatches({layout: 'list', myUri: match.connection.belongsToNeed, connectionUri: match.connection.uri})"
+                        ui-sref="{connectionUri: match.connection.uri}"
                         ng-mouseenter="self.showFeedback()"
                         ng-mouseleave="self.hideFeedback()">
                     <div class="smli__item__header">
