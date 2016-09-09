@@ -37,6 +37,6 @@ If you want to **set up your own deployment of Web of Needs** components, here y
 
 **Linked Data** support in WoN is described [here](webofneeds/won-node-webapp/README.md)
 
-**Matching Service Architecture** is described [here] (webofneeds/won-matcher-service/README.md)
+**Matching Service Architecture** is described [here](webofneeds/won-matcher-service/README.md)
 
 
