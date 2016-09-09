@@ -117,20 +117,15 @@ function genComponentConf() {
                 const eventsLoaded = eventUris && eventUris.size > 0;
 
                 //TODO seems like rather bad practice to have sideffects here
-                //scroll to bottom directly after rendering, if snapped
                 delay(0).then(() => {
+                    // scroll to bottom directly after rendering, if snapped
                     self.updateScrollposition();
-                });
 
-                //TODO more sideffects
-                if (connection && !connection.get('loadingEvents') && !eventsLoaded) {
-                    //return; // only start loading once.
-                    //TODO super hacky using the 4dbg. same bug as documented further down.
-                    pm4dbg.connections__showLatestMessages(connectionUri, 4);
-                }
-                //if(connection && ) {
-                    //self.connections__showLatestMessages(connectionUri, 3);
-                //}
+                    // amake sure latest messages are loaded
+                    if (connection && !connection.get('loadingEvents') && !eventsLoaded) {
+                        self.connections__showLatestMessages(connectionUri, 4);
+                    }
+                });
 
 
                 const chatMessages = selectChatMessages(state);
