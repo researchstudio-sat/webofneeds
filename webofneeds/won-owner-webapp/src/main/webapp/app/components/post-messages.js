@@ -52,7 +52,7 @@ function genComponentConf() {
                 alt="Loading&hellip;"
                 ng-show="self.connection.get('loadingEvents')"
                 class="hspinner"/>
-                <a ng-show="self.eventsLoaded"
+                <a ng-show="self.eventsLoaded && !self.connection.get('loadingEvents')"
                     ng-click="self.connections__showMoreMessages(self.connectionUri, 5)"
                     href="">
                         show more
