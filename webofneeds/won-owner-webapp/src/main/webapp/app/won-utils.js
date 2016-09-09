@@ -2,6 +2,8 @@
  * Created by ksinger on 11.08.2016.
  */
 
+import Immutable from 'immutable';
+
 export function initLeaflet(mapMount) {
     if(!L) {
         throw new Exception("Tried to initialize a leaflet widget while leaflet wasn't loaded.");
