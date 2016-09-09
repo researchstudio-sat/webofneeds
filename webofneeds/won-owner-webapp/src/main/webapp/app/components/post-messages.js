@@ -51,7 +51,7 @@ function genComponentConf() {
                 ng-show="self.connection.get('loadingEvents')"
                 class="hspinner"/>
                 <a ng-show="self.eventsLoaded"
-                    ng-click="self.connections__showMoreMessages(self.connectionUri, 3)"
+                    ng-click="self.connections__showMoreMessages(self.connectionUri, 5)"
                     href="">
                         show more
                 </a>
@@ -122,7 +122,7 @@ function genComponentConf() {
                 if (connection && !connection.get('loadingEvents') && !eventsLoaded) {
                     //return; // only start loading once.
                     //TODO super hacky using the 4dbg. same bug as documented further down.
-                    pm4dbg.connections__showLatestMessages(connectionUri, 3);
+                    pm4dbg.connections__showLatestMessages(connectionUri, 4);
                 }
                 //if(connection && ) {
                     //self.connections__showLatestMessages(connectionUri, 3);
