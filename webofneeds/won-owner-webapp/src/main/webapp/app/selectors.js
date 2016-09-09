@@ -32,12 +32,15 @@ export const selectUnreadEventUris = state => state
 export const selectRemoteEvents = createSelector(
     selectEvents,
     events => {
-        const remoteUrisAndEvents = events.toList().map(e => {
-            var remote = e
-                .get('hasCorrespondingRemoteMessage') // select remote
-                .set('correspondsToOwnMsg', e); //add back-reference to it
-            return remote && [remote.get('uri'), remote]
-        })
+        const remoteUrisAndEvents = events
+            .toList()
+            .map(e => {
+                let remote = e.get('hasCorrespondingRemoteMessage') // select remote
+                if(!remote) return undefined;
+                remote = remote.set('correspondsToOwnMsg', e); //add back-reference to it
+                return remote && [remote.get('uri'), remote]
+            })
+            .filter(uriAndEvent => uriAndEvent); // filter out `undefined`s
         return Immutable.Map(remoteUrisAndEvents)
     }
 )
