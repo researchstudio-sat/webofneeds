@@ -1,7 +1,7 @@
 <header>
     <won-topnav></won-topnav>
 </header>
-<main class="landingpage">
+<main class="landingpage" id="allSections">
     <a class="curtain" ng-show="self.focusSignup" ui-sref="landingpage({focusSignup: false})"></a>
     <div class="welcome">
         <div class="title">Welcome to the Web of Needs</div>
@@ -22,7 +22,7 @@
         <div class="title">How it works</div>
         <won-flex-grid items="::self.workGrid"></won-flex-grid>
     </div>
-    <div class="try" ng-show="!self.loggedIn">
+    <div class="try" ng-show="!self.loggedIn" id="signupSection">
         <div class="title">Try it yourself!</div>
         <div class="sub title">We hope you like this beta version! Please note that we are experimenting a lot and
             from time to time we wipe our database - which lead to the complete loss of your account and all the data

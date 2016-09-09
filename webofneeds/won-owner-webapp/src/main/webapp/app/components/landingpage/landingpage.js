@@ -6,7 +6,11 @@ import overviewTitleBarModule from '../visitor-title-bar';
 import compareToModule from '../../directives/compareTo';
 import accordionModule from '../accordion';
 import flexGridModule from '../flexgrid';
-import { attach, scrollTo } from '../../utils';
+import {
+    attach,
+    scrollTo,
+    delay,
+} from '../../utils';
 import { actionCreators }  from '../../actions/actions';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
@@ -100,12 +104,19 @@ class LandingpageController {
 
         const disconnect = this.$ngRedux.connect(signup, actionCreators)(this);
 
+
         this.$scope.$on('$destroy',disconnect);
+
+        this.$scope.$watch('self.focusSignup', (oldval, newval) => {
+            if (!oldval && newval){
+               delay(0).then(() => self.scrollToSignup());
+            }
+        })
+
         this.$scope.$on('$viewContentLoaded', function(){
             const focusSignup = self.$ngRedux.getState().getIn(['router', 'currentParams', 'focusSignup']) === "true";
             if(focusSignup){
-                scrollTo("signup");
-                angular.element('input#registerEmail').trigger('focus');
+                delay(0).then(() => self.scrollToSignup());
             }
         });
 
@@ -117,6 +128,11 @@ class LandingpageController {
 
     toggleMoreInfo(){
         this.moreInfo = !this.moreInfo;
+    }
+
+    scrollToSignup(){
+        const topPos = document.getElementById('signupSection').offsetTop;
+        document.getElementById('allSections').scrollTop = topPos;
     }
 }
 
