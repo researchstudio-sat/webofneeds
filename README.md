@@ -24,6 +24,7 @@ If you want to **set up your own deployment of Web of Needs** components, here y
 
 ### Papers and further Information
 
+* More detailed description of the Web of Needs can be found [here](http://sat.researchstudio.at/en/web-of-needs)
 * [Beyond Data: Building a Web of Needs](http://events.linkeddata.org/ldow2013/papers/ldow2013-paper-13.pdf)
 * [The Case for the Web of Needs](http://sat.researchstudio.at/sites/sat.researchstudio.at/files/won_cbi-2014_the_case_for_the_web_of_needs.pdf)
 * [Web of Needs - A New Paradigm for E-Commerce](http://sat.researchstudio.at/sites/sat.researchstudio.at/files/won-cbi-2013.pdf)
