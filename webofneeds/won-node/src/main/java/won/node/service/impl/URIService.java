@@ -110,11 +110,11 @@ public class URIService
   }
 
   public URI createConnectionsURIForNeed(URI needURI) {
-    return URI.create(needURI.toString() + "/connections/");
+    return URI.create(needURI.toString() + "/connections");
   }
 
   public URI createEventsURIForConnection(URI connURI) {
-    return URI.create(connURI.toString() + "/events/");
+    return URI.create(connURI.toString() + "/events");
   }
 
   public URI createConnectionURIForId(String id) {

@@ -174,7 +174,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   Resource needResource = metaModel.getResource(needUri.toString());
 
   // add connections
-  Resource connectionsContainer = metaModel.createResource(need.getNeedURI().toString() + "/connections/");
+  Resource connectionsContainer = metaModel.createResource(need.getNeedURI().toString() + "/connections");
   metaModel.add(metaModel.createStatement(needResource, WON.HAS_CONNECTIONS, connectionsContainer));
 
   // add need event container
@@ -301,7 +301,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
       if (includeLatestEvent) {
         //we add the latest event in the connection
         Slice<URI> latestEvents =
-          messageEventRepository.getMessageURIsByParentURI(connectionUri, new PageRequest(0, 1));
+          messageEventRepository.getMessageURIsByParentURI(connectionUri, new PageRequest(0, 1, new Sort(Sort
+                                                                                                           .Direction.DESC, "creationDate")));
         if (latestEvents.hasContent()) {
           URI eventURI = latestEvents.getContent().get(0);
           //add the event's dataset
