@@ -134,7 +134,7 @@ export default function(connections = initialState, action = {}) {
 
 function storeConnection(connections, connectionToStore) {
     let immutableCnct = sanitizeConnection(connectionToStore);
-    return connections.mergeIn(immutableCnct.get('uri'), immutableCnct);
+    return connections.mergeIn([immutableCnct.get('uri')], immutableCnct);
 }
 
 function storeConnections(connections, connectionsToStore) {
@@ -149,7 +149,7 @@ function storeConnections(connections, connectionsToStore) {
 function sanitizeConnection(connection) {
     let immutableCnct = connection;
     if(!Immutable.Map.isMap(connection)) {
-        immutableCnct = Immutable.fromJS(connection.connection)
+        immutableCnct = Immutable.fromJS(connection)
     }
     if(!Immutable.Set.isSet(immutableCnct.get('hasEvents'))) {
         //make sure events are stored as set (i.e. every uri only once)

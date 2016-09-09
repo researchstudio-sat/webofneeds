@@ -1,31 +1,43 @@
-webofneeds
-==========
+##webofneeds
 
 [![Join the chat at https://gitter.im/researchstudio-sat/webofneeds](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/researchstudio-sat/webofneeds?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-The central idea of the Web of needs is this: the WWW looks like a marketplace; 
-everyone knows what there is for sale, only a few know what is needed. We want to change that.
+E-marketplaces on the worldwide Web are information and transaction silos, which in the general case don’t allow transactions across their boundaries. The consequence is that the Web, often termed the global marketplace, is fragmented along the dimensions of geography, content domain, supply or demand, user base, and many more. This fragmentation makes it inefficient to buy and sell commodities on the Web. 
 
-The central point is the 'need', which we represent as a linked data resource. It names communication
-protocol endpoints that can be used to contact its owner and provide information about interesting other
-'needs'.
+**Web of Needs is an infrastructure that serves as a foundation for a distributed, decentralized e-marketplace on top of the Web, making boundaries between existing systems disappear from the user’s perspective.**
 
-Web of needs is built of 
-- won-node: the server component hosting the needs
-- won-owner: a simple application allowing for enduser need management  
-- and a matching-service: currently implemented as a crawler that contacts needs (via the protocol endpoints) whenever 
-   it finds a good match.
+Our overall goal is to create a decentralized infrastructure that allows people to publish documents on the Web which make it possible to contact each other, and this should only happen if all parties involved have an interest in doing so. The said document may contain a description of a product or service required or offered, a description of a problem to be solved with the help of others, an invitation to social activities, or anything else users may think of. Some concrete [use cases are described here](documentation/use-cases-users.md). On the abstract level of description, the document can be said to represent an interest in or a **need for some kind of interaction with others**. 
 
-Requirements for getting started:
+Therefore, we refer to this document as a **need**. It is the central entity of the system we propose. Each need has a globally unique identifier and an owner, i.e., a person or other entity that creates and controls it. When need owners want to communicate with each other, a connection object is created for each need involved. 
+
+Web of needs is built out of three main components. **Owner applications** enable users to create and manage their need objects. They can be any type of UI application like web applications or mobile apps for example. Owner applications publish needs as RDF documents to **won nodes** on the Web. When needs are published on the Web, independent **matching services** can crawl them (or subscribe for need updates at won nodes) and look for suitable matches. A protocol is in place to inform the won nodes and need owners of possible matches using hint messages. Based on this process need owners can initiate connections to other needs and start communication and other transactions.
+
+###Demo
+
+A **demo deployment of the Web of Needs** with a simple owner application, one won node and one matching service can be tested at www.matchat.org
+
+###Deployment
+
+If you want to **set up your own deployment of Web of Needs** components, here you find requirements for **getting started**:
 - install docker (we use 1.7.0)
 - follow the [instructions here](webofneeds/won-docker/README.md) to set up all the neccessary components of web of needs locally
 
----
+### Papers and further Information
 
-See also: http://events.linkeddata.org/ldow2013/papers/ldow2013-paper-13.pdf
+* More detailed description of the Web of Needs can be found [here](http://sat.researchstudio.at/en/web-of-needs)
+* [Beyond Data: Building a Web of Needs](http://events.linkeddata.org/ldow2013/papers/ldow2013-paper-13.pdf)
+* [The Case for the Web of Needs](http://sat.researchstudio.at/sites/sat.researchstudio.at/files/won_cbi-2014_the_case_for_the_web_of_needs.pdf)
+* [Web of Needs - A New Paradigm for E-Commerce](http://sat.researchstudio.at/sites/sat.researchstudio.at/files/won-cbi-2013.pdf)
+* [Building a Web of Needs](http://sat.researchstudio.at/sites/sat.researchstudio.at/files/kleedorfer_iswc_2011.pdf)
+
+---
 
 **Build-instructions** can be found in the [project wiki](https://github.com/researchstudio-sat/webofneeds/wiki)
 
 **Security architecture** overview can be found [here](webofneeds/won-core/README.md)
 
 **Linked Data** support in WoN is described [here](webofneeds/won-node-webapp/README.md)
+
+**Matching Service Architecture** is described [here](webofneeds/won-matcher-service/README.md)
+
+
