@@ -21,7 +21,7 @@ const workGrid = [{imageSrc: 'generated/icon-sprite.svg#ico36_description', text
     ' who has what you need, wants to meet or change something in your common environment? Go chat with them! '}];
 
 const peopleGrid = [{imageSrc: 'images/face1.png', text: '"I have something to offer"'},
-    {imageSrc: 'images/face2.png', text: '"I want to have something"'},
+    {imageSrc: 'images/face2.png', text: '"I want something"'},
     {imageSrc: 'images/face3.png', text: '"I want to do something together"'},
     {imageSrc: 'images/face4.png', text: '"I want to change something"'}];
 
