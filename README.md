@@ -22,12 +22,21 @@ If you want to **set up your own deployment of Web of Needs** components, here y
 - install docker (we use 1.7.0)
 - follow the [instructions here](webofneeds/won-docker/README.md) to set up all the neccessary components of web of needs locally
 
----
+### Papers and further Information
 
-See also: http://events.linkeddata.org/ldow2013/papers/ldow2013-paper-13.pdf
+* [Beyond Data: Building a Web of Needs](http://events.linkeddata.org/ldow2013/papers/ldow2013-paper-13.pdf)
+* [The Case for the Web of Needs](http://sat.researchstudio.at/sites/sat.researchstudio.at/files/won_cbi-2014_the_case_for_the_web_of_needs.pdf)
+* [Web of Needs - A New Paradigm for E-Commerce](http://sat.researchstudio.at/sites/sat.researchstudio.at/files/won-cbi-2013.pdf)
+* [Building a Web of Needs](http://sat.researchstudio.at/sites/sat.researchstudio.at/files/kleedorfer_iswc_2011.pdf)
+
+---
 
 **Build-instructions** can be found in the [project wiki](https://github.com/researchstudio-sat/webofneeds/wiki)
 
 **Security architecture** overview can be found [here](webofneeds/won-core/README.md)
 
 **Linked Data** support in WoN is described [here](webofneeds/won-node-webapp/README.md)
+
+**Matching Service Architecture** is described [here] (webofneeds/won-matcher-service/README.md)
+
+
