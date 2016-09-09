@@ -12,6 +12,7 @@ import {
     selectAllByConnections,
     selectOpenConnectionUri,
     selectOpenConnection,
+    selectRemoteEvents,
 } from '../selectors';
 
 import {
@@ -290,7 +291,13 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
         const connectionUri = selectOpenConnectionUri(state);
         const connection = selectOpenConnection(state);
         const requesterWebId = connection.get('belongsToNeed');
-        const events = selectEventsOfConnection(state, connectionUri);
+        const ownEvents = selectEventsOfConnection(state, connectionUri);
+        const remoteEvents =
+            selectRemoteEvents(state)
+            .filter(e =>
+                e.get('hasReceiver') === connectionUri ||
+                e.get('hasSender') === connectionUri
+            );
 
         /* TODO expand set of uris from latest chat message via daisy-chaining?
          * they have multiple predecessors, i.e. success response and previous chat message
@@ -300,15 +307,27 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
          * or look through *all* events here to find the event we're looking for.
          */
         // determine the oldest loaded event
-        const sortedEvents = events.sort((e1, e2) =>
-            msStringToDate(e1.get('hasReceivedTimestamp')) -
-            msStringToDate(e2.get('hasReceivedTimestamp'))
-        );
-        const oldestEvent = sortedEvents.first();
-        const latestEvent = sortedEvents.last();
+        //alternative approach sort everything together
+        //getOldestEventInChain(state, connectionUri)
+
+        // determine the oldest loaded event
+        const sortByTime = (someEvents, pathToMsString) =>
+            someEvents.sort((e1, e2) =>
+                msStringToDate(e1.getIn(pathToMsString)) -
+                msStringToDate(e2.getIn(pathToMsString))
+            );
+
+        const sortedOwnEvents = sortByTime(ownEvents, ['hasReceivedTimestamp']);
+
+        const oldestEvent = sortedOwnEvents.first();
         const eventHashValue = oldestEvent
                 .get('uri')
                 .replace(/.*\/event\/(.*)/, '$1'); // everything following the `/event/`
+
+        // chain is more of a cycle-free graph
+        // find all the ones w/o predecessors
+        // then take the oldest of these
+        // make sure to always take the timestamp on the own node
 
 
         dispatch({
@@ -351,6 +370,61 @@ export function showMoreMessages(connectionUri, numberOfEvents) {
 
 
     }
+}
+
+function getOldestEventInChain(state, connectionUri) {
+
+    const ownEvents = selectEventsOfConnection(state, connectionUri);
+    const remoteEvents =
+        selectRemoteEvents(state)
+            .filter(e =>
+            e.get('hasReceiver') === connectionUri ||
+            e.get('hasSender') === connectionUri
+        );
+
+    const sortByTime = (someEvents, pathToMsString) =>
+        someEvents.sort((e1, e2) =>
+            msStringToDate(e1.getIn(pathToMsString)) -
+            msStringToDate(e2.getIn(pathToMsString))
+        );
+
+    const sortedOwnEvents = sortByTime(ownEvents, ['hasReceivedTimestamp']);
+    const sortedRemoteEvents = sortByTime(remoteEvents, ['correspondsToOwnMsg', 'hasReceivedTimestamp']);
+
+    const timestamp = e => msStringToDate(
+        e.getIn(['correspondsToOwnMsg', 'hasReceivedTimestamp']) || //remoteEvent
+        e.get('hasReceivedTimestamp') // ownEvent
+    );
+    const allEvents = ownEvents.merge(remoteEvents);
+    const allEventsSorted = allEvents.sort((e1, e2) => timestamp(e1) - timestamp(e2));
+
+    //start with the latest event
+    const latestEvent = allEventsSorted.last();
+    let latestEvents = Immutable.Map()
+        .set(latestEvent.get('uri'), latestEvent);
+
+    const prevMsgs = e => {
+        const prev =
+            e.getIn(['correspondsToOwnMsg', 'hasPreviousMessage']) || //remoteEvent
+            e.get('hasPreviousMessage'); // ownEvent or remote's own predecessors
+        //make sure we get an array
+        if(is('Array', prev)) {
+            return prev;
+        } else {
+            return [prev];
+        }
+    };
+
+    //recursively add all connected events
+    //let frontier = Immutable.Set()
+    let acc = Immutable.Map()
+        .add('frontier', Immutable.Set())
+        .add('earliestLoaded', Immutable.Set());
+    for([uri, e] of latestEvents.entries()) {
+        const previous = prevMsgs(e);
+        if(!previous) continue;
+    }
+
 }
 
 function numOfEvts2pageSize(numberOfEvents) {
