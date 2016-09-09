@@ -14,7 +14,8 @@
     }
 
     > .mtb__inner__right {
-      @include flex-column;
+      display: none; //UNTIL WE INCLUDE THE SEARCH FUNCTIONALITY THIS WILL NOT BE DISPLAYED ANYMORE
+      /*@include flex-column;*/
     }
   }
 }

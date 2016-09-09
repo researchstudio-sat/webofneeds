@@ -73,7 +73,7 @@ function genComponentConf() {
                     </a>
                 </p>
 
-                <div class="post-info__mapmount" id="post-info__mapmount" style="height:500px"></div>
+                <div class="post-info__mapmount" id="post-info__mapmount"></div>
             </div>
         </div>
     `;

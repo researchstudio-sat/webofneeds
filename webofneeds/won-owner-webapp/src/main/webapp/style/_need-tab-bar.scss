@@ -31,7 +31,12 @@
       align-items: center;
       justify-content: flex-start;
 
-      @include square-image(4.7rem, 0, 1rem, 0, 1rem);
+      @media (max-width: $responsivenessBreakPoint){
+        @include square-image($postIconSize, 0, 0, 0, 0);
+      }
+      @media (min-width: $responsivenessBreakPoint){
+        @include square-image(4.7rem, 0, 1rem, 0, 1rem);
+      }
     }
 
     > .#{$prefix}__inner__right {
@@ -74,6 +79,11 @@
 
         > .#{$prefix}__tabs {
           align-self: stretch;
+
+          @media (max-width: $responsivenessBreakPoint) {
+            width: 17rem;
+            overflow-x: scroll;
+          }
           //height: 100%;
         }
       }

@@ -16,31 +16,33 @@ import {
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
     let template = `
-            <a ui-sref="post({postUri: self.needUri})">
-                <won-square-image  
-                    ng-class="{'inactive' : !self.isActive()}" 
-                    src="self.ownNeed.get('titleImgSrc')"
-                    title="self.ownNeed.getIn(['won:hasContent','dc:title'])"
-                    uri="self.needUri">
-                </won-square-image>
-            </a>
-            <a class="pil__description clickable" ui-sref="post({postUri: self.needUri})">
-                <div class="pil__description__topline">
-                    <div class="pil__description__topline__title">{{self.ownNeed.getIn(['won:hasContent','dc:title'])}}</div>
-                    <div class="pil__description__topline__creationdate">{{self.relativeCreationDate}}</div>
-                </div>
-                <div class="pil__description__subtitle">
-                    <span class="pil__description__subtitle__group" ng-show="self.ownNeed.get('group')">
-                        <img src="generated/icon-sprite.svg#ico36_group"
-                             class="pil__description__subtitle__group__icon">
-                         {{self.ownNeed.get('group')}}
-                         <span class="pil__description__subtitle__group__dash"> &ndash; </span>
-                    </span>
-                    <span class="pil__description__subtitle__type">
-                         {{self.labels.type[self.ownNeed.getIn(['won:hasBasicNeedType', '@id'])]}}
-                    </span>
-                </div>
-            </a>
+            <div class="pil__information">
+                <a ui-sref="post({postUri: self.needUri})">
+                    <won-square-image  
+                        ng-class="{'inactive' : !self.isActive()}" 
+                        src="self.ownNeed.get('titleImgSrc')"
+                        title="self.ownNeed.getIn(['won:hasContent','dc:title'])"
+                        uri="self.needUri">
+                    </won-square-image>
+                </a>
+                <a class="pil__description clickable" ui-sref="post({postUri: self.needUri})">
+                    <div class="pil__description__topline">
+                        <div class="pil__description__topline__title">{{self.ownNeed.getIn(['won:hasContent','dc:title'])}}</div>
+                        <div class="pil__description__topline__creationdate">{{self.relativeCreationDate}}</div>
+                    </div>
+                    <div class="pil__description__subtitle">
+                        <span class="pil__description__subtitle__group" ng-show="self.ownNeed.get('group')">
+                            <img src="generated/icon-sprite.svg#ico36_group"
+                                 class="pil__description__subtitle__group__icon">
+                             {{self.ownNeed.get('group')}}
+                             <span class="pil__description__subtitle__group__dash"> &ndash; </span>
+                        </span>
+                        <span class="pil__description__subtitle__type">
+                             {{self.labels.type[self.ownNeed.getIn(['won:hasBasicNeedType', '@id'])]}}
+                        </span>
+                    </div>
+                </a>
+            </div>
             <div class="pil__indicators">
                 <a
                     class="pil__indicators__item clickable"

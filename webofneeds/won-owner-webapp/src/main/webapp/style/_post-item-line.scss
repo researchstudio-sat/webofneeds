@@ -10,59 +10,75 @@ won-post-item-line {
   padding: 0.5rem 0;
   border-top: 0.1rem solid $won-line-gray;
 
+  @media (max-width: $responsivenessBreakPoint) {
+    flex-direction: column;
+    padding: 0.5rem;
+    background-color: white;
+  }
+
   a {
     text-decoration: none;
   }
 
   @include square-image($postIconSize, 0, 0.5rem, 0, 0);
 
-  .pil__description {
-    color: black;
+  .pil__information {
+    display: flex;
     flex-grow: 1;
-    padding-right: 1rem;
 
-    &__topline{
-      display: flex;
-      flex-wrap: nowrap;
-      justify-content: space-between;
+    .pil__description {
+      color: black;
+      flex-grow: 1;
+      padding-right: 1rem;
 
-      &__title{
-        font-weight: 500;
-      }
-
-      &__creationdate {
-        color: $won-subtitle-gray;
-        font-size: $smallFontSize;
-        white-space: nowrap;
-      }
-    }
-
-    &__subtitle {
-      color: $won-subtitle-gray;
-      font-size: $smallFontSize;
-      display: flex;
-      flex-direction: row;
-
-      &__group {
+      &__topline{
         display: flex;
-        align-items: center;
-        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
 
-        &__dash {
-          padding: 0 0.25rem;
+        &__title{
+          font-weight: 500;
         }
 
-        &__icon {
-          padding-right: 0.25rem;
-          @include fixed-square(0.75rem);
+        &__creationdate {
+          color: $won-subtitle-gray;
+          font-size: $smallFontSize;
+          white-space: nowrap;
+        }
+      }
+
+      &__subtitle {
+        color: $won-subtitle-gray;
+        font-size: $smallFontSize;
+        display: flex;
+        flex-direction: row;
+
+        &__group {
+          display: flex;
+          align-items: center;
+          flex-direction: row;
+
+          &__dash {
+            padding: 0 0.25rem;
+          }
+
+          &__icon {
+            padding-right: 0.25rem;
+            @include fixed-square(0.75rem);
+          }
         }
       }
     }
   }
-
   .pil__indicators {
     display: flex;
     flex-direction: row;
+
+    @media (max-width: $responsivenessBreakPoint) {
+      padding-top: 0.5rem;
+      justify-content: space-between;
+      width: 75%;
+    }
 
     &__item {
       display: flex;
