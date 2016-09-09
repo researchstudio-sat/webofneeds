@@ -301,7 +301,8 @@ public class LinkedDataServiceImpl implements LinkedDataService
       if (includeLatestEvent) {
         //we add the latest event in the connection
         Slice<URI> latestEvents =
-          messageEventRepository.getMessageURIsByParentURI(connectionUri, new PageRequest(0, 1));
+          messageEventRepository.getMessageURIsByParentURI(connectionUri, new PageRequest(0, 1, new Sort(Sort
+                                                                                                           .Direction.DESC, "creationDate")));
         if (latestEvents.hasContent()) {
           URI eventURI = latestEvents.getContent().get(0);
           //add the event's dataset
