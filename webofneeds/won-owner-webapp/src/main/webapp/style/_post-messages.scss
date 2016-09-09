@@ -4,6 +4,14 @@
 @import 'chattextfield';
 @import 'won-config';
 
+
+@media (max-width: $responsivenessBreakPoint) {
+  won-visitor-title-bar.hidden,
+  won-owner-title-bar.hidden {
+    display: none; //hide the subheader when a conversation is open on a mobile device
+  }
+}
+
 .post-messages {
   background: white;
   border: 0.1rem solid $won-line-gray;
@@ -11,6 +19,9 @@
   width: 100%;
   max-width: 35rem;
   margin: 0.5rem;
+  height: calc(100% - 1rem); //minus double the margin
+  box-sizing: border-box;
+
   @include max-content-width(35rem, $minContentPadding, 'post-messages');
 
   .post-messages__inner {
@@ -18,12 +29,14 @@
     justify-content: center;
     flex-wrap: wrap;
     align-items: flex-start;
-
+    height: 100%;
   }
 
   won-post-messages{
-    display: block;
+    display: flex;
+    flex-direction: column;
     width: 100%;
+    height: 100%;
 
     .pm__header {
       display:flex;
@@ -77,8 +90,8 @@
       margin: 1rem 0;
       background: white;
       border: 0.1rem solid $won-line-gray;
-      max-height: 30rem;
       overflow: auto;
+      flex-grow: 1;
 
       &__message {
         margin: 0.5rem 0;
