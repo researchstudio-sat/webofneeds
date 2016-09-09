@@ -16,7 +16,12 @@
 
   //$createPostMaxContentWidth: 46.25rem;
   $createPostMaxContentWidth: 35rem;
-  @include max-content-width($createPostMaxContentWidth, $minContentPadding, 'cp');
+  @media (max-width: $responsivenessBreakPoint){
+    @include max-content-width($createPostMaxContentWidth, 0, 'cp');
+  }
+  @media (min-width: $responsivenessBreakPoint){
+    @include max-content-width($createPostMaxContentWidth, $minContentPadding, 'cp');
+  }
 
   > .cp__inner {
     display: flex;
@@ -43,6 +48,7 @@
     flex-wrap: wrap;
 
     won-image-dropzone {
+      display: none; //removed for the time being (as long as the picture upload/save is not implemented)
       margin-right: $minContentPadding;
       margin-bottom: $minContentPadding;
     }

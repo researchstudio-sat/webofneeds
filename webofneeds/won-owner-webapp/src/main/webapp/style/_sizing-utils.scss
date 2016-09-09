@@ -58,7 +58,7 @@
   display: flex;
   justify-content: center;
   align-content: center;
-  align-items: center;
+  /*align-items: baseline;*/
   flex-direction: row;
 
   > .#{$prefix}__inner {

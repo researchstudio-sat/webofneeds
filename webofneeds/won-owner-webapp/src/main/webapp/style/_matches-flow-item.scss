@@ -10,6 +10,10 @@ won-matches-flow-item {
   background: $won-light-gray;
   width: 16.25rem;
 
+  @media (max-width: $responsivenessBreakPoint){
+    width: 100%;
+  }
+
   .mfi__description {
     padding: 0.5rem;
     color: black;

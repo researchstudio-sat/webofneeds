@@ -2,8 +2,14 @@
 @import 'sizing-utils';
 
 won-post-info {
-  @include max-content-width($maxContentWidth, $minContentPadding, 'post-info');
-  padding: 2rem;
+  @media (max-width: $responsivenessBreakPoint){
+    @include max-content-width($maxContentWidth, 0, 'post-info');
+    padding: 0.5rem;
+  }
+  @media (min-width: $responsivenessBreakPoint){
+    @include max-content-width($maxContentWidth, $minContentPadding, 'post-info');
+    padding: 2rem;
+  }
   width: 100%;
 
   .post-info__heading {
@@ -27,6 +33,15 @@ won-post-info {
     }
   }
 
+  .post-info__mapmount {
+    width: 100%;
+    height: 31rem;
+
+    @media (max-width : $responsivenessBreakPoint) {
+      height: 15rem;
+    }
+  }
+
   .post-info__inner {
     display: flex;
     flex-direction: row;
@@ -43,6 +58,5 @@ won-post-info {
       flex-grow: 1;
       flex-basis: 15rem;
     }
-
   }
 }
