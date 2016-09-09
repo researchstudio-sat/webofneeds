@@ -15,7 +15,7 @@ Web of needs is built out of three main components. **Owner applications** enabl
 
 A **demo deployment of the Web of Needs** with a simple owner application, one won node and one matching service can be tested at www.matchat.org
 
-If you want to set up your own deployment of Web of Needs components, here you find requirements for getting started:
+If you want to **set up your own deployment of Web of Needs** components, here you find requirements for **getting started**:
 - install docker (we use 1.7.0)
 - follow the [instructions here](webofneeds/won-docker/README.md) to set up all the neccessary components of web of needs locally
 
