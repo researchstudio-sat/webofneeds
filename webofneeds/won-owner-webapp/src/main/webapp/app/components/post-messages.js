@@ -4,10 +4,25 @@ import angular from 'angular';
 import Immutable from 'immutable';
 import squareImageModule from './square-image';
 import chatTextFieldModule from './chat-textfield';
-import { attach, is, delay, msStringToDate } from '../utils.js'
-import { actionCreators }  from '../actions/actions';
-import { labels, relativeTime } from '../won-label-utils';
-import { selectAllByConnections, selectOpenConnectionUri } from '../selectors';
+import {
+    attach,
+    is,
+    delay,
+    msStringToDate,
+    urisToLookupMap,
+} from '../utils.js'
+import {
+    actionCreators
+}  from '../actions/actions';
+import {
+    labels,
+    relativeTime,
+} from '../won-label-utils';
+import {
+    selectAllByConnections,
+    selectOpenConnectionUri,
+    selectOpenConnection,
+} from '../selectors';
 import { selectTimestamp } from '../won-utils'
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
@@ -33,6 +48,15 @@ function genComponentConf() {
             </div>
         </div>
         <div class="pm__content">
+            <img src="images/spinner/on_white.gif"
+                alt="Loading&hellip;"
+                ng-show="self.connection.get('loadingEvents')"
+                class="hspinner"/>
+                <a ng-show="self.eventsLoaded"
+                    ng-click="self.connections__showMoreMessages(self.connectionUri, 5)"
+                    href="">
+                        show more
+                </a>
             <div
                 class="pm__content__message"
                 ng-repeat="message in self.chatMessages"
@@ -72,6 +96,8 @@ function genComponentConf() {
         </div>
     `;
 
+
+
     class Controller {
         constructor(/* arguments = dependency injections */) {
             attach(this, serviceDependencies, arguments);
@@ -85,17 +111,33 @@ function genComponentConf() {
 
             //this.postmsg = this;
             const selectFromState = state => {
+                const connectionUri = selectOpenConnectionUri(state);
+                const connection = selectOpenConnection(state);
+                const eventUris = connection && connection.get('hasEvents');
+                const eventsLoaded = eventUris && eventUris.size > 0;
 
                 //TODO seems like rather bad practice to have sideffects here
                 //scroll to bottom directly after rendering, if snapped
                 delay(0).then(() => {
                     self.updateScrollposition();
-                    console.log('pm - delay ', self._snapBottom, self.chatMessages.length)
                 });
 
-                const connectionUri = selectOpenConnectionUri(state);
+                //TODO more sideffects
+                if (connection && !connection.get('loadingEvents') && !eventsLoaded) {
+                    //return; // only start loading once.
+                    //TODO super hacky using the 4dbg. same bug as documented further down.
+                    pm4dbg.connections__showLatestMessages(connectionUri, 4);
+                }
+                //if(connection && ) {
+                    //self.connections__showLatestMessages(connectionUri, 3);
+                //}
+
+
                 const chatMessages = selectChatMessages(state);
                 return {
+                    connectionUri,
+                    connection,
+                    eventsLoaded,
                     lastUpdateTime: state.get('lastUpdateTime'),
                     connectionData: selectAllByConnections(state).get(connectionUri),
                     chatMessages: chatMessages && chatMessages.toArray(), //toArray needed as ng-repeat won't work otherwise :|
@@ -107,6 +149,70 @@ function genComponentConf() {
             this.$scope.$on('$destroy', disconnect);
 
             this.snapToBottom();
+
+
+            // TODO <HACK>
+
+            const loadStuffAC = () => {
+                //TODO a `return` here might be a race condition that results in this function never being called.
+                //TODO the delay solution is super-hacky (idle-waiting)
+                if(!self.connection__showLatestMessages) delay(100).then(loadStuffAC); // we tried to call this before the action-creators where attached.
+                const state = self.$ngRedux.getState();
+                const connectionUri = selectOpenConnectionUri(state);
+                if(!connectionUri) return;
+                //self.connection__showLatestMessages(connectionUri, 2); //<-- has scoping issues. somehow it's not defined as function when the code runs. when breaking here, it is one though. mysterious.
+                pm4dbg.connections__showLatestMessages(pm4dbg.connectionUri, 3) // TODO, using 4dbg-variable. yes, this has become that hacky.
+            }
+
+            /*
+             * If component has been created
+             * after the connection had been loaded
+             * we can already start loading events.
+             */
+            //loadStuffAC();
+
+            //TODO delete unnecessary logging
+            //TODO call this when view is visible and the connection has been loaded (sometimes
+            // the view is faster, sometimes the connection)
+            console.log('post-messages.js: executing constructor.');
+            /*
+             * for the case that the component
+             * is visible before the connection
+             * has been loaded: set up a watch.
+             */
+            const eventWatchDeregister = this.$scope.$watch(
+                ({self}) => self.connection && self.connection.get('uri'),
+                (newCnctUri, oldCnctUri) => {
+                    console.log('post-messages.js: in connection watch', newCnctUri, oldCnctUri);
+                    //loadStuffAC();
+                });
+
+
+            // the caching mechanisms should de-dupe the requests.
+
+            // TODO pro-active loading!!!
+
+            // check in every select?
+            /*
+            use this approach if there's no flags or we need to check
+            outside of any component:
+            ```
+            const ensureLoaded = () => {
+                const state = self.$ngRedux.getState();
+                const connection = selectOpenConnection(state);
+                // pulled the eventsPending check to here, to avoid the expensive subset calculation
+                if(!self.eventsPending && !self.eventsLoaded && connection) {
+                    var desiredEvents = connection.get('hasEvents');
+                    var loadedEvents = state.getIn(['events','events']).keySeq();
+                    if(!desiredEvents.isSubset(loadedEvents)) {
+                        loadStuff();
+                    }
+                }
+            }
+            ```
+            */
+            // TODO </HACK>
+
         }
 
         snapToBottom() {
@@ -184,6 +290,7 @@ export default angular.module('won.owner.components.postMessages', [
 
 //TODO refactor so that it always returns an array of immutable messages to
 // allow ng-repeat without giving up the cheaper digestion
+//TODO move this to selectors.js
 function selectChatMessages(state) {
     const connectionUri = selectOpenConnectionUri(state);
     const connectionData = selectAllByConnections(state).get(connectionUri);

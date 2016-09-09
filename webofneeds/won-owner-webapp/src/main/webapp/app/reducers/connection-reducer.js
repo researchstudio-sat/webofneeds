@@ -79,17 +79,49 @@ export default function(connections = initialState, action = {}) {
                 [msgFromOwner.uri, eventOnOwnNode.uri]
             );
 
+        case actionTypes.connections.showLatestMessages:
+        case actionTypes.connections.showMoreMessages:
+            if(action.payload.get('pending')) {
+                return connections.update(
+                    action.payload.get('connectionUri'),
+                    cnct => {
+                        const existingCnct = cnct? cnct : Immutable.Map();
+                        return existingCnct
+                            .set('loadingEvents', true)
+                            .delete('failedLoadingEvents')
+                    }
+                );
+            } else if (action.payload.get('error')) {
+                return connections.update(
+                    action.payload.get('connectionUri'),
+                    cnct => cnct
+                        .delete('loadingEvents')
+                        .set('failedLoadingEvents', action.payload.get('error'))
+                );
+            } else /* success */ {
+                var loadedEvents = action.payload.get('events');
+                var connectionUri = action.payload.get('connectionUri');
+                var connectionsWithUpdatedFlags = connections.update(
+                    action.payload.get('connectionUri'),
+                    cnct => cnct
+                        .delete('loadingEvents')
+                        .delete('failedLoadingEvents')
+                );
+                return loadedEvents.reduce((cncts, event) =>
+                    storeEventUri(cncts, connectionUri, event.get('uri')),
+                    connectionsWithUpdatedFlags
+                );
+
+            }
+
         case actionTypes.messages.connectionMessageReceived:
             var eventOnOwn = action.payload.events['msg:FromExternal'];
-            return connections.updateIn(
-                [eventOnOwn.hasReceiver, 'hasEvents'],
-                eventUris => eventUris.add(eventOnOwn.uri)
-            );
+            return storeEventUri(connections, eventOnOwn.hasReceiver, eventOnOwn.uri);
 
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.openMessageReceived:
         case actionTypes.messages.hintMessageReceived:
-            return storeConnectionAndRelatedData(connections, action.payload);
+            return storeConnection(connections, action.payload.connection);
 
         case actionTypes.logout:
 
@@ -100,36 +132,53 @@ export default function(connections = initialState, action = {}) {
     }
 }
 
+function storeConnection(connections, connectionToStore) {
+    let immutableCnct = sanitizeConnection(connectionToStore);
+    return connections.mergeIn(immutableCnct.get('uri'), immutableCnct);
+}
+
 function storeConnections(connections, connectionsToStore) {
     if(connectionsToStore && connectionsToStore.size > 0) {
-        const connectionsWithEventSets = connectionsToStore.map(connection =>
-                //make sure hasEvents are sets
-                connection.update('hasEvents', events => Immutable.Set(events))
-        );
+        const connectionsWithEventSets = connectionsToStore.map(sanitizeConnection);
         return connections.merge(connectionsWithEventSets);
     } else {
         return connections;
     }
 }
 
-function storeEventUris(connections, connectionUri, eventUris) {
-    return connections.updateIn(
-        [connectionUri, 'hasEvents'],
-        events => events.merge(eventUris)
-    );
+function sanitizeConnection(connection) {
+    let immutableCnct = connection;
+    if(!Immutable.Map.isMap(connection)) {
+        immutableCnct = Immutable.fromJS(connection.connection)
+    }
+    if(!Immutable.Set.isSet(immutableCnct.get('hasEvents'))) {
+        //make sure events are stored as set (i.e. every uri only once)
+        immutableCnct = immutableCnct.update('hasEvents', events => Immutable.Set(events));
+    }
+    return immutableCnct;
 }
 
 
-function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
-    console.log("STORING CONNECTION AND RELATED DATA");
-    console.log(connectionWithRelatedData);
+function storeEventUri(connections, connectionUri, newEventUri) {
+    if(!newEventUri) {
+        return connections;
+    }
+    return connections.updateIn(
+        [connectionUri, 'hasEvents'],
+        eventUris => eventUris && Immutable.Set.isSet(eventUris)?
+                eventUris.add(newEventUri):
+                Immutable.Set([newEventUri])
+    );
+}
 
-    //make sure we have a set of events (as opposed to a list with redundancies)
-    const events = Immutable.Set(connectionWithRelatedData.connection.hasEvents);
-    const connection = Immutable
-        .fromJS(connectionWithRelatedData.connection)
-        .set('hasEvents', events);
-
-    return state
-        .mergeDeepIn([connection.get('uri')], connection);
+function storeEventUris(connections, connectionUri, newEventUris) {
+    if(!newEventUris) {
+        return connections;
+    }
+    return connections.updateIn(
+        [connectionUri, 'hasEvents'],
+        eventUris => eventUris && Immutable.Set.isSet(eventUris)?
+            eventUris.merge(newEventUris) :
+            Immutable.Set(newEventUris)
+    );
 }

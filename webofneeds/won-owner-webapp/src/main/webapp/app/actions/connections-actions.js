@@ -3,14 +3,28 @@
  */
 
 import  won from '../won-es6';
+import Immutable from 'immutable';
 
 
 import { getRandomPosInt } from '../utils';
 
-import { selectAllByConnections } from '../selectors';
+import {
+    selectAllByConnections,
+    selectOpenConnectionUri,
+    selectOpenConnection,
+    selectRemoteEvents,
+} from '../selectors';
+
+import {
+    selectEventsOfConnection,
+    selectTimestamp,
+} from '../won-utils';
 
 import {
     checkHttpStatus,
+    is,
+    urisToLookupMap,
+    msStringToDate,
 } from '../utils';
 
 import {
@@ -85,28 +99,6 @@ export function connectionsFetch(data) {
     }
 }
 
-export function connectionsLoad(needUris) {
-    return dispatch => {
-        needUris.forEach(needUri =>
-                won.executeCrawlableQuery(won.queries["getAllConnectionUrisOfNeed"], needUri)
-                    .then(function (connectionsOfNeed) {
-                        console.log("fetching connections");
-                        Promise.all(connectionsOfNeed.map(connection => getConnectionRelatedData(
-                            connection.need.value,
-                            connection.remoteNeed.value,
-                            connection.connection.value
-                        )))
-                            .then(connectionsWithRelatedData =>
-                                dispatch({
-                                    type: actionTypes.connections.load,
-                                    payload: connectionsWithRelatedData
-                                })
-                        );
-                    })
-        );
-    }
-}
-
 export function connectionsOpen(connectionUri,message) {
     return (dispatch, getState) => {
         const state = getState();
@@ -114,7 +106,7 @@ export function connectionsOpen(connectionUri,message) {
         //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer();
-        won.getConnection(eventData.connection.uri).then(connection=> {
+        won.getConnectionWithEventUris(eventData.connection.uri).then(connection=> {
             let msgToOpenFor = {event: eventData, connection: connection};
             buildOpenMessage(msgToOpenFor, message).then(messageData=> {
                 console.log("built open message");
@@ -135,7 +127,7 @@ export function connectionsConnect(connectionUri,message) {
         //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer();
-        won.getConnection(eventData.connection.uri).then(connection=> {
+        won.getConnectionWithEventUris(eventData.connection.uri).then(connection=> {
             let msgToOpenFor = {event: eventData, connection: connection};
             buildConnectMessage(msgToOpenFor, message).then(messageData=> {
                 deferred.resolve(messageData);
@@ -154,7 +146,7 @@ export function connectionsClose(connectionUri) {
         //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer();
-        won.getConnection(eventData.connection.uri).then(connection=> {
+        won.getConnectionWithEventUris(eventData.connection.uri).then(connection=> {
             let msgToOpenFor = {event: eventData, connection: connection};
             buildCloseMessage(msgToOpenFor).then(messageData=> {
                 deferred.resolve(messageData);
@@ -176,7 +168,7 @@ export function connectionsRate(connectionUri,rating) {
         //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
         let messageData = null;
         let deferred = Q.defer();
-        won.getConnection(eventData.connection.uri).then(connection=> {
+        won.getConnectionWithEventUris(eventData.connection.uri).then(connection=> {
             let msgToRateFor = {event: eventData, connection: connection};
             buildRateMessage(msgToRateFor, rating).then(messageData=> {
                 deferred.resolve(messageData);
@@ -186,4 +178,256 @@ export function connectionsRate(connectionUri,rating) {
             dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
         })
     }
+}
+
+/**
+ * @param connectionUri
+ * @param numberOfEvents
+ *   The approximate number of chat-message
+ *   that the view needs. Note that the
+ *   actual number varies due the varying number
+ *   of success-responses the server includes and
+ *   because the API only accepts a count of
+ *   events that include the latter.
+ * @return {Function}
+ */
+export function showLatestMessages(connectionUri, numberOfEvents){
+    return (dispatch, getState) => {
+        const state = getState();
+        const connectionUri = selectOpenConnectionUri(state);
+        const connection = selectOpenConnection(state);
+
+        if (!connectionUri || !connection) return;
+
+        const eventUris = connection.get('hasEvents');
+        if (connection.get('loadingEvents') || !eventUris || eventUris.size > 0) return; // only start loading once.
+
+        //TODO a `return` here might be a race condition that results in this function never being called.
+        //TODO the delay solution is super-hacky (idle-waiting)
+        // -----> if(!self.connection__showLatestEvent) delay(100).then(loadStuff); // we tried to call this before the action-creators where attached.
+
+        console.log('connections-actions.js: testing for selective loading. ', connectionUri, connection);
+        //TODO determine first if component is actually visible (angular calls the constructor long before that)
+
+        dispatch({
+            type: actionTypes.connections.showLatestMessages,
+            payload: Immutable.fromJS({connectionUri, pending: true}),
+        });
+
+        const requesterWebId = connection.get('belongsToNeed');
+
+        getEvents(
+            connection.get('hasEventContainer'),
+            {
+                requesterWebId,
+                pagingSize: numOfEvts2pageSize(numberOfEvents),
+                deep: true
+            }
+        )
+        .then(events =>
+            dispatch({
+                type: actionTypes.connections.showLatestMessages,
+                payload: Immutable.fromJS({
+                    connectionUri: connectionUri,
+                    events: events,
+                })
+            })
+        )
+        .catch(error => {
+            console.error('Failed loading the latest events: ', error);
+            dispatch({
+                type: actionTypes.connections.showLatestMessages,
+                payload: Immutable.fromJS({
+                    connectionUri: connectionUri,
+                    error: error,
+                })
+            })
+        });
+    }
+}
+
+//TODO replace the won.getEventsOfConnection with this version (and make sure it works
+// for all previous uses).
+/**
+ * Gets the events and uses the paging-parameters
+ * in a meaningful fashion.
+ * @param eventContainerUri
+ * @param params
+ * @return {*}
+ */
+function getEvents(eventContainerUri, params) {
+    const eventP = won
+        .getNode(eventContainerUri, params)
+        .then(eventContainer => is('Array', eventContainer.member) ?
+            eventContainer.member :
+            [eventContainer.member]
+        )
+        .then(eventUris => urisToLookupMap(
+            eventUris,
+            uri => won.getEvent(
+                uri,
+                { requesterWebId: params.requesterWebId }
+            )
+        ));
+
+    return eventP;
+
+}
+/**
+ * @param connectionUri
+ * @param numberOfEvents
+ *   The approximate number of chat-message
+ *   that the view needs. Note that the
+ *   actual number varies due the varying number
+ *   of success-responses the server includes and
+ *   because the API only accepts a count of
+ *   events that include the latter.
+ * @return {Function}
+ */
+export function showMoreMessages(connectionUri, numberOfEvents) {
+    return (dispatch, getState) => {
+
+        const state = getState();
+        const connectionUri = selectOpenConnectionUri(state);
+        const connection = selectOpenConnection(state);
+        const requesterWebId = connection.get('belongsToNeed');
+        const ownEvents = selectEventsOfConnection(state, connectionUri);
+        const remoteEvents =
+            selectRemoteEvents(state)
+            .filter(e =>
+                e.get('hasReceiver') === connectionUri ||
+                e.get('hasSender') === connectionUri
+            );
+
+        /* TODO expand set of uris from latest chat message via daisy-chaining?
+         * they have multiple predecessors, i.e. success response and previous chat message
+         * and this way we can find holes in the loaded messages.
+         * Prob: when daisy-chaining: make sure to look into the correspondingRemoteMessage to get links between their messages
+         * store normalized and write a selector to get event+remote? (for old code)
+         * or look through *all* events here to find the event we're looking for.
+         */
+        // determine the oldest loaded event
+        //alternative approach sort everything together
+        //getOldestEventInChain(state, connectionUri)
+
+        // determine the oldest loaded event
+        const sortByTime = (someEvents, pathToMsString) =>
+            someEvents.sort((e1, e2) =>
+                msStringToDate(e1.getIn(pathToMsString)) -
+                msStringToDate(e2.getIn(pathToMsString))
+            );
+
+        const sortedOwnEvents = sortByTime(ownEvents, ['hasReceivedTimestamp']);
+
+        const oldestEvent = sortedOwnEvents.first();
+        const eventHashValue = oldestEvent
+                .get('uri')
+                .replace(/.*\/event\/(.*)/, '$1'); // everything following the `/event/`
+
+        // chain is more of a cycle-free graph
+        // find all the ones w/o predecessors
+        // then take the oldest of these
+        // make sure to always take the timestamp on the own node
+
+
+        dispatch({
+            type: actionTypes.connections.showMoreMessages,
+            payload: Immutable.fromJS({connectionUri, pending: true}),
+        });
+
+        getEvents(
+            connection.get('hasEventContainer'),
+            {
+                requesterWebId,
+                pagingSize: numOfEvts2pageSize(numberOfEvents),
+                deep: true,
+                resumebefore: eventHashValue,
+            }
+        )
+        .then(events =>
+            dispatch({
+                type: actionTypes.connections.showMoreMessages,
+                payload: Immutable.fromJS({
+                    connectionUri: connectionUri,
+                    events: events,
+                })
+            })
+        )
+        .catch(error => {
+            console.error('Failed loading more events: ', error);
+            dispatch({
+                type: actionTypes.connections.showMoreMessages,
+                payload: Immutable.fromJS({
+                    connectionUri: connectionUri,
+                    error: error,
+                })
+            })
+        });
+
+
+
+
+
+
+    }
+}
+
+function getOldestEventInChain(state, connectionUri) {
+
+    const ownEvents = selectEventsOfConnection(state, connectionUri);
+    const remoteEvents =
+        selectRemoteEvents(state)
+            .filter(e =>
+            e.get('hasReceiver') === connectionUri ||
+            e.get('hasSender') === connectionUri
+        );
+
+    const sortByTime = (someEvents, pathToMsString) =>
+        someEvents.sort((e1, e2) =>
+            msStringToDate(e1.getIn(pathToMsString)) -
+            msStringToDate(e2.getIn(pathToMsString))
+        );
+
+    const sortedOwnEvents = sortByTime(ownEvents, ['hasReceivedTimestamp']);
+    const sortedRemoteEvents = sortByTime(remoteEvents, ['correspondsToOwnMsg', 'hasReceivedTimestamp']);
+
+    const timestamp = e => msStringToDate(
+        e.getIn(['correspondsToOwnMsg', 'hasReceivedTimestamp']) || //remoteEvent
+        e.get('hasReceivedTimestamp') // ownEvent
+    );
+    const allEvents = ownEvents.merge(remoteEvents);
+    const allEventsSorted = allEvents.sort((e1, e2) => timestamp(e1) - timestamp(e2));
+
+    //start with the latest event
+    const latestEvent = allEventsSorted.last();
+    let latestEvents = Immutable.Map()
+        .set(latestEvent.get('uri'), latestEvent);
+
+    const prevMsgs = e => {
+        const prev =
+            e.getIn(['correspondsToOwnMsg', 'hasPreviousMessage']) || //remoteEvent
+            e.get('hasPreviousMessage'); // ownEvent or remote's own predecessors
+        //make sure we get an array
+        if(is('Array', prev)) {
+            return prev;
+        } else {
+            return [prev];
+        }
+    };
+
+    //recursively add all connected events
+    //let frontier = Immutable.Set()
+    let acc = Immutable.Map()
+        .add('frontier', Immutable.Set())
+        .add('earliestLoaded', Immutable.Set());
+    for([uri, e] of latestEvents.entries()) {
+        const previous = prevMsgs(e);
+        if(!previous) continue;
+    }
+
+}
+
+function numOfEvts2pageSize(numberOfEvents) {
+     // `*3*` to compensate for the *roughly* 2 additional success events per chat message
+    return numberOfEvents * 3;
 }

@@ -2,7 +2,7 @@
  * Created by ksinger on 11.08.2016.
  */
 
-
+import Immutable from 'immutable';
 
 export function initLeaflet(mapMount) {
     if(!L) {
@@ -71,4 +71,14 @@ export function selectConnectionUris(need) {
     return need
         .getIn(['won:hasConnections', 'rdfs:member'])
         .map(c => c.get('@id'));
+}
+
+export function selectEventsOfConnection(state, connectionUri) {
+    const eventUris = state.getIn(['connections', connectionUri, 'hasEvents']);
+    const eventUrisAndEvents = eventUris &&
+        eventUris.map(eventUri => [
+            eventUri,
+            state.getIn(['events', 'events', eventUri])
+        ]);
+    return Immutable.Map(eventUrisAndEvents);
 }

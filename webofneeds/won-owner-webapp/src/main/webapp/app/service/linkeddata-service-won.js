@@ -102,7 +102,16 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         privateData.readUpdateLocksPerUri = {}; //uri -> ReadUpdateLock
         privateData.cacheStatus = {} //uri -> {timestamp, cacheItemState}
     }
-    const CACHE_ITEM_STATE = { OK: 1, DIRTY: 2, UNRESOLVABLE: 3, FETCHING: 4};
+    /**
+     * OK: fully fetched
+     * DIRTY: has changed
+     * UNRESOLVABLE: sthg went wrong during fetching
+     * FETCHING: a request has been sent but not returned yet
+     * PARTIALLY_FETCHED: the request succeeded but only a part of the ressource was requested (i.e. ld-pagination was used)
+     * @type {{OK: number, DIRTY: number, UNRESOLVABLE: number, FETCHING: number, PARTIALLY_FETCHED: number}}
+     */
+    const CACHE_ITEM_STATE = { OK: 1, DIRTY: 2, UNRESOLVABLE: 3, FETCHING: 4, PARTIALLY_FETCHED: 5};
+
 
     won.clearStore();
 
@@ -293,11 +302,11 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      *
      * @param uri
      */
-    var cacheItemInsertOrOverwrite = function(uri){
+    var cacheItemInsertOrOverwrite = function(uri, partial){
         //console.log("linkeddata-service-won.js: add to cache:    " + uri);
         privateData.cacheStatus[uri] = {
             timestamp: new Date().getTime(),
-            state: CACHE_ITEM_STATE.OK
+            state: partial? CACHE_ITEM_STATE.PARTIALLY_FETCHED : CACHE_ITEM_STATE.OK
         };
     }
 
@@ -346,6 +355,10 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      */
     var cacheItemIsOk = function cacheItemIsOk(uri){
         return cacheItemIsInState(uri, CACHE_ITEM_STATE.OK, "loaded");
+    }
+
+    var cacheItemIsPartiallyFetched = function cacheItemIsOk(uri){
+        return cacheItemIsInState(uri, CACHE_ITEM_STATE.PARTIALLY_FETCHED, "partially loaded");
     }
 
     /**
@@ -559,31 +572,6 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
 
 
     /**
-     * Adds the specified JSON-LD dataset to the store, identified by the specified uri.
-     * The uri is used for cache control.
-     */
-    won.addJsonLdData = function(uri, data) {
-        return new Promise((resolve, reject) =>
-            //console.log("linkeddata-service-won.js: storing jsonld data for uri: " + uri);
-            privateData.store.load("application/ld+json", data, function (success, results) {
-                //privateData.store.load("application/ld+json", data, function (success, results) {
-                //console.log("linkeddata-service-won.js: added jsonld data to rdf store, success: " + success);
-                if (success) {
-                    //TODO if this was a partial fetch, only mark
-                    // as OK if all requests to the ressource have
-                    // finished.
-                    cacheItemInsertOrOverwrite(uri);
-                    resolve(uri);
-                } else {
-                    reject('Failed to store json-ld data for ' + uri);
-                }
-
-            })
-        );
-    };
-
-
-    /**
      * Evaluates the specified property path via sparql on the default graph starting with the specified base uri.
      * Returns true if the query has at least one solution.
      * @param baseUri
@@ -670,7 +658,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
          * usually be accessed using some sort of paging, we skip them here
          * and thus always reload them.
          */
-        const partialFetch = !fetchesPartialRessource(fetchParams);
+        const partialFetch = fetchesPartialRessource(fetchParams);
         if ( cacheItemIsOkOrUnresolvableOrFetching(uri) ) {
             cacheItemMarkAccessed(uri);
             return Promise.resolve(uri);
@@ -685,19 +673,23 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
             .then(
                 (dataset) => {
                     if( !(fetchParams && fetchParams.deep) ) {
-                        if(!partialFetch) {
-                            cacheItemInsertOrOverwrite(uri);
-                        }
+                        cacheItemInsertOrOverwrite(uri, partialFetch);
                         return uri;
                     } else {
                         return selectLoadedResourcesFromDataset(
                             dataset
                         ).then(allLoadedResources => {
-                                //console.log('linkeddata-service-won.js: ensuring loaded deep: ', allLoadedResources);
                                 allLoadedResources.forEach(resourceUri => {
-                                    if (! (partialFetch && resourceUri === uri) ) {
-                                        cacheItemInsertOrOverwrite(resourceUri)
-                                    }
+                                    /*
+                                     * only mark root resource as partial.
+                                     * the other ressources should
+                                     * have been fetched fully during a
+                                     * request with the `deep`-flag
+                                     */
+                                    cacheItemInsertOrOverwrite(
+                                        resourceUri,
+                                        partialFetch && resourceUri === uri
+                                    )
                                 })
                                 return allLoadedResources;
                             }
@@ -832,55 +824,72 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * @return {Promise}
      */
     function loadFromOwnServerIntoCache(uri, params) { //requesterWebId, queryParams) {
-        return new Promise((resolve, reject) => {
+        let requestUri = queryString(uri, params);
 
-            let requestUri = queryString(uri, params);
+        console.log("linkeddata-service-won.js: fetching:        " + requestUri);
 
-            console.log("linkeddata-service-won.js: fetching:        " + requestUri);
-
-            fetch(requestUri, {
-                method: 'get',
-                credentials: "same-origin",
-                headers: {
-                    'Accept': 'application/ld+json',
-                    'Prefer': params.pagingSize?
-                        `return=representation; max-member-count="${ params.pagingSize }"` :
-                        undefined,
-                }
-            })
-            .then(dataset =>
-                dataset.json())
-            .then(
-                dataset => {
-                    //make sure we've got a non-empty dataset
-                    if (Object.keys(dataset).length === 0) {
-                        reject("failed to load " + uri);
-                    } else {
-                        //console.log("linkeddata-service-won.js: fetched:         " + uri)
-                        Promise.resolve()
-                            .then(() =>
-                                fetchesPartialRessource(params) ?
-                                    /* as paging is only used for containers
-                                     * and they don't lose entries, we can
-                                     * simply merge on top of the already
-                                     * loaded triples below. So we skip removing
-                                     * the previously loaded data here:
-                                     */
-                                    undefined : //NOP
-                                    /* remove any remaining stale data: */
-                                    won.deleteNode(uri)
-                            )
-                            .then(() =>
-                                won.addJsonLdData(uri, dataset)
-                            )
-                            .then(() =>
-                                resolve(dataset));
-                    }
-                  },
-                e =>  reject(`failed to load ${uri} due to reason: "${e}"`)
+        const datasetP = fetch(requestUri, {
+            method: 'get',
+            credentials: "same-origin",
+            headers: {
+                'Accept': 'application/ld+json',
+                'Prefer': params.pagingSize?
+                    `return=representation; max-member-count="${ params.pagingSize }"` :
+                    undefined,
+            }
+        })
+        .then(dataset =>
+            dataset.json())
+        .then( dataset =>
+            //make sure we've got a non-empty dataset
+            Object.keys(dataset).length === 0 ?
+                Promise.reject("failed to load " + uri + ": Object.keys(dataset).length == 0") :
+                dataset
+        )
+        .then(dataset =>
+            Promise.resolve()
+            .then(() =>
+                fetchesPartialRessource(params) ?
+                    /* as paging is only used for containers
+                     * and they don't lose entries, we can
+                     * simply merge on top of the already
+                     * loaded triples below. So we skip removing
+                     * the previously loaded data here:
+                     */
+                    undefined : //NOP
+                    /* remove any remaining stale data: */
+                    won.deleteNode(uri)
             )
-        });
+            .then(() =>
+                addJsonLdData(uri, dataset)
+            )
+            .then(() => dataset)
+        )
+        .catch(e =>
+            Promise.reject(`failed to load ${uri} due to reason: "${e}"`)
+        )
+
+        return datasetP;
     };
+
+    /**
+     * Adds the specified JSON-LD dataset to the store.
+     */
+    function addJsonLdData (uri, data) {
+        return new Promise((resolve, reject) =>
+            privateData.store.load("application/ld+json", data, function (success, results) {
+                if (success) {
+                    console.log('linkeddata-serice-won.js: finished storing triples ', data);
+                    resolve(uri);
+                } else {
+                    reject('Failed to store json-ld data for ' + uri);
+                }
+
+            })
+        );
+    };
+
+
 
     /**
      * Loads and returns a need and in a
@@ -1276,7 +1285,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         .then(connectionUris =>
             urisToLookupMap(
                 connectionUris,
-                uri => won.getConnection(uri, requesterWebId)
+                uri => won.getConnectionWithEventUris(uri, { requesterWebId })
             )
         );
 
@@ -1329,44 +1338,26 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     }
     
     /**
-     * @param connectionUri
-     * @param requesterWebId
-     * @return {*} the most recent event for that connection as a full object.
-     */
-    won.getLatestEventOfConnection = (connectionUri, requesterWebId) =>
-        won.getEventsOfConnection(connectionUri, requesterWebId)
-            //find latest event:
-            .then(eventsLookup => {
-                let latestEvent = {};
-                for(let [eventUri, event] of entries(eventsLookup)) {
-                    const latestEventTime = Number.parseInt(latestEvent.hasReceivedTimestamp)
-                    const eventTime = Number.parseInt(event.hasReceivedTimestamp)
-                    latestEvent = latestEventTime >= eventTime ? latestEvent : event;
-                }
-                return latestEvent;
-            });
-
-    /**
      * Returns all events associated with a given connection
      * in a promise for an object of (eventUri -> eventData)
      * @param connectionUri
-     * @param requesterWebId
+     * @param fetchParams See `ensureLoaded`.
      */
-    won.getEventsOfConnection = function(connectionUri, requesterWebId) {
-        return won.getEventUrisOfConnection(connectionUri, requesterWebId)
+    won.getEventsOfConnection = function(connectionUri, fetchParams) {
+        return won.getEventUrisOfConnection(connectionUri, fetchParams)
             .then(eventUris => urisToLookupMap(eventUris,
-                    eventUri => won.getEvent(eventUri, requesterWebId))
+                    eventUri => won.getEvent(eventUri, fetchParams))
             )
     };
 
     /**
      * Returns the uris of all events associated with a given connection
      * @param connectionUri
-     * @param requesterWebId
+     * @param fetchParams See `ensureLoaded`.
      * @returns promise for an array strings (the uris)
      */
-    won.getEventUrisOfConnection = function(connectionUri, requesterWebId) {
-        return won.getConnection(connectionUri, requesterWebId)
+    won.getEventUrisOfConnection = function(connectionUri, fetchParams) {
+        return won.getConnectionWithEventUris(connectionUri,  fetchParams)
             .then(connection => connection.hasEvents);
     }
 
@@ -1636,26 +1627,26 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * Maps `getNodeWithAttributes` over the list of uris and
      * collects the results.
      * @param uris array of strings
-     * @param requesterWebId map/object of (uri -> node's data)
+     * @param fetchParams See `ensureLoaded`.
      */
-    won.getNodes = function(uris, requesterWebId) {
-        return urisToLookupMap(uris, uri => won.getNode(uri, requesterWebId));
+    won.getNodes = function(uris, fetchParams) {
+        return urisToLookupMap(uris, uri => won.getNode(uri, fetchParams));
     };
 
     /**
      * @param connectionUri
-     * @param requesterWebId
+     * @param fetchParams See `ensureLoaded`.
      * @return {*} the connections predicates along with the uris of associated events
      */
-    won.getConnection = function(connectionUri, requesterWebId) {
+    won.getConnectionWithEventUris = function(connectionUri, fetchParams) {
         if(!is('String', connectionUri)) {
             throw new Error('Tried to request connection infos for sthg that isn\'t an uri: ' + connectionUri);
         }
-        return won.getNode(connectionUri, requesterWebId)
+        return won.getNode(connectionUri, fetchParams)
             //add the eventUris
             .then(connection => Promise.all([
                 Promise.resolve(connection),
-                won.getNode(connection.hasEventContainer, requesterWebId)
+                won.getNode(connection.hasEventContainer, fetchParams)
             ]))
             .then( ([connection, eventContainer]) => {
                 /*
@@ -1671,7 +1662,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     };
 
     //aliases (formerly functions that were just pass-throughs)
-    won.getEvent = (uri, requesterWebId) => won.getNode(uri, requesterWebId)
+    won.getEvent = (uri, fetchParams) => won.getNode(uri, fetchParams)
             .then(event => {
                 // framing will find multiple timestamps (one from each node and owner) -> only use latest for the client
                 if(is('Array', event.hasReceivedTimestamp)) {
@@ -1688,7 +1679,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                     * we fetch it here.
                     */
                     return won
-                        .getNode(event.hasCorrespondingRemoteMessage, requesterWebId)
+                        .getNode(event.hasCorrespondingRemoteMessage, fetchParams)
                         .then(correspondingEvent => {
                            event.hasCorrespondingRemoteMessage = correspondingEvent;
                            return event;
@@ -1709,17 +1700,16 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      * NOTE: Atm it ignores prefixes which might lead to clashes.
      *
      * @param eventUri
-     * @param requesterWebId
+     * @param fetchParams See `ensureLoaded`.
      */
-    won.getNode = function(uri, requesterWebId) {
+    won.getNode = function(uri, fetchParams) {
         if(!uri) {
             return Promise.reject({message : "getNode: uri must not be null"})
         }
 
-
         let releaseLock = undefined;
 
-        const nodePromise = won.ensureLoaded(uri, { requesterWebId })
+        const nodePromise = won.ensureLoaded(uri, fetchParams)
             .then(() => {
                 const lock = getReadUpdateLockPerUri(uri);
                 releaseLock = () => lock.releaseReadLock();
@@ -1777,7 +1767,11 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                 releaseLock();
                 return node;
             })
-            .catch(releaseLock);
+            .catch(e => {
+                releaseLock();
+                throw new Exception("Couldn't get node " +
+                    uri + " with params " + fetchParams, e);
+            });
 
         return nodePromise;
     }
@@ -1836,7 +1830,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                 let resultObject = {}
                 let data = Q.defer()
                 promises.push(data.promise)
-                won.getConnection(connection).then(function(connectionData){
+                won.getConnectionWithEventUris(connection).then(function(connectionData){
                     resultObject.connection = connectionData;
                     let query="prefix msg: <http://purl.org/webofneeds/message#> \n"+
                         "prefix won: <http://purl.org/webofneeds/model#> \n" +

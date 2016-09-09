@@ -106,10 +106,9 @@ function addOwnNeed(allNeeds, ownNeed) {
 }
 
 function addTheirNeed(allNeeds, theirNeed) {
-    const theirNeed_ = Immutable.fromJS(theirNeed);
-    //return setIfNew(allNeeds, ['theirNeeds', theirNeed_.get('@id')], theirNeed_);
-    if(theirNeed_ && theirNeed_.get('@id')) {
-        return setIfNew(allNeeds, ['theirNeeds', theirNeed_.get('@id')], theirNeed_);
+    const theirNeedImm = Immutable.fromJS(theirNeed);
+    if(theirNeedImm && theirNeedImm.get('@id')) {
+        return setIfNew(allNeeds, ['theirNeeds', theirNeedImm.get('@id')], theirNeedImm);
     } else {
         return allNeeds;
     }

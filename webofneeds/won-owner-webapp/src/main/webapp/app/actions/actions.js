@@ -71,16 +71,7 @@ import {
     accountRegister,
 } from './account-actions';
 
-import {
-    connectionsClose,
-    connectionsConnect,
-    connectionsFetch,
-    connectionsLoad,
-    connectionsOpen,
-    connectionsRate,
-    connectionsChatMessage,
-} from './connections-actions';
-
+import * as cnct from './connections-actions';
 import * as messages from './messages-actions';
 
 import {
@@ -109,14 +100,15 @@ const actionHierarchy = {
         add:INJ_DEFAULT,
     },
     connections:{
-        fetch: connectionsFetch,
-        load: connectionsLoad,
-        open: connectionsOpen,
-        connect: connectionsConnect,
+        fetch: cnct.connectionsFetch,
+        open: cnct.connectionsOpen,
+        connect: cnct.connectionsConnect,
         accepted: INJ_DEFAULT,
-        close: connectionsClose,
-        rate: connectionsRate,
-        sendChatMessage: connectionsChatMessage,
+        close: cnct.connectionsClose,
+        rate: cnct.connectionsRate,
+        sendChatMessage: cnct.connectionsChatMessage,
+        showLatestMessages: cnct.showLatestMessages,
+        showMoreMessages: cnct.showMoreMessages,
         reset:INJ_DEFAULT,
     },
     needs: {
@@ -300,8 +292,8 @@ export function draftsPublish(draft, nodeUri) {
 export function getConnectionRelatedData(needUri, remoteNeedUri, connectionUri) {
     const remoteNeed = won.getTheirNeed(remoteNeedUri);
     const ownNeed = won.getNeedWithConnectionUris(needUri);
-    const connection = won.getConnection(connectionUri);
-    const events = won.getEventsOfConnection(connectionUri, needUri)
+    const connection = won.getConnectionWithEventUris(connectionUri, { requesterWebId: needUri });
+    const events = won.getEventsOfConnection(connectionUri, { requesterWebId: needUri })
         .then(eventsLookup => {
             const eventList = [];
             for (let [uri, event] of entries(eventsLookup)) {
