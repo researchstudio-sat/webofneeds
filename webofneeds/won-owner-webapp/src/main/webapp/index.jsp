@@ -22,7 +22,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- see http://getbootstrap.com/css/#overview-mobile -->
-    <title ng-bind="'Web Of Needs - '+$root.title">Web Of Needs</title>
+    <title>Web Of Needs</title>
     <link rel="stylesheet" href="./generated/won.css" />
 </head>
 <body>
@@ -67,7 +67,7 @@
 this line loads the bundled app. comment it out if you want
 jspm to dynamically load and compile the sources at runtime.
 this makes for easier debugging, as you get seperate
-source files in the dev-tools' source explorer.-->
+source files in the dev-tools' source explorer. -->
 
 <script src="./generated/app_jspm.bundle.js"></script>
 
