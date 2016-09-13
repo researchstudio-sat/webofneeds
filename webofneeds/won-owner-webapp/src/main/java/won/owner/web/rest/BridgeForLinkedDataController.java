@@ -122,10 +122,11 @@ public class BridgeForLinkedDataController {
       copyResponseBody(originalResponse, response);
       // close response output stream
     } else {
+      copyResponseBody(originalResponse, response);
       response.setStatus(HttpStatus.SC_BAD_GATEWAY);
-      response.getOutputStream().print("The nodes' response was of type " + originalResponseMediaType
+      /*response.getOutputStream().print("The nodes' response was of type " + originalResponseMediaType
               + ". For security reasons the owner-server only forwards responses of the following types " +
-              RDFMediaType.rdfMediaTypes.toString());
+              RDFMediaType.rdfMediaTypes.toString());*/
     };
     response.getOutputStream().flush();
     response.getOutputStream().close();

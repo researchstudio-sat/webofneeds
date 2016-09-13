@@ -29,6 +29,10 @@ button, input, textarea {
   font-weight: inherit;
 }
 
+.debuglink {
+  font-size: $smallFontSize;
+}
+
 body {
 
   //this font will be inherited down the cascade

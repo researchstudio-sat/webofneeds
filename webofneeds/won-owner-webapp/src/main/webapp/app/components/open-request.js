@@ -98,6 +98,7 @@ function genComponentConf() {
                     ng-click="self.closeRequest()">Decline</button>
                 <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Accept</button>
             </div>
+            <a ng-show="self.debugmode" class="debuglink" target="_blank" href="{{self.connectionUri}}">[CONNDATA]</a>
         </div>
     `;
 
@@ -138,8 +139,7 @@ function genComponentConf() {
                         connectMsg.get('hasTextMessage') ||
                         connectMsg.getIn(['hasCorrespondingRemoteMessage', 'hasTextMessage'])
                     ),
-
-
+                    debugmode: won.debugmode,
                 }
             };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
