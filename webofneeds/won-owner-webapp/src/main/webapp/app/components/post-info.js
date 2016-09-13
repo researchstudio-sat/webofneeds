@@ -72,7 +72,9 @@ function genComponentConf() {
                         (show)
                     </a>
                 </p>
-
+                <p ng-show="self.debugmode">
+                    <a class="debuglink" target="_blank" href="{{self.post.get('@id')}}">[DATA]</a>
+                </p>
                 <div class="post-info__mapmount" id="post-info__mapmount"></div>
             </div>
         </div>
@@ -118,6 +120,7 @@ function genComponentConf() {
                         selectLastUpdateTime(state),
                         post && post.get('dct:created')
                     ),
+                    debugmode: won.debugmode
                 }
             };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);

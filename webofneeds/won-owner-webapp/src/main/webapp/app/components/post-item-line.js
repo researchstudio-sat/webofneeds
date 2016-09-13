@@ -102,6 +102,7 @@ function genComponentConf() {
                      <span class="pil__indicators__item__caption"></span>
                 </div>
             </div>
+            <a class="debuglink" ng-show="self.debugmode" target="_blank" href="{{self.needUri}}"> [DATA]</a>
     `;
 
     class Controller {
@@ -137,6 +138,7 @@ function genComponentConf() {
                             conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested
                         ).size > 0,
                     WON: won.WON,
+                    debugmode: won.debugmode,
                     ownNeed: need,
                     unreadCounts,
                 };

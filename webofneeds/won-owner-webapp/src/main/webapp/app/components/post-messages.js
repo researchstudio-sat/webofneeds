@@ -81,6 +81,8 @@ function genComponentConf() {
                             class="pm__content__message__content__time">
                                 {{ message.get('humanReadableTimestamp') }}
                         </div>
+                        <a ng-show="self.debugmode && message.get('hasSenderNeed') == self.connectionData.getIn(['ownNeed', '@id'])" class="debuglink" target="_blank" href="/owner/rest/linked-data/?requester={{self.encodeParam(message.get('hasSenderNeed'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">[MSGDATA]</a>
+                        <a ng-show="self.debugmode && message.get('hasSenderNeed') != self.connectionData.getIn(['ownNeed', '@id'])" class="debuglink" target="_blank" href="/owner/rest/linked-data/?requester={{self.encodeParam(message.get('hasReceiverNeed'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">[MSGDATA]</a>
                     </div>
             </div>
         </div>
@@ -137,6 +139,7 @@ function genComponentConf() {
                     connectionData: selectAllByConnections(state).get(connectionUri),
                     chatMessages: chatMessages && chatMessages.toArray(), //toArray needed as ng-repeat won't work otherwise :|
                     state4dbg: state,
+                    debugmode: won.debugmode
                 }
             };
 
@@ -144,6 +147,13 @@ function genComponentConf() {
             this.$scope.$on('$destroy', disconnect);
 
             this.snapToBottom();
+        }
+
+        encodeParam(param) {
+            var encoded = encodeURIComponent(param);
+            console.log("encoding: ",param);
+            console.log("encoded: ",encoded)
+            return encoded;
         }
 
         snapToBottom() {

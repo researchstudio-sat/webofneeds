@@ -63,6 +63,7 @@ function genComponentConf() {
                 <button class="won-button--filled black" ui-sref="{connectionUri: null}">Cancel</button>
                 <button class="won-button--filled red" ng-click="self.sendRequest(self.message)" ui-sref="{connectionUri: null}">Request Contact</button>
             </div>
+            <a ng-show="self.debugmode" class="debuglink" target="_blank" href="{{self.connectionUri}}">[CONNDATA]</a>
         </div>
     `;
 
@@ -87,6 +88,7 @@ function genComponentConf() {
                     theirCreationDate: theirNeed ?
                         relativeTime(selectLastUpdateTime(state, theirNeed.get('dct:created'))) :
                         undefined,
+                    debugmode: won.debugmode,
                 }
             };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
