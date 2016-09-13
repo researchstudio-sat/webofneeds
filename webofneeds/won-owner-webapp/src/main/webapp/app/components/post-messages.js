@@ -81,8 +81,8 @@ function genComponentConf() {
                             class="pm__content__message__content__time">
                                 {{ message.get('humanReadableTimestamp') }}
                         </div>
-                        <a ng-show="self.debugmode && message.get('hasSenderNeed') == self.connectionData.getIn(['ownNeed', '@id'])" class="debuglink" target="_self" href="/owner/rest/linked-data/?requester={{self.encodeParam(message.get('hasSenderNeed'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">[MSGDATA]</a>
-                        <a ng-show="self.debugmode && message.get('hasSenderNeed') != self.connectionData.getIn(['ownNeed', '@id'])" class="debuglink" target="_self" href="/owner/rest/linked-data/?requester={{self.encodeParam(message.get('hasReceiverNeed'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">[MSGDATA]</a>
+                        <a ng-show="self.debugmode && message.get('hasSenderNeed') == self.connectionData.getIn(['ownNeed', '@id'])" class="debuglink" target="_blank" href="/owner/rest/linked-data/?requester={{self.encodeParam(message.get('hasSenderNeed'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">[MSGDATA]</a>
+                        <a ng-show="self.debugmode && message.get('hasSenderNeed') != self.connectionData.getIn(['ownNeed', '@id'])" class="debuglink" target="_blank" href="/owner/rest/linked-data/?requester={{self.encodeParam(message.get('hasReceiverNeed'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">[MSGDATA]</a>
                     </div>
             </div>
         </div>
