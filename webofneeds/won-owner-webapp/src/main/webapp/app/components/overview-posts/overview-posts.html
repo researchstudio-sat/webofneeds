@@ -4,10 +4,21 @@
     <won-overview-title-bar selection="self.selection"></won-overview-title-bar>
 </header>
 <main class="overviewpostscontent">
-    <div class="opc__inner">
+    <div class="opc__inner" ng-class="{'empty' : (self.inactivePostsCount == 0 && self.activePostsCount == 0)}">
+        <div class="opc__empty" ng-if="self.inactivePostsCount == 0 && self.activePostsCount == 0">
+            <div class="opc__empty__description">
+                <img src="generated/icon-sprite.svg#ico-filter_list" class="opc__empty__description__icon">
+                <span class="opc__empty__description__text">This is the post overview, the needs you have created will be visible here.</span>
+            </div>
+            <a ui-sref="createNeed" class="opc__empty__link">
+                <img src="generated/icon-sprite.svg#ico36_plus" class="opc__empty__link__icon">
+                <span class="opc__empty__link__caption">Create a Need</span>
+            </a>
+        </div>
         <div class="title clickable"
             ng-click="self.activePostsOpen = !self.activePostsOpen"
-            ng-class="{'open' : self.activePostsOpen}">
+            ng-class="{'open' : self.activePostsOpen}"
+            ng-show="self.activePostsCount != 0 || self.activePostsCount != 0">
             Active Posts
             <span class="title__counter">{{self.activePostsCount}}</span>
         </div>
@@ -29,7 +40,8 @@
         -->
         <div class="title clickable"
              ng-click="self.closedPostsOpen = !self.closedPostsOpen"
-             ng-class="{'open' : self.closedPostsOpen}">
+             ng-class="{'open' : self.closedPostsOpen}"
+             ng-show="self.activePostsCount != 0 || self.activePostsCount != 0">
             Closed
             <span class="title__counter">{{self.inactivePostsCount}}</span>
         </div>
