@@ -3,8 +3,18 @@
     <won-overview-title-bar selection="self.selection"></won-overview-title-bar>
 </header>
 <main class="feedcontent">
-    <div class="fc__inner">
-        <h1 class="title">Recent activities</h1>
+    <div class="fc__inner" ng-class="{'empty' : self.ownNeedUris.length == 0}">
+        <div class="fc__empty" ng-if="self.ownNeedUris.length == 0">
+            <div class="fc__empty__description">
+                <img src="generated/icon-sprite.svg#ico-filter_list" class="fc__empty__description__icon">
+                <span class="fc__empty__description__text">This is the feed, once you have created a need you will find new requests, matches and messages in this View.</span>
+            </div>
+            <a ui-sref="createNeed" class="fc__empty__link">
+                <img src="generated/icon-sprite.svg#ico36_plus" class="fc__empty__link__icon">
+                <span class="fc__empty__link__caption">Create a Need</span>
+            </a>
+        </div>
+        <h1 class="title" ng-if="self.ownNeedUris.length > 0">Recent activities</h1>
 
         <won-feed-item ng-repeat="uri in self.ownNeedUris"
                        need-uri="uri"

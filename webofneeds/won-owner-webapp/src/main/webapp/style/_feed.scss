@@ -6,6 +6,8 @@
 .feedcontent {
   @include max-content-width(32rem, $minContentPadding, 'fc');
 
+  @include empty-description('fc');
+
   .title {
     font-weight: 300;
     text-align: center;

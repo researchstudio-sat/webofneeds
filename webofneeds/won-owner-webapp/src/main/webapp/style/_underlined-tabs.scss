@@ -25,7 +25,7 @@
     white-space: nowrap;
 
     &.disabled {
-      pointer-events: none;
+      /*pointer-events: none;*/ /*WE ALLOW A CHANGE TO EVERY POSSIBLE PAGE AND SHOW A DESCRIPTION FOR THE RESPECTIVE VIEWS*/
       color: lightgrey;
     }
   }
