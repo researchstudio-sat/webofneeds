@@ -5,9 +5,16 @@
 
 won-matches {
   width: 100%;
+  min-height: 100%;
   display: block;
   @include max-content-width($maxContentWidth, $minContentPadding, 'omc');
 
+  @include empty-description('omc');
+
+  > .omc__inner.empty {
+    align-self: center;
+    max-width: $maxContentWidth;
+  }
 
   .omc__sendrequest {
     position: absolute;
