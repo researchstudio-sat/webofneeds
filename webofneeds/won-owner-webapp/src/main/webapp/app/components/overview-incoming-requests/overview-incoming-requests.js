@@ -35,7 +35,14 @@ class IncomingRequestsController {
                         .filter(conn=>
                             conn.connection.hasConnectionState === won.WON.RequestReceived
                         )
-                    )
+                    ),
+                    hasRequests: Object.keys(connectionsDeprecated)
+                        .map(key => connectionsDeprecated[key])
+                        .filter(conn=>{
+                            if(conn.connection.hasConnectionState===won.WON.RequestReceived){
+                                return true
+                            }
+                        }).length > 0,
                 };
             }else{
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));

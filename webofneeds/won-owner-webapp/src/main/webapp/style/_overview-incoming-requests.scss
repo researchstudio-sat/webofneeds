@@ -8,6 +8,17 @@
   @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
   align-items: flex-start;
 
+  @include empty-description('opc');
+
+  &.empty {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  & > .opc__inner.empty {
+    max-width: 50rem;
+  }
+
   .oir__openrequest,
   .oir__requests{
     flex-grow: 1;
