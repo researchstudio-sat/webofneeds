@@ -33,9 +33,9 @@ function genComponentConf() {
                 <img src="generated/icon-sprite.svg#ico36_message_grey" class="omc__empty__description__icon">
                 <span class="omc__empty__description__text">You will be able to communicate with others once there are accepted connections. Accept a request or send requests and wait until the counterpart accepts it.</span>
             </div>
-            <a ui-sref="{connectionType: self.won.RequestsReceived}" class="fc__empty__link">
-                <img src="generated/icon-sprite.svg#ico36_incoming" class="fc__empty__link__icon">
-                <span class="fc__empty__link__caption">Accept requests</span>
+            <a ui-sref="{connectionType: self.won.RequestsReceived}" class="omc__empty__link">
+                <img src="generated/icon-sprite.svg#ico36_incoming" class="omc__empty__link__icon">
+                <span class="omc__empty__link__caption">Accept requests</span>
             </a>
         </div>
         <div class="omc__empty" ng-if="self.connectionType === self.won.RequestReceived && !self.hasConnections">
@@ -43,13 +43,13 @@ function genComponentConf() {
                 <img src="generated/icon-sprite.svg#ico36_incoming_grey" class="omc__empty__description__icon">
                 <span class="omc__empty__description__text">This view shows you all the incoming request for this specific need. Wait until someone tries to connect with you.</span>
             </div>
-            <a ui-sref="{connectionType: self.won.Connected}" class="fc__empty__link">
-                <img src="generated/icon-sprite.svg#ico36_message" class="fc__empty__link__icon">
-                <span class="fc__empty__link__caption">Go to conversations</span>
+            <a ui-sref="{connectionType: self.won.Connected}" class="omc__empty__link">
+                <img src="generated/icon-sprite.svg#ico36_message" class="omc__empty__link__icon">
+                <span class="omc__empty__link__caption">Go to conversations</span>
             </a>
-            <a ui-sref="{connectionType: self.won.Suggested}" class="fc__empty__link">
-                <img src="generated/icon-sprite.svg#ico36_matches" class="fc__empty__link__icon">
-                <span class="fc__empty__link__caption">Go to matches</span>
+            <a ui-sref="{connectionType: self.won.Suggested}" class="omc__empty__link">
+                <img src="generated/icon-sprite.svg#ico36_matches" class="omc__empty__link__icon">
+                <span class="omc__empty__link__caption">Go to matches</span>
             </a>
         </div>
         <div class="omc__empty" ng-if="self.connectionType === self.won.RequestSent && !self.hasConnections">
@@ -57,13 +57,13 @@ function genComponentConf() {
                 <img src="generated/icon-sprite.svg#ico36_outgoing_grey" class="omc__empty__description__icon">
                 <span class="omc__empty__description__text">This view shows you all your sent requests for this specific need. Connect with a match to see it here.</span>
             </div>
-            <a ui-sref="{connectionType: self.won.Connected}" class="fc__empty__link">
-                <img src="generated/icon-sprite.svg#ico36_message" class="fc__empty__link__icon">
-                <span class="fc__empty__link__caption">Go to conversations</span>
+            <a ui-sref="{connectionType: self.won.Connected}" class="omc__empty__link">
+                <img src="generated/icon-sprite.svg#ico36_message" class="omc__empty__link__icon">
+                <span class="omc__empty__link__caption">Go to conversations</span>
             </a>
-            <a ui-sref="{connectionType: self.won.Suggested}" class="fc__empty__link">
-                <img src="generated/icon-sprite.svg#ico36_matches" class="fc__empty__link__icon">
-                <span class="fc__empty__link__caption">Go to matches</span>
+            <a ui-sref="{connectionType: self.won.Suggested}" class="omc__empty__link">
+                <img src="generated/icon-sprite.svg#ico36_matches" class="omc__empty__link__icon">
+                <span class="omc__empty__link__caption">Go to matches</span>
             </a>
         </div>
         <div class="connectionSelectionItemLine"
