@@ -16,8 +16,28 @@ import { selectAllByConnections, selectOpenPostUri, displayingOverview } from '.
 const serviceDependencies = ['$ngRedux', '$scope'];
 let template = `
     <a class="curtain" ng-if="self.connection"></a>
-    <div class="omc__inner">
-        <div class="omc__header">
+    <div class="omc__inner" ng-class="{'empty' : !self.hasMatches}">
+        <div class="omc__empty" ng-if="!self.hasMatches && self.isOverview">
+            <div class="omc__empty__description">
+                <img src="generated/icon-sprite.svg#ico36_match_grey" class="omc__empty__description__icon">
+                <span class="omc__empty__description__text">The matches to all your needs will be listed here. 
+                 You cannot influence the matching process. It might take some time, or maybe there is nothing to
+                    be found for you, yet. Check back later or post more needs!</span>
+            </div>
+            <a ui-sref="createNeed" class="omc__empty__link">
+                <img src="generated/icon-sprite.svg#ico36_plus" class="omc__empty__link__icon">
+                <span class="omc__empty__link__caption">Create a Need</span>
+            </a>
+        </div>
+        <div class="omc__empty" ng-if="!self.hasMatches && !self.isOverview">
+            <div class="omc__empty__description">
+                <img src="generated/icon-sprite.svg#ico36_match_grey" class="omc__empty__description__icon">
+                <span class="omc__empty__description__text">The matches to this need will be listed here. 
+                 You cannot influence the matching process. It might take some time, or maybe there is nothing to
+                    be found for you, yet. Check back later!</span>
+            </div>
+        </div>
+        <div class="omc__header" ng-if="self.hasMatches">
             <div class="dummy"></div>
             <div class="title" ng-if="!self.post">Matches to your needs</div>
             <div class="omc__header__viewtype">
@@ -35,19 +55,19 @@ let template = `
                 </a>
             </div>
         </div>
-        <div ng-if="self.layout === 'tiles'" class="omc__content__flow">
+        <div ng-if="self.hasMatches && self.layout === 'tiles'" class="omc__content__flow">
             <won-matches-flow-item
                     connection-uri="m.getIn(['connection','uri'])"
                     ng-repeat="m in self.matches">
             </won-matches-flow-item>
         </div>
-        <div ng-if="self.layout === 'grid'" class="omc__content__grid">
+        <div ng-if="self.hasMatches && self.layout === 'grid'" class="omc__content__grid">
             <won-matches-grid-item
                     connection-uri="m.getIn(['connection','uri'])"
                     ng-repeat="m in self.matches">
             </won-matches-grid-item>
         </div>
-        <div ng-if="self.layout === 'list'" class="omc__content__list">
+        <div ng-if="self.hasMatches && self.layout === 'list'" class="omc__content__list">
             <won-matches-list-item
                     item="item"
                     connection-uri="item.connection.uri"
@@ -55,7 +75,7 @@ let template = `
             </won-matches-list-item>
         </div>
     </div>
-    <div class="omc__sendrequest" ng-if="self.connection">
+    <div class="omc__sendrequest" ng-if="self.hasMatches && self.connection">
         <won-send-request></won-send-request>
     </div>
 `
@@ -102,6 +122,12 @@ class Controller {
                 connection: state.getIn(['connections', connectionUri]),
                 matches: matchesByConnectionUri.toArray(),
                 matchesOfNeed: mapToMatches(matchesByConnectionUri.toJS()),//TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
+                hasMatches: matchesByConnectionUri
+                    .filter(conn => {
+                        if(conn.connection.hasConnectionState===won.WON.Suggested){
+                            return true
+                        }
+                    }).size > 0,
                 post: state.getIn(['needs','ownNeeds', postUri]),
             };
         };

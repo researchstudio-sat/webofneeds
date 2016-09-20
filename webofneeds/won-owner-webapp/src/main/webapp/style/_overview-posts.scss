@@ -11,6 +11,8 @@
     @include max-content-width(50rem, $minContentPadding, 'opc');
   }
 
+  @include empty-description('opc');
+
   .title {
     font-weight: 300;
     text-align: left;

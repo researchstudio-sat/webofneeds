@@ -3,7 +3,20 @@
     <won-overview-title-bar selection="self.selection" ng-if="!self.post"></won-overview-title-bar>
     <won-owner-title-bar selection="self.ownerSelection" ng-if="self.post"></won-owner-title-bar>
 </header>
-<main class="overviewincomingrequestscontent">
+<main class="overviewincomingrequestscontent" ng-class="{'empty' : !self.hasRequests}">
+    <div class="opc__inner empty" ng-if="!self.hasRequests">
+        <div class="opc__empty">
+            <div class="opc__empty__description">
+                <img src="generated/icon-sprite.svg#ico36_incoming_grey" class="opc__empty__description__icon">
+                <span class="opc__empty__description__text">Here you will see all incoming requests for your needs, but
+                    currently there are none. Check again later!</span>
+            </div>
+            <a ui-sref="createNeed" class="opc__empty__link">
+                <img src="generated/icon-sprite.svg#ico36_plus" class="opc__empty__link__icon">
+                <span class="opc__empty__link__caption">Create a Need</span>
+            </a>
+        </div>
+    </div>
     <div class="oir__requests" ng-class="{'hidden': self.connection !== undefined}">
         <won-request-item-line
                 open="false"
