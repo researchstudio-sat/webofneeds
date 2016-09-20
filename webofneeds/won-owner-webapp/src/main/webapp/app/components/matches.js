@@ -123,7 +123,7 @@ class Controller {
                         if(conn.connection.hasConnectionState===won.WON.Suggested){
                             return true
                         }
-                    }).length > 0,
+                    }).size > 0,
                 post: state.getIn(['needs','ownNeeds', postUri]),
             };
         };
