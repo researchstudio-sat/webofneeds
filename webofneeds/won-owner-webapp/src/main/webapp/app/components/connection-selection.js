@@ -33,7 +33,7 @@ function genComponentConf() {
                 <img src="generated/icon-sprite.svg#ico36_message_grey" class="omc__empty__description__icon">
                 <span class="omc__empty__description__text">You will be able to communicate with others once there are accepted connections. Accept a request or send requests and wait until the counterpart accepts it.</span>
             </div>
-            <a ui-sref="{connectionType: self.won.RequestsReceived}" class="omc__empty__link">
+            <a ui-sref="{connectionType: self.won.RequestReceived}" class="omc__empty__link">
                 <img src="generated/icon-sprite.svg#ico36_incoming" class="omc__empty__link__icon">
                 <span class="omc__empty__link__caption">Accept requests</span>
             </a>
