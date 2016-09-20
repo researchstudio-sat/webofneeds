@@ -48,7 +48,7 @@ function genComponentConf() {
                 <span class="omc__empty__link__caption">Go to conversations</span>
             </a>
             <a ui-sref="{connectionType: self.won.Suggested}" class="omc__empty__link">
-                <img src="generated/icon-sprite.svg#ico36_matches" class="omc__empty__link__icon">
+                <img src="generated/icon-sprite.svg#ico36_match" class="omc__empty__link__icon">
                 <span class="omc__empty__link__caption">Go to matches</span>
             </a>
         </div>
@@ -62,7 +62,7 @@ function genComponentConf() {
                 <span class="omc__empty__link__caption">Go to conversations</span>
             </a>
             <a ui-sref="{connectionType: self.won.Suggested}" class="omc__empty__link">
-                <img src="generated/icon-sprite.svg#ico36_matches" class="omc__empty__link__icon">
+                <img src="generated/icon-sprite.svg#ico36_match" class="omc__empty__link__icon">
                 <span class="omc__empty__link__caption">Go to matches</span>
             </a>
         </div>
