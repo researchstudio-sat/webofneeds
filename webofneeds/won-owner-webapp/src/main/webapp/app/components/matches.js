@@ -20,7 +20,9 @@ let template = `
         <div class="omc__empty" ng-if="!self.hasMatches && self.isOverview">
             <div class="omc__empty__description">
                 <img src="generated/icon-sprite.svg#ico36_match_grey" class="omc__empty__description__icon">
-                <span class="omc__empty__description__text">This view shows you all the matches to your needs. Create a need so that our matchers can create them.</span>
+                <span class="omc__empty__description__text">The matches to all your needs will be listed here. 
+                 You cannot influence the matching process. It might take some time, or maybe there is nothing to
+                    be found for you, yet. Check back later or post more needs!</span>
             </div>
             <a ui-sref="createNeed" class="omc__empty__link">
                 <img src="generated/icon-sprite.svg#ico36_plus" class="omc__empty__link__icon">
@@ -30,7 +32,9 @@ let template = `
         <div class="omc__empty" ng-if="!self.hasMatches && !self.isOverview">
             <div class="omc__empty__description">
                 <img src="generated/icon-sprite.svg#ico36_match_grey" class="omc__empty__description__icon">
-                <span class="omc__empty__description__text">This view shows you all the matches for this specific need. We have not found any so far, just try again later.</span>
+                <span class="omc__empty__description__text">The matches to this need will be listed here. 
+                 You cannot influence the matching process. It might take some time, or maybe there is nothing to
+                    be found for you, yet. Check back later!</span>
             </div>
         </div>
         <div class="omc__header" ng-if="self.hasMatches">
