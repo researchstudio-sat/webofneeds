@@ -1,0 +1,100 @@
+version: '2'
+services:
+
+  # create self-signed server certificate for satsrv05 and satsrv06
+  gencert:
+    build: ../../gencert
+    image: webofneeds/gencert:int
+    environment:
+      - "constraint:node==satsrv05"
+      - "CN=satsrv06.researchstudio.at"
+      - "PASS=pass:$won_certificate_passwd"
+      - "OPENSSL_CONFIG_FILE=/usr/local/openssl.conf"
+    volumes:
+      - $base_folder/won-server-certs:/usr/local/certs/out/
+      - $base_folder/openssl-int.conf:/usr/local/openssl.conf
+
+  # portsgres need databases for owner and wonnode
+  postgres:
+    image: webofneeds/postgres
+    environment:
+      - "constraint:node==satsrv05"
+    ports:
+      - "5433:5432"
+
+  # wonnode on satsrv05 (with proxy on satsrv06) => https://satsrv06/won
+  wonnode:
+    build: ../../wonnode
+    image: webofneeds/wonnode:int
+    environment:
+      - "constraint:node==satsrv05"
+      - "uri.host=satsrv06.researchstudio.at"
+      - "http.port=8889"
+      - "uri.prefix=https://satsrv06.researchstudio.at/won"
+      - "client.authentication.behind.proxy=true"
+      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
+      - "db.sql.jdbcUrl=jdbc:postgresql://satsrv05.researchstudio.at:5433/won_node"
+      - "db.sql.user=won"
+      - "db.sql.password=won"
+      - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
+      - "activemq.broker.port=61617"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+      - "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+        -Dinspectit.agent.name=int_satsrv05_wonnode
+        -Xdebug -Xrunjdwp:transport=dt_socket,address=62911,server=y,suspend=n
+        -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false
+        -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9010
+        -Djava.rmi.server.hostname=satsrv05.researchstudio.at"
+    ports:
+      - "8889:8443"
+      - "61617:61617"
+      - "62911:62911"
+      - "9010:9010"
+    volumes:
+      - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
+      - $base_folder/won-client-certs/wonnode_int:/usr/local/tomcat/won/client-certs/
+      - $base_folder/agent:/opt/agent/
+    depends_on:
+      - postgres
+      - gencert
+
+   # owner on satsrv05 (with proxy on satsrv06) => https://satsrv06/
+  owner:
+    build: ../../owner
+    image: webofneeds/owner:int
+    environment:
+      - "constraint:node==satsrv05"
+      - "node.default.host=satsrv06.researchstudio.at"
+      - "uri.host=satsrv06.researchstudio.at"
+      - "http.port=8082"
+      - "node.default.http.port=443"
+      - "uri.prefix=https://satsrv06.researchstudio.at"
+      - "uri.prefix.node.default=https://satsrv06.researchstudio.at/won"
+      - "node.default.http.port=8889"
+      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
+      - "db.sql.jdbcUrl=jdbc:postgresql://satsrv05.researchstudio.at:5433/won_owner"
+      - "db.sql.user=won"
+      - "db.sql.password=won"
+      - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
+      - "email.from.won.user=$MAIL_USER"
+      - "email.from.won.password=$MAIL_PASS"
+      - "email.from.won.smtp.host=$MAIL_HOST"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+      - "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+        -Dinspectit.agent.name=int_satsrv05_owner
+        -Xdebug -Xrunjdwp:transport=dt_socket,address=62912,server=y,suspend=n
+        -Dcom.sun.management.jmxremote.port=9011 -Dcom.sun.management.jmxremote.authenticate=false
+        -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9011
+        -Djava.rmi.server.hostname=satsrv05.researchstudio.at"
+    ports:
+      - "8082:8443"
+      - "62912:62912"
+      - "9011:9011"
+    volumes:
+      - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
+      - $base_folder/won-client-certs/owner_int:/usr/local/tomcat/won/client-certs/
+      - $base_folder/agent:/opt/agent/
+    depends_on:
+      - wonnode
+      - postgres
+      - gencert
