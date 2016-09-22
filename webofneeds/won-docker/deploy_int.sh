@@ -25,9 +25,6 @@ if [ "$GENERATE_NEW_CERTIFICATES" = true ] ; then
   ssh root@satsrv06 rm -rf $base_folder/won-client-certs
 fi
 
-# build the won docker images on every server of the cluster so that everywhere is the latest version available
-echo start docker build of images:
-
 ssh root@satsrv04 mkdir -p $base_folder/won-server-certs
 ssh root@satsrv05 mkdir -p $base_folder/won-server-certs
 ssh root@satsrv06 mkdir -p $base_folder/won-server-certs
@@ -38,7 +35,6 @@ ssh root@satsrv06 mkdir -p $base_folder/won-client-certs
 # copy the openssl.conf file to the server where the certificates are generated
 ssh root@satsrv05 mkdir -p $base_folder/won-server-certs
 scp $WORKSPACE/webofneeds/won-docker/gencert/openssl-int.conf root@satsrv05:$base_folder/openssl-int.conf
-
 
 echo run docker containers using docker-compose on satsrv04:
 cd deploy/int_satsrv04
