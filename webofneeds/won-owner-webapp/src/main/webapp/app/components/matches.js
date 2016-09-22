@@ -124,7 +124,7 @@ class Controller {
                 matchesOfNeed: mapToMatches(matchesByConnectionUri.toJS()),//TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
                 hasMatches: matchesByConnectionUri
                     .filter(conn => {
-                        if(conn.connection.hasConnectionState===won.WON.Suggested){
+                        if(conn.getIn(['connection','hasConnectionState'])===won.WON.Suggested){
                             return true
                         }
                     }).size > 0,
