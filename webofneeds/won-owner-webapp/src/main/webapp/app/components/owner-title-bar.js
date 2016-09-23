@@ -45,22 +45,30 @@ function genComponentConf() {
                             class="ntb__icon clickable"
                             src="generated/icon-sprite.svg#ico_settings"
                             ng-show="!self.settingsOpen"
-                            ng-click="self.settingsOpen = true"
-                            ng-mouseenter="self.settingsOpen = true">
-                        <button
-                            class="won-button--filled thin red"
-                            ng-show="self.isActive && self.settingsOpen"
-                            ng-mouseleave="self.settingsOpen=false"
-                            ng-click="self.closePost()">
-                                Close Post
-                        </button>
-                        <button
-                            class="won-button--filled thin red"
-                            ng-show="!self.isActive && self.settingsOpen"
-                            ng-mouseleave="self.settingsOpen=false"
-                            ng-click="self.reOpenPost()">
-                                Reopen Post
-                        </button>
+                            ng-click="self.settingsOpen = true">
+                        <div class="ntb__contextmenu contextmenu"
+                            ng-show="self.settingsOpen">
+                            <div class="content">
+                                <div class="topline">
+                                    <img
+                                        class="contextmenu__icon clickable"
+                                        src="generated/icon-sprite.svg#ico_settings"
+                                        ng-click="self.settingsOpen = false">
+                                </div>
+                                <button
+                                    class="won-button--filled thin red"
+                                    ng-show="self.isActive"
+                                    ng-click="self.closePost()">
+                                        Close Post
+                                </button>
+                                <button
+                                    class="won-button--filled thin red"
+                                    ng-show="!self.isActive"
+                                    ng-click="self.reOpenPost()">
+                                        Reopen Post
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class ="ntb__inner__right__lower">
@@ -165,11 +173,13 @@ function genComponentConf() {
 
         closePost() {
             console.log("CLOSING THE POST: "+this.post.get("@id"));
+            this.settingsOpen = false;
             this.needs__close(this.post.get("@id"));
         }
 
         reOpenPost() {
             console.log("RE-OPENING THE POST: "+this.post.get("@id"));
+            this.settingsOpen = false;
             this.needs__reopen(this.post.get("@id"));
         }
     }

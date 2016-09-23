@@ -16,9 +16,11 @@
   .#{$prefix}__icon {
     @media (max-width: $responsivenessBreakPoint){
       @include fixed-height(1rem);
+      padding: 0.25rem;
     }
     @media (min-width: $responsivenessBreakPoint){
       @include fixed-height(1.8rem);
+      padding: 0.5rem;
     }
 
     // assuming there's no icons that are wider than tall.
