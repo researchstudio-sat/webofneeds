@@ -75,10 +75,7 @@ class Controller {
                 hasSentRequests,
                 hasConversations,
                 connectionType: connectionTypeInParams,
-                showConnectionSelection: !!connectionTypeInParams && connectionTypeInParams !== won.WON.Suggested
-                && !(connectionTypeInParams === won.WON.RequestReceived && !this.hasReceivedRequests)
-                && !(connectionTypeInParams === won.WON.RequestSent && !this.hasSentRequests)
-                && !(connectionTypeInParams === won.WON.Connected && !this.hasConversations),
+                showConnectionSelection: !!connectionTypeInParams && connectionTypeInParams !== won.WON.Suggested,
                 showMatches: connectionTypeInParams === won.WON.Suggested && hasMatches,
                 showConversationDetails: connectionIsOpen && connectionTypeInParams === won.WON.Connected,
                 showIncomingRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestReceived,

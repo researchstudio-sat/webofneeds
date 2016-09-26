@@ -80,7 +80,11 @@
     <!-- left column for connection-typed tabs -->
     <won-connection-selection
             class="owner__messages"
-            ng-if="self.owningPost && self.showConnectionSelection"
+            ng-if="self.owningPost && self.showConnectionSelection && (
+                      (connectionTypeInParams === won.WON.Connected && self.hasConversations)
+                   || (connectionTypeInParams === won.WON.RequestReceived && self.hasReceivedRequests)
+                   || (connectionTypeInParams === won.WON.RequestSent && self.hasSentRequests)
+            )"
             connection-type="self.connectionType"
             selected-connection="::self.openConnection(connectionUri)"
             ng-class="{'hidden' : self.connectionUri !== undefined}"
