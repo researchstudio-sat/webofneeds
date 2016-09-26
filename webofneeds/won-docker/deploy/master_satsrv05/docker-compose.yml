@@ -12,15 +12,18 @@ services:
       - "OPENSSL_CONFIG_FILE=/usr/local/openssl.conf"
     volumes:
       - $base_folder/won-server-certs:/usr/local/certs/out/
-      - $base_folder/openssl-int.conf:/usr/local/openssl.conf
+      - $base_folder/openssl-master.conf:/usr/local/openssl.conf
 
   # portsgres need databases for owner and wonnode
   postgres:
     image: webofneeds/postgres
+    build: ../../image/postgres
     environment:
       - "constraint:node==satsrv05"
+    volumes:
+      - $base_folder/postgres/data:/var/lib/postgresql/data/
     ports:
-      - "5433:5432"
+      - "5432:5432"
 
   # wonnode on satsrv05 (with proxy on satsrv07) => https://satsrv07/won
   wonnode:
@@ -52,7 +55,7 @@ services:
       - "9018:9018"
     volumes:
       - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
-      - $base_folder/won-client-certs/wonnode_int:/usr/local/tomcat/won/client-certs/
+      - $base_folder/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/
       - $base_folder/agent:/opt/agent/
     depends_on:
       - postgres
@@ -91,7 +94,7 @@ services:
       - "9019:9019"
     volumes:
       - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
-      - $base_folder/won-client-certs/owner_int:/usr/local/tomcat/won/client-certs/
+      - $base_folder/won-client-certs/owner:/usr/local/tomcat/won/client-certs/
       - $base_folder/agent:/opt/agent/
     depends_on:
       - wonnode

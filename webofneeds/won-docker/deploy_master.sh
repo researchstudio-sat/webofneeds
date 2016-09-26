@@ -8,31 +8,31 @@
 # and are only deleted if the certificate changes and the postgres db has to be recreated.
 ##############################################################################################################
 
-
 # fail the whole script if one command fails
 set -e
 
 # base folder is used to mount some files (e.g. certificates) from the server into the containers
-export base_folder=/home/install/won/master
-jenkins_base_folder=/var/lib/jenkins/won/master
-mkdir -p $jenkins_base_folder
+export base_folder=/usr/share/webofneeds/master
+mkdir -p $base_folder
 
-# if the GENERATE_NEW_CERTIFICATES flag is set to true then setup things in a way that the certificates are recreated
-# that (currently) includes:
-# - deleting content of the server and client certificate folder
-# - emptying the postgres database (all need data is lost!)
-if [ "$GENERATE_NEW_CERTIFICATES" = true ] ; then
-  echo generating new certificates! Old files and postgres need database will be deleted!
+# check if all application data should be removed before deployment
+if [ "$remove_all_data" = true ] ; then
+
+  echo generating new certificates! Old files will be deleted!
   ssh root@satsrv04 rm -rf $base_folder/won-server-certs
   ssh root@satsrv05 rm -rf $base_folder/won-server-certs
   ssh root@satsrv06 rm -rf $base_folder/won-server-certs
   ssh root@satsrv04 rm -rf $base_folder/won-client-certs
   ssh root@satsrv05 rm -rf $base_folder/won-client-certs
   ssh root@satsrv06 rm -rf $base_folder/won-client-certs
-  rm -rf $jenkins_base_folder/won-server-certs
+  rm -rf $base_folder/won-server-certs
 
-  # TODO: delete data
-
+  echo delete postgres, bigdata and solr databases!
+  ssh root@satsrv04 rm -rf $base_folder/postgres/data
+  ssh root@satsrv05 rm -rf $base_folder/postgres/data
+  ssh root@satsrv06 rm -rf $base_folder/bigdata/data
+  ssh root@satsrv06 rm -rf $base_folder/solr/won/data
+  ssh root@satsrv06 rm -rf $base_folder/solr/wontest/data
 fi
 
 ssh root@satsrv04 mkdir -p $base_folder/won-server-certs
@@ -41,47 +41,37 @@ ssh root@satsrv06 mkdir -p $base_folder/won-server-certs
 ssh root@satsrv04 mkdir -p $base_folder/won-client-certs
 ssh root@satsrv05 mkdir -p $base_folder/won-client-certs
 ssh root@satsrv06 mkdir -p $base_folder/won-client-certs
-mkdir -p $jenkins_base_folder/won-server-certs
+mkdir -p $base_folder/won-server-certs
 
 # copy the openssl.conf file to the server where the certificates are generated
-scp $WORKSPACE/webofneeds/won-docker/gencert/openssl-master.conf root@satsrv05:$base_folder/openssl-master.conf
+scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl-master.conf root@satsrv05:$base_folder/openssl-master.conf
 
-echo run docker containers using docker-compose on satsrv07:
-cd deploy/int_satsrv07
-docker-compose -H satsrv07:2375 down
-docker-compose -H satsrv07:2375 up -d
+# copy the nginx.conf file to the proxy server
+cp $WORKSPACE/webofneeds/won-docker/image/nginx/nginx-master.conf $base_folder/nginx-master.conf
 
 echo run docker containers using docker-compose on satsrv04:
-cd ../int_satsrv04
+cd deploy/master_satsrv04
 docker-compose -H satsrv04:2375 down
 docker-compose -H satsrv04:2375 up -d
 
 echo run docker containers using docker-compose on satsrv05:
-cd ../int_satsrv05
+cd ../master_satsrv05
 docker-compose -H satsrv05:2375 down
 docker-compose -H satsrv05:2375 up -d
 
 # get the certificates and create a password file (for the nginx) to read the certificate
-echo ${won_certificate_passwd} > $jenkins_base_folder/won-server-certs/won_certificate_passwd_file
-rsync root@satsrv05:$base_folder/won-server-certs/* $jenkins_base_folder/won-server-certs/
+# the certificates must have been created on satsrv05 (in docker-compose file) before it can be used on proxy satsrv07
+echo ${won_certificate_passwd} > $base_folder/won-server-certs/won_certificate_passwd_file
+rsync root@satsrv05:$base_folder/won-server-certs/* $base_folder/won-server-certs/
+
+echo run docker containers using docker-compose on satsrv07:
+cd ../master_satsrv07
+docker-compose -H satsrv07:2375 down
+docker-compose -H satsrv07:2375 up -d
 
 echo run docker containers using docker-compose on satsrv06:
-cd ../int_satsrv06
+cd ../master_satsrv06
+docker -H satsrv06:2375 pull webofneeds/bigdata
 docker-compose -H satsrv06:2375 down
 docker-compose -H satsrv06:2375 up -d
 
-
-# if everything works up to this point - build :master images locally and push these local images into the dockerhub:
-# build:
-docker -H localhost:2375 build -t webofneeds/gencert:master $WORKSPACE/webofneeds/won-docker/gencert/
-docker -H localhost:2375 build -t webofneeds/wonnode:master $WORKSPACE/webofneeds/won-docker/wonnode/
-docker -H localhost:2375 build -t webofneeds/owner:master $WORKSPACE/webofneeds/won-docker/owner/
-docker -H localhost:2375 build -t webofneeds/matcher_service:master $WORKSPACE/webofneeds/won-docker/matcher-service/
-docker -H localhost:2375 build -t webofneeds/matcher_solr:master $WORKSPACE/webofneeds/won-docker/matcher-solr/
-# push:
-docker -H localhost:2375 login -u heikofriedrich
-docker -H localhost:2375 push webofneeds/gencert:master
-docker -H localhost:2375 push webofneeds/wonnode:master
-docker -H localhost:2375 push webofneeds/owner:master
-docker -H localhost:2375 push webofneeds/matcher_service:master
-docker -H localhost:2375 push webofneeds/matcher_solr:master

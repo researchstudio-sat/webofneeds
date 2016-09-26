@@ -9,13 +9,10 @@
 set -e
 
 # base folder is used to mount some files (e.g. certificates) from the server into the containers
-export base_folder=/home/install/won/int
+export base_folder=/usr/share/webofneeds/int
 
-# if the GENERATE_NEW_CERTIFICATES flag is set to true then setup things in a way that the certificates are recreated
-# that (currently) includes:
-# - deleting content of the server and client certificate folder
-# - emptying the postgres database (all need data is lost!) => is done later in the script anyway
-if [ "$GENERATE_NEW_CERTIFICATES" = true ] ; then
+# check if all application data should be removed before deployment (for integration test, that is only certificates)
+if [ "$remove_all_data" = true ] ; then
   echo generating new certificates! Old files and postgres need database will be deleted!
   ssh root@satsrv04 rm -rf $base_folder/won-server-certs
   ssh root@satsrv05 rm -rf $base_folder/won-server-certs
@@ -34,7 +31,7 @@ ssh root@satsrv06 mkdir -p $base_folder/won-client-certs
 
 # copy the openssl.conf file to the server where the certificates are generated
 ssh root@satsrv05 mkdir -p $base_folder/won-server-certs
-scp $WORKSPACE/webofneeds/won-docker/gencert/openssl-int.conf root@satsrv05:$base_folder/openssl-int.conf
+scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl-int.conf root@satsrv05:$base_folder/openssl-int.conf
 
 echo run docker containers using docker-compose on satsrv04:
 cd deploy/int_satsrv04
@@ -47,6 +44,7 @@ docker-compose -H satsrv05:2375 down
 docker-compose -H satsrv05:2375 up -d
 
 # get the certificates and create a password file (for the nginx) to read the certificate
+# the certificates must have been created on satsrv05 (in docker-compose file) before it can be used on proxy satsrv06
 ssh root@satsrv06 mkdir -p $base_folder/won-server-certs
 mkdir -p ~/won-server-certs
 rm ~/won-server-certs/*
@@ -55,10 +53,11 @@ rsync root@satsrv05:$base_folder/won-server-certs/* ~/won-server-certs/
 rsync ~/won-server-certs/* root@satsrv06:$base_folder/won-server-certs/
 
 # copy the nginx.conf file to the proxy server
-rsync $WORKSPACE/webofneeds/won-docker/nginx/nginx-int.conf root@satsrv06:$base_folder/nginx-int.conf
+scp $WORKSPACE/webofneeds/won-docker/image/nginx/nginx-int.conf root@satsrv06:$base_folder/nginx-int.conf
 
 echo run docker containers using docker-compose on satsrv06:
 cd ../int_satsrv06
+docker -H satsrv06:2375 pull webofneeds/bigdata
 docker-compose -H satsrv06:2375 down
 docker-compose -H satsrv06:2375 up -d
 

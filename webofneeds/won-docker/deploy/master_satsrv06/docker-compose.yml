@@ -13,10 +13,11 @@ services:
 
   # bigdata rdf store for matcher service
   bigdata:
-    build: ../../image/bigdata
     image: webofneeds/bigdata
     environment:
       - "constraint:node==satsrv06"
+    volumes:
+      - $base_folder/bigdata/data/:/usr/src/bigdata/data
     ports:
       - "9999:9999"
 
@@ -44,7 +45,7 @@ services:
       - "62920:62920"
       - "9020:9020"
     volumes:
-      - $base_folder/won-client-certs/matcher_service_int:/usr/src/matcher-service/client-certs/
+      - $base_folder/won-client-certs/matcher_service:/usr/src/matcher-service/client-certs/
       - $base_folder/agent:/opt/agent/
     depends_on:
       - bigdata
@@ -55,6 +56,9 @@ services:
     image: webofneeds/solr
     environment:
       - "constraint:node==satsrv06"
+    volumes:
+      - $base_folder/solr/won/data:/opt/solr/server/solr/won/data
+      - $base_folder/solr/wontest/data:/opt/solr/server/solr/wontest/data
     ports:
       - "8983:8983"
 

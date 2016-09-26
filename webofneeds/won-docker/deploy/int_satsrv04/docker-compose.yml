@@ -15,6 +15,7 @@ services:
   # portsgres need databases for owner and wonnode
   postgres:
     image: webofneeds/postgres
+    build: ../../image/postgres
     environment:
       - "constraint:node==satsrv04"
     ports:
@@ -48,7 +49,7 @@ services:
       - "9010:9010"
     volumes:
       - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
-      - $base_folder/won-client-certs/wonnode_int:/usr/local/tomcat/won/client-certs/
+      - $base_folder/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/
       - $base_folder/agent:/opt/agent/
     depends_on:
       - postgres
@@ -85,7 +86,7 @@ services:
       - "9011:9011"
     volumes:
       - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
-      - $base_folder/won-client-certs/owner_int:/usr/local/tomcat/won/client-certs/
+      - $base_folder/won-client-certs/owner:/usr/local/tomcat/won/client-certs/
       - $base_folder/agent:/opt/agent/
     depends_on:
       - wonnode
