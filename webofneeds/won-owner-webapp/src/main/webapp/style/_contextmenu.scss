@@ -4,6 +4,7 @@
 .contextmenu {
   position: relative;
   height: 0;
+  z-index: 1000;
 
   .content {
     background: white;

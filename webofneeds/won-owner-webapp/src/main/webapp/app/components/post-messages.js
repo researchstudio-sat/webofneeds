@@ -38,13 +38,13 @@ function genComponentConf() {
                 <div class="pm__header__title">
                     {{ self.connectionData.getIn(['remoteNeed', 'won:hasContent', 'dc:title']) }}
                 </div>
-                <div class="pm__header__options">
+                <!--div class="pm__header__options">
                     Options
                 </div>
                 <img
                     class="pm__header__options__icon clickable"
                     src="generated/icon-sprite.svg#ico_settings"
-                    ng-click="self.openConversationOption()"/>
+                    ng-click="self.openConversationOption()"/-->
             </div>
         </div>
         <div class="pm__content">

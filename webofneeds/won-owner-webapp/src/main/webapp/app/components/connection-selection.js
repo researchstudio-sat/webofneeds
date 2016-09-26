@@ -33,7 +33,7 @@ function genComponentConf() {
             <div class="conn">
                  <div
                  class="conn__item"
-                 ng-class="self.openConversationUri === connectionUri? 'selected' : ''">
+                 ng-class="self.isActive(connectionUri) ? 'selected' : ''">
                      <!--TODO request.titleImgSrc isn't defined -->
                     <won-square-image
                         src="request.titleImgSrc"
@@ -59,12 +59,25 @@ function genComponentConf() {
                                 {{ self.lastUpdated.get(connectionUri) }}
                             </div>
                             <img
-                                class="conn__item__description__topline__icon"
+                                class="conn__item__description__topline__icon clickable"
                                 src="generated/icon-sprite.svg#ico_settings"
-                                ng-show="!self.settingsOpen && self.openConversationUri === connectionUri"
-                                ng-mouseenter="self.settingsOpen = true">
-                            <div class="conn__item__description__settings" ng-show="self.settingsOpen && self.openConversationUri === connectionUri" ng-mouseleave="self.settingsOpen=false">
-                                <button class="won-button--filled thin red" ng-click="self.closeConnection(connectionUri)">Close Connection</button>
+                                ng-show="!self.settingsOpen && self.isActive(connectionUri)"
+                                ng-click="self.settingsOpen = true">
+                            <div class="ntb__contextmenu contextmenu" 
+                                ng-show="self.settingsOpen && self.isActive(connectionUri)">
+                                <div class="content">
+                                    <div class="topline">
+                                        <img
+                                            class="contextmenu__icon clickable"
+                                            src="generated/icon-sprite.svg#ico_settings"
+                                            ng-click="self.settingsOpen = false">
+                                    </div>
+                                    <button
+                                        class="won-button--filled thin red"
+                                        ng-click="self.closeConnection(connectionUri)">
+                                            Close Connection
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="conn__item__description__subtitle">
@@ -136,7 +149,7 @@ function genComponentConf() {
                         .map(ts => relativeTime(lastStateUpdate, ts)),
                     connectionUris,
                     allByConnections,
-                    openConversationUri: openConnectionUri,
+                    openConnectionUri: openConnectionUri,
                     won: won.WON,
                     post: post? post.toJS() : {},
                 };
@@ -145,6 +158,11 @@ function genComponentConf() {
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
         }
+
+        isActive(connectionUri) {
+            return this.openConnectionUri === connectionUri;
+        }
+
         setOpen(connectionUri) {
             this.openUri = connectionUri;
             this.selectedConnection({connectionUri}); //trigger callback with scope-object
