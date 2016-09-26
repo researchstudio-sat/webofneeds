@@ -3,7 +3,7 @@ services:
 
   # create self-signed server certificate for satsrv04
   gencert:
-    build: ../../gencert
+    build: ../../image/gencert
     image: webofneeds/gencert:int
     environment:
       - "constraint:node==satsrv04"
@@ -22,7 +22,7 @@ services:
 
   # wonnode on satsrv04 (without proxy) => https://satsrv04:8889/won
   wonnode:
-    build: ../../wonnode
+    build: ../../image/wonnode
     image: webofneeds/wonnode:int
     environment:
       - "constraint:node==satsrv04"
@@ -56,7 +56,7 @@ services:
 
   # owner on satsrv04 (without proxy) => https://satsrv04:8082/owner
   owner:
-    build: ../../owner
+    build: ../../image/owner
     image: webofneeds/owner:int
     environment:
       - "constraint:node==satsrv04"

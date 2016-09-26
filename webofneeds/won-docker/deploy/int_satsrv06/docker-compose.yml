@@ -16,7 +16,7 @@ services:
 
   # debug bot used to test need communication, connect to wonnodes on satsrv04 and satsrv05 (proxied by satsrv06)
   debug_bot:
-    build: ../../bots
+    build: ../../image/bots
     image: webofneeds/bots:int
     environment:
       - "constraint:node==satsrv06"
@@ -28,6 +28,7 @@ services:
 
   # bigdata rdf store for matcher service
   bigdata:
+    build: ../../image/bigdata
     image: webofneeds/bigdata
     environment:
       - "constraint:node==satsrv06"
@@ -36,7 +37,7 @@ services:
 
   # matcher service on satsrv06 and connect with wonnodes on satsrv04 and proxied wonnode on satsrv05 (proxied by satsrv06)
   matcher_service:
-    build: ../../matcher-service
+    build: ../../image/matcher-service
     image: webofneeds/matcher-service:int
     environment:
       - "constraint:node==satsrv06"
@@ -65,6 +66,7 @@ services:
 
   # solr server as a need index
   solr:
+    build: ../../image/solr
     image: webofneeds/solr
     environment:
       - "constraint:node==satsrv06"
@@ -73,7 +75,7 @@ services:
 
   # solr matcher and connect to matcher service
   matcher_solr:
-    build: ../../matcher-solr
+    build: ../../image/matcher-solr
     image: webofneeds/matcher_solr:int
     environment:
       - "constraint:node==satsrv06"
