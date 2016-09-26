@@ -28,50 +28,12 @@ import {
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-        <div class="omc__empty" ng-if="self.connectionType === self.won.Connected && !self.hasConnections">
-            <div class="omc__empty__description">
-                <img src="generated/icon-sprite.svg#ico36_message_grey" class="omc__empty__description__icon">
-                <span class="omc__empty__description__text">You will be able to communicate with others once there are accepted connections. Accept a request or send requests and wait until the counterpart accepts it.</span>
-            </div>
-            <a ui-sref="{connectionType: self.won.RequestReceived}" class="omc__empty__link">
-                <img src="generated/icon-sprite.svg#ico36_incoming" class="omc__empty__link__icon">
-                <span class="omc__empty__link__caption">Accept requests</span>
-            </a>
-        </div>
-        <div class="omc__empty" ng-if="self.connectionType === self.won.RequestReceived && !self.hasConnections">
-            <div class="omc__empty__description">
-                <img src="generated/icon-sprite.svg#ico36_incoming_grey" class="omc__empty__description__icon">
-                <span class="omc__empty__description__text">This view shows you all the incoming request for this specific need. Wait until someone tries to connect with you.</span>
-            </div>
-            <a ui-sref="{connectionType: self.won.Connected}" class="omc__empty__link">
-                <img src="generated/icon-sprite.svg#ico36_message" class="omc__empty__link__icon">
-                <span class="omc__empty__link__caption">Go to conversations</span>
-            </a>
-            <a ui-sref="{connectionType: self.won.Suggested}" class="omc__empty__link">
-                <img src="generated/icon-sprite.svg#ico36_match" class="omc__empty__link__icon">
-                <span class="omc__empty__link__caption">Go to matches</span>
-            </a>
-        </div>
-        <div class="omc__empty" ng-if="self.connectionType === self.won.RequestSent && !self.hasConnections">
-            <div class="omc__empty__description">
-                <img src="generated/icon-sprite.svg#ico36_outgoing_grey" class="omc__empty__description__icon">
-                <span class="omc__empty__description__text">This view shows you all your sent requests for this specific need. Connect with a match to see it here.</span>
-            </div>
-            <a ui-sref="{connectionType: self.won.Connected}" class="omc__empty__link">
-                <img src="generated/icon-sprite.svg#ico36_message" class="omc__empty__link__icon">
-                <span class="omc__empty__link__caption">Go to conversations</span>
-            </a>
-            <a ui-sref="{connectionType: self.won.Suggested}" class="omc__empty__link">
-                <img src="generated/icon-sprite.svg#ico36_match" class="omc__empty__link__icon">
-                <span class="omc__empty__link__caption">Go to matches</span>
-            </a>
-        </div>
         <div class="connectionSelectionItemLine"
                 ng-repeat="(key,connectionUri) in self.connectionUris">
             <div class="conn">
                  <div
                  class="conn__item"
-                 ng-class="self.openConversationUri === connectionUri? 'selected' : ''">
+                 ng-class="self.isActive(connectionUri) ? 'selected' : ''">
                      <!--TODO request.titleImgSrc isn't defined -->
                     <won-square-image
                         src="request.titleImgSrc"
@@ -97,12 +59,25 @@ function genComponentConf() {
                                 {{ self.lastUpdated.get(connectionUri) }}
                             </div>
                             <img
-                                class="conn__item__description__topline__icon"
+                                class="conn__item__description__topline__icon clickable"
                                 src="generated/icon-sprite.svg#ico_settings"
-                                ng-show="!self.settingsOpen && self.openConversationUri === connectionUri"
-                                ng-mouseenter="self.settingsOpen = true">
-                            <div class="conn__item__description__settings" ng-show="self.settingsOpen && self.openConversationUri === connectionUri" ng-mouseleave="self.settingsOpen=false">
-                                <button class="won-button--filled thin red" ng-click="self.closeConnection(connectionUri)">Close Connection</button>
+                                ng-show="!self.settingsOpen && self.isActive(connectionUri)"
+                                ng-click="self.settingsOpen = true">
+                            <div class="ntb__contextmenu contextmenu" 
+                                ng-show="self.settingsOpen && self.isActive(connectionUri)">
+                                <div class="content">
+                                    <div class="topline">
+                                        <img
+                                            class="contextmenu__icon clickable"
+                                            src="generated/icon-sprite.svg#ico_settings"
+                                            ng-click="self.settingsOpen = false">
+                                    </div>
+                                    <button
+                                        class="won-button--filled thin red"
+                                        ng-click="self.closeConnection(connectionUri)">
+                                            Close Connection
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="conn__item__description__subtitle">
@@ -168,20 +143,13 @@ function genComponentConf() {
 
                 const lastStateUpdate = selectLastUpdateTime(state);
 
-                if(connectionUris.size > 0){ //this is used to add a class to the toplevel element of the connection-selection, otherwise we would have to inject the class by asking the state in the toplevel
-                    angular.element("won-connection-selection").removeClass("empty");
-                }else{
-                    angular.element("won-connection-selection").addClass("empty");
-                }
-
                 return {
                     lastUpdated:
                         selectLastUpdatedPerConnection(state)
                         .map(ts => relativeTime(lastStateUpdate, ts)),
                     connectionUris,
-                    hasConnections: connectionUris.size > 0,
                     allByConnections,
-                    openConversationUri: openConnectionUri,
+                    openConnectionUri: openConnectionUri,
                     won: won.WON,
                     post: post? post.toJS() : {},
                 };
@@ -190,6 +158,11 @@ function genComponentConf() {
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
         }
+
+        isActive(connectionUri) {
+            return this.openConnectionUri === connectionUri;
+        }
+
         setOpen(connectionUri) {
             this.openUri = connectionUri;
             this.selectedConnection({connectionUri}); //trigger callback with scope-object

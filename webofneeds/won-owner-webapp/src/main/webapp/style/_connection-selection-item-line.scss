@@ -39,6 +39,24 @@
         flex-grow: 1;
         padding-right: 1rem;
 
+        .contextmenu {
+          position: absolute;
+          right: 1rem;
+          top: 0.2rem;
+
+          .content {
+            padding: 0.1rem 0.25rem 0.25rem 0.25rem;
+            margin: 0.15rem 0 0 0;
+          }
+
+          &__icon {
+            height: 1em;
+            min-height: 1em;
+            max-height: 1em;
+            width: auto;
+          }
+        }
+
         &__settings {
           position: absolute;
           border: 0.1rem solid $won-line-gray;

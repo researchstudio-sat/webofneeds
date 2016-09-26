@@ -46,6 +46,10 @@ import settingsTitleBarModule from './components/settings-title-bar';
 import avatarSettingsModule from './components/settings/avatar-settings';
 import generalSettingsModule from './components/settings/general-settings';
 
+//won import (used so you can access the debugmode variable without reloading the page)
+import won from './service/won';
+window.won = won;
+
 
 /* TODO this fragment is part of an attempt to sketch a different
  * approach to asynchronity (Remove it or the thunk-based

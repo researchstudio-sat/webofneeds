@@ -4,7 +4,8 @@
 @import 'flex-layout';
 
 won-matches-grid-item {
-  display: inline-block;
+  display: block;
+  page-break-inside: avoid;
   margin: 0.5rem 0;
   border: 0.1rem solid $won-line-gray;
   background: $won-light-gray;
@@ -109,7 +110,8 @@ won-matches-grid-item {
     display: flex;
     justify-content: space-between;
     padding: 0.5rem;
-    @include square-image($postIconSize, 0, 0, 0, 0.5rem);
+    min-height: 3rem;
+    @include square-image($feedIconSize, 0, 0, 0, 0.5rem);
 
     &:hover {
       .mgi__match__description__title {

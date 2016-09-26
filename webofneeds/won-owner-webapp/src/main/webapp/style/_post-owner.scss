@@ -6,6 +6,7 @@
 
 .ownerpostcontent {
   @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
+  @include empty-description('opc');
   align-items: flex-start;
 
   .oir__openrequest,
@@ -14,16 +15,6 @@
     max-width: 35rem;
     margin: 0.5rem;
   }
-
-  won-connection-selection.oir__openrequest.empty,
-  won-connection-selection.owner__messages.empty {
-    max-width: $maxContentWidth;
-    display: flex;
-    margin: 0 0.5rem;
-    min-height: 100%;
-    align-items: center;
-  }
-
 
   @media (max-width: $responsivenessBreakPoint){
     .owner__messages.hidden {
@@ -34,10 +25,6 @@
   .owner__openconversation{
     background: white;
     border: 0.1rem solid $won-line-gray;
-  }
-
-  won-connection-selection {
-    @include empty-description('omc');
   }
 }
 

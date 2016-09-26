@@ -33,6 +33,26 @@ class Controller {
 
         const selectFromState = (state)=>{
             const postUri = selectOpenPostUri(state);
+            const allByConnectionsAndPostUri = selectAllByConnections(state)
+                .filter(connectionRelated => connectionRelated.getIn(['ownNeed', '@id']) === postUri)
+                .toList();
+            
+            const hasMatches = allByConnectionsAndPostUri
+                .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Suggested)
+                .toList()
+                .size > 0;
+            const hasReceivedRequests = allByConnectionsAndPostUri
+                .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.RequestReceived)
+                .toList()
+                .size > 0;
+            const hasSentRequests = allByConnectionsAndPostUri
+                .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.RequestSent)
+                .toList()
+                .size > 0;
+            const hasConversations = allByConnectionsAndPostUri
+                    .filter(conn => conn.getIn(['connection', 'hasConnectionState']) === won.WON.Connected)
+                    .toList()
+                    .size > 0;
 
             const connectionUri = selectOpenConnectionUri(state);
             const actualConnectionType = state.getIn([
@@ -50,18 +70,24 @@ class Controller {
                 post: selectOpenPost(state),
                 owningPost: selectOwningOpenPost(state),
                 connectionUri,
+                hasMatches,
+                hasReceivedRequests,
+                hasSentRequests,
+                hasConversations,
                 connectionType: connectionTypeInParams,
                 showConnectionSelection: !!connectionTypeInParams && connectionTypeInParams !== won.WON.Suggested,
-                showMatches: connectionTypeInParams === won.WON.Suggested,
+                showMatches: connectionTypeInParams === won.WON.Suggested && hasMatches,
                 showConversationDetails: connectionIsOpen && connectionTypeInParams === won.WON.Connected,
                 showIncomingRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestReceived,
                 showSentRequestDetails: connectionIsOpen && connectionTypeInParams === won.WON.RequestSent,
+                won: won.WON,
             };
         }
 
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
         this.$scope.$on('$destroy', disconnect);
     }
+
     openConnection(connectionUri) {
         this.router__stateGo('post', {
             postUri: decodeURIComponent(this.postUri),

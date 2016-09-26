@@ -4,8 +4,9 @@
 @import 'flex-layout';
 
 won-matches-flow-item {
-  display: inline-block;
-  margin: 0.5rem 0;
+  display: block;
+  break-inside: avoid;
+  margin: 0.5rem 0.25rem;
   border: 0.1rem solid $won-line-gray;
   background: $won-light-gray;
   width: 16.25rem;
@@ -26,6 +27,9 @@ won-matches-flow-item {
       justify-content: space-between;
 
       &__title{
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
         font-weight: bold;
 
         &:hover {
@@ -132,7 +136,8 @@ won-matches-flow-item {
     display: flex;
     justify-content: space-between;
     padding: 0.5rem;
-    @include square-image($postIconSize, 0, 0, 0, 0.5rem);
+    min-height: 3rem;
+    @include square-image($feedIconSize, 0, 0, 0, 0.5rem);
 
     &:hover {
       .mfi__match__description__title {
