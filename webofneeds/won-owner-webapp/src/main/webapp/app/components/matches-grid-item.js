@@ -63,8 +63,7 @@ function genComponentConf() {
         <div
             class="mgi__match clickable"
             ng-if="!self.feedbackVisible"
-            ng-click="self.showFeedback()"
-            ng-mouseenter="self.showFeedback()">
+            ng-click="self.showFeedback()">
                 <div class="mgi__match__description">
                     <div class="mgi__match__description__title">
                         {{ self.ownNeed.getIn(['won:hasContent','dc:title']) }}
@@ -85,7 +84,7 @@ function genComponentConf() {
         </div>
         <won-feedback-grid
             connection-uri="self.connectionUri"
-            ng-mouseleave="self.hideFeedback()"
+            ng-click="self.hideFeedback()"
             ng-if="self.feedbackVisible"/>
     `;
 

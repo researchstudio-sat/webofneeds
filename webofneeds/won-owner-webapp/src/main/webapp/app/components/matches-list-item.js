@@ -63,9 +63,7 @@ function genComponentConf() {
                 <div class="smli__item clickable"
                         ng-class="{'selected' : self.openRequest === match}"
                         ng-repeat="match in self.item"
-                        ui-sref="{connectionUri: match.connection.uri}"
-                        ng-mouseenter="self.showFeedback()"
-                        ng-mouseleave="self.hideFeedback()">
+                        ui-sref="{connectionUri: match.connection.uri}">
                     <div class="smli__item__header">
                         <won-square-image
                             src="match.images[0].src"
