@@ -11,7 +11,7 @@ services:
       - "node.default.http.port=8888"
       - "won.node.uris=https://satsrv04.researchstudio.at:8888/won/resource https://satsrv07.researchstudio.at/won/resource"
 
-  # bigdata rdf store for matcher service
+  # bigdata rdf store for matcher service (this image is not built at deployment, it is downloaded from dockerhub)
   bigdata:
     image: webofneeds/bigdata
     environment:
@@ -53,7 +53,7 @@ services:
   # solr server as a need index
   solr:
     build: ../../image/solr
-    image: webofneeds/solr
+    image: webofneeds/solr:master
     environment:
       - "constraint:node==satsrv06"
     volumes:

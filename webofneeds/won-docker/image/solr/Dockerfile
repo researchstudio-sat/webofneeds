@@ -10,6 +10,10 @@ ADD ./core/wontest  /opt/solr/server/solr/wontest
 ADD ./core/won/conf /opt/solr/server/solr/wontest/conf
 ADD ./core/won/data /opt/solr/server/solr/wontest/data
 
+# do not make explicit volumes here, this will just fill up disk space in our integration test environment very fast
+# VOLUME /opt/solr/server/solr/won/data
+# VOLUME /opt/solr/server/solr/wontest/data
+
 USER root
 RUN chmod -R +wx /opt/solr/server/solr/won
 RUN chmod -R +wx /opt/solr/server/solr/wontest

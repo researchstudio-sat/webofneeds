@@ -26,7 +26,7 @@ services:
     depends_on:
       - nginx
 
-  # bigdata rdf store for matcher service
+  # bigdata rdf store for matcher service (this image is not built at deployment, it is downloaded from dockerhub)
   bigdata:
     image: webofneeds/bigdata
     environment:
@@ -66,7 +66,7 @@ services:
   # solr server as a need index
   solr:
     build: ../../image/solr
-    image: webofneeds/solr
+    image: webofneeds/solr:int
     environment:
       - "constraint:node==satsrv06"
     ports:

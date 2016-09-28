@@ -8,8 +8,9 @@ FROM openjdk:8
 ADD ./bigdata-bundled.jar /usr/src/bigdata/bigdata-bundled.jar
 ADD ./RWStore.properties /usr/src/bigdata/RWStore.properties
 
+# do not make explicit volumes here, this will just fill up disk space in our integration test environment very fast
 # define the data folder of the store in RWStore.properties
-VOLUME /usr/src/bigdata/data
+# VOLUME /usr/src/bigdata/data
 
 # start bigdata on port 9999
 WORKDIR /usr/src/bigdata/

@@ -16,7 +16,7 @@ services:
 
   # portsgres need databases for owner and wonnode
   postgres:
-    image: webofneeds/postgres
+    image: webofneeds/postgres:master
     build: ../../image/postgres
     environment:
       - "constraint:node==satsrv05"
