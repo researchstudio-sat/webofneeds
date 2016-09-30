@@ -1,0 +1,92 @@
+version: '2'
+services:
+
+  # debug bot used to test need communication, connect to wonnodes on satsrv04 and satsrv05 (proxied by satsrv07)
+  debug_bot:
+    build: ../../image/bots
+    image: webofneeds/bots:master
+    environment:
+      - "constraint:node==satsrv06"
+      - "node.default.host=satsrv04.researchstudio.at"
+      - "node.default.http.port=8888"
+      - "won.node.uris=https://satsrv04.researchstudio.at:8888/won/resource https://satsrv07.researchstudio.at/won/resource"
+
+  # bigdata rdf store for matcher service
+  bigdata:
+    image: webofneeds/bigdata
+    environment:
+      - "constraint:node==satsrv06"
+    volumes:
+      - $base_folder/bigdata/data/:/usr/src/bigdata/data
+    ports:
+      - "9999:9999"
+
+  # matcher service on satsrv06 and connect with wonnodes on satsrv04 and proxied wonnode on satsrv05 (proxied by satsrv07)
+  matcher_service:
+    build: ../../image/matcher-service
+    image: webofneeds/matcher-service:master
+    environment:
+      - "constraint:node==satsrv06"
+      - "node.host=satsrv06.researchstudio.at"
+      - "cluster.seed.host=satsrv06.researchstudio.at"
+      - "uri.sparql.endpoint=http://satsrv06.researchstudio.at:9999/bigdata/namespace/kb/sparql"
+      - "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8888/won/resource,https://satsrv07.researchstudio.at/won/resource"
+      - "cluster.local.port=2551"
+      - "cluster.seed.port=2551"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+      - "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+        -Dinspectit.agent.name=int_satsrv06_matcher_service
+        -Xdebug -Xrunjdwp:transport=dt_socket,address=62920,server=y,suspend=n
+        -Dcom.sun.management.jmxremote.port=9020 -Dcom.sun.management.jmxremote.authenticate=false
+        -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9020
+        -Djava.rmi.server.hostname=satsrv06.researchstudio.at"
+    ports:
+      - "2551:2551"
+      - "62920:62920"
+      - "9020:9020"
+    volumes:
+      - $base_folder/won-client-certs/matcher_service:/usr/src/matcher-service/client-certs/
+      - $base_folder/agent:/opt/agent/
+    depends_on:
+      - bigdata
+
+  # solr server as a need index
+  solr:
+    build: ../../image/solr
+    image: webofneeds/solr
+    environment:
+      - "constraint:node==satsrv06"
+    volumes:
+      - $base_folder/solr/won/data:/opt/solr/server/solr/won/data
+      - $base_folder/solr/wontest/data:/opt/solr/server/solr/wontest/data
+    ports:
+      - "8983:8983"
+
+  # solr matcher and connect to matcher service
+  matcher_solr:
+    build: ../../image/matcher-solr
+    image: webofneeds/matcher_solr:master
+    environment:
+      - "constraint:node==satsrv06"
+      - "node.host=satsrv06.researchstudio.at"
+      - "cluster.seed.host=satsrv06.researchstudio.at"
+      - "cluster.seed.port=2551"
+      - "cluster.local.port=2552"
+      - "matcher.solr.uri.solr.server=http://satsrv06.researchstudio.at:8983/solr/"
+      - "matcher.solr.uri.solr.server.public=http://satsrv06.researchstudio.at:8983/solr/"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+      - "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+        -Dinspectit.agent.name=int_satsrv06_matcher_solr
+        -Xdebug -Xrunjdwp:transport=dt_socket,address=62921,server=y,suspend=n
+        -Dcom.sun.management.jmxremote.port=9021 -Dcom.sun.management.jmxremote.authenticate=false
+        -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9021
+        -Djava.rmi.server.hostname=satsrv06.researchstudio.at"
+    ports:
+      - "2552:2552"
+      - "9021:9021"
+      - "62921:62921"
+    volumes:
+      - $base_folder/agent:/opt/agent/
+    depends_on:
+      - solr
+      - matcher_service

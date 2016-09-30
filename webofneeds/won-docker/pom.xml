@@ -59,7 +59,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/wonnode</outputDirectory>
+                            <outputDirectory>${project.basedir}/image/wonnode</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/won-node-webapp/target</directory>
@@ -78,7 +78,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/wonnode/conf</outputDirectory>
+                            <outputDirectory>${project.basedir}/image/wonnode/conf</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/conf</directory>
@@ -94,7 +94,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/wonnode/tomcat-libs</outputDirectory>
+                            <outputDirectory>${project.basedir}/image/wonnode/tomcat-libs</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/target/tomcat-libs</directory>
@@ -112,7 +112,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/owner</outputDirectory>
+                            <outputDirectory>${project.basedir}/image/owner</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/won-owner-webapp/target</directory>
@@ -131,7 +131,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/owner/conf</outputDirectory>
+                            <outputDirectory>${project.basedir}/image/owner/conf</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/conf</directory>
@@ -147,7 +147,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/owner/tomcat-libs</outputDirectory>
+                            <outputDirectory>${project.basedir}/image/owner/tomcat-libs</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/target/tomcat-libs</directory>
@@ -165,7 +165,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/matcher-service</outputDirectory>
+                            <outputDirectory>${project.basedir}/image/matcher-service</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/won-matcher-service/target</directory>
@@ -184,7 +184,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/matcher-service/conf</outputDirectory>
+                            <outputDirectory>${project.basedir}/image/matcher-service/conf</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/conf</directory>
@@ -202,7 +202,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/matcher-solr</outputDirectory>
+                            <outputDirectory>${project.basedir}/image/matcher-solr</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/won-matcher-solr/target</directory>
@@ -221,7 +221,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/matcher-solr/conf</outputDirectory>
+                            <outputDirectory>${project.basedir}/image/matcher-solr/conf</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/conf</directory>
@@ -239,7 +239,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/bots</outputDirectory>
+                            <outputDirectory>${project.basedir}/image/bots</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/won-bot/target</directory>
@@ -258,7 +258,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/bots/conf</outputDirectory>
+                            <outputDirectory>${project.basedir}/image/bots/conf</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/conf</directory>

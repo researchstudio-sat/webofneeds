@@ -1,6 +1,4 @@
-# This image is build and pushed to the dockerhub manually (webofneeds/solr)
 # The solr server should be accessible at port 8983
-
 # use java as a base image
 FROM solr:6.1.0
 
