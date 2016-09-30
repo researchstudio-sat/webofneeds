@@ -84,7 +84,7 @@ import java.util.concurrent.Executor;
  * The bot will only react to onXX methods (i.e., create events and publish them on the internal event bus) if it is in lifecycle phase ACTIVE.
  *
  */
-public class EventBot extends TriggeredBot
+public abstract class EventBot extends TriggeredBot
 {
   private EventBus eventBus;
   private EventListenerContext eventListenerContext = new MyEventListenerContext();
@@ -93,7 +93,7 @@ public class EventBot extends TriggeredBot
 
 
   @Override
-  public void act() throws Exception
+  public final void act() throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new ActEvent());
@@ -103,7 +103,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onMessageFromOtherNeed(final Connection con, final WonMessage wonMessage)
+  public final void onMessageFromOtherNeed(final Connection con, final WonMessage wonMessage)
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new MessageFromOtherNeedEvent(con,  wonMessage));
@@ -113,7 +113,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onHintFromMatcher(final Match match, final WonMessage wonMessage)
+  public final void onHintFromMatcher(final Match match, final WonMessage wonMessage)
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new HintFromMatcherEvent(match, wonMessage));
@@ -123,7 +123,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage)
+  public final void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage)
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new CloseFromOtherNeedEvent(con, wonMessage));
@@ -133,7 +133,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage)
+  public final void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage)
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new OpenFromOtherNeedEvent(con, wonMessage));
@@ -153,7 +153,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception
+  public final void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel, FacetType.OwnerFacet));
@@ -162,7 +162,7 @@ public class EventBot extends TriggeredBot
     }
   }
   @Override
-  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needUri, final Dataset wonMessageDataset)
+  public final void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needUri, final Dataset wonMessageDataset)
   {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new NeedCreatedEventForMatcher(needUri, wonMessageDataset));
@@ -171,7 +171,7 @@ public class EventBot extends TriggeredBot
     }
   }
   @Override
-  public void onMatcherRegistered(final URI wonNodeUri)
+  public final void onMatcherRegistered(final URI wonNodeUri)
   {
     if (getLifecyclePhase().isActive()){
       //EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(),wonNodeUri);
@@ -181,7 +181,7 @@ public class EventBot extends TriggeredBot
     }
   }
   @Override
-  public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI){
+  public final void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI){
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new NeedActivatedEventForMatcher(needURI));
     } else {
@@ -189,7 +189,7 @@ public class EventBot extends TriggeredBot
     }
   }
   @Override
-  public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI){
+  public final void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI){
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new NeedDeactivatedEventForMatcher(needURI));
     } else {
@@ -198,7 +198,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
+  public final void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new FailureResponseEvent(failedMessageUri, wonMessage));
     } else {
@@ -208,7 +208,7 @@ public class EventBot extends TriggeredBot
   }
 
   @Override
-  public void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
+  public final void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
     if (getLifecyclePhase().isActive()){
       eventBus.publish(new SuccessResponseEvent(successfulMessageUri, wonMessage));
     } else {
@@ -221,18 +221,16 @@ public class EventBot extends TriggeredBot
      * Override this method to initialize your event listeners. Will be called before
      * the first event is published.
      */
-  protected void initializeEventListeners(){
-
-  }
+  protected abstract void initializeEventListeners();
 
   /*
    * Override this method to shut down your event listeners. Will be called after
    * the last event is published. Event listeners may receive delayed events after
    * this method is called.
    */
-  protected void shutdownEventListeners(){
-
-  }
+  protected void shutdownEventListeners() {
+    logger.info("shutdownEventListeners was not overridden by the subclass");
+  };
 
 
   /**

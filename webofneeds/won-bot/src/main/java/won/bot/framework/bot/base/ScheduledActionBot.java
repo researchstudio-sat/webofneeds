@@ -24,7 +24,7 @@ import java.util.concurrent.Executor;
 /**
  * Bot that has access to a scheduler for performing recurring or deferred work
  */
-public class ScheduledActionBot extends BasicServiceBot
+public abstract class ScheduledActionBot extends BasicServiceBot
 {
   private TaskScheduler taskScheduler;
   private Executor insideSchedulerExecutor = new InsideSchedulerExecutor();
