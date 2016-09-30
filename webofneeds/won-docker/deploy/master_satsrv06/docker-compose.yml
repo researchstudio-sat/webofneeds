@@ -35,7 +35,7 @@ services:
       - "cluster.seed.port=2551"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
-        -Dinspectit.agent.name=int_satsrv06_matcher_service
+        -Dinspectit.agent.name=master_satsrv06_matcher_service
         -Xdebug -Xrunjdwp:transport=dt_socket,address=62920,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9020 -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9020
@@ -76,7 +76,7 @@ services:
       - "matcher.solr.uri.solr.server.public=http://satsrv06.researchstudio.at:8983/solr/"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
-        -Dinspectit.agent.name=int_satsrv06_matcher_solr
+        -Dinspectit.agent.name=master_satsrv06_matcher_solr
         -Xdebug -Xrunjdwp:transport=dt_socket,address=62921,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9021 -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9021
