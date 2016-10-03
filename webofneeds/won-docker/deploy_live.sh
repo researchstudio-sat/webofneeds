@@ -45,13 +45,13 @@ rsync $WORKSPACE/webofneeds/won-docker/image/nginx/nginx.conf root@satcluster02:
 echo run docker containers using docker-compose on satcluster02:
 cd deploy/live_satcluster02
 docker-compose -H satcluster02:2375 down
-docker-compose -H satcluster02:2375 up -d
+docker-compose -H satcluster02:2375 up --build  -d
 
 echo run docker containers using docker-compose on satcluster01:
 cd ../live_satcluster01
 docker -H satcluster01:2375 pull webofneeds/bigdata
 docker-compose -H satcluster01:2375 down
-docker-compose -H satcluster01:2375 up -d
+docker-compose -H satcluster01:2375 up --build -d
 
 echo push automatically built webobofneeds images to docker hub
 docker -H satcluster01:2375 login -u heikofriedrich
