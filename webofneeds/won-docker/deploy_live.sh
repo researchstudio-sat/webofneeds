@@ -54,7 +54,8 @@ docker-compose -H satcluster01:2375 down
 docker-compose -H satcluster01:2375 up --build -d
 
 echo push automatically built webobofneeds images to docker hub
-docker -H satcluster01:2375 login -u heikofriedrich
+docker -H satcluster01:2375 login --username=$DOCKER_USER --password=$DOCKER_PASS
+docker -H satcluster02:2375 login --username=$DOCKER_USER --password=$DOCKER_PASS
 docker -H satcluster01:2375 push webofneeds/gencert:live
 docker -H satcluster02:2375 push webofneeds/wonnode:live
 docker -H satcluster01:2375 push webofneeds/owner:live

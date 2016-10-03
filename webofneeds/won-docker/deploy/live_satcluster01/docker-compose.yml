@@ -25,7 +25,7 @@ services:
   # matcher service on satcluster01 and connect with wonnode on satcluster02 (proxied: node.matchat.org)
   matcher_service:
     build: ../../image/matcher-service
-    image: webofneeds/matcher-service:live
+    image: webofneeds/matcher_service:live
     environment:
       - "constraint:node==satcluster01"
       - "node.host=satcluster01.researchstudio.at"

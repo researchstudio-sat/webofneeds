@@ -37,7 +37,7 @@ services:
   # matcher service on satsrv06 and connect with wonnodes on satsrv04 and proxied wonnode on satsrv05 (proxied by satsrv06)
   matcher_service:
     build: ../../image/matcher-service
-    image: webofneeds/matcher-service:int
+    image: webofneeds/matcher_service:int
     environment:
       - "constraint:node==satsrv06"
       - "node.host=satsrv06.researchstudio.at"
