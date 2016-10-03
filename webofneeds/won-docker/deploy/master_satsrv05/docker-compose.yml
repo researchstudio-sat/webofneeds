@@ -20,6 +20,7 @@ services:
     build: ../../image/postgres
     environment:
       - "constraint:node==satsrv05"
+      - "POSTGRES_PASSWORD=$postgres_db_passwd"
     volumes:
       - $base_folder/postgres/data:/var/lib/postgresql/data/
     ports:
@@ -38,7 +39,7 @@ services:
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satsrv05.researchstudio.at:5432/won_node"
       - "db.sql.user=won"
-      - "db.sql.password=won"
+      - "db.sql.password=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
       - "activemq.broker.port=61616"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
@@ -76,7 +77,7 @@ services:
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satsrv05.researchstudio.at:5432/won_owner"
       - "db.sql.user=won"
-      - "db.sql.password=won"
+      - "db.sql.password=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
       - "email.from.won.user=$MAIL_USER"
       - "email.from.won.password=$MAIL_PASS"
