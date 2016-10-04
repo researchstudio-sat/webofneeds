@@ -33,10 +33,10 @@ webofneeds docker hub repository if not available locally. If the script finishe
 should be started.
 
 You can access the owner application to log in and create needs using the following link:
-* **owner:** https://${deploy_host}:8082/owner
+* **owner:** [https://${deploy_host}:8082/owner](https://${deploy_host}:8082/owner)
 
 You can access the wonnode and check the generated RDF needs using the following link:
-* **wonnode:** https://${deploy_host}/won
+* **wonnode:** [https://${deploy_host}:8889/won](https://${deploy_host}:8889/won)
 
 The certificates used by the application are created on the first execution of the script, and reused in later
 executions. You can find this data in your "base_folder". If the containers are removed and recreated all data that

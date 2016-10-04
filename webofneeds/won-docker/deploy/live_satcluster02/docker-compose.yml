@@ -22,8 +22,9 @@ services:
     environment:
       - "constraint:node==satcluster02"
       - "POSTGRES_PASSWORD=$postgres_db_passwd"
+      - "PGDATA=/var/lib/postgresql/data/pgdata"
     volumes:
-      - $base_folder/postgres/data:/var/lib/postgresql/data/
+      - $base_folder/postgres/data/pgdata:/var/lib/postgresql/data/pgdata
     ports:
       - "5433:5432"
 
