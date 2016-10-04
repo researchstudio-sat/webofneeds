@@ -18,6 +18,7 @@ package won.bot.framework.eventbot.action;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.bot.framework.bot.BotContext;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
@@ -29,7 +30,12 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.protocol.message.WonMessage;
 
+import javax.mail.Address;
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.net.URI;
+import java.util.HashMap;
 
 /**
  * User: fkleedorfer
@@ -125,4 +131,44 @@ public class EventBotActionUtils
     return listener;
   }
 
+    public static void addUriAddressRelation(EventListenerContext context, String mapName, URI needURI, MimeMessage sender) {
+        String email = null;
+
+        try {
+            Address[] froms = sender.getFrom();
+            email = froms == null ? null : ((InternetAddress) froms[0]).getAddress();
+        }catch(MessagingException me){
+            logger.error("COULD NOT RETRIEVE SENDER ADDRESS");
+            me.printStackTrace();
+            return;
+        }
+        BotContext botContext = context.getBotContext();
+        Object uriMap = botContext.get(mapName);
+
+        if(uriMap == null || !(uriMap instanceof HashMap)){
+            uriMap = new HashMap<URI, String>();
+        }
+
+        ((HashMap<URI, String>) uriMap).put(needURI, email);
+        botContext.put(mapName, uriMap);
+    }
+
+    public static void removeUriAddressRelation(EventListenerContext context, String mapName, URI needURI) {
+        BotContext botContext = context.getBotContext();
+        Object uriMap = botContext.get(mapName);
+
+        if(uriMap != null && uriMap instanceof HashMap){
+            ((HashMap<URI, String>) uriMap).remove(needURI);
+        }
+    }
+
+    public static String getAddressForURI(EventListenerContext context, String mapName, URI uri) {
+        BotContext botContext = context.getBotContext();
+        Object uriMap = botContext.get(mapName);
+
+        if(uriMap != null && uriMap instanceof HashMap){
+            return ((HashMap<URI, String>) uriMap).get(uri);
+        }
+        return null;
+    }
 }

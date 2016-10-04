@@ -19,12 +19,15 @@
        xmlns:mail="http://www.springframework.org/schema/integration/mail"
        xmlns:int="http://www.springframework.org/schema/integration"
        xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/integration/mail
         http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd
         http://www.springframework.org/schema/util
-        http://www.springframework.org/schema/util/spring-util.xsd">
+        http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
 
     <util:properties id="javaMailProperties">
@@ -32,6 +35,8 @@
         <prop key="mail.imap.socketFactory.fallback">false</prop>
         <prop key="mail.store.protocol">imaps</prop>
         <prop key="mail.debug">true</prop>
+        <prop key="mail.smtp.starttls.enable">true</prop>
+        <prop key="mail.smtp.starttls.required">true</prop>
     </util:properties>
 
     <mail:inbound-channel-adapter id="imapAdapter"
@@ -41,10 +46,22 @@
                                   should-mark-messages-as-read="true"
                                   auto-startup="true"
                                   java-mail-properties="javaMailProperties">
-        <int:poller fixed-rate="60000" max-messages-per-poll="10"/>
+        <int:poller fixed-rate="10000" max-messages-per-poll="10"/>
     </mail:inbound-channel-adapter>
 
+    <mail:outbound-channel-adapter id="outboundAdapter"
+                                   auto-startup="true"
+                                   channel="sendEmailChannel"
+                                   host="smtp.gmail.com"
+                                   port="587"
+                                   username="${email.from.won.user}"
+                                   password="${email.from.won.password}"
+                                   java-mail-properties="javaMailProperties">
+    </mail:outbound-channel-adapter>
+
+
     <int:channel id="receiveEmailChannel"/>
+    <int:channel id="sendEmailChannel"/>
 
     <int:service-activator input-channel="receiveEmailChannel" ref="mail2wonBot" method="receive"/>
 
@@ -52,6 +69,7 @@
         <!-- optional property, by default one echo need per each need will be created -->
         <property name="taskScheduler" ref="taskScheduler" />
         <property name="receiveEmailChannel" ref="receiveEmailChannel"/>
+        <property name="sendEmailChannel" ref="sendEmailChannel"/>
         <!--property name="needProducer" ref="needProducerFromMails" /-->
         <!--property name="nodeURISource" ref="nodeUriSourceRandom" /-->
         <!--<property name="matcherNodeURISource" ref="matcherNodeURISource"/>-->
@@ -60,5 +78,13 @@
         <!--property name="ownerService" ref="ownerProtocolNeedServiceClient" /-->
         <!--<property name="matcherProtocolNeedServiceClient" ref="matcherProtocolNeedServiceClient"/>-->
         <!--<property name="matcherProtocolMatcherService" ref="matcherProtocolMatcherServiceJMSBased"/>-->
+        <property name="trigger">
+            <bean class="org.springframework.scheduling.support.PeriodicTrigger">
+                <constructor-arg name="period" value="6002000" />
+                <constructor-arg name="timeUnit" value="MILLISECONDS" />
+                <property name="initialDelay" value="10000" /> <!-- wait 10s at the beginning -->
+                <property name="fixedRate" value="false" />  <!-- fixed delay after completion -->
+            </bean>
+        </property>
     </bean>
 </beans>

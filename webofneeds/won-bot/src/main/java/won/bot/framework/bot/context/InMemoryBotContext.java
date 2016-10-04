@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.BotContext;
 
+import javax.mail.Address;
 import java.net.URI;
 import java.util.*;
 
@@ -34,6 +35,16 @@ public class InMemoryBotContext implements BotContext
   private Map<String, List<URI>> namedNeedUriLists = new HashMap<String, List<URI>>();
   private Logger logger = LoggerFactory.getLogger(this.getClass());
   private Map<Object, Object> genericContext = new HashMap<Object,Object>();
+
+  private Map<URI, Address> uriAddressMap = new HashMap<URI, Address>();
+
+  public synchronized Map<URI, Address> getUriAddressMap() {
+    return uriAddressMap;
+  }
+
+  public synchronized void setUriAddressMap(Map<URI, Address> uriAddressMap) {
+    this.uriAddressMap = uriAddressMap;
+  }
 
   @Override
   public synchronized List<URI> listNeedUris() {
