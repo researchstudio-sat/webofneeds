@@ -22,6 +22,7 @@
     <import resource="classpath:/spring/component/storage/jpabased-rdf-storage.xml" />
     <import resource="classpath:/spring/component/camel/owner-camel.xml" />
     <import resource="classpath:/spring/component/ownerProtocolCommunicationService/ownerProtocolCommunicationService.xml" />
+    <import resource="classpath:/spring/component/ownerProtocolCommunicationService/wonNodeRegistrationEventPublisher.xml" />
     <import resource="classpath:/spring/component/wonNodeInformationService.xml" />
 
 </beans>

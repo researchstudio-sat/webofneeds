@@ -78,10 +78,9 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
    * @throws Exception
    */
   public synchronized void register(URI wonNodeURI, MessagingService messagingService) throws Exception {
-    logger.debug("WON NODE: " + wonNodeURI);
-
     CamelConfiguration camelConfiguration = null;
 
+    logger.debug("register at won node: " + wonNodeURI);
     if (isRegistered(wonNodeURI)) {
 
       WonNode wonNode = DataAccessUtils.loadWonNode(wonNodeRepository, wonNodeURI);
