@@ -1,0 +1,122 @@
+version: '2'
+services:
+
+  # create self-signed server certificate for $deploy_host
+  gencert:
+    image: webofneeds/gencert:live
+    environment:
+      - "CN=$deploy_host"
+      - "PASS=pass:changeit"
+    volumes:
+      - $base_folder/won-server-certs:/usr/local/certs/out/
+
+  # portsgres need databases for owner and wonnode
+  postgres:
+    image: webofneeds/postgres:live
+    environment:
+      - "PGDATA=/var/lib/postgresql/data/pgdata"
+    #volumes:
+    #  - $base_folder/postgres/data/pgdata:/var/lib/postgresql/data/pgdata
+    ports:
+      - "5433:5432"
+
+  # wonnode server => access https://$deploy_host:8889/won
+  wonnode:
+    image: webofneeds/wonnode:live
+    environment:
+      - "uri.host=$deploy_host"
+      - "http.port=8889"
+      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
+      - "db.sql.jdbcUrl=jdbc:postgresql://$deploy_host:5433/won_node"
+      - "db.sql.user=won"
+      - "db.sql.password=won"
+      - "CERTIFICATE_PASSWORD=changeit"
+      - "activemq.broker.port=61617"
+    ports:
+      - "8889:8443"
+      - "61617:61617"
+    volumes:
+      - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
+      - $base_folder/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/
+    depends_on:
+      - postgres
+
+  # debug bot used to test need communication
+  debug_bot:
+    image: webofneeds/bots:live
+    environment:
+      - "node.default.host=$deploy_host"
+      - "node.default.http.port=8889"
+      - "won.node.uris=https://$deploy_host:8889/won/resource"
+    depends_on:
+      - wonnode
+
+  # owner application (frontend) => access https://$deploy_host:8082/owner
+  owner:
+    image: webofneeds/owner:live
+    environment:
+      - "node.default.host=$deploy_host"
+      - "uri.host=$deploy_host"
+      - "http.port=8082"
+      - "node.default.http.port=8889"
+      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
+      - "db.sql.jdbcUrl=jdbc:postgresql://$deploy_host:5433/won_owner"
+      - "db.sql.user=won"
+      - "db.sql.password=won"
+      - "CERTIFICATE_PASSWORD=changeit"
+    ports:
+      - "8082:8443"
+    volumes:
+     - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
+     - $base_folder/won-client-certs/owner:/usr/local/tomcat/won/client-certs/
+    depends_on:
+      - wonnode
+      - postgres
+
+  # bigdata rdf store for matcher service
+  bigdata:
+    image: webofneeds/bigdata
+    #volumes:
+    #  - $base_folder/bigdata/data/:/usr/src/bigdata/data
+    ports:
+      - "10000:9999"
+
+  # matcher service on connect with wonnode
+  matcher_service:
+    image: webofneeds/matcher_service:live
+    environment:
+      - "node.host=$deploy_host"
+      - "cluster.seed.host=$deploy_host"
+      - "uri.sparql.endpoint=http://$deploy_host:10000/bigdata/namespace/kb/sparql"
+      - "wonNodeController.wonNode.crawl=https://$deploy_host:8889/won/resource"
+      - "cluster.local.port=2561"
+      - "cluster.seed.port=2561"
+    ports:
+      - "2561:2561"
+    depends_on:
+      - bigdata
+      - wonnode
+
+  # solr server as a need index
+  solr:
+    image: webofneeds/solr:live
+    #volumes:
+    #  - $base_folder/solr/won/data:/opt/solr/server/solr/won/data
+    #  - $base_folder/solr/wontest/data:/opt/solr/server/solr/wontest/data
+    ports:
+      - "8984:8983"
+
+  # solr matcher and connect to matcher service
+  matcher_solr:
+    image: webofneeds/matcher_solr:live
+    environment:
+      - "node.host=$deploy_host"
+      - "cluster.seed.host=$deploy_host"
+      - "cluster.seed.port=2561"
+      - "cluster.local.port=2562"
+      - "matcher.solr.uri.solr.server=http://$deploy_host:8984/solr/"
+      - "matcher.solr.uri.solr.server.public=http://$deploy_host:8984/solr/"
+    ports:
+      - "2562:2562"
+    depends_on:
+      - solr

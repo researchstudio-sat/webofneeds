@@ -1,3 +1,5 @@
+# NOTE: this image is not working correctly, the cron job for updating needs to be reworked
+
 FROM openjdk:8
 
 # install certbot
