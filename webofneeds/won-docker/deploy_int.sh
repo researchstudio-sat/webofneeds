@@ -36,12 +36,12 @@ scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl-int.conf root@satsrv0
 echo run docker containers using docker-compose on satsrv04:
 cd deploy/int_satsrv04
 docker-compose -H satsrv04:2375 down
-docker-compose -H satsrv04:2375 up -d
+docker-compose -H satsrv04:2375 up --build -d
 
 echo run docker containers using docker-compose on satsrv05:
 cd ../int_satsrv05
 docker-compose -H satsrv05:2375 down
-docker-compose -H satsrv05:2375 up -d
+docker-compose -H satsrv05:2375 up --build -d
 
 # get the certificates and create a password file (for the nginx) to read the certificate
 # the certificates must have been created on satsrv05 (in docker-compose file) before it can be used on proxy satsrv06
@@ -59,7 +59,7 @@ echo run docker containers using docker-compose on satsrv06:
 cd ../int_satsrv06
 docker -H satsrv06:2375 pull webofneeds/bigdata
 docker-compose -H satsrv06:2375 down
-docker-compose -H satsrv06:2375 up -d
+docker-compose -H satsrv06:2375 up --build -d
 
 
 

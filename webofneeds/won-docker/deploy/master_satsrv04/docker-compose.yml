@@ -14,12 +14,14 @@ services:
 
   # portsgres need databases for owner and wonnode
   postgres:
-    image: webofneeds/postgres
+    image: webofneeds/postgres:master
     build: ../../image/postgres
     environment:
       - "constraint:node==satsrv04"
+      - "POSTGRES_PASSWORD=$postgres_db_passwd"
+      - "PGDATA=/var/lib/postgresql/data/pgdata"
     volumes:
-      - $base_folder/postgres/data:/var/lib/postgresql/data/
+      - $base_folder/postgres/data/pgdata:/var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
 
@@ -34,7 +36,7 @@ services:
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satsrv04.researchstudio.at:5432/won_node"
       - "db.sql.user=won"
-      - "db.sql.password=won"
+      - "db.sql.password=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
       - "activemq.broker.port=61616"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
@@ -70,7 +72,7 @@ services:
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satsrv04.researchstudio.at:5432/won_owner"
       - "db.sql.user=won"
-      - "db.sql.password=won"
+      - "db.sql.password=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
       - "email.from.won.user=$MAIL_USER"
       - "email.from.won.password=$MAIL_PASS"
