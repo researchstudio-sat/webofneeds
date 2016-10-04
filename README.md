@@ -19,7 +19,6 @@ A **demo deployment of the Web of Needs** with a simple owner application, one w
 ###Deployment
 
 If you want to **set up your own deployment of Web of Needs** components, here you find requirements for **getting started**:
-- install docker (we use 1.7.0)
 - follow the [instructions here](webofneeds/won-docker/README.md) to set up all the neccessary components of web of needs locally
 
 ### Papers and further Information
