@@ -24,6 +24,10 @@
         </encoder>
     </appender>
 
+    <!-- avoid logging Exceptions with stack traces on WARN level when JMS Connection is broken -->
+    <logger name="org.apache.camel.component.jms.reply.TemporaryQueueReplyManager" level="ERROR"/>
+    <logger name="org.springframework.jms.connection.CachingConnectionFactory" level="ERROR"/>
+
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>

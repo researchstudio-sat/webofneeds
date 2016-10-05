@@ -19,12 +19,8 @@ package won.owner.messaging;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
@@ -43,19 +39,16 @@ import java.util.Map;
 /**
  * User: LEIH-NB
  * Date: 17.10.13
+ *
+ * Instance of this class receives events upon which it tries to register at the default won node using JMS.
  */
-
-public class OwnerWonMessageSenderJMSBased
-  implements ApplicationContextAware,
-  ApplicationListener<ContextRefreshedEvent>,
-        WonMessageSender
+public class OwnerWonMessageSenderJMSBased implements ApplicationListener<WonNodeRegistrationEvent>, WonMessageSender
 {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
-  private boolean onApplicationRun = false;
+  private boolean isDefaultWonNodeRegistered = false;
   private MessagingService messagingService;
   private URI defaultNodeURI;
-  private ApplicationContext ownerApplicationContext;
 
   //todo: make this configurable
   private String startingEndpoint;
@@ -129,38 +122,43 @@ public class OwnerWonMessageSenderJMSBased
     return signatureAddingProcessor.processOnBehalfOfNeed(outMessage);
   }
 
-
   /**
-   * The owner application calls the register() method node upon initalization to connect to the default won node
+   * The owner application calls the register() method node upon initalization (and during fixed time intervals)
+   * to connect to the default won node.
    *
-   * @param contextRefreshedEvent
+   * @param wonNodeRegistrationEvent
    */
-
   @Override
-  public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+  public void onApplicationEvent(final WonNodeRegistrationEvent wonNodeRegistrationEvent) {
 
-    if (!onApplicationRun) {
-      logger.debug("registering owner application on application event");
+    if (!isDefaultWonNodeRegistered) {
       try {
         new Thread()
         {
           @Override
           public void run() {
             try {
+
+              logger.info("register at default won node {}", defaultNodeURI);
               ownerProtocolCommunicationServiceImpl.register(defaultNodeURI, messagingService);
 
+              // try the registration as long as no exception occurs
+              logger.info("successfully registered at default won node {}", defaultNodeURI);
+              isDefaultWonNodeRegistered = true;
+
             } catch (Exception e) {
-              logger.warn("Could not register with default won node {}", defaultNodeURI, e);
+              logger.warn("Could not register with default won node {}. Try again later ...", defaultNodeURI);
+              logger.debug("Exceptions is: ", e);
             }
           }
         }.start();
+
       } catch (Exception e) {
-        logger.warn("registering ownerapplication on the node {} failed", defaultNodeURI);
+        logger.warn("Could not register with default won node {}. Try again later ...", defaultNodeURI);
+        logger.debug("Exceptions is: ", e);
       }
-      onApplicationRun = true;
     }
   }
-
 
   public void setMessagingService(MessagingService messagingService) {
     this.messagingService = messagingService;
@@ -168,11 +166,6 @@ public class OwnerWonMessageSenderJMSBased
 
   public void setDefaultNodeURI(URI defaultNodeURI) {
     this.defaultNodeURI = defaultNodeURI;
-  }
-
-  @Override
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    this.ownerApplicationContext = applicationContext;
   }
 
   public void setStartingEndpoint(String startingEndpoint) {
