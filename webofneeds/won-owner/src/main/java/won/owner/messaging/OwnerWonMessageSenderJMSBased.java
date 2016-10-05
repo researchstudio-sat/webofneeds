@@ -46,7 +46,7 @@ public class OwnerWonMessageSenderJMSBased implements ApplicationListener<WonNod
 {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
-  private boolean onApplicationRun = false;
+  private boolean isDefaultWonNodeRegistered = false;
   private MessagingService messagingService;
   private URI defaultNodeURI;
 
@@ -131,17 +131,20 @@ public class OwnerWonMessageSenderJMSBased implements ApplicationListener<WonNod
   @Override
   public void onApplicationEvent(final WonNodeRegistrationEvent wonNodeRegistrationEvent) {
 
-    if (!onApplicationRun) {
+    if (!isDefaultWonNodeRegistered) {
       try {
         new Thread()
         {
           @Override
           public void run() {
             try {
+
+              logger.info("register at default won node {}", defaultNodeURI);
               ownerProtocolCommunicationServiceImpl.register(defaultNodeURI, messagingService);
 
               // try the registration as long as no exception occurs
-              onApplicationRun = true;
+              logger.info("successfully registered at default won node {}", defaultNodeURI);
+              isDefaultWonNodeRegistered = true;
 
             } catch (Exception e) {
               logger.warn("Could not register with default won node {}. Try again later ...", defaultNodeURI);
