@@ -79,9 +79,7 @@ public class HintProducerProtocolActor extends UntypedProducerActor
     CamelMessage camelMsg = new CamelMessage(body, headers);
 
     // monitoring code
-    if (monitoringService.isMonitoringEnabled()) {
-      monitoringService.stopClock(MonitoringService.NEED_HINT_STOPWATCH, hint.getFromNeedUri());
-    }
+    monitoringService.stopClock(MonitoringService.NEED_HINT_STOPWATCH, hint.getFromNeedUri());
 
     log.debug("Send hint camel message {}", hint.getFromNeedUri());
     return camelMsg;
