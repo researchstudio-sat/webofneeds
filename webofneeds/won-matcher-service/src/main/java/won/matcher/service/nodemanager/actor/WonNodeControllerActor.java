@@ -254,24 +254,47 @@ public class WonNodeControllerActor extends UntypedActor
   private WonNodeConnection addWonNodeForCrawling(String wonNodeUri) {
 
     WonNodeConnection con = null;
+    Dataset ds = null;
+    WonNodeInfo nodeInfo = null;
+
+    // try register at won node
     try {
       registrationClient.register(wonNodeUri);
-      Dataset ds = linkedDataSource.getDataForResource(URI.create(wonNodeUri));
-      sparqlService.updateNamedGraphsOfDataset(ds);
-      WonNodeInfo nodeInfo = sparqlService.getWonNodeInfoFromDataset(ds);
+      ds = linkedDataSource.getDataForResource(URI.create(wonNodeUri));
+    } catch (RestClientException e) {
+      addFailedWonNode(wonNodeUri, con);
+      log.warning("Error requesting won node information from {}", wonNodeUri);
+      log.warning("Exception message: {} \nCause: {} ", e.getMessage(), e.getCause());
+      return null;
+    } catch (Exception e) {
+      addFailedWonNode(wonNodeUri, con);
+      log.warning("Error requesting won node information from {}", wonNodeUri);
+      log.warning("Exception message: {} \nCause: {} ", e.getMessage(), e.getCause());
+      return null;
+    }
 
-      // subscribe for need updates
+    // try save won node info in local rdf store
+    try {
+      sparqlService.updateNamedGraphsOfDataset(ds);
+      nodeInfo = sparqlService.getWonNodeInfoFromDataset(ds);
+    } catch (Exception e) {
+      addFailedWonNode(wonNodeUri, con);
+      log.error("Error saving won node information from {} into RDF store with SPARQL endpoint {}", wonNodeUri,
+                sparqlService.getSparqlEndpoint());
+      log.error("Exception message: {} \nCause: {} ", e.getMessage(), e.getCause());
+      return null;
+    }
+
+    // try subscribe need updates at won node
+    try {
       con = subscribeNeedUpdates(nodeInfo);
       crawlWonNodes.put(nodeInfo.getWonNodeURI(), con);
       failedWonNodeUris.remove(nodeInfo.getWonNodeURI());
       log.info("registered won node {} and start crawling it", nodeInfo.getWonNodeURI());
-
-    } catch (RestClientException e) {
-      addFailedWonNode(wonNodeUri, con);
-      log.warning("Error requesting won node information from {}, exception is {}", wonNodeUri, e);
     } catch (Exception e) {
       addFailedWonNode(wonNodeUri, con);
-      log.warning("Error adding won node {} for crawling, exception is {}", wonNodeUri, e);
+      log.error("Error subscribing for need updates at won node {}", wonNodeUri);
+      log.error("Exception message: {} \nCause: {} ", e.getMessage(), e.getCause());
     }
 
     return con;
