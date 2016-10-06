@@ -2,12 +2,9 @@ package won.matcher.solr;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.actor.DeadLetter;
-import akka.actor.Props;
 import com.hp.hpl.jena.query.Dataset;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import won.cryptography.ssl.TrustAnyCertificateStrategy;
-import won.matcher.service.common.actor.DeadLetterActor;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.solr.actor.SolrMatcherActor;
@@ -31,8 +28,6 @@ public class SolrTest
     ActorSystem system = ctx.getBean(ActorSystem.class);
     ActorRef solrMatcherActor = system.actorOf(
       SpringExtension.SpringExtProvider.get(system).props(SolrMatcherActor.class), "SolrMatcherActor");
-    ActorRef actor = system.actorOf(Props.create(DeadLetterActor.class), "DeadLetterActor");
-    system.eventStream().subscribe(actor, DeadLetter.class);
 
     // Create a sample need event
     //IMPORTANT! TAKE CARE OF "RESOURCE"; DO NOT USE "PAGE" IN THE URI
