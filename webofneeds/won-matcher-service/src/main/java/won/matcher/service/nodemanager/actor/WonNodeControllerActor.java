@@ -96,9 +96,19 @@ public class WonNodeControllerActor extends UntypedActor
     // set won nodes to skip by configuration
     skipWonNodeUris.addAll(config.getSkipWonNodes());
 
-    // get all known won node uris (that are not cín the config file) and just treat them as newly discovered won
-    // nodes to register them again
-    Set<WonNodeInfo> wonNodeInfo = sparqlService.retrieveAllWonNodeInfo();
+    // get all known won node uris from RDF store
+    Set<WonNodeInfo> wonNodeInfo = new HashSet<>();
+    try {
+      wonNodeInfo = sparqlService.retrieveAllWonNodeInfo();
+    } catch (Exception e) {
+      log.error("Error querying SPARQL endpoint {}. SPARQL endpoint must be running at matcher service startup!",
+                sparqlService.getSparqlEndpoint());
+      log.error("Exception was: {}", e);
+      log.info("Shut down matcher service!");
+      System.exit(-1);
+    }
+
+    // Treat the known won nodes as newly discovered won nodes to register them again at startup of matcher service
     for (WonNodeInfo nodeInfo : wonNodeInfo) {
       if (!config.getCrawlWonNodes().contains(nodeInfo.getWonNodeURI())) {
         WonNodeEvent e = new WonNodeEvent(nodeInfo.getWonNodeURI(), WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED);
@@ -136,6 +146,8 @@ public class WonNodeControllerActor extends UntypedActor
   public void onReceive(final Object message) {
 
     if (message instanceof Terminated) {
+
+      // if it is some other actor handle it differently
       handleConnectionErrors((Terminated) message);
       return;
     }
@@ -259,7 +271,7 @@ public class WonNodeControllerActor extends UntypedActor
       log.warning("Error requesting won node information from {}, exception is {}", wonNodeUri, e);
     } catch (Exception e) {
       addFailedWonNode(wonNodeUri, con);
-      log.warning("Error requesting won node information from {}, exception is {}", wonNodeUri, e);
+      log.warning("Error adding won node {} for crawling, exception is {}", wonNodeUri, e);
     }
 
     return con;
