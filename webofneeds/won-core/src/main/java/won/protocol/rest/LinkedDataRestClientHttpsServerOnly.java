@@ -50,8 +50,8 @@ public class LinkedDataRestClientHttpsServerOnly extends LinkedDataRestClient
 
 
   public LinkedDataRestClientHttpsServerOnly(TrustStrategy trustStrategy) {
-    this.readTimeout = 10000;
-    this.connectionTimeout = 10000; //DEF. TIMEOUT IS 10sec
+    this.readTimeout = 20000;
+    this.connectionTimeout = 20000; //DEF. TIMEOUT IS 20sec
     this.trustStrategy = trustStrategy;
   }
 
