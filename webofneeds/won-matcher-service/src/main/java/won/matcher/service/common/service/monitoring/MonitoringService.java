@@ -34,37 +34,41 @@ public class MonitoringService
 
   public void startClock(String stopWatchName, String splitName) {
 
-    Map<String, Split> splits = stopWatchSplits.get(stopWatchName);
-    if (splits == null) {
-      splits = new HashMap<>();
-      stopWatchSplits.put(stopWatchName, splits);
-    }
+    if (isMonitoringEnabled()) {
+      Map<String, Split> splits = stopWatchSplits.get(stopWatchName);
+      if (splits == null) {
+        splits = new HashMap<>();
+        stopWatchSplits.put(stopWatchName, splits);
+      }
 
-    if (splits.get(splitName) != null) {
-      log.warn("Split '{}' in stopwatch {} already set for monitoring start event", splitName, stopWatchName);
-      return;
-    }
+      if (splits.get(splitName) != null) {
+        log.warn("Split '{}' in stopwatch {} already set for monitoring start event", splitName, stopWatchName);
+        return;
+      }
 
-    Stopwatch stopwatch = SimonManager.getStopwatch(stopWatchName);
-    Split split = stopwatch.start();
-    splits.put(splitName, split);
+      Stopwatch stopwatch = SimonManager.getStopwatch(stopWatchName);
+      Split split = stopwatch.start();
+      splits.put(splitName, split);
+    }
   }
 
   public void stopClock(String stopWatchName, String splitName) {
 
-    Map<String, Split> splits = stopWatchSplits.get(stopWatchName);
-    if (splits == null) {
-      log.warn("No stopwatch '{}' found for monitoring end event", stopWatchName);
-      return;
-    }
+    if (isMonitoringEnabled()) {
+      Map<String, Split> splits = stopWatchSplits.get(stopWatchName);
+      if (splits == null) {
+        log.warn("No stopwatch '{}' found for monitoring end event", stopWatchName);
+        return;
+      }
 
-    Split split = splits.get(splitName);
-    if (split == null) {
-      log.warn("No split '{}' in stopwatch '{}' found for monitoring end event", splitName, stopWatchName);
-      return;
-    }
+      Split split = splits.get(splitName);
+      if (split == null) {
+        log.warn("No split '{}' in stopwatch '{}' found for monitoring end event", splitName, stopWatchName);
+        return;
+      }
 
-    split.stop();
-    //splits.remove(monitoringEvent.getSplitName());
+      split.stop();
+      //splits.remove(monitoringEvent.getSplitName());
+    }
   }
 }

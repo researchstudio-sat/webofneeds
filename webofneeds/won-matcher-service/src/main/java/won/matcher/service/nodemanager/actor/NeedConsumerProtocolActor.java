@@ -63,9 +63,7 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
       String wonNodeUri = (String) camelMsg.getHeaders().get(MSG_HEADER_WON_NODE_URI);
 
       // monitoring code
-      if (monitoringService.isMonitoringEnabled()) {
-        monitoringService.startClock(MonitoringService.NEED_HINT_STOPWATCH, needUri);
-      }
+      monitoringService.startClock(MonitoringService.NEED_HINT_STOPWATCH, needUri);
 
       // process the incoming need event
       if (needUri != null && wonNodeUri != null) {
