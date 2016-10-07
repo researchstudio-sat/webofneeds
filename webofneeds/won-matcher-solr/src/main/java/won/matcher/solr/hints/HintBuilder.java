@@ -105,7 +105,15 @@ public class HintBuilder
     for (SolrDocument doc : newDocs) {
 
       String needUri = doc.getFieldValue("id").toString();
-      String wonNodeUri = ((List) doc.getFieldValue(WON_NODE_SOLR_FIELD)).get(0).toString();
+
+      // wonNodeUri can be returned as either a String or ArrayList, not sure on what this depends
+      String wonNodeUri = null;
+      Object nodeObject = doc.getFieldValue(WON_NODE_SOLR_FIELD);
+      if (nodeObject instanceof String) {
+        wonNodeUri = doc.getFieldValue(WON_NODE_SOLR_FIELD).toString();
+      } else {
+        wonNodeUri = ((List) doc.getFieldValue(WON_NODE_SOLR_FIELD)).get(0).toString();
+      }
 
       // normalize the final score
       double score = Double.valueOf(doc.getFieldValue("score").toString()) * config.getScoreNormalizationFactor();
