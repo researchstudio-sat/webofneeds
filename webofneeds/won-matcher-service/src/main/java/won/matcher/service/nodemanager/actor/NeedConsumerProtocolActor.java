@@ -88,9 +88,8 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
           }
         }
       }
-    } else {
-      System.out.print("some other message");
     }
+
     unhandled(message);
   }
 

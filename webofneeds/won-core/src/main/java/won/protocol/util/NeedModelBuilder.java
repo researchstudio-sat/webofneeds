@@ -22,7 +22,6 @@ import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.DCTerms;
-import com.hp.hpl.jena.vocabulary.RDF;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
@@ -46,7 +45,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
   public void copyValuesFromProduct(final Model needModel)
   {
     assert needModel != null : "needModel must not be null";
-    Resource needResource = identifyNeedResource(needModel);
+    Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(needModel);
     this.setUri(needResource.getURI());
     Resource basicNeedTypeResource = needResource.getPropertyResourceValue(WON.HAS_BASIC_NEED_TYPE);
     if (basicNeedTypeResource != null) this.setBasicNeedType(URI.create(basicNeedTypeResource.getURI()));
@@ -223,30 +222,6 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
       }
     }
 
-  }
-
-  private Resource identifyNeedResource(final Model needModel)
-  {
-    assert needModel != null : "needModel must not be null";
-    Resource needResource = null;
-    //try fetching the base URI resource. If that is a Need, we'll assume we found the need resource
-    String baseUri = needModel.getNsPrefixURI("");
-    if (baseUri != null) {
-      //fetch the resource, check if it has the rdf:type won:Need
-      needResource = needModel.getResource(baseUri);
-      if (!needResource.hasProperty(RDF.type, WON.NEED)) {
-        needResource = null;
-      }
-    }
-    if (needResource != null) return needResource;
-    //found no need resource yet. Try to find it by type. We expect to find exactly one, otherwise we report an error
-    ResIterator it = needModel.listSubjectsWithProperty(RDF.type, WON.NEED);
-    if (it.hasNext()) needResource = it.next();
-    if (it.hasNext())
-      throw new IllegalArgumentException("expecting only one resource of type won:Need in specified model");
-    if (needResource == null)
-      throw new IllegalArgumentException("expected to find a resource of type won:Need in specified model");
-    return needResource;
   }
 
   private void addResourceIfPresent(Resource subject, Property predicate, URI object)

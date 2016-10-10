@@ -34,9 +34,10 @@ import java.util.*;
 
 
 /**
- * Actor that knows all won nodes the matching service is communicating. It gets informed
- * about new won nodes over the event stream (e.g. by he crawler) and decides which
- * won nodes to crawl and to register with for receiving need events.
+ * Actor that knows all won nodes the matching service is communicating with. It gets informed about new won nodes over
+ * the event stream (e.g. by he crawler) and decides which won nodes to crawl and to register with for receiving need
+ * events.
+ * There should only exist a single instance of this actor that has the global view of all connected won nodes.
  *
  * User: hfriedrich
  * Date: 27.04.2015
@@ -65,8 +66,10 @@ public class WonNodeControllerActor extends UntypedActor
 
   @Autowired
   private RegistrationClient registrationClient;
+
   @Autowired
   LinkedDataSource linkedDataSource;
+
   @Autowired
   private MessagingContext messagingContext;
 
@@ -93,22 +96,27 @@ public class WonNodeControllerActor extends UntypedActor
     // set won nodes to skip by configuration
     skipWonNodeUris.addAll(config.getSkipWonNodes());
 
-    // get all known won node uris
-    Set<WonNodeInfo> wonNodeInfo = sparqlService.retrieveAllWonNodeInfo();
-    for (WonNodeInfo nodeInfo : wonNodeInfo) {
-      try {
-        // TODO the correct way would be not to register here and assume we have already exchanged the keys, but since
-        // in development the key/trust store can change from run to run, we re-register here - think of a better way
-        registrationClient.register(nodeInfo.getWonNodeURI());
-      } catch (Exception e) {
-        //throw new IllegalArgumentException("Registration repeat at node " + nodeInfo.getWonNodeURI() + " failed", e);
-        log.error("Registration repeat at node " + nodeInfo.getWonNodeURI() + " failed", e);
-      }
-      WonNodeConnection con = subscribeNeedUpdates(nodeInfo);
-      crawlWonNodes.put(nodeInfo.getWonNodeURI(), con);
+    // get all known won node uris from RDF store
+    Set<WonNodeInfo> wonNodeInfo = new HashSet<>();
+    try {
+      wonNodeInfo = sparqlService.retrieveAllWonNodeInfo();
+    } catch (Exception e) {
+      log.error("Error querying SPARQL endpoint {}. SPARQL endpoint must be running at matcher service startup!",
+                sparqlService.getSparqlEndpoint());
+      log.error("Exception was: {}", e);
+      log.info("Shut down matcher service!");
+      System.exit(-1);
     }
 
-    // initialize the won nodes to crawl
+    // Treat the known won nodes as newly discovered won nodes to register them again at startup of matcher service
+    for (WonNodeInfo nodeInfo : wonNodeInfo) {
+      if (!config.getCrawlWonNodes().contains(nodeInfo.getWonNodeURI())) {
+        WonNodeEvent e = new WonNodeEvent(nodeInfo.getWonNodeURI(), WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED);
+        pubSubMediator.tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf());
+      }
+    }
+
+    // initialize the won nodes from the config file to crawl
     for (String nodeUri : config.getCrawlWonNodes()) {
       if (!skipWonNodeUris.contains(nodeUri)) {
         if (!crawlWonNodes.containsKey(nodeUri)) {
@@ -138,6 +146,8 @@ public class WonNodeControllerActor extends UntypedActor
   public void onReceive(final Object message) {
 
     if (message instanceof Terminated) {
+
+      // if it is some other actor handle it differently
       handleConnectionErrors((Terminated) message);
       return;
     }
@@ -169,12 +179,11 @@ public class WonNodeControllerActor extends UntypedActor
         }
 
         // try the connect to won node
-        WonNodeConnection con = addWonNodeForCrawling(event.getWonNodeUri());
+        addWonNodeForCrawling(event.getWonNodeUri());
 
         // connection failed ?
         if (failedWonNodeUris.contains(event.getWonNodeUri())) {
-          log.debug("Still could not connect to won node with uri: {}, will retry later ...",
-                    event.getWonNodeUri());
+          log.debug("Still could not connect to won node with uri: {}, will retry later ...", event.getWonNodeUri());
           return;
         }
 
@@ -237,7 +246,7 @@ public class WonNodeControllerActor extends UntypedActor
   }
 
   /**
-   * Try to add a won node for crawling
+   * Try to register at won nodes and add them for crawling
    *
    * @param wonNodeUri URI of the won node meta data resource
    * @return won node connection if successfully connected, otherwise null
@@ -245,22 +254,47 @@ public class WonNodeControllerActor extends UntypedActor
   private WonNodeConnection addWonNodeForCrawling(String wonNodeUri) {
 
     WonNodeConnection con = null;
+    Dataset ds = null;
+    WonNodeInfo nodeInfo = null;
+
+    // try register at won node
     try {
       registrationClient.register(wonNodeUri);
-      Dataset ds = linkedDataSource.getDataForResource(URI.create(wonNodeUri));
-      sparqlService.updateNamedGraphsOfDataset(ds);
-      WonNodeInfo nodeInfo = sparqlService.getWonNodeInfoFromDataset(ds);
+      ds = linkedDataSource.getDataForResource(URI.create(wonNodeUri));
+    } catch (RestClientException e) {
+      addFailedWonNode(wonNodeUri, con);
+      log.warning("Error requesting won node information from {}", wonNodeUri);
+      log.warning("Exception message: {} \nCause: {} ", e.getMessage(), e.getCause());
+      return null;
+    } catch (Exception e) {
+      addFailedWonNode(wonNodeUri, con);
+      log.warning("Error requesting won node information from {}", wonNodeUri);
+      log.warning("Exception message: {} \nCause: {} ", e.getMessage(), e.getCause());
+      return null;
+    }
 
-      // subscribe for need updates
+    // try save won node info in local rdf store
+    try {
+      sparqlService.updateNamedGraphsOfDataset(ds);
+      nodeInfo = sparqlService.getWonNodeInfoFromDataset(ds);
+    } catch (Exception e) {
+      addFailedWonNode(wonNodeUri, con);
+      log.error("Error saving won node information from {} into RDF store with SPARQL endpoint {}", wonNodeUri,
+                sparqlService.getSparqlEndpoint());
+      log.error("Exception message: {} \nCause: {} ", e.getMessage(), e.getCause());
+      return null;
+    }
+
+    // try subscribe need updates at won node
+    try {
       con = subscribeNeedUpdates(nodeInfo);
       crawlWonNodes.put(nodeInfo.getWonNodeURI(), con);
       failedWonNodeUris.remove(nodeInfo.getWonNodeURI());
-
-    } catch (RestClientException e) {
-      log.warning("Error requesting won node information from {}, exception is {}", wonNodeUri, e);
-      addFailedWonNode(wonNodeUri, con);
+      log.info("registered won node {} and start crawling it", nodeInfo.getWonNodeURI());
     } catch (Exception e) {
-      throw new IllegalArgumentException("Registration at node " + wonNodeUri + " failed", e);
+      addFailedWonNode(wonNodeUri, con);
+      log.error("Error subscribing for need updates at won node {}", wonNodeUri);
+      log.error("Exception message: {} \nCause: {} ", e.getMessage(), e.getCause());
     }
 
     return con;
@@ -295,11 +329,9 @@ public class WonNodeControllerActor extends UntypedActor
     while (iter.hasNext()) {
       String uri = iter.next();
 
-      // if won node becomes available start crawling the node
-      WonNodeConnection con = addWonNodeForCrawling(uri);
-      if (con != null) {
-        startCrawling(con.getWonNodeInfo());
-      }
+      // try register at the wonnode again
+      WonNodeEvent e = new WonNodeEvent(uri, WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED);
+      pubSubMediator.tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf());
     }
   }
 

@@ -42,7 +42,7 @@ public class LinkedDataRestClientHttp extends LinkedDataRestClient
 
 
   public LinkedDataRestClientHttp() {
-      this(10000,10000); //DEF. TIMEOUT IS 10sec
+      this(20000,20000); //DEF. TIMEOUT IS 20sec
   }
 
   public LinkedDataRestClientHttp(int connectTimeout, int readTimeout) {

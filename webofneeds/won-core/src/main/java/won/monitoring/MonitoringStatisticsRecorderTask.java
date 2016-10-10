@@ -40,13 +40,13 @@ public class MonitoringStatisticsRecorderTask implements Runnable
       return;
     }
     for(MonitoringStatisticsRecorder recorder: this.monitoringStatisticsRecorders){
-      logger.info("running monitoring stats recorder '{}'", recorder.getRecorderName());
+      logger.debug("running monitoring stats recorder '{}'", recorder.getRecorderName());
       recorder.recordMonitoringStatistics();
       logger.debug("done monitoring stats recorder '{}'", recorder.getRecorderName());
     }
     if (this.resetMonitorAfterRecording){
       if (this.monitoringResetter != null){
-        logger.info("resetting the monitor");
+        logger.debug("resetting the monitor");
         this.monitoringResetter.resetMonitoringStatistics();
       } else {
         logger.warn("MonitoringStatisticsRecorderTask is configured to reset the monitor after recording, but no MonitoringResetter has been configured");

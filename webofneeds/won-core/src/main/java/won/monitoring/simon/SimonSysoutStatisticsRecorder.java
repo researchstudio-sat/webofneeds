@@ -33,8 +33,6 @@ public class SimonSysoutStatisticsRecorder extends AbstractRecorder
     Simon rootSimon = SimonManager.getRootSimon();
     if (logger.isDebugEnabled()){
       logger.debug("Monitoring statistics: \n" + SimonUtils.simonTreeString(rootSimon));
-    } else {
-      logger.info("Suppressing output of SimonSysoutStatisticsRecorder as loglevel is not 'DEBUG'");
     }
   }
 
