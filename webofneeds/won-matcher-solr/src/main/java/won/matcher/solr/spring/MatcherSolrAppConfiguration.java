@@ -43,8 +43,11 @@ public class MatcherSolrAppConfiguration
   public ActorSystem actorSystem() {
 
     // load the Akka configuration
-    String seedNodes = "[\"akka.tcp://" + clusterConfig.getName() + "@" +
-      clusterConfig.getSeedHost() + ":" + clusterConfig.getSeedPort() + "\"]";
+    String seedNodes = "[";
+    for (String seed : clusterConfig.getSeedNodes()) {
+      seedNodes += "\"akka.tcp://" + clusterConfig.getName() + "@" + seed.trim() + "\",";
+    }
+    seedNodes += "]";
 
     final Config applicationConf = ConfigFactory.load();
     final Config config = ConfigFactory.parseString("akka.cluster.seed-nodes=" + seedNodes).

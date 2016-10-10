@@ -3,6 +3,7 @@ services:
 
   # create self-signed server certificate for $deploy_host
   gencert:
+    #build: ../../image/gencert
     image: webofneeds/gencert:live
     environment:
       - "CN=$deploy_host"
@@ -12,6 +13,7 @@ services:
 
   # portsgres need databases for owner and wonnode
   postgres:
+    #build: ../../image/postgres
     image: webofneeds/postgres:live
     environment:
       - "PGDATA=/var/lib/postgresql/data/pgdata"
@@ -22,6 +24,7 @@ services:
 
   # wonnode server => access https://$deploy_host:8889/won
   wonnode:
+    #build: ../../image/wonnode
     image: webofneeds/wonnode:live
     environment:
       - "uri.host=$deploy_host"
@@ -43,6 +46,7 @@ services:
 
   # debug bot used to test need communication
   debug_bot:
+    #build: ../../image/bots
     image: webofneeds/bots:live
     environment:
       - "node.default.host=$deploy_host"
@@ -53,6 +57,7 @@ services:
 
   # owner application (frontend) => access https://$deploy_host:8082/owner
   owner:
+    #build: ../../image/owner
     image: webofneeds/owner:live
     environment:
       - "node.default.host=$deploy_host"
@@ -83,14 +88,14 @@ services:
 
   # matcher service on connect with wonnode
   matcher_service:
+    #build: ../../image/matcher-service
     image: webofneeds/matcher_service:live
     environment:
       - "node.host=$deploy_host"
-      - "cluster.seed.host=$deploy_host"
+      - "cluster.seedNodes=$deploy_host:2561,$deploy_host:2562"
       - "uri.sparql.endpoint=http://$deploy_host:10000/bigdata/namespace/kb/sparql"
       - "wonNodeController.wonNode.crawl=https://$deploy_host:8889/won/resource"
       - "cluster.local.port=2561"
-      - "cluster.seed.port=2561"
     ports:
       - "2561:2561"
     depends_on:
@@ -108,11 +113,11 @@ services:
 
   # solr matcher and connect to matcher service
   matcher_solr:
+    #build: ../../image/matcher-solr
     image: webofneeds/matcher_solr:live
     environment:
       - "node.host=$deploy_host"
-      - "cluster.seed.host=$deploy_host"
-      - "cluster.seed.port=2561"
+      - "cluster.seedNodes=$deploy_host:2561,$deploy_host:2562"
       - "cluster.local.port=2562"
       - "matcher.solr.uri.solr.server=http://$deploy_host:8984/solr/"
       - "matcher.solr.uri.solr.server.public=http://$deploy_host:8984/solr/"

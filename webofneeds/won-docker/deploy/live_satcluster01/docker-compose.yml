@@ -29,11 +29,10 @@ services:
     environment:
       - "constraint:node==satcluster01"
       - "node.host=satcluster01.researchstudio.at"
-      - "cluster.seed.host=satcluster01.researchstudio.at"
+      - "cluster.seedNodes=satcluster01.researchstudio.at:2561,satcluster01.researchstudio.at:2562"
       - "uri.sparql.endpoint=http://satcluster01.researchstudio.at:10000/bigdata/namespace/kb/sparql"
       - "wonNodeController.wonNode.crawl=https://node.matchat.org/won/resource"
       - "cluster.local.port=2561"
-      - "cluster.seed.port=2561"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
       - "2561:2561"
@@ -61,8 +60,7 @@ services:
     environment:
       - "constraint:node==satcluster01"
       - "node.host=satcluster01.researchstudio.at"
-      - "cluster.seed.host=satcluster01.researchstudio.at"
-      - "cluster.seed.port=2561"
+      - "cluster.seedNodes=satcluster01.researchstudio.at:2561,satcluster01.researchstudio.at:2562"
       - "cluster.local.port=2562"
       - "matcher.solr.uri.solr.server=http://satcluster01.researchstudio.at:8984/solr/"
       - "matcher.solr.uri.solr.server.public=http://satcluster01.researchstudio.at:8984/solr/"

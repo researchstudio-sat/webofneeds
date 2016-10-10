@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+import java.util.List;
+
 /**
  * Basic cluster configuration of a component in the akka matcher service
  *
@@ -19,14 +21,12 @@ public class ClusterConfig
   @Value("${cluster.name}")
   private String name;
 
-  @Value("${cluster.seed.host}")
-  private String seedHost;
-
-  @Value("${cluster.seed.port}")
-  private int seedPort;
-
   @Value("${cluster.local.port}")
   private int localPort;
+
+  @Value("#{'${cluster.seedNodes}'.split(',')}")
+  private List<String> seedNodes;
+
 
   public String getNodeHost() {
     return nodeHost;
@@ -34,14 +34,6 @@ public class ClusterConfig
 
   public String getName() {
     return name;
-  }
-
-  public String getSeedHost() {
-    return seedHost;
-  }
-
-  public int getSeedPort() {
-    return seedPort;
   }
 
   public int getLocalPort() {
@@ -56,15 +48,16 @@ public class ClusterConfig
     this.name = name;
   }
 
-  public void setSeedHost(final String seedHost) {
-    this.seedHost = seedHost;
-  }
-
-  public void setSeedPort(final int seedPort) {
-    this.seedPort = seedPort;
-  }
-
   public void setLocalPort(final int localPort) {
     this.localPort = localPort;
   }
+
+  public List<String> getSeedNodes() {
+    return seedNodes;
+  }
+
+  public void setSeedNodes(final List<String> seedNodes) {
+    this.seedNodes = seedNodes;
+  }
+
 }

@@ -39,15 +39,18 @@ public class MatcherServiceAppConfiguration
   public ActorSystem actorSystem() {
 
     // load the Akka configuration
-    String seedNodes = "[\"akka.tcp://" + clusterConfig.getName() + "@" +
-      clusterConfig.getSeedHost() + ":" + clusterConfig.getSeedPort() + "\"]";
+    String seedNodes = "[";
+    for (String seed : clusterConfig.getSeedNodes()) {
+      seedNodes += "\"akka.tcp://" + clusterConfig.getName() + "@" + seed.trim() + "\",";
+    }
+    seedNodes += "]";
 
     final Config applicationConf = ConfigFactory.load();
     final Config config = ConfigFactory.parseString("akka.cluster.seed-nodes=" + seedNodes).
       withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.bind-port=" + clusterConfig.getLocalPort())).
       withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + clusterConfig.getNodeHost())).
-      withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + clusterConfig.getSeedPort())).
-      withFallback(ConfigFactory.parseString("akka.cluster.roles=[core]")).
+      withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + clusterConfig.getLocalPort())).
+                                         withFallback(ConfigFactory.parseString("akka.cluster.roles=[core]")).
       withFallback(ConfigFactory.load(applicationConf));
 
     ActorSystem system = ActorSystem.create(clusterConfig.getName(), config);

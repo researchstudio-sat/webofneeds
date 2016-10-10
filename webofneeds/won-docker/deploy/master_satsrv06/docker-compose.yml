@@ -28,11 +28,10 @@ services:
     environment:
       - "constraint:node==satsrv06"
       - "node.host=satsrv06.researchstudio.at"
-      - "cluster.seed.host=satsrv06.researchstudio.at"
+      - "cluster.seedNodes=satsrv06.researchstudio.at:2551,satsrv06.researchstudio.at:2552"
       - "uri.sparql.endpoint=http://satsrv06.researchstudio.at:9999/bigdata/namespace/kb/sparql"
       - "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8888/won/resource,https://satsrv07.researchstudio.at/won/resource"
       - "cluster.local.port=2551"
-      - "cluster.seed.port=2551"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
         -Dinspectit.agent.name=master_satsrv06_matcher_service
@@ -69,8 +68,7 @@ services:
     environment:
       - "constraint:node==satsrv06"
       - "node.host=satsrv06.researchstudio.at"
-      - "cluster.seed.host=satsrv06.researchstudio.at"
-      - "cluster.seed.port=2551"
+      - "cluster.seedNodes=satsrv06.researchstudio.at:2551,satsrv06.researchstudio.at:2552"
       - "cluster.local.port=2552"
       - "matcher.solr.uri.solr.server=http://satsrv06.researchstudio.at:8983/solr/"
       - "matcher.solr.uri.solr.server.public=http://satsrv06.researchstudio.at:8983/solr/"
