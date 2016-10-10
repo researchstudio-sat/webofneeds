@@ -1,20 +1,27 @@
 package won.matcher.service.crawler.actor;
 
+import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import com.hp.hpl.jena.query.Dataset;
-import won.matcher.service.common.service.http.HttpService;
-import won.matcher.service.crawler.config.CrawlConfig;
-import won.matcher.service.crawler.exception.CrawlWrapperException;
-import won.matcher.service.crawler.msg.CrawlUriMessage;
-import won.matcher.service.crawler.service.CrawlSparqlService;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
+import won.matcher.service.common.event.NeedEvent;
+import won.matcher.service.crawler.config.CrawlConfig;
+import won.matcher.service.crawler.exception.CrawlWrapperException;
+import won.matcher.service.crawler.msg.CrawlUriMessage;
+import won.matcher.service.crawler.service.CrawlSparqlService;
 import won.protocol.exception.IncorrectPropertyCountException;
+import won.protocol.model.NeedState;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
@@ -46,6 +53,15 @@ public class WorkerCrawlerActor extends UntypedActor
 
   @Autowired
   private CrawlConfig config;
+
+  private ActorRef pubSubMediator;
+
+  @Override
+  public void preStart() {
+
+    // initialize the distributed event bus to send need events to the matchers
+    pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
+  }
 
   /**
    * Receives messages with an URI and processes them by requesting the resource,
@@ -109,6 +125,29 @@ public class WorkerCrawlerActor extends UntypedActor
       uriMsg.getUri(), uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.DONE);
     log.debug("Crawling done for URI {}", uriDoneMsg.getUri());
     getSender().tell(uriDoneMsg, getSelf());
+
+    // if this URI/dataset was a need then send an event to the distributed event bus
+    Model model = WonRdfUtils.NeedUtils.getNeedModelFromNeedDataset(ds);
+    if (model != null) {
+
+      try {
+        Resource res = WonRdfUtils.NeedUtils.getNeedResource(model);
+        if (res != null) {
+
+          // only send active needs right now
+          NeedState state = WonRdfUtils.NeedUtils.queryActiveStatus(model, URI.create(uriMsg.getUri()));
+          if (state.equals(NeedState.ACTIVE)) {
+
+            log.debug("Created need event for need uri {}", uriMsg.getUri());
+            NeedEvent.TYPE type = NeedEvent.TYPE.CREATED;
+            NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, ds);
+            pubSubMediator.tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent), getSelf());
+          }
+        }
+      } catch (Exception e) {
+        // no need resource found in model
+      }
+    }
   }
 
   /**
