@@ -71,7 +71,7 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
         if (methodName != null) {
           log.debug("Received event '{}' for needUri '{}' and wonNeedUri '{}'", methodName, needUri, wonNodeUri);
 
-          // publish an internal need event
+          // publish a need event to all the (distributed) matchers and start crawling from that need too
           NeedEvent event = null;
           if (methodName.equals(MSG_HEADER_METHODNAME_NEEDCREATED)) {
             event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.CREATED, camelMsg.body().toString(), Lang.TRIG);
