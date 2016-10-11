@@ -94,7 +94,7 @@ services:
       - "uri.host=www.matchat.org"
       - "http.port=8082"
       - "node.default.http.port=443"
-      - "uri.prefix=https://satsrv07.researchstudio.at"
+      - "uri.prefix=https://www.matchat.org"
       - "uri.prefix.node.default=https://node.matchat.org/won"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satcluster01.researchstudio.at:5432/won_owner"
