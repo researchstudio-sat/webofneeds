@@ -12,13 +12,19 @@ import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.update.UpdateRequest;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import won.protocol.util.RdfUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 /**
@@ -33,6 +39,13 @@ public class SparqlService
   protected final Logger log = LoggerFactory.getLogger(getClass());
   protected String sparqlEndpoint;
   //protected DatasetAccessor accessor;
+
+  public static Dataset deserializeDataset(String serializedResource, Lang format) throws IOException {
+    InputStream is = new ByteArrayInputStream(serializedResource.getBytes(StandardCharsets.UTF_8));
+    Dataset ds = RdfUtils.toDataset(is, new RDFFormat(format));
+    is.close();
+    return ds;
+  }
 
   @Autowired
   public SparqlService(@Value("${uri.sparql.endpoint}")  String sparqlEndpoint) {

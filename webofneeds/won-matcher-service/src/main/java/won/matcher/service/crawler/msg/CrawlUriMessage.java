@@ -13,7 +13,7 @@ public class CrawlUriMessage implements Serializable
 {
   public static enum STATUS
   {
-    PROCESS, FAILED, DONE,
+    PROCESS, FAILED, DONE, SAVE,
   }
 
   private String uri;

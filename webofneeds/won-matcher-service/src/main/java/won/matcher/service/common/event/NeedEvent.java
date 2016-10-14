@@ -6,10 +6,11 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.LangBuilder;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
-import won.protocol.util.RdfUtils;
+import won.matcher.service.common.service.sparql.SparqlService;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringWriter;
 
 /**
  * This event is used in the matching service to indicate that a new need has been found.
@@ -75,11 +76,7 @@ public class NeedEvent implements Serializable
   }
 
   public Dataset deserializeNeedDataset() throws IOException {
-    InputStream is = new ByteArrayInputStream(serializedNeedResource.getBytes(StandardCharsets.UTF_8));
-    Lang format = getSerializationFormat();
-    Dataset ds = RdfUtils.toDataset(is, new RDFFormat(format));
-    is.close();
-    return ds;
+    return SparqlService.deserializeDataset(serializedNeedResource, getSerializationFormat());
   }
 
   @Override
