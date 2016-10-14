@@ -82,7 +82,9 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
 
     logger.debug("register at won node: " + wonNodeURI);
     if (isRegistered(wonNodeURI)) {
-
+      //TODO: if the WoN node does not remember the owner (eg because it decided to erase the owner application from
+      // its db), this will fail, and we currently have no way of restoring the registration, except for manually
+      // removing the registration data from the owner application's db, too.
       WonNode wonNode = DataAccessUtils.loadWonNode(wonNodeRepository, wonNodeURI);
       String ownerApplicationId = wonNode.getOwnerApplicationID();
       configureCamelEndpoint(wonNodeURI, ownerApplicationId);
