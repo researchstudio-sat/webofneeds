@@ -105,7 +105,7 @@ public class WorkerCrawlerActor extends UntypedActor
       uriMsg.getUri(), uriMsg.getBaseUri(), config.getCrawlNonBasePropertyPaths());
     for (String extractedURI : extractedURIs) {
       CrawlUriMessage newUriMsg = new CrawlUriMessage(
-        extractedURI, uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.PROCESS);
+        extractedURI, uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis());
       getSender().tell(newUriMsg, getSelf());
     }
 
@@ -114,7 +114,7 @@ public class WorkerCrawlerActor extends UntypedActor
     extractedURIs = sparqlService.extractURIs(uriMsg.getUri(), uriMsg.getBaseUri(), config.getCrawlBasePropertyPaths());
     for (String extractedURI : extractedURIs) {
       CrawlUriMessage newUriMsg = new CrawlUriMessage(
-        extractedURI, extractedURI, wonNodeUri, CrawlUriMessage.STATUS.PROCESS);
+        extractedURI, extractedURI, wonNodeUri, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis());
       getSender().tell(newUriMsg, getSelf());
     }
 
@@ -122,7 +122,7 @@ public class WorkerCrawlerActor extends UntypedActor
     // This needs to be done after all extracted URI messages have been sent to guarantee consistency
     // in case of failure
     CrawlUriMessage uriDoneMsg = new CrawlUriMessage(
-      uriMsg.getUri(), uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.DONE);
+      uriMsg.getUri(), uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.DONE, System.currentTimeMillis());
     log.debug("Crawling done for URI {}", uriDoneMsg.getUri());
     getSender().tell(uriDoneMsg, getSelf());
 

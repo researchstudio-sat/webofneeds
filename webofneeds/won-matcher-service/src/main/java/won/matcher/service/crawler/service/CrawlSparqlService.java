@@ -54,7 +54,7 @@ public class CrawlSparqlService extends SparqlService
     }
     queryTemplate += "}}\n";
     queryString += String.format(queryTemplate, METADATA_GRAPH,
-                                 msg.getUri(), CRAWL_DATE_PREDICATE, System.currentTimeMillis(),
+                                 msg.getUri(), CRAWL_DATE_PREDICATE, msg.getCrawlDate(),
                                  msg.getUri(), CRAWL_STATUS_PREDICATE, msg.getStatus(),
                                  msg.getUri(), CRAWL_BASE_URI_PREDICATE, msg.getBaseUri(),
                                  msg.getUri(), CRAWL_WON_NODE_URI_PREDICATE, msg.getWonNodeUri());
@@ -89,7 +89,7 @@ public class CrawlSparqlService extends SparqlService
       if (msg.getWonNodeUri() != null) {
         specificInsertTemplate += "<%s> <%s> <%s>. ";
       }
-      builder.append(String.format(specificInsertTemplate, msg.getUri(), CRAWL_DATE_PREDICATE, System.currentTimeMillis(),
+      builder.append(String.format(specificInsertTemplate, msg.getUri(), CRAWL_DATE_PREDICATE, msg.getCrawlDate(),
                                    msg.getUri(), CRAWL_STATUS_PREDICATE, msg.getStatus(),
                                    msg.getUri(), CRAWL_BASE_URI_PREDICATE, msg.getBaseUri(),
                                    msg.getUri(), CRAWL_WON_NODE_URI_PREDICATE, msg.getWonNodeUri()));
@@ -127,9 +127,9 @@ public class CrawlSparqlService extends SparqlService
       CrawlUriMessage msg = null;
       if (qs.get("wonNode") != null) {
         String wonNode = qs.get("wonNode").asResource().getURI();
-        msg = new CrawlUriMessage(uri, baseUri, wonNode, CrawlUriMessage.STATUS.PROCESS);
+        msg = new CrawlUriMessage(uri, baseUri, wonNode, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis());
       } else {
-        msg = new CrawlUriMessage(uri, baseUri, CrawlUriMessage.STATUS.PROCESS);
+        msg = new CrawlUriMessage(uri, baseUri, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis());
       }
 
       log.debug("Created message: {}", msg);

@@ -315,10 +315,10 @@ public class WonNodeControllerActor extends UntypedActor
 
     crawler.tell(
       new CrawlUriMessage(needListUri, needListUri, wonNodeInfo.getWonNodeURI(),
-                          CrawlUriMessage.STATUS.PROCESS), getSelf());
+                          CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
     crawler.tell(
       new CrawlUriMessage(needListUri + "/", needListUri + "/", wonNodeInfo.getWonNodeURI(),
-                          CrawlUriMessage.STATUS.PROCESS), getSelf());
+                          CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
   }
 
   /**
