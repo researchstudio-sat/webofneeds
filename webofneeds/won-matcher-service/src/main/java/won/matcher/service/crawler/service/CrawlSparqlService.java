@@ -1,9 +1,12 @@
 package won.matcher.service.crawler.service;
 
 import com.hp.hpl.jena.query.*;
+import com.hp.hpl.jena.vocabulary.DC;
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import won.matcher.service.common.event.BulkNeedEvent;
 import won.matcher.service.common.service.sparql.SparqlService;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.protocol.vocabulary.WON;
@@ -179,6 +182,49 @@ public class CrawlSparqlService extends SparqlService
     }
 
     return extractedURIs;
+  }
+
+  public BulkNeedEvent retrieveNeedEvents(long fromDate, long toDate, int maxEvents) {
+
+    // retrieve relevant properties of all needs that match the conditions
+    log.debug("bulk load need data from sparql endpoint in date range: [{},{}]", fromDate, toDate);
+    String queryTemplate = "\nSELECT ?needUri ?type ?wonNodeUri ?title ?desc ?tags WHERE { " +
+      " ?needUri <%s> <%s>. ?needUri <%s> '%s'. ?needUri <%s> ?date. " +
+      " ?needUri <%s> <%s>. ?needUri <%s> ?type. ?needUri <%s> ?title." +
+      " ?needUri <%s> ?wonNodeUri." +
+      " OPTIONAL {?needUri <%s> ?desc}. " + "OPTIONAL {?needUri <%s> ?tags}. " +
+      " FILTER (?date >= %d && ?date < %d ) }\n";
+
+    String queryString = String.format(
+      queryTemplate, RDF.type, WON.NEED, CrawlSparqlService.CRAWL_STATUS_PREDICATE, CrawlUriMessage.STATUS.DONE,
+      CrawlSparqlService.CRAWL_DATE_PREDICATE, WON.IS_IN_STATE, WON.NEED_STATE_ACTIVE,
+      WON.HAS_BASIC_NEED_TYPE, WON.HAS_CONTENT.toString() + ">/<" + DC.title.toString(),
+      WON.HAS_WON_NODE,
+      WON.HAS_CONTENT.toString() + ">/<" + WON.HAS_TEXT_DESCRIPTION.toString(),
+      WON.HAS_CONTENT.toString() + ">/<" + WON.HAS_TAG.toString(), fromDate, toDate);
+
+    log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
+    log.debug("Execute query: {}", queryString);
+    Query query = QueryFactory.create(queryString);
+    QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+    ResultSet results = qexec.execSelect();
+
+    int numNeeds = 0;
+    while (results.hasNext()) {
+
+      // add the needs with its attributes to the rescal matching data object
+      numNeeds++;
+      QuerySolution qs = results.nextSolution();
+      String needUri = qs.get("needUri").asResource().getURI();
+      String wonNodeUri = qs.get("wonNodeUri").asResource().getURI();
+      String type = qs.get("type").asLiteral().getString();
+
+      log.info("loaded: {}, {}, {}", needUri, type);
+
+    }
+    qexec.close();
+    log.debug("number of needs loaded: " + numNeeds);
+    return null;
   }
 
 }
