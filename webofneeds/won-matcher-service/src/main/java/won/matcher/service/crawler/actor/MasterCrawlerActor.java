@@ -64,11 +64,17 @@ public class MasterCrawlerActor extends UntypedActor
   public void preStart() {
 
     // Create the router/pool with worker actors that do the actual crawling
-    crawlingWorker = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).fromConfigProps(WorkerCrawlerActor.class), "CrawlingRouter");
+    crawlingWorker = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).fromConfigProps(
+      WorkerCrawlerActor.class), "CrawlingRouter");
 
     // create a single meta data update actor for all worker actors
-    updateMetaDataWorker = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).props(UpdateMetadataActor.class), "MetaDataUpdateWorker");
+    updateMetaDataWorker = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).props(
+      UpdateMetadataActor.class), "MetaDataUpdateWorker");
     getContext().watch(updateMetaDataWorker);
+
+    // create an need loading actor
+    getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).props(
+      NeedEventLoaderActor.class), "NeedEventLoader");
 
     // subscribe for won node events
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
