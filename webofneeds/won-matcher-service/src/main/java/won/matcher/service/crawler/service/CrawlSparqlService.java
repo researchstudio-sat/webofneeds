@@ -1,16 +1,19 @@
 package won.matcher.service.crawler.service;
 
 import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.vocabulary.DC;
-import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import won.matcher.service.common.event.BulkNeedEvent;
+import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.service.sparql.SparqlService;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.protocol.vocabulary.WON;
 
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -184,24 +187,36 @@ public class CrawlSparqlService extends SparqlService
     return extractedURIs;
   }
 
-  public BulkNeedEvent retrieveNeedEvents(long fromDate, long toDate, int maxEvents) {
+  private Model retrieveNeedModel(String uri) {
 
-    // retrieve relevant properties of all needs that match the conditions
+    String queryString = "prefix won: <http://purl.org/webofneeds/model#> construct { ?a ?b ?c .} \n" +
+      "where { GRAPH ?g { <" + uri + "> a won:Need. ?a ?b ?c. } }";
+
+    log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
+    log.debug("Execute query: {}", queryString);
+    Query query = QueryFactory.create(queryString);
+    QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+    Model needModel = qexec.execConstruct();
+    return needModel;
+  }
+
+  public BulkNeedEvent retrieveActiveNeedEvents(long fromDate, long toDate, int offset, int limit) {
+
+    // query template to retrieve all alctive cralwed/saved needs in a certain date range
     log.debug("bulk load need data from sparql endpoint in date range: [{},{}]", fromDate, toDate);
-    String queryTemplate = "\nSELECT ?needUri ?type ?wonNodeUri ?title ?desc ?tags WHERE { " +
-      " ?needUri <%s> <%s>. ?needUri <%s> '%s'. ?needUri <%s> ?date. " +
-      " ?needUri <%s> <%s>. ?needUri <%s> ?type. ?needUri <%s> ?title." +
-      " ?needUri <%s> ?wonNodeUri." +
-      " OPTIONAL {?needUri <%s> ?desc}. " + "OPTIONAL {?needUri <%s> ?tags}. " +
-      " FILTER (?date >= %d && ?date < %d ) }\n";
+    String queryTemplate = "prefix won: <http://purl.org/webofneeds/model#> \n" +
+      "SELECT ?needUri ?wonNodeUri WHERE {  \n" +
+      "  ?needUri a won:Need. \n" +
+      "  ?needUri won:crawlDate ?date.  \n" +
+      "  ?needUri won:isInState won:Active. \n" +
+      "  ?needUri won:hasWonNode ?wonNodeUri. \n" +
+      "  {?needUri won:crawlStatus 'SAVE'.} UNION {?needUri won:crawlStatus 'DONE'.}\n" +
+      "  FILTER (?date >= %d && ?date < %d ) \n" +
+      "} ORDER BY ?date\n" +
+      "OFFSET %d\n" +
+      "LIMIT %d";
 
-    String queryString = String.format(
-      queryTemplate, RDF.type, WON.NEED, CrawlSparqlService.CRAWL_STATUS_PREDICATE, CrawlUriMessage.STATUS.DONE,
-      CrawlSparqlService.CRAWL_DATE_PREDICATE, WON.IS_IN_STATE, WON.NEED_STATE_ACTIVE,
-      WON.HAS_BASIC_NEED_TYPE, WON.HAS_CONTENT.toString() + ">/<" + DC.title.toString(),
-      WON.HAS_WON_NODE,
-      WON.HAS_CONTENT.toString() + ">/<" + WON.HAS_TEXT_DESCRIPTION.toString(),
-      WON.HAS_CONTENT.toString() + ">/<" + WON.HAS_TAG.toString(), fromDate, toDate);
+    String queryString = String.format(queryTemplate, fromDate, toDate, offset, limit);
 
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
     log.debug("Execute query: {}", queryString);
@@ -209,22 +224,24 @@ public class CrawlSparqlService extends SparqlService
     QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
     ResultSet results = qexec.execSelect();
 
-    int numNeeds = 0;
+    // load all the needs into one bulk need event
+    BulkNeedEvent bulkNeedEvent = new BulkNeedEvent();
     while (results.hasNext()) {
 
-      // add the needs with its attributes to the rescal matching data object
-      numNeeds++;
       QuerySolution qs = results.nextSolution();
       String needUri = qs.get("needUri").asResource().getURI();
       String wonNodeUri = qs.get("wonNodeUri").asResource().getURI();
-      String type = qs.get("type").asLiteral().getString();
 
-      log.info("loaded: {}, {}, {}", needUri, type);
-
+      Model needModel = retrieveNeedModel(needUri);
+      StringWriter sw = new StringWriter();
+      RDFDataMgr.write(sw, needModel, RDFFormat.TRIG.getLang());
+      NeedEvent needEvent = new NeedEvent(
+        needUri, wonNodeUri, NeedEvent.TYPE.CREATED, sw.toString(), RDFFormat.TRIG.getLang());
+      bulkNeedEvent.addNeedEvent(needEvent);
     }
     qexec.close();
-    log.debug("number of needs loaded: " + numNeeds);
-    return null;
+    log.debug("number of need events created: " + bulkNeedEvent.getNeedEvents().size());
+    return bulkNeedEvent;
   }
 
 }
