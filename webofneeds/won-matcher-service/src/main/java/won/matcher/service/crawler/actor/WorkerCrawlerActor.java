@@ -148,8 +148,9 @@ public class WorkerCrawlerActor extends UntypedActor
     // signal sender that this URI is processed and save meta data about crawling the URI.
     // This needs to be done after all extracted URI messages have been sent to guarantee consistency
     // in case of failure
+    long crawlDate = System.currentTimeMillis();
     CrawlUriMessage uriDoneMsg = new CrawlUriMessage(
-      uriMsg.getUri(), uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.DONE, System.currentTimeMillis());
+      uriMsg.getUri(), uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.DONE, crawlDate);
     log.debug("Crawling done for URI {}", uriDoneMsg.getUri());
     getSender().tell(uriDoneMsg, getSelf());
 
@@ -167,7 +168,7 @@ public class WorkerCrawlerActor extends UntypedActor
 
             log.debug("Created need event for need uri {}", uriMsg.getUri());
             NeedEvent.TYPE type = NeedEvent.TYPE.CREATED;
-            NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, ds);
+            NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
             pubSubMediator.tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent), getSelf());
           }
         }

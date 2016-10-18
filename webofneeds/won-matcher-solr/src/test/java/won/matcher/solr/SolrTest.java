@@ -43,7 +43,7 @@ public class SolrTest
     linkedDataSource.setLinkedDataRestClient(restClient);
 
     Dataset ds = linkedDataSource.getDataForResource(URI.create(testUri));
-    NeedEvent needEvent = new NeedEvent(testUri, wonUri, NeedEvent.TYPE.CREATED, ds);
+    NeedEvent needEvent = new NeedEvent(testUri, wonUri, NeedEvent.TYPE.CREATED, System.currentTimeMillis(), ds);
 
     // send event to matcher implementation
     solrMatcherActor.tell(needEvent, null);

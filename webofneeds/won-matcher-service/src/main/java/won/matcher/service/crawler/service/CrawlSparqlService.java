@@ -191,7 +191,7 @@ public class CrawlSparqlService extends SparqlService
     // query template to retrieve all alctive cralwed/saved needs in a certain date range
     log.debug("bulk load need data from sparql endpoint in date range: [{},{}]", fromDate, toDate);
     String queryTemplate = "prefix won: <http://purl.org/webofneeds/model#> \n" +
-      "SELECT ?needUri ?wonNodeUri WHERE {  \n" +
+      "SELECT ?needUri ?wonNodeUri ?date WHERE {  \n" +
       "  ?needUri a won:Need. \n" +
       "  ?needUri won:crawlDate ?date.  \n" +
       "  ?needUri won:isInState won:Active. \n" +
@@ -217,12 +217,13 @@ public class CrawlSparqlService extends SparqlService
       QuerySolution qs = results.nextSolution();
       String needUri = qs.get("needUri").asResource().getURI();
       String wonNodeUri = qs.get("wonNodeUri").asResource().getURI();
+      long crawlDate = qs.getLiteral("date").getLong();
 
       Dataset ds = retrieveNeedDataset(needUri);
       StringWriter sw = new StringWriter();
       RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
-      NeedEvent needEvent = new NeedEvent(
-        needUri, wonNodeUri, NeedEvent.TYPE.CREATED, sw.toString(), RDFFormat.TRIG.getLang());
+      NeedEvent needEvent = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.CREATED,
+                                          crawlDate, sw.toString(), RDFFormat.TRIG.getLang());
       bulkNeedEvent.addNeedEvent(needEvent);
     }
     qexec.close();

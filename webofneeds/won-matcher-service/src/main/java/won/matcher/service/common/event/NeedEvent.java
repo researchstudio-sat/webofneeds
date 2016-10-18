@@ -26,6 +26,7 @@ public class NeedEvent implements Serializable
   private String serializedNeedResource;
   private String serializationLangName;
   private String serializationLangContentType;
+  private long crawlDate;
 
   private TYPE eventType;
 
@@ -34,19 +35,21 @@ public class NeedEvent implements Serializable
     CREATED, ACTIVATED, DEACTIVATED
   }
 
-  public NeedEvent(String uri, String wonNodeUri, TYPE eventType, String resource, Lang format) {
+  public NeedEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, String resource, Lang format) {
     this.uri = uri;
     this.wonNodeUri = wonNodeUri;
     this.eventType = eventType;
+    this.crawlDate = crawlDate;
     serializedNeedResource = resource;
     serializationLangName = format.getName();
     serializationLangContentType = format.getContentType().getContentType();
   }
 
-  public NeedEvent(String uri, String wonNodeUri, TYPE eventType, Dataset ds) {
+  public NeedEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, Dataset ds) {
     this.uri = uri;
     this.wonNodeUri = wonNodeUri;
     this.eventType = eventType;
+    this.crawlDate = crawlDate;
     StringWriter sw = new StringWriter();
     RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
     serializedNeedResource = sw.toString();
@@ -75,13 +78,18 @@ public class NeedEvent implements Serializable
     return format;
   }
 
+  public long getCrawlDate() {
+    return crawlDate;
+  }
+
   public Dataset deserializeNeedDataset() throws IOException {
     return SparqlService.deserializeDataset(serializedNeedResource, getSerializationFormat());
   }
 
   @Override
   public NeedEvent clone() {
-    NeedEvent e = new NeedEvent(uri, wonNodeUri, eventType, serializedNeedResource, getSerializationFormat());
+    NeedEvent e = new NeedEvent(uri, wonNodeUri, eventType, crawlDate, serializedNeedResource,
+                                getSerializationFormat());
     return e;
   }
 

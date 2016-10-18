@@ -76,14 +76,19 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
 
           // publish a need event to all the (distributed) matchers
           NeedEvent event = null;
+          long crawlDate = System.currentTimeMillis();
+
           if (methodName.equals(MSG_HEADER_METHODNAME_NEEDCREATED)) {
-            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.CREATED, camelMsg.body().toString(), Lang.TRIG);
+            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.CREATED, crawlDate,
+                                  camelMsg.body().toString(), Lang.TRIG);
             pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
           } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDACTIVATED)) {
-            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVATED, camelMsg.body().toString(), Lang.TRIG);
+            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVATED, crawlDate,
+                                  camelMsg.body().toString(), Lang.TRIG);
             pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
           } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDDEACTIVATED)) {
-            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.DEACTIVATED, camelMsg.body().toString(), Lang.TRIG);
+            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.DEACTIVATED, crawlDate,
+                                  camelMsg.body().toString(), Lang.TRIG);
             pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
           } else {
             unhandled(message);
@@ -91,7 +96,7 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
 
           // let the crawler save the data of this event too
           ResourceCrawlUriMessage resMsg = new ResourceCrawlUriMessage(
-            needUri, needUri, wonNodeUri, CrawlUriMessage.STATUS.SAVE, System.currentTimeMillis());
+            needUri, needUri, wonNodeUri, CrawlUriMessage.STATUS.SAVE, crawlDate);
           resMsg.setSerializedResource(camelMsg.body().toString());
           resMsg.setSerializationFormat(Lang.TRIG);
           pubSubMediator.tell(new DistributedPubSubMediator.Publish(resMsg.getClass().getName(), resMsg), getSelf());
