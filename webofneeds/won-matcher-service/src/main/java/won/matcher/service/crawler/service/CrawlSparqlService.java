@@ -1,7 +1,6 @@
 package won.matcher.service.crawler.service;
 
 import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,19 +186,6 @@ public class CrawlSparqlService extends SparqlService
     return extractedURIs;
   }
 
-  private Model retrieveNeedModel(String uri) {
-
-    String queryString = "prefix won: <http://purl.org/webofneeds/model#> construct { ?a ?b ?c .} \n" +
-      "where { GRAPH ?g { <" + uri + "> a won:Need. ?a ?b ?c. } }";
-
-    log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
-    log.debug("Execute query: {}", queryString);
-    Query query = QueryFactory.create(queryString);
-    QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
-    Model needModel = qexec.execConstruct();
-    return needModel;
-  }
-
   public BulkNeedEvent retrieveActiveNeedEvents(long fromDate, long toDate, int offset, int limit) {
 
     // query template to retrieve all alctive cralwed/saved needs in a certain date range
@@ -232,9 +218,9 @@ public class CrawlSparqlService extends SparqlService
       String needUri = qs.get("needUri").asResource().getURI();
       String wonNodeUri = qs.get("wonNodeUri").asResource().getURI();
 
-      Model needModel = retrieveNeedModel(needUri);
+      Dataset ds = retrieveNeedDataset(needUri);
       StringWriter sw = new StringWriter();
-      RDFDataMgr.write(sw, needModel, RDFFormat.TRIG.getLang());
+      RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
       NeedEvent needEvent = new NeedEvent(
         needUri, wonNodeUri, NeedEvent.TYPE.CREATED, sw.toString(), RDFFormat.TRIG.getLang());
       bulkNeedEvent.addNeedEvent(needEvent);
