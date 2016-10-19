@@ -34,7 +34,7 @@
         <prop key="mail.imap.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
         <prop key="mail.imap.socketFactory.fallback">false</prop>
         <prop key="mail.store.protocol">imaps</prop>
-        <prop key="mail.debug">true</prop>
+        <prop key="mail.debug">false</prop>
         <prop key="mail.smtp.starttls.enable">true</prop>
         <prop key="mail.smtp.starttls.required">true</prop>
     </util:properties>
