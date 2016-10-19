@@ -13,11 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
-import won.matcher.service.common.event.BulkHintEvent;
-import won.matcher.service.common.event.HintEvent;
-import won.matcher.service.common.event.NeedEvent;
+import won.matcher.service.common.event.*;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.solr.config.SolrMatcherConfig;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by hfriedrich on 30.09.2015.
@@ -38,8 +43,14 @@ public class MatcherPubSubActor extends UntypedActor
   @Autowired
   private SolrMatcherConfig config;
 
+  private static final String TICK = "tick";
+  private static final String APP_STATE_PROPERTIES_FILE_NAME = "state.config.properties";
+  private static final String LAST_SEEN_NEED_DATE_PROPERTY_NAME = "lastSeenNeedDate";
+  private boolean needsUpdated = false;
+  private Properties appStateProps = new Properties();
+
   @Override
-  public void preStart() {
+  public void preStart() throws IOException {
 
     // subscribe to need events
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
@@ -53,16 +64,95 @@ public class MatcherPubSubActor extends UntypedActor
       matcherActor = getContext().actorOf(SpringExtension.SpringExtProvider.get(
         getContext().system()).fromConfigProps(SolrMonitoringMatcherActor.class), "SolrMatcherPool");
     }
+
+    // Create a scheduler to request missing need events from matching service while this matcher was not available
+    getContext().system().scheduler().schedule(
+      Duration.create(30, TimeUnit.SECONDS), Duration.create(60, TimeUnit.SECONDS), getSelf(), TICK,
+      getContext().dispatcher(), null);
+
+    // read properties file that has the lastSeenNeedDate
+    FileInputStream in = null;
+    try {
+      in = new FileInputStream(APP_STATE_PROPERTIES_FILE_NAME);
+      appStateProps.load(in);
+      log.info("loaded properties file {}, property '{}' is set to " + appStateProps.getProperty
+        (LAST_SEEN_NEED_DATE_PROPERTY_NAME), APP_STATE_PROPERTIES_FILE_NAME, LAST_SEEN_NEED_DATE_PROPERTY_NAME);
+    } catch (FileNotFoundException e) {
+      log.info("properties file {} not found, create file", APP_STATE_PROPERTIES_FILE_NAME);
+    } catch (IOException e) {
+      log.error("cannot read properties file {}", APP_STATE_PROPERTIES_FILE_NAME);
+      throw e;
+    } finally {
+      if (in != null) {
+        in.close();
+      }
+
+      if (appStateProps.getProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME) == null) {
+        appStateProps.setProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME, String.valueOf(-1));
+        saveLastSeenNeedDate();
+      }
+
+      if (Long.valueOf(appStateProps.getProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME)) == -1) {
+        log.info("initialized property '{}' to -1, no need updates requested", LAST_SEEN_NEED_DATE_PROPERTY_NAME);
+        needsUpdated = true;
+      }
+    }
+  }
+
+  public void saveLastSeenNeedDate() throws IOException {
+
+    FileOutputStream out = null;
+    try {
+      out = new FileOutputStream(APP_STATE_PROPERTIES_FILE_NAME);
+      appStateProps.store(out, null);
+    } catch (IOException e) {
+      log.error("cannot write properties file {}", APP_STATE_PROPERTIES_FILE_NAME);
+      throw e;
+    } finally {
+      if (out != null) {
+        out.close();
+      }
+    }
   }
 
   @Override
-  public void onReceive(final Object o) throws Exception {
+  public void onReceive(Object o) throws Exception {
 
-    if (o instanceof NeedEvent) {
+    if (o.equals(TICK)) {
+      if (!needsUpdated) {
+        // request missing need events from matching service while this matcher was not available
+        long lastSeenNeedDate = Long.valueOf(appStateProps.getProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME));
+        log.info("request missed needs from mataching service with crawl date > {}", lastSeenNeedDate);
+        LoadNeedEvent loadNeedEvent = new LoadNeedEvent(lastSeenNeedDate, Long.MAX_VALUE);
+        pubSubMediator.tell(new DistributedPubSubMediator.Publish(
+          loadNeedEvent.getClass().getName(), loadNeedEvent), getSelf());
+      }
+    } else if (o instanceof NeedEvent) {
 
       NeedEvent needEvent = (NeedEvent) o;
       log.info("NeedEvent received: " + needEvent);
+
+      // save the last seen need date property after the needs are up to date with the matching service
+      if (needsUpdated) {
+        long lastSeenNeedDate = Long.valueOf(appStateProps.getProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME));
+        if (needEvent.getCrawlDate() > lastSeenNeedDate) {
+          appStateProps.setProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME, String.valueOf(needEvent.getCrawlDate()));
+          saveLastSeenNeedDate();
+        }
+      }
+
       matcherActor.tell(needEvent, getSelf());
+
+    } else if (o instanceof BulkNeedEvent) {
+
+      // receiving a bulk need event means this is the answer for the request of need updates
+      // there could arrive several of these bulk events
+      needsUpdated = true;
+      BulkNeedEvent bulkNeedEvent = (BulkNeedEvent) o;
+      log.info("BulkNeedEvent received with {} need events", bulkNeedEvent.getNeedEvents().size());
+      for (NeedEvent event : ((BulkNeedEvent) o).getNeedEvents()) {
+        getSelf().tell(event, getSelf());
+      }
 
     } else if (o instanceof HintEvent) {
 

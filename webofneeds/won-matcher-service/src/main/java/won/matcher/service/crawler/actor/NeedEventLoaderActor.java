@@ -22,15 +22,13 @@ import won.matcher.service.crawler.service.CrawlSparqlService;
 @Scope("prototype")
 public class NeedEventLoaderActor extends UntypedActor
 {
-  private static int MAX_BULK_SIZE = 100;
+  private static int MAX_BULK_SIZE = 10;
 
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private ActorRef pubSubMediator;
 
   @Autowired
   private CrawlSparqlService sparqlService;
-
-
 
   @Override
   public void preStart() {

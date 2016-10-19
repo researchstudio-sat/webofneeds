@@ -37,7 +37,7 @@ public class NeedIndexer {
   // SPARQL query to contruct a need object out of the dataset, use all graphs that reference "won:Need"
   private static final String NEED_INDEX_QUERY =
     "prefix won: <http://purl.org/webofneeds/model#> construct { ?a ?b ?c .} where { " +
-      "GRAPH ?graph { ?need a won:Need. } GRAPH ?graph2 { ?need ?x ?y. ?a ?b ?c. } }";
+      "GRAPH ?graph { ?need a won:Need. ?a ?b ?c. } }";
 
   @Autowired
   private SolrMatcherConfig config;
