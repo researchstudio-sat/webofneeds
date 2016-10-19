@@ -18,7 +18,7 @@ public class AliasFromFingerprintGenerator implements AliasGenerator
   public String generateAlias(final X509Certificate certificate) throws CertificateException {
     String fingerprint = null;
     try {
-      fingerprint = digest(certificate.getEncoded());
+      fingerprint = digest(certificate.getPublicKey().getEncoded());
     } catch (Exception e) {
       new CertificateException("Alias generation from certificate fingerprint failed", e);
     }
