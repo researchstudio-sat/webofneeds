@@ -59,10 +59,7 @@ const questions = [
     {title: "Can I post whatever I want here?", detail :"No. Make sure it is legal, unoffensive, and that it pleases" +
     " us. We will delete any postings we do not like without prior notice, explanation, and there will be no way to" +
     " restore the data."},
-    {title: "Are you selling my data?", detail :"We'd love to, but nobody's buying. If you're interested, contact" +
-    " us ;-) Seriously, you can expect us to use the data you provide here for scientific/research purposes, and if" +
-    " we are lucky, also for economic ones, while trying not to be evil. If you are not ok with that, and you would still" +
-    " like to try the system, please set up your own servers."},
+    {title: "Are you selling my data?", detail :"No."},
     {title: "How is this different from the websites I already know?",
         detail: "Two-way matching: The person searching for something will find supply, the person offering something" +
         " will find demands. Genericity: The process (post/match/chat) is quite general and can be applied to a great" +
@@ -75,7 +72,8 @@ const questions = [
         " cases, We will be glad to help if you want to try!"},
     {title: "How secure is this system?", detail:"tl;dr: Probably not very secure at the moment. As a general rule," +
     " try" +
-    " not to post or write anything here you would not be happy to write on a postcard with your name on it." +
+    " not to post or write anything here you would not be happy to write on a postcard with your name on it. (By the" +
+    " way, you should handle e-mail the same way.)" +
     " Here is how we" +
     " implemented it - in the bird's eye view: Your data is stored in clear text on our servers. The communication" +
     " between your browser and your counterpart's browser is relayed over at most four intermediate servers: your" +
