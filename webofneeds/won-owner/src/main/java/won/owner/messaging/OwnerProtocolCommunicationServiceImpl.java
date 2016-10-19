@@ -19,8 +19,12 @@ package won.owner.messaging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import won.cryptography.service.CryptographyService;
+import won.cryptography.service.KeyStoreService;
 import won.cryptography.service.RegistrationClient;
 import won.cryptography.service.RegistrationRestClientHttps;
+import won.cryptography.ssl.AliasFromFingerprintGenerator;
+import won.cryptography.ssl.AliasGenerator;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.jms.*;
@@ -33,6 +37,8 @@ import won.protocol.repository.WonNodeRepository;
 import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +62,11 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
   private ConnectionRepository connectionRepository;
   @Autowired
   private WonNodeRepository wonNodeRepository;
+  @Autowired
+  private CryptographyService cryptographyService;
+  @Autowired
+  private KeyStoreService keyStoreService;
+  private AliasGenerator aliasGenerator = new AliasFromFingerprintGenerator();
 
   //can also be autowired
   private RegistrationClient registrationClient;
@@ -84,8 +95,11 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
     if (isRegistered(wonNodeURI)) {
 
       WonNode wonNode = DataAccessUtils.loadWonNode(wonNodeRepository, wonNodeURI);
-      String ownerApplicationId = wonNode.getOwnerApplicationID();
+      Certificate cert = keyStoreService.getCertificate(cryptographyService.getDefaultPrivateKeyAlias());
+      String ownerApplicationId = aliasGenerator.generateAlias((X509Certificate) cert);
       configureCamelEndpoint(wonNodeURI, ownerApplicationId);
+      wonNode.setOwnerApplicationID(ownerApplicationId);
+      wonNodeRepository.save(wonNode);
       configureRemoteEndpointsForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
         (wonNodeURI), messagingService);
 
@@ -226,5 +240,9 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
   @Override
   public OwnerProtocolCamelConfigurator getProtocolCamelConfigurator() {
     return ownerProtocolCamelConfigurator;
+  }
+
+  public void setCryptographyService(final CryptographyService cryptographyService) {
+    this.cryptographyService = cryptographyService;
   }
 }
