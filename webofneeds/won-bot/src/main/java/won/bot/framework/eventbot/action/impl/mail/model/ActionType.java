@@ -1,4 +1,4 @@
-package won.bot.framework.eventbot.action.impl.mail.receive.util;
+package won.bot.framework.eventbot.action.impl.mail.model;
 
 /**
  * Created by fsuda on 18.10.2016.
@@ -6,7 +6,6 @@ package won.bot.framework.eventbot.action.impl.mail.receive.util;
 public enum ActionType {
     CLOSE_CONNECTION,
     CLOSE_NEED,
-    ACCEPT,
     CONNECT,
     NO_ACTION
 }

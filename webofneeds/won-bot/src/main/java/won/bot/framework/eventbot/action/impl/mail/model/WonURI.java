@@ -1,7 +1,5 @@
 package won.bot.framework.eventbot.action.impl.mail.model;
 
-import won.bot.framework.eventbot.action.impl.mail.receive.util.UriType;
-
 import java.net.URI;
 
 /* Helper Class to encapsulate an uri and the type
