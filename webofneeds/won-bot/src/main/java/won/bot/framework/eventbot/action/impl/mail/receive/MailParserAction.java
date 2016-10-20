@@ -25,11 +25,13 @@ public class MailParserAction extends BaseEventBotAction {
             MimeMessage message = ((MailReceivedEvent) event).getMessage();
 
             if(CreateNeedFromMailAction.isCreateMail(message)){
+                logger.debug("received a create mail publishing the CreateNeedFromMail event");
                 bus.publish(new CreateNeedFromMailEvent(message));
             }else if(MailCommandAction.isCommandMail(message)){
+                logger.debug("received a command mail publishing the MailCommand event");
                 bus.publish(new MailCommandEvent(message));
             }else{
-                logger.debug("UNKNOWN MAIL WILL NOT BE PROCESSED FURTHER");
+                logger.debug("unknown mail no further processing required");
             }
         }
     }
