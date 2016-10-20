@@ -14,5 +14,5 @@ ADD ./RWStore.properties /usr/src/bigdata/RWStore.properties
 
 # start bigdata on port 9999
 WORKDIR /usr/src/bigdata/
-CMD java -server -Xmx2g -Dbigdata.propertyFile=/usr/src/bigdata/RWStore.properties -jar bigdata-bundled.jar
+CMD java -server -Xmx2g -Djetty.start.timeout=60 -Dbigdata.propertyFile=/usr/src/bigdata/RWStore.properties -jar bigdata-bundled.jar
 

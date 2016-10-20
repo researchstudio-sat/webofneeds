@@ -31,6 +31,8 @@ services:
     image: webofneeds/bigdata
     environment:
       - "constraint:node==satsrv06"
+    volumes:
+      - $base_folder/bigdata/data/:/usr/src/bigdata/data
     ports:
       - "10000:9999"
 
@@ -68,6 +70,9 @@ services:
     image: webofneeds/solr:int
     environment:
       - "constraint:node==satsrv06"
+    volumes:
+      - $base_folder/solr/won/data:/opt/solr/server/solr/won/data
+      - $base_folder/solr/wontest/data:/opt/solr/server/solr/wontest/data
     ports:
       - "8984:8983"
 

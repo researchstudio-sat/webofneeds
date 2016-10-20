@@ -27,4 +27,5 @@ import java.util.List;
  */
 public interface WonNodeRepository extends WonRepository<WonNode> {
     List<WonNode> findByWonNodeURI(URI wonNodeURI);
+    WonNode findOneByWonNodeURIAndOwnerApplicationID(URI wonNodeURI, String ownerApplicationId);
 }
