@@ -11,15 +11,24 @@ set -e
 # base folder is used to mount some files (e.g. certificates) from the server into the containers
 export base_folder=/usr/share/webofneeds/int
 
-# check if all application data should be removed before deployment (for integration test, that is only certificates)
+# check if all application data should be removed before deployment
 if [ "$remove_all_data" = true ] ; then
-  echo generating new certificates! Old files and postgres need database will be deleted!
+
+  echo generating new certificates! Old files will be deleted!
   ssh root@satsrv04 rm -rf $base_folder/won-server-certs
   ssh root@satsrv05 rm -rf $base_folder/won-server-certs
   ssh root@satsrv06 rm -rf $base_folder/won-server-certs
   ssh root@satsrv04 rm -rf $base_folder/won-client-certs
   ssh root@satsrv05 rm -rf $base_folder/won-client-certs
   ssh root@satsrv06 rm -rf $base_folder/won-client-certs
+  rm -rf $base_folder/won-server-certs
+
+  echo delete postgres, bigdata and solr databases!
+  ssh root@satsrv04 rm -rf $base_folder/postgres/data
+  ssh root@satsrv05 rm -rf $base_folder/postgres/data
+  ssh root@satsrv06 rm -rf $base_folder/bigdata/data
+  ssh root@satsrv06 rm -rf $base_folder/solr/won/data
+  ssh root@satsrv06 rm -rf $base_folder/solr/wontest/data
 fi
 
 ssh root@satsrv04 mkdir -p $base_folder/won-server-certs
