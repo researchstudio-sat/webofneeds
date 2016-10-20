@@ -38,6 +38,7 @@ import won.protocol.util.DataAccessUtils;
 
 import java.net.URI;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
@@ -90,29 +91,39 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
    */
   public synchronized void register(URI wonNodeURI, MessagingService messagingService) throws Exception {
     CamelConfiguration camelConfiguration = null;
+    logger.info("setting up communication with won node: " + wonNodeURI);
 
-    logger.debug("register at won node: " + wonNodeURI);
-    if (isRegistered(wonNodeURI)) {
+    String ownerApplicationId = calculateOwnerApplicationIdFromOwnerCertificate();
+    WonNode wonNode = wonNodeRepository.findOneByWonNodeURIAndOwnerApplicationID(wonNodeURI, ownerApplicationId);
 
-      WonNode wonNode = DataAccessUtils.loadWonNode(wonNodeRepository, wonNodeURI);
-      Certificate cert = keyStoreService.getCertificate(cryptographyService.getDefaultPrivateKeyAlias());
-      String ownerApplicationId = aliasGenerator.generateAlias((X509Certificate) cert);
+    if (wonNode != null) {
+      logger.info("we're already registered. Connecting with WoN node: " + wonNodeURI);
       configureCamelEndpoint(wonNodeURI, ownerApplicationId);
-      wonNode.setOwnerApplicationID(ownerApplicationId);
-      wonNodeRepository.save(wonNode);
       configureRemoteEndpointsForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
         (wonNodeURI), messagingService);
-
+      logger.info("connected with WoN node: : " + wonNodeURI);
     } else {
-
-      String ownerApplicationId = registrationClient.register(wonNodeURI.toString());
-      logger.debug("registered ownerappID: " + ownerApplicationId);
+      logger.info("we're not yet registered. Registering with WoN node:" + wonNodeURI);
+      String nodeGeneratedOwnerApplicationId = registrationClient.register(wonNodeURI.toString());
+      if (!ownerApplicationId.equals(nodeGeneratedOwnerApplicationId) ){
+        throw new java.lang.IllegalStateException("WoN node " + wonNodeURI +" generated an ownerApplicationId that differs from" +
+                                          " ours. Node generated: " + nodeGeneratedOwnerApplicationId + ", we " +
+                                          "generated: " + ownerApplicationId);
+      }
+      logger.debug("registered with WoN node: " + wonNodeURI +",  ownerappID: " + ownerApplicationId);
       camelConfiguration = configureCamelEndpoint(wonNodeURI, ownerApplicationId);
       storeWonNode(ownerApplicationId, camelConfiguration, wonNodeURI);
       configureRemoteEndpointsForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
         (wonNodeURI), messagingService);
+      logger.info("connected with WoN node: : " + wonNodeURI);
     }
 
+
+  }
+
+  private String calculateOwnerApplicationIdFromOwnerCertificate() throws CertificateException {
+    Certificate cert = keyStoreService.getCertificate(cryptographyService.getDefaultPrivateKeyAlias());
+    return aliasGenerator.generateAlias((X509Certificate) cert);
   }
 
   // TODO this is messy, has to be improved, maybe endpoints should be obtained in the same step as registration,
@@ -201,13 +212,6 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
     return camelConfiguration;
   }
 
-  private boolean isRegistered(URI wonNodeURI) {
-    List<WonNode> wonNodes = wonNodeRepository.findByWonNodeURI(wonNodeURI);
-    if (!wonNodes.isEmpty()) {
-      return true;
-    }
-    return false;
-  }
 
 
   @Override
