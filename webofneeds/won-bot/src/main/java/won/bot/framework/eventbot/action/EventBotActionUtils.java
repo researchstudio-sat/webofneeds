@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.BotContext;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
+import won.bot.framework.eventbot.action.impl.mail.receive.util.MailContentExtractor;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
@@ -44,7 +45,7 @@ import java.util.HashMap;
  */
 public class EventBotActionUtils
 {
-    private static Logger logger = LoggerFactory.getLogger(EventBotActionUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(EventBotActionUtils.class);
 
     public static void rememberInListIfNamePresent(EventListenerContext ctx ,URI uri, String uriListName) {
         if (uriListName != null && uriListName.trim().length() > 0){
@@ -72,7 +73,7 @@ public class EventBotActionUtils
 
     /**
     * Creates a listener that waits for the response to the specified message. If a SuccessResponse is received,
-    * the successCallbck is executed, if a FailureResponse is received, the failureCallback is executed.
+    * the successCallback is executed, if a FailureResponse is received, the failureCallback is executed.
     * @param outgoingMessage
     * @param successCallback
     * @param failureCallback
@@ -105,7 +106,7 @@ public class EventBotActionUtils
 
     /**
     * Creates a listener that waits for the remote response to the specified message. If a SuccessResponse is received,
-    * the successCallbck is executed, if a FailureResponse is received, the failureCallback is executed.
+    * the successCallback is executed, if a FailureResponse is received, the failureCallback is executed.
     * @param outgoingMessage
     * @param successCallback
     * @param failureCallback
@@ -133,48 +134,6 @@ public class EventBotActionUtils
         context.getEventBus().subscribe(SuccessResponseEvent.class, listener);
         context.getEventBus().subscribe(FailureResponseEvent.class, listener);
         return listener;
-    }
-
-    //Util Methods to Get/Remove/Add Uri -> Address Relation
-    public static void addUriAddressRelation(EventListenerContext context, String mapName, URI needURI, MimeMessage sender) {
-        String email = null;
-
-        try {
-            Address[] froms = sender.getFrom();
-            email = froms == null ? null : ((InternetAddress) froms[0]).getAddress();
-        }catch(MessagingException me){
-            logger.error("COULD NOT RETRIEVE SENDER ADDRESS");
-            me.printStackTrace();
-            return;
-        }
-        BotContext botContext = context.getBotContext();
-        Object uriMap = botContext.get(mapName);
-
-        if(uriMap == null || !(uriMap instanceof HashMap)){
-            uriMap = new HashMap<URI, String>();
-        }
-
-        ((HashMap<URI, String>) uriMap).put(needURI, email);
-        botContext.put(mapName, uriMap);
-    }
-
-    public static void removeUriAddressRelation(EventListenerContext context, String mapName, URI needURI) {
-        BotContext botContext = context.getBotContext();
-        Object uriMap = botContext.get(mapName);
-
-        if(uriMap != null && uriMap instanceof HashMap){
-            ((HashMap<URI, String>) uriMap).remove(needURI);
-        }
-    }
-
-    public static String getAddressForURI(EventListenerContext context, String mapName, URI uri) {
-        BotContext botContext = context.getBotContext();
-        Object uriMap = botContext.get(mapName);
-
-        if(uriMap != null && uriMap instanceof HashMap){
-            return ((HashMap<URI, String>) uriMap).get(uri);
-        }
-        return null;
     }
 
     //Util Methods to Get/Remove/Add Uri -> MimeMessage Relation
@@ -212,33 +171,33 @@ public class EventBotActionUtils
     //Util Methods to Get/Remove/Add MailId -> URI Relation
     public static void removeMailIdWonURIRelation(EventListenerContext context, String mapName, String mailId) {
         BotContext botContext = context.getBotContext();
-        Object uriMap = botContext.get(mapName);
+        Object mailIdMap = botContext.get(mapName);
 
-        if(uriMap != null && uriMap instanceof HashMap){
-            ((HashMap<String, WonURI>) uriMap).remove(mailId);
+        if(mailIdMap != null && mailIdMap instanceof HashMap){
+            ((HashMap<String, WonURI>) mailIdMap).remove(mailId);
         }
     }
 
     public static WonURI getWonURIForMailId(EventListenerContext context, String mapName, String mailId) {
         BotContext botContext = context.getBotContext();
-        Object uriMap = botContext.get(mapName);
+        Object mailIdMap = botContext.get(mapName);
 
-        if(uriMap != null && uriMap instanceof HashMap){
-            return ((HashMap<String, WonURI>) uriMap).get(mailId);
+        if(mailIdMap != null && mailIdMap instanceof HashMap){
+            return ((HashMap<String, WonURI>) mailIdMap).get(mailId);
         }
         return null;
     }
 
     public static void addMailIdWonURIRelation(EventListenerContext context, String mapName, String mailId, WonURI uri) {
         BotContext botContext = context.getBotContext();
-        Object uriMap = botContext.get(mapName);
+        Object mailIdMap = botContext.get(mapName);
 
-        if(uriMap == null || !(uriMap instanceof HashMap)){
-            uriMap = new HashMap<String, WonURI>();
+        if(mailIdMap == null || !(mailIdMap instanceof HashMap)){
+            mailIdMap = new HashMap<String, WonURI>();
         }
 
-        ((HashMap<String, WonURI>) uriMap).put(mailId, uri);
-        botContext.put(mapName, uriMap);
+        ((HashMap<String, WonURI>) mailIdMap).put(mailId, uri);
+        botContext.put(mapName, mailIdMap);
     }
 
     public static HashMap<String, WonURI> getMailIdURIRelations(EventListenerContext context, String mapName) {

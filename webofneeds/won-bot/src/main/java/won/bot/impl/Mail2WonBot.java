@@ -28,7 +28,6 @@ import javax.mail.internet.MimeMessage;
  */
 public class Mail2WonBot extends EventBot{
     private static final String NAME_NEEDS = "mailNeeds";
-    private static final String URIMAILRELATIONS_NAME = "uriMailRelations";
     private static final String URIMIMEMESSAGERELATIONS_NAME = "uriMimeMessageRelations";
     private static final String MAILIDURIRELATIONS_NAME = "mailIdUriRelations";
 
@@ -56,21 +55,21 @@ public class Mail2WonBot extends EventBot{
         new ActionOnEventListener(
                 ctx,
                 "HintReceived",
-                new Hint2MailParserAction(ctx, NAME_NEEDS, URIMAILRELATIONS_NAME, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
+                new Hint2MailParserAction(ctx, NAME_NEEDS, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
         ));
 
         bus.subscribe(ConnectFromOtherNeedEvent.class,
         new ActionOnEventListener(
                 ctx,
                 "ConnectReceived",
-                new Connect2MailParserAction(ctx, NAME_NEEDS, URIMAILRELATIONS_NAME, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
+                new Connect2MailParserAction(ctx, NAME_NEEDS, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
         ));
 
         bus.subscribe(CreateNeedFromMailEvent.class,
         new ActionOnEventListener(
                 ctx,
                 "CreateNeedFromMailEvent",
-                new CreateNeedFromMailAction(ctx, NAME_NEEDS, URIMAILRELATIONS_NAME, URIMIMEMESSAGERELATIONS_NAME)
+                new CreateNeedFromMailAction(ctx, NAME_NEEDS, URIMIMEMESSAGERELATIONS_NAME)
 
         ));
         bus.subscribe(MailCommandEvent.class,
