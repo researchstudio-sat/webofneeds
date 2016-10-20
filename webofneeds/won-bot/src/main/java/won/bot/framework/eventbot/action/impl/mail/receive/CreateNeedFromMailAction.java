@@ -4,6 +4,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
+import won.bot.framework.eventbot.action.impl.mail.receive.util.MailContentExtractor;
 import won.bot.framework.eventbot.action.impl.needlifecycle.AbstractCreateNeedAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.mail.CreateNeedFromMailEvent;
@@ -31,12 +32,10 @@ import java.util.Arrays;
  * Created by fsuda on 30.09.2016.
  */
 public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
-    private String uriMailRelationsName;
     private String uriMimeMessageRelationsName;
 
-    public CreateNeedFromMailAction(EventListenerContext eventListenerContext, String uriListName, String uriMailRelationsName, String uriMimeMessageRelationsName, URI... facets) {
+    public CreateNeedFromMailAction(EventListenerContext eventListenerContext, String uriListName, String uriMimeMessageRelationsName, URI... facets) {
         super(eventListenerContext, uriListName);
-        this.uriMailRelationsName = uriMailRelationsName;
         this.uriMimeMessageRelationsName = uriMimeMessageRelationsName;
 
         this.usedForTesting = true;
@@ -55,11 +54,12 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
             MimeMessage message = ((CreateNeedFromMailEvent) event).getMessage();
 
             try {
-                String subject = message.getSubject();
-                String description = message.getContent().toString();
-                BasicNeedType type = retrieveBasicNeedType(subject);
-
+                BasicNeedType type = MailContentExtractor.getBasicNeedType(message);
                 assert type != null; //Done as a failsafe, this Action should never be called if it is not a valid CreateNeed-Mail
+
+                String title = MailContentExtractor.getTitle(message);
+                String description = MailContentExtractor.getDescription(message);
+                String[] tags = MailContentExtractor.getTags(message);
 
                 EventListenerContext ctx = getEventListenerContext();
                 WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
@@ -67,7 +67,7 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                 final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
                 final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
                 Model model = new NeedModelBuilder()
-                        .setTitle(subject)
+                        .setTitle(title)
                         .setBasicNeedType(type)
                         .setDescription(description)
                         .setUri(needURI)
@@ -78,7 +78,6 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
 
                 WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, model);
                 EventBotActionUtils.rememberInListIfNamePresent(ctx, needURI, uriListName);
-                EventBotActionUtils.addUriAddressRelation(ctx, uriMailRelationsName, needURI, message);
                 EventBotActionUtils.addUriMimeMessageRelation(ctx, uriMimeMessageRelationsName, needURI, message);
 
                 EventListener successCallback = new EventListener()
@@ -86,7 +85,7 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                     @Override
                     public void onEvent(Event event) throws Exception {
                         logger.debug("need creation successful, new need URI is {}", needURI);
-                        String sender = EventBotActionUtils.getAddressForURI(getEventListenerContext(), uriMailRelationsName, needURI);
+                        String sender = MailContentExtractor.getFromAddressString(EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), uriMimeMessageRelationsName, needURI));
                         logger.debug("created need was from sender: " + sender);
                     }
                 };
@@ -98,7 +97,6 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                         String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
                         logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
                         EventBotActionUtils.removeFromListIfNamePresent(getEventListenerContext(), needURI, uriListName);
-                        EventBotActionUtils.removeUriAddressRelation(getEventListenerContext(), uriMailRelationsName, needURI);
                         EventBotActionUtils.removeUriMimeMessageRelation(getEventListenerContext(), uriMimeMessageRelationsName, needURI);
                     }
                 };
@@ -116,25 +114,11 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
 
     public static boolean isCreateMail(MimeMessage message) {
         try{
-            String subject = message.getSubject();
-
-            return retrieveBasicNeedType(subject) != null;
+            return MailContentExtractor.getBasicNeedType(message) != null;
         }catch(MessagingException me){
             //TODO: LOGGER SHOULD BE STATIC FINAL ETC TO PRINT IN STATIC CONTEXT
             me.printStackTrace();
             return false;
-        }
-    }
-
-    public static BasicNeedType retrieveBasicNeedType(String subject){
-        //TODO: IMPLEMENT VOCABULARY VIA ADMIN INTERFACE OR PROPERTIES FILE THAT LINKS CERTAIN REGULAREXPRESSIONS WITH A BasicNeedType
-
-        if(subject.startsWith("[WANT]")){
-            return BasicNeedType.DEMAND;
-        }else if(subject.startsWith("[OFFER]")){
-            return BasicNeedType.SUPPLY;
-        }else{
-            return null;
         }
     }
 }

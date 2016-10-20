@@ -3,11 +3,15 @@ package won.bot.framework.eventbot.action.impl.wonmessage;
 import com.hp.hpl.jena.query.Dataset;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.mail.OpenConnectionEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
+import won.protocol.model.FacetType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
@@ -24,18 +28,39 @@ public class OpenConnectionUriAction extends BaseEventBotAction {
             logger.debug("trying to close connection related to event {}", event);
             try {
                 URI connectionURI = ((OpenConnectionEvent) event).getConnectionURI();
-                String msg = ((OpenConnectionEvent) event).getMessage();
-
                 logger.debug("Extracted connection uri {}", connectionURI);
-                if (connectionURI != null) {
-                    logger.debug("closing connection {}", connectionURI);
 
-                    getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(connectionURI, msg));
+                if(connectionURI != null){
+                    String msg = ((OpenConnectionEvent) event).getMessage();
+                    WonMessage openConnectionMessage = createWonMessage(connectionURI, msg);
+
+                    EventListener successCallback = new EventListener()
+                    {
+                        @Override
+                        public void onEvent(Event event) throws Exception {
+                            logger.debug("successfully opened connection {}", connectionURI);
+                        }
+                    };
+
+                    EventListener failureCallback = new EventListener()
+                    {
+                        @Override
+                        public void onEvent(Event event) throws Exception {
+                            String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
+                            logger.debug("open connection failed for URI {}, original message URI {}: {}", new Object[]{connectionURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
+                        }
+                    };
+                    EventBotActionUtils.makeAndSubscribeResponseListener(openConnectionMessage, successCallback, failureCallback, getEventListenerContext());
+
+                    logger.debug("registered listeners for response to message URI {}", openConnectionMessage.getMessageURI());
+                    getEventListenerContext().getWonMessageSender().sendWonMessage(openConnectionMessage);
+                    logger.debug("open connection message sent with message URI {}", openConnectionMessage.getMessageURI());
+
                 } else {
-                    logger.warn("could not determine which connection to close for event {}", event);
+                    logger.warn("could not determine which connection to open for event {}", event);
                 }
             } catch (Exception e) {
-                logger.warn("error trying to close connection", e);
+                logger.warn("error trying to open connection", e);
             }
         }
     }
@@ -51,16 +76,14 @@ public class OpenConnectionUriAction extends BaseEventBotAction {
         Dataset remoteNeedRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
         return WonMessageBuilder.setMessagePropertiesForConnect(
-                wonNodeInformationService.generateEventURI(
-                        wonNode),
-                connectionURI,
+                wonNodeInformationService.generateEventURI(wonNode),
+                FacetType.OwnerFacet.getURI(),
                 localNeed,
                 wonNode,
-                WonRdfUtils.NeedUtils.getRemoteConnectionURIFromConnection(connectionRDF, connectionURI),
+                FacetType.OwnerFacet.getURI(),
                 remoteNeed,
                 WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
                 msg
-        )
-                .build();
+        ).build();
     }
 }

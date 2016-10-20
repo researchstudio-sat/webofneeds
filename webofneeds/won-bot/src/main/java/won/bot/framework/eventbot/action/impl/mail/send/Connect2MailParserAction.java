@@ -6,7 +6,9 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
-import won.bot.framework.eventbot.action.impl.mail.receive.util.UriType;
+import won.bot.framework.eventbot.action.impl.mail.model.UriType;
+import won.bot.framework.eventbot.action.impl.mail.receive.util.MailContentExtractor;
+import won.bot.framework.eventbot.action.impl.mail.send.util.WonMimeMessageGenerator;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
 import won.protocol.model.Connection;
@@ -19,18 +21,18 @@ import java.net.URI;
  */
 public class Connect2MailParserAction extends BaseEventBotAction {
     private String uriListName;
-    private String uriMailRelationsName; //MAYBE WE DO NOT NEED THIS SINCE ITS IN THE uriMimeMessageRelations already (within the MimeMessage)
     private String uriMimeMessageRelationsName;
     private String mailIdUriRelationsName;
-    private MessageChannel messageChannel;
+    private MessageChannel sendChannel;
+    private EventListenerContext ctx;
 
-    public Connect2MailParserAction(EventListenerContext eventListenerContext, String uriListName, String uriMailRelationsName, String uriMimeMessageRelationsName, String mailIdUriRelationsName, MessageChannel messageChannel) {
+    public Connect2MailParserAction(EventListenerContext eventListenerContext, String uriListName, String uriMimeMessageRelationsName, String mailIdUriRelationsName, MessageChannel sendChannel) {
         super(eventListenerContext);
         this.uriListName = uriListName;
-        this.uriMailRelationsName = uriMailRelationsName;
         this.uriMimeMessageRelationsName = uriMimeMessageRelationsName;
         this.mailIdUriRelationsName = mailIdUriRelationsName;
-        this.messageChannel = messageChannel;
+        this.sendChannel = sendChannel;
+        this.ctx = eventListenerContext;
     }
 
     @Override
@@ -39,33 +41,15 @@ public class Connect2MailParserAction extends BaseEventBotAction {
             Connection con = ((ConnectFromOtherNeedEvent) event).getCon();
 
             URI responseTo = con.getNeedURI();
-            String respondToMailAddress = EventBotActionUtils.getAddressForURI(getEventListenerContext(), uriMailRelationsName, responseTo);
-            logger.debug("Someone issued a connect for URI: " + responseTo + " sending a mail to the creator: " + respondToMailAddress);
+            URI remoteNeedUri = con.getRemoteNeedURI();
 
-            MimeMessage originalMail = EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), uriMimeMessageRelationsName, responseTo);
-            MimeMessage answerMessage = (MimeMessage) originalMail.reply(false);
+            MimeMessage originalMail = EventBotActionUtils.getMimeMessageForURI(ctx, uriMimeMessageRelationsName, responseTo);
+            logger.debug("Someone issued a connect for URI: " + responseTo + " sending a mail to the creator: " + MailContentExtractor.getFromAddressString(originalMail));
 
-            StringBuilder mailText = new StringBuilder("Someone wants to connect with you:\n");
-            mailText.append("{");
-            mailText.append(con.getRemoteNeedURI());
-            mailText.append("}\n\n");
+            WonMimeMessage answerMessage = WonMimeMessageGenerator.createConnectMail(originalMail, remoteNeedUri);
+            EventBotActionUtils.addMailIdWonURIRelation(ctx, mailIdUriRelationsName, answerMessage.getMessageID(), new WonURI(con.getConnectionURI(), UriType.CONNECTION));
 
-            mailText.append("Original Message from <");
-            mailText.append(respondToMailAddress);
-            mailText.append("> on ");
-            mailText.append(originalMail.getSentDate());
-            mailText.append(":\n");
-            String originalContent = ">"+originalMail.getContent().toString().replaceAll("\\n","\n>");
-            mailText.append(originalContent);
-            answerMessage.setText(mailText.toString());
-
-            //We need to create an instance of our own MimeMessage Implementation in order to have the Unique Message Id set before sending
-            WonMimeMessage answerMessage2 = new WonMimeMessage(answerMessage);
-            answerMessage2.updateMessageID();
-
-            EventBotActionUtils.addMailIdWonURIRelation(getEventListenerContext(), mailIdUriRelationsName, answerMessage2.getMessageID(), new WonURI(con.getConnectionURI(), UriType.CONNECTION));
-
-            messageChannel.send(new GenericMessage<>(answerMessage2));
+            sendChannel.send(new GenericMessage<>(answerMessage));
         }
     }
 }

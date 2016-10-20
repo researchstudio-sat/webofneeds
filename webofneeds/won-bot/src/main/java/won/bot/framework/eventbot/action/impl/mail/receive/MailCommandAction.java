@@ -5,7 +5,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
-import won.bot.framework.eventbot.action.impl.mail.receive.util.ActionType;
+import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.mail.OpenConnectionEvent;
@@ -15,7 +15,6 @@ import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
-import java.net.URI;
 
 /**
  * Created by fsuda on 18.10.2016.
@@ -75,12 +74,11 @@ public class MailCommandAction  extends BaseEventBotAction {
     }
 
     private static ActionType determineAction(MimeMessage message) {
+        //TODO: determine better Actions and move to MailContentExtractor
         try {
             String messageContent = (String) message.getContent();
             if (messageContent.startsWith("close") || messageContent.startsWith("deny")) {
                 return ActionType.CLOSE_CONNECTION;
-            }else if(messageContent.startsWith("accept")){
-                return ActionType.ACCEPT;
             }else if(messageContent.startsWith("connect")){
                 return ActionType.CONNECT;
             }else {
