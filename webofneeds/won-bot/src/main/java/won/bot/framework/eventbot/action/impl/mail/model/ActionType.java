@@ -6,6 +6,8 @@ package won.bot.framework.eventbot.action.impl.mail.model;
 public enum ActionType {
     CLOSE_CONNECTION,
     CLOSE_NEED,
-    CONNECT,
+    OPEN_CONNECTION,
+    IMPLICIT_OPEN_CONNECTION,
+    SENDMESSAGE,
     NO_ACTION
 }
