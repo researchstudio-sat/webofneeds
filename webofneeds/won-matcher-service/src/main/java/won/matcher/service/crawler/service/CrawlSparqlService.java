@@ -186,9 +186,11 @@ public class CrawlSparqlService extends SparqlService
     return extractedURIs;
   }
 
-  public BulkNeedEvent retrieveActiveNeedEvents(long fromDate, long toDate, int offset, int limit) {
+  public BulkNeedEvent retrieveActiveNeedEvents(long fromDate, long toDate, int offset, int limit, boolean
+    sortAscending) {
 
     // query template to retrieve all alctive cralwed/saved needs in a certain date range
+    String orderClause = sortAscending ? "ORDER BY ?date\n" : "ORDER BY DESC(?date)\n";
     log.debug("bulk load need data from sparql endpoint in date range: [{},{}]", fromDate, toDate);
     String queryTemplate = "prefix won: <http://purl.org/webofneeds/model#> \n" +
       "SELECT ?needUri ?wonNodeUri ?date WHERE {  \n" +
@@ -198,9 +200,9 @@ public class CrawlSparqlService extends SparqlService
       "  ?needUri won:hasWonNode ?wonNodeUri. \n" +
       "  {?needUri won:crawlStatus 'SAVE'.} UNION {?needUri won:crawlStatus 'DONE'.}\n" +
       "  FILTER (?date >= %d && ?date < %d ) \n" +
-      "} ORDER BY ?date\n" +
-      "OFFSET %d\n" +
-      "LIMIT %d";
+      "} " + orderClause +
+      " OFFSET %d\n" +
+      " LIMIT %d";
 
     String queryString = String.format(queryTemplate, fromDate, toDate, offset, limit);
 

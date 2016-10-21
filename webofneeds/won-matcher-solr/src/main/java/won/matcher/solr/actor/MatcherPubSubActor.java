@@ -46,7 +46,7 @@ public class MatcherPubSubActor extends UntypedActor
   private static final String TICK = "tick";
   private static final String APP_STATE_PROPERTIES_FILE_NAME = "state.config.properties";
   private static final String LAST_SEEN_NEED_DATE_PROPERTY_NAME = "lastSeenNeedDate";
-  private boolean needsUpdated = false;
+  private boolean needsUpdateRequestReceived = false;
   private Properties appStateProps = new Properties();
 
   @Override
@@ -91,11 +91,6 @@ public class MatcherPubSubActor extends UntypedActor
         appStateProps.setProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME, String.valueOf(-1));
         saveLastSeenNeedDate();
       }
-
-      if (Long.valueOf(appStateProps.getProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME)) == -1) {
-        log.info("initialized property '{}' to -1, no need updates requested", LAST_SEEN_NEED_DATE_PROPERTY_NAME);
-        needsUpdated = true;
-      }
     }
   }
 
@@ -119,11 +114,21 @@ public class MatcherPubSubActor extends UntypedActor
   public void onReceive(Object o) throws Exception {
 
     if (o.equals(TICK)) {
-      if (!needsUpdated) {
+      if (!needsUpdateRequestReceived) {
+
         // request missing need events from matching service while this matcher was not available
         long lastSeenNeedDate = Long.valueOf(appStateProps.getProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME));
-        log.info("request missed needs from mataching service with crawl date > {}", lastSeenNeedDate);
-        LoadNeedEvent loadNeedEvent = new LoadNeedEvent(lastSeenNeedDate, Long.MAX_VALUE);
+        LoadNeedEvent loadNeedEvent;
+
+        if (lastSeenNeedDate == -1) {
+          // request the last one need event from matching service and accept every need event timestamp
+          loadNeedEvent = new LoadNeedEvent(1);
+        } else {
+          // request need events with date > last need event date
+          log.info("request missed needs from mataching service with crawl date > {}", lastSeenNeedDate);
+          loadNeedEvent = new LoadNeedEvent(lastSeenNeedDate, Long.MAX_VALUE);
+        }
+
         pubSubMediator.tell(new DistributedPubSubMediator.Publish(
           loadNeedEvent.getClass().getName(), loadNeedEvent), getSelf());
       }
@@ -133,7 +138,7 @@ public class MatcherPubSubActor extends UntypedActor
       log.info("NeedEvent received: " + needEvent);
 
       // save the last seen need date property after the needs are up to date with the matching service
-      if (needsUpdated) {
+      if (needsUpdateRequestReceived) {
         long lastSeenNeedDate = Long.valueOf(appStateProps.getProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME));
         if (needEvent.getCrawlDate() > lastSeenNeedDate) {
           appStateProps.setProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME, String.valueOf(needEvent.getCrawlDate()));
@@ -147,11 +152,18 @@ public class MatcherPubSubActor extends UntypedActor
 
       // receiving a bulk need event means this is the answer for the request of need updates
       // there could arrive several of these bulk events
-      needsUpdated = true;
+      needsUpdateRequestReceived = true;
       BulkNeedEvent bulkNeedEvent = (BulkNeedEvent) o;
       log.info("BulkNeedEvent received with {} need events", bulkNeedEvent.getNeedEvents().size());
-      for (NeedEvent event : ((BulkNeedEvent) o).getNeedEvents()) {
-        getSelf().tell(event, getSelf());
+      for (NeedEvent needEvent : ((BulkNeedEvent) o).getNeedEvents()) {
+
+        long lastSeenNeedDate = Long.valueOf(appStateProps.getProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME));
+        if (needEvent.getCrawlDate() > lastSeenNeedDate) {
+          appStateProps.setProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME, String.valueOf(needEvent.getCrawlDate()));
+          saveLastSeenNeedDate();
+        }
+
+        matcherActor.tell(needEvent, getSelf());
       }
 
     } else if (o instanceof HintEvent) {

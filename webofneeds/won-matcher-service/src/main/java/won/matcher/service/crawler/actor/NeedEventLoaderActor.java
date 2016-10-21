@@ -44,12 +44,21 @@ public class NeedEventLoaderActor extends UntypedActor
     if (o instanceof LoadNeedEvent) {
 
       LoadNeedEvent msg = (LoadNeedEvent) o;
-      log.debug("received request to load needs events in date interval {}", msg);
+      log.debug("received request to load needs events: {}", msg);
       BulkNeedEvent bulkNeedEvent;
       int offset = 0;
 
       do {
-        bulkNeedEvent = sparqlService.retrieveActiveNeedEvents(msg.getFromDate(), msg.getToDate(), offset, MAX_BULK_SIZE);
+
+        // check if need event should be returned in time interval or last X need events
+        if (msg.getLastXNeedEvents() == -1) {
+          bulkNeedEvent = sparqlService.retrieveActiveNeedEvents(
+            msg.getFromDate(), msg.getToDate(), offset, MAX_BULK_SIZE, true);
+        } else {
+          bulkNeedEvent = sparqlService.retrieveActiveNeedEvents(
+            0, Long.MAX_VALUE, offset, Math.min(MAX_BULK_SIZE, msg.getLastXNeedEvents() - offset), false);
+        }
+
         if (bulkNeedEvent.getNeedEvents().size() > 0) {
           log.debug("send bulk event of size {} back to requesting actor", bulkNeedEvent.getNeedEvents().size());
           getSender().tell(bulkNeedEvent, getSelf());
