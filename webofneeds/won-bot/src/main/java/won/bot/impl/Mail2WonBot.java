@@ -93,12 +93,11 @@ public class Mail2WonBot extends EventBot{
                 new OpenConnectionUriAction(ctx)
         ));
 
-        //if the bot receives a text message - try to map the command of the text message to a DebugEvent
         bus.subscribe(MessageFromOtherNeedEvent.class,
         new ActionOnEventListener(
                 ctx,
                 "ReceivedTextMessage",
-                new Message2MailAction(ctx, MAILIDURIRELATIONS_NAME, sendEmailChannel)
+                new Message2MailAction(ctx, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
         ));
     }
 

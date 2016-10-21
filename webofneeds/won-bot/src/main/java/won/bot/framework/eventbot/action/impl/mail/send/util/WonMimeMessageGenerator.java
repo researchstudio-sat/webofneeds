@@ -30,6 +30,7 @@ public class WonMimeMessageGenerator {
         mailText.append(originalContent);
         answerMessage.setText(mailText.toString());
 
+        //We need to create an instance of our own MimeMessage Implementation in order to have the Unique Message Id set before sending
         WonMimeMessage wonAnswerMessage = new WonMimeMessage(answerMessage);
         wonAnswerMessage.updateMessageID();
 
@@ -44,6 +45,31 @@ public class WonMimeMessageGenerator {
         mailText.append("{");
         mailText.append(remoteNeedUri);
         mailText.append("}\n\n");
+
+        mailText.append("Original Message from <");
+        mailText.append(respondToMailAddress);
+        mailText.append("> on ");
+        mailText.append(msgToRespondTo.getSentDate());
+        mailText.append(":\n");
+        String originalContent = ">"+msgToRespondTo.getContent().toString().replaceAll("\\n","\n>");
+        mailText.append(originalContent);
+        answerMessage.setText(mailText.toString());
+
+        //We need to create an instance of our own MimeMessage Implementation in order to have the Unique Message Id set before sending
+        WonMimeMessage wonAnswerMessage = new WonMimeMessage(answerMessage);
+        wonAnswerMessage.updateMessageID();
+
+        return wonAnswerMessage;
+    }
+
+    public static WonMimeMessage createTextMessageMail(MimeMessage msgToRespondTo, URI remoteNeedUri, String text) throws MessagingException, IOException {
+        //TODO: SEND BETTER TEXT (maybe include the messages from before and also include the corresponding need infos)
+        String respondToMailAddress = MailContentExtractor.getFromAddressString(msgToRespondTo);
+        MimeMessage answerMessage = (MimeMessage) msgToRespondTo.reply(false);
+
+        StringBuilder mailText = new StringBuilder("Someone sent the message:\n");
+        mailText.append(text);
+        mailText.append("\n\n");
 
         mailText.append("Original Message from <");
         mailText.append(respondToMailAddress);
