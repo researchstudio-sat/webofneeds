@@ -25,7 +25,7 @@ public class OpenConnectionUriAction extends BaseEventBotAction {
     @Override
     protected void doRun(Event event) throws Exception {
         if(event instanceof OpenConnectionEvent) {
-            logger.debug("trying to close connection related to event {}", event);
+            logger.debug("trying to open connection related to event {}", event);
             try {
                 URI connectionURI = ((OpenConnectionEvent) event).getConnectionURI();
                 logger.debug("Extracted connection uri {}", connectionURI);
