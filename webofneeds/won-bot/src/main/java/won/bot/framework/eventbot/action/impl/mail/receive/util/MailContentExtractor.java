@@ -39,7 +39,7 @@ public class MailContentExtractor {
     }
 
     public static String getTextMessage(Object content) {
-        //TODO: MAKE THE MESSAGE EXTRACTION A LITTLE BIT MORE SUFISTICATED
+        //TODO: make message extraction a little bit more sophisticated
         return content.toString().split("\\r")[0];
     }
 
