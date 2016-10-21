@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import won.bot.framework.bot.Bot;
 import won.bot.framework.bot.base.BaseBot;
+import won.bot.impl.DebugBot;
 
 import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
@@ -33,7 +34,7 @@ public class BotTests
 {
   @Test
   public void testIsInitialized(){
-    Bot bot = new BaseBot();
+    Bot bot = new DebugBot();
     try {
       bot.initialize();
     } catch (Exception e) {
@@ -53,7 +54,7 @@ public class BotTests
     final Set<Thread> threadsInInit = Collections.synchronizedSet(new HashSet<Thread>());
 
     //bot impl that remembers which thread entered the initialize method
-    final Bot bot = new BaseBot(){
+    final Bot bot = new DebugBot(){
       @Override
       protected void doInitialize()
       {
@@ -108,7 +109,7 @@ public class BotTests
 
   @Test
   public void testIsShutdown(){
-    Bot bot = new BaseBot();
+    Bot bot = new DebugBot();
     try {
       bot.shutdown();
     } catch (Exception e) {
@@ -128,7 +129,7 @@ public class BotTests
     final Set<Thread> threadsInShutdown = Collections.synchronizedSet(new HashSet<Thread>());
 
     //bot impl that remembers which thread entered the shutdown method
-    final Bot bot = new BaseBot(){
+    final Bot bot = new DebugBot(){
       @Override
       protected void doShutdown()
       {

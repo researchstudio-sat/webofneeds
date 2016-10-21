@@ -33,7 +33,7 @@ import java.net.URI;
 /**
  * Basic Bot implementation intended to be extended. Does nothing.
  */
-public class BaseBot implements Bot
+public abstract class BaseBot implements Bot
 {
   protected final Logger logger = LoggerFactory.getLogger(getClass());
   private BotContext botContext;
@@ -61,8 +61,6 @@ public class BaseBot implements Bot
     this.lifecyclePhase = BotLifecyclePhase.ACTIVE;
   }
 
-
-
   @Override
   public synchronized void shutdown() throws Exception
   {
@@ -75,12 +73,12 @@ public class BaseBot implements Bot
   /**
    * Override this method to do free resources during shutdown.
    */
-  protected void doShutdown() {}
+  protected abstract void doShutdown();
 
   /**
    * Override this method to do initialization work.
    */
-  protected void doInitialize() {};
+  protected abstract void doInitialize();
 
   /**
    * Sets the workDone flag to true.
@@ -111,38 +109,44 @@ public class BaseBot implements Bot
     return botContext;
   }
 
-  @Override public void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception{}
-
-  @Override public void onConnectFromOtherNeed(Connection con, final WonMessage wonMessage)  {}
-
-  @Override public void onOpenFromOtherNeed(Connection con, final WonMessage wonMessage){}
-
-  @Override public void onCloseFromOtherNeed(Connection con, final WonMessage wonMessage){}
-
-  @Override public void onHintFromMatcher(Match match, final WonMessage wonMessage) {}
-
-  @Override public void onMessageFromOtherNeed(Connection con, final WonMessage wonMessage) {}
+  @Override
+  public abstract void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception;
 
   @Override
-  public void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {}
+  public abstract void onConnectFromOtherNeed(Connection con, final WonMessage wonMessage);
 
   @Override
-  public void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {}
+  public abstract void onOpenFromOtherNeed(Connection con, final WonMessage wonMessage);
 
   @Override
-  public void onMatcherRegistered(final URI wonNodeUri) {}
+  public abstract void onCloseFromOtherNeed(Connection con, final WonMessage wonMessage);
 
   @Override
-  public void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Dataset needModel){}
+  public abstract void onHintFromMatcher(Match match, final WonMessage wonMessage);
 
   @Override
-  public void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI) {}
+  public abstract void onMessageFromOtherNeed(Connection con, final WonMessage wonMessage);
 
   @Override
-  public void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI) {}
+  public abstract void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage);
 
-  @Override public void act() throws Exception
-  {}
+  @Override
+  public abstract void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage);
+
+  @Override
+  public abstract void onMatcherRegistered(final URI wonNodeUri);
+
+  @Override
+  public abstract void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needURI, final Dataset needModel);
+
+  @Override
+  public abstract void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+
+  @Override
+  public abstract void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI);
+
+  @Override
+  public abstract void act() throws Exception;
 
   private void createDefaultBotContextIfNecessary()
   {

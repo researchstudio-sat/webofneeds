@@ -321,7 +321,7 @@ public class WonMessageBuilder
     URI remoteConnection,
     URI remoteNeed,
     URI remoteWonNode, String farewellMessage) {
-   return setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_OWNER,localConnection, localNeed,
+   return setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_OWNER, localConnection, localNeed,
                                        localWonNode, remoteConnection, remoteNeed, remoteWonNode, farewellMessage);
   }
 
@@ -349,6 +349,36 @@ public class WonMessageBuilder
       .setSentTimestampToNow();
   }
 
+  public static WonMessageBuilder setMessagePropertiesForClose(
+          URI messageURI,
+          URI localConnection,
+          URI localNeed,
+          URI localWonNode, String farewellMessage) {
+
+          return setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_OWNER, localConnection, localNeed, localWonNode, farewellMessage);
+  }
+
+  public static WonMessageBuilder setMessagePropertiesForClose(
+          URI messageURI,
+          WonMessageDirection direction,
+          URI localConnection,
+          URI localNeed,
+          URI localWonNode, String farewellMessage) {
+
+    return setMessagePropertiesForClose(messageURI, WonMessageDirection.FROM_OWNER, localConnection, localNeed,
+            localWonNode, localConnection, localNeed, localWonNode, farewellMessage);
+  }
+
+
+  /**
+   * Sets the MessageProperties for Closing open connections (happens when the need is closed and the system is closing
+   * all the corresponding connections when no connection is present from the remoteNeed
+   * @param messageURI
+   * @param localConnection
+   * @param localNeed
+   * @param localWonNode
+     * @return
+     */
   public static WonMessageBuilder setMessagePropertiesForLocalOnlyClose(
     URI messageURI,
     URI localConnection,

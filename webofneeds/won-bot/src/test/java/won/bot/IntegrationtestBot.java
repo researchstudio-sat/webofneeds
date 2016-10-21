@@ -27,4 +27,14 @@ public class IntegrationtestBot extends EventBot implements ContextExposingBot {
   public EventListenerContext getExposedEventListenerContext() {
     return getEventListenerContext();
   }
+
+  @Override
+  protected void initializeEventListeners() {
+
+  }
+
+  @Override
+  protected void shutdownEventListeners() {
+
+  }
 }

@@ -8,6 +8,7 @@ import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import com.hp.hpl.jena.sparql.path.Path;
 import com.hp.hpl.jena.sparql.path.PathParser;
 import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.camel.component.dataset.DataSet;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
+import won.protocol.model.ConnectionState;
 import won.protocol.model.Facet;
 import won.protocol.model.Match;
 import won.protocol.model.NeedState;
@@ -441,7 +443,7 @@ public class WonRdfUtils
     }
 
     /**
-     * Creates a model for connecting two facets.
+     * Creates a model for connecting two facets.CONNECTED.getURI().equals(connectionState)
      * @return
      */
     public static Model createFacetModelForHintOrConnect(URI facet, URI remoteFacet)
@@ -454,6 +456,20 @@ public class WonRdfUtils
       return model;
     }
 
+  }
+
+  public static class ConnectionUtils {
+    public static boolean isConnected(Dataset connectionDataset, URI connectionUri) {
+      URI connectionState = getConnectionState(connectionDataset, connectionUri);
+
+      return ConnectionState.CONNECTED.getURI().equals(connectionState);
+    }
+
+    public static URI getConnectionState(Dataset connectionDataset, URI connectionUri) {
+      Path statePath = PathParser.parse("won:hasConnectionState", DefaultPrefixUtils.getDefaultPrefixes());
+
+      return RdfUtils.getURIPropertyForPropertyPath(connectionDataset, connectionUri, statePath);
+    }
   }
 
   public static class NeedUtils
@@ -510,7 +526,6 @@ public class WonRdfUtils
       }
       return result;
     }
-
     public static NeedState queryActiveStatus(Dataset content, final URI needURI) {
       return RdfUtils.findOne(content, new RdfUtils.ModelVisitor<NeedState>()
       {

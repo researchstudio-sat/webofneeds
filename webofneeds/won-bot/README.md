@@ -27,9 +27,62 @@ relevant for the system being tested, i.e.:
     for delivery are defined based on Owner and Bot certificates, and if they are the same there will be errors. 
     
     NOTE: For the same reason as above, do not run several Bot applications at the same time, - stop one before 
-    running another.
+    running another or separate their configurations.
     
     NOTE: Keystore and trustore pathes have to be specified but the files themselves do not have to exist, they will 
     be created automatically. In fact, in case the Bot's default Node was previously having a different certificate  
     this file must be deleted - otherwise the Bot won't trust the Node and won't be able to register and create needs
     there.
+
+###Mail2Won Bot
+[Mail2WonBotApp](src/main/java/won/bot/app/Mail2WonBotApp.java) can be used to create Needs retrieved from a given Email
+Address. This Bot acts mostly like a Owner Application as it allows Users to create needs, open/close connections or requests
+and communicate with others. [Insert List of commands here]
+
+Run [Mail2WonBotApp](src/main/java/won/bot/app/Mail2WonBotApp.java) with the argument specifying the configuration
+location, e.g:
+    -DWON_CONFIG_DIR=C:/webofneeds/conf.local
+Furthermore you need to set the following arguments to ensure a connection to an incoming and outgoing mail-server
+    -Demail.user=username
+    -Demail.password=pass
+    -Demail.imap.host=imap.gmail.com:993
+    -Demail.smtp.host=smtp.gmail.com
+    -Demail.smtp.port=587
+
+Make sure this location contains the relevant property files, and you have specified the values of the properties
+relevant for the system being tested, i.e.:
+ * in [node-uri-source.properties](../conf/node-uri-source.properties)
+    * won.node.uris - specify values of nodes being tested - the bot will react to needs published on those nodes
+ * in [owner.properties](../conf/owner.properties)
+    * specify default node data (node.default.host/scheme/port) - the bot will create its own needs on that node
+    * make sure a path to keystore and truststore is specified (keystore/truststore.location) and their password
+    (keystore/truststore.password)
+
+    NOTE: Don't use at Bot the same keystore (and key pair) that you use for Owner Application or other Bots, especially if you are
+    running owner locally - the node won't deliver messages correctly to the Bot and Owner because the queues used
+    for delivery are defined based on Owner and Bot certificates, and if they are the same there will be errors.
+
+    NOTE: For the same reason as above, do not run several Bot applications at the same time, - stop one before
+    running another.
+
+    NOTE: Keystore and trustore pathes have to be specified but the files themselves do not have to exist, they will
+    be created automatically. In fact, in case the Bot's default Node was previously having a different certificate
+    this file must be deleted - otherwise the Bot won't trust the Node and won't be able to register and create needs
+    there.
+
+Usage:
+You can send an e-mail with a Subject starting with either [WANT], [OFFER], [TOGETHER], [CRITIQUE] to the configured Mailadress,
+ to create a Need of the given type. The Body or Content of the Mail will be used as the NeedDescription, the rest of the subject line
+ will be used as the Need Title. Furthermore Tags (Strings starting with #) will be extracted from the e-mail and will
+ be stored within the created need.
+
+You will then receive e-mails when the Matcher finds Connections to this created Need, you can answer those e-mails via
+the reply function of your e-mail-Client, for now we support the following commands (which will be retrieved from the replymessage-body):
+A Replymail that starts with:
+-"close" or "deny" will close the respective connection
+-"connect" sends a request to the other need or opens the connection if the status is already request received
+-answering a mail with anything that does not contain any of the keywords above will automatically open a connection and send the replymessage-body as a textmessage
+
+A Replymail for an already open connection(hasConnectionState: Connected) will send teh replymessage-body as a textmessage
+
+Every Remote Message sent to this Connection will be sent to you as an e-mail as well.

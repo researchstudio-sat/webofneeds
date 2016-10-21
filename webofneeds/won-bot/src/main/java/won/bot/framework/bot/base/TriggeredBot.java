@@ -23,7 +23,7 @@ import java.util.concurrent.ScheduledFuture;
 /**
  * Bot base class that expects a trigger to be injected that will cause the act() method to be called according to the trigger's specification.
  */
-public class TriggeredBot extends ScheduledActionBot
+public abstract class TriggeredBot extends ScheduledActionBot
 {
   private Trigger trigger;
   private ScheduledFuture scheduledExecution;
@@ -58,7 +58,7 @@ public class TriggeredBot extends ScheduledActionBot
   /**
    * Override this method to do initialization work.
    */
-  protected void doInitializeCustom() {};
+  protected abstract void doInitializeCustom();
 
   @Override
   protected void doShutdown()
@@ -71,9 +71,7 @@ public class TriggeredBot extends ScheduledActionBot
   /**
    * Override this method to do shutdown work.
    */
-  protected void doShutdownCustom() {
-    logger.info("bot is shutting down - doShutdownCustom() not overridden by bot implementation");
-  };
+  protected abstract void doShutdownCustom();
 
   /**
    * Overrides the inherited method so as to also cancel the trigger when

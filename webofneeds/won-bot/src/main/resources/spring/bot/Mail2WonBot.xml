@@ -1,0 +1,90 @@
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mail="http://www.springframework.org/schema/integration/mail"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/integration/mail
+        http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+    <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
+
+    <util:properties id="javaMailProperties">
+        <prop key="mail.imap.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+        <prop key="mail.imap.socketFactory.fallback">false</prop>
+        <prop key="mail.store.protocol">imaps</prop>
+        <prop key="mail.debug">false</prop>
+        <prop key="mail.smtp.starttls.enable">true</prop>
+        <prop key="mail.smtp.starttls.required">true</prop>
+    </util:properties>
+
+    <mail:inbound-channel-adapter id="imapAdapter"
+                                  store-uri="imaps://${email.user}:${email.password}@${email.imap.host}/INBOX"
+                                  channel="receiveEmailChannel"
+                                  should-delete-messages="false"
+                                  should-mark-messages-as-read="true"
+                                  auto-startup="true"
+                                  java-mail-properties="javaMailProperties">
+        <int:poller fixed-rate="10000" max-messages-per-poll="10"/>
+    </mail:inbound-channel-adapter>
+
+    <mail:outbound-channel-adapter id="outboundAdapter"
+                                   auto-startup="true"
+                                   channel="sendEmailChannel"
+                                   host="${email.smtp.host}"
+                                   port="${email.smtp.port}"
+                                   username="${email.user}"
+                                   password="${email.password}"
+                                   java-mail-properties="javaMailProperties">
+    </mail:outbound-channel-adapter>
+
+
+    <int:channel id="receiveEmailChannel"/>
+    <int:channel id="sendEmailChannel"/>
+
+    <int:service-activator input-channel="receiveEmailChannel" ref="mail2wonBot" method="receive"/>
+
+    <bean id="mail2wonBot" class="won.bot.impl.Mail2WonBot">
+        <!-- optional property, by default one echo need per each need will be created -->
+        <property name="taskScheduler" ref="taskScheduler" />
+        <property name="receiveEmailChannel" ref="receiveEmailChannel"/>
+        <property name="sendEmailChannel" ref="sendEmailChannel"/>
+        <!--property name="needProducer" ref="needProducerFromMails" /-->
+        <!--property name="nodeURISource" ref="nodeUriSourceRandom" /-->
+        <!--<property name="matcherNodeURISource" ref="matcherNodeURISource"/>-->
+        <!--<property name="matcherUri" value="${matcher.uri}" />-->
+        <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->
+        <!--property name="ownerService" ref="ownerProtocolNeedServiceClient" /-->
+        <!--<property name="matcherProtocolNeedServiceClient" ref="matcherProtocolNeedServiceClient"/>-->
+        <!--<property name="matcherProtocolMatcherService" ref="matcherProtocolMatcherServiceJMSBased"/>-->
+        <property name="trigger">
+            <bean class="org.springframework.scheduling.support.PeriodicTrigger">
+                <constructor-arg name="period" value="6002000" />
+                <constructor-arg name="timeUnit" value="MILLISECONDS" />
+                <property name="initialDelay" value="10000" /> <!-- wait 10s at the beginning -->
+                <property name="fixedRate" value="false" />  <!-- fixed delay after completion -->
+            </bean>
+        </property>
+    </bean>
+</beans>
