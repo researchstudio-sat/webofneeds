@@ -26,6 +26,7 @@ public class OpenConnectionEvent extends BaseEvent implements ConnectionSpecific
     }
 
     public OpenConnectionEvent(URI connectionURI, String message) {
-        this.connectionURI = connectionURI;
+        this(connectionURI);
+        this.message = message;
     }
 }
