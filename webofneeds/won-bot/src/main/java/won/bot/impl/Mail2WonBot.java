@@ -12,7 +12,9 @@ import won.bot.framework.eventbot.action.impl.mail.send.Hint2MailParserAction;
 import won.bot.framework.eventbot.action.impl.mail.send.Message2MailAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.CloseConnectionUriAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionUriAction;
+import won.bot.framework.eventbot.action.impl.wonmessage.SendMessageOnConnectionAction;
 import won.bot.framework.eventbot.bus.EventBus;
+import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.*;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
@@ -44,25 +46,12 @@ public class Mail2WonBot extends EventBot{
         EventListenerContext ctx = getEventListenerContext();
         bus = getEventBus();
 
+        //Mail initiated events
         bus.subscribe(MailReceivedEvent.class,
         new ActionOnEventListener(
                 ctx,
                 "MailReceived",
                 new MailParserAction(ctx)
-        ));
-
-        bus.subscribe(HintFromMatcherEvent.class,
-        new ActionOnEventListener(
-                ctx,
-                "HintReceived",
-                new Hint2MailParserAction(ctx, NAME_NEEDS, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
-        ));
-
-        bus.subscribe(ConnectFromOtherNeedEvent.class,
-        new ActionOnEventListener(
-                ctx,
-                "ConnectReceived",
-                new Connect2MailParserAction(ctx, NAME_NEEDS, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
         ));
 
         bus.subscribe(CreateNeedFromMailEvent.class,
@@ -72,11 +61,19 @@ public class Mail2WonBot extends EventBot{
                 new CreateNeedFromMailAction(ctx, NAME_NEEDS, URIMIMEMESSAGERELATIONS_NAME)
 
         ));
+
         bus.subscribe(MailCommandEvent.class,
         new ActionOnEventListener(
                 ctx,
                 "MailCommandEvent",
                 new MailCommandAction(ctx, MAILIDURIRELATIONS_NAME)
+        ));
+
+        bus.subscribe(SendTextMessageOnConnectionEvent.class,
+        new ActionOnEventListener(
+                ctx,
+                "SendTextMessage",
+                new SendMessageOnConnectionAction(ctx)
         ));
 
         bus.subscribe(CloseConnectionEvent.class,
@@ -91,6 +88,21 @@ public class Mail2WonBot extends EventBot{
                 ctx,
                 "OpenCommandEvent",
                 new OpenConnectionUriAction(ctx)
+        ));
+
+        //WON initiated Events
+        bus.subscribe(HintFromMatcherEvent.class,
+        new ActionOnEventListener(
+                ctx,
+                "HintReceived",
+                new Hint2MailParserAction(ctx, NAME_NEEDS, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
+        ));
+
+        bus.subscribe(ConnectFromOtherNeedEvent.class,
+        new ActionOnEventListener(
+                ctx,
+                "ConnectReceived",
+                new Connect2MailParserAction(ctx, NAME_NEEDS, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
         ));
 
         bus.subscribe(MessageFromOtherNeedEvent.class,
