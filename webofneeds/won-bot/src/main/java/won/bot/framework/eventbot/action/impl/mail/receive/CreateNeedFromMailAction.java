@@ -71,6 +71,7 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                         .setBasicNeedType(type)
                         .setDescription(description)
                         .setUri(needURI)
+                        .setTags(tags)
                         .setFacetTypes(facets)
                         .build();
 

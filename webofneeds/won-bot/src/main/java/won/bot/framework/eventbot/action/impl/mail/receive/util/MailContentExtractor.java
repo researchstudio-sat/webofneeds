@@ -1,6 +1,5 @@
 package won.bot.framework.eventbot.action.impl.mail.receive.util;
 
-import com.google.common.collect.BiMap;
 import won.protocol.model.BasicNeedType;
 
 import javax.mail.Address;
@@ -8,6 +7,9 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MailContentExtractor {
     //TODO: IMPLEMENT VOCABULARY VIA ADMIN INTERFACE OR PROPERTIES FILE THAT LINKS CERTAIN REGULAREXPRESSIONS WITH A BasicNeedType
@@ -15,7 +17,9 @@ public class MailContentExtractor {
     public static final String KEYWORD_TYPE_SUPPLY = "[OFFER]";
     public static final String KEYWORD_TYPE_DO_TOGETHER = "[TOGETHER]";
     public static final String KEYWORD_TYPE_CRITIQUE = "[CRITIQUE]";
+    public static final String TAGEXTRACTION_PATTERN_STRING = "[#]+[\\w]+\\b";
 
+    public static final Pattern tagExtractionPattern = Pattern.compile(TAGEXTRACTION_PATTERN_STRING);
 
     public static String getTitle(MimeMessage message) throws MessagingException {
         String subject = message.getSubject();
@@ -61,12 +65,20 @@ public class MailContentExtractor {
         }
     }
 
-    public static String[] getTags(MimeMessage message) {
-        String[] tags = {};
+    public static String[] getTags(MimeMessage message) throws MessagingException, IOException {
+        HashSet<String> tags = new HashSet<>();
 
-        //TODO:SOMEHOW FACILITATE THE REGEX:   /#(\w+)/gi   from the create need javascript textfield RETRIEVE TAGS FROM MAIL
+        Matcher m = tagExtractionPattern.matcher(new StringBuilder(message.getSubject()).append(" ").append(message.getContent()).toString());
 
-        return tags;
+        while(m.find()) {
+            tags.add(m.group());
+        }
+
+        String[] tagArray = new String[tags.size()];
+        tagArray = tags.toArray(tagArray);
+        Arrays.sort(tagArray);
+
+        return tagArray;
     }
 
     public static String getFromAddressString(MimeMessage message) throws MessagingException{
