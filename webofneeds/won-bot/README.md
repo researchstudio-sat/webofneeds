@@ -27,7 +27,7 @@ relevant for the system being tested, i.e.:
     for delivery are defined based on Owner and Bot certificates, and if they are the same there will be errors. 
     
     NOTE: For the same reason as above, do not run several Bot applications at the same time, - stop one before 
-    running another.
+    running another or separate their configurations.
     
     NOTE: Keystore and trustore pathes have to be specified but the files themselves do not have to exist, they will 
     be created automatically. In fact, in case the Bot's default Node was previously having a different certificate  
@@ -71,13 +71,13 @@ relevant for the system being tested, i.e.:
     there.
 
 Usage:
-You can send an E-Mail with a Subject starting with either [WANT], [OFFER], [TOGETHER], [CRITIQUE] to the configured Mailadress,
+You can send an e-mail with a Subject starting with either [WANT], [OFFER], [TOGETHER], [CRITIQUE] to the configured Mailadress,
  to create a Need of the given type. The Body or Content of the Mail will be used as the NeedDescription, the rest of the subject line
- will be used as the Need Title. Furthermore Tags (Strings starting with #) will be extracted from the E-Mail and will
+ will be used as the Need Title. Furthermore Tags (Strings starting with #) will be extracted from the e-mail and will
  be stored within the created need.
 
-You will then receive E-Mails when the Matcher finds Connections to this created Need, you can answer those E-Mails via
-the reply function of your E-Mail-Client, for now we support the following commands (which will be retrieved from the replymessage-body):
+You will then receive e-mails when the Matcher finds Connections to this created Need, you can answer those e-mails via
+the reply function of your e-mail-Client, for now we support the following commands (which will be retrieved from the replymessage-body):
 A Replymail that starts with:
 -"close" or "deny" will close the respective connection
 -"connect" sends a request to the other need or opens the connection if the status is already request received
@@ -85,4 +85,4 @@ A Replymail that starts with:
 
 A Replymail for an already open connection(hasConnectionState: Connected) will send teh replymessage-body as a textmessage
 
-Every Remote Message sent to this Connection will be sent to you as an E-Mail as well.
+Every Remote Message sent to this Connection will be sent to you as an e-mail as well.
