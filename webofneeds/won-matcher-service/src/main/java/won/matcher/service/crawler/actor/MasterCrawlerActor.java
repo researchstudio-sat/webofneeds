@@ -13,6 +13,7 @@ import won.matcher.service.common.event.WonNodeEvent;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.service.crawler.exception.CrawlWrapperException;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
+import won.matcher.service.crawler.msg.ResourceCrawlUriMessage;
 import won.matcher.service.crawler.service.CrawlSparqlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -63,15 +64,26 @@ public class MasterCrawlerActor extends UntypedActor
   public void preStart() {
 
     // Create the router/pool with worker actors that do the actual crawling
-    crawlingWorker = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).fromConfigProps(WorkerCrawlerActor.class), "CrawlingRouter");
+    crawlingWorker = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).fromConfigProps(
+      WorkerCrawlerActor.class), "CrawlingRouter");
 
     // create a single meta data update actor for all worker actors
-    updateMetaDataWorker = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).props(UpdateMetadataActor.class), "MetaDataUpdateWorker");
+    updateMetaDataWorker = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).props(
+      UpdateMetadataActor.class), "MetaDataUpdateWorker");
     getContext().watch(updateMetaDataWorker);
+
+    // create an need loading actor
+    getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).props(
+      NeedEventLoaderActor.class), "NeedEventLoader");
 
     // subscribe for won node events
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
     pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(WonNodeEvent.class.getName(), getSelf()), getSelf());
+
+    // subscribe to crawl events
+    pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(CrawlUriMessage.class.getName(), getSelf()), getSelf());
+    pubSubMediator.tell(new DistributedPubSubMediator.Subscribe(
+      ResourceCrawlUriMessage.class.getName(), getSelf()), getSelf());
 
     // load the unfinished uris and start crawling
     for (CrawlUriMessage msg : sparqlService.retrieveMessagesForCrawling(CrawlUriMessage.STATUS.PROCESS)) {
@@ -157,7 +169,7 @@ public class MasterCrawlerActor extends UntypedActor
   private void processCrawlUriMessage(CrawlUriMessage msg) {
 
     log.debug("Process message: {}", msg);
-    if (msg.getStatus().equals(CrawlUriMessage.STATUS.PROCESS)) {
+    if (msg.getStatus().equals(CrawlUriMessage.STATUS.PROCESS) || msg.getStatus().equals(CrawlUriMessage.STATUS.SAVE)) {
 
       // multiple extractions of the same URI can happen quite often since the extraction
       // query uses property path from base URI which may return URIs that are already

@@ -1,5 +1,6 @@
 package won.matcher.service.crawler.msg;
 
+
 import java.io.Serializable;
 
 /**
@@ -12,13 +13,14 @@ public class CrawlUriMessage implements Serializable
 {
   public static enum STATUS
   {
-    PROCESS, FAILED, DONE
+    PROCESS, FAILED, DONE, SAVE,
   }
 
   private String uri;
   private String baseUri;
   private String wonNodeUri;
   private STATUS status;
+  private long crawlDate;
 
   /**
    * Constructor
@@ -28,18 +30,36 @@ public class CrawlUriMessage implements Serializable
    * @param wonNodeUri URI of the corresponding won node
    * @param status describes what to with the URI
    */
-  public CrawlUriMessage(final String uri, final String baseUri, String wonNodeUri, final STATUS status) {
+
+  /**
+   *
+   * @param uri URI that should be or is already crawled
+   * @param baseUri base URI that is used with property paths to extract further URIs
+   * @param wonNodeUri URI of the corresponding won node
+   * @param status describes what to with the URI
+   * @param crawlDate timestamp in milli seconds when crawling message was generated
+   */
+  public CrawlUriMessage(final String uri, final String baseUri, String wonNodeUri, final STATUS status, long crawlDate) {
     this.uri = uri;
     this.baseUri = baseUri;
     this.status = status;
     this.wonNodeUri = wonNodeUri;
+    this.crawlDate = crawlDate;
   }
 
-  public CrawlUriMessage(final String uri, final String baseUri, final STATUS status) {
+  /**
+   *
+   * @param uri URI that should be or is already crawled
+   * @param baseUri base URI that is used with property paths to extract further URIs
+   * @param status describes what to with the URI
+   * @param crawlDate timestamp in milli seconds when crawling message was generated
+   */
+  public CrawlUriMessage(final String uri, final String baseUri, final STATUS status, long crawlDate) {
     this.uri = uri;
     this.baseUri = baseUri;
     this.status = status;
     this.wonNodeUri = null;
+    this.crawlDate = crawlDate;
   }
 
   public String getUri() {
@@ -58,14 +78,18 @@ public class CrawlUriMessage implements Serializable
     return wonNodeUri;
   }
 
+  public long getCrawlDate() {
+    return crawlDate;
+  }
+
   @Override
   public String toString() {
-    return "[" + uri + "," + baseUri + "," + wonNodeUri + "," + status + "]";
+    return "[" + uri + "," + baseUri + "," + wonNodeUri + "," + status + "," + crawlDate + "]";
   }
 
   @Override
   public CrawlUriMessage clone() {
-    return new CrawlUriMessage(uri, baseUri, wonNodeUri, status);
+    return new CrawlUriMessage(uri, baseUri, wonNodeUri, status, crawlDate);
   }
 
   @Override
@@ -74,7 +98,7 @@ public class CrawlUriMessage implements Serializable
     if (obj instanceof CrawlUriMessage) {
       CrawlUriMessage msg = (CrawlUriMessage) obj;
       if (uri.equals(msg.getUri()) && baseUri.equals(msg.getBaseUri()) &&
-        status.equals(msg.getStatus())) {
+        status.equals(msg.getStatus()) && crawlDate == msg.getCrawlDate()) {
         return (wonNodeUri == null) ? msg.getWonNodeUri() == null : wonNodeUri.equals(msg.getWonNodeUri());
       }
     }
@@ -84,6 +108,6 @@ public class CrawlUriMessage implements Serializable
 
   @Override
   public int hashCode() {
-    return (uri + baseUri + wonNodeUri + status.toString()).hashCode();
+    return (uri + baseUri + wonNodeUri + status.toString() + crawlDate).hashCode();
   }
 }

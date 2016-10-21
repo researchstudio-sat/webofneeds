@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.BulkHintEvent;
+import won.matcher.service.common.event.BulkNeedEvent;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.solr.config.SolrMatcherConfig;
 import won.matcher.solr.hints.HintBuilder;
@@ -62,6 +63,11 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     if (o instanceof NeedEvent) {
         NeedEvent needEvent = (NeedEvent) o;
         processNeedEvent(needEvent);
+    } else if (o instanceof BulkNeedEvent) {
+        log.info("received bulk need event, processing {} need events ...", ((BulkNeedEvent) o).getNeedEvents().size());
+        for (NeedEvent event : ((BulkNeedEvent) o).getNeedEvents()) {
+          processNeedEvent(event);
+        }
     } else {
       unhandled(o);
     }
@@ -70,10 +76,10 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
   protected void processNeedEvent(NeedEvent needEvent)
     throws IOException, SolrServerException, JsonLdError {
 
-    log.info("Need event received {}", needEvent);
-    Dataset dataset = deserializeNeed(needEvent);
+    log.info("Start processing need event {}", needEvent);
 
     // check if the need has doNotMatch flag, then do not use it for querying or indexing
+    Dataset dataset = deserializeNeed(needEvent);
     if (WonRdfUtils.NeedUtils.hasFlag(dataset, needEvent.getUri(), WON.DO_NOT_MATCH)) {
       log.info("Discard received need cause of doNotMatch flag: {}", needEvent);
       return;

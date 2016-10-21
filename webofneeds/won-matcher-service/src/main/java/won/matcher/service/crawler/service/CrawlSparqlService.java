@@ -1,13 +1,18 @@
 package won.matcher.service.crawler.service;
 
 import com.hp.hpl.jena.query.*;
-import won.matcher.service.common.service.sparql.SparqlService;
-import won.matcher.service.crawler.msg.CrawlUriMessage;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import won.matcher.service.common.event.BulkNeedEvent;
+import won.matcher.service.common.event.NeedEvent;
+import won.matcher.service.common.service.sparql.SparqlService;
+import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.protocol.vocabulary.WON;
 
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -54,7 +59,7 @@ public class CrawlSparqlService extends SparqlService
     }
     queryTemplate += "}}\n";
     queryString += String.format(queryTemplate, METADATA_GRAPH,
-                                 msg.getUri(), CRAWL_DATE_PREDICATE, System.currentTimeMillis(),
+                                 msg.getUri(), CRAWL_DATE_PREDICATE, msg.getCrawlDate(),
                                  msg.getUri(), CRAWL_STATUS_PREDICATE, msg.getStatus(),
                                  msg.getUri(), CRAWL_BASE_URI_PREDICATE, msg.getBaseUri(),
                                  msg.getUri(), CRAWL_WON_NODE_URI_PREDICATE, msg.getWonNodeUri());
@@ -89,7 +94,7 @@ public class CrawlSparqlService extends SparqlService
       if (msg.getWonNodeUri() != null) {
         specificInsertTemplate += "<%s> <%s> <%s>. ";
       }
-      builder.append(String.format(specificInsertTemplate, msg.getUri(), CRAWL_DATE_PREDICATE, System.currentTimeMillis(),
+      builder.append(String.format(specificInsertTemplate, msg.getUri(), CRAWL_DATE_PREDICATE, msg.getCrawlDate(),
                                    msg.getUri(), CRAWL_STATUS_PREDICATE, msg.getStatus(),
                                    msg.getUri(), CRAWL_BASE_URI_PREDICATE, msg.getBaseUri(),
                                    msg.getUri(), CRAWL_WON_NODE_URI_PREDICATE, msg.getWonNodeUri()));
@@ -127,9 +132,9 @@ public class CrawlSparqlService extends SparqlService
       CrawlUriMessage msg = null;
       if (qs.get("wonNode") != null) {
         String wonNode = qs.get("wonNode").asResource().getURI();
-        msg = new CrawlUriMessage(uri, baseUri, wonNode, CrawlUriMessage.STATUS.PROCESS);
+        msg = new CrawlUriMessage(uri, baseUri, wonNode, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis());
       } else {
-        msg = new CrawlUriMessage(uri, baseUri, CrawlUriMessage.STATUS.PROCESS);
+        msg = new CrawlUriMessage(uri, baseUri, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis());
       }
 
       log.debug("Created message: {}", msg);
@@ -179,6 +184,53 @@ public class CrawlSparqlService extends SparqlService
     }
 
     return extractedURIs;
+  }
+
+  public BulkNeedEvent retrieveActiveNeedEvents(long fromDate, long toDate, int offset, int limit, boolean
+    sortAscending) {
+
+    // query template to retrieve all alctive cralwed/saved needs in a certain date range
+    String orderClause = sortAscending ? "ORDER BY ?date\n" : "ORDER BY DESC(?date)\n";
+    log.debug("bulk load need data from sparql endpoint in date range: [{},{}]", fromDate, toDate);
+    String queryTemplate = "prefix won: <http://purl.org/webofneeds/model#> \n" +
+      "SELECT ?needUri ?wonNodeUri ?date WHERE {  \n" +
+      "  ?needUri a won:Need. \n" +
+      "  ?needUri won:crawlDate ?date.  \n" +
+      "  ?needUri won:isInState won:Active. \n" +
+      "  ?needUri won:hasWonNode ?wonNodeUri. \n" +
+      "  {?needUri won:crawlStatus 'SAVE'.} UNION {?needUri won:crawlStatus 'DONE'.}\n" +
+      "  FILTER (?date >= %d && ?date < %d ) \n" +
+      "} " + orderClause +
+      " OFFSET %d\n" +
+      " LIMIT %d";
+
+    String queryString = String.format(queryTemplate, fromDate, toDate, offset, limit);
+
+    log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
+    log.debug("Execute query: {}", queryString);
+    Query query = QueryFactory.create(queryString);
+    QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+    ResultSet results = qexec.execSelect();
+
+    // load all the needs into one bulk need event
+    BulkNeedEvent bulkNeedEvent = new BulkNeedEvent();
+    while (results.hasNext()) {
+
+      QuerySolution qs = results.nextSolution();
+      String needUri = qs.get("needUri").asResource().getURI();
+      String wonNodeUri = qs.get("wonNodeUri").asResource().getURI();
+      long crawlDate = qs.getLiteral("date").getLong();
+
+      Dataset ds = retrieveNeedDataset(needUri);
+      StringWriter sw = new StringWriter();
+      RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
+      NeedEvent needEvent = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.CREATED,
+                                          crawlDate, sw.toString(), RDFFormat.TRIG.getLang());
+      bulkNeedEvent.addNeedEvent(needEvent);
+    }
+    qexec.close();
+    log.debug("number of need events created: " + bulkNeedEvent.getNeedEvents().size());
+    return bulkNeedEvent;
   }
 
 }

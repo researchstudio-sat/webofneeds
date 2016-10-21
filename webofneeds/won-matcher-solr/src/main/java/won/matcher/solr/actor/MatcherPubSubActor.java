@@ -13,11 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
-import won.matcher.service.common.event.BulkHintEvent;
-import won.matcher.service.common.event.HintEvent;
-import won.matcher.service.common.event.NeedEvent;
+import won.matcher.service.common.event.*;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.solr.config.SolrMatcherConfig;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by hfriedrich on 30.09.2015.
@@ -38,8 +43,14 @@ public class MatcherPubSubActor extends UntypedActor
   @Autowired
   private SolrMatcherConfig config;
 
+  private static final String TICK = "tick";
+  private static final String APP_STATE_PROPERTIES_FILE_NAME = "state.config.properties";
+  private static final String LAST_SEEN_NEED_DATE_PROPERTY_NAME = "lastSeenNeedDate";
+  private boolean needsUpdateRequestReceived = false;
+  private Properties appStateProps = new Properties();
+
   @Override
-  public void preStart() {
+  public void preStart() throws IOException {
 
     // subscribe to need events
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
@@ -53,16 +64,107 @@ public class MatcherPubSubActor extends UntypedActor
       matcherActor = getContext().actorOf(SpringExtension.SpringExtProvider.get(
         getContext().system()).fromConfigProps(SolrMonitoringMatcherActor.class), "SolrMatcherPool");
     }
+
+    // Create a scheduler to request missing need events from matching service while this matcher was not available
+    getContext().system().scheduler().schedule(
+      Duration.create(30, TimeUnit.SECONDS), Duration.create(60, TimeUnit.SECONDS), getSelf(), TICK,
+      getContext().dispatcher(), null);
+
+    // read properties file that has the lastSeenNeedDate
+    FileInputStream in = null;
+    try {
+      in = new FileInputStream(APP_STATE_PROPERTIES_FILE_NAME);
+      appStateProps.load(in);
+      log.info("loaded properties file {}, property '{}' is set to " + appStateProps.getProperty
+        (LAST_SEEN_NEED_DATE_PROPERTY_NAME), APP_STATE_PROPERTIES_FILE_NAME, LAST_SEEN_NEED_DATE_PROPERTY_NAME);
+    } catch (FileNotFoundException e) {
+      log.info("properties file {} not found, create file", APP_STATE_PROPERTIES_FILE_NAME);
+    } catch (IOException e) {
+      log.error("cannot read properties file {}", APP_STATE_PROPERTIES_FILE_NAME);
+      throw e;
+    } finally {
+      if (in != null) {
+        in.close();
+      }
+
+      if (appStateProps.getProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME) == null) {
+        appStateProps.setProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME, String.valueOf(-1));
+        saveLastSeenNeedDate();
+      }
+    }
+  }
+
+  public void saveLastSeenNeedDate() throws IOException {
+
+    FileOutputStream out = null;
+    try {
+      out = new FileOutputStream(APP_STATE_PROPERTIES_FILE_NAME);
+      appStateProps.store(out, null);
+    } catch (IOException e) {
+      log.error("cannot write properties file {}", APP_STATE_PROPERTIES_FILE_NAME);
+      throw e;
+    } finally {
+      if (out != null) {
+        out.close();
+      }
+    }
   }
 
   @Override
-  public void onReceive(final Object o) throws Exception {
+  public void onReceive(Object o) throws Exception {
 
-    if (o instanceof NeedEvent) {
+    if (o.equals(TICK)) {
+      if (!needsUpdateRequestReceived) {
+
+        // request missing need events from matching service while this matcher was not available
+        long lastSeenNeedDate = Long.valueOf(appStateProps.getProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME));
+        LoadNeedEvent loadNeedEvent;
+
+        if (lastSeenNeedDate == -1) {
+          // request the last one need event from matching service and accept every need event timestamp
+          loadNeedEvent = new LoadNeedEvent(1);
+        } else {
+          // request need events with date > last need event date
+          log.info("request missed needs from mataching service with crawl date > {}", lastSeenNeedDate);
+          loadNeedEvent = new LoadNeedEvent(lastSeenNeedDate, Long.MAX_VALUE);
+        }
+
+        pubSubMediator.tell(new DistributedPubSubMediator.Publish(
+          loadNeedEvent.getClass().getName(), loadNeedEvent), getSelf());
+      }
+    } else if (o instanceof NeedEvent) {
 
       NeedEvent needEvent = (NeedEvent) o;
       log.info("NeedEvent received: " + needEvent);
+
+      // save the last seen need date property after the needs are up to date with the matching service
+      if (needsUpdateRequestReceived) {
+        long lastSeenNeedDate = Long.valueOf(appStateProps.getProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME));
+        if (needEvent.getCrawlDate() > lastSeenNeedDate) {
+          appStateProps.setProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME, String.valueOf(needEvent.getCrawlDate()));
+          saveLastSeenNeedDate();
+        }
+      }
+
       matcherActor.tell(needEvent, getSelf());
+
+    } else if (o instanceof BulkNeedEvent) {
+
+      // receiving a bulk need event means this is the answer for the request of need updates
+      // there could arrive several of these bulk events
+      needsUpdateRequestReceived = true;
+      BulkNeedEvent bulkNeedEvent = (BulkNeedEvent) o;
+      log.info("BulkNeedEvent received with {} need events", bulkNeedEvent.getNeedEvents().size());
+      for (NeedEvent needEvent : ((BulkNeedEvent) o).getNeedEvents()) {
+
+        long lastSeenNeedDate = Long.valueOf(appStateProps.getProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME));
+        if (needEvent.getCrawlDate() > lastSeenNeedDate) {
+          appStateProps.setProperty(LAST_SEEN_NEED_DATE_PROPERTY_NAME, String.valueOf(needEvent.getCrawlDate()));
+          saveLastSeenNeedDate();
+        }
+
+        matcherActor.tell(needEvent, getSelf());
+      }
 
     } else if (o instanceof HintEvent) {
 

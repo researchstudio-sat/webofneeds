@@ -12,13 +12,19 @@ import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.update.UpdateRequest;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import won.protocol.util.RdfUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 /**
@@ -33,6 +39,13 @@ public class SparqlService
   protected final Logger log = LoggerFactory.getLogger(getClass());
   protected String sparqlEndpoint;
   //protected DatasetAccessor accessor;
+
+  public static Dataset deserializeDataset(String serializedResource, Lang format) throws IOException {
+    InputStream is = new ByteArrayInputStream(serializedResource.getBytes(StandardCharsets.UTF_8));
+    Dataset ds = RdfUtils.toDataset(is, new RDFFormat(format));
+    is.close();
+    return ds;
+  }
 
   @Autowired
   public SparqlService(@Value("${uri.sparql.endpoint}")  String sparqlEndpoint) {
@@ -84,17 +97,44 @@ public class SparqlService
     }
   }
 
-  public Dataset retrieveDataset(String graphName) {
+  public Model retrieveModel(String graphName) {
 
-    DatasetGraph dsg = TDBFactory.createDatasetGraph();
-    dsg.getContext().set(TDB.symUnionDefaultGraph, new NodeValueBoolean(true));
-    Dataset ds = DatasetFactory.create(dsg);
     String queryTemplate = "CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <%s> { ?s ?p ?o } . }";
     String queryString = String.format(queryTemplate, graphName);
     Query query = QueryFactory.create(queryString);
     QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
     Model model = qexec.execConstruct();
+    return model;
+  }
+
+  public Dataset retrieveDataset(String graphName) {
+
+    DatasetGraph dsg = TDBFactory.createDatasetGraph();
+    dsg.getContext().set(TDB.symUnionDefaultGraph, new NodeValueBoolean(true));
+    Dataset ds = DatasetFactory.create(dsg);
+    Model model = retrieveModel(graphName);
     ds.addNamedModel(graphName, model);
+    return ds;
+  }
+
+  public Dataset retrieveNeedDataset(String uri) {
+
+    String queryString = "prefix won: <http://purl.org/webofneeds/model#> select distinct ?g where { " +
+      "GRAPH ?g { <" + uri + "> a won:Need. ?a ?b ?c. } }";
+
+    Query query = QueryFactory.create(queryString);
+    QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
+    ResultSet results = qexec.execSelect();
+
+    Dataset ds = DatasetFactory.createMem();
+    while (results.hasNext()) {
+
+      QuerySolution qs = results.next();
+      String graphUri = qs.getResource("g").getURI();
+      Model model = retrieveModel(graphUri);
+      ds.addNamedModel(graphUri, model);
+    }
+
     return ds;
   }
 

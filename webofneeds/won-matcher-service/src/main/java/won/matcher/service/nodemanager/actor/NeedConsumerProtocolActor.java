@@ -17,6 +17,8 @@ import org.apache.jena.riot.Lang;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import won.matcher.service.crawler.msg.CrawlUriMessage;
+import won.matcher.service.crawler.msg.ResourceCrawlUriMessage;
 
 /**
  * Camel actor represents the need consumer protocol to a won node.
@@ -69,23 +71,36 @@ public class NeedConsumerProtocolActor extends UntypedConsumerActor
       if (needUri != null && wonNodeUri != null) {
         Object methodName = camelMsg.getHeaders().get(MSG_HEADER_METHODNAME);
         if (methodName != null) {
-          log.debug("Received event '{}' for needUri '{}' and wonNeedUri '{}'", methodName, needUri, wonNodeUri);
+          log.debug("Received event '{}' for needUri '{}' and wonNeedUri '{}' and publish it to matchers",
+                    methodName, needUri, wonNodeUri);
 
-          // publish an internal need event
+          // publish a need event to all the (distributed) matchers
           NeedEvent event = null;
+          long crawlDate = System.currentTimeMillis();
+
           if (methodName.equals(MSG_HEADER_METHODNAME_NEEDCREATED)) {
-            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.CREATED, camelMsg.body().toString(), Lang.TRIG);
+            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.CREATED, crawlDate,
+                                  camelMsg.body().toString(), Lang.TRIG);
             pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
-            return;
           } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDACTIVATED)) {
-            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVATED, camelMsg.body().toString(), Lang.TRIG);
+            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.ACTIVATED, crawlDate,
+                                  camelMsg.body().toString(), Lang.TRIG);
             pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
-            return;
           } else if (methodName.equals(MSG_HEADER_METHODNAME_NEEDDEACTIVATED)) {
-            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.DEACTIVATED, camelMsg.body().toString(), Lang.TRIG);
+            event = new NeedEvent(needUri, wonNodeUri, NeedEvent.TYPE.DEACTIVATED, crawlDate,
+                                  camelMsg.body().toString(), Lang.TRIG);
             pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
-            return;
+          } else {
+            unhandled(message);
           }
+
+          // let the crawler save the data of this event too
+          ResourceCrawlUriMessage resMsg = new ResourceCrawlUriMessage(
+            needUri, needUri, wonNodeUri, CrawlUriMessage.STATUS.SAVE, crawlDate);
+          resMsg.setSerializedResource(camelMsg.body().toString());
+          resMsg.setSerializationFormat(Lang.TRIG);
+          pubSubMediator.tell(new DistributedPubSubMediator.Publish(resMsg.getClass().getName(), resMsg), getSelf());
+          return;
         }
       }
     }

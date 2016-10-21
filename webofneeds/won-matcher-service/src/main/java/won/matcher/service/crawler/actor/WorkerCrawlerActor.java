@@ -14,9 +14,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import won.matcher.service.common.event.NeedEvent;
+import won.matcher.service.common.service.sparql.SparqlService;
 import won.matcher.service.crawler.config.CrawlConfig;
 import won.matcher.service.crawler.exception.CrawlWrapperException;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
+import won.matcher.service.crawler.msg.ResourceCrawlUriMessage;
 import won.matcher.service.crawler.service.CrawlSparqlService;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.NeedState;
@@ -78,7 +80,8 @@ public class WorkerCrawlerActor extends UntypedActor
     }
 
     CrawlUriMessage uriMsg = (CrawlUriMessage) msg;
-    if (!uriMsg.getStatus().equals(CrawlUriMessage.STATUS.PROCESS)) {
+    if (!uriMsg.getStatus().equals(CrawlUriMessage.STATUS.PROCESS) &&
+      !uriMsg.getStatus().equals(CrawlUriMessage.STATUS.SAVE)) {
       unhandled(msg);
       return;
     }
@@ -86,10 +89,28 @@ public class WorkerCrawlerActor extends UntypedActor
     // URI message to process received
     // start the crawling request
     Dataset ds = null;
-    try {
-      ds = linkedDataSource.getDataForResource(URI.create(uriMsg.getUri()));
-    } catch (RestClientException e) {
-      throw new CrawlWrapperException(e, uriMsg);
+
+    // check if resource is already downloaded
+    if (uriMsg instanceof ResourceCrawlUriMessage) {
+      ResourceCrawlUriMessage resMsg = ((ResourceCrawlUriMessage) uriMsg);
+      if (resMsg.getSerializedResource() != null && resMsg.getSerializationFormat() != null) {
+        try {
+          // TODO: this should be optimized, why deserialize the resource here when we just want to save it in the RDF
+          // store? How to insert this serialized resource into the SPARQL endpoint?
+          ds = SparqlService.deserializeDataset(resMsg.getSerializedResource(), resMsg.getSerializationFormat());
+        } catch (Exception e) {
+          throw new CrawlWrapperException(e, uriMsg);
+        }
+      }
+    }
+
+    // download resource if not already downloaded
+    if (ds == null) {
+      try {
+        ds = linkedDataSource.getDataForResource(URI.create(uriMsg.getUri()));
+      } catch (RestClientException e) {
+        throw new CrawlWrapperException(e, uriMsg);
+      }
     }
 
     // Save dataset to triple store
@@ -99,13 +120,19 @@ public class WorkerCrawlerActor extends UntypedActor
       wonNodeUri = uriMsg.getWonNodeUri();
     }
 
+    // do nothing more here if the STATUS of the message was SAVE
+    if (uriMsg.getStatus().equals(CrawlUriMessage.STATUS.SAVE)) {
+      log.debug("processed crawl uri event {} with status 'SAVE'", uriMsg);
+      return;
+    }
+
     // send extracted non-base URIs back to sender and save meta data about crawling the URI
     log.debug("Extract non-base URIs from message {}", uriMsg);
     Set<String> extractedURIs = sparqlService.extractURIs(
       uriMsg.getUri(), uriMsg.getBaseUri(), config.getCrawlNonBasePropertyPaths());
     for (String extractedURI : extractedURIs) {
       CrawlUriMessage newUriMsg = new CrawlUriMessage(
-        extractedURI, uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.PROCESS);
+        extractedURI, uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis());
       getSender().tell(newUriMsg, getSelf());
     }
 
@@ -114,15 +141,16 @@ public class WorkerCrawlerActor extends UntypedActor
     extractedURIs = sparqlService.extractURIs(uriMsg.getUri(), uriMsg.getBaseUri(), config.getCrawlBasePropertyPaths());
     for (String extractedURI : extractedURIs) {
       CrawlUriMessage newUriMsg = new CrawlUriMessage(
-        extractedURI, extractedURI, wonNodeUri, CrawlUriMessage.STATUS.PROCESS);
+        extractedURI, extractedURI, wonNodeUri, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis());
       getSender().tell(newUriMsg, getSelf());
     }
 
     // signal sender that this URI is processed and save meta data about crawling the URI.
     // This needs to be done after all extracted URI messages have been sent to guarantee consistency
     // in case of failure
+    long crawlDate = System.currentTimeMillis();
     CrawlUriMessage uriDoneMsg = new CrawlUriMessage(
-      uriMsg.getUri(), uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.DONE);
+      uriMsg.getUri(), uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.DONE, crawlDate);
     log.debug("Crawling done for URI {}", uriDoneMsg.getUri());
     getSender().tell(uriDoneMsg, getSelf());
 
@@ -140,7 +168,7 @@ public class WorkerCrawlerActor extends UntypedActor
 
             log.debug("Created need event for need uri {}", uriMsg.getUri());
             NeedEvent.TYPE type = NeedEvent.TYPE.CREATED;
-            NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, ds);
+            NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
             pubSubMediator.tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent), getSelf());
           }
         }
@@ -148,6 +176,10 @@ public class WorkerCrawlerActor extends UntypedActor
         // no need resource found in model
       }
     }
+  }
+
+  private void processCrawlUriMessage(CrawlUriMessage uriMsg) {
+
   }
 
   /**

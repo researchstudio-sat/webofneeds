@@ -6,10 +6,11 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.LangBuilder;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
-import won.protocol.util.RdfUtils;
+import won.matcher.service.common.service.sparql.SparqlService;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringWriter;
 
 /**
  * This event is used in the matching service to indicate that a new need has been found.
@@ -25,6 +26,7 @@ public class NeedEvent implements Serializable
   private String serializedNeedResource;
   private String serializationLangName;
   private String serializationLangContentType;
+  private long crawlDate;
 
   private TYPE eventType;
 
@@ -33,19 +35,21 @@ public class NeedEvent implements Serializable
     CREATED, ACTIVATED, DEACTIVATED
   }
 
-  public NeedEvent(String uri, String wonNodeUri, TYPE eventType, String resource, Lang format) {
+  public NeedEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, String resource, Lang format) {
     this.uri = uri;
     this.wonNodeUri = wonNodeUri;
     this.eventType = eventType;
+    this.crawlDate = crawlDate;
     serializedNeedResource = resource;
     serializationLangName = format.getName();
     serializationLangContentType = format.getContentType().getContentType();
   }
 
-  public NeedEvent(String uri, String wonNodeUri, TYPE eventType, Dataset ds) {
+  public NeedEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, Dataset ds) {
     this.uri = uri;
     this.wonNodeUri = wonNodeUri;
     this.eventType = eventType;
+    this.crawlDate = crawlDate;
     StringWriter sw = new StringWriter();
     RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
     serializedNeedResource = sw.toString();
@@ -74,17 +78,18 @@ public class NeedEvent implements Serializable
     return format;
   }
 
+  public long getCrawlDate() {
+    return crawlDate;
+  }
+
   public Dataset deserializeNeedDataset() throws IOException {
-    InputStream is = new ByteArrayInputStream(serializedNeedResource.getBytes(StandardCharsets.UTF_8));
-    Lang format = getSerializationFormat();
-    Dataset ds = RdfUtils.toDataset(is, new RDFFormat(format));
-    is.close();
-    return ds;
+    return SparqlService.deserializeDataset(serializedNeedResource, getSerializationFormat());
   }
 
   @Override
   public NeedEvent clone() {
-    NeedEvent e = new NeedEvent(uri, wonNodeUri, eventType, serializedNeedResource, getSerializationFormat());
+    NeedEvent e = new NeedEvent(uri, wonNodeUri, eventType, crawlDate, serializedNeedResource,
+                                getSerializationFormat());
     return e;
   }
 
