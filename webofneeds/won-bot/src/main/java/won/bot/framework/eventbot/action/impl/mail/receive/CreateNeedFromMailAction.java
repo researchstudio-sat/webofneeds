@@ -8,7 +8,6 @@ import won.bot.framework.eventbot.action.impl.mail.receive.util.MailContentExtra
 import won.bot.framework.eventbot.action.impl.needlifecycle.AbstractCreateNeedAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.mail.CreateNeedFromMailEvent;
-import won.bot.framework.eventbot.event.impl.mail.MailReceivedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
@@ -19,10 +18,7 @@ import won.protocol.util.NeedModelBuilder;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
-import javax.mail.Folder;
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Store;
 import javax.mail.internet.MimeMessage;
 import java.net.URI;
 import java.util.ArrayList;
@@ -106,20 +102,13 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                 logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
                 getEventListenerContext().getWonMessageSender().sendWonMessage(createNeedMessage);
                 logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
-            }catch (MessagingException me){
-                logger.error("i had a messaging exception");
-                me.printStackTrace();
+            }  catch (MessagingException me){
+                logger.error("messaging exception occurred: {}", me);
             }
         }
     }
 
-    public static boolean isCreateMail(MimeMessage message) {
-        try{
-            return MailContentExtractor.getBasicNeedType(message) != null;
-        }catch(MessagingException me){
-            //TODO: LOGGER SHOULD BE STATIC FINAL ETC TO PRINT IN STATIC CONTEXT
-            me.printStackTrace();
-            return false;
-        }
+    public static boolean isCreateMail(MimeMessage message) throws MessagingException {
+        return MailContentExtractor.getBasicNeedType(message) != null;
     }
 }
