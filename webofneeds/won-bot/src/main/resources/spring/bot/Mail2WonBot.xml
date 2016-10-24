@@ -28,7 +28,9 @@
         http://www.springframework.org/schema/util/spring-util.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
+    <import resource="classpath:spring/component/botContext/botContext.xml"/>
 
     <util:properties id="javaMailProperties">
         <prop key="mail.imap.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
@@ -67,6 +69,9 @@
 
     <bean id="mail2wonBot" class="won.bot.impl.Mail2WonBot">
         <!-- optional property, by default one echo need per each need will be created -->
+
+        <!--<property name="botContext" ref="mongoBotContext" />-->
+
         <property name="taskScheduler" ref="taskScheduler" />
         <property name="receiveEmailChannel" ref="receiveEmailChannel"/>
         <property name="sendEmailChannel" ref="sendEmailChannel"/>
@@ -87,4 +92,5 @@
             </bean>
         </property>
     </bean>
+
 </beans>

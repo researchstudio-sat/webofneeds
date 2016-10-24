@@ -18,6 +18,7 @@ package won.bot.framework.bot.context;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Primary;
 import won.bot.framework.bot.BotContext;
 
 import javax.mail.Address;
@@ -27,6 +28,7 @@ import java.util.*;
 /**
  * Straightforward BotContext implementation using a List and a Map.
  */
+@Primary
 public class InMemoryBotContext implements BotContext
 {
   private Set<URI> needUris = new HashSet<URI>();
