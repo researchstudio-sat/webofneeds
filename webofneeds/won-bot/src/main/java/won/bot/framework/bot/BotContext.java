@@ -25,62 +25,54 @@ import java.util.List;
 public interface BotContext
 {
   /**
-   * List all need URIs known in this memory.
+   * List all need URIs known (from all named need lists)
    * @return
    */
   public List<URI> listNeedUris();
 
   /**
-   * list all node URIs known in this memory.
-   * @return
-   */
-  public List<URI> listNodeUris();
-  /**
-   * Check if this memory knows the specified need URI.
+   * Check if specified need URI is known (from all named need lists)
    * @param needURI
    * @return
    */
   public boolean isNeedKnown(URI needURI);
 
   /**
-   * Check if this memory knows the specified node URI
+   * Add an URI to a named need list
+   *
+   * @param uri
+   * @param name
+   */
+  public void appendToNamedNeedUriList(URI uri, String name);
+
+  /**
+   * List all need URIs from a specified named need list
+   *
+   * @param name
+   * @return
+   */
+  public List<URI> getNamedNeedUriList(String name);
+
+  /**
+   * Remove a need URI from a named need list
+   *
+   * @param uri
+   * @param name
+   */
+  public void removeNeedUriFromNamedNeedUriList(URI uri, String name);
+
+  /**
+   * Check if specified node URI is known
    * @param wonNodeURI
    * @return
    */
   public boolean isNodeKnown(URI wonNodeURI);
 
   /**
-   * Save the specified need URI in this memory under the specified name.
-   * @param uri
-   * @param name
-   */
-  public void rememberNeedUriWithName(URI uri, String name);
-
-  /**
-   * Save the specified need URI in this memory.
+   * Save node uri
    * @param uri
    */
-  public void rememberNeedUri(URI uri);
   public void rememberNodeUri(URI uri);
-  public void rememberNamedNeedUriList(List<URI> uris, String name);
-  public void appendToNamedNeedUriList(URI uri, String name);
-  public List<URI> getNamedNeedUriList(String name);
-
-  public void removeNeedUri(URI uri);
-  public void removeNamedNeedUri(String name);
-  public void removeNeedUriFromNamedNeedUriList(URI uri, String name);
-
-  /**
-   * Fetch a need URI by its name. The URI must have been given a name previously.
-   * @param name
-   * @return
-   */
-  public URI getNeedByName(String name);
-
-  /**
-   * List all need URI's names.
-   */
-  public List<String> listNeedUriNames();
 
   /**
    * Put an arbitrary object in the context.

@@ -74,7 +74,7 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                 logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(model), 150));
 
                 WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, model);
-                EventBotActionUtils.rememberInListIfNamePresent(ctx, needURI, uriListName);
+                EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
                 EventBotActionUtils.addUriMimeMessageRelation(ctx, uriMimeMessageRelationsName, needURI, message);
 
                 EventListener successCallback = new EventListener()
@@ -93,7 +93,7 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                     public void onEvent(Event event) throws Exception {
                         String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
                         logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
-                        EventBotActionUtils.removeFromListIfNamePresent(getEventListenerContext(), needURI, uriListName);
+                        EventBotActionUtils.removeFromList(getEventListenerContext(), needURI, uriListName);
                         EventBotActionUtils.removeUriMimeMessageRelation(getEventListenerContext(), uriMimeMessageRelationsName, needURI);
                     }
                 };

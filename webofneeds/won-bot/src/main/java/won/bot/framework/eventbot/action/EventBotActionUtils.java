@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.BotContext;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
-import won.bot.framework.eventbot.action.impl.mail.receive.util.MailContentExtractor;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
@@ -32,9 +31,6 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.protocol.message.WonMessage;
 
-import javax.mail.Address;
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.net.URI;
 import java.util.HashMap;
@@ -47,13 +43,12 @@ public class EventBotActionUtils
 {
     private static final Logger logger = LoggerFactory.getLogger(EventBotActionUtils.class);
 
-    public static void rememberInListIfNamePresent(EventListenerContext ctx ,URI uri, String uriListName) {
+    public static void rememberInList(EventListenerContext ctx, URI uri, String uriListName) {
         if (uriListName != null && uriListName.trim().length() > 0){
             ctx.getBotContext().appendToNamedNeedUriList(uri, uriListName);
             logger.debug("remembering need in NamedNeedList {} ", uri);
         } else {
-            ctx.getBotContext().rememberNeedUri(uri);
-            logger.debug("remembering need in List {} ", uri);
+            throw new IllegalArgumentException("'uriListName' must not not be null or empty");
         }
     }
 
@@ -61,13 +56,12 @@ public class EventBotActionUtils
         ctx.getBotContext().rememberNodeUri(uri);
     }
 
-    public static void removeFromListIfNamePresent(EventListenerContext ctx ,URI uri, String uriListName) {
+    public static void removeFromList(EventListenerContext ctx, URI uri, String uriListName) {
         if (uriListName != null && uriListName.trim().length() > 0){
             ctx.getBotContext().removeNeedUriFromNamedNeedUriList(uri, uriListName);
             logger.debug("removing need from NamedNeedList {} ", uri);
         } else {
-            ctx.getBotContext().removeNeedUri(uri);
-            logger.debug("removed need from bot context {} ", uri);
+            throw new IllegalArgumentException("'uriListName' must not not be null or empty");
         }
     }
 

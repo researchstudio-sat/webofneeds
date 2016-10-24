@@ -50,6 +50,7 @@ import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
  */
 public class RandomSimulatorBot extends EventBot
 {
+  private static final String NAME_NEEDS = "needs";
 
   private static final double PROB_OPEN_ON_HINT = 0.3;
   private static final double PROB_MESSAGE_ON_OPEN = 0.5;
@@ -81,7 +82,7 @@ public class RandomSimulatorBot extends EventBot
       new MultipleActions(ctx,
         new IncrementCounterAction(ctx, needCreationStartedCounter),
         new IncrementCounterAction(ctx, creationUnfinishedCounter),
-        new CreateNeedWithFacetsAction(ctx)
+        new CreateNeedWithFacetsAction(ctx, NAME_NEEDS)
       )
     );
     bus.subscribe(ActEvent.class, this.groupMemberCreator);
@@ -128,7 +129,7 @@ public class RandomSimulatorBot extends EventBot
     //each time a need was created, wait for a random interval, then create another one
     bus.subscribe(NeedCreatedEvent.class, new ActionOnEventListener(ctx,
       new RandomDelayedAction(ctx,MIN_NEXT_CREATION_TIMEOUT_MILLIS, MAX_NEXT_CREATION_TIMEOUT_MILLIS,this.hashCode(),
-        new CreateNeedWithFacetsAction(ctx)))
+        new CreateNeedWithFacetsAction(ctx, NAME_NEEDS)))
     );
 
     //when a hint is received, connect fraction of the cases after a random timeout

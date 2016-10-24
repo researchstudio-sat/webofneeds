@@ -134,7 +134,7 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
         WonMessage createNeedMessage = createWonMessage(wonNodeInformationService,
                 needURI, wonNodeUri, needModel);
         //remember the need URI so we can react to success/failure responses
-        EventBotActionUtils.rememberInListIfNamePresent(getEventListenerContext(), needURI, uriListName);
+        EventBotActionUtils.rememberInList(getEventListenerContext(), needURI, uriListName);
 
         EventListener successCallback = new EventListener()
         {
@@ -163,7 +163,7 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
             public void onEvent(Event event) throws Exception {
                 String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
                 logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
-                EventBotActionUtils.removeFromListIfNamePresent(getEventListenerContext(), needURI, uriListName);
+                EventBotActionUtils.removeFromList(getEventListenerContext(), needURI, uriListName);
                 getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
             }
         };

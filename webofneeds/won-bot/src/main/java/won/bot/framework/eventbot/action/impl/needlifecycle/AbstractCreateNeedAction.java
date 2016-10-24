@@ -69,15 +69,6 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
     this.usedForTesting = usedForTesting;
   }
 
-  /**
-   * Creates a need with the specified facets.
-   * If no facet is specified, the ownerFacet will be used.
-   */
-  public AbstractCreateNeedAction(final EventListenerContext eventListenerContext, URI... facets)
-  {
-    this(eventListenerContext, null, facets);
-  }
-
   protected WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI,
                                         Model needModel)
           throws WonMessageBuilderException {
