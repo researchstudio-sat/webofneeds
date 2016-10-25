@@ -24,10 +24,6 @@ import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnection
 import won.bot.framework.eventbot.event.impl.debugbot.MessageToElizaEvent;
 import won.protocol.model.Connection;
 
-import java.net.URI;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 
 /**
  * Expects a MessageToElizaEvent, passes the message to a per-connection Eliza instance and sends eliza's response
@@ -57,23 +53,16 @@ public class AnswerWithElizaAction extends BaseEventBotAction
   }
 
   private Eliza getElizaInstanceForConnection(final Connection con) {
-    Eliza elizaInstance = getElizaInstances().get(con.getConnectionURI());
-    if (elizaInstance == null){
+
+    Eliza elizaInstance = (Eliza) getEventListenerContext().getBotContext().get(
+      KEY_ELIZA_INSTANCES, con.getConnectionURI().toString());
+
+    if (elizaInstance == null) {
       elizaInstance = new Eliza();
-      getElizaInstances().put(con.getConnectionURI(), elizaInstance);
+      getEventListenerContext().getBotContext().put(KEY_ELIZA_INSTANCES, con.getConnectionURI().toString(), elizaInstance);
     }
+
     return elizaInstance;
   }
-
-  private Map<URI, Eliza> getElizaInstances(){
-    Map<URI, Eliza> instances = (Map<URI, Eliza>) getEventListenerContext().getBotContext().get
-      (KEY_ELIZA_INSTANCES);
-    if (instances == null){
-      instances = new LinkedHashMap<URI, Eliza>(this.maxElizaInstances, 0.8f, true);
-      getEventListenerContext().getBotContext().put(KEY_ELIZA_INSTANCES, instances);
-    }
-    return instances;
-  }
-
 
 }

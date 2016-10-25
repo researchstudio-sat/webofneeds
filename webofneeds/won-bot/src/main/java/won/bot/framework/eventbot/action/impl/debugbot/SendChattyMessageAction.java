@@ -22,6 +22,7 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -54,10 +55,11 @@ public class SendChattyMessageAction extends BaseEventBotAction
   @Override
   protected void doRun(final Event event) throws Exception {
     Set<URI> toRemove = null;
-    Set<URI> chattyConnections = (Set<URI>) getEventListenerContext().getBotContext().get(KEY_CHATTY_CONNECTIONS);
+    Collection<Object> chattyConnections = getEventListenerContext().getBotContext().values(KEY_CHATTY_CONNECTIONS);
     if (chattyConnections == null) return;
     theloop:
-    for (URI con : chattyConnections) {
+    for (Object o : chattyConnections) {
+      URI con = (URI) o;
       if (random.nextDouble() > probabilityOfSendingMessage) {
         continue;
       }
@@ -92,7 +94,11 @@ public class SendChattyMessageAction extends BaseEventBotAction
       //publish an event that causes the message to be sent
       getEventListenerContext().getEventBus().publish(new SendTextMessageOnConnectionEvent(message, con));
     }
-    if (toRemove != null) chattyConnections.removeAll(toRemove);
+    if (toRemove != null) {
+      for (URI uri : toRemove) {
+        getEventListenerContext().getBotContext().remove(KEY_CHATTY_CONNECTIONS, uri.toString());
+      }
+    }
   }
 
   private String getRandomMessage(String[] fromMessages){

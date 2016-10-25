@@ -54,7 +54,6 @@ import java.net.URI;
  */
 public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
 {
-
     private Counter counter = new CounterImpl("DebugNeedsCounter");
 
     private boolean isInitialForHint;
@@ -152,8 +151,8 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
                             .publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
                 }
                 //put the mapping between the original and the reaction in to the context.
-                getEventListenerContext().getBotContext().put(reactingToNeedUri, needURI);
-                getEventListenerContext().getBotContext().put(needURI, reactingToNeedUri);
+                getEventListenerContext().getBotContext().put(KEY_NEED_REMOTE_NEED_ASSOCIATION, reactingToNeedUri.toString(), needURI);
+                getEventListenerContext().getBotContext().put(KEY_NEED_REMOTE_NEED_ASSOCIATION, needURI.toString(), reactingToNeedUri);
             }
         };
 

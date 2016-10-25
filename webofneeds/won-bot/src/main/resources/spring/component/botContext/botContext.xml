@@ -24,7 +24,7 @@
         http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd">
 
 
-    <bean id="mongoBotContext" class="won.bot.framework.bot.context.MongoDbBotContext" />
+    <bean id="mongoBotContext" class="won.bot.framework.bot.context.MongoBotContext" />
     <bean id="memoryBotContext" class="won.bot.framework.bot.context.InMemoryBotContext" />
 
     <!-- MongoDB config -->

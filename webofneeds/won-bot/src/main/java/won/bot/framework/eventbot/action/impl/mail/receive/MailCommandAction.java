@@ -22,7 +22,7 @@ import java.io.IOException;
 /**
  * Created by fsuda on 18.10.2016.
  */
-public class MailCommandAction  extends BaseEventBotAction {
+public class MailCommandAction extends BaseEventBotAction {
     private String mailIdUriRelationsName;
 
     public MailCommandAction(EventListenerContext eventListenerContext, String mailIdUriRelationsName) {

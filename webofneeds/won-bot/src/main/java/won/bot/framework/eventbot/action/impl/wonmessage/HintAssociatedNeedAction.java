@@ -18,6 +18,7 @@ package won.bot.framework.eventbot.action.impl.wonmessage;
 
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.AbstractCreateNeedAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.NeedSpecificEvent;
 import won.protocol.exception.WonMessageBuilderException;
@@ -57,7 +58,8 @@ public class HintAssociatedNeedAction extends BaseEventBotAction
       return;
     }
     final URI myNeedUri = ((NeedSpecificEvent) event).getNeedURI();
-    final URI remoteNeedUri = (URI) getEventListenerContext().getBotContext().get(myNeedUri);
+    final URI remoteNeedUri = (URI) getEventListenerContext().getBotContext().get(
+      AbstractCreateNeedAction.KEY_NEED_REMOTE_NEED_ASSOCIATION, myNeedUri.toString());
 
     try {
       logger.info("Sending hint for {} and {}", myNeedUri, remoteNeedUri);

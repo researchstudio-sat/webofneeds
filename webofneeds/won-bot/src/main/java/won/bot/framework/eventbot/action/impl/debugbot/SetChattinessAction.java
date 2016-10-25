@@ -22,8 +22,6 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.debugbot.SetChattinessDebugCommandEvent;
 
 import java.net.URI;
-import java.util.HashSet;
-import java.util.Set;
 
 import static won.bot.framework.eventbot.action.impl.debugbot.SendChattyMessageAction.KEY_CHATTY_CONNECTIONS;
 
@@ -41,15 +39,12 @@ public class SetChattinessAction extends BaseEventBotAction
   protected void doRun(final Event event) throws Exception {
     if (event instanceof SetChattinessDebugCommandEvent){
       SetChattinessDebugCommandEvent chattinessDebugCommandEvent = (SetChattinessDebugCommandEvent)event;
-      Set<URI> chattyConnections = (Set<URI>) getEventListenerContext().getBotContext().get(KEY_CHATTY_CONNECTIONS);
-      if (chattyConnections == null){
-        chattyConnections = new HashSet<URI>();
-        getEventListenerContext().getBotContext().put(KEY_CHATTY_CONNECTIONS, chattyConnections);
-      }
+
+      URI uri = chattinessDebugCommandEvent.getConnectionURI();
       if (chattinessDebugCommandEvent.isChatty()){
-        chattyConnections.add(chattinessDebugCommandEvent.getConnectionURI());
+        getEventListenerContext().getBotContext().put(KEY_CHATTY_CONNECTIONS, uri.toString(), uri);
       } else {
-        chattyConnections.remove(chattinessDebugCommandEvent.getConnectionURI());
+        getEventListenerContext().getBotContext().remove(KEY_CHATTY_CONNECTIONS, uri.toString());
       }
     }
 

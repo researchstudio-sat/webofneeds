@@ -18,7 +18,6 @@ package won.bot.framework.eventbot.action;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.bot.BotContext;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
 import won.bot.framework.eventbot.event.Event;
@@ -33,7 +32,6 @@ import won.protocol.message.WonMessage;
 
 import javax.mail.internet.MimeMessage;
 import java.net.URI;
-import java.util.HashMap;
 
 /**
  * User: fkleedorfer
@@ -132,70 +130,27 @@ public class EventBotActionUtils
 
     //Util Methods to Get/Remove/Add Uri -> MimeMessage Relation
     public static void removeUriMimeMessageRelation(EventListenerContext context, String mapName, URI needURI) {
-        BotContext botContext = context.getBotContext();
-        Object uriMap = botContext.get(mapName);
-
-        if(uriMap != null && uriMap instanceof HashMap){
-            ((HashMap<URI, MimeMessage>) uriMap).remove(needURI);
-        }
+        context.getBotContext().remove(mapName, needURI.toString());
     }
 
     public static MimeMessage getMimeMessageForURI(EventListenerContext context, String mapName, URI uri) {
-        BotContext botContext = context.getBotContext();
-        Object uriMap = botContext.get(mapName);
-
-        if(uriMap != null && uriMap instanceof HashMap){
-            return ((HashMap<URI, MimeMessage>) uriMap).get(uri);
-        }
-        return null;
+        return (MimeMessage) context.getBotContext().get(mapName, uri.toString());
     }
 
     public static void addUriMimeMessageRelation(EventListenerContext context, String mapName, URI needURI, MimeMessage mimeMessage) {
-        BotContext botContext = context.getBotContext();
-        Object uriMap = botContext.get(mapName);
-
-        if(uriMap == null || !(uriMap instanceof HashMap)){
-            uriMap = new HashMap<URI, MimeMessage>();
-        }
-
-        ((HashMap<URI, MimeMessage>) uriMap).put(needURI, mimeMessage);
-        botContext.put(mapName, uriMap);
+        context.getBotContext().put(mapName, needURI.toString(), mimeMessage);
     }
 
     //Util Methods to Get/Remove/Add MailId -> URI Relation
     public static void removeMailIdWonURIRelation(EventListenerContext context, String mapName, String mailId) {
-        BotContext botContext = context.getBotContext();
-        Object mailIdMap = botContext.get(mapName);
-
-        if(mailIdMap != null && mailIdMap instanceof HashMap){
-            ((HashMap<String, WonURI>) mailIdMap).remove(mailId);
-        }
+        context.getBotContext().remove(mapName, mailId);
     }
 
     public static WonURI getWonURIForMailId(EventListenerContext context, String mapName, String mailId) {
-        BotContext botContext = context.getBotContext();
-        Object mailIdMap = botContext.get(mapName);
-
-        if(mailIdMap != null && mailIdMap instanceof HashMap){
-            return ((HashMap<String, WonURI>) mailIdMap).get(mailId);
-        }
-        return null;
+        return (WonURI) context.getBotContext().get(mapName, mailId);
     }
 
     public static void addMailIdWonURIRelation(EventListenerContext context, String mapName, String mailId, WonURI uri) {
-        BotContext botContext = context.getBotContext();
-        Object mailIdMap = botContext.get(mapName);
-
-        if(mailIdMap == null || !(mailIdMap instanceof HashMap)){
-            mailIdMap = new HashMap<String, WonURI>();
-        }
-
-        ((HashMap<String, WonURI>) mailIdMap).put(mailId, uri);
-        botContext.put(mapName, mailIdMap);
-    }
-
-    public static HashMap<String, WonURI> getMailIdURIRelations(EventListenerContext context, String mapName) {
-        BotContext botContext = context.getBotContext();
-        return (HashMap<String, WonURI>) botContext.get(mapName);
+        context.getBotContext().put(mapName, mailId, uri);
     }
 }

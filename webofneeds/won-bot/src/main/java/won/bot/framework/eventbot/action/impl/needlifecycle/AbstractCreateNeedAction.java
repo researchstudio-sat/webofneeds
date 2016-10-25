@@ -37,6 +37,8 @@ import java.util.List;
  */
 public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
 
+  public static final String KEY_NEED_REMOTE_NEED_ASSOCIATION = "need_remote_need";
+
   protected List<URI> facets;
   protected String uriListName;
   //indicates if the won:DoNotMatch flag is to be set

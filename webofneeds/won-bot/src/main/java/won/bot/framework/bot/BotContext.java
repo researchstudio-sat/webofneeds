@@ -17,6 +17,7 @@
 package won.bot.framework.bot;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -76,16 +77,43 @@ public interface BotContext
 
   /**
    * Put an arbitrary object in the context.
+   *
+   * @param collectionName
    * @param key
    * @param value
    */
-  public void put(Object key, Object value);
+  public void put(String collectionName, String key, final Object value);
 
   /**
-   * Retrieve an object previously  added using put().
+   *
    * @param key
    * @return
    */
-  public Object get(Object key);
+
+  /**
+   * Retrieve an object object from a collection previously added using put().
+   *
+   * @param collectionName
+   * @param key
+   * @return
+   */
+  public Object get(String collectionName, String key);
+
+  /**
+   * Retrieve all objects from one collection
+   *
+   * @param collectionName
+   * @return
+   */
+  public Collection<Object> values(String collectionName);
+
+  /**
+   * Remove an arbitrary object from the context
+   *
+   * @param collectionName
+   * @param key
+   * @return
+   */
+  public Object remove(String collectionName, String key);
 
 }

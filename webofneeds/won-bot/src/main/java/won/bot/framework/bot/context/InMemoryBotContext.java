@@ -33,11 +33,15 @@ public class InMemoryBotContext implements BotContext
   @Override
   public synchronized List<URI> listNeedUris() {
 
+    Set<URI> needUris = new HashSet<>();
     List ret = new ArrayList<URI>();
+
     Iterator<List<URI>> iter = namedNeedUriLists.values().iterator();
     while (iter.hasNext()) {
-      ret.addAll(iter.next());
+      needUris.addAll(iter.next());
     }
+
+    ret.addAll(needUris);
     return ret;
   }
 
@@ -67,7 +71,7 @@ public class InMemoryBotContext implements BotContext
   public synchronized void appendToNamedNeedUriList(URI uri, String name) {
     List<URI> uris = this.namedNeedUriLists.get(name);
     if (uris == null) {
-      uris = new ArrayList<URI>();
+      uris = new ArrayList<>();
     }
     uris.add(uri);
     this.namedNeedUriLists.put(name, uris);
@@ -75,18 +79,33 @@ public class InMemoryBotContext implements BotContext
 
   @Override
   public synchronized List<URI> getNamedNeedUriList(String name) {
-    List<URI> ret = new LinkedList<>();
-    ret.addAll(this.namedNeedUriLists.get(name));
-    return ret;
+
+    List<URI> namedList = this.namedNeedUriLists.get(name);
+    if (namedList != null) {
+      List<URI> ret = new LinkedList<>();
+      ret.addAll(this.namedNeedUriLists.get(name));
+      return ret;
+    }
+    return null;
   }
 
   @Override
-  public synchronized void put(Object key, Object value) {
+  public synchronized void put(String collectionName, String key, Object value) {
     this.genericContext.put(key, value);
   }
 
   @Override
-  public synchronized Object get(Object key) {
+  public synchronized Object get(String collectionName, String key) {
     return this.genericContext.get(key);
+  }
+
+  @Override
+  public synchronized Object remove(String collectionName, String key) {
+    return this.genericContext.remove(key);
+  }
+
+  @Override
+  public synchronized Collection<Object> values(String collectionName) {
+    return genericContext.values();
   }
 }
