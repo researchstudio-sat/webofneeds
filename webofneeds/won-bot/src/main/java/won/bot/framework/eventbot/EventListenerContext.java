@@ -17,7 +17,7 @@
 package won.bot.framework.eventbot;
 
 import org.springframework.scheduling.TaskScheduler;
-import won.bot.framework.bot.BotContext;
+import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.bot.framework.eventbot.bus.EventBus;

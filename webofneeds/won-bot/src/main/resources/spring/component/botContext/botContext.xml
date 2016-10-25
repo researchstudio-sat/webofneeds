@@ -23,18 +23,18 @@
         http://www.springframework.org/schema/data/mongo
         http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd">
 
-
-    <bean id="mongoBotContext" class="won.bot.framework.bot.context.MongoBotContext" />
-    <bean id="memoryBotContext" class="won.bot.framework.bot.context.InMemoryBotContext" />
-
     <!-- MongoDB config -->
     <mongo:mongo id="mongo" host="localhost" port="27017"/>
 
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
-    <constructor-arg ref="mongo"/>
-    <constructor-arg name="databaseName" value="botContext"/>
+        <constructor-arg ref="mongo"/>
+        <constructor-arg name="databaseName" value="botContext"/>
     </bean>
 
-    <mongo:repositories base-package="won.bot.framework.bot.context.repo"></mongo:repositories>
+    <bean id="mongoBotContext" class="won.bot.framework.bot.context.MongoBotContext">
+        <property name="template" ref="mongoTemplate"/>
+    </bean>
+
+    <bean id="memoryBotContext" class="won.bot.framework.bot.context.MemoryBotContext"/>
 
 </beans>

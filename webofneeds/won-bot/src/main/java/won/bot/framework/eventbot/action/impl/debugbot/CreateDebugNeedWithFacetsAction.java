@@ -150,9 +150,11 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
                     getEventListenerContext().getEventBus()
                             .publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
                 }
-                //put the mapping between the original and the reaction in to the context.
-                getEventListenerContext().getBotContext().put(KEY_NEED_REMOTE_NEED_ASSOCIATION, reactingToNeedUri.toString(), needURI);
-                getEventListenerContext().getBotContext().put(KEY_NEED_REMOTE_NEED_ASSOCIATION, needURI.toString(), reactingToNeedUri);
+                //putGeneric the mapping between the original and the reaction in to the context.
+                getEventListenerContext().getBotContext().putGeneric(KEY_NEED_REMOTE_NEED_ASSOCIATION,
+                                                                     reactingToNeedUri.toString(), needURI);
+                getEventListenerContext().getBotContext().putGeneric(KEY_NEED_REMOTE_NEED_ASSOCIATION,
+                                                                     needURI.toString(), reactingToNeedUri);
             }
         };
 

@@ -22,7 +22,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Event filter that accepts need specific events the URI of which is found in the specified named URI list.
@@ -44,7 +44,7 @@ public abstract class AbstractNamedUriListFilter extends EventListenerContextAwa
   {
     URI uri = getURIFromEvent(event);
     if (uri == null) return false;
-    List<URI> uris = getContext().getBotContext().getNamedNeedUriList(listname);
+    Collection<URI> uris = getContext().getBotContext().getNamedNeedUriList(listname);
     if (uris == null) {
       logger.debug("filtering by named need uri list, but no list found with name '{}'", listname );
       return false;

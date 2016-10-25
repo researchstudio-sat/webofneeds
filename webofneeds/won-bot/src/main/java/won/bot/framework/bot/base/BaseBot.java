@@ -21,9 +21,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.Bot;
-import won.bot.framework.bot.BotContext;
 import won.bot.framework.bot.BotLifecyclePhase;
-import won.bot.framework.bot.context.InMemoryBotContext;
+import won.bot.framework.bot.context.BotContext;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -56,7 +55,6 @@ public abstract class BaseBot implements Bot
   {
     if (!this.lifecyclePhase.isDown()) return;
     this.lifecyclePhase = BotLifecyclePhase.STARTING_UP;
-    createDefaultBotContextIfNecessary();
     doInitialize();
     this.lifecyclePhase = BotLifecyclePhase.ACTIVE;
   }
@@ -147,11 +145,4 @@ public abstract class BaseBot implements Bot
 
   @Override
   public abstract void act() throws Exception;
-
-  private void createDefaultBotContextIfNecessary()
-  {
-    if (this.botContext == null) {
-      this.botContext = new InMemoryBotContext();
-    }
-  }
 }

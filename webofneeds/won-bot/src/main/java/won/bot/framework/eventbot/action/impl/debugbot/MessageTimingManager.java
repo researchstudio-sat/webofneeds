@@ -76,27 +76,27 @@ public class MessageTimingManager
   }
 
   public boolean isWaitedLongEnough(URI connectionUri){
-    Date lastSent = (Date) context.getBotContext().get(KEY_LAST_MESSAGE_OUT_TIMESTAMPS, connectionUri.toString());
+    Date lastSent = (Date) context.getBotContext().getGeneric(KEY_LAST_MESSAGE_OUT_TIMESTAMPS, connectionUri.toString());
     if (lastSent == null) return false; //avoid sending messages on every actEvent if too many needs are connected
     return getInactivityPeriodOfPartner(connectionUri)
       .isPauseLongEnough(System.currentTimeMillis() - lastSent.getTime());
   }
 
   public InactivityPeriod getInactivityPeriodOfPartner(URI connectionUri){
-    Date lastIn = (Date) context.getBotContext().get(KEY_LAST_MESSAGE_IN_TIMESTAMPS, connectionUri.toString());
+    Date lastIn = (Date) context.getBotContext().getGeneric(KEY_LAST_MESSAGE_IN_TIMESTAMPS, connectionUri.toString());
     return InactivityPeriod.getInactivityPeriod(lastIn);
   }
 
   public InactivityPeriod getInactivityPeriodOfSelf(URI connectionUri){
-    Date lastOut = (Date) context.getBotContext().get(KEY_LAST_MESSAGE_OUT_TIMESTAMPS, connectionUri.toString());
+    Date lastOut = (Date) context.getBotContext().getGeneric(KEY_LAST_MESSAGE_OUT_TIMESTAMPS, connectionUri.toString());
     return InactivityPeriod.getInactivityPeriod(lastOut);
   }
 
   public void updateMessageTimeForMessageSent(URI connectionUri){
-    context.getBotContext().put(KEY_LAST_MESSAGE_OUT_TIMESTAMPS, connectionUri.toString(), new Date());
+    context.getBotContext().putGeneric(KEY_LAST_MESSAGE_OUT_TIMESTAMPS, connectionUri.toString(), new Date());
   }
 
   public void updateMessageTimeForMessageReceived(URI connectionUri){
-    context.getBotContext().put(KEY_LAST_MESSAGE_IN_TIMESTAMPS, connectionUri.toString(), new Date());
+    context.getBotContext().putGeneric(KEY_LAST_MESSAGE_IN_TIMESTAMPS, connectionUri.toString(), new Date());
   }
 }

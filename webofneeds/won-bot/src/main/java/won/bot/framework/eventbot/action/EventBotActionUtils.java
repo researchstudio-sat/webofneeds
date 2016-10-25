@@ -130,27 +130,27 @@ public class EventBotActionUtils
 
     //Util Methods to Get/Remove/Add Uri -> MimeMessage Relation
     public static void removeUriMimeMessageRelation(EventListenerContext context, String mapName, URI needURI) {
-        context.getBotContext().remove(mapName, needURI.toString());
+        context.getBotContext().removeGeneric(mapName, needURI.toString());
     }
 
     public static MimeMessage getMimeMessageForURI(EventListenerContext context, String mapName, URI uri) {
-        return (MimeMessage) context.getBotContext().get(mapName, uri.toString());
+        return (MimeMessage) context.getBotContext().getGeneric(mapName, uri.toString());
     }
 
     public static void addUriMimeMessageRelation(EventListenerContext context, String mapName, URI needURI, MimeMessage mimeMessage) {
-        context.getBotContext().put(mapName, needURI.toString(), mimeMessage);
+        context.getBotContext().putGeneric(mapName, needURI.toString(), mimeMessage);
     }
 
     //Util Methods to Get/Remove/Add MailId -> URI Relation
     public static void removeMailIdWonURIRelation(EventListenerContext context, String mapName, String mailId) {
-        context.getBotContext().remove(mapName, mailId);
+        context.getBotContext().removeGeneric(mapName, mailId);
     }
 
     public static WonURI getWonURIForMailId(EventListenerContext context, String mapName, String mailId) {
-        return (WonURI) context.getBotContext().get(mapName, mailId);
+        return (WonURI) context.getBotContext().getGeneric(mapName, mailId);
     }
 
     public static void addMailIdWonURIRelation(EventListenerContext context, String mapName, String mailId, WonURI uri) {
-        context.getBotContext().put(mapName, mailId, uri);
+        context.getBotContext().putGeneric(mapName, mailId, uri);
     }
 }

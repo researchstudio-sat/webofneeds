@@ -55,7 +55,8 @@ public class SendChattyMessageAction extends BaseEventBotAction
   @Override
   protected void doRun(final Event event) throws Exception {
     Set<URI> toRemove = null;
-    Collection<Object> chattyConnections = getEventListenerContext().getBotContext().values(KEY_CHATTY_CONNECTIONS);
+    Collection<Object> chattyConnections = getEventListenerContext().getBotContext().genericValues(
+      KEY_CHATTY_CONNECTIONS);
     if (chattyConnections == null) return;
     theloop:
     for (Object o : chattyConnections) {
@@ -96,7 +97,7 @@ public class SendChattyMessageAction extends BaseEventBotAction
     }
     if (toRemove != null) {
       for (URI uri : toRemove) {
-        getEventListenerContext().getBotContext().remove(KEY_CHATTY_CONNECTIONS, uri.toString());
+        getEventListenerContext().getBotContext().removeGeneric(KEY_CHATTY_CONNECTIONS, uri.toString());
       }
     }
   }

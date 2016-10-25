@@ -114,7 +114,6 @@ public class MessageLifecycleMonitoringAction extends BaseEventBotAction
       connectionMsgUris.put(msg.getMessageURI(), msg.getReceiverNeedURI());
 
     } else if (event instanceof CrawlReadyEvent) {
-      logger.info("\nConversation between Needs: " + getEventListenerContext().getBotContext().listNeedUris());
       reportMessageSizes(connectionMsgUris, "Connection Messages");
       reportMessageSizes(responseMsgUris, "Delivery Responses");
       getEventListenerContext().getEventBus().publish(new CrawlDoneEvent());

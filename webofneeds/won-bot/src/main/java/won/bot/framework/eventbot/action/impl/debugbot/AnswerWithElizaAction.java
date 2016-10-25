@@ -54,12 +54,13 @@ public class AnswerWithElizaAction extends BaseEventBotAction
 
   private Eliza getElizaInstanceForConnection(final Connection con) {
 
-    Eliza elizaInstance = (Eliza) getEventListenerContext().getBotContext().get(
+    Eliza elizaInstance = (Eliza) getEventListenerContext().getBotContext().getGeneric(
       KEY_ELIZA_INSTANCES, con.getConnectionURI().toString());
 
     if (elizaInstance == null) {
       elizaInstance = new Eliza();
-      getEventListenerContext().getBotContext().put(KEY_ELIZA_INSTANCES, con.getConnectionURI().toString(), elizaInstance);
+      getEventListenerContext().getBotContext().putGeneric(KEY_ELIZA_INSTANCES, con.getConnectionURI().toString(),
+                                                           elizaInstance);
     }
 
     return elizaInstance;
