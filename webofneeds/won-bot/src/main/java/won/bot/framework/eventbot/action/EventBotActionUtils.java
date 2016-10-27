@@ -30,8 +30,14 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.protocol.message.WonMessage;
 
+import javax.mail.MessagingException;
+import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URI;
+import java.util.Properties;
 
 /**
  * User: fkleedorfer
@@ -133,12 +139,21 @@ public class EventBotActionUtils
         context.getBotContext().removeGeneric(mapName, needURI.toString());
     }
 
-    public static MimeMessage getMimeMessageForURI(EventListenerContext context, String mapName, URI uri) {
-        return (MimeMessage) context.getBotContext().getGeneric(mapName, uri.toString());
+    public static MimeMessage getMimeMessageForURI(EventListenerContext context, String mapName, URI uri)
+      throws MessagingException {
+
+        // use the empty default session here for reconstructing the mime message
+        byte[] byteMsg = (byte[]) context.getBotContext().getGeneric(mapName, uri.toString());
+        ByteArrayInputStream is = new ByteArrayInputStream(byteMsg);
+        return new MimeMessage(Session.getDefaultInstance(new Properties(), null), is);
     }
 
-    public static void addUriMimeMessageRelation(EventListenerContext context, String mapName, URI needURI, MimeMessage mimeMessage) {
-        context.getBotContext().putGeneric(mapName, needURI.toString(), mimeMessage);
+    public static void addUriMimeMessageRelation(EventListenerContext context, String mapName, URI needURI, MimeMessage mimeMessage)
+      throws IOException, MessagingException {
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        mimeMessage.writeTo(os);
+        context.getBotContext().putGeneric(mapName, needURI.toString(), os.toByteArray());
     }
 
     //Util Methods to Get/Remove/Add MailId -> URI Relation

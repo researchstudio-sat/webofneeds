@@ -11,15 +11,14 @@ import java.util.*;
 @Primary
 public class MemoryBotContext implements BotContext
 {
-
   private Map<String, Map<String, Object>> contextMap = new HashMap<>();
-  private Set<URI> nodeUris = new HashSet<URI>();
+  private Set<URI> nodeUris = new HashSet<>();
   private Map<String, List<URI>> namedNeedUriLists = new HashMap();
 
   @Override
   public Set<URI> retrieveAllNeedUris() {
 
-    Set<URI> ret = new HashSet();
+    Set<URI> ret = new HashSet<>();
     Iterator<List<URI>> iter = namedNeedUriLists.values().iterator();
     while (iter.hasNext()) {
       ret.addAll(iter.next());
@@ -101,8 +100,8 @@ public class MemoryBotContext implements BotContext
   @Override
   public synchronized Collection<Object> genericValues(String collectionName) {
 
-    Collection<Object> collection = new LinkedList<>();
-    collection.addAll(getCollection(collectionName).values());
-    return collection;
+    Set<Object> set = new HashSet<>();
+    set.addAll(getCollection(collectionName).values());
+    return set;
   }
 }

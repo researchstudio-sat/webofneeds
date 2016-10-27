@@ -15,9 +15,9 @@ public class MongoContextObject
 
   private Object object;
 
-  public MongoContextObject(String id, Object o) {
+  public MongoContextObject(String id, Object object) {
     this.id = id;
-    this.object = o;
+    this.object = object;
   }
 
   public String getId() {

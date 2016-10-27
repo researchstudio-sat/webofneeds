@@ -29,7 +29,7 @@
     <!-- define the mongo database name -->
     <bean id="mongoDbFactory" class="org.springframework.data.mongodb.core.SimpleMongoDbFactory">
         <constructor-arg ref="mongo"/>
-        <constructor-arg value="botContext"/>
+        <constructor-arg value="botContextTest"/>
     </bean>
 
     <!-- use this mongo converter to be able to save keys with dots -->

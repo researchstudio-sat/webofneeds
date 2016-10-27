@@ -1,11 +1,14 @@
 package won.bot.framework.bot.context;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.net.URI;
 import java.util.*;
 
 /**
+ * Bot context implementation using persistent mongo db for storage.
+ *
  * Created by hfriedrich on 27.10.2016.
  */
 public class MongoBotContext implements BotContext
@@ -14,6 +17,7 @@ public class MongoBotContext implements BotContext
   private static final String NODE_URI_COLLECTION = "node_uris";
   private static final String NAMED_NEED_URI_COLLECTION_PREFIX = "named_need_uri_";
 
+  @Autowired
   private MongoTemplate template;
 
   public void setTemplate(final MongoTemplate template) {
@@ -25,9 +29,11 @@ public class MongoBotContext implements BotContext
   public Set<URI> retrieveAllNeedUris() {
 
     Set<URI> needUris = new HashSet<>();
-    for (Object obj : values(NEED_URI_NAME_COLLECTION)) {
-      String needUriCollection = (String) obj;
-      List<MongoContextObject> contextObjects = template.findAll(MongoContextObject.class, needUriCollection);
+    Set<String> needUriNames = getNeedUriNames();
+
+    for (String needUriCollection : needUriNames) {
+      List<MongoContextObject> contextObjects = template.findAll(
+        MongoContextObject.class, NAMED_NEED_URI_COLLECTION_PREFIX + needUriCollection);
       for (MongoContextObject mco : contextObjects) {
         needUris.add((URI) mco.getObject());
       }
@@ -36,12 +42,22 @@ public class MongoBotContext implements BotContext
     return needUris;
   }
 
+  private Set<String> getNeedUriNames() {
+
+    Set<String> needUriNames = new HashSet<>();
+    List<MongoContextObject> contextObjects = template.findAll(MongoContextObject.class, NEED_URI_NAME_COLLECTION);
+    for (MongoContextObject mco : contextObjects) {
+      needUriNames.add((String) mco.getObject());
+    }
+    return needUriNames;
+  }
+
   // TODO: optimize this by reducing queries to mongo db
   @Override
   public boolean isNeedKnown(final URI needURI) {
 
-    for (Object obj : values(NEED_URI_NAME_COLLECTION)) {
-      String needUriCollection = (String) obj;
+    Set<String> needUriNames = getNeedUriNames();
+    for (String needUriCollection : needUriNames) {
       if (null != get(NAMED_NEED_URI_COLLECTION_PREFIX + needUriCollection, needURI.toString())) {
         return true;
       }
@@ -127,7 +143,10 @@ public class MongoBotContext implements BotContext
   private Object get(String collectionName, String key) {
 
     MongoContextObject mco = template.findById(key, MongoContextObject.class, collectionName);
-    return mco.getObject();
+    if (mco != null) {
+      return mco.getObject();
+    }
+    return null;
   }
 
   @Override
