@@ -22,48 +22,36 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.MessageToElizaEvent;
-import won.protocol.model.Connection;
 
 
 /**
- * Expects a MessageToElizaEvent, passes the message to a per-connection Eliza instance and sends eliza's response
+ * Expects a MessageToElizaEvent, passes the message to a Eliza instance and sends eliza's response
  * over the connection.
  */
 public class AnswerWithElizaAction extends BaseEventBotAction
 {
-  public static final String KEY_ELIZA_INSTANCES = "elizaInstances";
-  private int maxElizaInstances = 20;
+  // use only one eliza instance for all connections
+  private Eliza eliza = new Eliza();
 
   public AnswerWithElizaAction(final EventListenerContext eventListenerContext, final int maxElizaInstances) {
     super(eventListenerContext);
-    this.maxElizaInstances = maxElizaInstances;
   }
 
   @Override
   protected void doRun(final Event event) throws Exception {
     if (event instanceof MessageToElizaEvent) {
       MessageToElizaEvent messageToElizaEvent = (MessageToElizaEvent) event;
-      Eliza elizaInstance = getElizaInstanceForConnection(messageToElizaEvent.getCon());
-      String elizasResponse = elizaInstance.processInput(((MessageToElizaEvent) event).getMessage());
+
+      String elizaResponse;
+      synchronized (eliza) {
+        elizaResponse = eliza.processInput(((MessageToElizaEvent) event).getMessage());
+      }
+
       getEventListenerContext().getEventBus().publish(
         new SendTextMessageOnConnectionEvent(
-          elizasResponse,
+          elizaResponse,
           messageToElizaEvent.getCon().getConnectionURI()));
     }
-  }
-
-  private Eliza getElizaInstanceForConnection(final Connection con) {
-
-    Eliza elizaInstance = (Eliza) getEventListenerContext().getBotContext().getGeneric(
-      KEY_ELIZA_INSTANCES, con.getConnectionURI().toString());
-
-    if (elizaInstance == null) {
-      elizaInstance = new Eliza();
-      getEventListenerContext().getBotContext().putGeneric(KEY_ELIZA_INSTANCES, con.getConnectionURI().toString(),
-                                                           elizaInstance);
-    }
-
-    return elizaInstance;
   }
 
 }

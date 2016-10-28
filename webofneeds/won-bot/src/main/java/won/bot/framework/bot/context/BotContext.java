@@ -1,5 +1,6 @@
 package won.bot.framework.bot.context;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.*;
 
@@ -78,7 +79,7 @@ public interface BotContext
    * @param key
    * @param value
    */
-  void putGeneric(String collectionName, String key, final Object value);
+  void putGeneric(String collectionName, String key, final Serializable value);
 
   /**
    * Retrieve an object object from a collection previously added using putGeneric().

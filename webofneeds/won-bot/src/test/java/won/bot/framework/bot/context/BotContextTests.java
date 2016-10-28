@@ -1,6 +1,5 @@
 package won.bot.framework.bot.context;
 
-import codeanticode.eliza.Eliza;
 import org.apache.xbean.spring.context.ClassPathXmlApplicationContext;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,9 +13,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.util.*;
 
@@ -176,10 +173,10 @@ public class BotContextTests
   }
 
   @Test
-  public void testPutAndRetrieveGenericObjects() throws MessagingException, IOException {
+  public void testPutAndRetrieveGenericObjects() throws MessagingException, IOException, ClassNotFoundException {
 
     // List
-    List<URI> uriList = new LinkedList<>();
+    LinkedList<URI> uriList = new LinkedList<>();
     uriList.add(URI1);
     uriList.add(URI1);
     uriList.add(URI2);
@@ -188,14 +185,33 @@ public class BotContextTests
     List<URI> uriListCopy = (List<URI>) botContext.getGeneric("uriList", "list1");
     Assert.assertEquals(uriList, uriListCopy);
 
-    // Map (here only non-complex keys are allowed in maps)
-    Map<String, URI> uriMap = new HashMap<>();
-    uriMap.put(URI1.toString(), URI1);
-    uriMap.put(URI2.toString(), URI1);
-    uriMap.put(URI3.toString(), URI3);
-    botContext.putGeneric("uriMap", "map1", uriMap);
-    Map<String, URI> uriMapCopy = (Map<String, URI>) botContext.getGeneric("uriMap", "map1");
-    Assert.assertEquals(uriMap, uriMapCopy);
+    // HashMap needs to be serialized (here only non-complex keys are allowed in maps)
+    HashMap<String, URI> uriHashMap = new HashMap<>();
+    uriHashMap.put(URI1.toString(), URI1);
+    uriHashMap.put(URI2.toString(), URI1);
+    uriHashMap.put(URI3.toString(), URI3);
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    ObjectOutputStream oos = new ObjectOutputStream(os);
+    oos.writeObject(uriHashMap);
+    botContext.putGeneric("uriMap", "map1", os.toByteArray());
+    byte[] byteMsg  = (byte[]) botContext.getGeneric("uriMap", "map1");
+    ByteArrayInputStream is = new ByteArrayInputStream(byteMsg);
+    ObjectInputStream ois = new ObjectInputStream(is);
+    HashMap<String, URI> uriHashMapCopy = (HashMap<String, URI>) ois.readObject();
+    Assert.assertEquals(uriHashMap, uriHashMapCopy);
+    oos.close();
+    os.close();
+    ois.close();
+    is.close();
+
+    // TreeMap is serializable
+    TreeMap<String, URI> uriTreeMap = new TreeMap<>();
+    uriTreeMap.put(URI1.toString(), URI2);
+    uriTreeMap.put(URI2.toString(), URI3);
+    uriTreeMap.put(URI3.toString(), URI1);
+    botContext.putGeneric("uriMap", "map1", uriTreeMap);  // overwrite the HashMap entry from the previous step
+    Map<String, URI> uriTreeMapCopy  = (Map<String, URI>) botContext.getGeneric("uriMap", "map1");
+    Assert.assertEquals(uriTreeMap, uriTreeMapCopy);
 
     // MimeMessage cannot be serialized directly => has to be serialized manually first
     Properties props = new Properties();
@@ -207,11 +223,11 @@ public class BotContextTests
     message.setSubject("text1");
     message.setDescription("text2");
     message.setSentDate(new Date());
-    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    os = new ByteArrayOutputStream();
     message.writeTo(os);
     botContext.putGeneric("mime", "mime1", os.toByteArray());
-    byte[] byteMsg = (byte[]) botContext.getGeneric("mime", "mime1");
-    ByteArrayInputStream is = new ByteArrayInputStream(byteMsg);
+    byteMsg = (byte[]) botContext.getGeneric("mime", "mime1");
+    is = new ByteArrayInputStream(byteMsg);
     MimeMessage messageCopy = new MimeMessage(Session.getDefaultInstance(props, null), is);
     Assert.assertEquals(message.getHeader("test1")[0], messageCopy.getHeader("test1")[0]);
     Assert.assertEquals(message.getAllHeaderLines().nextElement(), messageCopy.getAllHeaderLines().nextElement());
@@ -220,16 +236,10 @@ public class BotContextTests
     Assert.assertEquals(message.getSubject(), messageCopy.getSubject());
     Assert.assertEquals(message.getDescription(), messageCopy.getDescription());
     Assert.assertEquals(message.getSentDate(), messageCopy.getSentDate());
-
-    // Eliza instance
-    Eliza eliza = new Eliza();
-    eliza.processInput("hello");
-    eliza.processInput("how are you?");
-    botContext.putGeneric("eliza", "eliza", eliza);
-    Eliza elizaCopy = (Eliza) botContext.getGeneric("eliza", "eliza");
-    String answer1 = eliza.processInput("whats up?");
-    String answer2 = elizaCopy.processInput("whats up?");
-    // Assert.assertEquals(answer1, answer2);
+    oos.close();
+    os.close();
+    ois.close();
+    is.close();
   }
 
 }

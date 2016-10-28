@@ -3,6 +3,7 @@ package won.bot.framework.bot.context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.*;
 
@@ -121,7 +122,7 @@ public class MongoBotContext implements BotContext
   }
 
   @Override
-  public void putGeneric(String collectionName, String key, final Object value) {
+  public void putGeneric(String collectionName, String key, final Serializable value) {
 
     checkValidCollectionName(collectionName);
     put(collectionName, key, value);

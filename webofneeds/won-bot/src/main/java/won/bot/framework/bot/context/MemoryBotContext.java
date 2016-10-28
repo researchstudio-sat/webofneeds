@@ -2,6 +2,7 @@ package won.bot.framework.bot.context;
 
 import org.springframework.context.annotation.Primary;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.*;
 
@@ -83,7 +84,7 @@ public class MemoryBotContext implements BotContext
   }
 
   @Override
-  public synchronized void putGeneric(String collectionName, String key, final Object value) {
+  public synchronized void putGeneric(String collectionName, String key, final Serializable value) {
     getCollection(collectionName).put(key, value);
   }
 
