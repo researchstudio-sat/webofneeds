@@ -19,10 +19,12 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
+    <import resource="classpath:spring/component/botContext/botContext.xml"/>
 
     <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.DebugBot">
         <!-- optional property, by default one echo need per each need will be created -->
         <property name="taskScheduler" ref="taskScheduler" />
+        <property name="botContext" ref="${botContext.impl}" />
         <!--property name="needProducer" ref="needProducerFromMails" /-->
         <!--property name="nodeURISource" ref="nodeUriSourceRandom" /-->
         <property name="matcherNodeURISource" ref="matcherNodeURISource"/>

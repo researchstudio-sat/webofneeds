@@ -21,9 +21,11 @@
 
     <import resource="classpath:spring/component/needproducer/needproducer-mails-nonstop.xml"/>
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
+    <import resource="classpath:spring/component/botContext/botContext.xml"/>
 
     <bean id="randomSimulatorBot" class="won.bot.impl.RandomSimulatorBot">
         <property name="taskScheduler" ref="taskScheduler" />
+        <property name="botContext" ref="${botContext.impl}" />
         <property name="needProducer" ref="needProducerFromMails" />
         <property name="nodeURISource" ref="nodeUriSourceRandom" />
         <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->

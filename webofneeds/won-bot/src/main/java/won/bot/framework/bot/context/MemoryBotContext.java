@@ -1,7 +1,5 @@
 package won.bot.framework.bot.context;
 
-import org.springframework.context.annotation.Primary;
-
 import java.io.Serializable;
 import java.net.URI;
 import java.util.*;
@@ -9,7 +7,6 @@ import java.util.*;
 /**
  * In memory context implementation using nested maps. This is the default implementation of the bot context.
  */
-@Primary
 public class MemoryBotContext implements BotContext
 {
   private Map<String, Map<String, Object>> contextMap = new HashMap<>();

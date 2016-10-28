@@ -20,6 +20,7 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import won.bot.framework.bot.Bot;
 import won.bot.framework.bot.BotLifecyclePhase;
@@ -36,9 +37,11 @@ import java.net.URI;
 public abstract class BaseBot implements Bot
 {
   protected final Logger logger = LoggerFactory.getLogger(getClass());
-  private BotContext botContext;
   private BotLifecyclePhase lifecyclePhase = BotLifecyclePhase.DOWN;
   private boolean workDone = false;
+
+  @Autowired
+  private BotContext botContext;
 
   @Override
   public boolean knowsNeedURI(final URI needURI)

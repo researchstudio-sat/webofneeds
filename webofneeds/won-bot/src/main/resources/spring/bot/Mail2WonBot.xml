@@ -71,7 +71,6 @@
         <!-- optional property, by default one echo need per each need will be created -->
 
         <property name="botContext" ref="${botContext.impl}" />
-
         <property name="taskScheduler" ref="taskScheduler" />
         <property name="receiveEmailChannel" ref="receiveEmailChannel"/>
         <property name="sendEmailChannel" ref="sendEmailChannel"/>
