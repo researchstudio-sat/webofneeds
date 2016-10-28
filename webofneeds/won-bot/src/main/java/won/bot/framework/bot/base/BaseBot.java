@@ -20,6 +20,7 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 import won.bot.framework.bot.Bot;
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.bot.context.BotContext;
@@ -55,6 +56,17 @@ public abstract class BaseBot implements Bot
   {
     if (!this.lifecyclePhase.isDown()) return;
     this.lifecyclePhase = BotLifecyclePhase.STARTING_UP;
+
+    // try the connection with the bot context
+    try {
+      botContext.putGeneric("temp", "temp", "temp");
+      Object o = botContext.getGeneric("temp", "temp");
+      Assert.isTrue(o.equals("temp"));
+    } catch (Exception e) {
+      logger.error("Bot cannot establish connection with bot context");
+      throw e;
+    }
+
     doInitialize();
     this.lifecyclePhase = BotLifecyclePhase.ACTIVE;
   }

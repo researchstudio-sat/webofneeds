@@ -26,10 +26,16 @@
     <!-- MongoDB config -->
     <mongo:mongo id="mongo" host="localhost" port="27017"/>
 
+    <bean id="mongoClientUri" class="com.mongodb.MongoClientURI">
+        <constructor-arg
+                value="mongodb://${botContext.mongodb.user}:${botContext.mongodb.pass}@${botContext.mongodb.host}:${botContext.mongodb.port}/${botContext.mongodb.database}"/>
+    </bean>
+
     <!-- define the mongo database name -->
     <bean id="mongoDbFactory" class="org.springframework.data.mongodb.core.SimpleMongoDbFactory">
         <constructor-arg ref="mongo"/>
         <constructor-arg value="botContextTest"/>
+        <!--<constructor-arg ref="mongoClientUri"/>-->
     </bean>
 
     <!-- use this mongo converter to be able to save keys with dots -->
