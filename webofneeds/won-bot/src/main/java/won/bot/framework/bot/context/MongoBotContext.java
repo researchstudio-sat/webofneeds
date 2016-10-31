@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Bot context implementation using persistent mongo db for storage.
@@ -25,7 +26,6 @@ public class MongoBotContext implements BotContext
     this.template = template;
   }
 
-  // TODO: optimize this by reducing queries to mongo db
   @Override
   public Set<URI> retrieveAllNeedUris() {
 
@@ -35,9 +35,7 @@ public class MongoBotContext implements BotContext
     for (String needUriCollection : needUriNames) {
       List<MongoContextObject> contextObjects = template.findAll(
         MongoContextObject.class, NAMED_NEED_URI_COLLECTION_PREFIX + needUriCollection);
-      for (MongoContextObject mco : contextObjects) {
-        needUris.add((URI) mco.getObject());
-      }
+      needUris.addAll(contextObjects.stream().map(x -> (URI) x.getObject()).collect(Collectors.toSet()));
     }
 
     return needUris;
@@ -47,13 +45,10 @@ public class MongoBotContext implements BotContext
 
     Set<String> needUriNames = new HashSet<>();
     List<MongoContextObject> contextObjects = template.findAll(MongoContextObject.class, NEED_URI_NAME_COLLECTION);
-    for (MongoContextObject mco : contextObjects) {
-      needUriNames.add((String) mco.getObject());
-    }
+    needUriNames.addAll(contextObjects.stream().map(x -> (String) x.getObject()).collect(Collectors.toSet()));
     return needUriNames;
   }
 
-  // TODO: optimize this by reducing queries to mongo db
   @Override
   public boolean isNeedKnown(final URI needURI) {
 
@@ -84,9 +79,7 @@ public class MongoBotContext implements BotContext
     List<MongoContextObject> contextObjects = template.findAll(
       MongoContextObject.class, NAMED_NEED_URI_COLLECTION_PREFIX + name);
     List<URI> uriList = new LinkedList<>();
-    for (MongoContextObject mco : contextObjects) {
-      uriList.add((URI) mco.getObject());
-    }
+    uriList.addAll(contextObjects.stream().map(x -> (URI) x.getObject()).collect(Collectors.toSet()));
     return uriList;
   }
 
@@ -123,20 +116,17 @@ public class MongoBotContext implements BotContext
 
   @Override
   public void putGeneric(String collectionName, String key, final Serializable value) {
-
     checkValidCollectionName(collectionName);
     put(collectionName, key, value);
   }
 
   private void put(String collectionName, String key, final Object value) {
-
     MongoContextObject mco = new MongoContextObject(key, value);
     template.save(mco, collectionName);
   }
 
   @Override
   public final Object getGeneric(String collectionName, String key) {
-
     checkValidCollectionName(collectionName);
     return get(collectionName, key);
   }
@@ -152,7 +142,6 @@ public class MongoBotContext implements BotContext
 
   @Override
   public Collection<Object> genericValues(String collectionName) {
-
     checkValidCollectionName(collectionName);
     return values(collectionName);
   }
@@ -161,15 +150,12 @@ public class MongoBotContext implements BotContext
 
     List<MongoContextObject> contextObjects = template.findAll(MongoContextObject.class, collectionName);
     Collection<Object> objects = new HashSet<>();
-    for (MongoContextObject mco : contextObjects) {
-      objects.add(mco.getObject());
-    }
+    objects.addAll(contextObjects.stream().map(x -> x.getObject()).collect(Collectors.toList()));
     return objects;
   }
 
   @Override
   public final void removeGeneric(String collectionName, String key) {
-
     checkValidCollectionName(collectionName);
     remove(collectionName, key);
   }

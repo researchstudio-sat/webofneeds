@@ -3,6 +3,7 @@ package won.bot.framework.bot.context;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * In memory context implementation using nested maps. This is the default implementation of the bot context.
@@ -15,12 +16,8 @@ public class MemoryBotContext implements BotContext
 
   @Override
   public Set<URI> retrieveAllNeedUris() {
-
     Set<URI> ret = new HashSet<>();
-    Iterator<List<URI>> iter = namedNeedUriLists.values().iterator();
-    while (iter.hasNext()) {
-      ret.addAll(iter.next());
-    }
+    ret.addAll(namedNeedUriLists.values().stream().flatMap(List::stream).collect(Collectors.toSet()));
     return ret;
   }
 
