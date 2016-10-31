@@ -50,7 +50,11 @@ public class MemoryBotContext implements BotContext
   public synchronized List<URI> getNamedNeedUriList(final String name) {
 
     List<URI> ret = new LinkedList<>();
-    ret.addAll(this.namedNeedUriLists.get(name));
+    List<URI> namedList = this.namedNeedUriLists.get(name);
+    if (namedList != null) {
+      ret.addAll(namedList);
+    }
+
     return ret;
   }
 

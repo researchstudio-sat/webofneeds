@@ -140,6 +140,13 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
             @Override
             public void onEvent(Event event) throws Exception {
                 logger.debug("need creation successful, new need URI is {}", needURI);
+
+                //putGeneric the mapping between the original and the reaction in to the context.
+                getEventListenerContext().getBotContext().putGeneric(KEY_NEED_REMOTE_NEED_ASSOCIATION,
+                                                                     reactingToNeedUri.toString(), needURI);
+                getEventListenerContext().getBotContext().putGeneric(KEY_NEED_REMOTE_NEED_ASSOCIATION,
+                                                                     needURI.toString(), reactingToNeedUri);
+
                 if ((origEvent instanceof HintDebugCommandEvent) || isInitialForHint) {
                     getEventListenerContext().getEventBus()
                             .publish(new NeedCreatedEventForDebugHint(needURI, wonNodeUri, needModel, null));
@@ -150,11 +157,6 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
                     getEventListenerContext().getEventBus()
                             .publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
                 }
-                //putGeneric the mapping between the original and the reaction in to the context.
-                getEventListenerContext().getBotContext().putGeneric(KEY_NEED_REMOTE_NEED_ASSOCIATION,
-                                                                     reactingToNeedUri.toString(), needURI);
-                getEventListenerContext().getBotContext().putGeneric(KEY_NEED_REMOTE_NEED_ASSOCIATION,
-                                                                     needURI.toString(), reactingToNeedUri);
             }
         };
 
