@@ -32,6 +32,29 @@ services:
     depends:
       - mongodb
 
+  mail_bot:
+    build: ../../image/bots
+    image: webofneeds/bots:int
+    environment:
+      - "constraint:node==satsrv06"
+      - "MAIN_BOT=won.bot.app.Mail2WonBotApp"
+      - "node.default.host=satsrv04.researchstudio.at"
+      - "node.default.http.port=8888"
+      - "won.node.uris=https://satsrv04.researchstudio.at:8888/won/resource https://satsrv07.researchstudio.at/won/resource"
+      - "botContext.impl=mongoBotContext"
+      - "botContext.mongodb.user=won"
+      - "botContext.mongodb.pass=$mongo_db_passwd"
+      - "botContext.mongodb.host=satsrv06.researchstudio.at"
+      - "botContext.mongodb.port=27018"
+      - "botContext.mongodb.database=master_bot"
+      - "email.user=$mailinglist_user"
+      - "email.password=$mailinglist_passwd"
+      - "email.imap.host=$mailinglist_imap_host_and_port"
+      - "email.smtp.host=$mailinglist_smtp_host"
+      - "email.smtp.port=$mailinglist_smtp_port"
+    depends:
+      - mongodb
+
   # bigdata rdf store for matcher service (this image is not built at deployment, it is downloaded from dockerhub)
   bigdata:
     image: webofneeds/bigdata
