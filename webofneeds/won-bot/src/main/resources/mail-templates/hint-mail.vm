@@ -1,0 +1,5 @@
+We found a Match for you:
+{$remoteNeedUri}
+
+Original Message from <$respondAddress> on $sentDate:
+>$respondMessage
