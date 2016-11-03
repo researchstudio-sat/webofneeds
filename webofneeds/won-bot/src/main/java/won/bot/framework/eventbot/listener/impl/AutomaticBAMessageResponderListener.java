@@ -1,11 +1,11 @@
 package won.bot.framework.eventbot.listener.impl;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherNeedEvent;
 import won.bot.framework.eventbot.listener.BaseEventListener;
-import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
 import won.bot.framework.eventbot.listener.baStateBots.BATestScriptAction;
 import won.bot.framework.eventbot.listener.baStateBots.SimpleScriptManager;
@@ -75,7 +75,7 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener
         boolean weAreOnCoordinatorSide = areWeOnCoordinatorSide(openEvent.getCon());
         logger.info("Are we on Coordinator side? "+weAreOnCoordinatorSide);
         BATestBotScript script = setupStateMachine(openEvent, weAreOnCoordinatorSide);
-        //now, get the action from the state machine and make the right need send the message
+        //now, getGeneric the action from the state machine and make the right need send the message
         if (isScriptFinished(script)) return;
         BATestScriptAction action = script.getNextAction();
 
@@ -144,7 +144,7 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener
         } else {
           connectionToSendMessageFrom = WonLinkedDataUtils.getRemoteConnectionURIforConnectionURI(con
             .getConnectionURI(), getEventListenerContext().getLinkedDataSource());
-          //TODO: also get BA state for participant/coordinator and compare to
+          //TODO: also getGeneric BA state for participant/coordinator and compare to
           //state that the action says it should be in. If the state is different
           //throw an exception.
         }
@@ -161,7 +161,8 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener
         URI coordinatorUri = weAreOnCoordinatorSide? localNeedUri: remoteNeedUri;
         URI participantUri = weAreOnCoordinatorSide? remoteNeedUri: localNeedUri;
         //decide which state machine to use for this combination:
-        List<URI> participants = getEventListenerContext().getBotContext().getNamedNeedUriList(BACCBot.URI_LIST_NAME_PARTICIPANT);
+        List<URI> participants = getEventListenerContext().getBotContext().getNamedNeedUriList(
+          BACCBot.URI_LIST_NAME_PARTICIPANT);
         logger.debug("participants:{}", participants);
         logger.debug("participant URI to look for:{}", participantUri);
         //let's hard-code this for now:
@@ -193,7 +194,7 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener
         logger.debug("replying to open with message");
         //register a WS-BA state machine for this need-need combination:
         boolean weAreOnCoordinatorSide = areWeOnCoordinatorSide(messageEvent.getCon());
-        //now, get the action from the state machine and make the right need send the message
+        //now, getGeneric the action from the state machine and make the right need send the message
         BATestBotScript script = getStateMachine(messageEvent.getCon(),weAreOnCoordinatorSide);
         if (isScriptFinished(script)) return;
         BATestScriptAction action = script.getNextAction();

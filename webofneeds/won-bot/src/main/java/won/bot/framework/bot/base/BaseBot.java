@@ -20,10 +20,11 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import won.bot.framework.bot.Bot;
-import won.bot.framework.bot.BotContext;
 import won.bot.framework.bot.BotLifecyclePhase;
-import won.bot.framework.bot.context.InMemoryBotContext;
+import won.bot.framework.bot.context.BotContext;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -36,9 +37,11 @@ import java.net.URI;
 public abstract class BaseBot implements Bot
 {
   protected final Logger logger = LoggerFactory.getLogger(getClass());
-  private BotContext botContext;
   private BotLifecyclePhase lifecyclePhase = BotLifecyclePhase.DOWN;
   private boolean workDone = false;
+
+  @Autowired
+  private BotContext botContext;
 
   @Override
   public boolean knowsNeedURI(final URI needURI)
@@ -56,7 +59,17 @@ public abstract class BaseBot implements Bot
   {
     if (!this.lifecyclePhase.isDown()) return;
     this.lifecyclePhase = BotLifecyclePhase.STARTING_UP;
-    createDefaultBotContextIfNecessary();
+
+    // try the connection with the bot context
+    try {
+      botContext.putGeneric("temp", "temp", "temp");
+      Object o = botContext.getGeneric("temp", "temp");
+      Assert.isTrue(o.equals("temp"));
+    } catch (Exception e) {
+      logger.error("Bot cannot establish connection with bot context");
+      throw e;
+    }
+
     doInitialize();
     this.lifecyclePhase = BotLifecyclePhase.ACTIVE;
   }
@@ -147,11 +160,4 @@ public abstract class BaseBot implements Bot
 
   @Override
   public abstract void act() throws Exception;
-
-  private void createDefaultBotContextIfNecessary()
-  {
-    if (this.botContext == null) {
-      this.botContext = new InMemoryBotContext();
-    }
-  }
 }

@@ -21,8 +21,8 @@ import com.hp.hpl.jena.rdf.model.NodeIterator;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.needlifecycle.NeedDeactivatedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherNeedEvent;
 import won.node.facet.impl.WON_TX;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
@@ -32,7 +32,7 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * User: Danijel
@@ -70,7 +70,7 @@ public class TwoPhaseCommitNoVoteDeactivateAllNeedsAction extends BaseEventBotAc
             WON_TX.COORDINATION_MESSAGE_ABORT.getURI(), coordinationMessageUri);
       }
     }
-    List<URI> toDeactivate = getEventListenerContext().getBotContext().listNeedUris();
+    Collection<URI> toDeactivate = getEventListenerContext().getBotContext().retrieveAllNeedUris();
     for (URI uri: toDeactivate){
       getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(uri));
       getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));

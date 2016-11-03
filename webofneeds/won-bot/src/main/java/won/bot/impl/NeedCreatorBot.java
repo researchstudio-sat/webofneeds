@@ -40,6 +40,7 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
  */
 public class NeedCreatorBot extends EventBot
 {
+  private static final String NAME_NEEDS = "needs";
 
   protected BaseEventListener groupMemberCreator;
   protected BaseEventListener workDoneSignaller;
@@ -64,7 +65,7 @@ public class NeedCreatorBot extends EventBot
       new MultipleActions(ctx,
         new IncrementCounterAction(ctx, needCreationStartedCounter),
         new IncrementCounterAction(ctx, creationUnfinishedCounter),
-        new CreateNeedWithFacetsAction(ctx)
+        new CreateNeedWithFacetsAction(ctx, NAME_NEEDS)
       ),
       -1
     );

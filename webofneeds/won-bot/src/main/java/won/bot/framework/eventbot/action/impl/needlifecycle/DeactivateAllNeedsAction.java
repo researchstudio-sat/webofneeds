@@ -27,7 +27,7 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * User: fkleedorfer
@@ -42,7 +42,7 @@ public class DeactivateAllNeedsAction extends BaseEventBotAction
   @Override
   protected void doRun(Event event) throws Exception {
 
-    List<URI> toDeactivate = getEventListenerContext().getBotContext().listNeedUris();
+    Collection<URI> toDeactivate = getEventListenerContext().getBotContext().retrieveAllNeedUris();
     for (URI uri: toDeactivate){
 
       getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(uri));

@@ -19,7 +19,7 @@ package won.bot.framework.bot.base;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import org.springframework.scheduling.TaskScheduler;
-import won.bot.framework.bot.BotContext;
+import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;

@@ -27,7 +27,8 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * BaseEventBotAction that sends a hint message to the first need in the context to the second.
@@ -41,9 +42,10 @@ public class MatchNeedsAction extends BaseEventBotAction
 
   @Override
   protected void doRun(Event event) throws Exception{
-    List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();
-    URI need1 = needs.get(0);
-    URI need2 = needs.get(1);
+    Collection<URI> needs = getEventListenerContext().getBotContext().retrieveAllNeedUris();
+    Iterator<URI> iter = needs.iterator();
+    URI need1 = iter.next();
+    URI need2 = iter.next();
     logger.debug("matching needs {} and {}",need1,need2);
     logger.debug("getEventListnerContext():"+getEventListenerContext());
     logger.debug("getMatcherService(): "+getEventListenerContext().getMatcherProtocolNeedServiceClient());

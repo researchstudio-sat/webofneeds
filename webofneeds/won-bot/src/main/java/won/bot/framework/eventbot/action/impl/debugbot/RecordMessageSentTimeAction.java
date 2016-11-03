@@ -21,6 +21,8 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
 
+import java.net.URI;
+
 
 /**
  *
@@ -38,7 +40,10 @@ public class RecordMessageSentTimeAction extends BaseEventBotAction
   @Override
   protected void doRun(final Event event) throws Exception {
     if (event instanceof ConnectionSpecificEvent){
-      timingManager.updateMessageTimeForMessageSent(((ConnectionSpecificEvent)event).getConnectionURI());
+      URI connectionUri = ((ConnectionSpecificEvent)event).getConnectionURI();
+      if (connectionUri != null) {
+        timingManager.updateMessageTimeForMessageSent(((ConnectionSpecificEvent) event).getConnectionURI());
+      }
     }
   }
 

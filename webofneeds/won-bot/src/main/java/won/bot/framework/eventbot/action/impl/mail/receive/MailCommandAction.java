@@ -4,16 +4,15 @@ import org.hsqldb.lib.StringUtil;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
-import won.bot.framework.eventbot.action.impl.mail.model.UriType;
-import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
 import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
+import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
 import won.bot.framework.eventbot.action.impl.mail.receive.util.MailContentExtractor;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
-import won.bot.framework.eventbot.event.impl.mail.OpenConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.CloseConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
+import won.bot.framework.eventbot.event.impl.mail.OpenConnectionEvent;
 import won.protocol.util.WonRdfUtils;
 
 import javax.mail.MessagingException;
@@ -23,7 +22,7 @@ import java.io.IOException;
 /**
  * Created by fsuda on 18.10.2016.
  */
-public class MailCommandAction  extends BaseEventBotAction {
+public class MailCommandAction extends BaseEventBotAction {
     private String mailIdUriRelationsName;
 
     public MailCommandAction(EventListenerContext eventListenerContext, String mailIdUriRelationsName) {
@@ -71,12 +70,8 @@ public class MailCommandAction  extends BaseEventBotAction {
         }
     }
 
-    public static boolean isCommandMail(MimeMessage message){
-        try{
-            return !StringUtil.isEmpty(getReplyToMailId(message));
-        }catch(MessagingException me){
-            return false;
-        }
+    public static boolean isCommandMail(MimeMessage message) throws MessagingException {
+        return !StringUtil.isEmpty(getReplyToMailId(message));
     }
 
     public static String getReplyToMailId(MimeMessage message) throws MessagingException {

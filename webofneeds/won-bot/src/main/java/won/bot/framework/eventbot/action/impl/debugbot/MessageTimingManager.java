@@ -20,8 +20,6 @@ import won.bot.framework.eventbot.EventListenerContext;
 
 import java.net.URI;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Created by fkleedorfer on 10.06.2016.
@@ -78,39 +76,27 @@ public class MessageTimingManager
   }
 
   public boolean isWaitedLongEnough(URI connectionUri){
-    Date lastSent = getTimestampMapForKey
-      (KEY_LAST_MESSAGE_OUT_TIMESTAMPS).get
-      (connectionUri);
+    Date lastSent = (Date) context.getBotContext().getGeneric(KEY_LAST_MESSAGE_OUT_TIMESTAMPS, connectionUri.toString());
     if (lastSent == null) return false; //avoid sending messages on every actEvent if too many needs are connected
     return getInactivityPeriodOfPartner(connectionUri)
       .isPauseLongEnough(System.currentTimeMillis() - lastSent.getTime());
   }
 
   public InactivityPeriod getInactivityPeriodOfPartner(URI connectionUri){
-    Date lastIn = getTimestampMapForKey(KEY_LAST_MESSAGE_IN_TIMESTAMPS).get(connectionUri);
+    Date lastIn = (Date) context.getBotContext().getGeneric(KEY_LAST_MESSAGE_IN_TIMESTAMPS, connectionUri.toString());
     return InactivityPeriod.getInactivityPeriod(lastIn);
   }
 
   public InactivityPeriod getInactivityPeriodOfSelf(URI connectionUri){
-    Date lastOut = getTimestampMapForKey(KEY_LAST_MESSAGE_OUT_TIMESTAMPS).get(connectionUri);
+    Date lastOut = (Date) context.getBotContext().getGeneric(KEY_LAST_MESSAGE_OUT_TIMESTAMPS, connectionUri.toString());
     return InactivityPeriod.getInactivityPeriod(lastOut);
   }
 
   public void updateMessageTimeForMessageSent(URI connectionUri){
-    getTimestampMapForKey(KEY_LAST_MESSAGE_OUT_TIMESTAMPS).put(connectionUri, new Date());
+    context.getBotContext().putGeneric(KEY_LAST_MESSAGE_OUT_TIMESTAMPS, connectionUri.toString(), new Date());
   }
 
   public void updateMessageTimeForMessageReceived(URI connectionUri){
-    getTimestampMapForKey(KEY_LAST_MESSAGE_IN_TIMESTAMPS).put(connectionUri, new Date());
-  }
-
-
-  private Map<URI, Date> getTimestampMapForKey(String contextKey){
-    Map<URI, Date> instances = (Map<URI, Date>) context.getBotContext().get(contextKey);
-    if (instances == null){
-      instances = new LinkedHashMap<URI, Date>(this.maxInstances, 0.8f, true);
-      context.getBotContext().put(contextKey, instances);
-    }
-    return instances;
+    context.getBotContext().putGeneric(KEY_LAST_MESSAGE_IN_TIMESTAMPS, connectionUri.toString(), new Date());
   }
 }

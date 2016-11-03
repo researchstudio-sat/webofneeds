@@ -17,9 +17,9 @@
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
 import com.hp.hpl.jena.query.Dataset;
-import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.event.Event;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -27,7 +27,8 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * BaseEventBotAction connecting two needs on the specified facets. The need's URIs are obtained from
@@ -51,12 +52,13 @@ public class ConnectTwoNeedsAction extends BaseEventBotAction
   @Override
   public void doRun(Event event)
   {
-    List<URI> needs = getEventListenerContext().getBotContext().listNeedUris();
+    Collection<URI> needs = getEventListenerContext().getBotContext().retrieveAllNeedUris();
     try {
+      Iterator iter = needs.iterator();
       getEventListenerContext().getWonMessageSender().sendWonMessage(
-        createWonMessage(needs.get(0), needs.get(1)));
+        createWonMessage((URI) iter.next(), (URI) iter.next()));
     } catch (Exception e) {
-      logger.warn("could not connect {} and {}", new Object[]{needs.get(0), needs.get(1)}, e);
+      logger.warn("could not connect two need objects, exception was: ", e);
     }
   }
 

@@ -37,6 +37,8 @@ import java.util.List;
  */
 public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
 
+  public static final String KEY_NEED_REMOTE_NEED_ASSOCIATION = "need_remote_need";
+
   protected List<URI> facets;
   protected String uriListName;
   //indicates if the won:DoNotMatch flag is to be set
@@ -67,15 +69,6 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
     this.uriListName = uriListName;
     this.doNotMatch = doNotMatch;
     this.usedForTesting = usedForTesting;
-  }
-
-  /**
-   * Creates a need with the specified facets.
-   * If no facet is specified, the ownerFacet will be used.
-   */
-  public AbstractCreateNeedAction(final EventListenerContext eventListenerContext, URI... facets)
-  {
-    this(eventListenerContext, null, facets);
   }
 
   protected WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI,

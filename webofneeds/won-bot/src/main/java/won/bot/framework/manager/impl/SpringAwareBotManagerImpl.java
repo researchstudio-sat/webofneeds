@@ -39,7 +39,7 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl implements Applica
   @Override
   public void onApplicationEvent(final ApplicationEvent event)
   {
-    logger.info("processing application event {}", event);
+    logger.debug("processing application event {}", event);
     if (event instanceof ContextStartedEvent || event instanceof ContextRefreshedEvent){
       logger.info("context started or refreshed: searching for bots in spring context");
       try {

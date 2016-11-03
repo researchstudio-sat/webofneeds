@@ -18,10 +18,8 @@ package won.bot.framework.eventbot.action;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.bot.framework.bot.BotContext;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
-import won.bot.framework.eventbot.action.impl.mail.receive.util.MailContentExtractor;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
@@ -32,12 +30,14 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.protocol.message.WonMessage;
 
-import javax.mail.Address;
 import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
+import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
+import java.util.Properties;
 
 /**
  * User: fkleedorfer
@@ -47,13 +47,12 @@ public class EventBotActionUtils
 {
     private static final Logger logger = LoggerFactory.getLogger(EventBotActionUtils.class);
 
-    public static void rememberInListIfNamePresent(EventListenerContext ctx ,URI uri, String uriListName) {
+    public static void rememberInList(EventListenerContext ctx, URI uri, String uriListName) {
         if (uriListName != null && uriListName.trim().length() > 0){
             ctx.getBotContext().appendToNamedNeedUriList(uri, uriListName);
             logger.debug("remembering need in NamedNeedList {} ", uri);
         } else {
-            ctx.getBotContext().rememberNeedUri(uri);
-            logger.debug("remembering need in List {} ", uri);
+            throw new IllegalArgumentException("'uriListName' must not not be null or empty");
         }
     }
 
@@ -61,13 +60,12 @@ public class EventBotActionUtils
         ctx.getBotContext().rememberNodeUri(uri);
     }
 
-    public static void removeFromListIfNamePresent(EventListenerContext ctx ,URI uri, String uriListName) {
+    public static void removeFromList(EventListenerContext ctx, URI uri, String uriListName) {
         if (uriListName != null && uriListName.trim().length() > 0){
             ctx.getBotContext().removeNeedUriFromNamedNeedUriList(uri, uriListName);
             logger.debug("removing need from NamedNeedList {} ", uri);
         } else {
-            ctx.getBotContext().removeNeedUri(uri);
-            logger.debug("removed need from bot context {} ", uri);
+            throw new IllegalArgumentException("'uriListName' must not not be null or empty");
         }
     }
 
@@ -138,70 +136,36 @@ public class EventBotActionUtils
 
     //Util Methods to Get/Remove/Add Uri -> MimeMessage Relation
     public static void removeUriMimeMessageRelation(EventListenerContext context, String mapName, URI needURI) {
-        BotContext botContext = context.getBotContext();
-        Object uriMap = botContext.get(mapName);
-
-        if(uriMap != null && uriMap instanceof HashMap){
-            ((HashMap<URI, MimeMessage>) uriMap).remove(needURI);
-        }
+        context.getBotContext().removeGeneric(mapName, needURI.toString());
     }
 
-    public static MimeMessage getMimeMessageForURI(EventListenerContext context, String mapName, URI uri) {
-        BotContext botContext = context.getBotContext();
-        Object uriMap = botContext.get(mapName);
+    public static MimeMessage getMimeMessageForURI(EventListenerContext context, String mapName, URI uri)
+      throws MessagingException {
 
-        if(uriMap != null && uriMap instanceof HashMap){
-            return ((HashMap<URI, MimeMessage>) uriMap).get(uri);
-        }
-        return null;
+        // use the empty default session here for reconstructing the mime message
+        byte[] byteMsg = (byte[]) context.getBotContext().getGeneric(mapName, uri.toString());
+        ByteArrayInputStream is = new ByteArrayInputStream(byteMsg);
+        return new MimeMessage(Session.getDefaultInstance(new Properties(), null), is);
     }
 
-    public static void addUriMimeMessageRelation(EventListenerContext context, String mapName, URI needURI, MimeMessage mimeMessage) {
-        BotContext botContext = context.getBotContext();
-        Object uriMap = botContext.get(mapName);
+    public static void addUriMimeMessageRelation(EventListenerContext context, String mapName, URI needURI, MimeMessage mimeMessage)
+      throws IOException, MessagingException {
 
-        if(uriMap == null || !(uriMap instanceof HashMap)){
-            uriMap = new HashMap<URI, MimeMessage>();
-        }
-
-        ((HashMap<URI, MimeMessage>) uriMap).put(needURI, mimeMessage);
-        botContext.put(mapName, uriMap);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        mimeMessage.writeTo(os);
+        context.getBotContext().putGeneric(mapName, needURI.toString(), os.toByteArray());
     }
 
     //Util Methods to Get/Remove/Add MailId -> URI Relation
     public static void removeMailIdWonURIRelation(EventListenerContext context, String mapName, String mailId) {
-        BotContext botContext = context.getBotContext();
-        Object mailIdMap = botContext.get(mapName);
-
-        if(mailIdMap != null && mailIdMap instanceof HashMap){
-            ((HashMap<String, WonURI>) mailIdMap).remove(mailId);
-        }
+        context.getBotContext().removeGeneric(mapName, mailId);
     }
 
     public static WonURI getWonURIForMailId(EventListenerContext context, String mapName, String mailId) {
-        BotContext botContext = context.getBotContext();
-        Object mailIdMap = botContext.get(mapName);
-
-        if(mailIdMap != null && mailIdMap instanceof HashMap){
-            return ((HashMap<String, WonURI>) mailIdMap).get(mailId);
-        }
-        return null;
+        return (WonURI) context.getBotContext().getGeneric(mapName, mailId);
     }
 
     public static void addMailIdWonURIRelation(EventListenerContext context, String mapName, String mailId, WonURI uri) {
-        BotContext botContext = context.getBotContext();
-        Object mailIdMap = botContext.get(mapName);
-
-        if(mailIdMap == null || !(mailIdMap instanceof HashMap)){
-            mailIdMap = new HashMap<String, WonURI>();
-        }
-
-        ((HashMap<String, WonURI>) mailIdMap).put(mailId, uri);
-        botContext.put(mapName, mailIdMap);
-    }
-
-    public static HashMap<String, WonURI> getMailIdURIRelations(EventListenerContext context, String mapName) {
-        BotContext botContext = context.getBotContext();
-        return (HashMap<String, WonURI>) botContext.get(mapName);
+        context.getBotContext().putGeneric(mapName, mailId, uri);
     }
 }
