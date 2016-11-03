@@ -805,16 +805,14 @@ public class WonRdfUtils
       Path titlePath = PathParser.parse("won:hasContent/dc:title", DefaultPrefixUtils.getDefaultPrefixes());
       URI needUri = NeedUtils.getNeedURI(needDataset);
 
-      String titleString = RdfUtils.getStringPropertyForPropertyPath(needDataset, needUri, titlePath);
-      return titleString;
+      return RdfUtils.getStringPropertyForPropertyPath(needDataset, needUri, titlePath);
     }
 
     public static String getNeedDescription(Dataset needDataset) {
       Path descriptionPath = PathParser.parse("won:hasContent/won:hasTextDescription", DefaultPrefixUtils.getDefaultPrefixes());
       URI needUri = NeedUtils.getNeedURI(needDataset);
 
-      String descriptionString = RdfUtils.getStringPropertyForPropertyPath(needDataset, needUri, descriptionPath);
-      return descriptionString;
+      return RdfUtils.getStringPropertyForPropertyPath(needDataset, needUri, descriptionPath);
     }
 
     public static Resource getNeedResource(final Model needModel)
