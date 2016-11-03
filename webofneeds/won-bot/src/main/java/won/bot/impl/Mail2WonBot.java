@@ -6,6 +6,7 @@ import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.mail.receive.CreateNeedFromMailAction;
 import won.bot.framework.eventbot.action.impl.mail.receive.MailCommandAction;
+import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
 import won.bot.framework.eventbot.action.impl.mail.receive.MailParserAction;
 import won.bot.framework.eventbot.action.impl.mail.send.Connect2MailParserAction;
 import won.bot.framework.eventbot.action.impl.mail.send.Hint2MailParserAction;
@@ -39,6 +40,9 @@ public class Mail2WonBot extends EventBot{
     @Autowired
     private MessageChannel sendEmailChannel;
 
+    @Autowired
+    MailContentExtractor mailContentExtractor;
+
     private EventBus bus;
 
     @Override
@@ -51,14 +55,14 @@ public class Mail2WonBot extends EventBot{
         new ActionOnEventListener(
                 ctx,
                 "MailReceived",
-                new MailParserAction(ctx)
+                new MailParserAction(ctx, mailContentExtractor)
         ));
 
         bus.subscribe(CreateNeedFromMailEvent.class,
         new ActionOnEventListener(
                 ctx,
                 "CreateNeedFromMailEvent",
-                new CreateNeedFromMailAction(ctx, NAME_NEEDS, URIMIMEMESSAGERELATIONS_NAME)
+                new CreateNeedFromMailAction(ctx, NAME_NEEDS, mailContentExtractor, URIMIMEMESSAGERELATIONS_NAME)
 
         ));
 
@@ -66,7 +70,7 @@ public class Mail2WonBot extends EventBot{
         new ActionOnEventListener(
                 ctx,
                 "MailCommandEvent",
-                new MailCommandAction(ctx, MAILIDURIRELATIONS_NAME)
+                new MailCommandAction(ctx, MAILIDURIRELATIONS_NAME, mailContentExtractor)
         ));
 
         bus.subscribe(SendTextMessageOnConnectionEvent.class,

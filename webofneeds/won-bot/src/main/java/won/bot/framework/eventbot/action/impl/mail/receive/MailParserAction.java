@@ -16,8 +16,11 @@ import javax.mail.internet.MimeMessage;
  */
 public class MailParserAction extends BaseEventBotAction {
 
-    public MailParserAction(EventListenerContext eventListenerContext) {
+    private MailContentExtractor mailContentExtractor;
+
+    public MailParserAction(EventListenerContext eventListenerContext, MailContentExtractor mailContentExtractor) {
         super(eventListenerContext);
+        this.mailContentExtractor = mailContentExtractor;
     }
 
     protected void doRun(Event event) throws Exception {
@@ -26,7 +29,7 @@ public class MailParserAction extends BaseEventBotAction {
             MimeMessage message = ((MailReceivedEvent) event).getMessage();
 
             try {
-                if (CreateNeedFromMailAction.isCreateMail(message)) {
+                if (mailContentExtractor.getBasicNeedType(message) != null) {
                     logger.debug("received a create mail publishing the CreateNeedFromMail event");
                     bus.publish(new CreateNeedFromMailEvent(message));
                 } else if (MailCommandAction.isCommandMail(message)) {

@@ -4,7 +4,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
-import won.bot.framework.eventbot.action.impl.mail.receive.util.MailContentExtractor;
 import won.bot.framework.eventbot.action.impl.needlifecycle.AbstractCreateNeedAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.mail.CreateNeedFromMailEvent;
@@ -29,10 +28,15 @@ import java.util.Arrays;
  */
 public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
     private String uriMimeMessageRelationsName;
+    private MailContentExtractor mailContentExtractor;
 
-    public CreateNeedFromMailAction(EventListenerContext eventListenerContext, String uriListName, String uriMimeMessageRelationsName, URI... facets) {
+    public CreateNeedFromMailAction(EventListenerContext eventListenerContext, String uriListName,
+                                    MailContentExtractor mailContentExtractor, String uriMimeMessageRelationsName,
+                                    URI... facets) {
+
         super(eventListenerContext, uriListName);
         this.uriMimeMessageRelationsName = uriMimeMessageRelationsName;
+        this.mailContentExtractor = mailContentExtractor;
 
         this.usedForTesting = true;
 
@@ -50,12 +54,12 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
             MimeMessage message = ((CreateNeedFromMailEvent) event).getMessage();
 
             try {
-                BasicNeedType type = MailContentExtractor.getBasicNeedType(message);
+                BasicNeedType type = mailContentExtractor.getBasicNeedType(message);
                 assert type != null; //Done as a failsafe, this Action should never be called if it is not a valid CreateNeed-Mail
 
-                String title = MailContentExtractor.getTitle(message);
-                String description = MailContentExtractor.getDescription(message);
-                String[] tags = MailContentExtractor.getTags(message);
+                String title = mailContentExtractor.getTitle(message);
+                String description = mailContentExtractor.getDescription(message);
+                String[] tags = mailContentExtractor.getTags(message);
 
                 EventListenerContext ctx = getEventListenerContext();
                 WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
@@ -106,9 +110,5 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                 logger.error("messaging exception occurred: {}", me);
             }
         }
-    }
-
-    public static boolean isCreateMail(MimeMessage message) throws MessagingException {
-        return MailContentExtractor.getBasicNeedType(message) != null;
     }
 }

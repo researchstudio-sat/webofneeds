@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://camel.apache.org/schema/spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <bean id="mailExtractor" class="won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor">
+        <property name="demandTypePattern">
+            <bean id="demandTypePattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value="(?i)^\[WANT\].*" />
+            </bean>
+        </property>
+        <property name="supplyTypePattern">
+            <bean id="supplyTypePattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value="(?i)^\[OFFER\].*" />
+            </bean>
+        </property>
+        <property name="doTogetherTypePattern">
+            <bean id="doTogetherTypePattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value="(?i)^\[TOGETHER\].*" />
+            </bean>
+        </property>
+        <property name="critiqueTypePattern">
+            <bean id="critiqueTypePattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value="(?i)^\[CRITIQUE\].*" />
+            </bean>
+        </property>
+        <property name="tagExtractionPattern">
+            <bean id="tagExtractionPattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value="[#]+[\w]+\b" />
+            </bean>
+        </property>
+        <property name="textMessageExtractionPattern">
+            <bean id="textMessageExtractionPattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value="(?s).+?(?=\n>)" />
+            </bean>
+        </property>
+        <property name="descriptionExtractionPattern">
+            <bean id="descriptionExtractionPattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value="(?s).*" />
+            </bean>
+        </property>
+        <property name="titleExtractionPattern">
+            <bean id="titleExtractionPattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg>
+                    <value><![CDATA[(?s)(?<=\]).*]]></value>
+                </constructor-arg>
+            </bean>
+        </property>
+    </bean>
+
+
+</beans>

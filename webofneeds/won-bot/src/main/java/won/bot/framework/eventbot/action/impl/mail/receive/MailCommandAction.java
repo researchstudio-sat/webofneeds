@@ -6,7 +6,6 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
-import won.bot.framework.eventbot.action.impl.mail.receive.util.MailContentExtractor;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
@@ -24,10 +23,13 @@ import java.io.IOException;
  */
 public class MailCommandAction extends BaseEventBotAction {
     private String mailIdUriRelationsName;
+    private MailContentExtractor mailContentExtractor;
 
-    public MailCommandAction(EventListenerContext eventListenerContext, String mailIdUriRelationsName) {
+    public MailCommandAction(EventListenerContext eventListenerContext, String mailIdUriRelationsName,
+                             MailContentExtractor mailContentExtractor) {
         super(eventListenerContext);
         this.mailIdUriRelationsName = mailIdUriRelationsName;
+        this.mailContentExtractor = mailContentExtractor;
     }
 
     @Override
@@ -53,10 +55,12 @@ public class MailCommandAction extends BaseEventBotAction {
                         bus.publish(new OpenConnectionEvent(wonUri.getUri()));
                         break;
                     case IMPLICIT_OPEN_CONNECTION:
-                        bus.publish(new OpenConnectionEvent(wonUri.getUri(), MailContentExtractor.getTextMessage(message)));
+                        bus.publish(new OpenConnectionEvent(
+                          wonUri.getUri(),  mailContentExtractor.getTextMessage(message)));
                         break;
                     case SENDMESSAGE:
-                        bus.publish(new SendTextMessageOnConnectionEvent(MailContentExtractor.getTextMessage(message), wonUri.getUri()));
+                        bus.publish(new SendTextMessageOnConnectionEvent(
+                          mailContentExtractor.getTextMessage(message), wonUri.getUri()));
                         break;
                     case NO_ACTION:
                     default:

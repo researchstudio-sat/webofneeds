@@ -7,7 +7,7 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.UriType;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
-import won.bot.framework.eventbot.action.impl.mail.receive.util.MailContentExtractor;
+import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
 import won.protocol.message.WonMessage;
