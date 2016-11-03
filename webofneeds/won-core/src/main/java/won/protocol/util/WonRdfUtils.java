@@ -801,6 +801,20 @@ public class WonRdfUtils
       return tags;
     }
 
+    public static String getNeedTitle(Dataset needDataset) {
+      Path titlePath = PathParser.parse("won:hasContent/dc:title", DefaultPrefixUtils.getDefaultPrefixes());
+      URI needUri = NeedUtils.getNeedURI(needDataset);
+
+      return RdfUtils.getStringPropertyForPropertyPath(needDataset, needUri, titlePath);
+    }
+
+    public static String getNeedDescription(Dataset needDataset) {
+      Path descriptionPath = PathParser.parse("won:hasContent/won:hasTextDescription", DefaultPrefixUtils.getDefaultPrefixes());
+      URI needUri = NeedUtils.getNeedURI(needDataset);
+
+      return RdfUtils.getStringPropertyForPropertyPath(needDataset, needUri, descriptionPath);
+    }
+
     public static Resource getNeedResource(final Model needModel)
     {
       assert needModel != null : "needModel must not be null";
