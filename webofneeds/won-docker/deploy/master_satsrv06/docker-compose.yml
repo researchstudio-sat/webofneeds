@@ -29,7 +29,7 @@ services:
       - "botContext.mongodb.host=satsrv06.researchstudio.at"
       - "botContext.mongodb.port=27018"
       - "botContext.mongodb.database=master_bot"
-    depends:
+    depends_on:
       - mongodb
 
   mail_bot:
@@ -52,7 +52,7 @@ services:
       - "email.imap.host=$mailinglist_imap_host_and_port"
       - "email.smtp.host=$mailinglist_smtp_host"
       - "email.smtp.port=$mailinglist_smtp_port"
-    depends:
+    depends_on:
       - mongodb
 
   # bigdata rdf store for matcher service (this image is not built at deployment, it is downloaded from dockerhub)
