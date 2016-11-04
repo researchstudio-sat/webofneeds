@@ -91,11 +91,16 @@ public class WonOwnerMailSender {
   public void sendConversationNotificationHtmlMessage(String toEmail, String localNeed, String
     remoteNeed, String localConnection, String textMsg) {
 
-    StringWriter writer = new StringWriter();
-    VelocityContext context = createContext(toEmail, localNeed, remoteNeed, localConnection, textMsg);
-    conversationNotificationHtmlTemplate.merge(context, writer);
-    logger.debug("sending " + SUBJECT_CONVERSATION_MESSAGE + " to " + toEmail);
-    this.wonMailSender.sendHtmlMessage(toEmail, SUBJECT_CONVERSATION_MESSAGE, writer.toString());
+    if (textMsg != null && !textMsg.isEmpty()) {
+      StringWriter writer = new StringWriter();
+      VelocityContext context = createContext(toEmail, localNeed, remoteNeed, localConnection, textMsg);
+      conversationNotificationHtmlTemplate.merge(context, writer);
+      logger.debug("sending " + SUBJECT_CONVERSATION_MESSAGE + " to " + toEmail);
+      this.wonMailSender.sendHtmlMessage(toEmail, SUBJECT_CONVERSATION_MESSAGE, writer.toString());
+    } else {
+      logger.warn("do not send notification conversation email to {} with empty message. Connection is: {}",
+                  toEmail, localConnection);
+    }
   }
 
   public void sendConnectNotificationHtmlMessage(String toEmail, String localNeed, String
@@ -125,6 +130,5 @@ public class WonOwnerMailSender {
     hintNotificationHtmlTemplate.merge(context, writer);
     logger.debug("sending " + SUBJECT_MATCH + " to " + toEmail);
     this.wonMailSender.sendHtmlMessage(toEmail, SUBJECT_MATCH, writer.toString());
-
   }
 }
