@@ -1,0 +1,11 @@
+<div>
+    <p> Hi there,</p>
+    <p>The owner of '<a href="$linkRemoteNeed">$remoteNeedTitle</a>'   wants to start a conversation with you via your posting
+        <a href="$linkLocalNeed">$localNeedTitle</a>. They wrote:</p>
+    <p style="border-left:thick solid #808080=;"><span style=3D"margin-left:5px;color:#808080;">$textMsg</span></p>
+    <p><a href="$linkConnection">[Click here to pick up the conversation]</a></p>
+    <br/>
+    <p> <span>Best Wishes,</span> <br/>
+        <span>Owner application team</span>
+    </p>
+</div>
