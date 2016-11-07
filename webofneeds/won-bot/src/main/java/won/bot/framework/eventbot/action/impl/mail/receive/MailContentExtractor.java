@@ -38,6 +38,12 @@ public class MailContentExtractor
   // extract description from mail content
   private Pattern descriptionExtractionPattern;
 
+  // check if the need created from the mail should is used for testing only
+  private Pattern usedForTestingPattern;
+
+  // check if the need created from the mail should be not matched with other needs
+  private Pattern doNotMatchPattern;
+
   public void setDemandTypePattern(final Pattern demandTypePattern) {
     this.demandTypePattern = demandTypePattern;
   }
@@ -68,6 +74,22 @@ public class MailContentExtractor
 
   public void setDescriptionExtractionPattern(final Pattern descriptionExtractionPattern) {
     this.descriptionExtractionPattern = descriptionExtractionPattern;
+  }
+
+  public void setUsedForTestingPattern(Pattern usedForTestingPattern) {
+    this.usedForTestingPattern = usedForTestingPattern;
+  }
+
+  public void setDoNotMatchPattern(Pattern doNotMatchPattern) {
+    this.doNotMatchPattern = doNotMatchPattern;
+  }
+
+  public boolean isDoNotMatch(MimeMessage message) throws MessagingException {
+    return doNotMatchPattern.matcher(message.getSubject()).matches();
+  }
+
+  public boolean isUsedForTesting(MimeMessage message) throws MessagingException {
+    return usedForTestingPattern.matcher(message.getSubject()).matches();
   }
 
   public String getTitle(MimeMessage message) throws MessagingException {
@@ -169,5 +191,4 @@ public class MailContentExtractor
     Address[] froms = message.getFrom();
     return (froms == null) ? null : ((InternetAddress) froms[0]).getAddress();
   }
-
 }

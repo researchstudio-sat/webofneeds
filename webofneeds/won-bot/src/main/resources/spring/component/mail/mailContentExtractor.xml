@@ -63,6 +63,16 @@
                 </constructor-arg>
             </bean>
         </property>
+        <property name="usedForTestingPattern">
+            <bean id="usedForTestingPattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value=".*?\[DEBUG\].*?" />
+            </bean>
+        </property>
+        <property name="doNotMatchPattern">
+            <bean id="doNotMatchPattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value=".*?\[NO_MATCH\].*?" />
+            </bean>
+        </property>
     </bean>
 
 

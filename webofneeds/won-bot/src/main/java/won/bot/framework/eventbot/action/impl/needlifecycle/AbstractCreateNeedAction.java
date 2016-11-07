@@ -72,24 +72,29 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
   }
 
   protected WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI,
-                                        Model needModel)
-          throws WonMessageBuilderException {
+                                        Model needModel) throws WonMessageBuilderException {
+    return createWonMessage(wonNodeInformationService, needURI, wonNodeURI, needModel, usedForTesting, doNotMatch);
+  }
+
+  protected WonMessage createWonMessage(
+    WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI, Model needModel,
+    final boolean usedForTesting, final boolean doNotMatch ) throws WonMessageBuilderException {
 
     if (doNotMatch){
       needModel.getResource(needURI.toString()).addProperty(WON.HAS_FLAG, WON.DO_NOT_MATCH);
     }
+
     if (usedForTesting){
       needModel.getResource(needURI.toString()).addProperty(WON.HAS_FLAG, WON.USED_FOR_TESTING);
     }
+
     RdfUtils.replaceBaseURI(needModel, needURI.toString());
 
     return WonMessageBuilder.setMessagePropertiesForCreate(
-                    wonNodeInformationService.generateEventURI(
-                            wonNodeURI),
-                    needURI,
-                    wonNodeURI)
-            .addContent(needModel, null)
-            .build();
+      wonNodeInformationService.generateEventURI(
+        wonNodeURI),
+      needURI,
+      wonNodeURI).addContent(needModel, null).build();
   }
 
   public void setUsedForTesting(final boolean usedForTesting) {
