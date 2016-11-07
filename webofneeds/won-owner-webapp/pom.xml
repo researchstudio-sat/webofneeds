@@ -66,6 +66,12 @@
             <scope>${dependencies.scope}</scope>
         </dependency>
 
+        <!-- mail -->
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+        </dependency>
+
         <!-- Spring -->
 	    <dependency>
             <groupId>org.springframework</groupId>

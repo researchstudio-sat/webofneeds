@@ -31,6 +31,7 @@
 
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
     <import resource="classpath:spring/component/botContext/botContext.xml"/>
+    <import resource="classpath:spring/component/mail/mailContentExtractor.xml"/>
 
     <util:properties id="javaMailProperties">
         <prop key="mail.imap.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>

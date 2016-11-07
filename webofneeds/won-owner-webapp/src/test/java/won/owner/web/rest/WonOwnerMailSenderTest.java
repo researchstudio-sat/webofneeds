@@ -16,8 +16,14 @@ import won.owner.web.WonOwnerMailSender;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/spring/owner-mailer.xml"})
+@ContextConfiguration(locations = {"classpath:/spring/owner-context.xml"})
 public class WonOwnerMailSenderTest {
+
+  private String email = null; // TODO: insert email address for testing here
+  private String localNeedUri = null; // TODO: insert some local need URI for testing here
+  private String remoteNeedUri = null; // TODO: insert some remote need URI for testing here
+  private String localConnectionUri = "testLocalConnection";
+  private String textMessage = "This is a test text message!";
 
   @Autowired
   private WonOwnerMailSender emailSender;
@@ -26,11 +32,26 @@ public class WonOwnerMailSenderTest {
   private JavaMailSenderImpl baseEmailSender;
 
   // This test is useful for manual testing:
-  // uncomment @Test, provide your email address as receiver e-mail address,
-  // then go there and verify manually if the test message was delivered correctly
-  // @Test
-  public void sendPrivateLinkTest() {
-    emailSender.sendPrivateLink("***@example.com", "owner-url/private-link/test-link");
+  // uncomment @Test, provide your email address as receiver e-mail address as well as the local and remote need uris
+  // to test, then go there and verify manually if the test message was delivered correctly
+  //@Test
+  public void sendConversationNotificationHtmlMessageTest() {
+    emailSender.sendConversationNotificationHtmlMessage(email, localNeedUri, remoteNeedUri, localConnectionUri, textMessage);
+  }
+
+  //@Test
+  public void sendConnectNotificationHtmlMessageTest() {
+    emailSender.sendConnectNotificationHtmlMessage(email, localNeedUri, remoteNeedUri, localConnectionUri, textMessage);
+  }
+
+  //@Test
+  public void sendCloseNotificationHtmlMessageTest() {
+    emailSender.sendCloseNotificationHtmlMessage(email, localNeedUri, remoteNeedUri, localConnectionUri, textMessage);
+  }
+
+  //@Test
+  public void sendHintNotificationMessageHtmlTest() {
+    emailSender.sendHintNotificationMessageHtml(email, localNeedUri, remoteNeedUri, localConnectionUri);
   }
 
   // a test fails if mail account data were not specified in the owner.properties

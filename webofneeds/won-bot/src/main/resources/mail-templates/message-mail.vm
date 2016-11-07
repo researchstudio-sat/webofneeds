@@ -1,0 +1,5 @@
+Someone sent the message:
+$message
+
+Original Message from <$respondAddress> on $sentDate:
+>$respondMessage

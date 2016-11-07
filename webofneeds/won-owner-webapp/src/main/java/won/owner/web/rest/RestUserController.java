@@ -131,39 +131,6 @@ public class RestUserController
     return new ResponseEntity("\"New user was created\"", HttpStatus.CREATED);
   }
 
-
-  @ResponseBody
-  @RequestMapping(
-    value = "/email",
-    method = RequestMethod.POST
-  )
-  //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.SUPPORTS)
-  public ResponseEntity sendEmail(@RequestBody JsonNode input) {
-
-    String type = input.get("type").asText();
-    String to = input.get("to").asText();
-    User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-    if ("PRIVATE_LINK".equals(type)) {
-      if ("ROLE_PRIVATE".equals(user.getRole())) {
-        try{
-          emailSender.sendPrivateLink(to, user.getUsername());
-        }
-        catch (Exception ex) { // org.springframework.mail.MailException
-          logger.error("Email could not be sent", ex);
-          return new ResponseEntity("\"Email could not be sent\"", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-      } else {
-        return new ResponseEntity("\"Cannot send private link to not private user\"", HttpStatus.BAD_REQUEST);
-      }
-    } else {
-      return new ResponseEntity("\"Mail type " + type + " not supported\"", HttpStatus.BAD_REQUEST);
-    }
-
-    return new ResponseEntity("\"Email sent\"", HttpStatus.OK);
-  }
-
   @ResponseBody
   @RequestMapping(
     value = "/settings",

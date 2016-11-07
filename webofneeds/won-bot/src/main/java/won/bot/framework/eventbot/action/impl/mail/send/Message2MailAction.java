@@ -8,8 +8,7 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.UriType;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
-import won.bot.framework.eventbot.action.impl.mail.receive.util.MailContentExtractor;
-import won.bot.framework.eventbot.action.impl.mail.send.util.WonMimeMessageGenerator;
+import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
 import won.protocol.message.WonMessage;
@@ -27,6 +26,7 @@ public class Message2MailAction extends BaseEventBotAction {
     private String mailIdUriRelationsName;
     private EventListenerContext ctx;
     private MessageChannel sendChannel;
+    private WonMimeMessageGenerator mailGenerator;
 
     public Message2MailAction(EventListenerContext eventListenerContext, String uriMimeMessageRelationsName, String mailIdUriRelationsName, MessageChannel sendChannel) {
         super(eventListenerContext);
@@ -34,6 +34,7 @@ public class Message2MailAction extends BaseEventBotAction {
         this.uriMimeMessageRelationsName = uriMimeMessageRelationsName;
         this.sendChannel = sendChannel;
         this.ctx = eventListenerContext;
+        mailGenerator = new WonMimeMessageGenerator("mail-templates/message-mail.vm");
     }
 
     @Override
@@ -48,7 +49,8 @@ public class Message2MailAction extends BaseEventBotAction {
             MimeMessage originalMail = EventBotActionUtils.getMimeMessageForURI(ctx, uriMimeMessageRelationsName, responseTo);
             logger.debug("Someone sent a message for URI: " + responseTo + " sending a mail to the creator: " + MailContentExtractor.getFromAddressString(originalMail));
 
-            WonMimeMessage answerMessage = WonMimeMessageGenerator.createTextMessageMail(originalMail, remoteNeedUri, extractTextMessageFromWonMessage(message));
+            WonMimeMessage answerMessage = mailGenerator.createMail(
+              originalMail, remoteNeedUri, extractTextMessageFromWonMessage(message));
             EventBotActionUtils.addMailIdWonURIRelation(ctx, mailIdUriRelationsName, answerMessage.getMessageID(), new WonURI(con.getConnectionURI(), UriType.CONNECTION));
 
             sendChannel.send(new GenericMessage<>(answerMessage));
