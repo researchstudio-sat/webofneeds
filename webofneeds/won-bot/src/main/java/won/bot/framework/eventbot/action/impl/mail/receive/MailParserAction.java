@@ -36,7 +36,7 @@ public class MailParserAction extends BaseEventBotAction {
                     logger.debug("received a command mail publishing the MailCommand event");
                     bus.publish(new MailCommandEvent(message));
                 } else {
-                    logger.debug("unknown mail no further processing required");
+                    logger.warn("unknown mail with subject '{}', no further processing required", message.getSubject());
                 }
             } catch (MessagingException me) {
                 logger.error("Messaging exception occurred while processing MimeMessage: {}", me);

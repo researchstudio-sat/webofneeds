@@ -79,7 +79,12 @@ public class MailCommandAction extends BaseEventBotAction {
     }
 
     public static String getReplyToMailId(MimeMessage message) throws MessagingException {
-        return message.getHeader("In-Reply-To")[0];
+
+        String[] replyTo = message.getHeader("In-Reply-To");
+        if (replyTo != null && replyTo.length > 0) {
+            return replyTo[0];
+        }
+        return null;
     }
 
     private static ActionType determineAction(EventListenerContext ctx, MimeMessage message, WonURI wonUri) {
