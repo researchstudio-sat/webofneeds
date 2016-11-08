@@ -1,23 +1,23 @@
+Need Information:
 #if($remoteNeedTitle)
-Title:
-$remoteNeedTitle
-
+>Title:
+>$remoteNeedTitle
+>
 #end
 #if($remoteNeedDescription)
-Description:
-$remoteNeedDescription
-
+>Description:
+>$remoteNeedDescription
+>
 #end
-
 #if($remoteNeedTags)
-Tags:
+>Tags:
 #foreach($remoteNeedTag in $remoteNeedTags)
-    $remoteNeedTag
+>$remoteNeedTag
 #end
-
+>
 #end
 #if($remoteNeedUri)
-NeedURI:
-$remoteNeedUri
-
+>NeedURI:
+>$remoteNeedUri
+>
 #end
