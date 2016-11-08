@@ -163,7 +163,7 @@ public class MailContentExtractor
 
     String textMessage = getMailText(message);
     if (textMessage != null) {
-      Matcher m = descriptionExtractionPattern.matcher(textMessage);
+      Matcher m = textMessageExtractionPattern.matcher(textMessage);
       if (m.find()) {
         return m.group().trim();
       }
