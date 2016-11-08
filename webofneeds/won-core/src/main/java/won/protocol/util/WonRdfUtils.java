@@ -802,10 +802,9 @@ public class WonRdfUtils
     }
 
     public static String getNeedTitle(Dataset needDataset) {
-      Path titlePath = PathParser.parse("won:hasContent/dc:title", DefaultPrefixUtils.getDefaultPrefixes());
       URI needUri = NeedUtils.getNeedURI(needDataset);
 
-      return RdfUtils.getStringPropertyForPropertyPath(needDataset, needUri, titlePath);
+      return getNeedTitle(needDataset, needUri);
     }
 
     public static String getNeedDescription(Dataset needDataset) {
