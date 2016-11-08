@@ -87,18 +87,15 @@ public class MailCommandAction extends BaseEventBotAction {
         return null;
     }
 
-    private static ActionType determineAction(EventListenerContext ctx, MimeMessage message, WonURI wonUri) {
-        //TODO: determine better Actions and move to MailContentExtractor
+    private ActionType determineAction(EventListenerContext ctx, MimeMessage message, WonURI wonUri) {
         try {
-            String messageContent = (String) message.getContent();
-
             switch(wonUri.getType()) {
                 case CONNECTION:
                     boolean connected = WonRdfUtils.ConnectionUtils.isConnected(ctx.getLinkedDataSource().getDataForResource(wonUri.getUri()), wonUri.getUri());
 
-                    if (messageContent.startsWith("close") || messageContent.startsWith("deny")) {
+                    if (mailContentExtractor.isCmdClose(message)) {
                         return ActionType.CLOSE_CONNECTION;
-                    }else if(!connected && messageContent.startsWith("connect")){
+                    }else if(!connected && mailContentExtractor.isCmdConnect(message)){
                         return ActionType.OPEN_CONNECTION;
                     }else if(connected){
                         return ActionType.SENDMESSAGE;

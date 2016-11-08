@@ -44,6 +44,10 @@ public class MailContentExtractor
   // check if the need created from the mail should be not matched with other needs
   private Pattern doNotMatchPattern;
 
+  // check if this is a command mail of type close or connect
+  private Pattern cmdClosePattern;
+  private Pattern cmdConnectPattern;
+
   public void setDemandTypePattern(final Pattern demandTypePattern) {
     this.demandTypePattern = demandTypePattern;
   }
@@ -82,6 +86,22 @@ public class MailContentExtractor
 
   public void setDoNotMatchPattern(Pattern doNotMatchPattern) {
     this.doNotMatchPattern = doNotMatchPattern;
+  }
+
+  public void setCmdClosePattern(final Pattern cmdClosePattern) {
+    this.cmdClosePattern = cmdClosePattern;
+  }
+
+  public void setCmdConnectPattern(final Pattern cmdConnectPattern) {
+    this.cmdConnectPattern = cmdConnectPattern;
+  }
+
+  public boolean isCmdClose(MimeMessage message) throws IOException, MessagingException {
+    return cmdClosePattern.matcher(getMailText(message)).matches();
+  }
+
+  public boolean isCmdConnect(MimeMessage message) throws IOException, MessagingException {
+    return cmdConnectPattern.matcher(getMailText(message)).matches();
   }
 
   public boolean isDoNotMatch(MimeMessage message) throws MessagingException {
