@@ -802,10 +802,18 @@ public class WonRdfUtils
     }
 
     public static String getNeedTitle(Dataset needDataset) {
-      Path titlePath = PathParser.parse("won:hasContent/dc:title", DefaultPrefixUtils.getDefaultPrefixes());
       URI needUri = NeedUtils.getNeedURI(needDataset);
 
-      return RdfUtils.getStringPropertyForPropertyPath(needDataset, needUri, titlePath);
+      return getNeedTitle(needDataset, needUri);
+    }
+
+    public static URI getBasicNeedType(Dataset needDataset) {
+      URI needUri = NeedUtils.getNeedURI(needDataset);
+
+      Path basicNeedTypePath = PathParser.parse("won:hasBasicNeedType", DefaultPrefixUtils.getDefaultPrefixes());
+      URI basicNeedType = RdfUtils.getURIPropertyForPropertyPath(needDataset, needUri, basicNeedTypePath);
+
+      return basicNeedType;
     }
 
     public static String getNeedDescription(Dataset needDataset) {

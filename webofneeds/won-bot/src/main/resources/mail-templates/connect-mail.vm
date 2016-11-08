@@ -1,5 +1,5 @@
 Someone wants to connect with you:
-{$remoteNeedUri}
 
-Original Message from <$respondAddress> on $sentDate:
->$respondMessage
+#parse('mail-templates/inc/remote-need-info.vm')
+
+#parse('mail-templates/inc/quoted-message.vm')
