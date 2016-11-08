@@ -1,5 +1,6 @@
 package won.bot.impl;
 
+import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageChannel;
 import won.bot.framework.bot.base.EventBot;
@@ -11,6 +12,7 @@ import won.bot.framework.eventbot.action.impl.mail.receive.MailParserAction;
 import won.bot.framework.eventbot.action.impl.mail.send.Connect2MailParserAction;
 import won.bot.framework.eventbot.action.impl.mail.send.Hint2MailParserAction;
 import won.bot.framework.eventbot.action.impl.mail.send.Message2MailAction;
+import won.bot.framework.eventbot.action.impl.mail.send.WonMimeMessageGenerator;
 import won.bot.framework.eventbot.action.impl.wonmessage.CloseConnectionUriAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionUriAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.SendMessageOnConnectionAction;
@@ -43,11 +45,16 @@ public class Mail2WonBot extends EventBot{
     @Autowired
     MailContentExtractor mailContentExtractor;
 
+    @Autowired
+    WonMimeMessageGenerator mailGenerator;
+
     private EventBus bus;
 
     @Override
     protected void initializeEventListeners() {
         EventListenerContext ctx = getEventListenerContext();
+        mailGenerator.setEventListenerContext(ctx);
+
         bus = getEventBus();
 
         //Mail initiated events
@@ -99,21 +106,21 @@ public class Mail2WonBot extends EventBot{
         new ActionOnEventListener(
                 ctx,
                 "HintReceived",
-                new Hint2MailParserAction(ctx, NAME_NEEDS, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
+                new Hint2MailParserAction(mailGenerator, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
         ));
 
         bus.subscribe(ConnectFromOtherNeedEvent.class,
         new ActionOnEventListener(
                 ctx,
                 "ConnectReceived",
-                new Connect2MailParserAction(ctx, NAME_NEEDS, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
+                new Connect2MailParserAction(mailGenerator, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
         ));
 
         bus.subscribe(MessageFromOtherNeedEvent.class,
         new ActionOnEventListener(
                 ctx,
                 "ReceivedTextMessage",
-                new Message2MailAction(ctx, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
+                new Message2MailAction(mailGenerator, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
         ));
     }
 
@@ -121,19 +128,15 @@ public class Mail2WonBot extends EventBot{
         bus.publish(new MailReceivedEvent(message));
     }
 
-    public MessageChannel getReceiveEmailChannel() {
-        return receiveEmailChannel;
-    }
-
     public void setReceiveEmailChannel(MessageChannel receiveEmailChannel) {
         this.receiveEmailChannel = receiveEmailChannel;
     }
 
-    public MessageChannel getSendEmailChannel() {
-        return sendEmailChannel;
-    }
-
     public void setSendEmailChannel(MessageChannel sendEmailChannel) {
         this.sendEmailChannel = sendEmailChannel;
+    }
+
+    public void setMailGenerator(WonMimeMessageGenerator mailGenerator) {
+        this.mailGenerator = mailGenerator;
     }
 }

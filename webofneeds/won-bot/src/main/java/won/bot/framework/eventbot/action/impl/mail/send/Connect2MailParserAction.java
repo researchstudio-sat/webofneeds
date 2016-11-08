@@ -19,21 +19,17 @@ import java.net.URI;
  * Created by fsuda on 03.10.2016.
  */
 public class Connect2MailParserAction extends BaseEventBotAction {
-    private String uriListName;
     private String uriMimeMessageRelationsName;
     private String mailIdUriRelationsName;
     private MessageChannel sendChannel;
-    private EventListenerContext ctx;
     private WonMimeMessageGenerator mailGenerator;
 
-    public Connect2MailParserAction(EventListenerContext eventListenerContext, String uriListName, String uriMimeMessageRelationsName, String mailIdUriRelationsName, MessageChannel sendChannel) {
-        super(eventListenerContext);
-        this.uriListName = uriListName;
+    public Connect2MailParserAction(WonMimeMessageGenerator mailGenerator, String uriMimeMessageRelationsName, String mailIdUriRelationsName, MessageChannel sendChannel) {
+        super(mailGenerator.getEventListenerContext());
         this.uriMimeMessageRelationsName = uriMimeMessageRelationsName;
         this.mailIdUriRelationsName = mailIdUriRelationsName;
         this.sendChannel = sendChannel;
-        this.ctx = eventListenerContext;
-        mailGenerator = new WonMimeMessageGenerator("mail-templates/connect-mail.vm");
+        this.mailGenerator = mailGenerator;
     }
 
     @Override
@@ -44,13 +40,13 @@ public class Connect2MailParserAction extends BaseEventBotAction {
             URI responseTo = con.getNeedURI();
             URI remoteNeedUri = con.getRemoteNeedURI();
 
-            MimeMessage originalMail = EventBotActionUtils.getMimeMessageForURI(ctx, uriMimeMessageRelationsName, responseTo);
+            MimeMessage originalMail = EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), uriMimeMessageRelationsName, responseTo);
             logger.debug(
               "Someone issued a connect for URI: " + responseTo + " sending a mail to the creator: " + MailContentExtractor
                 .getFromAddressString(originalMail));
 
-            WonMimeMessage answerMessage = mailGenerator.createMail(originalMail, remoteNeedUri, null);
-            EventBotActionUtils.addMailIdWonURIRelation(ctx, mailIdUriRelationsName, answerMessage.getMessageID(), new WonURI(con.getConnectionURI(), UriType.CONNECTION));
+            WonMimeMessage answerMessage = mailGenerator.createConnectMail(originalMail, remoteNeedUri);
+            EventBotActionUtils.addMailIdWonURIRelation(getEventListenerContext(), mailIdUriRelationsName, answerMessage.getMessageID(), new WonURI(con.getConnectionURI(), UriType.CONNECTION));
 
             sendChannel.send(new GenericMessage<>(answerMessage));
         }
