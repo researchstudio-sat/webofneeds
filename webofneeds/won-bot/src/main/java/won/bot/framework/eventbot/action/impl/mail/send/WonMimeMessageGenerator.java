@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
 import won.protocol.message.WonMessage;
+import won.protocol.model.BasicNeedType;
 import won.protocol.util.WonRdfUtils;
 
 import javax.mail.MessagingException;
@@ -81,7 +82,7 @@ public class WonMimeMessageGenerator {
 
         MimeMessage answerMessage = (MimeMessage) msgToRespondTo.reply(false);
         answerMessage.setText(mailBody);
-        answerMessage.setSubject(answerMessage.getSubject() + " <-> " +  WonRdfUtils.NeedUtils.getNeedTitle(remoteNeedRDF));// TODO: Include Human Readable Basic Need Type
+        answerMessage.setSubject(answerMessage.getSubject() + " <-> ["+ BasicNeedType.fromURI(WonRdfUtils.NeedUtils.getBasicNeedType(remoteNeedRDF))+"] " +  WonRdfUtils.NeedUtils.getNeedTitle(remoteNeedRDF));// TODO: Include Human Readable Basic Need Type
 
         //We need to create an instance of our own MimeMessage Implementation in order to have the Unique Message Id set before sending
         WonMimeMessage wonAnswerMessage = new WonMimeMessage(answerMessage);
