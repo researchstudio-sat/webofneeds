@@ -12,9 +12,11 @@ import won.protocol.model.BasicNeedType;
 import won.protocol.util.WonRdfUtils;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.List;
 
@@ -22,11 +24,21 @@ import java.util.List;
  * This Class is used to generate all Mails that are going to be sent via the Mail2WonBot
  */
 public class WonMimeMessageGenerator {
+
     @Autowired
     private VelocityEngine velocityEngine;
 
+    private String sentFrom;
+    private String sentFromName;
     private EventListenerContext eventListenerContext;
 
+    public void setSentFrom(final String sentFrom) {
+        this.sentFrom = sentFrom;
+    }
+
+    public void setSentFromName(final String sentFromName) {
+        this.sentFromName = sentFromName;
+    }
 
     /**
      * Creates Response Message that is sent when a need tries to connect with another need
@@ -77,10 +89,12 @@ public class WonMimeMessageGenerator {
         return velocityContext;
     }
 
-    private WonMimeMessage generateWonMimeMessage(MimeMessage msgToRespondTo, String mailBody, URI remoteNeedUri) throws MessagingException {
+    private WonMimeMessage generateWonMimeMessage(MimeMessage msgToRespondTo, String mailBody, URI remoteNeedUri)
+      throws MessagingException, UnsupportedEncodingException {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
 
         MimeMessage answerMessage = (MimeMessage) msgToRespondTo.reply(false);
+        answerMessage.setFrom(new InternetAddress(sentFrom, sentFromName));
         answerMessage.setText(mailBody);
         answerMessage.setSubject(answerMessage.getSubject() + " <-> ["+ BasicNeedType.fromURI(WonRdfUtils.NeedUtils.getBasicNeedType(remoteNeedRDF))+"] " +  WonRdfUtils.NeedUtils.getNeedTitle(remoteNeedRDF));// TODO: Include Human Readable Basic Need Type
 

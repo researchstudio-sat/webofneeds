@@ -64,10 +64,6 @@
                                    java-mail-properties="javaMailProperties">
     </mail:outbound-channel-adapter>
 
-    <int:header-enricher input-channel="receiveEmailChannel" output-channel="sendEmailChannel" default-overwrite="false" >
-        <int:header name="from" value="${email.address}"/>
-    </int:header-enricher>
-
     <int:channel id="receiveEmailChannel"/>
     <int:channel id="sendEmailChannel"/>
 
@@ -109,5 +105,7 @@
     </bean>
     <bean id="mailGenerator" class="won.bot.framework.eventbot.action.impl.mail.send.WonMimeMessageGenerator">
         <property name="velocityEngine" ref="velocityEngine"/>
+        <property name="sentFrom" value="${email.bot.address}"/>
+        <property name="sentFromName" value="${email.bot.name}"/>
     </bean>
 </beans>
