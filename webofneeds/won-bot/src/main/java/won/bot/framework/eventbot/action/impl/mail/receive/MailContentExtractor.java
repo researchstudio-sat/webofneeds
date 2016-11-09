@@ -38,6 +38,16 @@ public class MailContentExtractor
   // extract description from mail content
   private Pattern descriptionExtractionPattern;
 
+  // check if the need created from the mail should is used for testing only
+  private Pattern usedForTestingPattern;
+
+  // check if the need created from the mail should be not matched with other needs
+  private Pattern doNotMatchPattern;
+
+  // check if this is a command mail of type close or connect
+  private Pattern cmdClosePattern;
+  private Pattern cmdConnectPattern;
+
   public void setDemandTypePattern(final Pattern demandTypePattern) {
     this.demandTypePattern = demandTypePattern;
   }
@@ -68,6 +78,38 @@ public class MailContentExtractor
 
   public void setDescriptionExtractionPattern(final Pattern descriptionExtractionPattern) {
     this.descriptionExtractionPattern = descriptionExtractionPattern;
+  }
+
+  public void setUsedForTestingPattern(Pattern usedForTestingPattern) {
+    this.usedForTestingPattern = usedForTestingPattern;
+  }
+
+  public void setDoNotMatchPattern(Pattern doNotMatchPattern) {
+    this.doNotMatchPattern = doNotMatchPattern;
+  }
+
+  public void setCmdClosePattern(final Pattern cmdClosePattern) {
+    this.cmdClosePattern = cmdClosePattern;
+  }
+
+  public void setCmdConnectPattern(final Pattern cmdConnectPattern) {
+    this.cmdConnectPattern = cmdConnectPattern;
+  }
+
+  public boolean isCmdClose(MimeMessage message) throws IOException, MessagingException {
+    return cmdClosePattern.matcher(getMailText(message)).matches();
+  }
+
+  public boolean isCmdConnect(MimeMessage message) throws IOException, MessagingException {
+    return cmdConnectPattern.matcher(getMailText(message)).matches();
+  }
+
+  public boolean isDoNotMatch(MimeMessage message) throws MessagingException {
+    return doNotMatchPattern.matcher(message.getSubject()).matches();
+  }
+
+  public boolean isUsedForTesting(MimeMessage message) throws MessagingException {
+    return usedForTestingPattern.matcher(message.getSubject()).matches();
   }
 
   public String getTitle(MimeMessage message) throws MessagingException {
@@ -121,7 +163,7 @@ public class MailContentExtractor
 
     String textMessage = getMailText(message);
     if (textMessage != null) {
-      Matcher m = descriptionExtractionPattern.matcher(textMessage);
+      Matcher m = textMessageExtractionPattern.matcher(textMessage);
       if (m.find()) {
         return m.group().trim();
       }
@@ -169,5 +211,4 @@ public class MailContentExtractor
     Address[] froms = message.getFrom();
     return (froms == null) ? null : ((InternetAddress) froms[0]).getAddress();
   }
-
 }

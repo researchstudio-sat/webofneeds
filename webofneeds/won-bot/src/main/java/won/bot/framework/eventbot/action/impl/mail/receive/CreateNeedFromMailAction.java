@@ -38,8 +38,6 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
         this.uriMimeMessageRelationsName = uriMimeMessageRelationsName;
         this.mailContentExtractor = mailContentExtractor;
 
-        this.usedForTesting = true;
-
         if (facets == null || facets.length == 0) {
             //add the default facet if none is present.
             this.facets = new ArrayList<URI>(1);
@@ -60,6 +58,8 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                 String title = mailContentExtractor.getTitle(message);
                 String description = mailContentExtractor.getDescription(message);
                 String[] tags = mailContentExtractor.getTags(message);
+                boolean isUsedForTesting = mailContentExtractor.isUsedForTesting(message);
+                boolean isDoNotMatch = mailContentExtractor.isDoNotMatch(message);
 
                 EventListenerContext ctx = getEventListenerContext();
                 WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
@@ -77,7 +77,8 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
 
                 logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(model), 150));
 
-                WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, model);
+                WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri,
+                                                                model, isUsedForTesting, isDoNotMatch);
                 EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
                 EventBotActionUtils.addUriMimeMessageRelation(ctx, uriMimeMessageRelationsName, needURI, message);
 

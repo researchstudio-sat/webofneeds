@@ -23,22 +23,22 @@
     <bean id="mailExtractor" class="won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor">
         <property name="demandTypePattern">
             <bean id="demandTypePattern" class="java.util.regex.Pattern" factory-method="compile">
-                <constructor-arg value="(?i)^\[WANT\].*" />
+                <constructor-arg value="(?si)^\[WANT\].*" />
             </bean>
         </property>
         <property name="supplyTypePattern">
             <bean id="supplyTypePattern" class="java.util.regex.Pattern" factory-method="compile">
-                <constructor-arg value="(?i)^\[OFFER\].*" />
+                <constructor-arg value="(?si)^\[OFFER\].*" />
             </bean>
         </property>
         <property name="doTogetherTypePattern">
             <bean id="doTogetherTypePattern" class="java.util.regex.Pattern" factory-method="compile">
-                <constructor-arg value="(?i)^\[TOGETHER\].*" />
+                <constructor-arg value="(?si)^\[TOGETHER\].*" />
             </bean>
         </property>
         <property name="critiqueTypePattern">
             <bean id="critiqueTypePattern" class="java.util.regex.Pattern" factory-method="compile">
-                <constructor-arg value="(?i)^\[CRITIQUE\].*" />
+                <constructor-arg value="(?si)^\[CRITIQUE\].*" />
             </bean>
         </property>
         <property name="tagExtractionPattern">
@@ -63,7 +63,25 @@
                 </constructor-arg>
             </bean>
         </property>
+        <property name="usedForTestingPattern">
+            <bean id="usedForTestingPattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value=".*?\[DEBUG\].*?" />
+            </bean>
+        </property>
+        <property name="doNotMatchPattern">
+            <bean id="doNotMatchPattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value=".*?\[NO_MATCH\].*?" />
+            </bean>
+        </property>
+        <property name="cmdClosePattern">
+            <bean id="cmdClosePattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value="(?si)^close.*" />
+            </bean>
+        </property>
+        <property name="cmdConnectPattern">
+            <bean id="cmdConnectPattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value="(?si)^connect.*" />
+            </bean>
+        </property>
     </bean>
-
-
 </beans>
