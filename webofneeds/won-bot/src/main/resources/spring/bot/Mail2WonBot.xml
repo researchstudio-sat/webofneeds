@@ -33,6 +33,8 @@
     <import resource="classpath:spring/component/botContext/botContext.xml"/>
     <import resource="classpath:spring/component/mail/mailContentExtractor.xml"/>
 
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/mail-bot.properties" ignore-unresolvable="true"/>
+
     <util:properties id="javaMailProperties">
         <prop key="mail.imap.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
         <prop key="mail.imap.socketFactory.fallback">false</prop>
@@ -43,7 +45,7 @@
     </util:properties>
 
     <mail:inbound-channel-adapter id="imapAdapter"
-                                  store-uri="imaps://${email.user}:${email.password}@${email.imap.host}/INBOX"
+                                  store-uri="imaps://${mailbot.email.user}:${mailbot.email.password}@${mailbot.email.imap.host}:${mailbot.email.imap.port}/INBOX"
                                   channel="receiveEmailChannel"
                                   should-delete-messages="false"
                                   should-mark-messages-as-read="true"
@@ -55,13 +57,12 @@
     <mail:outbound-channel-adapter id="outboundAdapter"
                                    auto-startup="true"
                                    channel="sendEmailChannel"
-                                   host="${email.smtp.host}"
-                                   port="${email.smtp.port}"
-                                   username="${email.user}"
-                                   password="${email.password}"
+                                   host="${mailbot.email.smtp.host}"
+                                   port="${mailbot.email.smtp.port}"
+                                   username="${mailbot.email.user}"
+                                   password="${mailbot.email.password}"
                                    java-mail-properties="javaMailProperties">
     </mail:outbound-channel-adapter>
-
 
     <int:channel id="receiveEmailChannel"/>
     <int:channel id="sendEmailChannel"/>
@@ -104,5 +105,7 @@
     </bean>
     <bean id="mailGenerator" class="won.bot.framework.eventbot.action.impl.mail.send.WonMimeMessageGenerator">
         <property name="velocityEngine" ref="velocityEngine"/>
+        <property name="sentFrom" value="${mailbot.email.address}"/>
+        <property name="sentFromName" value="${mailbot.email.name}"/>
     </bean>
 </beans>

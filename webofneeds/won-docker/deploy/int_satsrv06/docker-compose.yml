@@ -61,11 +61,7 @@ services:
       - "botContext.mongodb.host=satsrv06.researchstudio.at"
       - "botContext.mongodb.port=27017"
       - "botContext.mongodb.database=int_bot"
-      - "email.user=$mailinglist_user"
-      - "email.password=$mailinglist_passwd"
-      - "email.imap.host=$mailinglist_imap_host_and_port"
-      - "email.smtp.host=$mailinglist_smtp_host"
-      - "email.smtp.port=$mailinglist_smtp_port"
+      - "mailbot.email.password=$mailinglist_passwd"
     depends_on:
       - nginx
       - mongodb
