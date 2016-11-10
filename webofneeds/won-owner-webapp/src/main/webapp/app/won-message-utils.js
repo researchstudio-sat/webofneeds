@@ -484,7 +484,7 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
     });
 
     return allDataRawPromise
-        .then(([ ownNeeds, connections, events, theirNeeds ]) =>
+        .then(([ ownNeeds, connections, /* events, */ theirNeeds ]) =>
             wellFormedPayload({ ownNeeds, connections, /* events, STARTING with selective loading*/ theirNeeds, })
         );
 
