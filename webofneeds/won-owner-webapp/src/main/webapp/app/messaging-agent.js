@@ -47,7 +47,7 @@ export function runMessagingAgent(redux) {
 
     let ws = newSock();
     window.ws4dbg = ws;//TODO deletme
-    let unsubscribeWatch = null;
+    let unsubscribeWatches = [];
     let missedHeartbeats = 0;
 
     setInterval(checkHeartbeat, 30000);
@@ -82,7 +82,8 @@ export function runMessagingAgent(redux) {
 
     function onOpen() {
         /* Set up message-queue watch */
-        unsubscribeWatch = watchImmutableRdxState(
+
+        const unsubscribeMsgQWatch = watchImmutableRdxState(
             redux, ['messages', 'enqueued'],
             (newMsgBuffer, oldMsgBuffer) => {
                 if(newMsgBuffer) {
@@ -100,7 +101,7 @@ export function runMessagingAgent(redux) {
          * TODO this watch is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
          */
-        unsubscribeWatch = watchImmutableRdxState(
+        const unsubscribeResetWatch = unsubscribeWatches.push(watchImmutableRdxState(
             redux, ['messages', 'resetWsRequested_Hack'],
             (newRequestState, oldRequestState) => {
                 if(newRequestState) {
@@ -109,7 +110,10 @@ export function runMessagingAgent(redux) {
                     redux.dispatch(actionCreators.messages__requestWsReset_Hack(false));
                 }
             }
-        );
+        ));
+
+        unsubscribeWatches.push(unsubscribeMsgQWatch);
+        unsubscribeWatches.push(unsubscribeResetWatch);
 
     };
 
@@ -302,8 +306,11 @@ export function runMessagingAgent(redux) {
         } else {
             console.error('websocket crashed. reconnectAttempts = ',reconnectAttempts);
         }
-        if(unsubscribeWatch && typeof unsubscribeWatch === 'function')
-            unsubscribeWatch();
+        if(unsubscribeWatches) {
+            for(let unsubscribe; unsubscribe = unsubscribeWatches.pop(); !!unsubscribe) {
+                unsubscribe();
+            }
+        }
 
         if (e.code === 1011 || reconnectAttempts > 5) {
             console.error('either your session timed out or you encountered an unexpected server condition: \n', e.reason);
