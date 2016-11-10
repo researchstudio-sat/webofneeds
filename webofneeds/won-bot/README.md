@@ -42,12 +42,14 @@ and communicate with others. [Insert List of commands here]
 Run [Mail2WonBotApp](src/main/java/won/bot/app/Mail2WonBotApp.java) with the argument specifying the configuration
 location, e.g:
     -DWON_CONFIG_DIR=C:/webofneeds/conf.local
-Furthermore you need to set the following arguments to ensure a connection to an incoming and outgoing mail-server
-    -Demail.user=username
-    -Demail.password=pass
-    -Demail.imap.host=imap.gmail.com:993
-    -Demail.smtp.host=smtp.gmail.com
-    -Demail.smtp.port=587
+Furthermore you need to set the following properties within mail-bot.properties to ensure a connection to an incoming and outgoing mail-server
+    mailbot.email.address=emailadress
+    mailbot.email.user=username
+    mailbot.email.password=pass
+    mailbot.email.imap.host=imap.gmail.com
+    mailbot.email.imap.port=993
+    mailbot.email.smtp.host=smtp.gmail.com
+    mailbot.email.smtp.port=587
 
 Make sure this location contains the relevant property files, and you have specified the values of the properties
 relevant for the system being tested, i.e.:
