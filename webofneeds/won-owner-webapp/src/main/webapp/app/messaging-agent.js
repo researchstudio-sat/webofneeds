@@ -298,15 +298,15 @@ export function runMessagingAgent(redux) {
     let reconnectAttempts = 0;
     function onClose(e) {
         if(e.wasClean){
-            console.log('websocket closed. reconnectAttempts = ',reconnectAttempts);
+            console.log('websocket closed cleanly. reconnectAttempts = ',reconnectAttempts);
         } else {
-            console.error('websocket closed. reconnectAttempts = ',reconnectAttempts);
+            console.error('websocket crashed. reconnectAttempts = ',reconnectAttempts);
         }
         if(unsubscribeWatch && typeof unsubscribeWatch === 'function')
             unsubscribeWatch();
 
         if (e.code === 1011 || reconnectAttempts > 5) {
-            console.log('either your session timed out or you encountered an unexpected server condition. \n', e.reason);
+            console.error('either your session timed out or you encountered an unexpected server condition: \n', e.reason);
 
             fetch('rest/users/isSignedIn', {credentials: 'include'})
                 .then(checkHttpStatus) // will reject if not logged in
