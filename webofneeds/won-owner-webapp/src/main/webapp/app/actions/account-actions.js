@@ -72,7 +72,6 @@ export function accountLogout() {
         .then(() => {
             won.clearStore();
             dispatch(actionCreators.messages__requestWsReset_Hack());
-            dispatch(actionCreators.router__stateGo("landingpage"));
         })
         .catch(
             //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
@@ -80,6 +79,9 @@ export function accountLogout() {
                 console.log(error);
             }
         )
+        .then(() => { /* finally */
+            dispatch(actionCreators.router__stateGo("landingpage"));
+        })
 }
 
 export function accountRegister(username, password) {
