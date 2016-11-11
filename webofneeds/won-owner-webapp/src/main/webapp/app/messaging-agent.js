@@ -314,9 +314,7 @@ export function runMessagingAgent(redux) {
             console.error('messaging-agent.js: websocket crashed. reconnectAttempts = ',reconnectAttempts);
         }
 
-        if (e.code === 1011 || reconnectAttempts > 2) {
-            console.error('messaging-agent.js: either your session timed out or you encountered an unexpected server condition: \n', e.reason);
-
+        if (e.code === 1011 || reconnectAttempts > 1) {
             fetch('rest/users/isSignedIn', {credentials: 'include'}) // attempt to get a new session
                 .then(checkHttpStatus) // will reject if not logged in
                 .then(() => {//logged in -- re-initiate route-change
@@ -333,11 +331,6 @@ export function runMessagingAgent(redux) {
                     // TODO instead show a slide-in "Lost connection" with a reload button (that allows to copy typed text out)
                     redux.dispatch(actionCreators.logout())
                 });
-        } else if (reconnectAttempts > 1) {
-            setTimeout(() => {
-                ws = newSock();
-                reconnectAttempts++;
-            }, 2000);
         } else {
             /*
              * first reconnect happens immediately (to facilitate
