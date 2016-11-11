@@ -261,6 +261,8 @@ export function runMessagingAgent(redux) {
     function onOpen() {
         /* Set up message-queue watch */
 
+        reconnectAttempts = 0; // successful opening of socket. we can reset the reconnect counter.
+
         if(unsubscribeWatches.length === 0) {
             const unsubscribeMsgQWatch = watchImmutableRdxState(
                 redux, ['messages', 'enqueued'],
