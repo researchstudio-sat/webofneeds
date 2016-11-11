@@ -63,6 +63,12 @@ export function accountLogout() {
         .then(
             checkHttpStatus
         )
+        .catch(
+            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
+                error => {
+                console.log(error);
+            }
+        )
         .then(response =>
             dispatch({
                 type: actionTypes.logout,
@@ -73,12 +79,6 @@ export function accountLogout() {
             won.clearStore();
             dispatch(actionCreators.messages__requestWsReset_Hack());
         })
-        .catch(
-            //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
-            error => {
-                console.log(error);
-            }
-        )
         .then(() => { /* finally */
             dispatch(actionCreators.router__stateGo("landingpage"));
         })
