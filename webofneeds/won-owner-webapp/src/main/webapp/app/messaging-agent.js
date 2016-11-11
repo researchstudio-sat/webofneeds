@@ -317,7 +317,7 @@ export function runMessagingAgent(redux) {
             }
         }
 
-        if (e.code === 1011 || reconnectAttempts > 5) {
+        if (e.code === 1011 || reconnectAttempts > 2) {
             console.error('either your session timed out or you encountered an unexpected server condition: \n', e.reason);
 
             fetch('rest/users/isSignedIn', {credentials: 'include'})
