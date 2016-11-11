@@ -319,7 +319,8 @@ export function runMessagingAgent(redux) {
         if (e.code === 1011 || reconnectAttempts > 1) {
             fetch('rest/users/isSignedIn', {credentials: 'include'}) // attempt to get a new session
                 .then(checkHttpStatus) // will reject if not logged in
-                .then(() => {//logged in -- re-initiate route-change
+                .then(() => {
+                    // session is still valid -- reopen the socket
                     ws = newSock();
 
                 }).catch(error => {
