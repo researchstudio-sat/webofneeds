@@ -327,7 +327,9 @@ export function runMessagingAgent(redux) {
                         if(unsubscribe)
                             unsubscribe();
                     }
+
                     console.log("you lost the session we will call logout for you");
+                    // TODO instead show a slide-in "Lost connection" with a reload button (that allows to copy typed text out)
                     redux.dispatch(actionCreators.logout())
                 });
         } else if (reconnectAttempts > 1) {
