@@ -34,91 +34,6 @@ export function runMessagingAgent(redux) {
 
     console.log('Starting messaging agent.');
 
-    /* TODOs
-     * + make it generic?
-     *      + make the url a parameter?
-     *      + extract the watch? / make the path a parameter?
-     *      + registering a processor for the incoming messages (that
-     *        can trigger actions but lets the messaging agent stay generic)
-     *           + pass a callback
-     *           + make this a signal/observable
-     * + framing -> NOPE
-     * + reconnecting
-     * + lazy socket initialisation
-     */
-
-    let ws = newSock();
-    window.ws4dbg = ws;//TODO deletme
-    let unsubscribeWatches = [];
-    let missedHeartbeats = 0;
-
-    setInterval(checkHeartbeat, 30000);
-
-    function newSock() {
-        const ws = new SockJS('/owner/msg', null, {debug: true});
-        ws.onopen = onOpen;
-        ws.onmessage = onMessage;
-        ws.onerror = onError;
-        ws.onclose = onClose;
-        ws.onheartbeat = onHeartbeat;
-        missedHeartbeats = 0;
-
-        return ws;
-    };
-
-    function onHeartbeat(e) {
-        console.log('heartbeat',e);
-        missedHeartbeats = 0;
-    }
-
-    function checkHeartbeat() {
-        console.log("checking heartbeat presence: ", missedHeartbeats);
-
-        if(++missedHeartbeats > 3) {
-            console.log("no heartbeat present invoking logout");
-            redux.dispatch(actionCreators.logout());
-        }else{
-            console.log("heartbeat present");
-        }
-    }
-
-    function onOpen() {
-        /* Set up message-queue watch */
-
-        const unsubscribeMsgQWatch = watchImmutableRdxState(
-            redux, ['messages', 'enqueued'],
-            (newMsgBuffer, oldMsgBuffer) => {
-                if(newMsgBuffer) {
-                    const firstEntry = newMsgBuffer.entries().next().value;
-                    if(firstEntry) { //undefined if queue is empty
-                        const [eventUri, msg] = firstEntry;
-                        ws.send(JSON.stringify(msg));
-                        console.log("sent message: "+JSON.stringify(msg));
-                        redux.dispatch(actionCreators.messages__waitingForAnswer({ eventUri, msg }));
-                    }
-                }
-            }
-        );
-        /**
-         * TODO this watch is part of the session-upgrade hack documented in:
-         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
-         */
-        const unsubscribeResetWatch = unsubscribeWatches.push(watchImmutableRdxState(
-            redux, ['messages', 'resetWsRequested_Hack'],
-            (newRequestState, oldRequestState) => {
-                if(newRequestState) {
-                    ws.close();
-                    // a new ws-connection should be opened automatically in onClose
-                    redux.dispatch(actionCreators.messages__requestWsReset_Hack(false));
-                }
-            }
-        ));
-
-        unsubscribeWatches.push(unsubscribeMsgQWatch);
-        unsubscribeWatches.push(unsubscribeResetWatch);
-
-    };
-
 
     /**
      * The messageProcessingArray encapsulates all currently implemented message handlers with their respective redux dispatch
@@ -296,6 +211,94 @@ export function runMessagingAgent(redux) {
         })
     };
 
+
+    /* TODOs
+     * + make it generic?
+     *      + make the url a parameter?
+     *      + extract the watch? / make the path a parameter?
+     *      + registering a processor for the incoming messages (that
+     *        can trigger actions but lets the messaging agent stay generic)
+     *           + pass a callback
+     *           + make this a signal/observable
+     * + framing -> NOPE
+     * + reconnecting
+     * + lazy socket initialisation
+     */
+
+    let ws = newSock();
+    window.ws4dbg = ws;//TODO deletme
+    let unsubscribeWatches = [];
+
+    let missedHeartbeats = 0; // deadman-switch variable. counts up every 30s and gets reset onHeartbeat
+    setInterval(checkHeartbeat, 30000); // heartbeats should arrive roughly every 30s
+
+    function newSock() {
+        const ws = new SockJS('/owner/msg', null, {debug: true});
+        ws.onopen = onOpen;
+        ws.onmessage = onMessage;
+        ws.onerror = onError;
+        ws.onclose = onClose;
+        ws.onheartbeat = onHeartbeat;
+        missedHeartbeats = 0;
+
+        return ws;
+    };
+
+    function onHeartbeat(e) {
+        console.log('heartbeat',e);
+        missedHeartbeats = 0; // reset the deadman count
+    }
+
+    function checkHeartbeat() {
+        console.log("checking heartbeat presence: ", missedHeartbeats * 30, "s have passed since the last heartbeat.");
+
+        if(++missedHeartbeats > 3) {
+            console.error("no websocket-heartbeat present. closing socket.");
+            this.close();
+        }else{
+            console.log("heartbeat present");
+        }
+    }
+
+    function onOpen() {
+        /* Set up message-queue watch */
+
+        if(unsubscribeWatches.length === 0) {
+            const unsubscribeMsgQWatch = watchImmutableRdxState(
+                redux, ['messages', 'enqueued'],
+                (newMsgBuffer, oldMsgBuffer) => {
+                    if (newMsgBuffer) {
+                        const firstEntry = newMsgBuffer.entries().next().value;
+                        if (firstEntry) { //undefined if queue is empty
+                            const [eventUri, msg] = firstEntry;
+                            ws.send(JSON.stringify(msg));
+                            console.log("sent message: " + JSON.stringify(msg));
+                            redux.dispatch(actionCreators.messages__waitingForAnswer({eventUri, msg}));
+                        }
+                    }
+                }
+            );
+            /**
+             * TODO this watch is part of the session-upgrade hack documented in:
+             * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
+             */
+            const unsubscribeResetWatch = unsubscribeWatches.push(watchImmutableRdxState(
+                redux, ['messages', 'resetWsRequested_Hack'],
+                (newRequestState, oldRequestState) => {
+                    if (newRequestState) {
+                        redux.dispatch(actionCreators.messages__requestWsReset_Hack(false));
+                        console.log("Resetting websocket (a hack necessary for upgrading it after login)");
+                        ws.close();
+                        // a new ws-connection should be opened automatically in onClose
+                    }
+                }
+            ));
+
+            unsubscribeWatches.push(unsubscribeMsgQWatch);
+            unsubscribeWatches.push(unsubscribeResetWatch);
+        }
+
+    };
     function onError(e) {
         console.error('websocket error: ', e);
         this.close();
