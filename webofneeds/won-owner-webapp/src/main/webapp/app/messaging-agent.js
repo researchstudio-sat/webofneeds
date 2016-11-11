@@ -331,7 +331,8 @@ export function runMessagingAgent(redux) {
 
                     console.error('messaging-agent.js: either your session timed out or you encountered an unexpected server condition: \n', e.reason);
                     // TODO instead show a slide-in "Lost connection" with a reload button (that allows to copy typed text out)
-                    redux.dispatch(actionCreators.logout())
+                    //redux.dispatch(actionCreators.logout())
+                    redux.dispatch(actionCreators.lostConnection())
                 });
         } else {
             /*

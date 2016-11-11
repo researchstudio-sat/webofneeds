@@ -14,9 +14,13 @@ export default function(allToasts = initialState, action = {}) {
             allToasts = pushNewToast(allToasts, "Info Toast", won.WON.infoToast);
             return allToasts;
 
+
         case actionTypes.logout:
             return initialState;
 
+        case actionTypes.lostConnection:
+            return pushNewToast(allToasts, "Lost connection – make sure you’ve got internet "+
+                "connection, then click here: <button>Reconnect</button>");
         //INFO TOASTS: won.WON.infoToast
 
         //WARN TOASTS: won.WON.warnToast
