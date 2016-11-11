@@ -55,13 +55,18 @@ export function messagesReducer(messages = initialState, action = {}) {
             );
 
 
+        case actionTypes.lostConnection:
+            return messages.set('lostConnection', true);
+
+
         /**
          * TODO this sub-reducer is part of the session-upgrade hack documented in:
          * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
          */
          case actionTypes.messages.requestWsReset_Hack:
              const flag = (action.payload === undefined) ? true : action.payload;
-             return messages.set('resetWsRequested_Hack', flag);
+             return messages.set('resetWsRequested_Hack', flag)
+                            .set('lostConnection', false);
 
         default:
             return messages;
