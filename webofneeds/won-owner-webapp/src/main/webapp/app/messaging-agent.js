@@ -320,7 +320,7 @@ export function runMessagingAgent(redux) {
         if (e.code === 1011 || reconnectAttempts > 2) {
             console.error('either your session timed out or you encountered an unexpected server condition: \n', e.reason);
 
-            fetch('rest/users/isSignedIn', {credentials: 'include'})
+            fetch('rest/users/isSignedIn', {credentials: 'include'}) // attempt to get a new session
                 .then(checkHttpStatus) // will reject if not logged in
                 .then(() => {//logged in -- re-initiate route-change
                     ws = newSock();
@@ -336,10 +336,11 @@ export function runMessagingAgent(redux) {
                 reconnectAttempts++;
             }, 2000);
         } else {
-            // posting anonymously creates a new session for each post
-            // thus we need to reconnect here
-            // TODO reconnect only on next message instead of straight away <-- bad idea, prevents push notifications
-            // TODO add a delay if first reconnect fails
+            /*
+             * first reconnect happens immediately (to facilitate
+             * anonymous posting and the reset-hack necessary for
+             * login atm)
+             */
             ws = newSock();
             reconnectAttempts++;
         }
