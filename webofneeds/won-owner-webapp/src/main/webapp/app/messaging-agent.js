@@ -23,6 +23,7 @@ import {
     delay,
     watchImmutableRdxState,
     checkHttpStatus,
+    is,
 } from './utils';
 import { actionTypes, actionCreators } from './actions/actions';
 //import './message-service'; //TODO still uses es5
@@ -244,6 +245,7 @@ export function runMessagingAgent(redux) {
         missedHeartbeats = 0;
 
         reconnectAttempts++;
+
         return ws;
     };
 
@@ -285,7 +287,7 @@ export function runMessagingAgent(redux) {
              * TODO this watch is part of the session-upgrade hack documented in:
              * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
              */
-            const unsubscribeResetWatch = unsubscribeWatches.push(watchImmutableRdxState(
+            const unsubscribeResetWatch = watchImmutableRdxState(
                 redux, ['messages', 'resetWsRequested_Hack'],
                 (newRequestState, oldRequestState) => {
                     if (newRequestState) {
@@ -295,7 +297,7 @@ export function runMessagingAgent(redux) {
                         // a new ws-connection should be opened automatically in onClose
                     }
                 }
-            ));
+            );
 
             unsubscribeWatches.push(unsubscribeMsgQWatch);
             unsubscribeWatches.push(unsubscribeResetWatch);
@@ -323,7 +325,7 @@ export function runMessagingAgent(redux) {
                 }).catch(error => {
                     // cleanup - unsubscribe all watches and empty the array
                     for(let unsubscribe; unsubscribe = unsubscribeWatches.pop(); !!unsubscribe) {
-                        if(unsubscribe)
+                        if(unsubscribe && is("Function", unsubscribe))
                             unsubscribe();
                     }
 
