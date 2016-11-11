@@ -255,8 +255,6 @@ export function runMessagingAgent(redux) {
         if(++missedHeartbeats > 3) {
             console.error("no websocket-heartbeat present. closing socket.");
             this.close();
-        }else{
-            console.log("heartbeat present");
         }
     }
 
