@@ -229,6 +229,8 @@ export function runMessagingAgent(redux) {
     window.ws4dbg = ws;//TODO deletme
     let unsubscribeWatches = [];
 
+    let reconnectAttempts = 0; // should be increased when a socket is opened, reset to 0 after opening was successful
+
     let missedHeartbeats = 0; // deadman-switch variable. should count up every 30s and gets reset onHeartbeat
     setInterval(checkHeartbeat, 30000); // heartbeats should arrive roughly every 30s
 
@@ -241,6 +243,7 @@ export function runMessagingAgent(redux) {
         ws.onheartbeat = onHeartbeat;
         missedHeartbeats = 0;
 
+        reconnectAttempts++;
         return ws;
     };
 
@@ -304,7 +307,6 @@ export function runMessagingAgent(redux) {
         this.close();
     };
 
-    let reconnectAttempts = 0;
     function onClose(e) {
         if(e.wasClean){
             console.log('messaging-agent.js: websocket closed cleanly. reconnectAttempts = ',reconnectAttempts);
@@ -319,7 +321,6 @@ export function runMessagingAgent(redux) {
                 .then(checkHttpStatus) // will reject if not logged in
                 .then(() => {//logged in -- re-initiate route-change
                     ws = newSock();
-                    reconnectAttempts = 0;
 
                 }).catch(error => {
                     // cleanup - unsubscribe all watches and empty the array
@@ -344,7 +345,6 @@ export function runMessagingAgent(redux) {
              * login atm)
              */
             ws = newSock();
-            reconnectAttempts++;
         }
     };
 }
