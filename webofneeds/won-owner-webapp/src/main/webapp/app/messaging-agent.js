@@ -245,15 +245,15 @@ export function runMessagingAgent(redux) {
     };
 
     function onHeartbeat(e) {
-        console.log('heartbeat',e);
+        console.log('messaging-agent.js: received heartbeat',e);
         missedHeartbeats = 0; // reset the deadman count
     }
 
     function checkHeartbeat() {
-        console.log("checking heartbeat presence: ", missedHeartbeats * 30, "s have passed since the last heartbeat.");
+        console.log("messaging-agent.js: checking heartbeat presence: ", missedHeartbeats, " full intervals of 30s have passed since the last heartbeat.");
 
         if(++missedHeartbeats > 3) {
-            console.error("no websocket-heartbeat present. closing socket.");
+            console.error("messaging-agent.js: no websocket-heartbeat present. closing socket.");
             this.close();
         }
     }
@@ -270,7 +270,7 @@ export function runMessagingAgent(redux) {
                         if (firstEntry) { //undefined if queue is empty
                             const [eventUri, msg] = firstEntry;
                             ws.send(JSON.stringify(msg));
-                            console.log("sent message: " + JSON.stringify(msg));
+                            console.log("messaging-agent.js: sent message: " + JSON.stringify(msg));
                             redux.dispatch(actionCreators.messages__waitingForAnswer({eventUri, msg}));
                         }
                     }
@@ -285,7 +285,7 @@ export function runMessagingAgent(redux) {
                 (newRequestState, oldRequestState) => {
                     if (newRequestState) {
                         redux.dispatch(actionCreators.messages__requestWsReset_Hack(false));
-                        console.log("Resetting websocket (a hack necessary for upgrading it after login)");
+                        console.log("messaging-agent.js: Resetting websocket (a hack necessary for upgrading it after login)");
                         ws.close();
                         // a new ws-connection should be opened automatically in onClose
                     }
@@ -298,20 +298,20 @@ export function runMessagingAgent(redux) {
 
     };
     function onError(e) {
-        console.error('websocket error: ', e);
+        console.error('messaging-agent.js: websocket error: ', e);
         this.close();
     };
 
     let reconnectAttempts = 0;
     function onClose(e) {
         if(e.wasClean){
-            console.log('websocket closed cleanly. reconnectAttempts = ',reconnectAttempts);
+            console.log('messaging-agent.js: websocket closed cleanly. reconnectAttempts = ',reconnectAttempts);
         } else {
-            console.error('websocket crashed. reconnectAttempts = ',reconnectAttempts);
+            console.error('messaging-agent.js: websocket crashed. reconnectAttempts = ',reconnectAttempts);
         }
 
         if (e.code === 1011 || reconnectAttempts > 2) {
-            console.error('either your session timed out or you encountered an unexpected server condition: \n', e.reason);
+            console.error('messaging-agent.js: either your session timed out or you encountered an unexpected server condition: \n', e.reason);
 
             fetch('rest/users/isSignedIn', {credentials: 'include'}) // attempt to get a new session
                 .then(checkHttpStatus) // will reject if not logged in
