@@ -311,11 +311,6 @@ export function runMessagingAgent(redux) {
         } else {
             console.error('websocket crashed. reconnectAttempts = ',reconnectAttempts);
         }
-        if(unsubscribeWatches) {
-            for(let unsubscribe; unsubscribe = unsubscribeWatches.pop(); !!unsubscribe) {
-                unsubscribe();
-            }
-        }
 
         if (e.code === 1011 || reconnectAttempts > 2) {
             console.error('either your session timed out or you encountered an unexpected server condition: \n', e.reason);
@@ -327,6 +322,11 @@ export function runMessagingAgent(redux) {
                     reconnectAttempts = 0;
 
                 }).catch(error => {
+                    // cleanup - unsubscribe all watches and empty the array
+                    for(let unsubscribe; unsubscribe = unsubscribeWatches.pop(); !!unsubscribe) {
+                        if(unsubscribe)
+                            unsubscribe();
+                    }
                     console.log("you lost the session we will call logout for you");
                     redux.dispatch(actionCreators.logout())
                 });
