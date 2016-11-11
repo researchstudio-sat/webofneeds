@@ -229,7 +229,7 @@ export function runMessagingAgent(redux) {
     window.ws4dbg = ws;//TODO deletme
     let unsubscribeWatches = [];
 
-    let missedHeartbeats = 0; // deadman-switch variable. counts up every 30s and gets reset onHeartbeat
+    let missedHeartbeats = 0; // deadman-switch variable. should count up every 30s and gets reset onHeartbeat
     setInterval(checkHeartbeat, 30000); // heartbeats should arrive roughly every 30s
 
     function newSock() {
