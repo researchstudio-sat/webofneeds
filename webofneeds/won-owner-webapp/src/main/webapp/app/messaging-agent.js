@@ -322,7 +322,6 @@ export function runMessagingAgent(redux) {
                 .then(() => {
                     // session is still valid -- reopen the socket
                     ws = newSock();
-
                 }).catch(error => {
                     // cleanup - unsubscribe all watches and empty the array
                     for(let unsubscribe; unsubscribe = unsubscribeWatches.pop(); !!unsubscribe) {
@@ -330,7 +329,7 @@ export function runMessagingAgent(redux) {
                             unsubscribe();
                     }
 
-                    console.log("you lost the session we will call logout for you");
+                    console.error('messaging-agent.js: either your session timed out or you encountered an unexpected server condition: \n', e.reason);
                     // TODO instead show a slide-in "Lost connection" with a reload button (that allows to copy typed text out)
                     redux.dispatch(actionCreators.logout())
                 });
