@@ -259,7 +259,7 @@ export function runMessagingAgent(redux) {
 
         if(++missedHeartbeats > 3) {
             console.error("messaging-agent.js: no websocket-heartbeat present. closing socket.");
-            this.close();
+            ws.close();
         }
     }
 
