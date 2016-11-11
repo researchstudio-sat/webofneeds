@@ -69,7 +69,10 @@ function genTopnavConf() {
                         'error' : toast.get('type') === self.WON.errorToast
                       }"
             ng-repeat="toast in self.toastsArray">
-                <img class="topnav__toasts__element__close clickable" ng-click="self.toasts__delete(toast)" src="generated/icon-sprite.svg#ico27_close"/>
+                <img
+                    class="topnav__toasts__element__close clickable"
+                    ng-click="self.toasts__delete(toast)"
+                    src="generated/icon-sprite.svg#ico27_close"/>
                 <div class="topnav__toasts__element__text">{{toast.get('msg')}}</div>
             </div>
         </div>
