@@ -18,10 +18,12 @@
  */
 
 import won from './won-es6';
-import {attach,
-        delay,
-        watchImmutableRdxState,
-        checkHttpStatus } from './utils';
+import {
+    attach,
+    delay,
+    watchImmutableRdxState,
+    checkHttpStatus,
+} from './utils';
 import { actionTypes, actionCreators } from './actions/actions';
 //import './message-service'; //TODO still uses es5
 import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from './won-message-utils';
