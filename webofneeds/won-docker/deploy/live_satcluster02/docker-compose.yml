@@ -7,7 +7,7 @@ services:
   # - all involved containers (letsencrypt, nginx, wonnode) are configured to mount the right folders
   # - the certificate folder on the host is configured to be "$base_folder/letsencrypt/certs/live/matchat.org"
   # - nginx must be running so that the acme challenge can be executed
-  # - execute "docker exec livesatcluster02_letsencrypt_1 //usr/local/bin/certificate-request-and-renew.sh" for
+  # - execute "docker exec livesatcluster02_letsencrypt_1 bash //usr/local/bin/certificate-request-and-renew.sh" for
   #   certificate renewal on host satcluster02
   # - this script can be changed for testing e.g. by adding parameters like --dry-run or --test-cert to the certbot
   # - this should renew the letsencrypt certificate in "$base_folder/letsencrypt/certs/live/matchat.org" on the host
