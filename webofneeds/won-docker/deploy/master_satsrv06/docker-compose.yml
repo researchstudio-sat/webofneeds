@@ -47,7 +47,14 @@ services:
       - "botContext.mongodb.host=satsrv06.researchstudio.at"
       - "botContext.mongodb.port=27018"
       - "botContext.mongodb.database=master_bot"
+      - "mailbot.email.user=won-internal"
+      - "mailbot.email.address=won-internal@researchstudio.at"
+      - "mailbot.email.name=Web of Needs Master Mail Bot"
       - "mailbot.email.password=$mailinglist_passwd"
+      - "mailbot.email.imap.host=imap.researchstudio.at"
+      - "mailbot.email.imap.port=993"
+      - "mailbot.email.smtp.host=smtp.researchstudio.at"
+      - "mailbot.email.smtp.port=587"
     depends_on:
       - mongodb
 
