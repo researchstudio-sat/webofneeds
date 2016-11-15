@@ -31,4 +31,6 @@ ADD certificate-request-and-renew.sh /usr/local/bin/certificate-request-and-rene
 RUN chmod +x /usr/local/bin/certificate-request-and-renew.sh
 RUN dos2unix /usr/local/bin/certificate-request-and-renew.sh
 
+# keep this container running
+CMD tail -f /dev/null
 
