@@ -56,8 +56,17 @@ export function messagesReducer(messages = initialState, action = {}) {
 
 
         case actionTypes.lostConnection:
-            return messages.set('lostConnection', true);
+            return messages
+                .set('lostConnection', true)
+                .set('reconnecting', false);
 
+        case actionTypes.reconnect:
+            return messages.set('reconnecting', true);
+
+        case actionTypes.reconnectSuccess:
+            return messages
+                .set('lostConnection', false)
+                .set('reconnecting', false);
 
         /**
          * TODO this sub-reducer is part of the session-upgrade hack documented in:

@@ -11,6 +11,14 @@ import { actionCreators }  from '../actions/actions';
 
 function genTopnavConf() {
     let template = `
+        <div class="slide-in" ng-show="self.connectionHasBeenLost">
+            Lost connection – make sure your internet-connection
+            is working, then click “reconnect”.
+            <button ng-show="!self.reconnecting" ng-click="self.reconnect()" class="si__button red">
+                    Reconnect
+            </button>
+            <span ng-show="self.reconnecting">[SPINNER]</span>
+        </div>
         <nav class="topnav">
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
@@ -89,7 +97,9 @@ function genTopnavConf() {
                 WON: won.WON,
                 loggedIn: state.getIn(['user', 'loggedIn']),
                 email: state.getIn(['user','email']),
-                toastsArray: state.getIn(['toasts']).toArray()
+                toastsArray: state.getIn(['toasts']).toArray(),
+                connectionHasBeenLost: state.getIn(['messages', 'lostConnection']), // name chosen to avoid name-clash with the action-creator
+                reconnecting: state.getIn(['messages', 'reconnecting']),
             });
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);

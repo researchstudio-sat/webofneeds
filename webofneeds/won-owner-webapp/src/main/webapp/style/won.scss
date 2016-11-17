@@ -58,41 +58,7 @@ body {
 @import 'visitor-title-bar';
 @import 'settings-tab-bar';
 
-@mixin button-color($color, $bg_color) {
-  color: $color;
-  background: $bg_color;
-
-  &:active {
-    background: darken($bg_color, 15%);
-  }
-  &:disabled {
-    /*Default disabled colors, can be changed or extracted will be used
-    by every button that is set to disabled*/
-    color: white;
-    background: lightgrey;
-  }
-}
-
-/* style adapted from http://cssdeck.com/labs/beautiful-flat-buttons */
-.won-button--filled {
-  //padding: 0.5em 1em;
-  padding: 0.66em 2em;
-  font-size: $normalFontSize;
-  text-align: center;
-  border: 0;
-  border-radius: 0.19rem;
-  cursor: pointer;
-
-  /*Button color definitions*/
-  &.red { @include button-color(white,$won-red); }
-  &.darkgray { @include button-color(white, $won-dark-gray); }
-  &.lighterblue { @include button-color(white, $won-lighter-blue); }
-  &.black { @include button-color(white, black); }
-
-  &.thin {
-    padding: 0.4em 2em;
-  }
-}
+@import 'button';
 
 input[type=text],
 input[type=password],

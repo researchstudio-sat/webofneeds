@@ -231,6 +231,7 @@ export function runMessagingAgent(redux) {
     let unsubscribeWatches = [];
 
     let reconnectAttempts = 0; // should be increased when a socket is opened, reset to 0 after opening was successful
+    let reconnecting = false; // true after the user has requested a reconnect
 
     let missedHeartbeats = 0; // deadman-switch variable. should count up every 30s and gets reset onHeartbeat
     setInterval(checkHeartbeat, 30000); // heartbeats should arrive roughly every 30s
@@ -268,6 +269,11 @@ export function runMessagingAgent(redux) {
 
         reconnectAttempts = 0; // successful opening of socket. we can reset the reconnect counter.
 
+        if(reconnecting) { // successful reconnect (failure is handled via connectionLost)
+            reconnecting = false;
+            redux.dispatch(actionCreators.reconnectSuccess());
+        }
+
         if(unsubscribeWatches.length === 0) {
             const unsubscribeMsgQWatch = watchImmutableRdxState(
                 redux, ['messages', 'enqueued'],
@@ -283,6 +289,21 @@ export function runMessagingAgent(redux) {
                     }
                 }
             );
+            const unsubscribeReconnectWatch = watchImmutableRdxState(
+                redux, ['messages', 'reconnecting'],
+                (newState, oldState) => {
+                    reconnecting = newState;
+                    if (!oldState && newState) {
+                        console.log("messaging-agent.js: Resetting web-socket connection");
+                        reconnectAttempts = 0;
+                        if(ws.readyState !== WebSocket.CLOSED) {
+                            ws.close(); // a new ws-connection should be opened automatically in onClose
+                        } else {
+                            ws = newSock(); // onClose won't trigger for already closed websockets, so create a new one here.
+                        }
+                    }
+                }
+            );
             /**
              * TODO this watch is part of the session-upgrade hack documented in:
              * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
@@ -291,15 +312,16 @@ export function runMessagingAgent(redux) {
                 redux, ['messages', 'resetWsRequested_Hack'],
                 (newRequestState, oldRequestState) => {
                     if (newRequestState) {
-                        redux.dispatch(actionCreators.messages__requestWsReset_Hack(false));
                         console.log("messaging-agent.js: Resetting websocket (a hack necessary for upgrading it after login)");
-                        ws.close();
-                        // a new ws-connection should be opened automatically in onClose
+                        reconnectAttempts = 0;
+                        ws.close(); // a new ws-connection should be opened automatically in onClose
+                        redux.dispatch(actionCreators.messages__requestWsReset_Hack(false));
                     }
                 }
             );
 
             unsubscribeWatches.push(unsubscribeMsgQWatch);
+            unsubscribeWatches.push(unsubscribeReconnectWatch);
             unsubscribeWatches.push(unsubscribeResetWatch);
         }
 
@@ -317,6 +339,13 @@ export function runMessagingAgent(redux) {
         }
 
         if (e.code === 1011 || reconnectAttempts > 1) {
+
+            console.error('messaging-agent.js: either your session timed out or you encountered an unexpected server condition: \n', e.reason);
+            // TODO instead show a slide-in "Lost connection" with a reload button (that allows to copy typed text out)
+            // TODO recovery from timed out session
+            //redux.dispatch(actionCreators.logout())
+            redux.dispatch(actionCreators.lostConnection());
+            /*
             fetch('rest/users/isSignedIn', {credentials: 'include'}) // attempt to get a new session
                 .then(checkHttpStatus) // will reject if not logged in
                 .then(() => {
@@ -334,6 +363,7 @@ export function runMessagingAgent(redux) {
                     //redux.dispatch(actionCreators.logout())
                     redux.dispatch(actionCreators.lostConnection())
                 });
+                */
         } else {
             /*
              * first reconnect happens immediately (to facilitate
