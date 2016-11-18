@@ -82,6 +82,24 @@ public class WonMimeMessageGenerator {
         return generateWonMimeMessage(msgToRespondTo, writer.toString(), remoteNeedUri);
     }
 
+    public WonMimeMessage createWelcomeMail(MimeMessage msgToRespondTo) throws IOException, MessagingException {
+
+        VelocityContext velocityContext = new VelocityContext();
+        putQuotedMessage(velocityContext, msgToRespondTo);
+        velocityContext.put("mailbotEmailAddress", sentFrom);
+        velocityContext.put("mailbotName", sentFromName);
+        StringWriter writer = new StringWriter();
+        velocityEngine.getTemplate("mail-templates/welcome-mail.vm").merge(velocityContext, writer);
+
+        MimeMessage answerMessage = (MimeMessage) msgToRespondTo.reply(false);
+        answerMessage.setFrom(new InternetAddress(sentFrom, sentFromName));
+        answerMessage.setText(writer.toString());
+        WonMimeMessage wonAnswerMessage = new WonMimeMessage(answerMessage);
+        wonAnswerMessage.updateMessageID();
+
+        return wonAnswerMessage;
+    }
+
     /**
      * Creates the DefaultContext and fills in all relevant Infos which are used in every Mail, in our Case this is the NeedInfo and the quoted Original Message
      * @param msgToRespondTo Message that the new Mail is in ResponseTo (to extract the mailtext)
