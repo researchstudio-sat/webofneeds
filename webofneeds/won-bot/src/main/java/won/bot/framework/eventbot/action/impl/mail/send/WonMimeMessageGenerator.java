@@ -1,15 +1,20 @@
 package won.bot.framework.eventbot.action.impl.mail.send;
 
-import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.*;
+import com.hp.hpl.jena.tdb.TDB;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
 import won.protocol.message.WonMessage;
 import won.protocol.model.BasicNeedType;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.sparql.WonQueries;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -18,15 +23,18 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.List;
+import java.util.*;
 
 /**
  * This Class is used to generate all Mails that are going to be sent via the Mail2WonBot
  */
 public class WonMimeMessageGenerator {
+    private static final Logger logger = LoggerFactory.getLogger(WonMimeMessageGenerator.class);
 
     @Autowired
     private VelocityEngine velocityEngine;
+
+    private int MAX_PREVIOUS_MESSAGES = 3;
 
     private String sentFrom;
     private String sentFromName;
@@ -61,10 +69,13 @@ public class WonMimeMessageGenerator {
         return generateWonMimeMessage(msgToRespondTo, writer.toString(), remoteNeedUri);
     }
 
-    public WonMimeMessage createMessageMail(MimeMessage msgToRespondTo, URI remoteNeedUri, URI connectionUri, WonMessage wonMessage) throws MessagingException, IOException {
+    public WonMimeMessage createMessageMail(MimeMessage msgToRespondTo, URI requesterId, URI remoteNeedUri, URI connectionUri, WonMessage wonMessage) throws MessagingException, IOException {
         VelocityContext velocityContext = putDefaultContent(msgToRespondTo, remoteNeedUri);
 
         velocityContext.put("message", extractTextMessageFromWonMessage(wonMessage));
+        if(MAX_PREVIOUS_MESSAGES != 0) {
+            putPreviousMessages(velocityContext, connectionUri, requesterId);
+        }
 
         StringWriter writer = new StringWriter();
 
@@ -84,7 +95,7 @@ public class WonMimeMessageGenerator {
         VelocityContext velocityContext = new VelocityContext();
 
         putRemoteNeedInfo(velocityContext, remoteNeedUri);
-        putQuotedMessage(velocityContext, msgToRespondTo);
+        putQuotedMail(velocityContext, msgToRespondTo);
 
         return velocityContext;
     }
@@ -96,7 +107,7 @@ public class WonMimeMessageGenerator {
         MimeMessage answerMessage = (MimeMessage) msgToRespondTo.reply(false);
         answerMessage.setFrom(new InternetAddress(sentFrom, sentFromName));
         answerMessage.setText(mailBody);
-        answerMessage.setSubject(answerMessage.getSubject() + " <-> ["+ BasicNeedType.fromURI(WonRdfUtils.NeedUtils.getBasicNeedType(remoteNeedRDF))+"] " +  WonRdfUtils.NeedUtils.getNeedTitle(remoteNeedRDF));// TODO: Include Human Readable Basic Need Type
+        answerMessage.setSubject(answerMessage.getSubject() + " <-> ["+ BasicNeedType.fromURI(WonRdfUtils.NeedUtils.getBasicNeedType(remoteNeedRDF))+"] " +  WonRdfUtils.NeedUtils.getNeedTitle(remoteNeedRDF));
 
         //We need to create an instance of our own MimeMessage Implementation in order to have the Unique Message Id set before sending
         WonMimeMessage wonAnswerMessage = new WonMimeMessage(answerMessage);
@@ -122,14 +133,14 @@ public class WonMimeMessageGenerator {
     }
 
     /**
-     * Responsible for filling inc/quoted-message.vm template
+     * Responsible for filling inc/quoted-mail.vm template
      * @param velocityContext
      * @param msgToRespondTo
      * @throws MessagingException
      * @throws IOException
      */
-    private void putQuotedMessage(VelocityContext velocityContext, MimeMessage msgToRespondTo)
-        throws MessagingException, IOException {
+    private void putQuotedMail(VelocityContext velocityContext, MimeMessage msgToRespondTo)
+            throws MessagingException, IOException {
         String respondToMailAddress = MailContentExtractor.getFromAddressString(msgToRespondTo);
 
         velocityContext.put("respondAddress", respondToMailAddress);
@@ -141,6 +152,72 @@ public class WonMimeMessageGenerator {
         }
     }
 
+    /**
+     * Responsible for filling inc/previous-messages.vm
+     * @param velocityContext
+     * @param connectionUri
+     * @param requesterUri
+     */
+    private void putPreviousMessages(VelocityContext velocityContext, URI connectionUri, URI requesterUri) throws MessagingException, IOException {
+        logger.debug("getting the messages for connectionuri: {}", connectionUri);
+
+        Dataset baseDataSet = eventListenerContext.getLinkedDataSource().getDataForResource(connectionUri);
+        Dataset eventDataSet = eventListenerContext.getLinkedDataSource().getDataForResource(URI.create(connectionUri.toString()+"/events?deep=true"), requesterUri);
+
+        RdfUtils.addDatasetToDataset(baseDataSet, eventDataSet);
+
+        try {
+            List<String> previousMessages = new ArrayList<>();
+
+            Query query = QueryFactory.create(WonQueries.SPARQL_TEXTMESSAGES_BY_CONNECTION_ORDERED_BY_TIMESTAMP);
+            QuerySolutionMap initialBinding = new QuerySolutionMap();
+
+            QueryExecution qExec = QueryExecutionFactory.create(query, baseDataSet, initialBinding);
+
+            qExec.getContext().set(TDB.symUnionDefaultGraph, true);
+            ResultSet results = qExec.execSelect();
+
+            long currentMessageCount = 0;
+
+            if(results.hasNext()){ //to ignore the latest message as this is already shown in the mail
+                results.nextSolution();
+            };
+
+            while (results.hasNext()) {
+                currentMessageCount++;
+                StringBuilder messageLine = new StringBuilder();
+
+                if(MAX_PREVIOUS_MESSAGES != -1 && currentMessageCount > MAX_PREVIOUS_MESSAGES){
+                    previousMessages.add("[...]");
+                    break;
+                }
+
+                QuerySolution soln = results.nextSolution();
+
+                long timestamp = soln.get("timestamp").asLiteral().getLong();
+                messageLine.append("[").append(new Date(timestamp)).append("] ");
+
+                if(requesterUri.toString().equals(soln.get("needUri").asResource().getURI())) {
+                    messageLine.append("You said: \n");
+                } else {
+                    messageLine.append("They said: \n");
+                }
+
+                String message = ">"+soln.get("msg").asLiteral().getString().replaceAll("\\n", "\n>");
+
+                messageLine.append(message).append("\n");
+                previousMessages.add(messageLine.toString().replaceAll("\\n", "\n>"));
+            }
+            qExec.close();
+
+            Collections.reverse(previousMessages); //reverse the list to have the messages top down from old to new messages
+
+            velocityContext.put("previousMessages", previousMessages);
+        } catch (QueryParseException e) {
+            logger.error("query parse exception {}", e);
+        }
+    }
+
     private static String extractTextMessageFromWonMessage(WonMessage wonMessage){
         if (wonMessage == null) return null;
         String message = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
@@ -149,6 +226,10 @@ public class WonMimeMessageGenerator {
 
     public void setVelocityEngine(VelocityEngine velocityEngine) {
         this.velocityEngine = velocityEngine;
+    }
+
+    public void setMAX_PREVIOUS_MESSAGES(int MAX_PREVIOUS_MESSAGES) {
+        this.MAX_PREVIOUS_MESSAGES = MAX_PREVIOUS_MESSAGES;
     }
 
     public void setEventListenerContext(EventListenerContext eventListenerContext) {

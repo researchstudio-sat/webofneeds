@@ -107,5 +107,6 @@
         <property name="velocityEngine" ref="velocityEngine"/>
         <property name="sentFrom" value="${mailbot.email.address}"/>
         <property name="sentFromName" value="${mailbot.email.name}"/>
+        <property name="MAX_PREVIOUS_MESSAGES" value="5"/>
     </bean>
 </beans>
