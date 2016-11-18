@@ -15,9 +15,13 @@ function genTopnavConf() {
             Lost connection – make sure your internet-connection
             is working, then click “reconnect”.
             <button ng-show="!self.reconnecting" ng-click="self.reconnect()" class="si__button red">
-                    Reconnect
+                Reconnect
             </button>
-            <span ng-show="self.reconnecting">[SPINNER]</span>
+
+            <img src="images/spinner/on_white.gif"
+                alt="Reconnecting&hellip;"
+                ng-show="self.reconnecting"
+                class="hspinner"/>
         </div>
         <nav class="topnav">
             <div class="topnav__inner">
