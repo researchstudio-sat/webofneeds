@@ -107,6 +107,6 @@
         <property name="velocityEngine" ref="velocityEngine"/>
         <property name="sentFrom" value="${mailbot.email.address}"/>
         <property name="sentFromName" value="${mailbot.email.name}"/>
-        <property name="MAX_PREVIOUS_MESSAGES" value="5"/>
+        <property name="MAX_PREVIOUS_MESSAGES" value="5"/> <!-- 0 includes no messages at all, -1 includes all messages -->
     </bean>
 </beans>
