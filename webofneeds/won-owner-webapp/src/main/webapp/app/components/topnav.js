@@ -12,8 +12,8 @@ import { actionCreators }  from '../actions/actions';
 function genTopnavConf() {
     let template = `
         <div class="slide-in" ng-show="self.connectionHasBeenLost">
-            Lost connection – make sure your internet-connection
-            is working, then click “reconnect”.
+            Lost connection &ndash; make sure your internet-connection
+            is working, then click &ldquo;reconnect&rdquo;.
             <button ng-show="!self.reconnecting" ng-click="self.reconnect()" class="si__button red">
                 Reconnect
             </button>
