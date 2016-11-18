@@ -1,0 +1,51 @@
+package won.bot.framework.eventbot.action.impl.mail.receive;
+
+import won.bot.framework.bot.context.BotContext;
+import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.action.EventBotActionUtils;
+import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
+import won.bot.framework.eventbot.bus.EventBus;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.mail.CreateNeedFromMailEvent;
+import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
+
+import javax.mail.internet.MimeMessage;
+import java.util.Collection;
+
+/**
+ * Created by hfriedrich on 16.11.2016.
+ */
+public class SubscribeUnsubscribeAction extends BaseEventBotAction
+{
+  public SubscribeUnsubscribeAction(EventListenerContext eventListenerContext) {
+    super(eventListenerContext);
+  }
+
+  @Override
+  protected void doRun(final Event event) throws Exception {
+
+    if (event instanceof SubscribeUnsubscribeEvent) {
+
+      // save the new subscription status of the user to the bot context
+      SubscribeUnsubscribeEvent subscribeEvent = (SubscribeUnsubscribeEvent) event;
+      SubscribeStatus subscribeStatus = subscribeEvent.getSubscribeStatus();
+      String senderMailAddress = MailContentExtractor.getMailSender(subscribeEvent.getMessage());
+      BotContext botContext = getEventListenerContext().getBotContext();
+      EventBotActionUtils.setSubscribeStatusForMailAddress(botContext, senderMailAddress, subscribeStatus);
+
+      // depending on the new subscribe status of the user publish his cached mails as needs or delete the cache
+      if (SubscribeStatus.SUBSCRIBED.equals(subscribeStatus)) {
+
+        EventBus bus = getEventListenerContext().getEventBus();
+        Collection<MimeMessage> cachedMessages = EventBotActionUtils.loadCachedMailsForMailAddress(
+          botContext, senderMailAddress);
+        cachedMessages.stream().forEach(message -> bus.publish(new CreateNeedFromMailEvent(message)));
+
+      } else if (SubscribeStatus.UNSUBSCRIBED.equals(subscribeStatus)) {
+
+        EventBotActionUtils.removeCachedMailsForMailAddress(botContext, senderMailAddress);
+      }
+    }
+  }
+}

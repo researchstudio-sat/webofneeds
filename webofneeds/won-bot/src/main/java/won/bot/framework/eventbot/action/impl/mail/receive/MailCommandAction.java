@@ -1,10 +1,10 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
-import org.hsqldb.lib.StringUtil;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
+import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
@@ -12,6 +12,7 @@ import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnection
 import won.bot.framework.eventbot.event.impl.mail.CloseConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
 import won.bot.framework.eventbot.event.impl.mail.OpenConnectionEvent;
+import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
 import won.protocol.util.WonRdfUtils;
 
 import javax.mail.MessagingException;
@@ -22,6 +23,7 @@ import java.io.IOException;
  * Created by fsuda on 18.10.2016.
  */
 public class MailCommandAction extends BaseEventBotAction {
+
     private String mailIdUriRelationsName;
     private MailContentExtractor mailContentExtractor;
 
@@ -34,68 +36,91 @@ public class MailCommandAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(Event event) throws Exception {
-        if(event instanceof MailCommandEvent){
+
+        if(event instanceof MailCommandEvent) {
+
             MimeMessage message = ((MailCommandEvent) event).getMessage();
-            EventBus bus = getEventListenerContext().getEventBus();
+            String referenceId = MailContentExtractor.getMailReference(message);
 
-            try{
-                String replyToMailId = getReplyToMailId(message);
-
-                WonURI wonUri = EventBotActionUtils.getWonURIForMailId(getEventListenerContext(), mailIdUriRelationsName, replyToMailId);
-                assert wonUri != null;
-
-                ActionType actionType = determineAction(getEventListenerContext(), message, wonUri);
-                logger.debug("Executing " + actionType + " on uri: " + wonUri.getUri() + " of type " + wonUri.getType());
-
-                switch(actionType) {
-                    case CLOSE_CONNECTION:
-                        bus.publish(new CloseConnectionEvent(wonUri.getUri()));
-                        break;
-                    case OPEN_CONNECTION:
-                        bus.publish(new OpenConnectionEvent(wonUri.getUri()));
-                        break;
-                    case IMPLICIT_OPEN_CONNECTION:
-                        bus.publish(new OpenConnectionEvent(
-                          wonUri.getUri(),  mailContentExtractor.getTextMessage(message)));
-                        break;
-                    case SENDMESSAGE:
-                        bus.publish(new SendTextMessageOnConnectionEvent(
-                          mailContentExtractor.getTextMessage(message), wonUri.getUri()));
-                        break;
-                    case NO_ACTION:
-                    default:
-                        //INVALID COMMAND
-                        logger.error("No command was given or assumed");
-                        break;
-                }
-            }catch(Exception e){
-                logger.error("no reply mail was set or found");
+            // determine if the mail is referring to some other mail/need/connection or not
+            if (referenceId != null) {
+                processReferenceMailCommands(message, referenceId);
+            } else {
+                processNonReferenceMailCommand(message);
             }
         }
     }
 
-    public static boolean isCommandMail(MimeMessage message) throws MessagingException {
-        return !StringUtil.isEmpty(getReplyToMailId(message));
+    private void processNonReferenceMailCommand(MimeMessage message) throws IOException, MessagingException {
+
+        EventBus bus = getEventListenerContext().getEventBus();
+        ActionType mailAction = mailContentExtractor.getMailAction(message);
+
+        switch(mailAction) {
+            case SUBSCRIBE:
+                bus.publish(new SubscribeUnsubscribeEvent(message, SubscribeStatus.SUBSCRIBED));
+                break;
+
+            case UNSUBSCRIBE:
+                bus.publish(new SubscribeUnsubscribeEvent(message, SubscribeStatus.UNSUBSCRIBED));
+                break;
+
+            case NO_ACTION:
+            default:
+                //INVALID COMMAND
+                logger.error("No command was given or assumed");
+                break;
+        }
     }
 
-    public static String getReplyToMailId(MimeMessage message) throws MessagingException {
+    private void processReferenceMailCommands(MimeMessage message, String referenceId) {
 
-        String[] replyTo = message.getHeader("In-Reply-To");
-        if (replyTo != null && replyTo.length > 0) {
-            return replyTo[0];
+        EventBus bus = getEventListenerContext().getEventBus();
+        try{
+            WonURI wonUri = EventBotActionUtils.getWonURIForMailId(getEventListenerContext(), mailIdUriRelationsName, referenceId);
+            assert wonUri != null;
+
+            ActionType actionType = determineAction(getEventListenerContext(), message, wonUri);
+            logger.debug("Executing " + actionType + " on uri: " + wonUri.getUri() + " of type " + wonUri.getType());
+
+            switch(actionType) {
+                case CLOSE_CONNECTION:
+                    bus.publish(new CloseConnectionEvent(wonUri.getUri()));
+                    break;
+                case OPEN_CONNECTION:
+                    bus.publish(new OpenConnectionEvent(wonUri.getUri()));
+                    break;
+                case IMPLICIT_OPEN_CONNECTION:
+                    bus.publish(new OpenConnectionEvent(
+                      wonUri.getUri(),  mailContentExtractor.getTextMessage(message)));
+                    break;
+                case SENDMESSAGE:
+                    bus.publish(new SendTextMessageOnConnectionEvent(
+                      mailContentExtractor.getTextMessage(message), wonUri.getUri()));
+                    break;
+
+                case NO_ACTION:
+                default:
+                    //INVALID COMMAND
+                    logger.error("No command was given or assumed");
+                    break;
+            }
+        }catch(Exception e){
+            logger.error("no reply mail was set or found");
         }
-        return null;
     }
 
     private ActionType determineAction(EventListenerContext ctx, MimeMessage message, WonURI wonUri) {
         try {
+
+            ActionType mailAction = mailContentExtractor.getMailAction(message);
             switch(wonUri.getType()) {
                 case CONNECTION:
-                    boolean connected = WonRdfUtils.ConnectionUtils.isConnected(ctx.getLinkedDataSource().getDataForResource(wonUri.getUri()), wonUri.getUri());
-
-                    if (mailContentExtractor.isCmdClose(message)) {
+                    boolean connected = WonRdfUtils.ConnectionUtils.isConnected(
+                      ctx.getLinkedDataSource().getDataForResource(wonUri.getUri()), wonUri.getUri());
+                    if (ActionType.CLOSE_CONNECTION.equals(mailAction)) {
                         return ActionType.CLOSE_CONNECTION;
-                    }else if(!connected && mailContentExtractor.isCmdConnect(message)){
+                    }else if(!connected && ActionType.OPEN_CONNECTION.equals(mailAction)){
                         return ActionType.OPEN_CONNECTION;
                     }else if(connected){
                         return ActionType.SENDMESSAGE;
@@ -106,13 +131,13 @@ public class MailCommandAction extends BaseEventBotAction {
                 case NEED:
                     //TODO: implement need actions like close/reopen etc.
                 default:
-                    return ActionType.NO_ACTION;
+                    return mailAction;
             }
         }catch(MessagingException me){
-            me.printStackTrace();
+            logger.error("exception occurred checking command mail: {}", me);
             return ActionType.NO_ACTION;
         }catch(IOException ioe){
-            ioe.printStackTrace();
+            logger.error("exception occurred checking command mail: {}", ioe);
             return ActionType.NO_ACTION;
         }
     }

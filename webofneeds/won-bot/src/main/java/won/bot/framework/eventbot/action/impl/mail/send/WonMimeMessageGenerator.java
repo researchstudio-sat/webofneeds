@@ -85,7 +85,7 @@ public class WonMimeMessageGenerator {
     public WonMimeMessage createWelcomeMail(MimeMessage msgToRespondTo) throws IOException, MessagingException {
 
         VelocityContext velocityContext = new VelocityContext();
-        putQuotedMessage(velocityContext, msgToRespondTo);
+        putQuotedMail(velocityContext, msgToRespondTo);
         velocityContext.put("mailbotEmailAddress", sentFrom);
         velocityContext.put("mailbotName", sentFromName);
         StringWriter writer = new StringWriter();

@@ -1,18 +1,11 @@
 package won.bot.impl;
 
-import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageChannel;
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.action.impl.mail.receive.CreateNeedFromMailAction;
-import won.bot.framework.eventbot.action.impl.mail.receive.MailCommandAction;
-import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
-import won.bot.framework.eventbot.action.impl.mail.receive.MailParserAction;
-import won.bot.framework.eventbot.action.impl.mail.send.Connect2MailParserAction;
-import won.bot.framework.eventbot.action.impl.mail.send.Hint2MailParserAction;
-import won.bot.framework.eventbot.action.impl.mail.send.Message2MailAction;
-import won.bot.framework.eventbot.action.impl.mail.send.WonMimeMessageGenerator;
+import won.bot.framework.eventbot.action.impl.mail.receive.*;
+import won.bot.framework.eventbot.action.impl.mail.send.*;
 import won.bot.framework.eventbot.action.impl.wonmessage.CloseConnectionUriAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionUriAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.SendMessageOnConnectionAction;
@@ -73,6 +66,13 @@ public class Mail2WonBot extends EventBot{
 
         ));
 
+        bus.subscribe(WelcomeMailEvent.class, new ActionOnEventListener(
+          ctx,
+          "WelcomeMailAction",
+          new WelcomeMailAction(mailGenerator, sendEmailChannel)
+
+        ));
+
         bus.subscribe(MailCommandEvent.class,
         new ActionOnEventListener(
                 ctx,
@@ -100,6 +100,9 @@ public class Mail2WonBot extends EventBot{
                 "OpenCommandEvent",
                 new OpenConnectionUriAction(ctx)
         ));
+
+      bus.subscribe(SubscribeUnsubscribeEvent.class,
+                    new ActionOnEventListener(ctx, "SubscribeUnsubscribeEvent", new SubscribeUnsubscribeAction(ctx)));
 
         //WON initiated Events
         bus.subscribe(HintFromMatcherEvent.class,
