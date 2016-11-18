@@ -89,11 +89,7 @@ public class WonQueries {
                 "FILTER (?need in (::need::))"+
             "}";
 
-    /*public static final String SPARQL_MESSAGES_BY_CONNECTION = SPARQL_PREFIX + "SELECT ?message "+
-            "WHERE {"+
-            "?connection won:hasEventContainer ?event ."+
-            "?event won:hasTextMessage ?message ."+
-            "}";*/
+    public static final String SPARQL_TEXTMESSAGES_BY_CONNECTION_ORDERED_BY_TIMESTAMP = SPARQL_PREFIX + "SELECT * WHERE { graph ?g { ?s won:hasTextMessage ?msg .} graph ?g2 { ?s msg:hasReceivedTimestamp ?timestamp} graph ?g3 { ?s msg:hasSenderNeed ?needUri }} ORDER BY DESC(?timestamp)";
 
     public static final String SPARQL_NEED2 = SPARQL_PREFIX + "SELECT * WHERE"+
             "{"+
