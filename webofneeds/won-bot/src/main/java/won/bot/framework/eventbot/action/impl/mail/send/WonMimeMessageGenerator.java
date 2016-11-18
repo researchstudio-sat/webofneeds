@@ -194,23 +194,17 @@ public class WonMimeMessageGenerator {
 
                 QuerySolution soln = results.nextSolution();
 
-                long timestamp = soln.get("timestamp").asLiteral().getLong();
-                messageLine.append("[").append(new Date(timestamp)).append("] ");
-
                 if(requesterUri.toString().equals(soln.get("needUri").asResource().getURI())) {
-                    messageLine.append("You said: \n");
+                    messageLine.append("You said: ");
                 } else {
-                    messageLine.append("They said: \n");
+                    messageLine.append("They said: ");
                 }
 
-                String message = ">"+soln.get("msg").asLiteral().getString().replaceAll("\\n", "\n>");
-
-                messageLine.append(message).append("\n");
-                previousMessages.add(messageLine.toString().replaceAll("\\n", "\n>"));
+                String message = soln.get("msg").asLiteral().getString();
+                messageLine.append(message);
+                previousMessages.add(messageLine.toString().replaceAll("\\n", "\n>\t"));
             }
             qExec.close();
-
-            Collections.reverse(previousMessages); //reverse the list to have the messages top down from old to new messages
 
             velocityContext.put("previousMessages", previousMessages);
         } catch (QueryParseException e) {

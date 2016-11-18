@@ -48,7 +48,7 @@
         </property>
         <property name="textMessageExtractionPattern">
             <bean id="textMessageExtractionPattern" class="java.util.regex.Pattern" factory-method="compile">
-                <constructor-arg value="(?s).+?(?=\n.+?\n>)" />
+                <constructor-arg value="(?s).+?(?=\b[^\n]*\n>)" />
             </bean>
         </property>
         <property name="descriptionExtractionPattern">
