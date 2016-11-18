@@ -3,4 +3,6 @@ $message
 
 #parse('mail-templates/inc/remote-need-info.vm')
 
-#parse('mail-templates/inc/quoted-message.vm')
+#parse('mail-templates/inc/previous-messages.vm')
+
+#parse('mail-templates/inc/quoted-mail.vm')

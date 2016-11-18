@@ -1,0 +1,6 @@
+#if($previousMessages)
+Previous Messages:
+#foreach($message in $previousMessages)
+>$message
+#end
+#end
