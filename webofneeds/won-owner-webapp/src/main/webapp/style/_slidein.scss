@@ -1,0 +1,40 @@
+@import 'button';
+
+.slide-in {
+  & > .si__button {
+    @extend .won-button--filled;
+    // margin-left: 0.5rem;
+  }
+}
+
+.slide-in {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/**
+ * collapse animation
+ * adapted from: <https://weblog.west-wind.com/posts/2014/Feb/22/Using-CSS-Transitions-to-SlideUp-and-SlideDown>
+ */
+.slide-in {
+  transition: 0.5s;
+  overflow-y: hidden;
+
+  &:not(.slide-in--visible) {
+    padding-top: 0;
+    padding-bottom: 0;
+    max-height: 0;
+  }
+
+  &.slide-in--visible {
+    /*
+     * transition only works between numerical values
+     * and not between 0 and "auto" --> 9999rem is
+     * larger than the slide-in should ever get.
+     */
+    max-height: 9999rem;
+  }
+}
+
