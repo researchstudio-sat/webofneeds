@@ -1,0 +1,39 @@
+@mixin button-color($color, $bg_color) {
+  color: $color;
+  background: $bg_color;
+
+  &:active {
+    background: darken($bg_color, 15%);
+  }
+  &:disabled {
+    /*Default disabled colors, can be changed or extracted will be used
+    by every button that is set to disabled*/
+    color: white;
+    background: lightgrey;
+  }
+}
+
+.won-button {
+  padding: 0.66em 2em;
+  font-size: $normalFontSize;
+  text-align: center;
+  border-radius: 0.19rem;
+  cursor: pointer;
+}
+
+/* style adapted from http://cssdeck.com/labs/beautiful-flat-buttons */
+.won-button--filled {
+  @extend .won-button;
+
+  border: 0;
+
+  /*Button color definitions*/
+  &.red { @include button-color(white,$won-red); }
+  &.darkgray { @include button-color(white, $won-dark-gray); }
+  &.lighterblue { @include button-color(white, $won-lighter-blue); }
+  &.black { @include button-color(white, black); }
+
+  &.thin {
+    padding: 0.4em 2em;
+  }
+}
