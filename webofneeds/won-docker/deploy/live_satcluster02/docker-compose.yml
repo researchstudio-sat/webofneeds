@@ -1,6 +1,29 @@
 version: '2'
 services:
 
+  # letsencrypt container that helps renew the matchat.org (including www.match.org and node.matchat.org) certificate.
+  # This is only used around every 90 days to manually renew the certificate.
+  # To renew the certificate note the following things:
+  # - all involved containers (letsencrypt, nginx, wonnode) are configured to mount the right folders
+  # - the certificate folder on the host is configured to be "$base_folder/letsencrypt/certs/live/matchat.org"
+  # - nginx must be running so that the acme challenge can be executed
+  # - execute "docker exec livesatcluster02_letsencrypt_1 bash //usr/local/bin/certificate-request-and-renew.sh" for
+  #   certificate renewal on host satcluster02
+  # - this script can be changed for testing e.g. by adding parameters like --dry-run or --test-cert to the certbot
+  # - this should renew the letsencrypt certificate in "$base_folder/letsencrypt/certs/live/matchat.org" on the host
+  # - check if the .pem files and the java key store files (.jks and .pfx) in the same folder have also been updated
+  # - delete all (trust store) files in directory $base_folder/won-client-certs/ on all hosts (satcluster01/02)
+  # - redeploy all live containers (with jenkins job)
+  # - check if everything works (HTTPS, websocket and JMS communication)
+  letsencrypt:
+    build: ../../image/letsencrypt
+    image: webofneeds/letsencrypt:live
+    environment:
+      - "key_store_password=$won_certificate_passwd"
+    volumes:
+      - $base_folder/letsencrypt/certs:/etc/letsencrypt
+      - $base_folder/letsencrypt/acme-challenge:/usr/share/nginx/html
+
   # nginx proxy server on satcluster02 for wonnode
   nginx:
     image: nginx
@@ -49,10 +72,10 @@ services:
       - "8443:8443"
       - "61616:61616"
     volumes:
-      - $base_folder/letsencrypt/certs/live/node.matchat.org/fullchain.pem:/usr/local/tomcat/conf/ssl/t-cert.pem
-      - $base_folder/letsencrypt/certs/live/node.matchat.org/privkey.pem:/usr/local/tomcat/conf/ssl/t-key.pem
-      - $base_folder/letsencrypt/certs/live/node.matchat.org/t-key-cert.pfx:/usr/local/tomcat/conf/ssl/t-key-cert.pfx
-      - $base_folder/letsencrypt/certs/live/node.matchat.org/t-keystore.jks:/usr/local/tomcat/conf/ssl/t-keystore.jks
+      - $base_folder/letsencrypt/certs/live/matchat.org/fullchain.pem:/usr/local/tomcat/conf/ssl/t-cert.pem
+      - $base_folder/letsencrypt/certs/live/matchat.org/privkey.pem:/usr/local/tomcat/conf/ssl/t-key.pem
+      - $base_folder/letsencrypt/certs/live/matchat.org/t-key-cert.pfx:/usr/local/tomcat/conf/ssl/t-key-cert.pfx
+      - $base_folder/letsencrypt/certs/live/matchat.org/t-keystore.jks:/usr/local/tomcat/conf/ssl/t-keystore.jks
       - $base_folder/won-client-certs/wonnode:/usr/local/tomcat/won/client-certs/
     depends_on:
       - postgres
