@@ -35,7 +35,11 @@ export function accountLogin(username, password) {
             })
         )
         .then(() => {
-            dispatch(actionCreators.messages__requestWsReset_Hack());
+            /**
+             * TODO this action is part of the session-upgrade hack documented in:
+             * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
+             */
+            dispatch(actionCreators.reconnect());
             dispatch(actionCreators.router__stateGo("feed"));
         })
         .catch(error => {
@@ -77,7 +81,11 @@ export function accountLogout() {
         )
         .then(() => {
             won.clearStore();
-            dispatch(actionCreators.messages__requestWsReset_Hack());
+            /**
+             * TODO this action is part of the session-upgrade hack documented in:
+             * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
+             */
+            dispatch(actionCreators.reconnect());
         })
         .then(() => { /* finally */
             dispatch(actionCreators.router__stateGo("landingpage"));

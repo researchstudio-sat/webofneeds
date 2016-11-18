@@ -304,25 +304,9 @@ export function runMessagingAgent(redux) {
                     }
                 }
             );
-            /**
-             * TODO this watch is part of the session-upgrade hack documented in:
-             * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
-             */
-            const unsubscribeResetWatch = watchImmutableRdxState(
-                redux, ['messages', 'resetWsRequested_Hack'],
-                (newRequestState, oldRequestState) => {
-                    if (newRequestState) {
-                        console.log("messaging-agent.js: Resetting websocket (a hack necessary for upgrading it after login)");
-                        reconnectAttempts = 0;
-                        ws.close(); // a new ws-connection should be opened automatically in onClose
-                        redux.dispatch(actionCreators.messages__requestWsReset_Hack(false));
-                    }
-                }
-            );
 
             unsubscribeWatches.push(unsubscribeMsgQWatch);
             unsubscribeWatches.push(unsubscribeReconnectWatch);
-            unsubscribeWatches.push(unsubscribeResetWatch);
         }
 
     };

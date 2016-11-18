@@ -16,11 +16,6 @@ import { buildCreateMessage } from '../won-message-utils';
 const initialState = Immutable.fromJS({
     enqueued: {},
     waitingForAnswer: {},
-    /**
-     * TODO this field is part of the session-upgrade hack documented in:
-     * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
-     */
-    resetWsRequested_Hack: false,
 });
 export function messagesReducer(messages = initialState, action = {}) {
     switch(action.type) {
@@ -67,15 +62,6 @@ export function messagesReducer(messages = initialState, action = {}) {
             return messages
                 .set('lostConnection', false)
                 .set('reconnecting', false);
-
-        /**
-         * TODO this sub-reducer is part of the session-upgrade hack documented in:
-         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
-         */
-         case actionTypes.messages.requestWsReset_Hack:
-             const flag = (action.payload === undefined) ? true : action.payload;
-             return messages.set('resetWsRequested_Hack', flag)
-                            .set('lostConnection', false);
 
         default:
             return messages;
