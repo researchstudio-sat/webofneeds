@@ -13,21 +13,22 @@ function genTopnavConf() {
     let template = `
         <!-- <div class="slide-in" ng-show="self.connectionHasBeenLost">-->
         <div class="slide-in" ng-class="{'visible': self.connectionHasBeenLost}">
-            <img class="si__icon" src="generated/icon-sprite.svg#ico16_indicator_warning"/>
+            <img class="si__icon" src="generated/icon-sprite.svg#ico16_indicator_warning_white"/>
             <span class="si__text">Lost connection &ndash; make sure your internet-connection
             is working, then click &ldquo;reconnect&rdquo;.</span>
             <button
                 ng-show="self.connectionHasBeenLost && !self.reconnecting" ng-click="self.reconnect()"
-                class="si__button red">
+                class="si__button won-button outline white">
                     Reconnect
             </button>
 
-            <img src="images/spinner/on_white.gif"
+            <img src="images/spinner/on_red.gif"
                 alt="Reconnecting&hellip;"
                 ng-show="self.reconnecting"
                 class="hspinner"/>
         </div>
         <nav class="topnav">
+
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
                     <a  ui-sref="{{ self.loggedIn ? 'feed' : 'landingpage' }}" class="topnav__button">

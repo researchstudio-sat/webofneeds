@@ -4,6 +4,10 @@
 .slide-in {
   @extend .collapsible;
 
+  color: white;
+
+  background: $won-red;
+
   padding: 1rem;
 
   display: flex;
@@ -23,12 +27,12 @@
   & > .si__button {
     margin-left: 1.3rem;
     margin-right: 1rem;
-    @extend .won-button--filled;
+    // @extend .won-button--outline;
     // margin-left: 0.5rem;
   }
 
   > img {
-    height: 2rem;
+    // height: 2rem;
     max-height: 2rem;
   }
 }
