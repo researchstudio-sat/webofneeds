@@ -1,0 +1,8 @@
+Dear mailing list user,
+
+this is an automatic response from the $mailbotName to the following email you sent.
+
+#parse('mail-templates/inc/quoted-message.vm')
+
+publish all my mails in this mailing list to matchat.org: <mailto:$mailbotEmailAddress?subject=subscribe>
+do not publish my mails and ignore mails from $mailbotName in the future: <mailto:$mailbotEmailAddress?subject=unsubscribe>
