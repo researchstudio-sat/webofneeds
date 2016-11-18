@@ -12,11 +12,14 @@ import { actionCreators }  from '../actions/actions';
 function genTopnavConf() {
     let template = `
         <!-- <div class="slide-in" ng-show="self.connectionHasBeenLost">-->
-        <div class="slide-in" ng-class="{'slide-in--visible': self.connectionHasBeenLost}">
-            Lost connection &ndash; make sure your internet-connection
-            is working, then click &ldquo;reconnect&rdquo;.
-            <button ng-show="self.connectionHasBeenLost && !self.reconnecting" ng-click="self.reconnect()" class="si__button red">
-                Reconnect
+        <div class="slide-in" ng-class="{'visible': self.connectionHasBeenLost}">
+            <img class="si__icon" src="generated/icon-sprite.svg#ico16_indicator_warning"/>
+            <span class="si__text">Lost connection &ndash; make sure your internet-connection
+            is working, then click &ldquo;reconnect&rdquo;.</span>
+            <button
+                ng-show="self.connectionHasBeenLost && !self.reconnecting" ng-click="self.reconnect()"
+                class="si__button red">
+                    Reconnect
             </button>
 
             <img src="images/spinner/on_white.gif"
