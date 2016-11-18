@@ -42,9 +42,9 @@ public class SetChattinessAction extends BaseEventBotAction
 
       URI uri = chattinessDebugCommandEvent.getConnectionURI();
       if (chattinessDebugCommandEvent.isChatty()){
-        getEventListenerContext().getBotContext().putGeneric(KEY_CHATTY_CONNECTIONS, uri.toString(), uri);
+        getEventListenerContext().getBotContext().saveToObjectMap(KEY_CHATTY_CONNECTIONS, uri.toString(), uri);
       } else {
-        getEventListenerContext().getBotContext().removeGeneric(KEY_CHATTY_CONNECTIONS, uri.toString());
+        getEventListenerContext().getBotContext().removeFromObjectMap(KEY_CHATTY_CONNECTIONS, uri.toString());
       }
     }
 

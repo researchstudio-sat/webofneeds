@@ -33,7 +33,7 @@ import java.net.URI;
 /**
  * BaseEventBotAction connecting two needs on the specified facets.
  * Requires a NeedSpecificEvent to run and expeects the needURI from the event
- * to be associated with another need URI via the botContext.putGeneric method.
+ * to be associated with another need URI via the botContext.saveToObjectMap method.
  */
 public class HintAssociatedNeedAction extends BaseEventBotAction
 {
@@ -58,7 +58,7 @@ public class HintAssociatedNeedAction extends BaseEventBotAction
       return;
     }
     final URI myNeedUri = ((NeedSpecificEvent) event).getNeedURI();
-    final URI remoteNeedUri = (URI) getEventListenerContext().getBotContext().getGeneric(
+    final URI remoteNeedUri = (URI) getEventListenerContext().getBotContext().loadFromObjectMap(
       AbstractCreateNeedAction.KEY_NEED_REMOTE_NEED_ASSOCIATION, myNeedUri.toString());
 
     try {

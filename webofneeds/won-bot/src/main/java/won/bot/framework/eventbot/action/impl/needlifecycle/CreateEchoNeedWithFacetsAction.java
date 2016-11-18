@@ -90,11 +90,12 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction
           public void onEvent(Event event) throws Exception {
             logger.debug("need creation successful, new need URI is {}", needURI);
 
-            //put the mapping between the original and the reaction in to the context.
-            getEventListenerContext().getBotContext().putGeneric(KEY_NEED_REMOTE_NEED_ASSOCIATION,
-                                                                 reactingToNeedUri.toString(), needURI);
-            getEventListenerContext().getBotContext().putGeneric(KEY_NEED_REMOTE_NEED_ASSOCIATION, needURI.toString(),
-                                                                 reactingToNeedUri);
+            // save the mapping between the original and the reaction in to the context.
+            getEventListenerContext().getBotContext().saveToObjectMap(KEY_NEED_REMOTE_NEED_ASSOCIATION,
+                                                                      reactingToNeedUri.toString(), needURI);
+            getEventListenerContext().getBotContext().saveToObjectMap(KEY_NEED_REMOTE_NEED_ASSOCIATION,
+                                                                      needURI.toString(),
+                                                                      reactingToNeedUri);
 
             getEventListenerContext().getEventBus()
                                      .publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));

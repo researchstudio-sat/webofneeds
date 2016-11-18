@@ -10,7 +10,9 @@ import java.util.stream.Collectors;
  */
 public class MemoryBotContext implements BotContext
 {
-  private Map<String, Map<String, Object>> contextMap = new HashMap<>();
+  private Map<String, Map<String, Object>> contextObjectMap = new HashMap<>();
+  private Map<String, Map<String, List<Object>>> contextListMap = new HashMap<>();
+
   private Set<URI> nodeUris = new HashSet<>();
   private Map<String, List<URI>> namedNeedUriLists = new HashMap();
 
@@ -71,36 +73,78 @@ public class MemoryBotContext implements BotContext
     nodeUris.remove(uri);
   }
 
-  private Map<String, Object> getCollection(String collectionName) {
+  private Map<String, Object> getObjectMap(String collectionName) {
 
-    Map<String, Object> collection = contextMap.get(collectionName);
+    Map<String, Object> collection = contextObjectMap.get(collectionName);
     if (collection == null) {
       collection = new HashMap<>();
-      contextMap.put(collectionName, collection);
+      contextObjectMap.put(collectionName, collection);
     }
     return collection;
   }
 
   @Override
-  public synchronized void putGeneric(String collectionName, String key, final Serializable value) {
-    getCollection(collectionName).put(key, value);
+  public void dropCollection(String collectionName) {
+    contextObjectMap.remove(collectionName);
   }
 
   @Override
-  public synchronized final Object getGeneric(String collectionName, String key) {
-    return getCollection(collectionName).get(key);
+  public synchronized void saveToObjectMap(String collectionName, String key, final Serializable value) {
+    getObjectMap(collectionName).put(key, value);
   }
 
   @Override
-  public synchronized final void removeGeneric(String collectionName, String key) {
-    getCollection(collectionName).remove(key);
+  public synchronized final Object loadFromObjectMap(String collectionName, String key) {
+    return getObjectMap(collectionName).get(key);
   }
 
   @Override
-  public synchronized Collection<Object> genericValues(String collectionName) {
+  public Map<String, Object> loadObjectMap(final String collectionName) {
+    return new HashMap<String, Object>(getObjectMap(collectionName));
+  }
 
-    Set<Object> set = new HashSet<>();
-    set.addAll(getCollection(collectionName).values());
-    return set;
+  @Override
+  public synchronized final void removeFromObjectMap(String collectionName, String key) {
+    getObjectMap(collectionName).remove(key);
+  }
+
+  private Map<String, List<Object>> getListMap(String collectionName) {
+
+    Map<String, List<Object>> collection = contextListMap.get(collectionName);
+    if (collection == null) {
+      collection = new HashMap<>();
+      contextListMap.put(collectionName, collection);
+    }
+    return collection;
+  }
+
+  private List<Object> getList(String collectionName, String key) {
+
+    List<Object> objectList = getListMap(collectionName).get(key);
+    if (objectList == null) {
+      objectList = new LinkedList<>();
+      getListMap(collectionName).put(key, objectList);
+    }
+    return objectList;
+  }
+
+  @Override
+  public void addToListMap(final String collectionName, final String key, final Serializable... value) {
+    getList(collectionName, key).addAll(Arrays.asList(value));
+  }
+
+  @Override
+  public List<Object> loadFromListMap(final String collectionName, final String key) {
+    return new LinkedList<>(getList(collectionName, key));
+  }
+
+  @Override
+  public Map<String, List<Object>> loadListMap(final String collectionName) {
+    return new HashMap<>(getListMap(collectionName));
+  }
+
+  @Override
+  public void removeFromListMap(final String collectionName, final String key) {
+    getListMap(collectionName).remove(key);
   }
 }

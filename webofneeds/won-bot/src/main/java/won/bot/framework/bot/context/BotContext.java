@@ -11,6 +11,10 @@ import java.util.*;
  */
 public interface BotContext
 {
+  // ===============================
+  // application specific methods
+  // ===============================
+
   /**
    * Return a set of all known need uris stored in all named need uri lists
    *
@@ -27,7 +31,7 @@ public interface BotContext
   boolean isNeedKnown(final URI needURI);
 
   /**
-   *  removeGeneric a need uri from a named need uri list
+   *  removeFromObjectMap a need uri from a named need uri list
    *
    * @param uri
    * @param name
@@ -43,7 +47,7 @@ public interface BotContext
   void appendToNamedNeedUriList(URI uri, String name);
 
   /**
-   * getGeneric all the need from a named need uri list
+   * loadFromObjectMap all the need from a named need uri list
    *
    * @param name
    * @return
@@ -66,45 +70,90 @@ public interface BotContext
   void rememberNodeUri(final URI uri);
 
   /**
-   * removeGeneric a node uri
+   * removeFromObjectMap a node uri
    *
    * @param uri
    */
   void removeNodeUri(final URI uri);
 
+
+
+  // ===============================
+  // generic methods
+  // ==============================
+
   /**
-   * Put an arbitrary object in the context.
+   * Remove the whole collection from the bot context
+   *
+   * @param collectionName
+   */
+  void dropCollection(String collectionName);
+
+  /**
+   * Put an arbitrary single object in the context. If there exists already an object at the specified key then
+   * replace that object by the new one.
    *
    * @param collectionName
    * @param key
    * @param value
    */
-  void putGeneric(String collectionName, String key, final Serializable value);
+  void saveToObjectMap(String collectionName, String key, final Serializable value);
 
   /**
-   * Retrieve an object object from a collection previously added using putGeneric().
+   * Retrieve an object from a collection previously added using saveToObjectMap().
    *
    * @param collectionName
    * @param key
    * @return the requested object or null if it was not found
    */
-  Object getGeneric(String collectionName, String key);
+  Object loadFromObjectMap(String collectionName, String key);
 
   /**
-   * Retrieve all objects from one collection
+   * Retrieve a copy of the whole object map of the collection
+   *
+   * @return
+   */
+  Map<String, Object> loadObjectMap(String collectionName);
+
+  /**
+   * Remove an object saved at a specific map key in the collection
+   *
+   * @param collectionName
+   * @param key
+   */
+  void removeFromObjectMap(String collectionName, String key);
+
+  /**
+   * Add one or more arbitrary objects to a list at a specific key in the collection.
+   * the specified key.
+   *
+   * @param collectionName
+   * @param key
+   * @param value
+   */
+  void addToListMap(String collectionName, String key, final Serializable... value);
+
+  /**
+   * Retrieve all objects from one collection at one key previously added using addToListMap().
    *
    * @param collectionName
    * @return all objects from one collection or an empty collection if no objects are in there
    */
-  Collection<Object> genericValues(String collectionName);
+  List<Object> loadFromListMap(String collectionName, String key);
 
   /**
-   * Remove an arbitrary object from the context by its key
+   * Retrieve a copy of the whole object list map in a collection
+   *
+   * @param collectionName
+   * @return
+   */
+  Map<String, List<Object>> loadListMap(String collectionName);
+
+  /**
+   * Remove all object in the list at a specific map key in the collection
    *
    * @param collectionName
    * @param key
-   * @return the removed object or null if it was not found
    */
-  void removeGeneric(String collectionName, String key);
-
+  void removeFromListMap(String collectionName, String key);
 }

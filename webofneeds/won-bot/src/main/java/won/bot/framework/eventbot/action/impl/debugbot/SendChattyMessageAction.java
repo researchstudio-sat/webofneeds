@@ -22,10 +22,7 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
 
 import java.net.URI;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Action to perform when the debug bot is set to be 'chatty' - that is,
@@ -55,8 +52,9 @@ public class SendChattyMessageAction extends BaseEventBotAction
   @Override
   protected void doRun(final Event event) throws Exception {
     Set<URI> toRemove = null;
-    Collection<Object> chattyConnections = getEventListenerContext().getBotContext().genericValues(
-      KEY_CHATTY_CONNECTIONS);
+    Collection<Object> chattyConnections = getEventListenerContext().getBotContext().loadObjectMap(
+      KEY_CHATTY_CONNECTIONS).values();
+
     if (chattyConnections == null) return;
     theloop:
     for (Object o : chattyConnections) {
@@ -97,7 +95,7 @@ public class SendChattyMessageAction extends BaseEventBotAction
     }
     if (toRemove != null) {
       for (URI uri : toRemove) {
-        getEventListenerContext().getBotContext().removeGeneric(KEY_CHATTY_CONNECTIONS, uri.toString());
+        getEventListenerContext().getBotContext().removeFromObjectMap(KEY_CHATTY_CONNECTIONS, uri.toString());
       }
     }
   }
