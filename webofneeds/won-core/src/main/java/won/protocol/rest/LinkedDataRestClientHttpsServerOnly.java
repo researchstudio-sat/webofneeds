@@ -16,18 +16,19 @@
 
 package won.protocol.rest;
 
-import com.hp.hpl.jena.query.Dataset;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import won.cryptography.service.CryptographyUtils;
 
 import javax.annotation.PostConstruct;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: ypanchenko
@@ -39,13 +40,13 @@ public class LinkedDataRestClientHttpsServerOnly extends LinkedDataRestClient
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private RestTemplate restTemplate;
-  private HttpEntity entity;
   private HttpMessageConverter datasetConverter;
 
   private Integer readTimeout;
   private Integer connectionTimeout;
 
   private TrustStrategy trustStrategy;
+  private String acceptHeaderValue = null;
 
 
 
@@ -60,7 +61,7 @@ public class LinkedDataRestClientHttpsServerOnly extends LinkedDataRestClient
     datasetConverter = new RdfDatasetConverter();
     HttpHeaders headers = new HttpHeaders();
     headers.setAccept(datasetConverter.getSupportedMediaTypes());
-    entity = new HttpEntity(headers);
+    this.acceptHeaderValue = MediaType.toString(datasetConverter.getSupportedMediaTypes());
 
     try {
       restTemplate = createRestTemplateForReadingLinkedData();
@@ -79,14 +80,32 @@ public class LinkedDataRestClientHttpsServerOnly extends LinkedDataRestClient
   }
 
   @Override
-  public Dataset readResourceData(URI resourceURI, final URI requesterWebID) {
-    return super.readResourceData(resourceURI, restTemplate, entity);
+  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI) {
+    Map<String, String> requestHeaders = new HashMap<String, String>();
+    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+    return super.readResourceData(resourceURI, restTemplate, requestHeaders);
   }
 
+  @Override
+  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI, final
+  Map<String, String> requestHeaders) {
+    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+    return super.readResourceData(resourceURI, restTemplate, requestHeaders);
+  }
 
   @Override
-  public Dataset readResourceData(final URI resourceURI) {
-    return super.readResourceData(resourceURI, restTemplate, entity);
+  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI, URI requesterWebID) {
+    Map<String, String> requestHeaders = new HashMap<String, String>();
+    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+    return super.readResourceData(resourceURI, restTemplate, requestHeaders);
+  }
+
+  @Override
+  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI, final URI requesterWebID, final
+  Map<String, String> requestHeaders) {
+    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+    return super.readResourceData(resourceURI, restTemplate,
+                                  requestHeaders);
   }
 
   public void setReadTimeout(final Integer readTimeout) {

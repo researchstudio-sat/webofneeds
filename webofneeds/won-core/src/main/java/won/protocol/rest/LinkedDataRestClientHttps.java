@@ -16,12 +16,11 @@
 
 package won.protocol.rest;
 
-import com.hp.hpl.jena.query.Dataset;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import won.cryptography.service.CryptographyUtils;
@@ -31,6 +30,8 @@ import won.cryptography.ssl.PrivateKeyStrategyGenerator;
 
 import javax.annotation.PostConstruct;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: ypanchenko
@@ -42,8 +43,8 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private RestTemplate restTemplateWithDefaultWebId;
-  private HttpEntity entity;
   private HttpMessageConverter datasetConverter;
+  String acceptHeaderValue = null;
 
   private Integer readTimeout;
   private Integer connectionTimeout;
@@ -69,9 +70,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient
   public void initialize() {
     datasetConverter = new RdfDatasetConverter();
     HttpHeaders headers = new HttpHeaders();
-    headers.setAccept(datasetConverter.getSupportedMediaTypes());
-    entity = new HttpEntity(headers);
-
+    this.acceptHeaderValue = MediaType.toString(datasetConverter.getSupportedMediaTypes());
     try {
       restTemplateWithDefaultWebId = createRestTemplateForReadingLinkedData(this.keyStoreService
         .getDefaultAlias());
@@ -81,20 +80,25 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient
     }
   }
 
-  private RestTemplate createRestTemplateForReadingLinkedData(String webID) throws Exception {
-    RestTemplate template = CryptographyUtils.createSslRestTemplate(
-      this.keyStoreService.getUnderlyingKeyStore(),
-      this.keyStoreService.getPassword(),
-      privateKeyStrategyGenerator.createPrivateKeyStrategy(webID),
-      this.trustStoreService.getUnderlyingKeyStore(),
-      this.trustStrategy,
-      readTimeout, connectionTimeout);
+  private RestTemplate createRestTemplateForReadingLinkedData(String webID){
+    RestTemplate template = null;
+    try {
+      template = CryptographyUtils.createSslRestTemplate(
+        this.keyStoreService.getUnderlyingKeyStore(),
+        this.keyStoreService.getPassword(),
+        privateKeyStrategyGenerator.createPrivateKeyStrategy(webID),
+        this.trustStoreService.getUnderlyingKeyStore(),
+        this.trustStrategy,
+        readTimeout, connectionTimeout);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to create rest template for webID '" + webID +"'", e);
+    }
     template.getMessageConverters().add(datasetConverter);
     return template;
   }
 
   @Override
-  public Dataset readResourceData(URI resourceURI, final URI requesterWebID) {
+  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI, final URI requesterWebID) {
 
     HttpMessageConverter datasetConverter = new RdfDatasetConverter();
     RestTemplate restTemplate;
@@ -105,12 +109,13 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient
       throw new RuntimeException(e);
     }
     restTemplate.getMessageConverters().add(datasetConverter);
-
-    return super.readResourceData(resourceURI, restTemplate, entity);
+    Map<String, String> requestHeaders = new HashMap<String, String>();
+    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+    return super.readResourceData(resourceURI, restTemplate, requestHeaders);
   }
 
 
-  private RestTemplate getRestTemplateForReadingLinkedData(String webID) throws Exception {
+  private RestTemplate getRestTemplateForReadingLinkedData(String webID) {
 
     if (webID.equals(keyStoreService.getDefaultAlias())) {
       return restTemplateWithDefaultWebId;
@@ -119,8 +124,25 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient
   }
 
   @Override
-  public Dataset readResourceData(final URI resourceURI) {
-    return super.readResourceData(resourceURI, restTemplateWithDefaultWebId, entity);
+  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI) {
+    Map<String, String> requestHeaders = new HashMap<String, String>();
+    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+    return super.readResourceData(resourceURI, restTemplateWithDefaultWebId, requestHeaders);
+  }
+
+  @Override
+  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI, final
+                                                                Map<String, String> requestHeaders) {
+    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+    return super.readResourceData(resourceURI, restTemplateWithDefaultWebId, requestHeaders);
+  }
+
+  @Override
+  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI, final URI requesterWebID, final
+  Map<String, String> requestHeaders) {
+    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+    return super.readResourceData(resourceURI, getRestTemplateForReadingLinkedData(requesterWebID.toString()),
+                                  requestHeaders);
   }
 
   public void setReadTimeout(final Integer readTimeout) {
