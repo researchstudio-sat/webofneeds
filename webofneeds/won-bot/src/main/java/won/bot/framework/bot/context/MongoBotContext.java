@@ -184,7 +184,7 @@ public class MongoBotContext implements BotContext
 
     checkValidCollectionName(collectionName);
     MongoContextObject mco = template.findById(key, MongoContextObject.class, collectionName);
-    return (List<Object>) mco.getObject();
+    return mco == null ? new LinkedList<>() : (List<Object>) mco.getObject();
   }
 
   @Override

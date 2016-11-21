@@ -142,50 +142,112 @@ public class BotContextTests
   }
 
   @Test
-  public void testGenericMethods() {
+  public void testObjectMapMethods() {
 
-    Assert.assertNotNull(botContext.genericValues("col1"));
-    Assert.assertEquals(0, botContext.genericValues("col1").size());
+    botContext.dropCollection("col1");
+    botContext.dropCollection("col2");
+    botContext.dropCollection("col3");
 
-    botContext.putGeneric("col1", "uri1", URI1);
-    botContext.putGeneric("col1", "uri1", URI1);
-    botContext.putGeneric("col1", "uri2", URI1);
-    botContext.putGeneric("col1", "uri2", URI2);  // overwrite
-    botContext.putGeneric("col2", "uri1", URI2);
-    botContext.putGeneric("col2", "uri2", URI2);
-    botContext.putGeneric("col2", "uri3", URI3);
+    Assert.assertNotNull(botContext.loadObjectMap("col1"));
+    Assert.assertEquals(0, botContext.loadObjectMap("col1").size());
 
-    Assert.assertEquals(2, botContext.genericValues("col1").size());
-    Assert.assertEquals(URI1, botContext.getGeneric("col1", "uri1"));
-    Assert.assertEquals(URI2, botContext.getGeneric("col1", "uri2"));
-    Assert.assertEquals(2, botContext.genericValues("col2").size());
-    Assert.assertTrue(botContext.genericValues("col2").contains(URI2));
-    Assert.assertTrue(botContext.genericValues("col2").contains(URI3));
+    botContext.saveToObjectMap("col1", "uri1", URI1);
+    botContext.saveToObjectMap("col1", "uri1", URI1);
+    botContext.saveToObjectMap("col1", "uri2", URI1);
+    botContext.saveToObjectMap("col1", "uri2", URI2);  // overwrite
+    botContext.saveToObjectMap("col2", "uri1", URI2);
+    botContext.saveToObjectMap("col2", "uri2", URI2);
+    botContext.saveToObjectMap("col2", "uri3", URI3);
 
-    botContext.removeGeneric("col3", "uri1");
-    botContext.removeGeneric("col2", "uri3");
-    botContext.removeGeneric("col1", "uri1");
-    botContext.removeGeneric("col1", "uri2");
+    Assert.assertEquals(2, botContext.loadObjectMap("col1").size());
+    Assert.assertEquals(URI1, botContext.loadFromObjectMap("col1", "uri1"));
+    Assert.assertEquals(URI2, botContext.loadFromObjectMap("col1", "uri2"));
+    Assert.assertEquals(3, botContext.loadObjectMap("col2").size());
+    Assert.assertTrue(botContext.loadObjectMap("col2").values().contains(URI2));
+    Assert.assertTrue(botContext.loadObjectMap("col2").values().contains(URI3));
 
-    Assert.assertNull(botContext.getGeneric("col1", "uri1"));
-    Assert.assertEquals(0, botContext.genericValues("col1").size());
-    Assert.assertEquals(1, botContext.genericValues("col2").size());
+    botContext.removeFromObjectMap("col3", "uri1");
+    botContext.removeFromObjectMap("col2", "uri3");
+    botContext.removeFromObjectMap("col1", "uri1");
+    botContext.removeFromObjectMap("col1", "uri2");
+
+    Assert.assertNull(botContext.loadFromObjectMap("col1", "uri1"));
+    Assert.assertEquals(0, botContext.loadObjectMap("col1").size());
+    Assert.assertEquals(2, botContext.loadObjectMap("col2").size());
+
+    botContext.dropCollection("col1");
+    Assert.assertEquals(2, botContext.loadObjectMap("col2").size());
+    botContext.dropCollection("col2");
+    Assert.assertEquals(0, botContext.loadObjectMap("col2").size());
+  }
+
+  @Test
+  public void testListMapMethods() {
+
+    botContext.dropCollection("addCol1");
+    botContext.dropCollection("addCol2");
+
+    Assert.assertNotNull(botContext.loadListMap("addCol1"));
+    Assert.assertEquals(0, botContext.loadListMap("addCol1").size());
+
+    Assert.assertNotNull(botContext.loadFromListMap("addCol1", "list1"));
+    Assert.assertEquals(0, botContext.loadFromListMap("addCol1", "list1").size());
+
+    botContext.addToListMap("addCol1", "list1", URI1);
+    botContext.addToListMap("addCol1", "list1", URI2);
+    botContext.addToListMap("addCol1", "list2", URI1);
+    botContext.addToListMap("addCol1", "list2", URI1);
+    botContext.addToListMap("addCol1", "list2", URI2);
+    botContext.addToListMap("addCol2", "list1", URI2);
+    botContext.addToListMap("addCol2", "list2", URI1, URI2, URI3, URI1);
+
+    Assert.assertEquals(2, botContext.loadFromListMap("addCol1", "list1").size());
+    Assert.assertTrue(botContext.loadFromListMap("addCol1", "list1").contains(URI1));
+    Assert.assertTrue(botContext.loadFromListMap("addCol1", "list1").contains(URI2));
+    Assert.assertEquals(2, botContext.loadListMap("addCol1").size());
+    Assert.assertEquals(2, botContext.loadListMap("addCol1").get("list1").size());
+    Assert.assertEquals(3, botContext.loadListMap("addCol1").get("list2").size());
+    Assert.assertEquals(4, botContext.loadFromListMap("addCol2", "list2").size());
+
+    botContext.removeFromListMap("addCol1", "list2");
+    botContext.removeFromListMap("addCol2", "list2");
+
+    Assert.assertEquals(2, botContext.loadFromListMap("addCol1", "list1").size());
+    Assert.assertEquals(0, botContext.loadFromListMap("addCol1", "list2").size());
+    Assert.assertEquals(1, botContext.loadFromListMap("addCol2", "list1").size());
+    Assert.assertEquals(URI2, botContext.loadFromListMap("addCol2", "list1").get(0));
+  }
+
+  @Test
+  public void useEmailAddressAsKey() {
+
+    botContext.dropCollection("mail");
+    botContext.dropCollection("mailList");
+
+    String mailAddress = "first.last!#$%&'*+-/=?^_`{|}~@TEST123.com";
+    botContext.saveToObjectMap("mail", mailAddress, mailAddress);
+    Assert.assertEquals(mailAddress, botContext.loadFromObjectMap("mail", mailAddress));
+
+    botContext.addToListMap("mailList", mailAddress, 1, 2, 3);
+    Assert.assertEquals(3, botContext.loadFromListMap("mailList", mailAddress).size());
   }
 
   @Test
   public void testPutAndRetrieveGenericObjects() throws MessagingException, IOException, ClassNotFoundException {
 
     // List
+    botContext.dropCollection("uriList");
     LinkedList<URI> uriList = new LinkedList<>();
     uriList.add(URI1);
     uriList.add(URI1);
     uriList.add(URI2);
     uriList.add(URI3);
-    botContext.putGeneric("uriList", "list1", uriList);
-    List<URI> uriListCopy = (List<URI>) botContext.getGeneric("uriList", "list1");
+    botContext.saveToObjectMap("uriList", "list1", uriList);
+    List<URI> uriListCopy = (List<URI>) botContext.loadFromObjectMap("uriList", "list1");
     Assert.assertEquals(uriList, uriListCopy);
 
     // HashMap needs to be serialized (here only non-complex keys are allowed in maps)
+    botContext.dropCollection("uriMap");
     HashMap<String, URI> uriHashMap = new HashMap<>();
     uriHashMap.put(URI1.toString(), URI1);
     uriHashMap.put(URI2.toString(), URI1);
@@ -193,8 +255,8 @@ public class BotContextTests
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(os);
     oos.writeObject(uriHashMap);
-    botContext.putGeneric("uriMap", "map1", os.toByteArray());
-    byte[] byteMsg  = (byte[]) botContext.getGeneric("uriMap", "map1");
+    botContext.saveToObjectMap("uriMap", "map1", os.toByteArray());
+    byte[] byteMsg  = (byte[]) botContext.loadFromObjectMap("uriMap", "map1");
     ByteArrayInputStream is = new ByteArrayInputStream(byteMsg);
     ObjectInputStream ois = new ObjectInputStream(is);
     HashMap<String, URI> uriHashMapCopy = (HashMap<String, URI>) ois.readObject();
@@ -209,11 +271,12 @@ public class BotContextTests
     uriTreeMap.put(URI1.toString(), URI2);
     uriTreeMap.put(URI2.toString(), URI3);
     uriTreeMap.put(URI3.toString(), URI1);
-    botContext.putGeneric("uriMap", "map1", uriTreeMap);  // overwrite the HashMap entry from the previous step
-    Map<String, URI> uriTreeMapCopy  = (Map<String, URI>) botContext.getGeneric("uriMap", "map1");
+    botContext.saveToObjectMap("uriMap", "map1", uriTreeMap);  // overwrite the HashMap entry from the previous step
+    Map<String, URI> uriTreeMapCopy  = (Map<String, URI>) botContext.loadFromObjectMap("uriMap", "map1");
     Assert.assertEquals(uriTreeMap, uriTreeMapCopy);
 
     // MimeMessage cannot be serialized directly => has to be serialized manually first
+    botContext.dropCollection("mime");
     Properties props = new Properties();
     MimeMessage message = new MimeMessage(Session.getDefaultInstance(props, null));
     message.addHeader("test1", "test2");
@@ -225,8 +288,8 @@ public class BotContextTests
     message.setSentDate(new Date());
     os = new ByteArrayOutputStream();
     message.writeTo(os);
-    botContext.putGeneric("mime", "mime1", os.toByteArray());
-    byteMsg = (byte[]) botContext.getGeneric("mime", "mime1");
+    botContext.saveToObjectMap("mime", "mime1", os.toByteArray());
+    byteMsg = (byte[]) botContext.loadFromObjectMap("mime", "mime1");
     is = new ByteArrayInputStream(byteMsg);
     MimeMessage messageCopy = new MimeMessage(Session.getDefaultInstance(props, null), is);
     Assert.assertEquals(message.getHeader("test1")[0], messageCopy.getHeader("test1")[0]);
@@ -241,5 +304,7 @@ public class BotContextTests
     ois.close();
     is.close();
   }
+
+
 
 }
