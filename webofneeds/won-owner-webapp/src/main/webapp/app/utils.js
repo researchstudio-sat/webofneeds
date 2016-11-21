@@ -216,12 +216,12 @@ export function watch(subscribe, select, callback) {
      * allows attaching individual previousValue to it
      */
     (function (){
-        this.previousValue = select();
+        let previousValue = select();
         unsubscribe = subscribe(() => {
             const currentValue = select();
-            if(currentValue !== this.previousValue)
-                callback(currentValue, this.previousValue);
-            this.previousValue = currentValue;
+            if(currentValue !== previousValue)
+                callback(currentValue, previousValue);
+            previousValue = currentValue;
         });
     })();
 

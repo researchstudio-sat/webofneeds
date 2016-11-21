@@ -18,10 +18,13 @@
  */
 
 import won from './won-es6';
-import {attach,
-        delay,
-        watchImmutableRdxState,
-        checkHttpStatus } from './utils';
+import {
+    attach,
+    delay,
+    watchImmutableRdxState,
+    checkHttpStatus,
+    is,
+} from './utils';
 import { actionTypes, actionCreators } from './actions/actions';
 //import './message-service'; //TODO still uses es5
 import { getEventsFromMessage,setCommStateFromResponseForLocalNeedMessage } from './won-message-utils';
@@ -31,87 +34,6 @@ import * as messages from './actions/messages-actions';
 export function runMessagingAgent(redux) {
 
     console.log('Starting messaging agent.');
-
-    /* TODOs
-     * + make it generic?
-     *      + make the url a parameter?
-     *      + extract the watch? / make the path a parameter?
-     *      + registering a processor for the incoming messages (that
-     *        can trigger actions but lets the messaging agent stay generic)
-     *           + pass a callback
-     *           + make this a signal/observable
-     * + framing -> NOPE
-     * + reconnecting
-     * + lazy socket initialisation
-     */
-
-    let ws = newSock();
-    window.ws4dbg = ws;//TODO deletme
-    let unsubscribeWatch = null;
-    let missedHeartbeats = 0;
-
-    setInterval(checkHeartbeat, 30000);
-
-    function newSock() {
-        const ws = new SockJS('/owner/msg', null, {debug: true});
-        ws.onopen = onOpen;
-        ws.onmessage = onMessage;
-        ws.onerror = onError;
-        ws.onclose = onClose;
-        ws.onheartbeat = onHeartbeat;
-        missedHeartbeats = 0;
-
-        return ws;
-    };
-
-    function onHeartbeat(e) {
-        console.log('heartbeat',e);
-        missedHeartbeats = 0;
-    }
-
-    function checkHeartbeat() {
-        console.log("checking heartbeat presence: ", missedHeartbeats);
-
-        if(++missedHeartbeats > 3) {
-            console.log("no heartbeat present invoking logout");
-            redux.dispatch(actionCreators.logout());
-        }else{
-            console.log("heartbeat present");
-        }
-    }
-
-    function onOpen() {
-        /* Set up message-queue watch */
-        unsubscribeWatch = watchImmutableRdxState(
-            redux, ['messages', 'enqueued'],
-            (newMsgBuffer, oldMsgBuffer) => {
-                if(newMsgBuffer) {
-                    const firstEntry = newMsgBuffer.entries().next().value;
-                    if(firstEntry) { //undefined if queue is empty
-                        const [eventUri, msg] = firstEntry;
-                        ws.send(JSON.stringify(msg));
-                        console.log("sent message: "+JSON.stringify(msg));
-                        redux.dispatch(actionCreators.messages__waitingForAnswer({ eventUri, msg }));
-                    }
-                }
-            }
-        );
-        /**
-         * TODO this watch is part of the session-upgrade hack documented in:
-         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
-         */
-        unsubscribeWatch = watchImmutableRdxState(
-            redux, ['messages', 'resetWsRequested_Hack'],
-            (newRequestState, oldRequestState) => {
-                if(newRequestState) {
-                    ws.close();
-                    // a new ws-connection should be opened automatically in onClose
-                    redux.dispatch(actionCreators.messages__requestWsReset_Hack(false));
-                }
-            }
-        );
-
-    };
 
 
     /**
@@ -290,46 +212,149 @@ export function runMessagingAgent(redux) {
         })
     };
 
+
+    /* TODOs
+     * + make it generic?
+     *      + make the url a parameter?
+     *      + extract the watch? / make the path a parameter?
+     *      + registering a processor for the incoming messages (that
+     *        can trigger actions but lets the messaging agent stay generic)
+     *           + pass a callback
+     *           + make this a signal/observable
+     * + framing -> NOPE
+     * + reconnecting
+     * + lazy socket initialisation
+     */
+
+    let ws = newSock();
+    window.ws4dbg = ws;//TODO deletme
+    let unsubscribeWatches = [];
+
+    let reconnectAttempts = 0; // should be increased when a socket is opened, reset to 0 after opening was successful
+    let reconnecting = false; // true after the user has requested a reconnect
+
+    let missedHeartbeats = 0; // deadman-switch variable. should count up every 30s and gets reset onHeartbeat
+    setInterval(checkHeartbeat, 30000); // heartbeats should arrive roughly every 30s
+
+    function newSock() {
+        const ws = new SockJS('/owner/msg', null, {debug: true});
+        ws.onopen = onOpen;
+        ws.onmessage = onMessage;
+        ws.onerror = onError;
+        ws.onclose = onClose;
+        ws.onheartbeat = onHeartbeat;
+        missedHeartbeats = 0;
+
+        reconnectAttempts++;
+
+        return ws;
+    };
+
+    function onHeartbeat(e) {
+        console.log('messaging-agent.js: received heartbeat',e);
+        missedHeartbeats = 0; // reset the deadman count
+    }
+
+    function checkHeartbeat() {
+        console.log("messaging-agent.js: checking heartbeat presence: ", missedHeartbeats, " full intervals of 30s have passed since the last heartbeat.");
+
+        if(++missedHeartbeats > 3) {
+            console.error("messaging-agent.js: no websocket-heartbeat present. closing socket.");
+            ws.close();
+        }
+    }
+
+    function onOpen() {
+        /* Set up message-queue watch */
+
+        reconnectAttempts = 0; // successful opening of socket. we can reset the reconnect counter.
+
+        if(reconnecting) { // successful reconnect (failure is handled via connectionLost)
+            reconnecting = false;
+            redux.dispatch(actionCreators.reconnectSuccess());
+        }
+
+        if(unsubscribeWatches.length === 0) {
+            const unsubscribeMsgQWatch = watchImmutableRdxState(
+                redux, ['messages', 'enqueued'],
+                (newMsgBuffer, oldMsgBuffer) => {
+                    if (newMsgBuffer) {
+                        const firstEntry = newMsgBuffer.entries().next().value;
+                        if (firstEntry) { //undefined if queue is empty
+                            const [eventUri, msg] = firstEntry;
+                            ws.send(JSON.stringify(msg));
+                            console.log("messaging-agent.js: sent message: " + JSON.stringify(msg));
+                            redux.dispatch(actionCreators.messages__waitingForAnswer({eventUri, msg}));
+                        }
+                    }
+                }
+            );
+            const unsubscribeReconnectWatch = watchImmutableRdxState(
+                redux, ['messages', 'reconnecting'],
+                (newState, oldState) => {
+                    reconnecting = newState;
+                    if (!oldState && newState) {
+                        console.log("messaging-agent.js: Resetting web-socket connection");
+                        reconnectAttempts = 0;
+                        if(ws.readyState !== WebSocket.CLOSED) {
+                            ws.close(); // a new ws-connection should be opened automatically in onClose
+                        } else {
+                            ws = newSock(); // onClose won't trigger for already closed websockets, so create a new one here.
+                        }
+                    }
+                }
+            );
+
+            unsubscribeWatches.push(unsubscribeMsgQWatch);
+            unsubscribeWatches.push(unsubscribeReconnectWatch);
+        }
+
+    };
     function onError(e) {
-        console.error('websocket error: ', e);
+        console.error('messaging-agent.js: websocket error: ', e);
         this.close();
     };
 
-    let reconnectAttempts = 0;
     function onClose(e) {
         if(e.wasClean){
-            console.log('websocket closed. reconnectAttempts = ',reconnectAttempts);
+            console.log('messaging-agent.js: websocket closed cleanly. reconnectAttempts = ',reconnectAttempts);
         } else {
-            console.error('websocket closed. reconnectAttempts = ',reconnectAttempts);
+            console.error('messaging-agent.js: websocket crashed. reconnectAttempts = ',reconnectAttempts);
         }
-        if(unsubscribeWatch && typeof unsubscribeWatch === 'function')
-            unsubscribeWatch();
 
-        if (e.code === 1011 || reconnectAttempts > 5) {
-            console.log('either your session timed out or you encountered an unexpected server condition. \n', e.reason);
+        if (e.code === 1011 || reconnectAttempts > 1) {
 
-            fetch('rest/users/isSignedIn', {credentials: 'include'})
+            console.error('messaging-agent.js: either your session timed out or you encountered an unexpected server condition: \n', e.reason);
+            // TODO instead show a slide-in "Lost connection" with a reload button (that allows to copy typed text out)
+            // TODO recovery from timed out session
+            //redux.dispatch(actionCreators.logout())
+            redux.dispatch(actionCreators.lostConnection());
+            /*
+            fetch('rest/users/isSignedIn', {credentials: 'include'}) // attempt to get a new session
                 .then(checkHttpStatus) // will reject if not logged in
-                .then(() => {//logged in -- re-initiate route-change
+                .then(() => {
+                    // session is still valid -- reopen the socket
                     ws = newSock();
-                    reconnectAttempts = 0;
-
                 }).catch(error => {
-                    console.log("you lost the session we will call logout for you");
-                    redux.dispatch(actionCreators.logout())
+                    // cleanup - unsubscribe all watches and empty the array
+                    for(let unsubscribe; unsubscribe = unsubscribeWatches.pop(); !!unsubscribe) {
+                        if(unsubscribe && is("Function", unsubscribe))
+                            unsubscribe();
+                    }
+
+                    console.error('messaging-agent.js: either your session timed out or you encountered an unexpected server condition: \n', e.reason);
+                    // TODO instead show a slide-in "Lost connection" with a reload button (that allows to copy typed text out)
+                    //redux.dispatch(actionCreators.logout())
+                    redux.dispatch(actionCreators.lostConnection())
                 });
-        } else if (reconnectAttempts > 1) {
-            setTimeout(() => {
-                ws = newSock();
-                reconnectAttempts++;
-            }, 2000);
+                */
         } else {
-            // posting anonymously creates a new session for each post
-            // thus we need to reconnect here
-            // TODO reconnect only on next message instead of straight away <-- bad idea, prevents push notifications
-            // TODO add a delay if first reconnect fails
+            /*
+             * first reconnect happens immediately (to facilitate
+             * anonymous posting and the reset-hack necessary for
+             * login atm)
+             */
             ws = newSock();
-            reconnectAttempts++;
         }
     };
 }

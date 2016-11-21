@@ -1,0 +1,83 @@
+@mixin flat-button-color($color, $bg_color) {
+  color: $color;
+  background: $bg_color;
+  outline-color: $color;
+
+  &:active {
+    background: darken($bg_color, 15%);
+  }
+  &:disabled {
+    /*Default disabled colors, can be changed or extracted will be used
+    by every button that is set to disabled*/
+    color: white;
+    background: lightgrey;
+  }
+}
+
+@mixin outline-button-color($color) {
+  color: $color;
+  background: transparent;
+  border-color: $color;
+  outline-color: $color;
+
+  &:focus {
+    //outline: 0; // supress blue outline in chrome
+  }
+
+  &:active {
+    // background: rgba(255, 255, 255, 0.15);
+    background: rgba($color, 0.30);
+  }
+  &:disabled {
+    /*Default disabled colors, can be changed or extracted will be used
+    by every button that is set to disabled*/
+    color: white;
+    background: lightgrey;
+  }
+}
+
+.won-button {
+  padding: 0.66em 2em;
+  font-size: $normalFontSize;
+  text-align: center;
+  border-radius: 0.19rem;
+  cursor: pointer;
+}
+
+.won-button.outline {
+
+  @extend .won-button;
+
+  border-width: 1px;
+  border-style: solid;
+
+  &.white { @include outline-button-color(white); }
+  &.red { @include outline-button-color($won-red); }
+  &.darkgray { @include outline-button-color($won-dark-gray); }
+  &.lighterblue { @include outline-button-color($won-lighter-blue); }
+  &.black { @include outline-button-color(black); }
+
+  /*
+  &.darkgray { @include button-color(white, $won-dark-gray); }
+  &.lighterblue { @include button-color(white, $won-lighter-blue); }
+  &.black { @include button-color(white, black); }
+  */
+
+}
+
+/* style adapted from http://cssdeck.com/labs/beautiful-flat-buttons */
+.won-button--filled {
+  @extend .won-button;
+
+  border: 0;
+
+  /*Button color definitions*/
+  &.red { @include flat-button-color(white,$won-red); }
+  &.darkgray { @include flat-button-color(white, $won-dark-gray); }
+  &.lighterblue { @include flat-button-color(white, $won-lighter-blue); }
+  &.black { @include flat-button-color(white, black); }
+
+  &.thin {
+    padding: 0.4em 2em;
+  }
+}

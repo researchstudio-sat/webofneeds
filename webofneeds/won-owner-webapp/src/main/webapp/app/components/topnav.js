@@ -11,7 +11,24 @@ import { actionCreators }  from '../actions/actions';
 
 function genTopnavConf() {
     let template = `
+        <!-- <div class="slide-in" ng-show="self.connectionHasBeenLost">-->
+        <div class="slide-in" ng-class="{'visible': self.connectionHasBeenLost}">
+            <img class="si__icon" src="generated/icon-sprite.svg#ico16_indicator_warning_white"/>
+            <span class="si__text">Lost connection &ndash; make sure your internet-connection
+            is working, then click &ldquo;reconnect&rdquo;.</span>
+            <button
+                ng-show="self.connectionHasBeenLost && !self.reconnecting" ng-click="self.reconnect()"
+                class="si__button won-button outline white">
+                    Reconnect
+            </button>
+
+            <img src="images/spinner/on_red.gif"
+                alt="Reconnecting&hellip;"
+                ng-show="self.reconnecting"
+                class="hspinner"/>
+        </div>
         <nav class="topnav">
+
             <div class="topnav__inner">
                 <div class="topnav__inner__left">
                     <a  ui-sref="{{ self.loggedIn ? 'feed' : 'landingpage' }}" class="topnav__button">
@@ -69,7 +86,10 @@ function genTopnavConf() {
                         'error' : toast.get('type') === self.WON.errorToast
                       }"
             ng-repeat="toast in self.toastsArray">
-                <img class="topnav__toasts__element__close clickable" ng-click="self.toasts__delete(toast)" src="generated/icon-sprite.svg#ico27_close"/>
+                <img
+                    class="topnav__toasts__element__close clickable"
+                    ng-click="self.toasts__delete(toast)"
+                    src="generated/icon-sprite.svg#ico27_close"/>
                 <div class="topnav__toasts__element__text">{{toast.get('msg')}}</div>
             </div>
         </div>
@@ -86,7 +106,9 @@ function genTopnavConf() {
                 WON: won.WON,
                 loggedIn: state.getIn(['user', 'loggedIn']),
                 email: state.getIn(['user','email']),
-                toastsArray: state.getIn(['toasts']).toArray()
+                toastsArray: state.getIn(['toasts']).toArray(),
+                connectionHasBeenLost: state.getIn(['messages', 'lostConnection']), // name chosen to avoid name-clash with the action-creator
+                reconnecting: state.getIn(['messages', 'reconnecting']),
             });
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);

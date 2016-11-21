@@ -194,11 +194,6 @@ const actionHierarchy = {
         openMessageReceived: messages.openMessageReceived,
 
         waitingForAnswer: INJ_DEFAULT,
-        /**
-         * TODO this action is part of the session-upgrade hack documented in:
-         * https://github.com/researchstudio-sat/webofneeds/issues/381#issuecomment-172569377
-         */
-        requestWsReset_Hack: INJ_DEFAULT,
     },
     login: accountLogin,
     logout: accountLogout,
@@ -207,6 +202,11 @@ const actionHierarchy = {
     loginReset: INJ_DEFAULT,
     registerReset: INJ_DEFAULT,
     registerFailed: INJ_DEFAULT,
+
+    lostConnection: INJ_DEFAULT,
+    reconnect: INJ_DEFAULT,
+    reconnectSuccess: INJ_DEFAULT,
+
     toasts: {
         delete: INJ_DEFAULT,
         test: INJ_DEFAULT

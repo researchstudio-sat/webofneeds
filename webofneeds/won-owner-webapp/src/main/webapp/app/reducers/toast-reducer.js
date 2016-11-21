@@ -14,9 +14,14 @@ export default function(allToasts = initialState, action = {}) {
             allToasts = pushNewToast(allToasts, "Info Toast", won.WON.infoToast);
             return allToasts;
 
+
         case actionTypes.logout:
             return initialState;
 
+        case actionTypes.lostConnection:
+            return pushNewToast(allToasts, "Lost connection - progress " +
+                "can't be saved any more. Make sure your " +
+                "internet-connection is working, then click \"Reconnect\"", won.WON.warnToast);
         //INFO TOASTS: won.WON.infoToast
 
         //WARN TOASTS: won.WON.warnToast
