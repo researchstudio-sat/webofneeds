@@ -1,5 +1,0 @@
-#if($previousMessages)
-#foreach($message in $previousMessages)
-$message
-#end
-#end

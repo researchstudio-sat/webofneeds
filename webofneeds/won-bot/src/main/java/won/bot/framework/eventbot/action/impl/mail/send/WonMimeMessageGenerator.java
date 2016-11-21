@@ -176,46 +176,44 @@ public class WonMimeMessageGenerator {
 
             long currentMessageCount = 0;
 
-            boolean lastSource = false;
+            boolean lastSource = true;
             String quote = "";
 
-            if(results.hasNext()){
+            /*if(results.hasNext()){
                 QuerySolution soln = results.nextSolution();
                 lastSource = isYourMessage(soln, requesterUri);
                 velocityContext.put("message", getMsgSourceString(quote, lastSource) + buildMessageLine(soln, quote));
-            };
+            };*/
 
-            if(MAX_CONVERSATION_DEPTH != 0) {
-                List<String> messageBlock = new ArrayList<>();
-                quote = ">";
-                while (results.hasNext()) {
-                    QuerySolution soln = results.nextSolution();
-                    boolean msgSource = isYourMessage(soln, requesterUri); //Determine the source of this message
+            List<String> messageBlock = new ArrayList<>();
+            quote = "";
+            while (results.hasNext()) {
+                QuerySolution soln = results.nextSolution();
+                boolean msgSource = isYourMessage(soln, requesterUri); //Determine the source of this message
 
-                    if(msgSource != lastSource && messageBlock.size() > 0){
-                        previousMessages.add(getMsgSourceString(quote, msgSource));
-                        Collections.reverse(messageBlock);
-                        previousMessages.addAll(messageBlock);
-                        previousMessages.add(quote); //ADD EMPTY LINE TO MAKE THIS MORE READABLE
-                        messageBlock.clear();
-                        quote += ">";
-                    }
-
-                    if (MAX_CONVERSATION_DEPTH != -1 && quote.length() > MAX_CONVERSATION_DEPTH) {
-                        previousMessages.add(getMsgSourceString(quote, msgSource));
-                        previousMessages.add(quote+"[...]");
-                        break;
-                    }
-
-                    String messageLine = buildMessageLine(soln, quote);
-                    messageBlock.add(messageLine);
-
-                    lastSource = msgSource;
+                if(msgSource != lastSource && messageBlock.size() > 0){
+                    previousMessages.add(getMsgSourceString(quote, lastSource));
+                    Collections.reverse(messageBlock);
+                    previousMessages.addAll(messageBlock);
+                    previousMessages.add(quote); //ADD EMPTY LINE TO MAKE THIS MORE READABLE
+                    messageBlock.clear();
+                    quote += ">";
                 }
-                qExec.close();
 
-                velocityContext.put("previousMessages", previousMessages);
+                if (MAX_CONVERSATION_DEPTH != -1 && quote.length() > MAX_CONVERSATION_DEPTH) { //+1 so you always retrieve the newest messages anyway
+                    previousMessages.add(getMsgSourceString(quote, lastSource));
+                    previousMessages.add(quote+"[...]");
+                    break;
+                }
+
+                String messageLine = buildMessageLine(soln, quote);
+                messageBlock.add(messageLine);
+
+                lastSource = msgSource;
             }
+            qExec.close();
+
+            velocityContext.put("messages", previousMessages);
         } catch (QueryParseException e) {
             logger.error("query parse exception {}", e);
         }

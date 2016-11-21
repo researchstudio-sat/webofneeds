@@ -1,5 +1,4 @@
-$message
-#parse('mail-templates/inc/previous-messages.vm')
+#parse('mail-templates/inc/mail-messages.vm')
 
 #parse('mail-templates/inc/remote-need-info.vm')
 
