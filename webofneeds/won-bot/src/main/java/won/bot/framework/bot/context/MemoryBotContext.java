@@ -134,6 +134,11 @@ public class MemoryBotContext implements BotContext
   }
 
   @Override
+  public void removeFromListMap(final String collectionName, final String key, final Serializable... values) {
+    getList(collectionName, key).removeAll(Arrays.asList(values));
+  }
+
+  @Override
   public List<Object> loadFromListMap(final String collectionName, final String key) {
     return new LinkedList<>(getList(collectionName, key));
   }

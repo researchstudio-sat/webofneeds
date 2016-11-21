@@ -125,13 +125,21 @@ public interface BotContext
 
   /**
    * Add one or more arbitrary objects to a list at a specific key in the collection.
-   * the specified key.
    *
    * @param collectionName
    * @param key
-   * @param value
+   * @param values
    */
-  void addToListMap(String collectionName, String key, final Serializable... value);
+  void addToListMap(String collectionName, String key, final Serializable... values);
+
+  /**
+   * Remove one or more arbitrary objects from the list at a specific key in the collection.
+   *
+   * @param collectionName
+   * @param key
+   * @param values
+   */
+  void removeFromListMap(String collectionName, String key, final Serializable... values);
 
   /**
    * Retrieve all objects from one collection at one key previously added using addToListMap().

@@ -59,6 +59,9 @@ public class BotContextTests
   @Test
   public void testNamedNeedUriMethods() {
 
+    botContext.dropCollection(MongoBotContext.NEED_URI_COLLECTION);
+    botContext.dropCollection(MongoBotContext.NODE_URI_COLLECTION);
+
     Assert.assertNotNull(botContext.retrieveAllNeedUris());
     Assert.assertEquals(0, botContext.retrieveAllNeedUris().size());
 
