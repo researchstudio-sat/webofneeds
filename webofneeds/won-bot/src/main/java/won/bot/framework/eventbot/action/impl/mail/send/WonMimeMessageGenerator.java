@@ -34,7 +34,7 @@ public class WonMimeMessageGenerator {
     @Autowired
     private VelocityEngine velocityEngine;
 
-    private int MAX_PREVIOUS_MESSAGES = 3;
+    private int MAX_CONVERSATION_DEPTH = 3;
 
     private String sentFrom;
     private String sentFromName;
@@ -182,31 +182,32 @@ public class WonMimeMessageGenerator {
             if(results.hasNext()){
                 QuerySolution soln = results.nextSolution();
                 lastSource = isYourMessage(soln, requesterUri);
-                velocityContext.put("message", buildMessageLine(soln, quote, requesterUri, true));
+                velocityContext.put("message", getMsgSourceString(quote, lastSource) + buildMessageLine(soln, quote));
             };
 
-            if(MAX_PREVIOUS_MESSAGES != 0) {
+            if(MAX_CONVERSATION_DEPTH != 0) {
                 List<String> messageBlock = new ArrayList<>();
                 quote = ">";
                 while (results.hasNext()) {
-                    currentMessageCount++;
-
-                    if (MAX_PREVIOUS_MESSAGES != -1 && currentMessageCount > MAX_PREVIOUS_MESSAGES) {
-                        previousMessages.add(quote+">"+"[...]");
-                        break;
-                    }
-
                     QuerySolution soln = results.nextSolution();
                     boolean msgSource = isYourMessage(soln, requesterUri); //Determine the source of this message
 
-                    if(msgSource != lastSource){
-                        quote += ">";
+                    if(msgSource != lastSource && messageBlock.size() > 0){
+                        previousMessages.add(getMsgSourceString(quote, msgSource));
                         Collections.reverse(messageBlock);
                         previousMessages.addAll(messageBlock);
+                        previousMessages.add(quote); //ADD EMPTY LINE TO MAKE THIS MORE READABLE
                         messageBlock.clear();
+                        quote += ">";
                     }
 
-                    String messageLine = buildMessageLine(soln, quote, requesterUri, lastSource != msgSource);
+                    if (MAX_CONVERSATION_DEPTH != -1 && quote.length() > MAX_CONVERSATION_DEPTH) {
+                        previousMessages.add(getMsgSourceString(quote, msgSource));
+                        previousMessages.add(quote+"[...]");
+                        break;
+                    }
+
+                    String messageLine = buildMessageLine(soln, quote);
                     messageBlock.add(messageLine);
 
                     lastSource = msgSource;
@@ -222,29 +223,23 @@ public class WonMimeMessageGenerator {
 
     /**
      * Builds a valid messageLine
-     * @param soln
+     * @param soln To extract the msg text
      * @param quote String to indicate the quotationhierachy
-     * @param requesterUri
-     * @param addSource If we need to add the Source of the message
      * @return
      */
-    private static String buildMessageLine(QuerySolution soln, String quote, URI requesterUri, boolean addSource) {
+    private static String buildMessageLine(QuerySolution soln, String quote) {
         StringBuilder messageLine = new StringBuilder(quote);
-
-        if(addSource) {
-            if (isYourMessage(soln, requesterUri)) {
-                messageLine.append("You said: ");
-            } else {
-                messageLine.append("They said: ");
-            }
-        }
 
         String message = soln.get("msg").asLiteral().getString();
         messageLine.append(message);
 
-        StringBuilder replacementSb = new StringBuilder("\n").append(quote).append("\t");
+        StringBuilder replacementSb = new StringBuilder("\n").append(quote);
 
         return messageLine.toString().replaceAll("\\n", replacementSb.toString());
+    }
+
+    private static String getMsgSourceString(String quote, boolean msgSource) {
+        return quote + (msgSource? "You said:" : "They said:");
     }
 
     /**
@@ -267,8 +262,8 @@ public class WonMimeMessageGenerator {
         this.velocityEngine = velocityEngine;
     }
 
-    public void setMAX_PREVIOUS_MESSAGES(int MAX_PREVIOUS_MESSAGES) {
-        this.MAX_PREVIOUS_MESSAGES = MAX_PREVIOUS_MESSAGES;
+    public void setMAX_CONVERSATION_DEPTH(int MAX_CONVERSATION_DEPTH) {
+        this.MAX_CONVERSATION_DEPTH = MAX_CONVERSATION_DEPTH;
     }
 
     public void setEventListenerContext(EventListenerContext eventListenerContext) {
