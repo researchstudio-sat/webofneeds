@@ -1,5 +1,5 @@
 #if($previousMessages)
 #foreach($message in $previousMessages)
->$message
+$message
 #end
 #end

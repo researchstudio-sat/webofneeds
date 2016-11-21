@@ -1,4 +1,4 @@
-They said: $message
+$message
 #parse('mail-templates/inc/previous-messages.vm')
 
 #parse('mail-templates/inc/remote-need-info.vm')
