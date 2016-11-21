@@ -2,7 +2,6 @@ package won.bot.framework.eventbot.action.impl.mail.send;
 
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.tdb.TDB;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
@@ -10,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
-import won.protocol.message.WonMessage;
 import won.protocol.model.BasicNeedType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
@@ -35,6 +33,10 @@ public class WonMimeMessageGenerator {
     private VelocityEngine velocityEngine;
 
     private int MAX_CONVERSATION_DEPTH = 3;
+    private char QUOTE_CHAR = '>';
+
+    private static final String YOUR_MESSAGE = "You said: ";
+    private static final String THEIR_MESSAGE = "They said: ";
 
     private String sentFrom;
     private String sentFromName;
@@ -115,14 +117,14 @@ public class WonMimeMessageGenerator {
 
     /**
      * Responsible for filling inc/remote-need-info.vm template
-     * @param velocityContext
-     * @param remoteNeedUri
+     * @param velocityContext context to put template-vars in
+     * @param remoteNeedUri uri for the remote need
      */
     private void putRemoteNeedInfo(VelocityContext velocityContext, URI remoteNeedUri) {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
 
-        velocityContext.put("remoteNeedTitle", WonRdfUtils.NeedUtils.getNeedTitle(remoteNeedRDF).replaceAll("\\n", "\n>"));
-        velocityContext.put("remoteNeedDescription", WonRdfUtils.NeedUtils.getNeedDescription(remoteNeedRDF).replaceAll("\\n", "\n>"));
+        velocityContext.put("remoteNeedTitle", WonRdfUtils.NeedUtils.getNeedTitle(remoteNeedRDF).replaceAll("\\n", "\n" + QUOTE_CHAR));
+        velocityContext.put("remoteNeedDescription", WonRdfUtils.NeedUtils.getNeedDescription(remoteNeedRDF).replaceAll("\\n", "\n" + QUOTE_CHAR));
 
         List<String> tags = WonRdfUtils.NeedUtils.getTags(remoteNeedRDF);
         velocityContext.put("remoteNeedTags", tags.size() > 0 ? tags : null);
@@ -131,8 +133,8 @@ public class WonMimeMessageGenerator {
 
     /**
      * Responsible for filling inc/quoted-mail.vm template
-     * @param velocityContext
-     * @param msgToRespondTo
+     * @param velocityContext context to put template-vars in
+     * @param msgToRespondTo message to repspond to
      * @throws MessagingException
      * @throws IOException
      */
@@ -145,17 +147,17 @@ public class WonMimeMessageGenerator {
 
         String mailText = MailContentExtractor.getMailText(msgToRespondTo);
         if (mailText != null) {
-            velocityContext.put("respondMessage", mailText.replaceAll("\\n", "\n>"));
+            velocityContext.put("respondMessage", mailText.replaceAll("\\n", "\n" + QUOTE_CHAR));
         }
     }
 
     /**
      * Responsible for filling inc/previous-messages.vm
-     * @param velocityContext
-     * @param connectionUri
-     * @param requesterUri
+     * @param velocityContext context to put template-vars in
+     * @param connectionUri connectionUri to retrieve events from
+     * @param requesterUri determines your need uri (to know which messages are from you)
      */
-    private void putMessages(VelocityContext velocityContext, URI connectionUri, URI requesterUri) throws MessagingException, IOException {
+    private void putMessages(VelocityContext velocityContext, URI connectionUri, URI requesterUri) {
         logger.debug("getting the messages for connectionuri: {}", connectionUri);
 
         Dataset baseDataSet = eventListenerContext.getLinkedDataSource().getDataForResource(connectionUri);
@@ -164,45 +166,33 @@ public class WonMimeMessageGenerator {
         RdfUtils.addDatasetToDataset(baseDataSet, eventDataSet);
 
         try {
-            List<String> previousMessages = new ArrayList<>();
-
             Query query = QueryFactory.create(WonQueries.SPARQL_TEXTMESSAGES_BY_CONNECTION_ORDERED_BY_TIMESTAMP);
-            QuerySolutionMap initialBinding = new QuerySolutionMap();
-
-            QueryExecution qExec = QueryExecutionFactory.create(query, baseDataSet, initialBinding);
-
+            QueryExecution qExec = QueryExecutionFactory.create(query, baseDataSet, new QuerySolutionMap());
             qExec.getContext().set(TDB.symUnionDefaultGraph, true);
             ResultSet results = qExec.execSelect();
 
-            long currentMessageCount = 0;
-
-            boolean lastSource = true;
+            Boolean lastSource = null; //must be undefined since we do not know who the source of the last retrieved message is
             String quote = "";
 
-            /*if(results.hasNext()){
-                QuerySolution soln = results.nextSolution();
-                lastSource = isYourMessage(soln, requesterUri);
-                velocityContext.put("message", getMsgSourceString(quote, lastSource) + buildMessageLine(soln, quote));
-            };*/
-
+            List<String> messages = new ArrayList<>();
             List<String> messageBlock = new ArrayList<>();
-            quote = "";
+
             while (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 boolean msgSource = isYourMessage(soln, requesterUri); //Determine the source of this message
 
-                if(msgSource != lastSource && messageBlock.size() > 0){
-                    previousMessages.add(getMsgSourceString(quote, lastSource));
+                if(lastSource != null && msgSource != lastSource && messageBlock.size() > 0){
+                    messages.add(getMsgSourceString(quote, lastSource));
                     Collections.reverse(messageBlock);
-                    previousMessages.addAll(messageBlock);
-                    previousMessages.add(quote); //ADD EMPTY LINE TO MAKE THIS MORE READABLE
+                    messages.addAll(messageBlock);
+                    messages.add(quote); //ADD EMPTY LINE TO MAKE THIS MORE READABLE
                     messageBlock.clear();
-                    quote += ">";
+                    quote += QUOTE_CHAR;
                 }
 
                 if (MAX_CONVERSATION_DEPTH != -1 && quote.length() > MAX_CONVERSATION_DEPTH) { //+1 so you always retrieve the newest messages anyway
-                    previousMessages.add(getMsgSourceString(quote, lastSource));
-                    previousMessages.add(quote+"[...]");
+                    messages.add(getMsgSourceString(quote, msgSource));
+                    messages.add(quote+"[...]");
                     break;
                 }
 
@@ -213,7 +203,7 @@ public class WonMimeMessageGenerator {
             }
             qExec.close();
 
-            velocityContext.put("messages", previousMessages);
+            velocityContext.put("messages", messages);
         } catch (QueryParseException e) {
             logger.error("query parse exception {}", e);
         }
@@ -223,7 +213,7 @@ public class WonMimeMessageGenerator {
      * Builds a valid messageLine
      * @param soln To extract the msg text
      * @param quote String to indicate the quotationhierachy
-     * @return
+     * @return returns a human readable message line
      */
     private static String buildMessageLine(QuerySolution soln, String quote) {
         StringBuilder messageLine = new StringBuilder(quote);
@@ -231,29 +221,21 @@ public class WonMimeMessageGenerator {
         String message = soln.get("msg").asLiteral().getString();
         messageLine.append(message);
 
-        StringBuilder replacementSb = new StringBuilder("\n").append(quote);
-
-        return messageLine.toString().replaceAll("\\n", replacementSb.toString());
+        return messageLine.toString().replaceAll("\\n", "\n" + quote);
     }
 
     private static String getMsgSourceString(String quote, boolean msgSource) {
-        return quote + (msgSource? "You said:" : "They said:");
+        return quote + (msgSource? YOUR_MESSAGE : THEIR_MESSAGE );
     }
 
     /**
      * Determines the Source of the Message
-     * @param soln
-     * @param requesterUri
+     * @param soln to retrieve the needUri
+     * @param requesterUri determines your need uri (to know which messages are from you)
      * @return true if the message came from you, false if the message did not come from you
      */
     private static boolean isYourMessage(QuerySolution soln, URI requesterUri) {
         return requesterUri.toString().equals(soln.get("needUri").asResource().getURI());
-    }
-
-    private static String extractTextMessageFromWonMessage(WonMessage wonMessage){
-        if (wonMessage == null) return null;
-        String message = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
-        return StringUtils.trim(message);
     }
 
     public void setVelocityEngine(VelocityEngine velocityEngine) {
