@@ -69,13 +69,10 @@ public class WonMimeMessageGenerator {
         return generateWonMimeMessage(msgToRespondTo, writer.toString(), remoteNeedUri);
     }
 
-    public WonMimeMessage createMessageMail(MimeMessage msgToRespondTo, URI requesterId, URI remoteNeedUri, URI connectionUri, WonMessage wonMessage) throws MessagingException, IOException {
+    public WonMimeMessage createMessageMail(MimeMessage msgToRespondTo, URI requesterId, URI remoteNeedUri, URI connectionUri) throws MessagingException, IOException {
         VelocityContext velocityContext = putDefaultContent(msgToRespondTo, remoteNeedUri);
 
-        velocityContext.put("message", extractTextMessageFromWonMessage(wonMessage));
-        if(MAX_PREVIOUS_MESSAGES != 0) {
-            putPreviousMessages(velocityContext, connectionUri, requesterId);
-        }
+        putMessages(velocityContext, connectionUri, requesterId);
 
         StringWriter writer = new StringWriter();
 
@@ -158,7 +155,7 @@ public class WonMimeMessageGenerator {
      * @param connectionUri
      * @param requesterUri
      */
-    private void putPreviousMessages(VelocityContext velocityContext, URI connectionUri, URI requesterUri) throws MessagingException, IOException {
+    private void putMessages(VelocityContext velocityContext, URI connectionUri, URI requesterUri) throws MessagingException, IOException {
         logger.debug("getting the messages for connectionuri: {}", connectionUri);
 
         Dataset baseDataSet = eventListenerContext.getLinkedDataSource().getDataForResource(connectionUri);
@@ -179,37 +176,85 @@ public class WonMimeMessageGenerator {
 
             long currentMessageCount = 0;
 
-            if(results.hasNext()){ //to ignore the latest message as this is already shown in the mail
-                results.nextSolution();
+            boolean lastSource = false;
+            String quote = "";
+
+            if(results.hasNext()){
+                QuerySolution soln = results.nextSolution();
+                lastSource = isYourMessage(soln, requesterUri);
+                velocityContext.put("message", buildMessageLine(soln, quote, requesterUri, true));
             };
 
-            while (results.hasNext()) {
-                currentMessageCount++;
-                StringBuilder messageLine = new StringBuilder();
+            if(MAX_PREVIOUS_MESSAGES != 0) {
+                List<String> messageBlock = new ArrayList<>();
+                quote = ">";
+                while (results.hasNext()) {
+                    currentMessageCount++;
 
-                if(MAX_PREVIOUS_MESSAGES != -1 && currentMessageCount > MAX_PREVIOUS_MESSAGES){
-                    previousMessages.add("[...]");
-                    break;
+                    if (MAX_PREVIOUS_MESSAGES != -1 && currentMessageCount > MAX_PREVIOUS_MESSAGES) {
+                        previousMessages.add(quote+">"+"[...]");
+                        break;
+                    }
+
+                    QuerySolution soln = results.nextSolution();
+                    boolean msgSource = isYourMessage(soln, requesterUri); //Determine the source of this message
+
+                    if(msgSource != lastSource){
+                        quote += ">";
+                        Collections.reverse(messageBlock);
+                        previousMessages.addAll(messageBlock);
+                        messageBlock.clear();
+                    }
+
+                    String messageLine = buildMessageLine(soln, quote, requesterUri, lastSource != msgSource);
+                    messageBlock.add(messageLine);
+
+                    lastSource = msgSource;
                 }
+                qExec.close();
 
-                QuerySolution soln = results.nextSolution();
-
-                if(requesterUri.toString().equals(soln.get("needUri").asResource().getURI())) {
-                    messageLine.append("You said: ");
-                } else {
-                    messageLine.append("They said: ");
-                }
-
-                String message = soln.get("msg").asLiteral().getString();
-                messageLine.append(message);
-                previousMessages.add(messageLine.toString().replaceAll("\\n", "\n>\t"));
+                velocityContext.put("previousMessages", previousMessages);
             }
-            qExec.close();
-
-            velocityContext.put("previousMessages", previousMessages);
         } catch (QueryParseException e) {
             logger.error("query parse exception {}", e);
         }
+    }
+
+    /**
+     * Builds a valid messageLine
+     * @param soln
+     * @param quote String to indicate the quotationhierachy
+     * @param requesterUri
+     * @param addSource If we need to add the Source of the message
+     * @return
+     */
+    private static String buildMessageLine(QuerySolution soln, String quote, URI requesterUri, boolean addSource) {
+        StringBuilder messageLine = new StringBuilder(quote);
+
+        if(addSource) {
+            if (isYourMessage(soln, requesterUri)) {
+                messageLine.append("You said: ");
+            } else {
+                messageLine.append("They said: ");
+            }
+        }
+
+        String message = soln.get("msg").asLiteral().getString();
+        messageLine.append(message);
+
+        StringBuilder replacementSb = new StringBuilder("\n").append(quote).append("\t");
+
+        return messageLine.toString().replaceAll("\\n", replacementSb.toString());
+    }
+
+    /**
+     * Determines the Source of the Message
+     * @param soln
+     * @param requesterUri
+     * @return true if the message came from you, false if the message did not come from you
+     */
+    private static boolean isYourMessage(QuerySolution soln, URI requesterUri) {
+        return requesterUri.toString().equals(soln.get("needUri").asResource().getURI());
     }
 
     private static String extractTextMessageFromWonMessage(WonMessage wonMessage){
