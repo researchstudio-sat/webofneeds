@@ -39,7 +39,6 @@ public class Message2MailAction extends BaseEventBotAction {
     protected void doRun(Event event) throws Exception {
         if(event instanceof MessageFromOtherNeedEvent){
             Connection con = ((MessageFromOtherNeedEvent) event).getCon();
-            WonMessage message = ((MessageFromOtherNeedEvent) event).getWonMessage();
 
             URI responseTo = con.getNeedURI();
             URI remoteNeedUri = con.getRemoteNeedURI();
@@ -47,7 +46,7 @@ public class Message2MailAction extends BaseEventBotAction {
             MimeMessage originalMail = EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), uriMimeMessageRelationsName, responseTo);
             logger.debug("Someone sent a message for URI: " + responseTo + " sending a mail to the creator: " + MailContentExtractor.getFromAddressString(originalMail));
 
-            WonMimeMessage answerMessage = mailGenerator.createMessageMail(originalMail, responseTo, remoteNeedUri, con.getConnectionURI(), message);
+            WonMimeMessage answerMessage = mailGenerator.createMessageMail(originalMail, responseTo, remoteNeedUri, con.getConnectionURI());
             EventBotActionUtils.addMailIdWonURIRelation(getEventListenerContext(), mailIdUriRelationsName, answerMessage.getMessageID(), new WonURI(con.getConnectionURI(), UriType.CONNECTION));
 
             sendChannel.send(new GenericMessage<>(answerMessage));
