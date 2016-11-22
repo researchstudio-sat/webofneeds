@@ -23,12 +23,13 @@ if [ "$remove_all_data" = true ] ; then
   ssh root@satsrv06 rm -rf $base_folder/won-client-certs
   rm -rf $base_folder/won-server-certs
 
-  echo delete postgres, bigdata and solr databases!
+  echo delete postgres, bigdata, mongodb and solr databases!
   ssh root@satsrv04 rm -rf $base_folder/postgres/data
   ssh root@satsrv05 rm -rf $base_folder/postgres/data
   ssh root@satsrv06 rm -rf $base_folder/bigdata/data
   ssh root@satsrv06 rm -rf $base_folder/solr/won/data
   ssh root@satsrv06 rm -rf $base_folder/solr/wontest/data
+  ssh root@satsrv06 rm -rf $base_folder/mongodb/data
 fi
 
 ssh root@satsrv04 mkdir -p $base_folder/won-server-certs
