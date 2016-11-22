@@ -62,8 +62,8 @@ public abstract class BaseBot implements Bot
 
     // try the connection with the bot context
     try {
-      botContext.putGeneric("temp", "temp", "temp");
-      Object o = botContext.getGeneric("temp", "temp");
+      botContext.saveToObjectMap("temp", "temp", "temp");
+      Object o = botContext.loadFromObjectMap("temp", "temp");
       Assert.isTrue(o.equals("temp"));
     } catch (Exception e) {
       logger.error("Bot cannot establish connection with bot context");
