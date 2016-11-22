@@ -92,7 +92,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
             .format(new Object[]{dataset.getClass(), resource}));
   }
 
-  @Override
+  /*@Override
   public Dataset getDataForResource(final URI resource, final URI requesterWebID) {
     assert (resource != null && requesterWebID != null) : "resource and requester must not be null";
     Element element = null;
@@ -121,7 +121,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     throw new IllegalStateException(
       new MessageFormat("The underlying linkedDataCache should only contain Datasets, but we got a {0} for URI {1}")
         .format(new Object[]{dataset.getClass(), resource}));
-  }
+  }*/
 
   @Override
   public void afterPropertiesSet() throws Exception
