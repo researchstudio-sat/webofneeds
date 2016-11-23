@@ -62,7 +62,7 @@ public class MailContentExtractor
 
     // second search the mail reference in the subject written by predefined mailto links
     // e.g. in case of close need
-    Pattern referenceMailPattern = Pattern.compile("Message-Id: <(.+)>");
+    Pattern referenceMailPattern = Pattern.compile("Message-Id_(.+)");
     Matcher m = referenceMailPattern.matcher(message.getSubject());
     return m.find() ? m.group(1) : null;
   }
