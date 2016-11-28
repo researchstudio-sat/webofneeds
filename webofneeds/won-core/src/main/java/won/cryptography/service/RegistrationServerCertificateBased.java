@@ -35,7 +35,7 @@ public class RegistrationServerCertificateBased implements RegistrationServer
 
   public String registerOwner(Object certificateChainObj) throws WonProtocolException {
     String alias = null;
-    X509Certificate[] ownerCertChain = extractCertificateChain(certificateChainObj);
+    X509Certificate[] ownerCertChain = new X509Certificate[]{(X509Certificate) certificateChainObj};
     checkTrusted(ownerCertChain);
     try {
       alias  = aliasGenerator.generateAlias(ownerCertChain[0]);
@@ -50,7 +50,7 @@ public class RegistrationServerCertificateBased implements RegistrationServer
 
   public String registerNode(Object certificateChainObj) throws WonProtocolException {
 
-    X509Certificate[] nodeCertChain = extractCertificateChain(certificateChainObj);
+    X509Certificate[] nodeCertChain = new X509Certificate[]{(X509Certificate) certificateChainObj};
     checkTrusted(nodeCertChain);
     return null;
   }
@@ -65,28 +65,5 @@ public class RegistrationServerCertificateBased implements RegistrationServer
     }
   }
 
-  private X509Certificate extractCertificate(final Object certificateChainObj)  throws WonProtocolException {
-    X509Certificate clientCert[] = extractCertificateChain(certificateChainObj);
-    return clientCert[0];
-  }
 
-  private X509Certificate[] extractCertificateChain(final Object certificateChainObj)  throws WonProtocolException {
-    // Registration without certificate is not supported:
-    if (certificateChainObj == null) {
-      String msg = "Cannot register - no credentials provided!";
-      logger.info(msg);
-      throw new WonProtocolException(msg);
-    }
-
-    // Registration without certificate is not supported:
-    if ( !(certificateChainObj instanceof X509Certificate[]) || ((X509Certificate[]) certificateChainObj).length < 1) {
-      String msg = "Cannot register - provided credentials do not contain X509 certificate";
-      logger.info(msg);
-      throw new WonProtocolException(msg);
-    }
-
-    // Prepare certificate and calculated from it owner-id:
-    X509Certificate[] clientCert = ((X509Certificate[]) certificateChainObj);
-    return clientCert;
-  }
 }
