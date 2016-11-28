@@ -33,4 +33,8 @@ public class PredefinedAliasPrivateKeyStrategy implements PrivateKeyStrategy
     logger.debug("Choosen alias: " + alias);
     return alias;
   }
+
+  public String getAlias() {
+    return alias;
+  }
 }
