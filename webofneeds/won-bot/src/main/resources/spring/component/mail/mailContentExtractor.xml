@@ -83,5 +83,15 @@
                 <constructor-arg value="(?si)^connect.*" />
             </bean>
         </property>
+        <property name="cmdSubscribePattern">
+            <bean id="cmdSubscribePattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value="(?si)^subscribe.*" />
+            </bean>
+        </property>
+        <property name="cmdUnsubscribePattern">
+            <bean id="cmdUnsubscribePattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value="(?si)^unsubscribe.*" />
+            </bean>
+        </property>
     </bean>
 </beans>

@@ -2,6 +2,7 @@ package won.bot.framework.eventbot.action.impl.mail.send;
 
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.tdb.TDB;
+import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
@@ -21,7 +22,10 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.*;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This Class is used to generate all Mails that are going to be sent via the Mail2WonBot
@@ -54,32 +58,43 @@ public class WonMimeMessageGenerator {
      * Creates Response Message that is sent when a need tries to connect with another need
      */
     public WonMimeMessage createConnectMail(MimeMessage msgToRespondTo, URI remoteNeedUri) throws MessagingException, IOException {
+
         VelocityContext velocityContext = putDefaultContent(msgToRespondTo, remoteNeedUri);
-
-        StringWriter writer = new StringWriter();
-
-        velocityEngine.getTemplate("mail-templates/connect-mail.vm").merge(velocityContext, writer);
-        return generateWonMimeMessage(msgToRespondTo, writer.toString(), remoteNeedUri);
+        return generateWonMimeMessage(msgToRespondTo, velocityEngine.getTemplate("mail-templates/connect-mail.vm"),
+                                      velocityContext, remoteNeedUri);
     }
 
     public WonMimeMessage createHintMail(MimeMessage msgToRespondTo, URI remoteNeedUri) throws MessagingException, IOException {
+
         VelocityContext velocityContext = putDefaultContent(msgToRespondTo, remoteNeedUri);
-
-        StringWriter writer = new StringWriter();
-
-        velocityEngine.getTemplate("mail-templates/hint-mail.vm").merge(velocityContext, writer);
-        return generateWonMimeMessage(msgToRespondTo, writer.toString(), remoteNeedUri);
+        return generateWonMimeMessage(msgToRespondTo, velocityEngine.getTemplate("mail-templates/hint-mail.vm"),
+                                      velocityContext, remoteNeedUri);
     }
 
     public WonMimeMessage createMessageMail(MimeMessage msgToRespondTo, URI requesterId, URI remoteNeedUri, URI connectionUri) throws MessagingException, IOException {
+
         VelocityContext velocityContext = putDefaultContent(msgToRespondTo, remoteNeedUri);
-
         putMessages(velocityContext, connectionUri, requesterId);
+        return generateWonMimeMessage(msgToRespondTo, velocityEngine.getTemplate("mail-templates/message-mail.vm"),
+                                      velocityContext, remoteNeedUri);
+    }
 
+    public WonMimeMessage createWelcomeMail(MimeMessage msgToRespondTo) throws IOException, MessagingException {
+
+        VelocityContext velocityContext = new VelocityContext();
+        putQuotedMail(velocityContext, msgToRespondTo);
+        velocityContext.put("mailbotEmailAddress", sentFrom);
+        velocityContext.put("mailbotName", sentFromName);
         StringWriter writer = new StringWriter();
+        velocityEngine.getTemplate("mail-templates/welcome-mail.vm").merge(velocityContext, writer);
 
-        velocityEngine.getTemplate("mail-templates/message-mail.vm").merge(velocityContext, writer);
-        return generateWonMimeMessage(msgToRespondTo, writer.toString(), remoteNeedUri);
+        MimeMessage answerMessage = (MimeMessage) msgToRespondTo.reply(false);
+        answerMessage.setFrom(new InternetAddress(sentFrom, sentFromName));
+        answerMessage.setText(writer.toString());
+        WonMimeMessage wonAnswerMessage = new WonMimeMessage(answerMessage);
+        wonAnswerMessage.updateMessageID();
+
+        return wonAnswerMessage;
     }
 
     /**
@@ -99,20 +114,35 @@ public class WonMimeMessageGenerator {
         return velocityContext;
     }
 
-    private WonMimeMessage generateWonMimeMessage(MimeMessage msgToRespondTo, String mailBody, URI remoteNeedUri)
+    private WonMimeMessage generateWonMimeMessage(
+      MimeMessage msgToRespondTo, Template template, VelocityContext velocityContext, URI remoteNeedUri)
       throws MessagingException, UnsupportedEncodingException {
+
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
 
         MimeMessage answerMessage = (MimeMessage) msgToRespondTo.reply(false);
         answerMessage.setFrom(new InternetAddress(sentFrom, sentFromName));
-        answerMessage.setText(mailBody);
-        answerMessage.setSubject(answerMessage.getSubject() + " <-> ["+ BasicNeedType.fromURI(WonRdfUtils.NeedUtils.getBasicNeedType(remoteNeedRDF))+"] " +  WonRdfUtils.NeedUtils.getNeedTitle(remoteNeedRDF));
+        answerMessage.setText("");
+        answerMessage.setSubject(answerMessage.getSubject() + " <-> [" + BasicNeedType
+          .fromURI(WonRdfUtils.NeedUtils.getBasicNeedType(remoteNeedRDF)) + "] " + WonRdfUtils.NeedUtils
+          .getNeedTitle(remoteNeedRDF));
 
         //We need to create an instance of our own MimeMessage Implementation in order to have the Unique Message Id set before sending
         WonMimeMessage wonAnswerMessage = new WonMimeMessage(answerMessage);
         wonAnswerMessage.updateMessageID();
+        String messageId = wonAnswerMessage.getMessageID();
 
-        return  wonAnswerMessage;
+        // put variables (e.g. Message-Id) for the footer into the context and create mail body using the template
+        putCommandFooter(velocityContext, wonAnswerMessage);
+        StringWriter writer = new StringWriter();
+        template.merge(velocityContext, writer);
+        answerMessage.setText(writer.toString());
+
+        // create a new won mime message with the right body and message id set
+        wonAnswerMessage = new WonMimeMessage(answerMessage);
+        wonAnswerMessage.setMessageId(messageId);
+
+        return wonAnswerMessage;
     }
 
     /**
@@ -123,12 +153,29 @@ public class WonMimeMessageGenerator {
     private void putRemoteNeedInfo(VelocityContext velocityContext, URI remoteNeedUri) {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
 
-        velocityContext.put("remoteNeedTitle", WonRdfUtils.NeedUtils.getNeedTitle(remoteNeedRDF).replaceAll("\\n", "\n" + QUOTE_CHAR));
-        velocityContext.put("remoteNeedDescription", WonRdfUtils.NeedUtils.getNeedDescription(remoteNeedRDF).replaceAll("\\n", "\n" + QUOTE_CHAR));
+        velocityContext.put("remoteNeedTitle",
+                            WonRdfUtils.NeedUtils.getNeedTitle(remoteNeedRDF).replaceAll("\\n", "\n" + QUOTE_CHAR));
+        velocityContext.put("remoteNeedDescription", WonRdfUtils.NeedUtils.getNeedDescription(remoteNeedRDF)
+                                                                          .replaceAll("\\n", "\n" + QUOTE_CHAR));
 
         List<String> tags = WonRdfUtils.NeedUtils.getTags(remoteNeedRDF);
         velocityContext.put("remoteNeedTags", tags.size() > 0 ? tags : null);
         velocityContext.put("remoteNeedUri", remoteNeedUri);
+    }
+
+    /**
+     * Responsible for filling inc/footer.vm template
+     *
+     * @param velocityContext
+     * @param message
+     * @throws MessagingException
+     */
+    private void putCommandFooter(VelocityContext velocityContext, WonMimeMessage message)
+      throws MessagingException, UnsupportedEncodingException {
+
+        velocityContext.put("mailbotEmailAddress", sentFrom);
+        velocityContext.put("mailbotName", sentFromName);
+        velocityContext.put("mailReference", URLEncoder.encode(message.getMessageIdHeader(), "UTF-8"));
     }
 
     /**

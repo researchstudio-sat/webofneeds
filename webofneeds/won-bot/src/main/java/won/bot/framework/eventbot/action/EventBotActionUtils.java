@@ -20,7 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.eventbot.EventListenerContext;
+import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
+import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
@@ -181,7 +183,7 @@ public class EventBotActionUtils
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         mimeMessage.writeTo(os);
-        botContext.addToListMap(USER_CACHED_MAILS_COLLECTION, mimeMessage.getFrom().toString(), os.toByteArray());
+        botContext.addToListMap(USER_CACHED_MAILS_COLLECTION, MailContentExtractor.getMailSender(mimeMessage), os.toByteArray());
     }
 
     public static Collection<MimeMessage> loadCachedMailsForMailAddress(BotContext botContext, String mailAddress)
@@ -202,5 +204,16 @@ public class EventBotActionUtils
 
     public static void removeCachedMailsForMailAddress(BotContext botContext, String mailAddress) {
         botContext.dropCollection(mailAddress);
+    }
+
+    public static void setSubscribeStatusForMailAddress(
+      BotContext botContext, String mailAddress, SubscribeStatus status) {
+        botContext.saveToObjectMap(USER_SUBSCRIBE_COLLECTION, mailAddress, status);
+    }
+
+    public static SubscribeStatus getSubscribeStatusForMailAddress(BotContext botContext, String mailAddress) {
+
+        String status = (String) botContext.loadFromObjectMap(USER_SUBSCRIBE_COLLECTION, mailAddress);
+        return (status != null) ? SubscribeStatus.valueOf(status) : SubscribeStatus.NO_RESPONSE;
     }
 }
