@@ -65,7 +65,8 @@ public class ConnectWithAssociatedNeedAction extends BaseEventBotAction
         createWonMessage(myNeedUri
                 , remoteNeedUri));
     } catch (Exception e) {
-      logger.warn("could not connect {} and {}", new Object[]{myNeedUri, remoteNeedUri}, e);
+      logger.warn("could not connect "+ myNeedUri +" and "
+        + remoteNeedUri, e);
     }
   }
 
