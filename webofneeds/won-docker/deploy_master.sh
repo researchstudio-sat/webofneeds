@@ -33,6 +33,7 @@ if [ "$remove_all_data" = true ] ; then
   ssh root@satsrv06 rm -rf $base_folder/bigdata/data
   ssh root@satsrv06 rm -rf $base_folder/solr/won/data
   ssh root@satsrv06 rm -rf $base_folder/solr/wontest/data
+  ssh root@satsrv06 rm -rf $base_folder/mongodb/data
 fi
 
 ssh root@satsrv04 mkdir -p $base_folder/won-server-certs

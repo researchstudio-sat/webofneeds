@@ -19,5 +19,4 @@ Need Information:
 #if($remoteNeedUri)
 >NeedURI:
 >$remoteNeedUri
->
 #end

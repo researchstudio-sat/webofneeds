@@ -1,5 +1,6 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
+import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
 import won.protocol.model.BasicNeedType;
 
 import javax.mail.Address;
@@ -44,9 +45,57 @@ public class MailContentExtractor
   // check if the need created from the mail should be not matched with other needs
   private Pattern doNotMatchPattern;
 
-  // check if this is a command mail of type close or connect
+  // check if this is a command mail of different action types
   private Pattern cmdClosePattern;
   private Pattern cmdConnectPattern;
+  private Pattern cmdSubscribePattern;
+  private Pattern cmdUnsubscribePattern;
+
+  public static String getMailReference(MimeMessage message) throws MessagingException {
+
+    // first search the mail reference is in the in-reply-to header in case user answered a mail
+    // e.g. in case of messages, implicit connect
+    String[] replyTo = message.getHeader("In-Reply-To");
+    if (replyTo != null && replyTo.length > 0) {
+      return replyTo[0];
+    }
+
+    // second search the mail reference in the subject written by predefined mailto links
+    // e.g. in case of close need
+    Pattern referenceMailPattern = Pattern.compile("Message-Id_(.+)");
+    Matcher m = referenceMailPattern.matcher(message.getSubject());
+    return m.find() ? m.group(1) : null;
+  }
+
+  public static String getMailText(MimeMessage message) throws MessagingException, IOException {
+
+    if (message.isMimeType("text/plain")) {
+      return message.getContent().toString();
+    } else if (message.isMimeType("multipart/*")) {
+      return getMailTextFromMultiPart((MimeMultipart) message.getContent());
+    }
+
+    return null;
+  }
+
+  private static String getMailTextFromMultiPart(MimeMultipart mm) throws MessagingException, IOException {
+
+    for (int i = 0; i < mm.getCount(); i++) {
+      BodyPart part = mm.getBodyPart(i);
+      if (part.isMimeType("text/plain")) {
+        return part.getContent().toString();
+      } else if (part.isMimeType("multipart/*")) {
+        return getMailTextFromMultiPart((MimeMultipart) part.getContent());
+      }
+    }
+    return null;
+  }
+
+  public static String getMailSender(MimeMessage message) throws MessagingException {
+
+    Address[] froms = message.getFrom();
+    return (froms == null ? null : ((InternetAddress) froms[0]).getAddress());
+  }
 
   public void setDemandTypePattern(final Pattern demandTypePattern) {
     this.demandTypePattern = demandTypePattern;
@@ -96,12 +145,39 @@ public class MailContentExtractor
     this.cmdConnectPattern = cmdConnectPattern;
   }
 
-  public boolean isCmdClose(MimeMessage message) throws IOException, MessagingException {
-    return cmdClosePattern.matcher(getMailText(message)).matches();
+  public void setCmdSubscribePattern(final Pattern cmdSubscribePattern) {
+    this.cmdSubscribePattern = cmdSubscribePattern;
   }
 
-  public boolean isCmdConnect(MimeMessage message) throws IOException, MessagingException {
-    return cmdConnectPattern.matcher(getMailText(message)).matches();
+  public void setCmdUnsubscribePattern(final Pattern cmdUnsubscribePattern) {
+    this.cmdUnsubscribePattern = cmdUnsubscribePattern;
+  }
+
+  public boolean isCreateNeedMail(MimeMessage messsage) throws MessagingException {
+    return getBasicNeedType(messsage) != null;
+  }
+
+  public boolean isCommandMail(MimeMessage message) throws IOException, MessagingException {
+
+    // command mail is either an answer mail (with reference) to a previous mail (e.g. message, implicit connect) or an
+    // explicitly set action command (e.g. subscribe, unsubscribe, close need)
+    return getMailReference(message) != null ||
+      (getMailAction(message) != null && !ActionType.NO_ACTION.equals(getMailAction(message)));
+  }
+
+  public ActionType getMailAction(MimeMessage message) throws IOException, MessagingException {
+
+    if (cmdSubscribePattern.matcher(message.getSubject()).matches()) {
+      return ActionType.SUBSCRIBE;
+    } else if (cmdUnsubscribePattern.matcher(message.getSubject()).matches()) {
+      return ActionType.UNSUBSCRIBE;
+    } else if (cmdClosePattern.matcher(message.getSubject()).matches()) {
+      return ActionType.CLOSE_CONNECTION;
+    } else if (cmdConnectPattern.matcher(message.getSubject()).matches()) {
+      return ActionType.OPEN_CONNECTION;
+    } else {
+      return ActionType.NO_ACTION;
+    }
   }
 
   public boolean isDoNotMatch(MimeMessage message) throws MessagingException {
@@ -115,35 +191,7 @@ public class MailContentExtractor
   public String getTitle(MimeMessage message) throws MessagingException {
 
     Matcher m = titleExtractionPattern.matcher(message.getSubject());
-    if (m.find()) {
-      return m.group().trim();
-    }
-
-    return null;
-  }
-
-  public static String getMailText(MimeMessage message) throws MessagingException, IOException {
-
-    if (message.isMimeType("text/plain")) {
-      return message.getContent().toString();
-    } else if (message.isMimeType("multipart/*")) {
-      return getMailTextFromMultiPart((MimeMultipart) message.getContent());
-    }
-
-    return null;
-  }
-
-  private static String getMailTextFromMultiPart(MimeMultipart mm) throws MessagingException, IOException {
-
-    for (int i = 0; i < mm.getCount(); i++) {
-      BodyPart part = mm.getBodyPart(i);
-      if (part.isMimeType("text/plain")) {
-        return part.getContent().toString();
-      } else if (part.isMimeType("multipart/*")) {
-        return getMailTextFromMultiPart((MimeMultipart) part.getContent());
-      }
-    }
-    return null;
+    return m.find() ? m.group() : null;
   }
 
   public String getDescription(MimeMessage message) throws MessagingException, IOException {
