@@ -147,7 +147,9 @@ public class OwnerWonMessageSenderJMSBased implements ApplicationListener<WonNod
               isDefaultWonNodeRegistered = true;
 
             } catch (Exception e) {
-              logger.warn("Could not register with default won node {}. Try again later ...", defaultNodeURI);
+              logger.warn("Could not register with default won node {}. Try again later ... (reason is logged at " +
+                            "loglevel 'DEBUG')",
+                          defaultNodeURI);
               logger.debug("Exceptions is: ", e);
             }
           }
