@@ -90,14 +90,14 @@ public class DefaultSecurityWonTransmissionService implements WonTransmissionSer
     TrustStrategy linkedDataClientStrategy = new TrustAnyCertificateStrategy();
     //this.linkedDataClientStrategy = new TrustSelfSignedStrategy();
     //this.linkedDataClientStrategy = new TrustNooneStrategy();
-    this.linkedDataClient = new LinkedDataRestClientHttps(clientKeyStoreService, new PrivateKeyStrategyGenerator(),
+    this.linkedDataClient = new LinkedDataRestClientHttps(clientKeyStoreService,
                                                           trustStoreService, linkedDataClientStrategy);
 
 
     // temporary client to access response of linked data resources of node -
     // here uses the same key/trust setting as linkedDataClient
-    this.linkedDataRestBridge = new LinkedDataRestBridge(clientKeyStoreService, new
-      PrivateKeyStrategyGenerator(), trustStoreService, linkedDataClientStrategy);
+    this.linkedDataRestBridge = new LinkedDataRestBridge(clientKeyStoreService,
+                                                         trustStoreService, linkedDataClientStrategy);
 
     // LINKED DATA server-side:
     // Server-side is configured via Filters that do access control and WebID verification in spring/node-context.xml
