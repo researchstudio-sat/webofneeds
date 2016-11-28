@@ -26,7 +26,7 @@ import org.springframework.web.client.RestTemplate;
 import won.cryptography.service.CryptographyUtils;
 import won.cryptography.service.KeyStoreService;
 import won.cryptography.service.TrustStoreService;
-import won.cryptography.ssl.PrivateKeyStrategyGenerator;
+import won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy;
 
 import javax.annotation.PostConstruct;
 import java.net.URI;
@@ -49,19 +49,16 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient
   private Integer readTimeout;
   private Integer connectionTimeout;
 
-  private PrivateKeyStrategyGenerator privateKeyStrategyGenerator;
   private KeyStoreService keyStoreService;
   private TrustStoreService trustStoreService;
   private TrustStrategy trustStrategy;
 
 
 
-  public LinkedDataRestClientHttps(KeyStoreService keyStoreService, PrivateKeyStrategyGenerator
-    privateKeyStrategyGenerator, TrustStoreService trustStoreService, TrustStrategy trustStrategy) {
+  public LinkedDataRestClientHttps(KeyStoreService keyStoreService, TrustStoreService trustStoreService, TrustStrategy trustStrategy) {
     this.readTimeout = 20000;
     this.connectionTimeout = 20000; //DEF. TIMEOUT IS 20 sec
     this.keyStoreService = keyStoreService;
-    this.privateKeyStrategyGenerator = privateKeyStrategyGenerator;
     this.trustStoreService = trustStoreService;
     this.trustStrategy = trustStrategy;
   }
@@ -86,7 +83,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient
       template = CryptographyUtils.createSslRestTemplate(
         this.keyStoreService.getUnderlyingKeyStore(),
         this.keyStoreService.getPassword(),
-        privateKeyStrategyGenerator.createPrivateKeyStrategy(webID),
+        new PredefinedAliasPrivateKeyStrategy(webID),
         this.trustStoreService.getUnderlyingKeyStore(),
         this.trustStrategy,
         readTimeout, connectionTimeout);
