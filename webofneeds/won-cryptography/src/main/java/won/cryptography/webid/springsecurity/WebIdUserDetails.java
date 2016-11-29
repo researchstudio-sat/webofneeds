@@ -17,13 +17,11 @@
 package won.cryptography.webid.springsecurity;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by fkleedorfer on 24.11.2016.
@@ -31,15 +29,15 @@ import java.util.List;
 public class WebIdUserDetails implements UserDetails
 {
   private URI webId;
+  Collection<GrantedAuthority> authorities = new ArrayList<>(3);
 
-  public WebIdUserDetails(final URI webId) {
+  public WebIdUserDetails(final URI webId, Collection<GrantedAuthority> grantedAuthorities) {
     this.webId = webId;
+    this.authorities = grantedAuthorities;
   }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    List<GrantedAuthority> authorities = new ArrayList<>(1);
-    authorities.add(new SimpleGrantedAuthority("ROLE_CLIENT_CERTIFICATE_PRESENTED"));
     return authorities;
   }
 

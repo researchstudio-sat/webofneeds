@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +31,8 @@ import won.cryptography.webid.WebIDVerificationAgent;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.cert.Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Assumes that the provided username is a linked data URI that contains WebID information.
@@ -46,6 +49,7 @@ public class WebIdUserDetailsService implements AuthenticationUserDetailsService
   public UserDetails loadUserDetails(final PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
     String principal = (String) token.getPrincipal();
     Certificate certificate = (Certificate) token.getCredentials();
+
     logger.debug("Adding userDetails for '" + principal +"'");
     URI webID = null;
     try {
@@ -54,14 +58,24 @@ public class WebIdUserDetailsService implements AuthenticationUserDetailsService
       throw new BadCredentialsException("Principal of X.509 Certificate must be a WebId URI. Actual value: '" +
                                           principal+"'");
     }
+
+    //at this point, we know that a client certificate was presented. Grant this role:
+    List<GrantedAuthority> authorities = new ArrayList<>(3);
+    authorities.add(new SimpleGrantedAuthority("ROLE_CLIENT_CERTIFICATE_PRESENTED"));
+
     logger.debug("verifying webId '" + principal +"'");
-    if (webIDVerificationAgent.verify(certificate.getPublicKey(), webID)){
-      token.getAuthorities().add(new SimpleGrantedAuthority("ROLE_WEBID"));
-      logger.debug("webId '" + principal +"' successfully verified - ROLE_WEBID granted");
-    } else {
-      logger.debug("could not verify webId '" + principal +"'. ROLE_WEBID not granted");
+    try {
+      if (webIDVerificationAgent.verify(certificate.getPublicKey(), webID)) {
+        authorities.add(new SimpleGrantedAuthority("ROLE_WEBID"));
+        logger.debug("webId '" + principal + "' successfully verified - ROLE_WEBID granted");
+      } else {
+        logger.debug("could not verify webId '" + principal + "'. ROLE_WEBID not granted");
+      }
+    } catch (Exception e){
+      logger.debug("could not verify webId '" + principal + "' because of an error during verification. ROLE_WEBID " +
+                     "not granted. Cause is logged",e);
     }
-    return new WebIdUserDetails(webID);
+    return new WebIdUserDetails(webID, authorities);
   }
 }
 
