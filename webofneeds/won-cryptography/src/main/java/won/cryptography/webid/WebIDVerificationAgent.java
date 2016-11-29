@@ -26,7 +26,13 @@ public class WebIDVerificationAgent
   private LinkedDataSource linkedDataSource;
 
   public boolean verify(PublicKey publicKey, URI webId){
-    Dataset dataset = linkedDataSource.getDataForResource(webId);
+    Dataset dataset = null;
+    try {
+      dataset = linkedDataSource.getDataForResource(webId);
+    } catch (Exception e) {
+      throw new InternalAuthenticationServiceException("Could not retrieve data for WebID '" + webId + "'", e);
+    }
+
 
     //TODO for RSA key
     //      if (publicKey instanceof RSAPublicKey) {

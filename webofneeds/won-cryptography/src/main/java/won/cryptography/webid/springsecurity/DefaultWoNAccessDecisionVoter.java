@@ -60,17 +60,18 @@ public class DefaultWoNAccessDecisionVoter implements AccessDecisionVoter
     if (! (object instanceof FilterInvocation)) return ACCESS_ABSTAIN;
     String webId = userDetails.getUsername();
     String resource = ((FilterInvocation)object).getRequest().getRequestURL().toString();
-
-     if (authentication.getAuthorities().stream()
-                  .map(GrantedAuthority::getAuthority)
-                  .filter(r -> "ROLE_WEBID".equals(r))
-                  .findAny().isPresent()){
-        List<String> webIDs = new ArrayList<>(1);
-        webIDs.add(webId);
-        if (defaultAccessControlRules.isAccessPermitted(resource, webIDs)){
-          return ACCESS_GRANTED;
-        }
-     }
+    if (authentication.getAuthorities().stream()
+                      .map(GrantedAuthority::getAuthority)
+                      .filter(r -> "ROLE_WEBID".equals(r))
+                      .findAny().isPresent()) {
+      //perform our hard coded access control checks
+      List<String> webIDs = new ArrayList<>(1);
+      webIDs.add(webId);
+      if (defaultAccessControlRules.isAccessPermitted(resource, webIDs)){
+        return ACCESS_GRANTED;
+      }
+      return ACCESS_DENIED;
+    }
     return ACCESS_DENIED;
   }
 
