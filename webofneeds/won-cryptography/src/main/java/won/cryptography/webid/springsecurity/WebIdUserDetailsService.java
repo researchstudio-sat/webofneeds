@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -54,11 +55,12 @@ public class WebIdUserDetailsService implements AuthenticationUserDetailsService
                                           principal+"'");
     }
     logger.debug("verifying webId '" + principal +"'");
-    if (!webIDVerificationAgent.verify(certificate.getPublicKey(), webID)){
-      throw new BadCredentialsException("Verification of WebID '" + webID + "' failed");
+    if (webIDVerificationAgent.verify(certificate.getPublicKey(), webID)){
+      token.getAuthorities().add(new SimpleGrantedAuthority("ROLE_WEBID"));
+      logger.debug("webId '" + principal +"' successfully verified - ROLE_WEBID granted");
+    } else {
+      logger.debug("could not verify webId '" + principal +"'. ROLE_WEBID not granted");
     }
-    logger.debug("webId '" + principal +"' successfully verified");
-
     return new WebIdUserDetails(webID);
   }
 }

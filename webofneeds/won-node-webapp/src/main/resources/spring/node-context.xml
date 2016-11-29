@@ -50,11 +50,12 @@
         <!-- we want to extract client certs from a header field if we're behind a reverse proxy, so we need a custom
          extension of the X.509 filter -->
         <sec:custom-filter ref="clientCertificateFilter" position="X509_FILTER" />
-        <sec:intercept-url pattern = "/(resource|data|page)/event/.+" access="isFullyAuthenticated()" />
-        <sec:intercept-url pattern = "/(resource|data|page)/need/[a-zA-z0-9]+/deep.*" access="isFullyAuthenticated()" />
-        <sec:intercept-url pattern = "/(resource|data|page)/need/[a-zA-z0-9]+/events/.+" access="isFullyAuthenticated()" />
-        <sec:intercept-url pattern = "/(resource|data|page)/connection/[a-zA-z0-9]+/events/.+\?deep=true" access="isFullyAuthenticated()" />
-        <sec:intercept-url pattern = "/resource\?register=.+" access="isFullyAuthenticated()" />
+        <sec:intercept-url pattern = "/(resource|data|page)/event/.+" access="ROLE_WEBID" />
+        <sec:intercept-url pattern = "/(resource|data|page)/need/[a-zA-z0-9]+/deep.*" access="ROLE_WEBID" />
+        <sec:intercept-url pattern = "/(resource|data|page)/need/[a-zA-z0-9]+/events/.+" access="ROLE_WEBID" />
+        <sec:intercept-url pattern = "/(resource|data|page)/connection/[a-zA-z0-9]+/events/.+\?deep=true" access="ROLE_WEBID" />
+        <!-- we allow self-signed certificates that need not be webids -->
+        <sec:intercept-url pattern = "/resource\?register=.+" access="ROLE_CLIENT_CERTIFICATE_PRESENTED" />
         <sec:intercept-url pattern=".*" access="denyAll" />
     </sec:http>
 

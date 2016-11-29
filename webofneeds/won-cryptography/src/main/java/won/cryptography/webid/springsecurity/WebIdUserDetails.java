@@ -39,7 +39,7 @@ public class WebIdUserDetails implements UserDetails
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     List<GrantedAuthority> authorities = new ArrayList<>(1);
-    authorities.add(new SimpleGrantedAuthority("ROLE_WEBID"));
+    authorities.add(new SimpleGrantedAuthority("ROLE_CLIENT_CERTIFICATE_PRESENTED"));
     return authorities;
   }
 
