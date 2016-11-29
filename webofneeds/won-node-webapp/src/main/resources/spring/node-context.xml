@@ -35,7 +35,7 @@
     verification step is not needed, and we can be more open about caching.
      -->
     <sec:http request-matcher="regex"
-              pattern="(/(resource|data|page)/event/.+|/(resource|data|page)/need/[a-zA-z0-9]+/deep.*|/(resource|data|page)/need/[a-zA-z0-9]+/events/.+|/(resource|data|page)/connection/[a-zA-z0-9]+/events/.+\\?deep=true|/resource\\?register=.+)"
+              pattern="(/(resource|data|page)/event/.+|/(resource|data|page)/need/[a-zA-z0-9]+/deep.*|/(resource|data|page)/need/[a-zA-z0-9]+/events/.+|/(resource|data|page)/connection/[a-zA-z0-9]+/events/.+\?deep=true|/resource\?register=.+)"
               entry-point-ref="authorizationEntryPoint"
               authentication-manager-ref="authenticationManager"
               use-expressions="true"
@@ -53,8 +53,8 @@
         <sec:intercept-url pattern = "/(resource|data|page)/event/.+" access="isFullyAuthenticated()" />
         <sec:intercept-url pattern = "/(resource|data|page)/need/[a-zA-z0-9]+/deep.*" access="isFullyAuthenticated()" />
         <sec:intercept-url pattern = "/(resource|data|page)/need/[a-zA-z0-9]+/events/.+" access="isFullyAuthenticated()" />
-        <sec:intercept-url pattern = "/(resource|data|page)/connection/[a-zA-z0-9]+/events/.+\\?deep=true" access="isFullyAuthenticated()" />
-        <sec:intercept-url pattern = "/resource\\?register=.+" access="isFullyAuthenticated()" />
+        <sec:intercept-url pattern = "/(resource|data|page)/connection/[a-zA-z0-9]+/events/.+\?deep=true" access="isFullyAuthenticated()" />
+        <sec:intercept-url pattern = "/resource\?register=.+" access="isFullyAuthenticated()" />
         <sec:intercept-url pattern=".*" access="denyAll" />
     </sec:http>
 
