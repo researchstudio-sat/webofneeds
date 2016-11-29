@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.HandlerMapping;
 import won.cryptography.service.RegistrationServer;
+import won.cryptography.webid.springsecurity.ClientCertificateNoWebIdUserDetails;
 import won.cryptography.webid.springsecurity.WebIdUserDetails;
 import won.node.service.impl.URIService;
 import won.protocol.exception.IncorrectPropertyCountException;
@@ -1337,7 +1338,7 @@ public class
     String supportedTypesMsg = "Request parameter error; supported 'register' parameter values: 'owner', 'node'";
 
     if (registeredType == null) {
-      logger.warn(supportedTypesMsg);
+      logger.info(supportedTypesMsg);
       return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
     }
     PreAuthenticatedAuthenticationToken authentication = (PreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -1346,27 +1347,30 @@ public class
       throw new BadCredentialsException("Could not register: PreAuthenticatedAuthenticationToken expected");
     }
     Object principal = authentication.getPrincipal();
-    if (! (principal instanceof WebIdUserDetails)){
-      throw new BadCredentialsException("Could not register: WebIdUserDetails expected");
-    }
-    WebIdUserDetails userDetails = (WebIdUserDetails) principal;
-    String webId = userDetails.getUsername();
-    X509Certificate cert = (X509Certificate) authentication.getCredentials();
 
+    Object credentials = authentication.getCredentials();
+    X509Certificate cert = null;
+    if (credentials instanceof X509Certificate){
+      cert = (X509Certificate) credentials;
+    } else {
+      throw new BadCredentialsException("Could not register: expected to find a X509Certificate in the request");
+    }
     try {
       if (registeredType.equals("owner")) {
         String result = registrationServer.registerOwner(cert);
+        logger.debug("successfully registered owner");
         return new ResponseEntity<String>(result, HttpStatus.OK);
       }
       if (registeredType.equals("node")) {
         String result = registrationServer.registerNode(cert);
+        logger.debug("successfully registered node");
         return new ResponseEntity<String>(result, HttpStatus.OK);
       } else {
-        logger.warn(supportedTypesMsg);
+        logger.debug(supportedTypesMsg);
         return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
       }
     } catch (WonProtocolException e) {
-      logger.warn("Could not register " + registeredType, e);
+      logger.info("Could not register " + registeredType, e);
       return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
   }
