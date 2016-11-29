@@ -18,7 +18,9 @@ package won.cryptography.webid.springsecurity;
 
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.web.authentication.preauth.x509.X509AuthenticationFilter;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
+import org.springframework.security.web.authentication.preauth.x509.SubjectDnX509PrincipalExtractor;
+import org.springframework.security.web.authentication.preauth.x509.X509PrincipalExtractor;
 import won.protocol.vocabulary.WONCRYPT;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,12 +33,23 @@ import java.security.cert.X509Certificate;
 /**
  * Created by fkleedorfer on 28.11.2016.
  */
-public class ReverseProxyCompatibleX509AuthenticationFilter extends X509AuthenticationFilter
+public class ReverseProxyCompatibleX509AuthenticationFilter extends AbstractPreAuthenticatedProcessingFilter
 {
   private final boolean behindProxy;
+  private X509PrincipalExtractor principalExtractor = new SubjectDnX509PrincipalExtractor();
 
   public ReverseProxyCompatibleX509AuthenticationFilter(final boolean behindProxy) {
     this.behindProxy = behindProxy;
+  }
+
+  protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
+    X509Certificate cert = extractClientCertificate(request);
+
+    if (cert == null) {
+      return null;
+    }
+
+    return principalExtractor.extractPrincipal(cert);
   }
 
   @Override
@@ -95,5 +108,9 @@ public class ReverseProxyCompatibleX509AuthenticationFilter extends X509Authenti
     }
 
     return certificateChainObj[0];
+  }
+
+  public void setPrincipalExtractor(X509PrincipalExtractor principalExtractor) {
+    this.principalExtractor = principalExtractor;
   }
 }
