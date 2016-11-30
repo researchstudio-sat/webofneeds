@@ -19,16 +19,15 @@ package won.protocol.rest;
 import com.hp.hpl.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class LinkedDataRestClient
 {
@@ -44,7 +43,14 @@ public abstract class LinkedDataRestClient
    * @param resourceURI
    * @return
    */
-  public abstract Dataset readResourceData(URI resourceURI);
+  public Dataset readResourceData(URI resourceURI) {
+    return readResourceDataWithHeaders(resourceURI).getDataset();
+  }
+
+  public abstract DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI);
+
+  public abstract DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI, Map<String, String>
+    requestHeaders);
 
   /**
    * Retrieves RDF for the specified resource URI for the entity with provided WebID.
@@ -55,21 +61,52 @@ public abstract class LinkedDataRestClient
    * @param requesterWebID
    * @return
    */
-  public abstract Dataset readResourceData(URI resourceURI, URI requesterWebID);
+  public Dataset readResourceData(URI resourceURI, URI requesterWebID){
+    return readResourceDataWithHeaders(resourceURI, requesterWebID).getDataset();
+  }
+
+  public abstract DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI, URI requesterWebID);
 
 
-  protected Dataset readResourceData(URI resourceURI, RestTemplate restTemplate, HttpEntity entity) {
+  /**
+   * Retrieves RDF for the specified resource URI.
+   * Expects that the resource URI will lead to a 303 response, redirecting to the URI where RDF can be downloaded.
+
+   *
+   * @param resourceURI
+   * @return
+   */
+  public Dataset readResourceData(URI resourceURI, URI requesterWebID, Map<String, String>
+    requestHeaders){
+    return readResourceDataWithHeaders(resourceURI, requesterWebID, requestHeaders).getDataset();
+  }
+  public abstract DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI, URI requesterWebID,
+                                                                                      Map<String,
+    String>
+    requestHeaders);
+
+  protected DatasetResponseWithStatusCodeAndHeaders readResourceData(URI resourceURI, RestTemplate restTemplate, Map<String,
+    String> requestHeaders) {
     assert resourceURI != null : "resource URI must not be null";
     logger.debug("fetching linked data resource: {}", resourceURI);
 
     //If a RestClientException is thrown here complaining that it can't read a Model with MIME media type text/html,
     //it was probably the wrong resourceURI
     Dataset result;
+    int statusCode = -1;
+    Map<String, String> responseHeaderMap = null;
     try {
+      HttpEntity entity = new HttpEntity(requestHeaders);
       ResponseEntity<Dataset> response = restTemplate.exchange(resourceURI, HttpMethod.GET, entity, Dataset.class);
       //RestTemplate will automatically follow redirects on HttpGet calls
-
-      if(response.getStatusCode()!= HttpStatus.OK){
+      statusCode = response.getStatusCode().value();
+      HttpHeaders responseHeaders = response.getHeaders();
+      if (responseHeaders == null){
+        responseHeaderMap = new HashMap<>();
+      } else {
+        responseHeaderMap = responseHeaders.toSingleValueMap();
+      }
+      if(!response.getStatusCode().is2xxSuccessful()){
         throw new HttpClientErrorException(response.getStatusCode());
       }
       result = response.getBody();
@@ -87,7 +124,7 @@ public abstract class LinkedDataRestClient
       logger.debug("fetched model with {} statements in default model for resource {}",result.getDefaultModel().size(),
                    resourceURI);
     }
-    return result;
+    return new DatasetResponseWithStatusCodeAndHeaders(result, statusCode, responseHeaderMap);
   }
 
 

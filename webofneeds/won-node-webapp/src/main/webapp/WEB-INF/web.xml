@@ -6,12 +6,11 @@
     <display-name>WON Node Webapp</display-name>
 
     <filter>
-        <filter-name>filterChainProxy</filter-name>
+        <filter-name>springSecurityFilterChain</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     </filter>
     <filter-mapping>
-        <filter-name>filterChainProxy</filter-name> <!-- filterChainProxy -->
-        <!-- springSecurityFilterChain -->
+        <filter-name>springSecurityFilterChain</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
@@ -53,7 +52,12 @@
     </welcome-file-list>
 
     <!-- SECURITY -->
-    <security-constraint>
+    <!--
+        we don't use this because it messes with our headers. If we find out how to fine-tune it, we can
+        activate it again
+    -->
+
+    <!-- security-constraint>
         <web-resource-collection>
             <web-resource-name>node-linked-data</web-resource-name>
             <url-pattern>/*</url-pattern>
@@ -61,6 +65,6 @@
         <user-data-constraint>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
-    </security-constraint>
+    </security-constraint-->
 
 </web-app>

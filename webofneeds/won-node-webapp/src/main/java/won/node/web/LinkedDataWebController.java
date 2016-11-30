@@ -30,6 +30,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.FilterInvocation;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +43,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.HandlerMapping;
 import won.cryptography.service.RegistrationServer;
-import won.cryptography.webid.CertificateUtils;
+import won.cryptography.webid.springsecurity.ClientCertificateNoWebIdUserDetails;
+import won.cryptography.webid.springsecurity.WebIdUserDetails;
 import won.node.service.impl.URIService;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.exception.NoSuchConnectionException;
@@ -126,9 +132,6 @@ public class
   private String pageURIPrefix;
   private String  nodeResourceURIPrefix;
 
-  // true if the node is behind a reverse proxy
-  private boolean behindProxy;
-
   @Autowired
   private LinkedDataService linkedDataService;
 
@@ -138,6 +141,8 @@ public class
   //date format for Expires header (rfc 1123)
   private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyy HH:mm:ss z";
 
+  //timeout for resources that clients may cache for a short term
+  private static final int SHORT_TERM_CACHE_TIMEOUT_SECONDS = 600;
 
   @Autowired
   private URIService uriService;
@@ -572,11 +577,12 @@ public class
     //for /resource/need and resource/connection so that crawlers always re-fetch these data
     URI requestUriAsURI = URI.create(requestUri);
     String requestPath = requestUriAsURI.getPath();
-    if (! (requestPath.replaceAll("/$","").endsWith(this.connectionResourceURIPath.replaceAll("/$", "")) ||
-           requestPath.replaceAll("/$","").endsWith(this.needResourceURIPath.replaceAll("/$", "")))) {
-
-    } else {
+    if (requestPath.replaceAll("/$","").endsWith(this.connectionResourceURIPath.replaceAll("/$", "")) ||
+           requestPath.replaceAll("/$","").endsWith(this.needResourceURIPath.replaceAll("/$", ""))
+        ){
       headers = addAlreadyExpiredHeaders(headers);
+    } else {
+      headers = addNeverExpiresHeaders(headers);
     }
     return headers;
   }
@@ -826,6 +832,8 @@ public class
         //TODO: need information does change over time. The immutable need information should never expire, the mutable should
         HttpHeaders headers = new HttpHeaders();
       addCORSHeader(headers);
+      addHeadersForShortTermCaching(headers);
+      headers.add(HttpHeaders.CACHE_CONTROL, "public");
       return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
     }
 
@@ -1212,9 +1220,27 @@ public class
    * @return the headers map with added header values
    */
   private HttpHeaders addNeverExpiresHeaders(HttpHeaders headers){
-    SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_RFC_1123);
+    headers.add(HttpHeaders.CACHE_CONTROL, "public");
+    SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_RFC_1123, Locale.ENGLISH);
     headers.add(HTTP.HEADER_EXPIRES, dateFormat.format(getNeverExpiresDate()));
     headers.add(HTTP.HEADER_DATE, dateFormat.format(new Date()));
+    return headers;
+  }
+
+  /**
+   * Sets the Expires and Cache-Control header fields such that the response will be cached for a few minutes.
+   * Useful for data that might change during a server reconfiguration but is otherwise quite stable.
+   * @param headers
+   * @return the headers map with added header values
+   */
+  private HttpHeaders addHeadersForShortTermCaching(HttpHeaders headers){
+    SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_RFC_1123, Locale.ENGLISH);
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(new Date());
+    cal.add(Calendar.SECOND, SHORT_TERM_CACHE_TIMEOUT_SECONDS);
+    headers.add(HTTP.HEADER_EXPIRES, dateFormat.format(cal.getTime()));
+    headers.add(HTTP.HEADER_DATE, dateFormat.format(new Date()));
+    headers.add(HttpHeaders.CACHE_CONTROL, "max-age=" + SHORT_TERM_CACHE_TIMEOUT_SECONDS);
     return headers;
   }
 
@@ -1225,11 +1251,7 @@ public class
    * @return the headers map with added header values
    */
   private  HttpHeaders addAlreadyExpiredHeaders(HttpHeaders headers){
-    Date headerDate = new Date();
-    SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_RFC_1123);
-    String formattedDate = dateFormat.format(headerDate);
-    headers.add(HTTP.HEADER_EXPIRES, formattedDate);
-    headers.add(HTTP.HEADER_DATE, formattedDate);
+    headers.add(HttpHeaders.CACHE_CONTROL, "no-cache");
     return headers;
   }
 
@@ -1316,35 +1338,41 @@ public class
     String supportedTypesMsg = "Request parameter error; supported 'register' parameter values: 'owner', 'node'";
 
     if (registeredType == null) {
-      logger.warn(supportedTypesMsg);
+      logger.info(supportedTypesMsg);
       return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
     }
+    PreAuthenticatedAuthenticationToken authentication = (PreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-    X509Certificate[] certChain = null;
-    try {
-      certChain = CertificateUtils.extractClientCertificateFromRequest(request, behindProxy);
-    } catch (CertificateException e) {
-      logger.error(e.getMessage());
-      return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
+    if (! (authentication instanceof PreAuthenticatedAuthenticationToken)) {
+      throw new BadCredentialsException("Could not register: PreAuthenticatedAuthenticationToken expected");
     }
+    Object principal = authentication.getPrincipal();
 
+    Object credentials = authentication.getCredentials();
+    X509Certificate cert = null;
+    if (credentials instanceof X509Certificate){
+      cert = (X509Certificate) credentials;
+    } else {
+      throw new BadCredentialsException("Could not register: expected to find a X509Certificate in the request");
+    }
     try {
       if (registeredType.equals("owner")) {
-        String result = registrationServer.registerOwner(certChain);
+        String result = registrationServer.registerOwner(cert);
+        logger.debug("successfully registered owner");
         return new ResponseEntity<String>(result, HttpStatus.OK);
       }
       if (registeredType.equals("node")) {
-        String result = registrationServer.registerNode(certChain);
+        String result = registrationServer.registerNode(cert);
+        logger.debug("successfully registered node");
         return new ResponseEntity<String>(result, HttpStatus.OK);
       } else {
-        logger.warn(supportedTypesMsg);
+        logger.debug(supportedTypesMsg);
         return new ResponseEntity<String>(supportedTypesMsg, HttpStatus.BAD_REQUEST);
       }
     } catch (WonProtocolException e) {
-      logger.warn("Could not register " + registeredType, e);
+      logger.info("Could not register " + registeredType, e);
       return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
-
   }
 
   private class DateParameter
@@ -1399,13 +1427,5 @@ public class
     public String getTimestamp() {
       return timestamp;
     }
-  }
-
-  public boolean isBehindProxy() {
-    return behindProxy;
-  }
-
-  public void setBehindProxy(final boolean behindProxy) {
-    this.behindProxy = behindProxy;
   }
 }

@@ -6,7 +6,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sparql.path.Path;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.KeyStoreService;
 import won.protocol.util.DefaultPrefixUtils;
@@ -58,26 +57,26 @@ public class TestingDataSource implements LinkedDataSource
 
   @Override
   public Dataset getDataForResource(final URI resourceURI, final URI requesterWebID) {
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public Dataset getDataForResource(final URI resourceURI, final List<URI> properties, final int maxRequest, final int maxDepth) {
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public Dataset getDataForResource(final URI resourceURI, final URI requesterWebID, final List<URI> properties, final int maxRequest, final int maxDepth) {
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties, final int maxRequest, final int maxDepth, final boolean moveAllTriplesInDefaultGraph) {
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final URI requesterWebID, final List<Path> properties, final int maxRequest, final int maxDepth, final boolean moveAllTriplesInDefaultGraph) {
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 }
