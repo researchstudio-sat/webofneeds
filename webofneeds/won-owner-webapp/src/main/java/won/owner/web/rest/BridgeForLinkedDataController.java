@@ -27,10 +27,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+
+import static com.hp.hpl.jena.sparql.vocabulary.TestManifestUpdate_11.request;
 
 /**
  * User: ypanchenko
@@ -78,10 +81,25 @@ public class BridgeForLinkedDataController {
 
     // prepare restTestmplate that can deal with webID certificate
     RestTemplate restTemplate = null;
-    if (requesterWebId == null || !currentUserHasIdentity(requesterWebId)) {
+    //no webID requested? - don't use one!
+    if (requesterWebId == null) {
       restTemplate = linkedDataRestBridge.getRestTemplate();
     } else {
-      restTemplate = linkedDataRestBridge.getRestTemplate(requesterWebId);
+      //check if the requesterWebID actually is an URI
+      try {
+        new URI(requesterWebId);
+      } catch (URISyntaxException e) {
+        throw new IllegalArgumentException("Parameter 'requester' must be a URI. Actual value was: '" +
+                                             requesterWebId + "'");
+      }
+      //check if the currently logged in user owns that webid:
+      if (currentUserHasIdentity(requesterWebId)) {
+        //yes: let them use it
+        restTemplate = linkedDataRestBridge.getRestTemplate(requesterWebId);
+      } else {
+        //no: that's fishy, but we let them make the request without the webid
+        restTemplate = linkedDataRestBridge.getRestTemplate();
+      }
     }
 
     // prepare headers to be passed in request for linked data resource

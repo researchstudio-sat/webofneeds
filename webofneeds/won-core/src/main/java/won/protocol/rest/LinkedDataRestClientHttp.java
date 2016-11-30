@@ -16,11 +16,10 @@
 
 package won.protocol.rest;
 
-import com.hp.hpl.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -28,6 +27,9 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * User: fkleedorfer
@@ -38,7 +40,7 @@ public class LinkedDataRestClientHttp extends LinkedDataRestClient
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private RestTemplate restTemplate;
-  private HttpEntity entity;
+  private String acceptHeaderValue = null;
 
 
   public LinkedDataRestClientHttp() {
@@ -62,9 +64,7 @@ public class LinkedDataRestClientHttp extends LinkedDataRestClient
       restTemplate.getMessageConverters().add(datasetConverter);
 
       HttpHeaders headers = new HttpHeaders();
-      headers.setAccept(datasetConverter.getSupportedMediaTypes());
-
-      entity = new HttpEntity(headers);
+      this. acceptHeaderValue = MediaType.toString(datasetConverter.getSupportedMediaTypes());
   }
 
 
@@ -77,15 +77,40 @@ public class LinkedDataRestClientHttp extends LinkedDataRestClient
    * @return
    */
   @Override
-  public Dataset readResourceData(URI resourceURI) {
-    return super.readResourceData(resourceURI, restTemplate, entity);
+  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(URI resourceURI) {
+    Map<String, String> requestHeaders = new HashMap<String, String>();
+    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+    return super.readResourceData(resourceURI, restTemplate, requestHeaders);
   }
 
   @Override
-  public Dataset readResourceData(final URI resourceURI, final URI requesterWebID) {
-    logger.warn("Requester specific Data retrieval not supported - requesterWebID is ignored");
-    return readResourceData(resourceURI);
+  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI, final
+    Map<String, String> requestHeaders) {
+    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+    return super.readResourceData(resourceURI, restTemplate, requestHeaders);
   }
 
+  @Override
+  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI, final URI requesterWebID) {
+    logger.warn("Requester specific Data retrieval not supported - requesterWebID is ignored");
+    Map<String, String> requestHeaders = new HashMap<String, String>();
+    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+    return readResourceDataWithHeaders(resourceURI);
+  }
+
+  /**
+   * Reads the Dataset from the specified URI, using the provided headers. Adds the default accept headers before
+   * sending the request.
+   * @param resourceURI
+   * @param requesterWebID
+   * @param requestHeaders
+   * @return
+   */
+  @Override
+  public DatasetResponseWithStatusCodeAndHeaders readResourceDataWithHeaders(final URI resourceURI, final URI requesterWebID, final
+  Map<String, String> requestHeaders) {
+    requestHeaders.put(HttpHeaders.ACCEPT, this.acceptHeaderValue);
+    return super.readResourceData(resourceURI, restTemplate, requestHeaders);
+  }
 
 }

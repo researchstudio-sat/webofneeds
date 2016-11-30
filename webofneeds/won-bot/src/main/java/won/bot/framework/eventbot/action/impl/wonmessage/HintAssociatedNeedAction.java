@@ -69,7 +69,7 @@ public class HintAssociatedNeedAction extends BaseEventBotAction
           remoteNeedUri, myNeedUri, 0.9, matcherURI));
 
     } catch (Exception e) {
-      logger.warn("could not send hint for {} to {}", new Object[]{myNeedUri, remoteNeedUri}, e);
+      logger.warn("could not send hint for " +myNeedUri+ " to " + remoteNeedUri, e);
     }
   }
 
