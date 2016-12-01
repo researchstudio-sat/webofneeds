@@ -26,14 +26,12 @@ import won.protocol.rest.RDFMediaType;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.apache.jena.sparql.vocabulary.TestManifestUpdate_11.request;
 
 /**
  * User: ypanchenko
@@ -133,26 +131,40 @@ public class BridgeForLinkedDataController {
     throws IOException {
     // create response headers
     MediaType originalResponseMediaType = originalResponse.getHeaders().getContentType();
-    if(RDFMediaType.isRDFMediaType(originalResponseMediaType)){
+    if (originalResponseMediaType == null) {
+      // No content-type header: we assume there is no body, as in our application this only happens
+      // with 304 NOT MODIFIED responses. We don't copy the body to the response. We log a debug message though
+      logger.debug("no Content-Type header found in response from server. Assuming no body, not attempting to copy " +
+                     "body");
       copyLinkedDataResponseRelevantHeaders(originalResponse.getHeaders(), response);
       response.setStatus(originalResponse.getRawStatusCode());
-      // create response body
-      copyResponseBody(originalResponse, response);
-      // close response output stream
     } else {
-      copyResponseBody(originalResponse, response);
-      response.setStatus(HttpStatus.SC_BAD_GATEWAY);
-      /*response.getOutputStream().print("The nodes' response was of type " + originalResponseMediaType
-              + ". For security reasons the owner-server only forwards responses of the following types " +
-              RDFMediaType.rdfMediaTypes.toString());*/
-    };
+      if (RDFMediaType.isRDFMediaType(originalResponseMediaType)) {
+        copyLinkedDataResponseRelevantHeaders(originalResponse.getHeaders(), response);
+        response.setStatus(originalResponse.getRawStatusCode());
+        // create response body
+        copyResponseBody(originalResponse, response);
+        // close response output stream
+      } else {
+        //the content type is not an RDF media type. We don't like to handle such requests. indicate this with
+        //the BAD GATEWAY response status
+        copyResponseBody(originalResponse, response);
+        response.setStatus(HttpStatus.SC_BAD_GATEWAY);
+        /*response.getOutputStream().print("The nodes' response was of type " + originalResponseMediaType
+                + ". For security reasons the owner-server only forwards responses of the following types " +
+                RDFMediaType.rdfMediaTypes.toString());*/
+      }
+    }
     response.getOutputStream().flush();
     response.getOutputStream().close();
   }
 
   private void copyResponseBody(final ClientHttpResponse fromResponse, final HttpServletResponse toResponse)
     throws IOException {
-    org.apache.commons.io.IOUtils.copy(fromResponse.getBody(), toResponse.getOutputStream());
+    InputStream is = fromResponse.getBody();
+    if (is != null) {
+      org.apache.commons.io.IOUtils.copy(is, toResponse.getOutputStream());
+    }
   }
 
 
@@ -188,6 +200,8 @@ public class BridgeForLinkedDataController {
     copyHeader(HttpHeaders.ACCEPT_LANGUAGE, request, headers);
     copyHeader(HttpHeaders.ACCEPT_ENCODING, request, headers);
     copyHeader(HttpHeaders.USER_AGENT, request, headers);
+    copyHeader(HttpHeaders.CACHE_CONTROL, request, headers);
+    copyHeader(HttpHeaders.IF_NONE_MATCH, request, headers);
     return headers;
   }
 
