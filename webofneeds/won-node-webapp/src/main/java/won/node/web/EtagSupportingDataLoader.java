@@ -14,22 +14,21 @@
  *    limitations under the License.
  */
 
-package won.protocol.repository.rdfstorage.impl;
+package won.node.web;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
+import org.springframework.http.HttpHeaders;
+import won.protocol.model.DataWithEtag;
+
+import java.net.URI;
 
 /**
- * Simple in-memory RDF storage for testing/benchmarking purposes.
+ * Created by fkleedorfer on 01.12.2016.
  */
-@Deprecated
-public class InMemoryRdfStorageImpl extends AbstractDatasetBasedRdfStorageService
+public interface EtagSupportingDataLoader<T>
 {
-  private Dataset dataset;
+  public URI createUriForIdentifier(String identifier);
 
-  @Override
-  protected Dataset getDataset() {
-    return DatasetFactory.createMem();
-  }
+  public DataWithEtag<T> loadDataWithEtag(URI uri, String etag);
 
+  public void addHeaders(HttpHeaders headers);
 }

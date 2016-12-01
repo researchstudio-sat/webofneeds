@@ -22,6 +22,7 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
+import won.protocol.model.DataWithEtag;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
 
@@ -207,7 +208,7 @@ public interface NeedInformationService {
      * @throws NoSuchNeedException
      */
     public Connection readConnection(URI connectionURI) throws NoSuchConnectionException;
-
+    public DataWithEtag<Connection> readConnection(URI connectionURI, String Etag);
 
     /**
      * Retrieves the public description of the connection as an RDF graph.
