@@ -1,4 +1,4 @@
-<%--
+<!--
   ~ Copyright 2012  Research Studios Austria Forschungsges.m.b.H.
   ~
   ~    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +12,7 @@
   ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~    See the License for the specific language governing permissions and
   ~    limitations under the License.
-  --%>
-
-<!DOCTYPE HTML>
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+  -->
 <html>
 <head>
     <meta charset="UTF-8">
@@ -27,29 +23,6 @@
 </head>
 <body>
 <section ui-view></section>
-
-<!-- <debug-navigation>
-<div style="position: fixed;
-                    z-index: 200;
-                    bottom: 0px; left: 0px; right: 0px;
-                    background-color: lightgray;
-                    border-top: 1px solid black;">
-    debug navigation: |
-    <a ui-sref="landingpage">landingpage</a> |
-    <a ui-sref="createNeed({draftId: 0})">create-need</a> |
-    <a ui-sref="feed">feed</a> |
-    <a ui-sref="settings.general">settings</a> |
-    <a ui-sref="overviewMatches">matches</a> |
-    <a ui-sref="overviewIncomingRequests">incoming-requests</a> |
-    <a ui-sref="overviewPosts">posts</a> |
-    <a ui-sref="postVisitor({myUri: 'http://example.org/121337345', theirUri: 'http://example.org/97172311'})">visitor-info</a> |
-    <a ui-sref="postVisitorMsgs({myUri: 'http://example.org/121337345', theirUri: 'http://example.org/97172311'})">visitor-convo</a> |
-    <a ui-sref="postInfo({myUri: 'http://example.org/121337345'})">owner-info</a> |
-    <a ui-sref="postMatches({myUri: 'http://example.org/121337345'})">owner-matches</a> |
-    <a ui-sref="postRequests({myUri: 'http://example.org/121337345'})">owner-requests</a> |
-    <a ui-sref="postConversations({myUri: 'http://example.org/121337345'})">owner-convos</a>
-</div>
-<!-- </debug-navigation> -->
 
 <!-- TODO make sure to only show the svgs once angular has finished rendering -->
 
