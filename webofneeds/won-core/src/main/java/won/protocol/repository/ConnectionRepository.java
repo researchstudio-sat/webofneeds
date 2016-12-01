@@ -43,6 +43,8 @@ public interface ConnectionRepository extends WonRepository<Connection>
 
   Connection findOneByConnectionURI(URI URI);
 
+  Connection findOneByConnectionURIAndVersionNot(URI URI, long version);
+
   Connection findOneByNeedURIAndRemoteNeedURIAndTypeURI(URI needURI, URI remoteNeedURI, URI typeUri);
 
   List<Connection> findByNeedURI(URI URI);

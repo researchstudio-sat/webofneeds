@@ -271,12 +271,32 @@ public class LinkedDataServiceImpl implements LinkedDataService
       blankNodeUriSpec.addProperty(WON.HAS_EVENT_URI_PREFIX, model.createLiteral(this.eventResourceURIPrefix));
   }
 
+  /***
+   * ETag-aware method for obtaining connection data. Currently does not take into account new events, only changes
+   * to the connection itself.
+   * @param connectionUri
+   * @param includeEventContainer
+   * @param includeLatestEvent
+   * @param etag
+   * @return
+   */
   @Override
-  public Dataset getConnectionDataset(final URI connectionUri, final boolean includeEventContainer, final boolean
-    includeLatestEvent) throws
-    NoSuchConnectionException
+  public DataWithEtag<Dataset> getConnectionDataset(final URI connectionUri, final boolean includeEventContainer, final
+  boolean
+    includeLatestEvent, final String etag)
+
   {
-    Connection connection = needInformationService.readConnection(connectionUri);
+    DataWithEtag<Connection> data = null;
+    Connection connection = null;
+    data = needInformationService.readConnection(connectionUri, etag);
+    if (data.isNotFound()) {
+      return DataWithEtag.dataNotFound();
+    }
+    if (!data.isChanged()){
+      return DataWithEtag.dataNotChanged(data);
+    }
+    connection = data.getData();
+    String newEtag = data.getEtag();
 
     // load the model from storage
     Model model = connectionModelMapper.toModel(connection);
@@ -317,7 +337,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     Dataset connectionDataset = addBaseUriAndDefaultPrefixes(newDatasetWithNamedModel(createDataGraphUriFromResource
                                                                        (connectionResource), model));
     RdfUtils.addDatasetToDataset(connectionDataset, eventDataset);
-    return connectionDataset;
+    return new DataWithEtag<>(connectionDataset,newEtag, etag);
   }
 
 
@@ -550,6 +570,16 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return result;
   }
 
+  @Override
+  public DataWithEtag<Dataset> getDatasetForUri(URI datasetUri, String etag) {
+    DataWithEtag<Dataset> result = rdfStorage.loadDataset(datasetUri, etag);
+    if (result.getData() == null) return result;
+    DefaultPrefixUtils.setDefaultPrefixes(result.getData().getDefaultModel());
+    addBaseUriAndDefaultPrefixes(result.getData());
+    return result;
+  }
+
+
   private String createDataGraphUriFromResource(Resource needListPageResource) {
     URI uri = URI.create(needListPageResource.getURI());
     return createDataGraphUriFromUri(uri);
@@ -688,9 +718,9 @@ public class LinkedDataServiceImpl implements LinkedDataService
   public void addDeepConnectionData(Dataset dataset, List<URI> connectionURIs) throws NoSuchConnectionException {
     //add the connection model for each connection URI
     for (URI connectionURI : connectionURIs) {
-      Dataset connectionDataset =
-        getConnectionDataset(connectionURI, true, true);
-      RdfUtils.addDatasetToDataset(dataset, connectionDataset);
+      DataWithEtag<Dataset> connectionDataset =
+        getConnectionDataset(connectionURI, true, true, null);
+      RdfUtils.addDatasetToDataset(dataset, connectionDataset.getData());
     }
   }
 

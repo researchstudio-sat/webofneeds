@@ -38,6 +38,10 @@ public class DatasetHolder
 {
   private static final int DEFAULT_BYTE_ARRAY_SIZE = 500;
 
+  @Version
+  @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
+  private long version = 0L;
+
   @Transient
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -69,6 +73,14 @@ public class DatasetHolder
 
   public void setUri(final URI uri) {
     this.uri = uri;
+  }
+
+  protected void setVersion(final long version) {
+    this.version = version;
+  }
+
+  public long getVersion() {
+    return version;
   }
 
   byte[] getDatasetBytes() {
