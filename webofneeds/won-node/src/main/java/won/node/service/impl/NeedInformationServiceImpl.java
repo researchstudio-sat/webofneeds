@@ -25,10 +25,7 @@ import org.springframework.stereotype.Component;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessageType;
-import won.protocol.model.Connection;
-import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.model.Need;
-import won.protocol.model.NeedState;
+import won.protocol.model.*;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.NeedRepository;
@@ -267,6 +264,21 @@ public class NeedInformationServiceImpl implements NeedInformationService
     if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
     return DataAccessUtils.loadConnection(connectionRepository, connectionURI);
   }
+
+  @Override
+  public DataWithEtag<Connection> readConnection(final URI connectionURI, String etag)
+  {
+    if (connectionURI == null) throw new IllegalArgumentException("connectionURI is not set");
+    Connection con = null;
+    if (etag == null) {
+      con = connectionRepository.findOneByConnectionURI(connectionURI);
+    } else {
+      Long version = Long.valueOf(etag);
+      con = connectionRepository.findOneByConnectionURIAndVersionNot(connectionURI, version);
+    }
+    return new DataWithEtag<>(con, con == null ? etag : Long.toString(con.getVersion()), etag);
+  }
+
 
   //TODO implement RDF handling!
   @Override

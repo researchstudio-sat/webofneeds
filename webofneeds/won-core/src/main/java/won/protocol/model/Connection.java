@@ -33,6 +33,10 @@ public class Connection
   @Column( name = "id" )
   private Long id;
 
+  @Version
+  @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
+  private long version = 0L;
+
   /* The public URI of this connection */
   @Column( name = "connectionURI", unique = true)
   @Convert( converter = URIConverter.class )
@@ -142,6 +146,15 @@ public class Connection
   {
     this.state = state;
   }
+
+  protected void setVersion(final long version) {
+    this.version = version;
+  }
+
+  public long getVersion() {
+    return version;
+  }
+
 
   @Override
   public boolean equals(final Object o)

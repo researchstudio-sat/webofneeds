@@ -16,24 +16,18 @@
 
 package won.node.web;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.vocabulary.RDFS;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.NoSuchMessageException;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,16 +36,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.HandlerMapping;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import won.cryptography.service.RegistrationServer;
-import won.cryptography.webid.springsecurity.ClientCertificateNoWebIdUserDetails;
-import won.cryptography.webid.springsecurity.WebIdUserDetails;
 import won.node.service.impl.URIService;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.exception.WonProtocolException;
 import won.protocol.message.WonMessageType;
+import won.protocol.model.DataWithEtag;
 import won.protocol.model.NeedState;
+import won.protocol.rest.WonEtagHelper;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.util.RdfUtils;
@@ -200,17 +195,16 @@ public class
   //webmvc controller method
   @RequestMapping("${uri.path.page.connection}/{identifier}")
   public String showConnectionPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
-    try {
-      URI connectionURI = uriService.createConnectionURIForId(identifier);
-      Dataset rdfDataset = linkedDataService.getConnectionDataset(connectionURI, true, true);
-      model.addAttribute("rdfDataset", rdfDataset);
-      model.addAttribute("resourceURI", connectionURI.toString());
-      model.addAttribute("dataURI", uriService.toDataURIIfPossible(connectionURI).toString());
-      return "rdfDatasetView";
-    } catch (NoSuchConnectionException e) {
+    URI connectionURI = uriService.createConnectionURIForId(identifier);
+    DataWithEtag<Dataset> rdfDataset = linkedDataService.getConnectionDataset(connectionURI, true, true, null);
+    if (rdfDataset.isNotFound()) {
       response.setStatus(HttpServletResponse.SC_NOT_FOUND);
       return "notFoundView";
     }
+    model.addAttribute("rdfDataset", rdfDataset.getData());
+    model.addAttribute("resourceURI", connectionURI.toString());
+    model.addAttribute("dataURI", uriService.toDataURIIfPossible(connectionURI).toString());
+    return "rdfDatasetView";
   }
 
   //webmvc controller method
@@ -580,9 +574,9 @@ public class
     if (requestPath.replaceAll("/$","").endsWith(this.connectionResourceURIPath.replaceAll("/$", "")) ||
            requestPath.replaceAll("/$","").endsWith(this.needResourceURIPath.replaceAll("/$", ""))
         ){
-      headers = addAlreadyExpiredHeaders(headers);
+      addMutableResourceHeaders(headers);
     } else {
-      headers = addNeverExpiresHeaders(headers);
+      addImmutableResourceHeaders(headers);
     }
     return headers;
   }
@@ -643,9 +637,9 @@ public class
       addPagedResourceInSequenceHeader(headers, URI.create(this.needResourceURIPrefix), resource, passableQuery);
     }
 
-    headers = addAlreadyExpiredHeaders(
-      addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()), URI.create(this
-                                                                                              .needResourceURIPrefix)));
+    addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()), URI.create(this
+                                                                                            .needResourceURIPrefix));
+    addMutableResourceHeaders(headers);
     addCORSHeader(headers);
 
     return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
@@ -752,10 +746,9 @@ public class
         .warn("did not find connection that should be connected to need. connection:{}", e.getUnknownConnectionURI());
       return new ResponseEntity<Dataset>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    headers = addAlreadyExpiredHeaders(
-      addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
-                                   URI.create(this.connectionResourceURIPrefix)));
+    addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
+                                 URI.create(this.connectionResourceURIPrefix));
+    addMutableResourceHeaders(headers);
     addCORSHeader(headers);
     return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
   }
@@ -847,17 +840,24 @@ public class
     HttpServletRequest request,
       @PathVariable(value="identifier") String identifier) {
     logger.debug("readConnection() called");
-    URI connectionUri = URI.create(this.connectionResourceURIPrefix + "/" + identifier);
-    try {
-      Dataset model = linkedDataService.getConnectionDataset(connectionUri, true, true);
-      //TODO: connection information does change over time. The immutable connection information should never expire, the mutable should
-      HttpHeaders headers =new HttpHeaders();
-      addCORSHeader(headers);
-      return new ResponseEntity<Dataset>(model, headers, HttpStatus.OK);
+    return getResponseEntity(identifier, request, new EtagSupportingDataLoader<Dataset>(){
+      @Override
+      public URI createUriForIdentifier(final String identifier) {
+        return URI.create(connectionResourceURIPrefix + "/" + identifier);
+      }
 
-    } catch (NoSuchConnectionException e) {
-      return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
-    }
+      @Override
+      public DataWithEtag<Dataset> loadDataWithEtag(final URI uri, final String etag) {
+        return  linkedDataService.getConnectionDataset(uri, true, true, etag);
+      }
+
+      @Override
+      public void addHeaders(final HttpHeaders headers) {
+        addCORSHeader(headers);
+        addPublicHeaders(headers);
+        addMutableResourceHeaders(headers);
+      }
+    });
   }
 
 
@@ -932,8 +932,9 @@ public class
 
     //TODO: events list information does change over time, unless the connection is closed and cannot be reopened.
     // The events list of immutable connection information should never expire, the mutable should
-    headers = addAlreadyExpiredHeaders(
-      addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()), connectionEventsURI));
+    addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()),
+                                 URI.create(this.connectionResourceURIPrefix));
+    addMutableResourceHeaders(headers);
     addCORSHeader(headers);
     return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
 
@@ -963,23 +964,54 @@ public class
               "application/trig",
               "application/n-quads"})
   public ResponseEntity<Dataset> readEvent(
-    HttpServletRequest request,
-    @PathVariable(value = "identifier") String identifier) {
+    @PathVariable(value = "identifier") String identifier, HttpServletRequest request, HttpServletResponse
+    response) {
+    // get etag from headers, extract version identifier
     logger.debug("readConnectionEvent() called");
+    return getResponseEntity(identifier, request, new EtagSupportingDataLoader<Dataset>()
+    {
+      @Override
+      public URI createUriForIdentifier(final String identifier) {
+        return uriService.createEventURIForId(identifier);
+      }
 
-    URI eventURI = uriService.createEventURIForId(identifier);
-    Dataset rdfDataset = linkedDataService.getDatasetForUri(eventURI);
-    if (rdfDataset != null) {
-      HttpHeaders headers = new HttpHeaders();
-      addCORSHeader(headers);
-      return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
-    } else {
-      return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
-    }
+      @Override
+      public DataWithEtag<Dataset> loadDataWithEtag(final URI uri, final String etag) {
+        return linkedDataService.getDatasetForUri(uri, etag);
+      }
 
+      @Override
+      public void addHeaders(final HttpHeaders headers) {
+        addCORSHeader(headers);
+        addPrivateHeaders(headers);
+        addImmutableResourceHeaders(headers);
+      }
+    });
   }
 
-    @RequestMapping(
+  private  <T> ResponseEntity<T> getResponseEntity(String identifier, final
+  HttpServletRequest request, EtagSupportingDataLoader<T> loader) {
+    HttpHeaders requestHeaders = getHttpHeaders(request);
+    WonEtagHelper requestEtagHelper = WonEtagHelper.fromHeaderIfCompatibleWithAcceptHeader(requestHeaders);
+
+    String versionIdentifier = WonEtagHelper.getVersionIdentifier(requestEtagHelper);
+    // fetch the data if required
+    logger.debug("using version identifier {}", versionIdentifier);
+    URI entityUri = loader.createUriForIdentifier(identifier);
+    DataWithEtag<T> dataWithEtag = loader.loadDataWithEtag(entityUri, versionIdentifier);
+
+    // prepare the response headers
+    HttpHeaders headers = new HttpHeaders();
+    loader.addHeaders(headers);
+    // set the etag headers
+    setEtagHeaderForResponse(headers, dataWithEtag, requestEtagHelper);
+
+    //return the response
+    return getResponseEntityForPossiblyNotModifiedResult(dataWithEtag, headers);
+  }
+
+
+  @RequestMapping(
             value="${uri.path.data.attachment}/{identifier}",
             method = RequestMethod.GET,
             produces={"application/ld+json",
@@ -1027,6 +1059,7 @@ public class
     }
     return ret;
   }
+
 
 
     /**
@@ -1110,8 +1143,8 @@ public class
       }
 
       //append the required headers
-      headers = addAlreadyExpiredHeaders(
-        addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()), connectionsURI));
+      addMutableResourceHeaders(headers);
+      addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()), connectionsURI);
       addCORSHeader(headers);
       return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
 
@@ -1214,18 +1247,44 @@ public class
   }
 
   /**
-   * Sets the Date and Expires header fields such that the response will be treated as 'never expires'
-   * (and will therefore be cached forever)
-   * @param headers
-   * @return the headers map with added header values
+   * Headers:
+   * types of resources
+   * * public immutable
+   * * public mutable
+   * * private immutable
+   * * private mutable
+   * * public short-term cacheable
+   * * privet short-term cacheable
    */
-  private HttpHeaders addNeverExpiresHeaders(HttpHeaders headers){
+
+
+  private void addPrivateHeaders(HttpHeaders headers){
+    headers.add(HttpHeaders.CACHE_CONTROL, "private");
+    // with no-store, the items don't survive a browser reload - but if the browser is closed, the items are gone
+    //headers.add(HttpHeaders.CACHE_CONTROL, "no-store");
+  }
+
+  private void addPublicHeaders(HttpHeaders headers){
     headers.add(HttpHeaders.CACHE_CONTROL, "public");
+  }
+
+
+  private void addImmutableResourceHeaders(HttpHeaders headers) {
+    headers.add(HttpHeaders.CACHE_CONTROL, "max-age=31536000");
     SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_RFC_1123, Locale.ENGLISH);
     headers.add(HTTP.HEADER_EXPIRES, dateFormat.format(getNeverExpiresDate()));
     headers.add(HTTP.HEADER_DATE, dateFormat.format(new Date()));
-    return headers;
   }
+
+  private void addMutableResourceHeaders(HttpHeaders headers) {
+    headers.add(HttpHeaders.CACHE_CONTROL, "max-age=0");
+    headers.add(HttpHeaders.CACHE_CONTROL, "must-revalidate");
+    SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_RFC_1123, Locale.ENGLISH);
+    headers.add(HTTP.HEADER_EXPIRES, "0");
+    headers.add(HTTP.HEADER_DATE, dateFormat.format(new Date()));
+  }
+
+
 
   /**
    * Sets the Expires and Cache-Control header fields such that the response will be cached for a few minutes.
@@ -1241,17 +1300,6 @@ public class
     headers.add(HTTP.HEADER_EXPIRES, dateFormat.format(cal.getTime()));
     headers.add(HTTP.HEADER_DATE, dateFormat.format(new Date()));
     headers.add(HttpHeaders.CACHE_CONTROL, "max-age=" + SHORT_TERM_CACHE_TIMEOUT_SECONDS);
-    return headers;
-  }
-
-  /**
-   * Sets the Date and Expires header fields such that the response will be treated as 'already expired'
-   * (and will therefore not be cached)
-   * @param headers
-   * @return the headers map with added header values
-   */
-  private  HttpHeaders addAlreadyExpiredHeaders(HttpHeaders headers){
-    headers.add(HttpHeaders.CACHE_CONTROL, "no-cache");
     return headers;
   }
 
@@ -1273,6 +1321,48 @@ public class
     headers.add("Access-Control-Allow-Origin", "*");
   }
 
+  private HttpHeaders getHttpHeaders(final HttpServletResponse response) {
+    ServletServerHttpResponse servletResponse = new ServletServerHttpResponse(response);
+    return servletResponse.getHeaders();
+  }
+
+  private HttpHeaders getHttpHeaders(final HttpServletRequest request) {
+    ServletServerHttpRequest servletRequest = new ServletServerHttpRequest(request);
+    return servletRequest.getHeaders();
+  }
+
+  private <T> ResponseEntity<T> getResponseEntityForPossiblyNotModifiedResult(final DataWithEtag<T> datasetWithEtag,
+                                                                           final HttpHeaders headers) {
+    if (datasetWithEtag.isChanged()) {
+      if (datasetWithEtag != null) {
+        return new ResponseEntity<>(datasetWithEtag.getData(), headers, HttpStatus.OK);
+      } else {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+    } else {
+      return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
+    }
+  }
+
+  /**
+   * Depending on whether the data has changed, use the old etag or create a new one.
+   * @param headers
+   * @param datasetWithEtag
+   * @param requestEtagHelper
+   */
+  private <T> void setEtagHeaderForResponse(final HttpHeaders headers, final DataWithEtag<T> datasetWithEtag,
+                                         final WonEtagHelper requestEtagHelper) {
+    // check if the data has changed
+    if (datasetWithEtag.isChanged()) {
+      logger.debug("ETAG comparison shows that data has changed or no etag was present");
+      // data has changed: create a new etag and put it into the header
+      WonEtagHelper responseEtagHelper = WonEtagHelper.forVersion(datasetWithEtag.getEtag());
+      WonEtagHelper.setEtagHeader(responseEtagHelper, headers);
+    } else {
+      // data has not changed: use the old etag value for the response ETag header
+      WonEtagHelper.setEtagHeader(requestEtagHelper,headers);
+    }
+  }
 
 
 

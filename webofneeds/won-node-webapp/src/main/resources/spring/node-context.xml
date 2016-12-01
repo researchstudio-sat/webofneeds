@@ -41,7 +41,6 @@
               use-expressions="true"
               access-decision-manager-ref="webIdBasedAccessDecisionManager">
         <sec:headers>
-            <sec:cache-control/>
             <sec:content-type-options />
             <sec:hsts />
             <sec:frame-options />
