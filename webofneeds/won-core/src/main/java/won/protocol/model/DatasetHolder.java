@@ -102,7 +102,7 @@ public class DatasetHolder
     assert this.datasetBytes != null : "model must not be null";
     ByteArrayOutputStream out = new ByteArrayOutputStream(DEFAULT_BYTE_ARRAY_SIZE);
     synchronized(this){
-      RDFDataMgr.write(out, dataset, Lang.NTRIPLES);
+      RDFDataMgr.write(out, dataset, Lang.NQUADS);
       this.datasetBytes = out.toByteArray();
       this.cachedDataset = dataset;
       if (logger.isDebugEnabled()){
@@ -124,7 +124,7 @@ public class DatasetHolder
       InputStream is = new ByteArrayInputStream(this.datasetBytes);
       try {
         try {
-          RDFDataMgr.read(dataset, is, this.uri.toString(), Lang.NTRIPLES);
+          RDFDataMgr.read(dataset, is, this.uri.toString(), Lang.NQUADS);
         } catch (RiotException ex) {
             //assume that the data is stored in TRIG old format, try that.
             is = new ByteArrayInputStream(this.datasetBytes);
