@@ -20,6 +20,7 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RiotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +102,7 @@ public class DatasetHolder
     assert this.datasetBytes != null : "model must not be null";
     ByteArrayOutputStream out = new ByteArrayOutputStream(DEFAULT_BYTE_ARRAY_SIZE);
     synchronized(this){
-      RDFDataMgr.write(out, dataset, Lang.TRIG);
+      RDFDataMgr.write(out, dataset, Lang.NTRIPLES);
       this.datasetBytes = out.toByteArray();
       this.cachedDataset = dataset;
       if (logger.isDebugEnabled()){
@@ -122,7 +123,13 @@ public class DatasetHolder
       Dataset dataset = DatasetFactory.createMem();
       InputStream is = new ByteArrayInputStream(this.datasetBytes);
       try {
-        RDFDataMgr.read(dataset, is,  this.uri.toString(), Lang.TRIG);
+        try {
+          RDFDataMgr.read(dataset, is, this.uri.toString(), Lang.NTRIPLES);
+        } catch (RiotException ex) {
+            //assume that the data is stored in TRIG old format, try that.
+            is = new ByteArrayInputStream(this.datasetBytes);
+            RDFDataMgr.read(dataset, is, Lang.TRIG);
+        }
       } catch (Exception e) {
         logger.warn("could not read dataset {} from byte array. Byte array is null: {}, has length {}",
           new Object[]{this.uri,
