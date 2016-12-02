@@ -1,0 +1,84 @@
+@prefix msg:   <http://purl.org/webofneeds/message#> .
+@prefix conn:  <https://satsrv04.researchstudio.at:8889/won/resource/connection/> .
+@prefix woncrypt: <http://purl.org/webofneeds/woncrypt#> .
+@prefix need:  <https://satsrv04.researchstudio.at:8889/won/resource/need/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix local: <https://satsrv04.researchstudio.at:8889/won/resource/> .
+@prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:   <http://purl.org/webofneeds/model#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix event: <https://satsrv04.researchstudio.at:8889/won/resource/event/> .
+@prefix sioc:  <http://rdfs.org/sioc/ns#> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+<https://satsrv04.researchstudio.at/won/resource/connection/rt3odkhf6vizxrox61sp#data> {
+    conn:rt3odkhf6vizxrox61sp
+            a                        won:Connection ;
+            won:belongsToNeed        need:8786539650086094000 ;
+            won:hasConnectionState   won:Connected ;
+            won:hasEventContainer    <https://satsrv04.researchstudio.at:8889/won/resource/connection/rt3odkhf6vizxrox61sp/events> ;
+            won:hasFacet             won:OwnerFacet ;
+            won:hasRemoteConnection  conn:9vhal0rnjshfx4x6j5ro ;
+            won:hasRemoteNeed        need:e80lv765n203u2iv8fb7 ;
+            won:hasWonNode           <https://satsrv04.researchstudio.at:8889/won/resource> .
+
+    <https://satsrv04.researchstudio.at:8889/won/resource/connection/rt3odkhf6vizxrox61sp/events>
+            a            won:EventContainer ;
+            rdfs:member  event:txutyhkuu9xj5us9l6ct .
+}
+
+<https://satsrv04.researchstudio.at:8889/won/resource/event/txutyhkuu9xj5us9l6ct#envelope-1fu5> {
+    event:txutyhkuu9xj5us9l6ct
+            a                            msg:FromSystem ;
+            msg:hasCorrespondingRemoteMessage
+                    event:5l22wttqg3ca94vr8ino ;
+            msg:hasMessageType           msg:SuccessResponse ;
+            msg:hasPreviousMessage       event:6yvv6j7qpz0t8nldtkyt , event:adc5swwig03sakwtfafo ;
+            msg:hasReceivedTimestamp     "1480433146658"^^xsd:long ;
+            msg:hasReceiver              conn:9vhal0rnjshfx4x6j5ro ;
+            msg:hasReceiverNeed          need:e80lv765n203u2iv8fb7 ;
+            msg:hasReceiverNode          <https://satsrv04.researchstudio.at:8889/won/resource> ;
+            msg:hasSender                conn:rt3odkhf6vizxrox61sp ;
+            msg:hasSenderNeed            need:8786539650086094000 ;
+            msg:hasSenderNode            <https://satsrv04.researchstudio.at:8889/won/resource> ;
+            msg:isRemoteResponseTo       event:gpoa61inj1gz3hv2b624 ;
+            msg:isResponseTo             event:6yvv6j7qpz0t8nldtkyt ;
+            msg:isResponseToMessageType  msg:ConnectionMessage ;
+            msg:protocolVersion          "1.0"^^xsd:string .
+
+    <https://satsrv04.researchstudio.at:8889/won/resource/event/txutyhkuu9xj5us9l6ct#envelope-1fu5>
+            a                      msg:EnvelopeGraph ;
+            msg:containsSignature  <https://satsrv04.researchstudio.at:8889/won/resource/event/adc5swwig03sakwtfafo#envelope-19xl-sig> , <https://satsrv04.researchstudio.at:8889/won/resource/event/6yvv6j7qpz0t8nldtkyt#envelope-t0d8-sig> ;
+            <http://www.w3.org/2004/03/trix/rdfg-1/subGraphOf>
+                    event:txutyhkuu9xj5us9l6ct .
+
+    <https://satsrv04.researchstudio.at:8889/won/resource/event/adc5swwig03sakwtfafo#envelope-19xl-sig>
+            a                               sig:Signature ;
+            sig:hasSignatureValue           "MGYCMQCe06mOOeXQOXu967xedL+xCt/irMV//FNO2THndFIY+SmC5Z5yNF8CjY6bNjAxQqQCMQDd8hIE4x/G2e8zgH/iVUL8LUznurxMcOk0NLz7xsguhd9JEoC9xwF7cBjZUqziHfQ=" ;
+            sig:hasVerificationCertificate  <https://satsrv04.researchstudio.at:8889/won/resource> ;
+            msg:hasHash                     "AIfPwmpuPbb4OO/zzsHVX/t85NhbR+YsyxK1nxjIibiONxFTP8uzG+59SD4HkUphMDD0kM4dvssQKFSjj5mhSZF0kNgfkrSHGUVLUyanip6d7tXosdhftPyukMoIMdFlQ5HZJgSR098F16ttrmBAMRNSuRqfXjGONPZQNgSmlFuB" ;
+            msg:hasPublicKeyFingerprint     "dteGPcbZox6v1FEc0KCOJOsCH9eKabl1dr7C2E+LqHw=" ;
+            msg:hasSignedGraph              <https://satsrv04.researchstudio.at:8889/won/resource/event/adc5swwig03sakwtfafo#envelope-19xl> .
+
+    <https://satsrv04.researchstudio.at:8889/won/resource/event/6yvv6j7qpz0t8nldtkyt#envelope-t0d8-sig>
+            a                               sig:Signature ;
+            sig:hasSignatureValue           "MGQCMFqzfSI3MTDEU8c/lChkUOzMspfCMpr9p5xfjMBryUavQAuFAwsGOx0awvgEYhfWDgIwdXlS/STuZ7DlArst6nRZzj8EITIr669ePVxs1/PUZSPzAdq5adkl4VeC1ojuomyp" ;
+            sig:hasVerificationCertificate  <https://satsrv04.researchstudio.at:8889/won/resource> ;
+            msg:hasHash                     "ILXqlg2BGL7wuP8w4Gsq6BPqEosNe4I9anYF9gmHOsvx3n2R5B2qFfh5NmZmyRTuWWNQgylajbtPLpPCAy7KYF520WgiIssIYCHvjRqanXc0gwm6fRq0Ms8W/pCgwjX2bw/oJ+XApUaxk2TbNE0xiCZUmvw4A7BemNSvZ3VDeOY=" ;
+            msg:hasPublicKeyFingerprint     "dteGPcbZox6v1FEc0KCOJOsCH9eKabl1dr7C2E+LqHw=" ;
+            msg:hasSignedGraph              <https://satsrv04.researchstudio.at:8889/won/resource/event/6yvv6j7qpz0t8nldtkyt#envelope-t0d8> .
+}
+
+<https://satsrv04.researchstudio.at:8889/won/resource/event/txutyhkuu9xj5us9l6ct#envelope-1fu5-sig> {
+    <https://satsrv04.researchstudio.at:8889/won/resource/event/txutyhkuu9xj5us9l6ct#envelope-1fu5-sig>
+            a                               sig:Signature ;
+            sig:hasSignatureValue           "MGUCMAlxkgK/+9JriOMOxRaRTZxvyZxJ/mUmTIIqILEduNYhH52R45bEUoo6MSwBgW4ogQIxAP9V7vWqfeySs05RokqEa4+xMD4XMjlKSS1zEpsFZVtShyi5hL85U0MNnF3YZ0TsHA==" ;
+            sig:hasVerificationCertificate  <https://satsrv04.researchstudio.at:8889/won/resource> ;
+            msg:hasHash                     "YkxaGq2kHCLLqqKzTnfq742gQsN962t4vYhqSMooUU/vjnGDBsRw893j2ZuB6kD0lARUd7CJZbo+3QK/sTW4jc/GjNyOPgK+z6qIgnJYZHxkZwZ36irUdELcjY7nkTwfR1oXhuZJ2/xOJsMSaBQg54v/Kz1OeTo94Eflts8icIo=" ;
+            msg:hasPublicKeyFingerprint     "dteGPcbZox6v1FEc0KCOJOsCH9eKabl1dr7C2E+LqHw=" ;
+            msg:hasSignedGraph              <https://satsrv04.researchstudio.at:8889/won/resource/event/txutyhkuu9xj5us9l6ct#envelope-1fu5> .
+}
