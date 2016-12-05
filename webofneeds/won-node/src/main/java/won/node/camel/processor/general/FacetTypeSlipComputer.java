@@ -20,6 +20,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -132,12 +133,13 @@ public class FacetTypeSlipComputer implements InitializingBean, ApplicationConte
       Map.Entry pair = (Map.Entry)iter.next();
       Object facet =  pair.getValue();
       if (facetType != null) {
-        Annotation annotation = facet.getClass().getAnnotation(FacetMessageProcessor.class);
+        Annotation annotation = AopUtils.getTargetClass(facet).getAnnotation(FacetMessageProcessor.class);
         if(matches(annotation, messageType, direction, facetType)){
           return pair.getKey().toString();
         }
       } else {
-        Annotation annotation = facet.getClass().getAnnotation(DefaultFacetMessageProcessor.class);
+        Annotation annotation = AopUtils.getTargetClass(facet).getAnnotation(DefaultFacetMessageProcessor
+                                                                                          .class);
         if(matches(annotation, messageType, direction, facetType)){
           return pair.getKey().toString();
         }
