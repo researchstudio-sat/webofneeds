@@ -5,6 +5,7 @@ import org.apache.camel.Expression;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -129,8 +130,7 @@ public class MessageTypeSlipComputer implements InitializingBean, ApplicationCon
     while (iter.hasNext()) {
       Map.Entry pair = (Map.Entry)iter.next();
       Processor wonMessageProcessor = (Processor)pair.getValue();
-      Annotation annotation = wonMessageProcessor.getClass().getAnnotation(annotationClazz);
-
+      Annotation annotation = AopUtils.getTargetClass(wonMessageProcessor).getAnnotation(annotationClazz);
       if(matches(annotation, messageType, direction, null)){
         return pair.getKey().toString();
       }
