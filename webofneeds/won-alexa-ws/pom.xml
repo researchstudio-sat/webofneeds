@@ -1,37 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <version>0.2-SNAPSHOT</version>
-    <!--<parent>-->
-        <!--<artifactId>webofneeds</artifactId>-->
-        <!--<groupId>webofneeds</groupId>-->
-        <!--<version>0.2-SNAPSHOT</version>-->
-    <!--</parent>-->
+    <!--<version>0.2-SNAPSHOT</version>-->
+    <parent>
+        <artifactId>webofneeds</artifactId>
+        <groupId>webofneeds</groupId>
+        <version>0.2-SNAPSHOT</version>
+    </parent>
 
     <groupId>com.amazon.alexa</groupId>
     <packaging>war</packaging>
     <name>Web of Needs Alexa Web Service</name>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>won-alexa-ws</artifactId>
-
-    <!--<licenses>-->
-        <!--<license>-->
-            <!--<name>The Apache License, Version 2.0</name>-->
-            <!--<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>-->
-        <!--</license>-->
-    <!--</licenses>-->
-    <!--<developers>-->
-        <!--<developer>-->
-            <!--<name>Alexa Skills Kit</name>-->
-            <!--<email>dis-sdk-team@amazon.com</email>-->
-            <!--<organization>Alexa</organization>-->
-            <!--<organizationUrl>http://developer.amazon.com/ask</organizationUrl>-->
-        <!--</developer>-->
-    <!--</developers>-->
-    <!--<scm>-->
-        <!--<connection>scm:git:https://github.com/amzn/alexa-skills-kit-java.git</connection>-->
-        <!--<developerConnection>scm:git:https://github.com/amzn/alexa-skills-kit-java.git</developerConnection>-->
-        <!--<url>https://github.com/amzn/alexa-skills-kit-java.git</url>-->
-    <!--</scm>-->
 
     <dependencies>
 
@@ -92,6 +72,7 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
