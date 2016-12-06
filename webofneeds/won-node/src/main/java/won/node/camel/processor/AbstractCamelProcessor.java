@@ -57,7 +57,13 @@ public abstract class AbstractCamelProcessor implements Processor
   @Autowired
   protected NeedRepository needRepository;
   @Autowired
+  protected ConnectionContainerRepository connectionContainerRepository;
+  @Autowired
+  protected NeedEventContainerRepository needEventContainerRepository;
+  @Autowired
   protected ConnectionRepository connectionRepository;
+  @Autowired
+  protected ConnectionEventContainerRepository connectionEventContainerRepository;
   @Autowired
   protected FacetRepository facetRepository;
   @Autowired
@@ -76,6 +82,8 @@ public abstract class AbstractCamelProcessor implements Processor
   protected RandomNumberService randomNumberService;
   @Autowired
   protected ExecutorService executorService;
+
+
 
 
 

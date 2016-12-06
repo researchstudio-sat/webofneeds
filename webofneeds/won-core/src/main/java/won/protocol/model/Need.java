@@ -38,6 +38,10 @@ public class Need
   @Column( name = "id" )
   private Long id;
 
+  @Version
+  @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
+  private long version = 0L;
+
   /* The URI of the need */
   @Column( name = "needURI", unique = true)
   @Convert( converter = URIConverter.class)
@@ -70,6 +74,37 @@ public class Need
            joinColumns = @JoinColumn(name="need_id"),
            inverseJoinColumns = @JoinColumn(name = "owner_application_id"))
    private List<OwnerApplication> authorizedApplications;
+
+  @OneToOne(fetch = FetchType.LAZY, mappedBy = "need", cascade = CascadeType.ALL, orphanRemoval = true)
+  private NeedEventContainer eventContainer;
+
+  @OneToOne(fetch = FetchType.LAZY, mappedBy = "need", cascade = CascadeType.ALL, orphanRemoval = true)
+  private ConnectionContainer connectionContainer;
+
+
+  public NeedEventContainer getEventContainer() {
+    return eventContainer;
+  }
+
+  protected void setVersion(final long version) {
+    this.version = version;
+  }
+
+  public void setEventContainer(final NeedEventContainer eventContainer) {
+    this.eventContainer = eventContainer;
+  }
+
+  public void setConnectionContainer(final ConnectionContainer connectionContainer) {
+    this.connectionContainer = connectionContainer;
+  }
+
+  public long getVersion() {
+    return version;
+  }
+
+  public ConnectionContainer getConnectionContainer() {
+    return connectionContainer;
+  }
 
   @PrePersist
   protected void onCreate() {

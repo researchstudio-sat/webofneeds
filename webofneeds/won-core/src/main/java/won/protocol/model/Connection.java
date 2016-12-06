@@ -16,6 +16,8 @@
 
 package won.protocol.model;
 
+import won.protocol.model.parentaware.ParentAware;
+
 import javax.persistence.*;
 import java.net.URI;
 
@@ -26,7 +28,7 @@ import java.net.URI;
 @Entity
 @Table(name = "connection", indexes = { @Index(name = "IDX_CONNECTION_NEEDURI_REMOTENEEDURI", columnList = "needURI, " +
   "remoteNeedURI")}, uniqueConstraints = {@UniqueConstraint(name="IDX_UNIQUE_CONNECTION", columnNames = {"needURI", "remoteNeedURI", "typeURI"})})
-public class Connection
+public class Connection implements ParentAware<ConnectionContainer>
 {
   @Id
   @GeneratedValue
@@ -67,6 +69,31 @@ public class Connection
   @Column( name = "state")
   @Enumerated ( EnumType.STRING )
   private ConnectionState state;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  private ConnectionContainer parent;
+
+  @OneToOne (fetch = FetchType.LAZY, mappedBy="connection", optional = true, cascade = CascadeType.ALL,
+    orphanRemoval = true)
+  private ConnectionEventContainer eventContainer = null;
+
+  @Override
+  public ConnectionContainer getParent() {
+    return this.parent;
+  }
+
+
+  public ConnectionEventContainer getEventContainer() {
+    return eventContainer;
+  }
+
+  public void setEventContainer(final ConnectionEventContainer eventContainer) {
+    this.eventContainer = eventContainer;
+  }
+
+  public void setParent(final ConnectionContainer parent) {
+    this.parent = parent;
+  }
 
   @Override
   public String toString()
@@ -154,6 +181,8 @@ public class Connection
   public long getVersion() {
     return version;
   }
+
+
 
 
   @Override

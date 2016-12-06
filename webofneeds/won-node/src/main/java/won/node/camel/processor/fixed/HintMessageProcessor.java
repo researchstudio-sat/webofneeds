@@ -58,8 +58,10 @@ public class HintMessageProcessor extends AbstractCamelProcessor
       //add the facet to the model.
       facet = facets.iterator().next();
     }
+    URI connectionUri = wonNodeInformationService.generateConnectionURI(
+      wonNodeInformationService.getWonNodeUri(needURIFromWonMessage));
     con = dataService.createConnection(
-      needURIFromWonMessage, otherNeedURIFromWonMessage,
+      connectionUri, needURIFromWonMessage, otherNeedURIFromWonMessage,
       null, facet, ConnectionState.SUGGESTED, ConnectionEventType.MATCHER_HINT);
     //build message to send to owner, put in header
     //set the receiver to the newly generated connection uri

@@ -40,8 +40,8 @@ public interface DataAccessService
   Connection getConnection(List<Connection> connections, URI facetURI, ConnectionEventType eventType)
       throws ConnectionAlreadyExistsException;
 
-  public Connection createConnection(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
-    final URI facet, final ConnectionState connectionState, final ConnectionEventType connectionEventType)
+  public Connection createConnection(final URI connectionURI, final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
+                                     final URI facet, final ConnectionState connectionState, final ConnectionEventType connectionEventType)
     throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
 

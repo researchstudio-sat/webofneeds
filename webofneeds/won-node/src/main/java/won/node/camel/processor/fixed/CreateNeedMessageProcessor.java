@@ -7,14 +7,13 @@ import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.model.Facet;
-import won.protocol.model.Need;
-import won.protocol.model.NeedState;
-import won.protocol.model.OwnerApplication;
+import won.protocol.model.*;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -34,6 +33,7 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
 
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -56,9 +56,14 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     need.setNeedURI(needURI);
 
     // ToDo (FS) check if the WON node URI corresponds with the WON node (maybe earlier in the message layer)
+    NeedEventContainer needEventContainer = needEventContainerRepository.findOneByParentUri(needURI);
     need.setWonNodeURI(wonMessage.getReceiverNodeURI());
+    ConnectionContainer connectionContainer = new ConnectionContainer(need);
 
+    need.setConnectionContainer(connectionContainer);
+    need.setEventContainer(needEventContainer);
     need = needRepository.save(need);
+    connectionContainerRepository.save(connectionContainer);
 
     List<Facet> facets = WonRdfUtils.NeedUtils.getFacets(needURI, needContent);
     if (facets.size() == 0)

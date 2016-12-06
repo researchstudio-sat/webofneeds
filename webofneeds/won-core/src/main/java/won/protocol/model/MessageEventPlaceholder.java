@@ -2,6 +2,7 @@ package won.protocol.model;
 
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
+import won.protocol.model.parentaware.ParentAware;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlTransient;
@@ -10,14 +11,14 @@ import java.util.Date;
 
 @Entity
 @Table(name = "message_event")
-public class MessageEventPlaceholder
+public class MessageEventPlaceholder implements ParentAware<EventContainer>
 {
 
 
 
   public MessageEventPlaceholder() {}
 
-  public MessageEventPlaceholder(URI parentURI, WonMessage wonMessage){
+  public MessageEventPlaceholder(URI parentURI, WonMessage wonMessage, EventContainer eventContainer){
     this.parentURI = parentURI;
     this.messageURI = wonMessage.getMessageURI();
     this.messageType = wonMessage.getMessageType();
@@ -30,6 +31,7 @@ public class MessageEventPlaceholder
     this.creationDate = new Date();
     this.correspondingRemoteMessageURI = wonMessage.getCorrespondingRemoteMessageURI();
     this.referencedByOtherMessage = false;
+    this.eventContainer = eventContainer;
   }
 
   @Id
@@ -37,6 +39,13 @@ public class MessageEventPlaceholder
   @Column( name = "id" )
   @Convert( converter = URIConverter.class)
   private Long id;
+
+  @Version
+  @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
+  private long version = 0L;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  private EventContainer eventContainer;
 
   @Column(name = "messageURI")
   @Convert( converter = URIConverter.class)
@@ -89,6 +98,20 @@ public class MessageEventPlaceholder
 
   @Column(name = "referencedByOtherMessage")
   private boolean referencedByOtherMessage;
+
+
+  @Override
+  public EventContainer getParent() {
+    return getEventContainer();
+  }
+
+  public EventContainer getEventContainer() {
+    return eventContainer;
+  }
+
+  public long getVersion() {
+    return version;
+  }
 
   @XmlTransient
   public Long getId() {
