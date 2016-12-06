@@ -70,6 +70,9 @@
                 <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.generate_statistics">false</prop>
                 <prop key="hibernate.cache.use_minimal_puts">true</prop>
+                <prop key="hibernate.integrator_provider">
+                    <bean class="won.protocol.model.parentaware.ParentAwareIntegratorProvider" />
+                </prop>
             </props>
         </property>
     </bean>
