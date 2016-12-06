@@ -84,7 +84,7 @@ public class DatasetHolder
     return version;
   }
 
-  byte[] getDatasetBytes() {
+  public byte[] getDatasetBytes() {
     return datasetBytes;
   }
 
