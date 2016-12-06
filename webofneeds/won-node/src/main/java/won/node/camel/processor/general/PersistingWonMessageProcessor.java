@@ -21,11 +21,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
+import won.protocol.message.WonMessageType;
 import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
+import won.protocol.model.ConnectionEventContainer;
+import won.protocol.model.EventContainer;
 import won.protocol.model.MessageEventPlaceholder;
+import won.protocol.model.NeedEventContainer;
+import won.protocol.repository.ConnectionEventContainerRepository;
 import won.protocol.repository.MessageEventRepository;
+import won.protocol.repository.NeedEventContainerRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 
 import java.net.URI;
@@ -40,6 +46,10 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
   RDFStorageService rdfStorage;
   @Autowired
   protected MessageEventRepository messageEventRepository;
+  @Autowired
+  protected ConnectionEventContainerRepository connectionEventContainerRepository;
+  @Autowired
+  protected NeedEventContainerRepository needEventContainerRepository;
 
   @Override
   public WonMessage process(WonMessage message) throws WonMessageProcessingException {
@@ -73,8 +83,41 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
     logger.debug("STORING message with uri {} and parent uri", wonMessage.getMessageURI(), parent);
     rdfStorage.storeDataset(wonMessage.getMessageURI(),
             WonMessageEncoder.encodeAsDataset(wonMessage));
+    EventContainer container = loadOrCreateEventContainer(wonMessage, parent);
+
     messageEventRepository.save(new MessageEventPlaceholder(parent,
-      wonMessage));
+                                                            wonMessage, container));
   }
+
+  private EventContainer loadOrCreateEventContainer(final WonMessage wonMessage, final URI parent) {
+    WonMessageType type = wonMessage.getMessageType();
+    if (WonMessageType.CREATE_NEED.equals(type)) {
+      //create a need event container with null parent (because it will only be persisted at a later point in time)
+      EventContainer container = needEventContainerRepository.findOneByParentUri(parent);
+      if (container != null) return container;
+      NeedEventContainer nec = new NeedEventContainer (null, parent);
+      needEventContainerRepository.saveAndFlush(nec);
+      return nec;
+    } else if (WonMessageType.CONNECT.equals(type) || WonMessageType.HINT_MESSAGE.equals(type)) {
+      //create a connection event container witn null parent (because it will only be persisted at a later point in
+      // time)
+      EventContainer container = connectionEventContainerRepository.findOneByParentUri(parent);
+      if (container != null) return container;
+      ConnectionEventContainer cec = new ConnectionEventContainer(null, parent);
+      connectionEventContainerRepository.saveAndFlush(cec);
+      return cec;
+    }
+    EventContainer container = needEventContainerRepository.findOneByParentUri(parent);
+    if (container != null) return container;
+    container = connectionEventContainerRepository.findOneByParentUri(parent);
+    if (container != null) return container;
+    //let's see if we can find the event conta
+    throw new IllegalArgumentException(
+          "Cannot store '" + type + "' event '" + wonMessage.getMessageURI() + "': unable to find " +
+            "event container with parent URI '" + parent + "'");
+
+  }
+
+
 
 }

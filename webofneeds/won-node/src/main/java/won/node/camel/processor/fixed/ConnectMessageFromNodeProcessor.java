@@ -48,9 +48,11 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor
     }
     if (con == null){
       //create Connection in Database
-      con = dataService.createConnection(needUri, remoteNeedUri, remoteConnectionUri, facetURI,
-              ConnectionState.REQUEST_RECEIVED,
-              ConnectionEventType.PARTNER_OPEN);
+      URI connectionUri = wonNodeInformationService.generateConnectionURI(
+        wonNodeInformationService.getWonNodeUri(needUri));
+      con = dataService.createConnection(connectionUri, needUri, remoteNeedUri, remoteConnectionUri, facetURI,
+                                         ConnectionState.REQUEST_RECEIVED,
+                                         ConnectionEventType.PARTNER_OPEN);
     }
     con.setRemoteConnectionURI(remoteConnectionUri);
     con.setState(con.getState().transit(ConnectionEventType.PARTNER_OPEN));

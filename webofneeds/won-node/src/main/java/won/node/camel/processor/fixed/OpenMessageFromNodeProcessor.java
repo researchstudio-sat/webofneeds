@@ -33,9 +33,11 @@ public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor
     if (connectionURIFromWonMessage == null) {
       //the opener didn't know about the connection - maybe it doesn't exist
       URI facet = WonRdfUtils.FacetUtils.getFacet(wonMessage);
-      con = dataService.createConnection(wonMessage.getReceiverNeedURI(), wonMessage.getSenderNeedURI(),
-        wonMessage.getSenderURI(), facet,
-        ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
+      URI connectionUri = wonNodeInformationService.generateConnectionURI(
+        wonNodeInformationService.getWonNodeUri(wonMessage.getReceiverNeedURI()));
+      con = dataService.createConnection(connectionUri, wonMessage.getReceiverNeedURI(), wonMessage.getSenderNeedURI(),
+                                         wonMessage.getSenderURI(), facet,
+                                         ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
     } else {
       con = connectionRepository.findOneByConnectionURI(connectionURIFromWonMessage);
     }

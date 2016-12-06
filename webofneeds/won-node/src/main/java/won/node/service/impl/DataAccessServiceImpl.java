@@ -7,9 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.model.*;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.FacetRepository;
-import won.protocol.repository.NeedRepository;
+import won.protocol.repository.*;
 import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
@@ -38,11 +36,18 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   private FacetRepository facetRepository;
   @Autowired
   private WonNodeInformationService wonNodeInformationService;
-
+  @Autowired
+  protected ConnectionContainerRepository connectionContainerRepository;
+  @Autowired
+  protected NeedEventContainerRepository needEventContainerRepository;
+  @Autowired
+  protected ConnectionEventContainerRepository connectionEventContainerRepository;
 
 
   /**
    * Creates a new Connection object or returns an existing one.
+   *
+   * @param connectionURI
    * @param needURI
    * @param otherNeedURI
    * @param otherConnectionURI
@@ -54,9 +59,9 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
    * @throws IllegalMessageForNeedStateException
    * @throws ConnectionAlreadyExistsException
    */
-  public Connection createConnection(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
-                                      final URI facetURI, final ConnectionState connectionState,
-                                      final ConnectionEventType connectionEventType)
+  public Connection createConnection(final URI connectionURI, final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
+                                     final URI facetURI, final ConnectionState connectionState,
+                                     final ConnectionEventType connectionEventType)
       throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
@@ -74,15 +79,16 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   /* Create connection */
     Connection con = new Connection();
     //create and set new uri
-    con.setConnectionURI(wonNodeInformationService.generateConnectionURI(
-      wonNodeInformationService.getWonNodeUri(needURI)));
+    con.setConnectionURI(connectionURI);
     con.setNeedURI(needURI);
     con.setState(connectionState);
     con.setRemoteNeedURI(otherNeedURI);
     con.setRemoteConnectionURI(otherConnectionURI);
     con.setTypeURI(facetURI);
+    ConnectionEventContainer connectionEventContainer = new ConnectionEventContainer(con, connectionURI);
     try {
       con = connectionRepository.save(con);
+      connectionEventContainerRepository.save(connectionEventContainer);
     } catch (Exception e){
       //we assume the unique key constraint on needURI, remoteNeedURI, typeURI was violated: we have to perform an
       // update, not an insert

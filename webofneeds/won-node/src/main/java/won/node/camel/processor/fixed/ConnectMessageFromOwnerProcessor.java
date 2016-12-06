@@ -43,9 +43,11 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
     }
     if (con == null){
       //create Connection in Database
-      con = dataService.createConnection(senderNeedURI, receiverNeedURI, null, facetURI,
-                                                          ConnectionState.REQUEST_SENT,
-                                                          ConnectionEventType.OWNER_OPEN);
+      URI connectionUri = wonNodeInformationService.generateConnectionURI(
+        wonNodeInformationService.getWonNodeUri(senderNeedURI));
+      con = dataService.createConnection(connectionUri, senderNeedURI, receiverNeedURI, null, facetURI,
+                                         ConnectionState.REQUEST_SENT,
+                                         ConnectionEventType.OWNER_OPEN);
     }
     con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
     connectionRepository.save(con);
