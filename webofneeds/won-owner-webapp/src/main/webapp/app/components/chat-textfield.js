@@ -72,14 +72,15 @@ function genComponentConf() {
             dispatchEvent(this.$element[0], 'input', payload);
         }
         submit() {
-            const payload = {
-                value: this.value(),
-                valid: this.valid(),
-            };
-            this.onSubmit(payload);
-            dispatchEvent(this.$element[0], 'submit', payload);
+            const value = this.value();
+            const valid = this.valid();
+            if(value && valid) {
+                const payload = { value, valid };
+                this.onSubmit(payload);
+                dispatchEvent(this.$element[0], 'submit', payload);
 
-            this.medium.clear(); // clear text
+                this.medium.clear(); // clear text
+            }
         }
         charactersLeft() {
             return this.maxChars - this.value().length;
