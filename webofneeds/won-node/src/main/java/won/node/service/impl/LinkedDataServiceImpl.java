@@ -33,6 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.CryptographyService;
 import won.protocol.exception.NoSuchConnectionException;
@@ -109,6 +110,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   private String activeMqMatcherProtocolTopicNameNeedDeactivated;
 
 
+  @Transactional
   public Dataset listNeedURIs()
   {
     Model model = ModelFactory.createDefaultModel();
@@ -126,28 +128,33 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return ret;
   }
 
-
+  @Transactional
   public NeedInformationService.PagedResource<Dataset,URI> listNeedURIs(final int pageNum)
   {
     return listNeedURIs(pageNum, null, null);
   }
 
+  @Transactional
   public NeedInformationService.PagedResource<Dataset,URI> listNeedURIsBefore(final URI need)
   {
     return listNeedURIsBefore(need, null, null);
   }
 
+  @Transactional
   public NeedInformationService.PagedResource<Dataset,URI> listNeedURIsAfter(final URI need)
   {
     return listNeedURIsAfter(need, null, null);
   }
 
+  @Transactional
   public NeedInformationService.PagedResource<Dataset,URI> listNeedURIs(final int pageNum, final Integer preferedSize,
                                                                     NeedState needState) {
     Slice<URI> slice = needInformationService.listNeedURIs(pageNum, preferedSize, needState);
     return toContainerPage(this.needResourceURIPrefix + "/", slice);
 
   }
+
+  @Transactional
   public NeedInformationService.PagedResource<Dataset,URI> listNeedURIsBefore(
     final URI need, final Integer preferedSize, NeedState needState) {
 
@@ -156,6 +163,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   }
 
+  @Transactional
   public NeedInformationService.PagedResource<Dataset, URI> listNeedURIsAfter(
     final URI need, final Integer preferedSize, NeedState needState) {
 
@@ -164,6 +172,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
   }
 
+  @Transactional
   public Dataset getNeedDataset(final URI needUri) throws NoSuchNeedException {
   Need need = needInformationService.readNeed(needUri);
 
@@ -200,6 +209,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 }
 
   @Override
+  @Transactional
   public Dataset getNeedDataset(final URI needUri, boolean deep, Integer deepLayerSize
                                 ) throws NoSuchNeedException, NoSuchConnectionException, NoSuchMessageException {
     Dataset dataset = getNeedDataset(needUri);
@@ -218,6 +228,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
     return dataset;
   }
 
+  @Transactional
   public Dataset getNodeDataset()
     {
       Model model = ModelFactory.createDefaultModel();
@@ -281,6 +292,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
    * @return
    */
   @Override
+  @Transactional
   public DataWithEtag<Dataset> getConnectionDataset(final URI connectionUri, final boolean includeEventContainer, final
   boolean
     includeLatestEvent, final String etag)
@@ -342,6 +354,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
 
   @Override
+  @Transactional
   public Dataset listConnectionURIs(final boolean deep) throws NoSuchConnectionException {
     List<URI> uris = new ArrayList<URI>(needInformationService.listConnectionURIs());
     NeedInformationService.PagedResource<Dataset, URI> containerPage = toContainerPage(
@@ -354,6 +367,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   @Override
+  @Transactional
   public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIs(final int page, final Integer
     preferredSize, Date timeSpot, final boolean deep) throws NoSuchConnectionException {
     Slice<URI> slice = needInformationService.listConnectionURIs(page, preferredSize, timeSpot);
@@ -366,6 +380,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   @Override
+  @Transactional
   public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsBefore(
     URI beforeConnURI, final Integer preferredSize, Date timeSpot, boolean deep) throws NoSuchConnectionException {
     Slice<URI> slice = needInformationService.listConnectionURIsBefore(beforeConnURI, preferredSize, timeSpot);
@@ -377,6 +392,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   @Override
+  @Transactional
   public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsAfter(
     URI afterConnURI, final Integer preferredSize, Date timeSpot, boolean deep) throws NoSuchConnectionException {
     Slice<URI> slice = needInformationService.listConnectionURIsAfter(afterConnURI, preferredSize, timeSpot);
@@ -389,6 +405,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
     @Override
+    @Transactional
     public Dataset listConnectionURIs(final URI needURI, boolean deep, boolean addMetadata)
     throws NoSuchNeedException, NoSuchConnectionException {
     List<URI> uris = new ArrayList<URI>(needInformationService.listConnectionURIs(needURI));
@@ -405,6 +422,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   @Override
+  @Transactional
   public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIs(
     final int page, final URI needURI, final Integer preferredSize, final WonMessageType messageType, final Date
     timeSpot, boolean deep, boolean addMetadata)
@@ -422,6 +440,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   @Override
+  @Transactional
   public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsBefore(final URI needURI, URI
     beforeEventURI, final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep,
                                                                                      boolean addMetadata)
@@ -440,6 +459,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   @Override
+  @Transactional
   public NeedInformationService.PagedResource<Dataset, URI> listConnectionURIsAfter(final URI needURI, URI
     resumeConnURI, final Integer preferredSize, final WonMessageType messageType, final Date timeSpot, boolean deep,
                                                                                     boolean addMetadata)
@@ -487,6 +507,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
 
   @Override
+  @Transactional
   public Dataset listConnectionEventURIs(final URI connectionUri) throws
     NoSuchConnectionException
   {
@@ -494,6 +515,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   @Override
+  @Transactional
   public Dataset listConnectionEventURIs(final URI connectionUri, boolean deep) throws
     NoSuchConnectionException
   {
@@ -522,6 +544,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   @Override
+  @Transactional
   public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIs(final URI connectionUri, final int
     pageNum, Integer preferedSize, WonMessageType msgType, boolean deep) throws
     NoSuchConnectionException
@@ -537,6 +560,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
 
 
   @Override
+  @Transactional
   public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIsAfter(
     final URI connectionUri, final URI msgURI, Integer preferedSize, WonMessageType msgType, boolean deep) throws
     NoSuchConnectionException
@@ -549,6 +573,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   @Override
+  @Transactional
   public NeedInformationService.PagedResource<Dataset,URI> listConnectionEventURIsBefore(
     final URI connectionUri, final URI msgURI, Integer preferedSize, WonMessageType msgType, boolean deep) throws
     NoSuchConnectionException
@@ -562,6 +587,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   @Override
+  @Transactional
   public Dataset getDatasetForUri(URI datasetUri) {
     Dataset result = rdfStorage.loadDataset(datasetUri);
     if (result == null) return null;
@@ -571,6 +597,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   @Override
+  @Transactional
   public DataWithEtag<Dataset> getDatasetForUri(URI datasetUri, String etag) {
     DataWithEtag<Dataset> result = rdfStorage.loadDataset(datasetUri, etag);
     if (result.getData() == null) return result;

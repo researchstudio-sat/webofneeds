@@ -51,7 +51,7 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
   @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public void storeDataset(final URI resourceURI, final Dataset dataset) {
-    DatasetHolder datasetHolder = datasetHolderRepository.findOne(resourceURI);
+    DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
     if (datasetHolder!=null){
       datasetHolder.setDataset(dataset);
     } else{
@@ -63,7 +63,7 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
   @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
   @Override
   public Model loadModel(final URI resourceURI) {
-    DatasetHolder datasetHolder = datasetHolderRepository.findOne(resourceURI);
+    DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
     return datasetHolder == null ? null : datasetHolder.getDataset().getDefaultModel();
   }
 
@@ -83,7 +83,7 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
   @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
   @Override
   public Dataset loadDataset(final URI resourceURI) {
-    DatasetHolder datasetHolder = datasetHolderRepository.findOne(resourceURI);
+    DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
     return datasetHolder == null ? null : datasetHolder.getDataset();
   }
 

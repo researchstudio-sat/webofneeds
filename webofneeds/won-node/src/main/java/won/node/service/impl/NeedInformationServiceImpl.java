@@ -29,7 +29,6 @@ import won.protocol.model.*;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.NeedInformationService;
 import won.protocol.util.DataAccessUtils;
 
@@ -46,8 +45,6 @@ import java.util.List;
 public class NeedInformationServiceImpl implements NeedInformationService
 {
 
-  @Autowired
-  private RDFStorageService rdfStorage;
   @Autowired
   private NeedRepository needRepository;
   @Autowired
@@ -255,7 +252,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   {
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, needURI);
-    return rdfStorage.loadModel(need.getNeedURI());
+    return need.getDatatsetHolder().getDataset().getDefaultModel();
   }
 
   @Override
@@ -370,10 +367,5 @@ public class NeedInformationServiceImpl implements NeedInformationService
   public void setPageSize(int pageSize)
   {
     this.pageSize = pageSize;
-  }
-
-  public void setRdfStorage(RDFStorageService rdfStorage)
-  {
-    this.rdfStorage = rdfStorage;
   }
 }

@@ -8,13 +8,14 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import won.node.service.DataAccessService;
 import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.repository.rdfstorage.RDFStorageService;
+import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
@@ -36,7 +37,9 @@ public abstract class AbstractBAFacet implements Facet
 
   protected DataAccessService dataService;
 
-  protected RDFStorageService rdfStorageService;
+  @Autowired
+  protected DatasetHolderRepository datasetHolderRepository;
+
 
   /**
    *
@@ -165,7 +168,8 @@ public abstract class AbstractBAFacet implements Facet
     baseResource.addProperty(WON_TX.BA_STATE, connectionBAStateContent.createResource(stateUri.toString()));
 
     logger.debug("linked data:"+ RdfUtils.toString(connectionBAStateContent));
-    rdfStorageService.storeModel(con.getConnectionURI(), connectionBAStateContent);
+    con.getDatasetHolder().getDataset().setDefaultModel(connectionBAStateContent);
+    datasetHolderRepository.save(con.getDatasetHolder());
   }
 
 
@@ -377,11 +381,6 @@ public abstract class AbstractBAFacet implements Facet
 
   public void setURIService(won.node.service.impl.URIService URIService) {
     this.URIService = URIService;
-  }
-
-
-  public void setRdfStorageService(final RDFStorageService rdfStorageService) {
-    this.rdfStorageService = rdfStorageService;
   }
 
 }

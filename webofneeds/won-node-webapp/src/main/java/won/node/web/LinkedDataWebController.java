@@ -30,6 +30,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -153,6 +155,7 @@ public class
 
     //webmvc controller method
   @RequestMapping("${uri.path.page.need}/{identifier}")
+  @Transactional(propagation = Propagation.REQUIRED)
   public String showNeedPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
     try {
       URI needURI = uriService.createNeedURIForId(identifier);
@@ -178,6 +181,7 @@ public class
    */
   //webmvc controller method
   @RequestMapping("${uri.path.page.need}/{identifier}/deep")
+  @Transactional(propagation = Propagation.REQUIRED)
   public String showDeepNeedPage(@PathVariable String identifier, Model model, HttpServletResponse response, @RequestParam(value="layer-size", required=false) Integer layerSize) {
     try {
       URI needURI = uriService.createNeedURIForId(identifier);
@@ -194,6 +198,7 @@ public class
 
   //webmvc controller method
   @RequestMapping("${uri.path.page.connection}/{identifier}")
+  @Transactional(propagation = Propagation.REQUIRED)
   public String showConnectionPage(@PathVariable String identifier, Model model, HttpServletResponse response) {
     URI connectionURI = uriService.createConnectionURIForId(identifier);
     DataWithEtag<Dataset> rdfDataset = linkedDataService.getConnectionDataset(connectionURI, true, true, null);
@@ -209,6 +214,7 @@ public class
 
   //webmvc controller method
   @RequestMapping("${uri.path.page.connection}/{identifier}/events")
+  @Transactional(propagation = Propagation.REQUIRED)
   public String showConnectionEventsPage(
     @PathVariable String identifier,
     @RequestParam(value="p", required=false) Integer page,
@@ -274,6 +280,7 @@ public class
    */
   //webmvc controller method
   @RequestMapping("${uri.path.page.event}/{identifier}")
+  @Transactional(propagation = Propagation.REQUIRED)
   public String showEventPage(@PathVariable(value = "identifier") String identifier,
                               Model model,
                               HttpServletResponse response) {
@@ -292,6 +299,7 @@ public class
 
     //webmvc controller method
     @RequestMapping("${uri.path.page.attachment}/{identifier}")
+    @Transactional(propagation = Propagation.REQUIRED)
     public String showAttachmentPage(@PathVariable(value = "identifier") String identifier,
                                 Model model,
                                 HttpServletResponse response) {
@@ -310,6 +318,7 @@ public class
 
     //webmvc controller method
     @RequestMapping("${uri.path.page.need}")
+    @Transactional(propagation = Propagation.REQUIRED)
     public String showNeedURIListPage(
       @RequestParam(value="p", required=false) Integer page,
       @RequestParam(value="resumebefore", required=false) String beforeId,
@@ -352,6 +361,7 @@ public class
     }
 
     @RequestMapping("${uri.path.page}")
+    @Transactional(propagation = Propagation.REQUIRED)
     public String showNodeInformationPage(
             HttpServletRequest request,
             Model model,
@@ -368,6 +378,7 @@ public class
 
     //webmvc controller method
   @RequestMapping("${uri.path.page.connection}")
+  @Transactional(propagation = Propagation.REQUIRED)
   public String showConnectionURIListPage(
     @RequestParam(value="p", required=false) Integer page,
     @RequestParam(value="deep", defaultValue = "false") boolean deep,
@@ -408,6 +419,7 @@ public class
 
   //webmvc controller method
   @RequestMapping("${uri.path.page.need}/{identifier}/connections")
+  @Transactional(propagation = Propagation.REQUIRED)
   public String showConnectionURIListPage(
       @PathVariable String identifier,
       @RequestParam(value="p", required=false) Integer page,
@@ -474,6 +486,7 @@ public class
                 "application/trig",
                 "application/n-quads",
                 "*/*"})
+    @Transactional(propagation = Propagation.REQUIRED)
   public ResponseEntity<String> redirectToData(
       HttpServletRequest request, HttpServletResponse response) throws IOException {
     URI resourceUriPrefix = URI.create(this.resourceURIPrefix);
@@ -536,6 +549,7 @@ public class
       value="${uri.path.resource}/**",
       method = RequestMethod.GET,
       produces="text/html")
+  @Transactional(propagation = Propagation.REQUIRED)
   public ResponseEntity<String> redirectToPage(
       HttpServletRequest request, HttpServletResponse response)  throws IOException {
     URI resourceUriPrefix = URI.create(this.resourceURIPrefix);
@@ -587,6 +601,7 @@ public class
     produces={"application/ld+json",
               "application/trig",
               "application/n-quads"})
+  @Transactional(propagation = Propagation.REQUIRED)
   public ResponseEntity<Dataset> listNeedURIs(HttpServletRequest request, HttpServletResponse response,
     @RequestParam(value="p", required=false) Integer page,
     @RequestParam(value="resumebefore", required=false) String beforeId,
@@ -680,6 +695,7 @@ public class
     produces={"application/ld+json",
               "application/trig",
               "application/n-quads"})
+  @Transactional(propagation = Propagation.REQUIRED)
   public ResponseEntity<Dataset> listConnectionURIs(
       HttpServletRequest request,
       @RequestParam(value="p", required=false) Integer page,
@@ -793,6 +809,7 @@ public class
     produces={"application/ld+json",
               "application/trig",
               "application/n-quads"})
+  @Transactional(propagation = Propagation.REQUIRED)
   public ResponseEntity<Dataset> readNeedDeep(
     HttpServletRequest request,
     @PathVariable(value = "identifier") String identifier,
@@ -817,6 +834,7 @@ public class
       produces={"application/ld+json",
                 "application/trig",
                 "application/n-quads"})
+    @Transactional(propagation = Propagation.REQUIRED)
     public ResponseEntity<Dataset> readNode(
       HttpServletRequest request) {
         logger.debug("readNode() called");
@@ -836,6 +854,7 @@ public class
     produces={"application/ld+json",
               "application/trig",
               "application/n-quads"})
+  @Transactional(propagation = Propagation.REQUIRED)
   public ResponseEntity<Dataset> readConnection(
     HttpServletRequest request,
       @PathVariable(value="identifier") String identifier) {
@@ -867,6 +886,7 @@ public class
     produces={"application/ld+json",
               "application/trig",
               "application/n-quads"})
+  @Transactional(propagation = Propagation.REQUIRED)
   public ResponseEntity<Dataset> readConnectionEvents(
     HttpServletRequest request,
     @PathVariable(value="identifier") String identifier,
@@ -963,6 +983,7 @@ public class
     produces={"application/ld+json",
               "application/trig",
               "application/n-quads"})
+  @Transactional(propagation = Propagation.REQUIRED)
   public ResponseEntity<Dataset> readEvent(
     @PathVariable(value = "identifier") String identifier, HttpServletRequest request, HttpServletResponse
     response) {
@@ -1018,6 +1039,7 @@ public class
                     "application/trig",
                     "application/n-quads",
                     "*/*"})
+  @Transactional(propagation = Propagation.REQUIRED)
     public ResponseEntity<Dataset> readAttachment(
             HttpServletRequest request,
             @PathVariable(value = "identifier") String identifier) {
@@ -1085,6 +1107,7 @@ public class
     produces={"application/ld+json",
               "application/trig",
               "application/n-quads"})
+  @Transactional(propagation = Propagation.REQUIRED)
   public ResponseEntity<Dataset> readConnectionsOfNeed(
       HttpServletRequest request,
       @PathVariable(value="identifier") String identifier,
@@ -1421,6 +1444,7 @@ public class
     value="${uri.path.resource}",
     method = RequestMethod.POST,
     produces={"text/plain"})
+  @Transactional(propagation = Propagation.REQUIRED)
   public ResponseEntity<String> register(@RequestParam("register") String registeredType, HttpServletRequest
     request) throws CertificateException, UnsupportedEncodingException {
 

@@ -5,10 +5,13 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.exception.*;
+import won.protocol.exception.ConnectionAlreadyExistsException;
+import won.protocol.exception.IllegalMessageForNeedStateException;
+import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
+import won.protocol.model.Need;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.SIOC;
 
@@ -32,7 +35,8 @@ public class CommentUnrestrictedFacet extends AbstractFacet
     try {
      //TODO: use new system
      // needFacingConnectionClient.open(con, content, null);
-      Model needContent = rdfStorageService.loadModel(con.getNeedURI());
+      Need need = needRepository.findOneByNeedURI(con.getNeedURI());
+      Model needContent = need.getDatatsetHolder().getDataset().getDefaultModel();
       PrefixMapping prefixMapping = PrefixMapping.Factory.create();
 //    prefixMapping.setNsPrefix(SIOC.getURI(),"sioc");
       needContent.withDefaultMappings(prefixMapping);
@@ -44,7 +48,8 @@ public class CommentUnrestrictedFacet extends AbstractFacet
 
       // add WON node link
       logger.debug("linked data:"+ RdfUtils.toString(needContent));
-      rdfStorageService.storeModel(con.getNeedURI(), needContent);
+      need.getDatatsetHolder().getDataset().setDefaultModel(needContent);
+      needRepository.save(need);
 //    } catch (NoSuchConnectionException e) {
 //      e.printStackTrace();
 //    } catch (IllegalMessageForConnectionStateException e) {

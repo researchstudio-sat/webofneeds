@@ -67,6 +67,12 @@ public class Need
   @Column( name = "creationDate", nullable = false)
   private Date creationDate;
 
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private DatasetHolder datatsetHolder;
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private List<DatasetHolder> attachmentDatasetHolders;
+
   //EAGERly loaded because accessed outside hibernate session in
   // OwnerProtocolCamelConfiguratorImpl TODO: change this!
    @ManyToMany(targetEntity = OwnerApplication.class,fetch = FetchType.EAGER)
@@ -156,6 +162,22 @@ public class Need
   public void setOwnerURI(final URI ownerURI)
   {
     this.ownerURI = ownerURI;
+  }
+
+  public DatasetHolder getDatatsetHolder() {
+    return datatsetHolder;
+  }
+
+  public void setDatatsetHolder(final DatasetHolder datatsetHolder) {
+    this.datatsetHolder = datatsetHolder;
+  }
+
+  public List<DatasetHolder> getAttachmentDatasetHolders() {
+    return attachmentDatasetHolders;
+  }
+
+  public void setAttachmentDatasetHolders(final List<DatasetHolder> attachmentDatasetHolders) {
+    this.attachmentDatasetHolders = attachmentDatasetHolders;
   }
 
   @Override

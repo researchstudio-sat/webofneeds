@@ -67,5 +67,7 @@ public interface RDFStorageService
    */
   public DataWithEtag<Dataset> loadDataset(URI resourceURI, String etag);
 
+
+
   public boolean removeContent(URI resourceURI);
 }

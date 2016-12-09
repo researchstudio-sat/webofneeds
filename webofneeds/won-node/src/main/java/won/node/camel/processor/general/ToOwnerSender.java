@@ -17,6 +17,8 @@
 package won.node.camel.processor.general;
 
 import org.apache.camel.Exchange;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
@@ -28,6 +30,7 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 public class ToOwnerSender extends AbstractCamelProcessor
 {
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public void process(final Exchange exchange) throws Exception {
     WonMessage message = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     sendMessageToOwner(message, message.getReceiverNeedURI(), (String) exchange.getIn().getHeader(WonCamelConstants.OWNER_APPLICATION_ID));

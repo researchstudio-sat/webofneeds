@@ -22,6 +22,8 @@ import org.apache.jena.sparql.util.IsoMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -31,7 +33,6 @@ import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.model.Need;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.NeedRepository;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
@@ -60,10 +61,9 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
   private MessageEventRepository messageEventRepository;
   @Autowired
   protected NeedRepository needRepository;
-  @Autowired
-  RDFStorageService rdfStorage;
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public WonMessage process(final WonMessage message) throws UriAlreadyInUseException {
     checkEventURI(message);
     checkNeedURI(message);
@@ -88,7 +88,7 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
     if (event == null) {
       return;
     } else {
-      if (hasResponse(event) && isDuplicateMessage(message)) {
+      if (hasResponse(event) && isDuplicateMessage(message, event)) {
         // the same massage as the one already processed is received
         throw new EventAlreadyProcessedException(message.getMessageURI().toString());
       } else {
@@ -101,10 +101,10 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
     return event.getResponseMessageURI() != null;
   }
 
-  private boolean isDuplicateMessage(final WonMessage message) {
+  private boolean isDuplicateMessage(final WonMessage message, MessageEventPlaceholder event) {
 
     // retrieve already processed message
-    Dataset processedDataset = rdfStorage.loadDataset(message.getMessageURI());
+    Dataset processedDataset = event.getDatasetHolder().getDataset();
 
     // compare with received message
     // TODO ideally, here, only signatures of the corresponding envelopes have to be compared.
