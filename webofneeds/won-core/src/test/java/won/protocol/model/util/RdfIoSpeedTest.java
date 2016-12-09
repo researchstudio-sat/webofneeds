@@ -25,12 +25,14 @@ import org.junit.Ignore;
 import org.junit.Test;
 import won.protocol.util.RdfUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Vector;
 
 
 public class RdfIoSpeedTest
@@ -136,5 +138,52 @@ public class RdfIoSpeedTest
     RDFDataMgr.read(additionalDataset, new ByteArrayInputStream(out.toByteArray()), Lang.NQUADS);
     watch.stop();
     System.out.println("collecting in byteArrays took: " + watch.getTime());
+
+    watch = new StopWatch();
+    watch.start();
+
+    Vector<InputStream> streams = new Vector<>(10000);
+    for (int i = 0; i < 10000; i++){
+      streams.add(new ByteArrayInputStream(dataRdfq));
+    }
+    additionalDataset = DatasetFactory.createMem();
+    RDFDataMgr.read(additionalDataset, new SequenceInputStream(streams.elements()), Lang.NQUADS);
+    watch.stop();
+    System.out.println("collecting in vector -> sequenceInputStream took: " + watch.getTime());
+
+    watch = new StopWatch();
+    watch.start();
+
+    ArrayList<InputStream> streamsList = new ArrayList<>(10000);
+    for (int i = 0; i < 10000; i++){
+      streamsList.add(new ByteArrayInputStream(dataRdfq));
+    }
+    additionalDataset = DatasetFactory.createMem();
+    RDFDataMgr.read(additionalDataset, new SequenceInputStream(Collections.enumeration(streamsList)), Lang.NQUADS);
+    watch.stop();
+
+    System.out.println("collecting in arrayList -> sequenceInputStream took: " + watch.getTime());
+
+    watch = new StopWatch();
+    watch.start();
+    InputStream[] streamsArr = new InputStream[10000];
+    for (int i = 0; i < 10000; i++){
+      streamsArr[i] = new ByteArrayInputStream(dataRdfq);
+    }
+    additionalDataset = DatasetFactory.createMem();
+    RDFDataMgr.read(additionalDataset, new SequenceInputStream(new Enumeration(){
+      int index = 0;
+      @Override
+      public boolean hasMoreElements() {
+        return index < streamsArr.length;
+      }
+
+      @Override
+      public Object nextElement() {
+        return streamsArr[index++];
+      }
+    }), Lang.NQUADS);
+    watch.stop();
+    System.out.println("collecting in array -> sequenceInputStream took: " + watch.getTime());
   }
 }
