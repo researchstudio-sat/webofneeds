@@ -16,7 +16,8 @@ import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Need;
 import won.protocol.model.NeedState;
-import won.protocol.repository.rdfstorage.RDFStorageService;
+import won.protocol.repository.DatasetHolderRepository;
+import won.protocol.repository.NeedRepository;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
@@ -45,6 +46,11 @@ public abstract class AbstractFacet implements Facet
   @Autowired
   protected LinkedDataSource linkedDataSource;
 
+  @Autowired
+  protected DatasetHolderRepository datasetHolderRepository;
+
+  @Autowired
+  NeedRepository needRepository;
 
   protected won.node.service.impl.URIService URIService;
 
@@ -52,7 +58,9 @@ public abstract class AbstractFacet implements Facet
 
   protected DataAccessService dataService;
 
-  protected RDFStorageService rdfStorageService;
+
+
+
 
   /**
    * A string that is used to create a graph URI used for need data managed by this
@@ -501,8 +509,5 @@ public abstract class AbstractFacet implements Facet
     this.URIService = URIService;
   }
 
-  public void setRdfStorageService(final RDFStorageService rdfStorageService) {
-    this.rdfStorageService = rdfStorageService;
-  }
 
 }

@@ -62,6 +62,18 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
 
     need.setConnectionContainer(connectionContainer);
     need.setEventContainer(needEventContainer);
+
+    //store the need content
+    DatasetHolder datasetHolder = new DatasetHolder(needURI, needContent);
+    //store attachments
+    List<DatasetHolder> attachments = new ArrayList<>(attachmentHolders.size());
+    for(WonMessage.AttachmentHolder attachmentHolder: attachmentHolders){
+      datasetHolder = new DatasetHolder(attachmentHolder.getDestinationUri(), attachmentHolder.getAttachmentDataset());
+      attachments.add(datasetHolder);
+    }
+    //add everything to the need model class and save it
+    need.setDatatsetHolder(datasetHolder);
+    need.setAttachmentDatasetHolders(attachments);
     need = needRepository.save(need);
     connectionContainerRepository.save(connectionContainer);
 
@@ -73,11 +85,7 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
       facetRepository.save(f);
     }
 
-    rdfStorage.storeDataset(needURI, needContent);
-    //now store attachments
-    for(WonMessage.AttachmentHolder attachmentHolder: attachmentHolders){
-      rdfStorage.storeDataset(attachmentHolder.getDestinationUri(), attachmentHolder.getAttachmentDataset());
-    }
+
     return need;
   }
 

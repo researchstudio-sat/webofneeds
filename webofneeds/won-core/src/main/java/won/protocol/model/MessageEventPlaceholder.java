@@ -99,6 +99,8 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer>
   @Column(name = "referencedByOtherMessage")
   private boolean referencedByOtherMessage;
 
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private DatasetHolder datasetHolder;
 
   @Override
   public EventContainer getParent() {
@@ -224,6 +226,14 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer>
 
   public void setResponseMessageURI(final URI responseMessageURI) {
     this.responseMessageURI = responseMessageURI;
+  }
+
+  public DatasetHolder getDatasetHolder() {
+    return datasetHolder;
+  }
+
+  public void setDatasetHolder(final DatasetHolder datasetHolder) {
+    this.datasetHolder = datasetHolder;
   }
 
   @Override

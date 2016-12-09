@@ -73,6 +73,9 @@ public class Connection implements ParentAware<ConnectionContainer>
   @ManyToOne(fetch = FetchType.LAZY)
   private ConnectionContainer parent;
 
+  @OneToOne(fetch = FetchType.LAZY)
+  private DatasetHolder datasetHolder;
+
   @OneToOne (fetch = FetchType.LAZY, mappedBy="connection", optional = true, cascade = CascadeType.ALL,
     orphanRemoval = true)
   private ConnectionEventContainer eventContainer = null;
@@ -182,8 +185,13 @@ public class Connection implements ParentAware<ConnectionContainer>
     return version;
   }
 
+  public DatasetHolder getDatasetHolder() {
+    return datasetHolder;
+  }
 
-
+  public void setDatasetHolder(final DatasetHolder datasetHolder) {
+    this.datasetHolder = datasetHolder;
+  }
 
   @Override
   public boolean equals(final Object o)

@@ -27,4 +27,6 @@ import java.net.URI;
 public interface DatasetHolderRepository extends CrudRepository<DatasetHolder, URI>
 {
   public DatasetHolder findOneByUriAndVersionNot(URI uri, Long version);
+
+  public DatasetHolder findOneByUri(URI uri);
 }

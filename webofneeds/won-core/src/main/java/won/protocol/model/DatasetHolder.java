@@ -39,6 +39,12 @@ public class DatasetHolder
 {
   private static final int DEFAULT_BYTE_ARRAY_SIZE = 500;
 
+  //the URI of the dataset
+  @Id
+  @GeneratedValue
+  @Column( name = "id" )
+  private Long id;
+
   @Version
   @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
   private long version = 0L;
@@ -46,8 +52,6 @@ public class DatasetHolder
   @Transient
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  //the URI of the dataset
-  @Id
   @Column( name = "datasetURI", unique = true)
   @Convert( converter = URIConverter.class )
   private URI uri;
@@ -66,6 +70,14 @@ public class DatasetHolder
     this.uri = uri;
     setDataset(dataset);
     this.cachedDataset = dataset;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(final Long id) {
+    this.id = id;
   }
 
   public URI getUri() {

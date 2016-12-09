@@ -11,6 +11,7 @@ import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.FacetType;
+import won.protocol.model.Need;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.SIOC;
 
@@ -62,7 +63,9 @@ public class CommentFacet extends AbstractFacet
   }
 
   private void addDataManagedByFacet(final Connection con){
-    Dataset needContent = rdfStorageService.loadDataset(con.getNeedURI());
+    Need need = needRepository.findOneByNeedURI(con.getNeedURI());
+    Dataset needContent =  need.getDatatsetHolder().getDataset();
+
     Model facetManagedGraph = getFacetManagedGraph(con.getNeedURI(), needContent);
 
     List<URI> properties = new ArrayList<>();
@@ -79,13 +82,16 @@ public class CommentFacet extends AbstractFacet
 
     // add WON node link
     logger.debug("linked data:"+ RdfUtils.toString(facetManagedGraph));
-    rdfStorageService.storeDataset(con.getNeedURI(), needContent);
+    need.getDatatsetHolder().setDataset(needContent);
+    needRepository.save(need);
   }
 
   private void removeDataManagedByFacet(final Connection con){
-    Dataset needContent = rdfStorageService.loadDataset(con.getNeedURI());
+    Need need = needRepository.findOneByNeedURI(con.getNeedURI());
+    Dataset needContent =  need.getDatatsetHolder().getDataset();
     removeFacetManagedGraph(con.getNeedURI(), needContent);
-    rdfStorageService.storeDataset(con.getNeedURI(), needContent);
+    need.getDatatsetHolder().setDataset(needContent);
+    needRepository.save(need);
   }
 
 }

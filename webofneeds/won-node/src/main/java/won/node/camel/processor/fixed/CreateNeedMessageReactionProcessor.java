@@ -21,6 +21,8 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.exception.NoSuchNeedException;
@@ -44,6 +46,7 @@ public class CreateNeedMessageReactionProcessor extends AbstractCamelProcessor
 
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);

@@ -19,20 +19,19 @@ package won.node.camel.processor.general;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.WonMessageUtils;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.model.ConnectionEventContainer;
-import won.protocol.model.EventContainer;
-import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.model.NeedEventContainer;
+import won.protocol.model.*;
 import won.protocol.repository.ConnectionEventContainerRepository;
+import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.repository.NeedEventContainerRepository;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 
 import java.net.URI;
 
@@ -43,15 +42,16 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  RDFStorageService rdfStorage;
-  @Autowired
   protected MessageEventRepository messageEventRepository;
   @Autowired
   protected ConnectionEventContainerRepository connectionEventContainerRepository;
   @Autowired
   protected NeedEventContainerRepository needEventContainerRepository;
+  @Autowired
+  protected DatasetHolderRepository datasetHolderRepository;
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public WonMessage process(WonMessage message) throws WonMessageProcessingException {
     URI parentURI = WonMessageUtils.getParentEntityUri(message);
     saveMessage(message, parentURI);
@@ -81,12 +81,14 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
 
   private void saveMessage(final WonMessage wonMessage, URI parent) {
     logger.debug("STORING message with uri {} and parent uri", wonMessage.getMessageURI(), parent);
-    rdfStorage.storeDataset(wonMessage.getMessageURI(),
-            WonMessageEncoder.encodeAsDataset(wonMessage));
     EventContainer container = loadOrCreateEventContainer(wonMessage, parent);
+    DatasetHolder datasetHolder = new DatasetHolder(wonMessage.getMessageURI(), WonMessageEncoder.encodeAsDataset
+      (wonMessage));
+    MessageEventPlaceholder event = new MessageEventPlaceholder(parent,
+                                wonMessage, container);
+    event.setDatasetHolder(datasetHolder);
+    messageEventRepository.save(event);
 
-    messageEventRepository.save(new MessageEventPlaceholder(parent,
-                                                            wonMessage, container));
   }
 
   private EventContainer loadOrCreateEventContainer(final WonMessage wonMessage, final URI parent) {

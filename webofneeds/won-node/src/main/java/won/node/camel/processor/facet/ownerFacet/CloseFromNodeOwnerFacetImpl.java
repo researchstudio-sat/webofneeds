@@ -2,6 +2,8 @@ package won.node.camel.processor.facet.ownerFacet;
 
 import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.DefaultFacetMessageProcessor;
 import won.node.camel.processor.annotation.FacetMessageProcessor;
@@ -20,6 +22,7 @@ public class CloseFromNodeOwnerFacetImpl extends AbstractCamelProcessor
 {
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public void process(final Exchange exchange) {
     logger.debug("default facet implementation, not doing anything");
   }

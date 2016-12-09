@@ -2,6 +2,8 @@ package won.node.camel.processor.general;
 
 import org.apache.jena.query.Dataset;
 import org.apache.camel.Exchange;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
@@ -17,6 +19,7 @@ import java.net.URI;
 public class ResponseResenderProcessor extends AbstractCamelProcessor
 {
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public void process(final Exchange exchange) throws Exception {
     WonMessage originalMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.ORIGINAL_MESSAGE_HEADER);
 
@@ -39,7 +42,7 @@ public class ResponseResenderProcessor extends AbstractCamelProcessor
     MessageEventPlaceholder event = messageEventRepository.findOneByMessageURI(originalMessage.getMessageURI());
     // get response to this event:
     URI responseURI = event.getResponseMessageURI();
-    Dataset responseDataset = rdfStorage.loadDataset(responseURI);
+    Dataset responseDataset = event.getDatasetHolder().getDataset();
     WonMessage responseMessage = new WonMessage(responseDataset);
 
     Exception e = (Exception) exchange.getProperty(Exchange.EXCEPTION_CAUGHT);
