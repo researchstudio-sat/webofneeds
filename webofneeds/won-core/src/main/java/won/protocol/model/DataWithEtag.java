@@ -26,9 +26,12 @@ public class DataWithEtag<T>
   private T data;
   private String etag;
   private String oldEtag;
+  //if true indicates that the data was not found (as opposed to  unchanged)
+  private boolean notFound = false;
+
 
   public static DataWithEtag dataNotFound(){
-    return new DataWithEtag(null, null, null);
+    return new DataWithEtag(null, null, null, false);
   }
 
   /**
@@ -41,10 +44,20 @@ public class DataWithEtag<T>
     return new DataWithEtag(null, data.etag, data.oldEtag);
   };
 
-  public DataWithEtag(final T data, final String etag, final String oldEtag) {
+  public DataWithEtag(final T data, final String etag, String oldEtag, boolean notFound) {
     this.data = data;
     this.etag = etag;
     this.oldEtag = oldEtag;
+    this.notFound = notFound;
+  }
+
+  /**
+   * Construcutor setting notFound to false.
+   * @param data
+   * @param etag
+   */
+  public DataWithEtag(final T data, final String etag, final String oldEtag) {
+    this(data, etag, oldEtag, false);
   }
 
   public T getData() {
@@ -77,15 +90,12 @@ public class DataWithEtag<T>
   }
 
   /**
-   * If the data is null, there are two options:
-   * * the etags are identical, so there was no change - therefore the data was not populated
-   * * the data was not found, in which case the new etag is null, and even if the old etag is null, too, we
-   *   treat this as a change.
    *
-   * This method allows querying if the data is null because it was not found.
+   * This method allows querying if the data is null because it was not found. Only returns true
+   * if notFound was explicitly set to true before.
    * @return
    */
   public boolean isNotFound(){
-    return isChanged() && data == null;
+    return notFound;
   }
 }
