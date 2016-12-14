@@ -118,7 +118,7 @@ export function runMessagingAgent(redux) {
 
             if(msgFromSystem && msgFromSystem.isResponseToMessageType === won.WONMSG.connectMessageCompacted){
                 if (msgFromSystem.hasMessageType === won.WONMSG.successResponseCompacted)
-                    redux.dispatch(actionCreators.messages__connect__success(msgFromSystem));
+                    redux.dispatch(actionCreators.messages__connect__success(events));
                 //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
                 //  redux.dispatch(actionCreators.messages__open__failure(event));
                 return true;
@@ -152,8 +152,20 @@ export function runMessagingAgent(redux) {
             const msgFromSystem = events['msg:FromSystem'];
 
             if(msgFromSystem && msgFromSystem.isResponseToMessageType === won.WONMSG.openMessageCompacted){
-                if (msgFromSystem.hasMessageType === won.WONMSG.successResponseCompacted)
-                    redux.dispatch(actionCreators.messages__open__success(msgFromSystem));
+                if (msgFromSystem.hasMessageType === won.WONMSG.successResponseCompacted) {
+                    if (msgFromSystem.isRemoteResponseTo) {
+                        // got the second success-response (from the remote-node) - 2nd ACK
+                        redux.dispatch(actionCreators.messages__open__successRemote({ events }));
+                    } else {
+                        // got the first success-response (from our own node) - 1st ACK
+                        redux.dispatch(actionCreators.messages__open__successOwn({ events }));
+                    }
+                } else if(msgFromSystem.hasMessageType === won.WONMSG.failureResponseCompacted) {
+                    redux.dispatch(actionCreators.messages__open__failure({ events }));
+                }
+                    //redux.dispatch(actionCreators.messages__open__success(msgFromSystem));
+                //TODO redirect
+
                 //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
                 //  redux.dispatch(actionCreators.messages__open__failure(event));
                 return true;

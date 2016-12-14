@@ -102,7 +102,6 @@ export function connectionsOpen(connectionUri, message) {
         })
         .then( ([ msgData, optimisticEvent ]) => {
             // dispatch(actionCreators.messages__send(messageData));
-                // TODO redirect not triggered anymore
             dispatch({
                 type: actionTypes.connections.open,
                 payload: {
@@ -110,7 +109,14 @@ export function connectionsOpen(connectionUri, message) {
                     message: msgData.message,
                     optimisticEvent,
                 }
-            })
+            });
+
+            dispatch(actionCreators.router__stateGo("post", {
+                postUri: optimisticEvent.hasSenderNeed,
+                connectionType: won.WON.Connected,
+                connectionUri: optimisticEvent.hasSender,
+            }));
+
         });
     }
 }

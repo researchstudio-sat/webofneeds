@@ -18,8 +18,8 @@ export default function(connections = initialState, action = {}) {
         case actionTypes.login:
             return storeConnections(connections, action.payload.get('connections'));
 
-        case actionTypes.connections.accepted:
-            const acceptEvent = action.payload;
+        case actionTypes.messages.open.successOwn:
+            const acceptEvent = action.payload.events['msg:FromSystem'];
             const acceptConnectionUri = acceptEvent.hasReceiver;
             return connections.setIn([acceptConnectionUri, 'hasConnectionState'], won.WON.Connected);
 
