@@ -75,7 +75,7 @@ export function buildRateMessage(msgToRateFor, rating){
             .eventURI(eventUri)
             .hasOwnerDirection()
             .forEnvelopeData(envelopeData)
-            .hasSentTimestamp(new Date().getTime())
+            .hasSentTimestamp(new Date().getTime().toString())
             .addRating(rating, msgToRateFor.connection.uri)
             .build();
         //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.OPEN_SENT);
@@ -101,7 +101,7 @@ export function buildCloseMessage(msgToConnectFor){
             .eventURI(eventUri)
             .forEnvelopeData(envelopeData)
             .hasOwnerDirection()
-            .hasSentTimestamp(new Date().getTime())
+            .hasSentTimestamp(new Date().getTime().toString())
             .build();
         //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CLOSE_SENT);
         return {eventUri:eventUri,message:message};
@@ -124,7 +124,7 @@ export function buildCloseNeedMessage(needUri, wonNodeUri){
             .eventURI(eventUri)
             .hasReceiverNode(wonNodeUri)
             .hasOwnerDirection()
-            .hasSentTimestamp(new Date().getTime())
+            .hasSentTimestamp(new Date().getTime().toString())
             .forEnvelopeData(envelopeData)
             .build();
 
@@ -145,7 +145,7 @@ export function buildOpenNeedMessage(needUri, wonNodeUri){
             .eventURI(eventUri)
             .hasReceiverNode(wonNodeUri)
             .hasOwnerDirection()
-            .hasSentTimestamp(new Date().getTime())
+            .hasSentTimestamp(new Date().getTime().toString())
             .forEnvelopeData(envelopeData)
             .build();
 
@@ -173,7 +173,7 @@ export function buildConnectMessage(msgToConnectFor, textMessage){
             .hasRemoteFacet(won.WON.OwnerFacet)//TODO: looks like a copy-paste-leftover from connect
             .hasTextMessage(textMessage)
             .hasOwnerDirection()
-            .hasSentTimestamp(new Date().getTime())
+            .hasSentTimestamp(new Date().getTime().toString())
             .build();
         //var callback = createMessageCallbackForRemoteNeedMessage(eventUri, won.EVENT.CONNECT_SENT);
         return {eventUri:eventUri,message:message};
@@ -231,7 +231,7 @@ export function buildOpenMessage(connectionUri, chatMessage) {
                 .hasRemoteFacet(won.WON.OwnerFacet)//TODO: check. looks like a copy-paste-leftover from connect
                 .hasTextMessage(chatMessage)
                 .hasOwnerDirection()
-                .hasSentTimestamp(new Date().getTime())
+                .hasSentTimestamp(new Date().getTime().toString())
                 .build();
 
             return {
