@@ -5,14 +5,8 @@
              xmlns:beans="http://www.springframework.org/schema/beans" xmlns:benas="http://www.springframework.org/schema/beans"
              xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 								 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
-	<http pattern="/favicon.ico" security="none"/>
-	<http pattern="/app" security="none"/>
-	<http pattern="/bower_components" security="none"/>
-	<http pattern="/fonts" security="none"/>
-	<http pattern="/images" security="none"/>
-	<http pattern="/old" security="none"/>
-	<http pattern="/scripts" security="none"/>
-	<http pattern="/style" security="none"/>
+
+
 	<!-- special config for linked data brige: we want no caching headers added  -->
 	<http use-expressions="true" pattern="/rest/linked-data/**"
 		  entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint" security-context-repository-ref="securityContextRepository">
@@ -26,6 +20,23 @@
 		<intercept-url pattern="/**" access="denyAll" />
 		<custom-filter ref="sessionRepositoryFilter" before="FIRST" />
 	</http>
+
+	<http use-expressions="true"
+		  pattern="(/generated/.+|/images/.+|/favicon.ico|/app/.+|bower_components/.+|/fonts/.+|/scripts/.+|/style/.+|/index.html|/appConfig/.+|/jspm_packages/.+|/jspm_config.js)"
+		  request-matcher="regex"
+		  entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint"
+		   security-context-repository-ref="securityContextRepository">
+		<!--
+			This is static stuff, which may change, but usually doesn't.
+			If it changes, we want clients to notice the change via If-None-Match Etag validation.
+			We accept that users only check these resources once a day
+		-->
+		<headers >
+			<header name="Cache-Control" value="max-age=86400" />
+		</headers>
+		<intercept-url pattern=".*" access="permitAll()" />
+	</http>
+
 	<http use-expressions="true" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint"
 		  security-context-repository-ref="securityContextRepository">
         <intercept-url pattern="/msg" access="isAnonymous()"/>
