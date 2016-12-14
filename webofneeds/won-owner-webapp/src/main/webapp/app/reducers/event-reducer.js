@@ -63,6 +63,7 @@ export default function(state = initialState, action = {}) {
             var event = action.payload;
             return state.setIn(['events', event.uri], Immutable.fromJS(event));
 
+        case actionTypes.connections.open:
         case actionTypes.connections.sendChatMessage:
             var eventUri = action.payload.eventUri;
             return storeOptimisticEvent(state, action.payload.optimisticEvent);

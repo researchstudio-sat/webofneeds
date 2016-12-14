@@ -90,9 +90,27 @@ export function connectionsFetch(data) {
 export function connectionsOpen(connectionUri, message) {
     return (dispatch, getState) => {
         buildOpenMessage(connectionUri, message)
-        .then(messageData => {
-            dispatch(actionCreators.messages__send(messageData));
+        .then(msgData => {
+            const optimisticEventPromise = getEventsFromMessage(msgData.message)
+                .then(optimisticEvent => optimisticEvent['msg:FromOwner']);
+            return Promise.all([
+                Promise.resolve(msgData),
+                optimisticEventPromise,
+            ]);
+
             //TODO dispatch connections.open
+        })
+        .then( ([ msgData, optimisticEvent ]) => {
+            // dispatch(actionCreators.messages__send(messageData));
+                // TODO redirect not triggered anymore
+            dispatch({
+                type: actionTypes.connections.open,
+                payload: {
+                    eventUri: optimisticEvent.uri,
+                    message: msgData.message,
+                    optimisticEvent,
+                }
+            })
         });
     }
 }
