@@ -131,8 +131,6 @@ export function runMessagingAgent(redux) {
             const msgFromSystem = events['msg:FromSystem'];
 
             if(msgFromSystem && msgFromSystem.isResponseToMessageType === won.WONMSG.connectionMessageCompacted){
-                var eventUri = msgFromSystem.isRemoteResponseTo || msgFromSystem.isResponseTo;
-                var connectionUri = msgFromSystem.hasReceiver;
                 if (msgFromSystem.hasMessageType === won.WONMSG.successResponseCompacted) {
                     if (msgFromSystem.isRemoteResponseTo) {
                         // got the second success-response (from the remote-node) - 2nd ACK
