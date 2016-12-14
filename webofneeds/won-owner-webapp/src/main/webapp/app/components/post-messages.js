@@ -151,8 +151,8 @@ function genComponentConf() {
 
         encodeParam(param) {
             var encoded = encodeURIComponent(param);
-            console.log("encoding: ",param);
-            console.log("encoded: ",encoded)
+            // console.log("encoding: ",param);
+            // console.log("encoded: ",encoded)
             return encoded;
         }
 
