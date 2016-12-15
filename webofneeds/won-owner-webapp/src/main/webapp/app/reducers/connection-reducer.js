@@ -18,10 +18,27 @@ export default function(connections = initialState, action = {}) {
         case actionTypes.login:
             return storeConnections(connections, action.payload.get('connections'));
 
+        /*
         case actionTypes.messages.open.successOwn:
-            const acceptEvent = action.payload.events['msg:FromSystem'];
-            const acceptConnectionUri = acceptEvent.hasReceiver;
+            var acceptConnectionUri = action.payload.events['msg:FromSystem'].hasReceiver;
             return connections.setIn([acceptConnectionUri, 'hasConnectionState'], won.WON.Connected);
+        */
+
+        case actionTypes.connections.open:
+            var eventUri = action.payload.eventUri;
+            var connectionUri = action.payload.optimisticEvent.hasSender;
+            return connections.updateIn(
+                [connectionUri, 'hasEvents'],
+                    events => events.add(eventUri)
+            )
+            .setIn(
+                [connectionUri, 'hasConnectionState'],
+                won.WON.Connected
+            );
+
+        case actionTypes.messages.open.failure:
+            var acceptConnectionUri = action.payload.events['msg:FromSystem'].hasReceiver;
+            return connections.setIn([acceptConnectionUri, 'hasConnectionState'], won.WON.RequestReceived);
 
         case actionTypes.needs.received:
             const connectionUris = action.payload.affectedConnections
@@ -44,7 +61,6 @@ export default function(connections = initialState, action = {}) {
             return storeEventUris(connections, connectionUri, [action.payload.uri])
                 .setIn([connectionUri, 'hasConnectionState'], won.WON.Closed);
 
-        case actionTypes.connections.open:
         case actionTypes.connections.sendChatMessage:
             var eventUri = action.payload.eventUri;
             var connectionUri = action.payload.optimisticEvent.hasSender;

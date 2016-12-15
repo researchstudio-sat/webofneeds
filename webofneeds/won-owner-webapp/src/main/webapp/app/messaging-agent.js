@@ -158,10 +158,23 @@ export function runMessagingAgent(redux) {
                         redux.dispatch(actionCreators.messages__open__successRemote({ events }));
                     } else {
                         // got the first success-response (from our own node) - 1st ACK
+
                         redux.dispatch(actionCreators.messages__open__successOwn({ events }));
                     }
                 } else if(msgFromSystem.hasMessageType === won.WONMSG.failureResponseCompacted) {
                     redux.dispatch(actionCreators.messages__open__failure({ events }));
+
+                    /*
+                     * as the failure should hit right after the open went out
+                     * and should be rather rare, we can redirect in the optimistic
+                     * case (see connection-actions.js) and go back if it fails.
+                     */
+                    const acceptEvent = events['msg:FromSystem'];
+                    redux.dispatch(actionCreators.router__stateGo("post", {
+                        postUri: acceptEvent.hasSenderNeed,
+                        connectionType: won.WON.RequestReceived,
+                        connectionUri: acceptEvent.hasSender,
+                    }));
                 }
                     //redux.dispatch(actionCreators.messages__open__success(msgFromSystem));
                 //TODO redirect
