@@ -18,11 +18,9 @@ export default function(connections = initialState, action = {}) {
         case actionTypes.login:
             return storeConnections(connections, action.payload.get('connections'));
 
-        /*
         case actionTypes.messages.open.successOwn:
-            var acceptConnectionUri = action.payload.events['msg:FromSystem'].hasReceiver;
-            return connections.setIn([acceptConnectionUri, 'hasConnectionState'], won.WON.Connected);
-        */
+            var connectionUri = action.payload.events['msg:FromSystem'].hasReceiver;
+            return connections.setIn([connectionUri, 'messageDraft'], ""); // successful open -- can reset draft
 
         case actionTypes.connections.open:
             var eventUri = action.payload.eventUri;
@@ -61,6 +59,11 @@ export default function(connections = initialState, action = {}) {
             return storeEventUris(connections, connectionUri, [action.payload.uri])
                 .setIn([connectionUri, 'hasConnectionState'], won.WON.Closed);
 
+        case actionTypes.connections.typedAtChatMessage:
+            var connectionUri = action.payload.connectionUri;
+            var chatMessage = action.payload.message;
+            return connections.setIn([connectionUri, 'messageDraft'], chatMessage);
+
         case actionTypes.connections.sendChatMessage:
             var eventUri = action.payload.eventUri;
             var connectionUri = action.payload.optimisticEvent.hasSender;
@@ -84,7 +87,8 @@ export default function(connections = initialState, action = {}) {
         case actionTypes.messages.chatMessage.successOwn:
             var msgFromOwner = action.payload.events['msg:FromSystem'];
             var connectionUri = msgFromOwner.hasReceiver;
-            return storeEventUris(connections, connectionUri, [msgFromOwner.uri]);
+            return storeEventUris(connections, connectionUri, [msgFromOwner.uri])
+                .setIn([connectionUri, 'messageDraft'], chatMessage); // successful post -- no need for draft anymore
 
         case actionTypes.messages.chatMessage.successRemote:
             var eventOnOwnNode = action.payload.events['msg:FromExternal'];

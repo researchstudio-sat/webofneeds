@@ -199,6 +199,11 @@ function genComponentConf() {
 
         input(userInput) {
             this.chatMessage = userInput;
+
+            this.connections__typedAtChatMessage({
+                message: userInput ,
+                connectionUri: this.connectionUri,
+            });
         }
 
         send() {
