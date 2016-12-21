@@ -58,7 +58,7 @@ class OverviewPostsController {
                 post.getIn(['won:isInState', '@id']) === won.WON.ActiveCompacted
             );
             const inactivePosts = ownNeeds.filter(post =>
-                post.getIn(['won:isInState', '@id']) === won.WON.InctiveCompacted
+                post.getIn(['won:isInState', '@id']) === won.WON.InactiveCompacted
             );
             return {
                 activePosts: activePosts? activePosts.toJS() : {},
