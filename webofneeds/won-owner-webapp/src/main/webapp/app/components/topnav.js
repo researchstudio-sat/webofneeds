@@ -33,7 +33,9 @@ function genTopnavConf() {
                 <div class="topnav__inner__left">
                     <a  ui-sref="{{ self.loggedIn ? 'feed' : 'landingpage' }}" class="topnav__button">
                         <img src="generated/icon-sprite.svg#WON_ico_header" class="topnav__button__icon">
-                        <span class="topnav__page-title topnav__button__caption">Web of Needs &ndash; Beta</span>
+                        <span class="topnav__page-title topnav__button__caption">
+                            Web of Needs &ndash; Beta
+                        </span>
                     </a>
                 </div>
                 <div class="topnav__inner__center" ng-show="self.loggedIn">
@@ -45,27 +47,34 @@ function genTopnavConf() {
                 <div class="topnav__inner__right">
                     <ul class="topnav__list">
                         <li ng-show="!self.loggedIn">
-                            <button ui-sref="landingpage({focusSignup: true})" class="topnav__button won-button--filled lighterblue" ng-show="!self.open">Sign up</button>
+                            <button
+                                ui-sref="landingpage({focusSignup: true})"
+                                class="topnav__button won-button--filled lighterblue"
+                                ng-show="!self.open">
+                                    Sign up
+                            </button>
                         </li>
                         <li ng-show="!self.loggedIn">
                             <a class="topnav__button" ng-click="self.open = !self.open" ng-class="{'open' : self.open}">
                                 <span class="topnav__button__caption__always">Sign in</span>
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down" ng-show="!self.open" class="topnav__carret">
                                 <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" ng-show="self.open" class="topnav__carret">
+                                        ng-show="self.open" class="topnav__carret">
                             </a>
                         </li>
                         <li ng-show="self.loggedIn" ng-click="self.open = !self.open">
                             <a class="topnav__button">
                                 <span class="topnav__button__caption">{{self.email}}</span>
-                                <img src="generated/icon-sprite.svg#ico16_arrow_down" class="topnav__carret">
-                                <img src="generated/icon-sprite.svg#ico36_person" class="topnav__button__icon">
+                                <img src="generated/icon-sprite.svg#ico16_arrow_down"
+                                    class="topnav__carret">
+                                <img src="generated/icon-sprite.svg#ico36_person"
+                                    class="topnav__button__icon">
                             </a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
-        <nav class="loginOverlay" ng-show="self.open && !self.loggedIn">
             <div class="lo__inner">
                 <div class="lo__inner__right">
                     <won-login open="self.open"></won-login>
