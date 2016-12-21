@@ -13,7 +13,7 @@ System.config({
   },
 
   map: {
-    "Medium.js": "github:jakiestfu/Medium.js@1.0.1",
+    "Medium.js": "github:jakiestfu/Medium.js@master",
     "angular": "npm:angular@1.5.0-beta.2",
     "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.13.0",
     "angular-mocks": "github:angular/bower-angular-mocks@1.4.2",
@@ -28,7 +28,6 @@ System.config({
     "fetch": "github:github/fetch@0.10.1",
     "font-awesome": "bower:font-awesome@4.3.0",
     "immutable": "npm:immutable@3.7.5",
-    "jakiestfu/Medium.js": "github:jakiestfu/Medium.js@1.0.1",
     "jquery": "github:components/jquery@2.1.4",
     "js-md5": "bower:js-md5@1.1.0",
     "jsonld": "npm:jsonld@0.4.2",
@@ -113,7 +112,7 @@ System.config({
       "path-browserify": "npm:path-browserify@0.0.0"
     },
     "github:jspm/nodelibs-process@0.1.2": {
-      "process": "npm:process@0.11.5"
+      "process": "npm:process@0.11.9"
     },
     "github:jspm/nodelibs-punycode@0.1.0": {
       "punycode": "npm:punycode@1.3.2"
@@ -348,7 +347,7 @@ System.config({
       "base64-js": "npm:base64-js@0.0.8",
       "child_process": "github:jspm/nodelibs-child_process@0.1.0",
       "fs": "github:jspm/nodelibs-fs@0.1.2",
-      "ieee754": "npm:ieee754@1.1.6",
+      "ieee754": "npm:ieee754@1.1.8",
       "isarray": "npm:isarray@1.0.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
@@ -972,10 +971,7 @@ System.config({
     "npm:process-nextick-args@1.0.6": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:process@0.11.2": {
-      "assert": "github:jspm/nodelibs-assert@0.1.0"
-    },
-    "npm:process@0.11.5": {
+    "npm:process@0.11.9": {
       "assert": "github:jspm/nodelibs-assert@0.1.0",
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "vm": "github:jspm/nodelibs-vm@0.1.0"
@@ -1202,7 +1198,7 @@ System.config({
       "systemjs-json": "github:systemjs/plugin-json@0.1.0"
     },
     "npm:timers-browserify@1.4.2": {
-      "process": "npm:process@0.11.2"
+      "process": "npm:process@0.11.9"
     },
     "npm:tough-cookie@2.2.1": {
       "net": "github:jspm/nodelibs-net@0.1.2",

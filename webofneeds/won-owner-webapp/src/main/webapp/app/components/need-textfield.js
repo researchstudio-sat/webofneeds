@@ -4,7 +4,7 @@
 
 ;
 
-import Medium from '../mediumjs-es6';
+// import Medium from '../mediumjs-es6';
 import angular from 'angular';
 import 'ng-redux';
 import Immutable from 'immutable';
