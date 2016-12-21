@@ -107,6 +107,8 @@ function genLoginConf() {
              * the DOM has the correct information (e.g. via `.innerHTML`) there's
              * no better way of dealing this except for continuous event spamming.
              */
+            delay(500).then(triggerInputEvents);
+            delay(1000).then(triggerInputEvents);
             delay(2000).then(triggerInputEvents);
 
         }
