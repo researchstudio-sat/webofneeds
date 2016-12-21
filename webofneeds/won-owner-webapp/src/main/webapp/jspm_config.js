@@ -16,7 +16,6 @@ System.config({
     "Medium.js": "github:jakiestfu/Medium.js@1.0.1",
     "angular": "npm:angular@1.6.0",
     "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.13.0",
-    "angular-inview": "npm:angular-inview@2.1.0",
     "angular-mocks": "github:angular/bower-angular-mocks@1.4.2",
     "angular-route": "github:angular/bower-angular-route@1.4.2",
     "angular-sanitize": "github:angular/bower-angular-sanitize@1.4.8",
@@ -158,9 +157,6 @@ System.config({
       "module": "github:jspm/nodelibs-module@0.1.0",
       "path": "github:jspm/nodelibs-path@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
-    },
-    "npm:angular-inview@2.1.0": {
-      "angular": "npm:angular@1.6.0"
     },
     "npm:angular-ui-router@0.2.15": {
       "process": "github:jspm/nodelibs-process@0.1.2"

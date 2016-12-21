@@ -16,7 +16,6 @@ import 'redux';
 import ngReduxModule from 'ng-redux';
 import ngReduxRouterModule from 'redux-ui-router';
 import uiRouterModule from 'angular-ui-router';
-import ngInviewModule from 'angular-inview';
 import {
     camel2Hyphen,
     hyphen2Camel,
@@ -62,7 +61,6 @@ let app = angular.module('won.owner', [
     ngReduxModule,
     uiRouterModule,
     ngReduxRouterModule,
-    ngInviewModule.name,
 
     //components
     topnav,
