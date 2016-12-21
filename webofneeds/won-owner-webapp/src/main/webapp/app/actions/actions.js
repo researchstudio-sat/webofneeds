@@ -195,6 +195,8 @@ const actionHierarchy = {
 
         waitingForAnswer: INJ_DEFAULT,
     },
+    hideLogin: INJ_DEFAULT,
+    showLogin: INJ_DEFAULT,
     login: accountLogin,
     logout: accountLogout,
     register: accountRegister,

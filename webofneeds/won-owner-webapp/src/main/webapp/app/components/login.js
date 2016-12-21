@@ -7,7 +7,7 @@ import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 
 function genLoginConf() {
-    let template = `<a class="wl__button" ng-click="self.open = !self.open">
+    let template = `<a class="wl__button" ng-click="self.hideLogin()">
                         <span class="wl__button__caption">Sign in</span>
                         <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" class="wl__button__carret">
                     </a>
@@ -57,10 +57,13 @@ function genLoginConf() {
         constructor(/* arguments <- serviceDependencies */){
             attach(this, serviceDependencies, arguments);
 
+            window.lic4dbg = this;
+
             this.email = "";
             this.password = "";
 
             const login = (state) => ({
+                loginVisible: state.get('loginVisible'),
                 loggedIn: state.getIn(['user','loggedIn']),
                 loginError: state.getIn(['user','loginError'])
             });

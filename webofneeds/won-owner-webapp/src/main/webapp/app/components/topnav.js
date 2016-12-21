@@ -57,14 +57,17 @@ function genTopnavConf() {
                             </button>
                         </li>
                         <li ng-show="!self.loggedIn">
-                            <a class="topnav__button" ng-click="self.open = !self.open" ng-class="{'open' : self.open}">
-                                <span class="topnav__button__caption__always">Sign in</span>
-                                <img src="generated/icon-sprite.svg#ico16_arrow_down" ng-show="!self.open" class="topnav__carret">
-                                <img src="generated/icon-sprite.svg#ico16_arrow_up_hi" ng-show="self.open" class="topnav__carret">
+                            <a class="topnav__button"
+                                ng-click="self.showLogin()"
+                                ng-class="{'open' : self.open}">
+                                    <span class="topnav__button__caption__always">Sign in</span>
+                                    <img src="generated/icon-sprite.svg#ico16_arrow_down"
+                                        ng-show="!self.open" class="topnav__carret">
+                                    <img src="generated/icon-sprite.svg#ico16_arrow_up_hi"
                                         ng-show="self.open" class="topnav__carret">
                             </a>
                         </li>
-                        <li ng-show="self.loggedIn" ng-click="self.open = !self.open">
+                        <li ng-show="self.loggedIn" ng-click="self.showLogin()">
                             <a class="topnav__button">
                                 <span class="topnav__button__caption">{{self.email}}</span>
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down"
@@ -79,6 +82,7 @@ function genTopnavConf() {
         </nav>
 
 
+        <nav class="loginOverlay" ng-show="self.open && !self.loggedIn">
             <div class="lo__inner">
                 <div class="lo__inner__right">
                     <won-login open="self.open"></won-login>
@@ -121,6 +125,8 @@ function genTopnavConf() {
 
             const selectFromState = (state) => ({
                 WON: won.WON,
+                loginVisible: state.get('loginVisible'),
+                open: state.get('loginVisible'), // TODO interim while transition to redux-state based solution (i.e. "loginVisible")
                 loggedIn: state.getIn(['user', 'loggedIn']),
                 email: state.getIn(['user','email']),
                 toastsArray: state.getIn(['toasts']).toArray(),
