@@ -64,21 +64,25 @@
     </bean>
 
     <!-- Entity manager -->
-    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="owner-flyway">
         <property name="dataSource" ref="dataSource" />
         <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
         <property name="packagesToScan" value="won.owner.model, won.protocol.model" />
     </bean>
 
+    <bean id="owner-flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
     <!-- Session factory -->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean" depends-on="owner-flyway">
         <property name="dataSource" ref="dataSource" />
         <property name="hibernateProperties">
             <props>
                 <!-- set a custom hibernate postgres dialect to create indices for foreign keys automatically -->
                 <prop key="hibernate.dialect">won.protocol.util.hibernate.Postgres9WithFKIndicesDialect</prop>
 
-                <prop key="hbm2ddl.auto">create</prop>
+                <prop key="hbm2ddl.auto">validate</prop>
                 <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.generate_statistics">false</prop>
             </props>
