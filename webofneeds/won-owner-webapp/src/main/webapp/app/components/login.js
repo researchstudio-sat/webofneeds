@@ -78,7 +78,6 @@ function genLoginConf() {
             const disconnect = this.$ngRedux.connect(login, actionCreators)(this);
             this.$scope.$on('$destroy',disconnect);
 
-
             this.autofillHack();
 
             this.$scope.$watch(() => this.loginVisible, (newVis, oldVis) => {
@@ -94,11 +93,21 @@ function genLoginConf() {
          * so we do this here manually to make sure the ng-model updates itself.
          */
         autofillHack() {
-            return delay(0).then(() => {
+            const triggerInputEvents = () => {
                 this.$element.find('#loginEmail').trigger('input');
                 this.$element.find('#loginPassword').trigger('input');
-                delay(100).then(() => console.log("lic4dbg email: ", this.email));
-            });
+            };
+
+            delay(0).then(triggerInputEvents);
+
+            /*
+             * @2s delay: to catch cases where the login is opened before the
+             * page finishes loading (for FF+Keefox auto-fill triggers only then)
+             * There's no guarantee that 2s are enough tough. However, as not even
+             * the DOM has the correct information (e.g. via `.innerHTML`) there's
+             * no better way of dealing this except for continuous event spamming.
+             */
+            delay(2000).then(triggerInputEvents);
 
         }
     }
