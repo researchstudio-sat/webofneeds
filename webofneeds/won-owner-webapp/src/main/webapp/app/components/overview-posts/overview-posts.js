@@ -61,9 +61,9 @@ class OverviewPostsController {
                 post.getIn(['won:isInState', '@id']) === won.WON.InactiveCompacted
             );
             return {
-                activePosts: activePosts? activePosts.toJS() : {},
+                activePosts: activePosts? activePosts.toArray() : [],
                 activePostsCount: activePosts? activePosts.size : 0,
-                inactivePosts: inactivePosts? inactivePosts.toJS() : {},
+                inactivePosts: inactivePosts? inactivePosts.toArray() : [],
                 inactivePostsCount: inactivePosts? inactivePosts.size : 0,
                 unreadEvents,
                 unreadCounts: selectUnreadCountsByNeedAndType(state),
