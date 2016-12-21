@@ -27,6 +27,8 @@ function genTopnavConf() {
                 ng-show="self.reconnecting"
                 class="hspinner"/>
         </div>
+
+
         <nav class="topnav">
 
             <div class="topnav__inner">
@@ -75,12 +77,16 @@ function genTopnavConf() {
                 </div>
             </div>
         </nav>
+
+
             <div class="lo__inner">
                 <div class="lo__inner__right">
                     <won-login open="self.open"></won-login>
                 </div>
             </div>
         </nav>
+
+
         <nav class="loginOverlay" ng-show="self.open && self.loggedIn">
             <div class="lo__inner">
                 <div class="lo__inner__right">
@@ -88,6 +94,8 @@ function genTopnavConf() {
                 </div>
             </div>
         </nav>
+
+
         <div class="topnav__toasts">
             <div class="topnav__toasts__element" 
             ng-class="{ 'info' : toast.get('type') === self.WON.infoToast,
