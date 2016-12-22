@@ -12,6 +12,14 @@ window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
 
 import 'fetch'; //polyfill for window.fetch (for backward-compatibility with older browsers)
 
+
+// <debug-deletme>
+import * as rangy from 'rangy';
+//window.rangy = rangy; // medium.js requires this to be in the window-scope
+console.log('rangy: ', rangy);
+// </debug-deletme>
+
+
 import 'redux';
 import ngReduxModule from 'ng-redux';
 import ngReduxRouterModule from 'redux-ui-router';

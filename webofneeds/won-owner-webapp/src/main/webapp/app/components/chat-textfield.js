@@ -12,8 +12,6 @@ import 'angular-sanitize';
 import { dispatchEvent, attach, delay } from '../utils';
 import { actionCreators }  from '../actions/actions';
 
-window.Medium4dbg = Medium;
-
 function genComponentConf() {
     let template = `
         <div class="wdt__left">
