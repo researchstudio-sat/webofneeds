@@ -151,8 +151,8 @@ function genComponentConf() {
 
         encodeParam(param) {
             var encoded = encodeURIComponent(param);
-            console.log("encoding: ",param);
-            console.log("encoded: ",encoded)
+            // console.log("encoding: ",param);
+            // console.log("encoded: ",encoded)
             return encoded;
         }
 
@@ -199,6 +199,11 @@ function genComponentConf() {
 
         input(userInput) {
             this.chatMessage = userInput;
+
+            this.connections__typedAtChatMessage({
+                message: userInput ,
+                connectionUri: this.connectionUri,
+            });
         }
 
         send() {

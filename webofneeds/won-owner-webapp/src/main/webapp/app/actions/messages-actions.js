@@ -140,20 +140,23 @@ export function successfulConnect(event) {
     }
 }
 
-export function successfulOpen(event){
+//TODO move redirect elsewhere (e.g. to click-handler) then remove
+export function successfulOpen({ events }){
     return (dispatch, getState) => {
         const state = getState();
-        console.log("got response for OPEN: " + event.hasMessageType);
-        if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
-            console.log("messages was in waitingForAnswer", event);
+        const event = events['msg:FromSystem'];
+        dispatch({
+            type: actionTypes.messages.open.successOwn,
+            payload: {
+                events,
+            }
+        });
 
-            dispatch(actionCreators.connections__accepted(event));
-            dispatch(actionCreators.router__stateGo("post", {
-                postUri: event.hasReceiverNeed,
-                connectionType: won.WON.Connected,
-                connectionUri: event.hasReceiver,
-            }));
-        }
+        dispatch(actionCreators.router__stateGo("post", {
+            postUri: event.hasReceiverNeed,
+            connectionType: won.WON.Connected,
+            connectionUri: event.hasReceiver,
+        }));
     }
 }
 

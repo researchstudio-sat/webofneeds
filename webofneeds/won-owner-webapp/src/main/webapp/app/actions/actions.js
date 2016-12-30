@@ -103,9 +103,9 @@ const actionHierarchy = {
         fetch: cnct.connectionsFetch,
         open: cnct.connectionsOpen,
         connect: cnct.connectionsConnect,
-        accepted: INJ_DEFAULT,
         close: cnct.connectionsClose,
         rate: cnct.connectionsRate,
+        typedAtChatMessage: INJ_DEFAULT,
         sendChatMessage: cnct.connectionsChatMessage,
         showLatestMessages: cnct.showLatestMessages,
         showMoreMessages: cnct.showMoreMessages,
@@ -167,7 +167,9 @@ const actionHierarchy = {
             //TODO failure: messages.failedCreate
         },
         open: {
-            success: messages.successfulOpen,
+            successRemote: INJ_DEFAULT, //2nd successResponse
+            successOwn: INJ_DEFAULT, //1st successResponse
+            failure: INJ_DEFAULT,
             //TODO failure: messages.failedOpen
         },
         close: { //TODO: NAME SEEMS GENERIC EVEN THOUGH IT IS ONLY USED FOR CLOSING CONNECITONS; REFACTOR THIS SOMEDAY

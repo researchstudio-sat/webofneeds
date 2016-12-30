@@ -42,6 +42,7 @@ export function messagesReducer(messages = initialState, action = {}) {
                 .removeIn(['enqueued', pendingEventUri])
                 .setIn(['waitingForAnswer', pendingEventUri], msg);
 
+        case actionTypes.connections.open:
         case actionTypes.connections.sendChatMessage:
         case actionTypes.messages.send:
             return messages.setIn(
