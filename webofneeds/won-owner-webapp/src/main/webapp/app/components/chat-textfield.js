@@ -9,7 +9,12 @@ import angular from 'angular';
 import 'ng-redux';
 import Immutable from 'immutable';
 import 'angular-sanitize';
-import { dispatchEvent, attach, delay } from '../utils';
+import {
+    dispatchEvent,
+    attach,
+    delay,
+    is,
+} from '../utils';
 import { actionCreators }  from '../actions/actions';
 
 window.Medium4dbg = Medium;
@@ -108,7 +113,11 @@ function genComponentConf() {
                 element: this.mediumMount(),
 
                 modifier: 'auto',
-                placeholder: this.placeholder,
+
+                placeholder: is('string', this.placeholder) ?
+                    // make sure we've got a string to avoid errors internal to medium.js
+                    this.placeholder : "",
+
                 autoHR: false, //if true, inserts <hr> after two empty lines
                 mode: Medium.inlineMode, // no newlines, no styling
                 //mode: Medium.partialMode, // allows newlines, no styling

@@ -115,7 +115,7 @@ function genComponentConf() {
             const selectFromState = (state) => {
 
                 const ownNeeds = selectOwnNeeds(state);
-                const need = ownNeeds? ownNeeds.get(this.needUri) : undefined;
+                const need = ownNeeds && ownNeeds.get(this.needUri);
 
                 const allConnectionsByNeedUri = selectAllByConnections(state)
                     .filter(conn => conn.getIn(['ownNeed', '@id']) === this.needUri);

@@ -150,7 +150,7 @@ function accessControl(event, toState, toParams, fromState, fromParams, options,
     const hasPreviousState = !!fromState.name;
     const state = $ngRedux.getState();
     
-    const errorString = "Tried to access view \"" + toState + "\" that won't work" +
+    const errorString = "Tried to access view \"" + (toState && toState.name) + "\" that won't work" +
         "without logging in. Blocking route-change.";
 
     switch(toState.name) {
