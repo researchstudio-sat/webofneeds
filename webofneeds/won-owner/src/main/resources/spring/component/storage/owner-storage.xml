@@ -59,7 +59,7 @@
 
     <!-- Hibernate is used as JPA vendor-->
     <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-        <property name="generateDdl" value="true" /> <!-- Automatically create tables for the entity classes. Don't do this in production! -->
+        <property name="generateDdl" value="false" /> <!-- Automatically create tables for the entity classes. Don't do this in production! -->
         <property name="showSql" value="false" /> <!-- Set this to true for analyzing SQL queries -->
     </bean>
 
@@ -68,27 +68,34 @@
         <property name="dataSource" ref="dataSource" />
         <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
         <property name="packagesToScan" value="won.owner.model, won.protocol.model" />
-    </bean>
-
-    <bean id="owner-flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
-
-    <!-- Session factory -->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean" depends-on="owner-flyway">
-        <property name="dataSource" ref="dataSource" />
-        <property name="hibernateProperties">
+        <property name="jpaProperties">
             <props>
-                <!-- set a custom hibernate postgres dialect to create indices for foreign keys automatically -->
                 <prop key="hibernate.dialect">won.protocol.util.hibernate.Postgres9WithFKIndicesDialect</prop>
-
-                <prop key="hbm2ddl.auto">validate</prop>
+                <prop key="hibernate.hbm2ddl.auto">validate</prop>
                 <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.generate_statistics">false</prop>
             </props>
         </property>
     </bean>
 
+    <bean id="owner-flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+<!-- Session factory -->
+    <!--<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean" depends-on="owner-flyway">-->
+        <!--<property name="dataSource" ref="dataSource" />-->
+        <!--<property name="hibernateProperties">-->
+            <!--<props>-->
+                <!--&lt;!&ndash; set a custom hibernate postgres dialect to create indices for foreign keys automatically &ndash;&gt;-->
+                <!--<prop key="hibernate.dialect">won.protocol.util.hibernate.Postgres9WithFKIndicesDialect</prop>-->
+                <!--<prop key="hbm2ddl.auto">validate</prop>-->
+                <!--<prop key="hibernate.show_sql">false</prop>-->
+                <!--<prop key="hibernate.generate_statistics">false</prop>-->
+            <!--</props>-->
+        <!--</property>-->
+
+    <!--</bean>-->
     <!-- ==================================== -->
     <!--  Hibernate 4.3 Statistics for JMX    -->
     <!-- ==================================== -->
@@ -109,7 +116,7 @@
         <property name="entityManagerFactory" ref="entityManagerFactory" />
     </bean>
 
-    <tx:annotation-driven transaction-manager="transactionManager" />
+    <tx:annotation-driven transaction-manager="transactionManager"/>
 
     <!-- Defines where repositories are placed -->
     <jpa:repositories base-package="won.protocol.repository" />

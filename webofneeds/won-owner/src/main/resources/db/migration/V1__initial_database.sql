@@ -154,4 +154,11 @@ CREATE UNIQUE INDEX idx_unique_connection ON connection (needuri, remoteneeduri,
 CREATE INDEX idx_connection_needuri_remoteneeduri ON connection (needuri, remoteneeduri);
 CREATE UNIQUE INDEX uk_oyrkoqlwbhvfuykswdch6mcsq ON match (fromneed, toneed, originator);
 
+CREATE SEQUENCE hibernate_sequence
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 1
+  CACHE 1;
+
 COMMIT;
