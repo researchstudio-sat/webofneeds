@@ -20,11 +20,14 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation=
                "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
                 http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
                 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
-                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+                http://www.springframework.org/schema/data/repository http://www.springframework.org/schema/data/repository/spring-repository-1.8.xsd
+                http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
     <!--
          Load properties but ignore unresolvable properties so that
@@ -45,18 +48,12 @@
         <property name="password" value="${db.sql.password}" />
     </bean>
 
-    <!-- Hibernate is used as JPA vendor-->
-    <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-        <property name="generateDdl" value="true" /> <!-- Automatically create tables for the entity classes. Don't do this in production! -->
-        <property name="showSql" value="false" />
-    </bean>
-
-
-
     <!-- Entity manager -->
-    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="node-flyway">
         <property name="dataSource" ref="dataSource" />
-        <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/><!-- Hibernate is used as JPA vendor-->
+        </property>
         <property name="packagesToScan" value="won.protocol.model" />
         <!--
         The custom JpaDialect can be used to set the flush mode manually. Shouldn't be needed,
@@ -67,32 +64,21 @@
            </bean>
         </property>
         -->
-
-        <property name="jpaPropertyMap">
-            <map>
-                <!-- here's the right place to configure query caching and 2nd level cache -->
-                <entry key="hibernate.cache.use_minimal_puts" value="true" />
-                <entry key="hibernate.show_sql" value="false" />
-                <entry key="hibernate.generate_statistics" value="false" />
-            </map>
-        </property>
-    </bean>
-
-
-    <!-- Session factory -->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-        <property name="dataSource" ref="dataSource" />
-        <property name="hibernateProperties">
+        <property name="jpaProperties">
             <props>
-                <!-- set a custom hibernate postgres dialect to create indices for foreign keys automatically -->
                 <prop key="hibernate.dialect">won.protocol.util.hibernate.Postgres9WithFKIndicesDialect</prop>
-
-                <prop key="hbm2ddl.auto">create</prop>
+                <prop key="hibernate.hbm2ddl.auto">validate</prop>
                 <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.generate_statistics">false</prop>
+                <prop key="hibernate.cache.use_minimal_puts">true</prop>
             </props>
         </property>
     </bean>
+
+    <bean id="node-flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
 
     <!-- ==================================== -->
     <!--  Hibernate 4.3 Statistics for JMX    -->
@@ -102,7 +88,9 @@
             <map>
                 <entry key="Hibernate:type=NodeStatistics">
                     <bean class="won.monitoring.hibernate.HibernateStatisticsFactoryBean">
-                        <property name="sessionFactory" ref="sessionFactory" />
+                        <property name="sessionFactory">
+                            <util:property-path path="entityManagerFactory.sessionFactory"/>
+                        </property>
                     </bean>
                 </entry>
             </map>
