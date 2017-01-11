@@ -71,7 +71,7 @@ services:
       - "mailbot.email.smtp.port=587"
     depends_on:
       - nginx
-      - mongodbk
+      - mongodb
 
   telegram_bot:
     build: ../../image/bots
