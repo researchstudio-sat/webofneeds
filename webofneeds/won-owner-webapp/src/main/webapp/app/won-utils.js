@@ -61,8 +61,9 @@ export function selectTimestamp(event, ownNeedUri) {
      * should have been placed by our own node.
      *
      * The exception are events that haven't
-     * been confirmed yet. They don't have the
-     * timestamp.
+     * been confirmed yet. They don't have a
+     * received timestamp, as these are optimistic
+     * assumptions with only sent timestamps.
      */
     return event.get('hasReceivedTimestamp');
 };

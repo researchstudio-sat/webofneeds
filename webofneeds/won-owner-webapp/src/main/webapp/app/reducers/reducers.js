@@ -54,6 +54,21 @@ const reducers = {
     initialLoadFinished: (state = false, action = {}) =>
         state || action.type === actionTypes.initialPageLoad,
 
+    loginVisible: (visible = false, action = {}) => {
+        switch (action.type) {
+            case actionTypes.showLogin:
+                return true;
+
+            case actionTypes.hideLogin:
+            case actionTypes.login:
+            case actionTypes.logout:
+                return false;
+
+            default:
+                return visible;
+        }
+    },
+
 
     //config: createReducer(
     config: (config = Immutable.Map(), action = {}) => {
