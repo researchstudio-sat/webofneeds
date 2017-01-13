@@ -45,7 +45,6 @@ docker-compose -H satvm01:2375 up -d
 
 echo push automatically built webobofneeds images to docker hub
 docker -H satvm01:2375 login --username=$DOCKER_USER --password=$DOCKER_PASS
-docker -H satvm01:2375 login --username=$DOCKER_USER --password=$DOCKER_PASS
 docker -H satvm01:2375 push webofneeds/gencert:live
 docker -H satvm01:2375 push webofneeds/wonnode:live
 docker -H satvm01:2375 push webofneeds/owner:live

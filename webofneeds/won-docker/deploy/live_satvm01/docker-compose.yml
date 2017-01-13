@@ -7,6 +7,8 @@ services:
   # - all involved containers (letsencrypt, nginx, wonnode) are configured to mount the right folders
   # - the certificate folder on the host is configured to be "$base_folder/letsencrypt/certs/live/matchat.org"
   # - nginx must be running so that the acme challenge can be executed
+  #   (for a new creation of the certificate you can start nginx with the nginx-http-only.conf which doesnt need
+  #   certificate file for startup)
   # - execute "docker exec livesatvm01_letsencrypt_1 bash //usr/local/bin/certificate-request-and-renew.sh" for
   #   certificate renewal on host satvm01
   # - this script can be changed for testing e.g. by adding parameters like --dry-run or --test-cert to the certbot
@@ -30,7 +32,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "61617:61617"
+      - "61616:61616"
     volumes:
       - $base_folder/letsencrypt/certs:/etc/letsencrypt/
       - $base_folder/nginx.conf:/etc/nginx/nginx.conf
@@ -44,7 +46,7 @@ services:
       - "POSTGRES_PASSWORD=$postgres_db_passwd"
       - "PGDATA=/var/lib/postgresql/data/pgdata"
     volumes:
-      - $base_folder/postgres/data/pgdata:/var/lib/postgresql/data/pgdata
+      - $base_folder/postgres_node/data/pgdata:/var/lib/postgresql/data/pgdata
     ports:
       - "5433:5432"
 
@@ -66,7 +68,7 @@ services:
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
       - "8443:8443"
-      - "61616:61616"
+      - "61617:61616"
     volumes:
       - $base_folder/letsencrypt/certs/live/matchat.org/fullchain.pem:/usr/local/tomcat/conf/ssl/t-cert.pem
       - $base_folder/letsencrypt/certs/live/matchat.org/privkey.pem:/usr/local/tomcat/conf/ssl/t-key.pem
@@ -76,18 +78,6 @@ services:
     depends_on:
       - postgres_node
       - nginx
-
-  # debug bot used to test need communication, connect to wonnodes (proxied: node.matchat.org)
-  debug_bot:
-    build: ../../image/bots
-    image: webofneeds/bots:live
-    environment:
-      - "node.default.host=node.matchat.org"
-      - "node.default.http.port=443"
-      - "uri.prefix.node.default=https://node.matchat.org/won"
-      - "won.node.uris=https://node.matchat.org/won/resource"
-    depends_on:
-      - wonnode
 
   # bigdata rdf store for matcher service (this image is not built at deployment, it is downloaded from dockerhub)
   bigdata:
@@ -143,6 +133,18 @@ services:
       - solr
       - matcher_service
 
+  # debug bot used to test need communication, connect to wonnodes (proxied: node.matchat.org)
+  debug_bot:
+    build: ../../image/bots
+    image: webofneeds/bots:live
+    environment:
+      - "node.default.host=node.matchat.org"
+      - "node.default.http.port=443"
+      - "uri.prefix.node.default=https://node.matchat.org/won"
+      - "won.node.uris=https://node.matchat.org/won/resource"
+    depends_on:
+      - wonnode
+
   # portsgres need databases for owner
   postgres_owner:
     image: webofneeds/postgres:live
@@ -151,7 +153,7 @@ services:
       - "POSTGRES_PASSWORD=$postgres_db_passwd"
       - "PGDATA=/var/lib/postgresql/data/pgdata"
     volumes:
-      - $base_folder/postgres/data/pgdata:/var/lib/postgresql/data/pgdata
+      - $base_folder/postgres_owner/data/pgdata:/var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
 
