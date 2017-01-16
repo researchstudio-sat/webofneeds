@@ -143,12 +143,6 @@
             <groupId>org.javasimon</groupId>
             <artifactId>javasimon-spring</artifactId>
         </dependency>
-
-        <!-- DB Migration -->
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

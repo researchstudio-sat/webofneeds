@@ -100,6 +100,7 @@ services:
       - "db.sql.jdbcUrl=jdbc:postgresql://satcluster01.researchstudio.at:5432/won_owner"
       - "db.sql.user=won"
       - "db.sql.password=$postgres_db_passwd"
+      - "db.ddl.strategy=validate"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
       - "email.from.won.user=$MAIL_USER"
       - "email.from.won.password=$MAIL_PASS"

@@ -64,6 +64,7 @@ services:
       - "db.sql.jdbcUrl=jdbc:postgresql://satcluster02.researchstudio.at:5433/won_node"
       - "db.sql.user=won"
       - "db.sql.password=$postgres_db_passwd"
+      - "db.ddl.strategy=validate"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
       - "activemq.broker.port=61616"
       - "client.authentication.behind.proxy=true"
