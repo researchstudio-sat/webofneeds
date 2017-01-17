@@ -75,7 +75,7 @@
         </property>
     </bean>
 
-    <bean id="node-flyway" class="won.db.FlywayWrapper" init-method="migrate">
+    <bean id="node-flyway" class="won.db.FlywayWrapper">
         <property name="ddlStrategy" value="${db.ddl.strategy}"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>

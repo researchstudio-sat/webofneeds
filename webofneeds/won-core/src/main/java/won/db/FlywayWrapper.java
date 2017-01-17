@@ -1,24 +1,31 @@
 package won.db;
 
 import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.FlywayException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 
 import javax.sql.DataSource;
 
+import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
+
 /**
- * Created by fsuda on 13.01.2017.
+ * This Bean is used to determine whether or not an update/validation of the ddl is done via flywaydb.
  */
-public class FlywayWrapper {
-    private Flyway flyway = new Flyway();
+public class FlywayWrapper implements InitializingBean{
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
     private String ddlStrategy = "";
     private DataSource dataSource;
 
-    public int migrate() throws FlywayException {
-        if("validate".equals(ddlStrategy)) {
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if("validate".equals(ddlStrategy.trim())) {
+            Flyway flyway = new Flyway();
             flyway.setDataSource(dataSource);
-            return flyway.migrate();
+            flyway.migrate();
+        } else {
+            logger.info("Flyway DB Migration ommitted due to non-validate DDL-Strategy: " + ddlStrategy);
         }
-        return 0;
     }
 
     public String getDdlStrategy() {
