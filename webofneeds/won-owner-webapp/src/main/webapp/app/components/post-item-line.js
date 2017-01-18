@@ -126,7 +126,10 @@ function genComponentConf() {
 
 
                 return {
-                    relativeCreationDate: relativeTime(state.get('lastUpdateTime'), need.get('dct:created')),
+                    need,
+                    relativeCreationDate: need?
+                        relativeTime(state.get('lastUpdateTime'), need.get('dct:created')) :
+                        "",
                     hasConversations: allConnectionsByNeedUri
                         .filter(conn =>
                             conn.getIn(['connection', 'hasConnectionState']) === won.WON.Connected
@@ -151,7 +154,7 @@ function genComponentConf() {
         }
 
         isActive() {
-            return this.ownNeed.getIn(['won:isInState','@id']) === won.WON.ActiveCompacted;
+            return this.ownNeed && this.ownNeed.getIn(['won:isInState','@id']) === won.WON.ActiveCompacted;
         }
 
         unreadXCount(type) {
