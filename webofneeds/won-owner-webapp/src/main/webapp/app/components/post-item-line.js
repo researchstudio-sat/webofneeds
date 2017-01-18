@@ -148,13 +148,6 @@ function genComponentConf() {
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
-
-            updateRelativeTimestamps(
-                this.$scope,
-                this.$interval,
-                this.ownNeed.get('dct:created'),
-                t => this.creationDate = t);
-
         }
 
         isActive() {
