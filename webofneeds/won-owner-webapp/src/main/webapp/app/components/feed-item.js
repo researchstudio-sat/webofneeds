@@ -116,6 +116,8 @@ function genComponentConf() {
 
             this.labels = labels;
 
+            const self = this;
+
             this.maxNrOfItemsShown = 3;
             const selectFromState = (state) => {
                 const ownNeeds = selectOwnNeeds(state);
@@ -124,10 +126,10 @@ function genComponentConf() {
                 const unreadCountsByNeedAndType = selectUnreadCountsByNeedAndType(state);
 
                 return {
-                    ownNeed: ownNeeds && ownNeeds.get(this.needUri),
+                    ownNeed: ownNeeds && ownNeeds.get(self.needUri),
                     createdOn: ownNeeds && relativeTime(lastUpdated, ownNeeds.get('dct:created')),
-                    connections: connectionsByNeed && connectionsByNeed.get(this.needUri),
-                    unreadCounts: unreadCountsByNeedAndType && unreadCountsByNeedAndType.get(this.needUri),
+                    connections: connectionsByNeed && connectionsByNeed.get(self.needUri),
+                    unreadCounts: unreadCountsByNeedAndType && unreadCountsByNeedAndType.get(self.needUri),
 
 
 

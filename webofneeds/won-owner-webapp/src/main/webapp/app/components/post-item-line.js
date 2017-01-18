@@ -112,15 +112,17 @@ function genComponentConf() {
             this.labels = labels;
             //this.EVENT = won.EVENT;
 
+            const self = this;
+
             const selectFromState = (state) => {
 
                 const ownNeeds = selectOwnNeeds(state);
-                const need = ownNeeds && ownNeeds.get(this.needUri);
+                const need = ownNeeds && ownNeeds.get(self.needUri);
 
                 const allConnectionsByNeedUri = selectAllByConnections(state)
-                    .filter(conn => conn.getIn(['ownNeed', '@id']) === this.needUri);
+                    .filter(conn => conn.getIn(['ownNeed', '@id']) === self.needUri);
 
-                const unreadCounts = selectUnreadCountsByNeedAndType(state).get(this.needUri);
+                const unreadCounts = selectUnreadCountsByNeedAndType(state).get(self.needUri);
 
 
                 return {
