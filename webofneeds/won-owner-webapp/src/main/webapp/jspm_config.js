@@ -14,7 +14,7 @@ System.config({
 
   map: {
     "Medium.js": "github:jakiestfu/Medium.js@1.0.1",
-    "angular": "npm:angular@1.6.0",
+    "angular": "npm:angular@1.6.1",
     "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.13.0",
     "angular-mocks": "github:angular/bower-angular-mocks@1.4.2",
     "angular-route": "github:angular/bower-angular-route@1.4.2",
