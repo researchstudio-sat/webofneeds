@@ -13,7 +13,7 @@ rm won_certificate_passwd_file
 
 # copy the openssl.conf file to the server where the certificates are generated
 # the conf file is needed to specify alternative server names, see conf file in won-docker/image/gencert/openssl.conf
-# for entries of alternative server names: www.matchat.org, satvm01.researchstudio.at
+# for entries of alternative server names: matchat.org, www.matchat.org, satvm01.researchstudio.at
 scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl.conf won@satvm01:$base_folder/openssl.conf
 
 # owner server certificate generator
@@ -26,7 +26,7 @@ scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl.conf won@satvm01:$bas
 # command of the wonnode). Note that the filename of the certificate is also used in the tomcat config, (see
 # owner/ssl/server.xml) so be careful when changing it.
 docker -H satvm01:2375 rm gencert || echo 'No docker container found to remove with name: gencert'
-docker -H satvm01:2375 run --name=gencert -e CN="www.matchat.org" \
+docker -H satvm01:2375 run --name=gencert -e CN="matchat.org" \
 -e "PASS=file:/usr/local/certs/out/won_certificate_passwd_file" -e "OPENSSL_CONFIG_FILE=/usr/local/openssl.conf" \
 -v $base_folder/won-server-certs:/usr/local/certs/out/ \
 -v $base_folder/openssl.conf:/usr/local/openssl.conf webofneeds/gencert:live
