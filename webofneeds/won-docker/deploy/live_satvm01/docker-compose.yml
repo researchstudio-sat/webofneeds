@@ -93,6 +93,7 @@ services:
     image: webofneeds/matcher_service:live
     environment:
       - "node.host=satvm01.researchstudio.at"
+      - "matcher.uri=https://satvm01.researchstudio.at/matcher"
       - "cluster.seedNodes=satvm01.researchstudio.at:2561,satvm01.researchstudio.at:2562"
       - "uri.sparql.endpoint=http://satvm01.researchstudio.at:10000/bigdata/namespace/kb/sparql"
       - "wonNodeController.wonNode.crawl=https://node.matchat.org/won/resource"
@@ -167,6 +168,7 @@ services:
       - "http.port=8082"
       - "node.default.http.port=443"
       - "uri.prefix=https://www.matchat.org"
+      - "uri.prefix.owner=https://www.matchat.org/owner"
       - "uri.prefix.node.default=https://node.matchat.org/won"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
       - "db.sql.jdbcUrl=jdbc:postgresql://satvm01.researchstudio.at:5432/won_owner"
