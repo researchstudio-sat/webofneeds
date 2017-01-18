@@ -14,9 +14,9 @@ import 'fetch'; //polyfill for window.fetch (for backward-compatibility with old
 
 
 // <debug-deletme>
-import * as rangy from 'rangy';
+// import * as rangy from 'rangy';
 //window.rangy = rangy; // medium.js requires this to be in the window-scope
-console.log('rangy: ', rangy);
+// console.log('rangy: ', rangy);
 // </debug-deletme>
 
 

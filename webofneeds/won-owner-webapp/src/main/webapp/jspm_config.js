@@ -14,18 +14,17 @@ System.config({
 
   meta: {
     "Medium.js": {
-      deps: ["medium-import-helper"]
+      // deps: ["medium-import-helper"]
       // deps: [ "rangy", "undo.js" ]
-      /*
       globals: { // exposes these as `window.<depName>` for mediumjs
-        rangy: "rangy",
+        // rangy: "rangy",
         // "rangy": "npm:rangy@1.3.0",
-        Undo: "undo.js",
+        // Undo: "undo.js",
         // "Undo": "npm:undo.js@0.2.0",
       }
-      */
     },
 
+    /*
     "rangy": {
       exports: "rangy",
       format: "global",
@@ -35,6 +34,7 @@ System.config({
       exports: "Undo",
       format: "global",
     }
+    */
 
   },
 
