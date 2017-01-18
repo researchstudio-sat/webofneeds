@@ -62,8 +62,10 @@ class OverviewPostsController {
             );
             return {
                 activePosts: activePosts? activePosts.toArray() : [],
+                activePostsUris: activePosts? activePosts.toArray().map(p => p.get('@id')) : [],
                 activePostsCount: activePosts? activePosts.size : 0,
                 inactivePosts: inactivePosts? inactivePosts.toArray() : [],
+                activePostsUris: inactivePosts? inactivePosts.toArray().map(p => p.get('@id')) : [],
                 inactivePostsCount: inactivePosts? inactivePosts.size : 0,
                 unreadEvents,
                 unreadCounts: selectUnreadCountsByNeedAndType(state),

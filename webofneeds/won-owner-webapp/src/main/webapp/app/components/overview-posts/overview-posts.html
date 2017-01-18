@@ -24,9 +24,10 @@
             <span class="title__counter">{{self.activePostsCount}}</span>
         </div>
         <won-post-item-line ng-show="self.activePostsOpen"
-                            need-uri="item['@id']"
-                            ng-repeat="item in self.activePosts">
+                            ng-repeat="needUri in self.activePostsUris"
+                            need-uri="needUri">
         </won-post-item-line>
+
         <!--
         <div class="title clickable"
              ng-click="self.draftsOpen = !self.draftsOpen">
@@ -47,8 +48,8 @@
             <span class="title__counter">{{self.inactivePostsCount}}</span>
         </div>
         <won-post-item-line ng-show="self.closedPostsOpen"
-                            need-uri="item['@id']"
-                            ng-repeat="item in self.inactivePosts">
+                            need-uri="needUri"
+                            ng-repeat="needUri in self.inactivePostsUri">
         </won-post-item-line>
     </div>
 </main>
