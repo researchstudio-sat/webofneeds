@@ -27,7 +27,8 @@ console.log('undo: ', undo);
 // import './medium-import-helper';
 //import 'medium-import-helper';
 
-import Medium from 'Medium.js';
+//import Medium from 'Medium.js';
+import Medium from 'mediumjs-cjs';
 window.Medium = Medium;
 console.log('Medium: ', Medium);
 /*

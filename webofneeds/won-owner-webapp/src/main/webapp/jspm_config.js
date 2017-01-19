@@ -24,6 +24,10 @@ System.config({
     },
      */
 
+
+    //https://github.com/jspm/jspm-cli/issues/689
+
+    /*
     "medium-import-helper": {
       "format": "amd",
     },
@@ -40,6 +44,7 @@ System.config({
     "github:jakiestfu/Medium.js@master" : {
       "deps": ["medium-import-helper"],
     },
+    */
     //"immutable" : { deps: ["medium-import-helper"], },
     /*
      "format": "esm"
@@ -51,6 +56,7 @@ System.config({
   },
 
   map: {
+    "mediumjs-cjs": "./app/mediumjs-cjs",
     "medium-import-helper": "./app/medium-import-helper",
     "Medium.js": "github:jakiestfu/Medium.js@master",
     "angular": "npm:angular@1.4.8",
