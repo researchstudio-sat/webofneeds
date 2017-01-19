@@ -30,7 +30,7 @@
     "configFile": "jspm_config.js",
     "dependencies": {
       "Medium.js": "github:jakiestfu/Medium.js@master",
-      "angular": "npm:angular@^1.5.0-beta.2",
+      "angular": "npm:angular@1.4.8",
       "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.13.0",
       "angular-mocks": "github:angular/bower-angular-mocks@1.4.2",
       "angular-route": "github:angular/bower-angular-route@1.4.2",
@@ -46,7 +46,7 @@
       "jsonld": "npm:jsonld@^0.4.2",
       "leaflet": "npm:leaflet@^0.7.7",
       "ng-clip": "bower:ng-clip@0.2.6",
-      "ng-redux": "npm:ng-redux@^3.0.1",
+      "ng-redux": "npm:ng-redux@^3.4.0-beta.1",
       "ng-scrollbar": "bower:ng-scrollbar@0.0.6",
       "ng-tags-input": "bower:ng-tags-input@2.3.0",
       "q": "bower:q@1.0.1",

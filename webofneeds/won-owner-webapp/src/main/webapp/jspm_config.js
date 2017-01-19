@@ -39,8 +39,8 @@ System.config({
   },
 
   map: {
+    "angular": "npm:angular@1.4.8",
     "Medium.js": "github:jakiestfu/Medium.js@master",
-    "angular": "npm:angular@1.5.0-beta.2",
     "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.13.0",
     "angular-mocks": "github:angular/bower-angular-mocks@1.4.2",
     "angular-route": "github:angular/bower-angular-route@1.4.2",
@@ -59,13 +59,13 @@ System.config({
     "jsonld": "npm:jsonld@0.4.2",
     "leaflet": "npm:leaflet@0.7.7",
     "ng-clip": "bower:ng-clip@0.2.6",
-    "ng-redux": "npm:ng-redux@3.1.1",
+    "ng-redux": "npm:ng-redux@3.4.0-beta.1",
     "ng-scrollbar": "bower:ng-scrollbar@0.0.6",
     "ng-tags-input": "bower:ng-tags-input@2.3.0",
     "q": "bower:q@1.0.1",
     "rangy": "npm:rangy@1.3.0",
     "reduce-reducers": "npm:reduce-reducers@0.1.1",
-    "redux": "npm:redux@3.0.4",
+    "redux": "npm:redux@3.6.0",
     "redux-immutablejs": "npm:redux-immutablejs@0.0.6",
     "redux-thunk": "npm:redux-thunk@1.0.0",
     "redux-ui-router": "npm:redux-ui-router@0.3.3",
@@ -189,9 +189,6 @@ System.config({
     "npm:angular@1.4.8": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:angular@1.5.0-beta.2": {
-      "process": "github:jspm/nodelibs-process@0.1.2"
-    },
     "npm:ansi-green@0.1.1": {
       "ansi-wrap": "npm:ansi-wrap@0.1.0"
     },
@@ -209,7 +206,7 @@ System.config({
     "npm:are-we-there-yet@1.0.5": {
       "delegates": "npm:delegates@0.1.0",
       "events": "github:jspm/nodelibs-events@0.1.1",
-      "readable-stream": "npm:readable-stream@1.1.13",
+      "readable-stream": "npm:readable-stream@1.1.14",
       "util": "github:jspm/nodelibs-util@0.1.0"
     },
     "npm:arr-diff@1.1.0": {
@@ -362,7 +359,7 @@ System.config({
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "pako": "npm:pako@0.2.8",
       "process": "github:jspm/nodelibs-process@0.1.2",
-      "readable-stream": "npm:readable-stream@1.1.13",
+      "readable-stream": "npm:readable-stream@1.1.14",
       "util": "github:jspm/nodelibs-util@0.1.0"
     },
     "npm:buffer-xor@1.0.3": {
@@ -708,8 +705,8 @@ System.config({
     "npm:ini@1.3.4": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:invariant@2.2.0": {
-      "loose-envify": "npm:loose-envify@1.1.0",
+    "npm:invariant@2.2.2": {
+      "loose-envify": "npm:loose-envify@1.3.1",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:is-binary-path@1.0.1": {
@@ -773,9 +770,6 @@ System.config({
       "lodash._basecopy": "npm:lodash._basecopy@3.0.1",
       "lodash.keys": "npm:lodash.keys@3.1.2"
     },
-    "npm:lodash._basefor@3.0.2": {
-      "process": "github:jspm/nodelibs-process@0.1.2"
-    },
     "npm:lodash._basetostring@3.0.1": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
@@ -792,19 +786,25 @@ System.config({
       "lodash._createassigner": "npm:lodash._createassigner@3.1.1",
       "lodash.keys": "npm:lodash.keys@3.1.2"
     },
+    "npm:lodash.curry@4.1.1": {
+      "process": "github:jspm/nodelibs-process@0.1.2"
+    },
     "npm:lodash.isplainobject@3.2.0": {
-      "lodash._basefor": "npm:lodash._basefor@3.0.2",
-      "lodash.isarguments": "npm:lodash.isarguments@3.0.4",
+      "lodash._basefor": "npm:lodash._basefor@3.0.3",
+      "lodash.isarguments": "npm:lodash.isarguments@3.1.0",
       "lodash.keysin": "npm:lodash.keysin@3.0.8"
     },
     "npm:lodash.keys@3.1.2": {
       "lodash._getnative": "npm:lodash._getnative@3.9.1",
-      "lodash.isarguments": "npm:lodash.isarguments@3.0.4",
+      "lodash.isarguments": "npm:lodash.isarguments@3.1.0",
       "lodash.isarray": "npm:lodash.isarray@3.0.4"
     },
     "npm:lodash.keysin@3.0.8": {
-      "lodash.isarguments": "npm:lodash.isarguments@3.0.4",
+      "lodash.isarguments": "npm:lodash.isarguments@3.1.0",
       "lodash.isarray": "npm:lodash.isarray@3.0.4"
+    },
+    "npm:lodash.map@4.6.0": {
+      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:lodash.pad@3.1.1": {
       "lodash._basetostring": "npm:lodash._basetostring@3.0.1",
@@ -824,8 +824,9 @@ System.config({
     "npm:lodash@3.10.1": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:loose-envify@1.1.0": {
-      "js-tokens": "npm:js-tokens@1.0.2",
+    "npm:loose-envify@1.3.1": {
+      "fs": "github:jspm/nodelibs-fs@0.1.2",
+      "js-tokens": "npm:js-tokens@3.0.0",
       "process": "github:jspm/nodelibs-process@0.1.2",
       "stream": "github:jspm/nodelibs-stream@0.1.0",
       "util": "github:jspm/nodelibs-util@0.1.0"
@@ -879,15 +880,17 @@ System.config({
       "path": "github:jspm/nodelibs-path@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:ng-redux@3.1.1": {
-      "invariant": "npm:invariant@2.2.0",
+    "npm:ng-redux@3.4.0-beta.1": {
+      "invariant": "npm:invariant@2.2.2",
       "lodash.assign": "npm:lodash.assign@3.2.0",
+      "lodash.curry": "npm:lodash.curry@4.1.1",
       "lodash.isarray": "npm:lodash.isarray@3.0.4",
-      "lodash.isfunction": "npm:lodash.isfunction@3.0.6",
+      "lodash.isfunction": "npm:lodash.isfunction@3.0.8",
       "lodash.isobject": "npm:lodash.isobject@3.0.2",
       "lodash.isplainobject": "npm:lodash.isplainobject@3.2.0",
+      "lodash.map": "npm:lodash.map@4.6.0",
       "process": "github:jspm/nodelibs-process@0.1.2",
-      "redux": "npm:redux@3.0.4"
+      "redux": "npm:redux@3.6.0"
     },
     "npm:node-pre-gyp@0.6.17": {
       "child_process": "github:jspm/nodelibs-child_process@0.1.0",
@@ -1032,7 +1035,7 @@ System.config({
       "process": "github:jspm/nodelibs-process@0.1.2",
       "strip-json-comments": "npm:strip-json-comments@1.0.4"
     },
-    "npm:readable-stream@1.1.13": {
+    "npm:readable-stream@1.1.14": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "core-util-is": "npm:core-util-is@1.0.2",
       "events": "github:jspm/nodelibs-events@0.1.1",
@@ -1069,7 +1072,7 @@ System.config({
     "npm:redux-immutablejs@0.0.6": {
       "immutable": "npm:immutable@3.7.5",
       "process": "github:jspm/nodelibs-process@0.1.2",
-      "redux": "npm:redux@3.0.4"
+      "redux": "npm:redux@3.6.0"
     },
     "npm:redux-ui-router@0.3.3": {
       "angular": "npm:angular@1.4.8",
@@ -1082,8 +1085,12 @@ System.config({
     "npm:redux@3.0.0": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:redux@3.0.4": {
-      "process": "github:jspm/nodelibs-process@0.1.2"
+    "npm:redux@3.6.0": {
+      "lodash": "npm:lodash@4.17.4",
+      "lodash-es": "npm:lodash-es@4.17.4",
+      "loose-envify": "npm:loose-envify@1.3.1",
+      "process": "github:jspm/nodelibs-process@0.1.2",
+      "symbol-observable": "npm:symbol-observable@1.0.4"
     },
     "npm:regex-cache@0.4.2": {
       "is-equal-shallow": "npm:is-equal-shallow@0.1.3",
@@ -1169,7 +1176,7 @@ System.config({
     "npm:stream-browserify@1.0.0": {
       "events": "github:jspm/nodelibs-events@0.1.1",
       "inherits": "npm:inherits@2.0.1",
-      "readable-stream": "npm:readable-stream@1.1.13"
+      "readable-stream": "npm:readable-stream@1.1.14"
     },
     "npm:string_decoder@0.10.31": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
