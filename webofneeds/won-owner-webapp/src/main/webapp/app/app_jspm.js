@@ -15,8 +15,23 @@ import 'fetch'; //polyfill for window.fetch (for backward-compatibility with old
 
 // <debug-deletme>
 // import * as rangy from 'rangy';
-//window.rangy = rangy; // medium.js requires this to be in the window-scope
-// console.log('rangy: ', rangy);
+/*
+import rangy from 'rangy';
+window.rangy = rangy; // medium.js requires this to be in the window-scope
+console.log('rangy: ', rangy);
+import undo from 'undo.js';
+window.undo = undo; // medium.js requires this to be in the window-scope
+console.log('undo: ', undo);
+*/
+
+// import './medium-import-helper';
+import 'medium-import-helper';
+
+/*
+import Medium from 'Medium.js';
+window.Medium = Medium;
+console.log('Medium: ', Medium);
+*/
 // </debug-deletme>
 
 

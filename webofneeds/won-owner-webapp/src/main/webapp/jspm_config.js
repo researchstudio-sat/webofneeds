@@ -12,35 +12,50 @@ System.config({
     "bower:*": "jspm_packages/bower/*"
   },
 
-  meta: {
+  /*
+  shim: {
     "Medium.js": {
-      // deps: ["medium-import-helper"]
-      // deps: [ "rangy", "undo.js" ]
-      globals: { // exposes these as `window.<depName>` for mediumjs
-        // rangy: "rangy",
-        // "rangy": "npm:rangy@1.3.0",
-        // Undo: "undo.js",
-        // "Undo": "npm:undo.js@0.2.0",
-      }
+      deps: ["./app/medium-import-helper"],
     },
 
+  },
+  */
+
+  meta: {
     /*
-    "rangy": {
-      exports: "rangy",
-      format: "global",
+    "Medium.js": {
+      "globals": {
+        rangy: 'rangy',
+        Undo: 'undo.js',
+      },
+      deps: ["./app/medium-import-helper"],
     },
-
-    "undo.js": {
-      exports: "Undo",
-      format: "global",
-    }
     */
 
+    "medium-import-helper": {
+      "format": "amd"
+    },
+    /*
+    "rangy": {
+    // "./jspm_packages/npm/rangy@1.3.0.js": {
+    //"npm:rangy@1.3.0": {
+      "exports": "rangy",
+      "format": "cjs"
+    }
+    */
+    /*
+     "format": "esm"
+     "format": "register"
+     "format": "global"
+     "format": "cjs"
+     "format": "amd"
+    */
   },
 
   map: {
-    "angular": "npm:angular@1.4.8",
+    "medium-import-helper": "./app/medium-import-helper",
     "Medium.js": "github:jakiestfu/Medium.js@master",
+    "angular": "npm:angular@1.4.8",
     "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.13.0",
     "angular-mocks": "github:angular/bower-angular-mocks@1.4.2",
     "angular-route": "github:angular/bower-angular-route@1.4.2",
