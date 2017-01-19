@@ -24,9 +24,6 @@ System.config({
     },
      */
 
-
-    //https://github.com/jspm/jspm-cli/issues/689
-
     /*
     "medium-import-helper": {
       "format": "amd",
