@@ -87,9 +87,11 @@ let app = angular.module('won.owner', [
  * - http://stackoverflow.com/questions/39931983/angularjs-possible-unhandled-rejection-when-using-ui-router
  * - https://github.com/angular-ui/ui-router/issues/2889
  */
+/*
 app.config(['$qProvider', function ($qProvider) {
     $qProvider.errorOnUnhandledRejections(false);
 }]);
+*/
 
 app.config([ '$ngReduxProvider', configRedux ]);
 app.filter('filterByNeedState', function(){

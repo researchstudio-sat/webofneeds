@@ -112,19 +112,24 @@ function genComponentConf() {
             this.labels = labels;
             //this.EVENT = won.EVENT;
 
+            const self = this;
+
             const selectFromState = (state) => {
 
                 const ownNeeds = selectOwnNeeds(state);
-                const need = ownNeeds && ownNeeds.get(this.needUri);
+                const need = ownNeeds && ownNeeds.get(self.needUri);
 
                 const allConnectionsByNeedUri = selectAllByConnections(state)
-                    .filter(conn => conn.getIn(['ownNeed', '@id']) === this.needUri);
+                    .filter(conn => conn.getIn(['ownNeed', '@id']) === self.needUri);
 
-                const unreadCounts = selectUnreadCountsByNeedAndType(state).get(this.needUri);
+                const unreadCounts = selectUnreadCountsByNeedAndType(state).get(self.needUri);
 
 
                 return {
-                    relativeCreationDate: relativeTime(state.get('lastUpdateTime'), need.get('dct:created')),
+                    need,
+                    relativeCreationDate: need?
+                        relativeTime(state.get('lastUpdateTime'), need.get('dct:created')) :
+                        "",
                     hasConversations: allConnectionsByNeedUri
                         .filter(conn =>
                             conn.getIn(['connection', 'hasConnectionState']) === won.WON.Connected
@@ -146,17 +151,10 @@ function genComponentConf() {
 
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
-
-            updateRelativeTimestamps(
-                this.$scope,
-                this.$interval,
-                this.ownNeed.get('dct:created'),
-                t => this.creationDate = t);
-
         }
 
         isActive() {
-            return this.ownNeed.getIn(['won:isInState','@id']) === won.WON.ActiveCompacted;
+            return this.ownNeed && this.ownNeed.getIn(['won:isInState','@id']) === won.WON.ActiveCompacted;
         }
 
         unreadXCount(type) {
