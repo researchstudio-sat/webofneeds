@@ -84,7 +84,7 @@ public class LinkedDataRestBridge
       new PredefinedAliasPrivateKeyStrategy(webID),
       this.trustStoreService.getUnderlyingKeyStore(),
       this.trustStrategy,
-      readTimeout, connectionTimeout);
+      readTimeout, connectionTimeout, true);
     //prevent the RestTemplate from throwing an exception when the server responds with 4xx or 5xx status
     //because we want to hand the orginal response back to the original caller in BridgeForLinkedDataController
     template.setErrorHandler(new DefaultResponseErrorHandler(){

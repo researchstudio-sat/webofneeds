@@ -86,7 +86,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient
         new PredefinedAliasPrivateKeyStrategy(webID),
         this.trustStoreService.getUnderlyingKeyStore(),
         this.trustStrategy,
-        readTimeout, connectionTimeout);
+        readTimeout, connectionTimeout, true);
     } catch (Exception e) {
       throw new RuntimeException("Failed to create rest template for webID '" + webID +"'", e);
     }
