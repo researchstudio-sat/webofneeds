@@ -12,37 +12,35 @@ System.config({
     "bower:*": "jspm_packages/bower/*"
   },
 
-  /*
-  shim: {
-    "Medium.js": {
-      deps: ["./app/medium-import-helper"],
-    },
-
-  },
-  */
-
   meta: {
     /*
     "Medium.js": {
+      "deps": ["medium-import-helper"],
+
       "globals": {
         rangy: 'rangy',
         Undo: 'undo.js',
       },
-      deps: ["./app/medium-import-helper"],
     },
-    */
+     */
 
     "medium-import-helper": {
-      "format": "amd"
+      "format": "amd",
     },
-    /*
-    "rangy": {
-    // "./jspm_packages/npm/rangy@1.3.0.js": {
-    //"npm:rangy@1.3.0": {
-      "exports": "rangy",
-      "format": "cjs"
-    }
-    */
+
+    "jspm_packages/github/jakiestfu/Medium.js@master/medium.js" : {
+      "deps": ["medium-import-helper"],
+    },
+    "jspm_packages/github/jakiestfu/Medium.js@master.js" : {
+      "deps": ["medium-import-helper"],
+    },
+    "Medium.js" : {
+      "deps": ["medium-import-helper"],
+    },
+    "github:jakiestfu/Medium.js@master" : {
+      "deps": ["medium-import-helper"],
+    },
+    //"immutable" : { deps: ["medium-import-helper"], },
     /*
      "format": "esm"
      "format": "register"

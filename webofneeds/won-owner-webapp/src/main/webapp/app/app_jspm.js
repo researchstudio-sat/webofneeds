@@ -25,12 +25,12 @@ console.log('undo: ', undo);
 */
 
 // import './medium-import-helper';
-import 'medium-import-helper';
+//import 'medium-import-helper';
 
-/*
 import Medium from 'Medium.js';
 window.Medium = Medium;
 console.log('Medium: ', Medium);
+/*
 */
 // </debug-deletme>
 
