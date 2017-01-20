@@ -2,6 +2,7 @@ version: '2'
 services:
 
   # letsencrypt container that helps renew the matchat.org (including www.match.org and node.matchat.org) certificate.
+  # It is used by the nginx (external matchat representation of owner) and the wonnode.
   # This is only used around every 90 days to manually renew the certificate.
   # To renew the certificate note the following things:
   # - all involved containers (letsencrypt, nginx, wonnode) are configured to mount the right folders
@@ -25,6 +26,18 @@ services:
     volumes:
       - $base_folder/letsencrypt/certs:/etc/letsencrypt
       - $base_folder/letsencrypt/acme-challenge:/usr/share/nginx/html
+
+  # owner server self-signed certificate for communication with wonnode
+  gencert:
+    build: ../../image/gencert
+    image: webofneeds/gencert:live
+    environment:
+      - "CN=matchat.org"
+      - "PASS=file:/usr/local/certs/out/won_certificate_passwd_file"
+      - "OPENSSL_CONFIG_FILE=/usr/local/openssl.conf"
+    volumes:
+      - $base_folder/won-server-certs:/usr/local/certs/out/
+      - $base_folder/openssl.conf:/usr/local/openssl.conf
 
   # nginx proxy server for wonnode
   nginx:
@@ -78,6 +91,47 @@ services:
     depends_on:
       - postgres_node
       - nginx
+
+  # portsgres need databases for owner
+  postgres_owner:
+    image: webofneeds/postgres:live
+    build: ../../image/postgres
+    environment:
+      - "POSTGRES_PASSWORD=$postgres_db_passwd"
+      - "PGDATA=/var/lib/postgresql/data/pgdata"
+    volumes:
+      - $base_folder/postgres_owner/data/pgdata:/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+
+  # owner with nginx proxy (https://www.matchat.org)
+  owner:
+    build: ../../image/owner
+    image: webofneeds/owner:live
+    environment:
+      - "node.default.host=node.matchat.org"
+      - "uri.host=www.matchat.org"
+      - "http.port=8082"
+      - "node.default.http.port=443"
+      - "uri.prefix=https://www.matchat.org"
+      - "uri.prefix.node.default=https://node.matchat.org/won"
+      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
+      - "db.sql.jdbcUrl=jdbc:postgresql://satvm01.researchstudio.at:5432/won_owner"
+      - "db.sql.user=won"
+      - "db.sql.password=$postgres_db_passwd"
+      - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
+      - "email.from.won.user=$MAIL_USER"
+      - "email.from.won.password=$MAIL_PASS"
+      - "email.from.won.smtp.host=$MAIL_HOST"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+    ports:
+      - "8082:8443"
+    volumes:
+      - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
+      - $base_folder/won-client-certs/owner:/usr/local/tomcat/won/client-certs/
+    depends_on:
+      - postgres_owner
+      - gencert
 
   # bigdata rdf store for matcher service (this image is not built at deployment, it is downloaded from dockerhub)
   bigdata:
@@ -147,43 +201,4 @@ services:
     depends_on:
       - wonnode
 
-  # portsgres need databases for owner
-  postgres_owner:
-    image: webofneeds/postgres:live
-    build: ../../image/postgres
-    environment:
-      - "POSTGRES_PASSWORD=$postgres_db_passwd"
-      - "PGDATA=/var/lib/postgresql/data/pgdata"
-    volumes:
-      - $base_folder/postgres_owner/data/pgdata:/var/lib/postgresql/data/pgdata
-    ports:
-      - "5432:5432"
-
-  # owner with nginx proxy (https://www.matchat.org)
-  owner:
-    build: ../../image/owner
-    image: webofneeds/owner:live
-    environment:
-      - "node.default.host=node.matchat.org"
-      - "uri.host=www.matchat.org"
-      - "http.port=8082"
-      - "node.default.http.port=443"
-      - "uri.prefix=https://www.matchat.org"
-      - "uri.prefix.node.default=https://node.matchat.org/won"
-      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
-      - "db.sql.jdbcUrl=jdbc:postgresql://satvm01.researchstudio.at:5432/won_owner"
-      - "db.sql.user=won"
-      - "db.sql.password=$postgres_db_passwd"
-      - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
-      - "email.from.won.user=$MAIL_USER"
-      - "email.from.won.password=$MAIL_PASS"
-      - "email.from.won.smtp.host=$MAIL_HOST"
-      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-    ports:
-      - "8082:8443"
-    volumes:
-      - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
-      - $base_folder/won-client-certs/owner:/usr/local/tomcat/won/client-certs/
-    depends_on:
-      - postgres_owner
 
