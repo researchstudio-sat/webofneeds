@@ -112,7 +112,7 @@ public class DefaultSecurityWonTransmissionService implements WonTransmissionSer
     // REGISTRATION client-side:
     TOFUStrategy registrationClientStrategy = new TOFUStrategy();
     registrationClientStrategy.setTrustStoreService(trustStoreService);
-    registrationClientStrategy.setAliasGenerator(new AliasFromCNGenerator());
+    registrationClientStrategy.setAliasGenerator(new AliasFromFingerprintGenerator());
     PrivateKeyStrategy clientDefaultAliasKeyStrategy = new
       PredefinedAliasPrivateKeyStrategy(clientKeyStoreService.getDefaultAlias());
     this.registrationClient = new RegistrationRestClientHttps(clientKeyStoreService, clientDefaultAliasKeyStrategy,
