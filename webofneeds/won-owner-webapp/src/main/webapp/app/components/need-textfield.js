@@ -42,63 +42,68 @@ function genComponentConf() {
 
             this.initMedium();
 
-            this.mediumMountNg().bind('input', e => {
-                var description;
-                var title;
-                var tags;
-
-                angular.element(".medium-mount p").removeClass("medium_title");
-
-                if(angular.element(".medium-mount p") && angular.element(".medium-mount p").length > 1){
-                    angular.element(".medium-mount p:first").addClass("medium_title");
-                    title  = angular.element(".medium-mount p.medium_title").text();
-
-                    if(angular.element(".medium-mount p:not('.medium_title')") && angular.element(".medium-mount p:not('.medium_title')").length > 0){
-                        description = "";
-                        angular.element(".medium-mount p:not('.medium_title')").each(function(){
-                            description += angular.element(this).text() +"\n";
-                        });
-                    }
-                }else {
-                    title  = angular.element(".medium-mount p:first").text();
-                    description = undefined;
-                }
-
-                //ADD TAGS
-                var titleTags = title? title.match(/#(\w+)/gi) : [];
-                var descriptionTags = description? description.match(/#(\w+)/gi) : [];
-
-                tags = angular.element.unique(
-                    angular.element.merge(
-                        titleTags ? titleTags : [],
-                        descriptionTags ? descriptionTags : []
-                    )
-                );
-
-                for(var i=0; i<tags.length; i++){
-                    tags[i] = tags[i].substr(1);
-                }
-
-                //SAVE TO STATE
-                this.drafts__change__description({
-                    draftId: this.draftId,
-                    description : description
-                });
-
-                this.drafts__change__title({
-                    draftId: this.draftId,
-                    title: title.replace("&nbsp;","").trim() //TODO: MOVE THIS HACK TO VIEW LEVEL
-                });
-
-                this.drafts__change__tags({
-                    draftId: this.draftId,
-                    tags: tags && tags.length > 0? tags : undefined
-                });
-            });
+            this.mediumMountNg().bind('input', e => this.input(e));
+            this.mediumMountNg().bind('paste', e => this.input(e));
         }
         /*charactersLeft() {
             return this.characterLimit - this.medium.value().length;
         }*/
+        input(e) {
+            var description;
+            var title;
+            var tags;
+
+            const paragraphs = angular.element(".medium-mount p");
+            paragraphs.removeClass("medium_title");
+
+            if(paragraphs && paragraphs.length > 1){
+                const titleParagraph = angular.element(".medium-mount p:first");
+                titleParagraph.addClass("medium_title");
+                title  = titleParagraph.text();
+
+                const bodyParagraphs = angular.element(".medium-mount p:not('.medium_title')");
+                if(bodyParagraphs && bodyParagraphs.length > 0){
+                    description = "";
+                    bodyParagraphs.each(function(){
+                        description += angular.element(this).text() +"\n";
+                    });
+                }
+            } else {
+                title  = angular.element(".medium-mount p:first").text();
+                description = undefined;
+            }
+
+            //ADD TAGS
+            var titleTags = title? title.match(/#(\w+)/gi) : [];
+            var descriptionTags = description? description.match(/#(\w+)/gi) : [];
+
+            tags = angular.element.unique(
+                angular.element.merge(
+                    titleTags ? titleTags : [],
+                    descriptionTags ? descriptionTags : []
+                )
+            );
+
+            for(var i=0; i<tags.length; i++){
+                tags[i] = tags[i].substr(1);
+            }
+
+            //SAVE TO STATE
+            this.drafts__change__description({
+                draftId: this.draftId,
+                description : description
+            });
+
+            this.drafts__change__title({
+                draftId: this.draftId,
+                title: title.replace("&nbsp;","").trim() //TODO: MOVE THIS HACK TO VIEW LEVEL
+            });
+
+            this.drafts__change__tags({
+                draftId: this.draftId,
+                tags: tags && tags.length > 0? tags : undefined
+            });
+        }
         valid() {
             return true; //return this.charactersLeft() >= 0;
         }
