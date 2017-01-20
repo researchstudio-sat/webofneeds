@@ -13,48 +13,9 @@ System.config({
   },
 
   meta: {
-    /*
-    "Medium.js": {
-      "deps": ["medium-import-helper"],
-
-      "globals": {
-        rangy: 'rangy',
-        Undo: 'undo.js',
-      },
-    },
-     */
-
-    /*
-    "medium-import-helper": {
-      "format": "amd",
-    },
-
-    "jspm_packages/github/jakiestfu/Medium.js@master/medium.js" : {
-      "deps": ["medium-import-helper"],
-    },
-    "jspm_packages/github/jakiestfu/Medium.js@master.js" : {
-      "deps": ["medium-import-helper"],
-    },
-    "Medium.js" : {
-      "deps": ["medium-import-helper"],
-    },
-    "github:jakiestfu/Medium.js@master" : {
-      "deps": ["medium-import-helper"],
-    },
-    */
-    //"immutable" : { deps: ["medium-import-helper"], },
-    /*
-     "format": "esm"
-     "format": "register"
-     "format": "global"
-     "format": "cjs"
-     "format": "amd"
-    */
   },
 
   map: {
-    "mediumjs-cjs": "./app/mediumjs-cjs",
-    "medium-import-helper": "./app/medium-import-helper",
     "Medium.js": "github:jakiestfu/Medium.js@master",
     "angular": "npm:angular@1.4.8",
     "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.13.0",
