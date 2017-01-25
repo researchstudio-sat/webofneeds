@@ -43,5 +43,5 @@ echo run docker containers using docker-compose on satvm02
 docker --tlsverify -H satvm02.researchstudio.at:2376 pull webofneeds/bigdata
 cd deploy/master_satvm02
 docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm02.researchstudio.at:2376 down
-docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm02.researchstudio.at:2376 --build -d
+docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm02.researchstudio.at:2376 up --build -d
 
