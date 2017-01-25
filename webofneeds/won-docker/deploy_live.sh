@@ -20,21 +20,22 @@ scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl.conf won@satvm01:$bas
 scp $WORKSPACE/webofneeds/won-docker/image/nginx/nginx.conf won@satvm01:$base_folder/nginx.conf
 
 echo build the docker containers
-docker -H satvm01:2375 pull webofneeds/bigdata
+docker --tlsverify -H satvm01.researchstudio.at:2376 pull webofneeds/bigdata
+# TODO: change the explicit passing of tls params when docker-compose bug is fixed: https://github.com/docker/compose/issues/1427
 cd deploy/live_satvm01
-docker-compose -H satvm01:2375 build
+docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm01.researchstudio.at:2376 build
 
 echo run docker containers using docker-compose:
-docker-compose -H satvm01:2375 down
-docker-compose -H satvm01:2375 up -d
+docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm01.researchstudio.at:2376 down
+docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm01.researchstudio.at:2376 up -d
 
 echo push automatically built webobofneeds images to docker hub
-docker -H satvm01:2375 login --username=$DOCKER_USER --password=$DOCKER_PASS
-docker -H satvm01:2375 push webofneeds/gencert:live
-docker -H satvm01:2375 push webofneeds/wonnode:live
-docker -H satvm01:2375 push webofneeds/owner:live
-docker -H satvm01:2375 push webofneeds/matcher_service:live
-docker -H satvm01:2375 push webofneeds/matcher_solr:live
-docker -H satvm01:2375 push webofneeds/solr:live
-docker -H satvm01:2375 push webofneeds/postgres:live
-docker -H satvm01:2375 push webofneeds/bots:live
+docker --tlsverify -H satvm01.researchstudio.at:2376 login --username=$DOCKER_USER --password=$DOCKER_PASS
+docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/gencert:live
+docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/wonnode:live
+docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/owner:live
+docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/matcher_service:live
+docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/matcher_solr:live
+docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/solr:live
+docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/postgres:live
+docker --tlsverify -H satvm01.researchstudio.at:2376 push webofneeds/bots:live

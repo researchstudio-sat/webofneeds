@@ -38,9 +38,10 @@ rm won_certificate_passwd_file
 # copy the nginx.conf file to the proxy server
 rsync $WORKSPACE/webofneeds/won-docker/image/nginx/nginx-master.conf root@satvm02:$base_folder/nginx-master.conf
 
+# TODO: change the explicit passing of tls params when docker-compose bug is fixed: https://github.com/docker/compose/issues/1427
 echo run docker containers using docker-compose on satvm02
-docker -H satvm02:2375 pull webofneeds/bigdata
+docker --tlsverify -H satvm02.researchstudio.at:2376 pull webofneeds/bigdata
 cd deploy/master_satvm02
-docker-compose -H satvm02:2375 down
-docker-compose -H satvm02:2375 up --build -d
+docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm02.researchstudio.at:2376 down
+docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm02.researchstudio.at:2376 --build -d
 
