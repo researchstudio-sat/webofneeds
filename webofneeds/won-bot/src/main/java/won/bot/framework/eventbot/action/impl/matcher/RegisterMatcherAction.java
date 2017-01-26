@@ -20,9 +20,12 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
 
 import java.net.URI;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
 * User: fkleedorfer
@@ -30,22 +33,31 @@ import java.util.Iterator;
 */
 public class RegisterMatcherAction extends BaseEventBotAction
 {
+  private List<URI> registeredNodes = new LinkedList<>();
+
   public RegisterMatcherAction(final EventListenerContext eventListenerContext)
   {
     super(eventListenerContext);
   }
 
-
-    @Override
+  @Override
   protected void doRun(Event event) throws Exception
   {
     final Iterator wonNodeUriIterator = getEventListenerContext().getMatcherNodeURISource().getNodeURIIterator();
     while (wonNodeUriIterator.hasNext()){
       URI wonNodeUri = (URI)wonNodeUriIterator.next();
-      logger.debug("registering matcher on won node {}", wonNodeUri);
-      getEventListenerContext().getMatcherProtocolMatcherService().register( wonNodeUri );
-      EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(),wonNodeUri);
-      logger.debug("matcher registered on won node {}", wonNodeUri);
+      try {
+        if (!registeredNodes.contains(wonNodeUri)) {
+          logger.debug("registering matcher on won node {}", wonNodeUri);
+          EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(), wonNodeUri);
+          getEventListenerContext().getMatcherProtocolMatcherService().register(wonNodeUri);
+          registeredNodes.add(wonNodeUri);
+          logger.info("matcher registered on won node {}", wonNodeUri);
+        }
+      } catch (Exception e) {
+        logger.warn("Error registering matcher at won node {}. Try again later ... Exception was {}", wonNodeUri, e);
+        getEventListenerContext().getEventBus().publish(new MatcherRegisterFailedEvent(wonNodeUri));
+      }
     }
   }
 
