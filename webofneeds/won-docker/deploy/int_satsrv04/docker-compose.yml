@@ -6,7 +6,6 @@ services:
     build: ../../image/gencert
     image: webofneeds/gencert:int
     environment:
-      - "constraint:node==satsrv04"
       - "CN=satsrv04.researchstudio.at"
       - "PASS=pass:$won_certificate_passwd"
     volumes:
@@ -17,7 +16,6 @@ services:
     image: webofneeds/postgres:int
     build: ../../image/postgres
     environment:
-      - "constraint:node==satsrv04"
       - "POSTGRES_PASSWORD=$postgres_db_passwd"
       - "PGDATA=/var/lib/postgresql/data/pgdata"
     volumes:
@@ -30,7 +28,6 @@ services:
     build: ../../image/wonnode
     image: webofneeds/wonnode:int
     environment:
-      - "constraint:node==satsrv04"
       - "uri.host=satsrv04.researchstudio.at"
       - "http.port=8889"
       - "db.sql.jdbcDriverClass=org.postgresql.Driver"
@@ -64,7 +61,6 @@ services:
     build: ../../image/owner
     image: webofneeds/owner:int
     environment:
-      - "constraint:node==satsrv04"
       - "node.default.host=satsrv04.researchstudio.at"
       - "uri.host=satsrv04.researchstudio.at"
       - "http.port=8082"
