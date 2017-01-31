@@ -66,7 +66,6 @@
         -->
         <property name="jpaProperties">
             <props>
-                <prop key="hibernate.dialect">won.protocol.util.hibernate.Postgres9WithFKIndicesDialect</prop>
                 <prop key="hibernate.hbm2ddl.auto">${db.ddl.strategy}</prop>
                 <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.generate_statistics">false</prop>
