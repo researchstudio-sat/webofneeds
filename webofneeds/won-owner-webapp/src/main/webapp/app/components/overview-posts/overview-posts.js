@@ -28,7 +28,7 @@ class OverviewPostsController {
 
         const selectFromState = (state) => {
             const unreadEvents = selectUnreadEvents(state);
-            const receivedHintEvents = unreadEvents.filter(e=>e.get('eventType')===won.EVENT.HINT_RECEIVED);
+            const receivedHintEvents = unreadEvents.filter(e=> e && e.get('eventType')===won.EVENT.HINT_RECEIVED);
             let unseenMatchesCounts = Immutable.Map();
             receivedHintEvents.forEach(e => {
                 const receiverNeed = e.get('hasReceiverNeed');
