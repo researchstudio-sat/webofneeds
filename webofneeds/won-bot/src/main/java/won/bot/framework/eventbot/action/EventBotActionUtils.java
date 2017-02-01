@@ -216,4 +216,23 @@ public class EventBotActionUtils
         String status = (String) botContext.loadFromObjectMap(USER_SUBSCRIBE_COLLECTION, mailAddress);
         return (status != null) ? SubscribeStatus.valueOf(status) : SubscribeStatus.NO_RESPONSE;
     }
+
+    public static void addChatIdWonURIRelation(EventListenerContext context, String mapName, Long chatId, WonURI uri) {
+        context.getBotContext().saveToObjectMap(mapName, chatId.toString(), uri);
+    }
+    public static void addURIChatIdRelation(EventListenerContext context, String mapName, URI uri, Long chatId) {
+        context.getBotContext().saveToObjectMap(mapName, uri.toString(), chatId);
+    }
+
+    public static Long getChatIdForURI(EventListenerContext context, String mapName, URI uri) {
+        return (Long) context.getBotContext().loadFromObjectMap(mapName, uri.toString());
+    }
+
+    public static void addMessageIdWonURIRelation(EventListenerContext context, String mapName, Integer messageId, WonURI wonURI) {
+        context.getBotContext().saveToObjectMap(mapName, messageId.toString(), wonURI);
+    }
+
+    public static WonURI getWonURIForMessageId(EventListenerContext context, String mapName, Integer messageId) {
+        return (WonURI) context.getBotContext().loadFromObjectMap(mapName, messageId.toString());
+    }
 }

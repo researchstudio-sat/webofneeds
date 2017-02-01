@@ -2,6 +2,8 @@ package won.bot.framework.eventbot.action.impl.mail.send;
 
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.tdb.TDB;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;

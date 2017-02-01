@@ -128,6 +128,12 @@
           <groupId>webofneeds</groupId>
           <artifactId>won-core</artifactId>
           <version>${project.version}</version>
+          <exclusions>
+              <exclusion>
+                  <artifactId>jackson-core</artifactId>
+                  <groupId>com.fasterxml.jackson.core</groupId>
+              </exclusion>
+          </exclusions>
       </dependency>
       <dependency>
           <groupId>webofneeds</groupId>
@@ -253,6 +259,12 @@
         <groupId>codeanticode</groupId>
         <artifactId>eliza</artifactId>
         <version>1.0.1</version>
+      </dependency>
+
+      <!-- telegram bot api -->
+      <dependency>
+          <groupId>org.telegram</groupId>
+          <artifactId>telegrambots</artifactId>
       </dependency>
   </dependencies>
 </project>
