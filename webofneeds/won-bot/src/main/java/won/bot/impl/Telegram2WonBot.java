@@ -133,7 +133,6 @@ public class Telegram2WonBot extends EventBot {
 
         } catch (TelegramApiRequestException e) {
             logger.error(e.getMessage());
-            e.printStackTrace();
         }
     }
 
