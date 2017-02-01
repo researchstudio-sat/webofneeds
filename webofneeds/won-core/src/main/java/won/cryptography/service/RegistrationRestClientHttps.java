@@ -44,7 +44,7 @@ public class RegistrationRestClientHttps implements RegistrationClient
         this.privateKeyStrategy,
         this.trustStoreService.getUnderlyingKeyStore(),
         this.trustStrategy,
-        this.readTimeout, this.connectionTimeout);
+        this.readTimeout, this.connectionTimeout, false);
     } catch (Exception e) {
       String msg = "Could not create Rest Template for registration";
       logger.error(msg);

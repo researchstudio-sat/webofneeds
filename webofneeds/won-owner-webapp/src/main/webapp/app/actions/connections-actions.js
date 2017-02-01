@@ -37,6 +37,7 @@ import {
     buildCreateMessage,
     buildOpenMessage,
     buildCloseMessage,
+    buildChatMessage,
     buildRateMessage,
     buildConnectMessage,
     setCommStateFromResponseForLocalNeedMessage,
@@ -47,32 +48,19 @@ export function connectionsChatMessage(chatMessage, connectionUri) {
    return dispatch => {
        console.log('connectionsChatMessage: ', chatMessage, connectionUri);
 
-       won.getEnvelopeDataforConnection(connectionUri)
-       .then(envelopeData => {
-           const eventUri = envelopeData[won.WONMSG.hasSenderNode] + "/event/" +  getRandomPosInt(1,9223372036854775807);
-
-           /*
-            * Build the json-ld message that's signed on the owner-server
-            * and then send to the won-node.
-            */
-           const message = new won.MessageBuilder(won.WONMSG.connectionMessage)
-               .eventURI(eventUri)
-               .forEnvelopeData(envelopeData)
-               .addContentGraphData(won.WON.hasTextMessage, chatMessage)
-               .hasOwnerDirection()
-               .hasSentTimestamp(new Date().getTime().toString())
-               .build();
+       buildChatMessage(chatMessage, connectionUri)
+       .then(msgData => {
 
            /*
             * not sure how elegant it is to build the ld and then parse
             * it again. It uses existing utilities at least, reducing
             * redundant program logic. ^^
              */
-           const optimisticEventPromise = getEventsFromMessage(message)
+           const optimisticEventPromise = getEventsFromMessage(msgData.message)
                .then(optimisticEvent => optimisticEvent['msg:FromOwner']);
 
            return Promise.all([
-               Promise.resolve(message),
+               Promise.resolve(msgData.message),
                optimisticEventPromise,
            ]);
        })
@@ -99,26 +87,40 @@ export function connectionsFetch(data) {
     }
 }
 
-export function connectionsOpen(connectionUri,message) {
+export function connectionsOpen(connectionUri, message) {
     return (dispatch, getState) => {
-        const state = getState();
-        const eventData = selectAllByConnections(state).get(connectionUri).toJS(); // TODO avoid toJS;
-        //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
-        let messageData = null;
-        let deferred = Q.defer();
-        won.getConnectionWithEventUris(eventData.connection.uri).then(connection=> {
-            let msgToOpenFor = {event: eventData, connection: connection};
-            buildOpenMessage(msgToOpenFor, message).then(messageData=> {
-                console.log("built open message");
-                deferred.resolve(messageData);
-            })
-        });
-        deferred.promise.then((action)=> {
-            console.log("dispatching messages__send action"+ action);
-            dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
+        buildOpenMessage(connectionUri, message)
+        .then(msgData => {
+            const optimisticEventPromise = getEventsFromMessage(msgData.message)
+                .then(optimisticEvent => optimisticEvent['msg:FromOwner']);
+            return Promise.all([
+                Promise.resolve(msgData),
+                optimisticEventPromise,
+            ]);
+
+            //TODO dispatch connections.open
         })
+        .then( ([ msgData, optimisticEvent ]) => {
+            // dispatch(actionCreators.messages__send(messageData));
+            dispatch({
+                type: actionTypes.connections.open,
+                payload: {
+                    eventUri: optimisticEvent.uri,
+                    message: msgData.message,
+                    optimisticEvent,
+                }
+            });
+
+            dispatch(actionCreators.router__stateGo("post", {
+                postUri: optimisticEvent.hasSenderNeed,
+                connectionType: won.WON.Connected,
+                connectionUri: optimisticEvent.hasSender,
+            }));
+
+        });
     }
 }
+
 
 export function connectionsConnect(connectionUri,message) {
     return (dispatch, getState) => {

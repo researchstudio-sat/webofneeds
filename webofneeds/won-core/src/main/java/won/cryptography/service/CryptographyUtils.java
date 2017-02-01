@@ -41,9 +41,10 @@ public class CryptographyUtils {
   }
 
   private static SSLContext getSSLContext(final KeyStore keyStore, final String ksPass, final
-    PrivateKeyStrategy keyStrategy, final KeyStore trustStore, TrustStrategy trustStrategy)
+    PrivateKeyStrategy keyStrategy, final KeyStore trustStore, TrustStrategy trustStrategy, boolean
+    allowCached)
     throws Exception {
-    if (keyStrategy instanceof PredefinedAliasPrivateKeyStrategy) {
+    if (allowCached && keyStrategy instanceof PredefinedAliasPrivateKeyStrategy) {
       return getCachedSslContextForPredefinedAlias(keyStore, ksPass, (PredefinedAliasPrivateKeyStrategy) keyStrategy, trustStore, trustStrategy);
     } else {
       return createSSLContextBuilder(keyStore, ksPass, keyStrategy, trustStore, trustStrategy).build();
@@ -86,9 +87,9 @@ public class CryptographyUtils {
 
   public static RestTemplate createSslRestTemplate(final KeyStore keyStore, final String ksPass, final
   PrivateKeyStrategy keyStrategy, final KeyStore trustStore, TrustStrategy trustStrategy, final Integer readTimeout,
-                                                   final Integer connectionTimeout)  throws Exception  {
+                                                   final Integer connectionTimeout, final boolean allowCached)  throws Exception  {
 
-    SSLContext sslContext = getSSLContext(keyStore, ksPass, keyStrategy, trustStore, trustStrategy);
+    SSLContext sslContext = getSSLContext(keyStore, ksPass, keyStrategy, trustStore, trustStrategy, allowCached);
 
     // here in the constructor, also hostname verifier, protocol version, cipher suits, etc. can be specified
     SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext);

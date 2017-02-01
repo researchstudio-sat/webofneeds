@@ -4,8 +4,6 @@ services:
   # nginx proxy server on satsrv06 for owner and wonnode on host satsrv05
   nginx:
     image: nginx
-    environment:
-      - "constraint:node==satsrv06"
     ports:
       - "80:80"
       - "443:443"
@@ -32,9 +30,9 @@ services:
     build: ../../image/bots
     image: webofneeds/bots:int
     environment:
-      - "constraint:node==satsrv06"
       - "node.default.host=satsrv04.researchstudio.at"
       - "node.default.http.port=8889"
+      - "uri.prefix.owner=https://satsrv06.researchstudio.at/debug_bot"  # set this for the trust store alias
       - "won.node.uris=https://satsrv04.researchstudio.at:8889/won/resource https://satsrv06.researchstudio.at/won/resource"
       - "botContext.impl=mongoBotContext"
       - "botContext.mongodb.user=won"
@@ -50,10 +48,10 @@ services:
     build: ../../image/bots
     image: webofneeds/bots:int
     environment:
-      - "constraint:node==satsrv06"
       - "MAIN_BOT=won.bot.app.Mail2WonBotApp"
       - "node.default.host=satsrv04.researchstudio.at"
       - "node.default.http.port=8889"
+      - "uri.prefix.owner=https://satsrv06.researchstudio.at/mail_bot"  # set this for the trust store alias
       - "won.node.uris=https://satsrv04.researchstudio.at:8889/won/resource https://satsrv06.researchstudio.at/won/resource"
       - "botContext.impl=mongoBotContext"
       - "botContext.mongodb.user=won"
@@ -109,8 +107,8 @@ services:
     build: ../../image/matcher-service
     image: webofneeds/matcher_service:int
     environment:
-      - "constraint:node==satsrv06"
       - "node.host=satsrv06.researchstudio.at"
+      - "matcher.uri=https://satsrv06.researchstudio.at/matcher_service" # set this for the trust store alias
       - "cluster.seedNodes=satsrv06.researchstudio.at:2561,satsrv06.researchstudio.at:2562"
       - "uri.sparql.endpoint=http://satsrv06.researchstudio.at:10000/bigdata/namespace/kb/sparql"
       - "wonNodeController.wonNode.crawl=https://satsrv04.researchstudio.at:8889/won/resource,https://satsrv06.researchstudio.at/won/resource"
@@ -136,8 +134,6 @@ services:
   solr:
     build: ../../image/solr
     image: webofneeds/solr:int
-    environment:
-      - "constraint:node==satsrv06"
     volumes:
       - $base_folder/solr/won/data:/opt/solr/server/solr/won/data
       - $base_folder/solr/wontest/data:/opt/solr/server/solr/wontest/data
@@ -149,7 +145,6 @@ services:
     build: ../../image/matcher-solr
     image: webofneeds/matcher_solr:int
     environment:
-      - "constraint:node==satsrv06"
       - "node.host=satsrv06.researchstudio.at"
       - "cluster.seedNodes=satsrv06.researchstudio.at:2561,satsrv06.researchstudio.at:2562"
       - "cluster.local.port=2562"
