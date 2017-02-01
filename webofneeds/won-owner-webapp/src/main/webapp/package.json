@@ -29,7 +29,7 @@
   "jspm": {
     "configFile": "jspm_config.js",
     "dependencies": {
-      "Medium.js": "github:jakiestfu/Medium.js@master",
+      "Medium.js": "github:jakiestfu/Medium.js@a38c058f3b0ddd5387226a33bfbcf8269d1491e0",
       "angular": "npm:angular@1.4.8",
       "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.13.0",
       "angular-mocks": "github:angular/bower-angular-mocks@1.4.2",
