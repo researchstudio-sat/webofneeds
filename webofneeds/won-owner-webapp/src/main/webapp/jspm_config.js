@@ -12,9 +12,6 @@ System.config({
     "bower:*": "jspm_packages/bower/*"
   },
 
-  meta: {
-  },
-
   map: {
     "Medium.js": "github:jakiestfu/Medium.js@master",
     "angular": "npm:angular@1.4.8",
