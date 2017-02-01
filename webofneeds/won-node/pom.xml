@@ -143,7 +143,6 @@
             <groupId>org.javasimon</groupId>
             <artifactId>javasimon-spring</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>

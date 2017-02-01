@@ -18,7 +18,7 @@
     <import resource="classpath:/spring/core/owner-core.xml" />
     <import resource="classpath:/spring/component/ehcache/spring-owner-ehcache.xml" />
     <import resource="classpath:/spring/component/linkeddatasource/owner-linkeddatasource.xml" />
-    <import resource="classpath:/spring/component/storage/owner-storage.xml" />
+    <import resource="classpath:/spring/component/storage/jdbc-storage.xml" />
     <import resource="classpath:/spring/component/storage/jpabased-rdf-storage.xml" />
     <import resource="classpath:/spring/component/camel/owner-camel.xml" />
     <import resource="classpath:/spring/component/ownerProtocolCommunicationService/ownerProtocolCommunicationService.xml" />

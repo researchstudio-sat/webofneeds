@@ -212,6 +212,8 @@ public class WonMimeMessageGenerator {
         Dataset baseDataSet = eventListenerContext.getLinkedDataSource().getDataForResource(connectionUri);
         Dataset eventDataSet = eventListenerContext.getLinkedDataSource().getDataForResource(URI.create(connectionUri.toString()+"/events?deep=true"), requesterUri);
 
+        RDFDataMgr.write(System.out, eventDataSet, Lang.TRIG);
+
         RdfUtils.addDatasetToDataset(baseDataSet, eventDataSet);
 
         try {

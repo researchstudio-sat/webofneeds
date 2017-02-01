@@ -491,6 +491,11 @@
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
 
             <!-- HSQL STUFF -->
             <dependency>
@@ -923,6 +928,7 @@
         <org.slf4j.version>1.6.6</org.slf4j.version>
         <org.hsqldb.version>2.3.2</org.hsqldb.version>
         <postgresql.version>9.1-901.jdbc4</postgresql.version>
+        <flyway.version>4.0.3</flyway.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
         <javax.validation.version>1.1.0.Final</javax.validation.version>
         <mojoexec.version>1.3.2</mojoexec.version>
