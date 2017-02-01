@@ -274,12 +274,12 @@ export function runMessagingAgent(redux) {
     };
 
     function onHeartbeat(e) {
-        console.log('messaging-agent.js: received heartbeat',e);
+        console.debug('messaging-agent.js: received heartbeat',e);
         missedHeartbeats = 0; // reset the deadman count
     }
 
     function checkHeartbeat() {
-        console.log("messaging-agent.js: checking heartbeat presence: ", missedHeartbeats, " full intervals of 30s have passed since the last heartbeat.");
+        console.debug("messaging-agent.js: checking heartbeat presence: ", missedHeartbeats, " full intervals of 30s have passed since the last heartbeat.");
 
         if(++missedHeartbeats > 3) {
             console.error("messaging-agent.js: no websocket-heartbeat present. closing socket.");
