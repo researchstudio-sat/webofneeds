@@ -1035,6 +1035,10 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
             // We can flatten this and still have valid json-ld
             const simplified = needJsonLd['@graph'][0];
             if(!simplified) {
+                if(!needJsonLd || needJsonLd['@graph'].length === 0) {
+                    console.error('Received empty graph ', needJsonLd, ' for need ', needUri);
+                }
+
                 //doesn't contain graph. probably already simplified.
                 return needJsonLd;
             } else {
