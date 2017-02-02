@@ -1069,7 +1069,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         const jsonLdP = jsonld.promises
             .fromRDF(jsonldjsQuads, context)
             .then(complexJsonLd => {
-                //the framing algorithm expeds an js-object with an `@graph`-property
+                //the framing algorithm expects an js-object with an `@graph`-property
                 const complexJsonLd_ = complexJsonLd['@graph'] ?
                     complexJsonLd :
                     {'@graph': complexJsonLd};
