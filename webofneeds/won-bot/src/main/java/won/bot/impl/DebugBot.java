@@ -18,7 +18,8 @@ package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.action.impl.*;
+import won.bot.framework.eventbot.action.impl.MultipleActions;
+import won.bot.framework.eventbot.action.impl.RandomDelayedAction;
 import won.bot.framework.eventbot.action.impl.debugbot.*;
 import won.bot.framework.eventbot.action.impl.matcher.RegisterMatcherAction;
 import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateNeedAction;
@@ -27,6 +28,7 @@ import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.*;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
+import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
 import won.bot.framework.eventbot.event.impl.matcher.NeedCreatedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.wonmessage.*;
 import won.bot.framework.eventbot.filter.impl.NeedUriInNamedListFilter;
@@ -58,6 +60,11 @@ public class DebugBot extends EventBot
   protected BaseEventListener needDeactivator;
   protected BaseEventListener messageFromOtherNeedListener;
   protected BaseEventListener usageMessageSender;
+  private int registrationMatcherRetryInterval;
+
+  public void setRegistrationMatcherRetryInterval(final int registrationMatcherRetryInterval) {
+    this.registrationMatcherRetryInterval = registrationMatcherRetryInterval;
+  }
 
 
   private URI matcherUri;
@@ -76,13 +83,13 @@ public class DebugBot extends EventBot
     EventListenerContext ctx = getEventListenerContext();
     EventBus bus = getEventBus();
 
-    //register with WoN noodes, be notified when new needs are created
-    this.matcherRegistrator = new ActionOnEventListener(
-      ctx,
-      new RegisterMatcherAction(ctx),
-      1
-    );
+    //register with WoN nodes, be notified when new needs are created
+    RegisterMatcherAction registerMatcherAction = new RegisterMatcherAction(ctx);
+    this.matcherRegistrator = new ActionOnEventListener(ctx, registerMatcherAction, 1);
     bus.subscribe(ActEvent.class, this.matcherRegistrator);
+    RandomDelayedAction delayedRegistration = new RandomDelayedAction(ctx, registrationMatcherRetryInterval, registrationMatcherRetryInterval, 0, registerMatcherAction);
+    ActionOnEventListener matcherRetryRegistrator = new ActionOnEventListener(ctx, delayedRegistration);
+    bus.subscribe(MatcherRegisterFailedEvent.class, matcherRetryRegistrator);
 
     //create the echo need for debug initial connect - if we're not reacting to the creation of our own echo need.
     CreateDebugNeedWithFacetsAction needForInitialConnectAction =
