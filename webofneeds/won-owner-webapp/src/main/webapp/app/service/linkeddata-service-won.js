@@ -848,18 +848,17 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         )
         .then(dataset =>
             Promise.resolve()
-            .then(() =>
-                fetchesPartialRessource(params) ?
+            .then(() => {
+                if(!fetchesPartialRessource(params)) {
                     /* as paging is only used for containers
                      * and they don't lose entries, we can
                      * simply merge on top of the already
                      * loaded triples below. So we skip removing
-                     * the previously loaded data here:
-                     */
-                    undefined : //NOP
-                    /* remove any remaining stale data: */
+                     * the previously loaded data. For everything
+                     * remove any remaining stale data: */
                     won.deleteNode(uri)
-            )
+                }
+            })
             .then(() =>
                 addJsonLdData(uri, dataset)
             )
