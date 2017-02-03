@@ -881,6 +881,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                     console.log('linkeddata-serice-won.js: finished storing triples ', data);
                     resolve(uri);
                 } else {
+                    console.error('Failed to store json-ld data for ' + uri);
                     reject('Failed to store json-ld data for ' + uri);
                 }
 
