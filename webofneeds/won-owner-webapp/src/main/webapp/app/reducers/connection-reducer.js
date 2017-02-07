@@ -41,6 +41,7 @@ export default function(connections = initialState, action = {}) {
         case actionTypes.needs.received:
             const connectionUris = action.payload.affectedConnections
             if (!connectionUris){
+                console.error("invalid or empty action.payload.affectedConnections: ", connectionUris)
                 return connections;
             } else {
                 return connectionUris.reduce((updatedConnections, connectionUri) =>
@@ -163,6 +164,7 @@ function storeConnections(connections, connectionsToStore) {
         const connectionsWithEventSets = connectionsToStore.map(sanitizeConnection);
         return connections.merge(connectionsWithEventSets);
     } else {
+        console.error("invalid or empty connectionsToStore: ", connectionsToStore);
         return connections;
     }
 }
@@ -182,6 +184,7 @@ function sanitizeConnection(connection) {
 
 function storeEventUri(connections, connectionUri, newEventUri) {
     if(!newEventUri) {
+        console.error("Tried to store event with undefined or empty uri: ", newEventUri);
         return connections;
     }
     return connections.updateIn(
@@ -194,6 +197,7 @@ function storeEventUri(connections, connectionUri, newEventUri) {
 
 function storeEventUris(connections, connectionUri, newEventUris) {
     if(!newEventUris) {
+        console.error("Tried to store events from undefined or empty list: ", newEventUris);
         return connections;
     }
     return connections.updateIn(

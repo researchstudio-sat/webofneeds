@@ -848,18 +848,17 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         )
         .then(dataset =>
             Promise.resolve()
-            .then(() =>
-                fetchesPartialRessource(params) ?
+            .then(() => {
+                if(!fetchesPartialRessource(params)) {
                     /* as paging is only used for containers
                      * and they don't lose entries, we can
                      * simply merge on top of the already
                      * loaded triples below. So we skip removing
-                     * the previously loaded data here:
-                     */
-                    undefined : //NOP
-                    /* remove any remaining stale data: */
+                     * the previously loaded data. For everything
+                     * remove any remaining stale data: */
                     won.deleteNode(uri)
-            )
+                }
+            })
             .then(() =>
                 addJsonLdData(uri, dataset)
             )
@@ -882,6 +881,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                     console.log('linkeddata-serice-won.js: finished storing triples ', data);
                     resolve(uri);
                 } else {
+                    console.error('Failed to store json-ld data for ' + uri);
                     reject('Failed to store json-ld data for ' + uri);
                 }
 
@@ -1035,6 +1035,10 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
             // We can flatten this and still have valid json-ld
             const simplified = needJsonLd['@graph'][0];
             if(!simplified) {
+                if(!needJsonLd || needJsonLd['@graph'].length === 0) {
+                    console.error('Received empty graph ', needJsonLd, ' for need ', needUri);
+                }
+
                 //doesn't contain graph. probably already simplified.
                 return needJsonLd;
             } else {
@@ -1065,7 +1069,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         const jsonLdP = jsonld.promises
             .fromRDF(jsonldjsQuads, context)
             .then(complexJsonLd => {
-                //the framing algorithm expeds an js-object with an `@graph`-property
+                //the framing algorithm expects an js-object with an `@graph`-property
                 const complexJsonLd_ = complexJsonLd['@graph'] ?
                     complexJsonLd :
                     {'@graph': complexJsonLd};
