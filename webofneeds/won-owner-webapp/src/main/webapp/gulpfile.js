@@ -12,8 +12,8 @@ var sourcemaps = require('gulp-sourcemaps');
 
 
 gulp.task('default', ['build']);
-gulp.task('build', ['sass', 'iconsprite', 'bundlejs']);
-gulp.task('watch', ['sass', 'iconsprite', 'bundlejs'], function() {
+gulp.task('build', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res']);
+gulp.task('watch', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res'], function() {
     gulp.watch('./app/**/*.js', ['bundlejs']);
     gulp.watch('./style/**/*.scss', ['sass']);
     gulp.watch('./style/**/_*.scss', ['sass']);
@@ -52,6 +52,18 @@ gulp.task('sass', function(done) {
         .pipe(rename({ extname: '.min.css' }))
         .pipe(gulp.dest(generatedStyleFolder))
         .on('end', done);
+});
+
+/**
+ * Copies over static resources, that libraries in
+ * the bundle need to be in a place relativ to
+ * themselves -- and thus the bundle.
+ */
+gulp.task('copy-static-res', function(done) {
+    return gulp.src([
+        './jspm_packages/npm/leaflet@0.7.7/dist/images/**/*'
+    ])
+    .pipe(gulp.dest('./generated/images/'))
 });
 
 
