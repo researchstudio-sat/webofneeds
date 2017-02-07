@@ -1713,7 +1713,7 @@ Lexicon.Lexicon.prototype.registerBlank = function(label) {
     this.oidCounter++;
     var oidStr = ""+oid;
     this.OIDToBlank[oidStr] = true;
-    return(oidStr);
+    return(oid);
 };
 
 Lexicon.Lexicon.prototype.resolveBlank = function(label) {
@@ -1725,7 +1725,7 @@ Lexicon.Lexicon.prototype.resolveBlank = function(label) {
 
     var oid = this.oidCounter;
     this.oidCounter++;
-    return(""+oid);
+    return(oid);
 };
 
 Lexicon.Lexicon.prototype.resolveBlankCost = function(label) {
