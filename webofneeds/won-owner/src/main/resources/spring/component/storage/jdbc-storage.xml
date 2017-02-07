@@ -20,12 +20,14 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation=
                "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
                 http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
                 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
-                http://www.springframework.org/schema/data/repository http://www.springframework.org/schema/data/repository/spring-repository-1.8.xsd">
+                http://www.springframework.org/schema/data/repository http://www.springframework.org/schema/data/repository/spring-repository-1.8.xsd
+                http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
     <!--
          Load properties but ignore unresolvable properties so that
@@ -37,13 +39,7 @@
     <context:annotation-config />
 
     <!-- Defines where to search for annotated components -->
-    <!-- TODO: we may only need the model package here. Try that. -->
-    <context:component-scan base-package="won.protocol.exception" />
-    <context:component-scan base-package="won.protocol.matcher" />
     <context:component-scan base-package="won.protocol.model" />
-    <context:component-scan base-package="won.protocol.repository" />
-    <context:component-scan base-package="won.protocol.service" />
-    <context:component-scan base-package="won.protocol.util" />
 
     <!--also scan the owner's model package -->
     <context:component-scan base-package="won.owner.model" />
@@ -57,55 +53,53 @@
     </bean>
 
 
-    <!-- Hibernate is used as JPA vendor-->
-    <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-        <property name="generateDdl" value="true" /> <!-- Automatically create tables for the entity classes. Don't do this in production! -->
-        <property name="showSql" value="false" /> <!-- Set this to true for analyzing SQL queries -->
-    </bean>
-
     <!-- Entity manager -->
-    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <!-- http://docs.spring.io/spring/docs/current/spring-framework-reference/html/orm.html maybe try with LocalSessionFactoryBean instead of LocalContainerEntittyBean-->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="owner-flyway">
         <property name="dataSource" ref="dataSource" />
-        <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+        </property>
         <property name="packagesToScan" value="won.owner.model, won.protocol.model" />
-    </bean>
-
-    <!-- Session factory -->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-        <property name="dataSource" ref="dataSource" />
-        <property name="hibernateProperties">
+        <!-- only use when db is postgres/flyway integration -->
+        <property name="jpaProperties">
             <props>
-                <!-- set a custom hibernate postgres dialect to create indices for foreign keys automatically -->
-                <prop key="hibernate.dialect">won.protocol.util.hibernate.Postgres9WithFKIndicesDialect</prop>
-
-                <prop key="hbm2ddl.auto">create</prop>
+                <prop key="hibernate.hbm2ddl.auto">${db.ddl.strategy}</prop>
                 <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.generate_statistics">false</prop>
             </props>
         </property>
     </bean>
 
+    <bean id="owner-flyway" class="won.db.FlywayWrapper">
+        <property name="ddlStrategy" value="${db.ddl.strategy}"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--</bean>-->
     <!-- ==================================== -->
     <!--  Hibernate 4.3 Statistics for JMX    -->
     <!-- ==================================== -->
-    <!--bean id="jmxExporter" class="org.springframework.jmx.export.MBeanExporter">
+    <!--<bean id="jmxExporter" class="org.springframework.jmx.export.MBeanExporter">
         <property name="beans">
             <map>
                 <entry key="Hibernate:type=OwnerStatistics">
                     <bean class="won.monitoring.hibernate.HibernateStatisticsFactoryBean">
-                        <property name="sessionFactory" ref="sessionFactory" />
+                        <property name="sessionFactory">
+                            <util:property-path path="entityManagerFactory.sessionFactory"/>
+                        </property>
                     </bean>
                 </entry>
             </map>
         </property>
-    </bean-->
+    </bean>-->
 
     <!-- Configure transaction management -->
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory" />
     </bean>
 
-    <tx:annotation-driven transaction-manager="transactionManager" />
+    <tx:annotation-driven transaction-manager="transactionManager"/>
 
     <!-- Defines where repositories are placed -->
     <jpa:repositories base-package="won.protocol.repository" />

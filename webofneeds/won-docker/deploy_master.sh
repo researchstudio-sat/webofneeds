@@ -3,7 +3,6 @@ set -e
 
 # base folder is used to mount some files (e.g. certificates) from the server into the containers
 export base_folder=/usr/share/webofneeds/master
-mkdir -p $base_folder
 
 # check if all application data should be removed before deployment
 if [ "$remove_all_data" = true ] ; then

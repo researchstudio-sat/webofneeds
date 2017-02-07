@@ -134,7 +134,7 @@ function addConnection(state, needUri, connectionUri) {
         state = state.setIn(pathToConnections, Immutable.List());
     }
     const connections = state.getIn(pathToConnections);
-    if( connections.filter(c => c.get('@id') === connectionUri).size > 0) {
+    if( connections.filter(c => c && c.get('@id') === connectionUri).size > 0) {
         // connection's already been added to the need before
         return state;
     } else {

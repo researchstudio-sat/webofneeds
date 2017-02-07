@@ -57,7 +57,7 @@ docker-compose -H satsrv05:2375 up --build -d
 # the certificates must have been created on satsrv05 (in docker-compose file) before it can be used on proxy satsrv06
 ssh root@satsrv06 mkdir -p $base_folder/won-server-certs
 mkdir -p ~/won-server-certs
-rm ~/won-server-certs/*
+rm -f ~/won-server-certs/*
 echo ${won_certificate_passwd} > ~/won-server-certs/won_certificate_passwd_file
 rsync root@satsrv05:$base_folder/won-server-certs/* ~/won-server-certs/
 rsync ~/won-server-certs/* root@satsrv06:$base_folder/won-server-certs/
