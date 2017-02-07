@@ -1206,27 +1206,22 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     won.getEnvelopeDataForNeed=function(needUri){
         if(typeof needUri === 'undefined'||needUri == null){
             throw {message: "getEnvelopeDataForNeed: needUri must not be null"};
-
         }
         return won.getWonNodeUriOfNeed(needUri)
-            .then(function(wonNodeUri){
-                var ret = {};
+            .then(wonNodeUri => {
+                let ret = {};
                 ret[won.WONMSG.hasSenderNeed] = needUri;
                 ret[won.WONMSG.hasSenderNode] = wonNodeUri;
                 ret[won.WONMSG.hasReceiverNeed] = needUri;
                 ret[won.WONMSG.hasReceiverNode] = wonNodeUri;
                 return ret;
-
-            },function(reason) {
+            }).catch(reason => {
                 //no connection found
-                var deferred = q.defer();
-                var ret = {};
+                let ret = {};
                 ret[won.WONMSG.hasSenderNeed] = needUri;
                 ret[won.WONMSG.hasReceiverNeed] = needUri;
                 return ret;
-                deferred.resolve(ret);
-                return deferred.promise;}
-        )
+            });
     }
     /**
      * Fetches a structure that can be used directly (in a JSON-LD node) as the envelope data
