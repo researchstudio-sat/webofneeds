@@ -6,6 +6,8 @@
 ;
 
 import angular from 'angular';
+import inviewModule from 'angular-inview';
+
 import { attach, } from '../utils';
 import won from '../won-es6';
 import {
@@ -75,7 +77,7 @@ function genComponentConf() {
                 <p ng-show="self.debugmode">
                     <a class="debuglink" target="_blank" href="{{self.post.get('@id')}}">[DATA]</a>
                 </p>
-                <div class="post-info__mapmount" id="post-info__mapmount"></div>
+                <div class="post-info__mapmount" id="post-info__mapmount" in-view="$inview && self.mapInView($inviewInfo)"></div>
             </div>
         </div>
     `;
@@ -127,6 +129,12 @@ function genComponentConf() {
             this.$scope.$on('$destroy', disconnect);
         }
 
+        mapInView(inviewInfo) {
+            if(inviewInfo.changed) {
+                this.map.invalidateSize();
+            }
+        }
+
         updateMap(location) {
             if(!location) {
                 return;
@@ -176,6 +184,6 @@ return {
 }
 }
 
-export default angular.module('won.owner.components.postInfo', [])
+export default angular.module('won.owner.components.postInfo', [ inviewModule.name ])
     .directive('wonPostInfo', genComponentConf)
     .name;
