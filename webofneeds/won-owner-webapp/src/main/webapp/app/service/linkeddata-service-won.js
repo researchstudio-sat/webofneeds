@@ -1240,34 +1240,32 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                         return won.getRemoteneedUriOfConnection(connectionUri)
                             .then(function(remoteneedUri){
                                 return won.getWonNodeUriOfNeed(remoteneedUri)
-                                    .then(function(remoteWonNodeUri){
+                                    .then(remoteWonNodeUri => {
                                         //if the local connection was created through a hint message (most likely)
                                         //the remote connection is not known or doesn't exist yet. Hence, the next call
                                         //may or may not succeed.
-                                        return won.getRemoteConnectionUriOfConnection(connectionUri).then(
-                                            function(remoteconnectionUri) {
-                                                var ret = {};
+                                        return won.getRemoteConnectionUriOfConnection(connectionUri)
+                                            .then(remoteConnectionUri => {
+                                                let ret = {};
                                                 ret[won.WONMSG.hasSender] = connectionUri;
                                                 ret[won.WONMSG.hasSenderNeed] = needUri;
                                                 ret[won.WONMSG.hasSenderNode] = wonNodeUri;
-                                                if (remoteconnectionUri != null) {
-                                                    ret[won.WONMSG.hasReceiver] = remoteconnectionUri;
+                                                if (remoteConnectionUri != null) {
+                                                    ret[won.WONMSG.hasReceiver] = remoteConnectionUri;
                                                 }
                                                 ret[won.WONMSG.hasReceiverNeed] = remoteneedUri;
                                                 ret[won.WONMSG.hasReceiverNode] = remoteWonNodeUri;
                                                 return ret;
-                                            },function(reason) {
+                                            })
+                                            .catch(reason => {
                                                 //no connection found
-                                                var deferred = q.defer();
-                                                var ret = {};
+                                                let ret = {};
                                                 ret[won.WONMSG.hasSender] = connectionUri;
                                                 ret[won.WONMSG.hasSenderNeed] = needUri;
                                                 ret[won.WONMSG.hasSenderNode] = wonNodeUri;
                                                 ret[won.WONMSG.hasReceiverNeed] = remoteneedUri;
                                                 ret[won.WONMSG.hasReceiverNode] = remoteWonNodeUri;
                                                 return ret;
-                                                deferred.resolve(ret);
-                                                return deferred.promise;
                                             });
                                     });
                             });
