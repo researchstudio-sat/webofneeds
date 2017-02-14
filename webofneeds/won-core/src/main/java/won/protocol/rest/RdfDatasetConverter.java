@@ -58,8 +58,11 @@ public class RdfDatasetConverter extends AbstractHttpMessageConverter<Dataset>
   @Override
   protected void writeInternal(Dataset dataset, HttpOutputMessage httpOutputMessage) throws IOException,
     HttpMessageNotWritableException {
-    Lang rdfLanguage = mimeTypeToJenaLanguage(httpOutputMessage.getHeaders().getContentType(), Lang.TRIG);
+    MediaType contentType = httpOutputMessage.getHeaders().getContentType();
+    Lang rdfLanguage = mimeTypeToJenaLanguage(contentType, Lang.TRIG);
+    WonEtagHelper.setMediaTypeForEtagHeaderIfPresent(contentType, httpOutputMessage.getHeaders());
     RDFDataMgr.write(httpOutputMessage.getBody(), dataset, rdfLanguage);
+    //append content type to ETAG header to avoid confusing different representations of the same resource
     httpOutputMessage.getBody().flush();
   }
 

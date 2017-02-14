@@ -2,6 +2,7 @@ package won.protocol.repository.rdfstorage;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
+import won.protocol.model.DataWithEtag;
 
 import java.net.URI;
 
@@ -42,11 +43,29 @@ public interface RDFStorageService
   public Model loadModel(URI resourceURI);
 
   /**
+   * Compares the etag to the value derived from the data found in the storage for the specified URI.
+   * Loads the model if the values differ, returns null
+   * @param resourceURI
+   * @param etag
+   * @return
+   */
+  public DataWithEtag<Model> loadModel(URI resourceURI, String etag);
+
+  /**
    * Loads the dataset with the specified URL
    * @param resourceURI
    * @return
    */
   public Dataset loadDataset(URI resourceURI);
+
+  /**
+   * Compares the etag to the value derived from the data found in the storage for the specified URI.
+   * Loads the model if the values differ, returns null
+   * @param resourceURI
+   * @param etag
+   * @return
+   */
+  public DataWithEtag<Dataset> loadDataset(URI resourceURI, String etag);
 
   public boolean removeContent(URI resourceURI);
 }

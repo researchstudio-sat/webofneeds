@@ -20,6 +20,7 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RiotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,10 @@ import java.net.URI;
 public class DatasetHolder
 {
   private static final int DEFAULT_BYTE_ARRAY_SIZE = 500;
+
+  @Version
+  @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
+  private long version = 0L;
 
   @Transient
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -71,6 +76,14 @@ public class DatasetHolder
     this.uri = uri;
   }
 
+  protected void setVersion(final long version) {
+    this.version = version;
+  }
+
+  public long getVersion() {
+    return version;
+  }
+
   byte[] getDatasetBytes() {
     return datasetBytes;
   }
@@ -89,7 +102,7 @@ public class DatasetHolder
     assert this.datasetBytes != null : "model must not be null";
     ByteArrayOutputStream out = new ByteArrayOutputStream(DEFAULT_BYTE_ARRAY_SIZE);
     synchronized(this){
-      RDFDataMgr.write(out, dataset, Lang.TRIG);
+      RDFDataMgr.write(out, dataset, Lang.NQUADS);
       this.datasetBytes = out.toByteArray();
       this.cachedDataset = dataset;
       if (logger.isDebugEnabled()){
@@ -110,7 +123,13 @@ public class DatasetHolder
       Dataset dataset = DatasetFactory.createMem();
       InputStream is = new ByteArrayInputStream(this.datasetBytes);
       try {
-        RDFDataMgr.read(dataset, is,  this.uri.toString(), Lang.TRIG);
+        try {
+          RDFDataMgr.read(dataset, is, this.uri.toString(), Lang.NQUADS);
+        } catch (RiotException ex) {
+            //assume that the data is stored in TRIG old format, try that.
+            is = new ByteArrayInputStream(this.datasetBytes);
+            RDFDataMgr.read(dataset, is, Lang.TRIG);
+        }
       } catch (Exception e) {
         logger.warn("could not read dataset {} from byte array. Byte array is null: {}, has length {}",
           new Object[]{this.uri,
