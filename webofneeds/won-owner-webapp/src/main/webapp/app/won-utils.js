@@ -3,6 +3,7 @@
  */
 
 import Immutable from 'immutable';
+import L from './leaflet-bundleable';
 
 export function initLeaflet(mapMount) {
     if(!L) {
