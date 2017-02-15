@@ -13,6 +13,8 @@ import won.matcher.utils.tensor.TensorMatchingData;
 import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -44,20 +46,21 @@ public class RescalSparqlService extends CrawlSparqlService
 
     // retrieve relevant properties of all needs that match the conditions
     log.info("bulk load need data from sparql endpoint in crawlDate range: [{},{}]", fromCrawlDate, toCrawlDate);
-    String queryTemplate = "\nSELECT ?needUri ?type ?wonNodeUri ?title ?desc ?tags WHERE { " +
-      " ?needUri <%s> <%s>. ?needUri <%s> '%s'. ?needUri <%s> ?date. " +
+    String queryTemplate = "\nSELECT ?needUri ?type ?wonNodeUri ?title ?desc ?tag WHERE { " +
+      " ?needUri <%s> <%s>. ?needUri <%s> ?crawlStatus. ?needUri <%s> ?date. " +
       " ?needUri <%s> <%s>. ?needUri <%s> ?type. ?needUri <%s> ?title." +
       " ?needUri <%s> ?wonNodeUri." +
-      " OPTIONAL {?needUri <%s> ?desc}. " + "OPTIONAL {?needUri <%s> ?tags}. " +
-      " FILTER (?date >= %d && ?date < %d ) }\n";
+      " OPTIONAL {?needUri <%s> ?desc}. " + "OPTIONAL {?needUri <%s> ?tag}. " +
+      " FILTER (?date >= %d && ?date < %d && (?crawlStatus = '%s' || ?crawlStatus = '%s')) }\n";
 
     String queryString = String.format(
-      queryTemplate, RDF.type, WON.NEED, CrawlSparqlService.CRAWL_STATUS_PREDICATE, CrawlUriMessage.STATUS.DONE,
+      queryTemplate, RDF.type, WON.NEED, CrawlSparqlService.CRAWL_STATUS_PREDICATE,
       CrawlSparqlService.CRAWL_DATE_PREDICATE, WON.IS_IN_STATE, WON.NEED_STATE_ACTIVE,
       WON.HAS_BASIC_NEED_TYPE, WON.HAS_CONTENT.toString() + ">/<" + DC.title.toString(),
       WON.HAS_WON_NODE,
       WON.HAS_CONTENT.toString() + ">/<" + WON.HAS_TEXT_DESCRIPTION.toString(),
-      WON.HAS_CONTENT.toString() + ">/<" + WON.HAS_TAG.toString(), fromCrawlDate, toCrawlDate);
+      WON.HAS_CONTENT.toString() + ">/<" + WON.HAS_TAG.toString(), fromCrawlDate, toCrawlDate,
+      CrawlUriMessage.STATUS.DONE, CrawlUriMessage.STATUS.SAVE);
 
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
     log.debug("Execute query: {}", queryString);
@@ -68,6 +71,9 @@ public class RescalSparqlService extends CrawlSparqlService
     log.info("preprocess the loaded need data ...");
     int numNeeds = 0;
     int numAttributes = 0;
+    Set<String> processedNeedUris = new HashSet<>();
+
+
     while (results.hasNext()) {
 
       // add the needs with its attributes to the rescal matching data object
@@ -76,42 +82,49 @@ public class RescalSparqlService extends CrawlSparqlService
       String needUri = qs.get("needUri").asResource().getURI();
       String type = qs.get("type").asResource().getURI();
 
-      // need type
-      matchingData.addNeedType(needUri, type);
-      numAttributes++;
+      // needUris can occur multiple times in the query solution set since there is an entry for every tag of the
+      // need. if we already processed this needUri in this solution set we can skip everything except the tag
+      if (!processedNeedUris.contains(needUri)) {
+        log.debug("processing need: {}", needUri);
 
-      // title
-      String title = qs.get("title").asLiteral().getString();
-      String[] titleTokens = preprocessing.extractWordTokens(title);
-      for (String token : titleTokens) {
-        matchingData.addNeedAttribute(needUri, token, TensorMatchingData.SliceType.TITLE);
+        // need type
+        matchingData.addNeedType(needUri, type);
+        numAttributes++;
+
+        // title
+        String title = qs.get("title").asLiteral().getString();
+        String[] titleTokens = preprocessing.extractWordTokens(title);
+        for (String token : titleTokens) {
+          matchingData.addNeedAttribute(needUri, token, TensorMatchingData.SliceType.TITLE);
+          numAttributes++;
+        }
+
+        // won node of need
+        String wonNodeUri = qs.get("wonNodeUri").asResource().getURI();
+        matchingData.setWonNodeOfNeed(needUri, wonNodeUri);
+
+        // description
+        if (qs.get("desc") != null) {
+          String desc = qs.get("desc").asLiteral().getString();
+          String[] descTokens = preprocessing.extractWordTokens(desc);
+          for (String token : descTokens) {
+            matchingData.addNeedAttribute(needUri, token, TensorMatchingData.SliceType.DESCRIPTION);
+            numAttributes++;
+          }
+        }
+      }
+
+      // tag
+      if ((qs.get("tag") != null) && (qs.get("tag").isLiteral())) {
+        String tag = qs.get("tag").asLiteral().getString();
+        matchingData.addNeedAttribute(needUri, tag, TensorMatchingData.SliceType.TAG);
         numAttributes++;
       }
 
-      // won node of need
-      String wonNodeUri = qs.get("wonNodeUri").asResource().getURI();
-      matchingData.setWonNodeOfNeed(needUri, wonNodeUri);
-
-      // description
-      if (qs.get("desc") != null) {
-        String desc = qs.get("desc").asLiteral().getString();
-        String[] descTokens = preprocessing.extractRelevantWordTokens(desc);
-        for (String token : descTokens) {
-          matchingData.addNeedAttribute(needUri, token, TensorMatchingData.SliceType.DESCRIPTION);
-          numAttributes++;
-        }
-      }
-
-      // tags
-      if ((qs.get("tags") != null) && (qs.get("tags").isLiteral())) {
-        String tags = qs.get("tags").asLiteral().getString();
-        String[] tagTokens = preprocessing.extractWordTokens(tags);
-        for (String token : tagTokens) {
-          matchingData.addNeedAttribute(needUri, token, TensorMatchingData.SliceType.TAG);
-          numAttributes++;
-        }
-      }
+      // add the need uri to the processed ones
+      processedNeedUris.add(needUri);
     }
+
     qexec.close();
     log.info("number of needs loaded: " + numNeeds);
     log.info("number of (possibly double) attributes added: " + numAttributes);

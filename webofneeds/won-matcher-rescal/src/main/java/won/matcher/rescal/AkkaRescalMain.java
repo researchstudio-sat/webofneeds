@@ -1,3 +1,5 @@
+package won.matcher.rescal;
+
 import won.matcher.rescal.actor.RescalMatcherActor;
 import akka.actor.ActorSystem;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
