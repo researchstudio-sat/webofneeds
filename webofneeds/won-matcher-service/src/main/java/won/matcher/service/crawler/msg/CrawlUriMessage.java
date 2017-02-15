@@ -13,7 +13,12 @@ public class CrawlUriMessage implements Serializable
 {
   public static enum STATUS
   {
-    PROCESS, FAILED, DONE, SAVE,
+    PROCESS,  // resource is currently in the crawling process (e.g. downloading, link extraction, saving to rdf store)
+    FAILED,   // crawler failed to process the resource correctly in the last execution
+    DONE,     // resource was successfully crawled and saved and extracted links from that resource are processed too
+    SAVE,     // resource has been saved to the rdf store but links are not extracted. That means crawling of linked
+              // resources is not happening right now. In contrast to "DONE" the "SAVE" status is set if the resource
+              // was received by event subscription from the wonnode and not via the crawling process.
   }
 
   private String uri;
