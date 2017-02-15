@@ -10,7 +10,6 @@ from scipy.io import mmread
 from scipy.sparse import csr_matrix, lil_matrix
 from scipy.spatial.distance import pdist
 from scipy.spatial.distance import squareform
-from rescal import rescal_als
 from extrescal.extrescal import rescal
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout,
@@ -165,31 +164,31 @@ def adjust_mm_dimension(data_file, dim):
     return True
 
 # execute the recal algorithm
-def execute_rescal(input_tensor, rank, useNeedTypeSlice=True, useConnectionSlice=True, init='nvecs', conv=1e-4,
-                   lambda_A=0, lambda_R=0, lambda_V=0):
-
-    temp_tensor = input_tensor.getSliceMatrixList()
-    if not (useNeedTypeSlice):
-        _log.info('Do not use needtype slice for RESCAL')
-        del temp_tensor[SparseTensor.NEED_TYPE_SLICE]
-    if not (useConnectionSlice):
-        _log.info('Do not use connection slice for RESCAL')
-        del temp_tensor[SparseTensor.CONNECTION_SLICE]
-
-    _log.info('start rescal processing ...')
-    _log.info('config: init=%s, conv=%f, lambda_A=%f, lambda_R=%f, lambda_V=%f' %
-              (init, conv, lambda_A, lambda_R, lambda_V))
-    _log.info('Tensor: %d x %d x %d | Rank: %d' % (
-        temp_tensor[0].shape + (len(temp_tensor),) + (rank,))
-    )
-
-    A, R, _, _, _ = rescal_als(
-        temp_tensor, rank, init=init, conv=conv,
-        lambda_A=lambda_A, lambda_R=lambda_R, lambda_V=lambda_V, compute_fit='true'
-    )
-
-    _log.info('rescal stopped processing')
-    return A, R
+# def execute_rescal(input_tensor, rank, useNeedTypeSlice=True, useConnectionSlice=True, init='nvecs', conv=1e-4,
+#                    lambda_A=0, lambda_R=0, lambda_V=0):
+#
+#     temp_tensor = input_tensor.getSliceMatrixList()
+#     if not (useNeedTypeSlice):
+#         _log.info('Do not use needtype slice for RESCAL')
+#         del temp_tensor[SparseTensor.NEED_TYPE_SLICE]
+#     if not (useConnectionSlice):
+#         _log.info('Do not use connection slice for RESCAL')
+#         del temp_tensor[SparseTensor.CONNECTION_SLICE]
+#
+#     _log.info('start rescal processing ...')
+#     _log.info('config: init=%s, conv=%f, lambda_A=%f, lambda_R=%f, lambda_V=%f' %
+#               (init, conv, lambda_A, lambda_R, lambda_V))
+#     _log.info('Tensor: %d x %d x %d | Rank: %d' % (
+#         temp_tensor[0].shape + (len(temp_tensor),) + (rank,))
+#     )
+#
+#     A, R, _, _, _ = rescal_als(
+#         temp_tensor, rank, init=init, conv=conv,
+#         lambda_A=lambda_A, lambda_R=lambda_R, lambda_V=lambda_V, compute_fit='true'
+#     )
+#
+#     _log.info('rescal stopped processing')
+#     return A, R
 
 
 def execute_extrescal(input_tensor, rank, init='nvecs', conv=1e-4, lmbda=0):

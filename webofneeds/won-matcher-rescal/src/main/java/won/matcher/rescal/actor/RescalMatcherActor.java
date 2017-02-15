@@ -78,6 +78,7 @@ public class RescalMatcherActor extends UntypedActor
   private void executeRescalAlgorithm() throws IOException, InterruptedException {
 
     // load the needs and connections from the rdf store
+    log.info("start processing ...");
     long queryDate = System.currentTimeMillis();
     log.info("query needs and connections from rdf store '{}' from date '{}' to date '{}'", config.getSparqlEndpoint(),
              lastQueryDate, queryDate);
