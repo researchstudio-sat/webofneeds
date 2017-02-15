@@ -276,7 +276,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/matcher-rescal</outputDirectory>
+                            <outputDirectory>image/matcher-rescal</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/won-matcher-rescal/target</directory>
@@ -295,7 +295,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/matcher-rescal/python</outputDirectory>
+                            <outputDirectory>image/matcher-rescal/python</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/won-matcher-rescal/src/main/python</directory>
@@ -311,7 +311,7 @@
                         </goals>
                         <configuration>
                             <overwrite>true</overwrite>
-                            <outputDirectory>${project.basedir}/matcher-rescal/conf</outputDirectory>
+                            <outputDirectory>image/matcher-rescal/conf</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.parent.basedir}/conf</directory>

@@ -1,4 +1,4 @@
-package actor;
+package won.matcher.rescal.actor;
 
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
@@ -6,15 +6,15 @@ import akka.cluster.pubsub.DistributedPubSub;
 import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import common.event.BulkHintEvent;
-import config.RescalMatcherConfig;
+import won.matcher.rescal.config.RescalMatcherConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import rescal.HintReader;
-import rescal.RescalMatchingData;
-import rescal.RescalSparqlService;
+import won.matcher.rescal.service.HintReader;
+import won.matcher.rescal.service.RescalSparqlService;
 import scala.concurrent.duration.FiniteDuration;
+import won.matcher.service.common.event.BulkHintEvent;
+import won.matcher.utils.tensor.TensorMatchingData;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class RescalMatcherActor extends UntypedActor
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private long lastQueryDate = Long.MIN_VALUE;
   private RescalSparqlService sparqlService;
-  private RescalMatchingData rescalInputData = new RescalMatchingData();
+  private TensorMatchingData rescalInputData = new TensorMatchingData();
   private static final String TICK = "tick";
   private ActorRef pubSubMediator;
 

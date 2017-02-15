@@ -1,14 +1,15 @@
-package rescal;
+package won.matcher.rescal.service;
 
 
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.RDF;
-import crawler.msg.CrawlUriMessage;
-import crawler.service.CrawlSparqlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import preprocessing.OpenNlpTokenExtraction;
+import won.matcher.service.crawler.msg.CrawlUriMessage;
+import won.matcher.service.crawler.service.CrawlSparqlService;
+import won.matcher.utils.preprocessing.OpenNlpTokenExtraction;
+import won.matcher.utils.tensor.TensorMatchingData;
 import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class RescalSparqlService extends CrawlSparqlService
    * @param toCrawlDate maximum crawling timestamp used for loading
    */
   public void updateMatchingDataWithActiveNeeds(
-    RescalMatchingData matchingData, long fromCrawlDate,long toCrawlDate) {
+    TensorMatchingData matchingData, long fromCrawlDate,long toCrawlDate) {
 
     // retrieve relevant properties of all needs that match the conditions
     log.info("bulk load need data from sparql endpoint in crawlDate range: [{},{}]", fromCrawlDate, toCrawlDate);
@@ -83,7 +84,7 @@ public class RescalSparqlService extends CrawlSparqlService
       String title = qs.get("title").asLiteral().getString();
       String[] titleTokens = preprocessing.extractWordTokens(title);
       for (String token : titleTokens) {
-        matchingData.addNeedAttribute(needUri, token, RescalMatchingData.SliceType.TITLE);
+        matchingData.addNeedAttribute(needUri, token, TensorMatchingData.SliceType.TITLE);
         numAttributes++;
       }
 
@@ -96,7 +97,7 @@ public class RescalSparqlService extends CrawlSparqlService
         String desc = qs.get("desc").asLiteral().getString();
         String[] descTokens = preprocessing.extractRelevantWordTokens(desc);
         for (String token : descTokens) {
-          matchingData.addNeedAttribute(needUri, token, RescalMatchingData.SliceType.DESCRIPTION);
+          matchingData.addNeedAttribute(needUri, token, TensorMatchingData.SliceType.DESCRIPTION);
           numAttributes++;
         }
       }
@@ -106,7 +107,7 @@ public class RescalSparqlService extends CrawlSparqlService
         String tags = qs.get("tags").asLiteral().getString();
         String[] tagTokens = preprocessing.extractWordTokens(tags);
         for (String token : tagTokens) {
-          matchingData.addNeedAttribute(needUri, token, RescalMatchingData.SliceType.TAG);
+          matchingData.addNeedAttribute(needUri, token, TensorMatchingData.SliceType.TAG);
           numAttributes++;
         }
       }
@@ -124,7 +125,7 @@ public class RescalSparqlService extends CrawlSparqlService
    * @param toCrawlDate maximum crawling timestamp used for loading
    */
   public void updateMatchingDataWithConnections(
-    RescalMatchingData matchingData, long fromCrawlDate,long toCrawlDate) {
+    TensorMatchingData matchingData, long fromCrawlDate,long toCrawlDate) {
 
     // retrieve relevant properties of all connections that match the conditions
     log.info("bulk load connection data from sparql endpoint in crawlDate range: [{},{}]", fromCrawlDate, toCrawlDate);

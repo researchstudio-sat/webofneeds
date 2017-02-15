@@ -1,12 +1,8 @@
-import actor.RescalMatcherActor;
-import akka.actor.ActorRef;
+import won.matcher.rescal.actor.RescalMatcherActor;
 import akka.actor.ActorSystem;
-import akka.actor.DeadLetter;
-import akka.actor.Props;
-import common.actor.DeadLetterActor;
-import common.spring.SpringExtension;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import spring.MatcherRescalAppConfiguration;
+import won.matcher.rescal.spring.MatcherRescalAppConfiguration;
+import won.matcher.service.common.spring.SpringExtension;
 
 import java.io.IOException;
 
@@ -20,9 +16,6 @@ public class AkkaRescalMain
     AnnotationConfigApplicationContext ctx =
       new AnnotationConfigApplicationContext(MatcherRescalAppConfiguration.class);
     ActorSystem system = ctx.getBean(ActorSystem.class);
-    ActorRef rescalMatcherActor = system.actorOf(
-      SpringExtension.SpringExtProvider.get(system).props(RescalMatcherActor.class), "RescalMatcherActor");
-    ActorRef actor = system.actorOf(Props.create(DeadLetterActor.class), "DeadLetterActor");
-    system.eventStream().subscribe(actor, DeadLetter.class);
+    system.actorOf(SpringExtension.SpringExtProvider.get(system).props(RescalMatcherActor.class), "RescalMatcherActor");
   }
 }

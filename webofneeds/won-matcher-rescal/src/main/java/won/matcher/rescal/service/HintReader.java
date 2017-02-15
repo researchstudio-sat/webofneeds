@@ -1,9 +1,10 @@
-package rescal;
+package won.matcher.rescal.service;
 
-import common.event.BulkHintEvent;
-import common.event.HintEvent;
 import org.la4j.matrix.SparseMatrix;
 import org.la4j.matrix.functor.MatrixProcedure;
+import won.matcher.service.common.event.BulkHintEvent;
+import won.matcher.service.common.event.HintEvent;
+import won.matcher.utils.tensor.TensorMatchingData;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -20,17 +21,17 @@ import java.util.ArrayList;
 public class HintReader
 {
 
-  public static BulkHintEvent readHints(String folder, RescalMatchingData matchingData) throws IOException {
+  public static BulkHintEvent readHints(String folder, TensorMatchingData matchingData) throws IOException {
 
     // read the header file
     ArrayList<String> needHeaders = new ArrayList<>();
-    FileInputStream fis = new FileInputStream(folder + "/"+ RescalMatchingData.HEADERS_FILE);
+    FileInputStream fis = new FileInputStream(folder + "/"+ TensorMatchingData.HEADERS_FILE);
     BufferedReader br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
     String line = null;
     int i = 0;
     while ((line = br.readLine()) != null) {
-      if (line.startsWith(RescalMatchingData.NEED_PREFIX)) {
-        String originalHeaderEntry = line.substring(RescalMatchingData.NEED_PREFIX.length());
+      if (line.startsWith(TensorMatchingData.NEED_PREFIX)) {
+        String originalHeaderEntry = line.substring(TensorMatchingData.NEED_PREFIX.length());
         needHeaders.add(i, originalHeaderEntry);
       }
       i++;
@@ -66,9 +67,9 @@ public class HintReader
   {
     private BulkHintEvent hints;
     private ArrayList<String> needUris;
-    private RescalMatchingData matchingData;
+    private TensorMatchingData matchingData;
 
-    public BulkHintEventMatrixProcedure(ArrayList<String> needUris, RescalMatchingData matchingData) {
+    public BulkHintEventMatrixProcedure(ArrayList<String> needUris, TensorMatchingData matchingData) {
       hints = new BulkHintEvent();
       this.needUris = needUris;
       this.matchingData = matchingData;
