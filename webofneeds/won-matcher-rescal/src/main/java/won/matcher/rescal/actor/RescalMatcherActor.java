@@ -6,14 +6,15 @@ import akka.cluster.pubsub.DistributedPubSub;
 import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import won.matcher.rescal.config.RescalMatcherConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import scala.concurrent.duration.FiniteDuration;
+import won.matcher.rescal.config.RescalMatcherConfig;
 import won.matcher.rescal.service.HintReader;
 import won.matcher.rescal.service.RescalSparqlService;
-import scala.concurrent.duration.FiniteDuration;
 import won.matcher.service.common.event.BulkHintEvent;
+import won.matcher.service.common.event.HintEvent;
 import won.matcher.utils.tensor.TensorMatchingData;
 
 import java.io.BufferedReader;
@@ -117,6 +118,13 @@ public class RescalMatcherActor extends UntypedActor
     // load the predicted hints and send the to the event bus of the matching service
     BulkHintEvent hintsEvent = HintReader.readHints(config.getExecutionDirectory(), rescalInputData);
     log.info("loaded {} hints into bulk hint event and publish", hintsEvent.getHintEvents().size());
+
+    StringBuilder builder = new StringBuilder();
+    for (HintEvent hint : hintsEvent.getHintEvents()) {
+      builder.append("\n- " + hint);
+    }
+    log.info(builder.toString());
+
     pubSubMediator.tell(new DistributedPubSubMediator.Publish(hintsEvent.getClass().getName(), hintsEvent), getSelf());
     lastQueryDate = queryDate;
   }

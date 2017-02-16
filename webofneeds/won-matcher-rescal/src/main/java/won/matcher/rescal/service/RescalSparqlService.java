@@ -45,6 +45,8 @@ public class RescalSparqlService extends CrawlSparqlService
     TensorMatchingData matchingData, long fromCrawlDate,long toCrawlDate) {
 
     // retrieve relevant properties of all needs that match the conditions
+    // - crawl status is 'DONE' or 'SAVED'
+    // - needs crawl date must be in certain interval
     log.info("bulk load need data from sparql endpoint in crawlDate range: [{},{}]", fromCrawlDate, toCrawlDate);
     String queryTemplate = "\nSELECT ?needUri ?type ?wonNodeUri ?title ?desc ?tag WHERE { " +
       " ?needUri <%s> <%s>. ?needUri <%s> ?crawlStatus. ?needUri <%s> ?date. " +
@@ -140,20 +142,22 @@ public class RescalSparqlService extends CrawlSparqlService
   public void updateMatchingDataWithConnections(
     TensorMatchingData matchingData, long fromCrawlDate,long toCrawlDate) {
 
-    // retrieve relevant properties of all connections that match the conditions
+    // retrieve relevant properties of all connections that match the conditions:
+    // - use all connections for learning except hints (state suggested)
+    // - connections crawl date must be in certain interval
     log.info("bulk load connection data from sparql endpoint in crawlDate range: [{},{}]", fromCrawlDate, toCrawlDate);
     String queryTemplate = "\nSELECT ?connectionUri ?state ?need1 ?need2 WHERE { " +
       "?connectionUri <%s> <%s>. " + "?connectionUri <%s> '%s'. " +
       "?connectionUri <%s> ?date. " + "?connectionUri <%s> ?state. " +
       "?connectionUri <%s> ?need1. " + "?connectionUri <%s> ?need2. " +
-      " FILTER (?date >= %d && ?date < %d ) }\n";
+      " FILTER (?date >= %d && ?date < %d && ?state != <%s>) }\n";
 
     String queryString = String.format(
       queryTemplate, RDF.type, WON.CONNECTION,
       CrawlSparqlService.CRAWL_STATUS_PREDICATE, CrawlUriMessage.STATUS.DONE,
       CrawlSparqlService.CRAWL_DATE_PREDICATE, WON.HAS_CONNECTION_STATE,
       WON.BELONGS_TO_NEED, WON.HAS_REMOTE_NEED,
-      fromCrawlDate, toCrawlDate);
+      fromCrawlDate, toCrawlDate, WON.CONNECTION_STATE_SUGGESTED);
 
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
     log.debug("Execute query: {}", queryString);
