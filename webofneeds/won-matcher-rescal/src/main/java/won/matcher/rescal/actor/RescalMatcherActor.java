@@ -90,8 +90,8 @@ public class RescalMatcherActor extends UntypedActor
     rescalInputData.writeCleanedOutputFiles(config.getExecutionDirectory());
 
     // execute the rescal algorithm in python
-    String pythonCall = "python " + config.getPythonScriptDirectory() + "/rescal-matcher.py -folder \"" +
-      config.getExecutionDirectory() + "\" -rank " + config.getRescalRank() + " -threshold " + config.getRescalThreshold();
+    String pythonCall = "python " + config.getPythonScriptDirectory() + "/rescal-matcher.py -folder " +
+      config.getExecutionDirectory() + " -rank " + config.getRescalRank() + " -threshold " + config.getRescalThreshold();
     log.info("execute python script: " + pythonCall);
     Process pythonProcess = Runtime.getRuntime().exec(pythonCall);
 
