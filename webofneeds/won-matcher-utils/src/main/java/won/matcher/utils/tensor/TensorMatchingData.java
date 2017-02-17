@@ -126,11 +126,6 @@ public class TensorMatchingData
     checkName(need);
     checkName(wonNode);
     int x1 = addNeed(need);
-
-    if (tensor.hasNonZeroEntryInRow(x1, SliceType.WON_NODE.ordinal())) {
-      throw new IllegalStateException("Need '" + need + "' is not allowed to be assigned to more than one won node!");
-    }
-
     int x2 = addAttribute(wonNode);
     int x3 = SliceType.WON_NODE.ordinal();
     tensor.setEntry(1.0d, x1, x2, x3);
@@ -149,6 +144,10 @@ public class TensorMatchingData
     }
 
     return null;
+  }
+
+  public int[] getTensorDimensions() {
+    return tensor.getDimensions();
   }
 
   /**
@@ -296,9 +295,10 @@ public class TensorMatchingData
    * Same as {@link #writeCleanedOutputFiles(String)}  but removes empty needs and their connections before writing
    * the tensor
    * @param folder
+   * @return cleaned tensor data
    * @throws Exception
    */
-  public void writeCleanedOutputFiles(String folder) throws IOException {
+  public TensorMatchingData writeCleanedOutputFiles(String folder) throws IOException {
 
     int numNeedsBefore = getNeeds().size();
     int numAttributesBefore = getAttributes().size();
@@ -314,6 +314,8 @@ public class TensorMatchingData
     logger.info("Number of connections before cleaning: " + numConnectionsBefore);
     logger.info("Number of connections after cleaning: " + numConnectionsAfter);
     cleanedMatchingData.writeOutputFiles(folder);
+
+    return cleanedMatchingData;
   }
 
   /**

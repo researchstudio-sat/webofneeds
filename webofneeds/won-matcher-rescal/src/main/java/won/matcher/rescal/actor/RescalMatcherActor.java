@@ -41,13 +41,16 @@ public class RescalMatcherActor extends UntypedActor
   private ActorRef pubSubMediator;
 
   @Autowired
+  private HintReader hintReader;
+
+  @Autowired
   private RescalMatcherConfig config;
 
 
   @Override
   public void preStart() throws IOException {
 
-    // init sparql service
+    // init sparql service and hint reader
     sparqlService = new RescalSparqlService(config.getSparqlEndpoint());
 
     // subscribe to need events
@@ -79,7 +82,7 @@ public class RescalMatcherActor extends UntypedActor
   private void executeRescalAlgorithm() throws IOException, InterruptedException {
 
     // load the needs and connections from the rdf store
-    log.info("start processing ...");
+    log.info("start processing (every {} minutes) ...", config.getExecutionDuration());
     long queryDate = System.currentTimeMillis();
     log.info("query needs and connections from rdf store '{}' from date '{}' to date '{}'", config.getSparqlEndpoint(),
              lastQueryDate, queryDate);
@@ -88,7 +91,14 @@ public class RescalMatcherActor extends UntypedActor
 
     // write the files for rescal algorithm
     log.info("write rescal input data to folder: {}", config.getExecutionDirectory());
-    rescalInputData.writeCleanedOutputFiles(config.getExecutionDirectory());
+    TensorMatchingData cleanedTensorData = rescalInputData.writeCleanedOutputFiles(config.getExecutionDirectory());
+
+    int tensorSize = cleanedTensorData.getTensorDimensions()[0];
+    if (rescalInputData.getNeeds().size() + rescalInputData.getAttributes().size() < config.getRescalRank()) {
+      log.info("Do not start rescal algorithm since tensor size (number of needs + number of attributes) = {} is " +
+                 "smaller than rank parameter {}.", tensorSize, config.getRescalRank());
+      return;
+    }
 
     // execute the rescal algorithm in python
     String pythonCall = "python " + config.getPythonScriptDirectory() + "/rescal-matcher.py -folder " +
@@ -116,16 +126,20 @@ public class RescalMatcherActor extends UntypedActor
     }
 
     // load the predicted hints and send the to the event bus of the matching service
-    BulkHintEvent hintsEvent = HintReader.readHints(config.getExecutionDirectory(), rescalInputData, config.getPublicMatcherUri());
-    log.info("loaded {} hints into bulk hint event and publish", hintsEvent.getHintEvents().size());
+    BulkHintEvent hintsEvent = hintReader.readHints(rescalInputData);
 
-    StringBuilder builder = new StringBuilder();
-    for (HintEvent hint : hintsEvent.getHintEvents()) {
-      builder.append("\n- " + hint);
+    int numHints = (hintsEvent == null || hintsEvent.getHintEvents() == null) ? 0 : hintsEvent.getHintEvents().size();
+    log.info("loaded {} hints into bulk hint event and publish", numHints);
+
+    if (numHints > 0) {
+      StringBuilder builder = new StringBuilder();
+      for (HintEvent hint : hintsEvent.getHintEvents()) {
+        builder.append("\n- " + hint);
+      }
+      log.info(builder.toString());
+      pubSubMediator.tell(new DistributedPubSubMediator.Publish(hintsEvent.getClass().getName(), hintsEvent), getSelf());
     }
-    log.info(builder.toString());
 
-    pubSubMediator.tell(new DistributedPubSubMediator.Publish(hintsEvent.getClass().getName(), hintsEvent), getSelf());
     lastQueryDate = queryDate;
   }
 }
