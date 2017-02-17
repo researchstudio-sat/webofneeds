@@ -730,6 +730,13 @@ public class WonRdfUtils
       return titleString;
     }
 
+    public static boolean isNeedActive(Dataset needDataset, URI needUri) {
+      Path titlePath = PathParser.parse("won:isInState", DefaultPrefixUtils.getDefaultPrefixes());
+
+      URI uri = RdfUtils.getURIPropertyForPropertyPath(needDataset, needUri, titlePath);
+      return uri.equals(URI.create("http://purl.org/webofneeds/model#Active"));
+    }
+
     /**
      * Checks if the need has set a certain flag set
      *
