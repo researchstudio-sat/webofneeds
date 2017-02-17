@@ -4,6 +4,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
+import won.bot.framework.eventbot.action.impl.mail.model.UriType;
+import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
 import won.bot.framework.eventbot.action.impl.needlifecycle.AbstractCreateNeedAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.mail.CreateNeedFromMailEvent;
@@ -87,6 +89,7 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                     public void onEvent(Event event) throws Exception {
                         logger.debug("need creation successful, new need URI is {}", needURI);
                         String sender = MailContentExtractor.getFromAddressString(EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), needURI));
+                        EventBotActionUtils.addMailAddressWonURIRelation(getEventListenerContext(), sender, new WonURI(needURI, UriType.NEED));
                         logger.debug("created need was from sender: " + sender);
                     }
                 };
