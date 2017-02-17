@@ -56,6 +56,7 @@ public class EventBotActionUtils {
     private static final String MAIL_USER_CACHED_MAILS_COLLECTION = "user_cached_mails";
     private static final String MAIL_URIMIMEMESSAGERELATIONS_NAME = "uriMimeMessageRelations";
     private static final String MAIL_MAILIDURIRELATIONS_NAME = "mailIdUriRelations";
+    private static final String MAIL_MAILADRESSURIRELATIONS_NAME = "mailAdressUriRelations";
 
     public static void rememberInList(EventListenerContext ctx, URI uri, String uriListName) {
         if (uriListName != null && uriListName.trim().length() > 0){
@@ -86,7 +87,6 @@ public class EventBotActionUtils {
     }
 
     public static MimeMessage getMimeMessageForURI(EventListenerContext context, URI uri) throws MessagingException {
-
         // use the empty default session here for reconstructing the mime message
         byte[] byteMsg = (byte[]) context.getBotContext().loadFromObjectMap(MAIL_URIMIMEMESSAGERELATIONS_NAME, uri.toString());
         ByteArrayInputStream is = new ByteArrayInputStream(byteMsg);
@@ -114,15 +114,29 @@ public class EventBotActionUtils {
         context.getBotContext().saveToObjectMap(MAIL_MAILIDURIRELATIONS_NAME, mailId, uri);
     }
 
+    //Util Methods to Get/Remove/Add MailId -> URI Relation
+    public static List<WonURI> getWonURIsForMailAddress(EventListenerContext context, String mailAddress) {
+        List<WonURI> uriList = new LinkedList<>();
+        List<Object> objectList = context.getBotContext().loadFromListMap(MAIL_MAILADRESSURIRELATIONS_NAME, mailAddress);
+
+        for(Object o : objectList){
+            uriList.add((WonURI) o);
+        }
+
+        return uriList;
+    }
+
+    public static void addMailAddressWonURIRelation(EventListenerContext context, String mailAddress, WonURI uri) {
+        context.getBotContext().addToListMap(MAIL_MAILADRESSURIRELATIONS_NAME, mailAddress, uri);
+    }
+
     public static void addCachedMailsForMailAddress(BotContext botContext, MimeMessage mimeMessage) throws IOException, MessagingException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         mimeMessage.writeTo(os);
         botContext.addToListMap(MAIL_USER_CACHED_MAILS_COLLECTION, MailContentExtractor.getMailSender(mimeMessage), os.toByteArray());
     }
 
-    public static Collection<MimeMessage> loadCachedMailsForMailAddress(BotContext botContext, String mailAddress)
-      throws MessagingException {
-
+    public static Collection<MimeMessage> loadCachedMailsForMailAddress(BotContext botContext, String mailAddress) throws MessagingException {
         List<MimeMessage> mimeMessages = new LinkedList<>();
         List<Object> objectList = botContext.loadFromListMap(MAIL_USER_CACHED_MAILS_COLLECTION, mailAddress);
         for (Object o : objectList) {
