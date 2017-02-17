@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 @PropertySource("file:${WON_CONFIG_DIR}/matcher-rescal.properties")
 public class RescalMatcherConfig
 {
-  @Value("${uri.sparql.endpoint}")
+  @Value("${matcher.rescal.uri.sparql.endpoint}")
   private String sparqlEndpoint;
 
   @Value("${matcher.rescal.uri.public}")
