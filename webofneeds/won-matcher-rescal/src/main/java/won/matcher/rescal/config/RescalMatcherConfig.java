@@ -18,13 +18,16 @@ public class RescalMatcherConfig
   @Value("${uri.sparql.endpoint}")
   private String sparqlEndpoint;
 
+  @Value("${matcher.rescal.uri.public}")
+  private String publicMatcherUri;
+
   @Value("${matcher.rescal.executionDir}")
   private String executionDirectory;
 
   @Value("${matcher.rescal.pythonScriptDir}")
   private String pythonScriptDirectory;
 
-  @Value("${matcher.rescal.executionDuration}")
+  @Value("${matcher.rescal.executionDurationMinutes}")
   private long executionDuration;
 
   @Value("${matcher.rescal.threshold}")
@@ -40,6 +43,15 @@ public class RescalMatcherConfig
   public void setSparqlEndpoint(final String sparqlEndpoint) {
     this.sparqlEndpoint = sparqlEndpoint;
   }
+
+  public String getPublicMatcherUri() {
+    return publicMatcherUri;
+  }
+
+  public void setPublicMatcherUri(final String publicMatcherUri) {
+    this.publicMatcherUri = publicMatcherUri;
+  }
+
 
   public String getExecutionDirectory() {
     return executionDirectory;
@@ -58,7 +70,7 @@ public class RescalMatcherConfig
   }
 
   public FiniteDuration getExecutionDuration() {
-    return Duration.create(executionDuration, TimeUnit.MILLISECONDS);
+    return Duration.create(executionDuration, TimeUnit.MINUTES);
   }
 
   public void setExecutionDuration(final long executionDuration) {

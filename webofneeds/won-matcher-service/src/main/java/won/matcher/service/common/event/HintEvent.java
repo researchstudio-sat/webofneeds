@@ -96,7 +96,7 @@ public class HintEvent implements Serializable
 
   @Override
   public String toString() {
-    return "HintEvent: (" + getFromWonNodeUri() + ", " + getFromNeedUri() + ", " + getToWonNodeUri() + getToNeedUri()
-      + ", " + getMatcherUri() + ", " + getScore() + ")";
+    return "HintEvent: (" + getFromWonNodeUri() + ", " + getFromNeedUri() + ", " + getToWonNodeUri() + ", "+
+      getToNeedUri() + ", " + getMatcherUri() + ", " + getScore() + ")";
   }
 }

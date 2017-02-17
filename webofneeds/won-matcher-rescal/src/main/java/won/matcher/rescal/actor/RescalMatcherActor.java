@@ -116,7 +116,7 @@ public class RescalMatcherActor extends UntypedActor
     }
 
     // load the predicted hints and send the to the event bus of the matching service
-    BulkHintEvent hintsEvent = HintReader.readHints(config.getExecutionDirectory(), rescalInputData);
+    BulkHintEvent hintsEvent = HintReader.readHints(config.getExecutionDirectory(), rescalInputData, config.getPublicMatcherUri());
     log.info("loaded {} hints into bulk hint event and publish", hintsEvent.getHintEvents().size());
 
     StringBuilder builder = new StringBuilder();
