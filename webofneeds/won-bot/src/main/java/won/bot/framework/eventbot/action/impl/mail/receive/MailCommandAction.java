@@ -15,14 +15,18 @@ import won.bot.framework.eventbot.event.impl.mail.CloseConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
 import won.bot.framework.eventbot.event.impl.mail.OpenConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
+import won.bot.framework.eventbot.event.impl.needlifecycle.NeedDeactivatedEvent;
 import won.protocol.util.WonRdfUtils;
 
+import javax.mail.Address;
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.naming.AuthenticationException;
 import java.io.IOException;
 import java.net.URI;
 import java.security.AccessControlException;
+import java.util.List;
 
 import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
 
@@ -67,7 +71,12 @@ public class MailCommandAction extends BaseEventBotAction {
             case UNSUBSCRIBE:
                 bus.publish(new SubscribeUnsubscribeEvent(message, SubscribeStatus.UNSUBSCRIBED));
                 break;
-
+            case CLOSE_NEED:
+                URI needUri = retrieveNeedUriFromMail(message);
+                if(needUri != null) {
+                    bus.publish(new NeedDeactivatedEvent(needUri));
+                }
+                break;
             case NO_ACTION:
             default:
                 //INVALID COMMAND
@@ -108,7 +117,10 @@ public class MailCommandAction extends BaseEventBotAction {
             logger.debug("Command Message Sender: "+message.getFrom());
             logger.debug("Original Message Sender: "+originalMessage.getFrom());
 
-            if(!message.getFrom()[0].equals(originalMessage.getFrom()[0])) {
+            String senderNew = ((InternetAddress) message.getFrom()[0]).getAddress();
+            String senderOriginal = ((InternetAddress) originalMessage.getFrom()[0]).getAddress();
+
+            if(!senderNew.equals(senderOriginal)) {
                 throw new AccessControlException("Sender of original and command mail are not equal");
             }else{
                 logger.debug("Sender of original and command mail are not equal, continue with command processing");
@@ -125,14 +137,14 @@ public class MailCommandAction extends BaseEventBotAction {
                     bus.publish(new OpenConnectionEvent(wonUri.getUri()));
                     break;
                 case IMPLICIT_OPEN_CONNECTION:
-                    bus.publish(new OpenConnectionEvent(
-                      wonUri.getUri(),  mailContentExtractor.getTextMessage(message)));
+                    bus.publish(new OpenConnectionEvent(wonUri.getUri(), mailContentExtractor.getTextMessage(message)));
                     break;
                 case SENDMESSAGE:
-                    bus.publish(new SendTextMessageOnConnectionEvent(
-                      mailContentExtractor.getTextMessage(message), wonUri.getUri()));
+                    bus.publish(new SendTextMessageOnConnectionEvent(mailContentExtractor.getTextMessage(message), wonUri.getUri()));
                     break;
-
+                case CLOSE_NEED:
+                    bus.publish(new NeedDeactivatedEvent(needUri));
+                    break;
                 case NO_ACTION:
                 default:
                     //INVALID COMMAND
@@ -143,6 +155,32 @@ public class MailCommandAction extends BaseEventBotAction {
             logger.error("ACCESS RESTRICTION: sender of original and command mail are not equal, command will be blocked");
         } catch(Exception e){
             logger.error("no reply mail was set or found: "+e.getMessage());
+        }
+    }
+
+    private URI retrieveNeedUriFromMail(MimeMessage message){
+        try {
+            String sender = ((InternetAddress) message.getFrom()[0]).getAddress();
+            URI needURI = null;
+            String titleToClose = mailContentExtractor.getTitle(message).trim();
+
+            if (sender != null) {
+                List<WonURI> needUris = EventBotActionUtils.getWonURIsForMailAddress(getEventListenerContext(), sender);
+
+                for(WonURI u : needUris) {
+                    Dataset needRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(u.getUri());
+                    String needTitle = WonRdfUtils.NeedUtils.getNeedTitle(needRDF, u.getUri()).trim();
+
+                    if(titleToClose.equals(needTitle) && WonRdfUtils.NeedUtils.isNeedActive(needRDF, u.getUri())){
+                        return u.getUri();
+                    }
+                }
+            }
+
+            return needURI;
+        }catch (MessagingException me){
+            logger.error("could not extract information from mimemessage");
+            return null;
         }
     }
 
@@ -160,12 +198,16 @@ public class MailCommandAction extends BaseEventBotAction {
                         return ActionType.OPEN_CONNECTION;
                     }else if(connected){
                         return ActionType.SENDMESSAGE;
+                    }else if(ActionType.CLOSE_NEED.equals(mailAction)){
+                        return ActionType.CLOSE_NEED;
                     }else{
                         //if the connection is not connected yet and we do not parse any command we assume that the mailsender wants to establish a connection
                         return ActionType.IMPLICIT_OPEN_CONNECTION;
                     }
                 case NEED:
-                    //TODO: implement need actions like close/reopen etc.
+                    if(ActionType.CLOSE_NEED.equals(mailAction)){
+                        return ActionType.CLOSE_NEED;
+                    }
                 default:
                     return mailAction;
             }
