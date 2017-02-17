@@ -30,16 +30,10 @@ import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
  * Created by fsuda on 18.10.2016.
  */
 public class MailCommandAction extends BaseEventBotAction {
-
-    private String mailIdUriRelationsName;
-    private String uriMimeMessageRelationsName;
     private MailContentExtractor mailContentExtractor;
 
-    public MailCommandAction(EventListenerContext eventListenerContext, String mailIdUriRelationsName,
-                             String uriMimeMessageRelationsName, MailContentExtractor mailContentExtractor) {
+    public MailCommandAction(EventListenerContext eventListenerContext, MailContentExtractor mailContentExtractor) {
         super(eventListenerContext);
-        this.mailIdUriRelationsName = mailIdUriRelationsName;
-        this.uriMimeMessageRelationsName = uriMimeMessageRelationsName;
         this.mailContentExtractor = mailContentExtractor;
     }
 
@@ -86,7 +80,7 @@ public class MailCommandAction extends BaseEventBotAction {
 
         EventBus bus = getEventListenerContext().getEventBus();
         try{
-            WonURI wonUri = EventBotActionUtils.getWonURIForMailId(getEventListenerContext(), mailIdUriRelationsName, referenceId);
+            WonURI wonUri = EventBotActionUtils.getWonURIForMailId(getEventListenerContext(), referenceId);
 
             if(wonUri == null){
                 throw new NullPointerException("No corresponding wonUri found");
@@ -104,7 +98,7 @@ public class MailCommandAction extends BaseEventBotAction {
                     break;
             }
 
-            MimeMessage originalMessage = EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), uriMimeMessageRelationsName, needUri); //TODO: SET MAPNAME TO THE CORRECT ONE DIRECTLY FROM Mail2WonBot
+            MimeMessage originalMessage = EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), needUri);
 
             if(originalMessage == null) {
                 throw new NullPointerException("no originalmessage found");

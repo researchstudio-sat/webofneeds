@@ -25,10 +25,6 @@ import javax.mail.internet.MimeMessage;
  * Created by fsuda on 27.09.2016.
  */
 public class Mail2WonBot extends EventBot{
-    private static final String NAME_NEEDS = "mailNeeds";
-    private static final String URIMIMEMESSAGERELATIONS_NAME = "uriMimeMessageRelations";
-    private static final String MAILIDURIRELATIONS_NAME = "mailIdUriRelations";
-
     @Autowired
     private MessageChannel receiveEmailChannel;
 
@@ -62,7 +58,7 @@ public class Mail2WonBot extends EventBot{
         new ActionOnEventListener(
                 ctx,
                 "CreateNeedFromMailEvent",
-                new CreateNeedFromMailAction(ctx, NAME_NEEDS, mailContentExtractor, URIMIMEMESSAGERELATIONS_NAME)
+                new CreateNeedFromMailAction(ctx, mailContentExtractor)
 
         ));
 
@@ -77,7 +73,7 @@ public class Mail2WonBot extends EventBot{
         new ActionOnEventListener(
                 ctx,
                 "MailCommandEvent",
-                new MailCommandAction(ctx, MAILIDURIRELATIONS_NAME, URIMIMEMESSAGERELATIONS_NAME, mailContentExtractor)
+                new MailCommandAction(ctx, mailContentExtractor)
         ));
 
         bus.subscribe(SendTextMessageOnConnectionEvent.class,
@@ -109,21 +105,21 @@ public class Mail2WonBot extends EventBot{
         new ActionOnEventListener(
                 ctx,
                 "HintReceived",
-                new Hint2MailParserAction(mailGenerator, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
+                new Hint2MailParserAction(mailGenerator, sendEmailChannel)
         ));
 
         bus.subscribe(ConnectFromOtherNeedEvent.class,
         new ActionOnEventListener(
                 ctx,
                 "ConnectReceived",
-                new Connect2MailParserAction(mailGenerator, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
+                new Connect2MailParserAction(mailGenerator, sendEmailChannel)
         ));
 
         bus.subscribe(MessageFromOtherNeedEvent.class,
         new ActionOnEventListener(
                 ctx,
                 "ReceivedTextMessage",
-                new Message2MailAction(mailGenerator, URIMIMEMESSAGERELATIONS_NAME, MAILIDURIRELATIONS_NAME, sendEmailChannel)
+                new Message2MailAction(mailGenerator, sendEmailChannel)
         ));
     }
 

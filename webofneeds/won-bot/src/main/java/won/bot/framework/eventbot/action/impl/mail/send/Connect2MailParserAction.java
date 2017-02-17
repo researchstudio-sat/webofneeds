@@ -19,15 +19,11 @@ import java.net.URI;
  * Created by fsuda on 03.10.2016.
  */
 public class Connect2MailParserAction extends BaseEventBotAction {
-    private String uriMimeMessageRelationsName;
-    private String mailIdUriRelationsName;
     private MessageChannel sendChannel;
     private WonMimeMessageGenerator mailGenerator;
 
-    public Connect2MailParserAction(WonMimeMessageGenerator mailGenerator, String uriMimeMessageRelationsName, String mailIdUriRelationsName, MessageChannel sendChannel) {
+    public Connect2MailParserAction(WonMimeMessageGenerator mailGenerator, MessageChannel sendChannel) {
         super(mailGenerator.getEventListenerContext());
-        this.uriMimeMessageRelationsName = uriMimeMessageRelationsName;
-        this.mailIdUriRelationsName = mailIdUriRelationsName;
         this.sendChannel = sendChannel;
         this.mailGenerator = mailGenerator;
     }
@@ -40,13 +36,13 @@ public class Connect2MailParserAction extends BaseEventBotAction {
             URI responseTo = con.getNeedURI();
             URI remoteNeedUri = con.getRemoteNeedURI();
 
-            MimeMessage originalMail = EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), uriMimeMessageRelationsName, responseTo);
+            MimeMessage originalMail = EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), responseTo);
             logger.debug(
               "Someone issued a connect for URI: " + responseTo + " sending a mail to the creator: " + MailContentExtractor
                 .getFromAddressString(originalMail));
 
             WonMimeMessage answerMessage = mailGenerator.createConnectMail(originalMail, remoteNeedUri);
-            EventBotActionUtils.addMailIdWonURIRelation(getEventListenerContext(), mailIdUriRelationsName, answerMessage.getMessageID(), new WonURI(con.getConnectionURI(), UriType.CONNECTION));
+            EventBotActionUtils.addMailIdWonURIRelation(getEventListenerContext(), answerMessage.getMessageID(), new WonURI(con.getConnectionURI(), UriType.CONNECTION));
 
             sendChannel.send(new GenericMessage<>(answerMessage));
         }
