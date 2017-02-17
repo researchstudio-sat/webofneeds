@@ -77,7 +77,7 @@ public class Mail2WonBot extends EventBot{
         new ActionOnEventListener(
                 ctx,
                 "MailCommandEvent",
-                new MailCommandAction(ctx, MAILIDURIRELATIONS_NAME, mailContentExtractor)
+                new MailCommandAction(ctx, MAILIDURIRELATIONS_NAME, URIMIMEMESSAGERELATIONS_NAME, mailContentExtractor)
         ));
 
         bus.subscribe(SendTextMessageOnConnectionEvent.class,
