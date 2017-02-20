@@ -7,7 +7,6 @@ import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
 import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
-import won.bot.framework.eventbot.action.impl.mail.send.WonMimeMessage;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
@@ -18,17 +17,13 @@ import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
 import won.bot.framework.eventbot.event.impl.needlifecycle.NeedDeactivatedEvent;
 import won.protocol.util.WonRdfUtils;
 
-import javax.mail.Address;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.naming.AuthenticationException;
 import java.io.IOException;
 import java.net.URI;
 import java.security.AccessControlException;
 import java.util.List;
-
-import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
 
 /**
  * Created by fsuda on 18.10.2016.
@@ -72,7 +67,9 @@ public class MailCommandAction extends BaseEventBotAction {
                 bus.publish(new SubscribeUnsubscribeEvent(message, SubscribeStatus.UNSUBSCRIBED));
                 break;
             case CLOSE_NEED:
-                URI needUri = retrieveNeedUriFromMail(message);
+                /*A need can be closed with a mail that matches the takenCmdPattern in its subject and has the same title
+                 as a previously created need by the user*/
+                URI needUri = retrieveCorrespondingNeedUriFromMailByTitle(message);
                 if(needUri != null) {
                     bus.publish(new NeedDeactivatedEvent(needUri));
                 }
@@ -158,7 +155,13 @@ public class MailCommandAction extends BaseEventBotAction {
         }
     }
 
-    private URI retrieveNeedUriFromMail(MimeMessage message){
+    /**
+     * This Method tries to find a corresponding open need uri from a user(given by the from adress) and returns the
+     * corresponding need uri if there was an open need with the same title
+     * @param message used to extract sender adress and subject(title)
+     * @return
+     */
+    private URI retrieveCorrespondingNeedUriFromMailByTitle(MimeMessage message){
         try {
             String sender = ((InternetAddress) message.getFrom()[0]).getAddress();
             URI needURI = null;
