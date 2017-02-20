@@ -48,11 +48,11 @@ public class RescalSparqlService extends CrawlSparqlService
     // - crawl status is 'DONE' or 'SAVED'
     // - needs crawl date must be in certain interval
     log.info("bulk load need data from sparql endpoint in crawlDate range: [{},{}]", fromCrawlDate, toCrawlDate);
-    String queryTemplate = "\nSELECT ?needUri ?type ?wonNodeUri ?title ?desc ?tag WHERE { " +
-      " ?needUri <%s> <%s>. ?needUri <%s> ?crawlStatus. ?needUri <%s> ?date. " +
-      " ?needUri <%s> <%s>. ?needUri <%s> ?type. ?needUri <%s> ?title." +
-      " ?needUri <%s> ?wonNodeUri." +
-      " OPTIONAL {?needUri <%s> ?desc}. " + "OPTIONAL {?needUri <%s> ?tag}. " +
+    String queryTemplate = "\nSELECT ?needUri ?type ?wonNodeUri ?title ?desc ?tag WHERE {\n" +
+      " ?needUri <%s> <%s>.\n ?needUri <%s> ?crawlStatus.\n ?needUri <%s> ?date.\n" +
+      " ?needUri <%s> <%s>.\n ?needUri <%s> ?type.\n ?needUri <%s> ?title.\n" +
+      " ?needUri <%s> ?wonNodeUri.\n" +
+      " OPTIONAL {?needUri <%s> ?desc}.\n" + " OPTIONAL {?needUri <%s> ?tag}.\n" +
       " FILTER (?date >= %d && ?date < %d && (?crawlStatus = '%s' || ?crawlStatus = '%s')) }\n";
 
     String queryString = String.format(
@@ -143,21 +143,23 @@ public class RescalSparqlService extends CrawlSparqlService
     TensorMatchingData matchingData, long fromCrawlDate,long toCrawlDate) {
 
     // retrieve relevant properties of all connections that match the conditions:
-    // - use all connections for learning except hints (state suggested)
+    // - use all connections for learning with Good Feedback (this automatically excludes hints)
     // - connections crawl date must be in certain interval
     log.info("bulk load connection data from sparql endpoint in crawlDate range: [{},{}]", fromCrawlDate, toCrawlDate);
-    String queryTemplate = "\nSELECT ?connectionUri ?state ?need1 ?need2 WHERE { " +
-      "?connectionUri <%s> <%s>. " + "?connectionUri <%s> '%s'. " +
-      "?connectionUri <%s> ?date. " + "?connectionUri <%s> ?state. " +
-      "?connectionUri <%s> ?need1. " + "?connectionUri <%s> ?need2. " +
-      " FILTER (?date >= %d && ?date < %d && ?state != <%s>) }\n";
+    String queryTemplate = "\nSELECT ?connectionUri ?state ?need1 ?need2 WHERE {\n" +
+      " ?connectionUri <%s> <%s>.\n ?connectionUri <%s> '%s'.\n" +
+      " ?connectionUri <%s> ?date.\n ?connectionUri <%s> ?state.\n" +
+      " ?connectionUri <%s> ?need1.\n ?connectionUri <%s> ?need2.\n" +
+      " ?rating <%s> <%s>.\n ?rating <%s> ?connectionUri.\n" +
+      " FILTER (?date >= %d && ?date < %d) }\n";
 
     String queryString = String.format(
       queryTemplate, RDF.type, WON.CONNECTION,
       CrawlSparqlService.CRAWL_STATUS_PREDICATE, CrawlUriMessage.STATUS.DONE,
       CrawlSparqlService.CRAWL_DATE_PREDICATE, WON.HAS_CONNECTION_STATE,
       WON.BELONGS_TO_NEED, WON.HAS_REMOTE_NEED,
-      fromCrawlDate, toCrawlDate, WON.CONNECTION_STATE_SUGGESTED);
+      WON.HAS_BINARY_RATING, WON.GOOD, WON.FOR_RESOURCE,
+      fromCrawlDate, toCrawlDate);
 
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
     log.debug("Execute query: {}", queryString);
