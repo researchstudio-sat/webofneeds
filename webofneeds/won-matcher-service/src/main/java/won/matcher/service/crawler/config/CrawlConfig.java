@@ -36,6 +36,9 @@ public class CrawlConfig
   @Value("${crawler.metaDataUpdate.maxBulkSize}")
   private long metaDataUpdateMaxBulkSize;
 
+  @Value("${crawler.recrawl.interval.minutes}")
+  private long recrawlIntervalMinutes;
+
   public List<String> getCrawlBasePropertyPaths() {
     return crawlBasePropertyPaths;
   }
@@ -50,6 +53,10 @@ public class CrawlConfig
 
   public long getHttpReadTimeout() {
     return httpReadTimeout;
+  }
+
+  public FiniteDuration getRecrawlIntervalDuration() {
+    return Duration.create(recrawlIntervalMinutes, TimeUnit.MINUTES);
   }
 
   public FiniteDuration getMetaDataUpdateMaxDuration() {

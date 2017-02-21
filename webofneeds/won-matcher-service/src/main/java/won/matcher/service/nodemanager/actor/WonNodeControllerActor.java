@@ -19,11 +19,10 @@ import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.WonNodeEvent;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.service.crawler.actor.MasterCrawlerActor;
-import won.matcher.service.crawler.msg.CrawlUriMessage;
-import won.matcher.service.nodemanager.service.HintDBService;
 import won.matcher.service.nodemanager.config.ActiveMqWonNodeConnectionFactory;
 import won.matcher.service.nodemanager.config.WonNodeControllerConfig;
 import won.matcher.service.nodemanager.pojo.WonNodeConnection;
+import won.matcher.service.nodemanager.service.HintDBService;
 import won.matcher.service.nodemanager.service.WonNodeSparqlService;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
@@ -53,7 +52,7 @@ public class WonNodeControllerActor extends UntypedActor
   private Map<String, WonNodeConnection> crawlWonNodes = new HashMap<>();
   private Set<String> skipWonNodeUris = new HashSet<>();
   private Set<String> failedWonNodeUris = new HashSet<>();
-  private static final String TICK = "tick";
+  private static final String LIFE_CHECK_TICK = "life_check_tick";
 
   @Autowired
   private WonNodeSparqlService sparqlService;
@@ -83,7 +82,7 @@ public class WonNodeControllerActor extends UntypedActor
 
     // Create a scheduler to execute the life check for each won node regularly
     getContext().system().scheduler().schedule(config.getLifeCheckDuration(), config.getLifeCheckDuration(),
-                                               getSelf(), TICK, getContext().dispatcher(), null);
+                                               getSelf(), LIFE_CHECK_TICK, getContext().dispatcher(), null);
 
     // Subscribe for won node events
     pubSubMediator = DistributedPubSub.get(getContext().system()).mediator();
@@ -152,7 +151,7 @@ public class WonNodeControllerActor extends UntypedActor
       return;
     }
 
-    if (message.equals(TICK)) {
+    if (message.equals(LIFE_CHECK_TICK)) {
       lifeCheck();
       return;
     }
@@ -160,12 +159,14 @@ public class WonNodeControllerActor extends UntypedActor
     if (message instanceof WonNodeEvent) {
       WonNodeEvent event = (WonNodeEvent) message;
 
-      if (event.getStatus().equals(WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED)) {
+      if (event.getStatus().equals(WonNodeEvent.STATUS.NEW_WON_NODE_DISCOVERED ) ||
+        event.getStatus().equals(WonNodeEvent.STATUS.GET_WON_NODE_INFO_FOR_CRAWLING)) {
 
         // continue crawling of known won nodes
         if (crawlWonNodes.containsKey(event.getWonNodeUri())) {
             log.debug("Won node uri '{}' already discovered", event.getWonNodeUri());
-            WonNodeEvent e = new WonNodeEvent(event.getWonNodeUri(), WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE);
+            WonNodeInfo wonNodeInfo = crawlWonNodes.get(event.getWonNodeUri()).getWonNodeInfo();
+            WonNodeEvent e = new WonNodeEvent(event.getWonNodeUri(), WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE, wonNodeInfo);
             pubSubMediator.tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf());
             return;
         }
@@ -179,7 +180,7 @@ public class WonNodeControllerActor extends UntypedActor
         }
 
         // try the connect to won node
-        addWonNodeForCrawling(event.getWonNodeUri());
+        WonNodeConnection wonNodeConnection = addWonNodeForCrawling(event.getWonNodeUri());
 
         // connection failed ?
         if (failedWonNodeUris.contains(event.getWonNodeUri())) {
@@ -187,10 +188,14 @@ public class WonNodeControllerActor extends UntypedActor
           return;
         }
 
-        // crawl all new discovered won nodes
-        WonNodeEvent e = new WonNodeEvent(event.getWonNodeUri(), WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE);
+        // tell the crawler about discovered won nodes
+        if (wonNodeConnection == null || wonNodeConnection.getWonNodeInfo() == null) {
+          log.error("Cannot retrieve won node info from won node connection!");
+          return;
+        }
+
+        WonNodeEvent e = new WonNodeEvent(event.getWonNodeUri(), WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE, wonNodeConnection.getWonNodeInfo());
         pubSubMediator.tell(new DistributedPubSubMediator.Publish(e.getClass().getName(), e), getSelf());
-        startCrawling(crawlWonNodes.get(event.getWonNodeUri()).getWonNodeInfo());
         return;
       }
     }
@@ -298,27 +303,6 @@ public class WonNodeControllerActor extends UntypedActor
     }
 
     return con;
-  }
-
-  /**
-   * Start crawling a won node starting at the need list
-   *
-   * @param wonNodeInfo
-   */
-  private void startCrawling(WonNodeInfo wonNodeInfo) {
-
-    // try crawling with and without ending "/" in need list uri
-    String needListUri = wonNodeInfo.getNeedListURI();
-    if (needListUri.endsWith("/")) {
-      needListUri = needListUri.substring(0, needListUri.length() - 1);
-    }
-
-    crawler.tell(
-      new CrawlUriMessage(needListUri, needListUri, wonNodeInfo.getWonNodeURI(),
-                          CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
-    crawler.tell(
-      new CrawlUriMessage(needListUri + "/", needListUri + "/", wonNodeInfo.getWonNodeURI(),
-                          CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
   }
 
   /**

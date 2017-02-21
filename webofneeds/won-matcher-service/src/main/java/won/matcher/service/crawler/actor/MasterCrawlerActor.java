@@ -11,6 +11,7 @@ import akka.event.LoggingAdapter;
 import akka.japi.Function;
 import won.matcher.service.common.event.WonNodeEvent;
 import won.matcher.service.common.spring.SpringExtension;
+import won.matcher.service.crawler.config.CrawlConfig;
 import won.matcher.service.crawler.exception.CrawlWrapperException;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.matcher.service.crawler.msg.ResourceCrawlUriMessage;
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
+import won.protocol.service.WonNodeInfo;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,7 +39,8 @@ import java.util.concurrent.TimeUnit;
  * be resend for restarting crawling.
  * Newly discovered won node events are published on the event stream during crawling.
  * When an event is received that indicates that we connected to that won node, crawling
- * this won node can continue.
+ * this won node can continue and will be triggered regularly by
+ * {@link won.matcher.service.nodemanager.actor.WonNodeControllerActor}.
  *
  * User: hfriedrich
  * Date: 30.03.2015
@@ -56,12 +59,21 @@ public class MasterCrawlerActor extends UntypedActor
   private ActorRef crawlingWorker;
   private ActorRef updateMetaDataWorker;
   private ActorRef pubSubMediator;
+  private static final String RECRAWL_TICK = "recrawl_tick";
+  private static final int MIN_PENDING_MESSAGES_TO_SKIP_RECRAWLING = 10;
+
+  @Autowired
+  private CrawlConfig config;
 
   @Autowired
   private CrawlSparqlService sparqlService;
 
   @Override
   public void preStart() {
+
+    // Create a scheduler to execute the life check for each won node regularly
+    getContext().system().scheduler().schedule(config.getRecrawlIntervalDuration(), config.getRecrawlIntervalDuration(),
+                                               getSelf(), RECRAWL_TICK, getContext().dispatcher(), null);
 
     // Create the router/pool with worker actors that do the actual crawling
     crawlingWorker = getContext().actorOf(SpringExtension.SpringExtProvider.get(getContext().system()).fromConfigProps(
@@ -137,7 +149,9 @@ public class MasterCrawlerActor extends UntypedActor
   @Override
   public void onReceive(final Object message) {
 
-    if (message instanceof WonNodeEvent) {
+    if (message.equals(RECRAWL_TICK)) {
+      askWonNodeInfoForCrawling();
+    } else if (message instanceof WonNodeEvent) {
       processWonNodeEvent((WonNodeEvent) message);
     } else if (message instanceof CrawlUriMessage) {
       CrawlUriMessage uriMsg = (CrawlUriMessage) message;
@@ -228,14 +242,63 @@ public class MasterCrawlerActor extends UntypedActor
   private void processWonNodeEvent(WonNodeEvent event) {
 
     if (event.getStatus().equals(WonNodeEvent.STATUS.CONNECTED_TO_WON_NODE)) {
+
+      // If we receive a connection event then add the won node to the list of known nodes and start crawling it
       log.debug("added new won node to set of crawling won nodes: {}", event.getWonNodeUri());
       skipWonNodeUris.remove(event.getWonNodeUri());
       crawlWonNodeUris.add(event.getWonNodeUri());
+      startCrawling(event.getWonNodeInfo());
+
     } else if (event.getStatus().equals(WonNodeEvent.STATUS.SKIP_WON_NODE)) {
+
+      // if we should skip this won node remove it from the known won node list and add it to the skip list
       log.debug("skip crawling won node: {}", event.getWonNodeUri());
       crawlWonNodeUris.remove(event.getWonNodeUri());
       skipWonNodeUris.add(event.getWonNodeUri());
     }
+  }
+
+  /**
+   * Ask for complete won node info of all known won nodes on the event bus. Do this to initiate the crawling process
+   * again. Therefore clear the cache of crawled uris so that they can be crawled again.
+   */
+  private void askWonNodeInfoForCrawling() {
+
+    if (pendingMessages.size() > MIN_PENDING_MESSAGES_TO_SKIP_RECRAWLING) {
+      log.warning("Skip crawling cylce since there are currently {} messages in the pending queue. Try to restart " +
+                    "crawling again in {} minutes", pendingMessages.size(), config.getRecrawlIntervalDuration().toMinutes());
+      return;
+    }
+
+    log.info("Start crwaling process again. Clear the cached uris and crawling statistics");
+    doneMessages.clear();
+    failedMessages.clear();
+    pendingMessages.clear();
+
+    for (String wonNodeUri : crawlWonNodeUris) {
+      log.info("ask for won node info of {}", wonNodeUri);
+      WonNodeEvent event = new WonNodeEvent(wonNodeUri, WonNodeEvent.STATUS.GET_WON_NODE_INFO_FOR_CRAWLING);
+      pubSubMediator.tell(new DistributedPubSubMediator.Publish(event.getClass().getName(), event), getSelf());
+    }
+  }
+
+  /**
+   * Start crawling a won node starting at the need list
+   *
+   * @param wonNodeInfo
+   */
+  private void startCrawling(WonNodeInfo wonNodeInfo) {
+
+    // try crawling with and without ending "/" in need list uri
+    String needListUri = wonNodeInfo.getNeedListURI();
+    if (needListUri.endsWith("/")) {
+      needListUri = needListUri.substring(0, needListUri.length() - 1);
+    }
+
+    self().tell(new CrawlUriMessage(needListUri, needListUri, wonNodeInfo.getWonNodeURI(),
+                                    CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
+    self().tell(new CrawlUriMessage(needListUri + "/", needListUri + "/", wonNodeInfo.getWonNodeURI(),
+                                    CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis()), getSelf());
   }
 
 

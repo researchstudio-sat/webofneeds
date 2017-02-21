@@ -145,14 +145,15 @@ public class CrawlSparqlService extends SparqlService
   }
 
   /**
-   * Extract linked URIs of resource URI that are not already crawled. Use specified
-   * property paths to construct the query.
+   * Extract linked URIs of resource URI that have not been crawled since a certain date (crawlDateThreshold). Use
+   * specified property paths to construct the query.
    *
    * @param uri current processed resource URI
    * @param properties property paths used to query the sparql endpoint
+   * @param crawlDateThreshold extract only uris that have a crawlDate < crawlDateThreshold
    * @return set of extracted URIs from the resource URI
    */
-  public Set<String> extractURIs(String uri, String baseUri, Iterable<String> properties) {
+  public Set<String> extractURIs(String uri, String baseUri, Iterable<String> properties, long crawlDateThreshold) {
     Set<String> extractedURIs = new HashSet<String>();
     for (String prop : properties) {
       if (prop.trim().length()==0) {
@@ -160,13 +161,10 @@ public class CrawlSparqlService extends SparqlService
         //ignore empty strings
       }
       // select URIs specified by property paths that have not already been crawled
-      String queryTemplate = "\nSELECT ?obj WHERE { <%s> %s ?obj " +
-        "FILTER NOT EXISTS { { <%s> <%s> '%s' } UNION { <%s> <%s> '%s'} " +
-        "UNION { ?obj <%s> ?any } } }\n";
-      String queryString = String.format(queryTemplate, baseUri, prop,
-                                         uri, CRAWL_STATUS_PREDICATE, CrawlUriMessage.STATUS.DONE,
-                                         uri, CRAWL_STATUS_PREDICATE, CrawlUriMessage.STATUS.FAILED,
-                                         CRAWL_STATUS_PREDICATE);
+      String queryTemplate = "\nSELECT ?obj WHERE {\n <%s> %s ?obj.\n " +
+        " OPTIONAL {?obj <%s> ?crawlDate. FILTER ( ?crawlDate < %d )}\n}\n";
+      String queryString = String.format(queryTemplate, baseUri, prop, CRAWL_DATE_PREDICATE,
+                                         crawlDateThreshold);
 
       log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
       log.debug("Execute query: {}", queryString);
