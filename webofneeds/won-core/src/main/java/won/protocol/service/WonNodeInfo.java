@@ -16,7 +16,6 @@
 
 package won.protocol.service;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -27,41 +26,30 @@ import java.util.Set;
 */
 public class WonNodeInfo
 {
-
-  public WonNodeInfo() {
-    supportedProtocolImpl = new HashMap<>();
-  }
-
   private String wonNodeURI;
   private String eventURIPrefix;
-  private String connectionURIPattern;
-  private String needURIPattern;
+  private String connectionURIPrefix;
+  private String needURIPrefix;
   private String needListURI;
   private Map<String, Map <String, String>> supportedProtocolImpl;
+
+  protected WonNodeInfo(String wonNodeURI, String eventURIPrefix, String connectionURIPattern, String needURIPattern,
+                     String needListURI, Map<String, Map <String, String>> supportedProtocolImpl ) {
+
+    this.wonNodeURI = wonNodeURI;
+    this.eventURIPrefix = eventURIPrefix;
+    this.connectionURIPrefix = connectionURIPattern;
+    this.needURIPrefix = needURIPattern;
+    this.needListURI = needListURI;
+    this.supportedProtocolImpl = supportedProtocolImpl;
+  }
 
   public String getWonNodeURI() {
     return wonNodeURI;
   }
 
-  public void setWonNodeURI(final String wonNodeURI) {
-    this.wonNodeURI = wonNodeURI;
-  }
-
   public String getNeedListURI() {
     return needListURI;
-  }
-
-  public void setNeedListURI(final String needListURI) {
-    this.needListURI = needListURI;
-  }
-
-  public void setSupportedProtocolImplParamValue(String protocol, String paramName, String paramValue) {
-    Map<String,String> protocolMap = supportedProtocolImpl.get(protocol);
-    if (protocolMap == null) {
-      protocolMap = new HashMap<>();
-      supportedProtocolImpl.put(protocol, protocolMap);
-    }
-    protocolMap.put(paramName, paramValue);
   }
 
   public String getSupportedProtocolImplParamValue(String protocol, String paramName) {
@@ -93,23 +81,10 @@ public class WonNodeInfo
   }
 
   public String getConnectionURIPrefix() {
-    return connectionURIPattern;
+    return connectionURIPrefix;
   }
 
   public String getNeedURIPrefix() {
-    return needURIPattern;
+    return needURIPrefix;
   }
-
-  public void setEventURIPrefix(final String needMessageEventURIPattern) {
-    this.eventURIPrefix = needMessageEventURIPattern;
-  }
-
-  public void setConnectionURIPrefix(final String connectionURIPattern) {
-    this.connectionURIPattern = connectionURIPattern;
-  }
-
-  public void setNeedURIPrefix(final String needURIPattern) {
-    this.needURIPattern = needURIPattern;
-  }
-
 }
