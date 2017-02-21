@@ -2,15 +2,11 @@ package won.matcher.rescal.service;
 
 
 import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.vocabulary.DC;
-import com.hp.hpl.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.matcher.service.crawler.service.CrawlSparqlService;
 import won.matcher.utils.preprocessing.OpenNlpTokenExtraction;
 import won.matcher.utils.tensor.TensorMatchingData;
-import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -42,28 +38,28 @@ public class RescalSparqlService extends CrawlSparqlService
    * @param toCrawlDate maximum crawling timestamp used for loading
    */
   public void updateMatchingDataWithActiveNeeds(
-    TensorMatchingData matchingData, long fromCrawlDate,long toCrawlDate) {
+    TensorMatchingData matchingData, long fromCrawlDate, long toCrawlDate) {
 
     // retrieve relevant properties of all needs that match the conditions
     // - crawl status is 'DONE' or 'SAVED'
     // - needs crawl date must be in certain interval
+    // - needs must not have the flags 'UsedForTesting' or ''
+    String queryString = "prefix won: <http://purl.org/webofneeds/model#>\n" +
+      "prefix rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n\n" +
+      "SELECT ?needUri ?type ?wonNodeUri ?title ?desc ?tag WHERE {\n" +
+      " ?needUri rdfs:type won:Need.\n" +
+      " ?needUri won:crawlStatus ?crawlStatus.\n" +
+      " ?needUri won:crawlDate ?date.\n" +
+      " ?needUri won:isInState won:Active.\n" +
+      " ?needUri won:hasBasicNeedType ?type.\n" +
+      " ?needUri won:hasContent/<http://purl.org/dc/elements/1.1/title> ?title.\n" +
+      " ?needUri won:hasWonNode ?wonNodeUri.\n" +
+      " OPTIONAL {?needUri won:hasContent/won:hasTextDescription ?desc}.\n" +
+      " OPTIONAL {?needUri won:hasContent/won:hasTag ?tag}.\n" +
+      " FILTER (?date >= " + fromCrawlDate +" && ?date < " + toCrawlDate + " && \n" +
+      "        (?crawlStatus = 'DONE' || ?crawlStatus = 'SAVE'))\n}\n";
+
     log.info("bulk load need data from sparql endpoint in crawlDate range: [{},{}]", fromCrawlDate, toCrawlDate);
-    String queryTemplate = "\nSELECT ?needUri ?type ?wonNodeUri ?title ?desc ?tag WHERE {\n" +
-      " ?needUri <%s> <%s>.\n ?needUri <%s> ?crawlStatus.\n ?needUri <%s> ?date.\n" +
-      " ?needUri <%s> <%s>.\n ?needUri <%s> ?type.\n ?needUri <%s> ?title.\n" +
-      " ?needUri <%s> ?wonNodeUri.\n" +
-      " OPTIONAL {?needUri <%s> ?desc}.\n" + " OPTIONAL {?needUri <%s> ?tag}.\n" +
-      " FILTER (?date >= %d && ?date < %d && (?crawlStatus = '%s' || ?crawlStatus = '%s')) }\n";
-
-    String queryString = String.format(
-      queryTemplate, RDF.type, WON.NEED, CrawlSparqlService.CRAWL_STATUS_PREDICATE,
-      CrawlSparqlService.CRAWL_DATE_PREDICATE, WON.IS_IN_STATE, WON.NEED_STATE_ACTIVE,
-      WON.HAS_BASIC_NEED_TYPE, WON.HAS_CONTENT.toString() + ">/<" + DC.title.toString(),
-      WON.HAS_WON_NODE,
-      WON.HAS_CONTENT.toString() + ">/<" + WON.HAS_TEXT_DESCRIPTION.toString(),
-      WON.HAS_CONTENT.toString() + ">/<" + WON.HAS_TAG.toString(), fromCrawlDate, toCrawlDate,
-      CrawlUriMessage.STATUS.DONE, CrawlUriMessage.STATUS.SAVE);
-
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
     log.debug("Execute query: {}", queryString);
     Query query = QueryFactory.create(queryString);
@@ -145,22 +141,20 @@ public class RescalSparqlService extends CrawlSparqlService
     // retrieve relevant properties of all connections that match the conditions:
     // - use all connections for learning with Good Feedback (this automatically excludes hints)
     // - connections crawl date must be in certain interval
+    String queryString = "prefix won: <http://purl.org/webofneeds/model#>\n" +
+      "prefix rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n\n" +
+      "SELECT ?connectionUri ?state ?need1 ?need2 WHERE {\n" +
+      " ?connectionUri rdfs:type won:Connection.\n" +
+      " ?connectionUri won:crawlStatus 'DONE'.\n" +
+      " ?connectionUri won:crawlDate ?date.\n" +
+      " ?connectionUri won:hasConnectionState ?state.\n" +
+      " ?connectionUri won:belongsToNeed ?need1.\n" +
+      " ?connectionUri won:hasRemoteNeed ?need2.\n" +
+      " ?rating won:hasBinaryRating won:Good.\n" +
+      " ?rating won:forResource ?connectionUri.\n" +
+      " FILTER (?date >= " + fromCrawlDate + " && ?date < " + toCrawlDate + ")\n}\n";
+
     log.info("bulk load connection data from sparql endpoint in crawlDate range: [{},{}]", fromCrawlDate, toCrawlDate);
-    String queryTemplate = "\nSELECT ?connectionUri ?state ?need1 ?need2 WHERE {\n" +
-      " ?connectionUri <%s> <%s>.\n ?connectionUri <%s> '%s'.\n" +
-      " ?connectionUri <%s> ?date.\n ?connectionUri <%s> ?state.\n" +
-      " ?connectionUri <%s> ?need1.\n ?connectionUri <%s> ?need2.\n" +
-      " ?rating <%s> <%s>.\n ?rating <%s> ?connectionUri.\n" +
-      " FILTER (?date >= %d && ?date < %d) }\n";
-
-    String queryString = String.format(
-      queryTemplate, RDF.type, WON.CONNECTION,
-      CrawlSparqlService.CRAWL_STATUS_PREDICATE, CrawlUriMessage.STATUS.DONE,
-      CrawlSparqlService.CRAWL_DATE_PREDICATE, WON.HAS_CONNECTION_STATE,
-      WON.BELONGS_TO_NEED, WON.HAS_REMOTE_NEED,
-      WON.HAS_BINARY_RATING, WON.GOOD, WON.FOR_RESOURCE,
-      fromCrawlDate, toCrawlDate);
-
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
     log.debug("Execute query: {}", queryString);
     Query query = QueryFactory.create(queryString);
@@ -178,7 +172,7 @@ public class RescalSparqlService extends CrawlSparqlService
       String need2 = qs.get("need2").asResource().getURI();
 
       // add the connection to the matching data
-      matchingData.addNeedConnection(need1, need2);
+      matchingData.addNeedConnectionIfNeedsExist(need1, need2);
     }
     qexec.close();
     log.info("number of connections loaded: " + numConnections);
