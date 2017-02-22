@@ -43,10 +43,10 @@ public class RescalSparqlService extends CrawlSparqlService
     // retrieve relevant properties of all needs that match the conditions
     // - crawl status is 'DONE' or 'SAVED'
     // - needs crawl date must be in certain interval
-    // - needs must not have the flags 'UsedForTesting' or ''
+    // - needs must not have the flags 'UsedForTesting' or 'DoNotMatch'
     String queryString = "prefix won: <http://purl.org/webofneeds/model#>\n" +
       "prefix rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n\n" +
-      "SELECT ?needUri ?type ?wonNodeUri ?title ?desc ?tag WHERE {\n" +
+      "SELECT DISTINCT ?needUri ?type ?wonNodeUri ?title ?desc ?tag WHERE {\n" +
       " ?needUri rdfs:type won:Need.\n" +
       " ?needUri won:crawlStatus ?crawlStatus.\n" +
       " ?needUri won:crawlDate ?date.\n" +
@@ -56,8 +56,10 @@ public class RescalSparqlService extends CrawlSparqlService
       " ?needUri won:hasWonNode ?wonNodeUri.\n" +
       " OPTIONAL {?needUri won:hasContent/won:hasTextDescription ?desc}.\n" +
       " OPTIONAL {?needUri won:hasContent/won:hasTag ?tag}.\n" +
-      " FILTER (?date >= " + fromCrawlDate +" && ?date < " + toCrawlDate + " && \n" +
-      "        (?crawlStatus = 'DONE' || ?crawlStatus = 'SAVE'))\n}\n";
+      " OPTIONAL {?needUri won:hasFlag ?flag}.\n" +
+      " FILTER (!bound(?flag) || (?flag != won:DoNotMatch && ?flag != won:UsedForTesting))\n" +
+      " FILTER (?date >= " + fromCrawlDate +" && ?date < " + toCrawlDate + ")\n" +
+      " FILTER (?crawlStatus = 'DONE' || ?crawlStatus = 'SAVE')\n}\n";
 
     log.info("bulk load need data from sparql endpoint in crawlDate range: [{},{}]", fromCrawlDate, toCrawlDate);
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
@@ -141,9 +143,10 @@ public class RescalSparqlService extends CrawlSparqlService
     // retrieve relevant properties of all connections that match the conditions:
     // - use all connections for learning with Good Feedback (this automatically excludes hints)
     // - connections crawl date must be in certain interval
+    // - query only connections of needs that do not have the flag 'DoNotMatch' or 'UsedForTesting'
     String queryString = "prefix won: <http://purl.org/webofneeds/model#>\n" +
       "prefix rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n\n" +
-      "SELECT ?connectionUri ?state ?need1 ?need2 WHERE {\n" +
+      "SELECT DISTINCT ?connectionUri ?state ?need1 ?need2 WHERE {\n" +
       " ?connectionUri rdfs:type won:Connection.\n" +
       " ?connectionUri won:crawlStatus 'DONE'.\n" +
       " ?connectionUri won:crawlDate ?date.\n" +
@@ -152,6 +155,10 @@ public class RescalSparqlService extends CrawlSparqlService
       " ?connectionUri won:hasRemoteNeed ?need2.\n" +
       " ?rating won:hasBinaryRating won:Good.\n" +
       " ?rating won:forResource ?connectionUri.\n" +
+      " OPTIONAL {?need1 won:hasFlag ?flag1}.\n" +
+      " OPTIONAL {?need1 won:hasFlag ?flag2}.\n" +
+      " FILTER (!bound(?flag1) || (?flag1 != won:DoNotMatch && ?flag1 != won:UsedForTesting))\n" +
+      " FILTER (!bound(?flag2) || (?flag2 != won:DoNotMatch && ?flag2 != won:UsedForTesting))\n" +
       " FILTER (?date >= " + fromCrawlDate + " && ?date < " + toCrawlDate + ")\n}\n";
 
     log.info("bulk load connection data from sparql endpoint in crawlDate range: [{},{}]", fromCrawlDate, toCrawlDate);
@@ -171,7 +178,8 @@ public class RescalSparqlService extends CrawlSparqlService
       String need1 = qs.get("need1").asResource().getURI();
       String need2 = qs.get("need2").asResource().getURI();
 
-      // add the connection to the matching data
+      // add the connection to the matching data only if the corresponding
+      // needs have been added to the matching data already
       matchingData.addNeedConnectionIfNeedsExist(need1, need2);
     }
     qexec.close();
