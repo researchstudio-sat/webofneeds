@@ -49,20 +49,18 @@ public class CrawlSparqlService extends SparqlService
   public void updateCrawlingMetadata(CrawlUriMessage msg) {
 
     // delete the old entry
-    String queryTemplate = "\nDELETE WHERE { GRAPH <%s> { <%s> ?y ?z}};";
-    String queryString = String.format(queryTemplate, METADATA_GRAPH, msg.getUri());
+    String queryString = "prefix won: <http://purl.org/webofneeds/model#>\n" +
+      "DELETE WHERE { GRAPH won:crawlMetadata { <" + msg.getUri() + "> ?y ?z}}\n;";
 
     // insert new entry
-    queryTemplate = "\nINSERT DATA { GRAPH <%s> { <%s> <%s> %d. <%s> <%s> '%s'. <%s> <%s> <%s>. ";
+    queryString += "\nINSERT DATA { GRAPH won:crawlMetadata {\n" +
+      "<" + msg.getUri() + "> won:crawlDate " + msg.getCrawlDate() + ".\n" +
+      "<" + msg.getUri() + "> won:crawlStatus '" + msg.getStatus() + "'.\n" +
+      "<" + msg.getUri() + "> won:crawlBaseUri <" + msg.getBaseUri() + ">.\n";
     if (msg.getWonNodeUri() != null) {
-      queryTemplate += "<%s> <%s> <%s>. ";
+      queryString += "<" + msg.getUri() + "> won:wonNodeUri <" + msg.getWonNodeUri() + ">.\n";
     }
-    queryTemplate += "}}\n";
-    queryString += String.format(queryTemplate, METADATA_GRAPH,
-                                 msg.getUri(), CRAWL_DATE_PREDICATE, msg.getCrawlDate(),
-                                 msg.getUri(), CRAWL_STATUS_PREDICATE, msg.getStatus(),
-                                 msg.getUri(), CRAWL_BASE_URI_PREDICATE, msg.getBaseUri(),
-                                 msg.getUri(), CRAWL_WON_NODE_URI_PREDICATE, msg.getWonNodeUri());
+    queryString += "}}\n";
 
     // execute query
     executeUpdateQuery(queryString);
@@ -81,23 +79,21 @@ public class CrawlSparqlService extends SparqlService
 
     // delete the old entries
     StringBuilder builder = new StringBuilder();
+    builder.append("prefix won: <http://purl.org/webofneeds/model#>\n");
     for (CrawlUriMessage msg : msgs) {
-      builder.append("\nDELETE WHERE { GRAPH  <").append(METADATA_GRAPH).append(">  { <");
+      builder.append("\nDELETE WHERE { GRAPH won:crawlMetadata { <");
       builder.append(msg.getUri()).append("> ?p ?o }};");
     }
 
     // insert the new entries
-    String insertTemplate = "\n<%s> <%s> %d. <%s> <%s> '%s'. <%s> <%s> <%s>. ";
-    builder.append("\nINSERT DATA { GRAPH <").append(METADATA_GRAPH).append(">  { ");
+    builder.append("\n\nINSERT DATA { GRAPH won:crawlMetadata {\n");
     for (CrawlUriMessage msg : msgs) {
-      String specificInsertTemplate = insertTemplate;
+      builder.append("<").append(msg.getUri()).append("> won:crawlDate ").append(msg.getCrawlDate()).append(".\n");
+      builder.append("<").append(msg.getUri()).append("> won:crawlStatus '").append(msg.getStatus()).append("'.\n");
+      builder.append("<").append(msg.getUri()).append("> won:crawlBaseUri <").append(msg.getBaseUri()).append(">.\n");
       if (msg.getWonNodeUri() != null) {
-        specificInsertTemplate += "<%s> <%s> <%s>. ";
+        builder.append("<").append(msg.getUri()).append("> won:wonNodeUri <").append(msg.getWonNodeUri()).append(">.\n");
       }
-      builder.append(String.format(specificInsertTemplate, msg.getUri(), CRAWL_DATE_PREDICATE, msg.getCrawlDate(),
-                                   msg.getUri(), CRAWL_STATUS_PREDICATE, msg.getStatus(),
-                                   msg.getUri(), CRAWL_BASE_URI_PREDICATE, msg.getBaseUri(),
-                                   msg.getUri(), CRAWL_WON_NODE_URI_PREDICATE, msg.getWonNodeUri()));
     }
     builder.append("}};\n");
 
@@ -115,9 +111,11 @@ public class CrawlSparqlService extends SparqlService
   public Set<CrawlUriMessage> retrieveMessagesForCrawling(CrawlUriMessage.STATUS status) {
 
     Set<CrawlUriMessage> msgs = new LinkedHashSet<>();
-    String queryTemplate = "\nSELECT ?uri ?base ?wonNode WHERE { GRAPH <%s> " +
-      "{?uri ?p '%s'. ?uri <%s> ?base OPTIONAL { ?uri <%s> ?wonNode } }}\n";
-    String queryString = String.format(queryTemplate, METADATA_GRAPH, status, CRAWL_BASE_URI_PREDICATE, CRAWL_WON_NODE_URI_PREDICATE);
+    String queryString = "prefix won: <http://purl.org/webofneeds/model#>\n" +
+      "SELECT ?uri ?base ?wonNode WHERE { GRAPH won:crawlMetadata {\n" +
+      " ?uri ?p '" + status + "'.\n" +
+      " ?uri won:crawlBaseUri ?base.\n" +
+      " OPTIONAL { ?uri won:wonNodeUri ?wonNode }\n}}\n";
     log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
     log.debug("Execute query: {}", queryString);
     Query query = QueryFactory.create(queryString);
@@ -161,10 +159,10 @@ public class CrawlSparqlService extends SparqlService
         //ignore empty strings
       }
       // select URIs specified by property paths that have not already been crawled
-      String queryTemplate = "\nSELECT ?obj WHERE {\n <%s> %s ?obj.\n " +
-        " OPTIONAL {?obj <%s> ?crawlDate. FILTER ( ?crawlDate < %d )}\n}\n";
-      String queryString = String.format(queryTemplate, baseUri, prop, CRAWL_DATE_PREDICATE,
-                                         crawlDateThreshold);
+      String queryString = "prefix won: <http://purl.org/webofneeds/model#>\n" +
+        "SELECT ?obj WHERE {\n" +
+        " <" + baseUri +"> " + prop + " ?obj.\n" +
+        " OPTIONAL {?obj won:crawlDate ?crawlDate. FILTER ( ?crawlDate < " + crawlDateThreshold + " )}\n}\n";
 
       log.debug("Query SPARQL Endpoint: {}", sparqlEndpoint);
       log.debug("Execute query: {}", queryString);
