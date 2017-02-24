@@ -9,6 +9,7 @@ import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.command.DeactivateNeedCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.CloseConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
@@ -71,7 +72,7 @@ public class MailCommandAction extends BaseEventBotAction {
                  as a previously created need by the user*/
                 URI needUri = retrieveCorrespondingNeedUriFromMailByTitle(message);
                 if(needUri != null) {
-                    bus.publish(new NeedDeactivatedEvent(needUri));
+                    bus.publish(new DeactivateNeedCommandEvent(needUri));
                 }
                 break;
             case NO_ACTION:
@@ -140,7 +141,7 @@ public class MailCommandAction extends BaseEventBotAction {
                     bus.publish(new SendTextMessageOnConnectionEvent(mailContentExtractor.getTextMessage(message), wonUri.getUri()));
                     break;
                 case CLOSE_NEED:
-                    bus.publish(new NeedDeactivatedEvent(needUri));
+                    bus.publish(new DeactivateNeedCommandEvent(needUri));
                     break;
                 case NO_ACTION:
                 default:
