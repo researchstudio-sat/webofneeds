@@ -45,9 +45,11 @@ public class MailCommandAction extends BaseEventBotAction {
             MimeMessage message = ((MailCommandEvent) event).getMessage();
             String referenceId = MailContentExtractor.getMailReference(message);
 
+            WonURI wonUri = EventBotActionUtils.getWonURIForMailId(getEventListenerContext(), referenceId);
+
             // determine if the mail is referring to some other mail/need/connection or not
-            if (referenceId != null) {
-                processReferenceMailCommands(message, referenceId);
+            if(wonUri != null){
+                processReferenceMailCommands(message, wonUri);
             } else {
                 processNonReferenceMailCommand(message);
             }
@@ -83,12 +85,10 @@ public class MailCommandAction extends BaseEventBotAction {
         }
     }
 
-    private void processReferenceMailCommands(MimeMessage message, String referenceId) {
+    private void processReferenceMailCommands(MimeMessage message, WonURI wonUri) {
 
         EventBus bus = getEventListenerContext().getEventBus();
         try{
-            WonURI wonUri = EventBotActionUtils.getWonURIForMailId(getEventListenerContext(), referenceId);
-
             if(wonUri == null){
                 throw new NullPointerException("No corresponding wonUri found");
             }
