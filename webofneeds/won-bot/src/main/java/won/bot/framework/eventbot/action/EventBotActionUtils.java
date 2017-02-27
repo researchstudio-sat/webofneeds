@@ -161,8 +161,8 @@ public class EventBotActionUtils {
 
     public static SubscribeStatus getSubscribeStatusForMailAddress(BotContext botContext, String mailAddress) {
 
-        String status = (String) botContext.loadFromObjectMap(MAIL_USER_SUBSCRIBE_COLLECTION, mailAddress);
-        return (status != null) ? SubscribeStatus.valueOf(status) : SubscribeStatus.NO_RESPONSE;
+        SubscribeStatus status = (SubscribeStatus) botContext.loadFromObjectMap(MAIL_USER_SUBSCRIBE_COLLECTION, mailAddress);
+        return (status != null) ? SubscribeStatus.valueOf(status.name()) : SubscribeStatus.NO_RESPONSE;
     }
 
     //************************************************ TelegramBot Context Methods *************************************
