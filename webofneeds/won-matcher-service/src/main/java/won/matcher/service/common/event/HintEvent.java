@@ -1,6 +1,6 @@
 package won.matcher.service.common.event;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 import java.io.Serializable;
 import java.net.URI;

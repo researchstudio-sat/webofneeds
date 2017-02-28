@@ -16,9 +16,9 @@
 
 package won.protocol.jms;
 
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.sparql.path.Path;
-import com.hp.hpl.jena.sparql.path.PathParser;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.path.PathParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

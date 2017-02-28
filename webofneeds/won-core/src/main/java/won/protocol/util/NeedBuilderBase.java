@@ -16,9 +16,9 @@
 
 package won.protocol.util;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.util.FileUtils;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.util.FileUtils;
 import org.apache.commons.lang3.Range;
 import won.protocol.model.BasicNeedType;
 import won.protocol.model.NeedState;

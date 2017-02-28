@@ -33,7 +33,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.hp.hpl.jena.sparql.vocabulary.TestManifestUpdate_11.request;
+import static org.apache.jena.sparql.vocabulary.TestManifestUpdate_11.request;
 
 /**
  * User: ypanchenko

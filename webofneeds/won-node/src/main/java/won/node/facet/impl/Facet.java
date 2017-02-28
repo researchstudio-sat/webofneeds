@@ -16,7 +16,7 @@
 
 package won.node.facet.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;

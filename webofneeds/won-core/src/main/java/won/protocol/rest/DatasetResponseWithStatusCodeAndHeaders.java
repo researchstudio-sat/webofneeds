@@ -16,7 +16,7 @@
 
 package won.protocol.rest;
 
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 
 import java.util.Map;
 

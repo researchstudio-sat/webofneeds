@@ -1,18 +1,18 @@
 package won.protocol.util;
 
 import com.google.common.collect.Iterators;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.sparql.path.Path;
-import com.hp.hpl.jena.sparql.path.eval.PathEval;
-import com.hp.hpl.jena.sparql.util.Context;
-import com.hp.hpl.jena.tdb.TDB;
-import com.hp.hpl.jena.util.FileUtils;
-import com.hp.hpl.jena.util.ResourceUtils;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.impl.StatementImpl;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.path.eval.PathEval;
+import org.apache.jena.sparql.util.Context;
+import org.apache.jena.tdb.TDB;
+import org.apache.jena.util.FileUtils;
+import org.apache.jena.util.ResourceUtils;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
@@ -367,7 +367,7 @@ public class RdfUtils
    */
   public static Model readRdfSnippet(final InputStream in, final String rdfLanguage)
   {
-    com.hp.hpl.jena.rdf.model.Model model = ModelFactory.createDefaultModel();
+    org.apache.jena.rdf.model.Model model = ModelFactory.createDefaultModel();
     if (in == null) return model;
     String baseURI= "no:uri";
     model.setNsPrefix("", baseURI);
@@ -393,7 +393,7 @@ public class RdfUtils
    */
   public static Model readRdfSnippet(final Reader in, final String rdfLanguage)
   {
-    com.hp.hpl.jena.rdf.model.Model model = ModelFactory.createDefaultModel();
+    org.apache.jena.rdf.model.Model model = ModelFactory.createDefaultModel();
     if (in == null) return model;
     String baseURI= "no:uri";
     model.setNsPrefix("", baseURI);

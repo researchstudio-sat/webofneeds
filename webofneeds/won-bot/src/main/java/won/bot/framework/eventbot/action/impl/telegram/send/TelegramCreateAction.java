@@ -1,6 +1,6 @@
 package won.bot.framework.eventbot.action.impl.telegram.send;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.methods.send.SendPhoto;

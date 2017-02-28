@@ -16,7 +16,7 @@
 
 package won.protocol.service;
 
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 import org.springframework.context.NoSuchMessageException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;

@@ -16,7 +16,7 @@
 
 package won.owner.web;
 
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 import won.owner.pojo.MatchPojo;
 import won.owner.pojo.NeedPojo;
 import won.protocol.model.Match;

@@ -1,6 +1,6 @@
 package won.matcher.solr.query.factory;
 
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WON;
 
