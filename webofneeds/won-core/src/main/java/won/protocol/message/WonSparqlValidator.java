@@ -1,9 +1,9 @@
 package won.protocol.message;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.engine.binding.Binding;
+import org.apache.jena.graph.Node;
+import org.apache.jena.query.*;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
 
 /**
  * User: ypanchenko

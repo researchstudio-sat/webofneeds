@@ -1,9 +1,9 @@
 package won.protocol.message.processor.impl;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
 import won.cryptography.rdfsign.SignatureVerificationState;
 import won.cryptography.rdfsign.SigningStage;
 import won.cryptography.rdfsign.WonSigner;

@@ -1,7 +1,7 @@
 package won.bot.framework.eventbot.listener.baStateBots;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
 import won.node.facet.impl.WON_TX;
 import won.protocol.util.WonRdfUtils;
 

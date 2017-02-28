@@ -1,7 +1,7 @@
 package won.bot.integrationtest;
 
-import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.rdf.model.RDFNode;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.RDFNode;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;

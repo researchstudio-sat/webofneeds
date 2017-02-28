@@ -1,8 +1,8 @@
 package won.cryptography.utils;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusReader;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.trigplus.TriGPlusWriter;

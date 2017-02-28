@@ -1,6 +1,6 @@
 package won.protocol.util;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 /**
  * Created with IntelliJ IDEA.

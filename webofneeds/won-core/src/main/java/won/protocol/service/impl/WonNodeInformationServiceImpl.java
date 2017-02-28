@@ -1,6 +1,6 @@
 package won.protocol.service.impl;
 
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import won.cryptography.service.RandomNumberService;

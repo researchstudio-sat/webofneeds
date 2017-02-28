@@ -1,11 +1,11 @@
 package won.protocol.message;
 
 import com.google.common.collect.Sets;
-import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
-import com.hp.hpl.jena.tdb.TDB;
-import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.tdb.TDB;
+import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.util.RdfUtils;

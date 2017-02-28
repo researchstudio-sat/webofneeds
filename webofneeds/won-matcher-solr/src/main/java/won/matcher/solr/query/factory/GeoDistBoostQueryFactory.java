@@ -1,7 +1,7 @@
 package won.matcher.solr.query.factory;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
 import won.matcher.solr.index.NeedIndexer;
 import won.protocol.util.WonRdfUtils;
 

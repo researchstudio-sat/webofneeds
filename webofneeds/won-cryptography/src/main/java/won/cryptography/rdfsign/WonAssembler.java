@@ -1,7 +1,7 @@
 package won.cryptography.rdfsign;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.*;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.ontology.Ontology;
 import won.protocol.util.RdfUtils;

@@ -9,7 +9,7 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.service.sparql.SparqlService;

@@ -16,7 +16,7 @@
 
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.needlifecycle.AbstractCreateNeedAction;

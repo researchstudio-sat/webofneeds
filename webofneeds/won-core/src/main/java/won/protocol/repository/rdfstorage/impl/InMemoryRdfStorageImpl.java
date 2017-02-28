@@ -16,8 +16,8 @@
 
 package won.protocol.repository.rdfstorage.impl;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 
 /**
  * Simple in-memory RDF storage for testing/benchmarking purposes.

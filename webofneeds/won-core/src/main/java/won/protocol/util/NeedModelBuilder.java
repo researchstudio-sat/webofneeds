@@ -16,12 +16,12 @@
 
 package won.protocol.util;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.graph.*;
-import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-import com.hp.hpl.jena.vocabulary.DC;
-import com.hp.hpl.jena.vocabulary.DCTerms;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.graph.*;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.vocabulary.DC;
+import org.apache.jena.vocabulary.DCTerms;
 import won.protocol.vocabulary.GEO;
 import won.protocol.vocabulary.WON;
 
@@ -188,7 +188,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
       //now replace the contentDescription node with the default URI of the extracted graph
       contentDescriptionGraph.getPrefixMapping().setNsPrefix("", "no:uri"); //it really doesn't matter what we set here
       String prefixURI = contentDescriptionGraph.getPrefixMapping().getNsPrefixURI("");
-      Node prefixNode = Node.createURI(prefixURI);
+      Node prefixNode = NodeFactory.createURI(prefixURI);
       ExtendedIterator<Triple> it = contentDescriptionGraph.find(contentDescription.asNode(), Node.ANY, Node.ANY);
       while (it.hasNext()) {
         Triple triple = it.next();
