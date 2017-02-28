@@ -16,7 +16,7 @@
 
 package won.node.service;
 
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Resource;
 import won.node.service.impl.URIService;
 import won.protocol.exception.*;
 import won.protocol.model.Connection;

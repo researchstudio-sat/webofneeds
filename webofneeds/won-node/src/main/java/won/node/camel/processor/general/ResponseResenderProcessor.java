@@ -1,6 +1,6 @@
 package won.node.camel.processor.general;
 
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 import org.apache.camel.Exchange;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;

@@ -1,8 +1,8 @@
 package won.matcher.solr;
 
 import com.github.jsonldjava.core.JsonLdError;
-import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.needproducer.impl.RoundRobinCompositeNeedProducer;

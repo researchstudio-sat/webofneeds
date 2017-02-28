@@ -16,8 +16,8 @@
 
 package won.protocol.util.linkeddata;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.sparql.path.Path;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.path.Path;
 
 import java.net.URI;
 import java.util.List;

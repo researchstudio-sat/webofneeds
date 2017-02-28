@@ -16,7 +16,7 @@
 
 package won.protocol.repository.rdfstorage.impl;
 
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 
 /**
  * Maintains thread-local dataset objects.

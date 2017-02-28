@@ -1,6 +1,6 @@
 package won.cryptography.message;
 
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;

@@ -1,6 +1,6 @@
 package won.owner.protocol.message;
 
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.message.WonMessage;

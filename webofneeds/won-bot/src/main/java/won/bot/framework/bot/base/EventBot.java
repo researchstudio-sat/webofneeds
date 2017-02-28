@@ -16,8 +16,8 @@
 
 package won.bot.framework.bot.base;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.bot.BotLifecyclePhase;

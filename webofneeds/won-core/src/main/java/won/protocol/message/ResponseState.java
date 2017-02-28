@@ -1,6 +1,6 @@
 package won.protocol.message;
 
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Resource;
 import won.protocol.vocabulary.WONMSG;
 
 public enum ResponseState

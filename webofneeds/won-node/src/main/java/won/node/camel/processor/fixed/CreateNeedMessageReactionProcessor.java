@@ -16,8 +16,8 @@
 
 package won.node.camel.processor.fixed;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Service;

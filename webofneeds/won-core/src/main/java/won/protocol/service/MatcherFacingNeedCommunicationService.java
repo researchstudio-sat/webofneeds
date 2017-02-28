@@ -16,7 +16,7 @@
 
 package won.protocol.service;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 import won.protocol.message.WonMessage;
 
 import java.net.URI;

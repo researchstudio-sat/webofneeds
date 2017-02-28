@@ -16,7 +16,7 @@
 
 package won.bot.framework.component.needproducer;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 /**
  * Interface for producing needs. The needs produced must be suitable as the 'model'
