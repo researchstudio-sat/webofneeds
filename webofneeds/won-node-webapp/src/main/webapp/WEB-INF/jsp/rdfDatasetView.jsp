@@ -1,4 +1,4 @@
-<%@ page import="com.hp.hpl.jena.query.Dataset" %>
+<%@ page import="org.apache.jena.query.Dataset" %>
 <%@ page import="org.apache.jena.riot.RDFDataMgr" %>
 <%@ page import="org.apache.jena.riot.RDFFormat" %>
 <%@ page import="java.io.StringWriter" %>
