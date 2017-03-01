@@ -63,7 +63,7 @@ public class WonNodeSparqlService extends SparqlService
   }
 
   /**
-   * Get the {@link won.protocol.service.WonNodeInfo} as an object from a {@link com.hp.hpl.jena.query.Dataset}
+   * Get the {@link won.protocol.service.WonNodeInfo} as an object from a {@link Dataset}
    *
    * @param ds Dataset which holds won node information
    * @return
@@ -81,7 +81,7 @@ public class WonNodeSparqlService extends SparqlService
   }
 
   /**
-   * Get the won node URI from a {@link com.hp.hpl.jena.query.Dataset}
+   * Get the won node URI from a {@link Dataset}
    *
    * @param ds Dataset which holds won node information
    * @return

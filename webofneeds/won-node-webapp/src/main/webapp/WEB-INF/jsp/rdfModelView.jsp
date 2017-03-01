@@ -1,4 +1,4 @@
-<%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
+<%@ page import="org.apache.jena.rdf.model.Model" %>
 <%@ page import="java.io.StringWriter" %>
 <%@ page import="org.springframework.web.util.HtmlUtils" %>
 <%--
