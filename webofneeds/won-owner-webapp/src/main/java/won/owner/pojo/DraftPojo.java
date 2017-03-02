@@ -1,6 +1,6 @@
 package won.owner.pojo;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 import won.owner.model.Draft;
 
 import java.net.URI;

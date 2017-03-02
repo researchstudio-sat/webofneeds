@@ -16,7 +16,7 @@
 
 package won.bot.framework.eventbot.event.impl.needlifecycle;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
 import won.protocol.model.FacetType;
 

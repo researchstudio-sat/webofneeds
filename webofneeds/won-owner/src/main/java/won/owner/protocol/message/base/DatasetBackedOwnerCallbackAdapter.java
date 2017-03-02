@@ -16,8 +16,8 @@
 
 package won.owner.protocol.message.base;
 
-import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.tdb.TDB;
+import org.apache.jena.query.*;
+import org.apache.jena.tdb.TDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

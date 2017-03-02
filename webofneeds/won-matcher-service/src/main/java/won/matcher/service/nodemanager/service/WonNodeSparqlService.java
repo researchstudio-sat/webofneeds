@@ -1,8 +1,8 @@
 package won.matcher.service.nodemanager.service;
 
-import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
 import won.matcher.service.common.service.sparql.SparqlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,7 +63,7 @@ public class WonNodeSparqlService extends SparqlService
   }
 
   /**
-   * Get the {@link won.protocol.service.WonNodeInfo} as an object from a {@link com.hp.hpl.jena.query.Dataset}
+   * Get the {@link won.protocol.service.WonNodeInfo} as an object from a {@link Dataset}
    *
    * @param ds Dataset which holds won node information
    * @return
@@ -81,7 +81,7 @@ public class WonNodeSparqlService extends SparqlService
   }
 
   /**
-   * Get the won node URI from a {@link com.hp.hpl.jena.query.Dataset}
+   * Get the won node URI from a {@link Dataset}
    *
    * @param ds Dataset which holds won node information
    * @return

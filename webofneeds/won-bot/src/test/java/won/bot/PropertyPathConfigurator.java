@@ -16,9 +16,9 @@
 
 package won.bot;
 
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.sparql.path.Path;
-import com.hp.hpl.jena.sparql.path.PathParser;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.path.PathParser;
 import won.protocol.vocabulary.WON;
 
 import java.util.ArrayList;

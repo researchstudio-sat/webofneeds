@@ -16,7 +16,7 @@
 
 package won.bot.framework.component.needproducer;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 import java.io.File;
 import java.io.IOException;

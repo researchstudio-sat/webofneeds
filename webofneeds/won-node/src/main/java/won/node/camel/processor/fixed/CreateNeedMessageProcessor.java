@@ -1,6 +1,6 @@
 package won.node.camel.processor.fixed;
 
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.javasimon.SimonManager;

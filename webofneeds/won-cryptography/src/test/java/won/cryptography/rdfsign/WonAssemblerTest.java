@@ -1,6 +1,6 @@
 package won.cryptography.rdfsign;
 
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
 import org.junit.Assert;

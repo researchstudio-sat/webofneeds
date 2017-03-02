@@ -16,8 +16,8 @@
 
 package won.bot.framework.eventbot.action.impl.monitor;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.sparql.core.Quad;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.core.Quad;
 import org.apache.commons.io.Charsets;
 import org.apache.jena.riot.Lang;
 import org.javasimon.SimonManager;
