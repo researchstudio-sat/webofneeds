@@ -16,8 +16,8 @@
 
 package won.protocol.repository.rdfstorage.impl;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.tdb.TDBFactory;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.tdb.TDBFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

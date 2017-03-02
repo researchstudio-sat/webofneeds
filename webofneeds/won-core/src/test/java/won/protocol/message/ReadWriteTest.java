@@ -1,7 +1,7 @@
 package won.protocol.message;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.sparql.util.IsoMatcher;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.util.IsoMatcher;
 import org.apache.jena.riot.Lang;
 import org.junit.Assert;
 import org.junit.Test;

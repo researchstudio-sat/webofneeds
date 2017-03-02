@@ -1,8 +1,8 @@
 package won.cryptography.rdfsign;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Statement;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

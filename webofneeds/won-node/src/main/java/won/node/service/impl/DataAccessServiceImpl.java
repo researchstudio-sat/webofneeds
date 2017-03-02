@@ -1,7 +1,7 @@
 package won.node.service.impl;
 
-import com.hp.hpl.jena.graph.TripleBoundary;
-import com.hp.hpl.jena.rdf.model.*;
+import org.apache.jena.graph.TripleBoundary;
+import org.apache.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

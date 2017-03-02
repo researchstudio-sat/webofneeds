@@ -16,12 +16,12 @@
 
 package won.node.web;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.NodeIterator;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -998,7 +998,7 @@ public class
             addCORSHeader(headers);
           String mimeTypeOfResponse = RdfUtils.findFirst(rdfDataset, new RdfUtils.ModelVisitor<String>() {
             @Override
-            public String visit(com.hp.hpl.jena.rdf.model.Model model) {
+            public String visit(org.apache.jena.rdf.model.Model model) {
               String content = getObjectOfPropertyAsString(model, CNT.BYTES);
               if (content == null) return null;
               String contentType = getObjectOfPropertyAsString(model, WONMSG.CONTENT_TYPE);
@@ -1018,7 +1018,7 @@ public class
         }
     }
 
-  private String getObjectOfPropertyAsString(com.hp.hpl.jena.rdf.model.Model model, Property property){
+  private String getObjectOfPropertyAsString(org.apache.jena.rdf.model.Model model, Property property){
     NodeIterator nodeIteratr = model.listObjectsOfProperty(property);
     if (!nodeIteratr.hasNext()) return null;
     String ret = nodeIteratr.next().asLiteral().getString();

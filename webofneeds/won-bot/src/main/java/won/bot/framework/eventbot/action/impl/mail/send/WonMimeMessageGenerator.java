@@ -1,7 +1,9 @@
 package won.bot.framework.eventbot.action.impl.mail.send;
 
-import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.tdb.TDB;
+import org.apache.jena.query.*;
+import org.apache.jena.tdb.TDB;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -209,6 +211,8 @@ public class WonMimeMessageGenerator {
 
         Dataset baseDataSet = eventListenerContext.getLinkedDataSource().getDataForResource(connectionUri);
         Dataset eventDataSet = eventListenerContext.getLinkedDataSource().getDataForResource(URI.create(connectionUri.toString()+"/events?deep=true"), requesterUri);
+
+        RDFDataMgr.write(System.out, eventDataSet, Lang.TRIG);
 
         RdfUtils.addDatasetToDataset(baseDataSet, eventDataSet);
 

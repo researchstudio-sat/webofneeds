@@ -16,8 +16,8 @@
 
 package won.protocol.rest;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.atlas.web.ContentType;
 import org.apache.jena.riot.*;
 import org.slf4j.Logger;

@@ -97,9 +97,10 @@ function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
 
 function addOwnNeed(allNeeds, ownNeed) {
     const ownNeed_ = Immutable.fromJS(ownNeed);
-    if(ownNeed_.get('@id')) {
+    if(ownNeed_ && ownNeed_.get('@id')) {
         return setIfNew(allNeeds, ['ownNeeds', ownNeed_.get('@id')], ownNeed_);
     } else {
+        console.error('Tried to add invalid need-object: ', ownNeed_);
         return allNeeds;
     }
     //return setIfNew(allNeeds, ['ownNeeds', ownNeed_.get('@id')], ownNeed_);
@@ -110,6 +111,7 @@ function addTheirNeed(allNeeds, theirNeed) {
     if(theirNeedImm && theirNeedImm.get('@id')) {
         return setIfNew(allNeeds, ['theirNeeds', theirNeedImm.get('@id')], theirNeedImm);
     } else {
+        console.error('Tried to add invalid need-object: ', theirNeedImm);
         return allNeeds;
     }
 }
@@ -132,7 +134,7 @@ function addConnection(state, needUri, connectionUri) {
         state = state.setIn(pathToConnections, Immutable.List());
     }
     const connections = state.getIn(pathToConnections);
-    if( connections.filter(c => c.get('@id') === connectionUri).size > 0) {
+    if( connections.filter(c => c && c.get('@id') === connectionUri).size > 0) {
         // connection's already been added to the need before
         return state;
     } else {

@@ -33,6 +33,8 @@
         <!--property name="nodeURISource" ref="nodeUriSourceRandom" /-->
         <property name="matcherNodeURISource" ref="matcherNodeURISource"/>
         <property name="matcherUri" value="${matcher.uri}" />
+        <property name="registrationMatcherRetryInterval" value="5000"/>
+
         <property name="trigger">
             <bean class="org.springframework.scheduling.support.PeriodicTrigger">
                 <constructor-arg name="period" value="2000" />

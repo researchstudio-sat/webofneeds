@@ -86,23 +86,10 @@ public class MatcherProtocolMatcherServiceImplJMSBased
 
 
 
-  public void register(final URI wonNodeURI) {
-      try {
-        new Thread(){
-          @Override
-          public void run() {
-            try {
-                 configureMatcherProtocolOutTopics(wonNodeURI);
-            } catch (Exception e) {
-              logger.warn("Could not get topic lists from won node {}", wonNodeURI,e);
-            }
-          }
-        }.start();
-      } catch (Exception e) {
-        logger.warn("getting topic lists from the node {} failed",wonNodeURI);
-      }
-
+  public void register(final URI wonNodeURI) throws CamelConfigurationFailedException {
+    configureMatcherProtocolOutTopics(wonNodeURI);
   }
+
   public void register(){
       logger.debug("registering owner application on application event");
       try {

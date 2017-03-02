@@ -16,7 +16,7 @@
 
 package won.bot.framework.component.needproducer.impl;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.jsoup.Jsoup;

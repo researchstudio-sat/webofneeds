@@ -37,7 +37,7 @@ export const selectRemoteEvents = createSelector(
             .toList()
             .map(e => {
                 let remote = e.get('hasCorrespondingRemoteMessage') // select remote
-                if(is('string', remote)) remote = events.get(remote); // for those rare cases where remote is only a uri
+                if(is('String', remote)) remote = events.get(remote); // for those rare cases where remote is only a uri
                 if(!remote) return undefined;
                 remote = remote.set('correspondsToOwnMsg', e); //add back-reference to it
                 return remote && [remote.get('uri'), remote]

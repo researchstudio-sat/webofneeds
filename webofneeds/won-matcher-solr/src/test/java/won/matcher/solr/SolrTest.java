@@ -2,7 +2,7 @@ package won.matcher.solr;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import won.cryptography.ssl.TrustAnyCertificateStrategy;
 import won.matcher.service.common.event.NeedEvent;

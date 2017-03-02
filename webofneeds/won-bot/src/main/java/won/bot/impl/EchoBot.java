@@ -26,6 +26,7 @@ import won.bot.framework.eventbot.action.impl.wonmessage.ConnectWithAssociatedNe
 import won.bot.framework.eventbot.action.impl.wonmessage.RespondWithEchoToMessageAction;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
+import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
 import won.bot.framework.eventbot.event.impl.matcher.NeedCreatedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherNeedEvent;
@@ -52,8 +53,12 @@ public class EchoBot extends EventBot
   protected BaseEventListener autoResponder;
   protected BaseEventListener connectionCloser;
   protected BaseEventListener needDeactivator;
-
   private Integer numberOfEchoNeedsPerNeed;
+  private int registrationMatcherRetryInterval;
+
+  public void setRegistrationMatcherRetryInterval(final int registrationMatcherRetryInterval) {
+    this.registrationMatcherRetryInterval = registrationMatcherRetryInterval;
+  }
 
   @Override
   protected void initializeEventListeners()
@@ -61,13 +66,13 @@ public class EchoBot extends EventBot
     EventListenerContext ctx = getEventListenerContext();
     EventBus bus = getEventBus();
 
-    //register with WoN noodes, be notified when new needs are created
-    this.matcherRegistrator = new ActionOnEventListener(
-      ctx,
-      new RegisterMatcherAction(ctx),
-      1
-    );
+    //register with WoN nodes, be notified when new needs are created
+    RegisterMatcherAction registerMatcherAction = new RegisterMatcherAction(ctx);
+    this.matcherRegistrator = new ActionOnEventListener(ctx, registerMatcherAction, 1);
     bus.subscribe(ActEvent.class, this.matcherRegistrator);
+    RandomDelayedAction delayedRegistration = new RandomDelayedAction(ctx, registrationMatcherRetryInterval, registrationMatcherRetryInterval, 0, registerMatcherAction);
+    ActionOnEventListener matcherRetryRegistrator = new ActionOnEventListener(ctx, delayedRegistration);
+    bus.subscribe(MatcherRegisterFailedEvent.class, matcherRetryRegistrator);
 
     //create the echo need - if we're not reacting to the creation of our own echo need.
     this.needCreator = new ActionOnEventListener(

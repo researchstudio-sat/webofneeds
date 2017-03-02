@@ -6,7 +6,6 @@ services:
     build: ../../image/gencert
     image: webofneeds/gencert:int
     environment:
-      - "constraint:node==satsrv05"
       - "CN=satsrv06.researchstudio.at"
       - "PASS=pass:$won_certificate_passwd"
       - "OPENSSL_CONFIG_FILE=/usr/local/openssl.conf"
@@ -19,7 +18,6 @@ services:
     image: webofneeds/postgres:int
     build: ../../image/postgres
     environment:
-      - "constraint:node==satsrv05"
       - "POSTGRES_PASSWORD=$postgres_db_passwd"
       - "PGDATA=/var/lib/postgresql/data/pgdata"
     volumes:
@@ -32,7 +30,6 @@ services:
     build: ../../image/wonnode
     image: webofneeds/wonnode:int
     environment:
-      - "constraint:node==satsrv05"
       - "uri.host=satsrv06.researchstudio.at"
       - "http.port=8889"
       - "uri.prefix=https://satsrv06.researchstudio.at/won"
@@ -41,6 +38,7 @@ services:
       - "db.sql.jdbcUrl=jdbc:postgresql://satsrv05.researchstudio.at:5433/won_node"
       - "db.sql.user=won"
       - "db.sql.password=$postgres_db_passwd"
+      - "db.ddl.strategy=validate"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
       - "activemq.broker.port=61617"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
@@ -68,7 +66,6 @@ services:
     build: ../../image/owner
     image: webofneeds/owner:int
     environment:
-      - "constraint:node==satsrv05"
       - "node.default.host=satsrv06.researchstudio.at"
       - "uri.host=satsrv06.researchstudio.at"
       - "http.port=8082"
@@ -79,6 +76,7 @@ services:
       - "db.sql.jdbcUrl=jdbc:postgresql://satsrv05.researchstudio.at:5433/won_owner"
       - "db.sql.user=won"
       - "db.sql.password=$postgres_db_passwd"
+      - "db.ddl.strategy=validate"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
       - "email.from.won.user=$MAIL_USER"
       - "email.from.won.password=$MAIL_PASS"

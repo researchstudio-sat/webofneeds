@@ -28,6 +28,7 @@ import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsAc
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
+import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
 import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisteredEvent;
 import won.bot.framework.eventbot.event.impl.matcher.NeedCreatedEventForMatcher;
 import won.bot.framework.eventbot.event.impl.matcher.NeedDeactivatedEventForMatcher;
@@ -58,6 +59,12 @@ public class MatcherProtocolTestBot extends EventBot
   protected BaseEventListener allNeedsDeactivator;
   protected BaseEventListener workDoneSignaller;
   protected BaseEventListener matcherNotifier;
+  private int registrationMatcherRetryInterval;
+
+  public void setRegistrationMatcherRetryInterval(final int registrationMatcherRetryInterval) {
+    this.registrationMatcherRetryInterval = registrationMatcherRetryInterval;
+  }
+
   private static final String NAME_NEEDS = "needs";
 
   @Override
@@ -66,12 +73,14 @@ public class MatcherProtocolTestBot extends EventBot
     EventListenerContext ctx = getEventListenerContext();
     EventBus bus = getEventBus();
 
-    this.matcherRegistrator = new ActionOnEventListener(
-      ctx,
-      new RegisterMatcherAction(ctx),
-      1
-    );
+    //subscribe this bot with the WoN nodes' 'new need' topic
+    RegisterMatcherAction registerMatcherAction = new RegisterMatcherAction(ctx);
+    this.matcherRegistrator = new ActionOnEventListener(ctx, registerMatcherAction, 1);
     bus.subscribe(ActEvent.class, this.matcherRegistrator);
+    RandomDelayedAction delayedRegistration = new RandomDelayedAction(
+      ctx, registrationMatcherRetryInterval, registrationMatcherRetryInterval, 0, registerMatcherAction);
+    ActionOnEventListener matcherRetryRegistrator = new ActionOnEventListener(ctx, delayedRegistration);
+    bus.subscribe(MatcherRegisterFailedEvent.class, matcherRetryRegistrator);
 
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ActionOnEventListener(

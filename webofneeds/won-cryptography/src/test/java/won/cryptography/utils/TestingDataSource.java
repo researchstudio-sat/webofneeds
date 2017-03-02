@@ -1,10 +1,10 @@
 package won.cryptography.utils;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.sparql.path.Path;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.path.Path;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.KeyStoreService;

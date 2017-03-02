@@ -1,6 +1,6 @@
 package won.node.camel.processor;
 
-import com.hp.hpl.jena.query.DatasetFactory;
+import org.apache.jena.query.DatasetFactory;
 import junit.framework.Assert;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;

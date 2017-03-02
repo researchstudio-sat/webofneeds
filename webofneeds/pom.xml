@@ -491,6 +491,11 @@
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
 
             <!-- HSQL STUFF -->
             <dependency>
@@ -720,6 +725,18 @@
                 <version>2.4.11</version>
             </dependency>
 
+            <!-- telegram bot api -->
+            <dependency>
+                <groupId>org.telegram</groupId>
+                <artifactId>telegrambots</artifactId>
+                <version>2.4.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>4.5</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -898,19 +915,20 @@
         <junit.version>4.11</junit.version>
         <org.apache.commons.email.version>1.3.1</org.apache.commons.email.version>
         <net.sf.ehcache.version>2.6.8</net.sf.ehcache.version>
-        <org.apache.jena.version>2.12.1</org.apache.jena.version>
-        <org.apache.jena-tdb.version>1.1.1</org.apache.jena-tdb.version>
+        <org.apache.jena.version>3.1.0</org.apache.jena.version>
+        <org.apache.jena-tdb.version>3.1.0</org.apache.jena-tdb.version>
         <org.hibernate.version>4.3.4.Final</org.hibernate.version>
         <org.hibernate.hibernate-validator.version>5.1.3.Final</org.hibernate.hibernate-validator.version>
         <org.javasimon.version>3.4.0</org.javasimon.version>
         <org.jboss.jandex.version>1.1.0.Final</org.jboss.jandex.version>
         <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
-        <org.springframework.boot.version>1.0.2.RELEASE</org.springframework.boot.version>
-        <org.springframework.version>4.1.1.RELEASE</org.springframework.version>
+        <org.springframework.boot.version>1.2.8.RELEASE</org.springframework.boot.version>
+        <org.springframework.version>4.1.9.RELEASE</org.springframework.version>
         <org.springframework.security.version>3.2.9.RELEASE</org.springframework.security.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
         <org.hsqldb.version>2.3.2</org.hsqldb.version>
         <postgresql.version>9.1-901.jdbc4</postgresql.version>
+        <flyway.version>4.0.3</flyway.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
         <javax.validation.version>1.1.0.Final</javax.validation.version>
         <mojoexec.version>1.3.2</mojoexec.version>

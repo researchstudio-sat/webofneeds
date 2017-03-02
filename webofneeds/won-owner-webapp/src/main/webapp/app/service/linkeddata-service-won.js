@@ -848,18 +848,17 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         )
         .then(dataset =>
             Promise.resolve()
-            .then(() =>
-                fetchesPartialRessource(params) ?
+            .then(() => {
+                if(!fetchesPartialRessource(params)) {
                     /* as paging is only used for containers
                      * and they don't lose entries, we can
                      * simply merge on top of the already
                      * loaded triples below. So we skip removing
-                     * the previously loaded data here:
-                     */
-                    undefined : //NOP
-                    /* remove any remaining stale data: */
+                     * the previously loaded data. For everything
+                     * remove any remaining stale data: */
                     won.deleteNode(uri)
-            )
+                }
+            })
             .then(() =>
                 addJsonLdData(uri, dataset)
             )
@@ -882,6 +881,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                     console.log('linkeddata-serice-won.js: finished storing triples ', data);
                     resolve(uri);
                 } else {
+                    console.error('Failed to store json-ld data for ' + uri);
                     reject('Failed to store json-ld data for ' + uri);
                 }
 
@@ -1035,6 +1035,10 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
             // We can flatten this and still have valid json-ld
             const simplified = needJsonLd['@graph'][0];
             if(!simplified) {
+                if(!needJsonLd || needJsonLd['@graph'].length === 0) {
+                    console.error('Received empty graph ', needJsonLd, ' for need ', needUri);
+                }
+
                 //doesn't contain graph. probably already simplified.
                 return needJsonLd;
             } else {
@@ -1065,7 +1069,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
         const jsonLdP = jsonld.promises
             .fromRDF(jsonldjsQuads, context)
             .then(complexJsonLd => {
-                //the framing algorithm expeds an js-object with an `@graph`-property
+                //the framing algorithm expects an js-object with an `@graph`-property
                 const complexJsonLd_ = complexJsonLd['@graph'] ?
                     complexJsonLd :
                     {'@graph': complexJsonLd};
@@ -1202,27 +1206,22 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     won.getEnvelopeDataForNeed=function(needUri){
         if(typeof needUri === 'undefined'||needUri == null){
             throw {message: "getEnvelopeDataForNeed: needUri must not be null"};
-
         }
         return won.getWonNodeUriOfNeed(needUri)
-            .then(function(wonNodeUri){
-                var ret = {};
+            .then(wonNodeUri => {
+                let ret = {};
                 ret[won.WONMSG.hasSenderNeed] = needUri;
                 ret[won.WONMSG.hasSenderNode] = wonNodeUri;
                 ret[won.WONMSG.hasReceiverNeed] = needUri;
                 ret[won.WONMSG.hasReceiverNode] = wonNodeUri;
                 return ret;
-
-            },function(reason) {
+            }).catch(reason => {
                 //no connection found
-                var deferred = q.defer();
-                var ret = {};
+                let ret = {};
                 ret[won.WONMSG.hasSenderNeed] = needUri;
                 ret[won.WONMSG.hasReceiverNeed] = needUri;
                 return ret;
-                deferred.resolve(ret);
-                return deferred.promise;}
-        )
+            });
     }
     /**
      * Fetches a structure that can be used directly (in a JSON-LD node) as the envelope data
@@ -1241,34 +1240,32 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                         return won.getRemoteneedUriOfConnection(connectionUri)
                             .then(function(remoteneedUri){
                                 return won.getWonNodeUriOfNeed(remoteneedUri)
-                                    .then(function(remoteWonNodeUri){
+                                    .then(remoteWonNodeUri => {
                                         //if the local connection was created through a hint message (most likely)
                                         //the remote connection is not known or doesn't exist yet. Hence, the next call
                                         //may or may not succeed.
-                                        return won.getRemoteConnectionUriOfConnection(connectionUri).then(
-                                            function(remoteconnectionUri) {
-                                                var ret = {};
+                                        return won.getRemoteConnectionUriOfConnection(connectionUri)
+                                            .then(remoteConnectionUri => {
+                                                let ret = {};
                                                 ret[won.WONMSG.hasSender] = connectionUri;
                                                 ret[won.WONMSG.hasSenderNeed] = needUri;
                                                 ret[won.WONMSG.hasSenderNode] = wonNodeUri;
-                                                if (remoteconnectionUri != null) {
-                                                    ret[won.WONMSG.hasReceiver] = remoteconnectionUri;
+                                                if (remoteConnectionUri != null) {
+                                                    ret[won.WONMSG.hasReceiver] = remoteConnectionUri;
                                                 }
                                                 ret[won.WONMSG.hasReceiverNeed] = remoteneedUri;
                                                 ret[won.WONMSG.hasReceiverNode] = remoteWonNodeUri;
                                                 return ret;
-                                            },function(reason) {
+                                            })
+                                            .catch(reason => {
                                                 //no connection found
-                                                var deferred = q.defer();
-                                                var ret = {};
+                                                let ret = {};
                                                 ret[won.WONMSG.hasSender] = connectionUri;
                                                 ret[won.WONMSG.hasSenderNeed] = needUri;
                                                 ret[won.WONMSG.hasSenderNode] = wonNodeUri;
                                                 ret[won.WONMSG.hasReceiverNeed] = remoteneedUri;
                                                 ret[won.WONMSG.hasReceiverNode] = remoteWonNodeUri;
                                                 return ret;
-                                                deferred.resolve(ret);
-                                                return deferred.promise;
                                             });
                                     });
                             });

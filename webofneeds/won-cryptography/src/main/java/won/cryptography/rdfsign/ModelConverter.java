@@ -1,11 +1,11 @@
 package won.cryptography.rdfsign;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.NamedGraph;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.Prefix;
