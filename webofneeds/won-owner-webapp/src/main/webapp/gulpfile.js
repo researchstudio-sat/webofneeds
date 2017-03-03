@@ -10,6 +10,16 @@ var sassImportOnce = require('node-sass-import-once');
 var gulp_jspm = require('gulp-jspm');
 var sourcemaps = require('gulp-sourcemaps');
 
+require('./jspm_packages/system.js');
+require('./jspm_config.js');
+console.log('System: ', System.map['leaflet']);
+
+// try to get the path directly from systemjs?
+// or use https://www.npmjs.com/package/jspm-resolve ? (gives the path)
+// there's also a `paths: {<glob> : <base-path> }` that gives the base-path
+// system.locate ?
+// System.normalize ?
+// System.module ?
 
 gulp.task('default', ['build']);
 gulp.task('build', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res']);
