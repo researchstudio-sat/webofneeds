@@ -88,6 +88,7 @@ xsd:duration a rdfs:Datatype .
 
 :hasFlag a owl:ObjectProperty ;
 	rdfs:domain :Need ;
+	rdfs:range :Flag ;
 	rdfs:comment "Flags for the Need"@en ;
 	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 # 
@@ -102,6 +103,14 @@ xsd:duration a rdfs:Datatype .
 
 :hasMatcherProtocolEndpoint a owl:ObjectProperty ;
 	rdfs:comment "Points to the matcherProtocol webservice endpoint of the need. I.e., matchers can communicate with the need through this endpoint."@en ;
+	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+# 
+# http://purl.org/webofneeds/model#hasMatchingBehavior
+
+:hasMatchingBehavior a owl:ObjectProperty , owl:FunctionalProperty ;
+	rdfs:domain :Need ;
+	rdfs:range :MatchingBehavior ;
+	rdfs:comment "defines the behavior that matchers should use to send hints to the need" ;
 	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 # 
 # http://purl.org/webofneeds/model#hasNeedProtocolEndpoint
@@ -160,13 +169,28 @@ xsd:duration a rdfs:Datatype .
 	rdfs:range :TimeSpecification ;
 	rdfs:comment "Specifies when the Need object is available."@en ;
 	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-#
+# 
+# http://purl.org/webofneeds/model#is
+
+:is a owl:ObjectProperty ;
+	rdfs:domain :Need ;
+	rdfs:comment "This optional property is one of the two properties that defines the content of every need (the other is the \"seeks\" property). It is used to describe that part of the content that is available (e.g. for exchange) in contrast to the part that is seeked." ;
+	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+# 
 # http://purl.org/webofneeds/model#isInState
 
 :isInState a owl:ObjectProperty , owl:FunctionalProperty ;
 	rdfs:domain :Need ;
 	rdfs:range :NeedState ;
 	rdfs:comment "Defines the Need object's state."@en ;
+	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+# 
+# http://purl.org/webofneeds/model#seeks
+
+:seeks a owl:ObjectProperty ;
+	rdfs:domain :Need ;
+	rdfs:comment """This optional property is one of the two properties that defines the content of every need (the other is the \"is\" property). It is used to describe that part of the content that is
+seeked to fulfill the need in contrast to the part that is available.""" ;
 	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 # 
 # http://purl.org/webofneeds/model#supportsWonProtocolImpl
@@ -317,10 +341,22 @@ xsd:duration a rdfs:Datatype .
 	rdfs:comment "Facets are behaviours a Need can choose to support. Connections have a Facet; Needs can be connected through multiple Connections if they have different Facets."@en ;
 	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 # 
+# http://purl.org/webofneeds/model#Flag
+
+:Flag a owl:Class ;
+	rdfs:comment "defines flags of a need" ;
+	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+# 
 # http://purl.org/webofneeds/model#LocationSpecification
 
 :LocationSpecification a owl:Class ;
 	rdfs:comment "Specifies where a Need is available."@en ;
+	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+# 
+# http://purl.org/webofneeds/model#MatchingBehavior
+
+:MatchingBehavior a owl:Class ;
+	rdfs:comment "defines the behavior that matchers should use to send hints to the need. The default is \"mutual\"." ;
 	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 # 
 # http://purl.org/webofneeds/model#Need
@@ -372,7 +408,8 @@ It specifies a content - what the need is about, which may be something that is 
 # 
 # http://rdfs.org/sioc/types#Tag
 
-sioc:Tag a owl:Class .
+sioc:Tag a owl:Class ;
+	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 # 
 # http://www.w3.org/2001/XMLSchema#string
 
@@ -385,7 +422,8 @@ xsd:string a owl:Class .
 # 
 # http://www.w3.org/ns/ldp#CompositeContainer
 
-<http://www.w3.org/ns/ldp#CompositeContainer> a owl:Class .
+<http://www.w3.org/ns/ldp#CompositeContainer> a owl:Class ;
+	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 # 
 # 
 # 
@@ -414,6 +452,12 @@ xsd:string a owl:Class .
 	rdfs:comment "The connected state. Messages are forwarded to/from the owner."@en ;
 	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 # 
+# http://purl.org/webofneeds/model#DoNotMatch
+
+:DoNotMatch a owl:NamedIndividual , :MatchingBehavior ;
+	rdfs:comment "indicates the need should not be matched. It should not receive hints nor should other needs receive hints pointing them to this one."@en ;
+	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+# 
 # http://purl.org/webofneeds/model#GroupFacet
 
 :GroupFacet a owl:NamedIndividual , :Facet ;
@@ -424,6 +468,18 @@ xsd:string a owl:Class .
 
 :Inactive a owl:NamedIndividual , :NeedState ;
 	rdfs:comment "The incative state. Needs do not communicate in this state. Intended to stop receiving messages for something not currently of interest."@en ;
+	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+# 
+# http://purl.org/webofneeds/model#Lazy
+
+:Lazy a owl:NamedIndividual , :MatchingBehavior ;
+	rdfs:comment "indicates the need should not receive any hints. Only other needs may receive hints to this need." ;
+	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+# 
+# http://purl.org/webofneeds/model#Mutual
+
+:Mutual a owl:NamedIndividual , :MatchingBehavior ;
+	rdfs:comment "indicates the default matching behavior which means that hints are sent to both needs." ;
 	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 # 
 # http://purl.org/webofneeds/model#OwnerFacet
@@ -444,35 +500,21 @@ xsd:string a owl:Class .
 	rdfs:comment "Half-open state. The Connection has been requested by the local end but not yet been accepted by the remote counterpart."@en ;
 	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 # 
+# http://purl.org/webofneeds/model#Stealthy
+
+:Stealthy a owl:NamedIndividual , :MatchingBehavior ;
+	rdfs:comment "indicates that no other need should receive hints for the current need. The current need may however receive hints to other needs." ;
+	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+# 
 # http://purl.org/webofneeds/model#Suggested
 
 :Suggested a owl:NamedIndividual , :ConnectionState ;
 	rdfs:comment "Suggested state. The Connection has been created through a Hint Event but not yet been opened by either of the sides."@en ;
 	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 # 
-# 
-# 
-# #################################################################
-# #
-# #    Annotations
-# #
-# #################################################################
-# 
-# 
+# http://purl.org/webofneeds/model#UsedForTesting
 
-:DoNotMatch rdfs:isDefinedBy <http://purl.org/webofneeds/model> ;
-	rdfs:comment "Flag indicating the need should not be matched. It should not receive hints nor should other needs receive hints pointing them to this one."@en .
-# 
-
-:UsedForTesting rdfs:comment "Flag indicating the need has been created for testing purposes. It should only be matched with other needs flagged with UsedForTesting. The flag is intended to separate real-world needs from those generated for testing the system, so that users aren't spammed or misled.."@en ;
+:UsedForTesting a owl:NamedIndividual , :Flag ;
+	rdfs:comment "Flag indicating the need has been created for testing purposes. It should only be matched with other needs flagged with UsedForTesting. The flag is intended to separate real-world needs from those generated for testing the system, so that users aren't spammed or misled.."@en ;
 	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-# 
 
-:hasTag rdfs:comment "Specifies a tag for the need content."@en ;
-	rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-# 
-
-:hasTextDescription rdfs:isDefinedBy <http://purl.org/webofneeds/model> ;
-	rdfs:comment "Textual description of the need. May contain #hashtags but no HTML, XHTML or other formatting."@en .
-# 
-# Generated by the OWL API (version 4.2.6.20160910-2108) https://github.com/owlcs/owlapi
