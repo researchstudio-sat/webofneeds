@@ -1,9 +1,7 @@
 package won.bot.framework.eventbot.action.impl.telegram.send;
 
-import org.apache.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
-import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.methods.send.SendPhoto;
+import org.apache.jena.rdf.model.Model;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -18,14 +16,12 @@ import won.bot.framework.eventbot.event.impl.telegram.TelegramCreateNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
-import won.protocol.model.BasicNeedType;
 import won.protocol.model.FacetType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.NeedModelBuilder;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
-import java.io.File;
 import java.net.URI;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -71,12 +67,6 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
                 return;
             }
             try{
-                BasicNeedType type = telegramContentExtractor.getBasicNeedType(parameters[0]);
-
-                if(type == null) {
-                    throw new InvalidParameterException("no valid type was given");
-                }
-
                 String title = null;
 
                 if(parameters.length > 1){
@@ -98,7 +88,6 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
                 final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
                 Model model = new NeedModelBuilder()
                         .setTitle(title)
-                        .setBasicNeedType(type)
                         //.setDescription(description)
                         .setUri(needURI)
                         //.setTags(tags)

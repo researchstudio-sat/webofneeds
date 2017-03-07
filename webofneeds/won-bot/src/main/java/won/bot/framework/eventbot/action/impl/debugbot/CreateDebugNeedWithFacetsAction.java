@@ -16,16 +16,16 @@
 
 package won.bot.framework.eventbot.action.impl.debugbot;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
-import org.apache.commons.lang3.StringUtils;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
-import won.bot.framework.eventbot.action.impl.needlifecycle.AbstractCreateNeedAction;
 import won.bot.framework.eventbot.action.impl.counter.Counter;
 import won.bot.framework.eventbot.action.impl.counter.CounterImpl;
+import won.bot.framework.eventbot.action.impl.needlifecycle.AbstractCreateNeedAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.NeedCreationFailedEvent;
 import won.bot.framework.eventbot.event.NeedSpecificEvent;
@@ -38,7 +38,6 @@ import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
-import won.protocol.model.BasicNeedType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.NeedModelBuilder;
@@ -120,7 +119,6 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
         final Model needModel =
                 new NeedModelBuilder()
                         .setTitle(replyText)
-                        .setBasicNeedType(BasicNeedType.DO_TOGETHER)
                         .setDescription("This is a need automatically created by the DebugBot.")
                         .setUri(needURI)
                         .setFacetTypes(facets)

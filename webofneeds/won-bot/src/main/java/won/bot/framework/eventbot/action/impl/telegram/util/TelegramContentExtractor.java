@@ -1,7 +1,5 @@
 package won.bot.framework.eventbot.action.impl.telegram.util;
 
-import won.protocol.model.BasicNeedType;
-
 import java.util.regex.Pattern;
 
 public class TelegramContentExtractor {
@@ -9,20 +7,6 @@ public class TelegramContentExtractor {
     private Pattern supplyTypePattern;
     private Pattern doTogetherTypePattern;
     private Pattern critiqueTypePattern;
-
-    public BasicNeedType getBasicNeedType(String subject){
-        if (demandTypePattern.matcher(subject).matches()) {
-            return BasicNeedType.DEMAND;
-        } else if (supplyTypePattern.matcher(subject).matches()) {
-            return BasicNeedType.SUPPLY;
-        } else if (doTogetherTypePattern.matcher(subject).matches()) {
-            return BasicNeedType.DO_TOGETHER;
-        } else if (critiqueTypePattern.matcher(subject).matches()) {
-            return BasicNeedType.CRITIQUE;
-        }
-
-        return null;
-    }
 
     //Spring setter
 

@@ -1,11 +1,11 @@
 package won.matcher.solr.evaluation;
 
 import com.github.jsonldjava.core.JsonLdError;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.DC;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.index.NeedIndexer;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
-import won.matcher.solr.query.factory.NeedTypeQueryFactory;
+import won.matcher.solr.query.factory.BasicNeedQueryFactory;
 import won.matcher.solr.query.factory.TestNeedQueryFactory;
 import won.matcher.utils.tensor.TensorMatchingData;
 import won.protocol.exception.IncorrectPropertyCountException;
@@ -202,7 +202,7 @@ public class SolrMatcherEvaluation
     TestNeedQueryFactory needQuery = new TestNeedQueryFactory(need);
 
     SolrDocumentList docs = queryExecutor.executeNeedQuery(
-      needQuery.createQuery(), null, new NeedTypeQueryFactory(need).createQuery());
+      needQuery.createQuery(), null, new BasicNeedQueryFactory(need).createQuery());
 
     SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
 

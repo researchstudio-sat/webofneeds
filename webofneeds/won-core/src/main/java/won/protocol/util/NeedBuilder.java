@@ -16,9 +16,8 @@
 
 package won.protocol.util;
 
-import org.apache.jena.rdf.model.Model;
 import org.apache.commons.lang3.Range;
-import won.protocol.model.BasicNeedType;
+import org.apache.jena.rdf.model.Model;
 import won.protocol.model.NeedState;
 
 import java.net.URI;
@@ -48,12 +47,6 @@ public interface NeedBuilder<T>
   public NeedBuilder<T> setUri(String uri);
 
   public NeedBuilder<T> setRecurIn(Long recurIn);
-
-  public NeedBuilder<T> setBasicNeedType(URI type);
-
-  public NeedBuilder<T> setBasicNeedType(BasicNeedType type);
-
-  public NeedBuilder<T> setBasicNeedType(String basicNeedTypeUri);
 
   public NeedBuilder<T> setTitle(String title);
 

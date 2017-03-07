@@ -441,7 +441,6 @@
 
   <!-- define the fields we query fixed and let the other be created dynamically -->
   <field name="_graph.http___purl.org_dc_terms_created._value" type="tdates" indexed="true" stored="true"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasBasicNeedType._id" type="string" indexed="true" stored="true"/>
   <field name="_graph.http___purl.org_webofneeds_model_isInState._id" type="string" indexed="true" stored="true"/>
   <field name="_graph.http___purl.org_webofneeds_model_hasFlag._id" type="string" multiValued="true" indexed="true" stored="true"/>
 
@@ -457,31 +456,6 @@
 
   <!-- location fields for spatial queries -->
   <field name="need_location" type="location" indexed="true" stored="true"/>
-
-  <!-- <field name="_graph._id" type="text_general"/>
-  <field name="_graph._type" type="text_general"/>
-  <field name="_graph.http___purl.org_dc_terms_created._type" type="text_general"/>
-  <field name="_graph.http___purl.org_dc_terms_created._value" type="tdates"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasBasicNeedType._id" type="text_general"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasConnections._id" type="text_general"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent._id" type="text_general"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent._type" type="text_general"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_dc_elements_1.1_title" type="text_general"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTag" type="text_general"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTextDescription" type="text_general"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasEventContainer._id" type="text_general"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasEventContainer._type" type="text_general"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasEventContainer.http___www.w3.org_2000_01_rdf-schema_member._id" type="text_general"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasFacet._id" type="text_general"/>
-  <field name="_graph.http___purl.org_webofneeds_model_hasWonNode._id" type="text_general"/>
-  <field name="_graph.http___purl.org_webofneeds_model_isInState._id" type="text_general"/>
-  <field name="_graph.http___www.w3.org_ns_auth_cert_key._id" type="text_general"/>
-  <field name="_graph.http___www.w3.org_ns_auth_cert_key.http___www.w3.org_ns_auth_cert_PublicKey._id" type="text_general"/>
-  <field name="_graph.http___www.w3.org_ns_auth_cert_key.http___www.w3.org_ns_auth_cert_PublicKey._type" type="text_general"/>
-  <field name="_graph.http___www.w3.org_ns_auth_cert_key.http___www.w3.org_ns_auth_cert_PublicKey.http___purl.org_webofneeds_woncrypt_ecc_algorithm" type="text_general"/>
-  <field name="_graph.http___www.w3.org_ns_auth_cert_key.http___www.w3.org_ns_auth_cert_PublicKey.http___purl.org_webofneeds_woncrypt_ecc_curveId" type="text_general"/>
-  <field name="_graph.http___www.w3.org_ns_auth_cert_key.http___www.w3.org_ns_auth_cert_PublicKey.http___purl.org_webofneeds_woncrypt_ecc_qx" type="text_general"/>
-  <field name="_graph.http___www.w3.org_ns_auth_cert_key.http___www.w3.org_ns_auth_cert_PublicKey.http___purl.org_webofneeds_woncrypt_ecc_qy" type="text_general"/> -->
 
   <field name="_root_" type="string" docValues="false" indexed="true" stored="false"/>
   <field name="_text_" type="text_general" multiValued="true" indexed="true" stored="false"/>

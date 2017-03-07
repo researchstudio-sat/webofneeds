@@ -21,7 +21,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import won.protocol.model.BasicNeedType;
 import won.protocol.model.NeedState;
 import won.protocol.util.NeedBuilderBase;
 import won.protocol.util.NeedModelBuilder;
@@ -64,20 +63,6 @@ public class NeedModelBuilderTests
     builder = new TestNeedBuilder();
     builder.setState(NeedState.ACTIVE.getURI());
     Assert.assertEquals(NeedState.ACTIVE, builder.testGetTheNeedStateNS());
-  }
-
-  /**
-   * Tests if conversion between NeedState enum and the corresponding URI works.
-   * @throws Exception
-   */
-  @Test
-  void testBasicNeedTypeURIandEnum() throws Exception {
-    TestNeedBuilder builder = new TestNeedBuilder();
-    builder.setBasicNeedType(BasicNeedType.CRITIQUE);
-    Assert.assertEquals(BasicNeedType.CRITIQUE.getURI(), builder.testGetBasicNeedTypeURI());
-    builder = new TestNeedBuilder();
-    builder.setBasicNeedType(BasicNeedType.DEMAND.getURI());
-    Assert.assertEquals(BasicNeedType.DEMAND, builder.testGetBasicNeedTypeBNT());
   }
 
   public void testRoundTrip(Model model) throws FileNotFoundException
@@ -144,12 +129,5 @@ public class NeedModelBuilderTests
       return getStateURI();
     }
 
-    public BasicNeedType testGetBasicNeedTypeBNT(){
-      return getBasicNeedTypeBNT();
-    }
-
-    public URI testGetBasicNeedTypeURI(){
-      return getBasicNeedTypeURI();
-    }
   }
 }

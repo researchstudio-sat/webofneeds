@@ -96,11 +96,10 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
 
     // add filters to the query: right need type, need status active, creation date overlap 1 month,
     // geographical distance < 50 km
-    String[] filterQueries = new String[4];
+    String[] filterQueries = new String[3];
     filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
-    filterQueries[1] = new NeedTypeQueryFactory(dataset).createQuery();
-    filterQueries[2] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
-    filterQueries[3] = new GeoDistFilterQueryFactory(dataset, 50.0).createQuery();
+    filterQueries[1] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
+    filterQueries[2] = new GeoDistFilterQueryFactory(dataset, 50.0).createQuery();
 
     log.info("query Solr endpoint {} for need {}", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
     SolrDocumentList docs = executeQuery(

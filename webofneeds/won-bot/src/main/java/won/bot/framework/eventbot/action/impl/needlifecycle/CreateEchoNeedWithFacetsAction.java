@@ -16,9 +16,9 @@
 
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-import org.apache.commons.lang3.StringUtils;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.Event;
@@ -28,7 +28,6 @@ import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
-import won.protocol.model.BasicNeedType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.NeedModelBuilder;
 import won.protocol.util.RdfUtils;
@@ -71,7 +70,6 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction
         final Model needModel =
                 new NeedModelBuilder()
                         .setTitle("RE: " + replyText)
-                        .setBasicNeedType(BasicNeedType.SUPPLY)
                         .setDescription("This is a need automatically created by the EchoBot.")
                         .setUri(needURI)
                         .setFacetTypes(facets)

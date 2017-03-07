@@ -1,9 +1,9 @@
 package won.bot.framework.eventbot.action.impl.mail.send;
 
 import org.apache.jena.query.*;
-import org.apache.jena.tdb.TDB;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.tdb.TDB;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
-import won.protocol.model.BasicNeedType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.sparql.WonQueries;
@@ -125,8 +124,7 @@ public class WonMimeMessageGenerator {
         MimeMessage answerMessage = (MimeMessage) msgToRespondTo.reply(false);
         answerMessage.setFrom(new InternetAddress(sentFrom, sentFromName));
         answerMessage.setText("");
-        answerMessage.setSubject(answerMessage.getSubject() + " <-> [" + BasicNeedType
-          .fromURI(WonRdfUtils.NeedUtils.getBasicNeedType(remoteNeedRDF)) + "] " + WonRdfUtils.NeedUtils
+        answerMessage.setSubject(answerMessage.getSubject() + " <-> " + WonRdfUtils.NeedUtils
           .getNeedTitle(remoteNeedRDF));
 
         //We need to create an instance of our own MimeMessage Implementation in order to have the Unique Message Id set before sending

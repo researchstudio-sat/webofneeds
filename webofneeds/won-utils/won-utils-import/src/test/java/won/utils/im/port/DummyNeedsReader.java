@@ -1,7 +1,6 @@
 package won.utils.im.port;
 
 import org.apache.jena.rdf.model.Model;
-import won.protocol.model.BasicNeedType;
 import won.protocol.util.NeedModelBuilder;
 
 import java.io.IOException;
@@ -49,7 +48,6 @@ public class DummyNeedsReader implements NeedDataReader<Model>
     calender.set(Calendar.MONTH, needId);
     needModelBuilder.addAvailableAfter(calender.getTime());
     needModelBuilder.setAvailableAtLocation((float) 48.2000, (float) 16.3667);
-    needModelBuilder.setBasicNeedType(BasicNeedType.DEMAND);
     needModelBuilder.setCurrency("EUR");
     needModelBuilder.setPriceLimit((double) 100, (double) needId*100);
 

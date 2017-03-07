@@ -39,8 +39,6 @@ public class NeedPojoNeedModelBuilder extends NeedBuilderBase<Model>
       this.setContentDescription(needPojo.getContentDescription());
     if (needPojo.getState()!=null)
       this.setState(needPojo.getState());
-    if (needPojo.getBasicNeedType()!=null)
-      this.setBasicNeedType(needPojo.getBasicNeedType());
     if (needPojo.getCreationDate()!=null){
       DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
       Date creationDate = format.parse(needPojo.getCreationDate());
@@ -95,8 +93,6 @@ public class NeedPojoNeedModelBuilder extends NeedBuilderBase<Model>
     DefaultPrefixUtils.setDefaultPrefixes(needModel);
 
     Resource needResource = needModel.createResource(this.getNeedURIString(), WON.NEED);
-    // need type
-    needModel.add(needModel.createStatement(needResource, WON.HAS_BASIC_NEED_TYPE, WON.toResource(this.getBasicNeedTypeBNT())));
 
     // need content
     Resource needContent = needModel.createResource(WON.NEED_CONTENT);

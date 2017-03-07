@@ -20,7 +20,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import won.protocol.model.BasicNeedType;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.NeedState;
 
@@ -64,8 +63,6 @@ public class WON
   public static final Property HAS_BROKER_URI = m.createProperty(BASE_URI, "hasBrokerUri");
   public static final Resource WON_OVER_SOAP_WS = m.createResource(BASE_URI + "WonOverSoapWs");
   public static final Property IS_IN_STATE = m.createProperty(BASE_URI, "isInState");
-
-  public static final Property HAS_BASIC_NEED_TYPE = m.createProperty(BASE_URI, "hasBasicNeedType");
 
   public static final Property HAS_CONTENT = m.createProperty(BASE_URI, "hasContent");
 
@@ -146,11 +143,6 @@ public class WON
 
   // Resource individuals
 
-  public static final Resource BASIC_NEED_TYPE_DO_TOGETHER = m.createResource(BasicNeedType.DO_TOGETHER.getURI().toString());
-  public static final Resource BASIC_NEED_TYPE_SUPPLY = m.createResource(BasicNeedType.SUPPLY.getURI().toString());
-  public static final Resource BASIC_NEED_TYPE_DEMAND = m.createResource(BasicNeedType.DEMAND.getURI().toString());
-  public static final Resource BASIC_NEED_TYPE_CRITIQUE = m.createResource(BasicNeedType.CRITIQUE.getURI().toString());
-
   public static final Resource NEED_STATE_ACTIVE = m.createResource(NeedState.ACTIVE.getURI().toString());
   public static final Resource NEED_STATE_INACTIVE = m.createResource(NeedState.INACTIVE.getURI().toString());
 
@@ -221,29 +213,6 @@ public class WON
         throw new IllegalStateException("No case specified for " + state.name());
     }
   }
-
-  /**
-   * Converts the BasicNeedType Enum to a Resource.
-   *
-   * @param type
-   * @return
-   */
-  public static Resource toResource(BasicNeedType type)
-  {
-    switch (type) {
-      case DO_TOGETHER:
-        return BASIC_NEED_TYPE_DO_TOGETHER;
-      case SUPPLY:
-        return BASIC_NEED_TYPE_SUPPLY;
-      case DEMAND:
-        return BASIC_NEED_TYPE_DEMAND;
-      case CRITIQUE:
-        return BASIC_NEED_TYPE_CRITIQUE;
-      default:
-        throw new IllegalStateException("No such case specified for " + type.name());
-    }
-  }
-
 
   /**
    * Converts the ConnectionState Enum to a Resource.

@@ -20,7 +20,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.util.FileUtils;
 import org.apache.commons.lang3.Range;
-import won.protocol.model.BasicNeedType;
 import won.protocol.model.NeedState;
 import won.protocol.vocabulary.WON;
 
@@ -41,13 +40,10 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
 {
   private URI uriURI;
   private String uriString;
-  private URI basicNeedTypeURI;
   private Long recurIn;
   private int recurTimes;
   private boolean recurInfiniteTimes;
   private List<URI> facetTypes;
-  private BasicNeedType basicNeedTypeBNT;
-  private String basicNeedTypeURIString;
   private URI stateURI;
   private NeedState stateNS;
   private String stateURIString;
@@ -97,8 +93,7 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
     } else {
       otherNeedBuilder.setAvailableAtLocation(getAvailableAtLocationLatitude(), getAvailableAtLocationLongitude());
     }
-    otherNeedBuilder.setBasicNeedType(getBasicNeedTypeURI())
-        .setContentDescription(getContentDescription())
+    otherNeedBuilder.setContentDescription(getContentDescription())
         .setCreationDate(getCreationDate())
         .setPriceLimit(getPriceLimit())
         .setCurrency(getCurrency())
@@ -182,14 +177,6 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   protected String getNeedURIString()
   {
     return getStringForURI(this.uriString, this.uriURI);
-  }
-
-  protected URI getBasicNeedTypeURI()
-  {
-    if (this.basicNeedTypeURI != null) return this.basicNeedTypeURI;
-    if (this.basicNeedTypeBNT != null) return URI.create(WON.toResource(this.basicNeedTypeBNT).getURI());
-    if (this.basicNeedTypeURIString != null) return URI.create(this.basicNeedTypeURIString);
-    return null;
   }
 
   protected URI getStateURI()
@@ -302,33 +289,6 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
   {
     this.uriString = uri;
     this.uriURI = null;
-    return this;
-  }
-
-  @Override
-  public NeedBuilder<T> setBasicNeedType(final URI type)
-  {
-    this.basicNeedTypeURI = type;
-    this.basicNeedTypeBNT = null;
-    this.basicNeedTypeURIString = null;
-    return this;
-  }
-
-  @Override
-  public NeedBuilder<T> setBasicNeedType(final BasicNeedType type)
-  {
-    this.basicNeedTypeBNT = type;
-    this.basicNeedTypeURI = null;
-    this.basicNeedTypeURIString = null;
-    return this;
-  }
-
-  @Override
-  public NeedBuilder<T> setBasicNeedType(final String basicNeedTypeUri)
-  {
-    this.basicNeedTypeBNT = null;
-    this.basicNeedTypeURI = null;
-    this.basicNeedTypeURIString = basicNeedTypeUri;
     return this;
   }
 
@@ -561,13 +521,6 @@ public abstract class NeedBuilderBase<T> implements NeedBuilder<T>
     this.matcherProtocolEndpointString = null;
     this.matcherProtocolEndpointURI = endpoint;
     return this;
-  }
-
-  public BasicNeedType getBasicNeedTypeBNT() {
-    if (this.basicNeedTypeBNT != null) return this.basicNeedTypeBNT;
-    if (this.basicNeedTypeURI != null) return BasicNeedType.fromURI(this.basicNeedTypeURI);
-    if (this.basicNeedTypeURIString != null) return BasicNeedType.fromURI(URI.create(this.basicNeedTypeURIString));
-    return null;
   }
 
   @Override

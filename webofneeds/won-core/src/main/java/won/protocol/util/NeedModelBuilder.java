@@ -47,8 +47,7 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
     assert needModel != null : "needModel must not be null";
     Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(needModel);
     this.setUri(needResource.getURI());
-    Resource basicNeedTypeResource = needResource.getPropertyResourceValue(WON.HAS_BASIC_NEED_TYPE);
-    if (basicNeedTypeResource != null) this.setBasicNeedType(URI.create(basicNeedTypeResource.getURI()));
+
     Statement creationDateStmt = needResource.getProperty(DCTerms.created);
     if (creationDateStmt != null) {
       this.setCreationDate(DateTimeUtils.toDate(creationDateStmt.getObject(), needModel));
@@ -238,8 +237,6 @@ public class NeedModelBuilder extends NeedBuilderBase<Model>
       needModel.setNsPrefix("", getURI().toString());
     }
     Resource needResource = needModel.createResource(getNeedURIString(), WON.NEED);
-    // need type
-    addResourceIfPresent(needResource, WON.HAS_BASIC_NEED_TYPE, getBasicNeedTypeURI());
     //facets
     if (this.getFacetTypes() != null){
       for (URI facetType: this.getFacetTypes()){

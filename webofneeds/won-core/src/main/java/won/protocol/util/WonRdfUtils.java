@@ -5,11 +5,10 @@ import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.riot.Lang;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.RDF;
-import org.apache.camel.component.dataset.DataSet;
-import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.DataIntegrityException;
@@ -817,15 +816,6 @@ public class WonRdfUtils
       URI needUri = NeedUtils.getNeedURI(needDataset);
 
       return getNeedTitle(needDataset, needUri);
-    }
-
-    public static URI getBasicNeedType(Dataset needDataset) {
-      URI needUri = NeedUtils.getNeedURI(needDataset);
-
-      Path basicNeedTypePath = PathParser.parse("won:hasBasicNeedType", DefaultPrefixUtils.getDefaultPrefixes());
-      URI basicNeedType = RdfUtils.getURIPropertyForPropertyPath(needDataset, needUri, basicNeedTypePath);
-
-      return basicNeedType;
     }
 
     public static String getNeedDescription(Dataset needDataset) {

@@ -1,7 +1,7 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
-import org.apache.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.rdf.model.Model;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.UriType;
@@ -12,7 +12,6 @@ import won.bot.framework.eventbot.event.impl.mail.CreateNeedFromMailEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
-import won.protocol.model.BasicNeedType;
 import won.protocol.model.FacetType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.NeedModelBuilder;
@@ -53,9 +52,6 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
             MimeMessage message = ((CreateNeedFromMailEvent) event).getMessage();
 
             try {
-                BasicNeedType type = mailContentExtractor.getBasicNeedType(message);
-                assert type != null; //Done as a failsafe, this Action should never be called if it is not a valid CreateNeed-Mail
-
                 String title = mailContentExtractor.getTitle(message);
                 String description = mailContentExtractor.getDescription(message);
                 String[] tags = mailContentExtractor.getTags(message);
@@ -69,7 +65,6 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                 final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
                 Model model = new NeedModelBuilder()
                         .setTitle(title)
-                        .setBasicNeedType(type)
                         .setDescription(description)
                         .setUri(needURI)
                         .setTags(tags)
