@@ -11,9 +11,10 @@ var gulp_jspm = require('gulp-jspm');
 var sourcemaps = require('gulp-sourcemaps');
 
 
+
 gulp.task('default', ['build']);
-gulp.task('build', ['sass', 'iconsprite', 'bundlejs']);
-gulp.task('watch', ['sass', 'iconsprite', 'bundlejs'], function() {
+gulp.task('build', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res']);
+gulp.task('watch', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res'], function() {
     gulp.watch('./app/**/*.js', ['bundlejs']);
     gulp.watch('./style/**/*.scss', ['sass']);
     gulp.watch('./style/**/_*.scss', ['sass']);
@@ -52,6 +53,18 @@ gulp.task('sass', function(done) {
         .pipe(rename({ extname: '.min.css' }))
         .pipe(gulp.dest(generatedStyleFolder))
         .on('end', done);
+});
+
+/**
+ * Copies over static resources, that libraries in
+ * the bundle need to be in a place relativ to
+ * themselves -- and thus the bundle.
+ */
+gulp.task('copy-static-res', function(done) {
+    return gulp.src([
+        getRelModuleFolderPath('leaflet') + 'dist/images/**/*',
+    ])
+    .pipe(gulp.dest('./generated/images/'))
 });
 
 
@@ -104,6 +117,31 @@ gulp.task('clean', function () {
     //.forEach((folder) => rimraf(`./${folder}`, ()=>{}));
     rimraf('./generated', function(){});
 });
+
+
+
+require('./jspm_packages/system.js');
+require('./jspm_config.js');
+
+function getRelModuleFolderPath(moduleName) {
+    var absolutePath = getAbsModuleFolderPath(moduleName);
+
+    // example:
+    // * abs: https://localhost:8443/owner/jspm_packages/npm/leaflet@0.7.7.js
+    // * baseURL: https://localhost:8443/
+    // ==> ./jspm_packages/npm/leaflet@0.7.7/dist/images/**/*
+
+    return './' + absolutePath.substr(System.baseURL.length)
+}
+
+function getAbsModuleFolderPath(moduleName) {
+
+    // e.g. "https://localhost:8443/owner/jspm_packages/npm/leaflet@0.7.7.js"
+    var modulePath = System.normalizeSync(moduleName);
+
+    var folderPath = modulePath.substr(0, modulePath.length - 3) + '/'; // remove `.js`
+    return folderPath;
+}
 
 //npm install --save-dev "gulp-dgeni" "gulp-esdoc" "gulp-jsdoc" "dgeni" "dgeni-packages"
 //var dgeni = require('gulp-dgeni');A
