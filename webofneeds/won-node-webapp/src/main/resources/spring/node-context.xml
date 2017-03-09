@@ -19,8 +19,8 @@
         WebIdUserDetailsService, which in turn de-references the WebId URI and checks if the client certificate used in
         the request is indeed using the public key specified in the data returned for the URI.
 
-        TODO: continue here: If that is the case, the requested resource's acl is checked according to the principles
-         of WebAccessControl.
+        If that is the case, the requested resource's access policy is checked. This is a static policy allowing both
+        participants and their won nodes to read.
     -->
 
     <!-- use all spring security's http headers except cache-control, which we handle separately to allow for fine
