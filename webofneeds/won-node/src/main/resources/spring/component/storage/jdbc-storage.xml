@@ -64,16 +64,16 @@
            </bean>
         </property>
         -->
-        <property name="jpaProperties">
-            <props>
-                <prop key="hibernate.hbm2ddl.auto">${db.ddl.strategy}</prop>
-                <prop key="hibernate.show_sql">false</prop>
-                <prop key="hibernate.generate_statistics">false</prop>
-                <prop key="hibernate.cache.use_minimal_puts">true</prop>
-                <prop key="hibernate.integrator_provider">
+        <property name="jpaPropertyMap">
+            <map>
+                <entry key="hibernate.hbm2ddl.auto" value="${db.ddl.strategy}"/>
+                <entry key="hibernate.show_sql" value="false" />
+                <entry key="hibernate.generate_statistics" value="false" />
+                <entry key="hibernate.cache.use_minimal_puts" value="true"/>
+                <entry key="hibernate.integrator_provider">
                     <bean class="won.protocol.model.parentaware.ParentAwareIntegratorProvider" />
-                </prop>
-            </props>
+                </entry>
+            </map>
         </property>
     </bean>
 
