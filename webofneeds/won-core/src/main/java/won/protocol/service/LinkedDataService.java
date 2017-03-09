@@ -335,16 +335,11 @@ public interface LinkedDataService
   public Dataset getNodeDataset();
 
   /**
-   * returns a dataset of the (message) event with the specified URI
-   * @param eventURI
-   */
-  public Dataset getDatasetForUri(final URI eventURI);
-
-  /**
    * returns a dataset of the (message) event with the specified URI, with a value that can be used for an etag.
    * If the current etag is the same as the specified one, the dataset is null, indicating no change.
    * @param eventURI
    */
   public DataWithEtag<Dataset> getDatasetForUri(final URI eventURI, String etag);
+
 
 }
