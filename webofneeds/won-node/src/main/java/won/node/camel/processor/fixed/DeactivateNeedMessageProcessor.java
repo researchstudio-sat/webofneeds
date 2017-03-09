@@ -35,6 +35,7 @@ public class DeactivateNeedMessageProcessor extends AbstractCamelProcessor
     logger.debug("DEACTIVATING need. needURI:{}", receiverNeedURI);
     if (receiverNeedURI == null) throw new WonMessageProcessingException("receiverNeedURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
+    need.getEventContainer().getEvents().add(messageEventRepository.findOneByMessageURI(wonMessage.getMessageURI()));
     need.setState(NeedState.INACTIVE);
     need = needRepository.save(need);
   }

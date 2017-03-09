@@ -57,8 +57,13 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
 
     // ToDo (FS) check if the WON node URI corresponds with the WON node (maybe earlier in the message layer)
     NeedEventContainer needEventContainer = needEventContainerRepository.findOneByParentUri(needURI);
+    if (needEventContainer == null) {
+      needEventContainer = new NeedEventContainer(need, need.getNeedURI());
+    }
+    needEventContainer.getEvents().add(messageEventRepository.findOneByMessageURI(wonMessage.getMessageURI()));
     need.setWonNodeURI(wonMessage.getReceiverNodeURI());
     ConnectionContainer connectionContainer = new ConnectionContainer(need);
+
 
     need.setConnectionContainer(connectionContainer);
     need.setEventContainer(needEventContainer);
