@@ -104,6 +104,7 @@ public class ModelHolder
   public Model getModel(){
     assert this.uri != null : "uri must not be null";
     assert this.modelBytes != null : "model must not be null";
+    if (this.cachedModel != null) return cachedModel;
     synchronized (this) {
       if (this.cachedModel != null) return cachedModel;
       Model model = ModelFactory.createDefaultModel();
