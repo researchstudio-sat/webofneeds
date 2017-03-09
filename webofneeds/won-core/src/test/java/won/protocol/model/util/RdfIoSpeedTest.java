@@ -16,8 +16,8 @@
 
 package won.protocol.model.util;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
