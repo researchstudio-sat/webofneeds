@@ -42,6 +42,11 @@ public class Need
   @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
   private long version = 0L;
 
+  @Version
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name="last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private Date lastUpdate = new Date();
+
   /* The URI of the need */
   @Column( name = "needURI", unique = true)
   @Convert( converter = URIConverter.class)
