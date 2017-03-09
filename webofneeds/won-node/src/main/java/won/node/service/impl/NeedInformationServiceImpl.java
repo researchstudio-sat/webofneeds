@@ -130,6 +130,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
+  @Deprecated
   public Slice<URI> listConnectionURIs(int page, Integer preferedPageSize, Date timeSpot)
   {
     int pageSize = getPageSize(preferedPageSize);
@@ -147,6 +148,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
+  @Deprecated
   public Slice<URI> listConnectionURIsBefore(
     final URI resumeConnURI, final Integer preferredPageSize, final Date timeSpot) {
 
@@ -159,6 +161,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
+  @Deprecated
   public Slice<URI> listConnectionURIsAfter(
     final URI resumeConnURI, final Integer preferredPageSize, final Date timeSpot) {
 
@@ -171,12 +174,14 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
+  @Deprecated
   public Collection<URI> listConnectionURIs(final URI needURI) throws NoSuchNeedException
   {
     return connectionRepository.getAllConnectionURIsForNeedURI(needURI);
   }
 
   @Override
+  @Deprecated
   public Slice<URI> listConnectionURIs(final URI needURI, int page, Integer preferedPageSize, WonMessageType
     messageType, Date timeSpot) {
     Slice<URI> slice = null;
@@ -200,6 +205,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
+  @Deprecated
   public Slice listConnectionURIsBefore(final URI needURI, final URI resumeConnURI, final Integer preferredPageSize,
                                         WonMessageType messageType, final Date timeSpot) {
 
@@ -220,6 +226,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
+  @Deprecated
   public Slice listConnectionURIsAfter(final URI needURI, final URI resumeConnURI, final Integer preferredPageSize,
                                         final WonMessageType messageType, final Date timeSpot) {
 
@@ -291,6 +298,7 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
+  @Deprecated
   public Slice<URI> listConnectionEventURIs(
     URI connectionUri, int page, Integer preferedPageSize, WonMessageType messageType)
   {
@@ -308,6 +316,24 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
+  public Slice<MessageEventPlaceholder> listConnectionEvents(
+    URI connectionUri, int page, Integer preferedPageSize, WonMessageType messageType)
+  {
+    int pageSize = getPageSize(preferedPageSize);
+    int pageNum = page - 1;
+    Slice<MessageEventPlaceholder> slice = null;
+    if (messageType == null) {
+      slice = messageEventRepository.findByParentURI(
+        connectionUri, new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
+    } else {
+      slice = messageEventRepository.findByParentURIAndType(
+        connectionUri, messageType, new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
+    }
+    return slice;
+  }
+
+  @Override
+  @Deprecated
   public Slice<URI> listConnectionEventURIsAfter(URI connectionUri, URI msgURI, Integer preferredPageSize,
                                                  WonMessageType msgType) {
       MessageEventPlaceholder referenceMsg = messageEventRepository.findOneByMessageURI(msgURI);
@@ -325,6 +351,24 @@ public class NeedInformationServiceImpl implements NeedInformationService
   }
 
   @Override
+  public Slice<MessageEventPlaceholder> listConnectionEventsAfter(URI connectionUri, URI msgURI, Integer preferredPageSize,
+                                                 WonMessageType msgType) {
+    MessageEventPlaceholder referenceMsg = messageEventRepository.findOneByMessageURI(msgURI);
+    Date referenceDate = referenceMsg.getCreationDate();
+    int pageSize = getPageSize(preferredPageSize);
+    Slice<MessageEventPlaceholder> slice = null;
+    if (msgType == null) {
+      slice = messageEventRepository.findByParentURIAfter(
+        connectionUri, referenceDate, new PageRequest(0, pageSize, Sort.Direction.ASC, "creationDate"));
+    } else {
+      slice = messageEventRepository.findByParentURIAndTypeAfter(
+        connectionUri, referenceDate, msgType, new PageRequest(0, pageSize, Sort.Direction.ASC, "creationDate"));
+    }
+    return slice;
+  }
+
+  @Override
+  @Deprecated
   public Slice<URI> listConnectionEventURIsBefore(final URI connectionUri, final URI msgURI, final Integer
     preferredPageSize, final WonMessageType msgType) {
     MessageEventPlaceholder referenceMsg = messageEventRepository.findOneByMessageURI(msgURI);
@@ -337,6 +381,21 @@ public class NeedInformationServiceImpl implements NeedInformationService
     } else {
       slice = messageEventRepository.getMessageURIsByParentURIBefore(
         connectionUri, referenceDate, msgType, new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
+    }
+    return slice;
+  }
+
+  @Override
+  public Slice<MessageEventPlaceholder> listConnectionEventsBefore(final URI connectionUri, final URI msgURI, final Integer
+    preferredPageSize, final WonMessageType msgType) {
+    int pageSize = getPageSize(preferredPageSize);
+    Slice<MessageEventPlaceholder> slice = null;
+    if (msgType == null) {
+      slice = messageEventRepository.findByParentURIBeforeFetchDatasetEagerly(
+        connectionUri, msgURI, new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
+    } else {
+      slice = messageEventRepository.findByParentURIAndTypeBeforeFetchDatasetEagerly(
+        connectionUri, msgURI, msgType, new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
     }
     return slice;
   }
