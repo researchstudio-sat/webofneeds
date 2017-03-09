@@ -130,6 +130,7 @@ public class DatasetHolder
   public Dataset getDataset(){
     assert this.uri != null : "uri must not be null";
     assert this.datasetBytes != null : "model must not be null";
+    if (this.cachedDataset != null) return cachedDataset;
     synchronized (this) {
       if (this.cachedDataset != null) return cachedDataset;
       Dataset dataset = DatasetFactory.createMem();
