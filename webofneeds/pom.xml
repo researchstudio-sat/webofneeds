@@ -216,7 +216,6 @@
                         <artifactId>xercesImpl</artifactId>
                     </exclusion>
                     <exclusion>
-
                         <groupId>log4j</groupId>
                         <artifactId>log4j</artifactId>
                     </exclusion>
@@ -537,12 +536,6 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
                 <version>${ch.qos.logback.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.17</version>
-                <scope>test</scope>
             </dependency>
 
             <!-- Simon Monitoring stuff -->

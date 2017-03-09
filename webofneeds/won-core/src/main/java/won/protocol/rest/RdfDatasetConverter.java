@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.util.StopWatch;
 import won.protocol.util.RdfUtils;
 
 import java.io.IOException;
@@ -58,12 +59,16 @@ public class RdfDatasetConverter extends AbstractHttpMessageConverter<Dataset>
   @Override
   protected void writeInternal(Dataset dataset, HttpOutputMessage httpOutputMessage) throws IOException,
     HttpMessageNotWritableException {
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
     MediaType contentType = httpOutputMessage.getHeaders().getContentType();
     Lang rdfLanguage = mimeTypeToJenaLanguage(contentType, Lang.TRIG);
     WonEtagHelper.setMediaTypeForEtagHeaderIfPresent(contentType, httpOutputMessage.getHeaders());
     RDFDataMgr.write(httpOutputMessage.getBody(), dataset, rdfLanguage);
     //append content type to ETAG header to avoid confusing different representations of the same resource
     httpOutputMessage.getBody().flush();
+    stopWatch.stop();
+    logger.debug("writing dataset took " + stopWatch.getLastTaskTimeMillis() + " millls");
   }
 
   private static Lang mimeTypeToJenaLanguage(MediaType mediaType, Lang defaultLanguage) {
