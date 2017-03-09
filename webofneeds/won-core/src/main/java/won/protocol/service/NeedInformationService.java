@@ -21,10 +21,7 @@ import org.springframework.data.domain.Slice;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessageType;
-import won.protocol.model.Connection;
-import won.protocol.model.DataWithEtag;
-import won.protocol.model.Need;
-import won.protocol.model.NeedState;
+import won.protocol.model.*;
 
 import java.net.URI;
 import java.util.Collection;
@@ -238,8 +235,12 @@ public interface NeedInformationService {
    * @param messageType null => all types
    * @return a collection of all event URIs.
    */
+  @Deprecated
     public Slice<URI> listConnectionEventURIs(
       URI connectionUri, int page, Integer preferredPageSize, WonMessageType messageType);
+
+  public Slice<MessageEventPlaceholder> listConnectionEvents(
+    URI connectionUri, int page, Integer preferredPageSize, WonMessageType messageType);
 
 
   /**
@@ -253,8 +254,12 @@ public interface NeedInformationService {
    * @param msgType null => all types
    * @return a collection of all event URIs.
    */
-    public Slice<URI> listConnectionEventURIsBefore(
+  @Deprecated
+  public Slice<URI> listConnectionEventURIsBefore(
       URI connectionUri, URI msgURI, Integer preferredPageSize, WonMessageType msgType);
+
+  public Slice<MessageEventPlaceholder> listConnectionEventsBefore(
+    URI connectionUri, URI msgURI, Integer preferredPageSize, WonMessageType msgType);
 
 
   /**
@@ -268,7 +273,11 @@ public interface NeedInformationService {
    * @param msgType null => all types
    * @return a collection of all event URIs.
    */
+  @Deprecated
     public Slice<URI> listConnectionEventURIsAfter(
+    URI connectionUri, URI msgURI, Integer preferredPageSize, WonMessageType msgType);
+
+  public Slice<MessageEventPlaceholder> listConnectionEventsAfter(
     URI connectionUri, URI msgURI, Integer preferredPageSize, WonMessageType msgType);
 
 
