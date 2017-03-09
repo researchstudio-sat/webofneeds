@@ -3,6 +3,7 @@ package won.node.camel.processor.fixed;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.exception.IllegalMessageForConnectionStateException;
@@ -25,6 +26,7 @@ import java.net.URI;
 public class SendMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor
 {
 
+  @Transactional
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
