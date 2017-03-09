@@ -33,6 +33,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -285,9 +286,10 @@ public class
                               Model model,
                               HttpServletResponse response) {
     URI eventURI = uriService.createEventURIForId(identifier);
-    Dataset rdfDataset = linkedDataService.getDatasetForUri(eventURI);
-    if (model != null) {
-      model.addAttribute("rdfDataset", rdfDataset);
+
+    DataWithEtag<Dataset> data = linkedDataService.getDatasetForUri(eventURI, null);
+    if (model != null && ! data.isNotFound()) {
+      model.addAttribute("rdfDataset", data.getData());
       model.addAttribute("resourceURI", eventURI.toString());
       model.addAttribute("dataURI", uriService.toDataURIIfPossible(eventURI).toString());
       return "rdfDatasetView";
@@ -303,10 +305,10 @@ public class
     public String showAttachmentPage(@PathVariable(value = "identifier") String identifier,
                                 Model model,
                                 HttpServletResponse response) {
-        URI attachmentURI = uriService.createAttachmentURIForId(identifier);
-        Dataset rdfDataset = linkedDataService.getDatasetForUri(attachmentURI);
-        if (model != null) {
-            model.addAttribute("rdfDataset", rdfDataset);
+      URI attachmentURI = uriService.createAttachmentURIForId(identifier);
+      DataWithEtag<Dataset> data = linkedDataService.getDatasetForUri(attachmentURI, null);
+      if (model != null && ! data.isNotFound()) {
+            model.addAttribute("rdfDataset", data.getData());
             model.addAttribute("resourceURI", attachmentURI.toString());
             model.addAttribute("dataURI", uriService.toDataURIIfPossible(attachmentURI).toString());
             return "rdfDatasetView";
@@ -783,10 +785,15 @@ public class
     logger.debug("readNeed() called");
     URI needUri = URI.create(this.needResourceURIPrefix + "/" + identifier);
     try {
+      StopWatch stopWatch = new StopWatch();
+      stopWatch.start();
       Dataset dataset = linkedDataService.getNeedDataset(needUri);
       //TODO: need information does change over time. The immutable need information should never expire, the mutable should
       HttpHeaders headers = new HttpHeaders();
       addCORSHeader(headers);
+      stopWatch.stop();
+      logger.debug("readNeed took " + stopWatch.getLastTaskTimeMillis() + " millis");
+
       return new ResponseEntity<Dataset>(dataset, headers, HttpStatus.OK);
     } catch (NoSuchNeedException e) {
       return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
@@ -895,7 +902,8 @@ public class
     @RequestParam(value="resumeafter", required=false) String afterId,
     @RequestParam(value="type", required=false) String type,
     @RequestParam(value="deep", required = false, defaultValue = "false") boolean deep) {
-
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
     logger.debug("readConnection() called");
     Dataset rdfDataset = null;
     HttpHeaders headers = new HttpHeaders();
@@ -956,6 +964,8 @@ public class
                                  URI.create(this.connectionResourceURIPrefix));
     addMutableResourceHeaders(headers);
     addCORSHeader(headers);
+    stopWatch.stop();
+    logger.debug("readConnectionEvents took " + stopWatch.getLastTaskTimeMillis() + " millis");
     return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
 
   }
@@ -1046,11 +1056,11 @@ public class
       logger.debug("readAttachment() called");
 
         URI attachmentURI = uriService.createAttachmentURIForId(identifier);
-        Dataset rdfDataset = linkedDataService.getDatasetForUri(attachmentURI);
-        if (rdfDataset != null) {
+        DataWithEtag<Dataset> data = linkedDataService.getDatasetForUri(attachmentURI, null);
+        if (!data.isNotFound()) {
             HttpHeaders headers = new HttpHeaders();
             addCORSHeader(headers);
-          String mimeTypeOfResponse = RdfUtils.findFirst(rdfDataset, new RdfUtils.ModelVisitor<String>() {
+          String mimeTypeOfResponse = RdfUtils.findFirst(data.getData(), new RdfUtils.ModelVisitor<String>() {
             @Override
             public String visit(org.apache.jena.rdf.model.Model model) {
               String content = getObjectOfPropertyAsString(model, CNT.BYTES);
@@ -1066,7 +1076,7 @@ public class
             producibleMediaTypes.add(MediaType.valueOf(mimeTypeOfResponse));
             request.setAttribute(HandlerMapping.PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE, producibleMediaTypes);
           }
-          return new ResponseEntity<Dataset>(rdfDataset, headers, HttpStatus.OK);
+          return new ResponseEntity<Dataset>(data.getData(), headers, HttpStatus.OK);
         } else {
             return new ResponseEntity<Dataset>(HttpStatus.NOT_FOUND);
         }
@@ -1380,7 +1390,9 @@ public class
       logger.debug("ETAG comparison shows that data has changed or no etag was present");
       // data has changed: create a new etag and put it into the header
       WonEtagHelper responseEtagHelper = WonEtagHelper.forVersion(datasetWithEtag.getEtag());
-      WonEtagHelper.setEtagHeader(responseEtagHelper, headers);
+      if (responseEtagHelper != null) {
+        WonEtagHelper.setEtagHeader(responseEtagHelper, headers);
+      }
     } else {
       // data has not changed: use the old etag value for the response ETag header
       WonEtagHelper.setEtagHeader(requestEtagHelper,headers);
