@@ -9,6 +9,7 @@ import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.vocabulary.WONMSG;
 
@@ -30,9 +31,9 @@ public class CloseMessageFromNodeProcessor extends AbstractCamelProcessor
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     URI connectionURIFromWonMessage = wonMessage.getReceiverURI();
-    dataService.nextConnectionState(
+    Connection con = dataService.nextConnectionState(
       connectionURIFromWonMessage, ConnectionEventType.PARTNER_CLOSE);
-  }
+    }
 
 
 }

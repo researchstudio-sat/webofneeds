@@ -35,6 +35,7 @@ public class ActivateNeedMessageProcessor extends AbstractCamelProcessor
     logger.debug("ACTIVATING need. needURI:{}", receiverNeedURI);
     if (receiverNeedURI == null) throw new IllegalArgumentException("receiverNeedURI is not set");
     Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
+    need.getEventContainer().getEvents().add(messageEventRepository.findOneByMessageURI(wonMessage.getMessageURI()));
     need.setState(NeedState.ACTIVE);
     logger.debug("Setting Need State: " + need.getState());
     needRepository.save(need);
