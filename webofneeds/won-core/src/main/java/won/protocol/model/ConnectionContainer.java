@@ -20,6 +20,7 @@ import won.protocol.model.parentaware.ParentAware;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.Date;
 
 @Entity
 @Table(name="connection_container")
@@ -35,6 +36,11 @@ public class ConnectionContainer implements ParentAware<Need>
   @Version
   @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
   private long version = 0L;
+
+  @Version
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name="last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private Date lastUpdate = new Date();
 
   @OneToOne (fetch = FetchType.LAZY)
   @MapsId
