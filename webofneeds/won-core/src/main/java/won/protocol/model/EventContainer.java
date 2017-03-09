@@ -18,7 +18,9 @@ package won.protocol.model;
 
 import javax.persistence.*;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 @Entity
 @Inheritance
@@ -36,11 +38,16 @@ public abstract class EventContainer
   private URI parentUri;
 
   @OneToMany(fetch = FetchType.LAZY)
-  private Collection<MessageEventPlaceholder> events;
+  private Collection<MessageEventPlaceholder> events = new ArrayList<>(1);
 
   @Version
   @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
   private long version = 0L;
+
+  @Version
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name="last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private Date lastUpdate = new Date();
 
   public EventContainer() {
   }
