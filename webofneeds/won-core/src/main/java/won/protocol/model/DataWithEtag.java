@@ -44,6 +44,15 @@ public class DataWithEtag<T>
     return new DataWithEtag(null, data.etag, data.oldEtag);
   };
 
+  /**
+   * Creates a DWE that indicates nothing has changed.
+   * @param etag the unchanged etag
+   * @return
+   */
+  public static DataWithEtag dataNotChanged(String etag) {
+    return new DataWithEtag(null, etag, etag);
+  }
+
   public DataWithEtag(final T data, final String etag, String oldEtag, boolean notFound) {
     this.data = data;
     this.etag = etag;
