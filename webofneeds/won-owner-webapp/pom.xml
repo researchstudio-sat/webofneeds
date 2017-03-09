@@ -169,7 +169,6 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
-                    <warSourceExcludes>node/**,node_modules/**</warSourceExcludes>
                 </configuration>
             </plugin>
             <plugin>
