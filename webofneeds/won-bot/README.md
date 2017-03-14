@@ -63,7 +63,7 @@ A bot is connected to the resources it uses through the [EventListenerContext](s
 A bot manages the data it needs to operate in the [BotContext](src/main/java/won/bot/framework/bot/context/BotContext.java). Most importantly, the botContext contains all need URIs that the bot is responsible for. That particular information is required by the framework to decide which events should be routed to the bot, as it might be managing a number of bots. Other information in the bot context is just for the bot's internal purposes (i.e. your purposes).
 
 ## The Bot's App
-The java application that runs a bot is usually a spring-boot application that loads all the necessary config and then starts the bot. For examples, look at the existing [Bot Apps] (src/main/java/won/bot/app). 
+The java application that runs a bot is usually a spring-boot application that loads all the necessary config and then starts the bot. For examples, look at the existing [Bot Apps](src/main/java/won/bot/app). 
 
 To create a new app (which is what you want if you want to run a bot), it's easiest to copy it's app class and the corresponding spring config files, and then making modifications.
 
