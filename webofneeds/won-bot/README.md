@@ -1,6 +1,6 @@
-##Testing and debugging with bots
+## Testing and debugging with bots
 
-###Debug Bot
+### Debug Bot
 [DebugBotApp](src/main/java/won/bot/app/DebugBotApp.java) can be used to test if connections 
 can be established with the needs you are creating and if messages can be sent via those connections. For each 
 created by you need the Bot will generate a connection request and a hint messages. Additionally, some actions can be
@@ -34,7 +34,7 @@ relevant for the system being tested, i.e.:
     this file must be deleted - otherwise the Bot won't trust the Node and won't be able to register and create needs
     there.
 
-###Mail2Won Bot
+### Mail2Won Bot
 [Mail2WonBotApp](src/main/java/won/bot/app/Mail2WonBotApp.java) can be used to create Needs retrieved from a given Email
 Address. This Bot acts mostly like a Owner Application as it allows Users to create needs, open/close connections or requests
 and communicate with others. [Insert List of commands here]
