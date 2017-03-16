@@ -156,7 +156,7 @@ public class WON
   public static final Resource CONNECTION_STATE_CLOSED = m.createResource(ConnectionState.CLOSED.getURI().toString());
 
   public static final Property HAS_SUGGESTED_COUNT = m.createProperty(BASE_URI,
-                                                                                 "hasSuggestedCount");
+                                                                      "hasSuggestedCount");
   public static final Property HAS_REQUEST_RECEIVED_COUNT = m.createProperty(BASE_URI,
                                                                                  "hasRequestReceivedCount");
   public static final Property HAS_REQUEST_SENT_COUNT = m.createProperty(BASE_URI,
@@ -165,16 +165,18 @@ public class WON
                                                                              "hasConnectedCount");
   public static final Property HAS_CLOSED_COUNT = m.createProperty(BASE_URI,
                                                                              "hasClosedCount");
-
-
   //adds a flag to a need
   public static final Property HAS_FLAG = m.createProperty(BASE_URI+"hasFlag");
 
-  //the doNotMatch flag: need does not want matching
-  public static final Resource DO_NOT_MATCH = m.createResource(BASE_URI+"DoNotMatch");
-
   //the usedForTesting flag: need is not a real need, only match with other needs flagged with usedForTesting
-  public static final Resource USED_FOR_TESTING= m.createResource(BASE_URI+"UsedForTesting");
+  public static final Resource USED_FOR_TESTING= m.createResource(BASE_URI + "UsedForTesting");
+
+  // Matching behavior
+  public static final Property HAS_MATCHING_BEHAVIOR = m.createProperty(BASE_URI, "hasMatchingBehavior");
+  public static final Resource MATCHING_BEHAVIOR_MUTUAL = m.createResource(BASE_URI + "Mutual");
+  public static final Resource MATCHING_BEHAVIOR_DO_NOT_MATCH = m.createResource(BASE_URI+"DoNotMatch");
+  public static final Resource MATCHING_BEHAVIOR_LAZY = m.createResource(BASE_URI+"Lazy");
+  public static final Resource MATCHING_BEHAVIOR_STEALTHY = m.createResource(BASE_URI+"Stealthy");
 
   public static final Property HAS_GRAPH = m.createProperty(BASE_URI,"hasGraph");
 
