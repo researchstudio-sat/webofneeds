@@ -59,7 +59,15 @@ function genComponentConf() {
             if(paragraphs && paragraphs.length > 1){
                 const titleParagraph = angular.element(".medium-mount p:first");
                 titleParagraph.addClass("medium_title");
-                title  = titleParagraph.text();
+
+                /*
+                 * Remove placeholder-white-space if medium.js fails to remove it,
+                 * e.g. when pasting (a multi-line'd string) into an empty textfield.
+                 * The `[0]` access the dom-element inside of the angular-element.
+                 */
+                titleParagraph[0].innerHTML = titleParagraph[0].innerHTML.replace(/^&nbsp;/, '');
+
+                title = titleParagraph.text();
 
                 const bodyParagraphs = angular.element(".medium-mount p:not('.medium_title')");
                 if(bodyParagraphs && bodyParagraphs.length > 0){
@@ -131,40 +139,75 @@ function genComponentConf() {
                 //mode: Medium.inlineMode, // no newlines, no styling
                 mode: Medium.partialMode, // allows newlines, no styling
                 //maxLength: this.maxChars, // -1 would disable it
+
+                //tags: null,
+                /*
                 tags: {
-                    /*
-                     'break': 'br',
-                     'horizontalRule': 'hr',
-                     'paragraph': 'p',
-                     'outerLevel': ['pre', 'blockquote', 'figure'],
-                     'innerLevel': ['a', 'b', 'u', 'i', 'img', 'strong']
-                     */
+                    'break': 'br',
+                    // 'horizontalRule': 'hr',
+                    'paragraph': 'p',
+                    // 'outerLevel': ['pre', 'blockquote', 'figure'],
+                    // 'innerLevel': ['a', 'b', 'u', 'i', 'img', 'strong']
                     //'outerLevel': [], //should disable all tags
                     //'innerLevel': [], //should disable all tags
                 },
+                */
                 attributes: {
                     //remove: ['style', 'class'] //TODO does this remove the ng-class?
                     remove: ['style'] //TODO does this remove the ng-class?
                 },
+                //pasteAsText: false,
+                //pasteAsText: true,
+                beforeInsertHtml: function () {
+                    //this = Medium.Html (!)
+
+                    // Replace `<br>`s with the `<p>`s we use for line-breaking, to allow
+                    // multi-line pasting. This assumes that pasting happens inside
+                    // a `<p>` element and will horribly fail otherwise.
+                    // The trimming happens, as leading whitespaces are removed in other
+                    // lines as well during pasting.
+                    const originalHtml = this.html;
+                    const sanitizedHtml = originalHtml.trim().replace(/<br>/g, '</p><p>');
+                    this.html = sanitizedHtml;
+
+                    console.log('medium.js - beforeInsertHtml: ', this, originalHtml, sanitizedHtml);
+
+                    //this.html = 'trololololo';
+                    // TODO: parse
+                    // <br> -> </div> (also add opening tag!)
+                    // <br><br> -> <div> + <div><br></div>
+                },
                 /*
-                pasteAsText: true,
+                */
+                /*
+                pasteEventHandler: function(e) {
+                    //default paste event handler
+                    //enables paste (dunno why) but also breaks the inlineMode (suddenly there's <p> elements)
+                    console.log('medium.js - pasteEventHandler: ', this, arguments)
+                }
+                */
+
+                /*
+                TODO stopped here
+
+
+                 pasteAsText?
+                 intercept paste and replace <br>s with <p>s
+                 beforeInserHtml
+                 beforeAddTag - intercept any <br>
+
+                 intercept all paste events and call insertHtml manually?
+
+                */
+                /*
                 beforeInvokeElement: function () {
                  //this = Medium.Element
                      console.log('beforeInvokeElement: ', this)
-                 },
-                 beforeInsertHtml: function () {
-                 //this = Medium.Html
-                     console.log('beforeInsertHtml: ', this)
                  },
                  beforeAddTag: function (tag, shouldFocus, isEditable, afterElement) {
                      console.log('beforeAddTag: ', this, arguments)
                  },
                  keyContext: null, //what does this do?
-                 pasteEventHandler: function(e) {
-                    //default paste event handler
-                    //enables paste (dunno why) but also breaks the inlineMode (suddenly there's <p> elements)
-                    console.log('pasteEventHandler: ', this, arguments)
-                 }
                 */
 
             });
