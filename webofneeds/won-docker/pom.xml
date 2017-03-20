@@ -266,6 +266,59 @@
                         </configuration>
                     </execution>
 
+
+                    <!-- copy matcher rescal resources -->
+                    <execution>
+                        <id>copy-matcher-rescal-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>image/matcher-rescal</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/won-matcher-rescal/target</directory>
+                                    <includes>
+                                        <include>won-matcher-rescal.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-matcher-rescal-python</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>image/matcher-rescal/python</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/won-matcher-rescal/src/main/python</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-matcher-rescal-conf</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>image/matcher-rescal/conf</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/conf</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

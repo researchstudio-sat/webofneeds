@@ -187,3 +187,33 @@ services:
     depends_on:
       - solr
       - matcher_service
+
+  # rescal matcher and connect to matcher service
+  matcher_rescal:
+    build: ../../image/matcher-rescal
+    image: webofneeds/matcher_rescal:int
+    environment:
+      - "node.host=satsrv06.researchstudio.at"
+      - "cluster.seedNodes=satsrv06.researchstudio.at:2561,satsrv06.researchstudio.at:2563"
+      - "cluster.local.port=2563"
+      - "matcher.rescal.uri.public=http://satsrv06.researchstudio.at/rescal/"
+      - "matcher.rescal.uri.sparql.endpoint=http://satsrv06.researchstudio.at:10000/bigdata/namespace/kb/sparql"
+      - "matcher.rescal.executionDurationMinutes=30"
+      - "matcher.rescal.threshold=0.15"
+      - "matcher.rescal.rank=10"
+      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+      - "JMX_OPTS=-javaagent:/opt/agent/inspectit-agent.jar -Dinspectit.repository=satsrv07.researchstudio.at:9070
+        -Dinspectit.agent.name=int_satsrv06_matcher_rescal
+        -Xdebug -Xrunjdwp:transport=dt_socket,address=62916,server=y,suspend=n
+        -Dcom.sun.management.jmxremote.port=9016 -Dcom.sun.management.jmxremote.authenticate=false
+        -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9016
+        -Djava.rmi.server.hostname=satsrv06.researchstudio.at"
+    ports:
+      - "2563:2563"
+      - "9016:9016"
+      - "62916:62916"
+    volumes:
+      - $base_folder/agent:/opt/agent/
+    depends_on:
+      - bigdata
+      - matcher_service

@@ -147,3 +147,22 @@ services:
       - "2562:2562"
     depends_on:
       - solr
+
+  # rescal matcher and connect to matcher service
+  matcher_rescal:
+    #build: ../../image/matcher-rescal
+    image: webofneeds/matcher_rescal:live
+    environment:
+      - "node.host=$deploy_host"
+      - "cluster.seedNodes=$deploy_host:2561,$deploy_host:2563"
+      - "cluster.local.port=2563"
+      - "matcher.rescal.uri.public=http://$deploy_host/rescal/"
+      - "matcher.rescal.uri.sparql.endpoint=http://$deploy_host:10000/bigdata/namespace/kb/sparql"
+      - "matcher.rescal.executionDurationMinutes=1"
+      - "matcher.rescal.threshold=0.15"
+      - "matcher.rescal.rank=10"
+    ports:
+      - "2563:2563"
+    depends_on:
+      - bigdata
+      - matcher_service
