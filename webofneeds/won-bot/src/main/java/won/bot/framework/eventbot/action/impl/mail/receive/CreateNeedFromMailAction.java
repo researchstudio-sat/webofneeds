@@ -27,15 +27,14 @@ import java.util.Arrays;
  * Created by fsuda on 30.09.2016.
  */
 public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
-    private String uriMimeMessageRelationsName;
+    private static final String MAIL_NEEDSLIST_NAME = "mailNeeds";
     private MailContentExtractor mailContentExtractor;
 
-    public CreateNeedFromMailAction(EventListenerContext eventListenerContext, String uriListName,
-                                    MailContentExtractor mailContentExtractor, String uriMimeMessageRelationsName,
+    public CreateNeedFromMailAction(EventListenerContext eventListenerContext,
+                                    MailContentExtractor mailContentExtractor,
                                     URI... facets) {
 
-        super(eventListenerContext, uriListName);
-        this.uriMimeMessageRelationsName = uriMimeMessageRelationsName;
+        super(eventListenerContext, MAIL_NEEDSLIST_NAME);
         this.mailContentExtractor = mailContentExtractor;
 
         if (facets == null || facets.length == 0) {
@@ -80,14 +79,14 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                 WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri,
                                                                 model, isUsedForTesting, isDoNotMatch);
                 EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
-                EventBotActionUtils.addUriMimeMessageRelation(ctx, uriMimeMessageRelationsName, needURI, message);
+                EventBotActionUtils.addUriMimeMessageRelation(ctx, needURI, message);
 
                 EventListener successCallback = new EventListener()
                 {
                     @Override
                     public void onEvent(Event event) throws Exception {
                         logger.debug("need creation successful, new need URI is {}", needURI);
-                        String sender = MailContentExtractor.getFromAddressString(EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), uriMimeMessageRelationsName, needURI));
+                        String sender = MailContentExtractor.getFromAddressString(EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), needURI));
                         logger.debug("created need was from sender: " + sender);
                     }
                 };
@@ -99,7 +98,7 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                         String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
                         logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
                         EventBotActionUtils.removeFromList(getEventListenerContext(), needURI, uriListName);
-                        EventBotActionUtils.removeUriMimeMessageRelation(getEventListenerContext(), uriMimeMessageRelationsName, needURI);
+                        EventBotActionUtils.removeUriMimeMessageRelation(getEventListenerContext(), needURI);
                     }
                 };
                 EventBotActionUtils.makeAndSubscribeResponseListener(createNeedMessage, successCallback, failureCallback, getEventListenerContext());

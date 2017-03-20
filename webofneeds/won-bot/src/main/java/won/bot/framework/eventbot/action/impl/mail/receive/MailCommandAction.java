@@ -1,11 +1,13 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
+import com.hp.hpl.jena.query.Dataset;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
 import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
+import won.bot.framework.eventbot.action.impl.mail.send.WonMimeMessage;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
@@ -17,20 +19,21 @@ import won.protocol.util.WonRdfUtils;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.naming.AuthenticationException;
 import java.io.IOException;
+import java.net.URI;
+import java.security.AccessControlException;
+
+import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
 
 /**
  * Created by fsuda on 18.10.2016.
  */
 public class MailCommandAction extends BaseEventBotAction {
-
-    private String mailIdUriRelationsName;
     private MailContentExtractor mailContentExtractor;
 
-    public MailCommandAction(EventListenerContext eventListenerContext, String mailIdUriRelationsName,
-                             MailContentExtractor mailContentExtractor) {
+    public MailCommandAction(EventListenerContext eventListenerContext, MailContentExtractor mailContentExtractor) {
         super(eventListenerContext);
-        this.mailIdUriRelationsName = mailIdUriRelationsName;
         this.mailContentExtractor = mailContentExtractor;
     }
 
@@ -77,8 +80,39 @@ public class MailCommandAction extends BaseEventBotAction {
 
         EventBus bus = getEventListenerContext().getEventBus();
         try{
-            WonURI wonUri = EventBotActionUtils.getWonURIForMailId(getEventListenerContext(), mailIdUriRelationsName, referenceId);
-            assert wonUri != null;
+            WonURI wonUri = EventBotActionUtils.getWonURIForMailId(getEventListenerContext(), referenceId);
+
+            if(wonUri == null){
+                throw new NullPointerException("No corresponding wonUri found");
+            }
+
+            URI needUri;
+            switch(wonUri.getType()){
+                case CONNECTION:
+                    Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(wonUri.getUri());
+                    needUri = WonRdfUtils.NeedUtils.getLocalNeedURIFromConnection(connectionRDF, wonUri.getUri());
+                    break;
+                case NEED:
+                default:
+                    needUri = wonUri.getUri();
+                    break;
+            }
+
+            MimeMessage originalMessage = EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), needUri);
+
+            if(originalMessage == null) {
+                throw new NullPointerException("no originalmessage found");
+            }
+
+            logger.debug("Validate mailorigin with originalmail:");
+            logger.debug("Command Message Sender: "+message.getFrom());
+            logger.debug("Original Message Sender: "+originalMessage.getFrom());
+
+            if(!message.getFrom()[0].equals(originalMessage.getFrom()[0])) {
+                throw new AccessControlException("Sender of original and command mail are not equal");
+            }else{
+                logger.debug("Sender of original and command mail are not equal, continue with command processing");
+            }
 
             ActionType actionType = determineAction(getEventListenerContext(), message, wonUri);
             logger.debug("Executing " + actionType + " on uri: " + wonUri.getUri() + " of type " + wonUri.getType());
@@ -105,8 +139,10 @@ public class MailCommandAction extends BaseEventBotAction {
                     logger.error("No command was given or assumed");
                     break;
             }
-        }catch(Exception e){
-            logger.error("no reply mail was set or found");
+        }catch (AccessControlException ace){
+            logger.error("ACCESS RESTRICTION: sender of original and command mail are not equal, command will be blocked");
+        } catch(Exception e){
+            logger.error("no reply mail was set or found: "+e.getMessage());
         }
     }
 
