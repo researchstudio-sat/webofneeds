@@ -22,15 +22,11 @@ import java.net.URI;
  * Created by fsuda on 18.10.2016.
  */
 public class Message2MailAction extends BaseEventBotAction {
-    private String uriMimeMessageRelationsName;
-    private String mailIdUriRelationsName;
     private MessageChannel sendChannel;
     private WonMimeMessageGenerator mailGenerator;
 
-    public Message2MailAction(WonMimeMessageGenerator mailGenerator, String uriMimeMessageRelationsName, String mailIdUriRelationsName, MessageChannel sendChannel) {
+    public Message2MailAction(WonMimeMessageGenerator mailGenerator, MessageChannel sendChannel) {
         super(mailGenerator.getEventListenerContext());
-        this.mailIdUriRelationsName = mailIdUriRelationsName;
-        this.uriMimeMessageRelationsName = uriMimeMessageRelationsName;
         this.sendChannel = sendChannel;
         this.mailGenerator = mailGenerator;
     }
@@ -43,11 +39,11 @@ public class Message2MailAction extends BaseEventBotAction {
             URI responseTo = con.getNeedURI();
             URI remoteNeedUri = con.getRemoteNeedURI();
 
-            MimeMessage originalMail = EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), uriMimeMessageRelationsName, responseTo);
+            MimeMessage originalMail = EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), responseTo);
             logger.debug("Someone sent a message for URI: " + responseTo + " sending a mail to the creator: " + MailContentExtractor.getFromAddressString(originalMail));
 
             WonMimeMessage answerMessage = mailGenerator.createMessageMail(originalMail, responseTo, remoteNeedUri, con.getConnectionURI());
-            EventBotActionUtils.addMailIdWonURIRelation(getEventListenerContext(), mailIdUriRelationsName, answerMessage.getMessageID(), new WonURI(con.getConnectionURI(), UriType.CONNECTION));
+            EventBotActionUtils.addMailIdWonURIRelation(getEventListenerContext(), answerMessage.getMessageID(), new WonURI(con.getConnectionURI(), UriType.CONNECTION));
 
             sendChannel.send(new GenericMessage<>(answerMessage));
         }else{

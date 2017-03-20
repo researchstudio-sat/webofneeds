@@ -50,6 +50,7 @@ public class MailContentExtractor
   private Pattern cmdConnectPattern;
   private Pattern cmdSubscribePattern;
   private Pattern cmdUnsubscribePattern;
+  private Pattern cmdTakenPattern;
 
   public static String getMailReference(MimeMessage message) throws MessagingException {
 
@@ -153,16 +154,18 @@ public class MailContentExtractor
     this.cmdUnsubscribePattern = cmdUnsubscribePattern;
   }
 
+  public void setCmdTakenPattern(final Pattern cmdTakenPattern) {
+    this.cmdTakenPattern = cmdTakenPattern;
+  }
+
   public boolean isCreateNeedMail(MimeMessage messsage) throws MessagingException {
     return getBasicNeedType(messsage) != null;
   }
 
   public boolean isCommandMail(MimeMessage message) throws IOException, MessagingException {
-
     // command mail is either an answer mail (with reference) to a previous mail (e.g. message, implicit connect) or an
     // explicitly set action command (e.g. subscribe, unsubscribe, close need)
-    return getMailReference(message) != null ||
-      (getMailAction(message) != null && !ActionType.NO_ACTION.equals(getMailAction(message)));
+    return getMailReference(message) != null || (getMailAction(message) != null && !ActionType.NO_ACTION.equals(getMailAction(message)));
   }
 
   public ActionType getMailAction(MimeMessage message) throws IOException, MessagingException {
@@ -175,6 +178,8 @@ public class MailContentExtractor
       return ActionType.CLOSE_CONNECTION;
     } else if (cmdConnectPattern.matcher(message.getSubject()).matches()) {
       return ActionType.OPEN_CONNECTION;
+    } else if(cmdTakenPattern.matcher(message.getSubject()).matches()){
+      return ActionType.CLOSE_NEED;
     } else {
       return ActionType.NO_ACTION;
     }

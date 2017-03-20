@@ -68,6 +68,11 @@
                 <constructor-arg value=".*?\[DEBUG\].*?" />
             </bean>
         </property>
+        <property name="cmdTakenPattern">
+            <bean id="cmdTakenPattern" class="java.util.regex.Pattern" factory-method="compile">
+                <constructor-arg value=".*?\[TAKEN\].*?" />
+            </bean>
+        </property>
         <property name="doNotMatchPattern">
             <bean id="doNotMatchPattern" class="java.util.regex.Pattern" factory-method="compile">
                 <constructor-arg value=".*?\[NO_MATCH\].*?" />
