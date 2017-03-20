@@ -21,6 +21,7 @@ import won.protocol.model.Facet;
 import won.protocol.model.Match;
 import won.protocol.model.NeedState;
 import won.protocol.service.WonNodeInfo;
+import won.protocol.service.WonNodeInfoBuilder;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
@@ -145,27 +146,31 @@ public class WonRdfUtils
             NodeIterator it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()),
               WON.HAS_URI_PATTERN_SPECIFICATION);
             if (!it.hasNext()) return null;
-            WonNodeInfo wonNodeInfo = new WonNodeInfo();
-            wonNodeInfo.setWonNodeURI(wonNodeUri.toString());
+            WonNodeInfoBuilder wonNodeInfoBuilder = new WonNodeInfoBuilder();
+
+
+            wonNodeInfoBuilder.setWonNodeURI(wonNodeUri.toString());
             RDFNode node = it.next();
 
             // set the URI prefixes
+
             it = model.listObjectsOfProperty(node.asResource(), WON.HAS_NEED_URI_PREFIX);
             if (! it.hasNext() ) return null;
-            wonNodeInfo.setNeedURIPrefix(it.next().asLiteral().getString());
+            String needUriPrefix = it.next().asLiteral().getString();
+              wonNodeInfoBuilder.setNeedURIPrefix(needUriPrefix);
             it = model.listObjectsOfProperty(node.asResource(), WON.HAS_CONNECTION_URI_PREFIX);
             if (! it.hasNext() ) return null;
-            wonNodeInfo.setConnectionURIPrefix(it.next().asLiteral().getString());
+            wonNodeInfoBuilder.setConnectionURIPrefix(it.next().asLiteral().getString());
             it = model.listObjectsOfProperty(node.asResource(), WON.HAS_EVENT_URI_PREFIX);
             if (! it.hasNext() ) return null;
-            wonNodeInfo.setEventURIPrefix(it.next().asLiteral().getString());
+            wonNodeInfoBuilder.setEventURIPrefix(it.next().asLiteral().getString());
 
             // set the need list URI
             it = model.listObjectsOfProperty(model.getResource(wonNodeUri.toString()), WON.HAS_NEED_LIST);
             if (it.hasNext() ) {
-              wonNodeInfo.setNeedListURI(it.next().asNode().getURI());
+              wonNodeInfoBuilder.setNeedListURI(it.next().asNode().getURI());
             } else {
-              wonNodeInfo.setNeedListURI(wonNodeInfo.getNeedURIPrefix());
+              wonNodeInfoBuilder.setNeedListURI(needUriPrefix);
             }
 
             // set the supported protocol implementations
@@ -182,10 +187,10 @@ public class WonRdfUtils
               String protocol = rdfNodeToString(qs.get("protocol"));
               String param = rdfNodeToString(qs.get("param"));
               String value = rdfNodeToString(qs.get("value"));
-              wonNodeInfo.setSupportedProtocolImplParamValue(protocol, param, value);
+              wonNodeInfoBuilder.addSupportedProtocolImplParamValue(protocol, param, value);
             }
 
-            return wonNodeInfo;
+            return wonNodeInfoBuilder.build();
           }
       });
     }

@@ -127,31 +127,36 @@ public class WorkerCrawlerActor extends UntypedActor
     }
 
     // send extracted non-base URIs back to sender and save meta data about crawling the URI
+    // extract only uris which were crawled at least one recrawl interval ago
+    long crawlDate = System.currentTimeMillis();
     log.debug("Extract non-base URIs from message {}", uriMsg);
     Set<String> extractedURIs = sparqlService.extractURIs(
-      uriMsg.getUri(), uriMsg.getBaseUri(), config.getCrawlNonBasePropertyPaths());
+      uriMsg.getUri(), uriMsg.getBaseUri(), config.getCrawlNonBasePropertyPaths(),
+      crawlDate - config.getRecrawlIntervalDuration().toMillis());
     for (String extractedURI : extractedURIs) {
       CrawlUriMessage newUriMsg = new CrawlUriMessage(
-        extractedURI, uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis());
+        extractedURI, uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.PROCESS, crawlDate);
       getSender().tell(newUriMsg, getSelf());
     }
 
     // send extracted base URIs back to sender and save meta data about crawling the URI
+    // extract only uris which were crawled at least one recrawl interval ago
     log.debug("Extract base URIs from message {}", uriMsg);
-    extractedURIs = sparqlService.extractURIs(uriMsg.getUri(), uriMsg.getBaseUri(), config.getCrawlBasePropertyPaths());
+    extractedURIs = sparqlService.extractURIs(uriMsg.getUri(), uriMsg.getBaseUri(), config.getCrawlBasePropertyPaths(),
+      crawlDate - config.getRecrawlIntervalDuration().toMillis());
     for (String extractedURI : extractedURIs) {
       CrawlUriMessage newUriMsg = new CrawlUriMessage(
-        extractedURI, extractedURI, wonNodeUri, CrawlUriMessage.STATUS.PROCESS, System.currentTimeMillis());
+        extractedURI, extractedURI, wonNodeUri, CrawlUriMessage.STATUS.PROCESS, crawlDate);
       getSender().tell(newUriMsg, getSelf());
     }
 
     // signal sender that this URI is processed and save meta data about crawling the URI.
     // This needs to be done after all extracted URI messages have been sent to guarantee consistency
     // in case of failure
-    long crawlDate = System.currentTimeMillis();
+    crawlDate = System.currentTimeMillis();
     CrawlUriMessage uriDoneMsg = new CrawlUriMessage(
       uriMsg.getUri(), uriMsg.getBaseUri(), wonNodeUri, CrawlUriMessage.STATUS.DONE, crawlDate);
-    log.debug("Crawling done for URI {}", uriDoneMsg.getUri());
+    log.info("Crawling done for URI {}", uriDoneMsg.getUri());
     getSender().tell(uriDoneMsg, getSelf());
 
     // if this URI/dataset was a need then send an event to the distributed event bus
@@ -176,10 +181,6 @@ public class WorkerCrawlerActor extends UntypedActor
         // no need resource found in model
       }
     }
-  }
-
-  private void processCrawlUriMessage(CrawlUriMessage uriMsg) {
-
   }
 
   /**
