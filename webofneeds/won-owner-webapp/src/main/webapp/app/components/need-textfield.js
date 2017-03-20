@@ -49,43 +49,51 @@ function genComponentConf() {
             return this.characterLimit - this.medium.value().length;
         }*/
         input(e) {
-            var description;
-            var title;
-            var tags;
 
             const paragraphsDom = this.$element.find('p').toArray();
             const paragraphsNg = paragraphsDom.map(p => angular.element(p)); // how performant is `.element`?
             paragraphsNg.map(p => p.removeClass("medium_title"));
 
+            const titleParagraphDom = paragraphsDom[0];
+            const titleParagraphNg = paragraphsNg[0];
+            titleParagraphNg.addClass("medium_title");
+
+            var description;
+            var tags;
             if(paragraphsDom && paragraphsDom.length > 1){
-                const titleParagraphDom = paragraphsDom[0];
-                const titleParagraphNg = paragraphsNg[0];
-                titleParagraphNg.addClass("medium_title");
-
-                /*
-                 * Remove placeholder-white-space if medium.js fails to remove it,
-                 * e.g. when pasting (a multi-line'd string) into an empty textfield.
-                 * The `[0]` access the dom-element inside of the angular-element.
-                 */
-                titleParagraphDom.innerHTML = titleParagraphDom.innerHTML.replace(/^&nbsp;/, '');
-
-                title = titleParagraphNg.text();
-
-                const bodyParagraphs = angular.element(".medium-mount p:not('.medium_title')");
-                if(bodyParagraphs && bodyParagraphs.length > 0){
-                    description = "";
-                    bodyParagraphs.each(function(){
-                        description += angular.element(this).text() +"\n";
-                    });
-                }
+                const descriptionParagraphs = paragraphsNg.slice(1);
+                description = descriptionParagraphs.map(p =>
+                        p.text()
+                          /* remove trailing white-spaces (e.g. bogus-line-breaks,
+                           * i.e. the ones that aren't <p>)
+                           */
+                          .replace(/\s*$/,'')
+                    )
+                    .join('\n') // concatenate lines
+                    /*
+                     * remove leading/trailing empty lines that occur between title
+                     * and description when pasting multi-line text
+                    */
+                    .trim();
             } else {
-                title  = angular.element(".medium-mount p:first").text();
                 description = undefined;
             }
 
+            /*
+             * Remove placeholder-white-space if medium.js fails to remove it,
+             * e.g. when pasting (a multi-line'd string) into an empty textfield.
+             * The `[0]` access the dom-element inside of the angular-element.
+             */
+            titleParagraphDom.innerHTML = titleParagraphDom.innerHTML.replace(/^&nbsp;/, '');
+
+            const title = titleParagraphDom.innerHTML
+                //@`replace`: sometimes mediumjs doesn't remove the placeholder nbsp properly.
+                //.replace(/^&nbsp;/, '')
+                .trim();
+
             //ADD TAGS
-            var titleTags = title? title.match(/#(\w+)/gi) : [];
-            var descriptionTags = description? description.match(/#(\w+)/gi) : [];
+            const titleTags = title? title.match(/#(\w+)/gi) : [];
+            const descriptionTags = description? description.match(/#(\w+)/gi) : [];
 
             tags = angular.element.unique(
                 angular.element.merge(
@@ -98,15 +106,15 @@ function genComponentConf() {
                 tags[i] = tags[i].substr(1);
             }
 
-            //SAVE TO STATE
+            //SAVE TO STATE //TODO: MOVE THIS HACK TO VIEW LEVEL (to make component reusable)
             this.drafts__change__description({
                 draftId: this.draftId,
-                description : description
+                description : description,
             });
 
             this.drafts__change__title({
                 draftId: this.draftId,
-                title: title.replace("&nbsp;","").trim() //TODO: MOVE THIS HACK TO VIEW LEVEL
+                title: title,
             });
 
             this.drafts__change__tags({
