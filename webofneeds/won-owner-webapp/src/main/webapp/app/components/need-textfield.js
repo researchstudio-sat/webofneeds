@@ -53,21 +53,23 @@ function genComponentConf() {
             var title;
             var tags;
 
-            const paragraphs = angular.element(".medium-mount p");
-            paragraphs.removeClass("medium_title");
+            const paragraphsDom = this.$element.find('p').toArray();
+            const paragraphsNg = paragraphsDom.map(p => angular.element(p)); // how performant is `.element`?
+            paragraphsNg.map(p => p.removeClass("medium_title"));
 
-            if(paragraphs && paragraphs.length > 1){
-                const titleParagraph = angular.element(".medium-mount p:first");
-                titleParagraph.addClass("medium_title");
+            if(paragraphsDom && paragraphsDom.length > 1){
+                const titleParagraphDom = paragraphsDom[0];
+                const titleParagraphNg = paragraphsNg[0];
+                titleParagraphNg.addClass("medium_title");
 
                 /*
                  * Remove placeholder-white-space if medium.js fails to remove it,
                  * e.g. when pasting (a multi-line'd string) into an empty textfield.
                  * The `[0]` access the dom-element inside of the angular-element.
                  */
-                titleParagraph[0].innerHTML = titleParagraph[0].innerHTML.replace(/^&nbsp;/, '');
+                titleParagraphDom.innerHTML = titleParagraphDom.innerHTML.replace(/^&nbsp;/, '');
 
-                title = titleParagraph.text();
+                title = titleParagraphNg.text();
 
                 const bodyParagraphs = angular.element(".medium-mount p:not('.medium_title')");
                 if(bodyParagraphs && bodyParagraphs.length > 0){
