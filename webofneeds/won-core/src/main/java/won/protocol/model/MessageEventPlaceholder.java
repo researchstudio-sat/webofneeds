@@ -42,7 +42,7 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer>
 
   @Version
   @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
-  private long version = 0L;
+  private int version = 0;
 
   @ManyToOne(fetch = FetchType.LAZY)
   private EventContainer eventContainer;
@@ -111,7 +111,7 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer>
     return eventContainer;
   }
 
-  public long getVersion() {
+  public int getVersion() {
     return version;
   }
 

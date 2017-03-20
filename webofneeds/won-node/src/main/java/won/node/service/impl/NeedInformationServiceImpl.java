@@ -277,10 +277,10 @@ public class NeedInformationServiceImpl implements NeedInformationService
     if (etag == null) {
       con = connectionRepository.findOneByConnectionURI(connectionURI);
     } else {
-      Long version = Long.valueOf(etag);
+      Integer version = Integer.valueOf(etag);
       con = connectionRepository.findOneByConnectionURIAndVersionNot(connectionURI, version);
     }
-    return new DataWithEtag<>(con, con == null ? etag : Long.toString(con.getVersion()), etag);
+    return new DataWithEtag<>(con, con == null ? etag : Integer.toString(con.getVersion()), etag);
   }
 
 

@@ -47,7 +47,7 @@ public class DatasetHolder
 
   @Version
   @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
-  private long version = 0L;
+  private int version = 0;
 
   @Transient
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -88,11 +88,11 @@ public class DatasetHolder
     this.uri = uri;
   }
 
-  protected void setVersion(final long version) {
+  protected void setVersion(final int version) {
     this.version = version;
   }
 
-  public long getVersion() {
+  public int getVersion() {
     return version;
   }
 

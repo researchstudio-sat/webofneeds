@@ -35,7 +35,7 @@ public class ConnectionContainer implements ParentAware<Need>
 
   @Version
   @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
-  private long version = 0L;
+  private int version = 0;
 
   @Version
   @Temporal(TemporalType.TIMESTAMP)
@@ -50,7 +50,7 @@ public class ConnectionContainer implements ParentAware<Need>
     return connections;
   }
 
-  public long getVersion() {
+  public int getVersion() {
     return version;
   }
 

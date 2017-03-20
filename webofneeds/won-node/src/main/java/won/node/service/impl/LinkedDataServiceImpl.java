@@ -602,18 +602,18 @@ public class LinkedDataServiceImpl implements LinkedDataService
   @Override
   @Transactional
   public DataWithEtag<Dataset> getDatasetForUri(URI datasetUri, String etag) {
-    Long version = etag == null ? -1L: Long.valueOf(etag);
+    Integer version = etag == null ? -1: Integer.valueOf(etag);
     DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(datasetUri);
     if (datasetHolder == null) {
       return DataWithEtag.dataNotFound();
     }
-    if (version.longValue() == datasetHolder.getVersion()){
+    if (version.intValue() == datasetHolder.getVersion()){
       return DataWithEtag.dataNotChanged(etag);
     }
     Dataset dataset = datasetHolder.getDataset();
     DefaultPrefixUtils.setDefaultPrefixes(dataset.getDefaultModel());
     addBaseUriAndDefaultPrefixes(dataset);
-    return new DataWithEtag<Dataset>(dataset, Long.toString(datasetHolder.getVersion()), etag);
+    return new DataWithEtag<Dataset>(dataset, Integer.toString(datasetHolder.getVersion()), etag);
   }
 
 

@@ -40,7 +40,7 @@ public class Need
 
   @Version
   @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
-  private long version = 0L;
+  private int version = 0;
 
   @Version
   @Temporal(TemporalType.TIMESTAMP)
@@ -97,7 +97,7 @@ public class Need
     return eventContainer;
   }
 
-  protected void setVersion(final long version) {
+  protected void setVersion(final int version) {
     this.version = version;
   }
 
@@ -109,7 +109,7 @@ public class Need
     this.connectionContainer = connectionContainer;
   }
 
-  public long getVersion() {
+  public int getVersion() {
     return version;
   }
 

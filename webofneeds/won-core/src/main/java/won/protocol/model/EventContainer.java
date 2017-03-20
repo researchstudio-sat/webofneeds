@@ -42,7 +42,7 @@ public abstract class EventContainer
 
   @Version
   @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
-  private long version = 0L;
+  private int version = 0;
 
   @Version
   @Temporal(TemporalType.TIMESTAMP)
@@ -72,11 +72,11 @@ public abstract class EventContainer
     this.events = events;
   }
 
-  public long getVersion() {
+  public int getVersion() {
     return version;
   }
 
-  public void setVersion(final long version) {
+  public void setVersion(final int version) {
     this.version = version;
   }
 

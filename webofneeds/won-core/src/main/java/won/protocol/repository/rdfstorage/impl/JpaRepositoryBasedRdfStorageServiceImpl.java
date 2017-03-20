@@ -70,11 +70,11 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
   @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
   @Override
   public DataWithEtag<Model> loadModel(final URI resourceURI, String etag) {
-    Long version = Long.valueOf(etag);
+    Integer version = Integer.valueOf(etag);
     DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriAndVersionNot(resourceURI, version);
     DataWithEtag<Model> dataWithEtag =
       new DataWithEtag<Model>(datasetHolder == null ? null : datasetHolder.getDataset().getDefaultModel(),
-                       datasetHolder == null ? etag : Long.toString(datasetHolder.getVersion()),
+                       datasetHolder == null ? etag : Integer.toString(datasetHolder.getVersion()),
                        etag);
     return dataWithEtag;
   }
@@ -90,11 +90,11 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
   @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
   @Override
   public DataWithEtag<Dataset> loadDataset(final URI resourceURI, String etag) {
-    Long version = etag == null ? -1 : Long.valueOf(etag);
+    Integer version = etag == null ? -1 : Integer.valueOf(etag);
     DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriAndVersionNot(resourceURI, version);
     DataWithEtag<Dataset> dataWithEtag =
       new DataWithEtag<Dataset>(datasetHolder == null ? null : datasetHolder.getDataset(),
-                                datasetHolder == null ? etag : Long.toString(datasetHolder.getVersion()),
+                                datasetHolder == null ? etag : Integer.toString(datasetHolder.getVersion()),
                                 etag);
     return dataWithEtag;
   }
