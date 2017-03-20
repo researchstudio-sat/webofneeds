@@ -1,7 +1,7 @@
 package won.matcher.rescal.service;
 
 
-import com.hp.hpl.jena.query.*;
+import org.apache.jena.query.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.matcher.service.crawler.service.CrawlSparqlService;
