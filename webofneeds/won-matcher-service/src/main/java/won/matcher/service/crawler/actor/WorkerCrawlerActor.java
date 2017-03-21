@@ -7,8 +7,6 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -20,10 +18,11 @@ import won.matcher.service.crawler.exception.CrawlWrapperException;
 import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.matcher.service.crawler.msg.ResourceCrawlUriMessage;
 import won.matcher.service.crawler.service.CrawlSparqlService;
+import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.NeedState;
+import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 
@@ -160,26 +159,23 @@ public class WorkerCrawlerActor extends UntypedActor
     getSender().tell(uriDoneMsg, getSelf());
 
     // if this URI/dataset was a need then send an event to the distributed event bus
-    Model model = WonRdfUtils.NeedUtils.getNeedModelFromNeedDataset(ds);
-    if (model != null) {
+    NeedModelWrapper needModelWrapper;
+    try {
 
-      try {
-        Resource res = WonRdfUtils.NeedUtils.getNeedResource(model);
-        if (res != null) {
+      // only send active needs right now
+      needModelWrapper = new NeedModelWrapper(ds);
+      NeedState state = needModelWrapper.getNeedState();
+      if (state.equals(NeedState.ACTIVE)) {
 
-          // only send active needs right now
-          NeedState state = WonRdfUtils.NeedUtils.queryActiveStatus(model, URI.create(uriMsg.getUri()));
-          if (state.equals(NeedState.ACTIVE)) {
-
-            log.debug("Created need event for need uri {}", uriMsg.getUri());
-            NeedEvent.TYPE type = NeedEvent.TYPE.CREATED;
-            NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
-            pubSubMediator.tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent), getSelf());
-          }
-        }
-      } catch (Exception e) {
-        // no need resource found in model
+        log.debug("Created need event for need uri {}", uriMsg.getUri());
+        NeedEvent.TYPE type = NeedEvent.TYPE.CREATED;
+        NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
+        pubSubMediator
+          .tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent), getSelf());
       }
+
+    } catch (DataIntegrityException e) {
+      log.debug("no valid need model found in dataset for uri {}", uriMsg.getUri());
     }
   }
 

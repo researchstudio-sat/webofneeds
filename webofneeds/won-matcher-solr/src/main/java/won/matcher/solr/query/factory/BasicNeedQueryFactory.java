@@ -1,15 +1,14 @@
 package won.matcher.solr.query.factory;
 
 import org.apache.jena.query.Dataset;
-import org.apache.jena.vocabulary.DC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.IncorrectPropertyCountException;
-import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.WON;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.util.DefaultNeedModelWrapper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by hfriedrich on 01.08.2016.
@@ -45,26 +44,28 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
     super(need);
 
     contentFactories =  new ArrayList<>();
+    DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(need);
+
     try {
-      titleTerms = RdfUtils.findOnePropertyFromResource(need, null, DC.title).asLiteral().getString();
+      titleTerms = needModelWrapper.getTitle(NeedContentPropertyType.ALL);
       titleTerms = filterCharsAndKeyWords(titleTerms);
 
     } catch (IncorrectPropertyCountException e) {
-      log.warn("Title not found in RDF dataset: " + e.toString());
+      log.warn("No or too many title elements not found in RDF dataset: " + e.toString());
     }
 
     try {
-      descriptionTerms = RdfUtils.findOnePropertyFromResource(
-        need, null, WON.HAS_TEXT_DESCRIPTION).asLiteral().getString();
+      descriptionTerms = needModelWrapper.getDescription(NeedContentPropertyType.ALL);
       descriptionTerms = filterCharsAndKeyWords(descriptionTerms);
     } catch (IncorrectPropertyCountException e) {
-      log.warn("Description not found in RDF dataset: " + e.toString());
+      log.warn("No or too many description elements found in RDF dataset: " + e.toString());
     }
 
     try {
-      tagTerms = "\"" + String.join("\" \"", WonRdfUtils.NeedUtils.getTags(need)) + "\"";
+      Collection<String> tags = needModelWrapper.getTags(NeedContentPropertyType.ALL);
+      tagTerms = "\"" + String.join("\" \"", tags) + "\"";
     } catch (IncorrectPropertyCountException e) {
-      log.debug("Tags not found in RDF dataset: " + e.toString());
+      log.debug("No or too many tags found in RDF dataset: " + e.toString());
     }
   }
 

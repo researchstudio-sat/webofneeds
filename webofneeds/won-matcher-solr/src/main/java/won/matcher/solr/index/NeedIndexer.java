@@ -15,12 +15,13 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import won.matcher.service.common.service.http.HttpService;
 import won.matcher.solr.config.SolrMatcherConfig;
-import won.protocol.util.WonRdfUtils;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.util.DefaultNeedModelWrapper;
+import won.protocol.util.NeedModelWrapper;
 import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URI;
 import java.util.Map;
 
 /**
@@ -51,10 +52,11 @@ public class NeedIndexer {
     Query query = QueryFactory.create(NEED_INDEX_QUERY);
     QueryExecution qexec = QueryExecutionFactory.create(query, dataset);
     Model needModel = qexec.execConstruct();
-    String needUri = WonRdfUtils.NeedUtils.getNeedURI(needModel).toString();
+    NeedModelWrapper needModelWrapper = new NeedModelWrapper(dataset);
+    String needUri = needModelWrapper.getNeedUri();
 
     // check if test index should be used for need
-    boolean usedForTesting = WonRdfUtils.NeedUtils.hasFlag(dataset, needUri, WON.USED_FOR_TESTING);
+    boolean usedForTesting = needModelWrapper.hasFlag(WON.USED_FOR_TESTING);
     indexNeedModel(needModel, needUri, usedForTesting);
   }
 
@@ -73,9 +75,9 @@ public class NeedIndexer {
     framed.put("id", id);
 
     // add latitude and longitude values in one field for Solr spatial queries
-    URI needUri = WonRdfUtils.NeedUtils.getNeedURI(needModel);
-    Float longitude = WonRdfUtils.NeedUtils.getLocationLongitude(needModel, needUri);
-    Float latitude = WonRdfUtils.NeedUtils.getLocationLatitude(needModel, needUri);
+    DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needModel, null);
+    Float longitude = needModelWrapper.getLocationLatitude(NeedContentPropertyType.ALL);
+    Float latitude = needModelWrapper.getLocationLatitude(NeedContentPropertyType.ALL);
     if (latitude != null && longitude != null) {
       framed.put(SOLR_LOCATION_COORDINATES_FIELD, latitude.toString() + "," + longitude.toString());
     }
