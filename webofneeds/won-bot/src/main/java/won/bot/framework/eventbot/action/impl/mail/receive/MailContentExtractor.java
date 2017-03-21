@@ -1,6 +1,7 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
 import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
+import won.protocol.model.NeedContentPropertyType;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -177,7 +178,7 @@ public class MailContentExtractor
   }
 
   public boolean isCreateNeedMail(MimeMessage messsage) throws MessagingException {
-    return getBasicNeedType(messsage) != null;
+    return getNeedType(messsage) != null;
   }
 
   public boolean isCommandMail(MimeMessage message) throws IOException, MessagingException {

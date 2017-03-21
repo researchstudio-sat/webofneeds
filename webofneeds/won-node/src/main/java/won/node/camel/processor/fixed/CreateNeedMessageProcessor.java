@@ -14,11 +14,13 @@ import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.*;
+import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -82,11 +84,15 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     need = needRepository.save(need);
     connectionContainerRepository.save(connectionContainer);
 
-    List<Facet> facets = WonRdfUtils.NeedUtils.getFacets(needURI, needContent);
+    NeedModelWrapper needModelWrapper = new NeedModelWrapper(needContent);
+    Collection<String> facets = needModelWrapper.getFacetUris();
     if (facets.size() == 0)
       throw new IllegalArgumentException("at least one property won:hasFacet required ");
-    for (Facet f : facets) {
+    for (String facetUri : facets) {
       // TODO: check if there is a implementation for the facet on the node
+      Facet f = new Facet();
+      f.setNeedURI(needURI);
+      f.setTypeURI(URI.create(facetUri));
       facetRepository.save(f);
     }
 

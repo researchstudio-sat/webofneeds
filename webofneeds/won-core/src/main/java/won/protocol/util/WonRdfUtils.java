@@ -11,22 +11,17 @@ import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.exception.DataIntegrityException;
-import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.Facet;
 import won.protocol.model.Match;
-import won.protocol.model.NeedState;
 import won.protocol.service.WonNodeInfo;
+import won.protocol.service.WonNodeInfoBuilder;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -274,7 +269,7 @@ public class WonRdfUtils
      */
     @Deprecated
     public static String getTextMessage(Model model){
-      Statement stmt = model.getProperty(RdfUtils.getBaseResource(model),WON.HAS_TEXT_MESSAGE);
+      Statement stmt = model.getProperty(RdfUtils.getBaseResource(model), WON.HAS_TEXT_MESSAGE);
       if (stmt != null) {
         return stmt.getObject().asLiteral().getLexicalForm();
       }
@@ -472,6 +467,33 @@ public class WonRdfUtils
       Path statePath = PathParser.parse("won:hasConnectionState", DefaultPrefixUtils.getDefaultPrefixes());
 
       return RdfUtils.getURIPropertyForPropertyPath(connectionDataset, connectionUri, statePath);
+    }
+
+    /**
+     * return the needURI of a connection
+     *
+     * @param dataset <code>Dataset</code> object which contains connection information
+     * @param connectionURI
+     * @return <code>URI</code> of the need
+     */
+    public static URI getLocalNeedURIFromConnection(Dataset dataset, final URI connectionURI) {
+      return URI.create(RdfUtils.findOnePropertyFromResource(
+        dataset, connectionURI, WON.BELONGS_TO_NEED).asResource().getURI());
+    }
+
+    public static URI getRemoteNeedURIFromConnection(Dataset dataset, final URI connectionURI) {
+      return URI.create(RdfUtils.findOnePropertyFromResource(
+        dataset, connectionURI, WON.HAS_REMOTE_NEED).asResource().getURI());
+    }
+
+    public static URI getWonNodeURIFromConnection(Dataset dataset, final URI connectionURI) {
+      return URI.create(RdfUtils.findOnePropertyFromResource(
+        dataset, connectionURI, WON.HAS_WON_NODE).asResource().getURI());
+    }
+
+    public static URI getRemoteConnectionURIFromConnection(Dataset dataset, final URI connectionURI) {
+      return URI.create(RdfUtils.findOnePropertyFromResource(
+        dataset, connectionURI, WON.HAS_REMOTE_CONNECTION).asResource().getURI());
     }
   }
 
