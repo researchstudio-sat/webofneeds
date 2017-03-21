@@ -16,8 +16,9 @@
 
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
-import org.apache.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.Event;
@@ -60,6 +61,12 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction
         if (needModel == null){
           logger.warn("needproducer failed to produce a need model, aborting need creation");
           return;
+        }
+        Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(needModel);
+        if (needResource.isURIResource()) {
+          RdfUtils.replaceBaseURI(needModel, needResource.getURI());
+        } else {
+          RdfUtils.replaceBaseResource(needModel, needResource);
         }
         for (URI facetURI:facets){
             WonRdfUtils.FacetUtils.addFacet(needModel,facetURI);
