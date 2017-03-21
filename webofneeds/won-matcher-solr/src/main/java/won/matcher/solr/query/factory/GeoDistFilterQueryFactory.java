@@ -1,11 +1,9 @@
 package won.matcher.solr.query.factory;
 
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
 import won.matcher.solr.index.NeedIndexer;
-import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.util.DefaultNeedModelWrapper;
 
 /**
  * Created by hfriedrich on 22.08.2016.
@@ -19,10 +17,9 @@ public class GeoDistFilterQueryFactory extends NeedDatasetQueryFactory
   public GeoDistFilterQueryFactory(Dataset need, double distanceInKilometers) {
     super(need);
 
-    Model needModel = WonRdfUtils.NeedUtils.getNeedModelFromNeedDataset(needDataset);
-    URI needUri = WonRdfUtils.NeedUtils.getNeedURI(needModel);
-    latitude = WonRdfUtils.NeedUtils.getLocationLatitude(needModel, needUri);
-    longitude = WonRdfUtils.NeedUtils.getLocationLongitude(needModel, needUri);
+    DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(need);
+    latitude = needModelWrapper.getLocationLatitude(NeedContentPropertyType.ALL);
+    longitude = needModelWrapper.getLocationLongitude(NeedContentPropertyType.ALL);
     distance = distanceInKilometers;
   }
 

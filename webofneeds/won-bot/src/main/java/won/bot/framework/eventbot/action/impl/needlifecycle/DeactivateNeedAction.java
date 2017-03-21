@@ -16,6 +16,7 @@
 
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
+import org.apache.jena.query.Dataset;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -54,8 +55,8 @@ public class DeactivateNeedAction extends BaseEventBotAction
     WonNodeInformationService wonNodeInformationService =
       getEventListenerContext().getWonNodeInformationService();
 
-    URI localWonNode = WonRdfUtils.NeedUtils.queryWonNode(
-      getEventListenerContext().getLinkedDataSource().getDataForResource(needURI));
+    Dataset ds = getEventListenerContext().getLinkedDataSource().getDataForResource(needURI);
+    URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(ds, needURI);
 
     return WonMessageBuilder
       .setMessagePropertiesForDeactivate(

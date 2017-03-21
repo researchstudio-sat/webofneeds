@@ -12,7 +12,7 @@ import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.needproducer.impl.RoundRobinCompositeNeedProducer;
 import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
-import won.matcher.solr.query.factory.NeedTypeQueryFactory;
+import won.matcher.solr.query.factory.BasicNeedQueryFactory;
 import won.matcher.solr.query.factory.TestNeedQueryFactory;
 import won.matcher.solr.spring.SolrTestAppConfiguration;
 
@@ -48,7 +48,7 @@ public class SolrMatcherQueryTest
         String query = needQuery.createQuery();
         System.out.println("execute query: " + query);
 
-        SolrDocumentList docs = queryExecutor.executeNeedQuery(query, null, new NeedTypeQueryFactory(ds).createQuery());
+        SolrDocumentList docs = queryExecutor.executeNeedQuery(query, null, new BasicNeedQueryFactory(ds).createQuery());
         SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
 
         System.out.println("Found docs: " + docs.size() + ", keep docs: " + matchedDocs.size());

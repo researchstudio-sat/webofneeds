@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.owner.service.impl.URIService;
 import won.protocol.model.ConnectionState;
-import won.protocol.util.WonRdfUtils;
+import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.utils.mail.WonMailSender;
 
@@ -70,9 +70,12 @@ public class WonOwnerMailSender {
 
     String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
     Dataset needDataset =  linkedDataSource.getDataForResource(URI.create(remoteNeed));
-    String remoteNeedTitle = WonRdfUtils.NeedUtils.getNeedTitle(needDataset, URI.create(remoteNeed));
+    DefaultNeedModelWrapper remoteNeedWrapper = new DefaultNeedModelWrapper(needDataset);
+    String remoteNeedTitle = remoteNeedWrapper.getTitleFromIsOrAll();
+
     Dataset localNeedDataset =  linkedDataSource.getDataForResource(URI.create(localNeed));
-    String localNeedTitle = WonRdfUtils.NeedUtils.getNeedTitle(localNeedDataset, URI.create(localNeed));
+    DefaultNeedModelWrapper localNeedWrapper = new DefaultNeedModelWrapper(localNeedDataset);
+    String localNeedTitle = localNeedWrapper.getTitleFromIsOrAll();
     String linkLocalNeed = ownerAppLink + OWNER_LOCAL_NEED_LINK + localNeed;
     String linkRemoteNeed = uriService.getOwnerProtocolOwnerURI() + OWNER_REMOTE_NEED_LINK + remoteNeed;
     String linkConnection = ownerAppLink + String.format(OWNER_CONNECTION_LINK,localNeed, localConnection, ConnectionState.CONNECTED.getURI().toString());

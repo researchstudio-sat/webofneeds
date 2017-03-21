@@ -1,6 +1,8 @@
 package won.utils.crawl.app;
 
 import org.apache.jena.query.*;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
@@ -8,14 +10,11 @@ import org.apache.jena.tdb.TDB;
 import org.apache.jena.update.GraphStore;
 import org.apache.jena.update.GraphStoreFactory;
 import org.apache.jena.update.UpdateAction;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import won.protocol.model.BasicNeedType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -151,10 +150,6 @@ public class CLRunnerBean implements CommandLineRunner {
 
             while(it.hasNext()){
                 String var = it.next();
-
-                if("type".equals(var)){
-                    BasicNeedType.fromURI(URI.create(soln.get(var).asResource().getURI()));
-                }
                 sb.append(var).append(": ").append(soln.get(var)).append(" ");
             }
             System.out.println(sb.toString());

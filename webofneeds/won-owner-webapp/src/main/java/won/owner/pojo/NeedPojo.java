@@ -6,7 +6,6 @@ import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.model.BasicNeedType;
 import won.protocol.model.Facet;
 import won.protocol.model.FacetType;
 import won.protocol.model.NeedState;
@@ -31,7 +30,6 @@ public class NeedPojo
   private String needURI;
 
   private String title;
-  private BasicNeedType basicNeedType;
   private NeedState state = NeedState.ACTIVE;
   private String[] needFacetURIs;
   private String[] facetURIs = FacetType.getNames();
@@ -86,11 +84,6 @@ public class NeedPojo
     Statement creationDateStat = need.getProperty(DCTerms.created);
     if (creationDateStat!=null){
       creationDate = creationDateStat.getString();
-    }
-    Statement basicNeedStat = need.getProperty(WON.HAS_BASIC_NEED_TYPE);
-    if (basicNeedStat != null) {
-      URI uri = URI.create(basicNeedStat.getResource().getURI());
-      basicNeedType = BasicNeedType.parseString(uri.getFragment());
     }
 
     StmtIterator facetIter = need.listProperties(WON.HAS_FACET);
@@ -245,16 +238,6 @@ public class NeedPojo
   public void setTitle(final String title)
   {
     this.title = title;
-  }
-
-  public BasicNeedType getBasicNeedType()
-  {
-    return basicNeedType;
-  }
-
-  public void setBasicNeedType(final BasicNeedType basicNeedType)
-  {
-    this.basicNeedType = basicNeedType;
   }
 
   public NeedState getState()

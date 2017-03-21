@@ -1,11 +1,10 @@
 package won.matcher.solr.evaluation;
 
 import com.github.jsonldjava.core.JsonLdError;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.vocabulary.DC;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -14,12 +13,12 @@ import org.springframework.stereotype.Component;
 import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.index.NeedIndexer;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
-import won.matcher.solr.query.factory.NeedTypeQueryFactory;
+import won.matcher.solr.query.factory.BasicNeedQueryFactory;
 import won.matcher.solr.query.factory.TestNeedQueryFactory;
 import won.matcher.utils.tensor.TensorMatchingData;
 import won.protocol.exception.IncorrectPropertyCountException;
-import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.WON;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.util.DefaultNeedModelWrapper;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
@@ -84,12 +83,13 @@ public class SolrMatcherEvaluation
     String description = "";
 
     try {
-      title = RdfUtils.findOnePropertyFromResource(need, null, DC.title).asLiteral().getString();
+      DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(need);
+      title = needModelWrapper.getTitle(NeedContentPropertyType.ALL);
       title = title.replaceAll("[^A-Za-z0-9 ]", "_");
       title = title.replaceAll("NOT", "_");
       title = title.replaceAll("AND", "_");
       title = title.replaceAll("OR", "_");
-      description = RdfUtils.findOnePropertyFromResource(need, null, WON.HAS_TEXT_DESCRIPTION).asLiteral().getString();
+      description = needModelWrapper.getDescription(NeedContentPropertyType.ALL);
     } catch (IncorrectPropertyCountException e) {
 
       // do nothing
@@ -202,7 +202,7 @@ public class SolrMatcherEvaluation
     TestNeedQueryFactory needQuery = new TestNeedQueryFactory(need);
 
     SolrDocumentList docs = queryExecutor.executeNeedQuery(
-      needQuery.createQuery(), null, new NeedTypeQueryFactory(need).createQuery());
+      needQuery.createQuery(), null, new BasicNeedQueryFactory(need).createQuery());
 
     SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
 

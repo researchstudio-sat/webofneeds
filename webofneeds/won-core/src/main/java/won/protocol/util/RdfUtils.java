@@ -951,6 +951,17 @@ public class RdfUtils
       }
     }, true);
   }
+
+  public static RDFNode findOnePropertyFromResource(Dataset dataset, final Resource resource, final Property p) {
+    return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<RDFNode>()
+    {
+      @Override
+      public RDFNode visit(final Model model) {
+        return findOnePropertyFromResource(model, resource, p);
+      }
+    }, true);
+  }
+
   /**
    * Finds resource which is a specified property of a specified resource.
    * If multiple (non equal) resources are found an exception is thrown.
@@ -991,6 +1002,37 @@ public class RdfUtils
     }
     else
       return null;
+  }
+
+  public static Resource findOneSubjectResource(Dataset dataset, Property property, RDFNode object) {
+
+    return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<Resource>()
+    {
+      @Override
+      public Resource visit(final Model model) {
+        return findOneSubjectResource(model, property, object);
+      }
+    }, true);
+  }
+
+  public static Resource findOneSubjectResource(Model model, Property property, RDFNode object) {
+
+    Resource resource = null;
+    ResIterator iter = model.listSubjectsWithProperty(property, object);
+    while (iter.hasNext()) {
+      resource = iter.next();
+      if (iter.hasNext()) {
+        throw new IncorrectPropertyCountException("expecting exactly one subject resource for property " +
+                                                    property.getURI() + " and object " + object.toString(), 1, 2);
+      }
+    }
+
+    if (resource == null) {
+      throw new IncorrectPropertyCountException("expecting exactly one subject resource for property " +
+                                                  property.getURI() + " and object " + object.toString(), 1, 0);
+    }
+
+    return resource;
   }
 
   /**

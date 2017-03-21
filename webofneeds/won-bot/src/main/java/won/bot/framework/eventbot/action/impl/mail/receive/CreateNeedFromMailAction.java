@@ -1,7 +1,7 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
-import org.apache.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.rdf.model.Model;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.UriType;
@@ -12,10 +12,11 @@ import won.bot.framework.eventbot.event.impl.mail.CreateNeedFromMailEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
-import won.protocol.model.BasicNeedType;
 import won.protocol.model.FacetType;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.NeedModelBuilder;
+import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
@@ -53,9 +54,7 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
             MimeMessage message = ((CreateNeedFromMailEvent) event).getMessage();
 
             try {
-                BasicNeedType type = mailContentExtractor.getBasicNeedType(message);
-                assert type != null; //Done as a failsafe, this Action should never be called if it is not a valid CreateNeed-Mail
-
+                NeedContentPropertyType type = mailContentExtractor.getNeedType(message);
                 String title = mailContentExtractor.getTitle(message);
                 String description = mailContentExtractor.getDescription(message);
                 String[] tags = mailContentExtractor.getTags(message);
@@ -67,14 +66,19 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
 
                 final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
                 final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
-                Model model = new NeedModelBuilder()
-                        .setTitle(title)
-                        .setBasicNeedType(type)
-                        .setDescription(description)
-                        .setUri(needURI)
-                        .setTags(tags)
-                        .setFacetTypes(facets)
-                        .build();
+                DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needURI.toString());
+                needModelWrapper.setTitle(type, title);
+                needModelWrapper.setDescription(type, description);
+
+                for (String tag : tags) {
+                    needModelWrapper.addTag(type, tag);
+                }
+
+                for (URI facet : facets) {
+                    needModelWrapper.addFacetUri(facet.toString());
+                }
+
+                Model model = needModelWrapper.getNeedModel(NeedGraphType.NEED);
 
                 logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(model), 150));
 
