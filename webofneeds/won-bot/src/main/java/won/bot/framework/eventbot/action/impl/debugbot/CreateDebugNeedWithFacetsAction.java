@@ -19,8 +19,6 @@ package won.bot.framework.eventbot.action.impl.debugbot;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.sparql.path.Path;
-import org.apache.jena.sparql.path.PathParser;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.counter.Counter;
@@ -38,9 +36,11 @@ import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
+import won.protocol.model.MatchingBehaviorType;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.DefaultPrefixUtils;
-import won.protocol.util.NeedModelBuilder;
+import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
@@ -86,15 +86,17 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
             return;
         }
         final URI reactingToNeedUri = reactingToNeedUriTmp;
-        Path titlePath = PathParser.parse("won:hasContent/dc:title", DefaultPrefixUtils.getDefaultPrefixes());
 
         String titleString = null;
         boolean createNeed = true;
 
         if (needDataset != null) {
-            titleString = RdfUtils.getStringPropertyForPropertyPath(needDataset, reactingToNeedUri, titlePath);
-            createNeed = WonRdfUtils.NeedUtils.hasFlag(needDataset, reactingToNeedUri.toString(), WON.USED_FOR_TESTING)
-                         && !WonRdfUtils.NeedUtils.hasFlag(needDataset, reactingToNeedUri.toString(), WON.DO_NOT_MATCH);
+
+            DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needDataset);
+            titleString = needModelWrapper.getTitleFromIsOrAll();
+            MatchingBehaviorType matchingBehavior = needModelWrapper.getMatchingBehavior();
+            createNeed = needModelWrapper.hasFlag(WON.USED_FOR_TESTING) && !(MatchingBehaviorType.DO_NOT_MATCH.equals
+              (matchingBehavior) || MatchingBehaviorType.STEALTHY.equals(matchingBehavior));
         }
 
         if (!createNeed) return; //if create need is false do not continue the debug need creation
@@ -116,14 +118,14 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
 
         final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
         final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
-        final Model needModel =
-                new NeedModelBuilder()
-                        .setTitle(replyText)
-                        .setDescription("This is a need automatically created by the DebugBot.")
-                        .setUri(needURI)
-                        .setFacetTypes(facets)
-                        .build();
-
+        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needURI.toString());
+        needModelWrapper.setTitle(NeedContentPropertyType.IS_AND_SEEKS, replyText);
+        needModelWrapper.setDescription(NeedContentPropertyType.IS_AND_SEEKS,
+                                        "This is a need automatically created by the DebugBot.");
+        for (URI facet : facets) {
+            needModelWrapper.addFacetUri(facet.toString());
+        }
+        final Model needModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
         final Event origEvent = event;
 
         logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));

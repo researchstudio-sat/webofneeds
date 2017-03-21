@@ -9,6 +9,8 @@ import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.protocol.message.WonMessage;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
@@ -25,9 +27,9 @@ public class TelegramMessageGenerator {
     public SendMessage getHintMessage(Long chatId, URI remoteNeedUri, URI yourNeedUri) {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
 
-        String title = WonRdfUtils.NeedUtils.getNeedTitle(remoteNeedRDF);
-        String description = WonRdfUtils.NeedUtils.getNeedDescription(remoteNeedRDF);
-        List<String> tags = WonRdfUtils.NeedUtils.getTags(remoteNeedRDF);
+        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
+        String title = needModelWrapper.getTitleFromIsOrAll();
+        String description = needModelWrapper.getDescription(NeedContentPropertyType.ALL);
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -46,9 +48,9 @@ public class TelegramMessageGenerator {
     public SendMessage getConnectMessage(Long chatId, URI remoteNeedUri, URI yourNeedUri) {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
 
-        String title = WonRdfUtils.NeedUtils.getNeedTitle(remoteNeedRDF);
-        String description = WonRdfUtils.NeedUtils.getNeedDescription(remoteNeedRDF);
-        List<String> tags = WonRdfUtils.NeedUtils.getTags(remoteNeedRDF);
+        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
+        String title = needModelWrapper.getTitleFromIsOrAll();
+        String description = needModelWrapper.getDescription(NeedContentPropertyType.ALL);
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -78,9 +80,9 @@ public class TelegramMessageGenerator {
     public SendMessage getCreatedNeedMessage(Long chatId, URI needURI) {
         Dataset createdNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(needURI);
 
-        String title = WonRdfUtils.NeedUtils.getNeedTitle(createdNeedRDF);
-        String description = WonRdfUtils.NeedUtils.getNeedDescription(createdNeedRDF);
-        List<String> tags = WonRdfUtils.NeedUtils.getTags(createdNeedRDF);
+        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(createdNeedRDF);
+        String title = needModelWrapper.getTitleFromIsOrAll();
+        String description = needModelWrapper.getDescription(NeedContentPropertyType.ALL);
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
