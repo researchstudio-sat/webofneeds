@@ -32,13 +32,13 @@ public class IncorrectPropertyCountException extends DataIntegrityException
   }
 
   public IncorrectPropertyCountException(final String message, final int expectedCount, final int actualCount) {
-    super(message);
+    super(message + ", expected: " + expectedCount + ", actual: " + actualCount);
     this.expectedCount = expectedCount;
     this.actualCount = actualCount;
   }
 
   public IncorrectPropertyCountException(final String message, final Throwable cause, final int expectedCount, final int actualCount) {
-    super(message, cause);
+    super(message + ", expected: " + expectedCount + ", actual: " + actualCount, cause);
     this.expectedCount = expectedCount;
     this.actualCount = actualCount;
   }
@@ -50,7 +50,7 @@ public class IncorrectPropertyCountException extends DataIntegrityException
   }
 
   public IncorrectPropertyCountException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace, final int expectedCount, final int actualCount) {
-    super(message, cause, enableSuppression, writableStackTrace);
+    super(message + ", expected: " + expectedCount + ", actual: " + actualCount, cause, enableSuppression, writableStackTrace);
     this.expectedCount = expectedCount;
     this.actualCount = actualCount;
   }

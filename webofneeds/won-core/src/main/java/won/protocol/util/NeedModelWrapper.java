@@ -10,10 +10,12 @@ import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
-import won.protocol.model.*;
+import won.protocol.model.MatchingBehaviorType;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.model.NeedGraphType;
+import won.protocol.model.NeedState;
 import won.protocol.vocabulary.WON;
 
-import java.net.URI;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -102,7 +104,7 @@ public class NeedModelWrapper
     return matchingBehaviorMap;
   }
 
-  public void checkModels() {
+  private void checkModels() {
     try {
       getNeedNode(NeedGraphType.NEED);
       getNeedNode(NeedGraphType.SYSINFO);
@@ -398,8 +400,8 @@ public class NeedModelWrapper
                                                   propertyPath, 1, nodes.size());
     }
 
-    URI uri = URI.create(nodes.iterator().next().getURI());
-    return RdfUtils.getNodeForPropertyPath(needModel, uri, path);
+    Node node = nodes.iterator().next().asNode();
+    return RdfUtils.getNodeForPropertyPath(needModel, node, path);
   }
 
 }

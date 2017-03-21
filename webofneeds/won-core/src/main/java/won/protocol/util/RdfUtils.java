@@ -667,6 +667,15 @@ public class RdfUtils
     return result.next();
   }
 
+  public static Node getNodeForPropertyPath(final Model model, Node node, Path propertyPath) {
+    //Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
+    //                                        propertyPath);
+    Iterator<Node> result =  PathEval.eval(model.getGraph(), node, propertyPath, Context.emptyContext);
+
+    if (!result.hasNext()) return null;
+    return result.next();
+  }
+
   /**
    * Returns the first RDF node found in the specified dataset for the specified property path.
    * @param dataset
