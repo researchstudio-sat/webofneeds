@@ -13,7 +13,6 @@ System.config({
   },
 
   map: {
-    "Medium.js": "github:jakiestfu/Medium.js@1.0.1",
     "angular": "npm:angular@1.4.8",
     "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.13.0",
     "angular-inview": "npm:angular-inview@2.1.0",
@@ -29,7 +28,6 @@ System.config({
     "fetch": "github:github/fetch@0.10.1",
     "font-awesome": "bower:font-awesome@4.3.0",
     "immutable": "npm:immutable@3.7.5",
-    "jakiestfu/Medium.js": "github:jakiestfu/Medium.js@1.0.1",
     "jquery": "github:components/jquery@2.1.4",
     "js-md5": "bower:js-md5@1.1.0",
     "jsonld": "npm:jsonld@0.4.2",
@@ -39,7 +37,6 @@ System.config({
     "ng-scrollbar": "bower:ng-scrollbar@0.0.6",
     "ng-tags-input": "bower:ng-tags-input@2.3.0",
     "q": "bower:q@1.0.1",
-    "rangy": "npm:rangy@1.3.0",
     "reduce-reducers": "npm:reduce-reducers@0.1.1",
     "redux": "npm:redux@3.6.0",
     "redux-immutablejs": "npm:redux-immutablejs@0.0.6",
@@ -47,7 +44,6 @@ System.config({
     "redux-ui-router": "npm:redux-ui-router@0.3.3",
     "reselect": "npm:reselect@2.0.2",
     "sockjs": "bower:sockjs@0.3.4",
-    "undo.js": "npm:undo.js@0.2.0",
     "bower:font-awesome@4.3.0": {
       "css": "github:systemjs/plugin-css@0.1.20"
     },
@@ -1237,9 +1233,6 @@ System.config({
     "npm:uid-number@0.0.3": {
       "child_process": "github:jspm/nodelibs-child_process@0.1.0",
       "path": "github:jspm/nodelibs-path@0.1.0",
-      "process": "github:jspm/nodelibs-process@0.1.2"
-    },
-    "npm:undo.js@0.2.0": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:url@0.10.3": {

@@ -4,7 +4,7 @@
 
 ;
 
-import Medium from '../mediumjs-es6';
+// import Medium from '../mediumjs-es6';
 import angular from 'angular';
 import 'ng-redux';
 import Immutable from 'immutable';
@@ -16,8 +16,6 @@ import {
     is,
 } from '../utils';
 import { actionCreators }  from '../actions/actions';
-
-window.Medium4dbg = Medium;
 
 function genComponentConf() {
     let template = `
@@ -58,6 +56,9 @@ function genComponentConf() {
             this.mediumMountNg().bind('input', e => {
                 this.input()
             });
+            this.mediumMountNg().bind('paste', e => {
+                this.paste()
+            });
             this.mediumMountNg().bind('keydown', e =>
                 this.keydown(e)
             );
@@ -67,6 +68,14 @@ function genComponentConf() {
                 this.submit();
                 return false;
             }
+        }
+        paste() {
+            const payload = {
+                value: this.value(),
+                valid: this.valid(),
+            };
+            this.onPaste(payload);
+            dispatchEvent(this.$element[0], 'paste', payload);
         }
         input() {
             const payload = {
@@ -186,6 +195,11 @@ function genComponentConf() {
              *  on-input="::myCallback(value, valid)"
              */
             onInput: '&',
+            /*
+             * Usage:
+             *  on-paste="::myCallback(value, valid)"
+             */
+            onPaste: '&',
 
             submitButtonLabel: '=',
             /*

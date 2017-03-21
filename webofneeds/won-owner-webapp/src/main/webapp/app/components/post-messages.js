@@ -91,6 +91,7 @@ function genComponentConf() {
                 class="pm__footer"
                 placeholder="::'Your Message'"
                 on-input="::self.input(value)"
+                on-paste="::self.input(value)"
                 on-submit="::self.send()"
                 submit-button-label="::'Send'"
                 >

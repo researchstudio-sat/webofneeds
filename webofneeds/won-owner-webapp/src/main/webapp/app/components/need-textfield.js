@@ -4,15 +4,13 @@
 
 ;
 
-import Medium from '../mediumjs-es6';
+// import Medium from '../mediumjs-es6';
 import angular from 'angular';
 import 'ng-redux';
 import Immutable from 'immutable';
 import 'angular-sanitize';
 import { dispatchEvent, attach, delay } from '../utils';
 import { actionCreators }  from '../actions/actions';
-
-window.Medium4dbg = Medium;
 
 function genComponentConf() {
     let template = `
@@ -44,63 +42,86 @@ function genComponentConf() {
 
             this.initMedium();
 
-            this.mediumMountNg().bind('input', e => {
-                var description;
-                var title;
-                var tags;
-
-                angular.element(".medium-mount p").removeClass("medium_title");
-
-                if(angular.element(".medium-mount p") && angular.element(".medium-mount p").length > 1){
-                    angular.element(".medium-mount p:first").addClass("medium_title");
-                    title  = angular.element(".medium-mount p.medium_title").text();
-
-                    if(angular.element(".medium-mount p:not('.medium_title')") && angular.element(".medium-mount p:not('.medium_title')").length > 0){
-                        description = "";
-                        angular.element(".medium-mount p:not('.medium_title')").each(function(){
-                            description += angular.element(this).text() +"\n";
-                        });
-                    }
-                }else {
-                    title  = angular.element(".medium-mount p:first").text();
-                    description = undefined;
-                }
-
-                //ADD TAGS
-                var titleTags = title? title.match(/#(\w+)/gi) : [];
-                var descriptionTags = description? description.match(/#(\w+)/gi) : [];
-
-                tags = angular.element.unique(
-                    angular.element.merge(
-                        titleTags ? titleTags : [],
-                        descriptionTags ? descriptionTags : []
-                    )
-                );
-
-                for(var i=0; i<tags.length; i++){
-                    tags[i] = tags[i].substr(1);
-                }
-
-                //SAVE TO STATE
-                this.drafts__change__description({
-                    draftId: this.draftId,
-                    description : description
-                });
-
-                this.drafts__change__title({
-                    draftId: this.draftId,
-                    title: title.replace("&nbsp;","").trim() //TODO: MOVE THIS HACK TO VIEW LEVEL
-                });
-
-                this.drafts__change__tags({
-                    draftId: this.draftId,
-                    tags: tags && tags.length > 0? tags : undefined
-                });
-            });
+            this.mediumMountNg().bind('input', e => this.input(e));
+            this.mediumMountNg().bind('paste', e => this.input(e));
         }
         /*charactersLeft() {
             return this.characterLimit - this.medium.value().length;
         }*/
+        input(e) {
+
+            const paragraphsDom = this.$element.find('p').toArray();
+            const paragraphsNg = paragraphsDom.map(p => angular.element(p)); // how performant is `.element`?
+            paragraphsNg.map(p => p.removeClass("medium_title"));
+
+            const titleParagraphDom = paragraphsDom[0];
+            const titleParagraphNg = paragraphsNg[0];
+            titleParagraphNg.addClass("medium_title");
+
+            var description;
+            var tags;
+            if(paragraphsDom && paragraphsDom.length > 1){
+                const descriptionParagraphs = paragraphsNg.slice(1);
+                description = descriptionParagraphs.map(p =>
+                        p.text()
+                          /* remove trailing white-spaces (e.g. bogus-line-breaks,
+                           * i.e. the ones that aren't <p>)
+                           */
+                          .replace(/\s*$/,'')
+                    )
+                    .join('\n') // concatenate lines
+                    /*
+                     * remove leading/trailing empty lines that occur between title
+                     * and description when pasting multi-line text
+                    */
+                    .trim();
+            } else {
+                description = undefined;
+            }
+
+            /*
+             * Remove placeholder-white-space if medium.js fails to remove it,
+             * e.g. when pasting (a multi-line'd string) into an empty textfield.
+             * The `[0]` access the dom-element inside of the angular-element.
+             */
+            titleParagraphDom.innerHTML = titleParagraphDom.innerHTML.replace(/^&nbsp;/, '');
+
+            const title = titleParagraphDom.innerHTML
+                //@`replace`: sometimes mediumjs doesn't remove the placeholder nbsp properly.
+                //.replace(/^&nbsp;/, '')
+                .trim();
+
+            //ADD TAGS
+            const titleTags = title? title.match(/#(\w+)/gi) : [];
+            const descriptionTags = description? description.match(/#(\w+)/gi) : [];
+
+            tags = angular.element.unique(
+                angular.element.merge(
+                    titleTags ? titleTags : [],
+                    descriptionTags ? descriptionTags : []
+                )
+            );
+
+            for(var i=0; i<tags.length; i++){
+                tags[i] = tags[i].substr(1);
+            }
+
+            //SAVE TO STATE //TODO: MOVE THIS HACK TO VIEW LEVEL (to make component reusable)
+            this.drafts__change__description({
+                draftId: this.draftId,
+                description : description,
+            });
+
+            this.drafts__change__title({
+                draftId: this.draftId,
+                title: title,
+            });
+
+            this.drafts__change__tags({
+                draftId: this.draftId,
+                tags: tags && tags.length > 0? tags : undefined
+            });
+        }
         valid() {
             return true; //return this.charactersLeft() >= 0;
         }
@@ -128,40 +149,75 @@ function genComponentConf() {
                 //mode: Medium.inlineMode, // no newlines, no styling
                 mode: Medium.partialMode, // allows newlines, no styling
                 //maxLength: this.maxChars, // -1 would disable it
+
+                //tags: null,
+                /*
                 tags: {
-                    /*
-                     'break': 'br',
-                     'horizontalRule': 'hr',
-                     'paragraph': 'p',
-                     'outerLevel': ['pre', 'blockquote', 'figure'],
-                     'innerLevel': ['a', 'b', 'u', 'i', 'img', 'strong']
-                     */
+                    'break': 'br',
+                    // 'horizontalRule': 'hr',
+                    'paragraph': 'p',
+                    // 'outerLevel': ['pre', 'blockquote', 'figure'],
+                    // 'innerLevel': ['a', 'b', 'u', 'i', 'img', 'strong']
                     //'outerLevel': [], //should disable all tags
                     //'innerLevel': [], //should disable all tags
                 },
+                */
                 attributes: {
                     //remove: ['style', 'class'] //TODO does this remove the ng-class?
                     remove: ['style'] //TODO does this remove the ng-class?
                 },
+                //pasteAsText: false,
+                //pasteAsText: true,
+                beforeInsertHtml: function () {
+                    //this = Medium.Html (!)
+
+                    // Replace `<br>`s with the `<p>`s we use for line-breaking, to allow
+                    // multi-line pasting. This assumes that pasting happens inside
+                    // a `<p>` element and will horribly fail otherwise.
+                    // The trimming happens, as leading whitespaces are removed in other
+                    // lines as well during pasting.
+                    const originalHtml = this.html;
+                    const sanitizedHtml = originalHtml.trim().replace(/<br>/g, '</p><p>');
+                    this.html = sanitizedHtml;
+
+                    console.log('medium.js - beforeInsertHtml: ', this, originalHtml, sanitizedHtml);
+
+                    //this.html = 'trololololo';
+                    // TODO: parse
+                    // <br> -> </div> (also add opening tag!)
+                    // <br><br> -> <div> + <div><br></div>
+                },
                 /*
-                pasteAsText: true,
+                */
+                /*
+                pasteEventHandler: function(e) {
+                    //default paste event handler
+                    //enables paste (dunno why) but also breaks the inlineMode (suddenly there's <p> elements)
+                    console.log('medium.js - pasteEventHandler: ', this, arguments)
+                }
+                */
+
+                /*
+                TODO stopped here
+
+
+                 pasteAsText?
+                 intercept paste and replace <br>s with <p>s
+                 beforeInserHtml
+                 beforeAddTag - intercept any <br>
+
+                 intercept all paste events and call insertHtml manually?
+
+                */
+                /*
                 beforeInvokeElement: function () {
                  //this = Medium.Element
                      console.log('beforeInvokeElement: ', this)
-                 },
-                 beforeInsertHtml: function () {
-                 //this = Medium.Html
-                     console.log('beforeInsertHtml: ', this)
                  },
                  beforeAddTag: function (tag, shouldFocus, isEditable, afterElement) {
                      console.log('beforeAddTag: ', this, arguments)
                  },
                  keyContext: null, //what does this do?
-                 pasteEventHandler: function(e) {
-                    //default paste event handler
-                    //enables paste (dunno why) but also breaks the inlineMode (suddenly there's <p> elements)
-                    console.log('pasteEventHandler: ', this, arguments)
-                 }
                 */
 
             });
