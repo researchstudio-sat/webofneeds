@@ -27,6 +27,7 @@ import won.bot.framework.component.needproducer.NeedProducer;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * NeedProducer that is configured to read needs from a directory.
@@ -47,7 +48,7 @@ public class DirectoryBasedNeedProducer implements NeedProducer
 
   private int fileIndex = NOT_INITIALIZED;
 
-  private boolean initialized = false;
+  private AtomicBoolean initialized = new AtomicBoolean(false);
 
   private FileBasedNeedProducer fileBasedNeedProducer;
 
@@ -133,9 +134,9 @@ public class DirectoryBasedNeedProducer implements NeedProducer
     return false;
   }
 
-  private void initializeLazily()
+  private synchronized void initializeLazily()
   {
-    if (!initialized){
+    if (!initialized.get()){
       init();
     }
   }
@@ -148,9 +149,8 @@ public class DirectoryBasedNeedProducer implements NeedProducer
     return this.fileIndex == NOT_INITIALIZED || this.files == null || this.fileIndex >= this.files.length;
   }
 
-  private void init(){
-    if (this.initialized) return;
-    this.initialized = true;
+  private synchronized void init(){
+    if (this.initialized.get()) return;
     if (this.directory == null){
       logger.warn("No directory specified for DirectoryBasedNeedProducer, not reading any data.");
       return;
@@ -163,6 +163,7 @@ public class DirectoryBasedNeedProducer implements NeedProducer
       logger.debug("found {} files in directory {} with regex {}", new Object[]{files.length, this.directory, this.filenameFilterRegex});
     }
     rewind();
+    this.initialized.set(true);
   }
 
   private FileFilter createFileFilter()
