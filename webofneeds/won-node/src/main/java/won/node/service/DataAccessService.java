@@ -22,7 +22,6 @@ import won.protocol.exception.*;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionEventType;
 import won.protocol.model.ConnectionState;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 
 import java.net.URI;
 import java.util.Collection;
@@ -40,8 +39,8 @@ public interface DataAccessService
   Connection getConnection(List<Connection> connections, URI facetURI, ConnectionEventType eventType)
       throws ConnectionAlreadyExistsException;
 
-  public Connection createConnection(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
-    final URI facet, final ConnectionState connectionState, final ConnectionEventType connectionEventType)
+  public Connection createConnection(final URI connectionURI, final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
+                                     final URI facet, final ConnectionState connectionState, final ConnectionEventType connectionEventType)
     throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException;
 
 
@@ -54,15 +53,14 @@ public interface DataAccessService
   /**
    * Adds feedback, represented by the subgraph reachable from feedback, to the RDF description of the
    * item identified by forResource
-   * @param forResource
+   * @param connection
    * @param feedback
    * @return true if feedback could be added false otherwise
    */
-  boolean addFeedback(URI forResource, Resource feedback);
+  boolean addFeedback(Connection connection, Resource feedback);
 
   void updateRemoteConnectionURI(Connection con, URI remoteConnectionURI);
 
   void setURIService(URIService URIService);
 
-  void setRdfStorageService(RDFStorageService rdfStorageService);
 }

@@ -85,7 +85,6 @@
                   value="${activemq.matcher.outgoing.topicname.need.created}"/>
         <property name="activeMqMatcherProtocolTopicNameNeedDeactivated"
                   value="${activemq.matcher.outgoing.topicname.need.deactivated}"/>
-        <property name="rdfStorage" ref="rdfStorageRef" />
         <property name="uriService" ref="uriService" />
     </bean>
 
@@ -100,13 +99,11 @@
     <!--- DataAccessService -->
     <bean id="dataServiceRef" class="won.node.service.impl.DataAccessServiceImpl" depends-on="linkedDataService">
         <property name="URIService" ref="uriService" />
-        <property name="rdfStorageService" ref="rdfStorageRef" />
     </bean>
 
 
     <bean id="needInformationService" class="won.node.service.impl.NeedInformationServiceImpl">
         <property name="pageSize" value="${linkeddata.pagesize}" />
-        <property name="rdfStorage" ref="rdfStorageRef" />
     </bean>
 
     <bean id="ownerManagementService" class="won.node.service.impl.OwnerManagementServiceImpl"/>

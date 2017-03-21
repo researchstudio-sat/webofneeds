@@ -3,6 +3,7 @@ package won.node.camel.processor.fixed;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.exception.NoSuchConnectionException;
@@ -26,7 +27,7 @@ import java.net.URI;
 @FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CONNECT_STRING)
 public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor
 {
-
+  @Transactional
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -43,9 +44,11 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
     }
     if (con == null){
       //create Connection in Database
-      con = dataService.createConnection(senderNeedURI, receiverNeedURI, null, facetURI,
-                                                          ConnectionState.REQUEST_SENT,
-                                                          ConnectionEventType.OWNER_OPEN);
+      URI connectionUri = wonNodeInformationService.generateConnectionURI(
+        wonNodeInformationService.getWonNodeUri(senderNeedURI));
+      con = dataService.createConnection(connectionUri, senderNeedURI, receiverNeedURI, null, facetURI,
+                                         ConnectionState.REQUEST_SENT,
+                                         ConnectionEventType.OWNER_OPEN);
     }
     con.setState(con.getState().transit(ConnectionEventType.OWNER_OPEN));
     connectionRepository.save(con);
@@ -73,6 +76,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
   }
 
   @Override
+  @Transactional
   public void onSuccessResponse(final Exchange exchange) throws Exception {
     WonMessage responseMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     MessageEventPlaceholder mep = this.messageEventRepository.findOneByCorrespondingRemoteMessageURI(
@@ -85,6 +89,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
   }
 
   @Override
+  @Transactional
   public void onFailureResponse(final Exchange exchange) throws Exception {
     //TODO: define what to do if the connect fails remotely option: create a system message of type CLOSE,
     // and forward it only to the owner. Add an explanation (a reference to the failure response and some

@@ -3,6 +3,8 @@ package won.node.camel.processor.fixed;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -24,6 +26,7 @@ import java.net.URI;
 public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor
 {
 
+  @Transactional(propagation = Propagation.REQUIRED)
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -33,9 +36,11 @@ public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor
     if (connectionURIFromWonMessage == null) {
       //the opener didn't know about the connection - maybe it doesn't exist
       URI facet = WonRdfUtils.FacetUtils.getFacet(wonMessage);
-      con = dataService.createConnection(wonMessage.getReceiverNeedURI(), wonMessage.getSenderNeedURI(),
-        wonMessage.getSenderURI(), facet,
-        ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
+      URI connectionUri = wonNodeInformationService.generateConnectionURI(
+        wonNodeInformationService.getWonNodeUri(wonMessage.getReceiverNeedURI()));
+      con = dataService.createConnection(connectionUri, wonMessage.getReceiverNeedURI(), wonMessage.getSenderNeedURI(),
+                                         wonMessage.getSenderURI(), facet,
+                                         ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
     } else {
       con = connectionRepository.findOneByConnectionURI(connectionURIFromWonMessage);
     }

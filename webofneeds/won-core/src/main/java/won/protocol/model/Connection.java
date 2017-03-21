@@ -16,8 +16,11 @@
 
 package won.protocol.model;
 
+import won.protocol.model.parentaware.ParentAware;
+
 import javax.persistence.*;
 import java.net.URI;
+import java.util.Date;
 
 /**
  * User: fkleedorfer
@@ -26,12 +29,21 @@ import java.net.URI;
 @Entity
 @Table(name = "connection", indexes = { @Index(name = "IDX_CONNECTION_NEEDURI_REMOTENEEDURI", columnList = "needURI, " +
   "remoteNeedURI")}, uniqueConstraints = {@UniqueConstraint(name="IDX_UNIQUE_CONNECTION", columnNames = {"needURI", "remoteNeedURI", "typeURI"})})
-public class Connection
+public class Connection implements ParentAware<ConnectionContainer>
 {
   @Id
   @GeneratedValue
   @Column( name = "id" )
   private Long id;
+
+  @Version
+  @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
+  private int version = 0;
+
+  @Version
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name="last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private Date lastUpdate = new Date();
 
   /* The public URI of this connection */
   @Column( name = "connectionURI", unique = true)
@@ -63,6 +75,34 @@ public class Connection
   @Column( name = "state")
   @Enumerated ( EnumType.STRING )
   private ConnectionState state;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  private ConnectionContainer parent;
+
+  @OneToOne(fetch = FetchType.LAZY)
+  private DatasetHolder datasetHolder;
+
+  @OneToOne (fetch = FetchType.LAZY, mappedBy="connection", optional = true, cascade = CascadeType.ALL,
+    orphanRemoval = true)
+  private ConnectionEventContainer eventContainer = null;
+
+  @Override
+  public ConnectionContainer getParent() {
+    return this.parent;
+  }
+
+
+  public ConnectionEventContainer getEventContainer() {
+    return eventContainer;
+  }
+
+  public void setEventContainer(final ConnectionEventContainer eventContainer) {
+    this.eventContainer = eventContainer;
+  }
+
+  public void setParent(final ConnectionContainer parent) {
+    this.parent = parent;
+  }
 
   @Override
   public String toString()
@@ -141,6 +181,30 @@ public class Connection
   public void setState(final ConnectionState state)
   {
     this.state = state;
+  }
+
+  protected void setVersion(final int version) {
+    this.version = version;
+  }
+
+  public int getVersion() {
+    return version;
+  }
+
+  public Date getLastUpdate() {
+    return lastUpdate;
+  }
+
+  protected void setLastUpdate(final Date lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
+
+  public DatasetHolder getDatasetHolder() {
+    return datasetHolder;
+  }
+
+  public void setDatasetHolder(final DatasetHolder datasetHolder) {
+    this.datasetHolder = datasetHolder;
   }
 
   @Override

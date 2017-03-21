@@ -26,6 +26,7 @@ import org.springframework.security.core.userdetails.AuthenticationUserDetailsSe
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+import org.springframework.util.StopWatch;
 import won.cryptography.webid.WebIDVerificationAgent;
 
 import java.net.URI;
@@ -47,6 +48,8 @@ public class WebIdUserDetailsService implements AuthenticationUserDetailsService
 
   @Override
   public UserDetails loadUserDetails(final PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
     String principal = (String) token.getPrincipal();
     Certificate certificate = (Certificate) token.getCredentials();
 
@@ -75,6 +78,8 @@ public class WebIdUserDetailsService implements AuthenticationUserDetailsService
       logger.debug("could not verify webId '" + principal + "' because of an error during verification. ROLE_WEBID " +
                      "not granted. Cause is logged",e);
     }
+    stopWatch.stop();
+    logger.debug("webID check took " + stopWatch.getLastTaskTimeMillis() + " millis");
     return new WebIdUserDetails(webID, authorities);
   }
 }

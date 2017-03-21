@@ -28,7 +28,6 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Need;
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.*;
-import won.protocol.repository.rdfstorage.RDFStorageService;
 import won.protocol.service.LinkedDataService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.RdfUtils;
@@ -53,11 +52,17 @@ public abstract class AbstractCamelProcessor implements Processor
   @Autowired
   protected DataAccessService dataService;
   @Autowired
-  protected RDFStorageService rdfStorage;
+  protected DatasetHolderRepository datasetHolderRepository;
   @Autowired
   protected NeedRepository needRepository;
   @Autowired
+  protected ConnectionContainerRepository connectionContainerRepository;
+  @Autowired
+  protected NeedEventContainerRepository needEventContainerRepository;
+  @Autowired
   protected ConnectionRepository connectionRepository;
+  @Autowired
+  protected ConnectionEventContainerRepository connectionEventContainerRepository;
   @Autowired
   protected FacetRepository facetRepository;
   @Autowired
@@ -76,6 +81,8 @@ public abstract class AbstractCamelProcessor implements Processor
   protected RandomNumberService randomNumberService;
   @Autowired
   protected ExecutorService executorService;
+
+
 
 
 

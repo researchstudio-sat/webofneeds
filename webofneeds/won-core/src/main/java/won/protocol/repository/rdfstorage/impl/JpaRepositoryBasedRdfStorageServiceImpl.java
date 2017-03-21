@@ -22,6 +22,7 @@ import org.apache.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import won.protocol.model.DataWithEtag;
 import won.protocol.model.DatasetHolder;
 import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.rdfstorage.RDFStorageService;
@@ -50,7 +51,7 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
   @Transactional(propagation = Propagation.REQUIRED)
   @Override
   public void storeDataset(final URI resourceURI, final Dataset dataset) {
-    DatasetHolder datasetHolder = datasetHolderRepository.findOne(resourceURI);
+    DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
     if (datasetHolder!=null){
       datasetHolder.setDataset(dataset);
     } else{
@@ -62,16 +63,40 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
   @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
   @Override
   public Model loadModel(final URI resourceURI) {
-    DatasetHolder datasetHolder = datasetHolderRepository.findOne(resourceURI);
+    DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
     return datasetHolder == null ? null : datasetHolder.getDataset().getDefaultModel();
+  }
+
+  @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+  @Override
+  public DataWithEtag<Model> loadModel(final URI resourceURI, String etag) {
+    Integer version = Integer.valueOf(etag);
+    DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriAndVersionNot(resourceURI, version);
+    DataWithEtag<Model> dataWithEtag =
+      new DataWithEtag<Model>(datasetHolder == null ? null : datasetHolder.getDataset().getDefaultModel(),
+                       datasetHolder == null ? etag : Integer.toString(datasetHolder.getVersion()),
+                       etag);
+    return dataWithEtag;
   }
 
 
   @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
   @Override
   public Dataset loadDataset(final URI resourceURI) {
-    DatasetHolder datasetHolder = datasetHolderRepository.findOne(resourceURI);
+    DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
     return datasetHolder == null ? null : datasetHolder.getDataset();
+  }
+
+  @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
+  @Override
+  public DataWithEtag<Dataset> loadDataset(final URI resourceURI, String etag) {
+    Integer version = etag == null ? -1 : Integer.valueOf(etag);
+    DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriAndVersionNot(resourceURI, version);
+    DataWithEtag<Dataset> dataWithEtag =
+      new DataWithEtag<Dataset>(datasetHolder == null ? null : datasetHolder.getDataset(),
+                                datasetHolder == null ? etag : Integer.toString(datasetHolder.getVersion()),
+                                etag);
+    return dataWithEtag;
   }
 
   @Transactional(propagation = Propagation.SUPPORTS)

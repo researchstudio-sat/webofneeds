@@ -20,6 +20,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RiotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,11 +39,19 @@ public class DatasetHolder
 {
   private static final int DEFAULT_BYTE_ARRAY_SIZE = 500;
 
+  //the URI of the dataset
+  @Id
+  @GeneratedValue
+  @Column( name = "id" )
+  private Long id;
+
+  @Version
+  @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
+  private int version = 0;
+
   @Transient
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  //the URI of the dataset
-  @Id
   @Column( name = "datasetURI", unique = true)
   @Convert( converter = URIConverter.class )
   private URI uri;
@@ -63,6 +72,14 @@ public class DatasetHolder
     this.cachedDataset = dataset;
   }
 
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(final Long id) {
+    this.id = id;
+  }
+
   public URI getUri() {
     return uri;
   }
@@ -71,7 +88,15 @@ public class DatasetHolder
     this.uri = uri;
   }
 
-  byte[] getDatasetBytes() {
+  protected void setVersion(final int version) {
+    this.version = version;
+  }
+
+  public int getVersion() {
+    return version;
+  }
+
+  public byte[] getDatasetBytes() {
     return datasetBytes;
   }
 
@@ -89,7 +114,7 @@ public class DatasetHolder
     assert this.datasetBytes != null : "model must not be null";
     ByteArrayOutputStream out = new ByteArrayOutputStream(DEFAULT_BYTE_ARRAY_SIZE);
     synchronized(this){
-      RDFDataMgr.write(out, dataset, Lang.TRIG);
+      RDFDataMgr.write(out, dataset, Lang.NQUADS);
       this.datasetBytes = out.toByteArray();
       this.cachedDataset = dataset;
       if (logger.isDebugEnabled()){
@@ -105,12 +130,19 @@ public class DatasetHolder
   public Dataset getDataset(){
     assert this.uri != null : "uri must not be null";
     assert this.datasetBytes != null : "model must not be null";
+    if (this.cachedDataset != null) return cachedDataset;
     synchronized (this) {
       if (this.cachedDataset != null) return cachedDataset;
       Dataset dataset = DatasetFactory.createMem();
       InputStream is = new ByteArrayInputStream(this.datasetBytes);
       try {
-        RDFDataMgr.read(dataset, is,  this.uri.toString(), Lang.TRIG);
+        try {
+          RDFDataMgr.read(dataset, is, this.uri.toString(), Lang.NQUADS);
+        } catch (RiotException ex) {
+            //assume that the data is stored in TRIG old format, try that.
+            is = new ByteArrayInputStream(this.datasetBytes);
+            RDFDataMgr.read(dataset, is, Lang.TRIG);
+        }
       } catch (Exception e) {
         logger.warn("could not read dataset {} from byte array. Byte array is null: {}, has length {}",
           new Object[]{this.uri,

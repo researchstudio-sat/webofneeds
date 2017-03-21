@@ -3,6 +3,8 @@ package won.node.camel.processor.fixed;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -28,6 +30,7 @@ public class HintMessageProcessor extends AbstractCamelProcessor
 {
 
 
+  @Transactional(propagation = Propagation.REQUIRED)
   public void process(Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -58,8 +61,10 @@ public class HintMessageProcessor extends AbstractCamelProcessor
       //add the facet to the model.
       facet = facets.iterator().next();
     }
+    URI connectionUri = wonNodeInformationService.generateConnectionURI(
+      wonNodeInformationService.getWonNodeUri(needURIFromWonMessage));
     con = dataService.createConnection(
-      needURIFromWonMessage, otherNeedURIFromWonMessage,
+      connectionUri, needURIFromWonMessage, otherNeedURIFromWonMessage,
       null, facet, ConnectionState.SUGGESTED, ConnectionEventType.MATCHER_HINT);
     //build message to send to owner, put in header
     //set the receiver to the newly generated connection uri

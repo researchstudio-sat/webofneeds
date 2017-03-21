@@ -38,6 +38,15 @@ public class Need
   @Column( name = "id" )
   private Long id;
 
+  @Version
+  @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
+  private int version = 0;
+
+  @Version
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name="last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private Date lastUpdate = new Date();
+
   /* The URI of the need */
   @Column( name = "needURI", unique = true)
   @Convert( converter = URIConverter.class)
@@ -63,6 +72,12 @@ public class Need
   @Column( name = "creationDate", nullable = false)
   private Date creationDate;
 
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private DatasetHolder datatsetHolder;
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private List<DatasetHolder> attachmentDatasetHolders;
+
   //EAGERly loaded because accessed outside hibernate session in
   // OwnerProtocolCamelConfiguratorImpl TODO: change this!
    @ManyToMany(targetEntity = OwnerApplication.class,fetch = FetchType.EAGER)
@@ -70,6 +85,37 @@ public class Need
            joinColumns = @JoinColumn(name="need_id"),
            inverseJoinColumns = @JoinColumn(name = "owner_application_id"))
    private List<OwnerApplication> authorizedApplications;
+
+  @OneToOne(fetch = FetchType.LAZY, mappedBy = "need", cascade = CascadeType.ALL, orphanRemoval = true)
+  private NeedEventContainer eventContainer;
+
+  @OneToOne(fetch = FetchType.LAZY, mappedBy = "need", cascade = CascadeType.ALL, orphanRemoval = true)
+  private ConnectionContainer connectionContainer;
+
+
+  public NeedEventContainer getEventContainer() {
+    return eventContainer;
+  }
+
+  protected void setVersion(final int version) {
+    this.version = version;
+  }
+
+  public void setEventContainer(final NeedEventContainer eventContainer) {
+    this.eventContainer = eventContainer;
+  }
+
+  public void setConnectionContainer(final ConnectionContainer connectionContainer) {
+    this.connectionContainer = connectionContainer;
+  }
+
+  public int getVersion() {
+    return version;
+  }
+
+  public ConnectionContainer getConnectionContainer() {
+    return connectionContainer;
+  }
 
   @PrePersist
   protected void onCreate() {
@@ -121,6 +167,22 @@ public class Need
   public void setOwnerURI(final URI ownerURI)
   {
     this.ownerURI = ownerURI;
+  }
+
+  public DatasetHolder getDatatsetHolder() {
+    return datatsetHolder;
+  }
+
+  public void setDatatsetHolder(final DatasetHolder datatsetHolder) {
+    this.datatsetHolder = datatsetHolder;
+  }
+
+  public List<DatasetHolder> getAttachmentDatasetHolders() {
+    return attachmentDatasetHolders;
+  }
+
+  public void setAttachmentDatasetHolders(final List<DatasetHolder> attachmentDatasetHolders) {
+    this.attachmentDatasetHolders = attachmentDatasetHolders;
   }
 
   @Override

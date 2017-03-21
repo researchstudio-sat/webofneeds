@@ -21,6 +21,7 @@ import org.springframework.context.NoSuchMessageException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchNeedException;
 import won.protocol.message.WonMessageType;
+import won.protocol.model.DataWithEtag;
 import won.protocol.model.NeedState;
 
 import java.net.URI;
@@ -253,17 +254,20 @@ public interface LinkedDataService
   public Dataset getNeedDataset(final URI needUri, final boolean deep, final Integer deepLayerSize)  throws
     NoSuchNeedException, NoSuchConnectionException, NoSuchMessageException;
 
+
+
   /**
-   * Returns a model describing the connection with the specified URI.
+   * Returns a dataset describing the connection, if the etag indicates that it has changed.
    * @param connectionUri
-   * @param includeEventContainer adds the event container
-   * @param includeLatestEvent adds the latest event to the event container
+   * @param includeEventContainer
+   * @param includeLatestEvent
+   * @param etag
    * @return
    * @throws NoSuchConnectionException
    */
-  Dataset getConnectionDataset(URI connectionUri, boolean includeEventContainer, boolean
-    includeLatestEvent) throws
-    NoSuchConnectionException;
+  DataWithEtag<Dataset> getConnectionDataset(URI connectionUri, boolean includeEventContainer, boolean
+    includeLatestEvent, String etag);
+
   /**
    * Returns a dataset containing all event uris belonging to the specified connection.
    * @param connectionUri
@@ -331,9 +335,11 @@ public interface LinkedDataService
   public Dataset getNodeDataset();
 
   /**
-   * returns a dataset of the (message) event with the specified URI
+   * returns a dataset of the (message) event with the specified URI, with a value that can be used for an etag.
+   * If the current etag is the same as the specified one, the dataset is null, indicating no change.
    * @param eventURI
    */
-  public Dataset getDatasetForUri(final URI eventURI);
+  public DataWithEtag<Dataset> getDatasetForUri(final URI eventURI, String etag);
+
 
 }

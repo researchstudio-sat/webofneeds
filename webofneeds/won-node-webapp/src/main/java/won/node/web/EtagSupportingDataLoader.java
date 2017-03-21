@@ -14,27 +14,21 @@
  *    limitations under the License.
  */
 
-package won.protocol.repository.rdfstorage.impl;
+package won.node.web;
 
-import org.apache.jena.query.Dataset;
+import org.springframework.http.HttpHeaders;
+import won.protocol.model.DataWithEtag;
+
+import java.net.URI;
 
 /**
- * Maintains thread-local dataset objects.
+ * Created by fkleedorfer on 01.12.2016.
  */
-@Deprecated
-public abstract class AbstractOneDatasetPerThreadRdfStorageService extends AbstractDatasetBasedRdfStorageService
+public interface EtagSupportingDataLoader<T>
 {
-  ThreadLocal<Dataset> datasetThreadLocal = new ThreadLocal<Dataset>();
+  public URI createUriForIdentifier(String identifier);
 
-  @Override
-  protected Dataset getDataset() {
-    Dataset dataset = datasetThreadLocal.get();
-    if (dataset == null){
-      dataset = createDataset();
-      datasetThreadLocal.set(dataset);
-    }
-    return dataset;
-  }
+  public DataWithEtag<T> loadDataWithEtag(URI uri, String etag);
 
-  protected abstract Dataset createDataset();
+  public void addHeaders(HttpHeaders headers);
 }

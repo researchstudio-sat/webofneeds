@@ -20,6 +20,8 @@ import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import won.cryptography.rdfsign.SigningStage;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
@@ -51,6 +53,7 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
   private DatasetHolderRepository datasetHolderRepository;
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
     //find all unreferenced messages for the current message's parent
     List<MessageEventPlaceholder> messageEventPlaceholders = messageEventRepository
@@ -111,7 +114,7 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
   }
 
   private WonMessage loadWonMessageforURI(final URI messageURI) {
-    DatasetHolder datasetHolder = datasetHolderRepository.findOne(messageURI);
+    DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(messageURI);
     if (datasetHolder == null || datasetHolder.getDataset() == null){
       throw new IllegalStateException( String.format("could not load dataset for message %s",messageURI));
     }

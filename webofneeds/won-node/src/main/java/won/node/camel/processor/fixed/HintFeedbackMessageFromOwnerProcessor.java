@@ -20,6 +20,7 @@ import org.apache.jena.rdf.model.*;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -40,7 +41,7 @@ import java.net.URI;
 public class HintFeedbackMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor
 {
 
-
+  @Transactional
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -74,23 +75,23 @@ public class HintFeedbackMessageFromOwnerProcessor extends AbstractFromOwnerCame
         StmtIterator stmtIterator = baseResource.listProperties(WON.HAS_FEEDBACK);
         if (baseResource.hasProperty(WON.HAS_FEEDBACK)){
           //add the base resource as a feedback event to the connection
-          processFeedback(con.getConnectionURI(), baseResource);
+          processFeedback(con, baseResource);
         }
         return null;
       }
     });
   }
 
-  private void processFeedback(URI resourceGettingFeedback,
+  private void processFeedback(Connection connection,
                                final RDFNode feedbackNode) {
 
     if (!feedbackNode.isResource()) {
-      logger.warn("feedback node is not a resource, cannot process feedback in message {}", resourceGettingFeedback);
+      logger.warn("feedback node is not a resource, cannot process feedback for {}", connection.getConnectionURI());
       return;
     }
     final Resource feedbackRes = (Resource) feedbackNode;
-    if (!dataService.addFeedback(resourceGettingFeedback, feedbackRes)) {
-      logger.warn("failed to add feedback to resource {}", resourceGettingFeedback);
+    if (!dataService.addFeedback(connection, feedbackRes)) {
+      logger.warn("failed to add feedback to resource {}", connection.getConnectionURI());
     }
 
   }

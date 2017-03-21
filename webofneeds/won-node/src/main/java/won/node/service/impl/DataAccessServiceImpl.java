@@ -1,16 +1,15 @@
 package won.node.service.impl;
 
 import org.apache.jena.graph.TripleBoundary;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.protocol.exception.*;
 import won.protocol.model.*;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.FacetRepository;
-import won.protocol.repository.NeedRepository;
-import won.protocol.repository.rdfstorage.RDFStorageService;
+import won.protocol.repository.*;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.vocabulary.WON;
@@ -27,7 +26,7 @@ import java.util.List;
 public class DataAccessServiceImpl implements won.node.service.DataAccessService
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
-  private RDFStorageService rdfStorageService;
+
   private URIService URIService;
 
   @Autowired
@@ -38,11 +37,20 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   private FacetRepository facetRepository;
   @Autowired
   private WonNodeInformationService wonNodeInformationService;
-
+  @Autowired
+  protected ConnectionContainerRepository connectionContainerRepository;
+  @Autowired
+  protected NeedEventContainerRepository needEventContainerRepository;
+  @Autowired
+  protected ConnectionEventContainerRepository connectionEventContainerRepository;
+  @Autowired
+  protected DatasetHolderRepository datasetHolderRepository;
 
 
   /**
    * Creates a new Connection object or returns an existing one.
+   *
+   * @param connectionURI
    * @param needURI
    * @param otherNeedURI
    * @param otherConnectionURI
@@ -54,9 +62,9 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
    * @throws IllegalMessageForNeedStateException
    * @throws ConnectionAlreadyExistsException
    */
-  public Connection createConnection(final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
-                                      final URI facetURI, final ConnectionState connectionState,
-                                      final ConnectionEventType connectionEventType)
+  public Connection createConnection(final URI connectionURI, final URI needURI, final URI otherNeedURI, final URI otherConnectionURI,
+                                     final URI facetURI, final ConnectionState connectionState,
+                                     final ConnectionEventType connectionEventType)
       throws NoSuchNeedException, IllegalMessageForNeedStateException, ConnectionAlreadyExistsException {
 
     if (needURI == null) throw new IllegalArgumentException("needURI is not set");
@@ -74,15 +82,16 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   /* Create connection */
     Connection con = new Connection();
     //create and set new uri
-    con.setConnectionURI(wonNodeInformationService.generateConnectionURI(
-      wonNodeInformationService.getWonNodeUri(needURI)));
+    con.setConnectionURI(connectionURI);
     con.setNeedURI(needURI);
     con.setState(connectionState);
     con.setRemoteNeedURI(otherNeedURI);
     con.setRemoteConnectionURI(otherConnectionURI);
     con.setTypeURI(facetURI);
+    ConnectionEventContainer connectionEventContainer = new ConnectionEventContainer(con, connectionURI);
     try {
       con = connectionRepository.save(con);
+      connectionEventContainerRepository.save(connectionEventContainer);
     } catch (Exception e){
       //we assume the unique key constraint on needURI, remoteNeedURI, typeURI was violated: we have to perform an
       // update, not an insert
@@ -99,8 +108,13 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   {
     List<URI> ret = new LinkedList<URI>();
     Need need = DataAccessUtils.loadNeed(needRepository, needUri);
-    Model content = rdfStorageService.loadModel(need.getNeedURI());
-    if (content == null) return ret;
+    DatasetHolder datasetHolder = need.getDatatsetHolder();
+    Model content = null;
+    content = datasetHolder.getDataset().getDefaultModel();
+    if (content == null) {
+      throw new IllegalStateException("tried to access content dataset of need '"+need.getNeedURI()+"' but found " +
+                                        "none!");
+    }
     Resource baseRes = content.getResource(content.getNsPrefixURI(""));
     StmtIterator stmtIterator = baseRes.listProperties(WON.HAS_FACET);
     while (stmtIterator.hasNext()) {
@@ -154,30 +168,37 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   /**
    * Adds feedback, represented by the subgraph reachable from feedback, to the RDF description of the
    * item identified by forResource
-   * @param forResource
+   * @param connection
    * @param feedback
    * @return true if feedback could be added false otherwise
    */
   @Override
-  public boolean addFeedback(final URI forResource, final Resource feedback){
+  public boolean addFeedback(final Connection connection, final Resource feedback){
     //TODO: concurrent modifications to the model for this resource result in side-effects.
     //think about locking.
-    logger.debug("adding feedback to resource {}", forResource);
-    Model model = rdfStorageService.loadModel(forResource);
-    if (model == null) {
-      //if no model is found, we create one.
-      model = ModelFactory.createDefaultModel();
+    logger.debug("adding feedback to resource {}", connection);
+    DatasetHolder datasetHolder = connection.getDatasetHolder();
+    Dataset dataset = null;
+    if (datasetHolder == null) {
+      //if no dataset is found, we create one.
+      dataset = DatasetFactory.createMem();
+      datasetHolder = new DatasetHolder(connection.getConnectionURI(), dataset);
+      connection.setDatasetHolder(datasetHolder);
+    } else {
+      dataset = datasetHolder.getDataset();
     }
-    Resource mainRes = model.getResource(forResource.toString());
+    Model model = dataset.getDefaultModel();
+    Resource mainRes = model.getResource(connection.getConnectionURI().toString());
     if (mainRes == null){
-      logger.debug("could not add feedback to resource {}: resource not found/created in model");
+      logger.debug("could not add feedback to resource {}: resource not found/created in model", connection.getConnectionURI());
       return false;
     }
     mainRes.addProperty(WON.HAS_FEEDBACK_EVENT, feedback);
     ModelExtract extract = new ModelExtract(new StatementTripleBoundary(TripleBoundary.stopNowhere));
     model.add(extract.extract(feedback, feedback.getModel()));
-    logger.debug("done adding feedback for resource {}, storing...", forResource);
-    rdfStorageService.storeModel(forResource, model);
+    logger.debug("done adding feedback for resource {}, storing...", connection);
+    datasetHolderRepository.save(datasetHolder);
+    connectionRepository.save(connection);
     logger.debug("stored feedback");
     return true;
   }
@@ -220,10 +241,6 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     this.URIService = URIService;
   }
 
-  @Override
-  public void setRdfStorageService(RDFStorageService rdfStorageService) {
-    this.rdfStorageService = rdfStorageService;
-  }
 
 
 }

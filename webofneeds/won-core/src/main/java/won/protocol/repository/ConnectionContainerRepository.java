@@ -14,22 +14,13 @@
  *    limitations under the License.
  */
 
-package won.protocol.repository.rdfstorage.impl;
+package won.protocol.repository;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
+import won.protocol.model.ConnectionContainer;
 
 /**
- * Simple in-memory RDF storage for testing/benchmarking purposes.
+ * Created by fkleedorfer on 05.12.2016.
  */
-@Deprecated
-public class InMemoryRdfStorageImpl extends AbstractDatasetBasedRdfStorageService
+public interface ConnectionContainerRepository extends WonRepository<ConnectionContainer>
 {
-  private Dataset dataset;
-
-  @Override
-  protected Dataset getDataset() {
-    return DatasetFactory.createMem();
-  }
-
 }
