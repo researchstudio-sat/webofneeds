@@ -10,6 +10,9 @@ import won.protocol.vocabulary.WON;
 import java.util.Collection;
 
 /**
+ * Extends {@link NeedModelWrapper} to add matchat specific methods to access content fields like title, description, tags, etc.
+ * In many methods {@link NeedContentPropertyType} is used as a parameter to specify which content node you want to access.
+ *
  * Created by hfriedrich on 16.03.2017.
  */
 public class DefaultNeedModelWrapper extends NeedModelWrapper

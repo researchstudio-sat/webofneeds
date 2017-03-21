@@ -21,14 +21,24 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
+ * This class wraps the need models (need and sysinfo graphs in a need dataset).
+ * It provides abstraction for the need structure of is/seeks content nodes that are part of the need model.
+ * It can be used to load and query an existing need dataset (or models).
+ * Furthermore it can be used to create a need model by adding triples.
+ *
  * Created by hfriedrich on 16.03.2017.
  */
 public class NeedModelWrapper
 {
   private Model needModel;
   private Model sysInfoModel;
+
   private final HashBiMap<MatchingBehaviorType, Resource> matchingBehaviorMap = initMap();
 
+  /**
+   * Create a new need model (incluing sysinfo)
+   * @param needUri need uri to create the need models for
+   */
   public NeedModelWrapper(String needUri) {
 
     needModel = ModelFactory.createDefaultModel();
@@ -39,9 +49,12 @@ public class NeedModelWrapper
     sysInfoModel.createResource(needUri, WON.NEED);
   }
 
+  /**
+   * Load a need dataset and extract the need and sysinfo models from it
+   * @param ds need dataset to load
+   */
   public NeedModelWrapper(Dataset ds) {
 
-    // find the need model
     Iterator<String> iter = ds.listNames();
     while (iter.hasNext()) {
       String m = iter.next();
@@ -54,11 +67,29 @@ public class NeedModelWrapper
     checkModels();
   }
 
-    public NeedModelWrapper(Model needModel, Model sysInfoModel) {
+  /**
+   * Load the need and sysinfo models, if one of these models is null then initialize the other one as default model
+   * @param needModel
+   * @param sysInfoModel
+   */
+  public NeedModelWrapper(Model needModel, Model sysInfoModel) {
 
-      this.needModel = needModel;
-      this.sysInfoModel = sysInfoModel;
-      checkModels();
+    this.needModel = needModel;
+    this.sysInfoModel = sysInfoModel;
+
+    if ((sysInfoModel == null) && (needModel != null)) {
+      this.sysInfoModel = ModelFactory.createDefaultModel();
+      DefaultPrefixUtils.setDefaultPrefixes(this.sysInfoModel);
+      this.sysInfoModel.createResource(getNeedUri(), WON.NEED);
+    }
+
+    if ((needModel == null ) && (sysInfoModel != null)) {
+      this.needModel = ModelFactory.createDefaultModel();
+      DefaultPrefixUtils.setDefaultPrefixes(this.needModel);
+      this.needModel.createResource(getNeedNode(NeedGraphType.SYSINFO).getURI(), WON.NEED);
+    }
+
+    checkModels();
   }
 
   private HashBiMap initMap() {
@@ -82,6 +113,11 @@ public class NeedModelWrapper
     }
   }
 
+  /**
+   * get the need or sysinfo model
+   * @param graph type specifies the need or sysinfo model to return
+   * @return need or sysinfo model
+   */
   public Model getNeedModel(NeedGraphType graph) {
 
     if (graph.equals(NeedGraphType.NEED)) {
@@ -91,6 +127,11 @@ public class NeedModelWrapper
     }
   }
 
+  /**
+   * get the node of the need of either the need model or the sysinfo model
+   * @param graph type specifies the need or sysinfo need node to return
+   * @return need or sysinfo need node
+   */
   public Resource getNeedNode(NeedGraphType graph) {
 
     if (graph.equals(NeedGraphType.NEED)) {
@@ -104,32 +145,6 @@ public class NeedModelWrapper
     return getNeedNode(NeedGraphType.NEED).getURI();
   }
 
-  public Resource createContentNode(NeedContentPropertyType type, String uri) {
-
-    if (NeedContentPropertyType.ALL.equals(type)) {
-      throw new IllegalArgumentException("NeedContentPropertyType.ALL not defined for this method");
-    }
-
-    Resource contentNode = (uri != null) ? needModel.createResource(uri) : needModel.createResource();
-    contentNode.addProperty(RDF.type, WON.NEED_CONTENT);
-    Resource needNode = getNeedNode(NeedGraphType.NEED);
-
-    if (NeedContentPropertyType.IS.equals(type)) {
-      needNode.addProperty(WON.IS, contentNode);
-    } else if (NeedContentPropertyType.SEEKS.equals(type)) {
-      needNode.addProperty(WON.SEEKS, contentNode);
-    } else if (NeedContentPropertyType.SEEKS_SEEKS.equals(type)) {
-      Resource intermediate = needModel.createResource();
-      needNode.addProperty(WON.SEEKS, intermediate);
-      intermediate.addProperty(WON.SEEKS, contentNode);
-    } else if (NeedContentPropertyType.IS_AND_SEEKS.equals(type)) {
-      needNode.addProperty(WON.IS, contentNode);
-      needNode.addProperty(WON.SEEKS, contentNode);
-    }
-
-    return contentNode;
-  }
-
   public void setMatchingBehavior(MatchingBehaviorType matchingBehavior) {
 
     Resource matchingResource = matchingBehaviorMap.get(matchingBehavior);
@@ -141,10 +156,10 @@ public class NeedModelWrapper
   public MatchingBehaviorType getMatchingBehavior() {
 
     RDFNode matchingBehavior = RdfUtils.findOnePropertyFromResource(
-      needModel, getNeedNode(NeedGraphType.NEED), WON.HAS_MATCHING_BEHAVIOR);
+            needModel, getNeedNode(NeedGraphType.NEED), WON.HAS_MATCHING_BEHAVIOR);
 
+    // default matching behavior is MUTUAL
     if (matchingBehavior == null) {
-      // default matching behavior is MUTUAL
       return MatchingBehaviorType.MUTUAL;
     }
 
@@ -229,6 +244,43 @@ public class NeedModelWrapper
     return needModel.listResourcesWithProperty(RDF.type, WON.NEED_CONTENT).toSet();
   }
 
+  /**
+   * create a content node below the need node of the need model.
+   * @param type specifies which property (e.g. IS, SEEKS, ...) is used to connect the need node with the content node
+   * @param uri uri of the content node, if null then create blank node
+   * @return content node created
+   */
+  public Resource createContentNode(NeedContentPropertyType type, String uri) {
+
+    if (NeedContentPropertyType.ALL.equals(type)) {
+      throw new IllegalArgumentException("NeedContentPropertyType.ALL not defined for this method");
+    }
+
+    Resource contentNode = (uri != null) ? needModel.createResource(uri) : needModel.createResource();
+    contentNode.addProperty(RDF.type, WON.NEED_CONTENT);
+    Resource needNode = getNeedNode(NeedGraphType.NEED);
+
+    if (NeedContentPropertyType.IS.equals(type)) {
+      needNode.addProperty(WON.IS, contentNode);
+    } else if (NeedContentPropertyType.SEEKS.equals(type)) {
+      needNode.addProperty(WON.SEEKS, contentNode);
+    } else if (NeedContentPropertyType.SEEKS_SEEKS.equals(type)) {
+      Resource intermediate = needModel.createResource();
+      needNode.addProperty(WON.SEEKS, intermediate);
+      intermediate.addProperty(WON.SEEKS, contentNode);
+    } else if (NeedContentPropertyType.IS_AND_SEEKS.equals(type)) {
+      needNode.addProperty(WON.IS, contentNode);
+      needNode.addProperty(WON.SEEKS, contentNode);
+    }
+
+    return contentNode;
+  }
+
+  /**
+   * get all content nodes of a specified type
+   * @param type specifies which content nodes to return (IS, SEEKS, ALL, ...)
+   * @return content nodes
+   */
   public Collection<Resource> getContentNodes(NeedContentPropertyType type) {
 
     Collection<Resource> contentNodes = new LinkedList<>();
