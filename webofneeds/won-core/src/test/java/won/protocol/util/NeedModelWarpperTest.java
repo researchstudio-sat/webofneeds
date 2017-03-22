@@ -77,6 +77,21 @@ public class NeedModelWarpperTest
   }
 
   @Test
+  public void loadIsAndSeeksModel() throws IOException {
+
+    Dataset ds = Utils.createTestDataset("/needmodel/need2.trig");
+    NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+
+    Assert.assertEquals(1, needModelWrapper.getContentNodes(NeedContentPropertyType.IS).size());
+    Assert.assertEquals(1, needModelWrapper.getContentNodes(NeedContentPropertyType.IS_AND_SEEKS).size());
+    Assert.assertEquals(2, needModelWrapper.getContentNodes(NeedContentPropertyType.SEEKS).size());
+    Assert.assertEquals("title1", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS, DC.title));
+    Assert.assertEquals("title1", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS_AND_SEEKS, DC.title));
+    Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title).size());
+    Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, DC.title).size());
+  }
+
+  @Test
   public void createSysInfoModel() {
 
     // create a empty wrapper with a need uri, check that the need and sysinfo models are there

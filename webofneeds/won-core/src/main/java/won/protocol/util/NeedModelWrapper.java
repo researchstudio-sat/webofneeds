@@ -66,6 +66,19 @@ public class NeedModelWrapper
         sysInfoModel = ds.getNamedModel(m);
       }
     }
+
+    if ((sysInfoModel == null) && (needModel != null)) {
+      this.sysInfoModel = ModelFactory.createDefaultModel();
+      DefaultPrefixUtils.setDefaultPrefixes(this.sysInfoModel);
+      this.sysInfoModel.createResource(getNeedUri(), WON.NEED);
+    }
+
+    if ((needModel == null ) && (sysInfoModel != null)) {
+      this.needModel = ModelFactory.createDefaultModel();
+      DefaultPrefixUtils.setDefaultPrefixes(this.needModel);
+      this.needModel.createResource(getNeedNode(NeedGraphType.SYSINFO).getURI(), WON.NEED);
+    }
+
     checkModels();
   }
 
