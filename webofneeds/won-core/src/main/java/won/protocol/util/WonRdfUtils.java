@@ -11,6 +11,7 @@ import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
 import won.protocol.model.ConnectionState;
@@ -22,6 +23,7 @@ import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -506,8 +508,50 @@ public class WonRdfUtils
 
   public static class NeedUtils
   {
-    public static URI getNeedURI(Dataset ds) {
-      return URI.create(RdfUtils.findOneSubjectResource(ds, RDF.type, WON.NEED).getURI());
+    /**
+     * searches for a subject of type won:Need and returns the NeedURI
+     *
+     * @param dataset <code>Dataset</code> object which will be searched for the NeedURI
+     * @return <code>URI</code> which is of type won:Need
+     */
+    public static URI getNeedURI(Dataset dataset) {
+      return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<URI>()
+      {
+        @Override
+        public URI visit(final Model model) {
+          return getNeedURI(model);
+        }
+      }, true);
+    }
+
+    /**
+     * searches for a subject of type won:Need and returns the NeedURI
+     *
+     * @param model <code>Model</code> object which will be searched for the NeedURI
+     * @return <code>URI</code> which is of type won:Need
+     */
+    public static URI getNeedURI(Model model) {
+
+      List<URI> needURIs = new ArrayList<>();
+
+      ResIterator iterator = model.listSubjectsWithProperty(RDF.type, WON.NEED);
+      while (iterator.hasNext()) {
+        needURIs.add(URI.create(iterator.next().getURI()));
+      }
+      if (needURIs.size() == 0)
+        return null;
+      else if (needURIs.size() == 1)
+        return needURIs.get(0);
+      else if (needURIs.size() > 1) {
+        URI u = needURIs.get(0);
+        for (URI uri : needURIs) {
+          if (!uri.equals(u))
+            throw new IncorrectPropertyCountException(1,2);
+        }
+        return u;
+      }
+      else
+        return null;
     }
 
     public static URI getWonNodeURIFromNeed(Dataset dataset, final URI needURI) {

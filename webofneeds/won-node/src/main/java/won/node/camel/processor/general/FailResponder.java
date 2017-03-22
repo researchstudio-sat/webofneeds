@@ -71,25 +71,25 @@ public class FailResponder extends AbstractCamelProcessor
       } else {
         errormessage = String.format("An error occurred while processing message %s", originalMessage.getMessageURI());
       }
-      if (logger.isDebugEnabled()){
-        logger.debug("Caught error while processing WON message {} (type:{}) : {} - sending FailureResponse",
-                     new Object[]{originalMessage.getMessageURI(), originalMessage.getMessageType(), errormessage});
-        if (exception != null) {
-          logger.debug("stacktrace of caught exception:", exception);
-        }
-        logger.debug("original message: {}", RdfUtils.toString(originalMessage.getCompleteDataset()));
+
+      logger.warn("Caught error while processing WON message {} (type:{}) : {} - sending FailureResponse",
+                   new Object[]{originalMessage.getMessageURI(), originalMessage.getMessageType(), errormessage});
+      if (exception != null) {
+        logger.warn("stacktrace of caught exception:", exception);
       }
+      logger.debug("original message: {}", RdfUtils.toString(originalMessage.getCompleteDataset()));
+
       if (WonMessageType.FAILURE_RESPONSE == originalMessage.getMessageType() && WonMessageType.FAILURE_RESPONSE ==
         originalMessage.getIsResponseToMessageType()){
         //do not throw failures back and forth. If the original message is already a failure message
         //that indicates a problem processing a failure message, log this and stop.
         logger.info("Encountered an error processing a FailureResponse for a FailureResponse. The FailureResponse is " +
                       "logged at debug level. Its message URI is {}", originalMessage.getMessageURI(),exception);
-        if (logger.isDebugEnabled()){
-          StringWriter sw = new StringWriter();
-          RDFDataMgr.write(sw, originalMessage.getCompleteDataset(), Lang.TRIG);
-          logger.debug("FailureResponse to FailureResponse that raised the error:\n{}",sw.toString());
-        }
+
+        StringWriter sw = new StringWriter();
+        RDFDataMgr.write(sw, originalMessage.getCompleteDataset(), Lang.TRIG);
+        logger.warn("FailureResponse to FailureResponse that raised the error:\n{}",sw.toString());
+
         return;
       }
       URI newMessageURI = this.wonNodeInformationService.generateEventURI();

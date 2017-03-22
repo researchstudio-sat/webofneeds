@@ -10,6 +10,7 @@ import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
+import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.MatchingBehaviorType;
 import won.protocol.model.NeedContentPropertyType;
 import won.protocol.model.NeedGraphType;
@@ -60,7 +61,7 @@ public class NeedModelWrapper
     Iterator<String> iter = ds.listNames();
     while (iter.hasNext()) {
       String m = iter.next();
-      if (m.endsWith("#need")) {
+      if (m.endsWith("#need") || m.contains(WonMessageBuilder.CONTENT_URI_SUFFIX)) {
         needModel = ds.getNamedModel(m);
       } else if (m.endsWith("#sysinfo")) {
         sysInfoModel = ds.getNamedModel(m);
@@ -122,7 +123,7 @@ public class NeedModelWrapper
       getNeedNode(NeedGraphType.NEED);
       getNeedNode(NeedGraphType.SYSINFO);
     } catch (NullPointerException e1) {
-      throw new DataIntegrityException("both need and sysinfo graphs must exist in dataset", e1);
+      throw new DataIntegrityException("at least one graph of need or sysinfo must exist in dataset", e1);
     } catch (IncorrectPropertyCountException e2) {
       throw new DataIntegrityException("need and sysinfo models must be a won:Need");
     }
