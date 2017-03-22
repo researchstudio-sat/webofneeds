@@ -18,11 +18,11 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="
-        http://www.springframework.org/schema/beans
+       xmlns:spring="http://camel.apache.org/schema/spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
     <!-- 
           Load properties but ignore unresolvable properties so that 
@@ -37,102 +37,54 @@
         <property name="needFactories">
             <set>
 
-                <bean id="supplyNeedProducer"
+                <bean id="isNeedProducer"
                       class="won.bot.framework.component.needproducer.impl.TemplateBasedNeedProducer">
-                    <property name="template" value="classpath:/default-templates/default-template-supply.ttl"/>
+                    <property name="template" value="classpath:/default-templates/default-template.ttl"/>
                     <property name="wrappedProducer">
                         <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
-                            <property name="directory" value="${mail.directory.supply}"/>
+                            <property name="directory" value="${mail.directory.is}"/>
                             <property name="filenameFilterRegex" value=".*eml"/>
                             <property name="repeat" value="true"/>
                             <property name="fileBasedNeedProducer">
-                                <bean class="won.bot.framework.component.needproducer.impl.MailFileNeedProducer"/>
+                                <bean class="won.bot.framework.component.needproducer.impl.MailFileNeedProducer">
+                                    <property name="needContentPropertyType" value="IS"/>
+                                </bean>
                             </property>
                         </bean>
                     </property>
                 </bean>
-                <bean id="demandNeedProducer"
+                <bean id="seeksNeedProducer"
                       class="won.bot.framework.component.needproducer.impl.TemplateBasedNeedProducer">
-                    <property name="template" value="classpath:/default-templates/default-template-demand.ttl"/>
+                    <property name="template" value="classpath:/default-templates/default-template.ttl"/>
                     <property name="wrappedProducer">
                         <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
-                            <property name="directory" value="${mail.directory.demand}"/>
+                            <property name="directory" value="${mail.directory.seeks}"/>
                             <property name="filenameFilterRegex" value=".*eml"/>
                             <property name="repeat" value="true"/>
                             <property name="fileBasedNeedProducer">
-                                <bean class="won.bot.framework.component.needproducer.impl.MailFileNeedProducer"/>
+                                <bean class="won.bot.framework.component.needproducer.impl.MailFileNeedProducer">
+                                    <property name="needContentPropertyType" value="SEEKS"/>
+                                </bean>
                             </property>
                         </bean>
                     </property>
                 </bean>
-                <bean id="doTogetherNeedProducer"
+                <bean id="isAndSeeksNeedProducer"
                       class="won.bot.framework.component.needproducer.impl.TemplateBasedNeedProducer">
-                    <property name="template" value="classpath:/default-templates/default-template-doTogether.ttl"/>
+                    <property name="template" value="classpath:/default-templates/default-template.ttl"/>
                     <property name="wrappedProducer">
                         <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
-                            <property name="directory" value="${mail.directory.doTogether}"/>
+                            <property name="directory" value="${mail.directory.isseeks}"/>
                             <property name="filenameFilterRegex" value=".*eml"/>
                             <property name="repeat" value="false"/>
                             <property name="fileBasedNeedProducer">
-                                <bean class="won.bot.framework.component.needproducer.impl.MailFileNeedProducer"/>
+                                <bean class="won.bot.framework.component.needproducer.impl.MailFileNeedProducer">
+                                    <property name="needContentPropertyType" value="IS_AND_SEEKS"/>
+                                </bean>
                             </property>
                         </bean>
                     </property>
                 </bean>
-                <bean id="critiqueNeedProducer"
-                      class="won.bot.framework.component.needproducer.impl.TemplateBasedNeedProducer">
-                    <property name="template" value="classpath:/default-templates/default-template-critique.ttl"/>
-                    <property name="wrappedProducer">
-                        <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
-                            <property name="directory" value="${mail.directory.critique}"/>
-                            <property name="filenameFilterRegex" value=".*eml"/>
-                            <property name="repeat" value="false"/>
-                            <property name="fileBasedNeedProducer">
-                                <bean class="won.bot.framework.component.needproducer.impl.MailFileNeedProducer"/>
-                            </property>
-                        </bean>
-                    </property>
-                </bean>
-
-                <!-- ideally, needProducerFromTrig should return Dataset, thus, cannot be used here -->
-                <!--
-                <bean id="needProducerFromTrig"
-                      class="won.bot.framework.component.needproducer.impl.RoundRobinCompositeNeedProducer">
-                    <qualifier value="default"/>
-                    <property name="needFactories">
-                        <set>
-                            <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
-                                <property name="directory" value="${needs.trig.directory.supply}"/>
-
-                                <property name="filenameFilterRegex" value=".*trig"/>
-                                <property name="repeat" value="false"/>
-                                <property name="fileBasedNeedProducer">
-                                    <bean class="won.bot.framework.component.needproducer.impl.TrigFileNeedProducer"/>
-                                </property>
-                            </bean>
-                        </set>
-                    </property>
-                </bean>
-                -->
-
-                <bean id="needProducerFromTurtle"
-                      class="won.bot.framework.component.needproducer.impl.RoundRobinCompositeNeedProducer">
-                    <qualifier value="default"/>
-                    <property name="needFactories">
-                        <set>
-                            <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
-                                <property name="directory" value="${needs.turtle.directory.supply}"/>
-
-                                <property name="filenameFilterRegex" value=".*ttl"/>
-                                <property name="repeat" value="false"/>
-                                <property name="fileBasedNeedProducer">
-                                    <bean class="won.bot.framework.component.needproducer.impl.TrigFileNeedProducer"/>
-                                </property>
-                            </bean>
-                        </set>
-                    </property>
-                </bean>
-
             </set>
         </property>
     </bean>

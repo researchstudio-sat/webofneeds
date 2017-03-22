@@ -30,7 +30,7 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper
   }
 
   private void createContentNodeIfNonExist(NeedContentPropertyType type) {
-    if (getContentNodes(type).size() == 0) {
+    if (type == null || getContentNodes(type).size() == 0) {
       createContentNode(type, null);
     }
   }

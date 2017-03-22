@@ -23,10 +23,10 @@
     <import resource="classpath:spring/component/needproducer/needproducer-mixed.xml"/>
 
     <bean id="supplyNeedProducer" class="won.matcher.solr.evaluation.MailDirNeedProducer">
-        <property name="template" value="classpath:/default-templates/default-template-supply.ttl"/>
+        <property name="template" value="classpath:/default-templates/default-template.ttl"/>
         <property name="wrappedProducer">
             <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
-                <property name="directory" value="${mail.directory.supply}"/>
+                <property name="directory" value="${mail.directory.is}"/>
                 <property name="filenameFilterRegex" value=".*eml"/>
                 <property name="repeat" value="false"/>
                 <property name="fileBasedNeedProducer">
@@ -37,10 +37,10 @@
     </bean>
 
     <bean id="demandNeedProducer" class="won.matcher.solr.evaluation.MailDirNeedProducer">
-        <property name="template" value="classpath:/default-templates/default-template-demand.ttl"/>
+        <property name="template" value="classpath:/default-templates/default-template.ttl"/>
         <property name="wrappedProducer">
             <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
-                <property name="directory" value="${mail.directory.demand}"/>
+                <property name="directory" value="${mail.directory.seeks}"/>
                 <property name="filenameFilterRegex" value=".*eml"/>
                 <property name="repeat" value="false"/>
                 <property name="fileBasedNeedProducer">

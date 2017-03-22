@@ -40,7 +40,11 @@ import java.io.IOException;
 public class MailFileNeedProducer implements FileBasedNeedProducer
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
+  private NeedContentPropertyType needContentPropertyType = NeedContentPropertyType.IS_AND_SEEKS;
 
+  public void setNeedContentPropertyType(NeedContentPropertyType needContentPropertyType) {
+    this.needContentPropertyType = needContentPropertyType;
+  }
 
   @Override
   public  synchronized Model readNeedFromFile(final File file) throws IOException
@@ -52,7 +56,7 @@ public class MailFileNeedProducer implements FileBasedNeedProducer
       MimeMessage emailMessage = new MimeMessage(null, fis);
       MimeMessageParser parser = new MimeMessageParser(emailMessage);
       parser.parse();
-      needModelWrapper.setTitle(NeedContentPropertyType.IS_AND_SEEKS, parser.getSubject());
+      needModelWrapper.setTitle(needContentPropertyType, parser.getSubject());
       String content = null;
       if (parser.hasPlainContent()){
         content = parser.getPlainContent();
@@ -61,7 +65,7 @@ public class MailFileNeedProducer implements FileBasedNeedProducer
         content = doc.text();
       }
       if (content != null) {
-        needModelWrapper.setDescription(NeedContentPropertyType.IS_AND_SEEKS, content);
+        needModelWrapper.setDescription(needContentPropertyType, content);
       }
       logger.debug("mail subject          : {}", parser.getSubject());
       logger.debug("mail has plain content: {}", parser.hasPlainContent());

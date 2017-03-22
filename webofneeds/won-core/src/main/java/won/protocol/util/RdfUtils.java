@@ -209,7 +209,10 @@ public class RdfUtils
     Resource baseResource1 = getBaseResource(model1);
     Resource baseResource2 = getBaseResource(model2);
     replaceResourceInModel(result.getResource(baseResource1.getURI()), result.getResource(baseResource2.getURI()));
-    result.setNsPrefix("",model1.getNsPrefixURI(""));
+    String prefix = model1.getNsPrefixURI("");
+    if (prefix != null) {
+      result.setNsPrefix("", prefix);
+    }
     if (logger.isDebugEnabled()){
       logger.debug("result (after merging base resources):\n{}",writeModelToString(result, Lang.TTL));
     }
