@@ -922,7 +922,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
     window.selectNeedData4dbg = needUri => selectNeedData(needUri, privateData.store);
     function selectNeedData(needUri, store) {
         // this query returns the need and everything attached to the need's content-, connectsions- and event-node up to a varying depth
-        const query = `
+        let query = `
             prefix won: <http://purl.org/webofneeds/model#>
             prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             prefix dct: <http://purl.org/dc/terms/>
@@ -936,15 +936,13 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
 
             } where {
                 {
-                    <${needUri}> won:hasBasicNeedType ?c.
-                    <${needUri}> ?b ?c
-                } UNION {
                     <${needUri}> dct:created ?c.
-                    <${needUri}> ?b ?c
+                    <${needUri}> ?b ?c.
                 } UNION {
-                    <${needUri}> won:isInState ?c.
-                    <${needUri}> ?b ?c
-                }
+                     <${needUri}> won:isInState ?c.
+                     <${needUri}> ?b ?c.
+                 }
+
 
                 UNION
 
@@ -953,7 +951,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                     <${needUri}> ?b ?c.
                 } UNION {
                     <${needUri}> won:hasConnections ?c.
-                    ?c ?d ?e
+                    ?c ?d ?e.
                 }
 
                 UNION
@@ -963,40 +961,73 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                     <${needUri}> ?b ?c.
                 } UNION {
                     <${needUri}> won:hasEventContainer ?c.
-                    ?c ?d ?e
+                    ?c ?d ?e.
+                }
+
+                UNION
+
+
+                {
+                  <${needUri}> won:seeks ?c.
+                  <${needUri}> ?b ?c.
+                } UNION {
+                  <${needUri}> won:seeks ?c.
+                  ?c ?d ?e.
+                } UNION {
+                  <${needUri}> won:seeks ?c.
+                  ?c ?d ?e.
+                  ?e ?f ?g.
+                } UNION {
+                  <${needUri}> won:seeks ?c.
+                  ?c ?d ?e.
+                  ?e ?f ?g.
+                  ?g ?h ?i.
+                } UNION {
+                  <${needUri}> won:seeks ?c.
+                  ?c ?d ?e.
+                  ?e ?f ?g.
+                  ?g ?h ?i.
+                  ?i ?j ?k.
+                } UNION {
+                  <${needUri}> won:seeks ?c.
+                  ?c ?d ?e.
+                  ?e ?f ?g.
+                  ?g ?h ?i.
+                  ?i ?j ?k.
+                  ?k ?l ?m.
                 }
 
                 UNION
 
                 {
-                    <${needUri}> won:hasContent ?c.
-                    <${needUri}> ?b ?c
+                  <${needUri}> won:is ?c.
                 } UNION {
-                    <${needUri}> won:hasContent ?c.
-                    ?c ?d ?e.
+                  <${needUri}> won:is ?c.
+                  ?c ?d ?e.
                 } UNION {
-                    <${needUri}> won:hasContent ?c.
-                    ?c ?d ?e.
-                    ?e ?f ?g.
+                  <${needUri}> won:is ?c.
+                  ?c ?d ?e.
+                  ?e ?f ?g.
                 } UNION {
-                    <${needUri}> won:hasContent ?c.
-                    ?c ?d ?e.
-                    ?e ?f ?g.
-                    ?g ?h ?i.
+                  <${needUri}> won:is ?c.
+                  ?c ?d ?e.
+                  ?e ?f ?g.
+                  ?g ?h ?i.
                 } UNION {
-                    <${needUri}> won:hasContent ?c.
-                    ?c ?d ?e.
-                    ?e ?f ?g.
-                    ?g ?h ?i.
-                    ?i ?j ?k.
+                  <${needUri}> won:is ?c.
+                  ?c ?d ?e.
+                  ?e ?f ?g.
+                  ?g ?h ?i.
+                  ?i ?j ?k.
                 } UNION {
-                    <${needUri}> won:hasContent ?c.
-                    ?c ?d ?e.
-                    ?e ?f ?g.
-                    ?g ?h ?i.
-                    ?i ?j ?k.
-                    ?k ?l ?m.
+                  <${needUri}> won:is ?c.
+                  ?c ?d ?e.
+                  ?e ?f ?g.
+                  ?g ?h ?i.
+                  ?i ?j ?k.
+                  ?k ?l ?m.
                 }
+
             }
             `
         const needJsonLdP = new Promise((resolve, reject) =>
@@ -1007,6 +1038,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
 
                 const needJsonLdP = triples2framedJson(needUri, resultGraph.triples, {
                     /* frame */
+                    "@id": needUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
                     "@context": {
                         "msg" : "http://purl.org/webofneeds/message#",
                         "woncrypt" : "http://purl.org/webofneeds/woncrypt#",
@@ -1023,9 +1055,6 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                         "dct": "http://purl.org/dc/terms/",
                         "s" : "http://schema.org/",
                     },
-                    "won:hasContent": {
-                        "@type": "won:NeedContent"
-                    }
                 });
 
                 resolve(needJsonLdP);
