@@ -98,33 +98,34 @@
             });
         }
 
+        const putIntoBoth =
+            args.type === won.WON.BasicNeedTypeDotogetherCompacted ||
+            args.type === won.WON.BasicNeedTypeCritiqueCompacted;
+
+        const putIntoIs =
+            putIntoBoth ||
+            args.type === won.WON.BasicNeedTypeSupplyCompacted;
+
+        const putIntoSeeks =
+            putIntoBoth ||
+            args.type === won.WON.BasicNeedTypeDemandCompacted;
+
 
         var graph = [
             {
                 '@id': args.publishedContentUri,
                 '@type': 'won:Need',
-                'won:hasContent': '_:n01',
-                'won:hasBasicNeedType': args.type,
+                'won:is': putIntoIs? { '@id': '_:needContent' } : undefined,
+                'won:seeks': putIntoSeeks? { '@id': '_:needContent' } : undefined,
                 'won:hasFacet': args.facet? args.facet : 'won:OwnerFacet',
-                'won:hasAttachment': (hasAttachmentUrls(args) ? attachmentUrisTyped : undefined),
-                'won:hasFlag': !!won.debugmode ? 'won:UsedForTesting' : undefined
+                'won:hasFlag': !!won.debugmode ? 'won:UsedForTesting' : undefined,
             },
             {
-                '@id': '_:n01',
-                '@type': 'won:NeedContent',
+                '@id': '_:needContent',
                 'dc:title': args.title,
                 'won:hasTextDescription': args.description,
                 'won:hasTag': args.tags,
-                'won:hasContentDescription': (hasModalities(args) ? '_:contentDescription' : undefined)
-            }
-            //, <if _hasModalities> {... (see directly below) } </if>
-        ];
-
-        //check if at least one of images, location, time or price has been specified
-        if(hasModalities(args)) {
-            graph.push({
-                '@id': '_:contentDescription',
-                '@type': 'won:NeedModality',
+                'won:hasAttachment': (hasAttachmentUrls(args) ? attachmentUrisTyped : undefined),
                 'won:hasLocation': (!hasLocation(args)? undefined : {
                     '@type': 's:Place',
                     's:geo' : {
@@ -166,8 +167,9 @@
                     'won:hasUpperPriceLimit': args.upperPriceLimit
                 })
                 //TODO images, time, currency(?)
-            });
-        }
+            }
+            //, <if _hasModalities> {... (see directly below) } </if>
+        ];
         return {
             '@graph': graph,
             '@context': {
@@ -175,15 +177,6 @@
                  TODO add following datatypes to context
                  TODO only add the ones that are required?
                  */
-
-                'won:hasContentDescription': {
-                    '@id': won.WON.hasContentDescription, //'http://purl.org/webofneeds/model#hasContentDescription',
-                    '@type': '@id'
-                },
-                'won:hasBasicNeedType':{
-                    '@id': won.WON.hasBasicNeedType,//'http://purl.org/webofneeds/model#hasBasicNeedType',
-                    '@type':'@id'
-                },
 
                 //TODO probably an alias instead of an type declaration as it's intended here
                 'won:hasCurrency': 'xsd:string',
