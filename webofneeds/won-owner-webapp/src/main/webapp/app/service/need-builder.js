@@ -99,8 +99,7 @@
         }
 
         const putIntoBoth =
-            args.type === won.WON.BasicNeedTypeDotogetherCompacted ||
-            args.type === won.WON.BasicNeedTypeCritiqueCompacted;
+            args.type === won.WON.BasicNeedTypeDotogetherCompacted;
 
         const putIntoIs =
             putIntoBoth ||

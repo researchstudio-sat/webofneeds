@@ -34,12 +34,6 @@ const postTypeTexts = [
         helpText: 'Select this if you are looking to find other people who share your interest. You will be matched' +
         ' with other people who chose this option as well.'
     },
-    {
-        type: won.WON.BasicNeedTypeCritique,
-        text: 'I want to do something about',
-        helpText: 'Select this if there is some problem you want to fix (or get fixed). You will be' +
-        ' matched with other people who chose this option as well and have a similar idea.'
-    }
 ]
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
