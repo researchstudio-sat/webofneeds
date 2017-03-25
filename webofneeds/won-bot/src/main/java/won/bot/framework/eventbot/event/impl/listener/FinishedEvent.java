@@ -20,8 +20,7 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.BaseEventListener;
 
 /**
- * User: fkleedorfer
- * Date: 24.03.14
+ * Used to indicate that the specified EventListener has completed its work.
  */
 public class FinishedEvent implements Event
 {
