@@ -40,18 +40,18 @@ import java.net.URI;
 public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandAction<FeedbackCommandEvent> {
 
     public ExecuteFeedbackCommandAction(final EventListenerContext eventListenerContext) {
-        super(eventListenerContext);
+        super(eventListenerContext, false);
     }
 
 
     @Override
     protected MessageCommandFailureEvent createRemoteNodeFailureEvent(FeedbackCommandEvent originalCommand, WonMessage messageSent, FailureResponseEvent failureResponseEvent) {
-        return new FeedbackCommandFailureEvent(originalCommand, failureResponseEvent.getNeedURI(), failureResponseEvent.getRemoteNeedURI(), failureResponseEvent.getConnectionURI());
+        return null;
     }
 
     @Override
     protected MessageCommandSuccessEvent createRemoteNodeSuccessEvent(FeedbackCommandEvent originalCommand, WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
-        return new FeedbackCommandSuccessEvent(originalCommand, successResponseEvent.getNeedURI(), successResponseEvent.getRemoteNeedURI(), successResponseEvent.getConnectionURI());
+        return null;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandActio
 
     @Override
     protected MessageCommandSuccessEvent createLocalNodeSuccessEvent(FeedbackCommandEvent originalCommand, WonMessage messageSent, SuccessResponseEvent successResponseEvent) {
-        return null;
+        return new FeedbackCommandSuccessEvent(originalCommand, originalCommand.getCon());
     }
 
     protected WonMessage createWonMessage(FeedbackCommandEvent feedbackCommandEvent)
@@ -81,7 +81,7 @@ public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandActio
                                 wonNode),
                         connectionURI,
                         localNeed,
-                        wonNode, feedbackCommandEvent.getValue().equals(WON.GOOD)
+                        wonNode, URI.create(WON.GOOD.getURI()).equals(feedbackCommandEvent.getValue())
                 )
                 .build();
     }
