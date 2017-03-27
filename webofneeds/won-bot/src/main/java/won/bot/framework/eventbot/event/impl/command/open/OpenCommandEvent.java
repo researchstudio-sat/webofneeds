@@ -55,11 +55,4 @@ public class OpenCommandEvent extends BaseNeedAndConnectionSpecificEvent impleme
         return welcomeMessage;
     }
 
-    private static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI){
-        Connection con = new Connection();
-        con.setConnectionURI(connectionURI);
-        con.setNeedURI(needURI);
-        con.setRemoteNeedURI(remoteNeedURI);
-        return con;
-    }
 }
