@@ -327,7 +327,6 @@ public class NeedModelWrapper
     String queryString = "prefix won: <http://purl.org/webofneeds/model#> \n" +
       "SELECT DISTINCT ?contentNode WHERE { \n" +
       "?needNode a won:Need. \n" +
-      "?contentNode a won:NeedContent. \n" +
       "?needNode " + queryPropertyPath1 + " ?contentNode. \n " +
       "?needNode " + queryPropertyPath2 + " ?contentNode. }";
 
