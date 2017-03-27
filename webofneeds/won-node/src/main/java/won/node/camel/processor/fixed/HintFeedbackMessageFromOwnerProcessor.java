@@ -72,7 +72,6 @@ public class HintFeedbackMessageFromOwnerProcessor extends AbstractFromOwnerCame
       @Override
       public Model visit(final Model model) {
         Resource baseResource = model.getResource(messageURI.toString());
-        StmtIterator stmtIterator = baseResource.listProperties(WON.HAS_FEEDBACK);
         if (baseResource.hasProperty(WON.HAS_FEEDBACK)){
           //add the base resource as a feedback event to the connection
           processFeedback(con, baseResource);
