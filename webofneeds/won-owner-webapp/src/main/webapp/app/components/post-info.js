@@ -103,7 +103,7 @@ function genComponentConf() {
                 'self.location',
                 (location, previousLocationValue) => {
                     console.log('in location watch: ', location, previousLocationValue);
-                    if(!this._mapHasBeenAutoCentered) {
+                    if(location && !this._mapHasBeenAutoCentered) {
                         this.updateMap(location)
                         this._mapHasBeenAutoCentered = true;
                     }
