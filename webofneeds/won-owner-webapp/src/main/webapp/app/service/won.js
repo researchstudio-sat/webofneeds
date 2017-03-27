@@ -631,10 +631,6 @@
             "gr": "http://purl.org/goodrelations/v1#",
             "ldp": "http://www.w3.org/ns/ldp#",
             "rdfg": "http://www.w3.org/2004/03/trix/rdfg-1/",
-            "won:hasContent":{
-                "@id":"http://purl.org/webofneeds/model#hasContent",
-                "@type":"@id"
-            },
             "msg:hasMessageType":{
                 "@id":"http://purl.org/webofneeds/message#hasMessageType",
                 "@type":"@id"
