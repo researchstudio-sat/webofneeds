@@ -14,19 +14,24 @@ import {
     selectUnreadCountsByNeedAndType,
 } from '../selectors';
 
+import {
+    seeksOrIs,
+    inferLegacyNeedType,
+} from '../won-utils';
+
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
     let template = `
             <div class="fi clickable" ui-sref="post({postUri: self.ownNeed.get('@id')})">
                 <won-square-image
                     src="self.ownNeed.get('titleImg')"
-                    title="self.ownNeed.getIn(['won:hasContent','dc:title'])"
+                    title="self.ownNeedContent.get('dc:title')"
                     uri="self.ownNeed.get('@id')">
                 </won-square-image>
                 <div class="fi__description">
                     <div class="fi__description__topline">
                         <div class="fi__description__topline__title">
-                            {{ self.ownNeed.getIn(['won:hasContent','dc:title']) }}
+                            {{ self.ownNeedContent.get('dc:title') }}
                         </div>
                         <div class="fi__description__topline__date">
                             {{ self.createdOn }}
@@ -43,7 +48,7 @@ function genComponentConf() {
                         <span class="fi__description__subtitle__type">
                             {{
                                 self.labels.type[
-                                    self.ownNeed.getIn(['won:hasBasicNeedType','@id'])
+                                    self.inferLegacyNeedType(self.ownNeed)
                                 ]
                             }}
                         </span>
@@ -61,13 +66,13 @@ function genComponentConf() {
                 })">
                     <won-square-image
                         src="cnct.get('titleImg')"
-                        title="cnct.getIn(['remoteNeed','won:hasContent','dc:title'])"
+                        title="self.seeksOrIs(cnct.getIn('remoteNeed')).get('dc:title')"
                         uri="cnct.getIn(['remoteNeed','@id'])">
                     </won-square-image>
                     <div class="fmil__item__description">
                         <div class="fmil__item__description__topline">
                             <div class="fmil__item__description__topline__title">
-                                {{cnct.getIn(['remoteNeed','won:hasContent','dc:title'])}}
+                                {{self.seeksOrIs(cnct.getIn('remoteNeed')).get('dc:title')}}
                             </div>
                             <div class="fmil__item__description__topline__date">
                                 <!-- TODO only show this when this is a group's thread -->
@@ -111,6 +116,8 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
+            this.seeksOrIs = seeksOrIs;
+            this.inferLegacyNeedType = inferLegacyNeedType;
 
             window.fi4dbg = this;
 
@@ -124,10 +131,13 @@ function genComponentConf() {
                 const lastUpdated = selectLastUpdateTime(state);
                 const connectionsByNeed = selectConnectionsByNeed(state);
                 const unreadCountsByNeedAndType = selectUnreadCountsByNeedAndType(state);
+                const ownNeed = ownNeeds && ownNeeds.get(self.needUri);
+                const ownNeedContent = ownNeed && seeksOrIs(ownNeed);
 
                 return {
-                    ownNeed: ownNeeds && ownNeeds.get(self.needUri),
-                    createdOn: ownNeeds && relativeTime(lastUpdated, ownNeeds.get('dct:created')),
+                    ownNeed,
+                    ownNeedContent,
+                    createdOn: ownNeed && relativeTime(lastUpdated, ownNeed.get('dct:created')),
                     connections: connectionsByNeed && connectionsByNeed.get(self.needUri),
                     unreadCounts: unreadCountsByNeedAndType && unreadCountsByNeedAndType.get(self.needUri),
 
