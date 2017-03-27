@@ -17,6 +17,7 @@
 package won.bot.framework.eventbot.event.impl.command.connect;
 
 import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
+import won.bot.framework.eventbot.event.RemoteNeedSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.FacetType;
@@ -26,7 +27,7 @@ import java.net.URI;
 /**
  * Instructs the bot to connect to the specified remoteNeed on behalf of the need.
  */
-public class ConnectCommandEvent extends BaseNeedSpecificEvent implements MessageCommandEvent {
+public class ConnectCommandEvent extends BaseNeedSpecificEvent implements MessageCommandEvent, RemoteNeedSpecificEvent {
     private URI remoteNeedURI;
     private URI localFacet;
     private URI remoteFacet;
