@@ -26,8 +26,6 @@
     <import resource="classpath:spring/component/botContext/botContext.xml"/>
     <import resource="classpath:spring/component/telegram/telegramContentExtractor.xml"/>
 
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/telegram-bot.properties" ignore-unresolvable="true"/>
-
     <bean id="telegram2wonBot" class="won.bot.impl.Telegram2WonBot">
         <!-- optional property, by default one echo need per each need will be created -->
 

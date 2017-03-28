@@ -24,9 +24,6 @@
     <!--
        context that combines components to provide an environment for running bots
     -->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/bot.properties" ignore-unresolvable="true"/>
-
-
     <!--import resource="classpath:/spring/component/linkeddatasource/owner-linkeddatasource.xml" /-->
     <import resource="classpath:/spring/component/scheduling/scheduling.xml" />
     <import resource="classpath:/spring/component/ownerCallback/ownerCallback.xml" />
