@@ -23,13 +23,6 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
-    <!--
-         Load properties but ignore unresolvable properties so that
-         they are searched in other property configurers defined in the context
-    -->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/owner.properties" ignore-unresolvable="true"/>
-
-
     <bean id="uriService" class="won.owner.service.impl.URIService">
         <property name="ownerProtocolOwnerServiceEndpointURI" value="${uri.owner.protocol.endpoint}" />
         <property name="defaultOwnerProtocolNeedServiceEndpointURI" value="${uri.need.protocol.endpoint.default}" />
