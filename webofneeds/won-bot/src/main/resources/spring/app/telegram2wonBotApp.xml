@@ -32,6 +32,4 @@
     <import resource="classpath:/spring/app/botRunner.xml" />
     <!-- the bots to run -->
     <import resource="classpath:/spring/bot/Telegram2WonBot.xml" />
-
-
 </beans>

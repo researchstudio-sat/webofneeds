@@ -21,6 +21,14 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--
+         Load properties but ignore unresolvable properties so that
+         they are searched in other property configuerers defined in the context
+    -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node-uri-source.properties" ignore-unresolvable="true"/> <!-- was in ownerCallback.xml -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node-uri-source.properties" ignore-unresolvable="true"/> <!-- was in noderurisource-roundrobin.xml -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node-uri-source.properties" ignore-unresolvable="true"/> <!-- was in matcherProtocolMatcherServiceHandler.xml -->
     <!--
        context that combines components to provide an environment for running bots
     -->

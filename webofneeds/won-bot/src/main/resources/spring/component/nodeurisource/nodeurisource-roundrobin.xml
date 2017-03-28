@@ -24,12 +24,6 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-    <!--
-         Load properties but ignore unresolvable properties so that
-         they are searched in other property configuerers defined in the context
-    -->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node-uri-source.properties" ignore-unresolvable="true"/>
-
     <bean id="nodeUriSourceRoundRobin" class="won.bot.framework.component.nodeurisource.impl.RoundRobinMultiNodeUriSource" >
         <property name="nodeURIs" value="#{'${won.node.uris}'.split(' ')}" />
         <qualifier value="default" />

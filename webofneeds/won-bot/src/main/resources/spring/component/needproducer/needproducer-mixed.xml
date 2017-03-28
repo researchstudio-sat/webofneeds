@@ -24,14 +24,6 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-    <!-- 
-          Load properties but ignore unresolvable properties so that 
-          they are searched in other property configuerers defined in the context 
-     -->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/mail-dir-bot.properties" ignore-unresolvable="true"/>
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/need-dir-bot.properties" ignore-unresolvable="true"/>
-
-
     <bean id="needProducerMixed" class="won.bot.framework.component.needproducer.impl.RoundRobinCompositeNeedProducer">
         <qualifier value="default"/>
         <property name="needFactories">
