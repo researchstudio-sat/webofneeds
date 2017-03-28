@@ -24,9 +24,7 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher-service.properties"
-                                  ignore-unresolvable="true"/>
-
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher-service.properties" ignore-unresolvable="true"/>
 
     <bean id="keyStoreService" class="won.cryptography.service.KeyStoreService" init-method="init">
         <constructor-arg type="java.lang.String" value="${keystore.location}" />

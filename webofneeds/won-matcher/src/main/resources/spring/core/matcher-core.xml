@@ -28,7 +28,6 @@
     <context:component-scan base-package="won.protocol.rest">
         <context:include-filter type="regex" expression="won.protocol.rest.*"/>
     </context:component-scan>-->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties" ignore-unresolvable="true"/>
 
     <!-- protocol-level services -->
     <bean id="matcherMessagingService" class="won.protocol.jms.MessagingServiceImpl">

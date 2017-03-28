@@ -28,6 +28,7 @@
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/bot.properties" ignore-unresolvable="true"/> <!-- was in botRunner.xml -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/mail-dir-bot.properties" ignore-unresolvable="true"/> <!-- was in needproducer-mails.xml within mailBasedSimpleReactiveBotBACC.xml -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/node-uri-source.properties" ignore-unresolvable="true"/> <!-- was in nodeurisource-random.xml within mailBasedSimpleReactiveBotBACC.xml  and in ownerCallback.xml and noderurisource-roundrobin.xml and matcherProtocolMatcherServiceHandler.xml within botRunner.xml-->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties" ignore-unresolvable="true"/><!-- was in matcher-camel.xml within botRunner.xml and in in matcher-core.xml within botRunner.xml and in matcher-service.xml withihn botRunner.xml-->
 
     <!-- the runner -->
     <import resource="classpath:/spring/app/botRunner.xml" />

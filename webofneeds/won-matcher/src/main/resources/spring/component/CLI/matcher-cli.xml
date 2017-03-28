@@ -28,6 +28,5 @@
     <context:component-scan base-package="won.protocol.rest">
         <context:include-filter type="regex" expression="won.protocol.rest.*"/>
     </context:component-scan>-->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/matcher.properties" ignore-unresolvable="true"/>
     <bean id="matcherCLICommandLineRunner" class="won.matcher.cli.MatcherCLI"/>
 </beans>

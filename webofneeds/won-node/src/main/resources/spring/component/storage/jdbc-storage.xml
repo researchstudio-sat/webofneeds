@@ -29,13 +29,6 @@
                 http://www.springframework.org/schema/data/repository http://www.springframework.org/schema/data/repository/spring-repository-1.8.xsd
                 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-    <!--
-         Load properties but ignore unresolvable properties so that
-         they are searched in other property configurers defined in the context
-    -->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
-
-
     <!-- Defines where to search for annotated components -->
     <context:component-scan base-package="won.node.protocol.impl" />
 

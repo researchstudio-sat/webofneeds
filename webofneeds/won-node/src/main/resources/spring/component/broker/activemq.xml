@@ -25,15 +25,6 @@
   http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd
   http://www.springframework.org/schema/context
   http://www.springframework.org/schema/context/spring-context-3.1.xsd">
-
-
-    <!--
-         Load properties but ignore unresolvable properties so that
-         they are searched in other property configuerers defined in the context
-    -->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
-
-
     <!--
         The <broker> element is used to configure the ActiveMQ broker.
     -->
