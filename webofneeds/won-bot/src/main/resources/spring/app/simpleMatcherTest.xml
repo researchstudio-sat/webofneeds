@@ -26,11 +26,11 @@
     -->
 
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/bot.properties" ignore-unresolvable="true"/> <!-- was in botRunner.xml -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/mail-dir-bot.properties" ignore-unresolvable="true"/> <!-- was in needproducer-mails.xml --><!-- was in mailBasedSimpleReactiveBotMatcher.xml -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node-uri-source.properties" ignore-unresolvable="true"/> <!-- was in nodeurisource-random.xml --><!-- was in mailBasedSimpleReactiveBotMatcher.xml -->
 
     <!-- the runner -->
     <import resource="classpath:/spring/app/botRunner.xml" />
     <!-- the bots to run -->
     <import resource="classpath:/spring/bot/mailBasedSimpleReactiveBotMatcher.xml" />
-
-
 </beans>

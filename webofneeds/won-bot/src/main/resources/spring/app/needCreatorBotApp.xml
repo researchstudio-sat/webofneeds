@@ -27,6 +27,9 @@
 
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/bot.properties" ignore-unresolvable="true"/> <!-- was in botRunner.xml -->
     <context:property-placeholder location="file:${WON_CONFIG_DIR}/bot.properties" ignore-unresolvable="true"/> <!-- was in needCreatorBot.xml -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/mail-dir-bot.properties" ignore-unresolvable="true"/> <!-- was in needproducer-mixed.xml --><!-- was in needCreatorBot.xml -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/need-dir-bot.properties" ignore-unresolvable="true"/> <!-- was in needproducer-mixed.xml --><!-- was in needCreatorBot.xml -->
+    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node-uri-source.properties" ignore-unresolvable="true"/> <!-- was in nodeurisource-random.xml --><!-- was in needCreatorBot.xml -->
 
     <!-- the runner -->
     <import resource="classpath:/spring/app/botRunner.xml" />
