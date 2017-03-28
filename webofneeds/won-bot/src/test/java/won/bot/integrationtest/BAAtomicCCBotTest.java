@@ -40,7 +40,7 @@ import static junit.framework.TestCase.assertTrue;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/spring/app/botRunner.xml"})
+@ContextConfiguration(locations = {"classpath:/spring/app/baAtomicCCTest.xml"})
 
 public class BAAtomicCCBotTest
 {
