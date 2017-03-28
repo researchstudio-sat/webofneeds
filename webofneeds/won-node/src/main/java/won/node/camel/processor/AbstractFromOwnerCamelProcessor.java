@@ -17,7 +17,6 @@
 package won.node.camel.processor;
 
 import org.apache.camel.Exchange;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Base class for processors handling messages coming from a remote node.
@@ -30,7 +29,6 @@ public abstract class AbstractFromOwnerCamelProcessor extends AbstractCamelProce
    * @param exchange
    * @throws Exception
    */
-  @Transactional
   public void onSuccessResponse(Exchange exchange) throws Exception {
     logger.debug("received success response");
   };
@@ -40,7 +38,6 @@ public abstract class AbstractFromOwnerCamelProcessor extends AbstractCamelProce
    * @param exchange
    * @throws Exception
    */
-  @Transactional
   public void onFailureResponse(Exchange exchange) throws Exception {
     logger.debug("processing failure response");
   };
