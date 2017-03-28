@@ -16,16 +16,16 @@
 
 package won.protocol.repository;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.MessageEventPlaceholder;
 
+import javax.persistence.LockModeType;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -43,9 +43,15 @@ public interface ConnectionRepository extends WonRepository<Connection>
 
   Connection findOneByConnectionURI(URI URI);
 
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("select con from Connection con where connectionURI = :uri")
+  Connection findOneByConnectionURIForUpdate(@Param("uri") URI uri);
+
   Connection findOneByConnectionURIAndVersionNot(URI URI, long version);
 
-  Connection findOneByNeedURIAndRemoteNeedURIAndTypeURI(URI needURI, URI remoteNeedURI, URI typeUri);
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("select con from Connection con where needURI = :needUri and remoteNeedURI = :remoteNeedUri and typeURI = :typeUri")
+  Connection findOneByNeedURIAndRemoteNeedURIAndTypeURIForUpdate(@Param("needUri") URI needURI, @Param("remoteNeedUri") URI remoteNeedURI, @Param("typeUri") URI typeUri);
 
   List<Connection> findByNeedURI(URI URI);
 
@@ -72,8 +78,9 @@ public interface ConnectionRepository extends WonRepository<Connection>
   @Query("select connectionURI from Connection where needURI = ?1 and state != ?2")
   List<URI> getConnectionURIsByNeedURIAndNotInState(URI needURI, ConnectionState connectionState);
 
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("select c from Connection c where c.needURI = ?1 and c.state != ?2")
-  List<Connection> getConnectionsByNeedURIAndNotInState(URI needURI, ConnectionState connectionState);
+  List<Connection> getConnectionsByNeedURIAndNotInStateForUpdate(URI needURI, ConnectionState connectionState);
 
 
 

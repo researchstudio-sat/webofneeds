@@ -19,8 +19,10 @@ package won.node.camel.processor.general;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import won.node.service.DataAccessService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
@@ -49,13 +51,16 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
   protected NeedEventContainerRepository needEventContainerRepository;
   @Autowired
   protected DatasetHolderRepository datasetHolderRepository;
+  @Autowired
+  DataAccessService dataAccessService;
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
+  //we use READ_COMMITTED because we want to wait for an exclusive lock will accept data written by a concurrent transaction that commits before we read
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
   public WonMessage process(WonMessage message) throws WonMessageProcessingException {
     URI parentURI = WonMessageUtils.getParentEntityUri(message);
-    saveMessage(message, parentURI);
     updateResponseInfo(message);
+    saveMessage(message, parentURI);
     return message;
   }
 
@@ -69,7 +74,7 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
     URI originalMessageURI = message.getIsResponseToMessageURI();
     if (originalMessageURI != null) {
       // update the message it responds to with the uri of the response
-      MessageEventPlaceholder event = messageEventRepository.findOneByMessageURI(originalMessageURI);
+      MessageEventPlaceholder event = messageEventRepository.findOneByMessageURIforUpdate(originalMessageURI);
       if (event != null){
         //we may not have saved the event yet if the current message is a FailureResponse
         //and the error causing the response happened before saving the original message.
@@ -88,14 +93,17 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
                                 wonMessage, container);
     event.setDatasetHolder(datasetHolder);
     messageEventRepository.save(event);
-
+    //FIXLOSTUPDATES:
+    //this could be part of the problem if the transaction stays open for a long time
+    //options:
+    // * commit immediately here (trying with REQURES_NEW)
   }
 
   private EventContainer loadOrCreateEventContainer(final WonMessage wonMessage, final URI parent) {
     WonMessageType type = wonMessage.getMessageType();
     if (WonMessageType.CREATE_NEED.equals(type)) {
       //create a need event container with null parent (because it will only be persisted at a later point in time)
-      EventContainer container = needEventContainerRepository.findOneByParentUri(parent);
+      EventContainer container = needEventContainerRepository.findOneByParentUriForUpdate(parent);
       if (container != null) return container;
       NeedEventContainer nec = new NeedEventContainer (null, parent);
       needEventContainerRepository.saveAndFlush(nec);
@@ -103,15 +111,15 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
     } else if (WonMessageType.CONNECT.equals(type) || WonMessageType.HINT_MESSAGE.equals(type)) {
       //create a connection event container witn null parent (because it will only be persisted at a later point in
       // time)
-      EventContainer container = connectionEventContainerRepository.findOneByParentUri(parent);
+      EventContainer container = connectionEventContainerRepository.findOneByParentUriForUpdate(parent);
       if (container != null) return container;
       ConnectionEventContainer cec = new ConnectionEventContainer(null, parent);
       connectionEventContainerRepository.saveAndFlush(cec);
       return cec;
     }
-    EventContainer container = needEventContainerRepository.findOneByParentUri(parent);
+    EventContainer container = needEventContainerRepository.findOneByParentUriForUpdate(parent);
     if (container != null) return container;
-    container = connectionEventContainerRepository.findOneByParentUri(parent);
+    container = connectionEventContainerRepository.findOneByParentUriForUpdate(parent);
     if (container != null) return container;
     //let's see if we can find the event conta
     throw new IllegalArgumentException(
