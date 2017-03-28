@@ -20,6 +20,7 @@ import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.cryptography.rdfsign.SigningStage;
@@ -53,11 +54,12 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
   private DatasetHolderRepository datasetHolderRepository;
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
+  //we use READ_COMMITTED because we want to wait for an exclusive lock will accept data written by a concurrent transaction that commits before we read
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
   public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
     //find all unreferenced messages for the current message's parent
     List<MessageEventPlaceholder> messageEventPlaceholders = messageEventRepository
-      .findByParentURIAndNotReferencedByOtherMessage(message.getSenderURI());
+      .findByParentURIAndNotReferencedByOtherMessageForUpdate(message.getSenderURI());
 
     //initialize a variable for the result
     WonMessageType messageType = message.getMessageType();
@@ -67,10 +69,10 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
         messageType == HINT_MESSAGE) {
       //when we're starting a conversation, link to the create message of the need.
       messageEventPlaceholders.addAll(messageEventRepository
-                                        .findByParentURIAndMessageType(message.getReceiverNeedURI(), WonMessageType
+                                        .findByParentURIAndMessageTypeForUpdate(message.getReceiverNeedURI(), WonMessageType
                                           .CREATE_NEED));
       messageEventPlaceholders.addAll(messageEventRepository
-                                        .findByParentURIAndMessageType(message.getSenderNeedURI(), WonMessageType
+                                        .findByParentURIAndMessageTypeForUpdate(message.getSenderNeedURI(), WonMessageType
                                           .CREATE_NEED));
     }
     //the message should not sign itself, just in case:
@@ -98,6 +100,9 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
       // otherwise the current message may end up not being persisted but the previous message that is referenced here
       // will not be referenced by any subsequent messages.
       messageEventPlaceholder.setReferencedByOtherMessage(true);
+      if (logger.isDebugEnabled()){
+        logger.debug("adding reference to message {} into message {} ", messageEventPlaceholder.getMessageURI(), message.getMessageURI());
+      }
     }
     //persist the message
     messageEventRepository.save(messageEventPlaceholders);
@@ -114,7 +119,7 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
   }
 
   private WonMessage loadWonMessageforURI(final URI messageURI) {
-    DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(messageURI);
+    DatasetHolder datasetHolder = datasetHolderRepository.findOneByUriForUpdate(messageURI);
     if (datasetHolder == null || datasetHolder.getDataset() == null){
       throw new IllegalStateException( String.format("could not load dataset for message %s",messageURI));
     }

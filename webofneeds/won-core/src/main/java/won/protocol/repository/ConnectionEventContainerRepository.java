@@ -16,8 +16,12 @@
 
 package won.protocol.repository;
 
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import won.protocol.model.ConnectionEventContainer;
 
+import javax.persistence.LockModeType;
 import java.net.URI;
 
 /**
@@ -26,4 +30,9 @@ import java.net.URI;
 public interface ConnectionEventContainerRepository extends WonRepository<ConnectionEventContainer>
 {
   public ConnectionEventContainer findOneByParentUri(URI parentUri);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("select c from ConnectionEventContainer c where c.parentUri = :parentUri")
+  public ConnectionEventContainer findOneByParentUriForUpdate(@Param("parentUri") URI parentUri);
+
 }
