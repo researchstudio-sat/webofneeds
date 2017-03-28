@@ -35,7 +35,6 @@ import won.protocol.util.DataAccessUtils;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 /**
  * User: fkleedorfer
@@ -291,29 +290,6 @@ public class NeedInformationServiceImpl implements NeedInformationService
     return null;
   }
 
-
-  @Override
-  public List<URI> listConnectionEventURIs(URI connectionUri) {
-    return messageEventRepository.getMessageURIsByParentURI(connectionUri);
-  }
-
-  @Override
-  @Deprecated
-  public Slice<URI> listConnectionEventURIs(
-    URI connectionUri, int page, Integer preferedPageSize, WonMessageType messageType)
-  {
-    int pageSize = getPageSize(preferedPageSize);
-    int pageNum = page - 1;
-    Slice<URI> slice = null;
-    if (messageType == null) {
-      slice = messageEventRepository.getMessageURIsByParentURI(
-        connectionUri, new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
-    } else {
-      slice = messageEventRepository.getMessageURIsByParentURI(
-        connectionUri, messageType, new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
-    }
-    return slice;
-  }
 
   @Override
   public Slice<MessageEventPlaceholder> listConnectionEvents(
