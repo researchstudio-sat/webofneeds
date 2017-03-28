@@ -14,32 +14,16 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.eventbot.event.impl.listener;
+package won.bot.framework.eventbot.listener;
 
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.listener.BaseEventListener;
 
 /**
- * Used to indicate that the specified EventListener has completed its work.
+ * EventListener that does nothing.
  */
-public class FinishedEvent implements Event
-{
-  private BaseEventListener listener;
-  public FinishedEvent(final BaseEventListener listener)
-  {
-    this.listener = listener;
-  }
-
-  public BaseEventListener getListener()
-  {
-    return listener;
-  }
-
-  @Override
-  public String toString()
-  {
-    return "FinishedEvent{" +
-        "listener=" + listener +
-        '}';
-  }
+public class NopEventListener implements EventListener {
+    @Override
+    public void onEvent(Event event) throws Exception {
+        //do nothing
+    }
 }

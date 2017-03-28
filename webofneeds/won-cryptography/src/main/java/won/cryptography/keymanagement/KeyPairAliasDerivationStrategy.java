@@ -14,32 +14,18 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.eventbot.event.impl.listener;
-
-import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.listener.BaseEventListener;
+package won.cryptography.keymanagement;
 
 /**
- * Used to indicate that the specified EventListener has completed its work.
+ * Encapsulates the derivation of an alias for a given Need URI.
  */
-public class FinishedEvent implements Event
+public interface KeyPairAliasDerivationStrategy
 {
-  private BaseEventListener listener;
-  public FinishedEvent(final BaseEventListener listener)
-  {
-    this.listener = listener;
-  }
-
-  public BaseEventListener getListener()
-  {
-    return listener;
-  }
-
-  @Override
-  public String toString()
-  {
-    return "FinishedEvent{" +
-        "listener=" + listener +
-        '}';
-  }
+    /**
+     * Returns an Alias usable in a KeyStore.
+     * @param needURI
+     * @return always a valid alias string
+     * @throws IllegalArgumentException if the argument cannot be converted to an alias.
+     */
+    public String getAliasForNeedUri(String needURI);
 }

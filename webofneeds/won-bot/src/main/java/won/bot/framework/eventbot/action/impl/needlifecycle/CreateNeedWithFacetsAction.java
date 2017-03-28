@@ -16,8 +16,9 @@
 
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
-import org.apache.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.Event;
@@ -61,6 +62,15 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction
           logger.warn("needproducer failed to produce a need model, aborting need creation");
           return;
         }
+        URI needUriFromProducer = null;
+        Resource needResource = WonRdfUtils.NeedUtils.getNeedResource(needModel);
+        if (needResource.isURIResource()) {
+            needUriFromProducer = URI.create(needResource.getURI().toString());
+          RdfUtils.replaceBaseURI(needModel, needResource.getURI());
+        } else {
+          RdfUtils.replaceBaseResource(needModel, needResource);
+        }
+        final URI needUriBeforeCreation = needUriFromProducer;
         for (URI facetURI:facets){
             WonRdfUtils.FacetUtils.addFacet(needModel,facetURI);
         }
@@ -80,7 +90,7 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction
           public void onEvent(Event event) throws Exception {
             logger.debug("need creation successful, new need URI is {}", needURI);
             getEventListenerContext().getEventBus()
-                                     .publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
+                                     .publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null, needUriBeforeCreation));
           }
         };
 
@@ -91,7 +101,7 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction
             String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
             logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
             EventBotActionUtils.removeFromList(getEventListenerContext(), needURI, uriListName);
-            getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
+            getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri, needUriBeforeCreation));
           }
         };
       EventBotActionUtils.makeAndSubscribeResponseListener(

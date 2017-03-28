@@ -62,4 +62,12 @@ public abstract class BaseNeedAndConnectionSpecificEvent extends BaseEvent imple
       ", connectionURI=" + getConnectionURI() +
       '}';
   }
+
+  protected static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI){
+    Connection con = new Connection();
+    con.setConnectionURI(connectionURI);
+    con.setNeedURI(needURI);
+    con.setRemoteNeedURI(remoteNeedURI);
+    return con;
+  }
 }

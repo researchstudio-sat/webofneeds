@@ -35,11 +35,6 @@ public abstract class BaseEventBotAction implements won.bot.framework.eventbot.a
   private static final String EXCEPTION_TAG = "failed";
   private final String stopwatchName = getClass().getName();
 
-
-  private BaseEventBotAction()
-  {
-  }
-
   protected BaseEventBotAction(final EventListenerContext eventListenerContext)
   {
     this.eventListenerContext = eventListenerContext;

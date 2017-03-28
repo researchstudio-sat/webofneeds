@@ -37,7 +37,7 @@ public class MongoBotContext implements BotContext
     for (MongoContextObjectList mco : contextObjects) {
       List<Object> objectList = mco.getList();
       if (objectList != null) {
-        Set<URI> tempSet = mco.getList().stream().map(x -> (URI) x).collect(Collectors.toSet());
+        Set<URI> tempSet = mco.getList().stream().map(x -> URI.create((String) x)).collect(Collectors.toSet());
         uris.addAll(tempSet);
       }
     }
@@ -55,12 +55,12 @@ public class MongoBotContext implements BotContext
 
   @Override
   public void removeNeedUriFromNamedNeedUriList(final URI uri, final String name) {
-    pull(NEED_URI_COLLECTION, name, uri);
+    pull(NEED_URI_COLLECTION, name, uri.toString());
   }
 
   @Override
   public void appendToNamedNeedUriList(final URI uri, final String name) {
-    push(NEED_URI_COLLECTION, name, uri);
+    push(NEED_URI_COLLECTION, name, uri.toString());
   }
 
   @Override
@@ -68,7 +68,7 @@ public class MongoBotContext implements BotContext
 
     MongoContextObjectList mco = template.findById(name, MongoContextObjectList.class, NEED_URI_COLLECTION);
     return (mco == null || mco.getList() == null) ? new ArrayList<>() :
-     mco.getList().stream().map(x -> (URI)x).collect(Collectors.toList());
+     mco.getList().stream().map(x -> URI.create((String)x)).collect(Collectors.toList());
   }
 
   @Override

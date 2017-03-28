@@ -14,32 +14,14 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.eventbot.event.impl.listener;
+package won.bot.framework.eventbot.event.impl.command;
 
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.listener.BaseEventListener;
+import won.protocol.message.WonMessageType;
 
 /**
- * Used to indicate that the specified EventListener has completed its work.
+ * Interface for events that are intended to make the bot send a specific message.
  */
-public class FinishedEvent implements Event
-{
-  private BaseEventListener listener;
-  public FinishedEvent(final BaseEventListener listener)
-  {
-    this.listener = listener;
-  }
-
-  public BaseEventListener getListener()
-  {
-    return listener;
-  }
-
-  @Override
-  public String toString()
-  {
-    return "FinishedEvent{" +
-        "listener=" + listener +
-        '}';
-  }
+public interface MessageCommandEvent extends Event {
+    public WonMessageType getWonMessageType();
 }

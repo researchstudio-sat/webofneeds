@@ -9,13 +9,12 @@ import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.command.DeactivateNeedCommandEvent;
+import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.CloseConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
 import won.bot.framework.eventbot.event.impl.mail.OpenConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
-import won.bot.framework.eventbot.event.impl.needlifecycle.NeedDeactivatedEvent;
 import won.protocol.util.WonRdfUtils;
 
 import javax.mail.MessagingException;

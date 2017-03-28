@@ -14,32 +14,23 @@
  *    limitations under the License.
  */
 
-package won.bot.framework.eventbot.event.impl.listener;
-
-import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.listener.BaseEventListener;
+package won.cryptography.keymanagement;
 
 /**
- * Used to indicate that the specified EventListener has completed its work.
+ * Always uses the predefined alias
  */
-public class FinishedEvent implements Event
-{
-  private BaseEventListener listener;
-  public FinishedEvent(final BaseEventListener listener)
-  {
-    this.listener = listener;
-  }
+public class PredefinedAliasStrategy implements KeyPairAliasDerivationStrategy{
+    private String predefinedAlias = null;
 
-  public BaseEventListener getListener()
-  {
-    return listener;
-  }
+    public PredefinedAliasStrategy(String predefinedAlias) {
+        this.predefinedAlias = predefinedAlias;
+        if (this.predefinedAlias == null || this.predefinedAlias.trim().length() == 0) {
+            throw new IllegalArgumentException("Cannot use null or empty string as predefined alias");
+        }
+    }
 
-  @Override
-  public String toString()
-  {
-    return "FinishedEvent{" +
-        "listener=" + listener +
-        '}';
-  }
+    @Override
+    public String getAliasForNeedUri(String needURI) {
+        return predefinedAlias;
+    }
 }
