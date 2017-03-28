@@ -7,12 +7,14 @@ import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
+import won.protocol.message.processor.exception.UriAlreadyInUseException;
 import won.protocol.model.*;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
@@ -33,7 +35,7 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
 
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED)
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -59,6 +61,8 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     NeedEventContainer needEventContainer = needEventContainerRepository.findOneByParentUri(needURI);
     if (needEventContainer == null) {
       needEventContainer = new NeedEventContainer(need, need.getNeedURI());
+    } else {
+      throw new UriAlreadyInUseException("Found a NeedEventContainer for the need we're about to create (" + needURI + ") - aborting");
     }
     needEventContainer.getEvents().add(messageEventRepository.findOneByMessageURI(wonMessage.getMessageURI()));
     need.setWonNodeURI(wonMessage.getReceiverNodeURI());

@@ -3,6 +3,8 @@ package won.node.camel.processor.fixed;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
@@ -26,7 +28,7 @@ import java.net.URI;
 public class SendMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor
 {
 
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -34,7 +36,7 @@ public class SendMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcess
     if (connectionUri == null){
       throw new MissingMessagePropertyException(URI.create(WONMSG.SENDER_PROPERTY.toString()));
     }
-    Connection con = connectionRepository.findOneByConnectionURI(connectionUri);
+    Connection con = connectionRepository.findOneByConnectionURIForUpdate(connectionUri);
     if (con.getState() != ConnectionState.CONNECTED) {
       throw new IllegalMessageForConnectionStateException(connectionUri, "CONNECTION_MESSAGE", con.getState());
     }

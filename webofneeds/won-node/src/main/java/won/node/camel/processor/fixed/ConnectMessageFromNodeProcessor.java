@@ -3,6 +3,7 @@ package won.node.camel.processor.fixed;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
@@ -28,7 +29,7 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor
 {
 
 
-  @Transactional(propagation = Propagation.REQUIRED)
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -44,10 +45,10 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor
 
     Connection con = null;
     if (connectionURI != null) {
-      con = connectionRepository.findOneByConnectionURI(connectionURI);
+      con = connectionRepository.findOneByConnectionURIForUpdate(connectionURI);
       if (con == null) throw new NoSuchConnectionException(connectionURI);
     } else {
-      con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndTypeURI(needUri, remoteNeedUri, facetURI);
+      con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndTypeURIForUpdate(needUri, remoteNeedUri, facetURI);
     }
     if (con == null){
       //create Connection in Database

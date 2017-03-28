@@ -3,6 +3,8 @@ package won.node.camel.processor.fixed;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
@@ -27,7 +29,7 @@ import java.net.URI;
 @FixedMessageProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CONNECT_STRING)
 public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor
 {
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -37,10 +39,10 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
     URI connectionURI = wonMessage.getSenderURI(); //if the uri is known already, we can load the connection!
     Connection con = null;
     if (connectionURI != null) {
-      con = connectionRepository.findOneByConnectionURI(connectionURI);
+      con = connectionRepository.findOneByConnectionURIForUpdate(connectionURI);
       if (con == null) throw new NoSuchConnectionException(connectionURI);
     } else {
-      con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndTypeURI(senderNeedURI, receiverNeedURI, facetURI);
+      con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndTypeURIForUpdate(senderNeedURI, receiverNeedURI, facetURI);
     }
     if (con == null){
       //create Connection in Database
@@ -76,20 +78,20 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
   }
 
   @Override
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void onSuccessResponse(final Exchange exchange) throws Exception {
     WonMessage responseMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-    MessageEventPlaceholder mep = this.messageEventRepository.findOneByCorrespondingRemoteMessageURI(
+    MessageEventPlaceholder mep = this.messageEventRepository.findOneByCorrespondingRemoteMessageURIForUpdate(
       responseMessage
         .getIsResponseToMessageURI());
     //update the connection database: set the remote connection URI just obtained from the response
-    Connection con = this.connectionRepository.findOneByConnectionURI(mep.getSenderURI());
+    Connection con = this.connectionRepository.findOneByConnectionURIForUpdate(mep.getSenderURI());
     con.setRemoteConnectionURI(responseMessage.getSenderURI());
     this.connectionRepository.save(con);
   }
 
   @Override
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void onFailureResponse(final Exchange exchange) throws Exception {
     //TODO: define what to do if the connect fails remotely option: create a system message of type CLOSE,
     // and forward it only to the owner. Add an explanation (a reference to the failure response and some
