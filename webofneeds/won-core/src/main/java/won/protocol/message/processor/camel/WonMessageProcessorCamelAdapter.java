@@ -18,6 +18,8 @@ package won.protocol.message.processor.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
 
@@ -30,6 +32,7 @@ import won.protocol.message.processor.WonMessageProcessor;
  */
 public class WonMessageProcessorCamelAdapter implements Processor {
 
+  private final Logger logger = LoggerFactory.getLogger(getClass());
   public static String WON_MESSAGE_HEADER = "wonMessage";
 
   private WonMessageProcessor adaptee;
@@ -47,8 +50,20 @@ public class WonMessageProcessorCamelAdapter implements Processor {
     if (! (msg instanceof WonMessage) ) {
       throw new IllegalArgumentException("expected a WonMessage object in the '"+ WON_MESSAGE_HEADER + " header but the object is of type " + msg.getClass());
     }
+    if (logger.isDebugEnabled()){
+      logger.debug("calling adaptee {} with message {} (type: {}, direction: {}, recipient: {})",  new Object[]{adaptee, msg, ((WonMessage) msg).getMessageType(), ((WonMessage) msg).getEnvelopeType(), ((WonMessage) msg).getReceiverURI()});
+    }
     //call the process method
-    WonMessage resultMsg = adaptee.process((WonMessage) msg);
+    WonMessage resultMsg = null;
+    try {
+      resultMsg = adaptee.process((WonMessage) msg);
+        if (logger.isDebugEnabled()){
+            logger.debug("returning from adaptee {} with message {} (type: {}, direction: {}, recipient: {})",  new Object[]{adaptee, msg, ((WonMessage) msg).getMessageType(), ((WonMessage) msg).getEnvelopeType(), ((WonMessage) msg).getReceiverURI()});
+        }
+    } catch (Exception e) {
+      logger.info("re-trhowing exception {} caught calling adaptee {} with message {} (type: {}, direction: {}, recipient:{})",  new Object[]{ e, adaptee, msg, ((WonMessage) msg).getMessageType(), ((WonMessage) msg).getEnvelopeType(), ((WonMessage) msg).getReceiverURI()});
+      throw e;
+    }
     //set the result of the call as the new message in the exchange's in
     exchange.getIn().setHeader(WON_MESSAGE_HEADER, resultMsg);
   }
