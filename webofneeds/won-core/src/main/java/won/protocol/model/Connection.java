@@ -17,6 +17,7 @@
 package won.protocol.model;
 
 import won.protocol.model.parentaware.ParentAware;
+import won.protocol.model.parentaware.VersionedEntity;
 
 import javax.persistence.*;
 import java.net.URI;
@@ -29,51 +30,48 @@ import java.util.Date;
 @Entity
 @Table(name = "connection", indexes = { @Index(name = "IDX_CONNECTION_NEEDURI_REMOTENEEDURI", columnList = "needURI, " +
   "remoteNeedURI")}, uniqueConstraints = {@UniqueConstraint(name="IDX_UNIQUE_CONNECTION", columnNames = {"needURI", "remoteNeedURI", "typeURI"})})
-public class Connection implements ParentAware<ConnectionContainer>
-{
+public class Connection implements ParentAware<ConnectionContainer>, VersionedEntity {
   @Id
   @GeneratedValue
-  @Column( name = "id" )
+  @Column(name = "id")
   private Long id;
 
-  @Version
-  @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
+  @Column(name = "version", columnDefinition = "integer DEFAULT 0", nullable = false)
   private int version = 0;
 
-  @Version
   @Temporal(TemporalType.TIMESTAMP)
-  @Column(name="last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private Date lastUpdate = new Date();
 
   /* The public URI of this connection */
-  @Column( name = "connectionURI", unique = true)
-  @Convert( converter = URIConverter.class )
+  @Column(name = "connectionURI", unique = true)
+  @Convert(converter = URIConverter.class)
   private URI connectionURI;
 
   /* The uri of the connection's need object */
-  @Column( name = "needURI")
-  @Convert( converter = URIConverter.class )
+  @Column(name = "needURI")
+  @Convert(converter = URIConverter.class)
   private URI needURI;
 
   /* The uri of the facet's type */
-  @Column( name = "typeURI")
-  @Convert( converter = URIConverter.class )
+  @Column(name = "typeURI")
+  @Convert(converter = URIConverter.class)
   private URI typeURI;
 
   /* The URI of the remote connection */
   /* Caution: on the owner side, the remote connection URI is never known. */
-  @Column( name = "remoteConnectionURI")
-  @Convert( converter = URIConverter.class )
+  @Column(name = "remoteConnectionURI")
+  @Convert(converter = URIConverter.class)
   private URI remoteConnectionURI;
 
   /* The URI of the remote need */
-  @Column( name = "remoteNeedURI")
-  @Convert( converter = URIConverter.class )
+  @Column(name = "remoteNeedURI")
+  @Convert(converter = URIConverter.class)
   private URI remoteNeedURI;
 
   /* The state of the connection */
-  @Column( name = "state")
-  @Enumerated ( EnumType.STRING )
+  @Column(name = "state")
+  @Enumerated(EnumType.STRING)
   private ConnectionState state;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -82,8 +80,9 @@ public class Connection implements ParentAware<ConnectionContainer>
   @OneToOne(fetch = FetchType.LAZY)
   private DatasetHolder datasetHolder;
 
-  @OneToOne (fetch = FetchType.LAZY, mappedBy="connection", optional = true, cascade = CascadeType.ALL,
-    orphanRemoval = true)
+  @JoinColumn(name = "event_container_id")
+  @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL,
+          orphanRemoval = true)
   private ConnectionEventContainer eventContainer = null;
 
   @Override
@@ -103,6 +102,17 @@ public class Connection implements ParentAware<ConnectionContainer>
   public void setParent(final ConnectionContainer parent) {
     this.parent = parent;
   }
+
+  @Override
+  @PreUpdate
+  @PrePersist
+  public void incrementVersion() {
+    this.version++;
+    this.lastUpdate = new Date();
+  }
+
+  //TODO: we may want to introduce a creation date?
+
 
   @Override
   public String toString()

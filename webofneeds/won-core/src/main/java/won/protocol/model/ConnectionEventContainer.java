@@ -25,7 +25,7 @@ import java.net.URI;
 @DiscriminatorValue("Connection")
 public class ConnectionEventContainer extends EventContainer implements ParentAware<Connection>
 {
-  @OneToOne(fetch = FetchType.LAZY)
+  @OneToOne(fetch = FetchType.LAZY, mappedBy = "eventContainer", optional = false)
   private Connection connection;
 
   public ConnectionEventContainer() {
