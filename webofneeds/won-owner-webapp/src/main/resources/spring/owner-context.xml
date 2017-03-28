@@ -27,6 +27,7 @@
     <!-- was in owner-jmsonly.xml --><!-- was in owner-camel.xml within owner-jmsonly.xml-->
     <!-- was in owner-security.xml within owner-jmsonly.xml--><!-- was in owner-core.xml within owner-jmsonly.xml-->
     <!-- was in jpabased-rdf-storage.xml within owner-jmsonly.xml--><!-- within jdbc-storage.xml within owner-jmsonly.xml-->
+    <!-- was in owner-mailer.xml -->
 
     <!-- owner functioning -->
     <import resource="classpath:/spring/owner-jmsonly.xml"/>
