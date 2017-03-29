@@ -164,17 +164,16 @@ public class KeyStoreService
    * @param certificateChain
    * @param certificate
    * @param replace
-   * @throws IOException
    */
   private synchronized void putEntry(String alias, PrivateKey key, Certificate[] certificateChain, Certificate
-    certificate, boolean replace) throws IOException {
+    certificate, boolean replace){
 
     try {
       if (!replace && store.containsAlias(alias)) {
-        throw new IOException("Could not add new entry - key store already contains entry for " + alias);
+        return;
       }
     } catch (Exception e) {
-      throw new IOException("Could not add into the key store entry for " + alias, e);
+      throw new RuntimeException("Error checking if key with alias '"+ alias +"' is in the keystore", e);
     }
 
     try {
@@ -183,11 +182,11 @@ public class KeyStoreService
       } else if (alias != null && certificate != null) {
         store.setCertificateEntry(alias, certificate);
       } else {
-        throw new IOException("Could not add entry for " + alias + " to the key store");
+        throw new RuntimeException("Could not add entry for " + alias + " to the key store");
       }
       saveStoreToFile();
     } catch (Exception e) {
-      throw new IOException("Could not add entry for " + alias + " to the key store", e);
+      throw new RuntimeException("Could not add entry for " + alias + " to the key store", e);
     }
 
   }
