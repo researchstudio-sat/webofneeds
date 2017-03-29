@@ -16,6 +16,8 @@
 
 package won.protocol.model;
 
+import won.protocol.model.parentaware.VersionedEntity;
+
 import javax.persistence.*;
 import java.net.URI;
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ import java.util.Date;
 @Inheritance
 @DiscriminatorColumn(name="parent_type")
 @Table(name="event_container")
-public abstract class EventContainer
+public abstract class EventContainer implements VersionedEntity
 {
   @Id
   @GeneratedValue
@@ -40,11 +42,9 @@ public abstract class EventContainer
   @OneToMany(fetch = FetchType.LAZY)
   private Collection<MessageEventPlaceholder> events = new ArrayList<>(1);
 
-  @Version
   @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
   private int version = 0;
 
-  @Version
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name="last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private Date lastUpdate = new Date();
@@ -54,6 +54,19 @@ public abstract class EventContainer
 
   public EventContainer(final URI parentUri) {
     this.parentUri = parentUri;
+  }
+
+  @Override
+  @PrePersist
+  @PreUpdate
+  public void incrementVersion() {
+    this.version++;
+    this.lastUpdate = new Date();
+  }
+
+  @Override
+  public Date getLastUpdate() {
+    return lastUpdate;
   }
 
   public Long getId() {

@@ -101,7 +101,7 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
       configureCamelEndpoint(wonNodeURI, ownerApplicationId);
       configureRemoteEndpointsForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
         (wonNodeURI), messagingService);
-      logger.debug("connected with WoN node: : " + wonNodeURI);
+      logger.debug("connected with WoN node: " + wonNodeURI);
     } else {
       logger.info("we're not yet registered. Registering with WoN node:" + wonNodeURI);
       String nodeGeneratedOwnerApplicationId = registrationClient.register(wonNodeURI.toString());

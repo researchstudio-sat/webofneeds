@@ -16,10 +16,13 @@
 
 package won.protocol.model.parentaware;
 
+import java.util.Date;
+
 /**
- * Interface for entities that offer access to their parent entity.
+ * Created by fkleedorfer on 28.03.2017.
  */
-public interface ParentAware<T extends VersionedEntity>
-{
-  public T getParent();
+public interface VersionedEntity {
+    public int getVersion();
+    public void incrementVersion();
+    public Date getLastUpdate();
 }

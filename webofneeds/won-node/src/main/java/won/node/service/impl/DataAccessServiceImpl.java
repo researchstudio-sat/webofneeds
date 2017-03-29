@@ -181,7 +181,7 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     Dataset dataset = null;
     if (datasetHolder == null) {
       //if no dataset is found, we create one.
-      dataset = DatasetFactory.createMem();
+      dataset = DatasetFactory.create();
       datasetHolder = new DatasetHolder(connection.getConnectionURI(), dataset);
       connection.setDatasetHolder(datasetHolder);
     } else {
@@ -196,10 +196,11 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
     mainRes.addProperty(WON.HAS_FEEDBACK_EVENT, feedback);
     ModelExtract extract = new ModelExtract(new StatementTripleBoundary(TripleBoundary.stopNowhere));
     model.add(extract.extract(feedback, feedback.getModel()));
-    logger.debug("done adding feedback for resource {}, storing...", connection);
+    dataset.setDefaultModel(model);
+    datasetHolder.setDataset(dataset);
     datasetHolderRepository.save(datasetHolder);
     connectionRepository.save(connection);
-    logger.debug("stored feedback");
+    logger.debug("done adding feedback for resource {}", connection);
     return true;
   }
 
