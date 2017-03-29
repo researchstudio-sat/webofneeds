@@ -377,7 +377,8 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     } catch (ParseException e) {
       //cannot parse expires header - use a default
       expires = addNSecondsToNow(DEFAULT_EXPIRY_PERIOD);
-      logger.warn("could not parse 'Expires' header ' "
+      //TODO: there seems to be a problem with the Expires header from the LinkedDataService
+      logger.debug("could not parse 'Expires' header ' "
        + expiresHeader +"' obtained for '" + resource + "', using default expiry period of " + DEFAULT_EXPIRY_PERIOD
                     +" " +
                     "seconds");
