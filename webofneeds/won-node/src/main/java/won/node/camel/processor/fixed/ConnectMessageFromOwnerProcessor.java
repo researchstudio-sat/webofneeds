@@ -81,7 +81,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
   @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void onSuccessResponse(final Exchange exchange) throws Exception {
     WonMessage responseMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-    MessageEventPlaceholder mep = this.messageEventRepository.findOneByCorrespondingRemoteMessageURIForUpdate(
+    MessageEventPlaceholder mep = this.messageEventRepository.findOneByCorrespondingRemoteMessageURI(
       responseMessage
         .getIsResponseToMessageURI());
     //update the connection database: set the remote connection URI just obtained from the response
