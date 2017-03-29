@@ -27,7 +27,7 @@ import java.net.URI;
 /**
  * Indicates that the bot has successfully sent a connect message, thereby creating a connection.
  */
-public class ConnectCommandSuccessEvent extends AbstractMessageCommandResultEvent implements MessageCommandSuccessEvent {
+public class ConnectCommandSuccessEvent extends AbstractMessageCommandResultEvent implements MessageCommandSuccessEvent, ConnectCommandResultEvent {
     public ConnectCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con) {
         super(originalCommandEvent, con);
     }
