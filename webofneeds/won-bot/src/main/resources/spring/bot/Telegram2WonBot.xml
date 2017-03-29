@@ -16,11 +16,8 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
     <import resource="classpath:spring/component/botContext/botContext.xml"/>
@@ -29,8 +26,8 @@
     <bean id="telegram2wonBot" class="won.bot.impl.Telegram2WonBot">
         <!-- optional property, by default one echo need per each need will be created -->
 
-        <property name="botContext" ref="${botContext.impl}" />
-        <property name="taskScheduler" ref="taskScheduler" />
+        <property name="botContext" ref="${botContext.impl}"/>
+        <property name="taskScheduler" ref="taskScheduler"/>
         <property name="token" value="${telegrambot.token}"/>
         <property name="botName" value="${telegrambot.botname}"/>
         <property name="telegramContentExtractor" ref="telegramContentExtractor"/>
@@ -45,10 +42,10 @@
         <!--<property name="matcherProtocolMatcherService" ref="matcherProtocolMatcherServiceJMSBased"/>-->
         <property name="trigger">
             <bean class="org.springframework.scheduling.support.PeriodicTrigger">
-                <constructor-arg name="period" value="6002000" />
-                <constructor-arg name="timeUnit" value="MILLISECONDS" />
-                <property name="initialDelay" value="10000" /> <!-- wait 10s at the beginning -->
-                <property name="fixedRate" value="false" />  <!-- fixed delay after completion -->
+                <constructor-arg name="period" value="6002000"/>
+                <constructor-arg name="timeUnit" value="MILLISECONDS"/>
+                <property name="initialDelay" value="10000"/> <!-- wait 10s at the beginning -->
+                <property name="fixedRate" value="false"/>  <!-- fixed delay after completion -->
             </bean>
         </property>
     </bean>
