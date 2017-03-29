@@ -21,23 +21,20 @@
         xmlns:spring="http://www.springframework.org/schema/beans"
         xmlns:context="http://www.springframework.org/schema/context"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
   http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd
   http://www.springframework.org/schema/context
-  http://www.springframework.org/schema/context/spring-context-3.1.xsd">
-
-
-    <!--
-         Load properties but ignore unresolvable properties so that
-         they are searched in other property configuerers defined in the context
-    -->
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/>
-
-
+  http://www.springframework.org/schema/context/spring-context-4.1.xsd">
     <!--
         The <broker> element is used to configure the ActiveMQ broker.
     -->
+
+    <!-- This bean extends the the abstract PPC bean in the parent context -->
+    <spring:bean id="propertyPlaceholderConfigurer" parent="abstractPropertyPlaceholderConfigurer" />
+
     <broker xmlns="http://activemq.apache.org/schema/core" brokerName="wonBroker" persistent="false" >
+
+
 
         <!--
             For better performances use VM cursor and small memory limit.

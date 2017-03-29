@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  * Integration test.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/spring/app/botRunner.xml"})
+@ContextConfiguration(locations = {"classpath:/spring/app/simple2NeedGroupingTest.xml"})
 public class GroupingBotTest
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());

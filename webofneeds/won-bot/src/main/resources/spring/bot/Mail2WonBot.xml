@@ -19,21 +19,16 @@
        xmlns:mail="http://www.springframework.org/schema/integration/mail"
        xmlns:int="http://www.springframework.org/schema/integration"
        xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
         http://www.springframework.org/schema/integration/mail
         http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd
         http://www.springframework.org/schema/util
-        http://www.springframework.org/schema/util/spring-util.xsd
-        http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        http://www.springframework.org/schema/util/spring-util-4.1.xsd">
 
     <import resource="classpath:spring/component/nodeurisource/nodeurisource-random.xml"/>
     <import resource="classpath:spring/component/botContext/botContext.xml"/>
     <import resource="classpath:spring/component/mail/mailContentExtractor.xml"/>
-
-    <context:property-placeholder location="file:${WON_CONFIG_DIR}/mail-bot.properties" ignore-unresolvable="true"/>
 
     <util:properties id="javaMailProperties">
         <prop key="mail.imap.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
@@ -72,8 +67,8 @@
     <bean id="mail2wonBot" class="won.bot.impl.Mail2WonBot">
         <!-- optional property, by default one echo need per each need will be created -->
 
-        <property name="botContext" ref="${botContext.impl}" />
-        <property name="taskScheduler" ref="taskScheduler" />
+        <property name="botContext" ref="${botContext.impl}"/>
+        <property name="taskScheduler" ref="taskScheduler"/>
         <property name="receiveEmailChannel" ref="receiveEmailChannel"/>
         <property name="sendEmailChannel" ref="sendEmailChannel"/>
         <property name="mailGenerator" ref="mailGenerator"/>
@@ -87,10 +82,10 @@
         <!--<property name="matcherProtocolMatcherService" ref="matcherProtocolMatcherServiceJMSBased"/>-->
         <property name="trigger">
             <bean class="org.springframework.scheduling.support.PeriodicTrigger">
-                <constructor-arg name="period" value="60000" />
-                <constructor-arg name="timeUnit" value="MILLISECONDS" />
-                <property name="initialDelay" value="10000" /> <!-- wait 10s at the beginning -->
-                <property name="fixedRate" value="false" />  <!-- fixed delay after completion -->
+                <constructor-arg name="period" value="60000"/>
+                <constructor-arg name="timeUnit" value="MILLISECONDS"/>
+                <property name="initialDelay" value="10000"/> <!-- wait 10s at the beginning -->
+                <property name="fixedRate" value="false"/>  <!-- fixed delay after completion -->
             </bean>
         </property>
     </bean>
@@ -107,6 +102,7 @@
         <property name="velocityEngine" ref="velocityEngine"/>
         <property name="sentFrom" value="${mailbot.email.address}"/>
         <property name="sentFromName" value="${mailbot.email.name}"/>
-        <property name="MAX_CONVERSATION_DEPTH" value="${mailbot.max_conversation_depth}"/> <!-- 0 includes no messages at all, -1 includes all messages -->
+        <property name="MAX_CONVERSATION_DEPTH"
+                  value="${mailbot.max_conversation_depth}"/> <!-- 0 includes no messages at all, -1 includes all messages -->
     </bean>
 </beans>
