@@ -1001,6 +1001,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
 
                 {
                   <${needUri}> won:is ?c.
+                  <${needUri}> ?b ?c.
                 } UNION {
                   <${needUri}> won:is ?c.
                   ?c ?d ?e.
