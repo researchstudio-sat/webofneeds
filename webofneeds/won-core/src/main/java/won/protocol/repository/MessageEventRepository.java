@@ -155,9 +155,9 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
             Pageable pageable);
 
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+
     @Query("select msg from MessageEventPlaceholder msg where msg.correspondingRemoteMessageURI = :uri")
-    MessageEventPlaceholder findOneByCorrespondingRemoteMessageURIForUpdate(@Param("uri") URI uri);
+    MessageEventPlaceholder findOneByCorrespondingRemoteMessageURI(@Param("uri") URI uri);
 
 
 

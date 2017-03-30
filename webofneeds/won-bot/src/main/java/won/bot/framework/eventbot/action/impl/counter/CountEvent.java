@@ -16,41 +16,25 @@
 
 package won.bot.framework.eventbot.action.impl.counter;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import won.bot.framework.eventbot.event.BaseEvent;
 
 /**
- * Counter that is intended to be shared between actions and listeners.
+ * Indicates that a counter changed its count.
  */
-public class CounterImpl implements Counter
-{
-  private AtomicInteger count;
-  private String name;
+public class CountEvent extends BaseEvent{
+    private final EventPublishingCounter counter;
+    private final int count;
 
-  public CounterImpl(String name, final int initialCount) {
-    this.count = new AtomicInteger(initialCount);
-    this.name = name;
-  }
+    public CountEvent(EventPublishingCounter counter, int count) {
+        this.counter = counter;
+        this.count = count;
+    }
 
-  public CounterImpl(String name) {
-    this(name, 0);
-  }
+    public EventPublishingCounter getCounter() {
+        return counter;
+    }
 
-  @Override
-  public int getCount(){
-    return count.get();
-  }
-
-  @Override
-  public int increment(){
-    return count.incrementAndGet();
-  }
-
-  @Override
-  public int decrement(){
-    return count.decrementAndGet();
-  }
-
-  public String getName() {
-    return name;
-  }
+    public int getCount() {
+        return count;
+    }
 }

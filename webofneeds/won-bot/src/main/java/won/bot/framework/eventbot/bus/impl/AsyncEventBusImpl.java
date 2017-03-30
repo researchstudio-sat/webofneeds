@@ -24,6 +24,7 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.SubscriptionAware;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
 public class AsyncEventBusImpl implements EventBus
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
-  private HashMap<Class<? extends Event>,List<EventListener>> listenerMap = new HashMap<>();
+  private Map<Class<? extends Event>,List<EventListener>> listenerMap = new ConcurrentHashMap<>();
   private Executor executor;
   private Object monitor = new Object();
 
@@ -149,8 +150,10 @@ public class AsyncEventBusImpl implements EventBus
     } else {
       ret = getEventTypes(superclass);
     }
-    ret.add(clazz);
-    return ret;
+    List<Class<? extends Event>> finalRet = ret;
+    Arrays.stream(clazz.getInterfaces()).forEach(c -> finalRet.add((Class<? extends Event>) c));
+    finalRet.add(clazz);
+    return finalRet;
   }
 
 
