@@ -1,4 +1,4 @@
-##WoN Security architecture
+## WoN Security architecture
 
 
 The WoN Needs and Nodes are [web identities](doc/web-identity.md) - they are identified by 
@@ -32,7 +32,7 @@ Node and Matcher applications).
 The very rough overview of the classes involved in secure environment setup and usage can be found 
 [here](doc/security-classes.pdf).
 
-###Security Future work
+### Security Future work
 * Key revocation, including when a key is compromised, is not yet accounted for in our architecture;
 *	Integration of user definable access control rules to their data, i.e. 
 [web access control](https://www.w3.org/wiki/WebAccessControl);
