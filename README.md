@@ -17,7 +17,7 @@ Web of needs is built out of three main components. **Owner applications** enabl
 * [Security architecture](webofneeds/won-core/README.md)
 * [Linked Data interface](webofneeds/won-node-webapp/README.md)
 * [Matching Service Architecture](webofneeds/won-matcher-service/README.md)
-* [Bot Framework](webofneeds/won-bot/README.md)
+* [Bot Framework](webofneeds/won-bot/README.md) for interacting with WoN nodes programmatically
 
 
 
