@@ -171,6 +171,28 @@ export function selectSortedChatMessages(state) {
     }
 
 }
+
+export function connectionLastUpdatedAt(state, connection) {
+    const events = selectEvents(state);
+    const eventUris = connection.get('hasEvents');
+    if(!eventUris) return Immutable.List();
+
+    const timestamp = (event) =>
+        //msStringToDate(selectTimestamp(event, connectionUri))
+        msStringToDate(selectTimestamp(event));
+
+    const timestamps = eventUris
+        .map(eventUri => events.get(eventUri))
+        .map(event => timestamp(event));
+
+    const latestTimestamp = timestamps.reduce((t1, t2) =>
+        t1 > t2 ? t1 : t2,
+        undefined // returned if there's no timestamps
+    ); // calculate maximum
+
+    return latestTimestamp;
+}
+
 /**
  * Temporary helper function, that selects the "is" or "seeks"-branch
  * depending on which of these two is present. This is a temporary
@@ -250,4 +272,3 @@ export function inferLegacyNeedType(need) {
         return won.WON.BasicNeedTypeDotogetherCompacted;
     }
 }
-

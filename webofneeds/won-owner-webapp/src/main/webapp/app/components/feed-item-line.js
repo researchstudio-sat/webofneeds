@@ -9,21 +9,28 @@ import Immutable from 'immutable';
 import squareImageModule from '../components/square-image';
 import won from '../won-es6';
 import { actionCreators }  from '../actions/actions';
-import { attach } from '../utils';
+import {
+    attach,
+    msStringToDate,
+} from '../utils';
 import {
     labels,
     relativeTime,
 } from '../won-label-utils';
 import {
     selectLastUpdateTime,
+    //selectAllByConnections,
     selectUnreadCountsByNeedAndType,
     selectConnections,
     selectTheirNeeds,
+    //selectLatestUpdateByConnection,
 } from '../selectors';
 
 import {
     seeksOrIs,
     inferLegacyNeedType,
+    selectTimestamp,
+    connectionLastUpdatedAt,
 } from '../won-utils';
 
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
@@ -70,7 +77,13 @@ function genComponentConf() {
                 const remoteNeedUri = connection && connection.get('hasRemoteNeed');
                 const remoteNeed = remoteNeedUri && selectTheirNeeds(state).get(remoteNeedUri);
                 const remoteNeedContent = remoteNeed && seeksOrIs(remoteNeed);
-                const lastUpdated = ""; // TODO
+
+                //Problem: lastUpdated atm is only calculable, after the connection is viewed and the events loaded
+                const lastUpdated = relativeTime(
+                    state.get('lastUpdateTime'),
+                    connectionLastUpdatedAt(state, connection)
+                );
+
                 // const unreadCounts = TODO
 
                 return {
@@ -112,3 +125,4 @@ export default angular.module('won.owner.components.feedItemLine', [
 ])
     .directive('wonFeedItemLine', genComponentConf)
     .name;
+
