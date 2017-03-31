@@ -121,8 +121,7 @@ export const selectUnreadCountsByType = createSelector(
     selectUnreadEvents,
     unreadEvents => groupByType(unreadEvents)
         .map(eventsOfType => eventsOfType.size)
-)
-
+);
 
 /**
  * selects a map of `connectionUri -> { connection, events, ownNeed, remoteNeed }`
