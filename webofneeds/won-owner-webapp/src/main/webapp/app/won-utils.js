@@ -4,6 +4,19 @@
 
 import Immutable from 'immutable';
 import L from './leaflet-bundleable';
+import {
+    relativeTime,
+} from './won-label-utils';
+import {
+    msStringToDate,
+    is,
+} from './utils';
+import {
+    selectEvents,
+    selectAllByConnections,
+    selectOpenConnectionUri,
+    selectOpenConnection,
+} from './selectors';
 
 export function initLeaflet(mapMount) {
     if(!L) {
@@ -85,6 +98,79 @@ export function selectEventsOfConnection(state, connectionUri) {
     return Immutable.Map(eventUrisAndEvents);
 }
 
+//TODO refactor so that it always returns an array of immutable messages to
+// allow ng-repeat without giving up the cheaper digestion
+//TODO move this to selectors.js
+export function selectSortedChatMessages(state) {
+    const connectionUri = selectOpenConnectionUri(state);
+    const connectionData = selectAllByConnections(state).get(connectionUri);
+    const ownNeedUri = connectionData && connectionData.getIn(['ownNeed', '@id']);
+
+    if (!connectionData || !connectionData.get('events')) {
+        return Immutable.List();
+
+    } else {
+        const timestamp = (event) =>
+            //msStringToDate(selectTimestamp(event, connectionUri))
+            msStringToDate(selectTimestamp(event))
+
+        const chatMessages = connectionData.get('events')
+
+            /* filter for valid chat messages */
+            .filter(event => {
+                if (event.get('hasTextMessage')) return true;
+                else {
+                    let remote = event.get('hasCorrespondingRemoteMessage');
+                    if(is('String', remote)) {
+                        remote = state.getIn(['events', 'events', remote]);
+                    }
+                    return remote && remote.get('hasTextMessage');
+                }
+            }).map(event => {
+                const remote = event.get('hasCorrespondingRemoteMessage');
+                if (event.get('hasTextMessage'))
+                    return event;
+                else
+                    return remote;
+            })
+
+            /* sort them so the latest get shown last */
+            .sort((event1, event2) =>
+            timestamp(event1) - timestamp(event2)
+        )
+            /*
+             * sort so the latest, optimistic/unconfirmed
+             * messages are always at the bottom.
+             */
+            .sort((event1, event2) => {
+                const u1 = event1.get('unconfirmed');
+                const u2 = event2.get('unconfirmed');
+
+                if(u1 && !u2) {
+                    return 1;
+                }
+                else if (!u1 && u2) {
+                    return -1;
+                }
+                else {
+                    return 0;
+                }
+            })
+
+            /* add a nice relative timestamp */
+            .map(event => event.set(
+                'humanReadableTimestamp',
+                relativeTime(
+                    state.get('lastUpdateTime'),
+                    timestamp(event)
+                )
+            )
+        );
+
+        return chatMessages;
+    }
+
+}
 /**
  * Temporary helper function, that selects the "is" or "seeks"-branch
  * depending on which of these two is present. This is a temporary
