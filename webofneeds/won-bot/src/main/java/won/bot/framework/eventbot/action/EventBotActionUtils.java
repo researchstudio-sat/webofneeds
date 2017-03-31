@@ -26,7 +26,6 @@ import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
-import won.bot.framework.eventbot.filter.impl.AcceptOnceFilter;
 import won.bot.framework.eventbot.filter.impl.OriginalMessageUriRemoteResponseEventFilter;
 import won.bot.framework.eventbot.filter.impl.OriginalMessageUriResponseEventFilter;
 import won.bot.framework.eventbot.listener.EventListener;
@@ -202,7 +201,7 @@ public class EventBotActionUtils {
 
         //create an event listener that processes the response to the wonMessage we're about to send
         EventListener listener = new ActionOnFirstEventListener(context,
-                new AcceptOnceFilter(OriginalMessageUriResponseEventFilter.forWonMessage(outgoingMessage)),
+                OriginalMessageUriResponseEventFilter.forWonMessage(outgoingMessage),
                 new BaseEventBotAction(context)
                 {
                     @Override
@@ -237,7 +236,7 @@ public class EventBotActionUtils {
 
         //create an event listener that processes the remote response to the wonMessage we're about to send
         EventListener listener = new ActionOnFirstEventListener(context,
-                new AcceptOnceFilter(OriginalMessageUriRemoteResponseEventFilter.forWonMessage(outgoingMessage)),
+                OriginalMessageUriRemoteResponseEventFilter.forWonMessage(outgoingMessage),
                 new BaseEventBotAction(context)
                 {
                     @Override
