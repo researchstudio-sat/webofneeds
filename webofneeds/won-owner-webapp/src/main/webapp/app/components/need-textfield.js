@@ -93,8 +93,8 @@ function genComponentConf() {
                 .trim();
 
             //ADD TAGS
-            const titleTags = title? title.match(/#(\w+)/gi) : [];
-            const descriptionTags = description? description.match(/#(\w+)/gi) : [];
+            const titleTags = title? title.match(/#(\S+)/gi) : [];
+            const descriptionTags = description? description.match(/#(\S+)/gi) : [];
 
             tags = angular.element.unique(
                 angular.element.merge(
