@@ -38,108 +38,101 @@ public class AsyncEventBusImpl implements EventBus
   private Executor executor;
   private Object monitor = new Object();
 
-  public AsyncEventBusImpl(final Executor executor)
-  {
-    this.executor = executor;
-  }
-
-  @Override
-  public <T extends Event> void publish(final T event)
-  {
-    logger.debug("publishing event {}", event);
-    //get the list of listeners registered for the event
-    List<EventListener> listeners = getEventListenersForEvent(event);
-    if (listeners == null || listeners.size() == 0) {
-      logger.debug("no listeners registered for event {}, ignoring", event);
-      return;
+    public AsyncEventBusImpl(final Executor executor) {
+        this.executor = executor;
     }
-    //execute asynchronously: call the event listeners one after another
-    callEventListeners(listeners, event);
-  }
 
-
-  @Override
-  public <T extends Event> void subscribe(Class<T> clazz, final EventListener listener)
-  {
-    logger.debug("subscribing listener {} for type {}", listener, clazz);
-    synchronized (monitor) {
-      //we want to synchronize so we don't accidentally add or remove listeners at the same time
-      List<EventListener> newListenerList = copyOrCreateList(this.listenerMap.get(clazz));
-      newListenerList.add(listener);
-      this.listenerMap.put(clazz, Collections.unmodifiableList(newListenerList));
-      callOnSubscribeIfApplicable(listener, clazz);
-    }
-  }
-
-
-  @Override
-  public <T extends Event> void unsubscribe(Class<T> clazz, final EventListener listener)
-  {
-    logger.debug("unsubscribing listener {} for type {}", listener, clazz);
-    synchronized (monitor) {
-      //we want to synchronize so we don't accidentally add or remove listeners at the same time
-      List<EventListener> newListenerList = copyOrCreateList(this.listenerMap.get(clazz));      newListenerList.remove(listener);
-      this.listenerMap.put(clazz, Collections.unmodifiableList(newListenerList));
-      callOnUnsubscribeIfApplicable(listener, clazz);
-    }
-  }
-
-  @Override
-  public void unsubscribe(final EventListener listener)
-  {
-    logger.debug("unsubscribing listener {} from all events", listener);
-    synchronized (monitor){
-      for (Map.Entry<Class<? extends Event>, List<EventListener>> entry: listenerMap.entrySet()){
-        boolean unsubscribed = false; //remember if we had to unsubscribe the listener for the current event type
-        List<EventListener> listeners = entry.getValue();
-        if (listeners == null ) continue;
-        listeners = copyOrCreateList(listeners);
-        Iterator<EventListener> it = listeners.iterator();
-        while(it.hasNext()){
-          EventListener subscribedListener = it.next();
-          if (subscribedListener.equals(listener)) {
-            it.remove();
-            unsubscribed = true;
-          }
+    @Override
+    public <T extends Event> void publish(final T event) {
+        logger.debug("publishing event {}", event);
+        //get the list of listeners registered for the event
+        List<EventListener> listeners = getEventListenersForEvent(event);
+        if (listeners == null || listeners.size() == 0) {
+            logger.debug("no listeners registered for event {}, ignoring", event);
+            return;
         }
-        entry.setValue(listeners);
-        if (unsubscribed){
-          //if we had to unssubscribe the listener, we may have to call its onUnsubscribe method
-          callOnUnsubscribeIfApplicable(listener, entry.getKey());
-        }
-      }
+        //execute asynchronously: call the event listeners one after another
+        callEventListeners(listeners, event);
     }
-  }
 
-  private void callEventListeners(final List<EventListener> listeners, final Event event)
-  {
-    if (listeners == null || listeners.isEmpty()) return;
-    this.executor.execute(new Runnable(){
-      @Override
-      public void run()
-      {
-        logger.debug("processing event {} with {} listeners", event, listeners.size());
-        for (EventListener listener : listeners) {
-          try {
-            listener.onEvent(event);
-          } catch (Exception e) {
-            logger.warn("caught exception during execution of event {} on listener {}", event, listener);
-            logger.warn("stacktrace:",e);
-          }
+
+    @Override
+    public <T extends Event> void subscribe(Class<T> clazz, final EventListener listener) {
+        logger.debug("subscribing listener {} for type {}", listener, clazz);
+        synchronized (monitor) {
+            //we want to synchronize so we don't accidentally add or remove listeners at the same time
+            List<EventListener> newListenerList = copyOrCreateList(this.listenerMap.get(clazz));
+            newListenerList.add(listener);
+            this.listenerMap.put(clazz, Collections.unmodifiableList(newListenerList));
+            callOnSubscribeIfApplicable(listener, clazz);
         }
-      }
-    });
-  }
+    }
 
-  private List<EventListener> getEventListenersForEvent(final Event event)
-  {
-    //the map is secured against concurrent modification, the list inside is unmodifiable
-    List<Class<? extends Event>> classes = getEventTypes(event.getClass());
-    return listenerMap.entrySet().stream()
-                      .filter(entry -> classes.contains(entry.getKey()))
-                      .flatMap(e -> e.getValue().stream())
-                      .collect(Collectors.toList());
-  }
+
+    @Override
+    public <T extends Event> void unsubscribe(Class<T> clazz, final EventListener listener) {
+        logger.debug("unsubscribing listener {} for type {}", listener, clazz);
+        synchronized (monitor) {
+            //we want to synchronize so we don't accidentally add or remove listeners at the same time
+            List<EventListener> newListenerList = copyOrCreateList(this.listenerMap.get(clazz));
+            newListenerList.remove(listener);
+            this.listenerMap.put(clazz, Collections.unmodifiableList(newListenerList));
+            callOnUnsubscribeIfApplicable(listener, clazz);
+        }
+    }
+
+    @Override
+    public void unsubscribe(final EventListener listener) {
+        logger.debug("unsubscribing listener {} from all events", listener);
+        synchronized (monitor) {
+            for (Map.Entry<Class<? extends Event>, List<EventListener>> entry : listenerMap.entrySet()) {
+                boolean unsubscribed = false; //remember if we had to unsubscribe the listener for the current event type
+                List<EventListener> listeners = entry.getValue();
+                if (listeners == null) continue;
+                listeners = copyOrCreateList(listeners);
+                Iterator<EventListener> it = listeners.iterator();
+                while (it.hasNext()) {
+                    EventListener subscribedListener = it.next();
+                    if (subscribedListener.equals(listener)) {
+                        it.remove();
+                        unsubscribed = true;
+                    }
+                }
+                entry.setValue(listeners);
+                if (unsubscribed) {
+                    //if we had to unssubscribe the listener, we may have to call its onUnsubscribe method
+                    callOnUnsubscribeIfApplicable(listener, entry.getKey());
+                }
+            }
+        }
+    }
+
+    private void callEventListeners(final List<EventListener> listeners, final Event event) {
+        if (listeners == null || listeners.isEmpty()) return;
+        this.executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                logger.debug("processing event {} with {} listeners", event, listeners.size());
+                for (EventListener listener : listeners) {
+                    try {
+                        listener.onEvent(event);
+                    } catch (Exception e) {
+                        logger.warn("caught exception during execution of event {} on listener {}", event, listener);
+                        logger.warn("stacktrace:", e);
+                    }
+                }
+            }
+        });
+    }
+
+    private List<EventListener> getEventListenersForEvent(final Event event) {
+        //the map is secured against concurrent modification, the list inside is unmodifiable
+        List<Class<? extends Event>> classes = getEventTypes(event.getClass());
+        return listenerMap.entrySet().stream()
+                .filter(entry -> classes.contains(entry.getKey()))
+                .flatMap(e -> e.getValue().stream())
+                .collect(Collectors.toList());
+    }
 
   private List<Class<? extends Event>> getEventTypes(final Class<? extends Event> clazz) {
     Class superclass = clazz.getSuperclass();
@@ -157,27 +150,35 @@ public class AsyncEventBusImpl implements EventBus
   }
 
 
-  private List<EventListener> copyOrCreateList(final List<EventListener> listenerList)
-  {
-    if (listenerList == null) return new ArrayList<EventListener>(1);
-    List<EventListener> newListenerList = new ArrayList<EventListener>(listenerList.size()+1);
-    newListenerList.addAll(listenerList);
-    return newListenerList;
-  }
-
-  private <T extends Event> void callOnSubscribeIfApplicable(final EventListener listener, final Class<T> clazz)
-  {
-    if (listener instanceof  SubscriptionAware){
-      ((SubscriptionAware) listener).onSubscribe(clazz);
+    private List<EventListener> copyOrCreateList(final List<EventListener> listenerList) {
+        if (listenerList == null) return new ArrayList<EventListener>(1);
+        List<EventListener> newListenerList = new ArrayList<EventListener>(listenerList.size() + 1);
+        newListenerList.addAll(listenerList);
+        return newListenerList;
     }
-  }
 
-  private <T extends Event> void callOnUnsubscribeIfApplicable(final EventListener listener, final Class<T> clazz)
-  {
-    if (listener instanceof  SubscriptionAware){
-      ((SubscriptionAware) listener).onUnsubscribe(clazz);
+    private <T extends Event> void callOnSubscribeIfApplicable(final EventListener listener, final Class<T> clazz) {
+        if (listener instanceof SubscriptionAware) {
+            ((SubscriptionAware) listener).onSubscribe(clazz);
+        }
     }
-  }
 
+    private <T extends Event> void callOnUnsubscribeIfApplicable(final EventListener listener, final Class<T> clazz) {
+        if (listener instanceof SubscriptionAware) {
+            ((SubscriptionAware) listener).onUnsubscribe(clazz);
+        }
+    }
+
+
+    @Override
+    public EventBusStatistics generateEventBusStatistics() {
+        EventBusStatistics statistics = new EventBusStatistics();
+        statistics.setListenerCount(listenerMap.values().stream().flatMap(l -> l.stream()).distinct().count());
+        statistics.setListenerCountPerEvent(listenerMap.entrySet().stream().collect(
+                Collectors.toMap(e -> e.getKey(), e -> e.getValue().stream().distinct().count())));
+        statistics.setListenerCountPerListenerClass(listenerMap.values().stream().flatMap(l -> l.stream()).distinct()
+                .collect(Collectors.groupingBy(l -> l.getClass(), Collectors.counting())));
+        return statistics;
+    }
 
 }
