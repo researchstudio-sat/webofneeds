@@ -97,6 +97,7 @@ public class DirectoryBasedNeedProducer implements NeedProducer
   {
     try {
       //make a need from it
+      if (fileIndexToUse >= this.files.length) return null;
       return this.fileBasedNeedProducer.readNeedFromFile(this.files[fileIndexToUse]);
     } catch (IOException e) {
       logger.debug("could not read need from file {}", this.files[fileIndexToUse]);
