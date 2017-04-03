@@ -89,13 +89,19 @@ function genComponentConf() {
                        ui-sref="postMatches({myUri: self.ownNeed.get('@id')})"
                        ng-show="self.unreadMatchesCount()">
                         <img src="generated/icon-sprite.svg#ico36_match" class="fi__footer__indicators__item__icon"/>
-                        <span class="fi__footer__indicators__item__caption">{{ self.unreadMatchesCount() }} Matches</span>
+                        <span class="fi__footer__indicators__item__caption">
+                           {{ self.unreadMatchesCount() }}
+                           Match{{self.unreadMatchesCount() > 1 ? 'es' : ''}}
+                        </span>
                     </a>
                     <a class="fi__footer__indicators__item clickable"
                        ui-sref="postRequests({myUri: self.ownNeed.get('@id')})"
                        ng-show="self.unreadRequestsCount()">
                         <img src="generated/icon-sprite.svg#ico36_incoming" class="fi__footer__indicators__item__icon"/>
-                        <span class="fi__footer__indicators__item__caption">{{self.unreadRequestsCount()}} Incoming Requests</span>
+                        <span class="fi__footer__indicators__item__caption">
+                            {{self.unreadRequestsCount()}}
+                            Incoming Request{{ self.unreadRequestsCount() > 1 ? 's' : ''}}
+                        </span>
                     </a>
                 </div>
             </div>
