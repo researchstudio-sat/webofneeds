@@ -30,7 +30,10 @@ import java.util.List;
  *
  */
 @Entity
-@Table(name = "need")
+@Table(name = "need", uniqueConstraints = {
+        @UniqueConstraint(name="IDX_NEED_UNIQUE_EVENT_CONTAINER_ID",columnNames= "event_container_id"),
+        @UniqueConstraint(name = "IDX_NEED_UNIQUE_DATASETHOLDER_ID", columnNames = "datatsetholder_id")
+})
 //@Inheritance(strategy=InheritanceType.JOINED)
 public class Need implements VersionedEntity {
     @Id
@@ -81,7 +84,10 @@ public class Need implements VersionedEntity {
     @ManyToMany(targetEntity = OwnerApplication.class, fetch = FetchType.EAGER)
     @JoinTable(name = "NEED_OWNERAPP",
             joinColumns = @JoinColumn(name = "need_id"),
-            inverseJoinColumns = @JoinColumn(name = "owner_application_id"))
+            inverseJoinColumns = @JoinColumn(name = "owner_application_id"),
+            uniqueConstraints = {@UniqueConstraint(name="IDX_NO_UNIQUE_NEED_ID_OWNER_APPLICATION_ID", columnNames = {"need_id","owner_application_id"})},
+            indexes = {@Index(name="IDX_NO_NEED_ID", columnList = "need_id")}
+    )
     private List<OwnerApplication> authorizedApplications;
 
     @JoinColumn(name = "event_container_id")

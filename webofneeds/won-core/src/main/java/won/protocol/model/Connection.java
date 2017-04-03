@@ -28,8 +28,14 @@ import java.util.Date;
  * Date: 30.10.12
  */
 @Entity
-@Table(name = "connection", indexes = { @Index(name = "IDX_CONNECTION_NEEDURI_REMOTENEEDURI", columnList = "needURI, " +
-  "remoteNeedURI")}, uniqueConstraints = {@UniqueConstraint(name="IDX_UNIQUE_CONNECTION", columnNames = {"needURI", "remoteNeedURI", "typeURI"})})
+@Table(name = "connection", indexes = {
+        @Index(name = "IDX_CONNECTION_NEEDURI_REMOTENEEDURI", columnList = "needURI, remoteNeedURI"),
+    },
+    uniqueConstraints = {
+            @UniqueConstraint(name = "IDX_CONNECTION_UNIQUE_EVENT_CONTAINER_ID", columnNames = "event_container_id"),
+            @UniqueConstraint(name="IDX_UNIQUE_CONNECTION", columnNames = {"needURI", "remoteNeedURI", "typeURI"}),
+            @UniqueConstraint(name = "IDX_CONNECTION_UNIQUE_DATASETHOLDER_ID", columnNames = "datasetholder_id")
+    })
 public class Connection implements ParentAware<ConnectionContainer>, VersionedEntity {
   @Id
   @GeneratedValue
