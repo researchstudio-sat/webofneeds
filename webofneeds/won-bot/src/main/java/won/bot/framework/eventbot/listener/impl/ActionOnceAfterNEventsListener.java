@@ -62,6 +62,6 @@ public class ActionOnceAfterNEventsListener extends AbstractDoOnceAfterNEventsLi
   @Override
   protected void doOnce(Event event)
   {
-    getEventListenerContext().getExecutor().execute(task.getActionTask(event));
+    getEventListenerContext().getExecutor().execute(task.getActionTask(event, this));
   }
 }

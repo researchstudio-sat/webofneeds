@@ -57,6 +57,6 @@ public class ActionOnFirstNEventsListener extends AbstractHandleFirstNEventsList
 
   @Override
   protected void handleFirstNTimes(final Event event) throws Exception {
-    getEventListenerContext().getExecutor().execute(action.getActionTask(event));
+    getEventListenerContext().getExecutor().execute(action.getActionTask(event, this));
   }
 }

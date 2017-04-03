@@ -205,7 +205,7 @@ public class EventBotActionUtils {
                 new BaseEventBotAction(context)
                 {
                     @Override
-                    protected void doRun(final Event event) throws Exception {
+                    protected void doRun(final Event event, EventListener executingListener) throws Exception {
                         if (event instanceof SuccessResponseEvent) {
                             successCallback.onEvent(event);
                         } else  if (event instanceof FailureResponseEvent){
@@ -240,7 +240,7 @@ public class EventBotActionUtils {
                 new BaseEventBotAction(context)
                 {
                     @Override
-                    protected void doRun(final Event event) throws Exception {
+                    protected void doRun(final Event event, EventListener executingListener) throws Exception {
                         if (event instanceof SuccessResponseEvent) {
                             successCallback.onEvent(event);
                         } else  if (event instanceof FailureResponseEvent){

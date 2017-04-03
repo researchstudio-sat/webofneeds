@@ -21,6 +21,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.debugbot.SendNDebugCommandEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -45,7 +46,7 @@ public class SendNDebugMessagesAction extends BaseEventBotAction
   }
 
   @Override
-  protected void doRun(final Event event) throws Exception {
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     int n = this.messages.length;
     if (event instanceof SendNDebugCommandEvent){
       SendNDebugCommandEvent sendNDebugCommandEvent = (SendNDebugCommandEvent) event;

@@ -23,6 +23,7 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.bus.impl.EventBusStatistics;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.listener.EventListener;
 
 /*
  * Collects the EventBusStatistics and logs them.
@@ -37,7 +38,7 @@ public class StatisticsLoggingAction extends BaseEventBotAction
     }
 
     @Override
-    protected void doRun(Event event) throws Exception {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
         EventBus bus = getEventListenerContext().getEventBus();
         EventBusStatistics statistics = bus.generateEventBusStatistics();
         StringBuilder sb = new StringBuilder();

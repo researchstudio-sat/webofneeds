@@ -50,7 +50,7 @@ public class CreateNeedWithFacetsAction extends AbstractCreateNeedAction
   }
 
   @Override
-    protected void doRun(Event event) throws Exception
+    protected void doRun(Event event, EventListener executingListener) throws Exception
     {
         if (getEventListenerContext().getNeedProducer().isExhausted()){
             logger.info("the bot's need producer is exhausted.");

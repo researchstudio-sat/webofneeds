@@ -19,6 +19,7 @@ package won.bot.framework.eventbot.action.impl.matcher;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -41,7 +42,7 @@ public class MatchNeedsAction extends BaseEventBotAction
   }
 
   @Override
-  protected void doRun(Event event) throws Exception{
+  protected void doRun(Event event, EventListener executingListener) throws Exception{
     Collection<URI> needs = getEventListenerContext().getBotContext().retrieveAllNeedUris();
     Iterator<URI> iter = needs.iterator();
     URI need1 = iter.next();

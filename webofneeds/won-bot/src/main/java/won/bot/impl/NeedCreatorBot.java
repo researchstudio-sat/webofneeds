@@ -75,7 +75,7 @@ public class NeedCreatorBot extends EventBot
     {
       int lastOutput = 0;
       @Override
-      protected void doRun(final Event event) throws Exception {
+      protected void doRun(final Event event, EventListener executingListener) throws Exception {
         int cnt = needCreationStartedCounter.getCount();
         int unfinishedCount = creationUnfinishedCounter.getCount();
         int successCnt = needCreationSuccessfulCounter.getCount();
