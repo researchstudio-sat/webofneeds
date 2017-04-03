@@ -78,7 +78,7 @@ public class ConnectMessageFromOwnerProcessor extends AbstractFromOwnerCamelProc
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
   public void onSuccessResponse(final Exchange exchange) throws Exception {
     WonMessage responseMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     MessageEventPlaceholder mep = this.messageEventRepository.findOneByCorrespondingRemoteMessageURI(
