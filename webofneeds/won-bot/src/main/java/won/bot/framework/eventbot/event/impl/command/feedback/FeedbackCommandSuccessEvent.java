@@ -35,4 +35,12 @@ public class FeedbackCommandSuccessEvent extends AbstractMessageCommandResultEve
     public FeedbackCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI) {
         super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
     }
+
+    public FeedbackCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI, String message) {
+        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
+    }
+
+    public FeedbackCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
+        super(originalCommandEvent, con, message);
+    }
 }

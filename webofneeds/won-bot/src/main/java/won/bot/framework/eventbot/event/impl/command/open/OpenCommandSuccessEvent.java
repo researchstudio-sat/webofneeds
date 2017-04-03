@@ -35,4 +35,12 @@ public class OpenCommandSuccessEvent extends AbstractMessageCommandResultEvent i
     public OpenCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI) {
         super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
     }
+
+    public OpenCommandSuccessEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI, String message) {
+        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
+    }
+
+    public OpenCommandSuccessEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
+        super(originalCommandEvent, con, message);
+    }
 }

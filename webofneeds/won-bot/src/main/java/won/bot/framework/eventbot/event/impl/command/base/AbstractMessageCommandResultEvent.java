@@ -29,19 +29,34 @@ import java.net.URI;
 public abstract class AbstractMessageCommandResultEvent extends BaseNeedAndConnectionSpecificEvent implements MessageCommandResultEvent {
 
     private MessageCommandEvent originalCommandEvent;
+    private String message = null;
 
     public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, Connection con) {
-        super(con);
-        this.originalCommandEvent = originalCommandEvent;
+        this(originalCommandEvent, con, null);
     }
 
     public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI){
         this(originalCommandEvent, makeConnection(needURI, remoteNeedURI, connectionURI));
     }
 
+    public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI, String message){
+        this(originalCommandEvent, makeConnection(needURI, remoteNeedURI, connectionURI), message);
+    }
+
+    public AbstractMessageCommandResultEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
+        super(con);
+        this.originalCommandEvent = originalCommandEvent;
+        this.message = message;
+    }
+
     @Override
     public MessageCommandEvent getOriginalCommandEvent() {
         return originalCommandEvent;
+    }
+
+    @Override
+    public String getMessage() {
+        return null;
     }
 
     protected static Connection makeConnection(URI needURI, URI remoteNeedURI, URI connectionURI){
