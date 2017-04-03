@@ -28,7 +28,7 @@ public class CloseConnectionUriAction extends BaseEventBotAction {
     }
 
     @Override
-    protected void doRun(Event event) throws Exception {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
         if(event instanceof CloseConnectionEvent) {
             logger.debug("trying to close connection related to event {}", event);
             try {

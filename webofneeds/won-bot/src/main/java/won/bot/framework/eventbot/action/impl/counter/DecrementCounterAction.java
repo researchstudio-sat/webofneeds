@@ -18,6 +18,7 @@ package won.bot.framework.eventbot.action.impl.counter;
 
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.listener.EventListener;
 
 /**
  * Action that decrements the specified counter.
@@ -29,7 +30,7 @@ public class DecrementCounterAction extends BaseCounterAction
   }
 
   @Override
-  protected void doRun(final Event event) throws Exception {
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     getCounter().decrement();
   }
 }

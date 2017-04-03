@@ -100,7 +100,7 @@ public class GroupingBot extends EventBot
     this.autoResponderCreator = new ActionOnEventListener(ctx, groupMemberFilter, new BaseEventBotAction(ctx)
     {
       @Override
-      protected void doRun(final Event event) throws Exception {
+      protected void doRun(final Event event, EventListener executingListener) throws Exception {
         //create a listener that automatically answers messages, only for that need URI
         AutomaticMessageResponderListener listener = new AutomaticMessageResponderListener(ctx, "autoResponder",
                                                                                            NeedUriEventFilter

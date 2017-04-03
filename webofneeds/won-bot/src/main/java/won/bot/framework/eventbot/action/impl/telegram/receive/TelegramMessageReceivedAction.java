@@ -1,7 +1,6 @@
 package won.bot.framework.eventbot.action.impl.telegram.receive;
 
 import org.telegram.telegrambots.api.methods.AnswerCallbackQuery;
-import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.api.objects.CallbackQuery;
 import org.telegram.telegrambots.api.objects.Message;
@@ -18,8 +17,7 @@ import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnection
 import won.bot.framework.eventbot.event.impl.mail.CloseConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.OpenConnectionEvent;
 import won.bot.framework.eventbot.event.impl.telegram.TelegramMessageReceivedEvent;
-
-import java.io.File;
+import won.bot.framework.eventbot.listener.EventListener;
 
 public class TelegramMessageReceivedAction extends BaseEventBotAction {
     private TelegramContentExtractor telegramContentExtractor;
@@ -35,7 +33,7 @@ public class TelegramMessageReceivedAction extends BaseEventBotAction {
     }
 
     @Override
-    protected void doRun(Event event) throws Exception {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
         EventBus bus = getEventListenerContext().getEventBus();
 
         if(event instanceof TelegramMessageReceivedEvent){

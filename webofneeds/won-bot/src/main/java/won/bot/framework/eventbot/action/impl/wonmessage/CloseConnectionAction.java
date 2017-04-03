@@ -21,6 +21,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -43,7 +44,7 @@ public class CloseConnectionAction extends BaseEventBotAction
   }
 
   @Override
-  protected void doRun(final Event event) throws Exception {
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof ConnectionSpecificEvent) {
       ConnectionSpecificEvent connectionSpecificEvent = (ConnectionSpecificEvent) event;
       logger.debug("trying to close connection related to event {}", connectionSpecificEvent);
