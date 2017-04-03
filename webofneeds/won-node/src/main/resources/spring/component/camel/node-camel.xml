@@ -59,6 +59,7 @@
     establishing ssl connection is overkill, vm connection is used instead -->
     <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <property name="brokerURL" value="vm://wonBroker"/>
+        <property name="maxThreadPoolSize" value="10" />
     </bean>
 
     <!-- Configuring Broker -->
