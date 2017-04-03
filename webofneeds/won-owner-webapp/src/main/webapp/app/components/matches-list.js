@@ -1,6 +1,8 @@
 ;
 
+import Immutable from 'immutable'
 import angular from 'angular';
+import won from '../won-es6';
 import squareImageModule from './square-image';
 import {
     labels,
@@ -8,32 +10,54 @@ import {
 } from '../won-label-utils';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
+import matchesListItemModule from './matches-list-item';
 import {
+    seeksOrIs,
+    inferLegacyNeedType,
+} from '../won-utils';
+import {
+    selectOwnNeeds,
+    displayingOverview,
+    selectUnreadCountsByNeedAndType,
     selectLastUpdateTime,
     selectLastUpdatedPerConnection,
-
+    selectAllByConnections,
+    selectMatchesUrisByNeed,
+    selectOpenPostUri,
+    selectOpenPost,
 } from '../selectors'
 //import won from '../won-es6';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-        <div class="mli clickable" ng-click="self.toggleMatches()">
+        <div class="mli clickable"
+            ng-repeat="ownNeed in self.ownNeeds.toArray()"
+            ng-click="self.toggleMatches(ownNeed.get('@id'))"
+            ng-show="self.hasMatches(ownNeed.get('@id'))">
+
+            <div class="mli__ownneed" ng-show="self.isOverview">
                 <won-square-image
-                    src="self.item.titleImgSrc"
-                    title="self.item[0].ownNeed['won:hasContent']['dc:title']"
-                    uri="self.item[0].ownNeed['@id']">
+                    src="self.seeksOrIs(ownNeed).get('imageTODO')"
+                    title="self.seeksOrIs(ownNeed).get('dc:title')"
+                    uri="ownNeed.get('@id')">
                 </won-square-image>
                 <div class="mli__description">
                     <div class="mli__description__topline">
                         <div class="mli__description__topline__title">
-                            {{self.item[0].ownNeed['won:hasContent']['dc:title']}}
+                            {{ self.seeksOrIs(ownNeed).get('dc:title') }}
                         </div>
                         <div class="mli__description__topline__matchcount">
-                            {{self.item.length}}
+                            {{
+                                self.unreadCounts.getIn([
+                                    ownNeed.get('@id'),
+                                    self.WONMSG.hintMessage
+                                ])
+                            }}
                         </div>
                     </div>
                     <div class="mli__description__subtitle">
+                        <!--
                         <span class="mli__description__subtitle__group" ng-show="self.item.group">
                             <img
                                 src="generated/icon-sprite.svg#ico36_group"
@@ -43,101 +67,86 @@ function genComponentConf() {
                                 &ndash;
                             </span>
                         </span>
+                        -->
                         <span class="mli__description__subtitle__type">
                             {{
                                 self.labels.type[
-                                    self.item[0].ownNeed['won:hasBasicNeedType']['@id']
+                                    self.inferLegacyNeedType(ownNeed)
                                 ]
                             }}
                         </span>
                     </div>
                 </div>
                 <div class="mli__carret">
-                    <img class="mli__arrow" ng-show="self.open"
+                    <img class="mli__arrow" ng-show="self.isOpen(ownNeed.get('@id'))"
                         src="generated/icon-sprite.svg#ico16_arrow_up"/>
-                    <img class="mli__arrow" ng-show="!self.open"
+                    <img class="mli__arrow" ng-show="!self.isOpen(ownNeed.get('@id'))"
                         src="generated/icon-sprite.svg#ico16_arrow_down"/>
                 </div>
             </div>
-            <div class="smli" ng-show="self.open">
-                <div class="smli__item clickable"
-                        ng-class="{'selected' : self.openRequest === match}"
-                        ng-repeat="match in self.item"
-                        ui-sref="{connectionUri: match.connection.uri}">
-                    <div class="smli__item__header">
-                        <won-square-image
-                            src="match.images[0].src"
-                            title="match.remoteNeed['won:hasContent']['dc:title']"
-                            uri="match.remoteNeed['@id']">
-                        </won-square-image>
-                        <div class="smli__item__header__text">
-                            <div class="smli__item__header__text__topline">
-                                <div class="smli__item__header__text__topline__title">
-                                    {{match.remoteNeed['won:hasContent']['dc:title']}}
-                                </div>
-                                <div class="smli__item__header__text__topline__date">
-                                    {{ self.relativeTime(self.lastUpdated, match.remoteNeed['dct:created']) }}
-                                </div>
-                            </div>
-                            <div class="smli__item__header__text__subtitle">
-                                <span class="smli__item__header__text__subtitle__group" ng-show="request.group">
-                                    <img src="generated/icon-sprite.svg#ico36_group"
-                                         class="smli__item__header__text__subtitle__group__icon">
-                                             {{match.group}}
-                                             <span class="smli__item__header__text__subtitle__group__dash">
-                                                 &ndash;
-                                             </span>
-                                </span>
-                                <span class="smli__item__header__text__subtitle__type">
-                                    {{ self.labels.type[ match.remoteNeed['won:hasBasicNeedType']['@id'] ] }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+
+
+            <div class="smli" ng-show="self.isOpen(ownNeed.get('@id'))">
+                <won-matches-list-item
+                    class="smli__item clickable"
+                    ui-sref="{connectionUri: matchUri}"
+                    ng-repeat="matchUri in self.matchesUrisByNeed.get(ownNeed.get('@id')).toArray()"
+                    connection-uri="matchUri">
                     <!--
-                    <div class="smli__item__content">
-                        <div class="smli__item__content__location">
-                            <img class="smli__item__content__indicator"
-                                src="generated/icon-sprite.svg#ico16_indicator_location"/>
-                            <span>Vienna area</span>
-                        </div>
-                        <div class="smli__item__content__datetime">
-                            <img class="smli__item__content__indicator"
-                                src="generated/icon-sprite.svg#ico16_indicator_time"/>
-                            <span>Available until 5th May</span>
-                        </div>
-                        <div class="smli__item__content__text">
-                            <img class="smli__item__content__indicator"
-                                src="generated/icon-sprite.svg#ico16_indicator_description"/>
-                            <span>{{match.message}}</span>
-                        </div>
-                    </div>
+                    ui-sref="{connectionUri: '{{matchUri}}'}"
                     -->
-                </div>
+                </won-matches-list-item>
             </div>
+        </div>
     `;
 
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
 
-            window.mli4dbg = this;
+            window.ml4dbg = this;
+            this.seeksOrIs = seeksOrIs;
+            this.inferLegacyNeedType = inferLegacyNeedType;
+            this.open = [];
+            this.WONMSG = won.WONMSG;
 
             this.maxThumbnails = 4;
             this.labels = labels;
             this.relativeTime = relativeTime;
 
             const selectFromState = (state) => {
+                //const ownNeed = ownNeeds && ownNeeds.get(self.ownNeedUri);
+                const unreadCounts = selectUnreadCountsByNeedAndType(state);
+                const openPost = selectOpenPost(state);
+
+                const ownNeeds = openPost?
+                    Immutable.Map([[openPost.get('@id'), openPost]]) : // only show one post (the one which detail page it is)
+                    selectOwnNeeds(state);  // show all posts
+
+
                 return {
-                    lastUpdated: selectLastUpdateTime(state),
-                }
+                    isOverview: !openPost,
+                    ownNeeds,
+                    ownNeedUris: ownNeeds && ownNeeds.keySeq().toArray(),
+                    unreadCounts,
+                    matchesUrisByNeed: selectMatchesUrisByNeed(state),
+                };
             };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
         }
 
-        toggleMatches() {
-            this.open = !this.open;
+        hasMatches(ownNeedUri) {
+            const matchUris = this.matchesUrisByNeed.get(ownNeedUri);
+            return matchUris && matchUris.size > 0
+        }
+
+        toggleMatches(ownNeedUri) {
+            this.open[ownNeedUri] = !this.open[ownNeedUri];
+        }
+        isOpen (ownNeedUri) {
+            return !this.isOverview || //if only one post is shown, always display all matches
+                this.open[ownNeedUri];
         }
     }
     Controller.$inject = serviceDependencies;
@@ -147,17 +156,15 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: {
-            connectionUri: '=',
-            item: '='
-        },
+        scope: { },
         template: template
     }
 }
 
-export default angular.module('won.owner.components.matchesListItem', [
-    squareImageModule
+export default angular.module('won.owner.components.matchesList', [
+    squareImageModule,
+    matchesListItemModule,
 ])
-    .directive('wonMatchesListItem', genComponentConf)
+    .directive('wonMatchesList', genComponentConf)
     .name;
 
