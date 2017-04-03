@@ -35,4 +35,12 @@ public class OpenCommandFailureEvent extends AbstractMessageCommandResultEvent i
     public OpenCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI) {
         super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
     }
+
+    public OpenCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI, String message) {
+        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
+    }
+
+    public OpenCommandFailureEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
+        super(originalCommandEvent, con, message);
+    }
 }
