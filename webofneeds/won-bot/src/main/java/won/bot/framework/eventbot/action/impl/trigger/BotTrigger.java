@@ -34,11 +34,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class BotTrigger {
     private EventListenerContext context;
-    private Duration interval;
+    private volatile Duration interval;
     private AtomicBoolean active = new AtomicBoolean(false);
     private EventListener startListener;
     private EventListener stopListener;
-    private ScheduledFuture<?> cancelableTask;
+    private volatile ScheduledFuture<?> cancelableTask;
 
     public BotTrigger(EventListenerContext context, Duration interval) {
         this.context = context;
@@ -116,7 +116,7 @@ public class BotTrigger {
         active.set(true);
     }
 
-    private void reschedule() {
+    private synchronized void reschedule() {
         if (cancelableTask != null) {
             cancelableTask.cancel(true);
         }
