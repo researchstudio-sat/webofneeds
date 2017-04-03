@@ -31,12 +31,11 @@ import java.util.stream.Collectors;
 /**
  *
  */
-public class AsyncEventBusImpl implements EventBus
-{
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-  private Map<Class<? extends Event>,List<EventListener>> listenerMap = new ConcurrentHashMap<>();
-  private Executor executor;
-  private Object monitor = new Object();
+public class AsyncEventBusImpl implements EventBus {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private Map<Class<? extends Event>, List<EventListener>> listenerMap = new ConcurrentHashMap<>();
+    private Executor executor;
+    private Object monitor = new Object();
 
     public AsyncEventBusImpl(final Executor executor) {
         this.executor = executor;
@@ -127,27 +126,25 @@ public class AsyncEventBusImpl implements EventBus
 
     private List<EventListener> getEventListenersForEvent(final Event event) {
         //the map is secured against concurrent modification, the list inside is unmodifiable
-        List<Class<? extends Event>> classes = getEventTypes(event.getClass());
+        Set<Class<? extends Event>> classes = getEventTypes(event.getClass(),new HashSet<>());
         return listenerMap.entrySet().stream()
                 .filter(entry -> classes.contains(entry.getKey()))
                 .flatMap(e -> e.getValue().stream())
                 .collect(Collectors.toList());
     }
 
-  private List<Class<? extends Event>> getEventTypes(final Class<? extends Event> clazz) {
-    Class superclass = clazz.getSuperclass();
-    List<Class<? extends Event>> ret = null;
-    if (!Event.class.isAssignableFrom(superclass)){
-      //we have an event base class
-      ret = new LinkedList<>();
-    } else {
-      ret = getEventTypes(superclass);
+    private Set<Class<? extends Event>> getEventTypes(final Class<? extends Event> clazz, Set<Class<? extends Event>> eventTypes) {
+        if (eventTypes == null) eventTypes = new HashSet<>();
+        final Set<Class<? extends Event>> finalEventTypes = eventTypes;
+        //add interfaces and recurse for interfaces
+        Arrays.stream(clazz.getInterfaces()).forEach(c -> { if (Event.class.isAssignableFrom(c)) { getEventTypes((Class<? extends Event>) c, finalEventTypes);}});
+        Class superclass = clazz.getSuperclass();
+        if (superclass != null && !Event.class.isAssignableFrom(superclass)) {
+            getEventTypes(superclass, finalEventTypes);
+        }
+        finalEventTypes.add(clazz);
+        return finalEventTypes;
     }
-    List<Class<? extends Event>> finalRet = ret;
-    Arrays.stream(clazz.getInterfaces()).forEach(c -> finalRet.add((Class<? extends Event>) c));
-    finalRet.add(clazz);
-    return finalRet;
-  }
 
 
     private List<EventListener> copyOrCreateList(final List<EventListener> listenerList) {
