@@ -30,7 +30,7 @@ let template = `
             </a>
         </div>
         <div class="omc__header" ng-if="self.hasMatches">
-            <div class="title" ng-if="!self.post">Matches to your needs</div>
+            <div class="title">Matches to your post{{ self.isOverview? 's' : '' }}</div>
             <div class="omc__header__viewtype">
                 <a ui-sref="{layout: self.LAYOUT.TILES}">
                     <img ng-src="{{self.layout === 'tiles' ? 'generated/icon-sprite.svg#ico-filter_tile_selected' : 'generated/icon-sprite.svg#ico-filter_tile'}}"
