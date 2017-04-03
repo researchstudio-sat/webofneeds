@@ -160,7 +160,7 @@ const allByConnectionUri = (connectionUri)  => {
 };
 
 //TODO there's certainly more elegant ways to implement this selector than first grouping by connection then by need
-export const selectConnectionsByNeed = createSelector(
+export const selectAllByConnectionsByNeed = createSelector(
     selectAllByConnections,
         connections => connections
         .map(cnct => Immutable.fromJS(cnct)) //TODO this is a workaround. atm connections aren't ImmutableJS-objects
