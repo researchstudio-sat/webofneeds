@@ -11,6 +11,8 @@ import java.util.*;
  */
 public interface BotContext
 {
+  public static final String DEFAULT_NEED_LIST_NAME="need_uris";
+
   // ===============================
   // application specific methods
   // ===============================
