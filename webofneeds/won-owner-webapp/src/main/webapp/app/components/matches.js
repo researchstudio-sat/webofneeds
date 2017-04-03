@@ -30,7 +30,6 @@ let template = `
             </a>
         </div>
         <div class="omc__header" ng-if="self.hasMatches">
-            <div class="dummy"></div>
             <div class="title" ng-if="!self.post">Matches to your needs</div>
             <div class="omc__header__viewtype">
                 <a ui-sref="{layout: self.LAYOUT.TILES}">
