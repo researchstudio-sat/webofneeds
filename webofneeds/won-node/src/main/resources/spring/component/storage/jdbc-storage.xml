@@ -39,6 +39,14 @@
         <property name="jdbcUrl" value="${db.sql.jdbcUrl}"/>
         <property name="user" value="${db.sql.user}" />
         <property name="password" value="${db.sql.password}" />
+        <property name="initialPoolSize" value="20" />
+        <property name="maxPoolSize" value="50" />
+        <property name="minPoolSize" value="10" />
+        <property name="acquireIncrement" value="5" />
+        <property name="maxIdleTime" value="600" />
+        <property name="maxIdleTimeExcessConnections" value="60" />
+        <property name="maxConnectionAge" value="3600" />
+        <property name="numHelperThreads" value="50" />
     </bean>
 
     <!-- Entity manager -->
