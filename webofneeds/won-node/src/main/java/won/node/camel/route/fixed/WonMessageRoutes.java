@@ -117,7 +117,6 @@ public class WonMessageRoutes  extends RouteBuilder
             header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER).isNotNull())
             //swap back: outbound into normal
             .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.OUTBOUND_MESSAGE_HEADER))
-            .to("bean:wonMessageCloner")
             .to("bean:toNodeSender")
             .endChoice()
        .end()
@@ -135,7 +134,6 @@ public class WonMessageRoutes  extends RouteBuilder
             ))
             //swap back: original into normal
             .setHeader(WonCamelConstants.MESSAGE_HEADER, header(WonCamelConstants.ORIGINAL_MESSAGE_HEADER))
-            .to("bean:wonMessageCloner")
             .to("bean:toOwnerSender")
             .endChoice()
       .end()
@@ -205,7 +203,6 @@ public class WonMessageRoutes  extends RouteBuilder
             .routingSlip(method("facetTypeSlip"))
             //now, we have the message we want to pass on to the owner in the exchange's in header.
             //do we want to send a response back? only if we're not currently processing a respon
-            .to("bean:wonMessageCloner")
             .to("bean:toOwnerSender")
             .choice()
               .when(PredicateBuilder.and(
