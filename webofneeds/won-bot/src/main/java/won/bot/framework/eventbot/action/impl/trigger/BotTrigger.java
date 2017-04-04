@@ -46,12 +46,13 @@ public class BotTrigger {
     }
 
     /**
-     * Sets the interval to the specified duration. Will be used starting with next trigger event.
+     * Sets the interval to the specified duration and reschedules executions.
      *
      * @param interval
      */
-    public void setInterval(Duration interval) {
+    public void changeIntervalTo(Duration interval) {
         this.interval = interval;
+        reschedule();
     }
 
     public Duration getInterval() {
