@@ -6,6 +6,9 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.StatementImpl;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.eval.PathEval;
@@ -13,9 +16,6 @@ import org.apache.jena.sparql.util.Context;
 import org.apache.jena.tdb.TDB;
 import org.apache.jena.util.FileUtils;
 import org.apache.jena.util.ResourceUtils;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.IncorrectPropertyCountException;
@@ -122,6 +122,21 @@ public class RdfUtils
     }
     return clonedModel;
   }
+
+  public static Dataset cloneDataset(Dataset dataset) {
+    if (dataset == null) return null;
+    Dataset clonedDataset = DatasetFactory.create();
+    Model model = dataset.getDefaultModel();
+    if (model != null) {
+      clonedDataset.setDefaultModel(cloneModel(model));
+    }
+    for (Iterator<String> modelNames = dataset.listNames(); modelNames.hasNext(); ){
+      String modelName = modelNames.next();
+      clonedDataset.addNamedModel(modelName, cloneModel(dataset.getNamedModel(modelName)));
+    }
+    return clonedDataset;
+  }
+
 
   public static void replaceBaseURI(final Model model, final String baseURI)
   {
@@ -721,6 +736,7 @@ public class RdfUtils
     if (uriStringOrNull == null) return null;
     return URI.create(uriStringOrNull.toString());
   }
+
 
 
   /**
