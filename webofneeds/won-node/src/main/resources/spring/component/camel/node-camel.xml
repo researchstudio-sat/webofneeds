@@ -113,6 +113,8 @@
           class="won.node.camel.processor.general.ToNodeSender" />
     <bean id="toOwnerSender"
           class="won.node.camel.processor.general.ToOwnerSender" />
+    <bean id="wonMessageCloner"
+          class="won.node.camel.processor.general.WonMessageCloner" />
     <bean id="facetExtractor"
           class="won.protocol.message.processor.camel.FacetExtractingCamelProcessor" />
 
