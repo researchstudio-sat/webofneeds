@@ -70,7 +70,7 @@ public class SigningFrameworkTest {
             System.out.println(outFile);
 
             //this creates a default model out of the input graph
-            Dataset dataset = DatasetFactory.createMem();
+            Dataset dataset = DatasetFactory.createGeneral();
             RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
             is.close();
             //Dataset dataset = RDFDataMgr.loadDataset(SigningFrameworkTest.class.getResource(SIGNING_FW_TEST_FILE).getPath());
@@ -80,7 +80,7 @@ public class SigningFrameworkTest {
             os.close();
 
             InputStream is2 = new FileInputStream(outFile);
-            Dataset dataset2 = DatasetFactory.createMem();
+            Dataset dataset2 = DatasetFactory.createGeneral();
             RDFDataMgr.read(dataset2, is2, RDFFormat.TRIG.getLang());
             is2.close();
 
@@ -115,14 +115,14 @@ public class SigningFrameworkTest {
         File outFile = File.createTempFile("won", ".trig");
         System.out.println(outFile);
 
-        Dataset dataset = DatasetFactory.createMem();
+        Dataset dataset = DatasetFactory.createGeneral();
         RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
 
         //Dataset dataset = RDFDataMgr.loadDataset(SigningFrameworkTest.class.getResource(SIGNING_FW_TEST_FILE).getPath());
 
         RDFDataMgr.write(new FileOutputStream(outFile), dataset, RDFFormat.TRIG.getLang());
 
-        Dataset dataset2 = DatasetFactory.createMem();
+        Dataset dataset2 = DatasetFactory.createGeneral();
         RDFDataMgr.read(dataset2, new FileInputStream(outFile), RDFFormat.TRIG.getLang());
 
 

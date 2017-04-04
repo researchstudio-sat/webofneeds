@@ -73,6 +73,7 @@ public class KeyForNewNeedAddingProcessor implements WonMessageProcessor {
         String contentName = message.getContentGraphURIs().get(0);
         Model contentModel = msgDataset.getNamedModel(contentName);
         keyWriter.writeToModel(contentModel, contentModel.createResource(needUri), pubKey);
+        return new WonMessage(msgDataset);
       }
     } catch (Exception e) {
       logger.error("Failed to add key", e);

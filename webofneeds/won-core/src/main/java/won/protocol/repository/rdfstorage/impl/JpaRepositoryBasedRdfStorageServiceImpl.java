@@ -43,7 +43,7 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
   @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   @Override
   public void storeModel(final URI resourceURI, final Model model) {
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     dataset.setDefaultModel(model);
 
     storeDataset(resourceURI, dataset);

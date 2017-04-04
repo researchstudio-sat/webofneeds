@@ -58,7 +58,7 @@ public class WonMessage implements Serializable {
 
 
     public WonMessage(Dataset completeDataset) {
-        this.completeDataset = RdfUtils.cloneDataset(completeDataset);
+        this.completeDataset = completeDataset;
     }
 
     public static WonMessage deepCopy(WonMessage original) {
@@ -164,7 +164,7 @@ public class WonMessage implements Serializable {
         if (this.messageContent != null) {
             return RdfUtils.cloneDataset(this.messageContent);
         } else {
-            Dataset newMsgContent = DatasetFactory.createMem();
+            Dataset newMsgContent = DatasetFactory.createGeneral();
             Iterator<String> modelNames = this.completeDataset.listNames();
             List<String> envelopeGraphNames = getEnvelopeGraphURIs();
             //add all models that are not envelope graphs to the messageContent
@@ -240,7 +240,7 @@ public class WonMessage implements Serializable {
                 String attachmentGraphUri = solution.getResource("attachmentGraphUri").getURI();
                 String attachmentSigGraphUri = solution.getResource("attachmentSigGraphUri").getURI();
                 String attachmentDestinationUri = solution.getResource("attachmentDestinationUri").getURI();
-                Dataset attachmentDataset = DatasetFactory.createMem();
+                Dataset attachmentDataset = DatasetFactory.createGeneral();
                 attachmentDataset.addNamedModel(attachmentGraphUri, this.completeDataset.getNamedModel(attachmentGraphUri));
                 attachmentDataset.addNamedModel(attachmentSigGraphUri, this.completeDataset.getNamedModel(attachmentSigGraphUri));
                 AttachmentHolder attachmentHolder = new AttachmentHolder(URI.create(attachmentDestinationUri), attachmentDataset);
