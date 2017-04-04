@@ -32,19 +32,21 @@ public abstract class TriggeredBot extends ScheduledActionBot
   protected void doInitialize()
   {
     doInitializeCustom();
-    this.scheduledExecution = getTaskScheduler().schedule(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        try {
-          logger.debug("TRIGGER FIRE");
-          TriggeredBot.this.act();
-        } catch (Exception e) {
-          logger.warn("caught exception during triggered execution of act()", e);
+    if (trigger != null) {
+      this.scheduledExecution = getTaskScheduler().schedule(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            logger.debug("TRIGGER FIRE");
+            TriggeredBot.this.act();
+          } catch (Exception e) {
+            logger.warn("caught exception during triggered execution of act()", e);
+          }
         }
-      }
-    }, trigger);
+      }, trigger);
+    } else {
+      logger.info("This bot will not fire the ActEvent because no trigger was configured.");
+    }
   }
 
   /**
