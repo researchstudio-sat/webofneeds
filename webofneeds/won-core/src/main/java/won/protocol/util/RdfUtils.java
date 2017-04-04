@@ -85,14 +85,14 @@ public class RdfUtils
     if (content != null) {
       return toDataset(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), rdfFormat);
     } else
-      return DatasetFactory.createMem();
+      return DatasetFactory.createGeneral();
 
 
   }
 
   public static Dataset toDataset(InputStream stream, RDFFormat rdfFormat) {
 
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
 
     RDFDataMgr.read(dataset, stream, rdfFormat.getLang());
     try {
@@ -125,7 +125,7 @@ public class RdfUtils
 
   public static Dataset cloneDataset(Dataset dataset) {
     if (dataset == null) return null;
-    Dataset clonedDataset = DatasetFactory.create();
+    Dataset clonedDataset = DatasetFactory.createGeneral();
     Model model = dataset.getDefaultModel();
     if (model != null) {
       clonedDataset.setDefaultModel(cloneModel(model));
@@ -1160,7 +1160,7 @@ public class RdfUtils
   public static Dataset readDatasetFromString(final String data, final Lang lang)
   {
     StringReader sr = new StringReader(data);
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     RDFDataMgr.read(dataset, sr, "no:uri", lang);
     return dataset;
   }

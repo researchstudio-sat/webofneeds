@@ -85,7 +85,7 @@ public class WonMessageBuilder
     throws WonMessageBuilderException {
 
     if (dataset == null) {
-      dataset = DatasetFactory.createMem();
+      dataset = DatasetFactory.createGeneral();
     }
     if (messageURI == null){
       throw new WonMessageBuilderException("No messageURI specified");

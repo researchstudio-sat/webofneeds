@@ -51,7 +51,7 @@ public class ModelConverterTest
       // use this when debugging:
       //File outFile = File.createTempFile("won", ".trig");
       //System.out.println(outFile);
-      Dataset dataset = DatasetFactory.createMem();
+      Dataset dataset = DatasetFactory.createGeneral();
       RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
       is.close();
 
@@ -66,7 +66,7 @@ public class ModelConverterTest
       // of the converted model. For this, read the resulting graph collection
       // as a Model with Jena API
       InputStream is2 = new FileInputStream(outFile);
-      Dataset dataset2 = DatasetFactory.createMem();
+      Dataset dataset2 = DatasetFactory.createGeneral();
       RDFDataMgr.read(dataset2, is2, RDFFormat.TRIG.getLang());
       is2.close();
       Model model2 = dataset2.getNamedModel(modelName);
@@ -100,7 +100,7 @@ public class ModelConverterTest
 
       // prepare GraphCollection with NamedGraph to be converted:
       InputStream is = this.getClass().getResourceAsStream(resourceFile);
-      Dataset dataset = DatasetFactory.createMem();
+      Dataset dataset = DatasetFactory.createGeneral();
       RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
       is.close();
       String modelName = dataset.listNames().next();
@@ -127,7 +127,7 @@ public class ModelConverterTest
 
       // test convert from NamedGraph of GraphCollection into Model
       Model model2 = ModelConverter.namedGraphToModel(graphName, gc);
-      Dataset dataset2 = DatasetFactory.createMem();
+      Dataset dataset2 = DatasetFactory.createGeneral();
       dataset2.addNamedModel(modelName, model2);
       //TODO maybe chng the API so that the prefix map is taken care of in the converter:
       // if it makes sense from the the usage of this in Assembler point of view

@@ -97,7 +97,7 @@ public class ModelConverter
 
     // read the result with Jena as Dataset
     ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
 
     // extract the Model that corresponds to the NamedGraph
