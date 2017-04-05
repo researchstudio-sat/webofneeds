@@ -30,7 +30,7 @@
     -->
 
     <!-- This bean extends the the abstract PPC bean in the parent context -->
-    <spring:bean id="propertyPlaceholderConfigurer" parent="abstractPropertyPlaceholderConfigurer" />
+    <spring:bean id="propertySourcesPlaceholderConfigurer" parent="abstractPropertySourcesPlaceholderConfigurer" />
 
     <broker xmlns="http://activemq.apache.org/schema/core" brokerName="wonBroker" persistent="false" >
 

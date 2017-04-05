@@ -20,12 +20,12 @@
         2. we can define a concrete one in this context and in the child context because the
             template is visible in the child context
     -->
-    <bean id="abstractPropertyPlaceholderConfigurer" abstract="true" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean id="abstractPropertySourcesPlaceholderConfigurer" abstract="true" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <property name="location" value="file:${WON_CONFIG_DIR}/node.properties" />
         <property name="ignoreUnresolvablePlaceholders" value="true" />
     </bean>
     <!-- here's the concrete bean for the PPC. The same is done in the activemq.xml file -->
-    <bean id="propertyPlaceholderConfigurer" parent="abstractPropertyPlaceholderConfigurer" />
+    <bean id="propertyPlaceholderConfigurer" parent="abstractPropertySourcesPlaceholderConfigurer" />
 
     <!-- was in node.xml --><!-- was in message-processors.xml within node.xml--><!-- was in activemq.xml within node-camel.xml within node.xml-->
     <!-- was in node-camel.xml within node.xml --><!-- was in jdbc-storage.xml within node.xml -->
