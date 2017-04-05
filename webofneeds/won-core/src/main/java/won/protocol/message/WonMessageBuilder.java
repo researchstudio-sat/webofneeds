@@ -70,7 +70,7 @@ public class WonMessageBuilder
 
 
   public WonMessage build() throws WonMessageBuilderException {
-    return build(null);
+    return build(DatasetFactory.createGeneral());
   }
 
 
@@ -81,11 +81,11 @@ public class WonMessageBuilder
    * @return
    * @throws WonMessageBuilderException
    */
-  public WonMessage build(Dataset dataset)
+  public WonMessage build(final Dataset dataset)
     throws WonMessageBuilderException {
 
     if (dataset == null) {
-      dataset = DatasetFactory.createGeneral();
+      throw new IllegalArgumentException("specified dataset must not be null. If a new dataset is to be created for the message, build() should be called.");
     }
     if (messageURI == null){
       throw new WonMessageBuilderException("No messageURI specified");
@@ -98,7 +98,14 @@ public class WonMessageBuilder
     Model envelopeGraph = ModelFactory.createDefaultModel();
     DefaultPrefixUtils.setDefaultPrefixes(envelopeGraph);
     //create a new envelope graph uri and add the envelope graph to the dataset
-    String envelopeGraphURI = RdfUtils.createNewGraphURI(messageURI.toString(), ENVELOPE_URI_SUFFIX,4,dataset).toString();
+    //... and make sure that the graph URI will be new by also checking inside the wrapped message
+    String envelopeGraphURI = RdfUtils.createNewGraphURI(messageURI.toString(), ENVELOPE_URI_SUFFIX,4, graphUri -> {
+        if (dataset.containsNamedModel(graphUri)) return false;
+        if (wrappedMessage == null) return true;
+        if (wrappedMessage.getEnvelopeGraphURIs().contains(graphUri)) return false;
+        if (wrappedMessage.getContentGraphURIs().contains(graphUri)) return false;
+        return true;
+      }).toString();
     dataset.addNamedModel(envelopeGraphURI, envelopeGraph);
     // message URI
     Resource messageEventResource = envelopeGraph.createResource(messageURI.toString(),
