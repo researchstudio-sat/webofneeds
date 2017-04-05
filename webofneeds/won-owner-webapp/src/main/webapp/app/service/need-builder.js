@@ -172,6 +172,7 @@
         return {
             '@graph': graph,
             '@context': {
+                's': 'http://schema.org/',
                 /*
                  TODO add following datatypes to context
                  TODO only add the ones that are required?
