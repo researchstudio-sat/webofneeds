@@ -100,8 +100,8 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
             public void onEvent(Event event) throws Exception {
                 String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
                 logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
-                EventBotActionUtils.removeFromList(getEventListenerContext(), needURI, createNeedCommandEvent.getUriListName());
                 getEventListenerContext().getEventBus().publish(new CreateNeedCommandFailureEvent(needURI, needUriBeforeCreation, createNeedCommandEvent, textMessage));
+                EventBotActionUtils.removeFromList(getEventListenerContext(), needURI, createNeedCommandEvent.getUriListName());
             }
         };
         EventBotActionUtils.makeAndSubscribeResponseListener(
