@@ -172,56 +172,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <!-- optional -->
-                <configuration>
-                  <workingDirectory>src/main/webapp</workingDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <!-- optional: you don't really need execution ids,
-                        but it looks nice in your build log. -->
-                        <id>install node and npm</id>
-                        <goals>
-                          <goal>install-node-and-npm</goal>
-                        </goals>
-                        <!-- optional: default phase is "generate-resources" -->
-                        <phase>initialize</phase>
-                        <configuration>
-                            <nodeVersion>v7.1.0</nodeVersion>
-                            <npmVersion>3.10.9</npmVersion>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm install</id>
-                        <goals>
-                          <goal>npm</goal>
-                        </goals>
-                        <!-- optional: default phase is "generate-resources" -->
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <!-- optional: The default argument is actually
-                            "install", so unless you need to run some other npm command,
-                            you can remove this whole <configuration> section.
-                            -->
-                            <arguments>install</arguments>
-                      </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm run clean</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <phase>clean</phase>
-                        <configuration>
-                            <arguments>run clean</arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
                 <version>${cargo.version}</version>
@@ -282,4 +232,195 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>frontend-full</id>
+            <activation>
+                <!--
+                the idea is to execute this only if the generated folder is not there.
+                if code has changed and a bigger rebuild is required, either mvn clean && mvn install should work,
+                or this profile can be acivated by using -Pfrontend-full
+                -->
+                <file>
+                    <missing>src/main/webapp/generated</missing>
+                </file>
+
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.ekryd.echo-maven-plugin</groupId>
+                        <artifactId>echo-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>fullbuild-info-before</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>echo</goal>
+                                </goals>
+                                <configuration>
+                                    <message>Note: The full install process of the javascript based environment in won-owner-webapp will be done, which takes a long time. Once this is finished, it will be skipped automatically until 'mvn clean' is run. In order to force it manually, use the use the -Pfrontend-full profile</message>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>fullbuild-info-after</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>echo</goal>
+                                </goals>
+                                <configuration>
+                                    <message>Note: The full install process of the javascript based environment in won-owner-webapp was done, which took a long time (presumably). From now on, this will be skipped automatically until 'mvn clean' is run. In order to run it manually, use the -Pfrontend-full profile</message>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <!-- optional -->
+                        <configuration>
+                            <workingDirectory>src/main/webapp</workingDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <!-- optional: you don't really need execution ids,
+                                but it looks nice in your build log. -->
+                                <id>install node and npm</id>
+                                <goals>
+                                    <goal>install-node-and-npm</goal>
+                                </goals>
+                                <!-- optional: default phase is "generate-resources" -->
+                                <phase>initialize</phase>
+                                <configuration>
+                                    <nodeVersion>v7.1.0</nodeVersion>
+                                    <npmVersion>4.4.4</npmVersion>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>npm install</id>
+                                <goals>
+                                    <!-- everything else is executed by the postinstall hook in package.json -->
+                                    <goal>npm</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>npm run clean</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <phase>clean</phase>
+                                <configuration>
+                                    <arguments>run clean</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>frontend-quick</id>
+            <activation>
+                <!--
+                   the idea is to execute this only if one of the files generated by the gulp task is not there.
+                   if code has changed and a bigger rebuild is required, either mvn clean && mvn install should work,
+                   or this profile can be acivated by using -Pfrontend-quick
+                   -->
+                <file>
+                    <missing>src/main/webapp/generated/won.min.css</missing>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.ekryd.echo-maven-plugin</groupId>
+                        <artifactId>echo-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>quickbuild-info-before</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>echo</goal>
+                                </goals>
+                                <configuration>
+                                    <message>Note: a 'gulp build' of the javascript based environment in won-owner-webapp will be done. Once this is finished, it will be skipped automatically until 'mvn clean' is run. In order to run it manually, use the -Pfrontend-quick profile</message>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>quickbuild-info-after</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>echo</goal>
+                                </goals>
+                                <configuration>
+                                    <message>Note: a 'gulp build' of the javascript based environment in won-owner-webapp was done. From now on, this is skipped automatically until 'mvn clean' is run. In order to run it manually, use the -Pfrontend-quick profile</message>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <configuration>
+                            <workingDirectory>src/main/webapp</workingDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>gulp install</id>
+                                <goals>
+                                    <goal>gulp</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>frontend-clean</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.ekryd.echo-maven-plugin</groupId>
+                        <artifactId>echo-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>fullbuild-info-before</id>
+                                <phase>clean</phase>
+                                <goals>
+                                    <goal>echo</goal>
+                                </goals>
+                                <configuration>
+                                    <message>Note: profile frontend-clean is activated (by default) and will clean up the webapp in the 'clean' phase.</message>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <!-- optional -->
+                        <configuration>
+                            <workingDirectory>src/main/webapp</workingDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>npm run clean</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <phase>clean</phase>
+                                <configuration>
+                                    <arguments>run clean</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
