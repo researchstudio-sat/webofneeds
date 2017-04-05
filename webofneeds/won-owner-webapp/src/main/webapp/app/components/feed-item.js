@@ -147,10 +147,10 @@ function genComponentConf() {
                 this.unreadCounts.get(type)
         }
         unreadMatchesCount() {
-            return this.unreadXCount(won.EVENT.HINT_RECEIVED)
+            return this.unreadXCount(won.WONMSG.hintMessage);
         }
         unreadRequestsCount() {
-            return this.unreadXCount(won.EVENT.CONNECT_RECEIVED)
+            return this.unreadXCount(won.WONMSG.connectMessage);
         }
         getTextForConnectionState(state){
             let stateText = this.labels.connectionState[state];
