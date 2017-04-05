@@ -70,7 +70,9 @@ public class KeyStoreService
     } catch (Exception e) {
       logger.warn("Could not retrieve key for " + alias + " from ks " + storeFile.getName(), e);
     }
-    ehcache.put(new Element("KEY++"+alias, retrieved));
+    if (retrieved != null) {
+      ehcache.put(new Element("KEY++"+alias, retrieved));
+    }
     return retrieved;
 
   }
