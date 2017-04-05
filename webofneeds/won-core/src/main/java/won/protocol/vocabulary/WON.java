@@ -64,6 +64,7 @@ public class WON
   public static final Resource WON_OVER_SOAP_WS = m.createResource(BASE_URI + "WonOverSoapWs");
   public static final Property IS_IN_STATE = m.createProperty(BASE_URI, "isInState");
 
+  @Deprecated
   public static final Property HAS_CONTENT = m.createProperty(BASE_URI, "hasContent");
 
 
