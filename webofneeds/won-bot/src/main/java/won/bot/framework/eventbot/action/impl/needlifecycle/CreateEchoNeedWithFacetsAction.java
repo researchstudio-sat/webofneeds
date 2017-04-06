@@ -47,7 +47,7 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction
   }
 
   @Override
-    protected void doRun(Event event) throws Exception
+    protected void doRun(Event event, EventListener executingListener) throws Exception
     {
         String replyText = "";
         if (! (event instanceof NeedCreatedEventForMatcher)){

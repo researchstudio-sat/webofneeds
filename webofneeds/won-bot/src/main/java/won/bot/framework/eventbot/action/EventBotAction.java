@@ -17,6 +17,7 @@
 package won.bot.framework.eventbot.action;
 
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.listener.EventListener;
 
 /**
  * Interface for event bot actions. EventBotListeners are given actions
@@ -25,5 +26,5 @@ import won.bot.framework.eventbot.event.Event;
  */
 public interface EventBotAction
 {
-  public Runnable getActionTask(Event event);
+  public Runnable getActionTask(Event event, EventListener eventListener);
 }

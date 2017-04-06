@@ -2,8 +2,6 @@ package won.bot.framework.eventbot.action.impl.telegram.send;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
-import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -25,7 +23,6 @@ import won.protocol.util.NeedModelBuilder;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
-import java.io.File;
 import java.net.URI;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -60,7 +57,7 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
     }
 
     @Override
-    protected void doRun(Event event) throws Exception {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
         if(event instanceof TelegramCreateNeedEvent){
             TelegramCreateNeedEvent telegramCreateNeedEvent = (TelegramCreateNeedEvent) event;
             String[] parameters = telegramCreateNeedEvent.getStrings();

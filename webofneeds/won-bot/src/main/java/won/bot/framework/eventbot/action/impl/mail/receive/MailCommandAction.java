@@ -15,6 +15,7 @@ import won.bot.framework.eventbot.event.impl.mail.CloseConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
 import won.bot.framework.eventbot.event.impl.mail.OpenConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.util.WonRdfUtils;
 
 import javax.mail.MessagingException;
@@ -37,7 +38,7 @@ public class MailCommandAction extends BaseEventBotAction {
     }
 
     @Override
-    protected void doRun(Event event) throws Exception {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
 
         if(event instanceof MailCommandEvent) {
 

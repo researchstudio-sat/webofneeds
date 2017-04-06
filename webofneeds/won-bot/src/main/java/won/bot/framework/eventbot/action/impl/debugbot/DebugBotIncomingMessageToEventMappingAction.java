@@ -25,6 +25,7 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.MessageEvent;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.*;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.util.WonRdfUtils;
@@ -83,7 +84,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
   }
 
   @Override
-  protected void doRun(final Event event) throws Exception
+  protected void doRun(final Event event, EventListener executingListener) throws Exception
   {
     if (event instanceof BaseNeedAndConnectionSpecificEvent){
       handleTextMessageEvent((ConnectionSpecificEvent) event);

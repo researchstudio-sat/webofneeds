@@ -35,4 +35,12 @@ public class ConnectCommandFailureEvent extends AbstractMessageCommandResultEven
     public ConnectCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI) {
         super(originalCommandEvent, needURI, remoteNeedURI, connectionURI);
     }
+
+    public ConnectCommandFailureEvent(MessageCommandEvent originalCommandEvent, URI needURI, URI remoteNeedURI, URI connectionURI, String message) {
+        super(originalCommandEvent, needURI, remoteNeedURI, connectionURI, message);
+    }
+
+    public ConnectCommandFailureEvent(MessageCommandEvent originalCommandEvent, Connection con, String message) {
+        super(originalCommandEvent, con, message);
+    }
 }

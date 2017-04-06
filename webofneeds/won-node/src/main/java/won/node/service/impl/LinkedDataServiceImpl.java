@@ -633,7 +633,7 @@ public class LinkedDataServiceImpl implements LinkedDataService
   }
 
   private Dataset newDatasetWithNamedModel(String graphUri, Model model) {
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     dataset.addNamedModel(graphUri, model);
     return dataset;
   }

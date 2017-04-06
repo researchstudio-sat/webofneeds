@@ -23,7 +23,7 @@ public class OpenConnectionUriAction extends BaseEventBotAction {
     }
 
     @Override
-    protected void doRun(Event event) throws Exception {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
         if(event instanceof OpenConnectionEvent) {
             logger.debug("trying to open connection related to event {}", event);
             try {

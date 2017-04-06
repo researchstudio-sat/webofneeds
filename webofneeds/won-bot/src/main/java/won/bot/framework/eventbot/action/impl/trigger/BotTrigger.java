@@ -34,23 +34,66 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class BotTrigger {
     private EventListenerContext context;
-    private Duration interval;
+    private volatile Duration interval;
     private AtomicBoolean active = new AtomicBoolean(false);
     private EventListener startListener;
     private EventListener stopListener;
-    private ScheduledFuture<?> cancelableTask;
+    private volatile ScheduledFuture<?> cancelableTask;
 
     public BotTrigger(EventListenerContext context, Duration interval) {
         this.context = context;
         this.interval = interval;
     }
 
-    public synchronized void activate(){
+    /**
+     * Sets the interval to the specified duration and reschedules executions.
+     *
+     * @param interval
+     */
+    public void changeIntervalTo(Duration interval) {
+        this.interval = interval;
+        reschedule();
+    }
+
+    public Duration getInterval() {
+        return interval;
+    }
+
+    /**
+     * Changes the interval by the specified percentage, or sets it to the specified maxInterval, whichever is smaller.
+     *
+     * @param factor
+     */
+    public void changeIntervalByFactor(double factor, Duration maxInterval) {
+        long millis = this.interval.toMillis();
+        if (millis == 0 && factor < 1) {
+            //nothing to do, the interval is already minimial
+            return;
+        } else if (factor == 1){
+            //nothing to do, no need to reschedule
+            return;
+        }
+        if (factor <= 0) throw new IllegalArgumentException("factor must be > 0");
+        long newMillis = (long) ((double) millis * factor);
+        if (newMillis == millis) {
+            //for some reason, there was no change. increase/decreaese by 1
+            newMillis += factor > 1 ? 1 : -1;
+        }
+        newMillis = Math.max(0, Math.min(newMillis, maxInterval.toMillis()));
+        this.interval = Duration.ofMillis(newMillis);
+        reschedule();
+    }
+
+    public void changeIntervalByFactor(double factor) {
+        changeIntervalByFactor(factor, Duration.ofSeconds(10));
+    }
+
+    public synchronized void activate() {
         if (active.get()) return;
         //make the stop listener
         this.stopListener = new ActionOnFirstEventListener(this.context, new BotTriggerFilter(this), new BaseEventBotAction(BotTrigger.this.context) {
             @Override
-            protected void doRun(Event event) throws Exception {
+            protected void doRun(Event event, EventListener executingListener) throws Exception {
                 //unregister all listeners
                 BotTrigger.this.context.getEventBus().unsubscribe(BotTrigger.this.startListener);
                 BotTrigger.this.context.getEventBus().unsubscribe(BotTrigger.this.stopListener);
@@ -62,16 +105,9 @@ public class BotTrigger {
         //make the start listener
         this.startListener = new ActionOnFirstEventListener(this.context, new BotTriggerFilter(this), new BaseEventBotAction(BotTrigger.this.context) {
             @Override
-            protected void doRun(Event event) throws Exception {
-                //make the trigger
-                PeriodicTrigger myTrigger = new PeriodicTrigger(interval.toMillis());
-                //schedule a task that publishes the BotTriggerEvent
-                BotTrigger.this.cancelableTask = context.getTaskScheduler().schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        BotTrigger.this.context.getEventBus().publish(new BotTriggerEvent(BotTrigger.this));
-                    }
-                }, myTrigger);
+            protected void doRun(Event event, EventListener executingListener) throws Exception {
+                reschedule();
+
             }
         });
 
@@ -79,6 +115,22 @@ public class BotTrigger {
         context.getEventBus().subscribe(StopBotTriggerCommandEvent.class, stopListener);
         context.getEventBus().subscribe(StartBotTriggerCommandEvent.class, startListener);
         active.set(true);
+    }
+
+    private synchronized void reschedule() {
+        if (cancelableTask != null) {
+            cancelableTask.cancel(true);
+        }
+        //make the trigger
+        PeriodicTrigger myTrigger = new PeriodicTrigger(getInterval().toMillis());
+        myTrigger.setInitialDelay(getInterval().toMillis());
+        //schedule a task that publishes the BotTriggerEvent
+        BotTrigger.this.cancelableTask = context.getTaskScheduler().schedule(new Runnable() {
+            @Override
+            public void run() {
+                BotTrigger.this.context.getEventBus().publish(new BotTriggerEvent(BotTrigger.this));
+            }
+        }, myTrigger);
     }
 
 

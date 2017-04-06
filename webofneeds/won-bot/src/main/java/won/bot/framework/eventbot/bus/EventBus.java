@@ -16,6 +16,7 @@
 
 package won.bot.framework.eventbot.bus;
 
+import won.bot.framework.eventbot.bus.impl.EventBusStatistics;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.listener.EventListener;
 
@@ -56,4 +57,5 @@ public interface EventBus
    */
   public void unsubscribe(EventListener listener);
 
+  EventBusStatistics generateEventBusStatistics();
 }

@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.lifecycle.ErrorEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 
 /**
  *
@@ -41,14 +42,14 @@ public abstract class BaseEventBotAction implements won.bot.framework.eventbot.a
   }
 
   @Override
-  public Runnable getActionTask(final Event event) {
+  public Runnable getActionTask(final Event event, final EventListener eventListener) {
     return new Runnable(){
       public void run()
       {
         Stopwatch stopwatch = SimonManager.getStopwatch(stopwatchName);
         Split split = stopwatch.start();
         try {
-          doRun(event);
+          doRun(event, eventListener);
           split.stop();
         } catch (Exception e) {
           eventListenerContext.getEventBus().publish(new ErrorEvent(e));
@@ -69,7 +70,7 @@ public abstract class BaseEventBotAction implements won.bot.framework.eventbot.a
     return eventListenerContext;
   }
 
-  protected abstract void doRun(Event event) throws Exception;
+  protected abstract void doRun(Event event, EventListener executingListener) throws Exception;
 
 
 }

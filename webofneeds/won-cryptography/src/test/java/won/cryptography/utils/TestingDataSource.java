@@ -41,7 +41,7 @@ public class TestingDataSource implements LinkedDataSource
 
   @Override
   public Dataset getDataForResource(final URI resourceURI) {
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     DefaultPrefixUtils.setDefaultPrefixes(dataset.getDefaultModel());
     WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();
     Model model = dataset.getDefaultModel();

@@ -38,6 +38,7 @@ import won.bot.framework.eventbot.event.impl.lifecycle.ErrorEvent;
 import won.bot.framework.eventbot.event.impl.test.TestFailedEvent;
 import won.bot.framework.eventbot.event.impl.test.TestFinishedEvent;
 import won.bot.framework.eventbot.event.impl.test.TestPassedEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.BotManager;
 import won.bot.integrationtest.security.DelayedDuplicateMessageSendingConversationBot;
@@ -133,7 +134,7 @@ public class SecurityBotTests
     }
 
     @Override
-    protected void doRun(Event event) throws Exception {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
       if (event instanceof TestFinishedEvent) {
         futureTestResult.set((TestFinishedEvent) event);
       } else {
@@ -155,7 +156,7 @@ public class SecurityBotTests
     }
 
     @Override
-    protected void doRun(Event event) throws Exception {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
       if (event instanceof ErrorEvent) {
 
         StringBuilder message = new StringBuilder();

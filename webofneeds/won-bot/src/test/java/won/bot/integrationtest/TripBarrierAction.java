@@ -19,6 +19,7 @@ package won.bot.integrationtest;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.listener.EventListener;
 
 import java.util.concurrent.CyclicBarrier;
 
@@ -35,7 +36,7 @@ public class TripBarrierAction extends BaseEventBotAction
   }
 
   @Override
-  protected void doRun(final Event event) throws Exception {
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     try {
       //together with the barrier.await() in the @TestD method, this trips the barrier
       //and both threads continue.

@@ -37,7 +37,7 @@ public class MongoBotContext implements BotContext
     for (MongoContextObjectList mco : contextObjects) {
       List<Object> objectList = mco.getList();
       if (objectList != null) {
-        Set<URI> tempSet = mco.getList().stream().map(x -> URI.create((String) x)).collect(Collectors.toSet());
+        Set<URI> tempSet = mco.getList().stream().map(x -> (URI) x).collect(Collectors.toSet());
         uris.addAll(tempSet);
       }
     }
@@ -50,25 +50,22 @@ public class MongoBotContext implements BotContext
 
     // query the field "objectList" since this is the name of the member variable of MongoContextObjectList
     Query query = new Query(Criteria.where("objectList.string").is(needURI.toString()));
-    return null != template.find(query, Object.class, NEED_URI_COLLECTION);
+    return null != template.find(query, String.class, NEED_URI_COLLECTION);
   }
 
   @Override
   public void removeNeedUriFromNamedNeedUriList(final URI uri, final String name) {
-    pull(NEED_URI_COLLECTION, name, uri.toString());
+    template.remove(uri, name);
   }
 
   @Override
   public void appendToNamedNeedUriList(final URI uri, final String name) {
-    push(NEED_URI_COLLECTION, name, uri.toString());
+    template.insert(uri, name);
   }
 
   @Override
   public List<URI> getNamedNeedUriList(final String name) {
-
-    MongoContextObjectList mco = template.findById(name, MongoContextObjectList.class, NEED_URI_COLLECTION);
-    return (mco == null || mco.getList() == null) ? new ArrayList<>() :
-     mco.getList().stream().map(x -> URI.create((String)x)).collect(Collectors.toList());
+    return template.findAll(URI.class, name);
   }
 
   @Override

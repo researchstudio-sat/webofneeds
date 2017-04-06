@@ -96,7 +96,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         //logging on warn level as not reporting errors here can make misconfiguration hard to detect
         logger.warn(String.format("Couldn't fetch resource %s", resource));
         logger.debug("Exception is:", e);
-        return DatasetFactory.createMem();
+        return DatasetFactory.createGeneral();
     }
     LinkedDataCacheEntry linkedDataCacheEntry = null;
     if (element != null) {

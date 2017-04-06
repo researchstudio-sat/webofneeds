@@ -23,6 +23,7 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.needlifecycle.NeedDeactivatedEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.node.facet.impl.WON_TX;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
@@ -44,7 +45,7 @@ public class TwoPhaseCommitDeactivateOnCloseAction extends BaseEventBotAction
   }
 
   @Override
-  protected void doRun(Event event) throws Exception {
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
 
     //If we receive a close event, it must carry a commit message.
     if(event instanceof CloseFromOtherNeedEvent)
