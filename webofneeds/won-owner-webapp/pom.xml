@@ -167,6 +167,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <warSourceExcludes>app/**/*.js,bower_components/**,jspm_packages/**,node_modules/**,node/**,scripts/**</warSourceExcludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>build-owner-webapp-war</id>
@@ -319,6 +322,9 @@
                             </execution>
                             <execution>
                                 <id>default-exploded</id>
+                                <configuration>
+                                    <warSourceExcludes>app/**/*.js,bower_components/**,jspm_packages/**,node_modules/**,node/**,scripts/**</warSourceExcludes>
+                                </configuration>
                                 <phase>package</phase>
                                 <goals><goal>exploded</goal></goals>
                             </execution>
