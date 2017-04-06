@@ -11,6 +11,7 @@
     <packaging>jar</packaging>
     <groupId>webofneeds</groupId>
     <artifactId>won-matcher-utils</artifactId>
+    <name>Matcher Utils</name>
 
     <dependencies>
         <dependency>

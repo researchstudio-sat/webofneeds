@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
     <groupId>webofneeds</groupId>
     <artifactId>won-matcher-rescal</artifactId>
-
+    <name>Matcher-Rescal</name>
     <dependencies>
         <dependency>
             <groupId>webofneeds</groupId>

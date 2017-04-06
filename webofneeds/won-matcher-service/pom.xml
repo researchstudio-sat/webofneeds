@@ -11,6 +11,7 @@
     <packaging>jar</packaging>
     <groupId>webofneeds</groupId>
     <artifactId>won-matcher-service</artifactId>
+    <name>Matcher Service</name>
 
     <dependencies>
         <dependency>
