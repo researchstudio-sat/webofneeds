@@ -167,9 +167,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>build-owner-webapp-war</id>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -243,7 +245,90 @@
     </build>
     <profiles>
         <profile>
-            <id>frontend-skip</id>
+            <id>skip-owner-webapp-war</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.ekryd.echo-maven-plugin</groupId>
+                        <artifactId>echo-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>skip-owner-webapp-jar-before</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>echo</goal>
+                                </goals>
+                                <configuration>
+                                    <message>Note: building the won-owner-webapp war file is skipped. This is done because the profile 'skip-owner-webapp-war' is active ('-P skip-owner-webapp-war' on the command line)</message>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- use the same config as above but set the phase to 'none' -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-war</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-dependencies-to-owner-webapp</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>skip-owner-webapp-war-but-explode</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.ekryd.echo-maven-plugin</groupId>
+                        <artifactId>echo-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>skip-owner-webapp-war-but-explode-before</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>echo</goal>
+                                </goals>
+                                <configuration>
+                                    <message>Note: building the won-owner-webapp war file is skipped, but the webapp is built in 'exploded' mode. This is done because the profile 'skip-owner-webapp-war-but-explode' is active ('-P skip-owner-webapp-war-but-explode' on the command line)</message>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- use the same config as above but set the phase to 'none' -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-war</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <id>default-exploded</id>
+                                <phase>package</phase>
+                                <goals><goal>exploded</goal></goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>skip-frontend</id>
             <build>
                 <plugins>
                     <plugin>
@@ -257,7 +342,7 @@
                                     <goal>echo</goal>
                                 </goals>
                                 <configuration>
-                                    <message>Note: the install process for the javascript frontend is skipped completely. This is done because the profile 'frontend-skip' is active ('-P frontend-skip' on the command line)</message>
+                                    <message>Note: the install and build process for the javascript frontend is skipped completely. This is done because the profile 'skip-frontend' is active ('-P skip-frontend' on the command line)</message>
                                 </configuration>
                             </execution>
                         </executions>
@@ -289,7 +374,7 @@
             </build>
         </profile>
         <profile>
-            <id>frontend-gulp-only</id>
+            <id>skip-frontend-all-but-gulp</id>
             <build>
                 <plugins>
                     <plugin>
@@ -303,7 +388,7 @@
                                     <goal>echo</goal>
                                 </goals>
                                 <configuration>
-                                    <message>Note: the install process for the javascript frontend is skipped but 'gulp build' and 'gulp clean' are still executed. This is done because the profile 'frontend-gulp-only' is active ('-P frontend-gulp-only' on the command line)</message>
+                                    <message>Note: the install process for the javascript frontend is skipped but 'gulp build' and 'gulp clean' are still executed. This is done because the profile 'skip-frontend-all-but-gulp' is active ('-P skip-frontend-all-but-gulp' on the command line)</message>
                                 </configuration>
                             </execution>
                         </executions>
