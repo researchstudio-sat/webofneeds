@@ -14,7 +14,7 @@ Web of needs is built out of three main components. **Owner applications** enabl
 
 ### Further resources
 * [Build-instructions](/documentation/building-with-maven.md) and [Troubleshooting](documentation/troubleshooting.md)
-* [Security architecture](webofneeds/won-core/README.md) and how to (Set up the Keys and Certificates](documentation/installation-cryptographic-keys-and-certificates.md)
+* [Security architecture](webofneeds/won-core/README.md) and how to [Set up the Keys and Certificates](documentation/installation-cryptographic-keys-and-certificates.md)
 * [Linked Data interface](webofneeds/won-node-webapp/README.md)
 * [Matching Service Architecture](webofneeds/won-matcher-service/README.md)
 * [Bot Framework](webofneeds/won-bot/README.md) for interacting with WoN nodes programmatically
