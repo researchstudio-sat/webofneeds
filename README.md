@@ -18,8 +18,7 @@ Web of needs is built out of three main components. **Owner applications** enabl
 * [Linked Data interface](webofneeds/won-node-webapp/README.md)
 * [Matching Service Architecture](webofneeds/won-matcher-service/README.md)
 * [Bot Framework](webofneeds/won-bot/README.md) for interacting with WoN nodes programmatically
-
-
+* [Chatting with the Debug Bot and Viewing the RDF](/documentation/viewing-rdf.md) that the owner webapp and won nodes are exchanging
 
 ### Demo
 
