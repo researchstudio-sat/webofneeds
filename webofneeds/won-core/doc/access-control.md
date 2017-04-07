@@ -41,7 +41,7 @@ both in terms of privacy and it terms of scalability;
 message access, but it is possible to extend it, so that the users themselves define access to their resources via 
 RDF resource definition.
 
-###1.2.	Access control rules
+### 1.2.	Access control rules
 Currently, WoN uses pre-defined rules for access control of messages (only senders and receivers can access it), and 
 all other resources are publicly accessible. The pre-defined access control rules should in future be replaced, or 
 completed with the rules, defined by the users for their resources themselves, such as according to web access 
