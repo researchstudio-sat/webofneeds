@@ -13,7 +13,7 @@ var sourcemaps = require('gulp-sourcemaps');
 
 
 gulp.task('default', ['build']);
-gulp.task('build', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res']);
+gulp.task('build', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res', 'copy-static-scripts']);
 gulp.task('watch', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res'], function() {
     gulp.watch('./*.js', ['bundlejs']);
     gulp.watch('./app/**/*.js', ['bundlejs']);
@@ -57,7 +57,7 @@ gulp.task('sass', function(done) {
 });
 
 /**
- * Copies over static resources, that libraries in
+ * Copies over static resources that libraries in
  * the bundle need to be in a place relativ to
  * themselves -- and thus the bundle.
  */
@@ -67,7 +67,23 @@ gulp.task('copy-static-res', function(done) {
     ])
     .pipe(gulp.dest('./generated/images/'))
 });
-
+/**
+ * Copies over scripts that are required outside the bundle
+ * themselves -- and thus the bundle.
+ */
+gulp.task('copy-static-scripts', function(done) {
+    return gulp.src([
+        'node_modules/undo.js/undo.js',
+        'node_modules/rangy/lib/rangy-core.js',
+        'node_modules/medium.js/medium.js',
+        'scripts/jquery.10.2.js',
+        'scripts/jquery.fs.scroller.min.js',
+        'jspm_packages/system.js',
+        'jspm_packages/system-polyfills.js',
+        'jspm_config.js',
+    ])
+        .pipe(gulp.dest('./generated/scripts/'))
+});
 
 
 var svgSpriteConf = {
