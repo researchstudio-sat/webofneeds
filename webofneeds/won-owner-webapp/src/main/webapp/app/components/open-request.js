@@ -21,6 +21,12 @@ import {
     selectLastUpdatedPerConnection,
 } from '../selectors';
 
+import {
+    selectTimestamp,
+    seeksOrIs,
+    inferLegacyNeedType,
+} from '../won-utils'
+
 const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
@@ -31,13 +37,14 @@ function genComponentConf() {
             <div class="or__header__title">
                 <div class="or__header__title__topline">
                     <div class="or__header__title__topline__title">
-                        {{self.theirNeed.getIn(['won:hasContent','dc:title'])}}
+                        {{ self.theirNeedContent.get('dc:title') }}
                     </div>
                     <div class="or__header__title__topline__date">
-                        {{self.timestamp}}
+                        {{ self.lastUpdated }}
                     </div>
                 </div>
                 <div class="or__header__title__subtitle">
+                    <!--
                     <span class="or__header__title__subtitle__group" ng-show="{{self.theirNeed.get('group')}}">
                         <img
                             src="generated/icon-sprite.svg#ico36_group"
@@ -45,8 +52,9 @@ function genComponentConf() {
                         {{self.theirNeed.get('group')}}
                         <span class="or__header__title__subtitle__group__dash"> &ndash; </span>
                     </span>
+                    -->
                     <span class="or__header__title__subtitle__type">
-                        {{self.labels.type[self.theirNeed.getIn(['won:hasBasicNeedType','@id'])]}}
+                        {{ self.labels.type[self.theirNeedType] }}
                     </span>
                 </div>
             </div>
@@ -69,12 +77,12 @@ function genComponentConf() {
                 </div>
                 -->
                 <div class="or__content__description__text"
-                    ng-show="!!self.theirNeed.getIn(['won:hasContent','won:hasTextDescription'])">
+                    ng-show="!!self.theirNeedContent.get('won:hasTextDescription')">
                     <img
                         class="or__content__description__indicator"
                         src="generated/icon-sprite.svg#ico16_indicator_description"/>
                     <span>
-                        <p>{{ self.theirNeed.getIn(['won:hasContent','won:hasTextDescription']) }}</p>
+                        <p>{{ self.theirNeedContent.get('won:hasTextDescription') }}</p>
                     </span>
                 </div>
                 <div class="or__content__description__text"
@@ -86,7 +94,7 @@ function genComponentConf() {
                         <p>{{ self.textMsg }}</p>
                     </span>
                 </div>
-                
+
             </div>
         </div>
         <div class="or__footer" ng-show="self.isReceivedRequest">
@@ -98,7 +106,7 @@ function genComponentConf() {
                     ng-click="self.closeRequest()">Decline</button>
                 <button class="won-button--filled red" ng-click="self.openRequest(self.message)">Accept</button>
             </div>
-            <a ng-show="self.debugmode" class="debuglink" target="_blank" href="{{self.connectionUri}}">[CONNDATA]</a>
+            <a ng-show="self.debugmode" class="debuglink" target="_blank" href="{{self.connectionUri}}">[CNCT_DATA]</a>
         </div>
     `;
 
@@ -118,6 +126,7 @@ function genComponentConf() {
 
                 const lastUpdatedPerConnection = selectLastUpdatedPerConnection(state)
 
+                const lastStateUpdate = selectLastUpdateTime(state);
 
                 return {
                     theirNeed,
@@ -129,11 +138,17 @@ function genComponentConf() {
                     isOverview: displayingOverview(state),
                     connection: selectOpenConnection(state),
 
-                    timestamp: theirNeed && relativeTime(
-                        selectLastUpdateTime(state),
-                        //theirNeed.get('dct:created')
-                        lastUpdatedPerConnection && lastUpdatedPerConnection.get(connectionUri)
+                    theirNeedType: theirNeed && inferLegacyNeedType(theirNeed),
+                    theirNeedContent: theirNeed && seeksOrIs(theirNeed),
+                    theirNeedCreatedOn: theirNeed && relativeTime(
+                        lastStateUpdate,
+                        theirNeed.get('dct:created')
                     ),
+                    lastUpdated: lastUpdatedPerConnection &&
+                        relativeTime(
+                            lastStateUpdate,
+                            lastUpdatedPerConnection.get(connectionUri)
+                        ),
 
                     textMsg: connectMsg && (
                         connectMsg.get('hasTextMessage') ||
