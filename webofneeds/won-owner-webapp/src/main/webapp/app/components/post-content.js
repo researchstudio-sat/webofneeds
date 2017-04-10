@@ -51,12 +51,12 @@ function genComponentConf() {
           </span>
         </div>
         <div class="pc__text"
-          ng-show="!!self.textMsg">
+          ng-show="!!self.textMessage">
           <img
             class="pc__icon"
             src="generated/icon-sprite.svg#ico16_indicator_message"/>
           <span>
-            {{ self.textMsg }}
+            {{ self.textMessage }}
           </span>
         </div>
     `;
