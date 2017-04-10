@@ -1,0 +1,57 @@
+@import 'sizing-utils';
+@import 'square-image';
+
+won-post-header {
+  color: black;
+  flex-grow: 1;
+  padding-right: 1rem;
+
+  display: flex;
+  flex-direction: row;
+
+  @include square-image($feedIconSize, 0, 0.5rem, 0, 0);
+  won-square-image .image{
+    border: 0.1rem solid $won-light-gray;
+  }
+
+  .ph__right {
+    flex-grow: 1;
+
+    &__topline {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+
+      &__title {
+        font-weight: 500;
+      }
+
+      &__date {
+        font-size: $smallFontSize;
+        color: $won-subtitle-gray;
+      }
+    }
+
+    &__subtitle {
+      color: $won-subtitle-gray;
+      display: flex;
+      flex-direction: row;
+      font-size: $smallFontSize;
+
+      &__group {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+
+        &__dash {
+          padding: 0 0.25rem;
+        }
+
+        &__icon {
+          padding-right: 0.25rem;
+          @include fixed-square(0.75rem);
+        }
+      }
+    }
+  }
+}

@@ -6,6 +6,7 @@
 import angular from 'angular';
 import 'ng-redux';
 import postContentModule from './post-content';
+import postHeaderModule from './post-header';
 import { actionCreators }  from '../actions/actions';
 import {
     labels,
@@ -31,30 +32,11 @@ function genComponentConf() {
         <a> <!-- TODO allow to specify a custom route / handler for when the user presses the "x" -->
           <img class="piu__header__icon clickable" src="generated/icon-sprite.svg#ico36_close"/>
         </a>
-        <div class="piu__header__title">
-          <div class="piu__header__title__topline">
-            <div class="piu__header__title__topline__title">
-              {{ self.needContent.get('dc:title') }}
-            </div>
-            <div class="piu__header__title__topline__date">
-              {{ self.friendlyTimestamp }}
-            </div>
-          </div>
-          <div class="piu__header__title__subtitle">
-            <!--
-            <span class="piu__header__title__subtitle__group" ng-show="{{self.need.get('group')}}">
-              <img
-                src="generated/icon-sprite.svg#ico36_group"
-                class="piu__header__title__subtitle__group__icon">
-              {{self.need.get('group')}}
-              <span class="piu__header__title__subtitle__group__dash"> &ndash; </span>
-            </span>
-            -->
-            <span class="piu__header__title__subtitle__type">
-              {{ self.labels.type[self.needType] }}
-            </span>
-          </div>
-        </div>
+        <won-post-header
+          need-uri="self.needUri"
+          timestamp="self.timestamp"
+          size="self.size">
+        </won-post-header>
       </div>
       <won-post-content
         need-uri="self.needUri"
@@ -129,6 +111,7 @@ function genComponentConf() {
 
 export default angular.module('won.owner.components.postInfoUnified', [
     postContentModule,
+    postHeaderModule,
 ])
     .directive('wonPostInfoUnified', genComponentConf)
     .name;
