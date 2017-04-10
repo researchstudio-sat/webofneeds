@@ -93,7 +93,7 @@ function genComponentConf() {
              * - "medium" (NOT_YET_IMPLEMENTED) (used in incoming/outgoing requests and matches-tiles)
              * - "small" (NOT_YET_IMPLEMENTED) (in matches-list)
              */
-            size: '=',
+            //size: '=',
 
             /**
              * Additional text-message that is shown. Use this e.g. when displaying

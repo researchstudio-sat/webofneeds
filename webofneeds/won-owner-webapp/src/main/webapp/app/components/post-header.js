@@ -99,7 +99,7 @@ function genComponentConf() {
              * - "medium" (NOT_YET_IMPLEMENTED) (used in incoming/outgoing requests)
              * - "small" (NOT_YET_IMPLEMENTED) (in matches-list)
              */
-            size: '=',
+            //size: '=',
 
             /**
              * if set, the avatar will be hidden
