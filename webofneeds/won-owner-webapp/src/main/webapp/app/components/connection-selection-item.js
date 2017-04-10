@@ -117,11 +117,6 @@ function genComponentConf() {
 
                 const lastStateUpdate = selectLastUpdateTime(state);
                 const lastUpdatedPerConnection = selectLastUpdatedPerConnection(state);
-                const lastUpdatedRel = lastUpdatedPerConnection &&
-                    relativeTime(
-                        lastStateUpdate,
-                        lastUpdatedPerConnection.get(this.connectionUri)
-                    );
 
                 return {
                     openConnectionUri: selectOpenConnectionUri(state),
@@ -137,7 +132,11 @@ function genComponentConf() {
                         lastStateUpdate,
                         theirNeed.get('dct:created')
                     ),
-                    lastUpdated: lastUpdatedRel,
+                    lastUpdated: lastUpdatedPerConnection &&
+                        relativeTime(
+                            lastStateUpdate,
+                            lastUpdatedPerConnection.get(this.connectionUri)
+                        ),
                 }
             }
 
