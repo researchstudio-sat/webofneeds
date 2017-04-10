@@ -65,7 +65,6 @@ function genComponentConf() {
         constructor() {
             attach(this, serviceDependencies, arguments);
             window.pc4dbg = this;
-            this.labels = labels;
             const selectFromState = (state) => {
                 const need =
                     state.getIn(['needs', 'ownNeeds', this.needUri]) ||
