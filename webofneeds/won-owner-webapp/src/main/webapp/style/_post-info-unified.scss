@@ -1,32 +1,7 @@
-@import 'won-config';
-@import 'sizing-utils';
-@import 'fonts';
-@import 'flex-layout';
-
-@import 'post-info-unified';
-
-won-send-request {
+won-post-info-unified {
   display: block;
-  width: 100%;
 
-  .sr__caption {
-    display: flex;
-    padding: 0.5rem 0.5rem 0.5rem 1rem;
-
-    &__icon {
-      @include fixed-square($postIconSize);
-    }
-
-    &__title {
-      color: black;
-      flex-grow: 1;
-      font-weight: 300;
-      font-size: $mediumFontSize;
-      vertical-align: middle;
-    }
-  }
-
-  .sr__header {
+  .piu__header {
     display: flex;
     padding: 0.5rem;
 
@@ -79,27 +54,7 @@ won-send-request {
     }
   }
 
-  .sr__footer {
-    margin: 0 1rem;
-    padding: 1rem 0;
-    border-top: 0.1rem solid $won-line-gray;
-
-
-    input {
-      width: 100%;
-    }
-
-    .flexbuttons {
-      text-align: right;
-      padding-top: 1rem;
-
-      button {
-        margin-left: 0.5rem;
-      }
-    }
-  }
-
-  .sr__content {
+  .piu__content {
     padding: 1rem;
     font-size: $smallFontSize;
 
@@ -107,19 +62,17 @@ won-send-request {
       padding-top: 0.25rem;
 
       &__location,
-      &__text,
-      &__datetime {
-        display: flex;
-        flex-direction: row;
-        padding: 0.25rem 0;
-      }
+    &__text,
+    &__datetime {
+      display: flex;
+      flex-direction: row;
+      padding: 0.25rem 0;
+    }
 
-      &__indicator {
-        @include fixed-square(1rem);
-        padding-right: 0.5rem;
-      }
+    &__indicator {
+      @include fixed-square(1rem);
+      padding-right: 0.5rem;
     }
   }
 }
-
-@import 'extended-gallery';
+}
