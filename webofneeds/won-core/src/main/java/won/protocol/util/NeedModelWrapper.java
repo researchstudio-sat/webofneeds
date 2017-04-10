@@ -23,6 +23,7 @@ import won.protocol.vocabulary.WON;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class wraps the need models (need and sysinfo graphs in a need dataset).
@@ -429,47 +430,25 @@ public class NeedModelWrapper {
                         ));
     }
 
-    /**
-     * Returns the RDFNodes reachable from the specified startNode in breadth-first order.
-     * @param startNode
-     * @param model
-     * @return
-     */
-    private List<RDFNode> breadthFirstOrder(RDFNode startNode, Model model){
-        return breadthFirstOrder(startNode, model, Collections.emptyList());
-    }
 
-    /**
-     * Returns the RDFNodes reachable from the specified startNode in breadth-first order.
-     * @param startNode
-     * @param model
-     * @param blacklist
-     * @return
-     */
-    private List<RDFNode> breadthFirstOrder(RDFNode startNode, Model model, List<RDFNode> blacklist){
-        if (!startNode.isResource()) return Collections.emptyList();
-        if (blacklist.contains(startNode)) return Collections.emptyList();
-        Resource startResource = startNode.asResource();
-        List<RDFNode> toVisit =  model.listObjectsOfProperty(startResource, null).toList();
-        List<RDFNode> result = new ArrayList<>();
-        result.add(0, startNode); //put start node first -> breadth first
-        List<RDFNode> newBlacklist = new ArrayList<>(blacklist.size()+1);
-        newBlacklist.add(startNode); //don't revisit
-        newBlacklist.addAll(blacklist);
-        for(RDFNode newStartNode: toVisit) {
-            //recurse
-            result.addAll(breadthFirstOrder(newStartNode, model, Collections.unmodifiableList(newBlacklist)));
+    private Resource copyNode(Resource node) {
+        if (node.isAnon()) return node.getModel().createResource();
+        int i = 0;
+        String uri = node.getURI() + RandomStringUtils.randomAlphanumeric(4);
+        String newUri = uri+"_"+ i;
+        while (node.getModel().containsResource(new ResourceImpl(newUri))){
+            i++;
+            newUri = uri+"_"+i;
         }
-        return result;
+        return node.getModel().getResource(newUri);
     }
 
     /**
      * Returns a copy of the model in which no node reachable from the need node has multiple incoming edges
      * (unless the graph contains a circle, see below). This is achieved by making copies of all nodes that have multiple
-     * incoming edges, such that each copy and the original get on of the incoming edges. The outgoing
+     * incoming edges, such that each copy and the original get one of the incoming edges. The outgoing
      * edges of the original are replicated in the copies.
      *
-     * Nodes are visited in breadth first order. Each node is only be split once.
      * Nodes that were newly introduced by this algorithm are never split.
      *
      * In that special case that the graph contains a circle, the resulting graph still contains a circle, and
@@ -481,94 +460,177 @@ public class NeedModelWrapper {
         Model copy = RdfUtils.cloneModel(needModel);
         Set<RDFNode> blacklist = new HashSet<>();
         RDFNode needNode = copy.getResource(getNeedUri().toString());
-        List<RDFNode> nodesInBreadthFirstOrderFromNeed = breadthFirstOrder(needNode, copy);
-        List<RDFNode> nodesToVisit = new ArrayList<>();
-        nodesToVisit.addAll(nodesInBreadthFirstOrderFromNeed);
-        //now add all the other nodes that are objects
-        List<RDFNode> otherNodes = needModel.listObjects().toList();
-        otherNodes.removeAll(nodesInBreadthFirstOrderFromNeed);
-        nodesToVisit.addAll(otherNodes);
-        for(RDFNode toSplitIfNecessary: nodesToVisit) {
-            List<RDFNode> processedAndCreatedNodes = findAndSplitOneNode(copy,toSplitIfNecessary, blacklist);
-            blacklist.addAll(processedAndCreatedNodes);
-        }
+        //System.out.println("model before modification:");
+        //RDFDataMgr.write(System.out, copy, Lang.TRIG);
+        recursiveCopyWhereMultipleInEdges(needNode);
+        //System.out.println("model after modifcation:");
+        //RDFDataMgr.write(System.out, copy, Lang.TRIG);
         return copy;
+
+    }
+
+    private void recursiveCopyWhereMultipleInEdges(RDFNode node) {
+        ModelModification modelModification = new ModelModification();
+        recursiveCopyWhereMultipleInEdges(node, modelModification, new HashSet<>());
+        modelModification.modify(node.getModel());
     }
 
     /**
-     * Finds a node to split and applies the binary split until it is
-     * unsplit (i.e. each copy and the remaining original has exactly one incoming edge.
+     * If the specified node that has multiple incoming edges that have already been visited (in depth-first order, i.e.
+     * on the way from the root to this node, if this node is not the root), the node is 'split', i.e. one copy is made
+     * per such incoming edge. No copies are made for incoming edges from nodes that are discovered further down the tree.
      *
-     * The split node and all new copies are returned and are not to be processed
-     * any further during the splitting algorithm.
+     * When a copy of the node is made, the subgraph reachable from the node is copied as well.
      *
-     * @return true if a node was split, false if there were none
-     */
-    private List<RDFNode> findAndSplitOneNode(Model model, RDFNode node, Set<RDFNode> blacklist) {
-
-        if (!blacklist.contains(node) && isSplittableNode(node)) {
-            StmtIterator stmtIt = model.listStatements(null, null, node);
-            List<Resource> subjectsOfInEdges = new ArrayList<>();
-            while (stmtIt.hasNext()) {
-                Statement stmt = stmtIt.nextStatement();
-                subjectsOfInEdges.add(stmt.getSubject());
-            }
-            if (subjectsOfInEdges.size() > 1) {
-                //more than 1 in-edges. split node
-                //remember the new nodes and the current node and pass them back as result
-                //so they can be added to the blacklist
-                List<RDFNode> newlyProcessed = new ArrayList<>();
-                for (Resource subjectToSplitOff : subjectsOfInEdges) {
-                    RDFNode newNode = binarySplitNode(node.asResource(), subjectToSplitOff, model);
-                    newlyProcessed.add(newNode);
-                }
-                newlyProcessed.add(node);
-                return newlyProcessed;
-            }
-            return Collections.emptyList();
-        }
-        return Collections.emptyList();
-    }
-
-    /**
-     * Splits one copy off the specified node, connects it with the specified subject, copies all outgoing edges
-     * and returns the newly generated copy.
+     * This process is done when coming back from a depth-first recursion, i.e. smaller subgraphs are copied
+     * before larger subgraphs.
+     *
      * @param node
-     * @param subjectToSplitOff
-     * @param model
-     * @return
+     * @param modelModification
+     * @param visited
      */
-    private RDFNode binarySplitNode(Resource node, Resource subjectToSplitOff, Model model) {
-        //make copy
-        Resource copy = copyNode(node, model);
-        //re-point one edge from subjectToSplitOff to copy (doesn't matter if it has multiple edges to it or not)
-        StmtIterator it = model.listStatements(subjectToSplitOff, null, node);
-        Statement statement = it.nextStatement();
-        it.close();
-        Statement copiedStatement = new StatementImpl(statement.getSubject(), statement.getPredicate(), copy);
-        model.add(copiedStatement);
-        model.remove(statement);
-        List<Statement> statementList = new ArrayList<>();
-        //copy outgoing edges from node to copy
-        it = model.listStatements(node, null, (RDFNode)null);
-        while(it.hasNext()) {
-            statement = it.nextStatement();
-            copiedStatement = new StatementImpl(copy, statement.getPredicate(), statement.getObject());
-            statementList.add(copiedStatement);
+    private void recursiveCopyWhereMultipleInEdges(RDFNode node, ModelModification modelModification, Collection<RDFNode> visited) {
+        //a non-resource is trivially ok
+        if (!node.isResource()) return;
+        if (visited.contains(node)) return;
+        visited.add(node);
+        List<Statement> outgoingEdges = node.getModel().listStatements(node.asResource(), null, (RDFNode) null).toList();
+        for(Statement stmt: outgoingEdges ){
+            recursiveCopyWhereMultipleInEdges(stmt.getObject(), modelModification, visited);
         }
-        model.add(statementList);
-        return copy;
+
+        if (outgoingEdges.size() > 0) {
+            Set<Resource> reachableFromNode = findReachableResources(node);
+            List<Statement> incomingEdges = node.getModel().listStatements(null, null, node).toList();
+            incomingEdges = incomingEdges.stream().filter(stmt ->
+                    ! reachableFromNode.contains(stmt.getSubject())).collect(Collectors.toList());
+            if (incomingEdges.size() > 1 && isSplittableNode(node)) {
+                for (Statement stmt : incomingEdges) {
+                    RDFNode copy = recursiveCopy(node, modelModification);
+                    Statement newEdge = new StatementImpl(stmt.getSubject(), stmt.getPredicate(), copy);
+                    modelModification.add(newEdge);
+                    modelModification.remove(stmt);
+                    //RDFDataMgr.write(System.out, modelModification.copyAndModify(node.getModel()), Lang.TRIG);
+                }
+                modelModification.remove(outgoingEdges);
+            }
+        }
     }
 
-    private Resource copyNode(Resource node, Model model) {
-        if (node.isAnon()) return model.createResource();
-        int i = 0;
-        String uri = node.getURI() + RandomStringUtils.randomAlphanumeric(4);
-        String newUri = uri+"_"+ i;
-        while (model.containsResource(new ResourceImpl(newUri))){
-            i++;
-            newUri = uri+"_"+i;
-        }
-        return model.getResource(newUri);
+    private boolean isReachableFrom(RDFNode src, RDFNode target){
+        return isReachableFrom(src, target, new HashSet<>());
     }
+
+    private boolean isReachableFrom(RDFNode src, RDFNode target, Collection<RDFNode> visited){
+        if (src.equals(target)) return true;
+        if (!src.isResource()) return false;
+        if (visited.contains(src)) return false;
+        visited.add(src);
+        StmtIterator it = src.getModel().listStatements(src.asResource(), null, (RDFNode) null);
+        while(it.hasNext()){
+            Statement stmt = it.nextStatement();
+            if (isReachableFrom(src, stmt.getObject(), visited)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Set<Resource> findReachableResources(RDFNode src){
+        Set<Resource> reachable = new HashSet<>();
+        findReachableResources(src, reachable);
+        return reachable;
+    }
+
+    private void findReachableResources(RDFNode src, Set<Resource> found){
+        if (!src.isResource()) return;
+        if (found.contains(src)) return;
+        found.add(src.asResource());
+        StmtIterator it = src.getModel().listStatements(src.asResource(), null, (RDFNode) null);
+        while(it.hasNext()){
+            Statement stmt = it.nextStatement();
+            findReachableResources(src, found);
+        }
+    }
+
+    private RDFNode recursiveCopy(RDFNode node, ModelModification modelModification){
+        return recursiveCopy(node, modelModification, null,null, new HashSet<>());
+    }
+
+    private RDFNode recursiveCopy(RDFNode node, ModelModification modelModification, RDFNode toReplace, RDFNode replacement, Collection<RDFNode> visited){
+        if (node.equals(toReplace)) return replacement;
+        if (!node.isResource()) return node;
+        if (visited.contains(node)) return copyNode(node.asResource());
+        visited.add(node);
+        RDFNode nodeInCopy;
+        if (isSplittableNode(node)) {
+            nodeInCopy = copyNode(node.asResource());
+            visited.add(nodeInCopy);
+        } else {
+            return node;
+        }
+        if (toReplace == null && replacement == null){
+            toReplace = node;
+            replacement = nodeInCopy;
+        }
+        List<Statement> outgoingEdges = node.getModel().listStatements(node.asResource(), null, (RDFNode) null).toList();
+        for(Statement stmt: outgoingEdges ){
+            RDFNode newObject = recursiveCopy(stmt.getObject(), modelModification, toReplace, replacement, visited);
+            modelModification.add(new StatementImpl(nodeInCopy.asResource(), stmt.getPredicate(), newObject));
+            modelModification.remove(stmt);
+            //RDFDataMgr.write(System.out, modelModification.copyAndModify(node.getModel()), Lang.TRIG);
+        }
+        return nodeInCopy;
+    }
+
+    private class ModelModification{
+        private List<Statement> statementsToAdd;
+        private List<Statement> statementsToRemove;
+
+        public ModelModification() {
+            this.statementsToAdd = new LinkedList<>();
+            this.statementsToRemove = new LinkedList<>();
+        }
+
+        public Collection<Statement> getStatementsToAdd() {
+            return Collections.unmodifiableCollection(statementsToAdd);
+        }
+
+        public Collection<Statement> getStatementsToRemove() {
+            return Collections.unmodifiableCollection(statementsToRemove);
+        }
+
+        public void add (Statement stmt){
+            this.statementsToAdd.add(stmt);
+        }
+
+        public void add(Collection<Statement> statements) {
+            this.statementsToAdd.addAll(statements);
+        }
+
+        public void remove(Statement stmt){
+            this.statementsToRemove.add(stmt);
+        }
+
+        public void remove(Collection<Statement> statements){
+            this.statementsToRemove.addAll(statements);
+        }
+
+        public void mergeModificationsFrom(ModelModification other){
+            this.statementsToRemove.addAll(other.statementsToRemove);
+            this.statementsToAdd.addAll(other.statementsToAdd);
+        }
+
+        public Model copyAndModify(Model model) {
+            Model ret = RdfUtils.cloneModel(model);
+            modify(ret);
+            return ret;
+        }
+
+        public void modify(Model model){
+            model.add(this.statementsToAdd);
+            model.remove(this.statementsToRemove);
+        }
+    }
+
 }
