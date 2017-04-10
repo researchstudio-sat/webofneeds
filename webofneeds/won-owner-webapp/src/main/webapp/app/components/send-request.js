@@ -2,8 +2,8 @@
 
 import angular from 'angular';
 import 'ng-redux';
-import extendedGalleryModule from '../components/extended-gallery';
-import postInfoUnifiedModule from './post-info-unified';
+import postContentModule from './post-content';
+import postHeaderModule from './post-header';
 import { selectLastUpdateTime } from '../selectors';
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
@@ -25,9 +25,13 @@ function genComponentConf() {
         </a>
       </div>
 
-      <won-post-info-unified
+      <won-post-header
         need-uri="self.theirNeedUri">
-      </won-post-info-unified>
+      </won-post-header>
+
+      <won-post-content
+        need-uri="self.theirNeedUri">
+      </won-post-content>
 
       <div class="sr__footer">
         <input
@@ -97,8 +101,8 @@ function genComponentConf() {
 }
 
 export default angular.module('won.owner.components.sendRequest', [
-    extendedGalleryModule,
-    postInfoUnifiedModule,
+    postContentModule,
+    postHeaderModule,
 ])
     .directive('wonSendRequest', genComponentConf)
     .name;
