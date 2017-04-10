@@ -112,10 +112,6 @@ function genComponentConf() {
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
         }
-
-        toggleMatches() {
-            this.open = !this.open;
-        }
     }
     Controller.$inject = serviceDependencies;
 
