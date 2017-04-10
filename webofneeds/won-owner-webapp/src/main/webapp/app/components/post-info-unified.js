@@ -5,7 +5,7 @@
  */
 import angular from 'angular';
 import 'ng-redux';
-import extendedGalleryModule from '../components/extended-gallery';
+import postContentModule from './post-content';
 import { actionCreators }  from '../actions/actions';
 import {
     labels,
@@ -56,47 +56,12 @@ function genComponentConf() {
           </div>
         </div>
       </div>
-      <div class="piu__content">
-        <!--
-        <div class="piu__content__images" ng-show="self.need.get('images')">
-          <won-extended-gallery max-thumbnails="self.maxThumbnails" items="self.need.get('images')" class="vertical"></won-extended-gallery>
-        </div>
-        -->
-        <div class="piu__content__description">
-          <div
-            class="piu__content__description__location"
-            ng-show="won.needContent.getIn(['won:hasLocation', 's:name'])">
-              <img class="piu__content__description__indicator"
-                src="generated/icon-sprite.svg#ico16_indicator_location"/>
-              <span>{{ won.needContent.getIn(['won:hasLocation', 's:name']) }}</span>
-          </div>
-          <!--
-          <div class="piu__content__description__datetime">
-            <img class="piu__content__description__indicator" src="generated/icon-sprite.svg#ico16_indicator_time"/>
-            <span>Available until 5th May</span>
-          </div>
-          -->
-          <div class="piu__content__description__text"
-            ng-show="!!self.needContent.get('won:hasTextDescription')">
-            <img
-              class="piu__content__description__indicator"
-              src="generated/icon-sprite.svg#ico16_indicator_description"/>
-            <span>
-              <p>{{ self.needContent.get('won:hasTextDescription') }}</p>
-            </span>
-          </div>
-          <div class="piu__content__description__text"
-            ng-show="!!self.textMsg">
-            <img
-              class="piu__content__description__indicator"
-              src="generated/icon-sprite.svg#ico16_indicator_message"/>
-            <span>
-              <p>{{ self.textMsg }}</p>
-            </span>
-          </div>
-
-        </div>
-      </div>
+      <won-post-content
+        need-uri="self.needUri"
+        size="self.size"
+        text-message="self.textMessage"
+      >
+      </won-post-content>
     `;
 
     class Controller {
@@ -163,7 +128,7 @@ function genComponentConf() {
 }
 
 export default angular.module('won.owner.components.postInfoUnified', [
-    extendedGalleryModule
+    postContentModule,
 ])
     .directive('wonPostInfoUnified', genComponentConf)
     .name;

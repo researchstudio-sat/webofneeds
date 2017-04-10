@@ -1,4 +1,4 @@
-@import 'extended-gallery';
+@import 'post-content';
 
 won-post-info-unified {
   display: block;
@@ -55,27 +55,6 @@ won-post-info-unified {
       }
     }
   }
- .piu__content {
-   padding: 1rem;
-   font-size: $smallFontSize;
-
-   &__description {
-     padding-top: 0.25rem;
-
-     &__location,
-     &__text,
-     &__datetime {
-       display: flex;
-       flex-direction: row;
-       padding: 0.25rem 0;
-     }
-
-     &__indicator {
-       @include fixed-square(1rem);
-       padding-right: 0.5rem;
-     }
-   }
- }
 }
 
 
