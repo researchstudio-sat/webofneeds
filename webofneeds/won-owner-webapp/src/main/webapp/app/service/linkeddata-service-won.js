@@ -1075,6 +1075,15 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                 simplified['@context'] = needJsonLd['@context'];
                 return simplified;
             }
+        }).then(needJsonLd => {
+            /*
+             * The framing algorithm doesn't use arrays if there's
+             * only a single `rdfs:member`/element in the list :|
+             * Thus, we need to manually make sure all uses of
+             * `rdfs:member` have an array as value.
+             */
+            ensureRdfsMemberArrays(needJsonLd);
+            return needJsonLd;
         });
 
         return needJsonLdP;
@@ -1204,6 +1213,25 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
 
         return resultJson;
     }
+
+    /**
+     * Impure function, that all cases of `rdfs:member` have. This
+     * is necessary as the framing-algorithm doesn't use arrays in cases,
+     * where there's only a single `rdfs:member` property.
+     * an array as value.
+     * @param needJsonLd
+     * @param visited
+     */
+    function ensureRdfsMemberArrays(needJsonLd, visited = new Set()) {
+        if(visited.has(needJsonLd)) return;
+        visited.add(needJsonLd);
+
+        for( var k of Object.keys(needJsonLd)) {
+            if(k === "rdfs:member" && !is('Array', needJsonLd[k])) needJsonLd[k] = [needJsonLd[k]]
+            ensureRdfsMemberArrays(needJsonLd[k], visited)
+        }
+    }
+
 
     won.getWonNodeUriOfNeed = function(needUri){
         if (typeof needUri === 'undefined' || needUri == null  ){
