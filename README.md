@@ -14,6 +14,7 @@ Web of needs is built out of three main components. **Owner applications** enabl
 
 ### Further resources
 * Try [Chatting with the Debug Bot and Viewing the RDF](/documentation/viewing-rdf.md) that the owner webapp and won nodes are exchanging
+* Learn how to [Run your own WoN services](webofneeds/won-docker/README.md)
 * [Build-instructions](/documentation/building-with-maven.md) and [Troubleshooting](documentation/troubleshooting.md)
 * [Security architecture](webofneeds/won-core/README.md) and how to [Set up the Keys and Certificates](documentation/installation-cryptographic-keys-and-certificates.md)
 * [Linked Data interface](webofneeds/won-node-webapp/README.md)
