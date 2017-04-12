@@ -20,6 +20,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotAction;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.listener.EventListener;
 
 import java.util.Date;
 
@@ -37,12 +38,12 @@ public abstract class AbstractDelegatingAction extends BaseEventBotAction
     assert delegate != null : "delegate must not be null";
   }
 
-  protected void delegateImmediately(final Event event) {
-    getEventListenerContext().getExecutor().execute(delegate.getActionTask(event));
+  protected void delegateImmediately(final Event event, EventListener executingListener) {
+    getEventListenerContext().getExecutor().execute(delegate.getActionTask(event, executingListener));
   }
 
-  protected void delegateDelayed(final Event event, long delayMillis) {
+  protected void delegateDelayed(final Event event, long delayMillis, EventListener executingListener) {
     Date when = new Date(System.currentTimeMillis() + delayMillis);
-    getEventListenerContext().getTaskScheduler().schedule(delegate.getActionTask(event), when);
+    getEventListenerContext().getTaskScheduler().schedule(delegate.getActionTask(event, executingListener), when);
   }
 }

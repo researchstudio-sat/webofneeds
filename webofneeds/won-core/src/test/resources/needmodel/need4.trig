@@ -32,5 +32,6 @@
         dc:title                "title1".
 
     _:closesTheLoop won:connectsBackTo _:closesTheLoop.
+
 }
 

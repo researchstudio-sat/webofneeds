@@ -58,7 +58,7 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
     }
 
     @Override
-    protected void doRun(Event event) throws Exception {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
         if(event instanceof TelegramCreateNeedEvent){
             TelegramCreateNeedEvent telegramCreateNeedEvent = (TelegramCreateNeedEvent) event;
             String[] parameters = telegramCreateNeedEvent.getStrings();

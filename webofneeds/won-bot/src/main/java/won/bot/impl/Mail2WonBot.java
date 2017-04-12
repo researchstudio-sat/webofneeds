@@ -11,10 +11,9 @@ import won.bot.framework.eventbot.action.impl.wonmessage.CloseConnectionUriActio
 import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionUriAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.SendMessageOnConnectionAction;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.impl.command.DeactivateNeedCommandEvent;
+import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.*;
-import won.bot.framework.eventbot.event.impl.needlifecycle.NeedDeactivatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;

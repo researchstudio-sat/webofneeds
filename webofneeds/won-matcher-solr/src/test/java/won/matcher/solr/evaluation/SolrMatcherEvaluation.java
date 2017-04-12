@@ -53,10 +53,10 @@ public class SolrMatcherEvaluation
   NeedIndexer needIndexer;
 
   @Autowired
-  private MailDirNeedProducer demandNeedProducer;
+  private MailDirNeedProducer seeksNeedProducer;
 
   @Autowired
-  private MailDirNeedProducer supplyNeedProducer;
+  private MailDirNeedProducer isNeedProducer;
 
   @Autowired
   HintBuilder hintBuilder;
@@ -69,12 +69,12 @@ public class SolrMatcherEvaluation
   private TensorMatchingData matchingDataPredictions;
 
 
-  public void setDemandNeedProducer(final MailDirNeedProducer demandNeedProducer) {
-    this.demandNeedProducer = demandNeedProducer;
+  public void setSeeksNeedProducer(final MailDirNeedProducer seeksNeedProducer) {
+    this.seeksNeedProducer = seeksNeedProducer;
   }
 
-  public void setSupplyNeedProducer(final MailDirNeedProducer supplyNeedProducer) {
-    this.supplyNeedProducer = supplyNeedProducer;
+  public void setIsNeedProducer(final MailDirNeedProducer isNeedProducer) {
+    this.isNeedProducer = isNeedProducer;
   }
 
   public static String createNeedId(Dataset need) {
@@ -112,27 +112,30 @@ public class SolrMatcherEvaluation
   @PostConstruct
   public void init() throws IOException {
 
-    initNeedDir(demandNeedProducer);
-    initNeedDir(supplyNeedProducer);
+    initNeedDir(seeksNeedProducer);
+    initNeedDir(isNeedProducer);
   }
 
   private void initNeedDir(MailDirNeedProducer needProducer) throws IOException {
 
     // read the need files and add needs to the tensor
-    if (!needProducer.getDirectory().isDirectory()) {
-      throw new IOException("Input folder not a directory: " + needProducer.getDirectory().toString());
+    if (needProducer.getDirectory() == null || !needProducer.getDirectory().isDirectory()) {
+      throw new IOException("Input folder not a directory: " + ((needProducer.getDirectory() != null) ? needProducer.getDirectory().toString() : null));
     }
 
     while(!needProducer.isExhausted()) {
       String needFileName = needProducer.getCurrentFileName();
       Model needModel = needProducer.create();
-      Dataset ds = DatasetFactory.create(needModel);
+
+      Dataset ds = DatasetFactory.createTxnMem();
+      ds.addNamedModel("https://node.matchat.org/won/resource/need/test#need", needModel);
       String needId = createNeedId(ds);
 
-      if (needProducer == demandNeedProducer) {
+
+      if (needProducer == seeksNeedProducer) {
         matchingDataConnections.addNeedType(needId, "WANT");
         matchingDataPredictions.addNeedType(needId, "WANT");
-      } else {
+      } else if (needProducer == isNeedProducer ) {
         matchingDataConnections.addNeedType(needId, "OFFER");
         matchingDataPredictions.addNeedType(needId, "OFFER");
       }

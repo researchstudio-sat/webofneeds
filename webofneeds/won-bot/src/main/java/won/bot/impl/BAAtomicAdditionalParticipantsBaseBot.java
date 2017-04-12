@@ -22,6 +22,7 @@ import won.bot.framework.eventbot.filter.impl.AcceptOnceFilter;
 import won.bot.framework.eventbot.filter.impl.FinishedEventFilter;
 import won.bot.framework.eventbot.filter.impl.OrFilter;
 import won.bot.framework.eventbot.listener.BaseEventListener;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.baStateBots.BATestBotScript;
 import won.bot.framework.eventbot.listener.baStateBots.BATestScriptListener;
 import won.bot.framework.eventbot.listener.baStateBots.baCCMessagingBots.atomicBots.SecondPhaseStartedEvent;
@@ -240,7 +241,7 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
       new BaseEventBotAction(ctx)
       {
         @Override
-        protected void doRun(final Event event) throws Exception {
+        protected void doRun(final Event event, EventListener executingListener) throws Exception {
           logger.debug("starting second phase");
           logger.debug("non-delayed listeners: {}", firstPhasetestScriptListeners.size());
           logger.debug("delayed listeners: {}", firstPhasetestScriptWithDelayListeners.size());

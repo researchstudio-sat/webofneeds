@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.*;
@@ -126,7 +127,7 @@ public class WonWebSocketHandler
       headers.setLocation(need.getNeedURI());
       return new ResponseEntity<NeedPojo>(createdNeedPojo, headers, HttpStatus.CREATED);     */
   @Override
-  @Transactional(propagation = Propagation.SUPPORTS)
+  @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.READ_COMMITTED)
   public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException
   {
     logger.debug("OA Server - WebSocket message received: {}", message.getPayload());
@@ -201,7 +202,7 @@ public class WonWebSocketHandler
   }
 
   @Override
-  @Transactional(propagation = Propagation.SUPPORTS)
+  @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.READ_COMMITTED)
   public WonMessage process(final WonMessage wonMessage) {
 
     String wonMessageJsonLdString = WonMessageEncoder.encodeAsJsonLd(wonMessage);

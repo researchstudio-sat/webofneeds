@@ -25,6 +25,38 @@ export const selectLastUpdateTime = state => state.get('lastUpdateTime');
 export const selectRouterParams = state => state.getIn(['router', 'currentParams']);
 export const selectDrafts = state => state.get('drafts');
 
+
+
+export const selectConnectionsByNeed = createSelector(
+    selectOwnNeeds, selectConnections,
+    (ownNeeds, connections) => ownNeeds
+        .map(need =>
+            need.getIn(['won:hasConnections', 'rdfs:member'])
+        )
+
+        /*
+         * make sure there's no undefined connection containers (which
+         * happens if no connections exist / have been loaded for that need
+         */
+        .map(cnctContainer => cnctContainer? cnctContainer : Immutable.List())
+
+        .map(cnctContainer =>
+            cnctContainer.map(cnctUriObj =>
+                connections.get(cnctUriObj.get('@id'))
+            )
+        )
+);
+export const selectMatchesUrisByNeed = createSelector(
+    selectConnectionsByNeed,
+    connectionsByNeed => connectionsByNeed
+        .map(need => need
+            .filter(cnct =>
+                cnct.get('hasConnectionState') === won.WON.Suggested
+            )
+            .map(cnct => cnct.get('uri')) // full connecions to connectionUris
+        )
+);
+
 export const selectUnreadEventUris = state => state
     .getIn(['events', 'unreadEventUris']);
 
@@ -121,8 +153,7 @@ export const selectUnreadCountsByType = createSelector(
     selectUnreadEvents,
     unreadEvents => groupByType(unreadEvents)
         .map(eventsOfType => eventsOfType.size)
-)
-
+);
 
 /**
  * selects a map of `connectionUri -> { connection, events, ownNeed, remoteNeed }`
@@ -161,7 +192,7 @@ const allByConnectionUri = (connectionUri)  => {
 };
 
 //TODO there's certainly more elegant ways to implement this selector than first grouping by connection then by need
-export const selectConnectionsByNeed = createSelector(
+export const selectAllByConnectionsByNeed = createSelector(
     selectAllByConnections,
         connections => connections
         .map(cnct => Immutable.fromJS(cnct)) //TODO this is a workaround. atm connections aren't ImmutableJS-objects

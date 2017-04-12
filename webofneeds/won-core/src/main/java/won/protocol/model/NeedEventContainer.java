@@ -25,7 +25,7 @@ import java.net.URI;
 @DiscriminatorValue("Need")
 public class NeedEventContainer extends EventContainer implements ParentAware<Need>
 {
-  @OneToOne(fetch = FetchType.LAZY)
+  @OneToOne(fetch = FetchType.LAZY, mappedBy = "eventContainer", optional = false)
   private Need need;
 
   public NeedEventContainer() {

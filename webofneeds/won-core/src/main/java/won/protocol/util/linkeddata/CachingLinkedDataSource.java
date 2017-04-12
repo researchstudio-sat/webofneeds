@@ -16,11 +16,13 @@
 
 package won.protocol.util.linkeddata;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -31,6 +33,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -53,6 +57,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
   private static final String CACHE_NAME = "linkedDataCache";
   private static final String HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
   private static final int DEFAULT_EXPIRY_PERIOD = 600;
+  private static final int DEFAULT_BYTE_ARRAY_SIZE = 500;
   private final Logger logger = LoggerFactory.getLogger(getClass());
   @Autowired(required = true)
   private EhCacheCacheManager cacheManager;
@@ -91,7 +96,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         //logging on warn level as not reporting errors here can make misconfiguration hard to detect
         logger.warn(String.format("Couldn't fetch resource %s", resource));
         logger.debug("Exception is:", e);
-        return DatasetFactory.createMem();
+        return DatasetFactory.createGeneral();
     }
     LinkedDataCacheEntry linkedDataCacheEntry = null;
     if (element != null) {
@@ -269,13 +274,29 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     }
 
     //cache the result
-    LinkedDataCacheEntry entry = new LinkedDataCacheEntry(etag, expires, responseData.getDataset(),
+    LinkedDataCacheEntry entry = new LinkedDataCacheEntry(etag, expires, writeDatasetToByteArray(responseData.getDataset()),
                                                           cacheControlFlags, responseData.getResponseHeaders(),
                                                           responseData.getStatusCode());
     this.cache.put(new Element(makeCacheKey(resource, requesterWebID), entry));
     logger.debug("Fetched and cached {} ", resource);
     return responseData;
-  };
+  }
+
+
+    private static Dataset readDatasetFromByteArray(byte[] datasetbytes) {
+        Dataset dataset = DatasetFactory.create();
+        RDFDataMgr.read(dataset, new ByteArrayInputStream(datasetbytes), Lang.NQUADS);
+        return dataset;
+    }
+
+    private static byte[] writeDatasetToByteArray(Dataset dataset) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream(DEFAULT_BYTE_ARRAY_SIZE);
+        RDFDataMgr.write(out, dataset, Lang.NQUADS);
+        return out.toByteArray();
+    }
+
+
+
 
   /**
    * Checks if the cached entry has an ETAG value set and uses the 'If-None-Match' header if this is the case.
@@ -306,8 +327,8 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     if (datasetResponse.getStatusCode() == HttpStatus.NOT_MODIFIED.value()){
       //replace dataset in response with the cached dataset
       logger.debug("server said our ETAG is still valid, using cached dataset for URI {} ", resource);
-      datasetResponse = new DatasetResponseWithStatusCodeAndHeaders(linkedDataCacheEntry
-                                                                                           .getDataset(),
+      datasetResponse = new DatasetResponseWithStatusCodeAndHeaders(readDatasetFromByteArray(linkedDataCacheEntry
+                                                                                           .getDataset()),
                                                                     datasetResponse
                                                                                            .getStatusCode(),
                                                                     datasetResponse
@@ -346,8 +367,9 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
   private Date parseExpiresHeader(final URI resource, final DatasetResponseWithStatusCodeAndHeaders responseData) {
     String expiresHeader = responseData.getResponseHeaders().get(HttpHeaders.EXPIRES);
     if (expiresHeader == null) {
-      return null;
+        return null;
     }
+    expiresHeader = expiresHeader.trim();
     SimpleDateFormat format = new SimpleDateFormat(HTTP_DATE_FORMAT, Locale.ENGLISH);
     Date expires = null;
     try {
@@ -355,7 +377,8 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     } catch (ParseException e) {
       //cannot parse expires header - use a default
       expires = addNSecondsToNow(DEFAULT_EXPIRY_PERIOD);
-      logger.warn("could not parse 'Expires' header ' "
+      //TODO: there seems to be a problem with the Expires header from the LinkedDataService
+      logger.debug("could not parse 'Expires' header ' "
        + expiresHeader +"' obtained for '" + resource + "', using default expiry period of " + DEFAULT_EXPIRY_PERIOD
                     +" " +
                     "seconds");
@@ -454,6 +477,9 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     this.crawlerCallback = crawlerCallback;
   }
 
+
+
+
   public static enum CacheControlFlag
   {
     PUBLIC("public"),
@@ -485,17 +511,20 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     }
   }
 
-  public static class LinkedDataCacheEntry
+
+
+
+public static class LinkedDataCacheEntry
   {
     private String etag = null;
     private Date expires = null;
-    private Dataset dataset = null;
+    private byte[] dataset = null;
     private EnumSet<CacheControlFlag> cacheControlFlags = noneOf(CacheControlFlag.class);
     private Map<String, String> headers;
     private int statusCode;
 
 
-    public LinkedDataCacheEntry(final String etag, final Date expires, final Dataset dataset, final EnumSet<CacheControlFlag> cacheControlFlags, final Map<String, String> headers, final int statusCode) {
+    public LinkedDataCacheEntry(final String etag, final Date expires, final byte[] dataset, final EnumSet<CacheControlFlag> cacheControlFlags, final Map<String, String> headers, final int statusCode) {
       this.etag = etag;
       this.expires = expires;
       this.dataset = dataset;
@@ -505,14 +534,14 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     }
 
     public DatasetResponseWithStatusCodeAndHeaders recreateResponse(){
-      return new DatasetResponseWithStatusCodeAndHeaders(dataset, statusCode, headers);
+      return new DatasetResponseWithStatusCodeAndHeaders(readDatasetFromByteArray(dataset), statusCode, headers);
     }
 
     public String getEtag() {
       return etag;
     }
 
-    public Dataset getDataset() {
+    public byte[] getDataset() {
       return dataset;
     }
 

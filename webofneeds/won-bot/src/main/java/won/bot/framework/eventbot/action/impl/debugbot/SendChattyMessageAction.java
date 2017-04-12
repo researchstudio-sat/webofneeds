@@ -20,6 +20,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 
 import java.net.URI;
 import java.util.*;
@@ -50,7 +51,7 @@ public class SendChattyMessageAction extends BaseEventBotAction
   }
 
   @Override
-  protected void doRun(final Event event) throws Exception {
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     Set<URI> toRemove = null;
     Collection<Object> chattyConnections = getEventListenerContext().getBotContext().loadObjectMap(
       KEY_CHATTY_CONNECTIONS).values();

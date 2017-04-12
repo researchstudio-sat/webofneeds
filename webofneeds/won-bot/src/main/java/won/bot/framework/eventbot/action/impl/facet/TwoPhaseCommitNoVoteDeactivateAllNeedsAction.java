@@ -24,6 +24,7 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.needlifecycle.NeedDeactivatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherNeedEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.node.facet.impl.WON_TX;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
@@ -46,7 +47,7 @@ public class TwoPhaseCommitNoVoteDeactivateAllNeedsAction extends BaseEventBotAc
   }
 
   @Override
-  protected void doRun(Event event) throws Exception {
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
 
     //check the global COORDINATION_MESSAGE (must be ABORT)
     if(event instanceof CloseFromOtherNeedEvent)

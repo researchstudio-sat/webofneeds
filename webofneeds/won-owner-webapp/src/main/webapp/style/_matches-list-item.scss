@@ -3,7 +3,7 @@
 @import 'fonts';
 @import 'flex-layout';
 
-won-matches-list-item {
+won-matches-list {
   margin: 0 auto;
   max-width: 35rem;
   display: block;
@@ -12,8 +12,59 @@ won-matches-list-item {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    padding: 0.5rem 0;
+    flex-direction: column;
+    align-items: stretch;
     border-bottom: 0.1rem solid $won-line-gray;
+
+    &__ownneed {
+      margin: 0.5rem 0;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+
+      .mli__description {
+        color: black;
+        flex-grow: 1;
+        padding-right: 1rem;
+
+        &__topline{
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-start;
+
+          &__title{
+            font-weight: 500;
+          }
+
+          &__matchcount {
+            color: $won-red;
+            padding: 0 0.25rem;
+          }
+        }
+
+        &__subtitle {
+          color: $won-subtitle-gray;
+          display: flex;
+          flex-direction: row;
+          font-size: $smallFontSize;
+
+          &__group {
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+
+            &__dash {
+              padding: 0 0.25rem;
+            }
+
+            &__icon {
+              padding-right: 0.25rem;
+              @include fixed-square(0.75rem);
+            }
+          }
+        }
+      }
+    }
 
     a {
       text-decoration: none;
@@ -25,49 +76,6 @@ won-matches-list-item {
       border: 0.1rem solid $won-light-gray;
     }
 
-    .mli__description {
-      color: black;
-      flex-grow: 1;
-      padding-right: 1rem;
-
-      &__topline{
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-
-        &__title{
-          font-weight: 500;
-        }
-
-        &__matchcount {
-          color: $won-red;
-          padding: 0 0.25rem;
-        }
-      }
-
-      &__subtitle {
-        color: $won-subtitle-gray;
-        display: flex;
-        flex-direction: row;
-        font-size: $smallFontSize;
-
-        &__group {
-          display: flex;
-          align-items: center;
-          flex-direction: row;
-
-          &__dash {
-            padding: 0 0.25rem;
-          }
-
-          &__icon {
-            padding-right: 0.25rem;
-            @include fixed-square(0.75rem);
-          }
-        }
-      }
-    }
-
     .mli__carret {
       .mli__arrow {
         @include carretSized;
@@ -75,9 +83,12 @@ won-matches-list-item {
       }
     }
   }
+
+
   .smli {
     display: flex;
     flex-direction: column;
+    margin: 0.5rem 0;
 
     &__item {
       max-width: 33rem;

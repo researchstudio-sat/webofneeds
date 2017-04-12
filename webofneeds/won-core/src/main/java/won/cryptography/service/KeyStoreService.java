@@ -1,5 +1,9 @@
 package won.cryptography.service;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +37,10 @@ public class KeyStoreService
 
   private String defaultAlias;
 
+  private final Ehcache ehcache;
+
+
+
   public KeyStoreService(String filePath, String storePW) {
     this(new File(filePath), storePW);
   }
@@ -43,12 +51,17 @@ public class KeyStoreService
     logger.info("Using key store file {} with key store type {}, provider {}", new Object[]{storeFile,
                                                                                             KEY_STORE_TYPE,
                                                                                             PROVIDER_BC});
+
+    CacheManager manager = CacheManager.getInstance();
+    ehcache = new Cache("keyCache" + storeFile.hashCode(), 100, false, false, 60, 60);
+    manager.addCache(ehcache);
   }
 
   public PrivateKey getPrivateKey(String alias) {
 
+    Element cachedElement = ehcache.get("KEY++"+alias);
+    if (cachedElement != null) return (PrivateKey) cachedElement.getObjectValue();
     PrivateKey retrieved = null;
-
     try {
       // TODO if for storing the needs' keys an individual (e.g. per-user) password is used, then
       // here should be the password of the user/need, not of the store. If not, then here is
@@ -57,7 +70,9 @@ public class KeyStoreService
     } catch (Exception e) {
       logger.warn("Could not retrieve key for " + alias + " from ks " + storeFile.getName(), e);
     }
-
+    if (retrieved != null) {
+      ehcache.put(new Element("KEY++"+alias, retrieved));
+    }
     return retrieved;
 
   }
@@ -85,7 +100,8 @@ public class KeyStoreService
   }
 
   public Certificate getCertificate(String alias) {
-
+    Element cachedElement = ehcache.get("CERT++"+alias);
+    if (cachedElement != null) return (Certificate) cachedElement.getObjectValue();
     Certificate retrieved = null;
 
     try {
@@ -93,7 +109,7 @@ public class KeyStoreService
     } catch (Exception e) {
       logger.warn("No certificate found for alias " + alias, e);
     }
-
+    ehcache.put(new Element("CERT++"+alias, retrieved));
     return retrieved;
 
   }
@@ -164,17 +180,16 @@ public class KeyStoreService
    * @param certificateChain
    * @param certificate
    * @param replace
-   * @throws IOException
    */
   private synchronized void putEntry(String alias, PrivateKey key, Certificate[] certificateChain, Certificate
-    certificate, boolean replace) throws IOException {
+    certificate, boolean replace){
 
     try {
       if (!replace && store.containsAlias(alias)) {
-        throw new IOException("Could not add new entry - key store already contains entry for " + alias);
+        return;
       }
     } catch (Exception e) {
-      throw new IOException("Could not add into the key store entry for " + alias, e);
+      throw new RuntimeException("Error checking if key with alias '"+ alias +"' is in the keystore", e);
     }
 
     try {
@@ -183,11 +198,11 @@ public class KeyStoreService
       } else if (alias != null && certificate != null) {
         store.setCertificateEntry(alias, certificate);
       } else {
-        throw new IOException("Could not add entry for " + alias + " to the key store");
+        throw new RuntimeException("Could not add entry for " + alias + " to the key store");
       }
       saveStoreToFile();
     } catch (Exception e) {
-      throw new IOException("Could not add entry for " + alias + " to the key store", e);
+      throw new RuntimeException("Could not add entry for " + alias + " to the key store", e);
     }
 
   }

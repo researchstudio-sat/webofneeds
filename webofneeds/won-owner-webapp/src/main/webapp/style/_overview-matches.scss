@@ -7,10 +7,10 @@ won-matches {
   width: 100%;
   min-height: 100%;
   display: block;
+
   @include max-content-width($maxContentWidth, $minContentPadding, 'omc');
 
   @include empty-description('omc');
-
   > .omc__inner.empty {
     align-self: center;
     max-width: $maxContentWidth;
@@ -45,10 +45,6 @@ won-matches {
       padding: 0;
     }
 
-    .dummy {
-      width: $iconSize * 3;
-    }
-
     &__viewtype {
       display: flex;
       align-items: center;
@@ -58,11 +54,22 @@ won-matches {
     }
   }
 
+  .omc__inner {
+    display: flex;
+    flex-direction: column;
+    & > %omc__content { flex-grow: 1; }
+  }
+
+  @mixin omc__content {
+    flex-grow: 1; /*to be used with .omc__inner to make sure it grows to height of page*/
+    padding-bottom: 5rem;
+  }
+
   .omc__content__flow {
+    @include omc__content;
     column-count: 4;
     column-gap: 0.5rem;
     column-fill: auto;
-    padding-bottom: 5rem;
 
     @media (max-width: 70rem){
       column-count: 3;
@@ -78,10 +85,10 @@ won-matches {
   }
 
   .omc__content__grid {
+    @include omc__content;
     column-count: 3;
     column-gap: 0.5rem;
     column-fill: auto;
-    padding-bottom: 5rem;
 
     @media (max-width: 70rem){
       column-count: 2;
@@ -93,8 +100,8 @@ won-matches {
   }
 
   .omc__content__list {
+    @include omc__content;
     display: block;
-    padding-bottom: 5rem;
   }
 }
 

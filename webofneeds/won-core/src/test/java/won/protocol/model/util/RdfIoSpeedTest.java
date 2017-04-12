@@ -42,7 +42,7 @@ public class RdfIoSpeedTest
   @Ignore
   public void compareTrigRdfthriftNquads() throws IOException {
 
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     Path infile = Paths.get("won-core/src/test/resources/speedtest/dataset.trig");
     byte[] dataTrig = Files.readAllBytes(infile);
 
@@ -105,7 +105,7 @@ public class RdfIoSpeedTest
   @Test
   @Ignore
   public void compareCollectBytesVsCollectDatasets() throws IOException {
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     Path infile = Paths.get("won-core/src/test/resources/speedtest/dataset.trig");
     byte[] dataTrig = Files.readAllBytes(infile);
 
@@ -120,7 +120,7 @@ public class RdfIoSpeedTest
     watch.start();
 
     for (int i = 0; i < 10000; i++){
-      Dataset additionalDataset = DatasetFactory.createMem();
+      Dataset additionalDataset = DatasetFactory.createGeneral();
       RDFDataMgr.read(additionalDataset, new ByteArrayInputStream(dataRdfq), Lang.NQUADS);
       RdfUtils.addDatasetToDataset(dataset, additionalDataset);
     }
@@ -134,7 +134,7 @@ public class RdfIoSpeedTest
     for (int i = 0; i < 10000; i++){
       out.write(dataRdfq);
     }
-    Dataset additionalDataset = DatasetFactory.createMem();
+    Dataset additionalDataset = DatasetFactory.createGeneral();
     RDFDataMgr.read(additionalDataset, new ByteArrayInputStream(out.toByteArray()), Lang.NQUADS);
     watch.stop();
     System.out.println("collecting in byteArrays took: " + watch.getTime());
@@ -146,7 +146,7 @@ public class RdfIoSpeedTest
     for (int i = 0; i < 10000; i++){
       streams.add(new ByteArrayInputStream(dataRdfq));
     }
-    additionalDataset = DatasetFactory.createMem();
+    additionalDataset = DatasetFactory.createGeneral();
     RDFDataMgr.read(additionalDataset, new SequenceInputStream(streams.elements()), Lang.NQUADS);
     watch.stop();
     System.out.println("collecting in vector -> sequenceInputStream took: " + watch.getTime());
@@ -158,7 +158,7 @@ public class RdfIoSpeedTest
     for (int i = 0; i < 10000; i++){
       streamsList.add(new ByteArrayInputStream(dataRdfq));
     }
-    additionalDataset = DatasetFactory.createMem();
+    additionalDataset = DatasetFactory.createGeneral();
     RDFDataMgr.read(additionalDataset, new SequenceInputStream(Collections.enumeration(streamsList)), Lang.NQUADS);
     watch.stop();
 
@@ -170,7 +170,7 @@ public class RdfIoSpeedTest
     for (int i = 0; i < 10000; i++){
       streamsArr[i] = new ByteArrayInputStream(dataRdfq);
     }
-    additionalDataset = DatasetFactory.createMem();
+    additionalDataset = DatasetFactory.createGeneral();
     RDFDataMgr.read(additionalDataset, new SequenceInputStream(new Enumeration(){
       int index = 0;
       @Override

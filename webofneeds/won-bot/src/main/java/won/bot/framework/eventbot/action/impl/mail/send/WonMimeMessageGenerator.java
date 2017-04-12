@@ -1,8 +1,6 @@
 package won.bot.framework.eventbot.action.impl.mail.send;
 
 import org.apache.jena.query.*;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.tdb.TDB;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -159,7 +157,7 @@ public class WonMimeMessageGenerator {
         velocityContext.put("remoteNeedTitle", needModelWrapper.getTitleFromIsOrAll().replaceAll(
           "\\n", "\n" + QUOTE_CHAR));
         velocityContext.put("remoteNeedDescription", needModelWrapper.getDescription(
-          NeedContentPropertyType.ALL).replaceAll("\\n", "\n" + QUOTE_CHAR));
+                NeedContentPropertyType.ALL).replaceAll("\\n", "\n" + QUOTE_CHAR));
 
         Collection<String> tags = needModelWrapper.getTags(NeedContentPropertyType.ALL);
         velocityContext.put("remoteNeedTags", tags.size() > 0 ? tags : null);

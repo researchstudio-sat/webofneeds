@@ -299,6 +299,27 @@ public class NeedModelWrapper {
         }
     }
 
+    public NeedContentPropertyType getContentPropertyType(Resource contentNode) {
+
+        boolean is = getContentNodes(NeedContentPropertyType.IS).size() > 0;
+        boolean seeks = getContentNodes(NeedContentPropertyType.SEEKS).size() > 0;
+        boolean seeksSeeks = getContentNodes(NeedContentPropertyType.SEEKS_SEEKS).size() > 0;
+
+        if (is && seeks && seeksSeeks) {
+            return NeedContentPropertyType.ALL;
+        } else if (is && seeks) {
+            return NeedContentPropertyType.IS_AND_SEEKS;
+        } else if (is) {
+            return NeedContentPropertyType.IS;
+        } else if (seeks) {
+            return NeedContentPropertyType.SEEKS;
+        } else if (seeksSeeks) {
+            return NeedContentPropertyType.SEEKS_SEEKS;
+        }
+
+        return null;
+    }
+
     /**
      * get all content nodes of a specified type
      *
@@ -365,6 +386,16 @@ public class NeedModelWrapper {
         }
     }
 
+    public String getContentPropertyStringValue(Resource contentNode, Property p) {
+
+        RDFNode node = RdfUtils.findOnePropertyFromResource(needModel, contentNode, p);
+        if (node != null && node.isLiteral()) {
+            return node.asLiteral().getString();
+        }
+
+        return null;
+    }
+
     public String getContentPropertyStringValue(NeedContentPropertyType type, Property p) {
         return getContentPropertyObject(type, p).asLiteral().getString();
     }
@@ -372,6 +403,17 @@ public class NeedModelWrapper {
     public String getContentPropertyStringValue(NeedContentPropertyType type, String propertyPath) {
         Node node = getContentPropertyObject(type, propertyPath);
         return node != null ? node.getLiteralLexicalForm() : null;
+    }
+
+    public Collection<String> getContentPropertyStringValues(Resource contentNode, Property p) {
+
+        Collection<String> values = new LinkedList<>();
+        NodeIterator nodeIterator = needModel.listObjectsOfProperty(contentNode, p);
+        while (nodeIterator.hasNext()) {
+            values.add(nodeIterator.next().asLiteral().getString());
+        }
+
+        return values;
     }
 
     public Collection<String> getContentPropertyStringValues(NeedContentPropertyType type, Property p) {
