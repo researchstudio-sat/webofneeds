@@ -9,7 +9,11 @@ won-open-request {
 
   .or__header {
     display: flex;
-    padding: 0.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 1rem;
+
     border-bottom: 0.1rem solid $won-line-gray;
 
     &__icon {
