@@ -28,7 +28,7 @@ public class WonMessageDecoder
       logger.warn("cannot decode empty or null string to message");
       return null;
     }
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     StringReader sr = new StringReader(message);
     RDFDataMgr.read(dataset, sr, null, lang);
     return decodeFromDataset(dataset);

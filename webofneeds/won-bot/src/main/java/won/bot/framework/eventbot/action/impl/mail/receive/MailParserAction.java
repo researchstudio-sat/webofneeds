@@ -11,6 +11,7 @@ import won.bot.framework.eventbot.event.impl.mail.CreateNeedFromMailEvent;
 import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
 import won.bot.framework.eventbot.event.impl.mail.MailReceivedEvent;
 import won.bot.framework.eventbot.event.impl.mail.WelcomeMailEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -28,7 +29,7 @@ public class MailParserAction extends BaseEventBotAction {
         this.mailContentExtractor = mailContentExtractor;
     }
 
-    protected void doRun(Event event) throws Exception {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
         if(event instanceof MailReceivedEvent){
             EventBus bus = getEventListenerContext().getEventBus();
             MimeMessage message = ((MailReceivedEvent) event).getMessage();

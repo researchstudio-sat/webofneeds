@@ -38,6 +38,7 @@ import won.bot.framework.eventbot.event.impl.lifecycle.ErrorEvent;
 import won.bot.framework.eventbot.event.impl.test.TestFailedEvent;
 import won.bot.framework.eventbot.event.impl.test.TestFinishedEvent;
 import won.bot.framework.eventbot.event.impl.test.TestPassedEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.BotManager;
 import won.bot.integrationtest.security.DelayedDuplicateMessageSendingConversationBot;
@@ -52,7 +53,7 @@ import java.util.concurrent.TimeUnit;
  * Integration test.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/spring/app/botRunner.xml"})
+@ContextConfiguration(locations = {"classpath:/spring/app/securityBotTest.xml"})
 public class SecurityBotTests
 {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -133,7 +134,7 @@ public class SecurityBotTests
     }
 
     @Override
-    protected void doRun(Event event) throws Exception {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
       if (event instanceof TestFinishedEvent) {
         futureTestResult.set((TestFinishedEvent) event);
       } else {
@@ -155,7 +156,7 @@ public class SecurityBotTests
     }
 
     @Override
-    protected void doRun(Event event) throws Exception {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
       if (event instanceof ErrorEvent) {
 
         StringBuilder message = new StringBuilder();

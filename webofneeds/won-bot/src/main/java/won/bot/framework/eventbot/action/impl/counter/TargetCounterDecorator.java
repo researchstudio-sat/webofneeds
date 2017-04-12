@@ -78,7 +78,7 @@ public class TargetCounterDecorator implements Counter
   }
 
   private void publishEvent(){
-    this.context.getEventBus().publish(new TargetCountReachedEvent(delegate));
+    this.context.getEventBus().publish(new TargetCountReachedEvent(this));
   }
 
 

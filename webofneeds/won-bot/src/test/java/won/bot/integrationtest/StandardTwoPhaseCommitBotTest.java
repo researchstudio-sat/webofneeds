@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * Date: 14.5.14.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/spring/app/botRunner.xml"})
+@ContextConfiguration(locations = {"classpath:/spring/app/standardTwoPhaseCommitTest.xml"})
 public class StandardTwoPhaseCommitBotTest {
   private static final int RUN_ONCE = 1;
   private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;

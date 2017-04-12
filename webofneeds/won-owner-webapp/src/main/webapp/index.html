@@ -34,16 +34,17 @@ these static imports are necessary due to problems with bundling
 medium.js, as documented here:
 https://github.com/researchstudio-sat/webofneeds/issues/664
 -->
-<script src="./node_modules/undo.js/undo.js"></script>
-<script src="./node_modules/rangy/lib/rangy-core.js"></script>
-<script src="./node_modules/medium.js/medium.js"></script>
+<!-- each of these has to be copied here manually by the gulp build task -->
+<script src="./generated/scripts/undo.js"></script>
+<script src="./generated/scripts/rangy-core.js"></script>
+<script src="./generated/scripts/medium.js"></script>
 
-<script src="./scripts/jquery.10.2.js"></script>
-<script src="./scripts/jquery.fs.scroller.min.js"></script>
+<script src="./generated/scripts/jquery.10.2.js"></script>
+<script src="./generated/scripts/jquery.fs.scroller.min.js"></script>
 
-<script src="./jspm_packages/system.js"></script>
-<script src="./jspm_packages/system-polyfills.js"></script>
-<script src="./jspm_config.js"></script>
+<script src="./generated/scripts/system.js"></script>
+<script src="./generated/scripts/system-polyfills.js"></script>
+<script src="./generated/scripts/jspm_config.js"></script>
 
 <!--
 this line loads the bundled app. comment it out if you want

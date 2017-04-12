@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  * Integration test.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/spring/app/botRunner.xml"})
+@ContextConfiguration(locations = {"classpath:/spring/app/simple2NeedConversationTest.xml"})
 public class ConversationBotTest
 {
 

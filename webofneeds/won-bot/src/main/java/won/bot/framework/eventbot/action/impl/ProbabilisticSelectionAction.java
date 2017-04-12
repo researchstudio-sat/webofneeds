@@ -20,6 +20,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotAction;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.listener.EventListener;
 
 import java.util.Random;
 
@@ -48,12 +49,12 @@ public class ProbabilisticSelectionAction extends BaseEventBotAction
   }
 
   @Override
-  protected void doRun(final Event event) throws Exception {
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     double outcome = random.nextDouble();
     if (outcome <= probabilityA){
-      getEventListenerContext().getExecutor().execute(delegateA.getActionTask(event));
+      getEventListenerContext().getExecutor().execute(delegateA.getActionTask(event, executingListener));
     } else {
-      getEventListenerContext().getExecutor().execute(delegateB.getActionTask(event));
+      getEventListenerContext().getExecutor().execute(delegateB.getActionTask(event, executingListener));
     }
   }
 }

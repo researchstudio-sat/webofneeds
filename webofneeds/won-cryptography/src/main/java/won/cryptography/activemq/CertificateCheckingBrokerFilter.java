@@ -61,7 +61,7 @@ public class CertificateCheckingBrokerFilter extends BrokerFilter
       if (!checkPassed) throw new SecurityException("consumer " + info.getConsumerId()
         +" not allowed to consume from destination "+ info.getDestination());
     }
-    logger.info("consumer added. destination: {}, consumerId: {}", info.getDestination(), info.getConsumerId());
+    logger.debug("consumer added. destination: {}, consumerId: {}", info.getDestination(), info.getConsumerId());
     return super.addConsumer(context, info);
   }
 

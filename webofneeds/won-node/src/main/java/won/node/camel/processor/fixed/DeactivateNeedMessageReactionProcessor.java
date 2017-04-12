@@ -20,6 +20,7 @@ import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
@@ -47,7 +48,7 @@ public class DeactivateNeedMessageReactionProcessor extends AbstractCamelProcess
 {
   Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  @Transactional(propagation = Propagation.REQUIRED)
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void process(final Exchange exchange) throws Exception {
     WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     URI receiverNeedURI = wonMessage.getReceiverNeedURI();
@@ -56,7 +57,7 @@ public class DeactivateNeedMessageReactionProcessor extends AbstractCamelProcess
     Need need = DataAccessUtils.loadNeed(needRepository, receiverNeedURI);
     matcherProtocolMatcherClient.needDeactivated(need.getNeedURI(), wonMessage);
     //close all connections
-    Collection<Connection> conns = connectionRepository.getConnectionsByNeedURIAndNotInState(need.getNeedURI
+    Collection<Connection> conns = connectionRepository.getConnectionsByNeedURIAndNotInStateForUpdate(need.getNeedURI
       (), ConnectionState.CLOSED);
     for (Connection con: conns) {
       closeConnection(need, con);

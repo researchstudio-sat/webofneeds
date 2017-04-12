@@ -10,7 +10,6 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import won.bot.framework.bot.Bot;
@@ -40,7 +39,7 @@ public class SpringAwareBotManagerImpl extends BotManagerImpl implements Applica
   public void onApplicationEvent(final ApplicationEvent event)
   {
     logger.debug("processing application event {}", event);
-    if (event instanceof ContextStartedEvent || event instanceof ContextRefreshedEvent){
+    if (event instanceof ContextRefreshedEvent){
       logger.info("context started or refreshed: searching for bots in spring context");
       try {
         findAndRegisterBots();

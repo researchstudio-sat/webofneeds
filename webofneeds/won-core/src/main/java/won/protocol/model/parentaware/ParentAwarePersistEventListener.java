@@ -16,11 +16,11 @@
 
 package won.protocol.model.parentaware;
 
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.hibernate.LockMode;
-import org.hibernate.LockOptions;
 import org.hibernate.event.spi.PersistEvent;
 import org.hibernate.event.spi.PersistEventListener;
+import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,14 +38,21 @@ public class ParentAwarePersistEventListener implements PersistEventListener
 
     if(entity instanceof ParentAware) {
       ParentAware rootAware = (ParentAware) entity;
-      Object root = rootAware.getParent();
-      if (root == null) return;
-      event.getSession().buildLockRequest(new LockOptions().setLockMode(LockMode.OPTIMISTIC_FORCE_INCREMENT)).lock(root);
+      VersionedEntity parent = rootAware.getParent();
+      if (parent == null) return;
+      if (! (parent instanceof HibernateProxy)) {
+        //we have to do the increment manually
+        parent.incrementVersion();
+      }
+      Hibernate.initialize(parent);
+      event.getSession().save(parent);
       if (logger.isDebugEnabled()) {
-        logger.debug("Incrementing {} entity version because a {} child entity has been inserted", root, entity);
+        logger.debug("Incrementing {} entity version because a {} child entity has been inserted", parent, entity);
       }
     }
   }
+
+
 
   @Override
   public void onPersist(final PersistEvent event, final Map createdAlready) throws HibernateException {

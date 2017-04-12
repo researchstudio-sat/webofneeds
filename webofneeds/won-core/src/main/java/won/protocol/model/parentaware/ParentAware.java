@@ -19,7 +19,7 @@ package won.protocol.model.parentaware;
 /**
  * Interface for entities that offer access to their parent entity.
  */
-public interface ParentAware<T>
+public interface ParentAware<T extends VersionedEntity>
 {
   public T getParent();
 }

@@ -20,6 +20,8 @@ import org.apache.jena.rdf.model.*;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
@@ -41,11 +43,11 @@ import java.net.URI;
 public class HintFeedbackMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor
 {
 
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-    Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getSenderURI());
+    Connection con = connectionRepository.findOneByConnectionURIForUpdate(wonMessage.getSenderURI());
     logger.debug("HINT_FEEDBACK received from the owner side for connection {}", wonMessage.getSenderURI());
     processFeedbackMessage(con, wonMessage);
   }
@@ -72,7 +74,6 @@ public class HintFeedbackMessageFromOwnerProcessor extends AbstractFromOwnerCame
       @Override
       public Model visit(final Model model) {
         Resource baseResource = model.getResource(messageURI.toString());
-        StmtIterator stmtIterator = baseResource.listProperties(WON.HAS_FEEDBACK);
         if (baseResource.hasProperty(WON.HAS_FEEDBACK)){
           //add the base resource as a feedback event to the connection
           processFeedback(con, baseResource);

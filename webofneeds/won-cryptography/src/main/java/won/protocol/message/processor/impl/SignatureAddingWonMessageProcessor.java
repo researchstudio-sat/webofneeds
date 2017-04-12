@@ -3,6 +3,7 @@ package won.protocol.message.processor.impl;
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.service.CryptographyService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
@@ -21,6 +22,7 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private CryptographyService cryptographyService;
+  private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy;
 
   public SignatureAddingWonMessageProcessor() {
   }
@@ -41,7 +43,7 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor
 
   public WonMessage processOnBehalfOfNeed(final WonMessage message) throws WonMessageProcessingException {
     // use senderNeed key for signing
-    String alias = message.getSenderNeedURI().toString();
+    String alias = keyPairAliasDerivationStrategy.getAliasForNeedUri(message.getSenderNeedURI().toString());
     PrivateKey privateKey = cryptographyService.getPrivateKey(alias);
     PublicKey publicKey = cryptographyService.getPublicKey(alias);
     try {
@@ -61,5 +63,9 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor
 
   public void setCryptographyService(final CryptographyService cryptoService) {
     this.cryptographyService = cryptoService;
+  }
+
+  public void setKeyPairAliasDerivationStrategy(KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy) {
+    this.keyPairAliasDerivationStrategy = keyPairAliasDerivationStrategy;
   }
 }
