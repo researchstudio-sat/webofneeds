@@ -2,276 +2,67 @@
 @import 'sizing-utils';
 @import 'fonts';
 @import 'flex-layout';
+@import 'square-image';
 
-.connectionSelectionItemLine {
+won-connection-selection-item {
   display: block;
-  .conn {
-    display: flex;
-    flex-direction: column;
+  position: relative; // to allow positioning the contextmenu in relation to this component-root
 
-    &__item {
-      display: flex;
-      flex-grow: 1;
-      justify-content: space-between;
-      align-self: flex-end;
-      margin: 0.25rem 0;
-      padding: 0.25rem 0.25rem;
-      max-width: 33rem;
-      width: 100%;
-      position: relative;
-      left: 1rem;
-
-      border: 0.1rem solid $won-lighter-gray; //this is necessary so that the view does not "jump" when selecting an item
-
-      &:hover,
-      &.selected {
-        background-color: white;
-        border: 0.1rem solid $won-line-gray;
-      }
-      &.selected {
-        border-right: 0.1rem solid $won-lighter-gray;
-      }
-
-      @include square-image($postIconSize, 0, 0.5rem, 0, 0);
-
-      &__description {
-        color: black;
-        flex-grow: 1;
-        padding-right: 1rem;
-
-        .contextmenu {
-          position: absolute;
-          right: 1rem;
-          top: 0.2rem;
-
-          .content {
-            padding: 0.1rem 0.25rem 0.25rem 0.25rem;
-            margin: 0.15rem 0 0 0;
-          }
-
-          &__icon {
-            height: 1em;
-            min-height: 1em;
-            max-height: 1em;
-            width: auto;
-          }
-        }
-
-        &__settings {
-          position: absolute;
-          border: 0.1rem solid $won-line-gray;
-          background-color: white;
-          white-space: nowrap;
-          padding: 0.5rem;
-          right: 1rem;
-        }
-
-        &__topline{
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: space-between;
-
-          &__icon{
-            height:1em;
-            min-height:1em;
-            max-height:1em;
-            width:auto;
-          }
-          &__title{
-            font-weight: 600;
-          }
-
-          &__date{
-            font-size: $smallFontSize;
-            color: $won-subtitle-gray;
-          }
-        }
-        &__subtitle{
-          color: $won-subtitle-gray;
-          display: flex;
-          flex-direction: row;
-          font-size: $smallFontSize;
-          &__group {
-            display: flex;
-            align-items: center;
-            flex-direction: row;
-
-            &__dash {
-              padding: 0 0.25rem;
-            }
-
-            &__icon {
-              padding-right: 0.25rem;
-              @include fixed-square(0.75rem);
-            }
-            &__type{
-              font-weight:300
-            }
-          }
-        }
-        &__message {
-          font-size: $smallFontSize;
-
-          &__indicator {
-            display: inline-block;
-            background: $won-red;
-            border-radius: 100%;
-            margin-right: 0.25rem;
-            @include fixed-square(0.5rem);
-          }
-        }
-      }
-    }
+  .conn__icon {
+    @include fixed-square(1rem);
   }
-  .ril {
+
+  $greyBorder: 0.1rem solid $won-line-gray;
+  $invisibleBorder: 0.1rem solid $won-lighter-gray;
+
+  .conn__inner.selected {
+    border-top: $greyBorder;
+    border-left: $greyBorder;
+    border-bottom: $greyBorder;
+  }
+
+  &:first-child .conn__inner.selected {
+    //don't show border for first item to avoid duplicate borders with the title bar
+    border-top: $invisibleBorder;
+  }
+  &:not(:first-child) .conn__inner.selected {
+    //don't show border for first item to avoid duplicate borders with the title bar
+    border-top: $greyBorder;
+  }
+
+  .conn__inner {
     display: flex;
-    flex-wrap: wrap;
+    flex-grow: 1;
     justify-content: space-between;
-    padding: 0.5rem 0;
-    border-bottom: 0.1rem solid $won-line-gray;
+    align-self: stretch;
+    padding: 0.5rem;
 
-    a {
-      text-decoration: none;
+    border: $invisibleBorder; //this is necessary so that the view does not "jump" when selecting an item
+
+    &:hover, &.selected {
+      background-color: white;
     }
 
-    @include square-image($postIconSize, 0, 0.5rem, 0, 0);
-
-    .ril__description {
-      color: black;
-      flex-grow: 1;
-      padding-right: 1rem;
-
-      &__topline{
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-
-        &__title{
-          font-weight: 500;
-        }
-
-        &__messagecount {
-          color: $won-red;
-          padding: 0 0.25rem;
-        }
-      }
-
-      &__subtitle {
-        color: $won-subtitle-gray;
-        display: flex;
-        flex-direction: row;
-        font-size: $smallFontSize;
-
-        &__group {
-          display: flex;
-          align-items: center;
-          flex-direction: row;
-
-          &__dash {
-            padding: 0 0.25rem;
-          }
-
-          &__icon {
-            padding-right: 0.25rem;
-            @include fixed-square(0.75rem);
-          }
-        }
-      }
-    }
-
-    .ril__carret {
-      .ril__arrow {
-        @include carretSized;
-
-      }
+    .conn__icon {
+      margin-left: 0.5rem;
     }
   }
-  .mil {
+  .conn__contextmenu {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 99;
+
+    background: white;
+    border: 0.1rem solid $won-line-gray;
+    padding: 0.5rem;
+
     display: flex;
     flex-direction: column;
-    &__item {
-      display: flex;
-      flex-grow: 1;
-      justify-content: space-between;
-      align-self: flex-end;
-      margin: 0.25rem 0;
-      padding: 0.25rem 0.25rem;
-      max-width: 33rem;
-      width: 100%;
-      position: relative;
-      left: 1rem;
+    align-items: flex-end; // right align
 
-      border: 0.1rem solid $won-lighter-gray; //this is necessary so that the view does not "jump" when selecting an item
-
-      &:hover,
-      &.selected {
-        background-color: white;
-        border: 0.1rem solid $won-line-gray;
-      }
-      &.selected {
-        border-right: 0.1rem solid $won-lighter-gray;
-      }
-
-      @include square-image($postIconSize, 0, 0.5rem, 0, 0);
-
-      &__description {
-        color: black;
-        flex-grow: 1;
-        padding-right: 1rem;
-
-        &__topline{
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: space-between;
-
-          &__title{
-            font-weight: 500;
-          }
-
-          &__date{
-            font-size: $smallFontSize;
-            color: $won-subtitle-gray;
-          }
-        }
-
-        &__subtitle {
-          font-size: $smallFontSize;
-          color: $won-subtitle-gray;
-          display: flex;
-          flex-direction: row;
-
-          &__group {
-            display: flex;
-            align-items: center;
-            flex-direction: row;
-
-            &__dash {
-              padding: 0 0.25rem;
-            }
-
-            &__icon {
-              padding-right: 0.25rem;
-              @include fixed-square(0.75rem);
-            }
-          }
-        }
-
-        &__message {
-          font-size: $smallFontSize;
-
-          &__indicator {
-            display: inline-block;
-            background: $won-red;
-            border-radius: 100%;
-            margin-right: 0.25rem;
-            @include fixed-square(0.5rem);
-          }
-        }
-      }
+    .conn__icon {
+      margin-bottom: 0.5rem;
     }
-
-  }
-  .cmsg {
-
   }
 }

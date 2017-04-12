@@ -32,14 +32,11 @@ import {
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
-      <div class="connectionSelectionItemLine"
-        ng-repeat="(key,connectionUri) in self.connectionUris">
-        <won-connection-selection-item
-          class="conn"
-          selected-connection="self.selectedConnection({connectionUri: connectionUri})"
-          connection-uri="connectionUri">
-        </won-connection-selection-item>
-      </div>
+      <won-connection-selection-item
+        ng-repeat="(key,connectionUri) in self.connectionUris"
+        selected-connection="self.selectedConnection({connectionUri: connectionUri})"
+        connection-uri="connectionUri">
+      </won-connection-selection-item>
     `;
 
     class Controller {
