@@ -117,6 +117,10 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
 
     private String filterCharsAndKeyWords(String text) {
 
+        if (text == null) {
+            return null;
+        }
+
         // filter all special characters and number
         text = text.replaceAll("[^A-Za-z ]", " ");
         text = text.replaceAll("[^A-Za-z ]", " ");
@@ -127,6 +131,7 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
         text = text.replaceAll(" AND", " ");
         text = text.replaceAll(" OR", " ");
         text = text.replaceAll("\\s+", " ");
+
         return text;
     }
 
@@ -135,19 +140,24 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
 
         // boost the query with a location distance factor
         // add up all the reverse query boost components and add 1 so that the multiplicative boost factor is at least 1
-        StringBuilder sb = new StringBuilder();
-        sb.append("sum(1");
-        for (SolrQueryFactory queryFactory : locationFactories) {
-            sb.append(",").append(queryFactory.makeQueryString());
+        String boostQueryString = "";
+        if (locationFactories.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("sum(1");
+            for (SolrQueryFactory queryFactory : locationFactories) {
+                sb.append(",").append(queryFactory.makeQueryString());
+            }
+            sb.append(")");
+            MultiplicativeBoostQueryFactory boostQueryFactory = new MultiplicativeBoostQueryFactory(sb.toString());
+            boostQueryString = boostQueryFactory.makeQueryString();
         }
-        sb.append(")");
-        MultiplicativeBoostQueryFactory boostQueryFactory = new MultiplicativeBoostQueryFactory(sb.toString());
+
 
         // combine all content term query parts with boolean OR operator
         SolrQueryFactory[] contentArray = new SolrQueryFactory[contentFactories.size()];
         BooleanQueryFactory contentQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR,
                 contentFactories.toArray(contentArray));
 
-        return boostQueryFactory.createQuery() + contentQuery;
+        return boostQueryString + contentQuery;
     }
 }

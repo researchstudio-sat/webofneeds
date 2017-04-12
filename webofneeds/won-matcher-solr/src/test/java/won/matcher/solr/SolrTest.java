@@ -29,15 +29,35 @@ public class SolrTest {
         ActorRef solrMatcherActor = system.actorOf(
                 SpringExtension.SpringExtProvider.get(system).props(SolrMatcherActor.class), "SolrMatcherActor");
 
-        InputStream is = SolrTest.class.getResourceAsStream("/needmodel/need1.trig");
-        Dataset dataset = DatasetFactory.create();
-        RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
-        is.close();
+
+        NeedEvent ne1 = createNeedEvent("/needmodel/need1.trig");
+        NeedEvent ne2 = createNeedEvent("/needmodel/need2.trig");
+
+        solrMatcherActor.tell(ne1, null);
+        Thread.sleep(5000);
+        solrMatcherActor.tell(ne2, null);
+    }
+
+    private static NeedEvent createNeedEvent(String path) throws IOException {
+
+        InputStream is = null;
+        Dataset dataset = null;
+        try {
+            try {
+                is = SolrTest.class.getResourceAsStream(path);
+                dataset = DatasetFactory.create();
+                RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
+            }
+        } catch (IOException e) {
+            System.err.println(e);
+            return null;
+        }
+
         String needUri = WonRdfUtils.NeedUtils.getNeedURI(dataset).toString();
-
-        NeedEvent needEvent = new NeedEvent(needUri, "no_uri", NeedEvent.TYPE.CREATED, System.currentTimeMillis(), dataset);
-
-        // send event to matcher implementation
-        solrMatcherActor.tell(needEvent, null);
+        return new NeedEvent(needUri, "no_uri", NeedEvent.TYPE.CREATED, System.currentTimeMillis(), dataset);
     }
 }

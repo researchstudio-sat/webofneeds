@@ -50,7 +50,10 @@ public class SolrMatcherQueryTest {
 
                 SolrDocumentList docs = queryExecutor.executeNeedQuery(query, null, new BasicNeedQueryFactory(ds).createQuery());
                 SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
-                System.out.println("Found docs: " + docs != null ? docs.size() : 0 + ", keep docs: " + matchedDocs != null ? matchedDocs.size() : 0);
+                System.out.println("Found docs: " + ((docs != null) ? docs.size() : 0) + ", keep docs: " + ((matchedDocs != null) ? matchedDocs.size() : 0));
+                if (docs == null) {
+                    continue;
+                }
 
                 System.out.println("Keep docs: ");
                 System.out.println("======================");
