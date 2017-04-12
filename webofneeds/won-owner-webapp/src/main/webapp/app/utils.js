@@ -248,12 +248,13 @@ export function mapToMatches(connections){
     if(connections){
 
         Object.keys(connections).forEach(function(key){
+            const needUri = connections[key].ownNeed['@id'];
 
-            if(!needMap[connections[key].ownNeed['@id']]){
+            if(!needMap[needUri]){
                 let connectionsArr = [connections[key]]
-                needMap[connections[key].ownNeed['@id']]=connectionsArr
+                needMap[needUri]=connectionsArr
             }else{
-                needMap[connections[key].ownNeed['@id']].push(connections[key])
+                needMap[needUri].push(connections[key])
             }
         }.bind(this))
     }
