@@ -22,7 +22,7 @@
 
     <import resource="classpath:spring/component/needproducer/needproducer-mixed.xml"/>
 
-    <bean id="supplyNeedProducer" class="won.matcher.solr.evaluation.MailDirNeedProducer">
+    <bean id="isNeedProducer" class="won.matcher.solr.evaluation.MailDirNeedProducer">
         <property name="template" value="classpath:/default-templates/default-template.ttl"/>
         <property name="wrappedProducer">
             <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
@@ -36,7 +36,7 @@
         </property>
     </bean>
 
-    <bean id="demandNeedProducer" class="won.matcher.solr.evaluation.MailDirNeedProducer">
+    <bean id="seeksNeedProducer" class="won.matcher.solr.evaluation.MailDirNeedProducer">
         <property name="template" value="classpath:/default-templates/default-template.ttl"/>
         <property name="wrappedProducer">
             <bean class="won.bot.framework.component.needproducer.impl.DirectoryBasedNeedProducer">
@@ -53,8 +53,8 @@
     <bean id="solrMatcherEvaluation" class="won.matcher.solr.evaluation.SolrMatcherEvaluation" >
         <property name="outputDir" value="C:/dev/projects/matching-evaluation/out"/>
         <property name="connectionsFile" value="C:/dev/projects/matching-evaluation/connections.txt"/>
-        <property name="supplyNeedProducer" ref="supplyNeedProducer"/>
-        <property name="demandNeedProducer" ref="demandNeedProducer"/>
+        <property name="isNeedProducer" ref="isNeedProducer"/>
+        <property name="seeksNeedProducer" ref="seeksNeedProducer"/>
     </bean>
 
 </beans>
