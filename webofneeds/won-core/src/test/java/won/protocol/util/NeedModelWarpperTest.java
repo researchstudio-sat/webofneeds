@@ -173,7 +173,7 @@ public class NeedModelWarpperTest {
     }
 
     @Test
-    public void normalizeModel() throws IOException {
+    public void normalizeModel_Tree() throws IOException {
 
         // compare model that is not changed by normalization
         Dataset ds = Utils.createTestDataset("/needmodel/need1.trig");
@@ -182,11 +182,16 @@ public class NeedModelWarpperTest {
         Model normalizedModel = needModelWrapper.normalizeNeedModel();
         Assert.assertTrue(originalModel.isIsomorphicWith(normalizedModel));
 
+
+    }
+
+    @Test
+    public void normalizeNeedModel_Cycle1() throws IOException {
         // check case where "is" and "seeks" point to the same blank node
-        ds = Utils.createTestDataset("/needmodel/need2.trig");
-        needModelWrapper = new NeedModelWrapper(ds);
-        originalModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
-        normalizedModel = needModelWrapper.normalizeNeedModel();
+        Dataset ds = Utils.createTestDataset("/needmodel/need2.trig");
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+        Model originalModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
+        Model normalizedModel = needModelWrapper.normalizeNeedModel();
         NeedModelWrapper normalizedWrapper = new NeedModelWrapper(normalizedModel, null);
         Assert.assertEquals(needModelWrapper.getContentNodes(NeedContentPropertyType.IS),
                 needModelWrapper.getContentNodes(NeedContentPropertyType.IS_AND_SEEKS));
@@ -195,5 +200,64 @@ public class NeedModelWarpperTest {
         Assert.assertEquals("title1", isSeeksTitle);
         Assert.assertEquals(isSeeksTitle, normalizedWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS, DC.title));
         Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title).contains(isSeeksTitle));
+    }
+
+    @Test
+    public void normalizeNeedModel_Cycle2() throws IOException {
+        // check case where "is" and "seeks" point to the same blank node
+        Dataset ds = Utils.createTestDataset("/needmodel/need3.trig");
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+        Model originalModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
+        Model normalizedModel = needModelWrapper.normalizeNeedModel();
+        NeedModelWrapper normalizedWrapper = new NeedModelWrapper(normalizedModel, null);
+        Assert.assertEquals(needModelWrapper.getContentNodes(NeedContentPropertyType.IS),
+                needModelWrapper.getContentNodes(NeedContentPropertyType.IS_AND_SEEKS));
+        Assert.assertEquals(normalizedWrapper.getContentNodes(NeedContentPropertyType.IS_AND_SEEKS).size(), 0);
+        String isSeeksTitle = needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS_AND_SEEKS, DC.title);
+        Assert.assertEquals("title1", isSeeksTitle);
+        Assert.assertEquals(isSeeksTitle, normalizedWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS, DC.title));
+        Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title).contains(isSeeksTitle));
+    }
+
+    @Test
+    public void normalizeNeedModel_Cycle3() throws IOException {
+        // check case where "is" and "seeks" point to the same blank node
+        Dataset ds = Utils.createTestDataset("/needmodel/need4.trig");
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+        Model originalModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
+        Model normalizedModel = needModelWrapper.normalizeNeedModel();
+        NeedModelWrapper normalizedWrapper = new NeedModelWrapper(normalizedModel, null);
+        Assert.assertEquals(needModelWrapper.getContentNodes(NeedContentPropertyType.IS),
+                needModelWrapper.getContentNodes(NeedContentPropertyType.IS_AND_SEEKS));
+        Assert.assertEquals(normalizedWrapper.getContentNodes(NeedContentPropertyType.IS_AND_SEEKS).size(), 0);
+        String isSeeksTitle = needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS_AND_SEEKS, DC.title);
+        Assert.assertEquals("title1", isSeeksTitle);
+        Assert.assertEquals(isSeeksTitle, normalizedWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS, DC.title));
+        Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title).contains(isSeeksTitle));
+    }
+
+    @Test
+    public void normalizeNeedModel_Cycle4() throws IOException {
+        // check case where "is" and "seeks" point to the same blank node
+        Dataset ds = Utils.createTestDataset("/needmodel/need5.trig");
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+        Model originalModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
+        Model normalizedModel = needModelWrapper.normalizeNeedModel();
+        NeedModelWrapper normalizedWrapper = new NeedModelWrapper(normalizedModel, null);
+        Assert.assertEquals(needModelWrapper.getContentNodes(NeedContentPropertyType.IS),
+                needModelWrapper.getContentNodes(NeedContentPropertyType.IS_AND_SEEKS));
+        Assert.assertEquals(normalizedWrapper.getContentNodes(NeedContentPropertyType.IS_AND_SEEKS).size(), 0);
+        Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title).contains("title3"));
+        Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, DC.title).contains("title3"));
+    }
+
+    @Test
+    public void normalizeNeedModel_Cycle5() throws IOException {
+        // check case where "is" and "seeks" point to the same blank node
+        Dataset ds = Utils.createTestDataset("/needmodel/need6.trig");
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(ds);
+        Model originalModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
+        Model normalizedModel = needModelWrapper.normalizeNeedModel();
+        NeedModelWrapper normalizedWrapper = new NeedModelWrapper(normalizedModel, null);
     }
 }
