@@ -13,6 +13,11 @@ import {
     selectOwnNeeds,
 } from '../selectors';
 
+import {
+    seeksOrIs,
+    inferLegacyNeedType,
+} from '../won-utils';
+
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
     let template = `
@@ -21,13 +26,13 @@ function genComponentConf() {
                     <won-square-image  
                         ng-class="{'inactive' : !self.isActive()}" 
                         src="self.ownNeed.get('titleImgSrc')"
-                        title="self.ownNeed.getIn(['won:hasContent','dc:title'])"
+                        title="self.ownNeedContent.get('dc:title')"
                         uri="self.needUri">
                     </won-square-image>
                 </a>
                 <a class="pil__description clickable" ui-sref="post({postUri: self.needUri})">
                     <div class="pil__description__topline">
-                        <div class="pil__description__topline__title">{{self.ownNeed.getIn(['won:hasContent','dc:title'])}}</div>
+                        <div class="pil__description__topline__title">{{self.ownNeedContent.get('dc:title')}}</div>
                         <div class="pil__description__topline__creationdate">{{self.relativeCreationDate}}</div>
                     </div>
                     <div class="pil__description__subtitle">
@@ -38,7 +43,7 @@ function genComponentConf() {
                              <span class="pil__description__subtitle__group__dash"> &ndash; </span>
                         </span>
                         <span class="pil__description__subtitle__type">
-                             {{self.labels.type[self.ownNeed.getIn(['won:hasBasicNeedType', '@id'])]}}
+                             {{self.labels.type[self.ownNeedType]}}
                         </span>
                     </div>
                 </a>
@@ -108,6 +113,9 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
+            this.seeksOrIs = seeksOrIs;
+            this.inferLegacyNeedType = inferLegacyNeedType;
+
             window.pil4dbg = this; //TODO deletme
             this.labels = labels;
             //this.EVENT = won.EVENT;
@@ -127,6 +135,9 @@ function genComponentConf() {
 
                 return {
                     need,
+                    ownNeed: need,
+                    ownNeedContent: need && seeksOrIs(need),
+                    ownNeedType: need && inferLegacyNeedType(need),
                     relativeCreationDate: need?
                         relativeTime(state.get('lastUpdateTime'), need.get('dct:created')) :
                         "",
@@ -144,7 +155,6 @@ function genComponentConf() {
                         ).size > 0,
                     WON: won.WON,
                     debugmode: won.debugmode,
-                    ownNeed: need,
                     unreadCounts,
                 };
             };
