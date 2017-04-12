@@ -9,7 +9,8 @@ won-post-header {
   display: flex;
   flex-direction: row;
 
-  @include square-image($feedIconSize, 0, 0.5rem, 0, 0);
+  @include square-image($postIconSize, 0, 0.5rem, 0, 0);
+
   won-square-image .image{
     border: 0.1rem solid $won-light-gray;
   }
