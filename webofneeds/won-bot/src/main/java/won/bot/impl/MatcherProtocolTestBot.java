@@ -36,6 +36,7 @@ import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
 import won.bot.framework.eventbot.event.impl.needlifecycle.NeedDeactivatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
 import won.bot.framework.eventbot.listener.BaseEventListener;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
 
@@ -92,7 +93,7 @@ public class MatcherProtocolTestBot extends EventBot
     bus.subscribe(MatcherRegisteredEvent.class, new ActionOnEventListener(ctx, new BaseEventBotAction(ctx)
     {
       @Override
-      protected void doRun(final Event event) throws Exception {
+      protected void doRun(final Event event, EventListener executingListener) throws Exception {
         getEventListenerContext().getEventBus().subscribe(ActEvent.class, needCreator);
       }
     }, 1));

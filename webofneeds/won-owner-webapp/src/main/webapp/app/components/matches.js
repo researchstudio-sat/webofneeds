@@ -5,13 +5,22 @@ import angular from 'angular';
 import overviewTitleBarModule from './overview-title-bar';
 import matchesFlowItemModule from './matches-flow-item';
 import matchesGridItemModule from './matches-grid-item';
-import matchesListItemModule from './matches-list-item';
+import matchesListModule from './matches-list';
 import sendRequestModule from './send-request';
 
 import { attach, mapToMatches, decodeUriComponentProperly} from '../utils';
 import { labels } from '../won-label-utils';
 import { actionCreators }  from '../actions/actions';
-import { selectAllByConnections, selectOpenPostUri, displayingOverview } from '../selectors';
+import {
+    selectAllByConnections,
+    selectOpenPostUri,
+    displayingOverview,
+    selectOwnNeeds,
+} from '../selectors';
+import {
+    seeksOrIs,
+    inferLegacyNeedType,
+} from '../won-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 let template = `
@@ -30,8 +39,7 @@ let template = `
             </a>
         </div>
         <div class="omc__header" ng-if="self.hasMatches">
-            <div class="dummy"></div>
-            <div class="title" ng-if="!self.post">Matches to your needs</div>
+            <div class="title">Matches to your post{{ self.isOverview? 's' : '' }}</div>
             <div class="omc__header__viewtype">
                 <a ui-sref="{layout: self.LAYOUT.TILES}">
                     <img ng-src="{{self.layout === 'tiles' ? 'generated/icon-sprite.svg#ico-filter_tile_selected' : 'generated/icon-sprite.svg#ico-filter_tile'}}"
@@ -60,11 +68,8 @@ let template = `
             </won-matches-grid-item>
         </div>
         <div ng-if="self.hasMatches && self.layout === 'list'" class="omc__content__list">
-            <won-matches-list-item
-                    item="item"
-                    connection-uri="item.connection.uri"
-                    ng-repeat="(key,item) in self.matchesOfNeed">
-            </won-matches-list-item>
+            <won-matches-list item="item">
+            </won-matches-list>
         </div>
     </div>
     <div class="omc__sendrequest" ng-if="self.hasMatches && self.connection">
@@ -78,7 +83,7 @@ class Controller {
     constructor() {
         attach(this, serviceDependencies, arguments);
 
-        window.omc=this;
+        window.omc4dbg = this;
 
         this.labels = labels;
 
@@ -113,7 +118,6 @@ class Controller {
                 LAYOUT,
                 connection: state.getIn(['connections', connectionUri]),
                 matches: matchesByConnectionUri.toArray(),
-                matchesOfNeed: mapToMatches(matchesByConnectionUri.toJS()),//TODO plz don't do `.toJS()`. every time an ng-binding somewhere cries.
                 hasMatches: matchesByConnectionUri.size > 0,
                 post: state.getIn(['needs','ownNeeds', postUri]),
             };
@@ -147,7 +151,7 @@ export default angular.module('won.owner.components.matches', [
         overviewTitleBarModule,
         matchesFlowItemModule,
         matchesGridItemModule,
-        matchesListItemModule,
+        matchesListModule,
         sendRequestModule
     ])
     .directive('wonMatches', genComponentConf)

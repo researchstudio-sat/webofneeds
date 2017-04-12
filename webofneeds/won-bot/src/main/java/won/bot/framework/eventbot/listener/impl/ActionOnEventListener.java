@@ -93,14 +93,14 @@ public class ActionOnEventListener extends BaseEventListener
     synchronized (monitor){
       timesRun++;
       if (timesToRun <= 0){
-        getEventListenerContext().getExecutor().execute(task.getActionTask(event));
+        getEventListenerContext().getExecutor().execute(task.getActionTask(event, this));
       } else if (timesRun < timesToRun) {
         logger.debug("scheduling task, execution no {} ", timesRun);
-        getEventListenerContext().getExecutor().execute(task.getActionTask(event));
+        getEventListenerContext().getExecutor().execute(task.getActionTask(event, this));
       } else if (timesRun == timesToRun) {
         logger.debug("scheduling task, execution no {} (last time)", timesRun);
         getEventListenerContext().getEventBus().unsubscribe(this);
-        getEventListenerContext().getExecutor().execute(task.getActionTask(event));
+        getEventListenerContext().getExecutor().execute(task.getActionTask(event, this));
         publishFinishedEvent();
       }
     }

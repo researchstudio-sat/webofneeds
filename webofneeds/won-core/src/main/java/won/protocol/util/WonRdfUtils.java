@@ -531,28 +531,39 @@ public class WonRdfUtils
      * @return <code>URI</code> which is of type won:Need
      */
     public static URI getNeedURI(Model model) {
-
-      List<URI> needURIs = new ArrayList<>();
-
-      ResIterator iterator = model.listSubjectsWithProperty(RDF.type, WON.NEED);
-      while (iterator.hasNext()) {
-        needURIs.add(URI.create(iterator.next().getURI()));
-      }
-      if (needURIs.size() == 0)
-        return null;
-      else if (needURIs.size() == 1)
-        return needURIs.get(0);
-      else if (needURIs.size() > 1) {
-        URI u = needURIs.get(0);
-        for (URI uri : needURIs) {
-          if (!uri.equals(u))
-            throw new IncorrectPropertyCountException(1,2);
-        }
-        return u;
-      }
-      else
-        return null;
+        Resource res = getNeedResource(model);
+        return res == null ? null : URI.create(res.getURI());
     }
+
+      /**
+       * searches for a subject of type won:Need and returns the NeedURI
+       *
+       * @param model <code>Model</code> object which will be searched for the NeedURI
+       * @return <code>URI</code> which is of type won:Need
+       */
+      public static Resource getNeedResource(Model model) {
+
+          List<Resource> needURIs = new ArrayList<>();
+
+          ResIterator iterator = model.listSubjectsWithProperty(RDF.type, WON.NEED);
+          while (iterator.hasNext()) {
+              needURIs.add(iterator.next());
+          }
+          if (needURIs.size() == 0)
+              return null;
+          else if (needURIs.size() == 1)
+              return needURIs.get(0);
+          else if (needURIs.size() > 1) {
+              Resource u = needURIs.get(0);
+              for (Resource uri : needURIs) {
+                  if (!uri.equals(u))
+                      throw new IncorrectPropertyCountException(1,2);
+              }
+              return u;
+          }
+          else
+              return null;
+      }
 
     public static URI getWonNodeURIFromNeed(Dataset dataset, final URI needURI) {
       return URI.create(RdfUtils.findOnePropertyFromResource(

@@ -24,6 +24,7 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.OpenFromOtherNeedEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -50,7 +51,7 @@ public class OpenConnectionAction extends BaseEventBotAction
   }
 
   @Override
-  public void doRun(final Event event) throws Exception {
+  public void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof ConnectFromOtherNeedEvent) {
       ConnectionSpecificEvent connectEvent = (ConnectionSpecificEvent) event;
       logger.debug("auto-replying to connect for connection {}", connectEvent.getConnectionURI() );

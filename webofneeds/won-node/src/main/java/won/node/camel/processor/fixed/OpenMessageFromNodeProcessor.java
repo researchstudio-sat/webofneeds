@@ -3,6 +3,7 @@ package won.node.camel.processor.fixed;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
@@ -26,7 +27,7 @@ import java.net.URI;
 public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor
 {
 
-  @Transactional(propagation = Propagation.REQUIRED)
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -42,7 +43,7 @@ public class OpenMessageFromNodeProcessor extends AbstractCamelProcessor
                                          wonMessage.getSenderURI(), facet,
                                          ConnectionState.REQUEST_RECEIVED, ConnectionEventType.PARTNER_OPEN);
     } else {
-      con = connectionRepository.findOneByConnectionURI(connectionURIFromWonMessage);
+      con = connectionRepository.findOneByConnectionURIForUpdate(connectionURIFromWonMessage);
     }
     assert con != null;
     assert con.getRemoteNeedURI() != null;

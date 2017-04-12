@@ -1,6 +1,7 @@
 package won.node.facet.businessactivity.statemanager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.node.facet.impl.WON_TX;
@@ -22,7 +23,7 @@ public class JpaBasedBAStateManager implements BAStateManager
 
 
   @Override
-  @Transactional(readOnly = true)
+  @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
   public URI getStateForNeedUri(final URI coordinatorURI, final URI participantURI, final URI facetURI) {
     List<BAState> states = stateRepository.findByCoordinatorURIAndParticipantURIAndFacetTypeURI(coordinatorURI, participantURI, facetURI);
     Iterator<BAState> stateIterator = states.iterator();
@@ -34,7 +35,7 @@ public class JpaBasedBAStateManager implements BAStateManager
   }
 
   @Override
-  @Transactional(propagation = Propagation.SUPPORTS)
+  @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.REPEATABLE_READ)
   public void setStateForNeedUri(final URI stateUri, final URI statePhaseURI, final URI coordinatorURI, final URI participantURI, final URI facetURI) {
     BAState state = null;
     List<BAState> states = stateRepository.findByCoordinatorURIAndParticipantURIAndFacetTypeURI(coordinatorURI, participantURI, facetURI);
@@ -56,13 +57,13 @@ public class JpaBasedBAStateManager implements BAStateManager
   }
 
   @Override
-  @Transactional(propagation = Propagation.SUPPORTS)
+  @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.REPEATABLE_READ)
   public void setStateForNeedUri(final URI stateUri, final URI coordinatorURI, final URI participantURI, final URI facetURI) {
     setStateForNeedUri(stateUri, URI.create(WON_TX.PHASE_NONE.getURI()), coordinatorURI, participantURI, facetURI);
   }
 
   @Override
-  @Transactional(readOnly = true)
+  @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
   public URI getStatePhaseForNeedUri(final URI coordinatorURI, final URI participantURI, final URI facetURI) {
     List<BAState> states = stateRepository.findByCoordinatorURIAndParticipantURIAndFacetTypeURI(coordinatorURI, participantURI, facetURI);
     Iterator<BAState> stateIterator = states.iterator();

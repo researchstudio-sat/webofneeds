@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
     <groupId>webofneeds</groupId>
     <artifactId>won-matcher-rescal</artifactId>
-
+    <name>Matcher-Rescal</name>
     <dependencies>
         <dependency>
             <groupId>webofneeds</groupId>
@@ -78,11 +78,28 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>com.github.ekryd.echo-maven-plugin</groupId>
+                <artifactId>echo-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>skip-notice-matcher-rescal-uberjar</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>echo</goal>
+                        </goals>
+                        <configuration>
+                            <message>Note: this build is slow because a shaded jar is created. If you don't need that (you will know if you do), you can skip it by using the profile 'skip-matcher-rescal-uberjar'</message>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>2.1</version>
                 <executions>
                     <execution>
+                        <id>build-matcher-rescal-uberjar</id>
                         <phase>package</phase>
                         <goals><goal>shade</goal></goals>
                         <configuration>
@@ -114,5 +131,46 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>skip-matcher-rescal-uberjar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.ekryd.echo-maven-plugin</groupId>
+                        <artifactId>echo-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>skip-matcher-rescal-uberjar-before</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>echo</goal>
+                                </goals>
+                                <configuration>
+                                    <message>Note: building the shaded jar for the matcher-rescal is skipped completely. This is done because the profile 'skip-matcher-rescal-uberjar' is active ('-P skip-matcher-rescal-uberjar' on the command line)</message>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>skip-notice-matcher-rescal-uberjar</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- use the same config as above but set the phase to 'none' -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>2.1</version>
+                        <executions>
+                            <execution>
+                                <id>build-matcher-rescal-uberjar</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

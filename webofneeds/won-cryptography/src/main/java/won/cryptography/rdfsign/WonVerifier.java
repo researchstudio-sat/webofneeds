@@ -92,7 +92,7 @@ public class WonVerifier
 
       // make sure the signed graph specified in signature exists in the message
       if (!dataset.containsNamedModel(wonSignatureData.getSignedGraphUri())) {
-        logger.warn("cannot verify signature {} as it is not part of this message ", wonSignatureData.getSignatureUri());
+        logger.debug("cannot verify signature {} as it is not part of this message ", wonSignatureData.getSignatureUri());
         continue;
         //TODO: fetch the external reference and check it here
         //verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(), "No signed graph found for " +

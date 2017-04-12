@@ -1,20 +1,11 @@
 package won.bot.framework.eventbot.action.impl.telegram.send;
 
-import org.springframework.data.repository.query.QueryLookupStrategy;
-import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
-import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.telegram.WonTelegramBotHandler;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.telegram.SendHelpEvent;
-
-import java.util.ArrayList;
-import java.util.List;
+import won.bot.framework.eventbot.listener.EventListener;
 
 /**
  * Created by fsuda on 15.12.2016.
@@ -27,7 +18,7 @@ public class TelegramHelpAction extends BaseEventBotAction {
     }
 
     @Override
-    protected void doRun(Event event) throws Exception {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
         if(event instanceof SendHelpEvent){
 
 

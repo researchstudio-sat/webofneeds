@@ -10,7 +10,17 @@ import java.net.URI;
 import java.util.Date;
 
 @Entity
-@Table(name = "message_event")
+@Table(name = "message_event", indexes = {
+        //indices for this class have the name prefix "IDX_ME"
+         @Index(name = "IDX_ME_PARENT_URI", columnList = "parentURI"),
+         @Index(name = "IDX_ME_PARENT_URI_MESSAGE_TYPE", columnList = "parentURI, messageType"),
+         @Index(name = "IDX_ME_PARENT_URI_REFERENCED_BY_OTHER_MESSAGE", columnList = "parentURI, referencedByOtherMessage")
+        }, uniqueConstraints = {
+          @UniqueConstraint(name = "IDX_ME_UNIQUE_MESSAGE_URI", columnNames = "messageURI"),
+          @UniqueConstraint(name = "IDX_ME_UNIQUE_CORREXPONDING_REMOTE_MESSAGE_URI", columnNames = "correspondingRemoteMessageURI"),
+          @UniqueConstraint(name = "IDX_ME_UNIQUE_DATASETHOLDER_ID", columnNames = "datasetholder_id")
+        }
+)
 public class MessageEventPlaceholder implements ParentAware<EventContainer>
 {
 

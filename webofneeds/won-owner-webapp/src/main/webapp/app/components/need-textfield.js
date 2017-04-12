@@ -84,16 +84,17 @@ function genComponentConf() {
              * e.g. when pasting (a multi-line'd string) into an empty textfield.
              * The `[0]` access the dom-element inside of the angular-element.
              */
-            titleParagraphDom.innerHTML = titleParagraphDom.innerHTML.replace(/^&nbsp;/, '');
+            //titleParagraphDom.innerHTML = titleParagraphDom.innerHTML.replace(/^&nbsp;/, '');
+            // ^ can't do this, as it causes the cursor to jump
 
             const title = titleParagraphDom.innerHTML
-                //@`replace`: sometimes mediumjs doesn't remove the placeholder nbsp properly.
-                //.replace(/^&nbsp;/, '')
+                // sometimes mediumjs doesn't remove the placeholder nbsp properly.
+                .replace(/^&nbsp;/, '')
                 .trim();
 
             //ADD TAGS
-            const titleTags = title? title.match(/#(\w+)/gi) : [];
-            const descriptionTags = description? description.match(/#(\w+)/gi) : [];
+            const titleTags = title? title.match(/#(\S+)/gi) : [];
+            const descriptionTags = description? description.match(/#(\S+)/gi) : [];
 
             tags = angular.element.unique(
                 angular.element.merge(

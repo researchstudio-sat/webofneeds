@@ -16,16 +16,18 @@
 
 package won.bot.framework.eventbot.action.impl.counter;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Counter that is intended to be shared between actions and listeners.
  */
 public class CounterImpl implements Counter
 {
-  private int count;
+  private AtomicInteger count;
   private String name;
 
   public CounterImpl(String name, final int initialCount) {
-    this.count = initialCount;
+    this.count = new AtomicInteger(initialCount);
     this.name = name;
   }
 
@@ -34,18 +36,18 @@ public class CounterImpl implements Counter
   }
 
   @Override
-  public synchronized int getCount(){
-    return count;
+  public int getCount(){
+    return count.get();
   }
 
   @Override
-  public synchronized int increment(){
-    return ++count;
+  public int increment(){
+    return count.incrementAndGet();
   }
 
   @Override
-  public synchronized  int decrement(){
-    return --count;
+  public int decrement(){
+    return count.decrementAndGet();
   }
 
   public String getName() {

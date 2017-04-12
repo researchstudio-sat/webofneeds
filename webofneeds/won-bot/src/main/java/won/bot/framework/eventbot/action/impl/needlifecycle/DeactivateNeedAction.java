@@ -22,6 +22,7 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.NeedSpecificEvent;
 import won.bot.framework.eventbot.event.impl.needlifecycle.NeedDeactivatedEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -41,7 +42,7 @@ public class DeactivateNeedAction extends BaseEventBotAction
   }
 
   @Override
-  protected void doRun(Event event) throws Exception {
+  protected void doRun(Event event, EventListener executingListener) throws Exception {
 
     assert (event instanceof NeedSpecificEvent) : "can handle only NeedSpecificEvent";
 

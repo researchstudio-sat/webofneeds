@@ -22,6 +22,7 @@ import L from '../leaflet-bundleable';
 import {
     initLeaflet,
     initLeafletBaseMaps,
+    seeksOrIs,
 } from '../won-utils';
 
 import {
@@ -46,21 +47,21 @@ function genComponentConf() {
                 </p>
 
                 <h2 class="post-info__heading"
-                    ng-show="self.post.getIn(['won:hasContent','won:hasTextDescription'])">
+                    ng-show="self.postContent.get('won:hasTextDescription')">
                     Description
                 </h2>
                 <p class="post-info__details"
-                    ng-show="self.post.getIn(['won:hasContent','won:hasTextDescription'])">
-                    {{ self.post.getIn(['won:hasContent','won:hasTextDescription'])}}
+                    ng-show="self.postContent.get('won:hasTextDescription')">
+                    {{ self.postContent.get('won:hasTextDescription')}}
                 </p>
 
                 <h2 class="post-info__heading"
-                    ng-show="self.post.getIn(['won:hasContent','won:hasTag'])">
+                    ng-show="self.postContent.get('won:hasTag')">
                     Tags
                 </h2>
                 <div class="post-info__details post-info__tags"
-                    ng-show="self.post.getIn(['won:hasContent','won:hasTag'])">
-                        <span class="post-info__tags__tag" ng-repeat="tag in self.post.getIn(['won:hasContent','won:hasTag']).toJS()">{{tag}}</span>
+                    ng-show="self.postContent.get('won:hasTag')">
+                        <span class="post-info__tags__tag" ng-repeat="tag in self.postContent.get('won:hasTag').toJS()">{{tag}}</span>
                 </div>
 
                 <h2 class="post-info__heading"
@@ -103,7 +104,7 @@ function genComponentConf() {
                 'self.location',
                 (location, previousLocationValue) => {
                     console.log('in location watch: ', location, previousLocationValue);
-                    if(!this._mapHasBeenAutoCentered) {
+                    if(location && !this._mapHasBeenAutoCentered) {
                         this.updateMap(location)
                         this._mapHasBeenAutoCentered = true;
                     }
@@ -113,9 +114,11 @@ function genComponentConf() {
 
             const selectFromState = (state) => {
                 const post = selectOpenPost(state);
-                const location = post && post.getIn(['won:hasContent', 'won:hasContentDescription', 'won:hasLocation']);
+                const postContent = post && seeksOrIs(post);
+                const location = postContent && postContent.get('won:hasLocation');
                 return {
-                    post: post,
+                    post,
+                    postContent,
                     location: location,
                     address: location && location.get('s:name'),
                     friendlyTimestamp: relativeTime(

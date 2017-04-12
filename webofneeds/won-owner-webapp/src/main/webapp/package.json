@@ -7,7 +7,7 @@
     "undo.js": "0.2.0"
   },
   "scripts": {
-    "postinstall": "npm rebuild node-sass && jspm registry create bower jspm-bower-endpoint -y && jspm install && npm run build",
+    "postinstall": "npm rebuild node-sass && jspm registry create bower jspm-bower-endpoint -y && jspm install",
     "build": "gulp build",
     "watch": "gulp watch",
     "clean": "gulp clean"

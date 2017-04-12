@@ -69,7 +69,7 @@ public class DuplicateMessageSendingConversationBot extends IntegrationtestBot
                     ctx,
                     new BaseEventBotAction(ctx){
                         @Override
-                        protected void doRun(Event event) throws Exception {
+                        protected void doRun(Event event, EventListener executingListener) throws Exception {
                           FailureResponseEvent failureResponseEvent = (FailureResponseEvent)event;
                           bus.publish(new TestFailedEvent(
                                   DuplicateMessageSendingConversationBot.this,

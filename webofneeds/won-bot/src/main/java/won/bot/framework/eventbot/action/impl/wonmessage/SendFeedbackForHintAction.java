@@ -21,6 +21,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -45,7 +46,7 @@ public class SendFeedbackForHintAction extends BaseEventBotAction
   }
 
   @Override
-  public void doRun(final Event event) throws Exception {
+  public void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof HintFromMatcherEvent) {
       //TODO: the hint with a match object is not really suitable here. Would be better to
       // use connection object instead

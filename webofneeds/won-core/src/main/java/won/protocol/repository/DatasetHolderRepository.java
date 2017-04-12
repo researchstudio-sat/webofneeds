@@ -16,9 +16,13 @@
 
 package won.protocol.repository;
 
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import won.protocol.model.DatasetHolder;
 
+import javax.persistence.LockModeType;
 import java.net.URI;
 
 /**
@@ -29,4 +33,8 @@ public interface DatasetHolderRepository extends CrudRepository<DatasetHolder, U
   public DatasetHolder findOneByUriAndVersionNot(URI uri, Integer version);
 
   public DatasetHolder findOneByUri(URI uri);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("select d from DatasetHolder d where d.uri = :uri")
+  public DatasetHolder findOneByUriForUpdate(@Param("uri") URI uri);
 }

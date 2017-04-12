@@ -22,6 +22,7 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.needlifecycle.AbstractCreateNeedAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.NeedSpecificEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -51,7 +52,7 @@ public class ConnectWithAssociatedNeedAction extends BaseEventBotAction
   }
 
   @Override
-  public void doRun(Event event)
+  public void doRun(Event event, EventListener executingListener)
   {
     if (! (event instanceof NeedSpecificEvent)){
       logger.error("ConnectWithAssociatedNeedAction can only handle NeedSpecificEvents");

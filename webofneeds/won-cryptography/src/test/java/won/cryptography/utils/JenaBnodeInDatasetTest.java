@@ -25,7 +25,7 @@ public class JenaBnodeInDatasetTest
   public void testReadWriteDatasetWithTwoGraphs() throws Exception {
 
     InputStream is = this.getClass().getResourceAsStream(RESOURCE_FILE);
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
     is.close();
     assertSameSubjBnode(dataset, "http://www.example.com#", "G1", "G2", "pred1", "pred2");
@@ -42,7 +42,7 @@ public class JenaBnodeInDatasetTest
     os.close();
 
     InputStream is2 = new FileInputStream(outFile);;
-    Dataset dataset2 = DatasetFactory.createMem();
+    Dataset dataset2 = DatasetFactory.createGeneral();
     RDFDataMgr.read(dataset2, is2, RDFFormat.TRIG.getLang());
     is2.close();
     assertSameSubjBnode(dataset2, "http://www.example.com#", "G1", "G2", "pred1", "pred2");

@@ -6,6 +6,9 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.StatementImpl;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.shared.Lock;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.eval.PathEval;
@@ -13,9 +16,6 @@ import org.apache.jena.sparql.util.Context;
 import org.apache.jena.tdb.TDB;
 import org.apache.jena.util.FileUtils;
 import org.apache.jena.util.ResourceUtils;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.IncorrectPropertyCountException;
@@ -85,14 +85,14 @@ public class RdfUtils
     if (content != null) {
       return toDataset(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), rdfFormat);
     } else
-      return DatasetFactory.createMem();
+      return DatasetFactory.createGeneral();
 
 
   }
 
   public static Dataset toDataset(InputStream stream, RDFFormat rdfFormat) {
 
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
 
     RDFDataMgr.read(dataset, stream, rdfFormat.getLang());
     try {
@@ -122,6 +122,21 @@ public class RdfUtils
     }
     return clonedModel;
   }
+
+  public static Dataset cloneDataset(Dataset dataset) {
+    if (dataset == null) return null;
+    Dataset clonedDataset = DatasetFactory.createGeneral();
+    Model model = dataset.getDefaultModel();
+    if (model != null) {
+      clonedDataset.setDefaultModel(cloneModel(model));
+    }
+    for (Iterator<String> modelNames = dataset.listNames(); modelNames.hasNext(); ){
+      String modelName = modelNames.next();
+      clonedDataset.addNamedModel(modelName, cloneModel(dataset.getNamedModel(modelName)));
+    }
+    return clonedDataset;
+  }
+
 
   public static void replaceBaseURI(final Model model, final String baseURI)
   {
@@ -735,6 +750,7 @@ public class RdfUtils
   }
 
 
+
   /**
    * Dataset visitor used for repeated application of model operations in a dataset.
    */
@@ -1198,7 +1214,7 @@ public class RdfUtils
   public static Dataset readDatasetFromString(final String data, final Lang lang)
   {
     StringReader sr = new StringReader(data);
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     RDFDataMgr.read(dataset, sr, "no:uri", lang);
     return dataset;
   }

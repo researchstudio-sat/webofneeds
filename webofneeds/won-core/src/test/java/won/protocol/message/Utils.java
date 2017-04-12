@@ -26,7 +26,7 @@ public class Utils
   public static Dataset createTestDataset(String resourceName) throws IOException {
 
     InputStream is = Utils.class.getResourceAsStream(resourceName);
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
     is.close();
     return dataset;

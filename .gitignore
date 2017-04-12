@@ -59,7 +59,7 @@ bin/setenv.*
 /webofneeds/won-docker/wonnode/won.war
 
 #local config and data
-webofneeds/conf.local
+webofneeds/conf.*
 /webofneeds/data.local
 
 #local package caches

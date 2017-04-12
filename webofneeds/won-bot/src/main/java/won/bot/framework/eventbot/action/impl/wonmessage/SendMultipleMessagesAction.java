@@ -19,6 +19,7 @@ package won.bot.framework.eventbot.action.impl.wonmessage;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.listener.EventListener;
 
 /**
  * Created by fkleedorfer on 09.06.2016.
@@ -34,7 +35,7 @@ public class SendMultipleMessagesAction extends SendMessageAction
   }
 
   @Override
-  protected void doRun(final Event event) throws Exception {
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof ConnectionSpecificEvent) {
       for (int i = 0; i < messages.length; i++) {
         sendMessage((ConnectionSpecificEvent) event, messages[i]);

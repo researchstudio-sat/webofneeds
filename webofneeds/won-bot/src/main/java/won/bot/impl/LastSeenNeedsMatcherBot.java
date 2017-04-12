@@ -27,6 +27,7 @@ import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
 import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
 import won.bot.framework.eventbot.event.impl.matcher.NeedCreatedEventForMatcher;
 import won.bot.framework.eventbot.listener.BaseEventListener;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
@@ -79,7 +80,7 @@ public class LastSeenNeedsMatcherBot extends EventBot
             new BaseEventBotAction(ctx)
             {
               @Override
-              protected void doRun(final Event event)
+              protected void doRun(final Event event, EventListener executingListener)
                 throws Exception {
                 NeedCreatedEventForMatcher needCreatedEvent = (NeedCreatedEventForMatcher) event;
                 URI currentNeedURI = needCreatedEvent.getNeedURI();

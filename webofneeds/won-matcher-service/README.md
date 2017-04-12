@@ -1,4 +1,4 @@
-##Matching Service Architecture
+## Matching Service Architecture
 
 Matching is currently done by setting up an instance of a *won-matcher-service* module which provides functionality to connect
 to won nodes, crawl them for new needs and subscribe for need event life cycle updates. It also provides functionality to
@@ -14,7 +14,7 @@ distributed and scaled up quite easily. If you start up the main java program (s
 other Akka cluster nodes can connect to. The matching service provides the basic functionality for matching but does
 not execute a matching algorithm itself.
 
-###Solr Online Matcher
+### Solr Online Matcher
 
 The Solr matching algorithm from the module [won-matcher-solr](../won-matcher-solr) is the default online matcher
 that actually computes matches in real time. It saves received needs into a Solr index and generates queries for them
@@ -28,7 +28,7 @@ After registration the Solr matcher will receive events (e.g. most important nee
 service send on its event bus. The Solr matcher will also compute matches from incoming needs and send them back as
 hint events to the matching service via the event to be published.
 
-###Integrating a matching algorithm
+### Integrating a matching algorithm
 
 If you want to implement a new matching algorithm, have a look at [won-matcher-solr](../won-matcher-solr) module. As described you have to implement an actor that subscribes and publishes to the matching services event bus. Therefore you need to set up a
 Akka cluster node that connects itself with the matching service.
