@@ -72,8 +72,8 @@ public class ExecuteFeedbackCommandAction extends ExecuteSendMessageCommandActio
 
         Dataset connectionRDF =
                 getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
-        URI localNeed = WonRdfUtils.NeedUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
-        URI wonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
+        URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, connectionURI);
+        URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, connectionURI);
         //TODO: make more generic by using the URIs specified in the command.
         return WonMessageBuilder
                 .setMessagePropertiesForHintFeedback(
