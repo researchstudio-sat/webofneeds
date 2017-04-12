@@ -19,10 +19,12 @@
 
 .post-messages, .post-messages--connected {
   background: white;
-  border: 0.1rem solid $won-line-gray;
+  border-left: 0.1rem solid $won-line-gray;
+  border-right: 0.1rem solid $won-line-gray;
+  border-bottom: 0.1rem solid $won-line-gray;
   width: 100%;
   max-width: 35rem;
-  margin: 0.5rem;
+  //margin-ri: 0.5rem;
 
   box-sizing: border-box;
 
