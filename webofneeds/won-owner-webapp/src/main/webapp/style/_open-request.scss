@@ -16,49 +16,6 @@ won-open-request {
       @include fixed-square($postIconSize);
       padding-right: 0.5rem;
     }
-
-    &__title {
-      color: black;
-      flex-grow: 1;
-      padding-right: 1rem;
-
-      &__topline{
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-
-        &__title{
-          font-weight: 500;
-        }
-
-        &__date{
-          font-size: $smallFontSize;
-          color: $won-subtitle-gray;
-        }
-      }
-
-      &__subtitle {
-        color: $won-subtitle-gray;
-        display: flex;
-        flex-direction: row;
-        font-size: $smallFontSize;
-
-        &__group {
-          display: flex;
-          align-items: center;
-          flex-direction: row;
-
-          &__dash {
-            padding: 0 0.25rem;
-          }
-
-          &__icon {
-            padding-right: 0.25rem;
-            @include fixed-square(0.75rem);
-          }
-        }
-      }
-    }
   }
 
   .or__footer {
@@ -77,28 +34,6 @@ won-open-request {
 
       button {
         margin-left: 0.5rem;
-      }
-    }
-  }
-
-  .or__content {
-    padding: 1rem;
-    font-size: $smallFontSize;
-
-    &__description {
-      padding-top: 0.25rem;
-
-      &__location,
-      &__text,
-      &__datetime {
-        display: flex;
-        flex-direction: row;
-        padding: 0.25rem 0;
-      }
-
-      &__indicator {
-        @include fixed-square(1rem);
-        padding-right: 0.5rem;
       }
     }
   }
