@@ -29,7 +29,9 @@ function genComponentConf() {
       <won-square-image
           src="self.needContent.get('TODO')"
           title="self.needContent.get('dc:title')"
-          uri="self.needUri">
+          uri="self.needUri"
+          ng-show="!self.hideImage"
+          >
       </won-square-image>
       <div class="ph__right">
         <div class="ph__right__topline">
