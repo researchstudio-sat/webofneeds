@@ -79,7 +79,7 @@ function genComponentConf() {
                 </div>
                 <won-square-image
                     src="self.ownNeedContent.get('titleImgSrc')"
-                    title="self.ownNeedContent('dc:title')"
+                    title="self.ownNeedContent.get('dc:title')"
                     uri="self.ownNeed.getIn(['@id'])">
                 </won-square-image>
         </div>

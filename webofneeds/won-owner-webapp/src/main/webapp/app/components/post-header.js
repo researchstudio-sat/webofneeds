@@ -27,11 +27,11 @@ const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
       <won-square-image
-          src="self.needContent.get('TODO')"
-          title="self.needContent.get('dc:title')"
-          uri="self.needUri"
-          ng-show="!self.hideImage"
-          >
+        ng-class="{'bigger' : self.biggerImage}"
+        src="self.needContent.get('TODO')"
+        title="self.needContent.get('dc:title')"
+        uri="self.needUri"
+        ng-show="!self.hideImage">
       </won-square-image>
       <div class="ph__right">
         <div class="ph__right__topline">
@@ -107,6 +107,12 @@ function genComponentConf() {
              * if set, the avatar will be hidden
              */
             hideImage: '=',
+
+            /**
+             * If true, the title image will be a bit bigger. This
+             * can be used to create visual contrast.
+             */
+            biggerImage: '=',
         },
         template: template
     }

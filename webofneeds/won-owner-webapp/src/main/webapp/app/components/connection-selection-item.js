@@ -108,7 +108,7 @@ function genComponentConf() {
         }
 
         setOpen() {
-            this.selectedConnection({connectionUri: this.connectionUri}); //trigger callback with scope-object
+            this.onSelectedConnection({connectionUri: this.connectionUri}); //trigger callback with scope-object
             //TODO either publish a dom-event as well; or directly call the route-change
         }
 
@@ -127,9 +127,9 @@ function genComponentConf() {
             connectionUri: "=",
             /*
              * Usage:
-             *  selected-connection="myCallback(connectionUri)"
+             *  on-selected-connection="myCallback(connectionUri)"
              */
-            selectedConnection: "&"
+            onSelectedConnection: "&"
         },
         template: template
     }
