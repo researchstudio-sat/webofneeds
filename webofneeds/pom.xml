@@ -49,13 +49,13 @@
             <dependency>
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-solrj</artifactId>
-                <version>6.1.0</version>
+                <version>6.5.0</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-core</artifactId>
-                <version>${solr.version}</version>
+                <version>6.5.0</version>
             </dependency>
             <!-- Camel, AMQP & ActiveMQ -->
             <dependency>
@@ -124,14 +124,6 @@
                 <groupId>javax.jms</groupId>
                 <artifactId>jms</artifactId>
                 <version>${jms.version}</version>
-            </dependency>
-
-            <!-- SIREn-->
-            <dependency>
-                <groupId>org.sindice.siren</groupId>
-                <artifactId>siren-solr</artifactId>
-                <version>${siren.version}</version>
-                <type>jar</type>
             </dependency>
 
             <!-- SPIN -->
@@ -989,7 +981,7 @@
                                                ClassCastExceptions
                                         servlet: conflicts with tomcat's version
                                     -->
-                                    <excludeGroupIds>webofneeds,org.sindice.siren</excludeGroupIds>
+                                    <excludeGroupIds>webofneeds</excludeGroupIds>
                                     <excludeArtifactIds>servlet-api</excludeArtifactIds>
                                 </configuration>
                             </execution>
