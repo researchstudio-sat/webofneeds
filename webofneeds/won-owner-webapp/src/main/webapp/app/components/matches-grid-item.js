@@ -14,56 +14,23 @@ import {
     seeksOrIs,
     inferLegacyNeedType,
 } from '../won-utils';
+import postHeaderModule from './post-header';
+import postContentModule from './post-content';
 
 const serviceDependencies = ['$q', '$ngRedux', '$scope', '$interval'];
 function genComponentConf() {
     let template = `
-        <div class="mgi__description">
-            <div class="mgi__description__post clickable">
-                <div class="mgi__description__post__text">
-                    <div class="mgi__description__post__text__topline">
-                        <div class="mgi__description__post__text__topline__title">
-                            {{ self.theirNeedContent.get('dc:title') }}
-                        </div>
-                        <div class="mgi__description__post__text__topline__date">
-                            {{ self.theirNeedCreatedOn }}
-                        </div>
-                    </div>
-                    <div class="mgi__description__post__text__subtitle">
-                        <span
-                            class="mgi__description__post__text__subtitle__group"
-                            ng-show="self.connectionData.get('group')">
-                                <img src="generated/icon-sprite.svg#ico36_group"
-                                    class="mgi__description__post__text__subtitle__group__icon">
-                                {{ self.connectionData.get('group') }}
-                                <span class="mgi__description__post__text__subtitle__group__dash"> &ndash; </span>
-                        </span>
-                        <span class="mgi__description__post__text__subtitle__type">
-                            {{ self.labels.type[ self.theirNeedType ] }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div
-                class="mgi__description__content"
-                ng-show="self.theirNeedContent.getIn(['won:hasLocation', 's:name']) || self.theirNeed.get('deadline')">
-                    <div class="mgi__description__content__location"
-                        ng-show="self.theirNeedContent.getIn(['won:hasLocation', 's:name'])">
-                            <img
-                                class="mgi__description__content__indicator"
-                                src="generated/icon-sprite.svg#ico16_indicator_location"/>
-                            <span>{{ self.theirNeedContent.getIn(['won:hasLocation', 's:name']) }}</span>
-                    </div>
-                    <!--
-                    <div class="mgi__description__content__datetime"
-                        ng-show="self.theirNeed.get('deadline')">
-                            <img
-                                class="mgi__description__content__indicator"
-                                src="generated/icon-sprite.svg#ico16_indicator_time"/>
-                            <span>{{ self.theirNeed.get('deadline') }}</span>
-                    </div>
-                    -->
-            </div>
+        <div class="mgi__description"
+            ng-click="self.toggleFeedback()">
+
+            <won-post-header
+                need-uri="self.theirNeed.get('@id')">
+            </won-post-header>
+            <hr/>
+            <won-post-content
+                need-uri="self.theirNeed.get('@id')">
+            </won-post-content>
+
         </div>
         <div
             class="mgi__match clickable"
@@ -92,12 +59,6 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
-            this.images=[
-                "images/furniture1.png",
-                "images/furniture2.png",
-                "images/furniture3.png",
-                "images/furniture4.png"
-            ];
             this.feedbackVisible = false;
             this.labels = labels;
             window.mgi4dbg = this;
@@ -155,9 +116,11 @@ function genComponentConf() {
 }
 
 export default angular.module('won.owner.components.matchesGridItem', [
-    squareImageModule,
-    feedbackGridModule
-])
+        squareImageModule,
+        feedbackGridModule,
+        postHeaderModule,
+        postContentModule,
+    ])
     .directive('wonMatchesGridItem', genComponentConf)
     .name;
 
