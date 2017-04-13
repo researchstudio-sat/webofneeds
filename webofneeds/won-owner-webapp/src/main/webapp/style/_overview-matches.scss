@@ -101,7 +101,17 @@ won-matches {
 
   .omc__content__list {
     @include omc__content;
-    display: block;
+
+    won-connections-overview,
+    won-connection-selection {
+      max-width: 35rem;
+
+      //flex-grow: 1;
+      // crude centering:
+      margin-left: auto;
+      margin-right: auto;
+    }
+
   }
 }
 

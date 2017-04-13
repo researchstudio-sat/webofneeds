@@ -1,11 +1,19 @@
 @import 'won-config';
 
+won-connection-selection {
+  display: block;
+}
+
 won-connections-overview {
+  display: block;
+
   .covw__own-need {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    padding: 0.5rem 1rem; /*vert horiz*/
+
+    padding: 0.5rem 0; // vert horiz
+
     border-bottom: 0.1rem solid $won-line-gray;
 
     won-post-header {
