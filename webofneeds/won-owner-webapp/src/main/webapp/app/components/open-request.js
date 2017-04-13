@@ -49,6 +49,10 @@ function genComponentConf() {
         text-message="self.textMsg">
       </won-post-content>
 
+      <div class="or__footer" ng-show="self.isSentRequest">
+        Waiting for them to accept your contact request.
+      </div>
+
       <div class="or__footer" ng-show="self.isReceivedRequest">
         <input type="text" ng-model="self.message" placeholder="Reply Message (optional, in case of acceptance)"/>
         <div class="flexbuttons">
