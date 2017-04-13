@@ -10,6 +10,7 @@ import {
 import {
     msStringToDate,
     is,
+    arrEq,
 } from './utils';
 import {
     selectEvents,
@@ -273,3 +274,45 @@ export function inferLegacyNeedType(need) {
     }
 }
 
+/**
+ * Makes sure the select-statement is reevaluated, should
+ * one of the watched fields change.
+ *
+ * example usage:
+ * ```
+ * reduxSelectDependsOnProperties(['self.needUri', 'self.timestamp'], selectFromState, this)
+ * ```
+ *
+ * @param properties a list of watch expressions
+ * @param selectFromState same as $ngRedux.connect
+ * @param ctrl the controller to bind the results to. needs to have `$ngRedux` and `$scope` attached.
+ * @returns {*}
+* @returns a function to unregister the watch
+ */
+export function reduxSelectDependsOnProperties(properties, selectFromState, ctrl) {
+    return ctrl.$scope.$watchGroup(properties, (newVals, oldVals) => {
+        if(!arrEq(newVals, oldVals)) {
+            const state = ctrl.$ngRedux.getState();
+            const stateSlice = selectFromState(state);
+            Object.assign(ctrl, stateSlice);
+        }
+    });
+}
+
+/**
+ * Connects a component to ng-redux, sets up watches for the
+ * properties that `selectFromState` depends on and handles
+ * cleanup when the component is destroyed.
+ * @param selectFromState
+ * @param actionCreators
+ * @param properties
+ * @param ctrl a controller/component with `$scope` and `$ngRedux` attached
+ */
+export function connect2Redux(selectFromState, actionCreators, properties, ctrl) {
+    const disconnectRdx = ctrl.$ngRedux.connect(selectFromState, actionCreators)(ctrl);
+    const disconnectProps = reduxSelectDependsOnProperties(properties, selectFromState, ctrl );
+    ctrl.$scope.$on('$destroy', () => {
+        disconnectRdx();
+        disconnectProps();
+    });
+}

@@ -18,6 +18,8 @@ import {
     selectTimestamp,
     seeksOrIs,
     inferLegacyNeedType,
+    reduxSelectDependsOnProperties,
+    connect2Redux,
 } from '../won-utils'
 import {
     selectLastUpdateTime,
@@ -78,8 +80,20 @@ function genComponentConf() {
                     ),
                 }
             };
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            /*
+            const disconnectRdx = this.$ngRedux.connect(selectFromState, actionCreators)(this);
+            const disconnectProps = reduxSelectDependsOnProperties(
+                ['self.needUri', 'self.timestamp'],
+                selectFromState, this
+            );
+            this.$scope.$on('$destroy', () => { disconnectRdx(); disconnectProps()});
+            */
+
+            connect2Redux(
+                selectFromState, actionCreators,
+                ['self.needUri', 'self.timestamp'],
+                this
+            );
         }
     }
     Controller.$inject = serviceDependencies;
@@ -90,6 +104,7 @@ function genComponentConf() {
         bindToController: true, //scope-bindings -> ctrl
         scope: {
             needUri: '=',
+
             /**
              * Will be used instead of the posts creation date if specified.
              * Use if you e.g. instead want to show the date when a request was made.

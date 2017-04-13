@@ -13,6 +13,7 @@ import {
 } from '../utils.js'
 import {
     seeksOrIs,
+    connect2Redux,
 } from '../won-utils'
 
 const serviceDependencies = ['$ngRedux', '$scope'];
@@ -75,8 +76,11 @@ function genComponentConf() {
                     needContent: need && seeksOrIs(need),
                 }
             };
+            /*
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
+            */
+            connect2Redux(selectFromState, actionCreators, ['self.needUri'], this);
         }
     }
     Controller.$inject = serviceDependencies;
