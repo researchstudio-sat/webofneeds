@@ -174,6 +174,7 @@ export function selectSortedChatMessages(state) {
 }
 
 export function connectionLastUpdatedAt(state, connection) {
+    if(!connection) return Immutable.List();
     const events = selectEvents(state);
     const eventUris = connection.get('hasEvents');
     if(!eventUris) return Immutable.List();
