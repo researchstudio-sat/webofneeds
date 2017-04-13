@@ -12,6 +12,11 @@ won-connection-selection-item {
     @include fixed-square(1rem);
   }
 
+  .conn__unreadCount {
+    color: $won-red;
+    margin-left: 0.5rem;
+  }
+
   $greyBorder: 0.1rem solid $won-line-gray;
   $invisibleBorder: 0.1rem solid $won-lighter-gray;
 

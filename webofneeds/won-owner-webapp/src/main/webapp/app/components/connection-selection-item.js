@@ -18,6 +18,7 @@ import {
     selectOpenPostUri,
     selectLastUpdatedPerConnection,
     selectLastUpdateTime,
+    selectUnreadCountsByConnectionAndType,
 } from '../selectors';
 
 import {
@@ -39,6 +40,9 @@ function genComponentConf() {
           ng-click="self.setOpen()">
         </won-post-header>
 
+        <div class="conn__unreadCount">
+          {{ self.unreadCount }}
+        </div>
         <img
           class="conn__icon clickable"
           src="generated/icon-sprite.svg#ico_settings_grey"
@@ -66,17 +70,25 @@ function genComponentConf() {
             this.labels = labels;
             //this.settingsOpen = false;
 
+            this.cnctState2MessageType = won.cnctState2MessageType;
+
             const self = this;
 
             const selectFromState = (state)=> {
 
                 const connectionData = selectAllByConnections(state).get(this.connectionUri);
+                const connectionUri = connectionData && connectionData.getIn(['connection', 'uri']);
                 const ownNeed = connectionData && connectionData.get('ownNeed');
                 const theirNeed = connectionData && connectionData.get('remoteNeed');
 
                 const lastStateUpdate = selectLastUpdateTime(state);
                 const lastUpdatedPerConnection = selectLastUpdatedPerConnection(state);
 
+                const connectionType = connectionData && connectionData
+                    .getIn(['connection','hasConnectionState']);
+
+                const unreadCounts = selectUnreadCountsByConnectionAndType(state);
+                const messageType = won.cnctState2MessageType[connectionType];
                 return {
                     openConnectionUri: selectOpenConnectionUri(state),
 
@@ -91,12 +103,15 @@ function genComponentConf() {
                         lastStateUpdate,
                         theirNeed.get('dct:created')
                     ),
-                    lastUpdateTimestamp: lastUpdatedPerConnection.get(this.connectionUri),
+                    lastUpdateTimestamp: lastUpdatedPerConnection.get(connectionUri),
                     lastUpdated: lastUpdatedPerConnection &&
                         relativeTime(
                             lastStateUpdate,
-                            lastUpdatedPerConnection.get(this.connectionUri)
+                            lastUpdatedPerConnection.get(connectionUri)
                         ),
+
+                    unreadCount: unreadCounts && unreadCounts
+                        .getIn([connectionUri, messageType])
                 }
             }
 
