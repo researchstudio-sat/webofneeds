@@ -5,11 +5,17 @@
 </header>
 <main class="overviewsentrequestscontent">
     <div class="oir__requests" ng-class="{'hidden': self.connection !== undefined}">
+        <won-connections-overview
+                connection-type="::self.WON.RequestSent"
+                on-selected-connection="self.selectedConnection(connectionUri)">
+        </won-connections-overview>
+        <!--
         <won-request-item-line
                 open="false"
                 item="item"
                 ng-repeat="(key,item) in self.sentRequestsOfNeed">
         </won-request-item-line>
+        -->
     </div>
     <div class="oir__openrequest" ng-if="self.connection">
         <won-open-request></won-open-request>
