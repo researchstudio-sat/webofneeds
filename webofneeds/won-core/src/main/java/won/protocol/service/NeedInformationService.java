@@ -26,7 +26,6 @@ import won.protocol.model.*;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Service for obtaining information about needs and connections in the system in RDF.
@@ -216,28 +215,7 @@ public interface NeedInformationService {
      */
     public Model readConnectionContent(URI connectionURI) throws NoSuchConnectionException;
 
-  /**
-   * Retrieves list of event uris of the specified connection.
-   *
-   * @param connectionUri
-   * @return a collection of all event URIs.
-   */
-    public List<URI> listConnectionEventURIs(URI connectionUri);
 
-
-  /**
-   * Retrieves list of event uris of the specified connection that have a given message type and that are on the
-   * given page, taking into account number of uris per page preference.
-   *
-   * @param connectionUri
-   * @param page
-   * @param preferredPageSize preferred number of members per page, null => use default
-   * @param messageType null => all types
-   * @return a collection of all event URIs.
-   */
-  @Deprecated
-    public Slice<URI> listConnectionEventURIs(
-      URI connectionUri, int page, Integer preferredPageSize, WonMessageType messageType);
 
   public Slice<MessageEventPlaceholder> listConnectionEvents(
     URI connectionUri, int page, Integer preferredPageSize, WonMessageType messageType);

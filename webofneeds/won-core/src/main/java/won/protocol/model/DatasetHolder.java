@@ -133,7 +133,7 @@ public class DatasetHolder
     if (this.cachedDataset != null) return cachedDataset;
     synchronized (this) {
       if (this.cachedDataset != null) return cachedDataset;
-      Dataset dataset = DatasetFactory.createMem();
+      Dataset dataset = DatasetFactory.createGeneral();
       InputStream is = new ByteArrayInputStream(this.datasetBytes);
       try {
         try {

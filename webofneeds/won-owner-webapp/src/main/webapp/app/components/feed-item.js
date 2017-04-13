@@ -156,10 +156,17 @@ function genComponentConf() {
                 this.unreadCounts.get(type)
         }
         unreadMatchesCount() {
-            return this.unreadXCount(won.WONMSG.hintMessage);
+            return this.unreadXCount(won.WONMSG.hintMessage)
         }
         unreadRequestsCount() {
             return this.unreadXCount(won.WONMSG.connectMessage);
+        }
+        getTextForConnectionState(state){
+            let stateText = this.labels.connectionState[state];
+            if (!stateText) {
+                stateText = "unknown connection state";
+            }
+            return stateText;
         }
     }
     Controller.$inject = serviceDependencies;

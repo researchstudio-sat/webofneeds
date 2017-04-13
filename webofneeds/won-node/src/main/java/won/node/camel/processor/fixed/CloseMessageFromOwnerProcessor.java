@@ -3,6 +3,8 @@ package won.node.camel.processor.fixed;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractFromOwnerCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
@@ -25,14 +27,14 @@ import won.protocol.vocabulary.WONMSG;
 public class CloseMessageFromOwnerProcessor extends AbstractFromOwnerCamelProcessor
 {
 
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
 
     logger.debug("CLOSE received from the owner side for connection {}", wonMessage.getSenderURI());
 
-    Connection con = connectionRepository.findOneByConnectionURI(wonMessage.getSenderURI());
+    Connection con = connectionRepository.findOneByConnectionURIForUpdate(wonMessage.getSenderURI());
     ConnectionState originalState = con.getState();
     con = dataService.nextConnectionState(con, ConnectionEventType.OWNER_CLOSE);
     //if the connection was in suggested state, don't send a close message to the remote need

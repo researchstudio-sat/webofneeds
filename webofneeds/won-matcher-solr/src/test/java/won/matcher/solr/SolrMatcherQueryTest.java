@@ -20,64 +20,63 @@ import java.io.IOException;
 
 /**
  * Created by hfriedrich on 03.08.2016.
- *
+ * <p>
  * Utility test app to query an Solr index and check what results it returns.
  */
-public class SolrMatcherQueryTest
-{
-  public static void main(String[] args) throws IOException, InterruptedException, JsonLdError, SolrServerException {
+public class SolrMatcherQueryTest {
+    public static void main(String[] args) throws IOException, InterruptedException, JsonLdError, SolrServerException {
 
-    AnnotationConfigApplicationContext ctx =
-      new AnnotationConfigApplicationContext(SolrTestAppConfiguration.class);
+        AnnotationConfigApplicationContext ctx =
+                new AnnotationConfigApplicationContext(SolrTestAppConfiguration.class);
 
-    HintBuilder hintBuilder = ctx.getBean(HintBuilder.class);
-    //DefaultMatcherQueryExecuter queryExecutor = ctx.getBean(DefaultMatcherQueryExecuter.class);
-    TestMatcherQueryExecutor queryExecutor = ctx.getBean(TestMatcherQueryExecutor.class);
+        HintBuilder hintBuilder = ctx.getBean(HintBuilder.class);
+        //DefaultMatcherQueryExecuter queryExecutor = ctx.getBean(DefaultMatcherQueryExecuter.class);
+        TestMatcherQueryExecutor queryExecutor = ctx.getBean(TestMatcherQueryExecutor.class);
 
-    // set the options of the need producer (e.g. if it should exhaust) in the SolrNeedIndexerAppConfiguration file
-    NeedProducer needProducer = ctx.getBean(RoundRobinCompositeNeedProducer.class);
+        // set the options of the need producer (e.g. if it should exhaust) in the SolrNeedIndexerAppConfiguration file
+        NeedProducer needProducer = ctx.getBean(RoundRobinCompositeNeedProducer.class);
 
-    while (!needProducer.isExhausted()) { //&& needs < 20) {
+        while (!needProducer.isExhausted()) { //&& needs < 20) {
 
-      Dataset ds = DatasetFactory.create(needProducer.create());
+            Dataset ds = DatasetFactory.createTxnMem();
+            ds.addNamedModel("https://node.matchat.org/won/resource/need/test#need", needProducer.create());
 
-      try {
+            try {
 
-        TestNeedQueryFactory needQuery = new TestNeedQueryFactory(ds);
+                TestNeedQueryFactory needQuery = new TestNeedQueryFactory(ds);
 
-        String query = needQuery.createQuery();
-        System.out.println("execute query: " + query);
+                String query = needQuery.createQuery();
+                System.out.println("execute query: " + query);
 
-        SolrDocumentList docs = queryExecutor.executeNeedQuery(query, null, new BasicNeedQueryFactory(ds).createQuery());
-        SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
+                SolrDocumentList docs = queryExecutor.executeNeedQuery(query, null, new BasicNeedQueryFactory(ds).createQuery());
+                SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
+                System.out.println("Found docs: " + ((docs != null) ? docs.size() : 0) + ", keep docs: " + ((matchedDocs != null) ? matchedDocs.size() : 0));
+                if (docs == null) {
+                    continue;
+                }
 
-        System.out.println("Found docs: " + docs.size() + ", keep docs: " + matchedDocs.size());
+                System.out.println("Keep docs: ");
+                System.out.println("======================");
+                for (SolrDocument doc : matchedDocs) {
+                    String score = doc.getFieldValue("score").toString();
+                    String matchedNeedId = doc.getFieldValue("id").toString();
+                    System.out.println("Score: " + score + ", Id: " + matchedNeedId);
+                }
 
-        System.out.println("Keep docs: ");
-        System.out.println("======================");
-        for (SolrDocument doc : matchedDocs) {
-          String title = doc.getFieldValue("_graph.http___purl.org_webofneeds_model_hasContent.http___purl" +
-                                       ".org_dc_elements_1.1_title").toString();
-          String score = doc.getFieldValue("score").toString();
-          String matchedNeedId = doc.getFieldValue("id").toString();
-          System.out.println("Score: " + score + ", Title: " + title + ", Id: " + matchedNeedId);
+                System.out.println("All docs: ");
+                System.out.println("======================");
+                for (SolrDocument doc : docs) {
+                    String score = doc.getFieldValue("score").toString();
+                    String matchedNeedId = doc.getFieldValue("id").toString();
+                    System.out.println("Score: " + score + ", Id: " + matchedNeedId);
+                }
+
+
+            } catch (SolrException e) {
+                System.err.println(e);
+            }
         }
 
-        System.out.println("All docs: ");
-        System.out.println("======================");
-        for (SolrDocument doc : docs) {
-          String title = doc.getFieldValue("_graph.http___purl.org_webofneeds_model_hasContent.http___purl" +
-                                             ".org_dc_elements_1.1_title").toString();
-          String score = doc.getFieldValue("score").toString();
-          System.out.println("Score: " + score + ", Title: " + title);
-        }
-
-
-      } catch (SolrException e) {
-        System.err.println(e);
-      }
+        System.exit(0);
     }
-
-    System.exit(0);
-  }
 }

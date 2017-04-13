@@ -9,6 +9,7 @@ import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.mail.CreateNeedFromMailEvent;
 import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 
 import javax.mail.internet.MimeMessage;
 import java.util.Collection;
@@ -23,7 +24,7 @@ public class SubscribeUnsubscribeAction extends BaseEventBotAction
   }
 
   @Override
-  protected void doRun(final Event event) throws Exception {
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
 
     if (event instanceof SubscribeUnsubscribeEvent) {
 

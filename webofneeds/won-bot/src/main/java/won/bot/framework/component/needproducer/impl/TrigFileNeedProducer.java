@@ -42,7 +42,7 @@ public class TrigFileNeedProducer implements FileBasedNeedProducer
   {
     logger.debug("processing as turtle file: {} ", file);
     try (FileInputStream fis = new FileInputStream(file)) {
-      Dataset dataset = DatasetFactory.createMem();
+      Dataset dataset = DatasetFactory.createGeneral();
       RDFDataMgr.read(dataset, fis, RDFFormat.TRIG.getLang());
       // TODO this needs to be fixed according to the need trig format
       // definition, i.e. the need/connection/event/etc. triples are in core

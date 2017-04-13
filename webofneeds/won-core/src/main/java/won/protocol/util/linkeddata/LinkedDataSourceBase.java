@@ -54,7 +54,7 @@ public class LinkedDataSourceBase implements LinkedDataSource
     assert resource != null : "resource must not be null";
 
     logger.debug("fetching linked data for URI {}", resource);
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     try {
       dataset = linkedDataRestClient.readResourceData(resource);
     } catch (Exception e){
@@ -68,7 +68,7 @@ public class LinkedDataSourceBase implements LinkedDataSource
     assert (resource != null && requesterWebID != null) : "resource and requester must not be null";
 
     logger.debug("fetching linked data for URI {} requester {}", resource, requesterWebID);
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     try {
       dataset = linkedDataRestClient.readResourceData(resource, requesterWebID);
     } catch (Exception e){

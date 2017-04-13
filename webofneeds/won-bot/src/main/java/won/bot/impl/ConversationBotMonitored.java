@@ -131,7 +131,7 @@ public class ConversationBotMonitored extends EventBot
         ctx,
         NO_OF_NEEDS, new BaseEventBotAction(ctx){
       @Override
-      protected void doRun(Event event) throws Exception {
+      protected void doRun(Event event, EventListener executingListener) throws Exception {
         bus.publish(new CrawlReadyEvent());
       }
     }

@@ -1,39 +1,28 @@
 package won.matcher.solr.query.factory;
 
-import org.apache.jena.query.Dataset;
-import won.matcher.solr.index.NeedIndexer;
-import won.protocol.model.NeedContentPropertyType;
-import won.protocol.util.DefaultNeedModelWrapper;
-
 /**
  * Created by hfriedrich on 22.08.2016.
  */
-public class GeoDistBoostQueryFactory extends NeedDatasetQueryFactory
-{
-  private Float latitude;
-  private Float longitude;
+public class GeoDistBoostQueryFactory extends SolrQueryFactory {
+    private float latitude;
+    private float longitude;
+    private String solrLocationField;
 
-  public GeoDistBoostQueryFactory(Dataset need) {
-    super(need);
+    public GeoDistBoostQueryFactory(String solrLocationField, float latitude, float longitude) {
 
-    DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(need);
-    latitude = needModelWrapper.getLocationLatitude(NeedContentPropertyType.ALL);
-    longitude = needModelWrapper.getLocationLongitude(NeedContentPropertyType.ALL);
-  }
-
-  @Override
-  protected String makeQueryString() {
-
-    if (longitude == null || latitude == null) {
-      return "";
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.solrLocationField = solrLocationField;
     }
 
-    // boost the query with a factor between 1 (far away) and 2 (close) according to the
-    // geographical distance of the needs
-    StringBuilder sb = new StringBuilder();
-    sb.append("sum(1,recip(geodist(").append(NeedIndexer.SOLR_LOCATION_COORDINATES_FIELD).append(",").append(latitude)
-      .append(",").append(longitude).append("),5,100,100))");
+    @Override
+    protected String makeQueryString() {
 
-    return new MultiplicativeBoostQueryFactory(sb.toString()).createQuery();
-  }
+        // calculate the inverse of the distance as a distance measure
+        StringBuilder sb = new StringBuilder();
+        sb.append("recip(geodist(").append(solrLocationField).append(",").append(latitude)
+                .append(",").append(longitude).append("),5,100,100)");
+
+        return sb.toString();
+    }
 }

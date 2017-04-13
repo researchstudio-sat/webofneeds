@@ -21,6 +21,7 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 
 import java.net.URI;
 import java.util.Iterator;
@@ -41,7 +42,7 @@ public class RegisterMatcherAction extends BaseEventBotAction
   }
 
   @Override
-  protected void doRun(Event event) throws Exception
+  protected void doRun(Event event, EventListener executingListener) throws Exception
   {
     final Iterator wonNodeUriIterator = getEventListenerContext().getMatcherNodeURISource().getNodeURIIterator();
     while (wonNodeUriIterator.hasNext()){

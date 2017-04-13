@@ -1,4 +1,4 @@
-##webofneeds
+## webofneeds
 
 [![Join the chat at https://gitter.im/researchstudio-sat/webofneeds](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/researchstudio-sat/webofneeds?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -12,11 +12,19 @@ Therefore, we refer to this document as a **need**. It is the central entity of 
 
 Web of needs is built out of three main components. **Owner applications** enable users to create and manage their need objects. They can be any type of UI application like web applications or mobile apps for example. Owner applications publish needs as RDF documents to **won nodes** on the Web. When needs are published on the Web, independent **matching services** can crawl them (or subscribe for need updates at won nodes) and look for suitable matches. A protocol is in place to inform the won nodes and need owners of possible matches using hint messages. Based on this process need owners can initiate connections to other needs and start communication and other transactions.
 
-###Demo
+### Further resources
+* Try [Chatting with the Debug Bot and Viewing the RDF](/documentation/viewing-rdf.md) that the owner webapp and won nodes are exchanging
+* [Build-instructions](/documentation/building-with-maven.md) and [Troubleshooting](documentation/troubleshooting.md)
+* [Security architecture](webofneeds/won-core/README.md) and how to [Set up the Keys and Certificates](documentation/installation-cryptographic-keys-and-certificates.md)
+* [Linked Data interface](webofneeds/won-node-webapp/README.md)
+* [Matching Service Architecture](webofneeds/won-matcher-service/README.md)
+* [Bot Framework](webofneeds/won-bot/README.md) for interacting with WoN nodes programmatically
+
+### Demo
 
 A **demo deployment of the Web of Needs** with a simple owner application, one won node and one matching service can be tested at www.matchat.org
 
-###Deployment
+### Deployment
 
 If you want to **set up your own deployment of Web of Needs** components, here you find requirements for **getting started**:
 - follow the [instructions here](webofneeds/won-docker/README.md) to set up all the neccessary components of web of needs locally
@@ -28,15 +36,4 @@ If you want to **set up your own deployment of Web of Needs** components, here y
 * [The Case for the Web of Needs](http://sat.researchstudio.at/sites/sat.researchstudio.at/files/won_cbi-2014_the_case_for_the_web_of_needs.pdf)
 * [Web of Needs - A New Paradigm for E-Commerce](http://sat.researchstudio.at/sites/sat.researchstudio.at/files/won-cbi-2013.pdf)
 * [Building a Web of Needs](http://sat.researchstudio.at/sites/sat.researchstudio.at/files/kleedorfer_iswc_2011.pdf)
-
----
-
-**Build-instructions** can be found in the [project wiki](https://github.com/researchstudio-sat/webofneeds/wiki)
-
-**Security architecture** overview can be found [here](webofneeds/won-core/README.md)
-
-**Linked Data** support in WoN is described [here](webofneeds/won-node-webapp/README.md)
-
-**Matching Service Architecture** is described [here](webofneeds/won-matcher-service/README.md)
-
 

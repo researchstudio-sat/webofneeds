@@ -19,6 +19,7 @@ package won.bot.framework.eventbot.action.impl;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.listener.EventListener;
 
 /**
  * Action that publishes the specified event.
@@ -33,7 +34,7 @@ public class PublishEventAction extends BaseEventBotAction {
   }
 
   @Override
-  protected void doRun(Event e) throws Exception {
+  protected void doRun(Event e, EventListener executingListener) throws Exception {
     getEventListenerContext().getEventBus().publish(event);
   }
 }

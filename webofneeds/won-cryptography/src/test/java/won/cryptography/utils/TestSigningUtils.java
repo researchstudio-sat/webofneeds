@@ -64,10 +64,10 @@ public class TestSigningUtils {
     IOException {
     // read dataset with created need
     InputStream is = TestSigningUtils.class.getResourceAsStream(resourceFile);
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
     is.close();
-    Dataset testDataset = DatasetFactory.createMem();
+    Dataset testDataset = DatasetFactory.createGeneral();
     for (String name : graphNames) {
       testDataset.addNamedModel(name, dataset.getNamedModel(name));
     }
@@ -79,7 +79,7 @@ public class TestSigningUtils {
     IOException {
     // read dataset with created need
     InputStream is = TestSigningUtils.class.getResourceAsStream(resourceFile);
-    Dataset dataset = DatasetFactory.createMem();
+    Dataset dataset = DatasetFactory.createGeneral();
     RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
     is.close();
     return dataset;

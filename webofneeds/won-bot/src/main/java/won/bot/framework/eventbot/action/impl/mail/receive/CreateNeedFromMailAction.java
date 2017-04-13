@@ -49,7 +49,7 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
         }
     }
 
-    protected void doRun(Event event) throws Exception {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
         if(event instanceof CreateNeedFromMailEvent){
             MimeMessage message = ((CreateNeedFromMailEvent) event).getMessage();
 

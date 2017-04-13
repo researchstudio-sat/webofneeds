@@ -18,6 +18,7 @@ package won.bot.framework.eventbot.action.impl;
 
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.listener.EventListener;
 
 /**
  * Outputs a message via the configured logging system.
@@ -34,7 +35,7 @@ public class LogErrorAction extends LogAction
   }
 
   @Override
-  protected void doRun(Event event) throws Exception
+  protected void doRun(Event event, EventListener executingListener) throws Exception
   {
     logger.error(message);
   }

@@ -126,7 +126,7 @@ public class SparqlService
     QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query);
     ResultSet results = qexec.execSelect();
 
-    Dataset ds = DatasetFactory.createMem();
+    Dataset ds = DatasetFactory.createGeneral();
     while (results.hasNext()) {
 
       QuerySolution qs = results.next();

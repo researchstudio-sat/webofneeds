@@ -75,7 +75,7 @@ public class DatasetHolderAggregator
       if (this.aggregatedDataset != null) return this.aggregatedDataset;
       StopWatch stopWatch = new StopWatch();
       stopWatch.start();
-      Dataset result = DatasetFactory.createMem();
+      Dataset result = DatasetFactory.createGeneral();
       stopWatch.stop();
       logger.debug("init dataset: " + stopWatch.getLastTaskTimeMillis());
       stopWatch.start();

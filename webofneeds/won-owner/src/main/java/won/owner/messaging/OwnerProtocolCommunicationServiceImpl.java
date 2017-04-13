@@ -91,17 +91,17 @@ public class OwnerProtocolCommunicationServiceImpl implements OwnerProtocolCommu
    */
   public synchronized void register(URI wonNodeURI, MessagingService messagingService) throws Exception {
     CamelConfiguration camelConfiguration = null;
-    logger.info("setting up communication with won node: " + wonNodeURI);
+    logger.debug("setting up communication with won node: " + wonNodeURI);
 
     String ownerApplicationId = calculateOwnerApplicationIdFromOwnerCertificate();
     WonNode wonNode = wonNodeRepository.findOneByWonNodeURIAndOwnerApplicationID(wonNodeURI, ownerApplicationId);
 
     if (wonNode != null) {
-      logger.info("we're already registered. Connecting with WoN node: " + wonNodeURI);
+      logger.debug("we're already registered. Connecting with WoN node: " + wonNodeURI);
       configureCamelEndpoint(wonNodeURI, ownerApplicationId);
       configureRemoteEndpointsForOwnerApplication(ownerApplicationId, getProtocolCamelConfigurator().getEndpoint
         (wonNodeURI), messagingService);
-      logger.info("connected with WoN node: : " + wonNodeURI);
+      logger.debug("connected with WoN node: " + wonNodeURI);
     } else {
       logger.info("we're not yet registered. Registering with WoN node:" + wonNodeURI);
       String nodeGeneratedOwnerApplicationId = registrationClient.register(wonNodeURI.toString());

@@ -24,6 +24,7 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
 import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 
 import java.util.*;
 
@@ -43,7 +44,7 @@ public class MatchingLoadTestMonitorAction extends BaseEventBotAction
   }
 
   @Override
-  protected void doRun(final Event event) throws Exception {
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
 
     Stopwatch stopwatch = SimonManager.getStopwatch("needHintFullRoundtrip");
     if (event instanceof NeedCreatedEvent) {

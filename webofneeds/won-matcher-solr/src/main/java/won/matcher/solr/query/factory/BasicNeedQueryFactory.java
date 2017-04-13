@@ -1,122 +1,163 @@
 package won.matcher.solr.query.factory;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.exception.IncorrectPropertyCountException;
+import won.protocol.model.Coordinate;
 import won.protocol.model.NeedContentPropertyType;
 import won.protocol.util.DefaultNeedModelWrapper;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by hfriedrich on 01.08.2016.
  */
-public class BasicNeedQueryFactory extends NeedDatasetQueryFactory
-{
-  public static final String NEED_TITLE_SOLR_FIELD =
-    "_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_dc_elements_1.1_title";
-  public static final String NEED_DESCRIPTION_SOLR_FIELD =
-    "_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTextDescription";
-  public static final String NEED_TAG_SOLR_FIELD =
-    "_graph.http___purl.org_webofneeds_model_hasContent.http___purl.org_webofneeds_model_hasTag";
+public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
 
-  private final Logger log = LoggerFactory.getLogger(getClass());
-  protected ArrayList<SolrQueryFactory> contentFactories;
-  private String titleTerms;
-  private String descriptionTerms;
-  private String tagTerms;
-
-  public String getTitleTerms() {
-    return titleTerms;
-  }
-
-  public String getDescriptionTerms() {
-    return descriptionTerms;
-  }
-
-  public String getTagTerms() {
-    return tagTerms;
-  }
-
-  public BasicNeedQueryFactory(final Dataset need) {
-    super(need);
-
-    contentFactories =  new ArrayList<>();
-    DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(need);
-
-    try {
-      titleTerms = needModelWrapper.getTitle(NeedContentPropertyType.ALL);
-      titleTerms = filterCharsAndKeyWords(titleTerms);
-
-    } catch (IncorrectPropertyCountException e) {
-      log.warn("No or too many title elements not found in RDF dataset: " + e.toString());
+    public static final Map<NeedContentPropertyType, String> titleFieldMap;
+    static
+    {
+        titleFieldMap = new HashMap<>();
+        titleFieldMap.put(NeedContentPropertyType.IS,
+                "_graph.http___purl.org_webofneeds_model_is.http___purl.org_dc_elements_1.1_title");
+        titleFieldMap.put(NeedContentPropertyType.SEEKS,
+                "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_dc_elements_1.1_title");
+        titleFieldMap.put(NeedContentPropertyType.SEEKS_SEEKS,
+                "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_seeks.http___purl.org_dc_elements_1.1_title");
     }
 
-    try {
-      descriptionTerms = needModelWrapper.getDescription(NeedContentPropertyType.ALL);
-      descriptionTerms = filterCharsAndKeyWords(descriptionTerms);
-    } catch (IncorrectPropertyCountException e) {
-      log.warn("No or too many description elements found in RDF dataset: " + e.toString());
+    public static final Map<NeedContentPropertyType, String> descriptionFieldMap;
+    static
+    {
+        descriptionFieldMap = new HashMap<>();
+        descriptionFieldMap.put(NeedContentPropertyType.IS,
+                "_graph.http___purl.org_webofneeds_model_is.http___purl.org_webofneeds_model_hasTextDescription");
+        descriptionFieldMap.put(NeedContentPropertyType.SEEKS,
+                "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_hasTextDescription");
+        descriptionFieldMap.put(NeedContentPropertyType.SEEKS_SEEKS,
+                "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_hasTextDescription");
     }
 
-    try {
-      Collection<String> tags = needModelWrapper.getTags(NeedContentPropertyType.ALL);
-      tagTerms = "\"" + String.join("\" \"", tags) + "\"";
-    } catch (IncorrectPropertyCountException e) {
-      log.debug("No or too many tags found in RDF dataset: " + e.toString());
+    public static final Map<NeedContentPropertyType, String> tagFieldMap;
+    static
+    {
+        tagFieldMap = new HashMap<>();
+        tagFieldMap.put(NeedContentPropertyType.IS,
+                "_graph.http___purl.org_webofneeds_model_is.http___purl.org_webofneeds_model_hasTag");
+        tagFieldMap.put(NeedContentPropertyType.SEEKS,
+                "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_hasTag");
+        tagFieldMap.put(NeedContentPropertyType.SEEKS_SEEKS,
+                "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_hasTag");
     }
-  }
 
-  public void addTermsToTitleQuery(String terms, double boost) {
-
-    if (terms != null && !terms.trim().isEmpty()) {
-      SolrQueryFactory qf = new MatchFieldQueryFactory(NEED_TITLE_SOLR_FIELD, terms);
-      qf.setBoost(boost);
-      contentFactories.add(qf);
+    public static final Map<NeedContentPropertyType, String> locationFieldMap;
+    static
+    {
+        locationFieldMap = new HashMap<>();
+        locationFieldMap.put(NeedContentPropertyType.IS, "is_need_location");
+        locationFieldMap.put(NeedContentPropertyType.SEEKS, "seeks_need_location");
+        locationFieldMap.put(NeedContentPropertyType.SEEKS_SEEKS, "seeksSeeks_need_location");
     }
-  }
 
-  public void addTermsToDescriptionQuery(String terms, double boost) {
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    protected ArrayList<SolrQueryFactory> contentFactories;
+    protected ArrayList<SolrQueryFactory> locationFactories;
+    protected DefaultNeedModelWrapper needModelWrapper;
 
-    if (terms != null && !terms.trim().isEmpty()) {
-      SolrQueryFactory qf = new MatchFieldQueryFactory(NEED_DESCRIPTION_SOLR_FIELD, terms);
-      qf.setBoost(boost);
-      contentFactories.add(qf);
+    public BasicNeedQueryFactory(final Dataset need) {
+        super(need);
+        contentFactories = new ArrayList<>();
+        locationFactories = new ArrayList<>();
+        needModelWrapper = new DefaultNeedModelWrapper(need);
     }
-  }
 
-  public void addTermsToTagQuery(String terms, double boost) {
+    public void addTermsToTitleQuery(String terms, NeedContentPropertyType fieldType, double boost) {
 
-    if (terms != null && !terms.trim().isEmpty()) {
-      SolrQueryFactory qf = new MatchFieldQueryFactory(NEED_TAG_SOLR_FIELD, terms);
-      qf.setBoost(boost);
-      contentFactories.add(qf);
+        terms = filterCharsAndKeyWords(terms);
+        if (terms != null && !terms.trim().isEmpty()) {
+            String field = titleFieldMap.get(fieldType);
+            SolrQueryFactory qf = new MatchFieldQueryFactory(field, terms);
+            qf.setBoost(boost);
+            contentFactories.add(qf);
+        }
     }
-  }
 
-  private String filterCharsAndKeyWords(String text) {
+    public void addTermsToDescriptionQuery(String terms, NeedContentPropertyType fieldType, double boost) {
 
-    // filter all special characters and number
-    text = text.replaceAll("[^A-Za-z ]", " ");
-    text = text.replaceAll("[^A-Za-z ]", " ");
-    text = text.replaceAll("NOT", " ");
-    text = text.replaceAll("AND", " ");
-    text = text.replaceAll("OR", " ");
-    text = text.replaceAll("\\s+", " ");
-    return text;
-  }
+        terms = filterCharsAndKeyWords(terms);
+        if (terms != null && !terms.trim().isEmpty()) {
+            String field = descriptionFieldMap.get(fieldType);
+            SolrQueryFactory qf = new MatchFieldQueryFactory(field, terms);
+            qf.setBoost(boost);
+            contentFactories.add(qf);
+        }
+    }
 
-  @Override
-  protected String makeQueryString() {
+    public void addTermsToTagQuery(String terms, NeedContentPropertyType fieldType, double boost) {
 
-    // add the term queries of the title, description and tags fields
-    SolrQueryFactory[] factoryArray = new SolrQueryFactory[contentFactories.size()];
-    BooleanQueryFactory contentQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR,
-                                                               contentFactories.toArray(factoryArray));
+        terms = filterCharsAndKeyWords(terms);
+        if (terms != null && !terms.trim().isEmpty()) {
+            String field = tagFieldMap.get(fieldType);
+            SolrQueryFactory qf = new MatchFieldQueryFactory(field, terms);
+            qf.setBoost(boost);
+            contentFactories.add(qf);
+        }
+    }
 
-    // add a multiplicative boost for the closer geographical distances
-    return new GeoDistBoostQueryFactory(needDataset).createQuery() + contentQuery.createQuery();
-  }
+    public void addLocationFilters(Resource contentNode, NeedContentPropertyType fieldType) {
+
+        Coordinate coordinate = needModelWrapper.getLocationCoordinate(contentNode);
+        if (coordinate != null) {
+            locationFactories.add(new GeoDistBoostQueryFactory(locationFieldMap.get(fieldType), coordinate.getLatitude(), coordinate.getLongitude()));
+        }
+    }
+
+    private String filterCharsAndKeyWords(String text) {
+
+        if (text == null) {
+            return null;
+        }
+
+        // filter all special characters and number
+        text = text.replaceAll("[^A-Za-z ]", " ");
+        text = text.replaceAll("[^A-Za-z ]", " ");
+        text = text.replaceAll("NOT ", " ");
+        text = text.replaceAll("AND ", " ");
+        text = text.replaceAll("OR ", " ");
+        text = text.replaceAll(" NOT", " ");
+        text = text.replaceAll(" AND", " ");
+        text = text.replaceAll(" OR", " ");
+        text = text.replaceAll("\\s+", " ");
+
+        return text;
+    }
+
+    @Override
+    protected String makeQueryString() {
+
+        // boost the query with a location distance factor
+        // add up all the reverse query boost components and add 1 so that the multiplicative boost factor is at least 1
+        String boostQueryString = "";
+        if (locationFactories.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("sum(1");
+            for (SolrQueryFactory queryFactory : locationFactories) {
+                sb.append(",").append(queryFactory.makeQueryString());
+            }
+            sb.append(")");
+            MultiplicativeBoostQueryFactory boostQueryFactory = new MultiplicativeBoostQueryFactory(sb.toString());
+            boostQueryString = boostQueryFactory.makeQueryString();
+        }
+
+
+        // combine all content term query parts with boolean OR operator
+        SolrQueryFactory[] contentArray = new SolrQueryFactory[contentFactories.size()];
+        BooleanQueryFactory contentQuery = new BooleanQueryFactory(BooleanQueryFactory.BooleanOperator.OR,
+                contentFactories.toArray(contentArray));
+
+        return boostQueryString + contentQuery;
+    }
 }

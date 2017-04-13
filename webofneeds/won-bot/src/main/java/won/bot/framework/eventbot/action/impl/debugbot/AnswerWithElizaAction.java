@@ -22,6 +22,7 @@ import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.MessageToElizaEvent;
+import won.bot.framework.eventbot.listener.EventListener;
 
 
 /**
@@ -38,7 +39,7 @@ public class AnswerWithElizaAction extends BaseEventBotAction
   }
 
   @Override
-  protected void doRun(final Event event) throws Exception {
+  protected void doRun(final Event event, EventListener executingListener) throws Exception {
     if (event instanceof MessageToElizaEvent) {
       MessageToElizaEvent messageToElizaEvent = (MessageToElizaEvent) event;
 

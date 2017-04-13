@@ -49,13 +49,13 @@
             <dependency>
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-solrj</artifactId>
-                <version>6.1.0</version>
+                <version>6.5.0</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-core</artifactId>
-                <version>${solr.version}</version>
+                <version>6.5.0</version>
             </dependency>
             <!-- Camel, AMQP & ActiveMQ -->
             <dependency>
@@ -124,14 +124,6 @@
                 <groupId>javax.jms</groupId>
                 <artifactId>jms</artifactId>
                 <version>${jms.version}</version>
-            </dependency>
-
-            <!-- SIREn-->
-            <dependency>
-                <groupId>org.sindice.siren</groupId>
-                <artifactId>siren-solr</artifactId>
-                <version>${siren.version}</version>
-                <type>jar</type>
             </dependency>
 
             <!-- SPIN -->
@@ -734,6 +726,20 @@
     </dependencyManagement>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -818,6 +824,16 @@
                     <version>2.7</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>2.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.6</version>
+                </plugin>
+                <plugin>
                     <groupId>org.codehaus.cargo</groupId>
                     <artifactId>cargo-maven2-plugin</artifactId>
                     <version>${cargo.version}</version>
@@ -840,7 +856,12 @@
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <version>0.0.26</version>
+                    <version>1.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.ekryd.echo-maven-plugin</groupId>
+                    <artifactId>echo-maven-plugin</artifactId>
+                    <version>1.2.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -989,7 +1010,7 @@
                                                ClassCastExceptions
                                         servlet: conflicts with tomcat's version
                                     -->
-                                    <excludeGroupIds>webofneeds,org.sindice.siren</excludeGroupIds>
+                                    <excludeGroupIds>webofneeds</excludeGroupIds>
                                     <excludeArtifactIds>servlet-api</excludeArtifactIds>
                                 </configuration>
                             </execution>

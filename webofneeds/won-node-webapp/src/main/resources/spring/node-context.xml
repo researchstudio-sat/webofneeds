@@ -2,12 +2,35 @@
 
 <beans xmlns:sec="http://www.springframework.org/schema/security"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:context="http://www.springframework.org/schema/context"
              xmlns="http://www.springframework.org/schema/beans" xmlns:beans="http://www.springframework.org/schema/beans"
-             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-								 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+								 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+                                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
 
+    <!--context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/-->
+    <!--
+        Problem:
+        1. The embedded activemq broker creates a child spring context
+        2. Properties are not seen in child contexts because they are realized as bean factory post processors,
+            which do not post-process child contexts
+        3. We do not want to re-define the property file in the child context (for ease of configuration)
+        Solution:
+        1. we first define a bean template (abstract=true) for the PPC
+        2. we can define a concrete one in this context and in the child context because the
+            template is visible in the child context
+    -->
+    <bean id="abstractPropertySourcesPlaceholderConfigurer" abstract="true" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="location" value="file:${WON_CONFIG_DIR}/node.properties" />
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+    </bean>
+    <!-- here's the concrete bean for the PPC. The same is done in the activemq.xml file -->
+    <bean id="propertyPlaceholderConfigurer" parent="abstractPropertySourcesPlaceholderConfigurer" />
 
-    <!-- all the beans necessary for node's functioning -->
+    <!-- was in node.xml --><!-- was in message-processors.xml within node.xml--><!-- was in activemq.xml within node-camel.xml within node.xml-->
+    <!-- was in node-camel.xml within node.xml --><!-- was in jdbc-storage.xml within node.xml -->
+    <!-- was in jpabased-rdf-storage.xml within node.xml --><!-- was in node-security.xml within node.xml-->
+    <!-- was in node-core.xml within node.xml--><!-- all the beans necessary for node's functioning -->
     <import resource="classpath:/spring/node.xml"/>
 
     <!--

@@ -1,6 +1,6 @@
 # The solr server should be accessible at port 8983
 # use java as a base image
-FROM solr:6.1.0
+FROM solr:6.5.0
 
 # add the won core to the solr instance
 ADD ./core/won /opt/solr/server/solr/won
@@ -15,5 +15,6 @@ ADD ./core/won/data /opt/solr/server/solr/wontest/data
 # VOLUME /opt/solr/server/solr/wontest/data
 
 USER root
-RUN chmod -R +wx /opt/solr/server/solr/won
-RUN chmod -R +wx /opt/solr/server/solr/wontest
+RUN chown -R solr /opt/solr/server/solr/won
+RUN chown -R solr /opt/solr/server/solr/wontest
+USER solr

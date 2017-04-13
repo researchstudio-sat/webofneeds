@@ -202,7 +202,7 @@ public class WonMessageRoutes  extends RouteBuilder
             //are always directed at connections
             .routingSlip(method("facetTypeSlip"))
             //now, we have the message we want to pass on to the owner in the exchange's in header.
-            //do we want to send a response back? only if we're not currently processing a respon    
+            //do we want to send a response back? only if we're not currently processing a respon
             .to("bean:toOwnerSender")
             .choice()
               .when(PredicateBuilder.and(

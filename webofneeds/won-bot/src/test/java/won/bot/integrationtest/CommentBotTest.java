@@ -56,7 +56,7 @@ import static junit.framework.TestCase.assertTrue;
  * Integration test.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/spring/app/botRunner.xml"})
+@ContextConfiguration(locations = {"classpath:/spring/app/simpleCommentTest.xml"})
 public class CommentBotTest
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());

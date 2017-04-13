@@ -28,38 +28,40 @@ import won.protocol.vocabulary.*;
  * User: fkleedorfer
  * Date: 27.09.13
  */
-public class DefaultPrefixUtils
-{
-  /**
-   * Sets the default prefixes on the specified model.
-   * @param model
-   */
-  public static void setDefaultPrefixes(Model model) {
-    setDefaultPrefixes(model.getGraph().getPrefixMapping());
-  }
+public class DefaultPrefixUtils {
+    /**
+     * Sets the default prefixes on the specified model.
+     *
+     * @param model
+     */
+    public static void setDefaultPrefixes(Model model) {
+        setDefaultPrefixes(model.getGraph().getPrefixMapping());
+    }
 
-  /**
-   * * Sets the default prefixes on the specified prefixMapping.
-   * @param prefixMapping
-   */
-  public static void setDefaultPrefixes(PrefixMapping prefixMapping) {
-    prefixMapping.setNsPrefix("won", WON.getURI());
-    prefixMapping.setNsPrefix(WONMSG.DEFAULT_PREFIX, WONMSG.getURI());
-    prefixMapping.setNsPrefix(WONCRYPT.DEFAULT_PREFIX, WONCRYPT.getURI());
-    prefixMapping.setNsPrefix(SFSIG.DEFAULT_PREFIX, SFSIG.getURI());
-    prefixMapping.setNsPrefix(CERT.DEFAULT_PREFIX, CERT.getURI());
-    prefixMapping.setNsPrefix("sioc", SIOC.getURI());
-    prefixMapping.setNsPrefix("rdf", RDF.getURI());
-    prefixMapping.setNsPrefix("ldp", LDP.getURI());
-    prefixMapping.setNsPrefix("rdfs", RDFS.getURI());
-    prefixMapping.setNsPrefix("geo", GEO.getURI());
-    prefixMapping.setNsPrefix("xsd", XSD.getURI());
-    prefixMapping.setNsPrefix("dc", DC.getURI());    
-  }
+    /**
+     * * Sets the default prefixes on the specified prefixMapping.
+     *
+     * @param prefixMapping
+     */
+    public static void setDefaultPrefixes(PrefixMapping prefixMapping) {
+        prefixMapping.setNsPrefix("won", WON.getURI());
+        prefixMapping.setNsPrefix(WONMSG.DEFAULT_PREFIX, WONMSG.getURI());
+        prefixMapping.setNsPrefix(WONCRYPT.DEFAULT_PREFIX, WONCRYPT.getURI());
+        prefixMapping.setNsPrefix(SFSIG.DEFAULT_PREFIX, SFSIG.getURI());
+        prefixMapping.setNsPrefix(CERT.DEFAULT_PREFIX, CERT.getURI());
+        prefixMapping.setNsPrefix("sioc", SIOC.getURI());
+        prefixMapping.setNsPrefix("rdf", RDF.getURI());
+        prefixMapping.setNsPrefix("ldp", LDP.getURI());
+        prefixMapping.setNsPrefix("rdfs", RDFS.getURI());
+        prefixMapping.setNsPrefix("geo", GEO.getURI());
+        prefixMapping.setNsPrefix("xsd", XSD.getURI());
+        prefixMapping.setNsPrefix("dc", DC.getURI());
+        prefixMapping.setNsPrefix("s", "http://schema.org/");
+    }
 
-  public static PrefixMapping getDefaultPrefixes(){
-    PrefixMapping ret = PrefixMapping.Factory.create();
-    setDefaultPrefixes(ret);
-    return ret;
-  }
+    public static PrefixMapping getDefaultPrefixes() {
+        PrefixMapping ret = PrefixMapping.Factory.create();
+        setDefaultPrefixes(ret);
+        return ret;
+    }
 }
