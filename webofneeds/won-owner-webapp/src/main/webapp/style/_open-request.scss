@@ -7,6 +7,10 @@ won-open-request {
   display: block;
   width: 100%;
 
+  won-post-content {
+    padding: 1rem;
+  }
+
   .or__header {
     display: flex;
     padding-top: 0.5rem;

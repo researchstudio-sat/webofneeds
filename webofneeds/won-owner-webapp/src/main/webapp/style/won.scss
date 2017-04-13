@@ -110,6 +110,13 @@ main {
   align-items: baseline;
 }
 
+hr {
+  border: 0;
+  height: 1px;
+  background: $won-line-gray;
+  color: $won-line-gray;
+}
+
 @import 'gallery';
 @import 'post-info';
 @import 'post-messages';

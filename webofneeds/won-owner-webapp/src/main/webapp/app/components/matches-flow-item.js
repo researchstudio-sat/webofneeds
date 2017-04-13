@@ -4,6 +4,9 @@ import angular from 'angular';
 import squareImageModule from './square-image';
 import extendedGalleryModule from './extended-gallery';
 import feedbackGridModule from './feedback-grid';
+import postHeaderModule from './post-header';
+import postContentModule from './post-content';
+
 import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import {
@@ -37,52 +40,20 @@ function genComponentConf() {
                 ng-show="self.images.length == 0">
             </won-square-image>
         </div>
-        <div class="mfi__description clickable">
-            <div class="mfi__description__topline">
-                <div class="mfi__description__topline__title clickable">
-                    {{self.remoteNeedContent.get('dc:title')}}
-                </div>
-                <div class="mfi__description__topline__date">
-                    {{ self.remoteCreatedOn }}
-                </div>
-            </div>
-            <div class="mfi__description__subtitle">
-                <span
-                    class="mfi__description__subtitle__group"
-                    ng-show="self.connection.get('group')">
-                        <img
-                            src="generated/icon-sprite.svg#ico36_group"
-                            class="mfi__description__subtitle__group__icon">
-                        <span>
-                            {{ self.connectionData.get('group') }}
-                        </span>
-                        <span class="mfi__description__subtitle__group__dash">
-                            &ndash;
-                        </span>
-                </span>
-                <span class="mfi__description__subtitle__type">
-                    {{ self.labels.type[ self.remoteNeedType ] }}
-                </span>
-            </div>
-            <!-- include once you have content in your needs that needs to be displayed here -->
-            <div class="mfi__description__content" ng-show="false">
-                <div class="mfi__description__content__location">
-                    <img
-                        class="mfi__description__content__indicator"
-                        src="generated/icon-sprite.svg#ico16_indicator_location"/>
-                    <span>
-                        Vienna area
-                    </span>
-                </div>
-                <div class="mfi__description__content__datetime">
-                    <img
-                        class="mfi__description__content__indicator"
-                        src="generated/icon-sprite.svg#ico16_indicator_time"/>
-                    <span>o</span>
-                    <span>Available until 5th May</span>
-                </div>
-            </div>
+
+        <div class="mfi__description clickable"
+              ng-click="self.toggleFeedback()">
+
+            <won-post-header
+              need-uri="self.remoteNeed.get('@id')"
+              hide-image="true">
+            </won-post-header>
+            <hr/>
+            <won-post-content
+              need-uri="self.remoteNeed.get('@id')">
+            </won-post-content>
         </div>
+
         <div
             class="mfi__match clickable"
             ng-if="!self.feedbackVisible"
@@ -170,10 +141,12 @@ function genComponentConf() {
 }
 
 export default angular.module('won.owner.components.matchesFlowItem', [
-    squareImageModule,
-    extendedGalleryModule,
-    feedbackGridModule
-])
+        squareImageModule,
+        extendedGalleryModule,
+        feedbackGridModule,
+        postHeaderModule,
+        postContentModule,
+    ])
     .directive('wonMatchesFlowItem', genComponentConf)
     .name;
 
