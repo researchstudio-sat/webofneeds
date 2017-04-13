@@ -272,3 +272,4 @@ export function inferLegacyNeedType(need) {
         return won.WON.BasicNeedTypeDotogetherCompacted;
     }
 }
+

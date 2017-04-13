@@ -23,6 +23,7 @@ import {
     selectConnectionsByNeed,
     selectLastUpdatedPerConnection,
     selectRouterParams,
+    selectUnreadCountsByNeedAndType,
 } from '../selectors';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
@@ -35,6 +36,14 @@ function genComponentConf() {
             need-uri="needUri"
             timestamp="'TODOlatestOfThatType'">
           </won-post-header>
+
+          <div class="covw__unreadCount">
+            {{
+              self.unreadCounts.getIn([
+                  needUri, self.messageType
+              ])
+            }}
+          </div>
           <img class="covw__arrow" ng-show="self.isOpen(needUri)"
               src="generated/icon-sprite.svg#ico16_arrow_up"/>
           <img class="covw__arrow" ng-show="!self.isOpen(needUri)"
@@ -58,6 +67,7 @@ function genComponentConf() {
             this.open = {};
 
             const self = this;
+
 
             const selectFromState = (state)=> {
 
@@ -97,6 +107,10 @@ function genComponentConf() {
                     relevantOwnNeeds: relevantOwnNeeds && relevantOwnNeeds.toArray(),
                     relevantConnectionUrisByNeed: relevantConnectionUrisByNeed &&
                         relevantConnectionUrisByNeed.map(cncts => cncts.toJS()),
+
+                    unreadCounts: selectUnreadCountsByNeedAndType(state),
+
+                    messageType: won.cnctState2MessageType[this.connectionType],
                 }
             };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
