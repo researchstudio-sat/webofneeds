@@ -2,7 +2,6 @@
 
 import angular from 'angular';
 import overviewTitleBarModule from '../overview-title-bar';
-import requestItemLineModule from '../request-item-line';
 import openRequestModule from '../open-request';
 import connectionsOverviewModule from '../connections-overview';
 import { attach,mapToMatches } from '../../utils';
@@ -88,7 +87,6 @@ IncomingRequestsController.$inject = [];
 
 export default angular.module('won.owner.components.overviewIncomingRequests', [
         overviewTitleBarModule,
-        requestItemLineModule,
         openRequestModule,
         connectionsOverviewModule,
     ])

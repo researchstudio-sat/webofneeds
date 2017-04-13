@@ -170,7 +170,6 @@ export default angular.module('won.owner.components.matches', [
         overviewTitleBarModule,
         matchesFlowItemModule,
         matchesGridItemModule,
-        matchesListModule,
         sendRequestModule,
         connectionsOverviewModule,
         connectionSelectionModule,
