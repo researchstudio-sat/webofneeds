@@ -78,6 +78,10 @@ class IncomingRequestsController {
         //  this.loadMatches();
         this.$scope.$on('$destroy', disconnect);
     }
+
+    selectedConnection(connectionUri) {
+        this.router__stateGo('overviewIncomingRequests', {connectionUri});
+    }
 }
 
 IncomingRequestsController.$inject = [];

@@ -22,22 +22,28 @@ import {
     selectOwnNeeds,
     selectConnectionsByNeed,
     selectLastUpdatedPerConnection,
+    selectRouterParams,
 } from '../selectors';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
       <div ng-repeat="needUri in self.relevantOwnNeedUris">
-        <won-post-header
-          need-uri="needUri"
-          timestamp="'TODOlatestOfThatType'">
-        </won-post-header>
-        <div ng-repeat="connectionUri in self.relevantConnectionUrisByNeed.get(needUri)">
-          {{ connectionUri }}
+        <div class="covw__own-need"
+          ng-click="self.toggleConnections(needUri)">
+          <won-post-header
+            need-uri="needUri"
+            timestamp="'TODOlatestOfThatType'">
+          </won-post-header>
+          <img class="covw__arrow" ng-show="self.isOpen(needUri)"
+              src="generated/icon-sprite.svg#ico16_arrow_up"/>
+          <img class="covw__arrow" ng-show="!self.isOpen(needUri)"
+              src="generated/icon-sprite.svg#ico16_arrow_down"/>
         </div>
         <won-connection-selection-item
+          ng-show="self.isOpen(needUri)"
           ng-repeat="cnctUri in self.relevantConnectionUrisByNeed.get(needUri)"
-          selected-connection="self.setOpen(connectionUri)"
+          on-selected-connection="self.selectConnection(connectionUri)"
           connection-uri="cnctUri">
         </won-connection-selection-item>
       </div>
@@ -49,6 +55,7 @@ function genComponentConf() {
 
             window.connOvw4dbg = this;
             this.labels = labels;
+            this.open = {};
 
             const self = this;
 
@@ -57,11 +64,11 @@ function genComponentConf() {
                 const connectionsByNeed = selectConnectionsByNeed(state);
                 const relevantConnectionUrisByNeed = connectionsByNeed && connectionsByNeed
                     .map(connections => connections
-                        .filter(c => c.get('hasConnectionState') === self.connectionType)
+                        .filter(c => c && c.get('hasConnectionState') === self.connectionType)
                         .map(c => c.get('uri'))
-                        .toJS()
+                        .toSet()
                     )
-                    .filter(cnctUris => cnctUris.length > 0); // filter out needs without connections of that type/state
+                    .filter(cnctUris => cnctUris.size > 0); // filter out needs without connections of that type/state
 
                 const ownNeeds = selectOwnNeeds(state);
                 const ownNeedUris = ownNeeds &&
@@ -74,19 +81,36 @@ function genComponentConf() {
                 const relevantOwnNeeds = relevantOwnNeedUris && ownNeeds &&
                     ownNeeds.filter(n => relevantOwnNeedUris.has(n.get('@id')));
 
+                const routerParams = selectRouterParams(state);
+                const cnctInRoute = routerParams &&
+                    decodeURIComponent(routerParams.get('connectionUri'));
+                const needImpliedInRoute = cnctInRoute && relevantConnectionUrisByNeed &&
+                    relevantConnectionUrisByNeed
+                        .filter(cncts => cncts.has(cnctInRoute)) // find ownNeed associated with the connection
+                        .keySeq() // get needUris
+                        .first(); // the openConnectionUri can only be associated with one need
 
                 return {
+                    needImpliedInRoute,
                     lastUpdatePerConnection: selectLastUpdatedPerConnection(state),
                     relevantOwnNeedUris: relevantOwnNeedUris && relevantOwnNeedUris.toArray(),
                     relevantOwnNeeds: relevantOwnNeeds && relevantOwnNeeds.toArray(),
-                    relevantConnectionUrisByNeed,
+                    relevantConnectionUrisByNeed: relevantConnectionUrisByNeed &&
+                        relevantConnectionUrisByNeed.map(cncts => cncts.toJS()),
                 }
             };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
         }
-        setOpen(connectionUri) {
-            this.onSelectedConnection({connectionUri: this.connectionUri}); //trigger callback with scope-object
+        toggleConnections(ownNeedUri) {
+            this.open[ownNeedUri] = !this.open[ownNeedUri]
+        }
+        isOpen(ownNeedUri) {
+            return !!this.open[ownNeedUri] ||
+                this.needImpliedInRoute === ownNeedUri;
+        }
+        selectConnection(connectionUri) {
+            this.onSelectedConnection({connectionUri}); //trigger callback with scope-object
             //TODO either publish a dom-event as well; or directly call the route-change
         }
     }

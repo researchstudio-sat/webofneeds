@@ -3,6 +3,8 @@
 @import 'fonts';
 @import 'flex-layout';
 
+@import 'connections-overview';
+
 
 .overviewincomingrequestscontent {
   @include max-content-width($maxContentWidth, $minContentPadding, 'opc');
@@ -19,7 +21,6 @@
   .oir__requests{
     flex-grow: 1;
     max-width: 35rem;
-    margin: 0.5rem;
   }
   @media (max-width: $responsivenessBreakPoint){
     .oir__requests.hidden {

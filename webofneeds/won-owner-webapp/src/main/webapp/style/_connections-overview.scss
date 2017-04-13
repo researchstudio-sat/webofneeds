@@ -1,0 +1,27 @@
+@import 'won-config';
+
+won-connections-overview {
+  .covw__own-need {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0.5rem 1rem; /*vert horiz*/
+    border-bottom: 0.1rem solid $won-line-gray;
+
+    won-post-header {
+      flex-grow: 1;
+    }
+  }
+
+  won-connection-selection-item {
+    margin-left: 3rem; //indent the connections in comparison to own need
+
+    &:last-child {
+      margin-bottom: 2rem;
+    }
+  }
+
+  .covw__arrow {
+    @include carretSized;
+  }
+}
