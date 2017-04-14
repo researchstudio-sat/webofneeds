@@ -1,6 +1,7 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
 import won.bot.framework.bot.context.BotContext;
+import won.bot.framework.bot.context.MailBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -56,12 +57,12 @@ public class MailParserAction extends BaseEventBotAction {
     }
 
     private void processCreateNeedMail(MimeMessage message) throws MessagingException, IOException {
+        EventListenerContext ctx = getEventListenerContext();
 
-        EventBus bus = getEventListenerContext().getEventBus();
-        BotContext botContext = getEventListenerContext().getBotContext();
+        EventBus bus = ctx.getEventBus();
         String senderMailAddress = MailContentExtractor.getMailSender(message);
-        SubscribeStatus subscribeStatus =
-          EventBotActionUtils.getSubscribeStatusForMailAddress(botContext, senderMailAddress);
+        MailBotContextWrapper botContextWrapper = ((MailBotContextWrapper) ctx.getBotContextWrapper());
+        SubscribeStatus subscribeStatus = botContextWrapper.getSubscribeStatusForMailAddress(senderMailAddress);
 
         // depending of the user has subscribed/unsubscribed (via mailto links) his mails will be
         // published as needs, discarded or cached
@@ -73,10 +74,8 @@ public class MailParserAction extends BaseEventBotAction {
             logger.info("received mail from unsubscribed user '{}' so discard mail with subject '{}'",
                         senderMailAddress, message.getSubject());
         } else {
-            logger.info(
-              "received a create mail from new user '{}' with subject '{}' so cache it and send welcome mail",
-              senderMailAddress, message.getSubject());
-            EventBotActionUtils.addCachedMailsForMailAddress(botContext, message);
+            logger.info("received a create mail from new user '{}' with subject '{}' so cache it and send welcome mail",senderMailAddress, message.getSubject());
+            botContextWrapper.addCachedMailsForMailAddress(message);
             bus.publish(new WelcomeMailEvent(message));
         }
     }

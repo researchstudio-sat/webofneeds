@@ -2,6 +2,7 @@ package won.bot.framework.eventbot.action.impl.mail.receive;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.jena.query.Dataset;
+import won.bot.framework.bot.context.MailBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -42,13 +43,14 @@ public class MailCommandAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-
-        if(event instanceof MailCommandEvent) {
+        EventListenerContext ctx = getEventListenerContext();
+        if(event instanceof MailCommandEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper){
+            MailBotContextWrapper botContextWrapper = (MailBotContextWrapper) ctx.getBotContextWrapper();
 
             MimeMessage message = ((MailCommandEvent) event).getMessage();
             String referenceId = MailContentExtractor.getMailReference(message);
 
-            WonURI wonUri = EventBotActionUtils.getWonURIForMailId(getEventListenerContext(), referenceId);
+            WonURI wonUri = botContextWrapper.getWonURIForMailId(referenceId);
 
             // determine if the mail is referring to some other mail/need/connection or not
             if(wonUri != null){
@@ -89,7 +91,7 @@ public class MailCommandAction extends BaseEventBotAction {
     }
 
     private void processReferenceMailCommands(MimeMessage message, WonURI wonUri) {
-
+        MailBotContextWrapper botContextWrapper = ((MailBotContextWrapper) getEventListenerContext().getBotContextWrapper());
         EventBus bus = getEventListenerContext().getEventBus();
         try{
             if(wonUri == null){
@@ -108,7 +110,7 @@ public class MailCommandAction extends BaseEventBotAction {
                     break;
             }
 
-            MimeMessage originalMessage = EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), needUri);
+            MimeMessage originalMessage = botContextWrapper.getMimeMessageForURI(needUri);
 
             if(originalMessage == null) {
                 throw new NullPointerException("no originalmessage found");
@@ -167,12 +169,13 @@ public class MailCommandAction extends BaseEventBotAction {
      */
     private URI retrieveCorrespondingNeedUriFromMailByTitle(MimeMessage message){
         try {
+            MailBotContextWrapper botContextWrapper = ((MailBotContextWrapper) getEventListenerContext().getBotContextWrapper());
             String sender = ((InternetAddress) message.getFrom()[0]).getAddress();
             URI needURI = null;
             String titleToClose = mailContentExtractor.getTitle(message).trim();
 
             if (sender != null) {
-                List<WonURI> needUris = EventBotActionUtils.getWonURIsForMailAddress(getEventListenerContext(), sender);
+                List<WonURI> needUris = botContextWrapper.getWonURIsForMailAddress(sender);
 
                 for(WonURI u : needUris) {
                     Dataset needRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(u.getUri());

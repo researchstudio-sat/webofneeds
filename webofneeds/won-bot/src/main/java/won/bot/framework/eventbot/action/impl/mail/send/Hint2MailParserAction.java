@@ -2,6 +2,8 @@ package won.bot.framework.eventbot.action.impl.mail.send;
 
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.GenericMessage;
+import won.bot.framework.bot.context.MailBotContextWrapper;
+import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.UriType;
@@ -31,20 +33,22 @@ public class Hint2MailParserAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        if (event instanceof HintFromMatcherEvent) {
+        EventListenerContext ctx = getEventListenerContext();
+        if (event instanceof HintFromMatcherEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper){
+            MailBotContextWrapper botContextWrapper = (MailBotContextWrapper) ctx.getBotContextWrapper();
             Match match = ((HintFromMatcherEvent) event).getMatch();
             WonMessage message = ((HintFromMatcherEvent) event).getWonMessage();
 
             URI responseTo = match.getFromNeed();
             URI remoteNeedUri = match.getToNeed();
 
-            MimeMessage originalMail = EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), responseTo);
+            MimeMessage originalMail = botContextWrapper.getMimeMessageForURI(responseTo);
             logger.debug(
               "Found a hint for URI: " + responseTo + " sending a mail to the creator: " + MailContentExtractor
                 .getFromAddressString(originalMail));
 
             WonMimeMessage answerMessage = mailGenerator.createHintMail(originalMail, remoteNeedUri);
-            EventBotActionUtils.addMailIdWonURIRelation(getEventListenerContext(), answerMessage.getMessageID(), new WonURI(message.getReceiverURI(), UriType.CONNECTION));
+            botContextWrapper.addMailIdWonURIRelation(answerMessage.getMessageID(), new WonURI(message.getReceiverURI(), UriType.CONNECTION));
 
             sendChannel.send(new GenericMessage<>(answerMessage));
         }

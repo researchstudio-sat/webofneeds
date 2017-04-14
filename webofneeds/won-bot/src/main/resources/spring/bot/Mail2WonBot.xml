@@ -106,8 +106,13 @@
                   value="${mailbot.max_conversation_depth}"/> <!-- 0 includes no messages at all, -1 includes all messages -->
     </bean>
 
-    <bean id="botContextWrapper" class="won.bot.framework.bot.context.BotContextWrapper">
+    <bean id="botContextWrapper" class="won.bot.framework.bot.context.MailBotContextWrapper">
         <constructor-arg name="botContext" ref="${botContext.impl}"/>
         <constructor-arg name="needCreateListName" value="MAILNEEDS"/>
+        <constructor-arg name="userSubscribeStatusName" value="user_subscribe_status"/>
+        <constructor-arg name="userCachedMailsName" value="user_cached_mails"/>
+        <constructor-arg name="uriMimeMessageName" value="uriMimeMessageRelations"/>
+        <constructor-arg name="mailIdUriName" value="mailIdUriRelations"/>
+        <constructor-arg name="mailAddressUriName" value="mailAdressUriRelations"/>
     </bean>
 </beans>

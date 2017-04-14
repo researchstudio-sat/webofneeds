@@ -1,6 +1,7 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
 import org.apache.commons.lang3.StringUtils;
+import won.bot.framework.bot.context.MailBotContextWrapper;
 import org.apache.jena.rdf.model.Model;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -49,7 +50,9 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
     }
 
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        if(event instanceof CreateNeedFromMailEvent){
+        EventListenerContext ctx = getEventListenerContext();
+        if(event instanceof CreateNeedFromMailEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper){
+            MailBotContextWrapper botContextWrapper = (MailBotContextWrapper) ctx.getBotContextWrapper();
             MimeMessage message = ((CreateNeedFromMailEvent) event).getMessage();
 
             try {
@@ -60,7 +63,6 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                 boolean isUsedForTesting = mailContentExtractor.isUsedForTesting(message);
                 boolean isDoNotMatch = mailContentExtractor.isDoNotMatch(message);
 
-                EventListenerContext ctx = getEventListenerContext();
                 WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
 
                 final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
@@ -84,15 +86,15 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                 WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri,
                                                                 model, isUsedForTesting, isDoNotMatch);
                 EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
-                EventBotActionUtils.addUriMimeMessageRelation(ctx, needURI, message);
+                botContextWrapper.addUriMimeMessageRelation(needURI, message);
 
                 EventListener successCallback = new EventListener()
                 {
                     @Override
                     public void onEvent(Event event) throws Exception {
                         logger.debug("need creation successful, new need URI is {}", needURI);
-                        String sender = MailContentExtractor.getFromAddressString(EventBotActionUtils.getMimeMessageForURI(ctx, needURI));
-                        EventBotActionUtils.addMailAddressWonURIRelation(ctx, sender, new WonURI(needURI, UriType.NEED));
+                        String sender = MailContentExtractor.getFromAddressString(botContextWrapper.getMimeMessageForURI(needURI));
+                        botContextWrapper.addMailAddressWonURIRelation(sender, new WonURI(needURI, UriType.NEED));
                         logger.debug("created need was from sender: " + sender);
                     }
                 };
@@ -104,7 +106,7 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                         String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
                         logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
                         EventBotActionUtils.removeFromList(ctx, needURI, uriListName);
-                        EventBotActionUtils.removeUriMimeMessageRelation(ctx, needURI);
+                        botContextWrapper.removeUriMimeMessageRelation(needURI);
                     }
                 };
                 EventBotActionUtils.makeAndSubscribeResponseListener(createNeedMessage, successCallback, failureCallback, ctx);
