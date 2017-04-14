@@ -34,39 +34,35 @@ import java.util.Collection;
 * User: fkleedorfer
 * Date: 28.03.14
 */
-public class DeactivateAllNeedsOfGroupAction extends BaseEventBotAction
-{
-  private String groupName;
-  public DeactivateAllNeedsOfGroupAction(EventListenerContext eventListenerContext, String groupName) {
-    super(eventListenerContext);
-    this.groupName = groupName;
-  }
+public class DeactivateAllNeedsOfGroupAction extends BaseEventBotAction {
+    private String groupName;
 
-  @Override
-  protected void doRun(Event event, EventListener executingListener) throws Exception {
-    Collection<URI> toDeactivate = getEventListenerContext().getBotContext().getNamedNeedUriList(groupName);
-    for (URI uri: toDeactivate){
-      getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(uri));
-      getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
+    public DeactivateAllNeedsOfGroupAction(EventListenerContext eventListenerContext, String groupName) {
+        super(eventListenerContext);
+        this.groupName = groupName;
     }
-  }
 
-  private WonMessage createWonMessage(URI needURI) throws WonMessageBuilderException {
+    @Override
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
+        EventListenerContext ctx = getEventListenerContext();
 
-    WonNodeInformationService wonNodeInformationService =
-      getEventListenerContext().getWonNodeInformationService();
+        Collection<URI> toDeactivate = ctx.getBotContext().getNamedNeedUriList(groupName);
+        for (URI uri: toDeactivate){
+            ctx.getWonMessageSender().sendWonMessage(createWonMessage(uri));
+            ctx.getEventBus().publish(new NeedDeactivatedEvent(uri));
+        }
+    }
 
-    URI localWonNode = WonRdfUtils.NeedUtils.queryWonNode(
-      getEventListenerContext().getLinkedDataSource().getDataForResource(needURI));
+    private WonMessage createWonMessage(URI needURI) throws WonMessageBuilderException {
+        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
+
+        URI localWonNode = WonRdfUtils.NeedUtils.queryWonNode(getEventListenerContext().getLinkedDataSource().getDataForResource(needURI));
 
 
-    return WonMessageBuilder
-      .setMessagePropertiesForDeactivate(
-        wonNodeInformationService.generateEventURI(
-          localWonNode),
-        needURI,
-        localWonNode)
-      .build();
-  }
-
+        return WonMessageBuilder.setMessagePropertiesForDeactivate(
+                  wonNodeInformationService.generateEventURI(localWonNode),
+                  needURI,
+                  localWonNode)
+                  .build();
+    }
 }
