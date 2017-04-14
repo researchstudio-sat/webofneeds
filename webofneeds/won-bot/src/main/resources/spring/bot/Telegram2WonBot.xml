@@ -50,9 +50,12 @@
         </property>
     </bean>
 
-    <bean id="botContextWrapper" class="won.bot.framework.bot.context.BotContextWrapper">
+    <bean id="botContextWrapper" class="won.bot.framework.bot.context.TelegramBotContextWrapper">
         <constructor-arg name="botContext" ref="${botContext.impl}"/>
         <constructor-arg name="needCreateListName" value="telegramNeeds"/>
+        <constructor-arg name="chatIdUriRelationsName" value="tgChatIdUriRelations"/>
+        <constructor-arg name="messageIdUriRelationsName" value="tgMessageIdUriRelations"/>
+        <constructor-arg name="uriChatIdRelationsName" value="tgUriChatIdRelations"/>
     </bean>
 
     <bean id="telegramGenerator" class="won.bot.framework.eventbot.action.impl.telegram.util.TelegramMessageGenerator">

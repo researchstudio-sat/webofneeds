@@ -164,26 +164,6 @@ public class EventBotActionUtils {
         return (status != null) ? SubscribeStatus.valueOf(status.name()) : SubscribeStatus.NO_RESPONSE;
     }
 
-    //************************************************ TelegramBot Context Methods *************************************
-    public static void addChatIdWonURIRelation(EventListenerContext context, String mapName, Long chatId, WonURI uri) {
-        context.getBotContext().saveToObjectMap(mapName, chatId.toString(), uri);
-    }
-    public static void addURIChatIdRelation(EventListenerContext context, String mapName, URI uri, Long chatId) {
-        context.getBotContext().saveToObjectMap(mapName, uri.toString(), chatId);
-    }
-
-    public static Long getChatIdForURI(EventListenerContext context, String mapName, URI uri) {
-        return (Long) context.getBotContext().loadFromObjectMap(mapName, uri.toString());
-    }
-
-    public static void addMessageIdWonURIRelation(EventListenerContext context, String mapName, Integer messageId, WonURI wonURI) {
-        context.getBotContext().saveToObjectMap(mapName, messageId.toString(), wonURI);
-    }
-
-    public static WonURI getWonURIForMessageId(EventListenerContext context, String mapName, Integer messageId) {
-        return (WonURI) context.getBotContext().loadFromObjectMap(mapName, messageId.toString());
-    }
-
     //************************************************ EventListener ***************************************************
     /**
      * Creates a listener that waits for the response to the specified message. If a SuccessResponse is received,

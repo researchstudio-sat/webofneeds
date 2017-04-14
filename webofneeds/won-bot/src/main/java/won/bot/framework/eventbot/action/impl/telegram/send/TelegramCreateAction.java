@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import won.bot.framework.bot.context.TelegramBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.UriType;
@@ -36,17 +37,10 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
     private WonTelegramBotHandler wonTelegramBotHandler;
     private TelegramContentExtractor telegramContentExtractor;
 
-    private String uriChatIdListName;
-    private String chatIdUriListName;
-    private String messageIdUriListName;
-
-    public TelegramCreateAction(EventListenerContext eventListenerContext, String uriChatIdListName, String chatIdUriListName, String messageIdUriListName, WonTelegramBotHandler wonTelegramBotHandler, TelegramContentExtractor telegramContentExtractor, URI... facets) {
+    public TelegramCreateAction(EventListenerContext eventListenerContext, WonTelegramBotHandler wonTelegramBotHandler, TelegramContentExtractor telegramContentExtractor, URI... facets) {
         super(eventListenerContext);
         this.wonTelegramBotHandler = wonTelegramBotHandler;
         this.telegramContentExtractor = telegramContentExtractor;
-        this.uriChatIdListName = uriChatIdListName;
-        this.chatIdUriListName = chatIdUriListName;
-        this.messageIdUriListName = messageIdUriListName;
 
         if (facets == null || facets.length == 0) {
             //add the default facet if none is present.
@@ -59,7 +53,10 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        if(event instanceof TelegramCreateNeedEvent){
+        EventListenerContext ctx = getEventListenerContext();
+        if(event instanceof TelegramCreateNeedEvent && ctx.getBotContextWrapper() instanceof TelegramBotContextWrapper){
+            TelegramBotContextWrapper botContextWrapper = (TelegramBotContextWrapper) ctx.getBotContextWrapper();
+
             TelegramCreateNeedEvent telegramCreateNeedEvent = (TelegramCreateNeedEvent) event;
             String[] parameters = telegramCreateNeedEvent.getStrings();
             Long chatId = telegramCreateNeedEvent.getChat().getId();
@@ -89,7 +86,6 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
                 boolean isUsedForTesting = true;
                 boolean isDoNotMatch = false;
 
-                EventListenerContext ctx = getEventListenerContext();
                 WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
 
                 final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
@@ -106,19 +102,19 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
 
                 WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, model, isUsedForTesting, isDoNotMatch);
                 EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
-                EventBotActionUtils.addChatIdWonURIRelation(ctx, chatIdUriListName, chatId, new WonURI(needURI, UriType.NEED));
-                EventBotActionUtils.addURIChatIdRelation(ctx, uriChatIdListName, needURI, chatId);
+                botContextWrapper.addChatIdWonURIRelation(chatId, new WonURI(needURI, UriType.NEED));
+                botContextWrapper.addURIChatIdRelation(needURI, chatId);
 
                 EventListener successCallback = new EventListener()
                 {
                     @Override
                     public void onEvent(Event event) throws Exception {
                         logger.debug("need creation successful, new need URI is {}", needURI);
-                        logger.debug("created need was from sender: " + EventBotActionUtils.getChatIdForURI(getEventListenerContext(), uriChatIdListName, needURI));
+                        logger.debug("created need was from sender: " + botContextWrapper.getChatIdForURI(needURI));
 
                         try{
                             Message message = telegramCreateNeedEvent.getAbsSender().sendMessage(wonTelegramBotHandler.getTelegramMessageGenerator().getCreatedNeedMessage(chatId, needURI));
-                            EventBotActionUtils.addMessageIdWonURIRelation(getEventListenerContext(), messageIdUriListName, message.getMessageId(), new WonURI(needURI, UriType.NEED));
+                            botContextWrapper.addMessageIdWonURIRelation(message.getMessageId(), new WonURI(needURI, UriType.NEED));
                         }catch (TelegramApiException te){
                             logger.error(te.getMessage());
                         }
