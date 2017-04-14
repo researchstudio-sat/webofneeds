@@ -40,8 +40,8 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
     private String chatIdUriListName;
     private String messageIdUriListName;
 
-    public TelegramCreateAction(EventListenerContext eventListenerContext, String uriListName, String uriChatIdListName, String chatIdUriListName, String messageIdUriListName, WonTelegramBotHandler wonTelegramBotHandler, TelegramContentExtractor telegramContentExtractor, URI... facets) {
-        super(eventListenerContext, uriListName);
+    public TelegramCreateAction(EventListenerContext eventListenerContext, String uriChatIdListName, String chatIdUriListName, String messageIdUriListName, WonTelegramBotHandler wonTelegramBotHandler, TelegramContentExtractor telegramContentExtractor, URI... facets) {
+        super(eventListenerContext);
         this.wonTelegramBotHandler = wonTelegramBotHandler;
         this.telegramContentExtractor = telegramContentExtractor;
         this.uriChatIdListName = uriChatIdListName;
@@ -104,8 +104,7 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
                 Model model = wrapper.getNeedModel(NeedGraphType.NEED);
                 logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(model), 150));
 
-                WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri,
-                        model, isUsedForTesting, isDoNotMatch);
+                WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, model, isUsedForTesting, isDoNotMatch);
                 EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
                 EventBotActionUtils.addChatIdWonURIRelation(ctx, chatIdUriListName, chatId, new WonURI(needURI, UriType.NEED));
                 EventBotActionUtils.addURIChatIdRelation(ctx, uriChatIdListName, needURI, chatId);

@@ -21,6 +21,7 @@ import org.apache.jena.rdf.model.Model;
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.bot.BotLifecyclePhase;
+import won.bot.framework.bot.context.BotContextWrapper;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -271,8 +272,7 @@ public abstract class EventBot extends TriggeredBot
    * Class holding references to all important services that EventListeners inside bots need to
    * access.
    */
-  public class MyEventListenerContext implements EventListenerContext
-  {
+  public class MyEventListenerContext implements EventListenerContext {
 
     public TaskScheduler getTaskScheduler() {
       return EventBot.this.getTaskScheduler();
@@ -326,9 +326,13 @@ public abstract class EventBot extends TriggeredBot
       return EventBot.this.getEventBus();
     }
 
+    @Override
     public BotContext getBotContext() {
-      return EventBot.this.getBotContext();
+      return EventBot.this.getBotContextWrapper().getBotContext();
     }
+
+    @Override
+    public BotContextWrapper getBotContextWrapper() {return EventBot.this.getBotContextWrapper(); }
 
     /**
      * Returns an executor that passes the tasks to the TaskScheduler for immediate execution.

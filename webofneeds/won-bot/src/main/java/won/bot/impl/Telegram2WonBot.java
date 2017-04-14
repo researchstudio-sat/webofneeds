@@ -34,7 +34,6 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
  * Created by fsuda on 14.12.2016.
  */
 public class Telegram2WonBot extends EventBot {
-    private static final String NAME_NEEDS = "telegramNeeds";
     private static final String CHATIDURIRELATIONS_NAME = "tgChatIdUriRelations";
     private static final String MESSAGEIDURIRELATIONS_NAME = "tgMessageIdUriRelations";
     private static final String URICHATIDRELATIONS_NAME = "tgUriChatIdRelations";
@@ -85,7 +84,7 @@ public class Telegram2WonBot extends EventBot {
                 new ActionOnEventListener(
                         ctx,
                         "TelegramCreateAction",
-                        new TelegramCreateAction(ctx, NAME_NEEDS, URICHATIDRELATIONS_NAME, CHATIDURIRELATIONS_NAME, MESSAGEIDURIRELATIONS_NAME, wonTelegramBotHandler, telegramContentExtractor)
+                        new TelegramCreateAction(ctx, URICHATIDRELATIONS_NAME, CHATIDURIRELATIONS_NAME, MESSAGEIDURIRELATIONS_NAME, wonTelegramBotHandler, telegramContentExtractor)
                 ));
 
             bus.subscribe(CloseConnectionEvent.class,
