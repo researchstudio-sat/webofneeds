@@ -8,7 +8,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.ConnectFromListToListAction;
 import won.bot.framework.eventbot.action.impl.needlifecycle.CreateNeedWithFacetsAction;
-import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsOfGroupAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsOfListAction;
 import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
@@ -273,7 +273,7 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
     this.scriptsDoneListener = new ActionOnceAfterNEventsListener(
       ctx, "scriptsDoneListener", secondPhaseScriptListenerFilter,
       noOfNeeds - 1,
-      new DeactivateAllNeedsOfGroupAction(ctx, botContextWrapper.getParticipantListName()));
+      new DeactivateAllNeedsOfListAction(ctx, botContextWrapper.getParticipantListName()));
     bus.subscribe(FinishedEvent.class, this.scriptsDoneListener);
 
 

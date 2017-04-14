@@ -6,7 +6,7 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.facet.TwoPhaseCommitDeactivateOnCloseAction;
 import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
 import won.bot.framework.eventbot.action.impl.needlifecycle.CreateNeedWithFacetsAction;
-import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsOfGroupAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsOfListAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.ConnectFromListToListAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionAction;
 import won.bot.framework.eventbot.bus.EventBus;
@@ -101,7 +101,7 @@ public class StandardTwoPhaseCommitBot extends EventBot{
     bus.subscribe(CloseFromOtherNeedEvent.class, this.participantDeactivator);
 
     coordinatorDeactivator = new ActionOnEventListener(ctx, "coordinatorDeactivator",
-                                                       new FinishedEventFilter(participantDeactivator), new DeactivateAllNeedsOfGroupAction(ctx, botContextWrapper.getCoordinatorListName()), 1);
+                                                       new FinishedEventFilter(participantDeactivator), new DeactivateAllNeedsOfListAction(ctx, botContextWrapper.getCoordinatorListName()), 1);
     bus.subscribe(FinishedEvent.class, coordinatorDeactivator);
 
     //add a listener that counts two NeedDeactivatedEvents and then tells the
