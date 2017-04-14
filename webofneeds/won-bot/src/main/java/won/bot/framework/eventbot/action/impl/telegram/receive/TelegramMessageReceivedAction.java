@@ -5,6 +5,7 @@ import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageReplyMa
 import org.telegram.telegrambots.api.objects.CallbackQuery;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
+import won.bot.framework.bot.context.TelegramBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -23,20 +24,20 @@ public class TelegramMessageReceivedAction extends BaseEventBotAction {
     private TelegramContentExtractor telegramContentExtractor;
     private WonTelegramBotHandler wonTelegramBotHandler;
 
-    private String messageIdUriListName;
-
-    public TelegramMessageReceivedAction(EventListenerContext eventListenerContext, WonTelegramBotHandler wonTelegramBotHandler, TelegramContentExtractor telegramContentExtractor, String messageIdUriListName) {
+    public TelegramMessageReceivedAction(EventListenerContext eventListenerContext, WonTelegramBotHandler wonTelegramBotHandler, TelegramContentExtractor telegramContentExtractor) {
         super(eventListenerContext);
         this.wonTelegramBotHandler = wonTelegramBotHandler;
         this.telegramContentExtractor = telegramContentExtractor;
-        this.messageIdUriListName = messageIdUriListName;
     }
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
         EventBus bus = getEventListenerContext().getEventBus();
+        EventListenerContext ctx = getEventListenerContext();
 
-        if(event instanceof TelegramMessageReceivedEvent){
+        if(event instanceof TelegramMessageReceivedEvent && ctx.getBotContextWrapper() instanceof TelegramBotContextWrapper){
+            TelegramBotContextWrapper botContextWrapper = (TelegramBotContextWrapper) ctx.getBotContextWrapper();
+
             Update update = ((TelegramMessageReceivedEvent) event).getUpdate();
             Message message = update.getMessage();
             CallbackQuery callbackQuery = update.getCallbackQuery();
@@ -46,7 +47,7 @@ public class TelegramMessageReceivedAction extends BaseEventBotAction {
             }else if (callbackQuery != null && update.hasCallbackQuery()) {
                 message = callbackQuery.getMessage();
                 String data = callbackQuery.getData();
-                WonURI correspondingURI = EventBotActionUtils.getWonURIForMessageId(getEventListenerContext(), messageIdUriListName, message.getMessageId());
+                WonURI correspondingURI = botContextWrapper.getWonURIForMessageId(message.getMessageId());
 
                 AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
                 answerCallbackQuery.setCallbackQueryId(callbackQuery.getId());
@@ -72,7 +73,7 @@ public class TelegramMessageReceivedAction extends BaseEventBotAction {
 
                 wonTelegramBotHandler.editMessageReplyMarkup(editMessageReplyMarkup);
             }else if(message != null && message.isReply() && message.hasText()){
-                WonURI correspondingURI = EventBotActionUtils.getWonURIForMessageId(getEventListenerContext(), messageIdUriListName, message.getReplyToMessage().getMessageId());
+                WonURI correspondingURI = botContextWrapper.getWonURIForMessageId(message.getReplyToMessage().getMessageId());
                 bus.publish(new SendTextMessageOnConnectionEvent(message.getText(), correspondingURI.getUri()));
             }
         }

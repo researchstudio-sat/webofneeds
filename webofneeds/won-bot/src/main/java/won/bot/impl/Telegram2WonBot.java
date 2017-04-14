@@ -34,9 +34,6 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
  * Created by fsuda on 14.12.2016.
  */
 public class Telegram2WonBot extends EventBot {
-    private static final String CHATIDURIRELATIONS_NAME = "tgChatIdUriRelations";
-    private static final String MESSAGEIDURIRELATIONS_NAME = "tgMessageIdUriRelations";
-    private static final String URICHATIDRELATIONS_NAME = "tgUriChatIdRelations";
     private String botName;
     private String token;
 
@@ -70,7 +67,7 @@ public class Telegram2WonBot extends EventBot {
                 new ActionOnEventListener(
                         ctx,
                         "TelegramMessageReceived",
-                        new TelegramMessageReceivedAction(ctx, wonTelegramBotHandler, telegramContentExtractor, MESSAGEIDURIRELATIONS_NAME)
+                        new TelegramMessageReceivedAction(ctx, wonTelegramBotHandler, telegramContentExtractor)
                 ));
 
             bus.subscribe(SendHelpEvent.class,
@@ -84,7 +81,7 @@ public class Telegram2WonBot extends EventBot {
                 new ActionOnEventListener(
                         ctx,
                         "TelegramCreateAction",
-                        new TelegramCreateAction(ctx, URICHATIDRELATIONS_NAME, CHATIDURIRELATIONS_NAME, MESSAGEIDURIRELATIONS_NAME, wonTelegramBotHandler, telegramContentExtractor)
+                        new TelegramCreateAction(ctx, wonTelegramBotHandler, telegramContentExtractor)
                 ));
 
             bus.subscribe(CloseConnectionEvent.class,
@@ -113,21 +110,21 @@ public class Telegram2WonBot extends EventBot {
                     new ActionOnEventListener(
                             ctx,
                             "HintReceived",
-                            new Hint2TelegramAction(ctx, wonTelegramBotHandler, URICHATIDRELATIONS_NAME, MESSAGEIDURIRELATIONS_NAME)
+                            new Hint2TelegramAction(ctx, wonTelegramBotHandler)
                     ));
 
             bus.subscribe(ConnectFromOtherNeedEvent.class,
                     new ActionOnEventListener(
                             ctx,
                             "ConnectReceived",
-                            new Connect2TelegramAction(ctx, wonTelegramBotHandler, URICHATIDRELATIONS_NAME, MESSAGEIDURIRELATIONS_NAME)
+                            new Connect2TelegramAction(ctx, wonTelegramBotHandler)
                     ));
 
             bus.subscribe(MessageFromOtherNeedEvent.class,
                     new ActionOnEventListener(
                             ctx,
                             "ReceivedTextMessage",
-                            new Message2TelegramAction(ctx, wonTelegramBotHandler, URICHATIDRELATIONS_NAME, MESSAGEIDURIRELATIONS_NAME)
+                            new Message2TelegramAction(ctx, wonTelegramBotHandler)
                     ));
 
         } catch (TelegramApiRequestException e) {
