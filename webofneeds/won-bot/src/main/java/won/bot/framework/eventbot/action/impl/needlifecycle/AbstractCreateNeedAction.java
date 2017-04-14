@@ -19,6 +19,7 @@ package won.bot.framework.eventbot.action.impl.needlifecycle;
 import org.apache.jena.rdf.model.Model;
 import won.bot.framework.bot.context.BotContextWrapper;
 import won.bot.framework.bot.context.CommentBotContextWrapper;
+import won.bot.framework.bot.context.GroupBotContextWrapper;
 import won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -91,6 +92,14 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
             this.uriListName = participantCoordinatorBotContextWrapper.getParticipantListName();
         }else{
             throw new IllegalArgumentException("AbstractCreateNeedAction for participantCoordinatorBotContextWrapper only work with Coordinator or ParticipantFacet");
+        }
+    }else if(botContextWrapper instanceof GroupBotContextWrapper){
+        GroupBotContextWrapper groupBotContextWrapper = (GroupBotContextWrapper) botContextWrapper;
+
+        if(this.hasFacet(FacetType.GroupFacet)){
+            this.uriListName = groupBotContextWrapper.getGroupListName();
+        }else{
+            this.uriListName = groupBotContextWrapper.getGroupMembersListName();
         }
     }else{
         this.uriListName = botContextWrapper.getNeedCreateListName();
