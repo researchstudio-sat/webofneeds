@@ -21,7 +21,7 @@ import won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.wonmessage.ConnectFromListToListAction;
 import won.bot.framework.eventbot.action.impl.needlifecycle.CreateNeedWithFacetsAction;
-import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsOfGroupAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsOfListAction;
 import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
@@ -142,7 +142,7 @@ public abstract class BABaseBot extends EventBot {
         this.scriptsDoneListener = new ActionOnceAfterNEventsListener(
             ctx, "scriptsDoneListener", mainScriptListenerFilter,
             noOfNeeds - 1,
-            new DeactivateAllNeedsOfGroupAction(ctx, botContextWrapper.getParticipantListName()));
+            new DeactivateAllNeedsOfListAction(ctx, botContextWrapper.getParticipantListName()));
         bus.subscribe(FinishedEvent.class, this.scriptsDoneListener);
 
         //When the needs are deactivated, all connections are closed. wait for the close events and signal work done.

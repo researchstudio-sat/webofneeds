@@ -20,7 +20,7 @@ import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.bot.context.GroupBotContextWrapper;
 import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
 import won.bot.framework.eventbot.action.impl.needlifecycle.CreateNeedWithFacetsAction;
-import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsOfGroupAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsOfListAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.ConnectFromListToListAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.RespondToMessageAction;
@@ -170,7 +170,7 @@ public class GroupingBot extends EventBot
     this.messagesDoneListener = new ActionOnceAfterNEventsListener(
       ctx, "messagesDoneListener", mainAutoResponderFilter,
       NO_OF_GROUPMEMBERS * 2,
-      new DeactivateAllNeedsOfGroupAction(ctx, botContextWrapper.getGroupListName()));
+      new DeactivateAllNeedsOfListAction(ctx, botContextWrapper.getGroupListName()));
     bus.subscribe(FinishedEvent.class, this.messagesDoneListener);
 
 

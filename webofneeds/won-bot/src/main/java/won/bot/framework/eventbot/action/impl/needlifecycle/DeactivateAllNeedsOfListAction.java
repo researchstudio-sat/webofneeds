@@ -34,19 +34,19 @@ import java.util.Collection;
 * User: fkleedorfer
 * Date: 28.03.14
 */
-public class DeactivateAllNeedsOfGroupAction extends BaseEventBotAction {
-    private String groupName;
+public class DeactivateAllNeedsOfListAction extends BaseEventBotAction {
+    private String uriListName;
 
-    public DeactivateAllNeedsOfGroupAction(EventListenerContext eventListenerContext, String groupName) {
+    public DeactivateAllNeedsOfListAction(EventListenerContext eventListenerContext, String uriListName) {
         super(eventListenerContext);
-        this.groupName = groupName;
+        this.uriListName = uriListName;
     }
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
         EventListenerContext ctx = getEventListenerContext();
 
-        Collection<URI> toDeactivate = ctx.getBotContext().getNamedNeedUriList(groupName);
+        Collection<URI> toDeactivate = ctx.getBotContext().getNamedNeedUriList(uriListName);
         for (URI uri: toDeactivate){
             ctx.getWonMessageSender().sendWonMessage(createWonMessage(uri));
             ctx.getEventBus().publish(new NeedDeactivatedEvent(uri));
