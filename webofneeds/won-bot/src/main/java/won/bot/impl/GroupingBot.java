@@ -54,7 +54,6 @@ public class GroupingBot extends EventBot
   protected static final int NO_OF_MESSAGES = 5;
   protected static final long MILLIS_BETWEEN_MESSAGES = 1;
   protected static final String NAME_GROUPS = "groups";
-  protected static final String NAME_GROUPMEMBERS = "groupmembers";
   //we use protected members so we can extend the class and
   //access the listeners for unit test assertions and stats
   //
@@ -81,14 +80,14 @@ public class GroupingBot extends EventBot
     //create needs every trigger execution until N needs are created
     this.groupMemberCreator = new ActionOnEventListener(
       ctx, "groupMemberCreator",
-      new CreateNeedWithFacetsAction(ctx, NAME_GROUPMEMBERS),
+      new CreateNeedWithFacetsAction(ctx),
       NO_OF_GROUPMEMBERS
     );
     bus.subscribe(ActEvent.class, this.groupMemberCreator);
 
     //for each created need (in the group), add a listener that will auto-respond to messages directed at that need
     //create a filter that only accepts events for needs in the group:
-    NeedUriInNamedListFilter groupMemberFilter = new NeedUriInNamedListFilter(ctx, NAME_GROUPMEMBERS);
+    NeedUriInNamedListFilter groupMemberFilter = new NeedUriInNamedListFilter(ctx, ctx.getBotContextWrapper().getNeedCreateListName());
     //remember the auto-responders in a list
     this.autoResponders = new ArrayList<BaseEventListener>();
     //remember the listeners that wait for all messages
@@ -103,8 +102,7 @@ public class GroupingBot extends EventBot
       protected void doRun(final Event event, EventListener executingListener) throws Exception {
         //create a listener that automatically answers messages, only for that need URI
         AutomaticMessageResponderListener listener = new AutomaticMessageResponderListener(ctx, "autoResponder",
-                                                                                           NeedUriEventFilter
-                                                                                             .forEvent(event),
+                                                                                           NeedUriEventFilter.forEvent(event),
                                                                                            NO_OF_MESSAGES,
                                                                                            MILLIS_BETWEEN_MESSAGES);
         //remember the listener for later
@@ -137,12 +135,12 @@ public class GroupingBot extends EventBot
     this.groupCreator = new ActionOnceAfterNEventsListener(
       ctx, "groupCreator",
       NO_OF_GROUPMEMBERS,
-      new CreateNeedWithFacetsAction(ctx, NAME_GROUPS, FacetType.GroupFacet.getURI()));
+      new CreateNeedWithFacetsAction(ctx, FacetType.GroupFacet.getURI()));
     bus.subscribe(NeedCreatedEvent.class, this.groupCreator);
 
     //wait for N+1 needCreatedEvents, then connect the members with the group facet of the third need
     this.needConnector = new ActionOnceAfterNEventsListener(ctx, "needConnector", NO_OF_GROUPMEMBERS + 1,
-                                                             new ConnectFromListToListAction(ctx, NAME_GROUPMEMBERS,
+                                                             new ConnectFromListToListAction(ctx,  ctx.getBotContextWrapper().getNeedCreateListName(),
                                                                                              NAME_GROUPS,
                                                                                              FacetType.OwnerFacet
                                                                                                       .getURI(),

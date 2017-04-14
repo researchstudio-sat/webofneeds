@@ -41,12 +41,9 @@ import won.protocol.model.FacetType;
 /**
  *
  */
-public class CommentBot extends EventBot
-{
-
+public class CommentBot extends EventBot {
   private static final int NO_OF_NEEDS = 1;
   private static final long MILLIS_BETWEEN_MESSAGES = 10;
-
 
   //we use protected members so we can extend the class and
   //access the listeners for unit test assertions and stats
@@ -74,14 +71,14 @@ public class CommentBot extends EventBot
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ActionOnEventListener(
         ctx,
-        new CreateNeedWithFacetsAction(ctx, NAME_NEEDS),
+        new CreateNeedWithFacetsAction(ctx),
         NO_OF_NEEDS
     );
     bus.subscribe(ActEvent.class, this.needCreator);
 
     //count until 1 need is created, then create a comment facet
     this.commentFacetCreator = new ActionOnEventListener(ctx,
-            new CreateNeedWithFacetsAction(ctx,NAME_COMMENTS,FacetType.CommentFacet.getURI()),1) ;
+            new CreateNeedWithFacetsAction(ctx, FacetType.CommentFacet.getURI()),1) ;
     bus.subscribe(NeedCreatedEvent.class, this.commentFacetCreator);
 
     this.needConnector = new ActionOnceAfterNEventsListener(ctx,

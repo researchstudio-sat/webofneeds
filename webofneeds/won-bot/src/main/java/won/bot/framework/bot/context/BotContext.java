@@ -9,9 +9,8 @@ import java.util.*;
  * retrieved.
  *
  */
-public interface BotContext
-{
-  public static final String DEFAULT_NEED_LIST_NAME="need_uris";
+public interface BotContext {
+  String DEFAULT_NEED_LIST_NAME="need_uris";
 
   // ===============================
   // application specific methods

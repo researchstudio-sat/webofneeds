@@ -29,14 +29,13 @@ import java.util.Arrays;
  * Created by fsuda on 30.09.2016.
  */
 public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
-    private static final String MAIL_NEEDSLIST_NAME = "mailNeeds";
     private MailContentExtractor mailContentExtractor;
 
     public CreateNeedFromMailAction(EventListenerContext eventListenerContext,
                                     MailContentExtractor mailContentExtractor,
                                     URI... facets) {
 
-        super(eventListenerContext, MAIL_NEEDSLIST_NAME);
+        super(eventListenerContext);
         this.mailContentExtractor = mailContentExtractor;
 
         if (facets == null || facets.length == 0) {
@@ -88,8 +87,8 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                     @Override
                     public void onEvent(Event event) throws Exception {
                         logger.debug("need creation successful, new need URI is {}", needURI);
-                        String sender = MailContentExtractor.getFromAddressString(EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), needURI));
-                        EventBotActionUtils.addMailAddressWonURIRelation(getEventListenerContext(), sender, new WonURI(needURI, UriType.NEED));
+                        String sender = MailContentExtractor.getFromAddressString(EventBotActionUtils.getMimeMessageForURI(ctx, needURI));
+                        EventBotActionUtils.addMailAddressWonURIRelation(ctx, sender, new WonURI(needURI, UriType.NEED));
                         logger.debug("created need was from sender: " + sender);
                     }
                 };
@@ -100,14 +99,14 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                     public void onEvent(Event event) throws Exception {
                         String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
                         logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
-                        EventBotActionUtils.removeFromList(getEventListenerContext(), needURI, uriListName);
-                        EventBotActionUtils.removeUriMimeMessageRelation(getEventListenerContext(), needURI);
+                        EventBotActionUtils.removeFromList(ctx, needURI, uriListName);
+                        EventBotActionUtils.removeUriMimeMessageRelation(ctx, needURI);
                     }
                 };
-                EventBotActionUtils.makeAndSubscribeResponseListener(createNeedMessage, successCallback, failureCallback, getEventListenerContext());
+                EventBotActionUtils.makeAndSubscribeResponseListener(createNeedMessage, successCallback, failureCallback, ctx);
 
                 logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
-                getEventListenerContext().getWonMessageSender().sendWonMessage(createNeedMessage);
+                ctx.getWonMessageSender().sendWonMessage(createNeedMessage);
                 logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
             }  catch (MessagingException me){
                 logger.error("messaging exception occurred: {}", me);
