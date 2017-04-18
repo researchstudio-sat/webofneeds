@@ -10,10 +10,7 @@ ADD ./core/wontest  /opt/solr/server/solr/wontest
 ADD ./core/won/conf /opt/solr/server/solr/wontest/conf
 ADD ./core/won/data /opt/solr/server/solr/wontest/data
 
-# do not make explicit volumes here, this will just fill up disk space in our integration test environment very fast
-# VOLUME /opt/solr/server/solr/won/data
-# VOLUME /opt/solr/server/solr/wontest/data
-
+# use the root user (instead solr user) to run the solr for now, cause the directories that are created by the doctor containers will also be root
 USER root
 RUN chown -R solr /opt/solr/server/solr/won
 RUN chown -R solr /opt/solr/server/solr/wontest

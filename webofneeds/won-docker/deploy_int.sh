@@ -43,6 +43,13 @@ ssh root@satsrv06 mkdir -p $base_folder/won-client-certs
 ssh root@satsrv05 mkdir -p $base_folder/won-server-certs
 scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl-int.conf root@satsrv05:$base_folder/openssl-int.conf
 
+# create the solr data directories (if not available yet) with full rights for every user.
+# This is done so that the directory on the host can be written by the solr user from inside the container
+ssh root@satsrv06 mkdir -p $base_folder/solr/won/data
+ssh root@satsrv06 mkdir -p $base_folder/solr/wontest/data
+ssh root@satsrv06 chmod 777 $base_folder/solr/won/data
+ssh root@satsrv06 chmod 777 $base_folder/solr/wontest/data
+
 echo run docker containers using docker-compose on satsrv04:
 cd deploy/int_satsrv04
 docker-compose -H satsrv04:2375 down
