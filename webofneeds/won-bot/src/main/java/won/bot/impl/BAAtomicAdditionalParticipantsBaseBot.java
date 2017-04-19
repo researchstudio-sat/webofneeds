@@ -3,7 +3,7 @@ package won.bot.impl;
 
 import com.google.common.collect.Iterators;
 import won.bot.framework.bot.base.EventBot;
-import won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper;
+import won.bot.framework.bot.context.AdditionalParticipantCoordinatorBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.ConnectFromListToListAction;
@@ -97,7 +97,7 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
   @Override
   protected void initializeEventListeners() {
     final EventListenerContext ctx = getEventListenerContext();
-    final ParticipantCoordinatorBotContextWrapper botContextWrapper = (ParticipantCoordinatorBotContextWrapper) getBotContextWrapper();
+    final AdditionalParticipantCoordinatorBotContextWrapper botContextWrapper = (AdditionalParticipantCoordinatorBotContextWrapper) getBotContextWrapper();
     final EventBus bus = getEventBus();
     logger.info("info1: No of needs: "+noOfNeeds);
 
@@ -110,7 +110,7 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
     //create needs every trigger execution until noOfNeeds are created
     this.participantNeedCreator = new ActionOnEventListener(
       ctx, "participantCreator",
-      new CreateNeedWithFacetsAction(ctx, getParticipantFacetType().getURI()),
+      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getParticipantListName(), getParticipantFacetType().getURI()),
       noOfNonDelayedNeeds - 1
     );
     bus.subscribe(ActEvent.class, this.participantNeedCreator);
@@ -118,7 +118,7 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
     //create needs every trigger execution until noOfNeeds are created
     this.delayedParticipantNeedCreator = new ActionOnEventListener(
       ctx, "delayedParticipantCreator",
-      new CreateNeedWithFacetsAction(ctx, getParticipantFacetType().getURI()), //TODO: MAKE THIS SO URI_LIST_NAME_PARTICIPANT_DELAYED "delayedParticipants" works again
+      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getParticipantDelayedListName(), getParticipantFacetType().getURI()),
       noOfDelayedNeeds
     );
     bus.subscribe(ActEvent.class, this.delayedParticipantNeedCreator);
@@ -127,7 +127,7 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
     //when done, create one coordinator need
     this.coordinatorNeedCreator = new ActionOnEventListener(
       ctx, "coordinatorCreator", new FinishedEventFilter(participantNeedCreator),
-      new CreateNeedWithFacetsAction(ctx, getCoordinatorFacetType().getURI()),
+      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getCoordinatorListName(), getCoordinatorFacetType().getURI()),
       1
     );
     bus.subscribe(FinishedEvent.class, this.coordinatorNeedCreator);
@@ -227,7 +227,7 @@ public abstract class BAAtomicAdditionalParticipantsBaseBot extends EventBot{
 
     this.needConnectorWithDelay = new ActionOnEventListener(
       ctx, "needConnectorWithDelay", allNonDelayedConnectedFilter,
-      new ConnectFromListToListAction(ctx, botContextWrapper.getCoordinatorListName(), botContextWrapper.getParticipantListName(),
+      new ConnectFromListToListAction(ctx, botContextWrapper.getCoordinatorListName(), botContextWrapper.getParticipantDelayedListName(),
         getCoordinatorFacetType().getURI(),
         getParticipantFacetType().getURI(), MILLIS_BETWEEN_MESSAGES,
         scriptConnectWithDelayHook, "Hi!"),1);

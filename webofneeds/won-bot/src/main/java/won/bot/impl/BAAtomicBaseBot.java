@@ -93,7 +93,7 @@ public abstract class BAAtomicBaseBot extends EventBot{
     //create needs every trigger execution until noOfNeeds are created
     this.participantNeedCreator = new ActionOnEventListener(
       ctx, "participantCreator",
-      new CreateNeedWithFacetsAction(ctx, getParticipantFacetType().getURI()),
+      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getParticipantListName(), getParticipantFacetType().getURI()),
       noOfNeeds - 1
     );
     bus.subscribe(ActEvent.class, this.participantNeedCreator);
@@ -101,7 +101,7 @@ public abstract class BAAtomicBaseBot extends EventBot{
     //when done, create one coordinator need
     this.coordinatorNeedCreator = new ActionOnEventListener(
       ctx, "coordinatorCreator", new FinishedEventFilter(participantNeedCreator),
-      new CreateNeedWithFacetsAction(ctx, getCoordinatorFacetType().getURI()),
+      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getCoordinatorListName(), getCoordinatorFacetType().getURI()),
       1
     );
     bus.subscribe(FinishedEvent.class, this.coordinatorNeedCreator);

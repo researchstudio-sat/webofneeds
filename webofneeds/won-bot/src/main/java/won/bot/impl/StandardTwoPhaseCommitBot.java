@@ -60,7 +60,7 @@ public class StandardTwoPhaseCommitBot extends EventBot{
     //create needs every trigger execution until noOfNeeds are created
     this.participantNeedCreator = new ActionOnEventListener(
       ctx, "participantCreator",
-      new CreateNeedWithFacetsAction(ctx, FacetType.ParticipantFacet.getURI()),
+      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getParticipantListName(), FacetType.ParticipantFacet.getURI()),
       noOfNeeds - 1
     );
     bus.subscribe(ActEvent.class, this.participantNeedCreator);
@@ -68,7 +68,7 @@ public class StandardTwoPhaseCommitBot extends EventBot{
     //when done, create one coordinator need
     this.coordinatorNeedCreator = new ActionOnEventListener(
       ctx, "coordinatorCreator", new FinishedEventFilter(participantNeedCreator),
-      new CreateNeedWithFacetsAction(ctx, FacetType.CoordinatorFacet.getURI()),
+      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getCoordinatorListName(), FacetType.CoordinatorFacet.getURI()),
       1
     );
     bus.subscribe(FinishedEvent.class, this.coordinatorNeedCreator);
