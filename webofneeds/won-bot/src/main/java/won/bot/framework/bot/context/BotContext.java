@@ -47,6 +47,8 @@ public interface BotContext {
    */
   void appendToNamedNeedUriList(URI uri, String name);
 
+  boolean isInNamedNeedUriList(URI uri, String name);
+
   /**
    * loadFromObjectMap all the need from a named need uri list
    *
