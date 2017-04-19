@@ -3,13 +3,21 @@
 @import 'fonts';
 @import 'flex-layout';
 
+@import 'post-header';
+@import 'post-content';
+
 won-send-request {
   display: block;
   width: 100%;
 
+  won-post-header {
+    border-bottom: 0.1rem solid $won-line-gray;
+    padding: 1rem;
+  }
+
   .sr__caption {
     display: flex;
-    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    padding: 0.5rem 0.5rem 0rem 1rem;
 
     &__icon {
       @include fixed-square($postIconSize);

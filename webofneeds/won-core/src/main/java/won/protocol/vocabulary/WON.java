@@ -20,7 +20,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import won.protocol.model.BasicNeedType;
 import won.protocol.model.ConnectionState;
 import won.protocol.model.NeedState;
 
@@ -65,8 +64,7 @@ public class WON
   public static final Resource WON_OVER_SOAP_WS = m.createResource(BASE_URI + "WonOverSoapWs");
   public static final Property IS_IN_STATE = m.createProperty(BASE_URI, "isInState");
 
-  public static final Property HAS_BASIC_NEED_TYPE = m.createProperty(BASE_URI, "hasBasicNeedType");
-
+  @Deprecated
   public static final Property HAS_CONTENT = m.createProperty(BASE_URI, "hasContent");
 
 
@@ -81,7 +79,6 @@ public class WON
   public static final Resource GOOD = m.createResource(BASE_URI + "Good");
   public static final Resource BAD = m.createResource(BASE_URI+"Bad");
 
-  public static final Resource NEED_CONTENT = m.createResource(BASE_URI + "NeedContent");
   public static final Property HAS_TEXT_DESCRIPTION = m.createProperty(BASE_URI, "hasTextDescription");
   public static final Property HAS_CONTENT_DESCRIPTION = m.createProperty(BASE_URI, "hasContentDescription");
   public static final Property HAS_TAG = m.createProperty(BASE_URI, "hasTag");
@@ -119,6 +116,9 @@ public class WON
   public static final Property HAS_MATCH_SCORE = m.createProperty(BASE_URI, "hasMatchScore");
   public static final Property HAS_MATCH_COUNTERPART = m.createProperty(BASE_URI, "hasMatchCounterpart");
 
+  public static final Property IS = m.createProperty(BASE_URI, "is");
+  public static final Property SEEKS = m.createProperty(BASE_URI, "seeks");
+
   public static final Property HAS_NEED_MODALITY = m.createProperty(BASE_URI, "hasNeedModality");
   public static final Resource NEED_MODALITY = m.createResource(BASE_URI + "NeedModality");
 
@@ -146,11 +146,6 @@ public class WON
 
   // Resource individuals
 
-  public static final Resource BASIC_NEED_TYPE_DO_TOGETHER = m.createResource(BasicNeedType.DO_TOGETHER.getURI().toString());
-  public static final Resource BASIC_NEED_TYPE_SUPPLY = m.createResource(BasicNeedType.SUPPLY.getURI().toString());
-  public static final Resource BASIC_NEED_TYPE_DEMAND = m.createResource(BasicNeedType.DEMAND.getURI().toString());
-  public static final Resource BASIC_NEED_TYPE_CRITIQUE = m.createResource(BasicNeedType.CRITIQUE.getURI().toString());
-
   public static final Resource NEED_STATE_ACTIVE = m.createResource(NeedState.ACTIVE.getURI().toString());
   public static final Resource NEED_STATE_INACTIVE = m.createResource(NeedState.INACTIVE.getURI().toString());
 
@@ -161,7 +156,7 @@ public class WON
   public static final Resource CONNECTION_STATE_CLOSED = m.createResource(ConnectionState.CLOSED.getURI().toString());
 
   public static final Property HAS_SUGGESTED_COUNT = m.createProperty(BASE_URI,
-                                                                                 "hasSuggestedCount");
+                                                                      "hasSuggestedCount");
   public static final Property HAS_REQUEST_RECEIVED_COUNT = m.createProperty(BASE_URI,
                                                                                  "hasRequestReceivedCount");
   public static final Property HAS_REQUEST_SENT_COUNT = m.createProperty(BASE_URI,
@@ -170,16 +165,18 @@ public class WON
                                                                              "hasConnectedCount");
   public static final Property HAS_CLOSED_COUNT = m.createProperty(BASE_URI,
                                                                              "hasClosedCount");
-
-
   //adds a flag to a need
   public static final Property HAS_FLAG = m.createProperty(BASE_URI+"hasFlag");
 
-  //the doNotMatch flag: need does not want matching
-  public static final Resource DO_NOT_MATCH = m.createResource(BASE_URI+"DoNotMatch");
-
   //the usedForTesting flag: need is not a real need, only match with other needs flagged with usedForTesting
-  public static final Resource USED_FOR_TESTING= m.createResource(BASE_URI+"UsedForTesting");
+  public static final Resource USED_FOR_TESTING= m.createResource(BASE_URI + "UsedForTesting");
+
+  // Matching behavior
+  public static final Property HAS_MATCHING_BEHAVIOR = m.createProperty(BASE_URI, "hasMatchingBehavior");
+  public static final Resource MATCHING_BEHAVIOR_MUTUAL = m.createResource(BASE_URI + "Mutual");
+  public static final Resource MATCHING_BEHAVIOR_DO_NOT_MATCH = m.createResource(BASE_URI+"DoNotMatch");
+  public static final Resource MATCHING_BEHAVIOR_LAZY = m.createResource(BASE_URI+"Lazy");
+  public static final Resource MATCHING_BEHAVIOR_STEALTHY = m.createResource(BASE_URI+"Stealthy");
 
   public static final Property HAS_GRAPH = m.createProperty(BASE_URI,"hasGraph");
 
@@ -221,29 +218,6 @@ public class WON
         throw new IllegalStateException("No case specified for " + state.name());
     }
   }
-
-  /**
-   * Converts the BasicNeedType Enum to a Resource.
-   *
-   * @param type
-   * @return
-   */
-  public static Resource toResource(BasicNeedType type)
-  {
-    switch (type) {
-      case DO_TOGETHER:
-        return BASIC_NEED_TYPE_DO_TOGETHER;
-      case SUPPLY:
-        return BASIC_NEED_TYPE_SUPPLY;
-      case DEMAND:
-        return BASIC_NEED_TYPE_DEMAND;
-      case CRITIQUE:
-        return BASIC_NEED_TYPE_CRITIQUE;
-      default:
-        throw new IllegalStateException("No such case specified for " + type.name());
-    }
-  }
-
 
   /**
    * Converts the ConnectionState Enum to a Resource.

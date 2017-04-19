@@ -1,4 +1,5 @@
 import angular from 'angular';
+import Immutable from 'immutable';
 import squareImageModule from '../components/square-image';
 import won from '../won-es6';
 import { actionCreators }  from '../actions/actions';
@@ -10,9 +11,15 @@ import {
 import {
     selectOwnNeeds,
     selectLastUpdateTime,
-    selectConnectionsByNeed,
     selectUnreadCountsByNeedAndType,
 } from '../selectors';
+
+import {
+    seeksOrIs,
+    inferLegacyNeedType,
+} from '../won-utils';
+
+import feedItemLineModule from './feed-item-line';
 
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
 function genComponentConf() {
@@ -20,13 +27,13 @@ function genComponentConf() {
             <div class="fi clickable" ui-sref="post({postUri: self.ownNeed.get('@id')})">
                 <won-square-image
                     src="self.ownNeed.get('titleImg')"
-                    title="self.ownNeed.getIn(['won:hasContent','dc:title'])"
+                    title="self.ownNeedContent.get('dc:title')"
                     uri="self.ownNeed.get('@id')">
                 </won-square-image>
                 <div class="fi__description">
                     <div class="fi__description__topline">
                         <div class="fi__description__topline__title">
-                            {{ self.ownNeed.getIn(['won:hasContent','dc:title']) }}
+                            {{ self.ownNeedContent.get('dc:title') }}
                         </div>
                         <div class="fi__description__topline__date">
                             {{ self.createdOn }}
@@ -43,7 +50,7 @@ function genComponentConf() {
                         <span class="fi__description__subtitle__type">
                             {{
                                 self.labels.type[
-                                    self.ownNeed.getIn(['won:hasBasicNeedType','@id'])
+                                    self.inferLegacyNeedType(self.ownNeed)
                                 ]
                             }}
                         </span>
@@ -51,42 +58,28 @@ function genComponentConf() {
                 </div>
             </div>
             <div class="fmil">
-                <div class="fmil__item clickable"
-                ng-repeat="cnct in self.connections.toArray() track by $index"
-                ng-show="$index < self.maxNrOfItemsShown"
-                ui-sref="post({
-                    postUri: self.ownNeed.get('@id'),
-                    connectionUri: cnct.getIn(['connection', 'uri']),
-                    connectionType:  cnct.getIn(['connection', 'hasConnectionState'])
-                })">
-                    <won-square-image
-                        src="cnct.get('titleImg')"
-                        title="cnct.getIn(['remoteNeed','won:hasContent','dc:title'])"
-                        uri="cnct.getIn(['remoteNeed','@id'])">
-                    </won-square-image>
-                    <div class="fmil__item__description">
-                        <div class="fmil__item__description__topline">
-                            <div class="fmil__item__description__topline__title">
-                                {{cnct.getIn(['remoteNeed','won:hasContent','dc:title'])}}
-                            </div>
-                            <div class="fmil__item__description__topline__date">
-                                <!-- TODO only show this when this is a group's thread -->
-                              Today, 15:03
-                            </div>
-                        </div>
 
-                        <div class="fmil__item__description__message">{{ self.getTextForConnectionState(cnct.getIn(['connection', 'hasConnectionState'])) }}</div>
-                    </div>
-                </div>
+                <won-feed-item-line
+                    class="fmil__item clickable"
+                    ng-repeat="cnctUri in self.connectionUris track by $index"
+                    connection-uri="cnctUri"
+                    ng-show="$index < self.maxNrOfItemsShown"
+                    ui-sref="post({
+                        postUri: self.ownNeed.get('@id'),
+                        connectionUri: cnctUri,
+                        connectionType: cnct.getIn(['connection', 'hasConnectionState'])
+                    })">
+                </won-feed-item-line>
+
                 <div class="fmil__more clickable"
-                     ng-show="self.connections.size === self.maxNrOfItemsShown + 1"
+                     ng-show="self.connectionUris.size === self.maxNrOfItemsShown + 1"
                      ng-click="self.showMore()">
                         1 more activity
                 </div>
                 <div class="fmil__more clickable"
-                     ng-show="self.connections.size > self.maxNrOfItemsShown + 1"
+                     ng-show="self.connectionUris.size > self.maxNrOfItemsShown + 1"
                      ng-click="self.showMore()">
-                        {{self.connections.size - self.maxNrOfItemsShown}} more activities
+                        {{self.connectionUris.size - self.maxNrOfItemsShown}} more activities
                 </div>
             </div>
 
@@ -96,13 +89,19 @@ function genComponentConf() {
                        ui-sref="postMatches({myUri: self.ownNeed.get('@id')})"
                        ng-show="self.unreadMatchesCount()">
                         <img src="generated/icon-sprite.svg#ico36_match" class="fi__footer__indicators__item__icon"/>
-                        <span class="fi__footer__indicators__item__caption">{{ self.unreadMatchesCount() }} Matches</span>
+                        <span class="fi__footer__indicators__item__caption">
+                           {{ self.unreadMatchesCount() }}
+                           Match{{self.unreadMatchesCount() > 1 ? 'es' : ''}}
+                        </span>
                     </a>
                     <a class="fi__footer__indicators__item clickable"
                        ui-sref="postRequests({myUri: self.ownNeed.get('@id')})"
                        ng-show="self.unreadRequestsCount()">
                         <img src="generated/icon-sprite.svg#ico36_incoming" class="fi__footer__indicators__item__icon"/>
-                        <span class="fi__footer__indicators__item__caption">{{self.unreadRequestsCount()}} Incoming Requests</span>
+                        <span class="fi__footer__indicators__item__caption">
+                            {{self.unreadRequestsCount()}}
+                            Incoming Request{{ self.unreadRequestsCount() > 1 ? 's' : ''}}
+                        </span>
                     </a>
                 </div>
             </div>
@@ -111,6 +110,8 @@ function genComponentConf() {
     class Controller {
         constructor() {
             attach(this, serviceDependencies, arguments);
+            this.seeksOrIs = seeksOrIs;
+            this.inferLegacyNeedType = inferLegacyNeedType;
 
             window.fi4dbg = this;
 
@@ -122,17 +123,25 @@ function genComponentConf() {
             const selectFromState = (state) => {
                 const ownNeeds = selectOwnNeeds(state);
                 const lastUpdated = selectLastUpdateTime(state);
-                const connectionsByNeed = selectConnectionsByNeed(state);
+
                 const unreadCountsByNeedAndType = selectUnreadCountsByNeedAndType(state);
+                const ownNeed = ownNeeds && ownNeeds.get(self.needUri);
+                const ownNeedContent = ownNeed && seeksOrIs(ownNeed);
+
+                const cnctUriCollection = ownNeed.getIn(['won:hasConnections', 'rdfs:member']);
+                const connectionUris = !cnctUriCollection?
+                    [] : // if there's no cnctUriCollection, there's no connection uris
+                    cnctUriCollection
+                        .filter(c => c)
+                        .map(c => c.get('@id'))
+                        .toArray();
 
                 return {
-                    ownNeed: ownNeeds && ownNeeds.get(self.needUri),
-                    createdOn: ownNeeds && relativeTime(lastUpdated, ownNeeds.get('dct:created')),
-                    connections: connectionsByNeed && connectionsByNeed.get(self.needUri),
+                    ownNeed,
+                    ownNeedContent,
+                    connectionUris,
+                    createdOn: ownNeed && relativeTime(lastUpdated, ownNeed.get('dct:created')),
                     unreadCounts: unreadCountsByNeedAndType && unreadCountsByNeedAndType.get(self.needUri),
-
-
-
                 }
             }
             const disconnect = this.$ngRedux.connect(selectFromState,actionCreators)(this);
@@ -147,7 +156,7 @@ function genComponentConf() {
                 this.unreadCounts.get(type)
         }
         unreadMatchesCount() {
-            return this.unreadXCount(won.WONMSG.hintMessage);
+            return this.unreadXCount(won.WONMSG.hintMessage)
         }
         unreadRequestsCount() {
             return this.unreadXCount(won.WONMSG.connectMessage);
@@ -169,21 +178,14 @@ function genComponentConf() {
         bindToController: true, //scope-bindings -> ctrl
         scope: {
             needUri: '=',
-            /*
-             ownPost { title, type, creationdate, pic }
-             theirPosts/counterparts [
-                { } //need
-             ]
-            */
-            //unreadCounts: '=',
-            //connections: '=',
         },
         template: template
     }
 }
 
 export default angular.module('won.owner.components.feedItem', [
-    squareImageModule
+    squareImageModule,
+    feedItemLineModule,
 ])
     .directive('wonFeedItem', genComponentConf)
     .name;

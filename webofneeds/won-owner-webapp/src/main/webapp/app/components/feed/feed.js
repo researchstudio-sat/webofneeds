@@ -5,7 +5,7 @@ import { actionCreators }  from '../../actions/actions';
 import { attach } from '../../utils';
 
 import {
-    selectConnectionsByNeed,
+    selectAllByConnectionsByNeed,
     selectUnreadCountsByNeedAndType,
     selectUnreadEvents,
     selectOwnNeeds,
@@ -37,7 +37,7 @@ class FeedController {
 
                 ownNeedUris: ownNeeds && ownNeeds.filter(n => n.getIn([won.WON.isInStateCompacted, "@id"]) === won.WON.ActiveCompacted).map(n => n.get('@id')).toArray(),
 
-                connectionsByNeed: selectConnectionsByNeed(state),
+                connectionsByNeed: selectAllByConnectionsByNeed(state),
                 unreadCountsByNeedAndType: selectUnreadCountsByNeedAndType(state),
             }
         }

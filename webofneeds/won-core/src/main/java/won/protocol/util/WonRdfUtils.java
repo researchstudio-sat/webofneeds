@@ -5,21 +5,17 @@ import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.riot.Lang;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.RDF;
-import org.apache.camel.component.dataset.DataSet;
-import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.Facet;
 import won.protocol.model.Match;
-import won.protocol.model.NeedState;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
 import won.protocol.vocabulary.SFSIG;
@@ -27,7 +23,6 @@ import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -276,7 +271,7 @@ public class WonRdfUtils
      */
     @Deprecated
     public static String getTextMessage(Model model){
-      Statement stmt = model.getProperty(RdfUtils.getBaseResource(model),WON.HAS_TEXT_MESSAGE);
+      Statement stmt = model.getProperty(RdfUtils.getBaseResource(model), WON.HAS_TEXT_MESSAGE);
       if (stmt != null) {
         return stmt.getObject().asLiteral().getLexicalForm();
       }
@@ -328,7 +323,7 @@ public class WonRdfUtils
       match.setScore(score.asLiteral().getDouble());
 
       RDFNode counterpart = RdfUtils.findOnePropertyFromResource(messageContent, wonMessage.getMessageURI(),
-        WON.HAS_MATCH_COUNTERPART);
+                                                                 WON.HAS_MATCH_COUNTERPART);
       if (!counterpart.isResource()) return null;
       match.setToNeed(URI.create(counterpart.asResource().getURI()));
       return match;
@@ -475,155 +470,6 @@ public class WonRdfUtils
 
       return RdfUtils.getURIPropertyForPropertyPath(connectionDataset, connectionUri, statePath);
     }
-  }
-
-  public static class NeedUtils
-  {
-
-
-    public static URI queryWonNode(Dataset content) {
-
-      URI wonNodeURI = null;
-      final String queryString =
-        "PREFIX won: <http://purl.org/webofneeds/model#> " +
-          "SELECT * { { ?s won:hasWonNode ?wonNode } UNION { GRAPH ?g { ?s won:hasWonNode ?wonNode } } }";
-      Query query = QueryFactory.create(queryString);
-      try (QueryExecution qexec = QueryExecutionFactory.create(query, content)) {
-        ResultSet results = qexec.execSelect();
-        boolean foundOneResult = false;
-        for (; results.hasNext(); ) {
-          if (foundOneResult)
-            throw new IncorrectPropertyCountException(1,2);
-          foundOneResult = true;
-          QuerySolution solution = results.nextSolution();
-          Resource r = solution.getResource("wonNode");
-          try {
-            wonNodeURI = new URI(r.getURI());
-          } catch (URISyntaxException e) {
-            logger.warn("caught URISyntaxException:", e);
-            throw new DataIntegrityException("could not parse wonNodeUri: " + r.getURI(), e);
-          }
-        }
-      }
-      return wonNodeURI;
-    }
-
-    public static NeedState queryActiveStatus(Model model, URI needURI) {
-
-      StmtIterator iterator = model.listStatements(model.createResource(needURI.toString()),
-                                                   WON.IS_IN_STATE,
-                                                   (RDFNode) null);
-      if (!iterator.hasNext())
-        return null;
-
-      NeedState result = null;
-      while (iterator.hasNext()) {
-        Statement s = iterator.nextStatement();
-        if (s.getObject().equals(WON.NEED_STATE_ACTIVE)) {
-          if (result != null && result.equals(NeedState.INACTIVE))
-            throw new IncorrectPropertyCountException("More than one result found, but only one expected", 1,2);
-          result = NeedState.ACTIVE;
-        } else if (s.getObject().equals(WON.NEED_STATE_INACTIVE)) {
-          if (result != null && result.equals(NeedState.ACTIVE))
-            throw new IncorrectPropertyCountException("More than one result found, but only one expected", 1,2);
-          result = NeedState.INACTIVE;
-        }
-      }
-      return result;
-    }
-    public static NeedState queryActiveStatus(Dataset content, final URI needURI) {
-      return RdfUtils.findOne(content, new RdfUtils.ModelVisitor<NeedState>()
-      {
-        @Override
-        public NeedState visit(final Model model) {
-          return queryActiveStatus(model, needURI);
-        }
-      }, true);
-    }
-
-    /**
-     * returns a list of Facet objects each set with the NeedURI and the TypeURI
-     *
-     * @param needURI URI which will be set to the facets
-     * @param dataset <code>Dataset</code> object which will be searched for the facets
-     * @return list of facets
-     */
-    public static List<Facet> getFacets(final URI needURI, Dataset dataset) {
-      return RdfUtils.visitFlattenedToList(dataset, new RdfUtils.ModelVisitor<List<Facet>>()
-      {
-        @Override
-        public List<Facet> visit(final Model model) {
-          return getFacets(needURI, model);
-        }
-      });
-    }
-
-    /**
-     * returns a list of Facet objects each set with the NeedURI and the TypeURI
-     *
-     * @param needURI URI which will be set to the facets
-     * @param model <code>Model</code> object which will be searched for the facets
-     * @return list of facets
-     */
-    public static List<Facet> getFacets(URI needURI, Model model) {
-      List<Facet> result = new ArrayList<Facet>();
-
-      StmtIterator iterator = model.listStatements(model.createResource(needURI.toString()),
-                                                   WON.HAS_FACET,
-                                                   (RDFNode) null);
-      while (iterator.hasNext()) {
-        Facet f = new Facet();
-        f.setNeedURI(needURI);
-        f.setTypeURI(URI.create(iterator.nextStatement().getObject().asResource().getURI()));
-        result.add(f);
-      }
-      return result;
-    }
-
-    /**
-     * searches for a subject of type won:Need and returns the NeedURI
-     *
-     * @param dataset <code>Dataset</code> object which will be searched for the NeedURI
-     * @return <code>URI</code> which is of type won:Need
-     */
-    public static URI getNeedURI(Dataset dataset) {
-      return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<URI>()
-      {
-        @Override
-        public URI visit(final Model model) {
-          return getNeedURI(model);
-        }
-      }, true);
-    }
-    /**
-     * searches for a subject of type won:Need and returns the NeedURI
-     *
-     * @param model <code>Model</code> object which will be searched for the NeedURI
-     * @return <code>URI</code> which is of type won:Need
-     */
-    public static URI getNeedURI(Model model) {
-
-      List<URI> needURIs = new ArrayList<URI>();
-
-      ResIterator iterator = model.listSubjectsWithProperty(RDF.type, WON.NEED);
-      while (iterator.hasNext()) {
-        needURIs.add(URI.create(iterator.next().getURI()));
-      }
-      if (needURIs.size() == 0)
-        return null;
-      else if (needURIs.size() == 1)
-        return needURIs.get(0);
-      else if (needURIs.size() > 1) {
-        URI u = needURIs.get(0);
-        for (URI uri : needURIs) {
-          if (!uri.equals(u))
-            throw new IncorrectPropertyCountException(1,2);
-        }
-        return u;
-      }
-      else
-        return null;
-    }
 
     /**
      * return the needURI of a connection
@@ -651,214 +497,6 @@ public class WonRdfUtils
       return URI.create(RdfUtils.findOnePropertyFromResource(
         dataset, connectionURI, WON.HAS_REMOTE_CONNECTION).asResource().getURI());
     }
-
-    public static URI getWonNodeURIFromNeed(Dataset dataset, final URI needURI) {
-      return URI.create(RdfUtils.findOnePropertyFromResource(
-        dataset, needURI, WON.HAS_WON_NODE).asResource().getURI());
-    }
-
-    /**
-     * Extracts all triples from the dataset (which is expected to be a dataset describing
-     * one need, expressed in multiple named graphs) and copies them to a new model.
-     * @param dataset
-     * @return
-     */
-    public static Model getNeedModelFromNeedDataset(Dataset dataset){
-      assert dataset != null : "dataset must not be null";
-      final Model result = ModelFactory.createDefaultModel();
-
-      RdfUtils.visit(dataset,new RdfUtils.ModelVisitor<Object>() {
-        @Override
-        public Object visit(Model model) {
-          result.add(model);
-          return null;
-        }
-      });
-      return result;
-    }
-
-    public static URI queryConnectionContainer(Dataset dataset, final URI needURI) {
-      return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<URI>()
-      {
-        @Override
-        public URI visit(final Model model) {
-          return queryConnectionContainer(model, needURI);
-        }
-      }, true);
-    }
-
-    public static URI queryConnectionContainer(Model model, URI needURI) {
-
-      StmtIterator iterator = model.listStatements(model.createResource(needURI.toString()),
-                                                   WON.HAS_CONNECTIONS,
-                                                   (RDFNode) null);
-      if (!iterator.hasNext()) {
-        return null;
-      }
-      URI result = null;
-      while (iterator.hasNext()) {
-        Statement s = iterator.nextStatement();
-        URI nextURI = URI.create(s.getResource().getURI());
-        if (result != null && !result.equals(nextURI))
-          throw new IncorrectPropertyCountException(1,2);
-        result = nextURI;
-      }
-      return result;
-    }
-
-    public static void removeConnectionContainer(Dataset dataset, final URI needURI) {
-      RdfUtils.visit(dataset, new RdfUtils.ModelVisitor<Object>()
-      {
-        @Override
-        public Object visit(final Model model) {
-          removeConnectionContainer(model, needURI);
-          return null;
-        }
-      });
-    }
-
-    public static void removeConnectionContainer(Model model, URI needURI) {
-
-      StmtIterator iterator = model.listStatements(model.createResource(needURI.toString()),
-                                                   WON.HAS_CONNECTIONS,
-                                                   (RDFNode) null);
-
-      URI result = null;
-      while (iterator.hasNext()) {
-        model.remove(iterator.nextStatement());
-      }
-    }
-
-    public static String getNeedTitle(Dataset needDataset, URI needUri) {
-      Path titlePath = PathParser.parse("won:hasContent/dc:title", DefaultPrefixUtils.getDefaultPrefixes());
-      String titleString = RdfUtils.getStringPropertyForPropertyPath(needDataset, needUri, titlePath);
-      return titleString;
-    }
-
-    public static boolean isNeedActive(Dataset needDataset, URI needUri) {
-      Path titlePath = PathParser.parse("won:isInState", DefaultPrefixUtils.getDefaultPrefixes());
-
-      URI uri = RdfUtils.getURIPropertyForPropertyPath(needDataset, needUri, titlePath);
-      return uri.equals(URI.create("http://purl.org/webofneeds/model#Active"));
-    }
-
-    /**
-     * Checks if the need has set a certain flag set
-     *
-     * @param dataset need dataset
-     * @param needURI URI of the need
-     * @param flag Resource flag to be tested
-     * @return true if flag is there, false otherwise
-     */
-    public static boolean hasFlag(Dataset dataset, String needURI, Resource flag) {
-      Boolean ret = RdfUtils.findFirst(dataset, new RdfUtils.ModelVisitor<Boolean>()
-      {
-        @Override
-        public Boolean visit(Model model) {
-          Resource needResource = model.getResource(needURI);
-          boolean test = needResource.hasProperty(WON.HAS_FLAG, flag);
-          if (test) {
-            return true;
-          } else {
-            return null;
-          }
-        }
-      });
-
-      if (ret == null) {
-        ret = false;
-      }
-
-      return ret;
-    }
-
-    public static Float getLocationLatitude(Model need, URI needUri) {
-      Path propertyPath = PathParser.parse("won:hasContent/won:hasContentDescription/won:hasLocation/<s:geo>/<s:latitude>",
-                                           DefaultPrefixUtils.getDefaultPrefixes());
-      Float latitude = null;
-      String lat = RdfUtils.getStringPropertyForPropertyPath(need, needUri, propertyPath);
-      if (lat != null) {
-        latitude = new Float(lat);
-      }
-      return latitude;
-    }
-
-    public static Float getLocationLongitude(Model need, URI needUri) {
-      Path propertyPath = PathParser.parse("won:hasContent/won:hasContentDescription/won:hasLocation/<s:geo>/<s:longitude>",
-                                           DefaultPrefixUtils.getDefaultPrefixes());
-      Float longitude = null;
-      String lon = RdfUtils.getStringPropertyForPropertyPath(need, needUri, propertyPath);
-      if (lon != null) {
-        longitude = new Float(lon);
-      }
-      return longitude;
-    }
-
-    public static List<String> getTags(Dataset needDataset) {
-
-      List<String> tags = new LinkedList<>();
-      Model model = NeedUtils.getNeedModelFromNeedDataset(needDataset);
-      URI needURI = NeedUtils.getNeedURI(needDataset);
-      Resource needContent = model.getResource(needURI.toString()).getProperty(WON.HAS_CONTENT).getResource();
-
-      StmtIterator it = needContent.listProperties(WON.HAS_TAG);
-      while (it.hasNext()) {
-        Statement stmt = it.next();
-        RDFNode obj = stmt.getObject();
-        if (obj.isLiteral()) {
-          tags.add(obj.asLiteral().getString());
-        }
-      }
-
-      return tags;
-    }
-
-    public static String getNeedTitle(Dataset needDataset) {
-      URI needUri = NeedUtils.getNeedURI(needDataset);
-
-      return getNeedTitle(needDataset, needUri);
-    }
-
-    public static URI getBasicNeedType(Dataset needDataset) {
-      URI needUri = NeedUtils.getNeedURI(needDataset);
-
-      Path basicNeedTypePath = PathParser.parse("won:hasBasicNeedType", DefaultPrefixUtils.getDefaultPrefixes());
-      URI basicNeedType = RdfUtils.getURIPropertyForPropertyPath(needDataset, needUri, basicNeedTypePath);
-
-      return basicNeedType;
-    }
-
-    public static String getNeedDescription(Dataset needDataset) {
-      Path descriptionPath = PathParser.parse("won:hasContent/won:hasTextDescription", DefaultPrefixUtils.getDefaultPrefixes());
-      URI needUri = NeedUtils.getNeedURI(needDataset);
-
-      return RdfUtils.getStringPropertyForPropertyPath(needDataset, needUri, descriptionPath);
-    }
-
-    public static Resource getNeedResource(final Model needModel)
-    {
-      assert needModel != null : "needModel must not be null";
-      Resource needResource = null;
-      //try fetching the base URI resource. If that is a Need, we'll assume we found the need resource
-      String baseUri = needModel.getNsPrefixURI("");
-      if (baseUri != null) {
-        //fetch the resource, check if it has the rdf:type won:Need
-        needResource = needModel.getResource(baseUri);
-        if (!needResource.hasProperty(RDF.type, WON.NEED)) {
-          needResource = null;
-        }
-      }
-      if (needResource != null) return needResource;
-      //found no need resource yet. Try to find it by type. We expect to find exactly one, otherwise we report an error
-      ResIterator it = needModel.listSubjectsWithProperty(RDF.type, WON.NEED);
-      if (it.hasNext()) needResource = it.next();
-      if (it.hasNext())
-        throw new IllegalArgumentException("expecting only one resource of type won:Need in specified model");
-      if (needResource == null)
-        throw new IllegalArgumentException("expected to find a resource of type won:Need in specified model");
-      return needResource;
-    }
-
   }
 
   private static Model createModelWithBaseResource() {
@@ -867,5 +505,70 @@ public class WonRdfUtils
       model.createResource(model.getNsPrefixURI(""));
       return model;
     }
+
+  public static class NeedUtils
+  {
+    /**
+     * searches for a subject of type won:Need and returns the NeedURI
+     *
+     * @param dataset <code>Dataset</code> object which will be searched for the NeedURI
+     * @return <code>URI</code> which is of type won:Need
+     */
+    public static URI getNeedURI(Dataset dataset) {
+      return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<URI>()
+      {
+        @Override
+        public URI visit(final Model model) {
+          return getNeedURI(model);
+        }
+      }, true);
+    }
+
+    /**
+     * searches for a subject of type won:Need and returns the NeedURI
+     *
+     * @param model <code>Model</code> object which will be searched for the NeedURI
+     * @return <code>URI</code> which is of type won:Need
+     */
+    public static URI getNeedURI(Model model) {
+        Resource res = getNeedResource(model);
+        return res == null ? null : URI.create(res.getURI());
+    }
+
+      /**
+       * searches for a subject of type won:Need and returns the NeedURI
+       *
+       * @param model <code>Model</code> object which will be searched for the NeedURI
+       * @return <code>URI</code> which is of type won:Need
+       */
+      public static Resource getNeedResource(Model model) {
+
+          List<Resource> needURIs = new ArrayList<>();
+
+          ResIterator iterator = model.listSubjectsWithProperty(RDF.type, WON.NEED);
+          while (iterator.hasNext()) {
+              needURIs.add(iterator.next());
+          }
+          if (needURIs.size() == 0)
+              return null;
+          else if (needURIs.size() == 1)
+              return needURIs.get(0);
+          else if (needURIs.size() > 1) {
+              Resource u = needURIs.get(0);
+              for (Resource uri : needURIs) {
+                  if (!uri.equals(u))
+                      throw new IncorrectPropertyCountException(1,2);
+              }
+              return u;
+          }
+          else
+              return null;
+      }
+
+    public static URI getWonNodeURIFromNeed(Dataset dataset, final URI needURI) {
+      return URI.create(RdfUtils.findOnePropertyFromResource(
+        dataset, needURI, WON.HAS_WON_NODE).asResource().getURI());
+    }
+  }
 
 }

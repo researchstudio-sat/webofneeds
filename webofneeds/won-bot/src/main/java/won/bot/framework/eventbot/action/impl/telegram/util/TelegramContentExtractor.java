@@ -1,6 +1,6 @@
 package won.bot.framework.eventbot.action.impl.telegram.util;
 
-import won.protocol.model.BasicNeedType;
+import won.protocol.model.NeedContentPropertyType;
 
 import java.util.regex.Pattern;
 
@@ -9,20 +9,6 @@ public class TelegramContentExtractor {
     private Pattern supplyTypePattern;
     private Pattern doTogetherTypePattern;
     private Pattern critiqueTypePattern;
-
-    public BasicNeedType getBasicNeedType(String subject){
-        if (demandTypePattern.matcher(subject).matches()) {
-            return BasicNeedType.DEMAND;
-        } else if (supplyTypePattern.matcher(subject).matches()) {
-            return BasicNeedType.SUPPLY;
-        } else if (doTogetherTypePattern.matcher(subject).matches()) {
-            return BasicNeedType.DO_TOGETHER;
-        } else if (critiqueTypePattern.matcher(subject).matches()) {
-            return BasicNeedType.CRITIQUE;
-        }
-
-        return null;
-    }
 
     //Spring setter
 
@@ -40,5 +26,19 @@ public class TelegramContentExtractor {
 
     public void setCritiqueTypePattern(final Pattern critiqueTypePattern) {
         this.critiqueTypePattern = critiqueTypePattern;
+    }
+
+    public NeedContentPropertyType getNeedContentType(String subject){
+        if (demandTypePattern.matcher(subject).matches()) {
+            return NeedContentPropertyType.SEEKS;
+        } else if (supplyTypePattern.matcher(subject).matches()) {
+            return NeedContentPropertyType.IS;
+        } else if (doTogetherTypePattern.matcher(subject).matches()) {
+            return NeedContentPropertyType.IS_AND_SEEKS;
+        } else if (critiqueTypePattern.matcher(subject).matches()) {
+            return NeedContentPropertyType.IS_AND_SEEKS;
+        }
+
+        return null;
     }
 }

@@ -1,7 +1,7 @@
 package won.bot.framework.eventbot.action.impl.telegram.send;
 
-import org.apache.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.rdf.model.Model;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -16,10 +16,11 @@ import won.bot.framework.eventbot.event.impl.telegram.TelegramCreateNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
-import won.protocol.model.BasicNeedType;
 import won.protocol.model.FacetType;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.NeedModelBuilder;
+import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
@@ -68,7 +69,7 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
                 return;
             }
             try{
-                BasicNeedType type = telegramContentExtractor.getBasicNeedType(parameters[0]);
+                NeedContentPropertyType type = telegramContentExtractor.getNeedContentType(parameters[0]);
 
                 if(type == null) {
                     throw new InvalidParameterException("no valid type was given");
@@ -93,15 +94,14 @@ public class TelegramCreateAction extends AbstractCreateNeedAction {
 
                 final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
                 final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
-                Model model = new NeedModelBuilder()
-                        .setTitle(title)
-                        .setBasicNeedType(type)
-                        //.setDescription(description)
-                        .setUri(needURI)
-                        //.setTags(tags)
-                        .setFacetTypes(facets)
-                        .build();
 
+                DefaultNeedModelWrapper wrapper = new DefaultNeedModelWrapper(needURI.toString());
+                wrapper.setTitle(type, title);
+                for (URI facet : facets) {
+                    wrapper.addFacetUri(facet.toString());
+                }
+
+                Model model = wrapper.getNeedModel(NeedGraphType.NEED);
                 logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(model), 150));
 
                 WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri,

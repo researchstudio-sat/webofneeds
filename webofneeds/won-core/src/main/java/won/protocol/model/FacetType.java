@@ -1,7 +1,5 @@
 package won.protocol.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import won.protocol.vocabulary.WON;
 
 import java.net.URI;
@@ -28,10 +26,6 @@ public enum FacetType {
     BACCParticipantFacet("BACCParticipantFacet"),
     BAAtomicPCCoordinatorFacet("BAAtomicPCCoordinatorFacet"),
     BAAtomicCCCoordinatorFacet("BAAtomicCCCoordinatorFacet");
-
-
-
-    private static final Logger logger = LoggerFactory.getLogger(BasicNeedType.class);
 
     public static String[] getNames() {
         String[] ret = new String[FacetType.values().length];

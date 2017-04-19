@@ -224,7 +224,10 @@ public class RdfUtils
     Resource baseResource1 = getBaseResource(model1);
     Resource baseResource2 = getBaseResource(model2);
     replaceResourceInModel(result.getResource(baseResource1.getURI()), result.getResource(baseResource2.getURI()));
-    result.setNsPrefix("",model1.getNsPrefixURI(""));
+    String prefix = model1.getNsPrefixURI("");
+    if (prefix != null) {
+      result.setNsPrefix("", prefix);
+    }
     if (logger.isDebugEnabled()){
       logger.debug("result (after merging base resources):\n{}",writeModelToString(result, Lang.TTL));
     }
@@ -682,6 +685,15 @@ public class RdfUtils
     return result.next();
   }
 
+  public static Node getNodeForPropertyPath(final Model model, Node node, Path propertyPath) {
+    //Iterator<Node> result =  PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
+    //                                        propertyPath);
+    Iterator<Node> result =  PathEval.eval(model.getGraph(), node, propertyPath, Context.emptyContext);
+
+    if (!result.hasNext()) return null;
+    return result.next();
+  }
+
   /**
    * Returns the first RDF node found in the specified dataset for the specified property path.
    * @param dataset
@@ -967,6 +979,17 @@ public class RdfUtils
       }
     }, true);
   }
+
+  public static RDFNode findOnePropertyFromResource(Dataset dataset, final Resource resource, final Property p) {
+    return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<RDFNode>()
+    {
+      @Override
+      public RDFNode visit(final Model model) {
+        return findOnePropertyFromResource(model, resource, p);
+      }
+    }, true);
+  }
+
   /**
    * Finds resource which is a specified property of a specified resource.
    * If multiple (non equal) resources are found an exception is thrown.
@@ -1007,6 +1030,37 @@ public class RdfUtils
     }
     else
       return null;
+  }
+
+  public static Resource findOneSubjectResource(Dataset dataset, Property property, RDFNode object) {
+
+    return RdfUtils.findOne(dataset, new RdfUtils.ModelVisitor<Resource>()
+    {
+      @Override
+      public Resource visit(final Model model) {
+        return findOneSubjectResource(model, property, object);
+      }
+    }, true);
+  }
+
+  public static Resource findOneSubjectResource(Model model, Property property, RDFNode object) {
+
+    Resource resource = null;
+    ResIterator iter = model.listSubjectsWithProperty(property, object);
+    while (iter.hasNext()) {
+      resource = iter.next();
+      if (iter.hasNext()) {
+        throw new IncorrectPropertyCountException("expecting exactly one subject resource for property " +
+                                                    property.getURI() + " and object " + object.toString(), 1, 2);
+      }
+    }
+
+    if (resource == null) {
+      throw new IncorrectPropertyCountException("expecting exactly one subject resource for property " +
+                                                  property.getURI() + " and object " + object.toString(), 1, 0);
+    }
+
+    return resource;
   }
 
   /**

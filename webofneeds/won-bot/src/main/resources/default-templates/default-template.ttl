@@ -1,0 +1,14 @@
+@prefix :      <no:uri> .
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix geo:     <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:     <http://purl.org/webofneeds/model#> .
+@prefix gr:      <http://purl.org/goodrelations/v1#> .
+@prefix ldp:     <http://www.w3.org/ns/ldp#> .
+
+<>
+      a                       won:Need ;
+      won:hasFlag             won:UsedForTesting ;
+      won:hasMatchingBehavior won:Mutual .

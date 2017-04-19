@@ -9,7 +9,7 @@ import org.springframework.context.annotation.PropertySource;
  * The main application configuration.
  */
 @Configuration
-@ImportResource({"classpath:spring/component/needproducer/needproducer-mixed.xml",
+@ImportResource({"classpath:spring/component/solrMatcherEvaluation.xml",
                  "classpath:spring/component/solrMatcherEvaluation.xml"})
 @PropertySource({"file:${WON_CONFIG_DIR}/matcher-solr.properties",
                  "file:${WON_CONFIG_DIR}/cluster-node.properties",

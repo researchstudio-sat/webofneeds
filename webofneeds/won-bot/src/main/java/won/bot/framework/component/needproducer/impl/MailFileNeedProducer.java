@@ -16,15 +16,17 @@
 
 package won.bot.framework.component.needproducer.impl;
 
-import org.apache.jena.rdf.model.Model;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.util.MimeMessageParser;
+import org.apache.jena.rdf.model.Model;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.bot.framework.component.needproducer.FileBasedNeedProducer;
-import won.protocol.util.NeedModelBuilder;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.model.NeedGraphType;
+import won.protocol.util.DefaultNeedModelWrapper;
 
 import javax.mail.internet.MimeMessage;
 import java.io.File;
@@ -38,19 +40,23 @@ import java.io.IOException;
 public class MailFileNeedProducer implements FileBasedNeedProducer
 {
   private final Logger logger = LoggerFactory.getLogger(getClass());
+  private NeedContentPropertyType needContentPropertyType = NeedContentPropertyType.IS_AND_SEEKS;
 
+  public void setNeedContentPropertyType(NeedContentPropertyType needContentPropertyType) {
+    this.needContentPropertyType = needContentPropertyType;
+  }
 
   @Override
   public  synchronized Model readNeedFromFile(final File file) throws IOException
   {
     logger.debug("processing as mail file: {} ", file);
     FileInputStream fis = new FileInputStream(file);
-    NeedModelBuilder needModelBuilder = new NeedModelBuilder();
+    DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper("no:uri");
     try {
       MimeMessage emailMessage = new MimeMessage(null, fis);
       MimeMessageParser parser = new MimeMessageParser(emailMessage);
       parser.parse();
-      needModelBuilder.setTitle(parser.getSubject());
+      needModelWrapper.setTitle(needContentPropertyType, parser.getSubject());
       String content = null;
       if (parser.hasPlainContent()){
         content = parser.getPlainContent();
@@ -59,16 +65,15 @@ public class MailFileNeedProducer implements FileBasedNeedProducer
         content = doc.text();
       }
       if (content != null) {
-        needModelBuilder.setDescription(content);
+        needModelWrapper.setDescription(needContentPropertyType, content);
       }
       logger.debug("mail subject          : {}", parser.getSubject());
       logger.debug("mail has plain content: {}", parser.hasPlainContent());
       logger.debug("mail has html content : {}", parser.hasHtmlContent());
       logger.debug("mail has attachments  : {}", parser.hasAttachments());
       logger.debug("mail plain content    : {}", StringUtils.abbreviate(parser.getPlainContent(), 200));
-      logger.debug("mail html content     : {}", StringUtils.abbreviate(parser.getHtmlContent(),200));
-      needModelBuilder.setUri("no:uri");
-      return needModelBuilder.build();
+      logger.debug("mail html content     : {}", StringUtils.abbreviate(parser.getHtmlContent(), 200));
+      return needModelWrapper.getNeedModel(NeedGraphType.NEED);
     } catch (Exception e) {
       logger.debug("could not parse email from file {} ", file, e);
     } finally {

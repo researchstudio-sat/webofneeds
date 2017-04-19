@@ -10,6 +10,12 @@ import {
     labels,
     relativeTime,
 } from '../won-label-utils';
+
+import {
+    seeksOrIs,
+    inferLegacyNeedType,
+} from '../won-utils';
+
 import {
     selectAllByConnections,
     selectLastUpdateTime,
@@ -26,15 +32,15 @@ function genComponentConf() {
                 ng-show="self.images.length > 0">
             </won-extended-gallery>
             <won-square-image 
-                title="self.connectionData.getIn(['remoteNeed','won:hasContent','dc:title'])"
-                uri="self.connectionData.getIn(['remoteNeed','@id'])"
+                title="self.remoteNeedContent.get('dc:title')"
+                uri="self.remoteNeed.get('@id')"
                 ng-show="self.images.length == 0">
             </won-square-image>
         </div>
         <div class="mfi__description clickable">
             <div class="mfi__description__topline">
                 <div class="mfi__description__topline__title clickable">
-                    {{self.connectionData.getIn(['remoteNeed','won:hasContent','dc:title'])}}
+                    {{self.remoteNeedContent.get('dc:title')}}
                 </div>
                 <div class="mfi__description__topline__date">
                     {{ self.remoteCreatedOn }}
@@ -55,11 +61,7 @@ function genComponentConf() {
                         </span>
                 </span>
                 <span class="mfi__description__subtitle__type">
-                    {{
-                        self.labels.type[
-                            self.connectionData.getIn(['remoteNeed','won:hasBasicNeedType', '@id'])
-                        ]
-                    }}
+                    {{ self.labels.type[ self.remoteNeedType ] }}
                 </span>
             </div>
             <!-- include once you have content in your needs that needs to be displayed here -->
@@ -87,20 +89,16 @@ function genComponentConf() {
             ng-click="self.showFeedback()">
                 <div class="mfi__match__description">
                     <div class="mfi__match__description__title">
-                        {{ self.connectionData.getIn(['ownNeed','won:hasContent','dc:title']) }}
+                        {{ self.ownNeedContent.get('dc:title') }}
                     </div>
                     <div class="mfi__match__description__type">
-                        {{
-                            self.labels.type[
-                                self.connectionData.getIn(['ownNeed','won:hasBasicNeedType','@id'])
-                            ]
-                        }}
+                        {{ self.labels.type[ self.ownNeedType ] }}
                     </div>
                 </div>
                 <won-square-image
-                    src="self.connectionData.getIn(['ownNeed','titleImgSrc'])"
-                    title="self.connectionData.getIn(['ownNeed','won:hasContent','dc:title'])"
-                    uri="self.connectionData.getIn(['ownNeed','@id'])">
+                    src="self.ownNeedContent.get('titleImgSrc')"
+                    title="self.ownNeedContent.get('dc:title')"
+                    uri="self.ownNeed.get('@id')">
                 </won-square-image>
         </div>
         <won-feedback-grid
@@ -116,15 +114,28 @@ function genComponentConf() {
             this.maxThumbnails = 4;
             this.images=[];
 
-            const selectFromState = (state) => {
+            window.mfi4dbg = this;
 
+
+            const selectFromState = (state) => {
                 const connectionData = selectAllByConnections(state).get(this.connectionUri);
+                const ownNeed = connectionData && connectionData.get('ownNeed');
+                const remoteNeed = connectionData && connectionData.get('remoteNeed');
+
                 return {
-                    remoteCreatedOn: relativeTime(
+                    connectionData,
+
+                    ownNeed,
+                    ownNeedType: ownNeed && inferLegacyNeedType(ownNeed),
+                    ownNeedContent: ownNeed && seeksOrIs(ownNeed),
+
+                    remoteNeed,
+                    remoteNeedType: remoteNeed && inferLegacyNeedType(remoteNeed),
+                    remoteNeedContent: remoteNeed && seeksOrIs(remoteNeed),
+                    remoteCreatedOn: remoteNeed && relativeTime(
                         selectLastUpdateTime(state),
-                        connectionData.getIn(['remoteNeed', 'dct:created'])
+                        remoteNeed.get('dct:created')
                     ),
-                    connectionData: connectionData,
                 };
             };
 
