@@ -34,6 +34,13 @@ ssh root@satvm02 mkdir -p $base_folder/won-server-certs2
 scp won_certificate_passwd_file root@satvm02:$base_folder/won-server-certs2/won_certificate_passwd_file
 rm won_certificate_passwd_file
 
+# create the solr data directories (if not available yet) with full rights for every user.
+# This is done so that the directory on the host can be written by the solr user from inside the container
+ssh root@satvm02 mkdir -p $base_folder/solr/won/data
+ssh root@satvm02 mkdir -p $base_folder/solr/wontest/data
+ssh root@satvm02 chmod 777 $base_folder/solr/won/data
+ssh root@satvm02 chmod 777 $base_folder/solr/wontest/data
+
 # copy the nginx.conf file to the proxy server
 rsync $WORKSPACE/webofneeds/won-docker/image/nginx/nginx-master.conf root@satvm02:$base_folder/nginx-master.conf
 
