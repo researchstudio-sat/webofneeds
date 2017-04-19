@@ -90,8 +90,7 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
             logger.debug("need creation successful, new need URI is {}", needURI);
 
             // save the mapping between the original and the reaction in to the context.
-            ctx.getBotContext().saveToObjectMap(KEY_NEED_REMOTE_NEED_ASSOCIATION, reactingToNeedUri.toString(), needURI);
-            ctx.getBotContext().saveToObjectMap(KEY_NEED_REMOTE_NEED_ASSOCIATION, needURI.toString(), reactingToNeedUri);
+            getEventListenerContext().getBotContextWrapper().addUriAssociation(reactingToNeedUri, needURI);
             ctx.getEventBus().publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
           }
         };

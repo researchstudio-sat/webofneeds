@@ -59,8 +59,7 @@ public class ConnectWithAssociatedNeedAction extends BaseEventBotAction
       return;
     }
     final URI myNeedUri = ((NeedSpecificEvent) event).getNeedURI();
-    final URI remoteNeedUri = (URI) getEventListenerContext().getBotContext().loadFromObjectMap(
-      AbstractCreateNeedAction.KEY_NEED_REMOTE_NEED_ASSOCIATION, myNeedUri.toString());
+    final URI remoteNeedUri = getEventListenerContext().getBotContextWrapper().getUriAssociation(myNeedUri);
     try {
       getEventListenerContext().getWonMessageSender().sendWonMessage(
         createWonMessage(myNeedUri
