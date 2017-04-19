@@ -81,7 +81,7 @@ public class GroupingBot extends EventBot
     //create needs every trigger execution until N needs are created
     this.groupMemberCreator = new ActionOnEventListener(
       ctx, "groupMemberCreator",
-      new CreateNeedWithFacetsAction(ctx),
+      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getNeedCreateListName()),
       NO_OF_GROUPMEMBERS
     );
     bus.subscribe(ActEvent.class, this.groupMemberCreator);
@@ -136,7 +136,7 @@ public class GroupingBot extends EventBot
     this.groupCreator = new ActionOnceAfterNEventsListener(
       ctx, "groupCreator",
       NO_OF_GROUPMEMBERS,
-      new CreateNeedWithFacetsAction(ctx, FacetType.GroupFacet.getURI()));
+      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getGroupMembersListName(), FacetType.GroupFacet.getURI()));
     bus.subscribe(NeedCreatedEvent.class, this.groupCreator);
 
     //wait for N+1 needCreatedEvents, then connect the members with the group facet of the third need

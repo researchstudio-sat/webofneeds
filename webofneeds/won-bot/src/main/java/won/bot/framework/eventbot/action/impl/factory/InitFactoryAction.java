@@ -56,7 +56,7 @@ public class InitFactoryAction extends AbstractCreateNeedAction {
     }
 
     public InitFactoryAction(EventListenerContext eventListenerContext, int targetInFlightCount, int maxInFlightCount, URI... facets) {
-        super(eventListenerContext, false, false, facets);
+        super(eventListenerContext, null, false, false, facets);
         this.targetInFlightCount = targetInFlightCount;
         this.maxInFlightCount = maxInFlightCount;
     }

@@ -57,7 +57,7 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
     private boolean isInitialForConnect;
 
     public CreateDebugNeedWithFacetsAction(final EventListenerContext eventListenerContext, final boolean usedForTesting, final boolean doNotMatch, final URI... facets) {
-        super(eventListenerContext, usedForTesting, doNotMatch, facets);
+        super(eventListenerContext, eventListenerContext.getBotContextWrapper().getNeedCreateListName(), usedForTesting, doNotMatch, facets);
     }
 
     @Override

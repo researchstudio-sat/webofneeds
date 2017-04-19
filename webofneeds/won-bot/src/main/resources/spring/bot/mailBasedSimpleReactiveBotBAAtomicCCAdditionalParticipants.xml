@@ -40,9 +40,10 @@
         </property>
     </bean>
 
-    <bean id="botContextWrapper" class="won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper">
+    <bean id="botContextWrapper" class="won.bot.framework.bot.context.AdditionalParticipantCoordinatorBotContextWrapper">
         <constructor-arg name="botContext" ref="${botContext.impl}"/>
         <constructor-arg name="participantListName" value="participants"/>
+        <constructor-arg name="participantDelayedListName" value="participantsDelayed"/>
         <constructor-arg name="coordinatorListName" value="coordinator"/>
     </bean>
 </beans>

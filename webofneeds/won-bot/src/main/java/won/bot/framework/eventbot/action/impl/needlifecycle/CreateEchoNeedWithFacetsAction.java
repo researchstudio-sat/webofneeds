@@ -37,31 +37,30 @@ import won.protocol.util.WonRdfUtils;
 import java.net.URI;
 
 /**
-* Creates a need with the specified facets.
-* If no facet is specified, the ownerFacet will be used.
-*/
+ * Creates a need with the specified facets.
+ * If no facet is specified, the ownerFacet will be used.
+ */
 public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
-  public CreateEchoNeedWithFacetsAction(EventListenerContext eventListenerContext, URI... facets) {
-    super(eventListenerContext, facets);
-  }
+    public CreateEchoNeedWithFacetsAction(EventListenerContext eventListenerContext, URI... facets) {
+        super(eventListenerContext, facets);
+    }
 
-  @Override
-    protected void doRun(Event event, EventListener executingListener) throws Exception
-    {
+    @Override
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
         EventListenerContext ctx = getEventListenerContext();
 
         String replyText = "";
-        if (! (event instanceof NeedCreatedEventForMatcher)){
-          logger.error("CreateEchoNeedWithFacetsAction can only handle NeedCreatedEventForMatcher");
-          return;
+        if (!(event instanceof NeedCreatedEventForMatcher)) {
+            logger.error("CreateEchoNeedWithFacetsAction can only handle NeedCreatedEventForMatcher");
+            return;
         }
         final URI reactingToNeedUri = ((NeedCreatedEventForMatcher) event).getNeedURI();
-        final Dataset needDataset = ((NeedCreatedEventForMatcher)event).getNeedData();
+        final Dataset needDataset = ((NeedCreatedEventForMatcher) event).getNeedData();
         String titleString = WonRdfUtils.NeedUtils.getNeedTitle(needDataset, reactingToNeedUri);
-        if (titleString != null){
-          replyText = titleString;
+        if (titleString != null) {
+            replyText = titleString;
         } else {
-          replyText = "Your Posting (" + reactingToNeedUri.toString() +")";
+            replyText = "Your Posting (" + reactingToNeedUri.toString() + ")";
         }
 
         WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
@@ -80,36 +79,34 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
         logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
 
         WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, needModel);
-      //remember the need URI so we can react to success/failure responses
-      EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
+        //remember the need URI so we can react to success/failure responses
+        EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
 
-        EventListener successCallback = new EventListener()
-        {
-          @Override
-          public void onEvent(Event event) throws Exception {
-            logger.debug("need creation successful, new need URI is {}", needURI);
+        EventListener successCallback = new EventListener() {
+            @Override
+            public void onEvent(Event event) throws Exception {
+                logger.debug("need creation successful, new need URI is {}", needURI);
 
-            // save the mapping between the original and the reaction in to the context.
-            getEventListenerContext().getBotContextWrapper().addUriAssociation(reactingToNeedUri, needURI);
-            ctx.getEventBus().publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
-          }
+                // save the mapping between the original and the reaction in to the context.
+                getEventListenerContext().getBotContextWrapper().addUriAssociation(reactingToNeedUri, needURI);
+                ctx.getEventBus().publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
+            }
         };
 
-        EventListener failureCallback = new EventListener()
-        {
-          @Override
-          public void onEvent(Event event) throws Exception {
-            String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
-            logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
-            EventBotActionUtils.removeFromList(ctx, needURI, uriListName);
-            ctx.getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
-          }
+        EventListener failureCallback = new EventListener() {
+            @Override
+            public void onEvent(Event event) throws Exception {
+                String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
+                logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
+                EventBotActionUtils.removeFromList(ctx, needURI, uriListName);
+                ctx.getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
+            }
         };
-      EventBotActionUtils.makeAndSubscribeResponseListener(createNeedMessage, successCallback, failureCallback, ctx);
+        EventBotActionUtils.makeAndSubscribeResponseListener(createNeedMessage, successCallback, failureCallback, ctx);
 
-      logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
-      getEventListenerContext().getWonMessageSender().sendWonMessage(createNeedMessage);
-      logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
+        logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
+        getEventListenerContext().getWonMessageSender().sendWonMessage(createNeedMessage);
+        logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
     }
 
 

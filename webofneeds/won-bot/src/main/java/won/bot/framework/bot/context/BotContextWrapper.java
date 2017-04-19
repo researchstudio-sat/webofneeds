@@ -3,6 +3,7 @@ package won.bot.framework.bot.context;
 import won.bot.framework.eventbot.action.impl.needlifecycle.AbstractCreateNeedAction;
 
 import java.net.URI;
+import java.util.List;
 
 public class BotContextWrapper {
     public static final String KEY_NEED_REMOTE_NEED_ASSOCIATION = "need_remote_need";
@@ -31,5 +32,9 @@ public class BotContextWrapper {
         // save the mapping between the original and the reaction in to the context.
         getBotContext().saveToObjectMap(KEY_NEED_REMOTE_NEED_ASSOCIATION, uri.toString(), uri2);
         getBotContext().saveToObjectMap(KEY_NEED_REMOTE_NEED_ASSOCIATION, uri2.toString(), uri);
+    }
+
+    public List<URI> getNeedCreateList(){
+        return getBotContext().getNamedNeedUriList(needCreateListName);
     }
 }

@@ -53,7 +53,7 @@ public class DuplicateMessageURIFailureBot extends IntegrationtestBot {
               ctx,
               new CreateNeedWithFacetsAction(
                 //use a decorator that will cause the same need URI to be used in each create message
-                new ConstantNewEventURIDecorator(ctx, "constantMsgURI" + System.currentTimeMillis())),
+                new ConstantNewEventURIDecorator(ctx, "constantMsgURI" + System.currentTimeMillis()), getBotContextWrapper().getNeedCreateListName()),
               2));
 
     //log error if we can create 2 needs

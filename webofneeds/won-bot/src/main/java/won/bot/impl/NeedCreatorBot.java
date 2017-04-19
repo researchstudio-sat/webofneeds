@@ -62,7 +62,7 @@ public class NeedCreatorBot extends EventBot {
       new MultipleActions(ctx,
         new IncrementCounterAction(ctx, needCreationStartedCounter),
         new IncrementCounterAction(ctx, creationUnfinishedCounter),
-        new CreateNeedWithFacetsAction(ctx)
+        new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName())
       ),
       -1
     );

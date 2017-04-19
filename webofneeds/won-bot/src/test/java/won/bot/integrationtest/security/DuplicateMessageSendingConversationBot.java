@@ -80,7 +80,7 @@ public class DuplicateMessageSendingConversationBot extends IntegrationtestBot
 
     bus.subscribe(ActEvent.class, new ActionOnEventListener(
             ctx,
-            new CreateNeedWithFacetsAction(ctx),
+            new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName()),
             NO_OF_NEEDS
         ));
 

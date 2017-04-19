@@ -23,6 +23,7 @@ import won.bot.framework.bot.context.GroupBotContextWrapper;
 import won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -48,18 +49,27 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
     protected boolean doNotMatch;
 
     /**
+     * Creates a need with the specified facets.
+     * If no facet is specified, the ownerFacet will be used, Flag 'UsedForTesting' will be set.
+     * uriListName is used from the set botcontextwrapper getNeedCreateListName
+     */
+    public AbstractCreateNeedAction(EventListenerContext eventListenerContext, URI... facets) {
+        this(eventListenerContext, eventListenerContext.getBotContextWrapper().getNeedCreateListName(), facets);
+    }
+
+    /**
     * Creates a need with the specified facets.
     * If no facet is specified, the ownerFacet will be used, Flag 'UsedForTesting' will be set.
     */
-    public AbstractCreateNeedAction(EventListenerContext eventListenerContext, URI... facets) {
-        this(eventListenerContext, true, false, facets);
+    public AbstractCreateNeedAction(EventListenerContext eventListenerContext, String uriListName, URI... facets) {
+        this(eventListenerContext, uriListName, true, false, facets);
     }
 
     /**
     * Creates a need with the specified facets.
     * If no facet is specified, the ownerFacet will be used.
     */
-    public AbstractCreateNeedAction(EventListenerContext eventListenerContext, final boolean usedForTesting, final boolean doNotMatch, URI... facets) {
+    public AbstractCreateNeedAction(EventListenerContext eventListenerContext, String uriListName, final boolean usedForTesting, final boolean doNotMatch, URI... facets) {
         super(eventListenerContext);
         if (facets == null || facets.length == 0) {
             //add the default facet if none is present.
@@ -70,36 +80,7 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
         }
         this.doNotMatch = doNotMatch;
         this.usedForTesting = usedForTesting;
-
-        BotContextWrapper botContextWrapper = eventListenerContext.getBotContextWrapper();
-
-        if(botContextWrapper instanceof CommentBotContextWrapper){
-            this.uriListName = botContextWrapper.getNeedCreateListName();
-
-            if(this.hasFacet(FacetType.CommentFacet)){
-                this.uriListName = ((CommentBotContextWrapper) botContextWrapper).getCommentListName();
-            }
-        }else if(botContextWrapper instanceof ParticipantCoordinatorBotContextWrapper){
-            ParticipantCoordinatorBotContextWrapper participantCoordinatorBotContextWrapper = (ParticipantCoordinatorBotContextWrapper) botContextWrapper;
-
-            if(this.hasFacet(FacetType.CoordinatorFacet)){
-                this.uriListName = participantCoordinatorBotContextWrapper.getCoordinatorListName();
-            }else if(this.hasFacet(FacetType.ParticipantFacet)){
-                this.uriListName = participantCoordinatorBotContextWrapper.getParticipantListName();
-            }else{
-                throw new IllegalArgumentException("AbstractCreateNeedAction for participantCoordinatorBotContextWrapper only work with Coordinator or ParticipantFacet");
-            }
-        }else if(botContextWrapper instanceof GroupBotContextWrapper){
-            GroupBotContextWrapper groupBotContextWrapper = (GroupBotContextWrapper) botContextWrapper;
-
-            if(this.hasFacet(FacetType.GroupFacet)){
-                this.uriListName = groupBotContextWrapper.getGroupListName();
-            }else{
-                this.uriListName = groupBotContextWrapper.getGroupMembersListName();
-            }
-        }else{
-            this.uriListName = botContextWrapper.getNeedCreateListName();
-        }
+        this.uriListName = uriListName;
     }
 
     protected WonMessage createWonMessage(WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI, Model needModel) throws WonMessageBuilderException {
