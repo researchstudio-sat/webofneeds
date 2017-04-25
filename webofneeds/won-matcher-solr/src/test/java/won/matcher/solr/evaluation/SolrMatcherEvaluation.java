@@ -133,11 +133,11 @@ public class SolrMatcherEvaluation
 
 
       if (needProducer == seeksNeedProducer) {
-        matchingDataConnections.addNeedType(needId, "WANT");
-        matchingDataPredictions.addNeedType(needId, "WANT");
+        matchingDataConnections.addNeedAttribute("needtype", needId, "WANT");
+        matchingDataPredictions.addNeedAttribute("needtype", needId, "WANT");
       } else if (needProducer == isNeedProducer ) {
-        matchingDataConnections.addNeedType(needId, "OFFER");
-        matchingDataPredictions.addNeedType(needId, "OFFER");
+        matchingDataConnections.addNeedAttribute("needtype", needId, "OFFER");
+        matchingDataPredictions.addNeedAttribute("needtype", needId, "OFFER");
       }
 
       needFileDatasetMap.put(FilenameUtils.removeExtension(needFileName), ds);
@@ -192,7 +192,7 @@ public class SolrMatcherEvaluation
             throw new IOException("No need found in input directory for connection specified in connection file:  \n" +
                                     createNeedId(need) + "\n" + match);
         }
-        matchingDataPredictions.addNeedConnection(createNeedId(need), match);
+        matchingDataPredictions.addNeedConnection(createNeedId(need), match, false);
       }
     }
 
@@ -237,7 +237,7 @@ public class SolrMatcherEvaluation
                                 need1 + "\n" + need2);
         }
       }
-      matchingDataConnections.addNeedConnection(need1, need2);
+      matchingDataConnections.addNeedConnection(need1, need2, false);
     }
   }
 

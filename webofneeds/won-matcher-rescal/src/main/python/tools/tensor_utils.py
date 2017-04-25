@@ -22,12 +22,11 @@ _log = logging.getLogger()
 
 class SparseTensor:
 
-        CONNECTION_SLICE, NEED_TYPE_SLICE, ATTR_SUBJECT_SLICE, ATTR_CONTENT_SLICE, CATEGORY_SLICE = range(5)
-        defaultSlices = [CONNECTION_SLICE, NEED_TYPE_SLICE, ATTR_SUBJECT_SLICE]
+        CONNECTION_SLICE = 0
 
         def __init__(self, headers):
             self.shape = (len(headers), len(headers))
-            self.data = [csr_matrix(np.zeros(shape=self.shape))] * 5
+            self.data = []
             self.headers = list(headers)
 
         def copy(self):
@@ -50,7 +49,7 @@ class SparseTensor:
             if self.shape != matrix.shape:
                 raise Exception("Bad shape of added slices of tensor, is (%d,%d) but should be (%d,%d)!" %
                                 (matrix.shape[0], matrix.shape[1], self.shape[0], self.shape[1]))
-            self.data[slice] = csr_matrix(matrix)
+            self.data.append(csr_matrix(matrix))
 
         def getHeaders(self):
             return list(self.headers)
@@ -76,14 +75,6 @@ class SparseTensor:
             attr = [self.getHeaders()[i][6:] for i in attr]
             return attr
 
-        def getNeedIndicesForAttribute(self, attribute):
-            needs = []
-            if (attribute in self.getHeaders()):
-                attr_idx = self.getHeaders().index(attribute)
-                needs = [need for need in self.getNeedIndices() if
-                         (self.getSliceMatrix(SparseTensor.NEED_TYPE_SLICE)[need, attr_idx] == 1)]
-            return needs
-
         def hasConnection(self, need1, need2):
             return (self.getSliceMatrix(SparseTensor.CONNECTION_SLICE)[need1,need2] != 0)
 
@@ -103,11 +94,10 @@ class SparseTensor:
 
 
 
-# read the input tensor data (e.g. data-0.mtx ... data-3.mtx) and
-# the headers file (e.g. headers.txt)
+# read the input tensor data (e.g. data-0.mtx ... ) and the headers file (e.g. headers.txt)
 # if adjustDim is True then the dimensions of the slice matrix
 # files are automatically adjusted to fit to biggest dimensions of all slices
-def read_input_tensor(headers_filename, data_file_names, tensor_slices, adjustDim=False):
+def read_input_tensor(headers_filename, data_file_names, adjustDim=False):
 
     #load the header file
     _log.info("Read header input file: " + headers_filename)
@@ -126,17 +116,23 @@ def read_input_tensor(headers_filename, data_file_names, tensor_slices, adjustDi
                 maxDim = matrix.shape[1]
 
     # load the data files
-    slice = 0
+    slice = 1
     tensor = SparseTensor(headers)
     for data_file in data_file_names:
         if adjustDim:
             adjusted = adjust_mm_dimension(data_file, maxDim)
             if adjusted:
                 _log.warn("Adujst dimension to (%d,%d) of matrix file: %s" % (maxDim, maxDim, data_file))
-        _log.info("Read as slice %d the data input file: %s" % (slice, data_file))
-        matrix = mmread(data_file)
-        tensor.addSliceMatrix(matrix, tensor_slices[slice])
-        slice = slice + 1
+
+        if data_file.endswith("connection.mtx"):
+            _log.info("Read as slice %d the data input file: %s" % (0, data_file))
+            matrix = mmread(data_file)
+            tensor.addSliceMatrix(matrix, 0)
+        else:
+            _log.info("Read as slice %d the data input file: %s" % (slice, data_file))
+            matrix = mmread(data_file)
+            tensor.addSliceMatrix(matrix, slice)
+            slice = slice + 1
     return tensor
 
 # adjust (increase) the dimension of an mm matrix file
@@ -162,34 +158,6 @@ def adjust_mm_dimension(data_file, dim):
             file.write(line + "\n")
     file.close()
     return True
-
-# execute the recal algorithm
-# def execute_rescal(input_tensor, rank, useNeedTypeSlice=True, useConnectionSlice=True, init='nvecs', conv=1e-4,
-#                    lambda_A=0, lambda_R=0, lambda_V=0):
-#
-#     temp_tensor = input_tensor.getSliceMatrixList()
-#     if not (useNeedTypeSlice):
-#         _log.info('Do not use needtype slice for RESCAL')
-#         del temp_tensor[SparseTensor.NEED_TYPE_SLICE]
-#     if not (useConnectionSlice):
-#         _log.info('Do not use connection slice for RESCAL')
-#         del temp_tensor[SparseTensor.CONNECTION_SLICE]
-#
-#     _log.info('start rescal processing ...')
-#     _log.info('config: init=%s, conv=%f, lambda_A=%f, lambda_R=%f, lambda_V=%f' %
-#               (init, conv, lambda_A, lambda_R, lambda_V))
-#     _log.info('Tensor: %d x %d x %d | Rank: %d' % (
-#         temp_tensor[0].shape + (len(temp_tensor),) + (rank,))
-#     )
-#
-#     A, R, _, _, _ = rescal_als(
-#         temp_tensor, rank, init=init, conv=conv,
-#         lambda_A=lambda_A, lambda_R=lambda_R, lambda_V=lambda_V, compute_fit='true'
-#     )
-#
-#     _log.info('rescal stopped processing')
-#     return A, R
-
 
 def execute_extrescal(input_tensor, rank, init='nvecs', conv=1e-4, lmbda=0):
 
@@ -248,8 +216,7 @@ def predict_rescal_hints_by_threshold(A, R, threshold, mask_matrix, keepScore=Tr
 # - tensor: tensor for which the predictions are computed
 # - symmetric: create a symmetric mask
 # - keepConnections: if true keep the predictions between the needs where a connection existed before
-# - typeSensitiveMatching: use only need combinations that having matching types
-def create_hint_mask_matrix(tensor, symmetric=False, keepConnections=False, typeSensitiveMatching=True):
+def create_hint_mask_matrix(tensor, symmetric=False, keepConnections=False):
 
     # use only need to need indices for hint connection prediction
     need_indices = np.zeros(tensor.getMatrixShape()[0])
@@ -258,32 +225,6 @@ def create_hint_mask_matrix(tensor, symmetric=False, keepConnections=False, type
     need_matrix = need_vector * need_vector.T
     np.fill_diagonal(need_matrix, 0)
     mask_matrix = need_matrix
-
-    # optionally match only certain types of needs with each other
-    if typeSensitiveMatching:
-
-        # Supply Demand matrix
-        supply_vector = np.zeros(tensor.getMatrixShape()[0])
-        supply_vector[tensor.getNeedIndicesForAttribute("Attr: http://purl.org/webofneeds/model#Supply")] = 1
-        supply_vector = supply_vector[np.newaxis]
-        demand_vector = np.zeros(tensor.getMatrixShape()[0])
-        demand_vector[tensor.getNeedIndicesForAttribute("Attr: http://purl.org/webofneeds/model#Demand")] = 1
-        demand_vector = demand_vector[np.newaxis]
-        supply_demand_matrix = (supply_vector * demand_vector.T) + (demand_vector * supply_vector.T)
-
-        # DoTogether matrix
-        do_together_vector = np.zeros(tensor.getMatrixShape()[0])
-        do_together_vector[tensor.getNeedIndicesForAttribute("Attr: http://purl.org/webofneeds/model#DoTogether")] = 1
-        do_together_vector = do_together_vector[np.newaxis]
-        do_together_matrix = do_together_vector * do_together_vector.T
-
-        # Critique matrix
-        critique_vector = np.zeros(tensor.getMatrixShape()[0])
-        critique_vector[tensor.getNeedIndicesForAttribute("Attr: http://purl.org/webofneeds/model#Critique")] = 1
-        critique_vector = critique_vector[np.newaxis]
-        critique_matrix = critique_vector * critique_vector.T
-        type_matrix = supply_demand_matrix + do_together_matrix + critique_matrix
-        mask_matrix = np.multiply(mask_matrix, type_matrix)
 
     # optionally exclude already existing connections from prediction
     if not keepConnections:

@@ -26,172 +26,147 @@ import java.util.List;
  * User: hfriedrich
  * Date: 18.07.2014
  */
-public class TensorMatchingDataTest
-{
-  private static final double DELTA = 0.001d;
+public class TensorMatchingDataTest {
+    private static final double DELTA = 0.001d;
 
-  private TensorMatchingData data;
+    private TensorMatchingData data;
 
-  @Before
-  public void initData() {
-    data = new TensorMatchingData();
-  }
+    @Before
+    public void initData() {
+        data = new TensorMatchingData();
+    }
 
-  @Test
-  public void dataInitialized() {
-    Assert.assertEquals(data.getAttributes().size(), 0);
-    Assert.assertEquals(data.getNeeds().size(), 0);
-  }
+    @Test
+    public void dataInitialized() {
+        Assert.assertEquals(data.getAttributes().size(), 0);
+        Assert.assertEquals(data.getNeeds().size(), 0);
+    }
 
-  @Test
-  public void addNeedType() {
+    @Test
+    public void addNeedConnection() {
 
-    data.addNeedType("Need1", "OFFER");
-    Assert.assertEquals(data.getNeeds().size(), 1);
-    Assert.assertEquals(data.getAttributes().size(), 1);
-    Assert.assertTrue(data.getNeeds().contains("Need1"));
-    Assert.assertTrue(data.getAttributes().contains("OFFER"));
+        data.addNeedConnection("Need1", "Need2", false);
+        Assert.assertEquals(data.getNeeds().size(), 2);
+        Assert.assertEquals(data.getAttributes().size(), 0);
+        Assert.assertTrue(data.getNeeds().contains("Need1"));
+        Assert.assertTrue(data.getNeeds().contains("Need2"));
 
-    data.addNeedType("Need1", "OFFER");
-    Assert.assertEquals(data.getNeeds().size(), 1);
-    Assert.assertEquals(data.getAttributes().size(), 1);
-    Assert.assertTrue(data.getNeeds().contains("Need1"));
-    Assert.assertTrue(data.getAttributes().contains("OFFER"));
+        data.addNeedConnection("Need1", "Need3", false);
+        Assert.assertEquals(data.getNeeds().size(), 3);
+        Assert.assertEquals(data.getAttributes().size(), 0);
+        Assert.assertTrue(data.getNeeds().contains("Need1"));
+        Assert.assertTrue(data.getNeeds().contains("Need2"));
+        Assert.assertTrue(data.getNeeds().contains("Need3"));
+    }
 
-    data.addNeedType("Need2", "WANT");
-    Assert.assertEquals(data.getNeeds().size(), 2);
-    Assert.assertEquals(data.getAttributes().size(), 2);
-    Assert.assertTrue(data.getNeeds().contains("Need1"));
-    Assert.assertTrue(data.getNeeds().contains("Need2"));
-    Assert.assertTrue(data.getAttributes().contains("OFFER"));
-    Assert.assertTrue(data.getAttributes().contains("WANT"));
-  }
+    @Test
+    public void addNeedAttribute() {
 
-  @Test
-  public void addNeedConnection() {
+        data.addNeedAttribute("title", "Need1", "Attr1");
+        Assert.assertEquals(data.getNeeds().size(), 1);
+        Assert.assertEquals(data.getAttributes().size(), 1);
+        Assert.assertTrue(data.getNeeds().contains("Need1"));
+        Assert.assertTrue(data.getAttributes().contains("Attr1"));
 
-    data.addNeedConnection("Need1", "Need2");
-    Assert.assertEquals(data.getNeeds().size(), 2);
-    Assert.assertEquals(data.getAttributes().size(), 0);
-    Assert.assertTrue(data.getNeeds().contains("Need1"));
-    Assert.assertTrue(data.getNeeds().contains("Need2"));
+        data.addNeedAttribute("description", "Need1", "Attr2");
+        Assert.assertEquals(data.getNeeds().size(), 1);
+        Assert.assertEquals(data.getAttributes().size(), 2);
+        Assert.assertTrue(data.getNeeds().contains("Need1"));
+        Assert.assertTrue(data.getAttributes().contains("Attr1"));
+        Assert.assertTrue(data.getAttributes().contains("Attr2"));
 
-    data.addNeedConnection("Need1", "Need3");
-    Assert.assertEquals(data.getNeeds().size(), 3);
-    Assert.assertEquals(data.getAttributes().size(), 0);
-    Assert.assertTrue(data.getNeeds().contains("Need1"));
-    Assert.assertTrue(data.getNeeds().contains("Need2"));
-    Assert.assertTrue(data.getNeeds().contains("Need3"));
-  }
+        data.addNeedAttribute("title", "Need2", "Attr1");
+        Assert.assertEquals(data.getNeeds().size(), 2);
+        Assert.assertEquals(data.getAttributes().size(), 2);
+        Assert.assertTrue(data.getNeeds().contains("Need1"));
+        Assert.assertTrue(data.getNeeds().contains("Need2"));
+        Assert.assertTrue(data.getAttributes().contains("Attr1"));
+        Assert.assertTrue(data.getAttributes().contains("Attr2"));
+    }
 
-  @Test
-  public void addNeedAttribute() {
+    @Test
+    public void checkTensor() throws IOException {
 
-    data.addNeedAttribute("Need1", "Attr1", TensorMatchingData.SliceType.TITLE);
-    Assert.assertEquals(data.getNeeds().size(), 1);
-    Assert.assertEquals(data.getAttributes().size(), 1);
-    Assert.assertTrue(data.getNeeds().contains("Need1"));
-    Assert.assertTrue(data.getAttributes().contains("Attr1"));
+        data.addNeedAttribute("needType", "Need1", "OFFER");
+        data.addNeedAttribute("title", "Need1", "Couch");
+        data.addNeedAttribute("title", "Need1", "IKEA");
+        data.addNeedAttribute("description", "Need1", "...");
+        data.addNeedAttribute("needType", "Need2", "WANT");
+        data.addNeedAttribute("title", "Need2", "Leather");
+        data.addNeedAttribute("title", "Need2", "Couch");
+        data.addNeedAttribute("description", "Need2", "IKEA");
+        data.addNeedConnection("Need1", "Need2", false);
+        data.addNeedAttribute("needType", "Need3", "WANT");
+        data.addNeedConnection("Need1", "NeedWithoutAttributes", false);
+        data.addNeedAttribute("tag", "Need2", "#couch");
+        data.addNeedAttribute("tag", "Need4", "#sofa");
+        data.addNeedConnection("Need2", "Need4", false);
+        data.addNeedConnection("Need1", "NeedWithoutAttributes2", false);
 
-    data.addNeedAttribute("Need1", "Attr2", TensorMatchingData.SliceType.DESCRIPTION);
-    Assert.assertEquals(data.getNeeds().size(), 1);
-    Assert.assertEquals(data.getAttributes().size(), 2);
-    Assert.assertTrue(data.getNeeds().contains("Need1"));
-    Assert.assertTrue(data.getAttributes().contains("Attr1"));
-    Assert.assertTrue(data.getAttributes().contains("Attr2"));
+        // number of original different name entries in the tensor header => 14
+        ThirdOrderSparseTensor tensor = data.createFinalTensor();
+        int[] dim = {14, 14, 5};
+        Assert.assertArrayEquals(dim, tensor.getDimensions());
 
-    data.addNeedAttribute("Need2", "Attr1", TensorMatchingData.SliceType.TITLE);
-    Assert.assertEquals(data.getNeeds().size(), 2);
-    Assert.assertEquals(data.getAttributes().size(), 2);
-    Assert.assertTrue(data.getNeeds().contains("Need1"));
-    Assert.assertTrue(data.getNeeds().contains("Need2"));
-    Assert.assertTrue(data.getAttributes().contains("Attr1"));
-    Assert.assertTrue(data.getAttributes().contains("Attr2"));
-  }
+        Assert.assertEquals(1.0d, tensor.getEntry(0, 1, data.getSliceIndex("needType")), DELTA);
+        Assert.assertEquals(1.0d, tensor.getEntry(0, 2, data.getSliceIndex("title")), DELTA);
+        Assert.assertEquals(1.0d, tensor.getEntry(0, 3, data.getSliceIndex("title")), DELTA);
+        Assert.assertEquals(1.0d, tensor.getEntry(0, 4, data.getSliceIndex("description")),
+                DELTA);
+        Assert.assertEquals(1.0d, tensor.getEntry(5, 6, data.getSliceIndex("needType")), DELTA);
+        Assert.assertEquals(1.0d, tensor.getEntry(5, 7, data.getSliceIndex("title")), DELTA);
+        Assert.assertEquals(1.0d, tensor.getEntry(5, 2, data.getSliceIndex("title")), DELTA);
+        Assert.assertEquals(1.0d, tensor.getEntry(5, 3, data.getSliceIndex("description")),
+                DELTA);
+        Assert.assertEquals(1.0d, tensor.getEntry(0, 5, data.getSliceIndex(TensorMatchingData.CONNECTION_SLICE_NAME)), DELTA);
+        Assert.assertEquals(1.0d, tensor.getEntry(5, 0, data.getSliceIndex(TensorMatchingData.CONNECTION_SLICE_NAME)), DELTA);
+        Assert.assertEquals(1.0d, tensor.getEntry(8, 6, data.getSliceIndex("needType")), DELTA);
 
-  @Test
-  public void checkTensor() throws IOException {
+        // 1 connection (symmentric entries) => 2 NZ entries
+        Assert.assertEquals(8, tensor.getNonZeroEntries(data.getSliceIndex(TensorMatchingData.CONNECTION_SLICE_NAME)));
 
-    data.addNeedType("Need1", "OFFER");
-    data.addNeedAttribute("Need1", "Couch", TensorMatchingData.SliceType.TITLE);
-    data.addNeedAttribute("Need1", "IKEA", TensorMatchingData.SliceType.TITLE);
-    data.addNeedAttribute("Need1", "...", TensorMatchingData.SliceType.DESCRIPTION);
-    data.addNeedType("Need2", "WANT");
-    data.addNeedAttribute("Need2", "Leather", TensorMatchingData.SliceType.TITLE);
-    data.addNeedAttribute("Need2", "Couch", TensorMatchingData.SliceType.TITLE);
-    data.addNeedAttribute("Need2", "IKEA", TensorMatchingData.SliceType.DESCRIPTION);
-    data.addNeedConnection("Need1", "Need2");
-    data.addNeedType("Need3", "WANT");
-    data.addNeedConnection("Need1", "NeedWithoutAttributes");
-    data.addNeedAttribute("Need2", "#couch", TensorMatchingData.SliceType.TAG);
-    data.addNeedAttribute("Need4", "#sofa", TensorMatchingData.SliceType.TAG);
-    data.addNeedConnection("Need2", "Need4");
-    data.addNeedConnection("Need1", "NeedWithoutAttributes2");
+        // three needs with types
+        Assert.assertEquals(3, tensor.getNonZeroEntries(data.getSliceIndex("needType")));
 
-    // number of original different name entries in the tensor header => 14
-    ThirdOrderSparseTensor tensor = data.createFinalTensor();
-    int[] dim = {14, 14, TensorMatchingData.SliceType.values().length};
-    Assert.assertArrayEquals(dim, tensor.getDimensions());
+        // 4 title, 2 description, 2 tag attributes
+        Assert.assertEquals(4, tensor.getNonZeroEntries(data.getSliceIndex("title")));
+        Assert.assertEquals(2, tensor.getNonZeroEntries(data.getSliceIndex("description")));
+        Assert.assertEquals(2, tensor.getNonZeroEntries(data.getSliceIndex("tag")));
+    }
 
-    Assert.assertEquals(1.0d, tensor.getEntry(0, 1, TensorMatchingData.SliceType.NEED_TYPE.ordinal()), DELTA);
-    Assert.assertEquals(1.0d, tensor.getEntry(0, 2, TensorMatchingData.SliceType.TITLE.ordinal()), DELTA);
-    Assert.assertEquals(1.0d, tensor.getEntry(0, 3, TensorMatchingData.SliceType.TITLE.ordinal()), DELTA);
-    Assert.assertEquals(1.0d, tensor.getEntry(0, 4, TensorMatchingData.SliceType.DESCRIPTION.ordinal()),
-                        DELTA);
-    Assert.assertEquals(1.0d, tensor.getEntry(5, 6, TensorMatchingData.SliceType.NEED_TYPE.ordinal()), DELTA);
-    Assert.assertEquals(1.0d, tensor.getEntry(5, 7, TensorMatchingData.SliceType.TITLE.ordinal()), DELTA);
-    Assert.assertEquals(1.0d, tensor.getEntry(5, 2, TensorMatchingData.SliceType.TITLE.ordinal()), DELTA);
-    Assert.assertEquals(1.0d, tensor.getEntry(5, 3, TensorMatchingData.SliceType.DESCRIPTION.ordinal()),
-                        DELTA);
-    Assert.assertEquals(1.0d, tensor.getEntry(0, 5, TensorMatchingData.SliceType.CONNECTION.ordinal()), DELTA);
-    Assert.assertEquals(1.0d, tensor.getEntry(5, 0, TensorMatchingData.SliceType.CONNECTION.ordinal()), DELTA);
-    Assert.assertEquals(1.0d, tensor.getEntry(8, 6, TensorMatchingData.SliceType.NEED_TYPE.ordinal()), DELTA);
+    @Test
+    public void checkCleanedTensor() throws IOException {
 
-    // 1 connection (symmentric entries) => 2 NZ entries
-    Assert.assertEquals(8, tensor.getNonZeroEntries(TensorMatchingData.SliceType.CONNECTION.ordinal()));
+        data.addNeedAttribute("needType", "Need1", "OFFER");
+        data.addNeedAttribute("title", "Need1", "Couch");
+        data.addNeedAttribute("title", "Need1", "IKEA");
+        data.addNeedAttribute("description", "Need1", "...");
+        data.addNeedAttribute("needType", "Need2", "WANT");
+        data.addNeedAttribute("title", "Need2", "Leather");
+        data.addNeedAttribute("title", "Need2", "Couch");
+        data.addNeedAttribute("description", "Need2", "IKEA");
+        data.addNeedConnection("Need1", "Need2", false);
+        data.addNeedAttribute("needType", "Need3", "WANT");
+        data.addNeedConnection("Need1", "NeedWithoutAttributes", false);
+        data.addNeedAttribute("tag", "Need2", "#couch");
+        data.addNeedAttribute("tag", "Need4", "#sofa");
+        data.addNeedConnection("Need2", "Need4", false);
+        data.addNeedConnection("Need1", "NeedWithoutAttributes2", false);
 
-    // three needs with types
-    Assert.assertEquals(3, tensor.getNonZeroEntries(TensorMatchingData.SliceType.NEED_TYPE.ordinal()));
+        // number of original different name entries in the tensor header => 14,
+        // by cleaning the tensor the two Needs "NeedWithoutAttributes" should be removed
+        // together with their connections
+        data = data.removeEmptyNeedsAndConnections();
+        ThirdOrderSparseTensor tensor = data.createFinalTensor();
+        int[] dim = {12, 12, 5};
+        Assert.assertArrayEquals(dim, tensor.getDimensions());
 
-    // 4 title, 2 description, 2 tag attributes
-    Assert.assertEquals(4, tensor.getNonZeroEntries(TensorMatchingData.SliceType.TITLE.ordinal()));
-    Assert.assertEquals(2, tensor.getNonZeroEntries(TensorMatchingData.SliceType.DESCRIPTION.ordinal()));
-    Assert.assertEquals(2, tensor.getNonZeroEntries(TensorMatchingData.SliceType.TAG.ordinal()));
-  }
-
-  @Test
-  public void checkCleanedTensor() throws IOException {
-
-    data.addNeedType("Need1", "OFFER");
-    data.addNeedAttribute("Need1", "Couch", TensorMatchingData.SliceType.TITLE);
-    data.addNeedAttribute("Need1", "IKEA", TensorMatchingData.SliceType.TITLE);
-    data.addNeedAttribute("Need1", "...", TensorMatchingData.SliceType.DESCRIPTION);
-    data.addNeedType("Need2", "WANT");
-    data.addNeedAttribute("Need2", "Leather", TensorMatchingData.SliceType.TITLE);
-    data.addNeedAttribute("Need2", "Couch", TensorMatchingData.SliceType.TITLE);
-    data.addNeedAttribute("Need2", "IKEA", TensorMatchingData.SliceType.DESCRIPTION);
-    data.addNeedConnection("Need1", "Need2");
-    data.addNeedType("Need3", "WANT");
-    data.addNeedConnection("Need1", "NeedWithoutAttributes");
-    data.addNeedAttribute("Need2", "#couch", TensorMatchingData.SliceType.TAG);
-    data.addNeedAttribute("Need4", "#sofa", TensorMatchingData.SliceType.TAG);
-    data.addNeedConnection("Need2", "Need4");
-    data.addNeedConnection("Need1", "NeedWithoutAttributes2");
-
-    // number of original different name entries in the tensor header => 14,
-    // by cleaning the tensor the two Needs "NeedWithoutAttributes" should be removed
-    // together with their connections
-    data = data.removeEmptyNeedsAndConnections();
-    ThirdOrderSparseTensor tensor = data.createFinalTensor();
-    int[] dim = {12, 12, TensorMatchingData.SliceType.values().length};
-    Assert.assertArrayEquals(dim, tensor.getDimensions());
-
-    List<String> needs = new LinkedList<>();
-    needs.add("Need1");
-    needs.add("Need2");
-    needs.add("Need3");
-    needs.add("Need4");
-    Assert.assertEquals(needs, data.getNeeds());
-  }
+        List<String> needs = new LinkedList<>();
+        needs.add("Need1");
+        needs.add("Need2");
+        needs.add("Need3");
+        needs.add("Need4");
+        Assert.assertEquals(needs, data.getNeeds());
+    }
 
 }
