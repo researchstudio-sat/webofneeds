@@ -12,6 +12,9 @@ import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 /**
+ * Loads all SPARQL "*.rq" files from a specified directory and executes them (using time range parameters) on a
+ * SPARQL endpoint. The result {@link TensorEntry} objects from all queries are returned.
+ *
  * Created by hfriedrich on 21.04.2017.
  */
 public class TensorEntryAllGenerator implements TensorEntryGenerator {

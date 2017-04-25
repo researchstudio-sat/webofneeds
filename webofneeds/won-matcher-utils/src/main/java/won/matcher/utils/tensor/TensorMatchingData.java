@@ -16,7 +16,7 @@ import java.util.List;
  * It to builds an internal tensor data structure (RESCAL three-way-tensor).
  * The data structure can be build incrementally and when finished written to file system
  * for further processing by the RESCAL algorithm or evaluation algorithms.
- * <p>
+ *
  * User: hfriedrich
  * Date: 17.07.2014
  */

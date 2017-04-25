@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 /**
+ * Used for tokenization of {@link TensorEntry} objects.
+ *
  * Created by hfriedrich on 21.04.2017.
  */
 public class TensorEntryTokenizer implements TensorEntryGenerator {
