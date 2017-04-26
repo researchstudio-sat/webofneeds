@@ -14,5 +14,5 @@ SELECT DISTINCT ?slice ?need ?value WHERE { # value is the remote need
     OPTIONAL {?value won:hasFlag ?flag2}.
     FILTER (!bound(?flag1) || (?flag1 != won:DoNotMatch && ?flag1 != won:UsedForTesting))
     FILTER (!bound(?flag2) || (?flag2 != won:DoNotMatch && ?flag2 != won:UsedForTesting))
-    FILTER (?date >= " + fromCrawlDate + " && ?date < " + toCrawlDate + ") # bind variables ?from and ?to here
+    FILTER (?date >= ?from && ?date < ?to) # bind variables ?from and ?to here
 }
