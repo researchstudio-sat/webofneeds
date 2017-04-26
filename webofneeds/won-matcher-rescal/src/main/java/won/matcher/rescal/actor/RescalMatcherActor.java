@@ -100,12 +100,16 @@ public class RescalMatcherActor extends UntypedActor {
             rescalInputData.addNeedConnection(entry.getNeedUri(), entry.getValue(), true);
         }
 
-        // write the files for rescal algorithm
+        log.info("number of needs in tensor: {}", rescalInputData.getNeeds().size());
+        log.info("number of attributes in tensor: {}", rescalInputData.getAttributes().size());
+        log.info("number of connections in tensor: {}", rescalInputData.getNumberOfConnections());
+        log.info("number of slices in tensor: {}", rescalInputData.getSlices().size());
         if (!rescalInputData.isValidTensor()) {
-            log.info("no data available for tensor, wait for next execution!");
+            log.info("not enough tensor data available for execution yet, wait for next execution!");
             return;
         }
 
+        // write the files for rescal algorithm
         log.info("write rescal input data to folder: {}", config.getExecutionDirectory());
         TensorMatchingData cleanedTensorData = rescalInputData.writeCleanedOutputFiles(config.getExecutionDirectory());
 

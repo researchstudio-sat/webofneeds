@@ -24,7 +24,6 @@ public class TensorMatchingData {
     private static final Logger logger = LoggerFactory.getLogger(TensorMatchingData.class);
 
     private static final int MAX_DIMENSION = 1000000;
-    private static final int MAX_SLICES = 20;
 
     public static final String NEED_PREFIX = "Need: ";
     public static final String ATTRIBUTE_PREFIX = "Attr: ";
@@ -41,7 +40,7 @@ public class TensorMatchingData {
 
     public TensorMatchingData() {
 
-        tensor = new ThirdOrderSparseTensor(MAX_DIMENSION, MAX_DIMENSION, MAX_SLICES);
+        tensor = new ThirdOrderSparseTensor(MAX_DIMENSION, MAX_DIMENSION);
         needs = new ArrayList<>();
         attributes = new ArrayList<>();
         slices = new ArrayList<>();
@@ -172,9 +171,6 @@ public class TensorMatchingData {
 
     private int addSlice(String slice) {
         if (!slices.contains(slice)) {
-            if (slices.size() >= MAX_SLICES) {
-                throw new IllegalStateException("max number of tensor slices reached!");
-            }
             slices.add(slice);
         }
         return slices.indexOf(slice);
@@ -224,7 +220,7 @@ public class TensorMatchingData {
     protected ThirdOrderSparseTensor createFinalTensor() {
 
         int dim = getNeeds().size() + getAttributes().size();
-        tensor.resize(dim, dim, slices.size());
+        tensor.resize(dim, dim);
         return tensor;
     }
 
@@ -273,6 +269,18 @@ public class TensorMatchingData {
         return continuousList;
     }
 
+    public List<String> getSlices() {
+        ArrayList<String> continuousList = new ArrayList<String>();
+        continuousList.addAll(slices);
+        return continuousList;
+    }
+
+    public int getNumberOfConnections() {
+
+        int connectionSlice = getSliceIndex(CONNECTION_SLICE_NAME);
+        return (connectionSlice != -1) ? (getTensor().getNonZeroEntries(connectionSlice) / 2) : 0;
+    }
+
     /**
      * Same as {@link #writeCleanedOutputFiles(String)}  but removes empty needs and their connections before writing
      * the tensor
@@ -287,19 +295,15 @@ public class TensorMatchingData {
             throw new IllegalStateException("Tensor must filled with data before it can be written");
         }
 
-        int numNeedsBefore = getNeeds().size();
-        int numAttributesBefore = getAttributes().size();
-        int numConnectionsBefore = getTensor().getNonZeroEntries(getSliceIndex(CONNECTION_SLICE_NAME)) / 2;
         logger.info("remove empty needs and connections ...");
         TensorMatchingData cleanedMatchingData = removeEmptyNeedsAndConnections();
 
-        int numConnectionsAfter = cleanedMatchingData.getTensor().getNonZeroEntries(cleanedMatchingData.getSliceIndex(CONNECTION_SLICE_NAME)) / 2;
-        logger.info("Number of needs before cleaning: " + numNeedsBefore);
+        logger.info("Number of needs before cleaning: " + getNeeds().size());
         logger.info("Number of needs after cleaning: " + cleanedMatchingData.getNeeds().size());
-        logger.info("Number of attributes before cleaning: " + numAttributesBefore);
+        logger.info("Number of attributes before cleaning: " + getAttributes().size());
         logger.info("Number of attributes after cleaning: " + cleanedMatchingData.getAttributes().size());
-        logger.info("Number of connections before cleaning: " + numConnectionsBefore);
-        logger.info("Number of connections after cleaning: " + numConnectionsAfter);
+        logger.info("Number of connections before cleaning: " + getNumberOfConnections());
+        logger.info("Number of connections after cleaning: " + cleanedMatchingData.getNumberOfConnections());
         cleanedMatchingData.writeOutputFiles(folder);
 
         return cleanedMatchingData;
