@@ -1,6 +1,7 @@
 # Requirements
 
-Maven version > 3.2 is needed for the build
+* Maven version > 3.2
+* JDK version > 1.8  
 
 # Building
 
