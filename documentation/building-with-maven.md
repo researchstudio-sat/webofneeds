@@ -1,3 +1,7 @@
+# Requirements
+
+Maven version > 3.2 is needed for the build
+
 # Building
 
 To build the project, go to the webofneeds folder and type
