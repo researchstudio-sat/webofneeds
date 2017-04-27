@@ -1,10 +1,3 @@
-#############################################################################################################
-# Deployment descriptions:
-# This script deploys several docker containers using docker-compose of the won application to the servers
-# satsrv04, satsrv05 and satsrv06. The details of the container deployment can be found in the docker-compose
-# files in the folder ./deploy/int_satsrv04 (int_satsrv05, int_satsrv06).
-##############################################################################################################
-
 # fail the whole script if one command fails
 set -e
 
@@ -15,64 +8,45 @@ export base_folder=/usr/share/webofneeds/int
 if [ "$remove_all_data" = true ] ; then
 
   echo generating new certificates! Old files will be deleted!
-  ssh root@satsrv04 rm -rf $base_folder/won-server-certs
-  ssh root@satsrv05 rm -rf $base_folder/won-server-certs
-  ssh root@satsrv06 rm -rf $base_folder/won-server-certs
-  ssh root@satsrv04 rm -rf $base_folder/won-client-certs
-  ssh root@satsrv05 rm -rf $base_folder/won-client-certs
-  ssh root@satsrv06 rm -rf $base_folder/won-client-certs
-  rm -rf $base_folder/won-server-certs
+  ssh root@satvm05 rm -rf $base_folder/won-server-certs1
+  ssh root@satvm05 rm -rf $base_folder/won-server-certs2
+  ssh root@satvm05 rm -rf $base_folder/won-client-certs
 
-  echo delete postgres, bigdata, mongodb and solr databases!
-  ssh root@satsrv04 rm -rf $base_folder/postgres/data
-  ssh root@satsrv05 rm -rf $base_folder/postgres/data
-  ssh root@satsrv06 rm -rf $base_folder/bigdata/data
-  ssh root@satsrv06 rm -rf $base_folder/solr/won/data
-  ssh root@satsrv06 rm -rf $base_folder/solr/wontest/data
-  ssh root@satsrv06 rm -rf $base_folder/mongodb/data
+  echo delete postgres, bigdata and solr databases!
+  ssh root@satvm05 rm -rf $base_folder/postgres1/data
+  ssh root@satvm05 rm -rf $base_folder/postgres2/data
+  ssh root@satvm05 rm -rf $base_folder/bigdata/data
+  ssh root@satvm05 rm -rf $base_folder/solr/won/data
+  ssh root@satvm05 rm -rf $base_folder/solr/wontest/data
+  ssh root@satvm05 rm -rf $base_folder/mongodb/data
 fi
 
-ssh root@satsrv04 mkdir -p $base_folder/won-server-certs
-ssh root@satsrv05 mkdir -p $base_folder/won-server-certs
-ssh root@satsrv06 mkdir -p $base_folder/won-server-certs
-ssh root@satsrv04 mkdir -p $base_folder/won-client-certs
-ssh root@satsrv05 mkdir -p $base_folder/won-client-certs
-ssh root@satsrv06 mkdir -p $base_folder/won-client-certs
+ssh root@satvm05 mkdir -p $base_folder/won-server-certs1
+ssh root@satvm05 mkdir -p $base_folder/won-server-certs2
+ssh root@satvm05 mkdir -p $base_folder/won-client-certs
 
-# copy the openssl.conf file to the server where the certificates are generated
-ssh root@satsrv05 mkdir -p $base_folder/won-server-certs
-scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl-int.conf root@satsrv05:$base_folder/openssl-int.conf
+# create a password file for the certificates, variable ${won_certificate_passwd} must be set from outside the script
+# note: name of the password file is fixed in won-docker/image/nginx/nginx-int.conf
+echo ${won_certificate_passwd} > won_certificate_passwd_file
+ssh root@satvm05 mkdir -p $base_folder/won-server-certs1
+scp won_certificate_passwd_file root@satvm05:$base_folder/won-server-certs1/won_certificate_passwd_file
+ssh root@satvm05 mkdir -p $base_folder/won-server-certs2
+scp won_certificate_passwd_file root@satvm05:$base_folder/won-server-certs2/won_certificate_passwd_file
+rm won_certificate_passwd_file
 
-echo run docker containers using docker-compose on satsrv04:
-cd deploy/int_satsrv04
-docker-compose -H satsrv04:2375 down
-docker-compose -H satsrv04:2375 up --build -d
-
-echo run docker containers using docker-compose on satsrv05:
-cd ../int_satsrv05
-docker-compose -H satsrv05:2375 down
-docker-compose -H satsrv05:2375 up --build -d
-
-# get the certificates and create a password file (for the nginx) to read the certificate
-# the certificates must have been created on satsrv05 (in docker-compose file) before it can be used on proxy satsrv06
-ssh root@satsrv06 mkdir -p $base_folder/won-server-certs
-mkdir -p ~/won-server-certs
-rm -f ~/won-server-certs/*
-echo ${won_certificate_passwd} > ~/won-server-certs/won_certificate_passwd_file
-rsync root@satsrv05:$base_folder/won-server-certs/* ~/won-server-certs/
-rsync ~/won-server-certs/* root@satsrv06:$base_folder/won-server-certs/
+# create the solr data directories (if not available yet) with full rights for every user.
+# This is done so that the directory on the host can be written by the solr user from inside the container
+ssh root@satvm05 mkdir -p $base_folder/solr/won/data
+ssh root@satvm05 mkdir -p $base_folder/solr/wontest/data
+ssh root@satvm05 chmod 777 $base_folder/solr/won/data
+ssh root@satvm05 chmod 777 $base_folder/solr/wontest/data
 
 # copy the nginx.conf file to the proxy server
-scp $WORKSPACE/webofneeds/won-docker/image/nginx/nginx-int.conf root@satsrv06:$base_folder/nginx-int.conf
+rsync $WORKSPACE/webofneeds/won-docker/image/nginx/nginx-int.conf root@satvm05:$base_folder/nginx-int.conf
 
-echo run docker containers using docker-compose on satsrv06:
-cd ../int_satsrv06
-docker -H satsrv06:2375 pull webofneeds/bigdata
-docker-compose -H satsrv06:2375 down
-docker-compose -H satsrv06:2375 up --build -d
-
-
-
-
-
-
+# TODO: change the explicit passing of tls params when docker-compose bug is fixed: https://github.com/docker/compose/issues/1427
+echo run docker containers using docker-compose on satvm05
+docker --tlsverify -H satvm05.researchstudio.at:2376 pull webofneeds/bigdata
+cd deploy/int_satvm05
+docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm05.researchstudio.at:2376 down
+docker-compose --tlsverify --tlscacert=/var/lib/jenkins/.docker/ca.pem --tlscert=/var/lib/jenkins/.docker/cert.pem --tlskey=/var/lib/jenkins/.docker/key.pem -H satvm05.researchstudio.at:2376 up --build -d

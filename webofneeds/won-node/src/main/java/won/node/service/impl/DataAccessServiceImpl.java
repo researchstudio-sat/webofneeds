@@ -47,8 +47,9 @@ public class DataAccessServiceImpl implements won.node.service.DataAccessService
   protected DatasetHolderRepository datasetHolderRepository;
 
 
+
   /**
-   * Creates a new Connection object or returns an existing one.
+   * Creates a new Connection object.
    *
    * @param connectionURI
    * @param needURI

@@ -1,3 +1,10 @@
+# Requirements
+
+* Maven version > 3.2
+* JDK version > 1.8  
+
+# Building
+
 To build the project, go to the webofneeds folder and type
 
 `mvn install`
@@ -35,7 +42,7 @@ In addition to the profiles mentioned above, there are several profiles availabl
 * `skip-tests` - skips the tests
 
 # Running the services
-Follow the guide [Single-Machine-Setup-for-Developers](../Single-Machine-Setup-for-Developers).
+Follow the guide in the [`won-docker README`](../webofneeds/won-docker/README.md).
 
 
 # Speeding up server startup

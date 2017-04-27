@@ -19,6 +19,7 @@ ADD ./conf ${WON_CONFIG_DIR}
 ADD ./python /usr/src/matcher-rescal/python
 ENV matcher.rescal.pythonScriptDir=/usr/src/matcher-rescal/python
 ENV matcher.rescal.executionDir=/usr/src/matcher-rescal/execution
+RUN mkdir -p /usr/src/matcher-rescal/execution/output
 
 # start rescal matcher
 WORKDIR /usr/src/matcher-rescal
