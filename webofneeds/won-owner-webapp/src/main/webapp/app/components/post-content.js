@@ -21,10 +21,10 @@ function genComponentConf() {
     let template = `
         <div
           class="pc__text"
-          ng-show="won.needContent.getIn(['won:hasLocation', 's:name'])">
+          ng-show="self.needContent.getIn(['won:hasLocation', 's:name'])">
             <img class="pc__icon"
               src="generated/icon-sprite.svg#ico16_indicator_location"/>
-            <span>{{ won.needContent.getIn(['won:hasLocation', 's:name']) }}</span>
+            <span>{{ self.needContent.getIn(['won:hasLocation', 's:name']) }}</span>
         </div>
       <!--
       <div class="pc__images" ng-show="self.need.get('images')">
