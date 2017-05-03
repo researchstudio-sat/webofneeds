@@ -31,6 +31,7 @@ import {
     inferLegacyNeedType,
     selectTimestamp,
     connectionLastUpdatedAt,
+    connect2Redux,
 } from '../won-utils';
 
 const serviceDependencies = ['$scope', '$interval', '$ngRedux'];
@@ -94,8 +95,7 @@ function genComponentConf() {
                     lastUpdated,
                 }
             }
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
+            connect2Redux(selectFromState, actionCreators, ['self.connectionUri'], this);
         }
 
         getTextForConnectionState(state){

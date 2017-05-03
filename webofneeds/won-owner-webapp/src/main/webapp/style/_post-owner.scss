@@ -13,7 +13,6 @@
   .owner__messages{
     flex-grow: 1;
     max-width: 35rem;
-    margin: 0.5rem;
   }
 
   @media (max-width: $responsivenessBreakPoint){
@@ -24,7 +23,7 @@
 
   .owner__openconversation{
     background: white;
-    border: 0.1rem solid $won-line-gray;
+    border: $thinGrayBorder;
   }
 }
 

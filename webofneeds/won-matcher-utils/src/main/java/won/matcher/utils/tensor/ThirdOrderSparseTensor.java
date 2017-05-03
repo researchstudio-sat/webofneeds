@@ -26,93 +26,94 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Sparse third order tensor based on la4j implementation of sparse matrices.
- *
+ * <p/>
  * User: hfriedrich
  * Date: 09.07.2014
  */
-public class ThirdOrderSparseTensor
-{
-  private CCSMatrix[] slices;
-  private int[] dims;
+public class ThirdOrderSparseTensor {
 
-  public ThirdOrderSparseTensor(int dimX1, int dimX2, int dimX3) {
+    //private CCSMatrix[] slices;
 
-    dims = null;
-    slices = null;
-    resize(dimX1, dimX2, dimX3);
-  }
+    private ArrayList<CCSMatrix> slices;
+    private int[] dims;
 
-  public void resize(int dimX1, int dimX2, int dimX3) {
+    public ThirdOrderSparseTensor(int dimX1, int dimX2) {
 
-    CCSMatrix[] newSlices = new CCSMatrix[dimX3];
-    for (int x3 = 0; x3 < dimX3; x3++) {
-      if (dims != null && x3 < dims[2]) {
-        newSlices[x3] = slices[x3].copyOfShape(dimX1, dimX2).to(Matrices.CCS);
-      } else {
-        newSlices[x3] = CCSMatrix.zero(dimX1, dimX2);
-      }
-    }
-    dims = new int[]{dimX1, dimX2, dimX3};
-    slices = newSlices;
-  }
-
-  public void setEntry(double value, int x1, int x2, int x3) {
-    slices[x3].set(x1, x2, value);
-  }
-
-  public double getEntry(int x1, int x2, int x3) {
-    return slices[x3].get(x1, x2);
-  }
-
-  public int getNonZeroEntries(int dimX3) {
-    return slices[dimX3].cardinality();
-  }
-
-  public int[] getDimensions() {
-    return dims;
-  }
-
-  public void writeSliceToFile(String fileName, int slice) throws IOException {
-
-    // write the mtx file (remove the column-major specification cause python mm does not read it)
-    OutputStream os = new FileOutputStream(new File(fileName));
-    NumberFormat format = DecimalFormat.getInstance(Locale.US);
-    os.write(slices[slice].toMatrixMarket(format).replace("column-major", "").getBytes());
-  }
-
-  public Collection<Integer> getNonZeroIndicesOfRow(int x1, int x3) {
-    NonZeroVectorProcedure nz = new NonZeroVectorProcedure();
-    slices[x3].eachNonZeroInRow(x1, nz);
-    return nz.getNonZeroIndices();
-  }
-
-  public boolean hasNonZeroEntryInRow(int x1, int x3) {
-    return (slices[x3].getRow(x1).max() > 0.0d);
-  }
-
-  // class used to return all non-zero indices of a Vector
-  private class NonZeroVectorProcedure implements VectorProcedure
-  {
-    private List<Integer> nonZeroIndices;
-
-    public NonZeroVectorProcedure() {
-      nonZeroIndices = new LinkedList<>();
+        dims = null;
+        slices = new ArrayList<>();
+        resize(dimX1, dimX2);
     }
 
-    @Override
-    public void apply(final int i, final double value) {
-      nonZeroIndices.add(i);
+    public void resize(int dimX1, int dimX2) {
+
+        for (int x3 = 0; x3 < slices.size(); x3++) {
+            if (slices.get(x3) != null) {
+                slices.set(x3, slices.get(x3).copyOfShape(dimX1, dimX2).to(Matrices.CCS));
+            }
+        }
+        dims = new int[]{dimX1, dimX2, slices.size()};
     }
 
-    public Collection<Integer> getNonZeroIndices() {
-      return nonZeroIndices;
+    public void setEntry(double value, int x1, int x2, int x3) {
+
+        if (slices.size() <= x3) {
+            for (int i = slices.size(); i <= x3; i++) {
+                slices.add(i, CCSMatrix.zero(dims[0], dims[1]));
+            }
+            dims = new int[]{dims[0], dims[1], slices.size()};
+        }
+        slices.get(x3).set(x1, x2, value);
     }
-  }
+
+    public double getEntry(int x1, int x2, int x3) {
+        return slices.get(x3).get(x1, x2);
+    }
+
+    public int getNonZeroEntries(int dimX3) {
+        return slices.get(dimX3).cardinality();
+    }
+
+    public int[] getDimensions() {
+        return dims;
+    }
+
+    public void writeSliceToFile(String fileName, int slice) throws IOException {
+
+        // write the mtx file (remove the column-major specification cause python mm does not read it)
+        OutputStream os = new FileOutputStream(new File(fileName));
+        NumberFormat format = DecimalFormat.getInstance(Locale.US);
+        os.write(slices.get(slice).toMatrixMarket(format).replace("column-major", "").getBytes());
+    }
+
+    public Collection<Integer> getNonZeroIndicesOfRow(int x1, int x3) {
+        NonZeroVectorProcedure nz = new NonZeroVectorProcedure();
+        slices.get(x3).eachNonZeroInRow(x1, nz);
+        return nz.getNonZeroIndices();
+    }
+
+    public boolean hasNonZeroEntryInRow(int x1, int x3) {
+        return (slices.get(x3).getRow(x1).max() > 0.0d);
+    }
+
+    // class used to return all non-zero indices of a Vector
+    private class NonZeroVectorProcedure implements VectorProcedure {
+        private List<Integer> nonZeroIndices;
+
+        public NonZeroVectorProcedure() {
+            nonZeroIndices = new LinkedList<>();
+        }
+
+        @Override
+        public void apply(final int i, final double value) {
+            nonZeroIndices.add(i);
+        }
+
+        public Collection<Integer> getNonZeroIndices() {
+            return nonZeroIndices;
+        }
+    }
 }

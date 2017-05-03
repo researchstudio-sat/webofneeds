@@ -5,7 +5,7 @@
 
 won-feed-item {
   display: block;
-  border: 0.1rem solid $won-line-gray;
+  border: $thinGrayBorder;
   margin-bottom: 1rem;
 
   .fi {
@@ -14,7 +14,7 @@ won-feed-item {
     flex-wrap: wrap;
     justify-content: space-between;
     padding: 0.5rem;
-    border-bottom: 0.1rem solid $won-line-gray;
+    border-bottom: $thinGrayBorder;
 
     a {
       text-decoration: none;
@@ -111,13 +111,13 @@ won-feed-item {
       margin: 0.5rem 0.5rem 0.5rem (1.5rem + $postIconSize);
     }
 
-    @include speech-bubble-top(white, $won-line-gray, 0.625rem, $thinBorder, 5rem);
+    @include speech-bubble-top(white, $won-line-gray, 0.625rem, $thinBorderWidth, 5rem);
   }
 
   .fi__footer {
     background: white;
     padding: 0.5rem;
-    border-top: 0.1rem solid $won-line-gray;
+    border-top: $thinGrayBorder;
     font-size: $smallFontSize;
 
     a {

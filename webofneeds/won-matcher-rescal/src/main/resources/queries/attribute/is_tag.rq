@@ -1,0 +1,16 @@
+prefix won: <http://purl.org/webofneeds/model#>
+prefix rdfs: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix dc: <http://purl.org/dc/elements/1.1/>
+
+SELECT DISTINCT ?slice ?need ?value WHERE {
+    BIND('is_tag' as ?slice)
+    ?need rdfs:type won:Need.
+    ?need won:crawlStatus ?crawlStatus.
+    ?need won:crawlDate ?date.
+    ?need won:isInState won:Active.
+    ?need won:is/won:hasTag ?value.
+    OPTIONAL {?needUri won:hasFlag ?flag}.
+    FILTER (!bound(?flag) || (?flag != won:DoNotMatch && ?flag != won:UsedForTesting))
+    FILTER (?date >= ?from && ?date < ?to)  # bind variables ?from and ?to here
+    FILTER (?crawlStatus = 'DONE' || ?crawlStatus = 'SAVE')
+} 

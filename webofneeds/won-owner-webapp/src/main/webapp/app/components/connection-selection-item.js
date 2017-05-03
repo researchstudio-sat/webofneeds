@@ -18,6 +18,7 @@ import {
     selectOpenPostUri,
     selectLastUpdatedPerConnection,
     selectLastUpdateTime,
+    selectUnreadCountsByConnectionAndType,
 } from '../selectors';
 
 import {
@@ -25,78 +26,40 @@ import {
     seeksOrIs,
     inferLegacyNeedType,
 } from '../won-utils'
+import postHeaderModule from './post-header';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
       <div
-      class="conn__item"
+      class="conn__inner"
       ng-class="self.isOpen() ? 'selected' : ''">
-         <!--TODO request.titleImgSrc isn't defined -->
-        <won-square-image
-          src="request.titleImgSrc"
-          class="clickable"
-          title="self.theirNeedContent.get('dc:title')"
-          uri="self.theirNeed.get('@id')"
+        <won-post-header
+          need-uri="self.theirNeed.get('@id')"
+          timestamp="self.lastUpdateTimestamp"
           ng-click="self.setOpen()">
-        </won-square-image>
-        <div class="conn__item__description">
-          <div class="conn__item__description__topline">
-            <div
-              class="conn__item__description__topline__title clickable"
-              ng-click="self.setOpen()">
-              {{ self.theirNeedContent.get('dc:title') }}
-            </div>
-            <div class="conn__item__description__topline__date">
-              {{ self.lastUpdated }}
-            </div>
-            <img
-              class="conn__item__description__topline__icon clickable"
-              src="generated/icon-sprite.svg#ico_settings"
-              ng-show="!self.settingsOpen && self.isOpen()"
-              ng-click="self.settingsOpen = true">
-            <div class="ntb__contextmenu contextmenu"
-              ng-show="self.settingsOpen && self.isOpen()">
-              <div class="content">
-                <div class="topline">
-                  <img
-                    class="contextmenu__icon clickable"
-                    src="generated/icon-sprite.svg#ico_settings"
-                    ng-click="self.settingsOpen = false">
-                </div>
-                <button
-                  class="won-button--filled thin red"
-                  ng-click="self.closeConnection()">
-                    Close Connection
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="conn__item__description__subtitle">
-            <!--
-            <span class="conn__item__description__subtitle__group" ng-show="request.group">
-              <img
-                src="generated/icon-sprite.svg#ico36_group"
-                class="mil__item__description__subtitle__group__icon">
-              {{ self.allByConnections.getIn([connectionUri, 'group']) }}
-              <span class="mil__item__description__subtitle__group__dash"> &ndash; </span>
-            </span>
-            -->
-            <span class="conn__item__description__subtitle__type">
-              {{ self.labels.type[ self.theirNeedType ] }}
-            </span>
-          </div>
-          <!--
-          <div class="conn__item__description__message">
-            <span
-              class="conn__item__description__message__indicator"
-              ng-click="self.setOpen(connectionUri)"
-              ng-show="!self.read(connectionUri))"/>
-              <!-- TODO self.read isn't defined
-            {{ self.allByConnections.getIn([connectionUri, 'lastEvent', 'msg']) }}
-          </div>
-          -->
+        </won-post-header>
+
+        <div class="conn__unreadCount">
+          {{ self.unreadCount }}
         </div>
+        <img
+          class="conn__icon clickable"
+          src="generated/icon-sprite.svg#ico_settings_grey"
+          ng-click="self.settingsOpen = true">
+      </div>
+
+      <div class="conn__contextmenu"
+        ng-show="self.settingsOpen">
+          <img
+            class="conn__icon clickable"
+            src="generated/icon-sprite.svg#ico_settings_hi"
+            ng-click="self.settingsOpen = false">
+          <button
+            class="won-button--filled thin red"
+            ng-click="self.closeConnection()">
+              Close Connection
+          </button>
       </div>
     `;
 
@@ -107,17 +70,25 @@ function genComponentConf() {
             this.labels = labels;
             //this.settingsOpen = false;
 
+            this.cnctState2MessageType = won.cnctState2MessageType;
+
             const self = this;
 
             const selectFromState = (state)=> {
 
                 const connectionData = selectAllByConnections(state).get(this.connectionUri);
+                const connectionUri = connectionData && connectionData.getIn(['connection', 'uri']);
                 const ownNeed = connectionData && connectionData.get('ownNeed');
                 const theirNeed = connectionData && connectionData.get('remoteNeed');
 
                 const lastStateUpdate = selectLastUpdateTime(state);
                 const lastUpdatedPerConnection = selectLastUpdatedPerConnection(state);
 
+                const connectionType = connectionData && connectionData
+                    .getIn(['connection','hasConnectionState']);
+
+                const unreadCounts = selectUnreadCountsByConnectionAndType(state);
+                const messageType = won.cnctState2MessageType[connectionType];
                 return {
                     openConnectionUri: selectOpenConnectionUri(state),
 
@@ -132,11 +103,15 @@ function genComponentConf() {
                         lastStateUpdate,
                         theirNeed.get('dct:created')
                     ),
+                    lastUpdateTimestamp: lastUpdatedPerConnection.get(connectionUri),
                     lastUpdated: lastUpdatedPerConnection &&
                         relativeTime(
                             lastStateUpdate,
-                            lastUpdatedPerConnection.get(this.connectionUri)
+                            lastUpdatedPerConnection.get(connectionUri)
                         ),
+
+                    unreadCount: unreadCounts && unreadCounts
+                        .getIn([connectionUri, messageType])
                 }
             }
 
@@ -148,7 +123,7 @@ function genComponentConf() {
         }
 
         setOpen() {
-            this.selectedConnection({connectionUri: this.connectionUri}); //trigger callback with scope-object
+            this.onSelectedConnection({connectionUri: this.connectionUri}); //trigger callback with scope-object
             //TODO either publish a dom-event as well; or directly call the route-change
         }
 
@@ -167,13 +142,15 @@ function genComponentConf() {
             connectionUri: "=",
             /*
              * Usage:
-             *  selected-connection="myCallback(connectionUri)"
+             *  on-selected-connection="myCallback(connectionUri)"
              */
-            selectedConnection: "&"
+            onSelectedConnection: "&"
         },
         template: template
     }
 }
-export default angular.module('won.owner.components.connectionSelectionItem', [])
+export default angular.module('won.owner.components.connectionSelectionItem', [
+        postHeaderModule,
+    ])
     .directive('wonConnectionSelectionItem', genComponentConf)
     .name;

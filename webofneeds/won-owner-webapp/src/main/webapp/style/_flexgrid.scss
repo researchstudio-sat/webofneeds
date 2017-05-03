@@ -69,7 +69,7 @@ won-flex-grid {
     }
 
     .signup {
-      border-right: 0.1rem solid $won-light-gray;
+      border-right: $thinBorderWidth solid $won-light-gray;
     }
 
     @media screen and (max-width: 20rem) {

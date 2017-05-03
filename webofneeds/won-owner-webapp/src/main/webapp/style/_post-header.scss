@@ -4,14 +4,15 @@
 won-post-header {
   color: black;
   flex-grow: 1;
-  padding: 0.5rem;
+  //padding: 0.5rem;
 
   display: flex;
   flex-direction: row;
 
-  @include square-image($feedIconSize, 0, 0.5rem, 0, 0);
+  @include square-image($postIconSize, 0, 0.5rem, 0, 0);
+
   won-square-image .image{
-    border: 0.1rem solid $won-light-gray;
+    border: $thinBorderWidth solid $won-light-gray;
   }
 
   .ph__right {

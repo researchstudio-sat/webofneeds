@@ -34,8 +34,10 @@ $smallFontSize: 0.75rem;
 
 //$formInputHeight: 4.19rem;
 $formInputHeight: 3.69rem;
-$thinBorder: 0.0625rem; /* 1px @ 100% */
-$boldBorder: 0.1875rem; /* 3px @ 100% */
+$thinBorderWidth: 0.0625rem; /* 1px @ 100% */
+$boldBorderWidth: 0.1875rem; /* 3px @ 100% */
+$thinGrayBorder: $thinBorderWidth solid $won-line-gray;
+$thinRedBorder: $thinBorderWidth solid $won-red;
 
 @mixin carretSized { //the small down-arrow
   /*

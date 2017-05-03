@@ -2,11 +2,11 @@
 @import 'positioning-utils';
 
 %won-extended-gallery__frame {
-  border: 0.1rem solid $won-line-gray;
+  border: $thinGrayBorder;
   position: relative;
 
   &:hover {
-    border: 0.1rem solid $won-red;
+    border: $thinRedBorder;
   }
 
   > img {
@@ -75,13 +75,13 @@ won-extended-gallery {
 
     &__more{
       @include fixed-square($postIconSize);
-      border: 0.1rem solid $won-line-gray;
+      border: $thinGrayBorder;
       display: flex;
       align-items: center;
       justify-content: center;
 
       &:hover {
-        border: 0.1rem solid $won-red;
+        border: $thinRedBorder;
       }
 
       span {

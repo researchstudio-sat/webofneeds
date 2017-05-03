@@ -838,6 +838,12 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                     undefined,
             }
         })
+        .then(response => {
+            if (response.status === 200)
+                return response;
+            else
+                throw new Exception(`${response.status} - ${response.statusText}`);
+        })
         .then(dataset =>
             dataset.json())
         .then( dataset =>

@@ -303,6 +303,17 @@
     won.UNREAD.GROUP.BYNEED="byNeed";
 
 
+    /**
+     * type of latest message for a connection in a given state.
+     */
+    won.cnctState2MessageType = Object.freeze({
+        [won.WON.Suggested]: won.WONMSG.hintMessage,
+        [won.WON.RequestReceived]: won.WONMSG.connectMessage,
+        [won.WON.RequestSent]: won.WONMSG.connectSentMessage,
+        [won.WON.Connected]: won.WONMSG.connectionMessage,
+        [won.WON.Closed]: won.WONMSG.closeMessage,
+    });
+
     won.messageType2EventType = {
         [won.WONMSG.hintMessageCompacted] :  won.EVENT.HINT_RECEIVED,
         [won.WONMSG.connectMessageCompacted] :  won.EVENT.CONNECT_RECEIVED,

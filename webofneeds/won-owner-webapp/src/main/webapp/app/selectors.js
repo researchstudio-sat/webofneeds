@@ -128,6 +128,24 @@ function groupByType(events) {
     )
 }
 
+export const selectUnreadEventsByConnectionAndType = createSelector(
+    selectUnreadEvents,
+    unreadEvents => unreadEvents
+        .groupBy(e =>  e.get('hasReceiver')) // we're only interested in new message received (we know the ones we send)
+        .map(groupByType)
+);
+
+/**
+ * @param {object} state
+ * @return {object} event counts for each connection. access via
+ *      `unreadCounts.getIn([cnctUri, eventType])`, e.g.:
+ *      `unreadCounts.getIn(['http://example.org/won/resource/connection/1234', won.EVENT.HINT_RECEIVED])`
+ */
+export const selectUnreadCountsByConnectionAndType = createSelector(
+    selectUnreadEventsByConnectionAndType,
+    unreadEvents => unreadEvents.map(eventsByType => eventsByType.map(events => events.size))
+);
+
 /**
  * @param {object} state
  * @return {object} event counts for each need. access via
