@@ -5,13 +5,15 @@
 
 import angular from 'angular';
 import overviewTitleBarModule from '../overview-title-bar';
-import requestItemLineModule from '../request-item-line';
 import openRequestModule from '../open-request';
 import { attach,mapToMatches } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
 import { selectAllByConnections } from '../../selectors';
-const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 
+import connectionsOverviewModule from  '../connections-overview';
+
+
+const serviceDependencies = ['$q', '$ngRedux', '$scope'];
 class SentRequestsController {
     constructor() {
         attach(this, serviceDependencies, arguments);
@@ -35,6 +37,7 @@ class SentRequestsController {
                                 return true
                             }
                         }),
+                    /*
                     sentRequestsOfNeed: mapToMatches(Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
                         .filter(conn=> {
@@ -42,6 +45,7 @@ class SentRequestsController {
                                 return true
                             }
                         }))
+                        */
                 };
             }else{
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
@@ -55,6 +59,7 @@ class SentRequestsController {
                                 return true
                             }
                         }),
+                    /*
                     sentRequestsOfNeed: mapToMatches(Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
                         .filter(conn=> {
@@ -62,6 +67,7 @@ class SentRequestsController {
                                 return true
                             }
                         }))
+                        */
                 };
             }
         }
@@ -70,14 +76,17 @@ class SentRequestsController {
         //  this.loadMatches();
         this.$scope.$on('$destroy', disconnect);
     }
+    selectedConnection(connectionUri) {
+        this.router__stateGo('overviewSentRequests', {connectionUri});
+    }
 }
 
 SentRequestsController.$inject = [];
 
 export default angular.module('won.owner.components.overviewSentRequests', [
         overviewTitleBarModule,
-        requestItemLineModule,
-        openRequestModule
+        openRequestModule,
+        connectionsOverviewModule,
     ])
     .controller('OverviewSentRequestsController', [...serviceDependencies,SentRequestsController])
     .name;

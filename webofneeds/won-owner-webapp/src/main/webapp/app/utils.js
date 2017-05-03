@@ -248,12 +248,13 @@ export function mapToMatches(connections){
     if(connections){
 
         Object.keys(connections).forEach(function(key){
+            const needUri = connections[key].ownNeed['@id'];
 
-            if(!needMap[connections[key].ownNeed['@id']]){
+            if(!needMap[needUri]){
                 let connectionsArr = [connections[key]]
-                needMap[connections[key].ownNeed['@id']]=connectionsArr
+                needMap[needUri]=connectionsArr
             }else{
-                needMap[connections[key].ownNeed['@id']].push(connections[key])
+                needMap[needUri].push(connections[key])
             }
         }.bind(this))
     }
@@ -685,4 +686,35 @@ export function getIn(obj, path) {
 
 export function contains(arr, el) {
     return arr.indexOf(el) > 0;
+}
+
+/**
+ * zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
+ * e.g. zipWith((x,y)=>x-y, [8,9,3], [3,2]) // => [5,7]
+ * @param f
+ * @param xs
+ * @param ys
+ */
+export function zipWith(f, xs, ys) {
+    const zs = new Array(Math.min(xs.length, ys.length));
+    for(let i = 0; i < xs.length && i < ys.length; i++) {
+        zs[i] = f(xs[i], ys[i]);
+    }
+    return zs;
+}
+
+export function all(boolArr) {
+    return boolArr.reduce((b1, b2) => b1 && b2, true);
+}
+
+/**
+ * compares two arrays and checks if their contents are equal
+ */
+export function arrEq(xs, ys) {
+    return xs.length === ys.length &&
+        all(
+            //elementwise comparison
+            zipWith((x, y) => x === y, xs, ys)
+        );
+
 }

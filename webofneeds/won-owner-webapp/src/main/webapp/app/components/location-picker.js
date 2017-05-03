@@ -27,6 +27,7 @@ import {
 
 import {
     initLeaflet,
+    seeksOrIs,
 } from '../won-utils';
 
 const serviceDependencies = ['$scope', '$ngRedux', '$element', '$sce'];
@@ -80,9 +81,10 @@ function genComponentConf() {
                 const openDraft = selectOpenDraft(state);
                 const routerParams = selectRouterParams(state);
                 const ownNeeds = selectOwnNeeds(state);
-                const previousLocations = ownNeeds && ownNeeds.map(n =>
-                        n.getIn(['won:hasContent', 'won:hasContentDescription', 'won:hasLocation'])
-                    )
+                const previousLocations = ownNeeds && ownNeeds.map(need => {
+                        const content = seeksOrIs(need);
+                        return content.getIn('won:hasLocation');
+                    })
                     .filter(location => location) //remove entries from needs without locations
 
                     //eliminate duplicates in name

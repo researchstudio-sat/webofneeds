@@ -24,6 +24,8 @@ import {
     selectOpenConnection,
 } from '../selectors';
 import {
+    seeksOrIs,
+    inferLegacyNeedType,
     selectTimestamp,
     selectSortedChatMessages,
 } from '../won-utils'
@@ -39,7 +41,7 @@ function genComponentConf() {
                          src="generated/icon-sprite.svg#ico36_close"/>
                 </a>
                 <div class="pm__header__title">
-                    {{ self.connectionData.getIn(['remoteNeed', 'won:hasContent', 'dc:title']) }}
+                    {{ self.theirNeedContent.get('dc:title') }}
                 </div>
                 <!--div class="pm__header__options">
                     Options
@@ -65,10 +67,10 @@ function genComponentConf() {
                 ng-repeat="message in self.chatMessages"
                 ng-class="message.get('hasSenderNeed') == self.connectionData.getIn(['ownNeed', '@id']) ? 'right' : 'left'">
                     <won-square-image
-                        title="self.connectionData.getIn(['remoteNeed', 'won:hasContent', 'dc:title'])"
-                        src="self.connectionData.getIn(['remoteNeed', 'titleImgSrc'])"
-                        uri="self.connectionData.getIn(['remoteNeed', '@id'])"
-                        ng-show="message.get('hasSenderNeed') != self.connectionData.getIn(['ownNeed', '@id'])">
+                        title="self.theirNeedContent.get('dc:title')"
+                        src="self.theirNeedContent.get('TODOtitleImgSrc')"
+                        uri="self.theirNeed.get('@id')"
+                        ng-show="message.get('hasSenderNeed') != self.ownNeed.get('@id')">
                     </won-square-image>
                     <div class="pm__content__message__content">
                         <div class="pm__content__message__content__text">
@@ -84,8 +86,20 @@ function genComponentConf() {
                             class="pm__content__message__content__time">
                                 {{ message.get('humanReadableTimestamp') }}
                         </div>
-                        <a ng-show="self.debugmode && message.get('hasSenderNeed') == self.connectionData.getIn(['ownNeed', '@id'])" class="debuglink" target="_blank" href="/owner/rest/linked-data/?requester={{self.encodeParam(message.get('hasSenderNeed'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">[MSGDATA]</a>
-                        <a ng-show="self.debugmode && message.get('hasSenderNeed') != self.connectionData.getIn(['ownNeed', '@id'])" class="debuglink" target="_blank" href="/owner/rest/linked-data/?requester={{self.encodeParam(message.get('hasReceiverNeed'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">[MSGDATA]</a>
+                        <a
+                          ng-show="self.debugmode && message.get('hasSenderNeed') == self.ownNeed.get('@id')"
+                          class="debuglink"
+                          target="_blank"
+                          href="/owner/rest/linked-data/?requester={{self.encodeParam(message.get('hasSenderNeed'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">
+                            [MSGDATA]
+                        </a>
+                        <a
+                          ng-show="self.debugmode && message.get('hasSenderNeed') != self.ownNeed.get('@id')"
+                          class="debuglink"
+                          target="_blank"
+                          href="/owner/rest/linked-data/?requester={{self.encodeParam(message.get('hasReceiverNeed'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">
+                            [MSGDATA]
+                        </a>
                     </div>
             </div>
         </div>
@@ -134,16 +148,28 @@ function genComponentConf() {
                 });
 
 
+                const connectionData = selectAllByConnections(state).get(connectionUri);
+                const ownNeed = connectionData && connectionData.get('ownNeed');
+                const theirNeed = connectionData && connectionData.get('remoteNeed');
+
                 const chatMessages = selectSortedChatMessages(state);
                 return {
+                    connectionData,
                     connectionUri,
                     connection,
                     eventsLoaded,
                     lastUpdateTime: state.get('lastUpdateTime'),
-                    connectionData: selectAllByConnections(state).get(connectionUri),
                     chatMessages: chatMessages && chatMessages.toArray(), //toArray needed as ng-repeat won't work otherwise :|
                     state4dbg: state,
-                    debugmode: won.debugmode
+                    debugmode: won.debugmode,
+
+                    ownNeed,
+                    ownNeedType: ownNeed && inferLegacyNeedType(ownNeed),
+                    ownNeedContent: ownNeed && seeksOrIs(ownNeed),
+
+                    theirNeed,
+                    theirNeedType: theirNeed && inferLegacyNeedType(theirNeed),
+                    theirNeedContent: theirNeed && seeksOrIs(theirNeed),
                 }
             };
 

@@ -1,12 +1,13 @@
 ;
 
-import  won from '../won-es6';
+import won from '../won-es6';
 import angular from 'angular';
 import overviewTitleBarModule from './overview-title-bar';
 import matchesFlowItemModule from './matches-flow-item';
 import matchesGridItemModule from './matches-grid-item';
-import matchesListModule from './matches-list';
 import sendRequestModule from './send-request';
+import connectionsOverviewModule from './connections-overview';
+import connectionSelectionModule from './connection-selection';
 
 import { attach, mapToMatches, decodeUriComponentProperly} from '../utils';
 import { labels } from '../won-label-utils';
@@ -68,8 +69,17 @@ let template = `
             </won-matches-grid-item>
         </div>
         <div ng-if="self.hasMatches && self.layout === 'list'" class="omc__content__list">
-            <won-matches-list item="item">
-            </won-matches-list>
+            <won-connections-overview
+                ng-show="self.isOverview"
+                connection-type="::self.WON.Suggested"
+                on-selected-connection="self.selectedConnection(connectionUri)">
+            </won-connections-overview>
+
+            <won-connection-selection
+                ng-show="!self.isOverview"
+                connection-type="::self.WON.Suggested"
+                on-selected-connection="self.selectedConnection(connectionUri)">
+            </won-connection-selection>
         </div>
     </div>
     <div class="omc__sendrequest" ng-if="self.hasMatches && self.connection">
@@ -85,6 +95,8 @@ class Controller {
 
         window.omc4dbg = this;
 
+        this.WON = won.WON;
+        this.LAYOUT = LAYOUT;
         this.labels = labels;
 
         const selectFromState = (state) => {
@@ -115,7 +127,7 @@ class Controller {
             return {
                 isOverview,
                 layout,
-                LAYOUT,
+                //LAYOUT,
                 connection: state.getIn(['connections', connectionUri]),
                 matches: matchesByConnectionUri.toArray(),
                 hasMatches: matchesByConnectionUri.size > 0,
@@ -133,6 +145,13 @@ class Controller {
         )
     }
 
+    selectedConnection(connectionUri) {
+        if(this.isOverview) {
+            this.router__stateGo('overviewMatches', {connectionUri});
+        } else {
+            this.router__stateGo('post', {connectionUri});
+        }
+    }
 }
 Controller.$inject = serviceDependencies;
 
@@ -151,8 +170,9 @@ export default angular.module('won.owner.components.matches', [
         overviewTitleBarModule,
         matchesFlowItemModule,
         matchesGridItemModule,
-        matchesListModule,
-        sendRequestModule
+        sendRequestModule,
+        connectionsOverviewModule,
+        connectionSelectionModule,
     ])
     .directive('wonMatches', genComponentConf)
     //.controller('OverviewMatchesController', [...serviceDependencies,OverviewMatchesController])

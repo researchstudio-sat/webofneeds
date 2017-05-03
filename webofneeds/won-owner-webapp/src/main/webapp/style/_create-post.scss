@@ -6,7 +6,7 @@
 .create-post {
   hr {
     border: 0;
-    border-top: $thinBorder solid $won-line-gray;
+    border-top: $thinBorderWidth solid $won-line-gray;
     width: 100%;
   }
 
@@ -137,20 +137,20 @@ won-image-dropzone {
   .wid__dropzone--empty {
     @extend %wid__dropzone;
 
-    border: $boldBorder dashed $won-line-gray;
-    border-radius: $boldBorder;
+    border: $boldBorderWidth dashed $won-line-gray;
+    border-radius: $boldBorderWidth;
 
     background-color: white;
 
     .wid__dropzone__default-bg {
-      @include max-square($borderSize - 2 * $padding - 2 * $boldBorder);
+      @include max-square($borderSize - 2 * $padding - 2 * $boldBorderWidth);
     }
   }
 
   .wid__dropzone--filled {
     @extend %wid__dropzone;
 
-    border: $thinBorder solid $won-line-gray;
+    border: $thinBorderWidth solid $won-line-gray;
 
     .wid__dropzone__default-bg {
       display: none;

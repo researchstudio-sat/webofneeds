@@ -10,7 +10,7 @@ won-accordion {
   .accordion__element {
     display: table;
     border-spacing: 0.5rem;
-    border-top: 0.1rem solid $won-line-gray;
+    border-top: $thinGrayBorder;
 
     .header{
       display: table-cell;

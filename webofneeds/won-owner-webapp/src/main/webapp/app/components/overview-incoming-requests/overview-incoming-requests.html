@@ -18,13 +18,13 @@
         </div>
     </div>
     <div class="oir__requests" ng-class="{'hidden': self.connection !== undefined}">
-        <won-request-item-line
-                open="false"
-                item="item"
-                ng-repeat="(key,item) in self.incomingRequestsOfNeed">
-        </won-request-item-line>
+        <won-connections-overview
+            connection-type="::self.WON.RequestReceived"
+            on-selected-connection="self.selectedConnection(connectionUri)">
+        </won-connections-overview>
     </div>
-    <div class="oir__openrequest" ng-if="self.connection">
-        <won-open-request></won-open-request>
-    </div>
+    <won-open-request
+        class="oir__openrequest"
+        ng-if="self.connection">
+    </won-open-request>
 </main>

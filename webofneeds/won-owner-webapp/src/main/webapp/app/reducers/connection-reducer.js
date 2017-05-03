@@ -38,18 +38,6 @@ export default function(connections = initialState, action = {}) {
             var acceptConnectionUri = action.payload.events['msg:FromSystem'].hasReceiver;
             return connections.setIn([acceptConnectionUri, 'hasConnectionState'], won.WON.RequestReceived);
 
-        case actionTypes.needs.received:
-            const connectionUris = action.payload.affectedConnections
-            if (!connectionUris){
-                console.error("invalid or empty action.payload.affectedConnections: ", connectionUris)
-                return connections;
-            } else {
-                return connectionUris.reduce((updatedConnections, connectionUri) =>
-                    updatedConnections.setIn([connectionUri, 'hasConnectionState'], won.WON.Closed),
-                    connections
-                )
-            }
-
         case actionTypes.messages.connect.success:
             var connectionUri = action.payload.hasReceiver;
             return storeEventUris(connections, connectionUri, [action.payload.uri])
