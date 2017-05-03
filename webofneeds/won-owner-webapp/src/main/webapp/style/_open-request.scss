@@ -18,7 +18,7 @@ won-open-request {
     padding-left: 0.5rem;
     padding-right: 1rem;
 
-    border-bottom: 0.1rem solid $won-line-gray;
+    border-bottom: $thinGrayBorder;
 
     &__icon {
       @include fixed-square($postIconSize);
@@ -29,7 +29,7 @@ won-open-request {
   .or__footer {
     margin: 0 1rem;
     padding: 1rem 0;
-    border-top: 0.1rem solid $won-line-gray;
+    border-top: $thinGrayBorder;
 
 
     input {

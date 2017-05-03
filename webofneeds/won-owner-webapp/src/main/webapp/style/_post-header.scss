@@ -12,7 +12,7 @@ won-post-header {
   @include square-image($postIconSize, 0, 0.5rem, 0, 0);
 
   won-square-image .image{
-    border: 0.1rem solid $won-light-gray;
+    border: $thinBorderWidth solid $won-light-gray;
   }
 
   .ph__right {

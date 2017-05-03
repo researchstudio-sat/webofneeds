@@ -17,7 +17,7 @@ won-connection-selection-item {
     margin-left: 0.5rem;
   }
 
-  $greyBorder: 0.1rem solid $won-line-gray;
+  $greyBorder: $thinGrayBorder;
   $invisibleBorder: 0.1rem solid $won-lighter-gray;
 
   .conn__inner.selected {
@@ -59,7 +59,7 @@ won-connection-selection-item {
     z-index: 99;
 
     background: white;
-    border: 0.1rem solid $won-line-gray;
+    border: $thinGrayBorder;
     padding: 0.5rem;
 
     display: flex;

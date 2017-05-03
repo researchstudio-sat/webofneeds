@@ -14,7 +14,7 @@ won-connections-overview {
 
     padding: 0.5rem 0; // vert horiz
 
-    border-bottom: 0.1rem solid $won-line-gray;
+    border-bottom: $thinGrayBorder;
 
     won-post-header {
       flex-grow: 1;

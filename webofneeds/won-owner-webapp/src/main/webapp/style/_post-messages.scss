@@ -19,9 +19,9 @@
 
 .post-messages, .post-messages--connected {
   background: white;
-  border-left: 0.1rem solid $won-line-gray;
-  border-right: 0.1rem solid $won-line-gray;
-  border-bottom: 0.1rem solid $won-line-gray;
+  border-left: $thinGrayBorder;
+  border-right: $thinGrayBorder;
+  border-bottom: $thinGrayBorder;
   width: 100%;
   max-width: 35rem;
   //margin-ri: 0.5rem;
@@ -95,7 +95,7 @@
       padding: 1rem;
       margin: 1rem 0;
       background: white;
-      border: 0.1rem solid $won-line-gray;
+      border: $thinGrayBorder;
       overflow: auto;
       flex-grow: 1;
 
@@ -108,14 +108,14 @@
           justify-content: flex-start;
 
           & .pm__content__message__content__text {
-            @include speech-bubble-left($won-light-gray, $won-line-gray, 0.3125rem, $thinBorder, 0.5rem);
+            @include speech-bubble-left($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
           }
         }
         &.right{
           justify-content: flex-end;
 
           & .pm__content__message__content__text {
-            @include speech-bubble-right($won-light-gray, $won-line-gray, 0.3125rem, $thinBorder, 0.5rem);
+            @include speech-bubble-right($won-light-gray, $won-line-gray, 0.3125rem, $thinBorderWidth, 0.5rem);
           }
         }
 
@@ -125,7 +125,7 @@
 
           &__text{
             padding: 0.5rem;
-            border: 0.1rem solid $won-line-gray;
+            border: $thinGrayBorder;
             background: $won-light-gray;
           }
 

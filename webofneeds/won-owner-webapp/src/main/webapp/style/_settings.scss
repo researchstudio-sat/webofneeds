@@ -26,12 +26,12 @@
   won-notification-settings,
   won-address-settings {
     .leftside {
-      border-right: 0.1rem solid $won-line-gray;
+      border-right: $thinGrayBorder;
     }
 
     .flexbuttons{
       padding: 1rem 0;
-      border-bottom: 0.1rem solid $won-line-gray;
+      border-bottom: $thinGrayBorder;
     }
 
     .setting {
@@ -39,7 +39,7 @@
     }
 
     .noaddresses {
-      border-right: 0.1rem solid $won-line-gray;
+      border-right: $thinGrayBorder;
     }
 
     .nonotifications,
@@ -68,7 +68,7 @@
   }
 
   won-account-settings {
-    border-bottom: 0.1rem solid $won-line-gray;
+    border-bottom: $thinGrayBorder;
   }
 
   won-avatar-settings,
@@ -215,11 +215,11 @@
       flex-wrap: wrap;
       flex-direction: row;
       justify-content: space-between;
-      border-top: 0.1rem solid $won-line-gray;
+      border-top: $thinGrayBorder;
 
       .avatar {
         flex-grow: 1;
-        border-bottom: 0.1rem solid $won-line-gray;
+        border-bottom: $thinGrayBorder;
 
         > div {
           padding: 0 1rem;
@@ -228,7 +228,7 @@
 
         &:nth-child(odd) {
           > div{
-            border-right: 0.1rem solid $won-line-gray;
+            border-right: $thinGrayBorder;
 
             @media (max-width: 58rem){
               border-right: 0;
@@ -255,7 +255,7 @@
               display: flex;
               flex-direction: column;
               align-items: flex-end;
-              border: 0.1rem solid $won-line-gray;
+              border: $thinGrayBorder;
 
               &__button{
                 text-decoration: none;
@@ -275,7 +275,7 @@
             .avatarimage__grid {
               padding-right: 1rem;
               background-color: white;
-              border: 0.1rem solid $won-line-gray;
+              border: $thinGrayBorder;
               border-top: 0;
               display: flex;
               flex-wrap: wrap;
@@ -290,7 +290,7 @@
             .avatarimage__footer {
               padding: 0.5rem;
               background-color: white;
-              border: 0.1rem solid $won-line-gray;
+              border: $thinGrayBorder;
               border-top: 0;
 
               a {

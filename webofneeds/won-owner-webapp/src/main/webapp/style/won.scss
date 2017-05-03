@@ -67,7 +67,7 @@ input[type=email] {
   padding: 0.66rem;
   box-sizing: border-box;
   border-radius: 0.19rem;
-  border: 0.1rem solid $won-line-gray;
+  border: $thinGrayBorder;
 }
 
 .clickable {

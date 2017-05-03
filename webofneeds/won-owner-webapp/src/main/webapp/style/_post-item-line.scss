@@ -8,7 +8,7 @@ won-post-item-line {
   flex-wrap: nowrap;
   justify-content: space-between;
   padding: 0.5rem 0;
-  border-top: 0.1rem solid $won-line-gray;
+  border-top: $thinGrayBorder;
 
   @media (max-width: $responsivenessBreakPoint) {
     flex-direction: column;

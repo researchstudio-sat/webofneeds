@@ -11,7 +11,7 @@ won-send-request {
   width: 100%;
 
   won-post-header {
-    border-bottom: 0.1rem solid $won-line-gray;
+    border-bottom: $thinGrayBorder;
     padding: 1rem;
   }
 
@@ -39,7 +39,7 @@ won-send-request {
   .sr__footer {
     margin: 0 1rem;
     padding: 1rem 0;
-    border-top: 0.1rem solid $won-line-gray;
+    border-top: $thinGrayBorder;
 
 
     input {

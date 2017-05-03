@@ -8,7 +8,7 @@ won-matches-flow-item {
   display: block;
   break-inside: avoid;
   margin: 0.5rem 0.25rem;
-  border: 0.1rem solid $won-line-gray;
+  border: $thinGrayBorder;
   background: $won-light-gray;
   width: 16.25rem;
 
@@ -26,7 +26,7 @@ won-matches-flow-item {
       font-size: $smallFontSize;
     }
 
-    @include speech-bubble-bottom($won-light-gray, $won-line-gray, 0.625rem, $thinBorder, 50%);
+    @include speech-bubble-bottom($won-light-gray, $won-line-gray, 0.625rem, $thinBorderWidth, 50%);
   }
 
   .mfi__gallery {
@@ -50,7 +50,7 @@ won-matches-flow-item {
     won-extended-gallery {
       .eg__selected {
         flex-grow: 1;
-        border: 0.1rem solid $won-line-gray;
+        border: $thinGrayBorder;
         position: relative;
         height: initial !important;
 
@@ -73,7 +73,7 @@ won-matches-flow-item {
   }
 
   .mfi__match {
-    border-top: 0.1rem solid $won-line-gray;
+    border-top: $thinGrayBorder;
     background: white;
     display: flex;
     justify-content: space-between;
@@ -107,7 +107,7 @@ won-matches-flow-item {
   }
 
   won-feedback-grid {
-    border-top: 0.1rem solid $won-line-gray;
+    border-top: $thinGrayBorder;
   }
 }
 
