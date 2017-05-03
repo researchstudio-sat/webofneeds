@@ -185,6 +185,7 @@ export function connectionLastUpdatedAt(state, connection) {
 
     const timestamps = eventUris
         .map(eventUri => events.get(eventUri))
+        .filter(event => event) // filter out events for which we have uris but no data.
         .map(event => timestamp(event));
 
     const latestTimestamp = timestamps.reduce((t1, t2) =>
