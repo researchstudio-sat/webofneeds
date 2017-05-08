@@ -93,36 +93,30 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     boolean usedForTesting = needModelWrapper.hasFlag(WON.USED_FOR_TESTING);
     SolrMatcherQueryExecutor queryExecutor = (usedForTesting ? testQueryExecuter : defaultQueryExecuter);
 
-    if (needModelWrapper.getMatchingBehavior().equals(MatchingBehaviorType.LAZY)) {
-      log.info("Do not create query for need cause of matching behavior LAZY: {}", needEvent);
+
+    // default query matches content terms (of fields title, description and tags) with different weights
+    // and gives an additional multiplicative boost for geographically closer needs
+    DefaultNeedQueryFactory needQueryFactory = new DefaultNeedQueryFactory(dataset);
+    String queryString = needQueryFactory.createQuery();
+
+    // add filters to the query: need status active and creation date overlap 1 month
+    String[] filterQueries = new String[2];
+    filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
+    filterQueries[1] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
+
+    log.info("query Solr endpoint {} for need {}", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
+    SolrDocumentList docs = executeQuery(
+      queryExecutor, queryString, null, filterQueries);
+
+    if (docs != null) {
+      BulkHintEvent events = produceHints(docs, needEvent, needModelWrapper);
+      publishHints(events, needEvent);
     } else {
-      // default query matches content terms (of fields title, description and tags) with different weights
-      // and gives an additional multiplicative boost for geographically closer needs
-      DefaultNeedQueryFactory needQueryFactory = new DefaultNeedQueryFactory(dataset);
-      String queryString = needQueryFactory.createQuery();
-
-      // add filters to the query: need status active and creation date overlap 1 month
-      String[] filterQueries = new String[2];
-      filterQueries[0] = new NeedStateQueryFactory(dataset).createQuery();
-      filterQueries[1] = new CreationDateQueryFactory(dataset, 1, ChronoUnit.MONTHS).createQuery();
-
-      log.info("query Solr endpoint {} for need {}", config.getSolrEndpointUri(usedForTesting), needEvent.getUri());
-      SolrDocumentList docs = executeQuery(
-        queryExecutor, queryString, null, filterQueries);
-
-      if (docs != null) {
-        BulkHintEvent events = produceHints(docs, needEvent);
-        publishHints(events, needEvent);
-      } else {
-        log.warning("No results found for query of need ", needEvent);
-      }
+      log.warning("No results found for query of need ", needEvent);
     }
 
-    if (needModelWrapper.getMatchingBehavior().equals(MatchingBehaviorType.STEALTHY)) {
-      log.info("Do not index need cause of matching behavior STEALTHY: {}", needEvent);
-    } else {
-      indexNeedEvent(needEvent, dataset);
-    }
+    indexNeedEvent(needEvent, dataset);
+
   }
 
   protected Dataset deserializeNeed(NeedEvent needEvent) throws IOException {
@@ -136,9 +130,9 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     return queryExecutor.executeNeedQuery(queryString, params, filterQueries);
   }
 
-  protected BulkHintEvent produceHints(SolrDocumentList docs, NeedEvent needEvent) {
+  protected BulkHintEvent produceHints(SolrDocumentList docs, NeedEvent needEvent, NeedModelWrapper needModelWrapper) {
 
-    BulkHintEvent bulkHintEvent = hintBuilder.generateHintsFromSearchResult(docs, needEvent);
+    BulkHintEvent bulkHintEvent = hintBuilder.generateHintsFromSearchResult(docs, needEvent, needModelWrapper);
     return bulkHintEvent;
   }
 

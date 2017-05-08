@@ -11,6 +11,8 @@ import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.solr.config.SolrMatcherConfig;
 import won.matcher.solr.utils.Kneedle;
+import won.protocol.model.MatchingBehaviorType;
+import won.protocol.util.NeedModelWrapper;
 
 import java.util.Comparator;
 import java.util.List;
@@ -24,6 +26,7 @@ public class HintBuilder
   private final Logger log = LoggerFactory.getLogger(getClass());
 
   public final static String WON_NODE_SOLR_FIELD = "_graph.http___purl.org_webofneeds_model_hasWonNode._id";
+  public final static String MATCHING_BEHAVIOR_SOLR_FIELD ="_graph.http___purl.org_webofneeds_model_hasMatchingBehavior._id";
 
   @Autowired
   private SolrMatcherConfig config;
@@ -94,18 +97,25 @@ public class HintBuilder
       return matches;
   }
 
-  public BulkHintEvent generateHintsFromSearchResult(final SolrDocumentList docs, final NeedEvent need) {
+  public BulkHintEvent generateHintsFromSearchResult(final SolrDocumentList docs, final NeedEvent need, NeedModelWrapper needModelWrapper) {
 
     // generate hints from query result documents
     BulkHintEvent bulkHintEvent = new BulkHintEvent();
     log.info("Received {} matches as query result for need {}", (docs != null) ? docs.size() : 0, need);
     SolrDocumentList newDocs = calculateMatchingResults(docs);
     log.info("Cut down result to {} matches for need query result {}", newDocs.size(), need);
+    MatchingBehaviorType needMatchingBehavior = needModelWrapper.getMatchingBehavior();
 
     for (SolrDocument doc : newDocs) {
 
-      String needUri = doc.getFieldValue("id").toString();
+      String matchedNeedUri = doc.getFieldValue("id").toString();
 
+      //matchingBehavior:
+      MatchingBehaviorType matchedNeedMatchingBehavior = MatchingBehaviorType.fromURI(doc.getFieldValue(MATCHING_BEHAVIOR_SOLR_FIELD).toString());
+      if (matchedNeedMatchingBehavior == null) {
+        //default matching behavior: mutual
+        matchedNeedMatchingBehavior = MatchingBehaviorType.MUTUAL;
+      }
       // wonNodeUri can be returned as either a String or ArrayList, not sure on what this depends
       String wonNodeUri = null;
       Object nodeObject = doc.getFieldValue(WON_NODE_SOLR_FIELD);
@@ -124,13 +134,16 @@ public class HintBuilder
         score = 0.0;
       }
 
-      log.debug("generate hint for match {} with normalized score {}", needUri, score);
-      bulkHintEvent.addHintEvent(new HintEvent(need.getWonNodeUri(), need.getUri(), wonNodeUri, needUri,
-                                               config.getSolrServerPublicUri(), score));
+      log.debug("generate hint for match {} with normalized score {}", matchedNeedUri, score);
+
+      if (needMatchingBehavior.shouldSendHintGivenPartnerMatchingBehavior(matchedNeedMatchingBehavior)) {
+        bulkHintEvent.addHintEvent(new HintEvent(need.getWonNodeUri(), need.getUri(), wonNodeUri, matchedNeedUri,
+                config.getSolrServerPublicUri(), score));
+      }
 
       // also send the same hints to the other side (remote need and wonnode)?
-      if (config.isCreateHintsForBothNeeds()) {
-        bulkHintEvent.addHintEvent(new HintEvent(wonNodeUri, needUri, need.getWonNodeUri(), need.getUri(),
+      if (matchedNeedMatchingBehavior.shouldSendHintGivenPartnerMatchingBehavior(needMatchingBehavior)) {
+        bulkHintEvent.addHintEvent(new HintEvent(wonNodeUri, matchedNeedUri, need.getWonNodeUri(), need.getUri(),
                                                  config.getSolrServerPublicUri(), score));
       }
     }
