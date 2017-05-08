@@ -1,8 +1,5 @@
 package won.protocol.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Created with IntelliJ IDEA.
  * User: gabriel
@@ -14,8 +11,6 @@ public enum MessagingType
 {
     Queue("Queue"),
     Topic("Topic");
-
-    private static final Logger logger = LoggerFactory.getLogger(BasicNeedType.class);
 
     private String type;
 

@@ -1,6 +1,7 @@
 import argparse
 import logging
 import sys
+import os
 from scipy.io import mmwrite
 
 __author__ = 'hfriedrich'
@@ -24,9 +25,12 @@ if __name__ == '__main__':
 
     # cmd line parsing
     parser = argparse.ArgumentParser(description='link prediction algorithm evaluation script')
-    parser.add_argument('-folder',
-                        action="store", dest="folder", required=True,
-                        help="folder with tensor input and output files")
+    parser.add_argument('-inputfolder',
+                        action="store", dest="inputfolder", required=True,
+                        help="folder with tensor input files")
+    parser.add_argument('-outputfolder',
+                        action="store", dest="outputfolder", required=True,
+                        help="folder for tensor output files")
     parser.add_argument('-rank',
                         action="store", dest="rank", default="500", type=int,
                         help="rank of rescal algorithm")
@@ -37,13 +41,17 @@ if __name__ == '__main__':
 
     # load the tensor
     header_file = "headers.txt"
-    slice_files = ["connection.mtx", "needtype.mtx", "subject.mtx", "content.mtx", "tag.mtx"]
-    slice_types = SparseTensor.defaultSlices + [SparseTensor.ATTR_CONTENT_SLICE, SparseTensor.CATEGORY_SLICE]
-    header_input = args.folder + "/" + header_file
+
+    slice_files = []
+    for file in os.listdir(args.inputfolder):
+        if file.endswith(".mtx"):
+            slice_files.append(file)
+
+    header_input = args.inputfolder + "/" + header_file
     data_input = []
     for slice in slice_files:
-        data_input.append(args.folder + "/" + slice)
-    input_tensor = read_input_tensor(header_input, data_input, slice_types, True)
+        data_input.append(args.inputfolder + "/" + slice)
+    input_tensor = read_input_tensor(header_input, data_input, True)
 
     # execute rescal
     A,R = execute_extrescal(input_tensor, args.rank)
@@ -55,6 +63,6 @@ if __name__ == '__main__':
     _log.info("number of hints created: %d" % len(connection_prediction.nonzero()[0]))
 
     # write the hint output matrix
-    output  = args.folder + "/" + "hints.mtx"
+    output  = args.outputfolder + "/" + "hints.mtx"
     _log.info("write hint prediction output matrix: " + output)
     mmwrite(output, connection_prediction)

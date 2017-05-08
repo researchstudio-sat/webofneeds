@@ -1,11 +1,10 @@
 package won.matcher.solr.evaluation;
 
 import com.github.jsonldjava.core.JsonLdError;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.vocabulary.DC;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -14,12 +13,12 @@ import org.springframework.stereotype.Component;
 import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.index.NeedIndexer;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
-import won.matcher.solr.query.factory.NeedTypeQueryFactory;
+import won.matcher.solr.query.factory.BasicNeedQueryFactory;
 import won.matcher.solr.query.factory.TestNeedQueryFactory;
 import won.matcher.utils.tensor.TensorMatchingData;
 import won.protocol.exception.IncorrectPropertyCountException;
-import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.WON;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.util.DefaultNeedModelWrapper;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
@@ -54,10 +53,10 @@ public class SolrMatcherEvaluation
   NeedIndexer needIndexer;
 
   @Autowired
-  private MailDirNeedProducer demandNeedProducer;
+  private MailDirNeedProducer seeksNeedProducer;
 
   @Autowired
-  private MailDirNeedProducer supplyNeedProducer;
+  private MailDirNeedProducer isNeedProducer;
 
   @Autowired
   HintBuilder hintBuilder;
@@ -70,12 +69,12 @@ public class SolrMatcherEvaluation
   private TensorMatchingData matchingDataPredictions;
 
 
-  public void setDemandNeedProducer(final MailDirNeedProducer demandNeedProducer) {
-    this.demandNeedProducer = demandNeedProducer;
+  public void setSeeksNeedProducer(final MailDirNeedProducer seeksNeedProducer) {
+    this.seeksNeedProducer = seeksNeedProducer;
   }
 
-  public void setSupplyNeedProducer(final MailDirNeedProducer supplyNeedProducer) {
-    this.supplyNeedProducer = supplyNeedProducer;
+  public void setIsNeedProducer(final MailDirNeedProducer isNeedProducer) {
+    this.isNeedProducer = isNeedProducer;
   }
 
   public static String createNeedId(Dataset need) {
@@ -84,12 +83,13 @@ public class SolrMatcherEvaluation
     String description = "";
 
     try {
-      title = RdfUtils.findOnePropertyFromResource(need, null, DC.title).asLiteral().getString();
+      DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(need);
+      title = needModelWrapper.getTitle(NeedContentPropertyType.ALL);
       title = title.replaceAll("[^A-Za-z0-9 ]", "_");
       title = title.replaceAll("NOT", "_");
       title = title.replaceAll("AND", "_");
       title = title.replaceAll("OR", "_");
-      description = RdfUtils.findOnePropertyFromResource(need, null, WON.HAS_TEXT_DESCRIPTION).asLiteral().getString();
+      description = needModelWrapper.getDescription(NeedContentPropertyType.ALL);
     } catch (IncorrectPropertyCountException e) {
 
       // do nothing
@@ -112,29 +112,32 @@ public class SolrMatcherEvaluation
   @PostConstruct
   public void init() throws IOException {
 
-    initNeedDir(demandNeedProducer);
-    initNeedDir(supplyNeedProducer);
+    initNeedDir(seeksNeedProducer);
+    initNeedDir(isNeedProducer);
   }
 
   private void initNeedDir(MailDirNeedProducer needProducer) throws IOException {
 
     // read the need files and add needs to the tensor
-    if (!needProducer.getDirectory().isDirectory()) {
-      throw new IOException("Input folder not a directory: " + needProducer.getDirectory().toString());
+    if (needProducer.getDirectory() == null || !needProducer.getDirectory().isDirectory()) {
+      throw new IOException("Input folder not a directory: " + ((needProducer.getDirectory() != null) ? needProducer.getDirectory().toString() : null));
     }
 
     while(!needProducer.isExhausted()) {
       String needFileName = needProducer.getCurrentFileName();
       Model needModel = needProducer.create();
-      Dataset ds = DatasetFactory.create(needModel);
+
+      Dataset ds = DatasetFactory.createTxnMem();
+      ds.addNamedModel("https://node.matchat.org/won/resource/need/test#need", needModel);
       String needId = createNeedId(ds);
 
-      if (needProducer == demandNeedProducer) {
-        matchingDataConnections.addNeedType(needId, "WANT");
-        matchingDataPredictions.addNeedType(needId, "WANT");
-      } else {
-        matchingDataConnections.addNeedType(needId, "OFFER");
-        matchingDataPredictions.addNeedType(needId, "OFFER");
+
+      if (needProducer == seeksNeedProducer) {
+        matchingDataConnections.addNeedAttribute("needtype", needId, "WANT");
+        matchingDataPredictions.addNeedAttribute("needtype", needId, "WANT");
+      } else if (needProducer == isNeedProducer ) {
+        matchingDataConnections.addNeedAttribute("needtype", needId, "OFFER");
+        matchingDataPredictions.addNeedAttribute("needtype", needId, "OFFER");
       }
 
       needFileDatasetMap.put(FilenameUtils.removeExtension(needFileName), ds);
@@ -189,7 +192,7 @@ public class SolrMatcherEvaluation
             throw new IOException("No need found in input directory for connection specified in connection file:  \n" +
                                     createNeedId(need) + "\n" + match);
         }
-        matchingDataPredictions.addNeedConnection(createNeedId(need), match);
+        matchingDataPredictions.addNeedConnection(createNeedId(need), match, false);
       }
     }
 
@@ -202,7 +205,7 @@ public class SolrMatcherEvaluation
     TestNeedQueryFactory needQuery = new TestNeedQueryFactory(need);
 
     SolrDocumentList docs = queryExecutor.executeNeedQuery(
-      needQuery.createQuery(), null, new NeedTypeQueryFactory(need).createQuery());
+      needQuery.createQuery(), null, new BasicNeedQueryFactory(need).createQuery());
 
     SolrDocumentList matchedDocs = hintBuilder.calculateMatchingResults(docs);
 
@@ -234,7 +237,7 @@ public class SolrMatcherEvaluation
                                 need1 + "\n" + need2);
         }
       }
-      matchingDataConnections.addNeedConnection(need1, need2);
+      matchingDataConnections.addNeedConnection(need1, need2, false);
     }
   }
 

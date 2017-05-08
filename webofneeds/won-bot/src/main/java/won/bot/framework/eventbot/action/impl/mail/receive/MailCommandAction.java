@@ -17,6 +17,8 @@ import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
 import won.bot.framework.eventbot.event.impl.mail.OpenConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
 import won.bot.framework.eventbot.listener.EventListener;
+import won.protocol.model.NeedState;
+import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.WonRdfUtils;
 
 import javax.mail.MessagingException;
@@ -99,7 +101,7 @@ public class MailCommandAction extends BaseEventBotAction {
             switch(wonUri.getType()){
                 case CONNECTION:
                     Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(wonUri.getUri());
-                    needUri = WonRdfUtils.NeedUtils.getLocalNeedURIFromConnection(connectionRDF, wonUri.getUri());
+                    needUri = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, wonUri.getUri());
                     break;
                 case NEED:
                 default:
@@ -176,9 +178,9 @@ public class MailCommandAction extends BaseEventBotAction {
 
                 for(WonURI u : needUris) {
                     Dataset needRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(u.getUri());
-                    String needTitle = WonRdfUtils.NeedUtils.getNeedTitle(needRDF, u.getUri()).trim();
-
-                    if(titleToClose.equals(needTitle) && WonRdfUtils.NeedUtils.isNeedActive(needRDF, u.getUri())){
+                    DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needRDF);
+                    String needTitle = needModelWrapper.getTitleFromIsOrAll().trim();
+                    if(titleToClose.equals(needTitle) && needModelWrapper.getNeedState().equals(NeedState.ACTIVE)){
                         return u.getUri();
                     }
                 }

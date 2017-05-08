@@ -7,7 +7,7 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
-import won.protocol.util.WonRdfUtils;
+import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 
 import java.net.URI;
@@ -47,9 +47,9 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor
       // of messages mean that the new connection has been created recently
       logger.debug("invalidating connections list for need " + message.getReceiverNeedURI());
       Dataset need = linkedDataSource.getDataForResource(message.getReceiverNeedURI());
-      URI connectionsListUri = WonRdfUtils.NeedUtils.queryConnectionContainer(need, message.getReceiverNeedURI());
+      NeedModelWrapper wrapper = new NeedModelWrapper(need);
+      URI connectionsListUri = URI.create(wrapper.getConnectionContainerUri());
       linkedDataSource.invalidate(connectionsListUri);
-
     }
 
     return message;

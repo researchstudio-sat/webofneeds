@@ -6,6 +6,7 @@ import com.github.jsonldjava.core.JsonLdProcessor;
 import com.github.jsonldjava.utils.JsonUtils;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
@@ -15,12 +16,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import won.matcher.service.common.service.http.HttpService;
 import won.matcher.solr.config.SolrMatcherConfig;
-import won.protocol.util.WonRdfUtils;
+import won.protocol.model.Coordinate;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.util.DefaultNeedModelWrapper;
+import won.protocol.util.NeedModelWrapper;
 import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URI;
 import java.util.Map;
 
 /**
@@ -30,68 +33,90 @@ import java.util.Map;
 @Scope("prototype")
 public class NeedIndexer {
 
-  private final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
-  public static final String SOLR_LOCATION_COORDINATES_FIELD = "need_location";
+    public static final String SOLR_IS_LOCATION_COORDINATES_FIELD = "is_need_location";
+    public static final String SOLR_SEEKS_LOCATION_COORDINATES_FIELD = "seeks_need_location";
+    public static final String SOLR_SEEKS_SEEKS_LOCATION_COORDINATES_FIELD = "seeksSeeks_need_location";
 
-  // SPARQL query to contruct a need object out of the dataset, use all graphs that reference "won:Need"
-  private static final String NEED_INDEX_QUERY =
-    "prefix won: <http://purl.org/webofneeds/model#> construct { ?a ?b ?c .} where { " +
-      "GRAPH ?graph { ?need a won:Need. ?a ?b ?c. } }";
+    // SPARQL query to contruct a need object out of the dataset, use all graphs that reference "won:Need"
+    private static final String NEED_INDEX_QUERY =
+            "prefix won: <http://purl.org/webofneeds/model#> construct { ?a ?b ?c .} where { " +
+                    "GRAPH ?graph { ?need a won:Need. ?a ?b ?c. } }";
 
-  @Autowired
-  private SolrMatcherConfig config;
+    @Autowired
+    private SolrMatcherConfig config;
 
-  @Autowired
-  private HttpService httpService;
+    @Autowired
+    private HttpService httpService;
 
-  public void index(Dataset dataset) throws IOException, JsonLdError {
+    public void index(Dataset dataset) throws IOException, JsonLdError {
 
-    // serialize the need Dataset to jsonld
-    Query query = QueryFactory.create(NEED_INDEX_QUERY);
-    QueryExecution qexec = QueryExecutionFactory.create(query, dataset);
-    Model needModel = qexec.execConstruct();
-    String needUri = WonRdfUtils.NeedUtils.getNeedURI(needModel).toString();
+        // serialize the need Dataset to jsonld
+        Query query = QueryFactory.create(NEED_INDEX_QUERY);
+        QueryExecution qexec = QueryExecutionFactory.create(query, dataset);
+        Model needModel = qexec.execConstruct();
 
-    // check if test index should be used for need
-    boolean usedForTesting = WonRdfUtils.NeedUtils.hasFlag(dataset, needUri, WON.USED_FOR_TESTING);
-    indexNeedModel(needModel, needUri, usedForTesting);
-  }
+        // normalize the need model for solr indexing
+        NeedModelWrapper needModelWrapper = new NeedModelWrapper(needModel, null);
+        String needUri = needModelWrapper.getNeedUri();
+        needModel = needModelWrapper.normalizeNeedModel();
 
-  public void indexNeedModel(Model needModel, String id, boolean useTestCore) throws IOException, JsonLdError {
-
-    // create the json from rdf model
-    StringWriter sw = new StringWriter();
-    RDFDataMgr.write(sw, needModel, Lang.JSONLD);
-    String jsonld = sw.toString();
-    Object jsonObject = JsonUtils.fromString(jsonld);
-    Object frame = JsonUtils.fromString(" {\"@type\": \""+ WON.NEED + "\"} ");
-    JsonLdOptions options = new JsonLdOptions();
-    Map<String, Object> framed = JsonLdProcessor.frame(jsonObject, frame, options);
-
-    // add the uri of the need as id field to avoid multiple adding of needs but instead allow updates
-    framed.put("id", id);
-
-    // add latitude and longitude values in one field for Solr spatial queries
-    URI needUri = WonRdfUtils.NeedUtils.getNeedURI(needModel);
-    Float longitude = WonRdfUtils.NeedUtils.getLocationLongitude(needModel, needUri);
-    Float latitude = WonRdfUtils.NeedUtils.getLocationLatitude(needModel, needUri);
-    if (latitude != null && longitude != null) {
-      framed.put(SOLR_LOCATION_COORDINATES_FIELD, latitude.toString() + "," + longitude.toString());
+        // check if test index should be used for need
+        boolean usedForTesting = needModelWrapper.hasFlag(WON.USED_FOR_TESTING);
+        indexNeedModel(needModel, needUri, usedForTesting);
     }
 
-    // write the final json string
-    sw = new StringWriter();
-    JsonUtils.writePrettyPrint(sw, framed);
-    String needJson = sw.toString();
+    public void indexNeedModel(Model needModel, String id, boolean useTestCore) throws IOException, JsonLdError {
 
-    // post the need to the solr index
-    String indexUri = config.getSolrEndpointUri(useTestCore);
-    indexUri += "update/json/docs";
-    if (config.isCommitIndexedNeedImmediately()) {
-      indexUri += "?commit=" + config.isCommitIndexedNeedImmediately();
+        // create the json from rdf model
+        StringWriter sw = new StringWriter();
+        RDFDataMgr.write(sw, needModel, Lang.JSONLD);
+        String jsonld = sw.toString();
+        Object jsonObject = JsonUtils.fromString(jsonld);
+        Object frame = JsonUtils.fromString(" {\"@type\": \"" + WON.NEED + "\"} ");
+        JsonLdOptions options = new JsonLdOptions();
+        Map<String, Object> framed = JsonLdProcessor.frame(jsonObject, frame, options);
+
+        // add the uri of the need as id field to avoid multiple adding of needs but instead allow updates
+        framed.put("id", id);
+
+        // add latitude and longitude values in one field for Solr spatial queries
+        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needModel, null);
+
+        for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.IS)) {
+            Coordinate coordinate = needModelWrapper.getLocationCoordinate(contentNode);
+            if (coordinate != null) {
+                framed.put(SOLR_IS_LOCATION_COORDINATES_FIELD, String.valueOf(coordinate.getLatitude()) + "," + String.valueOf(coordinate.getLongitude()));
+            }
+        }
+
+        for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.SEEKS)) {
+            Coordinate coordinate = needModelWrapper.getLocationCoordinate(contentNode);
+            if (coordinate != null) {
+                framed.put(SOLR_SEEKS_LOCATION_COORDINATES_FIELD, String.valueOf(coordinate.getLatitude()) + "," + String.valueOf(coordinate.getLongitude()));
+            }
+        }
+
+        for (Resource contentNode : needModelWrapper.getContentNodes(NeedContentPropertyType.SEEKS_SEEKS)) {
+            Coordinate coordinate = needModelWrapper.getLocationCoordinate(contentNode);
+            if (coordinate != null) {
+                framed.put(SOLR_SEEKS_SEEKS_LOCATION_COORDINATES_FIELD, String.valueOf(coordinate.getLatitude()) + "," + String.valueOf(coordinate.getLongitude()));
+            }
+        }
+
+        // write the final json string
+        sw = new StringWriter();
+        JsonUtils.writePrettyPrint(sw, framed);
+        String needJson = sw.toString();
+
+        // post the need to the solr index
+        String indexUri = config.getSolrEndpointUri(useTestCore);
+        indexUri += "update/json/docs";
+        if (config.isCommitIndexedNeedImmediately()) {
+            indexUri += "?commit=" + config.isCommitIndexedNeedImmediately();
+        }
+        log.debug("Post needto solr index. \n Solr URI: {} \n Need (JSON): {}", indexUri, needJson);
+        httpService.postJsonRequest(indexUri, needJson);
     }
-    log.debug("Post needto solr index. \n Solr URI: {} \n Need (JSON): {}", indexUri, needJson);
-    httpService.postJsonRequest(indexUri, needJson);
-  }
 }

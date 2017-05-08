@@ -47,7 +47,7 @@ public interface ConnectionRepository extends WonRepository<Connection>
   @Query("select con from Connection con where connectionURI = :uri")
   Connection findOneByConnectionURIForUpdate(@Param("uri") URI uri);
 
-  Connection findOneByConnectionURIAndVersionNot(URI URI, long version);
+  Connection findOneByConnectionURIAndVersionNot(URI URI, int version);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("select con from Connection con where needURI = :needUri and remoteNeedURI = :remoteNeedUri and typeURI = :typeUri")

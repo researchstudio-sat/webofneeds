@@ -16,6 +16,7 @@
 
 package won.bot.framework.eventbot.action.impl.facet;
 
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -76,8 +77,8 @@ public class TwoPhaseCommitDeactivateOnCloseAction extends BaseEventBotAction
     WonNodeInformationService wonNodeInformationService =
       getEventListenerContext().getWonNodeInformationService();
 
-    URI localWonNode = WonRdfUtils.NeedUtils.queryWonNode(
-      getEventListenerContext().getLinkedDataSource().getDataForResource(needURI));
+    Dataset ds = getEventListenerContext().getLinkedDataSource().getDataForResource(needURI);
+    URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(ds, needURI);
 
     return WonMessageBuilder
       .setMessagePropertiesForDeactivate(

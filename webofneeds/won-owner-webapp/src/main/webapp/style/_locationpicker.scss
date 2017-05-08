@@ -4,7 +4,7 @@
 won-location-picker {
 
   .lp__searchbox {
-    border-width: $thinBorder;
+    border-width: $thinBorderWidth;
     border-style: solid;
     border-radius: 0.1rem;
     background-color: white;
@@ -14,7 +14,7 @@ won-location-picker {
     min-height: $formInputHeight;
 
     $realFontHeight: $normalFontSize * 22/16; /* of one line of text */
-    $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorder;
+    $verticalPadding: ($formInputHeight - $realFontHeight) / 2 - $thinBorderWidth;
     padding: $verticalPadding 0.438rem;
 
     box-sizing: border-box;

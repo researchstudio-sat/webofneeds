@@ -22,8 +22,7 @@ public class WonQueries {
 
     public static final String SPARQL_ALL_NEEDS = SPARQL_PREFIX + "SELECT * WHERE " +
                                                     "{ ?need won:hasContent ?x; " +
-                                                            "won:isInState ?state; " +
-                                                            "won:hasBasicNeedType ?type." +
+                                                            "won:isInState ?state. " +
                                                         "?x   won:hasTextDescription ?desc; " +
                                                              "won:hasTag ?tag; " +
                                                              "dc:title ?title. " +
@@ -45,8 +44,7 @@ public class WonQueries {
 
     public static final String SPARQL_NEEDS_FILTERED_BY_URI = SPARQL_PREFIX + "SELECT * WHERE " +
                                                     "{ ?need won:hasContent ?x; " +
-                                                            "won:isInState ?state; " +
-                                                            "won:hasBasicNeedType ?type." +
+                                                            "won:isInState ?state. " +
                                                         "?x  won:hasTextDescription ?desc; " +
                                                             "won:hasTag ?tag; " +
                                                             "dc:title ?title. " +

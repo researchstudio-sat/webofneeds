@@ -3,49 +3,61 @@ package won.matcher.solr;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import won.cryptography.ssl.TrustAnyCertificateStrategy;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.solr.actor.SolrMatcherActor;
 import won.matcher.solr.spring.MatcherSolrAppConfiguration;
-import won.protocol.rest.LinkedDataRestClientHttpsServerOnly;
-import won.protocol.util.linkeddata.LinkedDataSourceBase;
+import won.protocol.util.WonRdfUtils;
 
 import java.io.IOException;
-import java.net.URI;
+import java.io.InputStream;
 
 /**
  * Created by hfriedrich on 11.09.2015.
  */
-public class SolrTest
-{
-  public static void main(String[] args) throws IOException, InterruptedException {
+public class SolrTest {
+    public static void main(String[] args) throws IOException, InterruptedException {
 
-    // init basic Akka
-    AnnotationConfigApplicationContext ctx =
-      new AnnotationConfigApplicationContext(MatcherSolrAppConfiguration.class);
-    ActorSystem system = ctx.getBean(ActorSystem.class);
-    ActorRef solrMatcherActor = system.actorOf(
-      SpringExtension.SpringExtProvider.get(system).props(SolrMatcherActor.class), "SolrMatcherActor");
+        // init basic Akka
+        AnnotationConfigApplicationContext ctx =
+                new AnnotationConfigApplicationContext(MatcherSolrAppConfiguration.class);
+        ActorSystem system = ctx.getBean(ActorSystem.class);
+        ActorRef solrMatcherActor = system.actorOf(
+                SpringExtension.SpringExtProvider.get(system).props(SolrMatcherActor.class), "SolrMatcherActor");
 
-    // Create a sample need event
-    //IMPORTANT! TAKE CARE OF "RESOURCE"; DO NOT USE "PAGE" IN THE URI
-    String wonUri = args[0]; // e.g. "http://satsrv07.researchstudio.at:8889/won/resource";
-    String testUri = args[1]; // e.g. "http://satsrv07.researchstudio.at:8889/won/resource/need/lwxlqr555dsewtuyx2io";
 
-    // if https is used, use https URIs and HTTPS rest client:
-    //String wonUri = "https://satsrv05.researchstudio.at:8889/won/resource";
-    //String testUri = "https://satsrv05.researchstudio.at:8889/won/resource/need/xbuwdvqk7nkheydlfzwp";
-    LinkedDataSourceBase linkedDataSource = new LinkedDataSourceBase();
-    LinkedDataRestClientHttpsServerOnly restClient = new LinkedDataRestClientHttpsServerOnly(new TrustAnyCertificateStrategy());
-    restClient.initialize();
-    linkedDataSource.setLinkedDataRestClient(restClient);
+        NeedEvent ne1 = createNeedEvent("/needmodel/need1.trig");
+        NeedEvent ne2 = createNeedEvent("/needmodel/need2.trig");
 
-    Dataset ds = linkedDataSource.getDataForResource(URI.create(testUri));
-    NeedEvent needEvent = new NeedEvent(testUri, wonUri, NeedEvent.TYPE.CREATED, System.currentTimeMillis(), ds);
+        solrMatcherActor.tell(ne1, null);
+        Thread.sleep(5000);
+        solrMatcherActor.tell(ne2, null);
+    }
 
-    // send event to matcher implementation
-    solrMatcherActor.tell(needEvent, null);
-  }
+    private static NeedEvent createNeedEvent(String path) throws IOException {
+
+        InputStream is = null;
+        Dataset dataset = null;
+        try {
+            try {
+                is = SolrTest.class.getResourceAsStream(path);
+                dataset = DatasetFactory.create();
+                RDFDataMgr.read(dataset, is, RDFFormat.TRIG.getLang());
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
+            }
+        } catch (IOException e) {
+            System.err.println(e);
+            return null;
+        }
+
+        String needUri = WonRdfUtils.NeedUtils.getNeedURI(dataset).toString();
+        return new NeedEvent(needUri, "no_uri", NeedEvent.TYPE.CREATED, System.currentTimeMillis(), dataset);
+    }
 }

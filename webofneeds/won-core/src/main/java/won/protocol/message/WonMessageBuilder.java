@@ -24,9 +24,9 @@ import java.util.*;
  */
 public class WonMessageBuilder
 {
-  private static final String CONTENT_URI_SUFFIX = "#content-";
-  private static final String SIGNATURE_URI_SUFFIX = "#signature-";
-  private static final String ENVELOPE_URI_SUFFIX = "#envelope-";
+  public static final String CONTENT_URI_SUFFIX = "#content-";
+  public static final String SIGNATURE_URI_SUFFIX = "#signature-";
+  public static final String ENVELOPE_URI_SUFFIX = "#envelope-";
   private static final CheapInsecureRandomString randomString = new CheapInsecureRandomString();
   private static final int RANDOM_SUFFIX_LENGTH = 5;
 

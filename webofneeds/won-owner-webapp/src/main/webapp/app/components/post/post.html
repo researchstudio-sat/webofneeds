@@ -86,7 +86,7 @@
                    || (connectionTypeInParams === won.WON.RequestSent && self.hasSentRequests)
             )"
             connection-type="self.connectionType"
-            selected-connection="::self.openConnection(connectionUri)"
+            on-selected-connection="self.openConnection(connectionUri)"
             ng-class="{'hidden' : self.connectionUri !== undefined}"
             >
     </won-connection-selection>

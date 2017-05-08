@@ -23,7 +23,12 @@ import {
     selectOpenConnectionUri,
     selectOpenConnection,
 } from '../selectors';
-import { selectTimestamp } from '../won-utils'
+import {
+    seeksOrIs,
+    inferLegacyNeedType,
+    selectTimestamp,
+    selectSortedChatMessages,
+} from '../won-utils'
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
@@ -36,7 +41,7 @@ function genComponentConf() {
                          src="generated/icon-sprite.svg#ico36_close"/>
                 </a>
                 <div class="pm__header__title">
-                    {{ self.connectionData.getIn(['remoteNeed', 'won:hasContent', 'dc:title']) }}
+                    {{ self.theirNeedContent.get('dc:title') }}
                 </div>
                 <!--div class="pm__header__options">
                     Options
@@ -62,10 +67,10 @@ function genComponentConf() {
                 ng-repeat="message in self.chatMessages"
                 ng-class="message.get('hasSenderNeed') == self.connectionData.getIn(['ownNeed', '@id']) ? 'right' : 'left'">
                     <won-square-image
-                        title="self.connectionData.getIn(['remoteNeed', 'won:hasContent', 'dc:title'])"
-                        src="self.connectionData.getIn(['remoteNeed', 'titleImgSrc'])"
-                        uri="self.connectionData.getIn(['remoteNeed', '@id'])"
-                        ng-show="message.get('hasSenderNeed') != self.connectionData.getIn(['ownNeed', '@id'])">
+                        title="self.theirNeedContent.get('dc:title')"
+                        src="self.theirNeedContent.get('TODOtitleImgSrc')"
+                        uri="self.theirNeed.get('@id')"
+                        ng-show="message.get('hasSenderNeed') != self.ownNeed.get('@id')">
                     </won-square-image>
                     <div class="pm__content__message__content">
                         <div class="pm__content__message__content__text">
@@ -81,8 +86,20 @@ function genComponentConf() {
                             class="pm__content__message__content__time">
                                 {{ message.get('humanReadableTimestamp') }}
                         </div>
-                        <a ng-show="self.debugmode && message.get('hasSenderNeed') == self.connectionData.getIn(['ownNeed', '@id'])" class="debuglink" target="_blank" href="/owner/rest/linked-data/?requester={{self.encodeParam(message.get('hasSenderNeed'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">[MSGDATA]</a>
-                        <a ng-show="self.debugmode && message.get('hasSenderNeed') != self.connectionData.getIn(['ownNeed', '@id'])" class="debuglink" target="_blank" href="/owner/rest/linked-data/?requester={{self.encodeParam(message.get('hasReceiverNeed'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">[MSGDATA]</a>
+                        <a
+                          ng-show="self.debugmode && message.get('hasSenderNeed') == self.ownNeed.get('@id')"
+                          class="debuglink"
+                          target="_blank"
+                          href="/owner/rest/linked-data/?requester={{self.encodeParam(message.get('hasSenderNeed'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">
+                            [MSGDATA]
+                        </a>
+                        <a
+                          ng-show="self.debugmode && message.get('hasSenderNeed') != self.ownNeed.get('@id')"
+                          class="debuglink"
+                          target="_blank"
+                          href="/owner/rest/linked-data/?requester={{self.encodeParam(message.get('hasReceiverNeed'))}}&uri={{self.encodeParam(message.get('uri'))}}&deep=true">
+                            [MSGDATA]
+                        </a>
                     </div>
             </div>
         </div>
@@ -106,7 +123,7 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             window.pm4dbg = this;
             window.selectOpenConnectionUri4dbg = selectOpenConnectionUri;
-            window.selectChatMessages4dbg = selectChatMessages;
+            window.selectChatMessages4dbg = selectSortedChatMessages;
 
             const self = this;
 
@@ -131,16 +148,28 @@ function genComponentConf() {
                 });
 
 
-                const chatMessages = selectChatMessages(state);
+                const connectionData = selectAllByConnections(state).get(connectionUri);
+                const ownNeed = connectionData && connectionData.get('ownNeed');
+                const theirNeed = connectionData && connectionData.get('remoteNeed');
+
+                const chatMessages = selectSortedChatMessages(state);
                 return {
+                    connectionData,
                     connectionUri,
                     connection,
                     eventsLoaded,
                     lastUpdateTime: state.get('lastUpdateTime'),
-                    connectionData: selectAllByConnections(state).get(connectionUri),
                     chatMessages: chatMessages && chatMessages.toArray(), //toArray needed as ng-repeat won't work otherwise :|
                     state4dbg: state,
-                    debugmode: won.debugmode
+                    debugmode: won.debugmode,
+
+                    ownNeed,
+                    ownNeedType: ownNeed && inferLegacyNeedType(ownNeed),
+                    ownNeedContent: ownNeed && seeksOrIs(ownNeed),
+
+                    theirNeed,
+                    theirNeedType: theirNeed && inferLegacyNeedType(theirNeed),
+                    theirNeedContent: theirNeed && seeksOrIs(theirNeed),
                 }
             };
 
@@ -233,78 +262,3 @@ export default angular.module('won.owner.components.postMessages', [
 ])
     .directive('wonPostMessages', genComponentConf)
     .name;
-
-
-//TODO refactor so that it always returns an array of immutable messages to
-// allow ng-repeat without giving up the cheaper digestion
-//TODO move this to selectors.js
-function selectChatMessages(state) {
-    const connectionUri = selectOpenConnectionUri(state);
-    const connectionData = selectAllByConnections(state).get(connectionUri);
-    const ownNeedUri = connectionData && connectionData.getIn(['ownNeed', '@id']);
-
-    if (!connectionData || !connectionData.get('events')) {
-        return Immutable.List();
-
-    } else {
-        const timestamp = (event) =>
-            //msStringToDate(selectTimestamp(event, connectionUri))
-            msStringToDate(selectTimestamp(event))
-
-        const chatMessages = connectionData.get('events')
-
-            /* filter for valid chat messages */
-            .filter(event => {
-                if (event.get('hasTextMessage')) return true;
-                else {
-                    let remote = event.get('hasCorrespondingRemoteMessage');
-                    if(is('String', remote)) {
-                        remote = state.getIn(['events', 'events', remote]);
-                    }
-                    return remote && remote.get('hasTextMessage');
-                }
-            }).map(event => {
-                const remote = event.get('hasCorrespondingRemoteMessage');
-                if (event.get('hasTextMessage'))
-                    return event;
-                else
-                    return remote;
-            })
-
-            /* sort them so the latest get shown last */
-            .sort((event1, event2) =>
-                timestamp(event1) - timestamp(event2)
-            )
-            /*
-             * sort so the latest, optimistic/unconfirmed
-             * messages are always at the bottom.
-             */
-            .sort((event1, event2) => {
-                const u1 = event1.get('unconfirmed');
-                const u2 = event2.get('unconfirmed');
-
-                if(u1 && !u2) {
-                  return 1;
-                }
-                else if (!u1 && u2) {
-                    return -1;
-                }
-                else {
-                    return 0;
-                }
-            })
-
-            /* add a nice relative timestamp */
-            .map(event => event.set(
-                    'humanReadableTimestamp',
-                    relativeTime(
-                        state.get('lastUpdateTime'),
-                        timestamp(event)
-                    )
-                )
-            );
-
-        return chatMessages;
-    }
-
-}

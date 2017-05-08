@@ -181,9 +181,9 @@ export function successfulCreate(event) {
                     dispatch(actionCreators.drafts__publishSuccessful({
                         publishEventUri: event.isResponseTo,
                         needUri: event.hasSenderNeed,
-                        eventData: eventData
+                        eventData: eventData,
+                        need: need,
                     }));
-                    dispatch(actionCreators.needs__received(need));
                 });
             });
 

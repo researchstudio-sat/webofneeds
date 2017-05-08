@@ -83,17 +83,21 @@ public class ReverseProxyCompatibleX509AuthenticationFilter extends AbstractPreA
             "set by the reverse proxy!");
       }
       // the load balancer (e.g. nginx) forwards the certificate into a header by replacing new lines with whitespaces
-      // (2 or more). Also replace tabs, which sometimes nginx may send instead of whitespace
-      String certificateContent = certificateHeader.replaceAll("\\s{2,}", System.lineSeparator())
+      // (2 or more for nginx, 1 for apache 2.4 - for the latter case we have to add the lookbehind pattern). Also replace tabs, which sometimes nginx may send instead of whitespace
+      String certificateContent = certificateHeader.replaceAll("(?<!-----BEGIN|-----END)\\s+", System.lineSeparator())
                                                    .replaceAll("\\t+", System.lineSeparator());
+        if (logger.isDebugEnabled()){
+            logger.debug("found this certificate in the " + WONCRYPT.CLIENT_CERTIFICATE_HEADER + " header: "+ certificateHeader);
+            logger.debug("found this certificate in the " + WONCRYPT.CLIENT_CERTIFICATE_HEADER + " header (after whitespace replacement): " + certificateContent);
+        }
       X509Certificate[] userCertificate = new X509Certificate[1];
       try {
         userCertificate[0] = (X509Certificate) certificateFactory
           .generateCertificate(new ByteArrayInputStream(certificateContent.getBytes("ISO-8859-11")));
       } catch (CertificateException e) {
-        throw new InternalAuthenticationServiceException("could not extract certificate from request", e);
+        throw new AuthenticationCredentialsNotFoundException("could not extract certificate from request", e);
       } catch (UnsupportedEncodingException e) {
-        throw new InternalAuthenticationServiceException("could not extract certificate from request with encoding " +
+        throw new AuthenticationCredentialsNotFoundException("could not extract certificate from request with encoding " +
                                                            "ISO-8859-11",e);
       }
       certificateChainObj = userCertificate;

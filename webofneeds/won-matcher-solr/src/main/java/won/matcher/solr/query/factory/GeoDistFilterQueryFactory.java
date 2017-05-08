@@ -1,43 +1,31 @@
 package won.matcher.solr.query.factory;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import won.matcher.solr.index.NeedIndexer;
-import won.protocol.util.WonRdfUtils;
-
-import java.net.URI;
-
 /**
  * Created by hfriedrich on 22.08.2016.
  */
-public class GeoDistFilterQueryFactory extends NeedDatasetQueryFactory
-{
-  private Float latitude;
-  private Float longitude;
-  private double distance;
+public class GeoDistFilterQueryFactory extends SolrQueryFactory {
 
-  public GeoDistFilterQueryFactory(Dataset need, double distanceInKilometers) {
-    super(need);
+    private float latitude;
+    private float longitude;
+    private String solrLocationField;
+    private double distance;
 
-    Model needModel = WonRdfUtils.NeedUtils.getNeedModelFromNeedDataset(needDataset);
-    URI needUri = WonRdfUtils.NeedUtils.getNeedURI(needModel);
-    latitude = WonRdfUtils.NeedUtils.getLocationLatitude(needModel, needUri);
-    longitude = WonRdfUtils.NeedUtils.getLocationLongitude(needModel, needUri);
-    distance = distanceInKilometers;
-  }
+    public GeoDistFilterQueryFactory(String solrLocationField, float latitude, float longitude, double distanceInKilometers) {
 
-  @Override
-  protected String makeQueryString() {
-
-    if (longitude == null || latitude == null) {
-      return "";
+        this.solrLocationField = solrLocationField;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        distance = distanceInKilometers;
     }
 
-    // create a geographical distance filter with radius "distance"
-    StringBuilder sb = new StringBuilder();
-    sb.append("{!geofilt sfield=").append(NeedIndexer.SOLR_LOCATION_COORDINATES_FIELD).append(" pt=").append(latitude)
-      .append(",").append(longitude).append(" d=").append(distance).append("}");
-    return sb.toString();
-  }
+    @Override
+    protected String makeQueryString() {
+
+        // create a geographical distance filter with radius "distance" (in kilometers)
+        StringBuilder sb = new StringBuilder();
+        sb.append("{!geofilt sfield=").append(solrLocationField).append(" pt=")
+                .append(latitude).append(",").append(longitude).append(" d=").append(distance).append("}");
+        return sb.toString();
+    }
 
 }

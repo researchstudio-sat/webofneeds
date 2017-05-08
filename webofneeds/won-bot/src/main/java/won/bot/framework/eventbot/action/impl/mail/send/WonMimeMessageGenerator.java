@@ -2,8 +2,6 @@ package won.bot.framework.eventbot.action.impl.mail.send;
 
 import org.apache.jena.query.*;
 import org.apache.jena.tdb.TDB;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -12,9 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.mail.receive.MailContentExtractor;
-import won.protocol.model.BasicNeedType;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.sparql.WonQueries;
 
 import javax.mail.MessagingException;
@@ -26,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -121,13 +120,12 @@ public class WonMimeMessageGenerator {
       throws MessagingException, UnsupportedEncodingException {
 
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
+        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
 
         MimeMessage answerMessage = (MimeMessage) msgToRespondTo.reply(false);
         answerMessage.setFrom(new InternetAddress(sentFrom, sentFromName));
         answerMessage.setText("");
-        answerMessage.setSubject(answerMessage.getSubject() + " <-> [" + BasicNeedType
-          .fromURI(WonRdfUtils.NeedUtils.getBasicNeedType(remoteNeedRDF)) + "] " + WonRdfUtils.NeedUtils
-          .getNeedTitle(remoteNeedRDF));
+        answerMessage.setSubject(answerMessage.getSubject() + " <-> " + needModelWrapper.getTitleFromIsOrAll());
 
         //We need to create an instance of our own MimeMessage Implementation in order to have the Unique Message Id set before sending
         WonMimeMessage wonAnswerMessage = new WonMimeMessage(answerMessage);
@@ -154,13 +152,14 @@ public class WonMimeMessageGenerator {
      */
     private void putRemoteNeedInfo(VelocityContext velocityContext, URI remoteNeedUri) {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
+        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
 
-        velocityContext.put("remoteNeedTitle",
-                            WonRdfUtils.NeedUtils.getNeedTitle(remoteNeedRDF).replaceAll("\\n", "\n" + QUOTE_CHAR));
-        velocityContext.put("remoteNeedDescription", WonRdfUtils.NeedUtils.getNeedDescription(remoteNeedRDF)
-                                                                          .replaceAll("\\n", "\n" + QUOTE_CHAR));
+        velocityContext.put("remoteNeedTitle", needModelWrapper.getTitleFromIsOrAll().replaceAll(
+          "\\n", "\n" + QUOTE_CHAR));
+        velocityContext.put("remoteNeedDescription", needModelWrapper.getDescription(
+                NeedContentPropertyType.ALL).replaceAll("\\n", "\n" + QUOTE_CHAR));
 
-        List<String> tags = WonRdfUtils.NeedUtils.getTags(remoteNeedRDF);
+        Collection<String> tags = needModelWrapper.getTags(NeedContentPropertyType.ALL);
         velocityContext.put("remoteNeedTags", tags.size() > 0 ? tags : null);
         velocityContext.put("remoteNeedUri", remoteNeedUri);
     }

@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.matcher.solr.config.SolrMatcherConfig;
 import won.matcher.solr.hints.HintBuilder;
-import won.matcher.solr.query.factory.BasicNeedQueryFactory;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -44,7 +43,7 @@ public class DefaultMatcherQueryExecuter implements SolrMatcherQueryExecutor
     SolrQuery query = new SolrQuery();
     log.debug("use query: {} with filters {}", queryString, filterQueries);
     query.setQuery(queryString);
-    query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD, BasicNeedQueryFactory.NEED_TITLE_SOLR_FIELD);
+    query.setFields("id", "score", HintBuilder.WON_NODE_SOLR_FIELD);
     query.setRows(config.getMaxHints());
 
     if (filterQueries != null) {

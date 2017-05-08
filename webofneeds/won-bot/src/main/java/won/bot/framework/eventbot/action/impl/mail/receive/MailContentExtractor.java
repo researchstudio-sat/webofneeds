@@ -1,7 +1,7 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
 import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
-import won.protocol.model.BasicNeedType;
+import won.protocol.model.NeedContentPropertyType;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -66,6 +66,25 @@ public class MailContentExtractor
     Pattern referenceMailPattern = Pattern.compile("Message-Id_(.+)");
     Matcher m = referenceMailPattern.matcher(message.getSubject());
     return m.find() ? m.group(1) : null;
+  }
+
+  public NeedContentPropertyType getNeedType(MimeMessage message) throws MessagingException {
+    return getNeedType(message.getSubject());
+  }
+
+  public NeedContentPropertyType getNeedType(String subject) {
+
+    if (demandTypePattern.matcher(subject).matches()) {
+      return NeedContentPropertyType.SEEKS;
+    } else if (supplyTypePattern.matcher(subject).matches()) {
+      return NeedContentPropertyType.IS;
+    } else if (doTogetherTypePattern.matcher(subject).matches()) {
+      return NeedContentPropertyType.IS_AND_SEEKS;
+    } else if (critiqueTypePattern.matcher(subject).matches()) {
+      return NeedContentPropertyType.IS_AND_SEEKS;
+    }
+
+    return null;
   }
 
   public static String getMailText(MimeMessage message) throws MessagingException, IOException {
@@ -159,7 +178,7 @@ public class MailContentExtractor
   }
 
   public boolean isCreateNeedMail(MimeMessage messsage) throws MessagingException {
-    return getBasicNeedType(messsage) != null;
+    return getNeedType(messsage) != null;
   }
 
   public boolean isCommandMail(MimeMessage message) throws IOException, MessagingException {
@@ -221,25 +240,6 @@ public class MailContentExtractor
         return m.group().trim();
       }
     }
-    return null;
-  }
-
-  public BasicNeedType getBasicNeedType(MimeMessage message) throws MessagingException {
-    return getBasicNeedType(message.getSubject());
-  }
-
-  public BasicNeedType getBasicNeedType(String subject) {
-
-    if (demandTypePattern.matcher(subject).matches()) {
-      return BasicNeedType.DEMAND;
-    } else if (supplyTypePattern.matcher(subject).matches()) {
-      return BasicNeedType.SUPPLY;
-    } else if (doTogetherTypePattern.matcher(subject).matches()) {
-      return BasicNeedType.DO_TOGETHER;
-    } else if (critiqueTypePattern.matcher(subject).matches()) {
-      return BasicNeedType.CRITIQUE;
-    }
-
     return null;
   }
 

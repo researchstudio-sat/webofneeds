@@ -2,8 +2,8 @@
 
 import angular from 'angular';
 import overviewTitleBarModule from '../overview-title-bar';
-import requestItemLineModule from '../request-item-line';
 import openRequestModule from '../open-request';
+import connectionsOverviewModule from '../connections-overview';
 import { attach,mapToMatches } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
 import { selectAllByConnections } from '../../selectors';
@@ -13,6 +13,7 @@ class IncomingRequestsController {
     constructor() {
         attach(this, serviceDependencies, arguments);
         window.oireq = this;
+        this.WON = won.WON;
 
         this.selection = 2;
         this.ownerSelection = 2; //ONLY NECESSARY FOR VIEW WITH NEED
@@ -23,7 +24,9 @@ class IncomingRequestsController {
 
             if(state.getIn(['router', 'currentParams', 'myUri']) === undefined) {
                 return {
+                    WON: won.WON,
                     connection: state.getIn(['connections', connectionUri]),
+                    /*
                     incomingRequests: Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
                         .filter(conn=>
@@ -36,6 +39,8 @@ class IncomingRequestsController {
                             conn.connection.hasConnectionState === won.WON.RequestReceived
                         )
                     ),
+                    */
+
                     hasRequests: Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
                         .filter(conn=>{
@@ -47,8 +52,10 @@ class IncomingRequestsController {
             }else{
                 const postId = decodeURIComponent(state.getIn(['router', 'currentParams', 'myUri']));
                 return {
+                    WON: won.WON,
                     post: state.getIn(['needs','ownNeeds', postId]).toJS(),
                     connection: state.getIn(['connections', connectionUri]),
+                    /*
                     incomingRequests: Object.keys(connectionsDeprecated)
                         .map(key => connectionsDeprecated[key])
                         .filter(conn=>
@@ -61,6 +68,7 @@ class IncomingRequestsController {
                             conn.connection.hasConnectionState === won.WON.RequestReceived && conn.ownNeed['@id'] === postId
                         )
                     )
+                    */
                 };
             }
         }
@@ -69,14 +77,18 @@ class IncomingRequestsController {
         //  this.loadMatches();
         this.$scope.$on('$destroy', disconnect);
     }
+
+    selectedConnection(connectionUri) {
+        this.router__stateGo('overviewIncomingRequests', {connectionUri});
+    }
 }
 
 IncomingRequestsController.$inject = [];
 
 export default angular.module('won.owner.components.overviewIncomingRequests', [
         overviewTitleBarModule,
-        requestItemLineModule,
-        openRequestModule
+        openRequestModule,
+        connectionsOverviewModule,
     ])
     .controller('OverviewIncomingRequestsController', [...serviceDependencies,IncomingRequestsController])
     .name;

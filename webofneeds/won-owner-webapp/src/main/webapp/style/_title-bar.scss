@@ -4,8 +4,8 @@
 
 @mixin title-bar($prefix) {
   background-color: $won-light-gray;
-  border-top: $thinBorder solid $won-line-gray;
-  border-bottom: $thinBorder solid $won-line-gray;
+  border-top: $thinBorderWidth solid $won-line-gray;
+  border-bottom: $thinBorderWidth solid $won-line-gray;
 
   @include max-content-width($maxContentWidth, $minContentPadding, $prefix);
 

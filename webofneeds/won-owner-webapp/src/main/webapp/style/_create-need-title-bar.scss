@@ -21,9 +21,9 @@
   }
 
   @media (max-width: $responsivenessBreakPoint) {
-    @include speech-bubble-top($won-light-gray, $won-line-gray, 1rem, $thinBorder, 47%);
+    @include speech-bubble-top($won-light-gray, $won-line-gray, 1rem, $thinBorderWidth, 47%);
   }
   @media (min-width: $responsivenessBreakPoint) {
-    @include speech-bubble-top($won-light-gray, $won-line-gray, 1rem, $thinBorder, 50%);
+    @include speech-bubble-top($won-light-gray, $won-line-gray, 1rem, $thinBorderWidth, 50%);
   }
 }
