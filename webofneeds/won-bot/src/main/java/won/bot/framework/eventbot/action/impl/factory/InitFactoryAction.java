@@ -68,6 +68,9 @@ public class InitFactoryAction extends AbstractCreateNeedAction {
             return;
         }
 
+        final boolean usedForTesting = this.usedForTesting;
+        final boolean doNotMatch = this.doNotMatch;
+
         EventListenerContext ctx = getEventListenerContext();
         EventBus bus = ctx.getEventBus();
         FactoryBotContextWrapper botContextWrapper = (FactoryBotContextWrapper) ctx.getBotContextWrapper();
@@ -107,7 +110,7 @@ public class InitFactoryAction extends AbstractCreateNeedAction {
                     if(needURI != null){
                         bus.publish(new FactoryNeedCreationSkippedEvent());
                     }else{
-                        bus.publish(new CreateNeedCommandEvent(model, botContextWrapper.getFactoryListName(), true, false));
+                        bus.publish(new CreateNeedCommandEvent(model, botContextWrapper.getFactoryListName(), usedForTesting, doNotMatch));
                     }
                 }
             }
