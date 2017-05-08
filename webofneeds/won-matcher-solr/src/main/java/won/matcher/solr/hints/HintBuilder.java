@@ -150,7 +150,7 @@ public class HintBuilder
     //matchingBehavior:
     MatchingBehaviorType matchedNeedMatchingBehavior = MatchingBehaviorType.MUTUAL;
     Object matchingBehaviorFieldValue = doc.getFieldValue(MATCHING_BEHAVIOR_SOLR_FIELD);
-    if (matchingBehaviorFieldValue == null){
+    if (matchingBehaviorFieldValue != null){
       matchedNeedMatchingBehavior = MatchingBehaviorType.fromURI(matchingBehaviorFieldValue.toString());
       if (matchedNeedMatchingBehavior == null) {
         //default matching behavior: mutual
