@@ -75,7 +75,7 @@ xsd:duration rdf:type rdfs:Datatype .
 :hasFacet rdf:type owl:ObjectProperty ;
           rdfs:domain :Need ;
           rdfs:range :Facet ;
-          rdfs:comment "Indicates that a need or connection supports the specified facet (=behaviour)."@en ;
+          rdfs:comment "Indicates that a need or connection supports the specified facet (=behavior)."@en ;
           rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
@@ -150,7 +150,7 @@ xsd:duration rdf:type rdfs:Datatype .
 
 ###  http://purl.org/webofneeds/model#hasRemoteFacet
 :hasRemoteFacet rdf:type owl:ObjectProperty ;
-                rdfs:comment "Indicates that a remote need or remote connection supports the specified facet (=behaviour) or specifies the remote facet to connect with."@en ;
+                rdfs:comment "Indicates that a remote need or remote connection supports the specified facet (=behavior) or specifies the remote facet to connect with."@en ;
                 rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
@@ -347,7 +347,7 @@ seeked to fulfill the need in contrast to the part that is available.""" ;
 
 ###  http://purl.org/webofneeds/model#Facet
 :Facet rdf:type owl:Class ;
-       rdfs:comment "Facets are behaviours a Need can choose to support. Connections have a Facet; Needs can be connected through multiple Connections if they have different Facets."@en ;
+       rdfs:comment "Facets are behaviors a Need can choose to support. Connections have a Facet; Needs can be connected through multiple Connections if they have different Facets."@en ;
        rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
@@ -467,13 +467,13 @@ xsd:string rdf:type owl:Class .
 ###  http://purl.org/webofneeds/model#DoNotMatch
 :DoNotMatch rdf:type owl:NamedIndividual ,
                      :MatchingBehavior ;
-            rdfs:comment "A Need specifying this matching behaviour indicates that matchers should ignore this Need."@en ;
+            rdfs:comment "A Need specifying this matching behavior indicates that matchers should ignore this Need."@en ;
             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 ###  http://purl.org/webofneeds/model#Greedy
 :Greedy rdf:type owl:NamedIndividual ,
                  :MatchingBehavior ;
-        rdfs:comment "A Need specifying this matching behaviour indicates that matchers should send hints to this Need and to the remote Need, even if the remote Need specifies its matching behavior as 'STEALTHY' "@en ;
+        rdfs:comment "A Need specifying this matching behavior indicates that matchers should send hints to this Need and to the remote Need, even if the remote Need specifies its matching behavior as 'STEALTHY' "@en ;
         rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 ###  http://purl.org/webofneeds/model#GroupFacet
