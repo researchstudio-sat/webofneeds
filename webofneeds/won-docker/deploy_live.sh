@@ -19,6 +19,13 @@ scp $WORKSPACE/webofneeds/won-docker/image/gencert/openssl.conf won@satvm01:$bas
 # copy the nginx.conf file to the proxy server
 scp $WORKSPACE/webofneeds/won-docker/image/nginx/nginx.conf won@satvm01:$base_folder/nginx.conf
 
+# create the solr data directories (if not available yet) with full rights for every user.
+# This is done so that the directory on the host can be written by the solr user from inside the container
+ssh won@satvm01 mkdir -p $base_folder/solr/won/data
+ssh won@satvm01 mkdir -p $base_folder/solr/wontest/data
+ssh won@satvm01 chmod 777 $base_folder/solr/won/data
+ssh won@satvm01 chmod 777 $base_folder/solr/wontest/data
+
 echo build the docker containers
 docker --tlsverify -H satvm01.researchstudio.at:2376 pull webofneeds/bigdata
 # TODO: change the explicit passing of tls params when docker-compose bug is fixed: https://github.com/docker/compose/issues/1427
