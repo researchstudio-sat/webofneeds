@@ -109,13 +109,8 @@ public class HintBuilder
     for (SolrDocument doc : newDocs) {
 
       String matchedNeedUri = doc.getFieldValue("id").toString();
+      MatchingBehaviorType matchedNeedMatchingBehavior = getMatchingBehaviorTypeForMatchedNeed(doc);
 
-      //matchingBehavior:
-      MatchingBehaviorType matchedNeedMatchingBehavior = MatchingBehaviorType.fromURI(doc.getFieldValue(MATCHING_BEHAVIOR_SOLR_FIELD).toString());
-      if (matchedNeedMatchingBehavior == null) {
-        //default matching behavior: mutual
-        matchedNeedMatchingBehavior = MatchingBehaviorType.MUTUAL;
-      }
       // wonNodeUri can be returned as either a String or ArrayList, not sure on what this depends
       String wonNodeUri = null;
       Object nodeObject = doc.getFieldValue(WON_NODE_SOLR_FIELD);
@@ -149,5 +144,19 @@ public class HintBuilder
     }
 
     return bulkHintEvent;
+  }
+
+  public MatchingBehaviorType getMatchingBehaviorTypeForMatchedNeed(SolrDocument doc) {
+    //matchingBehavior:
+    MatchingBehaviorType matchedNeedMatchingBehavior = MatchingBehaviorType.MUTUAL;
+    Object matchingBehaviorFieldValue = doc.getFieldValue(MATCHING_BEHAVIOR_SOLR_FIELD);
+    if (matchingBehaviorFieldValue == null){
+      matchedNeedMatchingBehavior = MatchingBehaviorType.fromURI(matchingBehaviorFieldValue.toString());
+      if (matchedNeedMatchingBehavior == null) {
+        //default matching behavior: mutual
+        matchedNeedMatchingBehavior = MatchingBehaviorType.MUTUAL;
+      }
+    }
+    return matchedNeedMatchingBehavior;
   }
 }
