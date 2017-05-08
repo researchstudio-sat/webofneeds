@@ -470,6 +470,11 @@ xsd:string rdf:type owl:Class .
             rdfs:comment "A Need specifying this matching behaviour indicates that matchers should ignore this Need."@en ;
             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
+###  http://purl.org/webofneeds/model#Greedy
+:Greedy rdf:type owl:NamedIndividual ,
+                 :MatchingBehavior ;
+        rdfs:comment "A Need specifying this matching behaviour indicates that matchers should send hints to this Need and to the remote Need, even if the remote Need specifies its matching behavior as 'STEALTHY' "@en ;
+        rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 ###  http://purl.org/webofneeds/model#GroupFacet
 :GroupFacet rdf:type owl:NamedIndividual ,
@@ -488,14 +493,14 @@ xsd:string rdf:type owl:Class .
 ###  http://purl.org/webofneeds/model#Lazy
 :Lazy rdf:type owl:NamedIndividual ,
                :MatchingBehavior ;
-      rdfs:comment "A Need specifying this matching behaviour indicates that matchers should send hints only to the remote Need, but not to this Need."@en ;
+      rdfs:comment "A Need specifying this matching behavior indicates that matchers should send hints only to the remote Need, but not to this Need."@en ;
       rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
 ###  http://purl.org/webofneeds/model#Mutual
 :Mutual rdf:type owl:NamedIndividual ,
                  :MatchingBehavior ;
-        rdfs:comment "A Need specifying this matching behaviour indicates that matchers should send hints to this Need and to the remote Need."@en ;
+        rdfs:comment "A Need specifying this matching behavior indicates that matchers should send hints to this Need and to the remote Need."@en ;
         rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
@@ -523,7 +528,7 @@ xsd:string rdf:type owl:Class .
 ###  http://purl.org/webofneeds/model#Stealthy
 :Stealthy rdf:type owl:NamedIndividual ,
                    :MatchingBehavior ;
-          rdfs:comment "A Need specifying this matching behaviour indicates that matchers should send hints only to this Need, not to the remote Need."@en ;
+          rdfs:comment "A Need specifying this matching behavior indicates that matchers should send hints only to this Need, not to the remote Need."@en ;
           rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
