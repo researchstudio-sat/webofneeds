@@ -28,7 +28,6 @@ import won.matcher.solr.query.TestMatcherQueryExecutor;
 import won.matcher.solr.query.factory.CreationDateQueryFactory;
 import won.matcher.solr.query.factory.DefaultNeedQueryFactory;
 import won.matcher.solr.query.factory.NeedStateQueryFactory;
-import won.protocol.model.MatchingBehaviorType;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.vocabulary.WON;
 
@@ -84,8 +83,8 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     // check if the need has doNotMatch flag, then do not use it for querying or indexing
     Dataset dataset = deserializeNeed(needEvent);
     NeedModelWrapper needModelWrapper = new NeedModelWrapper(dataset);
-    if (needModelWrapper.getMatchingBehavior().equals(MatchingBehaviorType.DO_NOT_MATCH)) {
-      log.info("Discard received need cause of matching behavior DO_NOT_MATCH: {}", needEvent);
+    if (needModelWrapper.hasFlag(WON.DO_NOT_MATCH)) {
+      log.info("Discarding received need due to flag DO_NOT_MATCH: {}", needEvent);
       return;
     }
 

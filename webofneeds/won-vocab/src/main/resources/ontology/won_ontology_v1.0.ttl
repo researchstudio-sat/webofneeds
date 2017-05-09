@@ -211,6 +211,19 @@ seeked to fulfill the need in contrast to the part that is available.""" ;
                          rdfs:comment "Connects a Need object with a description of a WON protocol it supports."@en ;
                          rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
+### http://purl.org/webofneeds/model#wantsHints
+:wantsHints rdf:type owl:ObjectProperty ;
+                         rdfs:domain :Need ;
+                         rdfs:range :HintSetting ;
+                         rdfs:comment "Informs matchers if they should send hints to this Need."@en ;
+                         rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+
+### http://purl.org/webofneeds/model#wantsHintsForCounterpart
+:wantsHints rdf:type owl:ObjectProperty ;
+                         rdfs:domain :Need ;
+                         rdfs:range :HintSetting ;
+                         rdfs:comment "Informs matchers if they should send hints to the matched Need (i.e., the prospecive 'counterpart' of this Need)."@en ;
+                         rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 #################################################################
 #    Data properties
@@ -357,17 +370,15 @@ seeked to fulfill the need in contrast to the part that is available.""" ;
       rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
+###  http://purl.org/webofneeds/model#Flag
+:HintSetting rdf:type owl:Class ;
+      rdfs:comment "Superclass of all HintSetting individuals a need can have."@en ;
+      rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+
 ###  http://purl.org/webofneeds/model#LocationSpecification
 :LocationSpecification rdf:type owl:Class ;
                        rdfs:comment "Specifies where a Need is available."@en ;
                        rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
-
-###  http://purl.org/webofneeds/model#MatchingBehavior
-:MatchingBehavior rdf:type owl:Class ;
-                  rdfs:comment "Defines the behavior that matchers should use to send hints to the need. The default is Mutual."@en ;
-                  rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
 
 ###  http://purl.org/webofneeds/model#Need
 :Need rdf:type owl:Class ;
@@ -465,16 +476,9 @@ xsd:string rdf:type owl:Class .
 
 
 ###  http://purl.org/webofneeds/model#DoNotMatch
-:DoNotMatch rdf:type owl:NamedIndividual ,
-                     :MatchingBehavior ;
-            rdfs:comment "A Need specifying this matching behavior indicates that matchers should ignore this Need."@en ;
+:DoNotMatch rdf:type owl:NamedIndividual, :Flag;
+            rdfs:comment "A Need specifying this flag indicates that matchers should ignore this Need."@en ;
             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
-###  http://purl.org/webofneeds/model#Greedy
-:Greedy rdf:type owl:NamedIndividual ,
-                 :MatchingBehavior ;
-        rdfs:comment "A Need specifying this matching behavior indicates that matchers should send hints to this Need and to the remote Need, even if the remote Need specifies its matching behavior as 'STEALTHY' "@en ;
-        rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 ###  http://purl.org/webofneeds/model#GroupFacet
 :GroupFacet rdf:type owl:NamedIndividual ,
@@ -488,21 +492,6 @@ xsd:string rdf:type owl:Class .
                    :NeedState ;
           rdfs:comment "The incative state. Needs do not communicate in this state. Intended to stop receiving messages for something not currently of interest."@en ;
           rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
-
-###  http://purl.org/webofneeds/model#Lazy
-:Lazy rdf:type owl:NamedIndividual ,
-               :MatchingBehavior ;
-      rdfs:comment "A Need specifying this matching behavior indicates that matchers should send hints only to the remote Need, but not to this Need."@en ;
-      rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
-
-###  http://purl.org/webofneeds/model#Mutual
-:Mutual rdf:type owl:NamedIndividual ,
-                 :MatchingBehavior ;
-        rdfs:comment "A Need specifying this matching behavior indicates that matchers should send hints to this Need and to the remote Need."@en ;
-        rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
 
 ###  http://purl.org/webofneeds/model#OwnerFacet
 :OwnerFacet rdf:type owl:NamedIndividual ,
@@ -524,14 +513,6 @@ xsd:string rdf:type owl:Class .
              rdfs:comment "Half-open state. The Connection has been requested by the local end but not yet been accepted by the remote counterpart."@en ;
              rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
-
-###  http://purl.org/webofneeds/model#Stealthy
-:Stealthy rdf:type owl:NamedIndividual ,
-                   :MatchingBehavior ;
-          rdfs:comment "A Need specifying this matching behavior indicates that matchers should send hints only to this Need, not to the remote Need."@en ;
-          rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
-
 ###  http://purl.org/webofneeds/model#Suggested
 :Suggested rdf:type owl:NamedIndividual ,
                     :ConnectionState ;
@@ -542,6 +523,25 @@ xsd:string rdf:type owl:Class .
 ###  http://purl.org/webofneeds/model#UsedForTesting
 :UsedForTesting rdf:type owl:NamedIndividual ,
                          :Flag .
+
+###  http://purl.org/webofneeds/model#Yes
+:Yes rdf:type owl:NamedIndividual ,
+                      :HintSetting ;
+             rdfs:comment "This HintSetting tells matchers to send hints."@en ;
+             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+
+###  http://purl.org/webofneeds/model#No
+:No rdf:type owl:NamedIndividual ,
+                      :HintSetting ;
+             rdfs:comment "This HintSetting tells matchers not to send hints."@en ;
+             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+
+###  http://purl.org/webofneeds/model#WeakYes
+:WeakYes rdf:type owl:NamedIndividual ,
+                      :HintSetting ;
+             rdfs:comment "This HintSetting tells matchers to send hints unless the counterpart uses 'No'."@en ;
+             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+
 
 
 #################################################################

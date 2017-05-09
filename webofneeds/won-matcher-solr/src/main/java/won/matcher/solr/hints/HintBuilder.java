@@ -11,7 +11,7 @@ import won.matcher.service.common.event.HintEvent;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.solr.config.SolrMatcherConfig;
 import won.matcher.solr.utils.Kneedle;
-import won.protocol.model.MatchingBehaviorType;
+import won.protocol.model.HintSetting;
 import won.protocol.util.NeedModelWrapper;
 
 import java.util.Comparator;
@@ -26,7 +26,8 @@ public class HintBuilder
   private final Logger log = LoggerFactory.getLogger(getClass());
 
   public final static String WON_NODE_SOLR_FIELD = "_graph.http___purl.org_webofneeds_model_hasWonNode._id";
-  public final static String MATCHING_BEHAVIOR_SOLR_FIELD ="_graph.http___purl.org_webofneeds_model_hasMatchingBehavior._id";
+  public final static String WANTS_HINTS_SOLR_FIELD ="_graph.http___purl.org_webofneeds_model_wantsHints._id";
+  public final static String WANTS_HINTS_FOR_COUNTERPART_SOLR_FIELD ="_graph.http___purl.org_webofneeds_model_wantsHintsForCounterpart._id";
 
   @Autowired
   private SolrMatcherConfig config;
@@ -103,47 +104,47 @@ public class HintBuilder
     BulkHintEvent bulkHintEvent = new BulkHintEvent();
     SolrDocumentList newDocs = calculateMatchingResults(docs);
     log.info("Received {} matches as query result for need {}, keeping the top {} ", new Object[]{(docs != null) ? docs.size() : 0, need, newDocs.size()});
-    MatchingBehaviorType needMatchingBehavior = needModelWrapper.getMatchingBehavior();
-    log.debug("need to be matched has MatchingBehaviorType {} ", needMatchingBehavior);
+    HintSetting wantsHints = needModelWrapper.getWantsHints();
+    HintSetting wantsHintsForCounterpart = needModelWrapper.getWantsHintsForCounterpart();
+    log.debug("need to be matched has wantsHints: {}, wantsHintsForCounterpart: {} ", wantsHints, wantsHintsForCounterpart);
     for (SolrDocument doc : newDocs) {
       //NOTE: not the whole document is loaded here. The fields that are selected are defined
       //in won.matcher.solr.query.DefaultMatcherQueryExecuter - if additional fields are required, the field list
       //has to be exended in that class.
 
       String matchedNeedUri = doc.getFieldValue("id").toString();
-      MatchingBehaviorType matchedNeedMatchingBehavior = getMatchingBehaviorTypeForMatchedNeed(doc);
-      log.debug("matched need has MatchingBehaviorType {}", matchedNeedMatchingBehavior);
+      if (matchedNeedUri == null) {
+        log.debug("omitting matched need: could not extract need URI");
+        continue;
+      }
+      HintSetting matchedNeedWantsHints = getHintSetting(doc, WANTS_HINTS_SOLR_FIELD);
+      HintSetting matchedNeedWantsHintsForCounterpart = getHintSetting(doc, WANTS_HINTS_FOR_COUNTERPART_SOLR_FIELD);
+      log.debug("matched need has wantsHints: {}, wantsHintsForCounterpart: {}", matchedNeedWantsHints, matchedNeedWantsHintsForCounterpart);
       // wonNodeUri can be returned as either a String or ArrayList, not sure on what this depends
-      String wonNodeUri = null;
-      Object nodeObject = doc.getFieldValue(WON_NODE_SOLR_FIELD);
-      if (nodeObject instanceof String) {
-        wonNodeUri = doc.getFieldValue(WON_NODE_SOLR_FIELD).toString();
-      } else {
-        wonNodeUri = ((List) doc.getFieldValue(WON_NODE_SOLR_FIELD)).get(0).toString();
+      String wonNodeUri  = getFieldValueFirstOfListIfNecessary(doc, WON_NODE_SOLR_FIELD);
+      if (wonNodeUri == null) {
+        log.debug("omitting matched need {}: could not extract WoN node URI", matchedNeedUri);
+        continue;
       }
 
       // normalize the final score
       double score = Double.valueOf(doc.getFieldValue("score").toString()) * config.getScoreNormalizationFactor();
 
-      if (score > 1.0) {
-        score = 1.0;
-      } else if (score < 0.0) {
-        score = 0.0;
-      }
+      score = Math.max(0, Math.min(1, score));
 
       log.debug("generate hint for match {} with normalized score {}", matchedNeedUri, score);
       if (log.isDebugEnabled()){
-        log.debug("need will receive a hint: {} (uri: {})", needMatchingBehavior.shouldSendHintGivenPartnerMatchingBehavior(matchedNeedMatchingBehavior), need.getUri());
-        log.debug("matched need need will receive a hint: {} (uri: {})", matchedNeedMatchingBehavior.shouldSendHintGivenPartnerMatchingBehavior(needMatchingBehavior), matchedNeedUri);
+        log.debug("need will receive a hint: {} (uri: {})", HintSetting.shouldSendHint(wantsHints, matchedNeedWantsHintsForCounterpart), need.getUri());
+        log.debug("matched need need will receive a hint: {} (uri: {})", HintSetting.shouldSendHint(matchedNeedWantsHints, wantsHintsForCounterpart), matchedNeedUri);
       }
 
-      if (needMatchingBehavior.shouldSendHintGivenPartnerMatchingBehavior(matchedNeedMatchingBehavior)) {
+      if (HintSetting.shouldSendHint(wantsHints, matchedNeedWantsHintsForCounterpart)) {
         bulkHintEvent.addHintEvent(new HintEvent(need.getWonNodeUri(), need.getUri(), wonNodeUri, matchedNeedUri,
                 config.getSolrServerPublicUri(), score));
       }
 
       // also send the same hints to the other side (remote need and wonnode)?
-      if (matchedNeedMatchingBehavior.shouldSendHintGivenPartnerMatchingBehavior(needMatchingBehavior)) {
+      if (HintSetting.shouldSendHint(matchedNeedWantsHints, wantsHintsForCounterpart)) {
         bulkHintEvent.addHintEvent(new HintEvent(wonNodeUri, matchedNeedUri, need.getWonNodeUri(), need.getUri(),
                                                  config.getSolrServerPublicUri(), score));
       }
@@ -152,20 +153,30 @@ public class HintBuilder
     return bulkHintEvent;
   }
 
-  public MatchingBehaviorType getMatchingBehaviorTypeForMatchedNeed(SolrDocument doc) {
+  private HintSetting getHintSetting(SolrDocument doc, String fieldName) {
     //matchingBehavior:
-    MatchingBehaviorType matchedNeedMatchingBehavior = MatchingBehaviorType.MUTUAL;
-    Object matchingBehaviorFieldValue = doc.getFieldValue(MATCHING_BEHAVIOR_SOLR_FIELD);
-    if (matchingBehaviorFieldValue != null){
-      matchedNeedMatchingBehavior = MatchingBehaviorType.fromURI(matchingBehaviorFieldValue.toString());
-      if (matchedNeedMatchingBehavior == null) {
-        log.debug("MatchingBehavior value in field {}, '{}', could not be converted to a known value, using default value MUTUAL", MATCHING_BEHAVIOR_SOLR_FIELD, matchingBehaviorFieldValue);
-        //default matching behavior: mutual
-        matchedNeedMatchingBehavior = MatchingBehaviorType.MUTUAL;
-      }
-    } else {
-      log.debug("did not find a MatchingBehavior value in field {}, using default value MUTUAL", MATCHING_BEHAVIOR_SOLR_FIELD);
+    String hintSettingString = getFieldValueFirstOfListIfNecessary(doc, fieldName);
+    if (hintSettingString == null) {
+      log.debug("did not find a HintSetting value in field {}, using default value {}", fieldName, HintSetting.DEFAULT);
+      return HintSetting.DEFAULT;
     }
-    return matchedNeedMatchingBehavior;
+    HintSetting hintSetting = HintSetting.fromURI(hintSettingString.toString());
+    if (hintSetting == null) {
+      log.debug("HintSetting value in field {}, '{}', could not be converted to a known value, using default value {}", new Object[]{fieldName, hintSettingString, HintSetting.DEFAULT});
+      return HintSetting.DEFAULT;
+    }
+    return hintSetting;
+  }
+
+  private String getFieldValueFirstOfListIfNecessary(SolrDocument doc, String field){
+    Object value = doc.getFieldValue(field);
+    if (value == null) return null;
+    if (value instanceof String) {
+      return (String) value;
+    }
+    if (value instanceof List) {
+      return ((List) value).get(0).toString();
+    }
+    return null;
   }
 }

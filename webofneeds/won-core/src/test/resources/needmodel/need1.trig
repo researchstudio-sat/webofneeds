@@ -46,7 +46,7 @@
                                                           ] ;
             won:hasFacet          won:OwnerFacet ;
             won:hasFlag           won:UsedForTesting ;
-            won:hasMatchingBehavior won:Lazy;
+            won:wantsHints won:No;
             cert:key              [ cert:PublicKey  [ a                       woncrypt:ECCPublicKey ;
                                                       woncrypt:ecc_algorithm  "EC" ;
                                                       woncrypt:ecc_curveId    "secp384r1" ;
