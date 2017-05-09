@@ -106,6 +106,9 @@ public class HintBuilder
     MatchingBehaviorType needMatchingBehavior = needModelWrapper.getMatchingBehavior();
     log.debug("need to be matched has MatchingBehaviorType {} ", needMatchingBehavior);
     for (SolrDocument doc : newDocs) {
+      //NOTE: not the whole document is loaded here. The fields that are selected are defined
+      //in won.matcher.solr.query.DefaultMatcherQueryExecuter - if additional fields are required, the field list
+      //has to be exended in that class.
 
       String matchedNeedUri = doc.getFieldValue("id").toString();
       MatchingBehaviorType matchedNeedMatchingBehavior = getMatchingBehaviorTypeForMatchedNeed(doc);
