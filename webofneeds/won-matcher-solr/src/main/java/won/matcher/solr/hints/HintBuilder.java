@@ -156,9 +156,12 @@ public class HintBuilder
     if (matchingBehaviorFieldValue != null){
       matchedNeedMatchingBehavior = MatchingBehaviorType.fromURI(matchingBehaviorFieldValue.toString());
       if (matchedNeedMatchingBehavior == null) {
+        log.debug("MatchingBehavior value in field {}, '{}', could not be converted to a known value, using default value MUTUAL", MATCHING_BEHAVIOR_SOLR_FIELD, matchingBehaviorFieldValue);
         //default matching behavior: mutual
         matchedNeedMatchingBehavior = MatchingBehaviorType.MUTUAL;
       }
+    } else {
+      log.debug("did not find a MatchingBehavior value in field {}, using default value MUTUAL", MATCHING_BEHAVIOR_SOLR_FIELD);
     }
     return matchedNeedMatchingBehavior;
   }
