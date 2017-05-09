@@ -101,16 +101,15 @@ public class HintBuilder
 
     // generate hints from query result documents
     BulkHintEvent bulkHintEvent = new BulkHintEvent();
-    log.info("Received {} matches as query result for need {}", (docs != null) ? docs.size() : 0, need);
     SolrDocumentList newDocs = calculateMatchingResults(docs);
-    log.info("Cut down result to {} matches for need query result {}", newDocs.size(), need);
+    log.info("Received {} matches as query result for need {}, keeping the top {} ", new Object[]{(docs != null) ? docs.size() : 0, need, newDocs.size()});
     MatchingBehaviorType needMatchingBehavior = needModelWrapper.getMatchingBehavior();
-
+    log.debug("need to be matched has MatchingBehaviorType {} ", needMatchingBehavior);
     for (SolrDocument doc : newDocs) {
 
       String matchedNeedUri = doc.getFieldValue("id").toString();
       MatchingBehaviorType matchedNeedMatchingBehavior = getMatchingBehaviorTypeForMatchedNeed(doc);
-
+      log.debug("matched need has MatchingBehaviorType {}", matchedNeedMatchingBehavior);
       // wonNodeUri can be returned as either a String or ArrayList, not sure on what this depends
       String wonNodeUri = null;
       Object nodeObject = doc.getFieldValue(WON_NODE_SOLR_FIELD);
@@ -130,6 +129,10 @@ public class HintBuilder
       }
 
       log.debug("generate hint for match {} with normalized score {}", matchedNeedUri, score);
+      if (log.isDebugEnabled()){
+        log.debug("need will receive a hint: {} (uri: {})", needMatchingBehavior.shouldSendHintGivenPartnerMatchingBehavior(matchedNeedMatchingBehavior), need.getUri());
+        log.debug("matched need need will receive a hint: {} (uri: {})", matchedNeedMatchingBehavior.shouldSendHintGivenPartnerMatchingBehavior(needMatchingBehavior), matchedNeedUri);
+      }
 
       if (needMatchingBehavior.shouldSendHintGivenPartnerMatchingBehavior(matchedNeedMatchingBehavior)) {
         bulkHintEvent.addHintEvent(new HintEvent(need.getWonNodeUri(), need.getUri(), wonNodeUri, matchedNeedUri,
