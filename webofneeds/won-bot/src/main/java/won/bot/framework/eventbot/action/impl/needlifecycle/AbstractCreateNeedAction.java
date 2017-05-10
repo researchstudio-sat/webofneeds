@@ -85,7 +85,8 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
 
 
     if (doNotMatch){
-      needModelWrapper.addFlag(WON.DO_NOT_MATCH);
+      needModelWrapper.addFlag(WON.SUPPRESS_HINTS_FOR_ME);
+      needModelWrapper.addFlag(WON.SUPPRESS_HINTS_FOR_COUNTERPART);
     }
 
     if (usedForTesting){
