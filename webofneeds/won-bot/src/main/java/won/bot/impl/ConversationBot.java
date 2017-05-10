@@ -45,8 +45,6 @@ public class ConversationBot extends EventBot
   private static final int NO_OF_NEEDS = 2;
   private static final int NO_OF_MESSAGES = 10;
   private static final long MILLIS_BETWEEN_MESSAGES = 100;
-    private static final String NAME_NEEDS = "needs";
-
 
   //we use protected members so we can extend the class and
   //access the listeners for unit test assertions and stats
@@ -70,7 +68,7 @@ public class ConversationBot extends EventBot
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ActionOnEventListener(
         ctx,
-        new CreateNeedWithFacetsAction(ctx, NAME_NEEDS),
+        new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName()),
         NO_OF_NEEDS
     );
     bus.subscribe(ActEvent.class, this.needCreator);
@@ -78,10 +76,12 @@ public class ConversationBot extends EventBot
     //count until 2 needs were created, then
     //   * connect the 2 needs
     this.needConnector = new ActionOnceAfterNEventsListener(ctx,"needConnector",
-        NO_OF_NEEDS, new ConnectFromListToListAction(ctx, NAME_NEEDS, NAME_NEEDS, FacetType.OwnerFacet.getURI(),
-                                                     FacetType.OwnerFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi, I " +
-                                                       "am the ConversationBot." +
-                                                       ""));
+        NO_OF_NEEDS, new ConnectFromListToListAction(ctx,
+            ctx.getBotContextWrapper().getNeedCreateListName(),
+            ctx.getBotContextWrapper().getNeedCreateListName(),
+            FacetType.OwnerFacet.getURI(),
+            FacetType.OwnerFacet.getURI(),
+            MILLIS_BETWEEN_MESSAGES, "Hi, I am the ConversationBot."));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 
     //add a listener that is informed of the connect/open events and that auto-opens

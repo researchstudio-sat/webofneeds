@@ -16,7 +16,6 @@
 
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
-import org.apache.jena.query.Dataset;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -35,38 +34,35 @@ import java.util.Collection;
 * User: fkleedorfer
 * Date: 28.03.14
 */
-public class DeactivateAllNeedsOfGroupAction extends BaseEventBotAction
-{
-  private String groupName;
-  public DeactivateAllNeedsOfGroupAction(EventListenerContext eventListenerContext, String groupName) {
-    super(eventListenerContext);
-    this.groupName = groupName;
-  }
+public class DeactivateAllNeedsOfListAction extends BaseEventBotAction {
+    private String uriListName;
 
-  @Override
-  protected void doRun(Event event, EventListener executingListener) throws Exception {
-    Collection<URI> toDeactivate = getEventListenerContext().getBotContext().getNamedNeedUriList(groupName);
-    for (URI uri: toDeactivate){
-      getEventListenerContext().getWonMessageSender().sendWonMessage(createWonMessage(uri));
-      getEventListenerContext().getEventBus().publish(new NeedDeactivatedEvent(uri));
+    public DeactivateAllNeedsOfListAction(EventListenerContext eventListenerContext, String uriListName) {
+        super(eventListenerContext);
+        this.uriListName = uriListName;
     }
-  }
 
-  private WonMessage createWonMessage(URI needURI) throws WonMessageBuilderException {
+    @Override
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
+        EventListenerContext ctx = getEventListenerContext();
 
-    WonNodeInformationService wonNodeInformationService =
-      getEventListenerContext().getWonNodeInformationService();
+        Collection<URI> toDeactivate = ctx.getBotContext().getNamedNeedUriList(uriListName);
+        for (URI uri: toDeactivate){
+            ctx.getWonMessageSender().sendWonMessage(createWonMessage(uri));
+            ctx.getEventBus().publish(new NeedDeactivatedEvent(uri));
+        }
+    }
 
-    Dataset ds = getEventListenerContext().getLinkedDataSource().getDataForResource(needURI);
-    URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(ds, needURI);
+    private WonMessage createWonMessage(URI needURI) throws WonMessageBuilderException {
+        WonNodeInformationService wonNodeInformationService = getEventListenerContext().getWonNodeInformationService();
 
-    return WonMessageBuilder
-      .setMessagePropertiesForDeactivate(
-        wonNodeInformationService.generateEventURI(
-          localWonNode),
-        needURI,
-        localWonNode)
-      .build();
-  }
+        URI localWonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(getEventListenerContext().getLinkedDataSource().getDataForResource(needURI), needURI);
 
+
+        return WonMessageBuilder.setMessagePropertiesForDeactivate(
+                  wonNodeInformationService.generateEventURI(localWonNode),
+                  needURI,
+                  localWonNode)
+                  .build();
+    }
 }

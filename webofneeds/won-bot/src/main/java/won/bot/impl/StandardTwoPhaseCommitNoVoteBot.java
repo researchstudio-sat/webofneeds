@@ -1,6 +1,7 @@
 package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
+import won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.facet.TwoPhaseCommitNoVoteDeactivateAllNeedsAction;
 import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
@@ -45,8 +46,6 @@ public class StandardTwoPhaseCommitNoVoteBot extends EventBot{
 
   protected BaseEventListener participantNeedCreator;
   protected BaseEventListener coordinatorNeedCreator;
-  public static final String URI_LIST_NAME_PARTICIPANT = "participants";
-  public static final String URI_LIST_NAME_COORDINATOR = "coordinator";
 
   @Override
   protected void initializeEventListeners()
@@ -54,10 +53,12 @@ public class StandardTwoPhaseCommitNoVoteBot extends EventBot{
     EventListenerContext ctx = getEventListenerContext();
     EventBus bus = getEventBus();
 
+    ParticipantCoordinatorBotContextWrapper botContextWrapper = (ParticipantCoordinatorBotContextWrapper) getBotContextWrapper();
+
     //create needs every trigger execution until noOfNeeds are created
     this.participantNeedCreator = new ActionOnEventListener(
       ctx, "participantCreator",
-      new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_PARTICIPANT, FacetType.ParticipantFacet.getURI()),
+      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getParticipantListName(), FacetType.ParticipantFacet.getURI()),
       noOfNeeds - 1
     );
     bus.subscribe(ActEvent.class, this.participantNeedCreator);
@@ -65,7 +66,7 @@ public class StandardTwoPhaseCommitNoVoteBot extends EventBot{
     //when done, create one coordinator need
     this.coordinatorNeedCreator = new ActionOnEventListener(
       ctx, "coordinatorCreator", new FinishedEventFilter(participantNeedCreator),
-      new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_COORDINATOR, FacetType.CoordinatorFacet.getURI()),
+      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getCoordinatorListName(), FacetType.CoordinatorFacet.getURI()),
       1
     );
     bus.subscribe(FinishedEvent.class, this.coordinatorNeedCreator);
@@ -73,7 +74,7 @@ public class StandardTwoPhaseCommitNoVoteBot extends EventBot{
     //when done, connect the participants to the coordinator
     this.needConnector = new ActionOnceAfterNEventsListener(
       ctx, "needConnector", noOfNeeds,
-      new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
+      new ConnectFromListToListAction(ctx, botContextWrapper.getCoordinatorListName(), botContextWrapper.getParticipantListName(),
                                       FacetType.CoordinatorFacet.getURI(), FacetType.ParticipantFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hi!"));
     bus.subscribe(NeedCreatedEvent.class, this.needConnector);
 

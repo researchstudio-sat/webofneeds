@@ -21,6 +21,7 @@ import org.apache.jena.rdf.model.Model;
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.bot.BotLifecyclePhase;
+import won.bot.framework.bot.context.BotContextWrapper;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -84,347 +85,334 @@ import java.util.concurrent.Executor;
  * The bot will only react to onXX methods (i.e., create events and publish them on the internal event bus) if it is in lifecycle phase ACTIVE.
  *
  */
-public abstract class EventBot extends TriggeredBot
-{
-  private EventBus eventBus;
-  private EventListenerContext eventListenerContext = new MyEventListenerContext();
-  private EventGeneratingWonMessageSenderWrapper wonMessageSenderWrapper;
+public abstract class EventBot extends TriggeredBot {
+    private EventBus eventBus;
+    private EventListenerContext eventListenerContext = new MyEventListenerContext();
+    private EventGeneratingWonMessageSenderWrapper wonMessageSenderWrapper;
 
 
-
-  @Override
-  public final void act() throws Exception
-  {
-    if (getLifecyclePhase().isActive()){
-      eventBus.publish(new ActEvent());
-    } else {
-      logger.info("not publishing event for call to act() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-    }
-  }
-
-  @Override
-  public final void onMessageFromOtherNeed(final Connection con, final WonMessage wonMessage)
-  {
-    if (getLifecyclePhase().isActive()){
-      eventBus.publish(new MessageFromOtherNeedEvent(con,  wonMessage));
-    } else {
-      logger.info("not publishing event for call to onMessageFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-    }
-  }
-
-  @Override
-  public final void onHintFromMatcher(final Match match, final WonMessage wonMessage)
-  {
-    if (getLifecyclePhase().isActive()){
-      eventBus.publish(new HintFromMatcherEvent(match, wonMessage));
-    } else {
-      logger.info("not publishing event for call to onHintFromMatcher() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-    }
-  }
-
-  @Override
-  public final void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage)
-  {
-    if (getLifecyclePhase().isActive()){
-      eventBus.publish(new CloseFromOtherNeedEvent(con, wonMessage));
-    } else {
-      logger.info("not publishing event for call to onClose() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-    }
-  }
-
-  @Override
-  public final void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage)
-  {
-    if (getLifecyclePhase().isActive()){
-      eventBus.publish(new OpenFromOtherNeedEvent(con, wonMessage));
-    } else {
-      logger.info("not publishing event for call to onOpenFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-    }
-  }
-
-  @Override
-  public void onConnectFromOtherNeed(final Connection con, final WonMessage wonMessage)
-  {
-    if (getLifecyclePhase().isActive()){
-      eventBus.publish(new ConnectFromOtherNeedEvent(con, wonMessage));
-    } else {
-      logger.info("not publishing event for call to onConnectFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-    }
-  }
-
-  @Override
-  public final void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception
-  {
-    if (getLifecyclePhase().isActive()){
-      eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel, FacetType.OwnerFacet));
-    } else {
-      logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-    }
-  }
-  @Override
-  public final void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needUri, final Dataset wonMessageDataset)
-  {
-    if (getLifecyclePhase().isActive()){
-      eventBus.publish(new NeedCreatedEventForMatcher(needUri, wonMessageDataset));
-    } else {
-      logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-    }
-  }
-  @Override
-  public final void onMatcherRegistered(final URI wonNodeUri)
-  {
-    if (getLifecyclePhase().isActive()){
-      //EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(),wonNodeUri);
-      eventBus.publish(new MatcherRegisteredEvent(wonNodeUri));
-    } else {
-      logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-    }
-  }
-  @Override
-  public final void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI){
-    if (getLifecyclePhase().isActive()){
-      eventBus.publish(new NeedActivatedEventForMatcher(needURI));
-    } else {
-      logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-    }
-  }
-  @Override
-  public final void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI){
-    if (getLifecyclePhase().isActive()){
-      eventBus.publish(new NeedDeactivatedEventForMatcher(needURI));
-    } else {
-      logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-    }
-  }
-
-  @Override
-  public final void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
-    if (getLifecyclePhase().isActive()){
-      eventBus.publish(new FailureResponseEvent(failedMessageUri, wonMessage));
-    } else {
-      logger.info("not publishing event for call to onFailureResponse() as the bot is not in state {} but {}",
-        BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-    }
-  }
-
-  @Override
-  public final void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
-    if (getLifecyclePhase().isActive()){
-      eventBus.publish(new SuccessResponseEvent(successfulMessageUri, wonMessage));
-    } else {
-      logger.info("not publishing event for call to onSuccessResponse() as the bot is not in state {} but {}",
-        BotLifecyclePhase.ACTIVE, getLifecyclePhase());
-    }
-  }
-
-  /*
-     * Override this method to initialize your event listeners. Will be called before
-     * the first event is published.
-     */
-  protected abstract void initializeEventListeners();
-
-  /*
-   * Override this method to shut down your event listeners. Will be called after
-   * the last event is published. Event listeners may receive delayed events after
-   * this method is called.
-   */
-  protected void shutdownEventListeners() {
-    logger.info("shutdownEventListeners was not overridden by the subclass");
-  };
-
-
-  /**
-   * Init method used to create the event bus and allow event listeners to register. Do not override!
-   * It not final to allow for CGLIB autoproxying.
-   */
-  @Override
-  protected void doInitializeCustom()
-  {
-    this.eventBus = new AsyncEventBusImpl(getExecutor());
-    //add an eventhandler that reacts to errors
-    this.getEventBus().subscribe(ErrorEvent.class, new ErrorEventListener(getEventListenerContext()));
-    initializeEventListeners();
-    this.eventBus.publish(new InitializeEvent());
-  }
-
-  /**
-   * Init method used to shut down the event bus and allow event listeners shut down. Do not override!
-   * It not final to allow for CGLIB autoproxying.
-   */
-  @Override
-  protected void doShutdownCustom()
-  {
-    eventBus.publish(new ShutdownEvent());
-    shutdownEventListeners();
-  }
-
-  protected EventBus getEventBus(){
-    return eventBus;
-  }
-
-  protected EventListenerContext getEventListenerContext()
-  {
-    return eventListenerContext;
-  }
-
-  /**
-   * Class holding references to all important services that EventListeners inside bots need to
-   * access.
-   */
-  public class MyEventListenerContext implements EventListenerContext
-  {
-
-    public TaskScheduler getTaskScheduler() {
-      return EventBot.this.getTaskScheduler();
-    }
-
-    public NodeURISource getNodeURISource()
-    {
-      return EventBot.this.getNodeURISource();
-    }
-
-    public URI getSolrServerURI(){
-      return EventBot.this.getSolrServerURI();
+    @Override
+    public final void act() throws Exception {
+        if (getLifecyclePhase().isActive()){
+            eventBus.publish(new ActEvent());
+        } else {
+            logger.info("not publishing event for call to act() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
     }
 
     @Override
-    public MatcherNodeURISource getMatcherNodeURISource() {
-      return EventBot.this.getMatcheNodeURISource();
-    }
-
-    public WonMessageSender getWonMessageSender()
-    {
-      return getWonMessageSenderWrapperLazily();
-    }
-
-    public MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient(){
-        return EventBot.this.getMatcherProtocolNeedServiceClient();
+    public final void onMessageFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+        if (getLifecyclePhase().isActive()){
+            eventBus.publish(new MessageFromOtherNeedEvent(con,  wonMessage));
+        } else {
+            logger.info("not publishing event for call to onMessageFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
     }
 
     @Override
-    public MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService() {
-      return EventBot.this.getMatcherProtocolMatcherService();
-    }
-
-    public NeedProducer getNeedProducer()
-    {
-      return EventBot.this.getNeedProducer();
-    }
-
-
-    public void cancelTrigger(){
-      EventBot.this.cancelTrigger();
+    public final void onHintFromMatcher(final Match match, final WonMessage wonMessage) {
+        if (getLifecyclePhase().isActive()){
+            eventBus.publish(new HintFromMatcherEvent(match, wonMessage));
+        } else {
+            logger.info("not publishing event for call to onHintFromMatcher() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
     }
 
     @Override
-    public void workIsDone()
-    {
-      EventBot.this.workIsDone();
+    public final void onCloseFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+        if (getLifecyclePhase().isActive()){
+            eventBus.publish(new CloseFromOtherNeedEvent(con, wonMessage));
+        } else {
+            logger.info("not publishing event for call to onClose() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
     }
 
-    public EventBus getEventBus() {
-      return EventBot.this.getEventBus();
+    @Override
+    public final void onOpenFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+        if (getLifecyclePhase().isActive()){
+            eventBus.publish(new OpenFromOtherNeedEvent(con, wonMessage));
+        } else {
+           logger.info("not publishing event for call to onOpenFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
     }
 
-    public BotContext getBotContext() {
-      return EventBot.this.getBotContext();
+    @Override
+    public void onConnectFromOtherNeed(final Connection con, final WonMessage wonMessage) {
+        if (getLifecyclePhase().isActive()){
+            eventBus.publish(new ConnectFromOtherNeedEvent(con, wonMessage));
+        } else {
+            logger.info("not publishing event for call to onConnectFromOtherNeed() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
+    }
+
+    @Override
+    public final void onNewNeedCreated(final URI needUri, final URI wonNodeUri, final Model needModel) throws Exception {
+        if (getLifecyclePhase().isActive()){
+            eventBus.publish(new NeedCreatedEvent(needUri, wonNodeUri, needModel, FacetType.OwnerFacet));
+        } else {
+            logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
+    }
+
+    @Override
+    public final void onNewNeedCreatedNotificationForMatcher(final URI wonNodeURI, final URI needUri, final Dataset wonMessageDataset) {
+        if (getLifecyclePhase().isActive()){
+            eventBus.publish(new NeedCreatedEventForMatcher(needUri, wonMessageDataset));
+        } else {
+            logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
+    }
+
+    @Override
+    public final void onMatcherRegistered(final URI wonNodeUri) {
+        if (getLifecyclePhase().isActive()){
+            //EventBotActionUtils.rememberInNodeListIfNamePresent(getEventListenerContext(),wonNodeUri);
+            eventBus.publish(new MatcherRegisteredEvent(wonNodeUri));
+        } else {
+            logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
+    }
+
+    @Override
+    public final void onNeedActivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI) {
+        if (getLifecyclePhase().isActive()){
+            eventBus.publish(new NeedActivatedEventForMatcher(needURI));
+        } else {
+            logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
+    }
+
+    @Override
+    public final void onNeedDeactivatedNotificationForMatcher(final URI wonNodeURI, final URI needURI){
+        if (getLifecyclePhase().isActive()){
+            eventBus.publish(new NeedDeactivatedEventForMatcher(needURI));
+        } else {
+            logger.info("not publishing event for call to onNewNeedCreated() as the bot is not in state {} but {}", BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
+    }
+
+    @Override
+    public final void onFailureResponse(final URI failedMessageUri, final WonMessage wonMessage) {
+        if (getLifecyclePhase().isActive()){
+            eventBus.publish(new FailureResponseEvent(failedMessageUri, wonMessage));
+        } else {
+            logger.info("not publishing event for call to onFailureResponse() as the bot is not in state {} but {}",
+            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
+    }
+
+    @Override
+    public final void onSuccessResponse(final URI successfulMessageUri, final WonMessage wonMessage) {
+        if (getLifecyclePhase().isActive()){
+            eventBus.publish(new SuccessResponseEvent(successfulMessageUri, wonMessage));
+        } else {
+            logger.info("not publishing event for call to onSuccessResponse() as the bot is not in state {} but {}",
+            BotLifecyclePhase.ACTIVE, getLifecyclePhase());
+        }
+    }
+
+    /*
+    * Override this method to initialize your event listeners. Will be called before
+    * the first event is published.
+    */
+    protected abstract void initializeEventListeners();
+
+    /*
+    * Override this method to shut down your event listeners. Will be called after
+    * the last event is published. Event listeners may receive delayed events after
+    * this method is called.
+    */
+    protected void shutdownEventListeners() {
+        logger.info("shutdownEventListeners was not overridden by the subclass");
+    };
+
+
+    /**
+    * Init method used to create the event bus and allow event listeners to register. Do not override!
+    * It not final to allow for CGLIB autoproxying.
+    */
+    @Override
+    protected void doInitializeCustom() {
+        this.eventBus = new AsyncEventBusImpl(getExecutor());
+        //add an eventhandler that reacts to errors
+        this.getEventBus().subscribe(ErrorEvent.class, new ErrorEventListener(getEventListenerContext()));
+        initializeEventListeners();
+        this.eventBus.publish(new InitializeEvent());
     }
 
     /**
-     * Returns an executor that passes the tasks to the TaskScheduler for immediate execution.
-     * @return
-     */
-    public Executor getExecutor(){
-      return EventBot.this.getExecutor();
+    * Init method used to shut down the event bus and allow event listeners shut down. Do not override!
+    * It not final to allow for CGLIB autoproxying.
+    */
+    @Override
+    protected void doShutdownCustom() {
+        eventBus.publish(new ShutdownEvent());
+        shutdownEventListeners();
     }
 
-    @Override
-    public LinkedDataSource getLinkedDataSource()
+    protected EventBus getEventBus(){
+    return eventBus;
+    }
+
+    protected EventListenerContext getEventListenerContext()
     {
-      return EventBot.this.getLinkedDataSource();
+    return eventListenerContext;
     }
 
-    @Override
-    public WonNodeInformationService getWonNodeInformationService() {
-      return EventBot.this.getWonNodeInformationService();
-    }
-  }
-
-  private EventGeneratingWonMessageSenderWrapper getWonMessageSenderWrapperLazily() {
-    if (this.wonMessageSenderWrapper == null){
-      this.wonMessageSenderWrapper = new EventGeneratingWonMessageSenderWrapper(EventBot.this.getWonMessageSender());
-    }
-    return wonMessageSenderWrapper;
-  }
-
-  /**
-   * Event listener that will stop the bot by publishing a WorkDoneEvent if an ErrorEvent is seen.
-   * Expects to be registered for WorkDoneEvents and ErrorEvents and will not react to a WorkDoneEvent.
-   */
-  private class ErrorEventListener extends BaseEventListener {
-
-    private boolean done = false;
-    private Object monitor = new Object();
-    public ErrorEventListener(EventListenerContext context) {
-      super(context);
-    }
-
-    @Override
-    protected void doOnEvent(final won.bot.framework.eventbot.event.Event event) throws Exception {
-      synchronized (monitor) {
-        if (event instanceof ErrorEvent) {
-          //only react to an ErrorEvent
-          if (! done) {
-            //make sure we send only one WorkDoneEvent
-            logger.warn("saw an ErrorEvent, stopping the bot by publishing a WorkDoneEvent", ((ErrorEvent) event).getThrowable());
-            getEventListenerContext().getEventBus().publish(new WorkDoneEvent(EventBot.this));
-          }
-          Throwable t = ((ErrorEvent) event).getThrowable();
-          logger.info("ErrorEvent contained this throwable:", t);
-          setDoneAndUnsubscribe();
+    /**
+    * Class holding references to all important services that EventListeners inside bots need to
+    * access.
+    */
+    public class MyEventListenerContext implements EventListenerContext {
+        public TaskScheduler getTaskScheduler() {
+            return EventBot.this.getTaskScheduler();
         }
-        if (event instanceof WorkDoneEvent) {
-          setDoneAndUnsubscribe();
+
+        public NodeURISource getNodeURISource() {
+            return EventBot.this.getNodeURISource();
         }
-      }
+
+        public URI getSolrServerURI() {
+            return EventBot.this.getSolrServerURI();
+        }
+
+        @Override
+        public MatcherNodeURISource getMatcherNodeURISource() {
+            return EventBot.this.getMatcheNodeURISource();
+        }
+
+        public WonMessageSender getWonMessageSender() {
+            return getWonMessageSenderWrapperLazily();
+        }
+
+        public MatcherProtocolNeedServiceClientSide getMatcherProtocolNeedServiceClient(){
+            return EventBot.this.getMatcherProtocolNeedServiceClient();
+        }
+
+        @Override
+        public MatcherProtocolMatcherServiceImplJMSBased getMatcherProtocolMatcherService() {
+            return EventBot.this.getMatcherProtocolMatcherService();
+        }
+
+        public NeedProducer getNeedProducer() {
+            return EventBot.this.getNeedProducer();
+        }
+
+
+        public void cancelTrigger(){
+            EventBot.this.cancelTrigger();
+        }
+
+        @Override
+        public void workIsDone() {
+            EventBot.this.workIsDone();
+        }
+
+        public EventBus getEventBus() {
+            return EventBot.this.getEventBus();
+        }
+
+        @Override
+        public BotContext getBotContext() {
+            return EventBot.this.getBotContextWrapper().getBotContext();
+        }
+
+        @Override
+        public BotContextWrapper getBotContextWrapper() {
+            return EventBot.this.getBotContextWrapper();
+        }
+
+        /**
+        * Returns an executor that passes the tasks to the TaskScheduler for immediate execution.
+        * @return
+        */
+        public Executor getExecutor(){
+            return EventBot.this.getExecutor();
+        }
+
+        @Override
+        public LinkedDataSource getLinkedDataSource() {
+            return EventBot.this.getLinkedDataSource();
+        }
+
+        @Override
+        public WonNodeInformationService getWonNodeInformationService() {
+            return EventBot.this.getWonNodeInformationService();
+        }
     }
 
-    private void setDoneAndUnsubscribe() {
-      done = true;
-      getEventBus().unsubscribe(this);
-    }
-  }
-
-  /**
-   * Wraps a WonMessageSender so a WonMessageSentEvent can be published after a message has been sent.
-   */
-  private class EventGeneratingWonMessageSenderWrapper implements WonMessageSender
-  {
-    private final WonMessageSender delegate;
-
-    public EventGeneratingWonMessageSenderWrapper(final WonMessageSender delegate) {
-      this.delegate = delegate;
+    private EventGeneratingWonMessageSenderWrapper getWonMessageSenderWrapperLazily() {
+        if (this.wonMessageSenderWrapper == null){
+            this.wonMessageSenderWrapper = new EventGeneratingWonMessageSenderWrapper(EventBot.this.getWonMessageSender());
+        }
+        return wonMessageSenderWrapper;
     }
 
-    @Override
-    public void sendWonMessage(final WonMessage message) throws WonMessageSenderException {
-      delegate.sendWonMessage(message);
-      //publish the WonMessageSent event if no exception was raised
-      WonMessageType type = message.getMessageType();
-      Event event = null;
-      //if the event is connection specific, raise a more specialized event
-      switch (type){
-        case CLOSE:
-        case CONNECT:
-        case CONNECTION_MESSAGE:
-        case OPEN:
-          event = new WonMessageSentOnConnectionEvent(message);
-          break;
-        default:
-          event = new WonMessageSentEvent(message);
-      }
-      getEventBus().publish(event);
-    }
-  }
+    /**
+    * Event listener that will stop the bot by publishing a WorkDoneEvent if an ErrorEvent is seen.
+    * Expects to be registered for WorkDoneEvents and ErrorEvents and will not react to a WorkDoneEvent.
+    */
+    private class ErrorEventListener extends BaseEventListener {
+        private boolean done = false;
+        private Object monitor = new Object();
+        public ErrorEventListener(EventListenerContext context) {
+        super(context);
+        }
 
+        @Override
+        protected void doOnEvent(final won.bot.framework.eventbot.event.Event event) throws Exception {
+            synchronized (monitor) {
+                if (event instanceof ErrorEvent) {
+                    //only react to an ErrorEvent
+                    if (! done) {
+                        //make sure we send only one WorkDoneEvent
+                        logger.warn("saw an ErrorEvent, stopping the bot by publishing a WorkDoneEvent", ((ErrorEvent) event).getThrowable());
+                        getEventListenerContext().getEventBus().publish(new WorkDoneEvent(EventBot.this));
+                    }
+                    Throwable t = ((ErrorEvent) event).getThrowable();
+                    logger.info("ErrorEvent contained this throwable:", t);
+                    setDoneAndUnsubscribe();
+                }
+                if (event instanceof WorkDoneEvent) {
+                    setDoneAndUnsubscribe();
+                }
+            }
+        }
+
+        private void setDoneAndUnsubscribe() {
+            done = true;
+            getEventBus().unsubscribe(this);
+        }
+    }
+
+    /**
+    * Wraps a WonMessageSender so a WonMessageSentEvent can be published after a message has been sent.
+    */
+    private class EventGeneratingWonMessageSenderWrapper implements WonMessageSender {
+        private final WonMessageSender delegate;
+
+        public EventGeneratingWonMessageSenderWrapper(final WonMessageSender delegate) {
+        this.delegate = delegate;
+        }
+
+        @Override
+        public void sendWonMessage(final WonMessage message) throws WonMessageSenderException {
+            delegate.sendWonMessage(message);
+            //publish the WonMessageSent event if no exception was raised
+            WonMessageType type = message.getMessageType();
+            Event event = null;
+            //if the event is connection specific, raise a more specialized event
+            switch (type){
+                case CLOSE:
+                case CONNECT:
+                case CONNECTION_MESSAGE:
+                case OPEN:
+                    event = new WonMessageSentOnConnectionEvent(message);
+                    break;
+                default:
+                    event = new WonMessageSentEvent(message);
+            }
+            getEventBus().publish(event);
+        }
+    }
 }

@@ -38,10 +38,7 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 /**
  *
  */
-public class NeedCreatorBot extends EventBot
-{
-  private static final String NAME_NEEDS = "needs";
-
+public class NeedCreatorBot extends EventBot {
   protected BaseEventListener groupMemberCreator;
   protected BaseEventListener workDoneSignaller;
 
@@ -65,7 +62,7 @@ public class NeedCreatorBot extends EventBot
       new MultipleActions(ctx,
         new IncrementCounterAction(ctx, needCreationStartedCounter),
         new IncrementCounterAction(ctx, creationUnfinishedCounter),
-        new CreateNeedWithFacetsAction(ctx, NAME_NEEDS)
+        new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName())
       ),
       -1
     );
@@ -124,5 +121,4 @@ public class NeedCreatorBot extends EventBot
 //      new SignalWorkDoneAction(ctx));
 //    bus.subscribe(TargetCountReachedEvent.class, this.workDoneSignaller);
   }
-
 }

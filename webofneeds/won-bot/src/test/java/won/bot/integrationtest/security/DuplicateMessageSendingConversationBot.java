@@ -53,8 +53,6 @@ public class DuplicateMessageSendingConversationBot extends IntegrationtestBot
   private static final int NO_OF_NEEDS = 2;
   private static final int NO_OF_MESSAGES = 10;
   private static final long MILLIS_BETWEEN_MESSAGES = 100;
-    private static final String NAME_NEEDS = "needs";
-
 
   @Override
   protected void initializeEventListeners()
@@ -82,13 +80,13 @@ public class DuplicateMessageSendingConversationBot extends IntegrationtestBot
 
     bus.subscribe(ActEvent.class, new ActionOnEventListener(
             ctx,
-            new CreateNeedWithFacetsAction(ctx, NAME_NEEDS),
+            new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName()),
             NO_OF_NEEDS
         ));
 
     //connect needs
     bus.subscribe(NeedCreatedEvent.class, new ActionOnceAfterNEventsListener(ctx, "needConnector",
-                                                                             NO_OF_NEEDS * 2, new ConnectFromListToListAction(ctx, NAME_NEEDS, NAME_NEEDS, FacetType.OwnerFacet.getURI(),
+                                                                             NO_OF_NEEDS * 2, new ConnectFromListToListAction(ctx, getBotContextWrapper().getNeedCreateListName(), getBotContextWrapper().getNeedCreateListName(), FacetType.OwnerFacet.getURI(),
                                                                                                                               FacetType.OwnerFacet.getURI(), MILLIS_BETWEEN_MESSAGES,
                                                                                                                               "Hi!"
                                                              )));

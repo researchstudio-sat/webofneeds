@@ -46,14 +46,11 @@ import won.protocol.model.FacetType;
 /**
  *
  */
-public class ConversationBotMonitored extends EventBot
-{
+public class ConversationBotMonitored extends EventBot {
 
   private static final int NO_OF_NEEDS = 2;
   private static final int NO_OF_MESSAGES = 1;
   private static final long MILLIS_BETWEEN_MESSAGES = 100;
-    private static final String NAME_NEEDS = "needs";
-
 
   //we use protected members so we can extend the class and
   //access the listeners for unit test assertions and stats
@@ -79,7 +76,7 @@ public class ConversationBotMonitored extends EventBot
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ActionOnEventListener(
         ctx,
-        new CreateNeedWithFacetsAction(ctx, NAME_NEEDS),
+        new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName()),
         NO_OF_NEEDS
     );
     bus.subscribe(ActEvent.class, this.needCreator);
@@ -87,7 +84,7 @@ public class ConversationBotMonitored extends EventBot
     //count until 2 needs were created, then
     //   * connect the 2 needs
     this.needConnector = new ActionOnceAfterNEventsListener(ctx,"needConnector",
-        NO_OF_NEEDS, new ConnectFromListToListAction(ctx, NAME_NEEDS, NAME_NEEDS, FacetType.OwnerFacet.getURI(),
+        NO_OF_NEEDS, new ConnectFromListToListAction(ctx, ctx.getBotContextWrapper().getNeedCreateListName(), ctx.getBotContextWrapper().getNeedCreateListName(), FacetType.OwnerFacet.getURI(),
                                                      FacetType.OwnerFacet.getURI(), MILLIS_BETWEEN_MESSAGES, "Hello," +
                                                        "I am the ConversationBot, a simple bot that will exchange " +
                                                        "messages and deactivate its needs after some time."));

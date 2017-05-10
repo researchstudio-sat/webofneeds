@@ -1,6 +1,7 @@
 package won.bot.framework.eventbot.listener.impl;
 
 import org.apache.jena.rdf.model.Model;
+import won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherNeedEvent;
@@ -161,8 +162,10 @@ public class AutomaticBAMessageResponderListener extends BaseEventListener
         URI coordinatorUri = weAreOnCoordinatorSide? localNeedUri: remoteNeedUri;
         URI participantUri = weAreOnCoordinatorSide? remoteNeedUri: localNeedUri;
         //decide which state machine to use for this combination:
-        List<URI> participants = getEventListenerContext().getBotContext().getNamedNeedUriList(
-          BACCBot.URI_LIST_NAME_PARTICIPANT);
+
+        ParticipantCoordinatorBotContextWrapper botContextWrapper = (ParticipantCoordinatorBotContextWrapper) getEventListenerContext().getBotContextWrapper();
+        List<URI> participants = botContextWrapper.getParticipants();
+
         logger.debug("participants:{}", participants);
         logger.debug("participant URI to look for:{}", participantUri);
         //let's hard-code this for now:

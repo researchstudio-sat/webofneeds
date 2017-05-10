@@ -51,12 +51,6 @@ import java.util.Properties;
 public class EventBotActionUtils {
     private static final Logger logger = LoggerFactory.getLogger(EventBotActionUtils.class);
 
-    private static final String MAIL_USER_SUBSCRIBE_COLLECTION = "user_subscribe_status";
-    private static final String MAIL_USER_CACHED_MAILS_COLLECTION = "user_cached_mails";
-    private static final String MAIL_URIMIMEMESSAGERELATIONS_NAME = "uriMimeMessageRelations";
-    private static final String MAIL_MAILIDURIRELATIONS_NAME = "mailIdUriRelations";
-    private static final String MAIL_MAILADRESSURIRELATIONS_NAME = "mailAdressUriRelations";
-
     public static void rememberInList(EventListenerContext ctx, URI uri, String uriListName) {
         if (uriListName != null && uriListName.trim().length() > 0){
             ctx.getBotContext().appendToNamedNeedUriList(uri, uriListName);
@@ -77,111 +71,6 @@ public class EventBotActionUtils {
         } else {
             throw new IllegalArgumentException("'uriListName' must not not be null or empty");
         }
-    }
-
-    //************************************************ Mail2WonBot Context Methods *************************************
-    //Util Methods to Get/Remove/Add Uri -> MimeMessage Relation
-    public static void removeUriMimeMessageRelation(EventListenerContext context, URI needURI) {
-        context.getBotContext().removeFromObjectMap(MAIL_URIMIMEMESSAGERELATIONS_NAME, needURI.toString());
-    }
-
-    public static MimeMessage getMimeMessageForURI(EventListenerContext context, URI uri) throws MessagingException {
-        // use the empty default session here for reconstructing the mime message
-        byte[] byteMsg = (byte[]) context.getBotContext().loadFromObjectMap(MAIL_URIMIMEMESSAGERELATIONS_NAME, uri.toString());
-        ByteArrayInputStream is = new ByteArrayInputStream(byteMsg);
-        return new MimeMessage(Session.getDefaultInstance(new Properties(), null), is);
-    }
-
-    public static void addUriMimeMessageRelation(EventListenerContext context, URI needURI, MimeMessage mimeMessage)
-      throws IOException, MessagingException {
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        mimeMessage.writeTo(os);
-        context.getBotContext().saveToObjectMap(MAIL_URIMIMEMESSAGERELATIONS_NAME, needURI.toString(), os.toByteArray());
-    }
-
-    //Util Methods to Get/Remove/Add MailId -> URI Relation
-    public static void removeMailIdWonURIRelation(EventListenerContext context, String mailId) {
-        context.getBotContext().removeFromObjectMap(MAIL_MAILIDURIRELATIONS_NAME, mailId);
-    }
-
-    public static WonURI getWonURIForMailId(EventListenerContext context, String mailId) {
-        return (WonURI) context.getBotContext().loadFromObjectMap(MAIL_MAILIDURIRELATIONS_NAME, mailId);
-    }
-
-    public static void addMailIdWonURIRelation(EventListenerContext context, String mailId, WonURI uri) {
-        context.getBotContext().saveToObjectMap(MAIL_MAILIDURIRELATIONS_NAME, mailId, uri);
-    }
-
-    //Util Methods to Get/Remove/Add MailId -> URI Relation
-    public static List<WonURI> getWonURIsForMailAddress(EventListenerContext context, String mailAddress) {
-        List<WonURI> uriList = new LinkedList<>();
-        List<Object> objectList = context.getBotContext().loadFromListMap(MAIL_MAILADRESSURIRELATIONS_NAME, mailAddress);
-
-        for(Object o : objectList){
-            uriList.add((WonURI) o);
-        }
-
-        return uriList;
-    }
-
-    public static void addMailAddressWonURIRelation(EventListenerContext context, String mailAddress, WonURI uri) {
-        context.getBotContext().addToListMap(MAIL_MAILADRESSURIRELATIONS_NAME, mailAddress, uri);
-    }
-
-    public static void addCachedMailsForMailAddress(BotContext botContext, MimeMessage mimeMessage) throws IOException, MessagingException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        mimeMessage.writeTo(os);
-        botContext.addToListMap(MAIL_USER_CACHED_MAILS_COLLECTION, MailContentExtractor.getMailSender(mimeMessage), os.toByteArray());
-    }
-
-    public static Collection<MimeMessage> loadCachedMailsForMailAddress(BotContext botContext, String mailAddress) throws MessagingException {
-        List<MimeMessage> mimeMessages = new LinkedList<>();
-        List<Object> objectList = botContext.loadFromListMap(MAIL_USER_CACHED_MAILS_COLLECTION, mailAddress);
-        for (Object o : objectList) {
-
-            // use the empty default session here for reconstructing the mime message
-            byte[] byteMsg = (byte[]) o;
-            ByteArrayInputStream is = new ByteArrayInputStream(byteMsg);
-            mimeMessages.add(new MimeMessage(Session.getDefaultInstance(new Properties(), null), is));
-        }
-
-        return mimeMessages;
-    }
-
-    public static void removeCachedMailsForMailAddress(BotContext botContext, String mailAddress) {
-        botContext.dropCollection(mailAddress);
-    }
-
-    public static void setSubscribeStatusForMailAddress(
-      BotContext botContext, String mailAddress, SubscribeStatus status) {
-        botContext.saveToObjectMap(MAIL_USER_SUBSCRIBE_COLLECTION, mailAddress, status);
-    }
-
-    public static SubscribeStatus getSubscribeStatusForMailAddress(BotContext botContext, String mailAddress) {
-
-        SubscribeStatus status = (SubscribeStatus) botContext.loadFromObjectMap(MAIL_USER_SUBSCRIBE_COLLECTION, mailAddress);
-        return (status != null) ? SubscribeStatus.valueOf(status.name()) : SubscribeStatus.NO_RESPONSE;
-    }
-
-    //************************************************ TelegramBot Context Methods *************************************
-    public static void addChatIdWonURIRelation(EventListenerContext context, String mapName, Long chatId, WonURI uri) {
-        context.getBotContext().saveToObjectMap(mapName, chatId.toString(), uri);
-    }
-    public static void addURIChatIdRelation(EventListenerContext context, String mapName, URI uri, Long chatId) {
-        context.getBotContext().saveToObjectMap(mapName, uri.toString(), chatId);
-    }
-
-    public static Long getChatIdForURI(EventListenerContext context, String mapName, URI uri) {
-        return (Long) context.getBotContext().loadFromObjectMap(mapName, uri.toString());
-    }
-
-    public static void addMessageIdWonURIRelation(EventListenerContext context, String mapName, Integer messageId, WonURI wonURI) {
-        context.getBotContext().saveToObjectMap(mapName, messageId.toString(), wonURI);
-    }
-
-    public static WonURI getWonURIForMessageId(EventListenerContext context, String mapName, Integer messageId) {
-        return (WonURI) context.getBotContext().loadFromObjectMap(mapName, messageId.toString());
     }
 
     //************************************************ EventListener ***************************************************

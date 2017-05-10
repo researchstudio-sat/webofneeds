@@ -1,11 +1,12 @@
 package won.bot.impl;
 
 import won.bot.framework.bot.base.EventBot;
+import won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.ConnectFromListToListAction;
 import won.bot.framework.eventbot.action.impl.needlifecycle.CreateNeedWithFacetsAction;
-import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsOfGroupAction;
+import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateAllNeedsOfListAction;
 import won.bot.framework.eventbot.action.impl.lifecycle.SignalWorkDoneAction;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
@@ -36,8 +37,6 @@ import java.util.*;
  * Date: 10.4.14.
  */
 public abstract class BAAtomicBaseBot extends EventBot{
-  public static final String URI_LIST_NAME_PARTICIPANT = "participants";
-  public static final String URI_LIST_NAME_COORDINATOR = "coordinator";
   protected final int noOfNeeds;
   protected final List<TwoPhaseScript> scripts;
   private static final long MILLIS_BETWEEN_MESSAGES = 10;
@@ -89,10 +88,12 @@ public abstract class BAAtomicBaseBot extends EventBot{
     final EventListenerContext ctx = getEventListenerContext();
     final EventBus bus = getEventBus();
 
+    ParticipantCoordinatorBotContextWrapper botContextWrapper = (ParticipantCoordinatorBotContextWrapper) getBotContextWrapper();
+
     //create needs every trigger execution until noOfNeeds are created
     this.participantNeedCreator = new ActionOnEventListener(
       ctx, "participantCreator",
-      new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_PARTICIPANT, getParticipantFacetType().getURI()),
+      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getParticipantListName(), getParticipantFacetType().getURI()),
       noOfNeeds - 1
     );
     bus.subscribe(ActEvent.class, this.participantNeedCreator);
@@ -100,7 +101,7 @@ public abstract class BAAtomicBaseBot extends EventBot{
     //when done, create one coordinator need
     this.coordinatorNeedCreator = new ActionOnEventListener(
       ctx, "coordinatorCreator", new FinishedEventFilter(participantNeedCreator),
-      new CreateNeedWithFacetsAction(ctx, URI_LIST_NAME_COORDINATOR, getCoordinatorFacetType().getURI()),
+      new CreateNeedWithFacetsAction(ctx, botContextWrapper.getCoordinatorListName(), getCoordinatorFacetType().getURI()),
       1
     );
     bus.subscribe(FinishedEvent.class, this.coordinatorNeedCreator);
@@ -152,7 +153,7 @@ public abstract class BAAtomicBaseBot extends EventBot{
     //when done, connect the participants to the coordinator
     this.needConnector = new ActionOnceAfterNEventsListener(
       ctx, "needConnector", noOfNeeds,
-      new ConnectFromListToListAction(ctx, URI_LIST_NAME_COORDINATOR, URI_LIST_NAME_PARTICIPANT,
+      new ConnectFromListToListAction(ctx, botContextWrapper.getCoordinatorListName(), botContextWrapper.getParticipantListName(),
                                       getCoordinatorFacetType().getURI(),
                                       getParticipantFacetType().getURI(), MILLIS_BETWEEN_MESSAGES,
         scriptConnectHook,"Hi!"));
@@ -191,7 +192,7 @@ public abstract class BAAtomicBaseBot extends EventBot{
     this.scriptsDoneListener = new ActionOnceAfterNEventsListener(
       ctx, "scriptsDoneListener", secondPhaseScriptListenerFilter,
       noOfNeeds - 1,
-      new DeactivateAllNeedsOfGroupAction(ctx, URI_LIST_NAME_PARTICIPANT));
+      new DeactivateAllNeedsOfListAction(ctx, botContextWrapper.getParticipantListName()));
       bus.subscribe(FinishedEvent.class, this.scriptsDoneListener);
 
 

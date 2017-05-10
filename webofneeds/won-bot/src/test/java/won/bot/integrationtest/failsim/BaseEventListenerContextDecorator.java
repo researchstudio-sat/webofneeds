@@ -18,6 +18,7 @@ package won.bot.integrationtest.failsim;
 
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.context.BotContext;
+import won.bot.framework.bot.context.BotContextWrapper;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.bot.framework.eventbot.EventListenerContext;
@@ -102,6 +103,9 @@ public abstract class BaseEventListenerContextDecorator implements EventListener
   public BotContext getBotContext() {
     return delegate.getBotContext();
   }
+
+  @Override
+  public BotContextWrapper getBotContextWrapper() {return delegate.getBotContextWrapper(); }
 
   @Override
   public Executor getExecutor() {
