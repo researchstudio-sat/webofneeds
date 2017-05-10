@@ -56,7 +56,7 @@ public class NeedModelWarpperTest {
         Assert.assertTrue(needModelWrapper.hasFlag(WON.USED_FOR_TESTING));
         Assert.assertEquals(1, needModelWrapper.getFacetUris().size());
         Assert.assertEquals("http://purl.org/webofneeds/model#OwnerFacet", needModelWrapper.getFacetUris().iterator().next());
-        Assert.assertTrue(needModelWrapper.hasFlag(WON.SUPPRESS_HINT_FOR_ME));
+        Assert.assertTrue(needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME));
 
         // query the content nodes
         Assert.assertEquals(2, needModelWrapper.getContentNodes(NeedContentPropertyType.ALL).size());

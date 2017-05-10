@@ -83,8 +83,8 @@ public abstract class AbstractSolrMatcherActor extends UntypedActor
     // check if the need has doNotMatch flag, then do not use it for querying or indexing
     Dataset dataset = deserializeNeed(needEvent);
     NeedModelWrapper needModelWrapper = new NeedModelWrapper(dataset);
-    if (needModelWrapper.hasFlag(WON.SUPPRESS_HINT_FOR_ME) && needModelWrapper.hasFlag(WON.SUPPRESS_HINT_FOR_COUNTERPART)) {
-      log.info("Discarding received need due to flags won:SuppressHintForMe and won:SuppressHintForCounterpart: {}", needEvent);
+    if (needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME) && needModelWrapper.hasFlag(WON.NO_HINT_FOR_COUNTERPART)) {
+      log.info("Discarding received need due to flags won:NoHintForMe and won:NoHintForCounterpart: {}", needEvent);
       return;
     }
 

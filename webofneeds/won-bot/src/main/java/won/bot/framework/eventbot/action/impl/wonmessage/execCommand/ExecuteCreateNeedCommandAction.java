@@ -122,8 +122,8 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
 
 
         if (doNotMatch){
-            needModelWrapper.addFlag(WON.SUPPRESS_HINT_FOR_ME);
-            needModelWrapper.addFlag(WON.SUPPRESS_HINT_FOR_COUNTERPART);
+            needModelWrapper.addFlag(WON.NO_HINT_FOR_ME);
+            needModelWrapper.addFlag(WON.NO_HINT_FOR_COUNTERPART);
         }
 
         if (usedForTesting){

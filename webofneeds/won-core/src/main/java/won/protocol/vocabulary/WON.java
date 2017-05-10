@@ -172,8 +172,8 @@ public class WON
   public static final Resource USED_FOR_TESTING= m.createResource(BASE_URI + "UsedForTesting");
 
   // hint behaviour
-  public static final Resource SUPPRESS_HINT_FOR_COUNTERPART = m.createResource(BASE_URI+"SuppressHintForCounterpart");
-  public static final Resource SUPPRESS_HINT_FOR_ME = m.createResource(BASE_URI+"SuppressHintForMe");
+  public static final Resource NO_HINT_FOR_COUNTERPART = m.createResource(BASE_URI+"NoHintForCounterpart");
+  public static final Resource NO_HINT_FOR_ME = m.createResource(BASE_URI+"NoHintForMe");
 
   public static final Property HAS_GRAPH = m.createProperty(BASE_URI,"hasGraph");
 

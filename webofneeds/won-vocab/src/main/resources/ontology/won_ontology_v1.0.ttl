@@ -456,14 +456,14 @@ xsd:string rdf:type owl:Class .
            rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
-###  http://purl.org/webofneeds/model#SuppressHintForMe
-:SuppressHintForMe rdf:type owl:NamedIndividual, :Flag;
-            rdfs:comment "A Need specifying this flag indicates that matchers should not send Hint messages to that Need. If the SuppressHintForCounterpart flag is also present, matchers should disregard this need completely."@en ;
+###  http://purl.org/webofneeds/model#NoHintForMe
+:NoHintForMe rdf:type owl:NamedIndividual, :Flag;
+            rdfs:comment "A Need specifying this flag indicates that matchers should not send Hint messages to that Need. If the NoHintForCounterpart flag is also present, matchers should disregard this need completely."@en ;
             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
-###  http://purl.org/webofneeds/model#SuppressHintForCounterpart
-:SuppressHintForCounterpart rdf:type owl:NamedIndividual, :Flag;
-            rdfs:comment "A Need specifying this flag indicates that matchers should not send Hint messages to the counterpart in case of a match. If the SuppressHintForMe flag is also present, matchers should disregard this need completely."@en ;
+###  http://purl.org/webofneeds/model#NoHintForCounterpart
+:NoHintForCounterpart rdf:type owl:NamedIndividual, :Flag;
+            rdfs:comment "A Need specifying this flag indicates that matchers should not send Hint messages to the counterpart in case of a match. If the NoHintForMe flag is also present, matchers should disregard this need completely."@en ;
             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 ###  http://purl.org/webofneeds/model#GroupFacet
