@@ -37,17 +37,16 @@ public class DefaultNeedQueryFactory extends BasicNeedQueryFactory {
 
     private void addTermsToQuery(Resource contentNode, NeedContentPropertyType fieldType) {
 
-        String title = needModelWrapper.getTitle(contentNode);
-        String description = needModelWrapper.getDescription(contentNode);
+        Collection<String> titles = needModelWrapper.getTitles(contentNode);
+        Collection<String> descriptions = needModelWrapper.getDescriptions(contentNode);
         Collection<String> tags = needModelWrapper.getTags(contentNode);
         String tagsTerms = "\"" + String.join("\" \"", tags) + "\"";
-
-        addTermsToTitleQuery(title, fieldType, 4);
+        titles.stream().forEach(title -> addTermsToTitleQuery(title, fieldType, 4));
         addTermsToTitleQuery(tagsTerms, fieldType, 2);
         addTermsToTagQuery(tagsTerms, fieldType, 4);
-        addTermsToTagQuery(title, fieldType, 2);
-        addTermsToDescriptionQuery(title, fieldType, 2);
+        titles.stream().forEach(title -> addTermsToTagQuery(title, fieldType, 2));
+        titles.stream().forEach(title -> addTermsToDescriptionQuery(title, fieldType, 2));
         addTermsToDescriptionQuery(tagsTerms, fieldType, 2);
-        addTermsToDescriptionQuery(description, fieldType, 1);
+        descriptions.stream().forEach(descr -> addTermsToDescriptionQuery(descr, fieldType, 1));
     }
 }
