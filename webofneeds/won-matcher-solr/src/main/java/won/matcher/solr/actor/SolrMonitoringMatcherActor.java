@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import won.matcher.service.common.event.BulkHintEvent;
 import won.matcher.service.common.event.NeedEvent;
 import won.matcher.solr.query.SolrMatcherQueryExecutor;
+import won.protocol.util.NeedModelWrapper;
 
 import java.io.IOException;
 
@@ -64,12 +65,12 @@ public class SolrMonitoringMatcherActor extends AbstractSolrMatcherActor
   }
 
   @Override
-  protected BulkHintEvent produceHints(SolrDocumentList docs, NeedEvent needEvent) {
+  protected BulkHintEvent produceHints(SolrDocumentList docs, NeedEvent needEvent, NeedModelWrapper needModelWrapper) {
 
     Stopwatch stopwatch = SimonManager.getStopwatch("produceHints");
     Split split = stopwatch.start();
 
-    BulkHintEvent hints = super.produceHints(docs, needEvent);
+    BulkHintEvent hints = super.produceHints(docs, needEvent, needModelWrapper);
 
     split.stop();
     return hints;

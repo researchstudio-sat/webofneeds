@@ -17,18 +17,12 @@
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
 import org.apache.jena.rdf.model.Model;
-import won.bot.framework.bot.context.BotContextWrapper;
-import won.bot.framework.bot.context.CommentBotContextWrapper;
-import won.bot.framework.bot.context.GroupBotContextWrapper;
-import won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
 import won.protocol.model.FacetType;
-import won.protocol.model.MatchingBehaviorType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
@@ -92,8 +86,11 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
         WonNodeInformationService wonNodeInformationService, URI needURI, URI wonNodeURI, Model needModel,
         final boolean usedForTesting, final boolean doNotMatch ) throws WonMessageBuilderException {
 
-    NeedModelWrapper needModelWrapper = new NeedModelWrapper(needModel, null);if (doNotMatch){
-      needModelWrapper.setMatchingBehavior(MatchingBehaviorType.DO_NOT_MATCH);
+    NeedModelWrapper needModelWrapper = new NeedModelWrapper(needModel, null);
+
+
+    if (doNotMatch){
+      needModelWrapper.addFlag(WON.DO_NOT_MATCH);
     }
 
     if (usedForTesting){
