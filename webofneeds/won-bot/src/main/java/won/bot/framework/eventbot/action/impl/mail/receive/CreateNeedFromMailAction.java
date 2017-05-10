@@ -1,6 +1,7 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.rdf.model.Model;
 import won.bot.framework.bot.context.MailBotContextWrapper;
 import org.apache.jena.rdf.model.Model;
 import won.bot.framework.eventbot.EventListenerContext;

@@ -55,9 +55,9 @@ public class ExecuteConnectionMessageCommandAction extends ExecuteSendMessageCom
         Model localMessageModel = RdfUtils.cloneModel(messageCommandEvent.getMessageModel());
         Dataset connectionRDF =
                 getEventListenerContext().getLinkedDataSource().getDataForResource(messageCommandEvent.getConnectionURI());
-        URI remoteNeed = WonRdfUtils.NeedUtils.getRemoteNeedURIFromConnection(connectionRDF, messageCommandEvent.getConnectionURI());
-        URI localNeed = WonRdfUtils.NeedUtils.getLocalNeedURIFromConnection(connectionRDF, messageCommandEvent.getConnectionURI());
-        URI wonNode = WonRdfUtils.NeedUtils.getWonNodeURIFromConnection(connectionRDF, messageCommandEvent.getConnectionURI());
+        URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, messageCommandEvent.getConnectionURI());
+        URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, messageCommandEvent.getConnectionURI());
+        URI wonNode = WonRdfUtils.ConnectionUtils.getWonNodeURIFromConnection(connectionRDF, messageCommandEvent.getConnectionURI());
         Dataset remoteNeedRDF =
                 getEventListenerContext().getLinkedDataSource().getDataForResource(remoteNeed);
 
@@ -70,7 +70,7 @@ public class ExecuteConnectionMessageCommandAction extends ExecuteSendMessageCom
                         messageCommandEvent.getConnectionURI(),
                         localNeed,
                         wonNode,
-                        WonRdfUtils.NeedUtils.getRemoteConnectionURIFromConnection(connectionRDF, messageCommandEvent.getConnectionURI()),
+                        WonRdfUtils.ConnectionUtils.getRemoteConnectionURIFromConnection(connectionRDF, messageCommandEvent.getConnectionURI()),
                         remoteNeed,
                         WonRdfUtils.NeedUtils.getWonNodeURIFromNeed(remoteNeedRDF, remoteNeed),
                         localMessageModel)
