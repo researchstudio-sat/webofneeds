@@ -93,7 +93,7 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
 
             DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needDataset);
             titleString = needModelWrapper.getTitleFromIsOrAll();
-            createNeed = needModelWrapper.hasFlag(WON.USED_FOR_TESTING) && !needModelWrapper.hasFlag(WON.SUPPRESS_HINTS_FOR_ME);
+            createNeed = needModelWrapper.hasFlag(WON.USED_FOR_TESTING) && !needModelWrapper.hasFlag(WON.SUPPRESS_HINT_FOR_ME);
         }
 
         if (!createNeed) return; //if create need is false do not continue the debug need creation

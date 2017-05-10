@@ -105,9 +105,9 @@ public class HintBuilder {
         BulkHintEvent bulkHintEvent = new BulkHintEvent();
         SolrDocumentList newDocs = calculateMatchingResults(docs);
         log.info("Received {} matches as query result for need {}, keeping the top {} ", new Object[]{(docs != null) ? docs.size() : 0, need, newDocs.size()});
-        boolean suppressHintsForMe = needModelWrapper.hasFlag(WON.SUPPRESS_HINTS_FOR_ME);
-        boolean suppressHintsForCounterpart = needModelWrapper.hasFlag(WON.SUPPRESS_HINTS_FOR_COUNTERPART);
-        log.debug("need to be matched has SuppressHintsForMe: {}, SuppressHintsForCounterpart: {} ", suppressHintsForMe, suppressHintsForCounterpart);
+        boolean suppressHintForMe = needModelWrapper.hasFlag(WON.SUPPRESS_HINT_FOR_ME);
+        boolean suppressHintForCounterpart = needModelWrapper.hasFlag(WON.SUPPRESS_HINT_FOR_COUNTERPART);
+        log.debug("need to be matched has SuppressHintForMe: {}, SuppressHintForCounterpart: {} ", suppressHintForMe, suppressHintForCounterpart);
         for (SolrDocument doc : newDocs) {
             //NOTE: not the whole document is loaded here. The fields that are selected are defined
             //in won.matcher.solr.query.DefaultMatcherQueryExecuter - if additional fields are required, the field list
@@ -119,12 +119,12 @@ public class HintBuilder {
                 continue;
             }
             List<String> flags = getValueList(doc, HAS_FLAG_SOLR_FIELD);
-            boolean matchedNeedSuppressHintsForMe = flags.contains(WON.SUPPRESS_HINTS_FOR_ME.toString());
-            boolean matchedNeedSuppressHintsForCounterpart = flags.contains(WON.SUPPRESS_HINTS_FOR_COUNTERPART.toString());
-            boolean doSuppressHintForNeed = suppressHintsForMe || matchedNeedSuppressHintsForCounterpart;
-            boolean doSuppressHintForMatchedNeed = suppressHintsForCounterpart || matchedNeedSuppressHintsForMe;
+            boolean matchedNeedSuppressHintForMe = flags.contains(WON.SUPPRESS_HINT_FOR_ME.toString());
+            boolean matchedNeedSuppressHintForCounterpart = flags.contains(WON.SUPPRESS_HINT_FOR_COUNTERPART.toString());
+            boolean doSuppressHintForNeed = suppressHintForMe || matchedNeedSuppressHintForCounterpart;
+            boolean doSuppressHintForMatchedNeed = suppressHintForCounterpart || matchedNeedSuppressHintForMe;
             if (log.isDebugEnabled()) {
-                log.debug("matched need has SuppressHintsForMe: {}, SuppressHintsForCounterpart: {}", matchedNeedSuppressHintsForMe, matchedNeedSuppressHintsForCounterpart);
+                log.debug("matched need has SuppressHintForMe: {}, SuppressHintForCounterpart: {}", matchedNeedSuppressHintForMe, matchedNeedSuppressHintForCounterpart);
                 log.debug("need will receive a hint: {} (uri: {})", !doSuppressHintForNeed, need.getUri());
                 log.debug("matched need need will receive a hint: {} (uri: {})", !doSuppressHintForMatchedNeed, matchedNeedUri);
             }
