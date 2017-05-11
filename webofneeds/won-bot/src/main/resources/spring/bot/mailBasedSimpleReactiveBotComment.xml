@@ -40,7 +40,6 @@
 
     <bean id="botContextWrapper" class="won.bot.framework.bot.context.CommentBotContextWrapper">
         <constructor-arg name="botContext" ref="${botContext.impl}"/>
-        <constructor-arg name="needCreateListName" value="needs"/>
-        <constructor-arg name="commentListName" value="comments"/>
+        <constructor-arg name="botName" value="commentBot"/>
     </bean>
 </beans>

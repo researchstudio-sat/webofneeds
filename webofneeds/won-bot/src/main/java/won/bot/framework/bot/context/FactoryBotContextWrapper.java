@@ -1,39 +1,20 @@
 package won.bot.framework.bot.context;
 
-
-import won.bot.framework.component.factory.FactoryConstraintService;
-
 import java.net.URI;
 
 public class FactoryBotContextWrapper extends BotContextWrapper {
-    private String factoryListName;
-    private String factoryInternalIdName;
-    private String factoryOfferToFactoryNeedMapName;
+    private String factoryListName = getBotName() + ":factoryList";
+    private String factoryInternalIdName = getBotName() + ":factoryInternalId";
+    private String factoryOfferToFactoryNeedMapName = getBotName() + ":factoryOfferToFactoryNeedMap";
 
-    private FactoryConstraintService factoryConstraintService;
-
-    public FactoryBotContextWrapper(BotContext botContext, String needCreateListName, String factoryListName, String factoryInternalIdName, String factoryOfferToFactoryNeedMapName) {
-        super(botContext, needCreateListName);
-        this.factoryListName = factoryListName;
-        this.factoryInternalIdName = factoryInternalIdName;
-        this.factoryOfferToFactoryNeedMapName = factoryOfferToFactoryNeedMapName;
+    public FactoryBotContextWrapper(BotContext botContext, String botName) {
+        super(botContext, botName);
     }
 
     public String getFactoryListName() {
         return factoryListName;
     }
 
-    public String getFactoryInternalIdName() {
-        return factoryInternalIdName;
-    }
-
-    public String getFactoryOfferToFactoryNeedMapName() {
-        return factoryOfferToFactoryNeedMapName;
-    }
-
-    public void setFactoryOfferToFactoryNeedMapName(String factoryOfferToFactoryNeedMapName) {
-        this.factoryOfferToFactoryNeedMapName = factoryOfferToFactoryNeedMapName;
-    }
 
     public boolean isFactoryNeed(URI uri) {
         return getBotContext().isInNamedNeedUriList(uri, factoryListName);

@@ -4,13 +4,11 @@ package won.bot.framework.bot.context;
  * Created by fsuda on 14.04.2017.
  */
 public class GroupBotContextWrapper extends BotContextWrapper {
-    private String groupListName;
-    private String groupMembersListName;
+    private String groupListName = getBotName() + ":groupList";
+    private String groupMembersListName = getBotName() + ":groupMembers";
 
-    public GroupBotContextWrapper(BotContext botContext, String groupMembersListName, String groupListName) {
-        super(botContext, null);
-        this.groupListName = groupListName;
-        this.groupMembersListName = groupMembersListName;
+    public GroupBotContextWrapper(BotContext botContext, String botName) {
+        super(botContext, botName);
     }
 
     @Override

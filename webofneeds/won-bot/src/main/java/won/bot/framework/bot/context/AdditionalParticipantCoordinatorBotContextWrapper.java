@@ -7,11 +7,10 @@ import java.util.List;
  * Created by fsuda on 14.04.2017.
  */
 public class AdditionalParticipantCoordinatorBotContextWrapper extends ParticipantCoordinatorBotContextWrapper {
-    private String participantDelayedListName;
+    private String participantDelayedListName = getBotName() + ":participantsDelayed";
 
-    public AdditionalParticipantCoordinatorBotContextWrapper(BotContext botContext, String participantListName, String participantDelayedListName, String coordinatorListName) {
-        super(botContext, participantListName, coordinatorListName);
-        this.participantDelayedListName = participantDelayedListName;
+    public AdditionalParticipantCoordinatorBotContextWrapper(BotContext botContext, String botName) {
+        super(botContext, botName);
     }
 
     public String getParticipantDelayedListName() {

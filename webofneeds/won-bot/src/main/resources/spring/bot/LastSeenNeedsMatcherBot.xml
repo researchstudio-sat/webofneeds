@@ -44,6 +44,6 @@
 
     <bean id="botContextWrapper" class="won.bot.framework.bot.context.BotContextWrapper">
         <constructor-arg name="botContext" ref="${botContext.impl}"/>
-        <constructor-arg name="needCreateListName" value="needs"/>
+        <constructor-arg name="botName" value="lastSeenNeedsMatcherBot"/>
     </bean>
 </beans>
