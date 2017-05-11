@@ -89,7 +89,7 @@ public class SolrMatcherEvaluation
       title = title.replaceAll("NOT", "_");
       title = title.replaceAll("AND", "_");
       title = title.replaceAll("OR", "_");
-      description = needModelWrapper.getDescription(NeedContentPropertyType.ALL);
+      description = needModelWrapper.getSomeDescription(NeedContentPropertyType.ALL);
     } catch (IncorrectPropertyCountException e) {
 
       // do nothing
