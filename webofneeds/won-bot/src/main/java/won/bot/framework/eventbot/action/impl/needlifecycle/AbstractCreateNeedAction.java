@@ -100,7 +100,7 @@ public abstract class AbstractCreateNeedAction extends BaseEventBotAction {
     }
 
     if (usedForTesting){
-      needModelWrapper.addFlag(WON.USED_FOR_TESTING);
+      needModelWrapper.addFlag( WON.USED_FOR_TESTING);
     }
 
         RdfUtils.replaceBaseURI(needModel, needURI.toString());
