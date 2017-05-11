@@ -211,20 +211,6 @@ seeked to fulfill the need in contrast to the part that is available.""" ;
                          rdfs:comment "Connects a Need object with a description of a WON protocol it supports."@en ;
                          rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
-### http://purl.org/webofneeds/model#wantsHints
-:wantsHints rdf:type owl:ObjectProperty ;
-                         rdfs:domain :Need ;
-                         rdfs:range :HintSetting ;
-                         rdfs:comment "Informs matchers if they should send hints to this Need."@en ;
-                         rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
-### http://purl.org/webofneeds/model#wantsHintsForCounterpart
-:wantsHints rdf:type owl:ObjectProperty ;
-                         rdfs:domain :Need ;
-                         rdfs:range :HintSetting ;
-                         rdfs:comment "Informs matchers if they should send hints to the matched Need (i.e., the prospecive 'counterpart' of this Need)."@en ;
-                         rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
 #################################################################
 #    Data properties
 #################################################################
@@ -370,11 +356,6 @@ seeked to fulfill the need in contrast to the part that is available.""" ;
       rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
-###  http://purl.org/webofneeds/model#Flag
-:HintSetting rdf:type owl:Class ;
-      rdfs:comment "Superclass of all HintSetting individuals a need can have."@en ;
-      rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
 ###  http://purl.org/webofneeds/model#LocationSpecification
 :LocationSpecification rdf:type owl:Class ;
                        rdfs:comment "Specifies where a Need is available."@en ;
@@ -475,9 +456,14 @@ xsd:string rdf:type owl:Class .
            rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
-###  http://purl.org/webofneeds/model#DoNotMatch
-:DoNotMatch rdf:type owl:NamedIndividual, :Flag;
-            rdfs:comment "A Need specifying this flag indicates that matchers should ignore this Need."@en ;
+###  http://purl.org/webofneeds/model#NoHintForMe
+:NoHintForMe rdf:type owl:NamedIndividual, :Flag;
+            rdfs:comment "A Need specifying this flag indicates that matchers should not send Hint messages to that Need. If the NoHintForCounterpart flag is also present, matchers should disregard this need completely."@en ;
+            rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
+
+###  http://purl.org/webofneeds/model#NoHintForCounterpart
+:NoHintForCounterpart rdf:type owl:NamedIndividual, :Flag;
+            rdfs:comment "A Need specifying this flag indicates that matchers should not send Hint messages to the counterpart in case of a match. If the NoHintForMe flag is also present, matchers should disregard this need completely."@en ;
             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 ###  http://purl.org/webofneeds/model#GroupFacet
@@ -524,23 +510,7 @@ xsd:string rdf:type owl:Class .
 :UsedForTesting rdf:type owl:NamedIndividual ,
                          :Flag .
 
-###  http://purl.org/webofneeds/model#Yes
-:Yes rdf:type owl:NamedIndividual ,
-                      :HintSetting ;
-             rdfs:comment "This HintSetting tells matchers to send hints."@en ;
-             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
-###  http://purl.org/webofneeds/model#No
-:No rdf:type owl:NamedIndividual ,
-                      :HintSetting ;
-             rdfs:comment "This HintSetting tells matchers not to send hints."@en ;
-             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
-###  http://purl.org/webofneeds/model#WeakYes
-:WeakYes rdf:type owl:NamedIndividual ,
-                      :HintSetting ;
-             rdfs:comment "This HintSetting tells matchers to send hints unless the counterpart uses 'No'."@en ;
-             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
 

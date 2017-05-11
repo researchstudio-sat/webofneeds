@@ -13,7 +13,6 @@ import org.apache.jena.vocabulary.RDF;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.model.HintSetting;
 import won.protocol.model.NeedContentPropertyType;
 import won.protocol.model.NeedGraphType;
 import won.protocol.model.NeedState;
@@ -155,42 +154,6 @@ public class NeedModelWrapper {
 
     public String getNeedUri() {
         return getNeedNode(NeedGraphType.NEED).getURI();
-    }
-
-    public void setWantsHints(HintSetting hintSetting){
-        Resource need = getNeedNode(NeedGraphType.NEED);
-        need.removeAll(WON.WANTS_HINTS);
-        need.addProperty(WON.WANTS_HINTS, WON.toResource(hintSetting));
-    }
-
-    public void setWantsHintsForCounterpart(HintSetting hintSetting){
-        Resource need = getNeedNode(NeedGraphType.NEED);
-        need.removeAll(WON.WANTS_HINTS_FOR_COUNTERPART);
-        need.addProperty(WON.WANTS_HINTS_FOR_COUNTERPART, WON.toResource(hintSetting));
-    }
-
-    public HintSetting getWantsHints() {
-
-        RDFNode hintSetting = RdfUtils.findOnePropertyFromResource(
-                needModel, getNeedNode(NeedGraphType.NEED), WON.WANTS_HINTS);
-
-        // default hint setting is WEAK_YES
-        if (hintSetting == null) {
-            return HintSetting.DEFAULT;
-        }
-        return HintSetting.fromURI(hintSetting.asResource().getURI().toString());
-    }
-
-    public HintSetting getWantsHintsForCounterpart() {
-
-        RDFNode hintSetting = RdfUtils.findOnePropertyFromResource(
-                needModel, getNeedNode(NeedGraphType.NEED), WON.WANTS_HINTS_FOR_COUNTERPART);
-
-        // default hint setting is WEAK_YES
-        if (hintSetting == null) {
-            return HintSetting.DEFAULT;
-        }
-        return HintSetting.fromURI(hintSetting.asResource().getURI().toString());
     }
 
     public void addFlag(Resource flag) {

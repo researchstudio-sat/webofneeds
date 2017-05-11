@@ -21,7 +21,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import won.protocol.model.ConnectionState;
-import won.protocol.model.HintSetting;
 import won.protocol.model.NeedState;
 
 /**
@@ -173,13 +172,8 @@ public class WON
   public static final Resource USED_FOR_TESTING= m.createResource(BASE_URI + "UsedForTesting");
 
   // hint behaviour
-  public static final Resource DO_NOT_MATCH = m.createResource(BASE_URI+"DoNotMatch");
-
-  public static final Property WANTS_HINTS = m.createProperty(BASE_URI+"wantsHints");
-  public static final Property WANTS_HINTS_FOR_COUNTERPART = m.createProperty(BASE_URI+"wantsHintsForCounterpart");
-  public static final Resource YES = m.createResource(BASE_URI+"Yes");
-  public static final Resource NO  = m.createResource(BASE_URI+"No");
-  public static final Resource WEAK_YES = m.createResource(BASE_URI+"WeakYes");
+  public static final Resource NO_HINT_FOR_COUNTERPART = m.createResource(BASE_URI+"NoHintForCounterpart");
+  public static final Resource NO_HINT_FOR_ME = m.createResource(BASE_URI+"NoHintForMe");
 
   public static final Property HAS_GRAPH = m.createProperty(BASE_URI,"hasGraph");
 
@@ -246,14 +240,5 @@ public class WON
     }
   }
 
-  public static Resource toResource(HintSetting hintSetting){
-    switch (hintSetting){
-      case YES: return WON.YES;
-      case NO: return  WON.NO;
-      case WEAK_YES: return WON.WEAK_YES;
-      default:
-        throw new IllegalArgumentException("Could not convert hintSetting " + hintSetting + " to resource");
-    }
-  }
 
 }

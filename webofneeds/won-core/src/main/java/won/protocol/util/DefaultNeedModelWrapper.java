@@ -59,10 +59,12 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
     public String getTitle(Resource contentNode) {
         return getContentPropertyStringValue(contentNode, DC.title);
     }
+    public Collection<String> getTitles(Resource contentNode) { return getContentPropertyStringValues(contentNode, DC.title);}
 
     public String getTitle(NeedContentPropertyType type) {
         return getContentPropertyStringValue(type, DC.title);
     }
+    public Collection<String> getTitles(NeedContentPropertyType type) { return getContentPropertyStringValues(type, DC.title);}
 
     public void setDescription(NeedContentPropertyType type, String description) {
         createContentNodeIfNonExist(type);
@@ -73,8 +75,15 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
         return getContentPropertyStringValue(contentNode, WON.HAS_TEXT_DESCRIPTION);
     }
 
+    public Collection<String> getDescriptions(Resource contentNode) {
+        return getContentPropertyStringValues(contentNode, WON.HAS_TEXT_DESCRIPTION);
+    }
+
     public String getDescription(NeedContentPropertyType type) {
         return getContentPropertyStringValue(type, WON.HAS_TEXT_DESCRIPTION);
+    }
+    public Collection<String> getDescriptions(NeedContentPropertyType type) {
+        return getContentPropertyStringValues(type, WON.HAS_TEXT_DESCRIPTION);
     }
 
     public void addTag(NeedContentPropertyType type, String tag) {
