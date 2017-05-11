@@ -23,7 +23,9 @@ import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.counter.Counter;
 import won.bot.framework.eventbot.action.impl.counter.CounterImpl;
+import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.action.impl.needlifecycle.AbstractCreateNeedAction;
+import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.NeedCreationFailedEvent;
 import won.bot.framework.eventbot.event.NeedSpecificEvent;
@@ -57,14 +59,12 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
     private boolean isInitialForHint;
     private boolean isInitialForConnect;
 
-    public CreateDebugNeedWithFacetsAction(final EventListenerContext eventListenerContext, final String uriListName,
-                                           final boolean usedForTesting, final boolean doNotMatch, final URI... facets) {
-        super(eventListenerContext, uriListName, usedForTesting, doNotMatch, facets);
+    public CreateDebugNeedWithFacetsAction(final EventListenerContext eventListenerContext, final boolean usedForTesting, final boolean doNotMatch, final URI... facets) {
+        super(eventListenerContext, eventListenerContext.getBotContextWrapper().getNeedCreateListName(), usedForTesting, doNotMatch, facets);
     }
 
     @Override
-    protected void doRun(Event event, EventListener executingListener) throws Exception
-    {
+    protected void doRun(Event event, EventListener executingListener) throws Exception {
         String replyText = "";
         URI reactingToNeedUriTmp = null;
         Dataset needDataset = null;
@@ -110,10 +110,11 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
             replyText = "Debug Need No. " + counter.increment();
         }
 
-        WonNodeInformationService wonNodeInformationService =
-                getEventListenerContext().getWonNodeInformationService();
+        EventListenerContext ctx = getEventListenerContext();
+        WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
+        EventBus bus = ctx.getEventBus();
 
-        final URI wonNodeUri = getEventListenerContext().getNodeURISource().getNodeURI();
+        final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
         final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needURI.toString());
         needModelWrapper.setTitle(NeedContentPropertyType.IS_AND_SEEKS, replyText);
@@ -127,10 +128,9 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
 
         logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
 
-        WonMessage createNeedMessage = createWonMessage(wonNodeInformationService,
-                needURI, wonNodeUri, needModel);
+        WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri, needModel);
         //remember the need URI so we can react to success/failure responses
-        EventBotActionUtils.rememberInList(getEventListenerContext(), needURI, uriListName);
+        EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
 
         EventListener successCallback = new EventListener()
         {
@@ -139,20 +139,14 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
                 logger.debug("need creation successful, new need URI is {}", needURI);
 
                 // save the mapping between the original and the reaction in to the context.
-                getEventListenerContext().getBotContext().saveToObjectMap(KEY_NEED_REMOTE_NEED_ASSOCIATION,
-                                                                          reactingToNeedUri.toString(), needURI);
-                getEventListenerContext().getBotContext().saveToObjectMap(KEY_NEED_REMOTE_NEED_ASSOCIATION,
-                                                                          needURI.toString(), reactingToNeedUri);
+                getEventListenerContext().getBotContextWrapper().addUriAssociation(reactingToNeedUri, needURI);
 
                 if ((origEvent instanceof HintDebugCommandEvent) || isInitialForHint) {
-                    getEventListenerContext().getEventBus()
-                            .publish(new NeedCreatedEventForDebugHint(needURI, wonNodeUri, needModel, null));
+                    bus.publish(new NeedCreatedEventForDebugHint(needURI, wonNodeUri, needModel, null));
                 } else if ((origEvent instanceof ConnectDebugCommandEvent) || isInitialForConnect) {
-                    getEventListenerContext().getEventBus()
-                            .publish(new NeedCreatedEventForDebugConnect(needURI, wonNodeUri, needModel, null));
+                    bus.publish(new NeedCreatedEventForDebugConnect(needURI, wonNodeUri, needModel, null));
                 } else {
-                    getEventListenerContext().getEventBus()
-                            .publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
+                    bus.publish(new NeedCreatedEvent(needURI, wonNodeUri, needModel, null));
                 }
             }
         };
@@ -163,15 +157,15 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
             public void onEvent(Event event) throws Exception {
                 String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
                 logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
-                EventBotActionUtils.removeFromList(getEventListenerContext(), needURI, uriListName);
-                getEventListenerContext().getEventBus().publish(new NeedCreationFailedEvent(wonNodeUri));
+                EventBotActionUtils.removeFromList(ctx, needURI, uriListName);
+                bus.publish(new NeedCreationFailedEvent(wonNodeUri));
             }
         };
         EventBotActionUtils.makeAndSubscribeResponseListener(
-                createNeedMessage, successCallback, failureCallback, getEventListenerContext());
+                createNeedMessage, successCallback, failureCallback, ctx);
 
         logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
-        getEventListenerContext().getWonMessageSender().sendWonMessage(createNeedMessage);
+        ctx.getWonMessageSender().sendWonMessage(createNeedMessage);
         logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
     }
 

@@ -27,7 +27,7 @@
 
     <bean id="needCreatorBot" class="won.bot.impl.NeedCreatorBot">
         <property name="taskScheduler" ref="taskScheduler"/>
-        <property name="botContext" ref="${botContext.impl}"/>
+        <property name="botContextWrapper" ref="botContextWrapper"/>
         <!--<property name="needProducer" ref="needProducerFromMails" />-->
         <!--<property name="needProducer" ref="needProducerFromTrig" />-->
         <property name="needProducer" ref="needProducerMixed"/>
@@ -42,6 +42,11 @@
                 <property name="fixedRate" value="true"/>  <!-- fixed delay after completion -->
             </bean>
         </property>
+    </bean>
+
+    <bean id="botContextWrapper" class="won.bot.framework.bot.context.BotContextWrapper">
+        <constructor-arg name="botContext" ref="${botContext.impl}"/>
+        <constructor-arg name="botName" value="needCreatorBot"/>
     </bean>
 </beans>
 

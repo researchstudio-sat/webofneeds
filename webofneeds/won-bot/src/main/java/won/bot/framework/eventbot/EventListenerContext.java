@@ -18,6 +18,7 @@ package won.bot.framework.eventbot;
 
 import org.springframework.scheduling.TaskScheduler;
 import won.bot.framework.bot.context.BotContext;
+import won.bot.framework.bot.context.BotContextWrapper;
 import won.bot.framework.component.needproducer.NeedProducer;
 import won.bot.framework.component.nodeurisource.NodeURISource;
 import won.bot.framework.eventbot.bus.EventBus;
@@ -94,6 +95,11 @@ public interface EventListenerContext
    */
   public BotContext getBotContext();
 
+  /**
+   * Returns the BotContextWrapper of the bot. Used to access the known need URISs
+   * @return
+   */
+  public BotContextWrapper getBotContextWrapper();
   /**
    * Returns an executor that passes the tasks to the TaskScheduler for immediate execution.
    * @return

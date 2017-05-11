@@ -26,7 +26,7 @@
     <bean id="telegram2wonBot" class="won.bot.impl.Telegram2WonBot">
         <!-- optional property, by default one echo need per each need will be created -->
 
-        <property name="botContext" ref="${botContext.impl}"/>
+        <property name="botContextWrapper" ref="botContextWrapper"/>
         <property name="taskScheduler" ref="taskScheduler"/>
         <property name="token" value="${telegrambot.token}"/>
         <property name="botName" value="${telegrambot.botname}"/>
@@ -48,6 +48,11 @@
                 <property name="fixedRate" value="false"/>  <!-- fixed delay after completion -->
             </bean>
         </property>
+    </bean>
+
+    <bean id="botContextWrapper" class="won.bot.framework.bot.context.TelegramBotContextWrapper">
+        <constructor-arg name="botContext" ref="${botContext.impl}"/>
+        <constructor-arg name="botName" value="telegramBot"/>
     </bean>
 
     <bean id="telegramGenerator" class="won.bot.framework.eventbot.action.impl.telegram.util.TelegramMessageGenerator">

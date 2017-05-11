@@ -25,6 +25,7 @@ import org.springframework.util.Assert;
 import won.bot.framework.bot.Bot;
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.bot.context.BotContext;
+import won.bot.framework.bot.context.BotContextWrapper;
 import won.protocol.message.WonMessage;
 import won.protocol.model.Connection;
 import won.protocol.model.Match;
@@ -41,17 +42,17 @@ public abstract class BaseBot implements Bot
   private boolean workDone = false;
 
   @Autowired
-  private BotContext botContext;
+  private BotContextWrapper botContextWrapper;
 
   @Override
   public boolean knowsNeedURI(final URI needURI)
   {
-    return this.botContext.isNeedKnown(needURI);
+    return this.botContextWrapper.getBotContext().isNeedKnown(needURI);
   }
 
   @Override
   public boolean knowsNodeURI(final URI wonNodeURI) {
-    return this.botContext.isNodeKnown(wonNodeURI);
+    return this.botContextWrapper.getBotContext().isNodeKnown(wonNodeURI);
   }
 
   @Override
@@ -62,8 +63,8 @@ public abstract class BaseBot implements Bot
 
     // try the connection with the bot context
     try {
-      botContext.saveToObjectMap("temp", "temp", "temp");
-      Object o = botContext.loadFromObjectMap("temp", "temp");
+      botContextWrapper.getBotContext().saveToObjectMap("temp", "temp", "temp");
+      Object o = botContextWrapper.getBotContext().loadFromObjectMap("temp", "temp");
       Assert.isTrue(o.equals("temp"));
     } catch (Exception e) {
       logger.error("Bot cannot establish connection with bot context");
@@ -112,14 +113,12 @@ public abstract class BaseBot implements Bot
     return this.lifecyclePhase;
   }
 
-  public void setBotContext(final BotContext botContext)
-  {
-    this.botContext = botContext;
+  public void setBotContextWrapper(final BotContextWrapper botContextWrapper) {
+    this.botContextWrapper = botContextWrapper;
   }
 
-  protected BotContext getBotContext()
-  {
-    return botContext;
+  protected BotContextWrapper getBotContextWrapper() {
+    return botContextWrapper;
   }
 
   @Override

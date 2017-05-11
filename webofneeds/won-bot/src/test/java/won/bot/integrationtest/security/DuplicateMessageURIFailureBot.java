@@ -38,10 +38,7 @@ import won.bot.integrationtest.failsim.ConstantNewEventURIDecorator;
 /**
  *
  */
-public class DuplicateMessageURIFailureBot extends IntegrationtestBot
-{
-  private static final String NAME_NEEDS = "needs";
-
+public class DuplicateMessageURIFailureBot extends IntegrationtestBot {
   @Override
   protected void initializeEventListeners()
   {
@@ -56,7 +53,7 @@ public class DuplicateMessageURIFailureBot extends IntegrationtestBot
               ctx,
               new CreateNeedWithFacetsAction(
                 //use a decorator that will cause the same need URI to be used in each create message
-                new ConstantNewEventURIDecorator(ctx, "constantMsgURI" + System.currentTimeMillis()),NAME_NEEDS),
+                new ConstantNewEventURIDecorator(ctx, "constantMsgURI" + System.currentTimeMillis()), getBotContextWrapper().getNeedCreateListName()),
               2));
 
     //log error if we can create 2 needs

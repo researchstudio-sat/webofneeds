@@ -42,10 +42,7 @@ import won.protocol.model.FacetType;
  * Bot that creates a new 'Re:' need for each need that is created in the system and connects. When a connection is established,
  * all messages are just echoed.
  */
-public class EchoBot extends EventBot
-{
-
-  private static final String NAME_NEEDS = "echoNeeds";
+public class EchoBot extends EventBot {
   private BaseEventListener matcherRegistrator;
   protected BaseEventListener needCreator;
   protected BaseEventListener needConnector;
@@ -77,7 +74,7 @@ public class EchoBot extends EventBot
     //create the echo need - if we're not reacting to the creation of our own echo need.
     this.needCreator = new ActionOnEventListener(
             ctx,
-            new NotFilter(new NeedUriInNamedListFilter(ctx, NAME_NEEDS)),
+            new NotFilter(new NeedUriInNamedListFilter(ctx, ctx.getBotContextWrapper().getNeedCreateListName())),
             prepareCreateNeedAction(ctx)
             );
     bus.subscribe(NeedCreatedEventForMatcher.class, this.needCreator);
@@ -109,11 +106,11 @@ public class EchoBot extends EventBot
 
   private EventBotAction prepareCreateNeedAction(final EventListenerContext ctx) {
     if (numberOfEchoNeedsPerNeed == null) {
-      return new CreateEchoNeedWithFacetsAction(ctx, NAME_NEEDS);
+      return new CreateEchoNeedWithFacetsAction(ctx);
     } else {
       CreateEchoNeedWithFacetsAction[] actions = new CreateEchoNeedWithFacetsAction[numberOfEchoNeedsPerNeed];
       for (int i = 0; i < numberOfEchoNeedsPerNeed; i++) {
-        actions[i] = new CreateEchoNeedWithFacetsAction(ctx,NAME_NEEDS);
+        actions[i] = new CreateEchoNeedWithFacetsAction(ctx);
       }
       return new MultipleActions(ctx, actions);
     }

@@ -43,11 +43,9 @@ import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
 /**
  *
  */
-public class MatcherProtocolTestBot extends EventBot
-{
+public class MatcherProtocolTestBot extends EventBot {
 
   private static final int NO_OF_NEEDS = 2;
-
 
   //we use protected members so we can extend the class and
   //access the listeners for unit test assertions and stats
@@ -65,8 +63,6 @@ public class MatcherProtocolTestBot extends EventBot
   public void setRegistrationMatcherRetryInterval(final int registrationMatcherRetryInterval) {
     this.registrationMatcherRetryInterval = registrationMatcherRetryInterval;
   }
-
-  private static final String NAME_NEEDS = "needs";
 
   @Override
   protected void initializeEventListeners()
@@ -86,7 +82,7 @@ public class MatcherProtocolTestBot extends EventBot
     //create needs every trigger execution until 2 needs are created
     this.needCreator = new ActionOnEventListener(
         ctx,
-        new CreateNeedWithFacetsAction(ctx, NAME_NEEDS),
+        new CreateNeedWithFacetsAction(ctx, getBotContextWrapper().getNeedCreateListName()),
         NO_OF_NEEDS
     );
 

@@ -23,7 +23,7 @@
 
     <bean id="mailBasedSimpleReactiveBot" class="won.bot.impl.BAAtomicCCCompletingNotCompletingBot">
         <property name="taskScheduler" ref="taskScheduler"/>
-        <property name="botContext" ref="${botContext.impl}"/>
+        <property name="botContextWrapper" ref="botContextWrapper"/>
         <property name="needProducer" ref="needProducerFromMails"/>
         <property name="nodeURISource" ref="nodeUriSourceRandom"/>
         <!-- expects a bean named "ownerProtocolNeedServiceClient" in the context -->
@@ -36,6 +36,11 @@
                 <property name="fixedRate" value="false"/>  <!-- fixed delay after completion -->
             </bean>
         </property>
+    </bean>
+
+    <bean id="botContextWrapper" class="won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper">
+        <constructor-arg name="botContext" ref="${botContext.impl}"/>
+        <constructor-arg name="botName" value="BAAtomicCCBotCompletingNotCompleting"/>
     </bean>
 </beans>
 

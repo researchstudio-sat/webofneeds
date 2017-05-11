@@ -47,7 +47,6 @@ import java.net.URI;
 public class DebugBot extends EventBot
 {
 
-  private static final String NAME_NEEDS = "debugNeeds";
   private static final long CONNECT_DELAY_MILLIS = 0;
   private static final long DELAY_BETWEEN_N_MESSAGES = 1000;
   private static final double CHATTY_MESSAGE_PROBABILITY = 0.1;
@@ -93,21 +92,25 @@ public class DebugBot extends EventBot
 
     //create the echo need for debug initial connect - if we're not reacting to the creation of our own echo need.
     CreateDebugNeedWithFacetsAction needForInitialConnectAction =
-      new CreateDebugNeedWithFacetsAction(ctx,NAME_NEEDS,true,true);
+      new CreateDebugNeedWithFacetsAction(ctx,true,true);
     needForInitialConnectAction.setIsInitialForConnect(true);
 
     ActionOnEventListener initialConnector = new ActionOnEventListener(
             ctx,
-            new NotFilter(new NeedUriInNamedListFilter(ctx, NAME_NEEDS)),
+            new NotFilter(new NeedUriInNamedListFilter(ctx, ctx.getBotContextWrapper().getNeedCreateListName())),
             needForInitialConnectAction
             );
     bus.subscribe(NeedCreatedEventForMatcher.class, initialConnector);
 
     //create the echo need for debug initial hint - if we're not reacting to the creation of our own echo need.
-    CreateDebugNeedWithFacetsAction initialHinter = new CreateDebugNeedWithFacetsAction(ctx, NAME_NEEDS, true, true);
+    CreateDebugNeedWithFacetsAction initialHinter = new CreateDebugNeedWithFacetsAction(ctx, true, true);
     initialHinter.setIsInitialForHint(true);
-    ActionOnEventListener needForInitialHintListener = new ActionOnEventListener(
-      ctx, new NotFilter(new NeedUriInNamedListFilter(ctx, NAME_NEEDS)), initialHinter);
+    ActionOnEventListener needForInitialHintListener = new ActionOnEventListener(ctx,
+                                                                                new NotFilter(
+                                                                                        new NeedUriInNamedListFilter(ctx,
+                                                                                                ctx.getBotContextWrapper().getNeedCreateListName()
+                                                                                        )
+                                                                                ), initialHinter);
     bus.subscribe(NeedCreatedEventForMatcher.class, needForInitialHintListener);
 
     //as soon as the echo need triggered by debug connect created, connect to original
@@ -176,10 +179,7 @@ public class DebugBot extends EventBot
 
     // react to the hint and connect commands by creating a need (it will fire correct need created for connect/hint
     // events)
-    needCreator = new ActionOnEventListener(
-      ctx,
-      new CreateDebugNeedWithFacetsAction(ctx,NAME_NEEDS, true, true)
-    );
+    needCreator = new ActionOnEventListener(ctx, new CreateDebugNeedWithFacetsAction(ctx, true, true));
     bus.subscribe(HintDebugCommandEvent.class, needCreator);
     bus.subscribe(ConnectDebugCommandEvent.class, needCreator);
 

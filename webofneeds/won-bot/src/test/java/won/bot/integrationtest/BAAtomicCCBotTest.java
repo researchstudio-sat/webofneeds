@@ -16,6 +16,7 @@ import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import won.bot.PropertyPathConfigurator;
+import won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper;
 import won.bot.framework.eventbot.event.impl.lifecycle.WorkDoneEvent;
 import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
@@ -203,7 +204,7 @@ public class BAAtomicCCBotTest
 
     public void  executeRDFValidationAssert(){
 
-      List<URI> needs = getEventListenerContext().getBotContext().getNamedNeedUriList(URI_LIST_NAME_COORDINATOR);
+      List<URI> needs = ((ParticipantCoordinatorBotContextWrapper) getBotContextWrapper()).getCoordinators();
 
       LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
 
@@ -255,7 +256,7 @@ public class BAAtomicCCBotTest
 
     public void  executeBAStateRDFValidationAssert(){
 
-      List<URI> needs = getEventListenerContext().getBotContext().getNamedNeedUriList(URI_LIST_NAME_COORDINATOR);
+      List<URI> needs = ((ParticipantCoordinatorBotContextWrapper) getBotContextWrapper()).getCoordinators();
 
       LinkedDataSource linkedDataSource = getEventListenerContext().getLinkedDataSource();
 

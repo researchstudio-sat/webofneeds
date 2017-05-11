@@ -17,7 +17,7 @@ Common bot implementations will do several of the following
  
 ## Implementing a Bot
 ### Base Class
-Bot implementations are best created by extending [EventBot](src/main/java/won/bot/impl/EchoBot.java) and implementing its `initializeEventListeners()` method. This method should then be used to set up all the event listeners required for the bot to perform its work.
+Bot implementations are best created by extending [EventBot](src/main/java/won/bot/base/EventBot.java) and implementing its `initializeEventListeners()` method. This method should then be used to set up all the event listeners required for the bot to perform its work.
 ```
 public class MyBot extends EventBot
 {
@@ -62,6 +62,8 @@ A bot is connected to the resources it uses through the [EventListenerContext](s
 ## The BotContext
 A bot manages the data it needs to operate in the [BotContext](src/main/java/won/bot/framework/bot/context/BotContext.java). Most importantly, the botContext contains all need URIs that the bot is responsible for. That particular information is required by the framework to decide which events should be routed to the bot, as it might be managing a number of bots. Other information in the bot context is just for the bot's internal purposes (i.e. your purposes).
 
+## The BotContextWrapper
+A bot always contains a specific [BotContextWrapper](src/main/java/won/bot/framework/bot/context/BotContextWrapper.java). This class or the respective subclasses enable you to access the BotContext described above, and facilitates HelperMethods for BotContext-DataRetrieval
 ## The Bot's App
 The java application that runs a bot is usually a spring-boot application that loads all the necessary config and then starts the bot. For examples, look at the existing [Bot Apps](src/main/java/won/bot/app). 
 

@@ -2,6 +2,8 @@ package won.bot.framework.eventbot.action.impl.mail.receive;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
+import won.bot.framework.bot.context.MailBotContextWrapper;
+import org.apache.jena.rdf.model.Model;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.UriType;
@@ -30,14 +32,13 @@ import java.util.Arrays;
  * Created by fsuda on 30.09.2016.
  */
 public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
-    private static final String MAIL_NEEDSLIST_NAME = "mailNeeds";
     private MailContentExtractor mailContentExtractor;
 
     public CreateNeedFromMailAction(EventListenerContext eventListenerContext,
                                     MailContentExtractor mailContentExtractor,
                                     URI... facets) {
 
-        super(eventListenerContext, MAIL_NEEDSLIST_NAME);
+        super(eventListenerContext);
         this.mailContentExtractor = mailContentExtractor;
 
         if (facets == null || facets.length == 0) {
@@ -50,7 +51,9 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
     }
 
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        if(event instanceof CreateNeedFromMailEvent){
+        EventListenerContext ctx = getEventListenerContext();
+        if(event instanceof CreateNeedFromMailEvent && ctx.getBotContextWrapper() instanceof MailBotContextWrapper){
+            MailBotContextWrapper botContextWrapper = (MailBotContextWrapper) ctx.getBotContextWrapper();
             MimeMessage message = ((CreateNeedFromMailEvent) event).getMessage();
 
             try {
@@ -61,7 +64,6 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                 boolean isUsedForTesting = mailContentExtractor.isUsedForTesting(message);
                 boolean isDoNotMatch = mailContentExtractor.isDoNotMatch(message);
 
-                EventListenerContext ctx = getEventListenerContext();
                 WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
 
                 final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
@@ -85,15 +87,15 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                 WonMessage createNeedMessage = createWonMessage(wonNodeInformationService, needURI, wonNodeUri,
                                                                 model, isUsedForTesting, isDoNotMatch);
                 EventBotActionUtils.rememberInList(ctx, needURI, uriListName);
-                EventBotActionUtils.addUriMimeMessageRelation(ctx, needURI, message);
+                botContextWrapper.addUriMimeMessageRelation(needURI, message);
 
                 EventListener successCallback = new EventListener()
                 {
                     @Override
                     public void onEvent(Event event) throws Exception {
                         logger.debug("need creation successful, new need URI is {}", needURI);
-                        String sender = MailContentExtractor.getFromAddressString(EventBotActionUtils.getMimeMessageForURI(getEventListenerContext(), needURI));
-                        EventBotActionUtils.addMailAddressWonURIRelation(getEventListenerContext(), sender, new WonURI(needURI, UriType.NEED));
+                        String sender = MailContentExtractor.getFromAddressString(botContextWrapper.getMimeMessageForURI(needURI));
+                        botContextWrapper.addMailAddressWonURIRelation(sender, new WonURI(needURI, UriType.NEED));
                         logger.debug("created need was from sender: " + sender);
                     }
                 };
@@ -104,14 +106,14 @@ public class CreateNeedFromMailAction extends AbstractCreateNeedAction {
                     public void onEvent(Event event) throws Exception {
                         String textMessage = WonRdfUtils.MessageUtils.getTextMessage(((FailureResponseEvent) event).getFailureMessage());
                         logger.debug("need creation failed for need URI {}, original message URI {}: {}", new Object[]{needURI, ((FailureResponseEvent) event).getOriginalMessageURI(), textMessage});
-                        EventBotActionUtils.removeFromList(getEventListenerContext(), needURI, uriListName);
-                        EventBotActionUtils.removeUriMimeMessageRelation(getEventListenerContext(), needURI);
+                        EventBotActionUtils.removeFromList(ctx, needURI, uriListName);
+                        botContextWrapper.removeUriMimeMessageRelation(needURI);
                     }
                 };
-                EventBotActionUtils.makeAndSubscribeResponseListener(createNeedMessage, successCallback, failureCallback, getEventListenerContext());
+                EventBotActionUtils.makeAndSubscribeResponseListener(createNeedMessage, successCallback, failureCallback, ctx);
 
                 logger.debug("registered listeners for response to message URI {}", createNeedMessage.getMessageURI());
-                getEventListenerContext().getWonMessageSender().sendWonMessage(createNeedMessage);
+                ctx.getWonMessageSender().sendWonMessage(createNeedMessage);
                 logger.debug("need creation message sent with message URI {}", createNeedMessage.getMessageURI());
             }  catch (MessagingException me){
                 logger.error("messaging exception occurred: {}", me);

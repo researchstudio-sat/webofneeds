@@ -67,7 +67,7 @@
     <bean id="mail2wonBot" class="won.bot.impl.Mail2WonBot">
         <!-- optional property, by default one echo need per each need will be created -->
 
-        <property name="botContext" ref="${botContext.impl}"/>
+        <property name="botContextWrapper" ref="botContextWrapper"/>
         <property name="taskScheduler" ref="taskScheduler"/>
         <property name="receiveEmailChannel" ref="receiveEmailChannel"/>
         <property name="sendEmailChannel" ref="sendEmailChannel"/>
@@ -104,5 +104,10 @@
         <property name="sentFromName" value="${mailbot.email.name}"/>
         <property name="MAX_CONVERSATION_DEPTH"
                   value="${mailbot.max_conversation_depth}"/> <!-- 0 includes no messages at all, -1 includes all messages -->
+    </bean>
+
+    <bean id="botContextWrapper" class="won.bot.framework.bot.context.MailBotContextWrapper">
+        <constructor-arg name="botContext" ref="${botContext.impl}"/>
+        <constructor-arg name="botName" value="mailBot"/>
     </bean>
 </beans>
