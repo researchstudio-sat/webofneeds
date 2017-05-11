@@ -371,29 +371,77 @@ public class NeedModelWrapper {
         return node != null ? node.getLiteralLexicalForm() : null;
     }
 
-    public Collection<String> getContentPropertyStringValues(Resource contentNode, Property p) {
+    public Collection<String> getContentPropertyStringValues(Resource contentNode, Property p, String language) {
 
         Collection<String> values = new LinkedList<>();
         NodeIterator nodeIterator = needModel.listObjectsOfProperty(contentNode, p);
         while (nodeIterator.hasNext()) {
-            values.add(nodeIterator.next().asLiteral().getString());
+            Literal literalValue = nodeIterator.next().asLiteral();
+            if (language == null || language.equals(literalValue.getLanguage())) {
+                values.add(literalValue.getString());
+            }
         }
 
         return values;
     }
 
-    public Collection<String> getContentPropertyStringValues(NeedContentPropertyType type, Property p) {
+    public Collection<String> getContentPropertyStringValues(NeedContentPropertyType type, Property p, String language) {
 
         Collection<String> values = new LinkedList<>();
         Collection<Resource> nodes = getContentNodes(type);
         for (Resource node : nodes) {
-            NodeIterator nodeIterator = needModel.listObjectsOfProperty(node, p);
-            while (nodeIterator.hasNext()) {
-                values.add(nodeIterator.next().asLiteral().getString());
-            }
+            Collection valuesOfContentNode = getContentPropertyStringValues(node, p, language);
+            values.addAll(valuesOfContentNode);
         }
         return values;
     }
+
+    /**
+     * Returns one of the possibly many specified values. The specified preferred languages will be tried first in the specified order.
+     * @param contentNode
+     * @return the string value or null if nothing is found
+     */
+    public String getSomeContentPropertyStringValue(Resource contentNode, Property p){
+        return getSomeContentPropertyStringValue(contentNode, p, null);
+    }
+
+    /**
+     * Returns one of the possibly many specified values. The specified preferred languages will be tried first in the specified order.
+     * @param contentNode
+     * @param preferredLanguages String array of a non-empty language tag as defined by https://tools.ietf.org/html/bcp47. The language tag must be well-formed according to section 2.2.9 of https://tools.ietf.org/html/bcp47.
+     * @return the string value or null if nothing is found
+     */
+    public String getSomeContentPropertyStringValue(Resource contentNode, Property p, String... preferredLanguages){
+        Collection<String> values = null;
+        for (int i = 0; i < preferredLanguages.length; i++){
+            values = getContentPropertyStringValues(contentNode, p, preferredLanguages[i]);
+            if (values != null && values.size() > 0) return values.iterator().next();
+        }
+        values = getContentPropertyStringValues(contentNode, p, null);
+        if (values != null && values.size() > 0) return values.iterator().next();
+        return null;
+    }
+
+    /**
+     * Returns one of the possibly many specified values. The specified preferred languages will be tried first in the specified order.
+     * @param preferredLanguages String array of a non-empty language tag as defined by https://tools.ietf.org/html/bcp47. The language tag must be well-formed according to section 2.2.9 of https://tools.ietf.org/html/bcp47.
+     * @return the string value or null if nothing is found
+     */
+    public String getSomeContentPropertyStringValue(NeedContentPropertyType type, Property p, String... preferredLanguages){
+        Collection<Resource> nodes = getContentNodes(type);
+        for (int i = 0; i < preferredLanguages.length; i++) {
+            for (Resource node : nodes) {
+                String valueOfContentNode = getSomeContentPropertyStringValue(node, p, preferredLanguages[i]);
+                if (valueOfContentNode != null) return valueOfContentNode;
+            }
+        }
+        for (Resource node : nodes) {
+            String valueOfContentNode = getSomeContentPropertyStringValue(node, p);
+            if (valueOfContentNode != null) return valueOfContentNode;
+        }
+        return null;
+    }
+
 
     private RDFNode getContentPropertyObject(NeedContentPropertyType type, Property p) {
 

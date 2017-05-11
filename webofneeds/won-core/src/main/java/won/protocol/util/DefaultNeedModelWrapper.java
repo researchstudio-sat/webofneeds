@@ -6,12 +6,12 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.DC;
-import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.Coordinate;
 import won.protocol.model.NeedContentPropertyType;
 import won.protocol.vocabulary.WON;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Extends {@link NeedModelWrapper} to add matchat specific methods to access content fields like title, description, tags, etc.
@@ -44,36 +44,65 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
         setContentPropertyStringValue(type, DC.title, title);
     }
 
-    public String getTitleFromIsOrAll() {
-
-        String title = null;
-        try {
-            title = getContentPropertyStringValue(NeedContentPropertyType.IS, DC.title);
-        } catch (IncorrectPropertyCountException e1) {
-            title = getContentPropertyStringValue(NeedContentPropertyType.ALL, DC.title);
-        }
-
-        return title;
+    public Collection<String> getTitlesFromIsOrAll() {
+        return getTitlesFromIsOrAll(null);
     }
 
-    public Collection<String> getTitles(Resource contentNode) { return getContentPropertyStringValues(contentNode, DC.title);}
+    public Collection<String> getTitlesFromIsOrAll(String language) {
 
-    public Collection<String> getTitles(NeedContentPropertyType type) { return getContentPropertyStringValues(type, DC.title);}
+        Collection<String> titles = null;
+        titles = getContentPropertyStringValues(NeedContentPropertyType.IS, DC.title, language);
+        if (titles != null && titles.size() > 0) return titles;
+        titles = getContentPropertyStringValues(NeedContentPropertyType.IS, DC.title, null);
+        if (titles != null && titles.size() > 0) return titles;
+        titles = getContentPropertyStringValues(NeedContentPropertyType.ALL, DC.title, language);
+        if (titles != null && titles.size() > 0) return titles;
+        titles = getContentPropertyStringValues(NeedContentPropertyType.ALL, DC.title, null);
+        if (titles != null && titles.size() > 0) return titles;
+        return Collections.emptyList();
+    }
+
+    public String getSomeTitleFromIsOrAll(String... preferredLanguages) {
+        String title = null;
+        title = getSomeContentPropertyStringValue(NeedContentPropertyType.IS, DC.title, preferredLanguages);
+        if (title != null) return title;
+        title = getSomeContentPropertyStringValue(NeedContentPropertyType.ALL, DC.title, preferredLanguages);
+        if (title != null) return title;
+        return null;
+    }
+
+    public String getSomeTitle(Resource contentNode, String... preferredLanguages) {
+        String title = null;
+        return getSomeContentPropertyStringValue(contentNode, DC.title, preferredLanguages);
+    }
+
+    public Collection<String> getTitles(Resource contentNode){ return getTitles(contentNode, null);}
+    public Collection<String> getTitles(Resource contentNode, String language) { return getContentPropertyStringValues(contentNode, DC.title, language);}
+
+    public Collection<String> getTitles(NeedContentPropertyType type) { return getTitles(type, null);}
+    public Collection<String> getTitles(NeedContentPropertyType type, String language) { return getContentPropertyStringValues(type, DC.title, language);}
 
     public void setDescription(NeedContentPropertyType type, String description) {
         createContentNodeIfNonExist(type);
         setContentPropertyStringValue(type, DC.description, description);
     }
 
-    public Collection<String> getDescriptions(Resource contentNode) {
-        return getContentPropertyStringValues(contentNode,DC.description);
+    public String getSomeDescription(NeedContentPropertyType type, String... preferredLanguages) {
+        return getSomeContentPropertyStringValue(type, DC.description, preferredLanguages);
     }
 
-    public String getDescription(NeedContentPropertyType type) {
-        return getContentPropertyStringValue(type, DC.description);
+    public String getSomeDescription(Resource contentNode, String... preferredLanguages){
+        return getSomeContentPropertyStringValue(contentNode, DC.description, preferredLanguages);
     }
-    public Collection<String> getDescriptions(NeedContentPropertyType type) {
-        return getContentPropertyStringValues(type, DC.description);
+
+
+    public Collection<String> getDescriptions(Resource contentNode) { return getDescriptions(contentNode, null); }
+    public Collection<String> getDescriptions(Resource contentNode, String language) {
+        return getContentPropertyStringValues(contentNode,DC.description, language);
+    }
+    public Collection<String> getDescriptions(NeedContentPropertyType type) { return getDescriptions(type, null);}
+    public Collection<String> getDescriptions(NeedContentPropertyType type, String language) {
+        return getContentPropertyStringValues(type, DC.description, language);
     }
 
     public void addTag(NeedContentPropertyType type, String tag) {
@@ -82,11 +111,11 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
     }
 
     public Collection<String> getTags(Resource contentNode) {
-        return getContentPropertyStringValues(contentNode, WON.HAS_TAG);
+        return getContentPropertyStringValues(contentNode, WON.HAS_TAG, null);
     }
 
     public Collection<String> getTags(NeedContentPropertyType type) {
-        return getContentPropertyStringValues(type, WON.HAS_TAG);
+        return getContentPropertyStringValues(type, WON.HAS_TAG, null);
     }
 
     public Coordinate getLocationCoordinate(Resource contentNode) {

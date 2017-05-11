@@ -59,7 +59,7 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction
       final Dataset needDataset = ((NeedCreatedEventForMatcher)event).getNeedData();
       DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needDataset);
 
-      String titleString = needModelWrapper.getTitleFromIsOrAll();
+      String titleString = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
       if (titleString != null){
         replyText = titleString;
       } else {

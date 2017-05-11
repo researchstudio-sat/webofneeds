@@ -1,5 +1,6 @@
 package won.bot.framework.eventbot.action.impl.mail.send;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.jena.query.*;
 import org.apache.jena.tdb.TDB;
 import org.apache.velocity.Template;
@@ -125,7 +126,7 @@ public class WonMimeMessageGenerator {
         MimeMessage answerMessage = (MimeMessage) msgToRespondTo.reply(false);
         answerMessage.setFrom(new InternetAddress(sentFrom, sentFromName));
         answerMessage.setText("");
-        answerMessage.setSubject(answerMessage.getSubject() + " <-> " + needModelWrapper.getTitleFromIsOrAll());
+        answerMessage.setSubject(answerMessage.getSubject() + " <-> " + StringUtils.trim(needModelWrapper.getSomeTitleFromIsOrAll("en","de")));
 
         //We need to create an instance of our own MimeMessage Implementation in order to have the Unique Message Id set before sending
         WonMimeMessage wonAnswerMessage = new WonMimeMessage(answerMessage);
@@ -154,10 +155,10 @@ public class WonMimeMessageGenerator {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
 
-        velocityContext.put("remoteNeedTitle", needModelWrapper.getTitleFromIsOrAll().replaceAll(
+        velocityContext.put("remoteNeedTitle", StringUtils.trim(needModelWrapper.getSomeTitleFromIsOrAll("en","de")).replaceAll(
           "\\n", "\n" + QUOTE_CHAR));
-        velocityContext.put("remoteNeedDescription", needModelWrapper.getDescription(
-                NeedContentPropertyType.ALL).replaceAll("\\n", "\n" + QUOTE_CHAR));
+        velocityContext.put("remoteNeedDescription", StringUtils.trim(needModelWrapper.getSomeDescription(
+                NeedContentPropertyType.ALL,"en","de")).replaceAll("\\n", "\n" + QUOTE_CHAR));
 
         Collection<String> tags = needModelWrapper.getTags(NeedContentPropertyType.ALL);
         velocityContext.put("remoteNeedTags", tags.size() > 0 ? tags : null);

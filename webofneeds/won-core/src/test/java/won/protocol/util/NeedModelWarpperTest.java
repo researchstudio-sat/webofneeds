@@ -67,10 +67,10 @@ public class NeedModelWarpperTest {
         Assert.assertEquals(0, needModelWrapper.getContentNodes(NeedContentPropertyType.IS_AND_SEEKS).size());
         Assert.assertEquals("Offering tennis lessons", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS, DC.title));
         Assert.assertEquals("tennis students", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.SEEKS, DC.title));
-        Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, DC.title).size());
-        Assert.assertEquals(3, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, WON.HAS_TAG).size());
-        Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, WON.HAS_TAG).size());
-        Assert.assertEquals(5, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, WON.HAS_TAG).size());
+        Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, DC.title, null).size());
+        Assert.assertEquals(3, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, WON.HAS_TAG, null).size());
+        Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, WON.HAS_TAG, null).size());
+        Assert.assertEquals(5, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, WON.HAS_TAG, null).size());
         Assert.assertEquals("16.358398", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS, "won:hasLocation/<s:geo>/<s:longitude>"));
     }
 
@@ -85,8 +85,8 @@ public class NeedModelWarpperTest {
         Assert.assertEquals(2, needModelWrapper.getContentNodes(NeedContentPropertyType.SEEKS).size());
         Assert.assertEquals("title1", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS, DC.title));
         Assert.assertEquals("title1", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS_AND_SEEKS, DC.title));
-        Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title).size());
-        Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, DC.title).size());
+        Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title, null).size());
+        Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, DC.title, null).size());
     }
 
     @Test
@@ -133,8 +133,8 @@ public class NeedModelWarpperTest {
         // adding content without creating content nodes doesnt work
         needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.IS, DC.description, "description");
         needModelWrapper.addContentPropertyStringValue(NeedContentPropertyType.IS, WON.HAS_TAG, "tag");
-        Assert.assertEquals(needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, DC.description).size(), 0);
-        Assert.assertEquals(needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, WON.HAS_TAG).size(), 0);
+        Assert.assertEquals(needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, DC.description, null).size(), 0);
+        Assert.assertEquals(needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, WON.HAS_TAG, null).size(), 0);
 
         // add different content nodes now and check that they are there
         needModelWrapper.createContentNode(NeedContentPropertyType.IS, "https://is_uri");
@@ -157,14 +157,14 @@ public class NeedModelWarpperTest {
         needModelWrapper.addContentPropertyStringValue(NeedContentPropertyType.IS, WON.HAS_TAG, "tag1");
         needModelWrapper.addContentPropertyStringValue(NeedContentPropertyType.SEEKS, WON.HAS_TAG, "tag2");
         needModelWrapper.addContentPropertyStringValue(NeedContentPropertyType.IS_AND_SEEKS, WON.HAS_TAG, "tag3");
-        Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, DC.description).size());
-        Assert.assertEquals(1, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS_AND_SEEKS, DC.description).size());
+        Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, DC.description, null).size());
+        Assert.assertEquals(1, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS_AND_SEEKS, DC.description, null).size());
         Assert.assertEquals("description2", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS_AND_SEEKS, DC.description));
-        Assert.assertEquals(4, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, DC.description).size());
-        Assert.assertEquals(3, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS_AND_SEEKS, WON.HAS_TAG).size());
-        Assert.assertEquals(6, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, WON.HAS_TAG).size());
-        Assert.assertEquals(4, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, WON.HAS_TAG).size());
-        Assert.assertEquals(5, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, WON.HAS_TAG).size());
+        Assert.assertEquals(4, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, DC.description, null).size());
+        Assert.assertEquals(3, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS_AND_SEEKS, WON.HAS_TAG, null).size());
+        Assert.assertEquals(6, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, WON.HAS_TAG, null).size());
+        Assert.assertEquals(4, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, WON.HAS_TAG, null).size());
+        Assert.assertEquals(5, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, WON.HAS_TAG, null).size());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class NeedModelWarpperTest {
         String isSeeksTitle = needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS_AND_SEEKS, DC.title);
         Assert.assertEquals("title1", isSeeksTitle);
         Assert.assertEquals(isSeeksTitle, normalizedWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS, DC.title));
-        Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title).contains(isSeeksTitle));
+        Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title, null).contains(isSeeksTitle));
     }
 
     @Test
@@ -211,7 +211,7 @@ public class NeedModelWarpperTest {
         String isSeeksTitle = needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS_AND_SEEKS, DC.title);
         Assert.assertEquals("title1", isSeeksTitle);
         Assert.assertEquals(isSeeksTitle, normalizedWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS, DC.title));
-        Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title).contains(isSeeksTitle));
+        Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title, null).contains(isSeeksTitle));
     }
 
     @Test
@@ -228,7 +228,7 @@ public class NeedModelWarpperTest {
         String isSeeksTitle = needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS_AND_SEEKS, DC.title);
         Assert.assertEquals("title1", isSeeksTitle);
         Assert.assertEquals(isSeeksTitle, normalizedWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS, DC.title));
-        Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title).contains(isSeeksTitle));
+        Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title, null).contains(isSeeksTitle));
     }
 
     @Test
@@ -242,8 +242,8 @@ public class NeedModelWarpperTest {
         Assert.assertEquals(needModelWrapper.getContentNodes(NeedContentPropertyType.IS),
                 needModelWrapper.getContentNodes(NeedContentPropertyType.IS_AND_SEEKS));
         Assert.assertEquals(normalizedWrapper.getContentNodes(NeedContentPropertyType.IS_AND_SEEKS).size(), 0);
-        Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title).contains("title3"));
-        Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, DC.title).contains("title3"));
+        Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.SEEKS, DC.title, null).contains("title3"));
+        Assert.assertTrue(normalizedWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, DC.title, null).contains("title3"));
     }
 
     @Test
