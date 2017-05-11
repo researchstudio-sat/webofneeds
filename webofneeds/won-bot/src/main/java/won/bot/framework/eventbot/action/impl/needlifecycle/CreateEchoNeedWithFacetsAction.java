@@ -16,9 +16,9 @@
 
 package won.bot.framework.eventbot.action.impl.needlifecycle;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
-import org.apache.commons.lang3.StringUtils;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.event.Event;
@@ -28,9 +28,10 @@ import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
-import won.protocol.model.BasicNeedType;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.NeedModelBuilder;
+import won.protocol.util.DefaultNeedModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
@@ -56,7 +57,9 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
         }
         final URI reactingToNeedUri = ((NeedCreatedEventForMatcher) event).getNeedURI();
         final Dataset needDataset = ((NeedCreatedEventForMatcher) event).getNeedData();
-        String titleString = WonRdfUtils.NeedUtils.getNeedTitle(needDataset, reactingToNeedUri);
+        DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needDataset);
+
+        String titleString = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
         if (titleString != null) {
             replyText = titleString;
         } else {
@@ -67,14 +70,17 @@ public class CreateEchoNeedWithFacetsAction extends AbstractCreateNeedAction {
 
         final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
         final URI needURI = wonNodeInformationService.generateNeedURI(wonNodeUri);
-        final Model needModel =
-                new NeedModelBuilder()
-                        .setTitle("RE: " + replyText)
-                        .setBasicNeedType(BasicNeedType.SUPPLY)
-                        .setDescription("This is a need automatically created by the EchoBot.")
-                        .setUri(needURI)
-                        .setFacetTypes(facets)
-                        .build();
+        needModelWrapper = new DefaultNeedModelWrapper(needURI.toString());
+
+        needModelWrapper.createContentNode(NeedContentPropertyType.IS_AND_SEEKS, needURI.toString());
+        needModelWrapper.setTitle(NeedContentPropertyType.IS_AND_SEEKS, "RE: " + replyText);
+        needModelWrapper.setDescription(NeedContentPropertyType.IS_AND_SEEKS,
+                "This is a need automatically created by the EchoBot.");
+        for (URI facetUri : facets) {
+            needModelWrapper.addFacetUri(facetUri.toString());
+        }
+
+        final Model needModel = needModelWrapper.getNeedModel(NeedGraphType.NEED);
 
         logger.debug("creating need on won node {} with content {} ", wonNodeUri, StringUtils.abbreviate(RdfUtils.toString(needModel), 150));
 
