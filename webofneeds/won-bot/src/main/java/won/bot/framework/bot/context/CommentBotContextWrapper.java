@@ -5,11 +5,10 @@ import java.net.URI;
 import java.util.List;
 
 public class CommentBotContextWrapper extends BotContextWrapper {
-    private String commentListName;
+    private String commentListName = getBotName() + ":commentList";
 
-    public CommentBotContextWrapper(BotContext botContext, String needCreateListName, String commentListName) {
-        super(botContext, needCreateListName);
-        this.commentListName = commentListName;
+    public CommentBotContextWrapper(BotContext botContext, String botName) {
+        super(botContext, botName);
     }
 
     public String getCommentListName() {

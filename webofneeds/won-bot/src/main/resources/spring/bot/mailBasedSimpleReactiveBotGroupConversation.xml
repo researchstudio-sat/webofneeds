@@ -40,7 +40,6 @@
 
     <bean id="botContextWrapper" class="won.bot.framework.bot.context.GroupBotContextWrapper">
         <constructor-arg name="botContext" ref="${botContext.impl}"/>
-        <constructor-arg name="groupMembersListName" value="groupmembers"/>
-        <constructor-arg name="groupListName" value="groups"/>
+        <constructor-arg name="botName" value="groupBot"/>
     </bean>
 </beans>

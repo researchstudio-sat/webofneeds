@@ -42,7 +42,6 @@
 
     <bean id="botContextWrapper" class="won.bot.framework.bot.context.ParticipantCoordinatorBotContextWrapper">
         <constructor-arg name="botContext" ref="${botContext.impl}"/>
-        <constructor-arg name="participantListName" value="participants"/>
-        <constructor-arg name="coordinatorListName" value="coordinator"/>
+        <constructor-arg name="botName" value="BAAtomicCCBot"/>
     </bean>
 </beans>

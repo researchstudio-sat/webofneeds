@@ -20,39 +20,14 @@ import java.util.Properties;
  * Created by fsuda on 14.04.2017.
  */
 public class MailBotContextWrapper extends BotContextWrapper{
-    private String userSubscribeStatusName;
-    private String userCachedMailsName;
-    private String uriMimeMessageName;
-    private String mailIdUriName;
-    private String mailAddressUriName;
+    private String userSubscribeStatusName = getBotName() + ":subscribeStatus";
+    private String userCachedMailsName= getBotName() + ":userCachedMails";
+    private String uriMimeMessageName= getBotName() + ":uriMimeMessage";
+    private String mailIdUriName= getBotName() + ":mailIdUri";
+    private String mailAddressUriName = getBotName() + ":mailAddressUri";
 
-    public MailBotContextWrapper(BotContext botContext, String needCreateListName, String userSubscribeStatusName, String userCachedMailsName, String uriMimeMessageName, String mailIdUriName, String mailAddressUriName) {
-        super(botContext, needCreateListName);
-        this.userSubscribeStatusName = userSubscribeStatusName;
-        this.userCachedMailsName = userCachedMailsName;
-        this.uriMimeMessageName = uriMimeMessageName;
-        this.mailIdUriName = mailIdUriName;
-        this.mailAddressUriName = mailAddressUriName;
-    }
-
-    public String getUserSubscribeStatusName() {
-        return userSubscribeStatusName;
-    }
-
-    public String getUserCachedMailsName() {
-        return userCachedMailsName;
-    }
-
-    public String getUriMimeMessageName() {
-        return uriMimeMessageName;
-    }
-
-    public String getMailIdUriName() {
-        return mailIdUriName;
-    }
-
-    public String getMailAddressUriName() {
-        return mailAddressUriName;
+    public MailBotContextWrapper(BotContext botContext, String botName) {
+        super(botContext, botName);
     }
 
     //Util Methods to Get/Remove/Add Uri -> MimeMessage Relation

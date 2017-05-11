@@ -7,14 +7,16 @@ import java.util.List;
 
 public class BotContextWrapper {
     public static final String KEY_NEED_REMOTE_NEED_ASSOCIATION = "need_remote_need";
-
-    private String needCreateListName;
+    private String botName;
+    private String needCreateListName = botName + ":needList";
     private BotContext botContext;
 
-    public BotContextWrapper(BotContext botContext, String needCreateListName) {
+    public BotContextWrapper(BotContext botContext, String botName) {
         this.botContext = botContext;
-        this.needCreateListName = needCreateListName;
+        this.botName = botName;
     }
+
+    public String getBotName() { return botName; }
 
     public String getNeedCreateListName() {
         return needCreateListName;
