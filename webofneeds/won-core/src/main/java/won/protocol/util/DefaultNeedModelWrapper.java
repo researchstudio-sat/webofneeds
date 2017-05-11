@@ -56,34 +56,24 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
         return title;
     }
 
-    public String getTitle(Resource contentNode) {
-        return getContentPropertyStringValue(contentNode, DC.title);
-    }
     public Collection<String> getTitles(Resource contentNode) { return getContentPropertyStringValues(contentNode, DC.title);}
 
-    public String getTitle(NeedContentPropertyType type) {
-        return getContentPropertyStringValue(type, DC.title);
-    }
     public Collection<String> getTitles(NeedContentPropertyType type) { return getContentPropertyStringValues(type, DC.title);}
 
     public void setDescription(NeedContentPropertyType type, String description) {
         createContentNodeIfNonExist(type);
-        setContentPropertyStringValue(type, WON.HAS_TEXT_DESCRIPTION, description);
-    }
-
-    public String getDescription(Resource contentNode) {
-        return getContentPropertyStringValue(contentNode, WON.HAS_TEXT_DESCRIPTION);
+        setContentPropertyStringValue(type, DC.description, description);
     }
 
     public Collection<String> getDescriptions(Resource contentNode) {
-        return getContentPropertyStringValues(contentNode, WON.HAS_TEXT_DESCRIPTION);
+        return getContentPropertyStringValues(contentNode,DC.description);
     }
 
     public String getDescription(NeedContentPropertyType type) {
-        return getContentPropertyStringValue(type, WON.HAS_TEXT_DESCRIPTION);
+        return getContentPropertyStringValue(type, DC.description);
     }
     public Collection<String> getDescriptions(NeedContentPropertyType type) {
-        return getContentPropertyStringValues(type, WON.HAS_TEXT_DESCRIPTION);
+        return getContentPropertyStringValues(type, DC.description);
     }
 
     public void addTag(NeedContentPropertyType type, String tag) {

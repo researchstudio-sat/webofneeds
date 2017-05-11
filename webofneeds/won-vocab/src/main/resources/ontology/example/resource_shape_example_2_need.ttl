@@ -11,7 +11,7 @@ ex:Need1
 	won:hasContent ex:Need1_Content1 ;
 	won:hasMatchingConstraint ex:Need1_Constraint1.
 	
-ex:Need1_Content1 won:hasTextDescription "Ich suche nach einer Mitfahrgelegenheit Wien - Salzburg für 2 Personen. Wär toll wenn sich jemand finden würde. (irgendwann zwischen Fr-So) Bitte, bitte wenn jemand diese Strecke fährt, bei mir melden :-) Dankeschön.. LG"^^xsd:string
+ex:Need1_Content1 dc:description "Ich suche nach einer Mitfahrgelegenheit Wien - Salzburg für 2 Personen. Wär toll wenn sich jemand finden würde. (irgendwann zwischen Fr-So) Bitte, bitte wenn jemand diese Strecke fährt, bei mir melden :-) Dankeschön.. LG"^^xsd:string
 
 ex:Need1_Constraint1 
 	a oslc:ResourceShape ;

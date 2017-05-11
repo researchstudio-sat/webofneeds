@@ -23,7 +23,7 @@ public class WonQueries {
     public static final String SPARQL_ALL_NEEDS = SPARQL_PREFIX + "SELECT * WHERE " +
                                                     "{ ?need won:hasContent ?x; " +
                                                             "won:isInState ?state. " +
-                                                        "?x   won:hasTextDescription ?desc; " +
+                                                        "?x   dc:description ?desc; " +
                                                              "won:hasTag ?tag; " +
                                                              "dc:title ?title. " +
                                                         "?x won:hasContentDescription ?y. " +
@@ -45,7 +45,7 @@ public class WonQueries {
     public static final String SPARQL_NEEDS_FILTERED_BY_URI = SPARQL_PREFIX + "SELECT * WHERE " +
                                                     "{ ?need won:hasContent ?x; " +
                                                             "won:isInState ?state. " +
-                                                        "?x  won:hasTextDescription ?desc; " +
+                                                        "?x  dc:description ?desc; " +
                                                             "won:hasTag ?tag; " +
                                                             "dc:title ?title. " +
                                                         "?x won:hasContentDescription ?y. " +
@@ -132,8 +132,8 @@ public class WonQueries {
                 "}" +
             "}";
 
-    //public static final String SPARQL_MY_NEED = "SELECT * WHERE {?need won:containedInPrivateGraph ?graph. ?need won:hasContent ?x; won:isInState ?state. ?x won:hasTextDescription ?desc; won:hasTag ?tag; dc:title ?title.}";
-    //public static final String SPARQL_NEEDS_FILTERED_BY_UUIDS = "SELECT * WHERE { ?need won:hasContent ?x; won:isInState ?state. ?x won:hasTextDescription ?desc; won:hasTag ?tag; dc:title ?title. filter (?need in (<http://rsa021.researchstudio.at:8080/won/resource/need/5630666034445812000>))}";
+    //public static final String SPARQL_MY_NEED = "SELECT * WHERE {?need won:containedInPrivateGraph ?graph. ?need won:hasContent ?x; won:isInState ?state. ?x dc:description ?desc; won:hasTag ?tag; dc:title ?title.}";
+    //public static final String SPARQL_NEEDS_FILTERED_BY_UUIDS = "SELECT * WHERE { ?need won:hasContent ?x; won:isInState ?state. ?x dc:description ?desc; won:hasTag ?tag; dc:title ?title. filter (?need in (<http://rsa021.researchstudio.at:8080/won/resource/need/5630666034445812000>))}";
 
     //queryString = WonQueries.SPARQL_PREFIX +
 //                    "SELECT ?need ?connection ?need2 WHERE {" +

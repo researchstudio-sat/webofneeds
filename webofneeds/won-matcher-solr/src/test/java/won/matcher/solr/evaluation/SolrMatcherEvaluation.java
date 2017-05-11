@@ -84,7 +84,7 @@ public class SolrMatcherEvaluation
 
     try {
       DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(need);
-      title = needModelWrapper.getTitle(NeedContentPropertyType.ALL);
+      title = needModelWrapper.getTitles(NeedContentPropertyType.ALL).iterator().next();
       title = title.replaceAll("[^A-Za-z0-9 ]", "_");
       title = title.replaceAll("NOT", "_");
       title = title.replaceAll("AND", "_");

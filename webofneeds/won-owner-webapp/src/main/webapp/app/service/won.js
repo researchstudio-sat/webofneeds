@@ -156,8 +156,6 @@
     won.WON.hasStartTimeCompacted = won.WON.prefix + ":hasStartTime";
     won.WON.hasTag = won.WON.baseUri + "hasTag";
     won.WON.hasTagCompacted = won.WON.prefix + ":hasTag";
-    won.WON.hasTextDescription = won.WON.baseUri + "hasTextDescription";
-    won.WON.hasTextDescriptionCompacted = won.WON.prefix + ":hasTextDescription";
 
     won.WON.hasMatchScore = won.WON.baseUri + "hasMatchScore";
     won.WON.hasMatchScoreCompacted = won.WON.prefix + ":hasMatchScore";

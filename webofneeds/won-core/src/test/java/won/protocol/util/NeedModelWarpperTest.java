@@ -6,7 +6,9 @@ import org.apache.jena.vocabulary.DC;
 import org.junit.Assert;
 import org.junit.Test;
 import won.protocol.message.Utils;
-import won.protocol.model.*;
+import won.protocol.model.NeedContentPropertyType;
+import won.protocol.model.NeedGraphType;
+import won.protocol.model.NeedState;
 import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
@@ -129,9 +131,9 @@ public class NeedModelWarpperTest {
         Assert.assertEquals(NEED_URI, needModelWrapper.getNeedUri());
 
         // adding content without creating content nodes doesnt work
-        needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.IS, WON.HAS_TEXT_DESCRIPTION, "description");
+        needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.IS, DC.description, "description");
         needModelWrapper.addContentPropertyStringValue(NeedContentPropertyType.IS, WON.HAS_TAG, "tag");
-        Assert.assertEquals(needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, WON.HAS_TEXT_DESCRIPTION).size(), 0);
+        Assert.assertEquals(needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, DC.description).size(), 0);
         Assert.assertEquals(needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, WON.HAS_TAG).size(), 0);
 
         // add different content nodes now and check that they are there
@@ -149,16 +151,16 @@ public class NeedModelWarpperTest {
         Assert.assertEquals("https://is_and_seeks_uri", needModelWrapper.getContentNodes(NeedContentPropertyType.IS_AND_SEEKS).iterator().next().getURI());
 
         // add content now and check if it can be queried correctly
-        needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.IS, WON.HAS_TEXT_DESCRIPTION, "description");
-        needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.SEEKS, WON.HAS_TEXT_DESCRIPTION, "description1");
-        needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.SEEKS, WON.HAS_TEXT_DESCRIPTION, "description2");
+        needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.IS, DC.description, "description");
+        needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.SEEKS, DC.description, "description1");
+        needModelWrapper.setContentPropertyStringValue(NeedContentPropertyType.SEEKS, DC.description, "description2");
         needModelWrapper.addContentPropertyStringValue(NeedContentPropertyType.IS, WON.HAS_TAG, "tag1");
         needModelWrapper.addContentPropertyStringValue(NeedContentPropertyType.SEEKS, WON.HAS_TAG, "tag2");
         needModelWrapper.addContentPropertyStringValue(NeedContentPropertyType.IS_AND_SEEKS, WON.HAS_TAG, "tag3");
-        Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, WON.HAS_TEXT_DESCRIPTION).size());
-        Assert.assertEquals(1, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS_AND_SEEKS, WON.HAS_TEXT_DESCRIPTION).size());
-        Assert.assertEquals("description2", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS_AND_SEEKS, WON.HAS_TEXT_DESCRIPTION));
-        Assert.assertEquals(4, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, WON.HAS_TEXT_DESCRIPTION).size());
+        Assert.assertEquals(2, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, DC.description).size());
+        Assert.assertEquals(1, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS_AND_SEEKS, DC.description).size());
+        Assert.assertEquals("description2", needModelWrapper.getContentPropertyStringValue(NeedContentPropertyType.IS_AND_SEEKS, DC.description));
+        Assert.assertEquals(4, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, DC.description).size());
         Assert.assertEquals(3, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS_AND_SEEKS, WON.HAS_TAG).size());
         Assert.assertEquals(6, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.ALL, WON.HAS_TAG).size());
         Assert.assertEquals(4, needModelWrapper.getContentPropertyStringValues(NeedContentPropertyType.IS, WON.HAS_TAG).size());

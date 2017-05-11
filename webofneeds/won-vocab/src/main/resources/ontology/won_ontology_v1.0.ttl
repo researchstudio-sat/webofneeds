@@ -167,12 +167,6 @@ xsd:duration rdf:type rdfs:Datatype .
         rdfs:range xsd:string .
 
 
-###  http://purl.org/webofneeds/model#hasTextDescription
-:hasTextDescription rdf:type owl:ObjectProperty ,
-                             owl:FunctionalProperty ;
-                    rdfs:range xsd:string .
-
-
 ###  http://purl.org/webofneeds/model#hasTimeSpecification
 :hasTimeSpecification rdf:type owl:ObjectProperty ;
                       rdfs:range :TimeSpecification ;
@@ -284,11 +278,6 @@ seeked to fulfill the need in contrast to the part that is available.""" ;
 
 ###  http://purl.org/webofneeds/model#hasTag
 :hasTag rdf:type owl:DatatypeProperty .
-
-
-###  http://purl.org/webofneeds/model#hasTextDescription
-:hasTextDescription rdf:type owl:DatatypeProperty ,
-                             owl:FunctionalProperty .
 
 
 ###  http://purl.org/webofneeds/model#hasTimeStamp

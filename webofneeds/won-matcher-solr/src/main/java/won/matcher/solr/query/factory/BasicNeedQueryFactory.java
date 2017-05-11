@@ -34,11 +34,11 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
     {
         descriptionFieldMap = new HashMap<>();
         descriptionFieldMap.put(NeedContentPropertyType.IS,
-                "_graph.http___purl.org_webofneeds_model_is.http___purl.org_webofneeds_model_hasTextDescription");
+                "_graph.http___purl.org_webofneeds_model_is.is.http___purl.org_dc_elements_1.1_description");
         descriptionFieldMap.put(NeedContentPropertyType.SEEKS,
-                "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_hasTextDescription");
+                "_graph.http___purl.org_webofneeds_model_seeks.is.http___purl.org_dc_elements_1.1_description");
         descriptionFieldMap.put(NeedContentPropertyType.SEEKS_SEEKS,
-                "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_hasTextDescription");
+                "_graph.http___purl.org_webofneeds_model_seeks.http___purl.org_webofneeds_model_seeks.is.http___purl.org_dc_elements_1.1_description");
     }
 
     public static final Map<NeedContentPropertyType, String> tagFieldMap;

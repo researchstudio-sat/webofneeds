@@ -33,7 +33,7 @@
                                     won:hasTag                 """a
                                     a
                                     a""" ;
-                                    won:hasTextDescription     "hi  i havae a briken wahing machine   come take it away.\r\n \r\n \r\ns d"
+                                    dc:description     "hi  i havae a briken wahing machine   come take it away.\r\n \r\n \r\ns d"
                                   ] ;
             won:hasFacet          won:OwnerFacet .
 }
