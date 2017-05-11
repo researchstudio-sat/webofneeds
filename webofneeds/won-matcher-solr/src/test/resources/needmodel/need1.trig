@@ -21,7 +21,7 @@
             won:is        [ a                       won:NeedContent ;
                             dc:title                "Offering tennis lessons";
                             won:hasTag              "tennis" , "lesson", "offer" ;
-                            won:hasTextDescription  "tennis lessons for kids and adults of all levels";
+                            dc:description  "tennis lessons for kids and adults of all levels";
                             won:hasLocation  [ a                   <s:Place> ;
                                                 won:hasBoundingBox  [ won:hasNorthWestCorner  [ a              <s:GeoCoordinates> ;
                                                                                                 <s:latitude>   "48.213814" ;
@@ -42,7 +42,7 @@
             won:seeks     [ a                       won:NeedContent ;
                             dc:title                "tennis students";
                             won:hasTag              "tennis" , "lesson" ;
-                            won:hasTextDescription  "people learning tennis";
+                            dc:description  "people learning tennis";
                             won:hasLocation  [ a                   <s:Place> ;
                                                                     <s:geo>             [ a              <s:GeoCoordinates> ;
                                                                                           <s:latitude>   "49.2" ;

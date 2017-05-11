@@ -32,7 +32,7 @@
                                                                                                ]
                                                                ] ;
                                     won:hasTag                 "aaa" ;
-                                    won:hasTextDescription     "a"
+                                    dc:description     "a"
                                   ] ;
             won:hasFacet          won:OwnerFacet ;
             cert:key [ cert:PublicKey

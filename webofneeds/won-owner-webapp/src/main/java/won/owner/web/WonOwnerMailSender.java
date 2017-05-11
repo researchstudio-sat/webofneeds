@@ -71,11 +71,11 @@ public class WonOwnerMailSender {
     String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
     Dataset needDataset =  linkedDataSource.getDataForResource(URI.create(remoteNeed));
     DefaultNeedModelWrapper remoteNeedWrapper = new DefaultNeedModelWrapper(needDataset);
-    String remoteNeedTitle = remoteNeedWrapper.getTitleFromIsOrAll();
+    String remoteNeedTitle = remoteNeedWrapper.getSomeTitleFromIsOrAll("en","de");
 
     Dataset localNeedDataset =  linkedDataSource.getDataForResource(URI.create(localNeed));
     DefaultNeedModelWrapper localNeedWrapper = new DefaultNeedModelWrapper(localNeedDataset);
-    String localNeedTitle = localNeedWrapper.getTitleFromIsOrAll();
+    String localNeedTitle = localNeedWrapper.getSomeTitleFromIsOrAll("en","de");
     String linkLocalNeed = ownerAppLink + OWNER_LOCAL_NEED_LINK + localNeed;
     String linkRemoteNeed = uriService.getOwnerProtocolOwnerURI() + OWNER_REMOTE_NEED_LINK + remoteNeed;
     String linkConnection = ownerAppLink + String.format(OWNER_CONNECTION_LINK,localNeed, localConnection, ConnectionState.CONNECTED.getURI().toString());

@@ -122,7 +122,7 @@
             {
                 '@id': '_:needContent',
                 'dc:title': args.title,
-                'won:hasTextDescription': args.description,
+                'dc:description': args.description,
                 'won:hasTag': args.tags,
                 'won:hasAttachment': (hasAttachmentUrls(args) ? attachmentUrisTyped : undefined),
                 'won:hasLocation': (!hasLocation(args)? undefined : {

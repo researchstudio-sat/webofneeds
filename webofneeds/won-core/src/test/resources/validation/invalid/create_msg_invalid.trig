@@ -109,7 +109,7 @@ event:2100661890849016800error
                                                                                                ]
                                                                ] ;
                                     won:hasTag                 "fish" ;
-                                    won:hasTextDescription     "fish"
+                                    dc:description     "fish"
                                   ] ;
             won:hasFacet          won:OwnerFacet ;
             <http://www.w3.org/ns/auth/cert#key>

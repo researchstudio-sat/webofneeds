@@ -43,12 +43,12 @@ function genComponentConf() {
         </div>
         -->
         <div class="pc__text"
-          ng-show="!!self.needContent.get('won:hasTextDescription')">
+          ng-show="!!self.needContent.get('dc:description')">
           <img
             class="pc__icon"
             src="generated/icon-sprite.svg#ico16_indicator_description"/>
           <span>
-            {{ self.needContent.get('won:hasTextDescription') }}
+            {{ self.needContent.get('dc:description') }}
           </span>
         </div>
         <div class="pc__text"

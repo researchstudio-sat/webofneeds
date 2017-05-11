@@ -586,7 +586,7 @@
         <rdf:type rdf:resource="&won;NeedContent"/>
         <terms:title rdf:datatype="&rdfs;Literal">Couch</terms:title>
         <terms:title rdf:datatype="&xsd;string">Couch</terms:title>
-        <won:hasTextDescription rdf:datatype="&xsd;string">rote Couch mit integrierter Mäusefalle</won:hasTextDescription>
+        <terms:description rdf:datatype="&xsd;string">rote Couch mit integrierter Mäusefalle</terms:description>
         <won:hasDepth rdf:resource="&wonex;CouchDepth"/>
         <won:hasHeight rdf:resource="&wonex;CouchHeight"/>
         <won:hasWeight rdf:resource="&wonex;CouchWeight"/>

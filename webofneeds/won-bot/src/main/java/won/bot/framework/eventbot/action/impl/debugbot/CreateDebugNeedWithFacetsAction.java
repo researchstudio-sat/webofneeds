@@ -92,7 +92,7 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
         if (needDataset != null) {
 
             DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needDataset);
-            titleString = needModelWrapper.getTitleFromIsOrAll();
+            titleString = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
             createNeed = needModelWrapper.hasFlag(WON.USED_FOR_TESTING) && !needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME);
         }
 

@@ -11,7 +11,7 @@ ex:Need2
 	won:hasContent ex:Need2_Content2 ;
 	won:hasMatchingConstraint ex:Need2_Constraint2.
 	
-ex:Need2_Content2 won:hasTextDescription "Zu verschenken, 1 Jacke, hellgrün ist Gr. 22 (Gr. 44 - Kurzgröße) und hat goldene Knöpfe."^^xsd:string
+ex:Need2_Content2 dc:description "Zu verschenken, 1 Jacke, hellgrün ist Gr. 22 (Gr. 44 - Kurzgröße) und hat goldene Knöpfe."^^xsd:string
 
 ex:Need2_Constraint2 
 	a oslc:ResourceShape ;

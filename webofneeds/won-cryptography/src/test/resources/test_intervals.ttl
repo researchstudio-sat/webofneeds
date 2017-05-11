@@ -12,7 +12,7 @@
         won:hasBasicNeedType         won:Demand ;
         won:hasContent               [ a                       won:NeedContent ;
                                        dc:title                "Test ranges"^^xsd:string ;
-                                       won:hasTextDescription  "I'm just testing ranges here."^^xsd:string
+                                       dc:description  "I'm just testing ranges here."^^xsd:string
                                      ] ;
         won:hasNeedModality          [ a                          won:NeedModality ;
                                        won:hasPriceSpecification  [ a                       won:PriceSpecification ;

@@ -28,8 +28,8 @@ public class TelegramMessageGenerator {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
 
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
-        String title = needModelWrapper.getTitleFromIsOrAll();
-        String description = needModelWrapper.getDescription(NeedContentPropertyType.ALL);
+        String title = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
+        String description = needModelWrapper.getSomeDescription(NeedContentPropertyType.ALL,"en","de");
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -49,8 +49,8 @@ public class TelegramMessageGenerator {
         Dataset remoteNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(remoteNeedUri);
 
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(remoteNeedRDF);
-        String title = needModelWrapper.getTitleFromIsOrAll();
-        String description = needModelWrapper.getDescription(NeedContentPropertyType.ALL);
+        String title = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
+        String description = needModelWrapper.getSomeDescription(NeedContentPropertyType.ALL, "en","de");
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -81,8 +81,8 @@ public class TelegramMessageGenerator {
         Dataset createdNeedRDF = eventListenerContext.getLinkedDataSource().getDataForResource(needURI);
 
         DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(createdNeedRDF);
-        String title = needModelWrapper.getTitleFromIsOrAll();
-        String description = needModelWrapper.getDescription(NeedContentPropertyType.ALL);
+        String title = needModelWrapper.getSomeTitleFromIsOrAll("en","de");
+        String description = needModelWrapper.getSomeDescription(NeedContentPropertyType.ALL, "en","de");
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);

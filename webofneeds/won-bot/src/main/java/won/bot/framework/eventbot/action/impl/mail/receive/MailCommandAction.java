@@ -1,5 +1,6 @@
 package won.bot.framework.eventbot.action.impl.mail.receive;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.jena.query.Dataset;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -176,7 +177,7 @@ public class MailCommandAction extends BaseEventBotAction {
                 for(WonURI u : needUris) {
                     Dataset needRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(u.getUri());
                     DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needRDF);
-                    String needTitle = needModelWrapper.getTitleFromIsOrAll().trim();
+                    String needTitle = StringUtils.trim(needModelWrapper.getSomeTitleFromIsOrAll("en","de"));
                     if(titleToClose.equals(needTitle) && needModelWrapper.getNeedState().equals(NeedState.ACTIVE)){
                         return u.getUri();
                     }

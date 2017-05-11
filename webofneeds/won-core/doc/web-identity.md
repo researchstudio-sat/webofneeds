@@ -39,7 +39,7 @@ Below is an example of part of a Need resource description in TRIG format:
     won:hasBasicNeedType  won:Demand ;
     won:hasContent        [ a  won:NeedContent ;
                                dc:title               "WANTED: external CD burner."^^xsd:string ;
-                               won:hasTextDescription "Mine broke. Need a new one ASAP."^^xsd:string
+                               dc:description "Mine broke. Need a new one ASAP."^^xsd:string
                           ] ;
     won:hasFacet          won:OwnerFacet ;
     won:hasNeedModality   [ a  won:NeedModality ] ;

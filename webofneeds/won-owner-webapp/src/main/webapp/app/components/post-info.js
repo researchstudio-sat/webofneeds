@@ -47,12 +47,12 @@ function genComponentConf() {
                 </p>
 
                 <h2 class="post-info__heading"
-                    ng-show="self.postContent.get('won:hasTextDescription')">
+                    ng-show="self.postContent.get('dc:description')">
                     Description
                 </h2>
                 <p class="post-info__details"
-                    ng-show="self.postContent.get('won:hasTextDescription')">
-                    {{ self.postContent.get('won:hasTextDescription')}}
+                    ng-show="self.postContent.get('dc:description')">
+                    {{ self.postContent.get('dc:description')}}
                 </p>
 
                 <h2 class="post-info__heading"

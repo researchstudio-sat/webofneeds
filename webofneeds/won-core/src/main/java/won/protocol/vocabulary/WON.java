@@ -79,8 +79,6 @@ public class WON
   public static final Resource GOOD = m.createResource(BASE_URI + "Good");
   public static final Resource BAD = m.createResource(BASE_URI+"Bad");
 
-  public static final Property HAS_TEXT_DESCRIPTION = m.createProperty(BASE_URI, "hasTextDescription");
-  public static final Property HAS_CONTENT_DESCRIPTION = m.createProperty(BASE_URI, "hasContentDescription");
   public static final Property HAS_TAG = m.createProperty(BASE_URI, "hasTag");
   public static final Property HAS_ATTACHED_MEDIA = m.createProperty(BASE_URI, "hasAttachedMedia");
   public static final Property HAS_HEIGHT = m.createProperty(BASE_URI, "hasHeight");

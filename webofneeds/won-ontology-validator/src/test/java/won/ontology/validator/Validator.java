@@ -196,7 +196,7 @@ public class Validator
         "SELECT ?need ?text ?description WHERE {" +
         "?need rdf:type won:Need. " +
         "?need won:hasContent ?content." +
-        "?content won:hasTextDescription ?text." +
+        "?content dc:description ?text." +
         "?content won:hasContentDescription ?description." +
         "}";
     Query query = QueryFactory.create(queryString);

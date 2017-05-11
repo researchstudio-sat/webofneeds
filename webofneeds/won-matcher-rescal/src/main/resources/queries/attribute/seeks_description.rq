@@ -8,7 +8,7 @@ SELECT DISTINCT ?slice ?need ?value WHERE {
     ?need won:crawlStatus ?crawlStatus.
     ?need won:crawlDate ?date.
     ?need won:isInState won:Active.
-    ?need won:seeks/won:hasTextDescription ?value.
+    ?need won:seeks/dc:description ?value.
     OPTIONAL {?needUri won:hasFlag ?flag}.
     FILTER (!bound(?flag) || (?flag != won:DoNotMatch && ?flag != won:UsedForTesting))
     FILTER (?date >= ?from && ?date < ?to)  # bind variables ?from and ?to here

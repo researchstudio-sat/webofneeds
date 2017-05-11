@@ -84,12 +84,12 @@ public class SolrMatcherEvaluation
 
     try {
       DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(need);
-      title = needModelWrapper.getTitle(NeedContentPropertyType.ALL);
+      title = needModelWrapper.getTitles(NeedContentPropertyType.ALL).iterator().next();
       title = title.replaceAll("[^A-Za-z0-9 ]", "_");
       title = title.replaceAll("NOT", "_");
       title = title.replaceAll("AND", "_");
       title = title.replaceAll("OR", "_");
-      description = needModelWrapper.getDescription(NeedContentPropertyType.ALL);
+      description = needModelWrapper.getSomeDescription(NeedContentPropertyType.ALL);
     } catch (IncorrectPropertyCountException e) {
 
       // do nothing
