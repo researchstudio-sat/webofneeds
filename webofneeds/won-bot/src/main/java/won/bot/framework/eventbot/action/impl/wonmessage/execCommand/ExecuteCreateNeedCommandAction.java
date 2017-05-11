@@ -32,7 +32,6 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.model.MatchingBehaviorType;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.NeedModelWrapper;
 import won.protocol.util.RdfUtils;
@@ -123,7 +122,8 @@ public class ExecuteCreateNeedCommandAction extends BaseEventBotAction {
 
 
         if (doNotMatch){
-            needModelWrapper.setMatchingBehavior(MatchingBehaviorType.DO_NOT_MATCH);
+            needModelWrapper.addFlag(WON.NO_HINT_FOR_ME);
+            needModelWrapper.addFlag(WON.NO_HINT_FOR_COUNTERPART);
         }
 
         if (usedForTesting){

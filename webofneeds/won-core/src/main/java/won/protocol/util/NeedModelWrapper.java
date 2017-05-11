@@ -1,6 +1,5 @@
 package won.protocol.util;
 
-import com.google.common.collect.HashBiMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.*;
@@ -14,7 +13,6 @@ import org.apache.jena.vocabulary.RDF;
 import won.protocol.exception.DataIntegrityException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessageBuilder;
-import won.protocol.model.MatchingBehaviorType;
 import won.protocol.model.NeedContentPropertyType;
 import won.protocol.model.NeedGraphType;
 import won.protocol.model.NeedState;
@@ -36,8 +34,6 @@ import java.util.stream.Collectors;
 public class NeedModelWrapper {
     protected Model needModel;
     protected Model sysInfoModel;
-
-    private final HashBiMap<MatchingBehaviorType, Resource> matchingBehaviorMap = initMap();
 
     /**
      * Create a new need model (incluing sysinfo)
@@ -114,15 +110,6 @@ public class NeedModelWrapper {
         checkModels();
     }
 
-    private HashBiMap initMap() {
-
-        HashBiMap<MatchingBehaviorType, Resource> matchingBehaviorMap = HashBiMap.create();
-        matchingBehaviorMap.put(MatchingBehaviorType.MUTUAL, WON.MATCHING_BEHAVIOR_MUTUAL);
-        matchingBehaviorMap.put(MatchingBehaviorType.DO_NOT_MATCH, WON.MATCHING_BEHAVIOR_DO_NOT_MATCH);
-        matchingBehaviorMap.put(MatchingBehaviorType.LAZY, WON.MATCHING_BEHAVIOR_LAZY);
-        matchingBehaviorMap.put(MatchingBehaviorType.STEALTHY, WON.MATCHING_BEHAVIOR_STEALTHY);
-        return matchingBehaviorMap;
-    }
 
     private void checkModels() {
         try {
@@ -167,27 +154,6 @@ public class NeedModelWrapper {
 
     public String getNeedUri() {
         return getNeedNode(NeedGraphType.NEED).getURI();
-    }
-
-    public void setMatchingBehavior(MatchingBehaviorType matchingBehavior) {
-
-        Resource matchingResource = matchingBehaviorMap.get(matchingBehavior);
-        Resource need = getNeedNode(NeedGraphType.NEED);
-        need.removeAll(WON.HAS_MATCHING_BEHAVIOR);
-        need.addProperty(WON.HAS_MATCHING_BEHAVIOR, matchingResource);
-    }
-
-    public MatchingBehaviorType getMatchingBehavior() {
-
-        RDFNode matchingBehavior = RdfUtils.findOnePropertyFromResource(
-                needModel, getNeedNode(NeedGraphType.NEED), WON.HAS_MATCHING_BEHAVIOR);
-
-        // default matching behavior is MUTUAL
-        if (matchingBehavior == null) {
-            return MatchingBehaviorType.MUTUAL;
-        }
-
-        return matchingBehaviorMap.inverse().get(matchingBehavior.asResource());
     }
 
     public void addFlag(Resource flag) {

@@ -6,10 +6,7 @@ import org.apache.jena.vocabulary.DC;
 import org.junit.Assert;
 import org.junit.Test;
 import won.protocol.message.Utils;
-import won.protocol.model.MatchingBehaviorType;
-import won.protocol.model.NeedContentPropertyType;
-import won.protocol.model.NeedGraphType;
-import won.protocol.model.NeedState;
+import won.protocol.model.*;
 import won.protocol.vocabulary.WON;
 
 import java.io.IOException;
@@ -59,7 +56,7 @@ public class NeedModelWarpperTest {
         Assert.assertTrue(needModelWrapper.hasFlag(WON.USED_FOR_TESTING));
         Assert.assertEquals(1, needModelWrapper.getFacetUris().size());
         Assert.assertEquals("http://purl.org/webofneeds/model#OwnerFacet", needModelWrapper.getFacetUris().iterator().next());
-        Assert.assertEquals(MatchingBehaviorType.LAZY, needModelWrapper.getMatchingBehavior());
+        Assert.assertTrue(needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME));
 
         // query the content nodes
         Assert.assertEquals(2, needModelWrapper.getContentNodes(NeedContentPropertyType.ALL).size());
@@ -100,15 +97,11 @@ public class NeedModelWarpperTest {
 
         // check that wrapper is empty
         Assert.assertFalse(needModelWrapper.hasFlag(WON.USED_FOR_TESTING));
-        Assert.assertEquals(MatchingBehaviorType.MUTUAL, needModelWrapper.getMatchingBehavior());
         Assert.assertEquals(0, needModelWrapper.getContentNodes(NeedContentPropertyType.ALL).size());
         Assert.assertEquals(0, needModelWrapper.getContentNodes(NeedContentPropertyType.ALL).size());
         Assert.assertEquals(0, needModelWrapper.getFacetUris().size());
 
         // set some values to the sysinfo model and check them
-        needModelWrapper.setMatchingBehavior(MatchingBehaviorType.LAZY);
-        needModelWrapper.setMatchingBehavior(MatchingBehaviorType.DO_NOT_MATCH);
-        Assert.assertEquals(MatchingBehaviorType.DO_NOT_MATCH, needModelWrapper.getMatchingBehavior());
         needModelWrapper.setNeedState(NeedState.INACTIVE);
         needModelWrapper.setNeedState(NeedState.ACTIVE);
         Assert.assertEquals(NeedState.ACTIVE, needModelWrapper.getNeedState());

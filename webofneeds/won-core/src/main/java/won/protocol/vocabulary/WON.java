@@ -171,12 +171,9 @@ public class WON
   //the usedForTesting flag: need is not a real need, only match with other needs flagged with usedForTesting
   public static final Resource USED_FOR_TESTING= m.createResource(BASE_URI + "UsedForTesting");
 
-  // Matching behavior
-  public static final Property HAS_MATCHING_BEHAVIOR = m.createProperty(BASE_URI, "hasMatchingBehavior");
-  public static final Resource MATCHING_BEHAVIOR_MUTUAL = m.createResource(BASE_URI + "Mutual");
-  public static final Resource MATCHING_BEHAVIOR_DO_NOT_MATCH = m.createResource(BASE_URI+"DoNotMatch");
-  public static final Resource MATCHING_BEHAVIOR_LAZY = m.createResource(BASE_URI+"Lazy");
-  public static final Resource MATCHING_BEHAVIOR_STEALTHY = m.createResource(BASE_URI+"Stealthy");
+  // hint behaviour
+  public static final Resource NO_HINT_FOR_COUNTERPART = m.createResource(BASE_URI+"NoHintForCounterpart");
+  public static final Resource NO_HINT_FOR_ME = m.createResource(BASE_URI+"NoHintForMe");
 
   public static final Property HAS_GRAPH = m.createProperty(BASE_URI,"hasGraph");
 
@@ -215,7 +212,7 @@ public class WON
       case INACTIVE:
         return NEED_STATE_INACTIVE;
       default:
-        throw new IllegalStateException("No case specified for " + state.name());
+        throw new IllegalArgumentException("No case specified for " + state.name());
     }
   }
 
@@ -239,8 +236,9 @@ public class WON
       case CLOSED:
         return CONNECTION_STATE_CLOSED;
       default:
-        throw new IllegalStateException("No such case specified for " + type.name());
+        throw new IllegalArgumentException("No such case specified for " + type.name());
     }
   }
+
 
 }

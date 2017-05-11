@@ -36,7 +36,6 @@ import won.bot.framework.eventbot.event.impl.needlifecycle.NeedCreatedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
-import won.protocol.model.MatchingBehaviorType;
 import won.protocol.model.NeedContentPropertyType;
 import won.protocol.model.NeedGraphType;
 import won.protocol.service.WonNodeInformationService;
@@ -94,9 +93,7 @@ public class CreateDebugNeedWithFacetsAction extends AbstractCreateNeedAction
 
             DefaultNeedModelWrapper needModelWrapper = new DefaultNeedModelWrapper(needDataset);
             titleString = needModelWrapper.getTitleFromIsOrAll();
-            MatchingBehaviorType matchingBehavior = needModelWrapper.getMatchingBehavior();
-            createNeed = needModelWrapper.hasFlag(WON.USED_FOR_TESTING) && !(MatchingBehaviorType.DO_NOT_MATCH.equals
-              (matchingBehavior) || MatchingBehaviorType.STEALTHY.equals(matchingBehavior));
+            createNeed = needModelWrapper.hasFlag(WON.USED_FOR_TESTING) && !needModelWrapper.hasFlag(WON.NO_HINT_FOR_ME);
         }
 
         if (!createNeed) return; //if create need is false do not continue the debug need creation
