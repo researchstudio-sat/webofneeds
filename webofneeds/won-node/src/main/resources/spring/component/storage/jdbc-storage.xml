@@ -47,6 +47,12 @@
         <property name="maxIdleTimeExcessConnections" value="60" />
         <property name="maxConnectionAge" value="3600" />
         <property name="numHelperThreads" value="50" />
+        <!--
+         added these properties to avoid classloader problems, see
+         http://www.mchange.com/projects/c3p0/#configuring_to_avoid_memory_leaks_on_redeploy
+        -->
+        <property name="contextClassLoaderSource" value="library" />
+        <property name="privilegeSpawnedThreads" value="true" />
     </bean>
 
     <!-- Entity manager -->
@@ -56,15 +62,7 @@
             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/><!-- Hibernate is used as JPA vendor-->
         </property>
         <property name="packagesToScan" value="won.protocol.model" />
-        <!--
-        The custom JpaDialect can be used to set the flush mode manually. Shouldn't be needed,
-        but it's a neat trick :)
-        <property name="jpaDialect">
-           <bean class="won.protocol.util.hibernate.FlushModeSettingHibernateJpaDialect">
-               <property name="flushMode" value="ALWAYS" />
-           </bean>
-        </property>
-        -->
+
         <property name="jpaPropertyMap">
             <map>
                 <entry key="hibernate.hbm2ddl.auto" value="${db.ddl.strategy}"/>

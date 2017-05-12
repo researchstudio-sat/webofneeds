@@ -16,8 +16,6 @@
 
 package won.protocol.model;
 
-import org.hibernate.cfg.Configuration;
-import org.hibernate.tool.hbm2ddl.SchemaExport;
 import won.protocol.model.parentaware.VersionedEntity;
 
 import javax.persistence.*;
@@ -229,14 +227,6 @@ public class Need implements VersionedEntity {
         result = 31 * result + ownerURI.hashCode();
         result = 31 * result + creationDate.hashCode();
         return result;
-    }
-
-    public static void main(String args[]) {
-        Configuration config =
-                new Configuration();
-        config.addAnnotatedClass(Need.class);
-        config.configure();
-        new SchemaExport(config).create(true, true);
     }
 
 

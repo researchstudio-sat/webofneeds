@@ -440,19 +440,19 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-c3p0</artifactId>
                 <version>${org.hibernate.version}</version>
-                <!--exclusions>
+                <exclusions>
                     <exclusion>
                         <groupId>com.mchange</groupId>
                         <artifactId>c3p0</artifactId>
                     </exclusion>
-                </exclusions-->
+                </exclusions>
             </dependency>
 
-            <!--dependency>
+            <dependency>
                 <groupId>com.mchange</groupId>
                 <artifactId>c3p0</artifactId>
                 <version>${com.mchange.c3p0.version}</version>
-            </dependency-->
+            </dependency>
 
             <!-- hibernate depends on this, but has it in test/provided scope -->
             <dependency>
@@ -479,7 +479,7 @@
 
             <!-- DATABASE -->
             <dependency>
-                <groupId>postgresql</groupId>
+                <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
             </dependency>
@@ -927,6 +927,7 @@
         <com.google.guava.version>15.0</com.google.guava.version>
         <ch.qos.logback.version>1.0.13</ch.qos.logback.version>
         <com.fasterxml.classmate.version>1.0.0</com.fasterxml.classmate.version>
+        <com.mchange.c3p0.version>0.9.5</com.mchange.c3p0.version>
         <junit.version>4.11</junit.version>
         <org.apache.commons.email.version>1.3.1</org.apache.commons.email.version>
         <net.sf.ehcache.version>2.6.8</net.sf.ehcache.version>
@@ -942,7 +943,7 @@
         <org.springframework.security.version>3.2.9.RELEASE</org.springframework.security.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
         <org.hsqldb.version>2.3.2</org.hsqldb.version>
-        <postgresql.version>9.1-901.jdbc4</postgresql.version>
+        <postgresql.version>42.1.1</postgresql.version>
         <flyway.version>4.0.3</flyway.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
         <javax.validation.version>1.1.0.Final</javax.validation.version>
