@@ -42,6 +42,12 @@
         <property name="jdbcUrl" value="${db.sql.jdbcUrl}"/>
         <property name="user" value="${db.sql.user}" />
         <property name="password" value="${db.sql.password}" />
+        <!--
+        added these properties to avoid classloader problems, see
+        http://www.mchange.com/projects/c3p0/#configuring_to_avoid_memory_leaks_on_redeploy
+        -->
+        <property name="contextClassLoaderSource" value="library" />
+        <property name="privilegeSpawnedThreads" value="true" />
     </bean>
 
 
