@@ -117,10 +117,10 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-c3p0</artifactId>
         </dependency>
-        <!--dependency>
+        <dependency>
             <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
-        </dependency-->
+        </dependency>
         <dependency>
             <!-- required for hibernate, which has it in test/provided scopes but needs it in our application -->
             <groupId>org.jboss</groupId>
@@ -135,7 +135,7 @@
 
         <!-- DATABASE -->
         <dependency>
-            <groupId>postgresql</groupId>
+            <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
         <dependency>
