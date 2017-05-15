@@ -417,5 +417,46 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>suppress-npm-clean</id>
+            <activation>
+                <file>
+                    <missing>src/main/webapp/node</missing>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.ekryd.echo-maven-plugin</groupId>
+                        <artifactId>echo-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>frontend-suppress-npm-clean</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>echo</goal>
+                                </goals>
+                                <configuration>
+                                    <message>Note: the profile 'suppress-npm-clean' is active because the local installation of nodejs was not found in 'src/main/webapp/node'. 'npm run clean' will not be executed.</message>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>npm-run-clean</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>
