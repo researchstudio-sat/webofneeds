@@ -5,7 +5,7 @@
 @import 'post-header';
 
 won-matches-flow-item {
-  display: block;
+  display: inline-block;
   break-inside: avoid;
   margin: 0.5rem 0.25rem;
   border: $thinGrayBorder;
