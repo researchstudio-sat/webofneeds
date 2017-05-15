@@ -413,9 +413,11 @@ public class NeedModelWrapper {
      */
     public String getSomeContentPropertyStringValue(Resource contentNode, Property p, String... preferredLanguages){
         Collection<String> values = null;
-        for (int i = 0; i < preferredLanguages.length; i++){
-            values = getContentPropertyStringValues(contentNode, p, preferredLanguages[i]);
-            if (values != null && values.size() > 0) return values.iterator().next();
+        if(preferredLanguages != null){
+            for (int i = 0; i < preferredLanguages.length; i++){
+                values = getContentPropertyStringValues(contentNode, p, preferredLanguages[i]);
+                if (values != null && values.size() > 0) return values.iterator().next();
+            }
         }
         values = getContentPropertyStringValues(contentNode, p, null);
         if (values != null && values.size() > 0) return values.iterator().next();
@@ -429,10 +431,12 @@ public class NeedModelWrapper {
      */
     public String getSomeContentPropertyStringValue(NeedContentPropertyType type, Property p, String... preferredLanguages){
         Collection<Resource> nodes = getContentNodes(type);
-        for (int i = 0; i < preferredLanguages.length; i++) {
-            for (Resource node : nodes) {
-                String valueOfContentNode = getSomeContentPropertyStringValue(node, p, preferredLanguages[i]);
-                if (valueOfContentNode != null) return valueOfContentNode;
+        if(preferredLanguages != null) {
+            for (int i = 0; i < preferredLanguages.length; i++) {
+                for (Resource node : nodes) {
+                    String valueOfContentNode = getSomeContentPropertyStringValue(node, p, preferredLanguages[i]);
+                    if (valueOfContentNode != null) return valueOfContentNode;
+                }
             }
         }
         for (Resource node : nodes) {
