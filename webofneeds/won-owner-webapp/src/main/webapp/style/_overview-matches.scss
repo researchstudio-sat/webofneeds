@@ -69,7 +69,7 @@ won-matches {
     @include omc__content;
     column-count: 4;
     column-gap: 0.5rem;
-    column-fill: auto;
+    column-fill: balance;
 
     @media (max-width: 70rem){
       column-count: 3;
@@ -88,7 +88,7 @@ won-matches {
     @include omc__content;
     column-count: 3;
     column-gap: 0.5rem;
-    column-fill: auto;
+    column-fill: balance;
 
     @media (max-width: 70rem){
       column-count: 2;
