@@ -34,23 +34,14 @@ const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
 function genComponentConf() {
     let template = `
-        <div>
-            <div class="pm__header">
-                <a ui-sref="{connectionUri : null}">
-                    <img class="pm__header__icon clickable"
-                         src="generated/icon-sprite.svg#ico36_close"/>
-                </a>
-                <div class="pm__header__title"
-                  ui-sref="post({ postUri: self.theirNeed.get('@id'), connectionUri: null, connectionType: null})">
-                    {{ self.theirNeedContent.get('dc:title') }}
-                </div>
-                <!--div class="pm__header__options">
-                    Options
-                </div>
-                <img
-                    class="pm__header__options__icon clickable"
-                    src="generated/icon-sprite.svg#ico_settings"
-                    ng-click="self.openConversationOption()"/-->
+        <div class="pm__header">
+            <a ui-sref="{connectionUri : null}">
+                <img class="pm__header__icon clickable"
+                     src="generated/icon-sprite.svg#ico36_close"/>
+            </a>
+            <div class="pm__header__title"
+              ui-sref="post({ postUri: self.theirNeed.get('@id'), connectionUri: null, connectionType: null})">
+                {{ self.theirNeedContent.get('dc:title') }}
             </div>
         </div>
         <div class="pm__content">
