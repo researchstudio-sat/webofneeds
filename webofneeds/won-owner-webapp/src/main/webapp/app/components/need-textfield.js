@@ -87,7 +87,7 @@ function genComponentConf() {
             //titleParagraphDom.innerHTML = titleParagraphDom.innerHTML.replace(/^&nbsp;/, '');
             // ^ can't do this, as it causes the cursor to jump
 
-            const title = titleParagraphDom.innerHTML
+            const title = titleParagraphNg.text()
                 // sometimes mediumjs doesn't remove the placeholder nbsp properly.
                 .replace(/^&nbsp;/, '')
                 .trim();
