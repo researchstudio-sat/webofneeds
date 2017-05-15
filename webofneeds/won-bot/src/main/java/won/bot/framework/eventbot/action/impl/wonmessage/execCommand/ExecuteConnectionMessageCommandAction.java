@@ -23,8 +23,8 @@ import java.net.URI;
  * Action executing a ConnectionMessageCommandEvent, creating a connection message for sending in the specified connection, adding the specified model as the content of the message.
  */
 public class ExecuteConnectionMessageCommandAction extends ExecuteSendMessageCommandAction<ConnectionMessageCommandEvent> {
-    public ExecuteConnectionMessageCommandAction(EventListenerContext eventListenerContext, boolean messageIsSentToRemoteNode) {
-        super(eventListenerContext, messageIsSentToRemoteNode);
+    public ExecuteConnectionMessageCommandAction(EventListenerContext eventListenerContext) {
+        super(eventListenerContext, true);
     }
 
     @Override
