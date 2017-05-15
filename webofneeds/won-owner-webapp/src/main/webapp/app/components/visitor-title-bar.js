@@ -9,6 +9,10 @@ import won from '../won-es6';
 import { labels } from '../won-label-utils';
 import { selectOpenPost } from '../selectors';
 import { actionCreators }  from '../actions/actions';
+import {
+    seeksOrIs,
+    inferLegacyNeedType,
+} from '../won-utils';
 
 const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
@@ -20,24 +24,26 @@ function genComponentConf() {
                         <img src="generated/icon-sprite.svg#ico36_backarrow" class="vtb__icon">
                     </a>
                     <won-square-image 
-                        title="self.post.get('title')" 
-                        src="self.post.get('titleImgSrc')"
-                        uri="self.post.get('uri')">
+                        title="self.theirPostContent.get('dc:title')"
+                        src="self.theirPostContent.get('titleImgSrc')"
+                        uri="self.theirPost.get('@id')">
                     </won-square-image>
                     <div class="vtb__inner__left__titles">
-                        <h1 class="vtb__title">{{self.post.get('title')}}</h1>
+                        <h1 class="vtb__title">{{self.theirPostContent.get('dc:title')}}</h1>
                         <div class="vtb__inner__left__titles__type">
-                            {{self.labels.type[self.post.getIn(['won:hasBasicNeedType','@id'])]}}
+                            {{self.labels.type[self.theirPostType] }}
                         </div>
                     </div>
                 </div>
                 <div class="vtb__inner__right" ng-show="self.hasConnectionWithOwnPost">
                     <button class="won-button--filled red">Quit Contact</button>
                     <ul class="vtb__tabs">
-                        <li ng-class="self.selection == 0? 'vtb__tabs__selected' : ''" ng-click="self.selection = 0">
+                        <li
+                            ng-class="self.selection == 0? 'vtb__tabs__selected' : ''"
+                            ng-click="self.selection = 0">
                         <a ui-sref="post({ERROR: 'Messages tab not implemented yet'})">
                             Messages
-                            <span class="vtb__tabs__unread">{{self.post.get('messages').length}}</span>
+                            <span class="vtb__tabs__unread">{{self.theirPost.get('messages').length}}</span>
                         </a></li>
                         <li ng-class="self.selection == 1? 'vtb__tabs__selected' : ''" ng-click="self.selection = 1">
                         <a ui-sref="postVisitor({myUri: 'http://example.org/121337345'})">
@@ -54,11 +60,18 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             this.labels = labels;
             window.vtb4dbg = this;
-            const selectFromState = state => ({
-                post: selectOpenPost(state),
-                labels,
-                hasConnectionWithOwnPost: false,
-            });
+            const selectFromState = state => {
+                const theirPost = selectOpenPost(state);
+                const theirPostContent = seeksOrIs(theirPost);
+                const theirPostType = inferLegacyNeedType(theirPost);
+                return {
+                    theirPost,
+                    theirPostContent,
+                    theirPostType,
+                    labels,
+                    hasConnectionWithOwnPost: false,
+                }
+            };
             const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
             this.$scope.$on('$destroy', disconnect);
         }
