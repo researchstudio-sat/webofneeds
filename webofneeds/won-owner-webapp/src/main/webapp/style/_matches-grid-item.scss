@@ -4,7 +4,7 @@
 @import 'flex-layout';
 
 won-matches-grid-item {
-  display: block;
+  display: inline-block;
   page-break-inside: avoid;
   margin: 0.5rem 0;
   border: $thinGrayBorder;
