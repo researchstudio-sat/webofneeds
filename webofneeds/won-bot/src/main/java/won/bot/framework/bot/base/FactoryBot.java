@@ -2,21 +2,9 @@ package won.bot.framework.bot.base;
 
 import won.bot.framework.bot.context.FactoryBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.action.impl.factory.FactoryHintCheckAction;
-import won.bot.framework.eventbot.action.impl.factory.InitFactoryAction;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
-import won.bot.framework.eventbot.behaviour.CoordinationBehaviour;
 import won.bot.framework.eventbot.behaviour.FactoryBotHintBehaviour;
 import won.bot.framework.eventbot.behaviour.FactoryBotInitBehaviour;
-import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.factory.InitFactoryFinishedEvent;
-import won.bot.framework.eventbot.event.impl.lifecycle.InitializeEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
-import won.bot.framework.eventbot.listener.EventListener;
-import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
-import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
 
 public abstract class FactoryBot extends EventBot {
     @Override
@@ -42,7 +30,7 @@ public abstract class FactoryBot extends EventBot {
             }
         };
 
-        factoryBotInitBehaviour.activateAfterDeactivate(runningBehaviour,factoryBotHintBehaviour);
+        factoryBotInitBehaviour.onDeactivateActivate(runningBehaviour,factoryBotHintBehaviour);
 
         factoryBotInitBehaviour.activate();
     }

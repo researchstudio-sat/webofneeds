@@ -49,28 +49,28 @@ public abstract class BotBehaviour {
         this.coordinationBehaviours = Collections.synchronizedSet(new HashSet<>());
     }
 
-    public void activateAfterDeactivate(BotBehaviour... nextBehaviours) {
+    public void onDeactivateActivate(BotBehaviour... nextBehaviours) {
         Arrays.stream(nextBehaviours).forEach(botBehaviour -> {
             CoordinationBehaviour c = CoordinationBehaviour.connectDeactivateActivate(context, this, botBehaviour);
             this.coordinationBehaviours.add(c);
         });
     }
 
-    public void activateWithActivate(BotBehaviour... nextBehaviours) {
+    public void onActivateActivate(BotBehaviour... nextBehaviours) {
         Arrays.stream(nextBehaviours).forEach(botBehaviour -> {
             CoordinationBehaviour c = CoordinationBehaviour.connectActivateActivate(context, this, botBehaviour);
             this.coordinationBehaviours.add(c);
         });
     }
 
-    public void deactivateAfterDeactivate(BotBehaviour... nextBehaviours) {
+    public void onDeactivateDeactivate(BotBehaviour... nextBehaviours) {
         Arrays.stream(nextBehaviours).forEach(botBehaviour -> {
             CoordinationBehaviour c = CoordinationBehaviour.connectDeactivateDeactivate(context, this, botBehaviour);
             this.coordinationBehaviours.add(c);
         });
     }
 
-    public void deactivateAfterActivate(BotBehaviour... nextBehaviours) {
+    public void onActivateDeactivate(BotBehaviour... nextBehaviours) {
         Arrays.stream(nextBehaviours).forEach(botBehaviour -> {
             CoordinationBehaviour c = CoordinationBehaviour.connectDeactivateActivate(context, this, botBehaviour);
             this.coordinationBehaviours.add(c);
