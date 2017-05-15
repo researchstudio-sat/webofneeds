@@ -208,6 +208,7 @@ export function connectionLastUpdatedAt(state, connection) {
  *          the entire owner-application to the is-seeks need-structure.
  */
 export function seeksOrIs(need) {
+    if(!need) return undefined;
     const seeks = need.get('won:seeks');
     const is = need.get('won:is');
 
@@ -253,6 +254,7 @@ window.seeksOrIs4dbg = seeksOrIs;
  *          to the is-seeks need-structure.
  */
 export function inferLegacyNeedType(need) {
+    if(!need) return undefined;
     const seeks = need.get('won:seeks');
     const is = need.get('won:is');
 
