@@ -6,5 +6,5 @@
 @import 'need-tab-bar';
 
 .visitor-title-bar {
-  @include need-tab-bar('vtb', 13rem);
+  @include need-tab-bar('vtb');
 }

@@ -28,12 +28,10 @@ function genComponentConf() {
                         src="self.theirPostContent.get('titleImgSrc')"
                         uri="self.theirPost.get('@id')">
                     </won-square-image>
-                    <div class="vtb__inner__left__titles">
-                        <h1 class="vtb__title">{{self.theirPostContent.get('dc:title')}}</h1>
-                        <div class="vtb__inner__left__titles__type">
-                            {{self.labels.type[self.theirPostType] }}
-                        </div>
-                    </div>
+                    <hgroup>
+                        <h1 class="vtb__title">{{ self.theirPostContent.get('dc:title') }}</h1>
+                        <div class="vtb__titles__type">{{self.labels.type[self.theirPostType]}}</div>
+                    </hgroup>
                 </div>
                 <div class="vtb__inner__right" ng-show="self.hasConnectionWithOwnPost">
                     <button class="won-button--filled red">Quit Contact</button>
