@@ -20,14 +20,6 @@
                                                "Fabian Salcher" .
 
 #################################################################
-#    Datatypes
-#################################################################
-
-###  http://www.w3.org/2001/XMLSchema#duration
-xsd:duration rdf:type rdfs:Datatype .
-
-
-#################################################################
 #    Object Properties
 #################################################################
 
@@ -100,15 +92,6 @@ xsd:duration rdf:type rdfs:Datatype .
                             rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
-###  http://purl.org/webofneeds/model#hasMatchingBehavior
-:hasMatchingBehavior rdf:type owl:ObjectProperty ,
-                              owl:FunctionalProperty ;
-                     rdfs:domain :Need ;
-                     rdfs:range :MatchingBehavior ;
-                     rdfs:comment "defines the behavior that matchers should use to send hints to the need" ;
-                     rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
-
 ###  http://purl.org/webofneeds/model#hasNeedProtocolEndpoint
 :hasNeedProtocolEndpoint rdf:type owl:ObjectProperty ;
                          rdfs:subPropertyOf owl:topObjectProperty ;
@@ -177,7 +160,7 @@ xsd:duration rdf:type rdfs:Datatype .
 ###  http://purl.org/webofneeds/model#is
 :is rdf:type owl:ObjectProperty ;
     rdfs:domain :Need ;
-    rdfs:comment "This optional property is one of the two properties that defines the content of every need (the other is the \"seeks\" property). It is used to describe that part of the content that is available (e.g. for exchange) in contrast to the part that is seeked." ;
+    rdfs:comment "This optional property is one of the two properties that defines the content of every need (the other is the \"seeks\" property). It is used to describe that part of the content that is available (e.g. for exchange) in contrast to the part that is sought." ;
     rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
@@ -194,7 +177,7 @@ xsd:duration rdf:type rdfs:Datatype .
 :seeks rdf:type owl:ObjectProperty ;
        rdfs:domain :Need ;
        rdfs:comment """This optional property is one of the two properties that defines the content of every need (the other is the \"is\" property). It is used to describe that part of the content that is
-seeked to fulfill the need in contrast to the part that is available.""" ;
+sought to fulfill the need in contrast to the part that is available.""" ;
        rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
@@ -376,10 +359,6 @@ It specifies a content - what the need is about, which may be something that is 
                    rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
 
 
-###  http://purl.org/webofneeds/model#UsedForTesting
-:UsedForTesting rdf:type owl:Class .
-
-
 ###  http://purl.org/webofneeds/model#WonOverActiveMq
 :WonOverActiveMq rdf:type owl:Class ;
                  rdfs:subClassOf :WonProtocol ;
@@ -396,18 +375,8 @@ It specifies a content - what the need is about, which may be something that is 
 
 ###  http://purl.org/webofneeds/model#WonProtocol
 :WonProtocol rdf:type owl:Class ;
-             rdfs:comment """Superclass for Web of Needs protocol implementations.
-"""@en ;
+             rdfs:comment """Superclass for Web of Needs protocol implementations."""@en ;
              rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
-
-###  http://rdfs.org/sioc/types#Tag
-sioc:Tag rdf:type owl:Class ;
-         rdfs:isDefinedBy <http://purl.org/webofneeds/model> .
-
-
-###  http://www.w3.org/2001/XMLSchema#string
-xsd:string rdf:type owl:Class .
 
 
 ###  http://www.w3.org/2003/01/geo/wgs84_pos#Point
