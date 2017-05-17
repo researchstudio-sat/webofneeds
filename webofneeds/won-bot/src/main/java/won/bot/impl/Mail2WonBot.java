@@ -26,7 +26,7 @@ import javax.mail.internet.MimeMessage;
  * In Future Implementations it will support the bidirectional communication between the node content and the email sender?!
  * Created by fsuda on 27.09.2016.
  */
-public class Mail2WonBot extends EventBot{
+public class Mail2WonBot extends EventBot {
     @Autowired
     private MessageChannel receiveEmailChannel;
 
@@ -48,80 +48,80 @@ public class Mail2WonBot extends EventBot{
 
         bus = getEventBus();
 
-        //Mail initiated events
-        bus.subscribe(MailReceivedEvent.class,
-        new ActionOnEventListener(
-                ctx,
-                "MailReceived",
-                new MailParserAction(ctx, mailContentExtractor)
-        ));
+        BotBehaviour connectBehaviour = new ConnectBevahiour(ctx);
+        connectBehaviour.activate();
 
-        bus.subscribe(CreateNeedFromMailEvent.class,
-        new ActionOnEventListener(
-                ctx,
-                "CreateNeedFromMailEvent",
-                new CreateNeedFromMailAction(ctx, mailContentExtractor)
-
-        ));
-
-        bus.subscribe(WelcomeMailEvent.class, new ActionOnEventListener(
-          ctx,
-          "WelcomeMailAction",
-          new WelcomeMailAction(mailGenerator, sendEmailChannel)
-
-        ));
-
-        bus.subscribe(MailCommandEvent.class,
-        new ActionOnEventListener(
-                ctx,
-                "MailCommandEvent",
-                new MailCommandAction(ctx, mailContentExtractor)
-        ));
+        BotBehaviour closeBehaviour = new CloseBevahiour(ctx);
+        closeBehaviour.activate();
 
         BotBehaviour connectionMessageBehaviour = new ConnectionMessageBehaviour(ctx);
         connectionMessageBehaviour.activate();
 
-        BotBehaviour closeConnectionBehaviour = new CloseBevahiour(ctx);
-        closeConnectionBehaviour.activate();
+        //Mail initiated events
+        bus.subscribe(MailReceivedEvent.class,
+                new ActionOnEventListener(
+                        ctx,
+                        "MailReceived",
+                        new MailParserAction(ctx, mailContentExtractor)
+                ));
+
+        bus.subscribe(CreateNeedFromMailEvent.class,
+                new ActionOnEventListener(
+                        ctx,
+                        "CreateNeedFromMailEvent",
+                        new CreateNeedFromMailAction(ctx, mailContentExtractor)
+
+                ));
+
+        bus.subscribe(WelcomeMailEvent.class, new ActionOnEventListener(
+                ctx,
+                "WelcomeMailAction",
+                new WelcomeMailAction(mailGenerator, sendEmailChannel)
+
+        ));
+
+        bus.subscribe(MailCommandEvent.class,
+                new ActionOnEventListener(
+                        ctx,
+                        "MailCommandEvent",
+                        new MailCommandAction(ctx, mailContentExtractor)
+                ));
 
         bus.subscribe(DeactivateNeedCommandEvent.class,
-        new ActionOnEventListener(
-                ctx,
-                "DeactivateNeedEvent",
-                new DeactivateNeedAction(ctx)
-        ));
-
-        BotBehaviour connectBehaviour = new ConnectBevahiour(ctx);
-        connectBehaviour.activate();
+                new ActionOnEventListener(
+                        ctx,
+                        "DeactivateNeedEvent",
+                        new DeactivateNeedAction(ctx)
+                ));
 
         bus.subscribe(SubscribeUnsubscribeEvent.class,
-        new ActionOnEventListener(
-                ctx,
-                "SubscribeUnsubscribeEvent",
-                new SubscribeUnsubscribeAction(ctx)
-        ));
+                new ActionOnEventListener(
+                        ctx,
+                        "SubscribeUnsubscribeEvent",
+                        new SubscribeUnsubscribeAction(ctx)
+                ));
 
         //WON initiated Events
         bus.subscribe(HintFromMatcherEvent.class,
-        new ActionOnEventListener(
-                ctx,
-                "HintReceived",
-                new Hint2MailParserAction(mailGenerator, sendEmailChannel)
-        ));
+                new ActionOnEventListener(
+                        ctx,
+                        "HintReceived",
+                        new Hint2MailParserAction(mailGenerator, sendEmailChannel)
+                ));
 
         bus.subscribe(ConnectFromOtherNeedEvent.class,
-        new ActionOnEventListener(
-                ctx,
-                "ConnectReceived",
-                new Connect2MailParserAction(mailGenerator, sendEmailChannel)
-        ));
+                new ActionOnEventListener(
+                        ctx,
+                        "ConnectReceived",
+                        new Connect2MailParserAction(mailGenerator, sendEmailChannel)
+                ));
 
         bus.subscribe(MessageFromOtherNeedEvent.class,
-        new ActionOnEventListener(
-                ctx,
-                "ReceivedTextMessage",
-                new Message2MailAction(mailGenerator, sendEmailChannel)
-        ));
+                new ActionOnEventListener(
+                        ctx,
+                        "ReceivedTextMessage",
+                        new Message2MailAction(mailGenerator, sendEmailChannel)
+                ));
     }
 
     public void receive(MimeMessage message) {

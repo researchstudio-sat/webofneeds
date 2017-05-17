@@ -53,40 +53,40 @@ public class Telegram2WonBot extends EventBot {
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         try {
             wonTelegramBotHandler = new WonTelegramBotHandler(bus, telegramMessageGenerator, botName, token);
-            logger.debug("botName: "+wonTelegramBotHandler.getBotUsername());
-            logger.debug("botTokn: "+wonTelegramBotHandler.getBotToken());
+            logger.debug("botName: " + wonTelegramBotHandler.getBotUsername());
+            logger.debug("botTokn: " + wonTelegramBotHandler.getBotToken());
             telegramBotsApi.registerBot(wonTelegramBotHandler);
-
-            //Telegram initiated Events
-            bus.subscribe(TelegramMessageReceivedEvent.class,
-                new ActionOnEventListener(
-                        ctx,
-                        "TelegramMessageReceived",
-                        new TelegramMessageReceivedAction(ctx, wonTelegramBotHandler, telegramContentExtractor)
-                ));
-
-            bus.subscribe(SendHelpEvent.class,
-                new ActionOnEventListener(
-                        ctx,
-                        "TelegramHelpAction",
-                        new TelegramHelpAction(ctx, wonTelegramBotHandler)
-                ));
-
-            bus.subscribe(TelegramCreateNeedEvent.class,
-                new ActionOnEventListener(
-                        ctx,
-                        "TelegramCreateAction",
-                        new TelegramCreateAction(ctx, wonTelegramBotHandler, telegramContentExtractor)
-                ));
-
-            BotBehaviour closeBehaviour = new CloseBevahiour(ctx);
-            closeBehaviour.activate();
 
             BotBehaviour connectBehaviour = new ConnectBevahiour(ctx);
             connectBehaviour.activate();
 
+            BotBehaviour closeBehaviour = new CloseBevahiour(ctx);
+            closeBehaviour.activate();
+
             BotBehaviour connectionMessageBehaviour = new ConnectionMessageBehaviour(ctx);
             connectionMessageBehaviour.activate();
+
+            //Telegram initiated Events
+            bus.subscribe(TelegramMessageReceivedEvent.class,
+                    new ActionOnEventListener(
+                            ctx,
+                            "TelegramMessageReceived",
+                            new TelegramMessageReceivedAction(ctx, wonTelegramBotHandler, telegramContentExtractor)
+                    ));
+
+            bus.subscribe(SendHelpEvent.class,
+                    new ActionOnEventListener(
+                            ctx,
+                            "TelegramHelpAction",
+                            new TelegramHelpAction(ctx, wonTelegramBotHandler)
+                    ));
+
+            bus.subscribe(TelegramCreateNeedEvent.class,
+                    new ActionOnEventListener(
+                            ctx,
+                            "TelegramCreateAction",
+                            new TelegramCreateAction(ctx, wonTelegramBotHandler, telegramContentExtractor)
+                    ));
 
             //WON initiated Events
             bus.subscribe(HintFromMatcherEvent.class,
