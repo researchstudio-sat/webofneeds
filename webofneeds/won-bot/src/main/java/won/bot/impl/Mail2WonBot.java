@@ -6,13 +6,8 @@ import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.impl.mail.receive.*;
 import won.bot.framework.eventbot.action.impl.mail.send.*;
-import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateNeedAction;
-import won.bot.framework.eventbot.behaviour.BotBehaviour;
-import won.bot.framework.eventbot.behaviour.CloseBevahiour;
-import won.bot.framework.eventbot.behaviour.ConnectBevahiour;
-import won.bot.framework.eventbot.behaviour.ConnectionMessageBehaviour;
+import won.bot.framework.eventbot.behaviour.*;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandEvent;
 import won.bot.framework.eventbot.event.impl.mail.*;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
@@ -57,6 +52,9 @@ public class Mail2WonBot extends EventBot {
         BotBehaviour connectionMessageBehaviour = new ConnectionMessageBehaviour(ctx);
         connectionMessageBehaviour.activate();
 
+        BotBehaviour deactivateNeedBehaviour = new DeactivateNeedBehaviour(ctx);
+        deactivateNeedBehaviour.activate();
+
         //Mail initiated events
         bus.subscribe(MailReceivedEvent.class,
                 new ActionOnEventListener(
@@ -87,12 +85,6 @@ public class Mail2WonBot extends EventBot {
                         new MailCommandAction(ctx, mailContentExtractor)
                 ));
 
-        bus.subscribe(DeactivateNeedCommandEvent.class,
-                new ActionOnEventListener(
-                        ctx,
-                        "DeactivateNeedEvent",
-                        new DeactivateNeedAction(ctx)
-                ));
 
         bus.subscribe(SubscribeUnsubscribeEvent.class,
                 new ActionOnEventListener(

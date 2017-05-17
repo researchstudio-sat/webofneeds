@@ -16,29 +16,10 @@
 
 package won.bot.framework.eventbot.event.impl.command.deactivate;
 
-import won.bot.framework.eventbot.event.BaseNeedSpecificEvent;
-import won.bot.framework.eventbot.event.NeedSpecificEvent;
-import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
-import won.protocol.message.WonMessageType;
-
-import java.net.URI;
+import won.bot.framework.eventbot.event.impl.command.MessageCommandResultEvent;
 
 /**
- * Instructs the bot to deactivate a need.
+ * Tags a result event of a DeactivateNeedCommand.
  */
-public class DeactivateNeedCommandEvent implements MessageCommandEvent {
-    private URI needUri;
-
-    public DeactivateNeedCommandEvent(URI needUri) {
-        this.needUri = needUri;
-    }
-
-    @Override
-    public WonMessageType getWonMessageType() {
-        return WonMessageType.DEACTIVATE;
-    }
-
-    public URI getNeedUri() {
-        return needUri;
-    }
+public interface DeactivateNeedCommandResultEvent extends MessageCommandResultEvent {
 }

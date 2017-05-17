@@ -22,10 +22,10 @@ import won.bot.framework.eventbot.action.impl.MultipleActions;
 import won.bot.framework.eventbot.action.impl.RandomDelayedAction;
 import won.bot.framework.eventbot.action.impl.debugbot.*;
 import won.bot.framework.eventbot.action.impl.matcher.RegisterMatcherAction;
-import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateNeedAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.*;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
 import won.bot.framework.eventbot.behaviour.ConnectionMessageBehaviour;
+import won.bot.framework.eventbot.behaviour.DeactivateNeedBehaviour;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.impl.debugbot.*;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
@@ -56,7 +56,6 @@ public class DebugBot extends EventBot {
     protected BaseEventListener needHinter;
     protected BaseEventListener autoOpener;
     protected BaseEventListener needCloser;
-    protected BaseEventListener needDeactivator;
     protected BaseEventListener messageFromOtherNeedListener;
     protected BaseEventListener usageMessageSender;
     private int registrationMatcherRetryInterval;
@@ -80,6 +79,14 @@ public class DebugBot extends EventBot {
 
         EventListenerContext ctx = getEventListenerContext();
         EventBus bus = getEventBus();
+
+        //react to a message that was not identified as a debug command
+        BotBehaviour connectionMessageBehaviour = new ConnectionMessageBehaviour(ctx);
+        connectionMessageBehaviour.activate();
+
+        //react to the debug deactivate command (deactivate my need)
+        BotBehaviour deactivateNeedBehaviour = new DeactivateNeedBehaviour(ctx);
+        deactivateNeedBehaviour.activate();
 
         //register with WoN nodes, be notified when new needs are created
         RegisterMatcherAction registerMatcherAction = new RegisterMatcherAction(ctx);
@@ -167,10 +174,6 @@ public class DebugBot extends EventBot {
 
         bus.subscribe(CloseDebugCommandEvent.class, this.needCloser);
 
-        //react to the debug deactivate command (deactivate my need)
-        this.needDeactivator = new ActionOnEventListener(ctx, new DeactivateNeedAction(ctx));
-        bus.subscribe(DeactivateDebugCommandEvent.class, this.needDeactivator);
-
         //react to close event: set connection to not chatty
         bus.subscribe(CloseFromOtherNeedEvent.class,
                 new ActionOnEventListener(ctx,
@@ -181,10 +184,6 @@ public class DebugBot extends EventBot {
         needCreator = new ActionOnEventListener(ctx, new CreateDebugNeedWithFacetsAction(ctx, true, true));
         bus.subscribe(HintDebugCommandEvent.class, needCreator);
         bus.subscribe(ConnectDebugCommandEvent.class, needCreator);
-
-        //react to a message that was not identified as a debug command
-        BotBehaviour connectionMessageBehaviour = new ConnectionMessageBehaviour(ctx);
-        connectionMessageBehaviour.activate();
 
         bus.subscribe(SendNDebugCommandEvent.class,
                 new ActionOnEventListener(ctx, new SendNDebugMessagesAction(ctx,
