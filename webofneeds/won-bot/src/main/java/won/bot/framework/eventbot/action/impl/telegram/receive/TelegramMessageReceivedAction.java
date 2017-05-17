@@ -1,6 +1,7 @@
 package won.bot.framework.eventbot.action.impl.telegram.receive;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
 import org.telegram.telegrambots.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.api.objects.CallbackQuery;
@@ -14,11 +15,14 @@ import won.bot.framework.eventbot.action.impl.telegram.WonTelegramBotHandler;
 import won.bot.framework.eventbot.action.impl.telegram.util.TelegramContentExtractor;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.command.connect.ConnectCommandEvent;
+import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.mail.CloseConnectionEvent;
 import won.bot.framework.eventbot.event.impl.telegram.TelegramMessageReceivedEvent;
 import won.bot.framework.eventbot.listener.EventListener;
+import won.protocol.model.Connection;
+import won.protocol.util.ConnectionModelMapper;
+import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
@@ -81,7 +85,11 @@ public class TelegramMessageReceivedAction extends BaseEventBotAction {
                 wonTelegramBotHandler.editMessageReplyMarkup(editMessageReplyMarkup);
             }else if(message != null && message.isReply() && message.hasText()){
                 WonURI correspondingURI = botContextWrapper.getWonURIForMessageId(message.getReplyToMessage().getMessageId());
-                bus.publish(new SendTextMessageOnConnectionEvent(message.getText(), correspondingURI.getUri()));
+
+                Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(correspondingURI.getUri());
+                Connection con = RdfUtils.findFirst(connectionRDF, x -> new ConnectionModelMapper().fromModel(x));
+                Model messageModel = WonRdfUtils.MessageUtils.textMessage(message.getText());
+                bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
             }
         }
     }

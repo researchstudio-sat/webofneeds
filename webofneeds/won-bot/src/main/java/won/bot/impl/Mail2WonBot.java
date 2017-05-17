@@ -8,12 +8,11 @@ import won.bot.framework.eventbot.action.impl.mail.receive.*;
 import won.bot.framework.eventbot.action.impl.mail.send.*;
 import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateNeedAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.CloseConnectionUriAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.SendMessageOnConnectionAction;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
 import won.bot.framework.eventbot.behaviour.ConnectBevahiour;
+import won.bot.framework.eventbot.behaviour.ConnectionMessageBehaviour;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandEvent;
-import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.*;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherNeedEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.HintFromMatcherEvent;
@@ -79,12 +78,8 @@ public class Mail2WonBot extends EventBot{
                 new MailCommandAction(ctx, mailContentExtractor)
         ));
 
-        bus.subscribe(SendTextMessageOnConnectionEvent.class,
-        new ActionOnEventListener(
-                ctx,
-                "SendTextMessage",
-                new SendMessageOnConnectionAction(ctx)
-        ));
+        BotBehaviour connectionMessageBehaviour = new ConnectionMessageBehaviour(ctx);
+        connectionMessageBehaviour.activate();
 
         bus.subscribe(CloseConnectionEvent.class,
         new ActionOnEventListener(
@@ -103,7 +98,7 @@ public class Mail2WonBot extends EventBot{
         BotBehaviour connectBehaviour = new ConnectBevahiour(ctx);
         connectBehaviour.activate();
 
-      bus.subscribe(SubscribeUnsubscribeEvent.class,
+        bus.subscribe(SubscribeUnsubscribeEvent.class,
                     new ActionOnEventListener(ctx, "SubscribeUnsubscribeEvent", new SubscribeUnsubscribeAction(ctx)));
 
         //WON initiated Events
