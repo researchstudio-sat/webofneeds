@@ -5,17 +5,16 @@ import org.apache.jena.query.Dataset;
 import won.bot.framework.bot.context.MailBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.ActionType;
 import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.command.connect.ConnectCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.CloseConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
-import won.bot.framework.eventbot.event.impl.mail.OpenConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.model.NeedState;
@@ -98,11 +97,14 @@ public class MailCommandAction extends BaseEventBotAction {
                 throw new NullPointerException("No corresponding wonUri found");
             }
 
-            URI needUri;
+            URI needUri= null;
+            URI remoteNeedUri= null;
+
             switch(wonUri.getType()){
                 case CONNECTION:
                     Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(wonUri.getUri());
                     needUri = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, wonUri.getUri());
+                    remoteNeedUri = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, wonUri.getUri());
                     break;
                 case NEED:
                 default:
@@ -137,10 +139,10 @@ public class MailCommandAction extends BaseEventBotAction {
                     bus.publish(new CloseConnectionEvent(wonUri.getUri()));
                     break;
                 case OPEN_CONNECTION:
-                    bus.publish(new OpenConnectionEvent(wonUri.getUri()));
+                    bus.publish(new ConnectCommandEvent(needUri, remoteNeedUri));
                     break;
                 case IMPLICIT_OPEN_CONNECTION:
-                    bus.publish(new OpenConnectionEvent(wonUri.getUri(), mailContentExtractor.getTextMessage(message)));
+                    bus.publish(new ConnectCommandEvent(needUri, remoteNeedUri, mailContentExtractor.getTextMessage(message)));
                     break;
                 case SENDMESSAGE:
                     bus.publish(new SendTextMessageOnConnectionEvent(mailContentExtractor.getTextMessage(message), wonUri.getUri()));

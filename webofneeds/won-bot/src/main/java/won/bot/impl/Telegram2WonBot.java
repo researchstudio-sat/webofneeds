@@ -6,21 +6,18 @@ import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.eventbot.EventListenerContext;
-import won.bot.framework.eventbot.action.impl.mail.send.Connect2MailParserAction;
-import won.bot.framework.eventbot.action.impl.mail.send.Hint2MailParserAction;
-import won.bot.framework.eventbot.action.impl.mail.send.Message2MailAction;
 import won.bot.framework.eventbot.action.impl.telegram.WonTelegramBotHandler;
 import won.bot.framework.eventbot.action.impl.telegram.receive.TelegramMessageReceivedAction;
 import won.bot.framework.eventbot.action.impl.telegram.send.*;
 import won.bot.framework.eventbot.action.impl.telegram.util.TelegramContentExtractor;
 import won.bot.framework.eventbot.action.impl.telegram.util.TelegramMessageGenerator;
 import won.bot.framework.eventbot.action.impl.wonmessage.CloseConnectionUriAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionUriAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.SendMessageOnConnectionAction;
+import won.bot.framework.eventbot.behaviour.BotBehaviour;
+import won.bot.framework.eventbot.behaviour.ConnectBevahiour;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.CloseConnectionEvent;
-import won.bot.framework.eventbot.event.impl.mail.OpenConnectionEvent;
 import won.bot.framework.eventbot.event.impl.telegram.SendHelpEvent;
 import won.bot.framework.eventbot.event.impl.telegram.TelegramCreateNeedEvent;
 import won.bot.framework.eventbot.event.impl.telegram.TelegramMessageReceivedEvent;
@@ -91,12 +88,8 @@ public class Telegram2WonBot extends EventBot {
                         new CloseConnectionUriAction(ctx)
                 ));
 
-            bus.subscribe(OpenConnectionEvent.class,
-                new ActionOnEventListener(
-                        ctx,
-                        "OpenCommandEvent",
-                        new OpenConnectionUriAction(ctx)
-                ));
+            BotBehaviour connectBehaviour = new ConnectBevahiour(ctx);
+            connectBehaviour.activate();
 
             bus.subscribe(SendTextMessageOnConnectionEvent.class,
                 new ActionOnEventListener(

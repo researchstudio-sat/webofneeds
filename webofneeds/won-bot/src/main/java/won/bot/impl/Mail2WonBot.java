@@ -8,8 +8,9 @@ import won.bot.framework.eventbot.action.impl.mail.receive.*;
 import won.bot.framework.eventbot.action.impl.mail.send.*;
 import won.bot.framework.eventbot.action.impl.needlifecycle.DeactivateNeedAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.CloseConnectionUriAction;
-import won.bot.framework.eventbot.action.impl.wonmessage.OpenConnectionUriAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.SendMessageOnConnectionAction;
+import won.bot.framework.eventbot.behaviour.BotBehaviour;
+import won.bot.framework.eventbot.behaviour.ConnectBevahiour;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
@@ -99,12 +100,8 @@ public class Mail2WonBot extends EventBot{
                 new DeactivateNeedAction(ctx)
         ));
 
-        bus.subscribe(OpenConnectionEvent.class,
-        new ActionOnEventListener(
-                ctx,
-                "OpenCommandEvent",
-                new OpenConnectionUriAction(ctx)
-        ));
+        BotBehaviour connectBehaviour = new ConnectBevahiour(ctx);
+        connectBehaviour.activate();
 
       bus.subscribe(SubscribeUnsubscribeEvent.class,
                     new ActionOnEventListener(ctx, "SubscribeUnsubscribeEvent", new SubscribeUnsubscribeAction(ctx)));

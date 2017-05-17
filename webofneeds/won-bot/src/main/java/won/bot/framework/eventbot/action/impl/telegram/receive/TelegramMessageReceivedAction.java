@@ -1,5 +1,6 @@
 package won.bot.framework.eventbot.action.impl.telegram.receive;
 
+import org.apache.jena.query.Dataset;
 import org.telegram.telegrambots.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.api.objects.CallbackQuery;
@@ -8,17 +9,19 @@ import org.telegram.telegrambots.api.objects.Update;
 import won.bot.framework.bot.context.TelegramBotContextWrapper;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
-import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
 import won.bot.framework.eventbot.action.impl.telegram.WonTelegramBotHandler;
 import won.bot.framework.eventbot.action.impl.telegram.util.TelegramContentExtractor;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.command.SendTextMessageOnConnectionEvent;
+import won.bot.framework.eventbot.event.impl.command.connect.ConnectCommandEvent;
 import won.bot.framework.eventbot.event.impl.mail.CloseConnectionEvent;
-import won.bot.framework.eventbot.event.impl.mail.OpenConnectionEvent;
 import won.bot.framework.eventbot.event.impl.telegram.TelegramMessageReceivedEvent;
 import won.bot.framework.eventbot.listener.EventListener;
+import won.protocol.util.WonRdfUtils;
+
+import java.net.URI;
 
 public class TelegramMessageReceivedAction extends BaseEventBotAction {
     private TelegramContentExtractor telegramContentExtractor;
@@ -60,7 +63,11 @@ public class TelegramMessageReceivedAction extends BaseEventBotAction {
                             bus.publish(new CloseConnectionEvent(correspondingURI.getUri()));
                             answerCallbackQuery.setText("Closed Connection");
                         } else if("1".equals(data)) { //ACCEPT CONNECTION
-                            bus.publish(new OpenConnectionEvent(correspondingURI.getUri()));
+                            Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(correspondingURI.getUri());
+                            URI remoteNeed = WonRdfUtils.ConnectionUtils.getRemoteNeedURIFromConnection(connectionRDF, correspondingURI.getUri());
+                            URI localNeed = WonRdfUtils.ConnectionUtils.getLocalNeedURIFromConnection(connectionRDF, correspondingURI.getUri());
+
+                            bus.publish(new ConnectCommandEvent(localNeed, remoteNeed));
                             answerCallbackQuery.setText("Opened Connection");
                         }
                         break;
