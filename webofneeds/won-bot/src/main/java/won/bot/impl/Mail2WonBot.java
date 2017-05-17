@@ -99,7 +99,11 @@ public class Mail2WonBot extends EventBot{
         connectBehaviour.activate();
 
         bus.subscribe(SubscribeUnsubscribeEvent.class,
-                    new ActionOnEventListener(ctx, "SubscribeUnsubscribeEvent", new SubscribeUnsubscribeAction(ctx)));
+        new ActionOnEventListener(
+                ctx,
+                "SubscribeUnsubscribeEvent",
+                new SubscribeUnsubscribeAction(ctx)
+        ));
 
         //WON initiated Events
         bus.subscribe(HintFromMatcherEvent.class,
