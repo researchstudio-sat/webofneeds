@@ -11,12 +11,11 @@ import won.bot.framework.eventbot.action.impl.telegram.receive.TelegramMessageRe
 import won.bot.framework.eventbot.action.impl.telegram.send.*;
 import won.bot.framework.eventbot.action.impl.telegram.util.TelegramContentExtractor;
 import won.bot.framework.eventbot.action.impl.telegram.util.TelegramMessageGenerator;
-import won.bot.framework.eventbot.action.impl.wonmessage.CloseConnectionUriAction;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
+import won.bot.framework.eventbot.behaviour.CloseBevahiour;
 import won.bot.framework.eventbot.behaviour.ConnectBevahiour;
 import won.bot.framework.eventbot.behaviour.ConnectionMessageBehaviour;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.impl.mail.CloseConnectionEvent;
 import won.bot.framework.eventbot.event.impl.telegram.SendHelpEvent;
 import won.bot.framework.eventbot.event.impl.telegram.TelegramCreateNeedEvent;
 import won.bot.framework.eventbot.event.impl.telegram.TelegramMessageReceivedEvent;
@@ -80,12 +79,8 @@ public class Telegram2WonBot extends EventBot {
                         new TelegramCreateAction(ctx, wonTelegramBotHandler, telegramContentExtractor)
                 ));
 
-            bus.subscribe(CloseConnectionEvent.class,
-                new ActionOnEventListener(
-                        ctx,
-                        "CloseCommandEvent",
-                        new CloseConnectionUriAction(ctx)
-                ));
+            BotBehaviour closeBehaviour = new CloseBevahiour(ctx);
+            closeBehaviour.activate();
 
             BotBehaviour connectBehaviour = new ConnectBevahiour(ctx);
             connectBehaviour.activate();

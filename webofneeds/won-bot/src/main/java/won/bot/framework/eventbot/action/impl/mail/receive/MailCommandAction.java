@@ -11,10 +11,10 @@ import won.bot.framework.eventbot.action.impl.mail.model.SubscribeStatus;
 import won.bot.framework.eventbot.action.impl.mail.model.WonURI;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.command.close.CloseCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.connect.ConnectCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandEvent;
-import won.bot.framework.eventbot.event.impl.mail.CloseConnectionEvent;
 import won.bot.framework.eventbot.event.impl.mail.MailCommandEvent;
 import won.bot.framework.eventbot.event.impl.mail.SubscribeUnsubscribeEvent;
 import won.bot.framework.eventbot.listener.EventListener;
@@ -139,9 +139,12 @@ public class MailCommandAction extends BaseEventBotAction {
             ActionType actionType = determineAction(getEventListenerContext(), message, wonUri);
             logger.debug("Executing " + actionType + " on uri: " + wonUri.getUri() + " of type " + wonUri.getType());
 
+            Connection con;
+
             switch(actionType) {
                 case CLOSE_CONNECTION:
-                    bus.publish(new CloseConnectionEvent(wonUri.getUri()));
+                    con = RdfUtils.findFirst(connectionRDF, x -> new ConnectionModelMapper().fromModel(x));
+                    bus.publish(new CloseCommandEvent(con));
                     break;
                 case OPEN_CONNECTION:
                     bus.publish(new ConnectCommandEvent(needUri, remoteNeedUri));
@@ -150,7 +153,7 @@ public class MailCommandAction extends BaseEventBotAction {
                     bus.publish(new ConnectCommandEvent(needUri, remoteNeedUri, mailContentExtractor.getTextMessage(message)));
                     break;
                 case SENDMESSAGE:
-                    Connection con = RdfUtils.findFirst(connectionRDF, x -> new ConnectionModelMapper().fromModel(x));
+                    con = RdfUtils.findFirst(connectionRDF, x -> new ConnectionModelMapper().fromModel(x));
                     Model messageModel = WonRdfUtils.MessageUtils.textMessage(mailContentExtractor.getTextMessage(message));
                     bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
                     break;

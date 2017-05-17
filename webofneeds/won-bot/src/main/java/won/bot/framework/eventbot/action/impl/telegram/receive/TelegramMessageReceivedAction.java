@@ -15,9 +15,9 @@ import won.bot.framework.eventbot.action.impl.telegram.WonTelegramBotHandler;
 import won.bot.framework.eventbot.action.impl.telegram.util.TelegramContentExtractor;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.command.close.CloseCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.connect.ConnectCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
-import won.bot.framework.eventbot.event.impl.mail.CloseConnectionEvent;
 import won.bot.framework.eventbot.event.impl.telegram.TelegramMessageReceivedEvent;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.model.Connection;
@@ -64,7 +64,10 @@ public class TelegramMessageReceivedAction extends BaseEventBotAction {
                         break;
                     case CONNECTION:
                         if("0".equals(data)) { //CLOSE CONNECTION
-                            bus.publish(new CloseConnectionEvent(correspondingURI.getUri()));
+                            Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(correspondingURI.getUri());
+                            Connection con = RdfUtils.findFirst(connectionRDF, x -> new ConnectionModelMapper().fromModel(x));
+                            bus.publish(new CloseCommandEvent(con));
+
                             answerCallbackQuery.setText("Closed Connection");
                         } else if("1".equals(data)) { //ACCEPT CONNECTION
                             Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(correspondingURI.getUri());
