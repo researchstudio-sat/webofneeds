@@ -61,25 +61,25 @@ function genComponentConf() {
 
             <won-feed-item-line
                 class="fmil__item clickable"
-                ng-repeat="cnctUri in self.connectionUris track by $index"
-                connection-uri="cnctUri"
+                ng-repeat="cnct in self.connections track by $index"
+                connection-uri="cnct.get('uri')"
                 ng-show="$index < self.maxNrOfItemsShown"
                 ui-sref="post({
                     postUri: self.ownNeed.get('@id'),
-                    connectionUri: cnctUri,
-                    connectionType: cnct.getIn(['connection', 'hasConnectionState'])
+                    connectionUri: cnct.get('uri'),
+                    connectionType: cnct.get('hasConnectionState')
                 })">
             </won-feed-item-line>
 
             <div class="fmil__more clickable"
-                 ng-show="self.connectionUris.size === self.maxNrOfItemsShown + 1"
+                 ng-show="self.nrOfConnections === self.maxNrOfItemsShown + 1"
                  ng-click="self.showMore()">
                     1 more activity
             </div>
             <div class="fmil__more clickable"
-                 ng-show="self.connectionUris.size > self.maxNrOfItemsShown + 1"
+                 ng-show="self.nrOfConnections > self.maxNrOfItemsShown + 1"
                  ng-click="self.showMore()">
-                    {{self.connectionUris.size - self.maxNrOfItemsShown}} more activities
+                    {{self.nrOfConnections - self.maxNrOfItemsShown}} more activities
             </div>
         </div>
 
@@ -129,17 +129,19 @@ function genComponentConf() {
                 const ownNeedContent = ownNeed && seeksOrIs(ownNeed);
 
                 const cnctUriCollection = ownNeed.getIn(['won:hasConnections', 'rdfs:member']);
-                const connectionUris = !cnctUriCollection?
-                    [] : // if there's no cnctUriCollection, there's no connection uris
+                const connections = !cnctUriCollection?
+                    [] : // if there's no cnctUriCollection, there's no connections
                     cnctUriCollection
-                        .filter(c => c)
-                        .map(c => c.get('@id'))
+                        .filter(c => c) // filter out `undefined`s
+                        .map(c => state.getIn(['connections', c.get('@id')]))
                         .toArray();
+
 
                 return {
                     ownNeed,
                     ownNeedContent,
-                    connectionUris,
+                    connections,
+                    nrOfConnections: connections? connections.size : 0,
                     createdOn: ownNeed && relativeTime(lastUpdated, ownNeed.get('dct:created')),
                     unreadCounts: unreadCountsByNeedAndType && unreadCountsByNeedAndType.get(self.needUri),
                 }
