@@ -13,6 +13,7 @@ import {
     checkHttpStatus,
     contains,
     clone,
+    jsonld2simpleFormat,
 } from '../utils';
 
 import {
@@ -199,8 +200,8 @@ export function successfulCreate(event) {
 
 export function openMessageReceived(events) {
     return dispatch => {
-        const eventOnRemote = events['msg:FromOwner'];
-        const eventOnOwn = events['msg:FromExternal'];
+        const eventOnRemote = events['msg:FromOwner']; // from the other person's owner application / node
+        const eventOnOwn = events['msg:FromExternal']; // generated on our node
         eventOnRemote.eventType = won.messageType2EventType[eventOnRemote.hasMessageType];
         won.invalidateCacheForNewMessage(eventOnOwn.hasReceiver || eventOnRemote.hasReceiver)
         .then(() =>
@@ -221,6 +222,10 @@ export function connectMessageReceived(events) {
         const eventOnRemote = events['msg:FromOwner'];
         const eventOnOwn = events['msg:FromExternal'];
         eventOnRemote.eventType = won.messageType2EventType[eventOnRemote.hasMessageType];
+
+        console.log('Conversion fromOwner #deletme: ', jsonld2simpleFormat(events['msg:FromOwner']['framedMessage']));
+        console.log('Conversion fromExternal #deletme: ', jsonld2simpleFormat(events['msg:FromExternal']['framedMessage']));
+
         won.invalidateCacheForNewConnection(eventOnOwn.hasReceiver, eventOnRemote.hasReceiverNeed)
         .then(() => getConnectionData(eventOnRemote, eventOnOwn))
         .then(data =>
