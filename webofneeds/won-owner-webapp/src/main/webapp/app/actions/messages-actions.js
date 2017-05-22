@@ -256,7 +256,6 @@ export function connectMessageReceived(events) {
                     updatedConnection: ownConnectionUri,
                     connection: connection.set('hasConnectionState', won.WON.RequestReceived),
                     ownNeedUri: ownNeedUri,
-                    ownNeed: state.getIn(['needs', 'ownNeeds', ownNeedUri]),
                     remoteNeed: theirNeed,
                     receivedEvent: eventOnOwn.uri, // the more relevant event. used for unread-counter.
                     events: [
