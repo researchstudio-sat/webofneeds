@@ -718,3 +718,68 @@ export function arrEq(xs, ys) {
         );
 
 }
+
+/**
+ * Converts from proper json-ld to the format
+ * that is returned by `rdfstore.node`. Note that
+ * the process isn't reversible, as rdf-prefixes
+ * are stripped as part of it.
+ * @param jsonldObj
+ * @returns {{}}
+ */
+export function jsonld2simpleFormat(jsonldObj) {
+    if (!jsonldObj) {
+        return;
+    } else if (is('String', jsonldObj)) {
+        return jsonldObj;
+    } else if (is('Array', jsonldObj)) {
+        return jsonldObj.map(x => jsonld2simpleFormat(x));
+    } else if (is('Object', jsonldObj)) {
+
+        if (Object.keys(jsonldObj).length === 1 && jsonldObj['@id']) {
+            // current node is an URL. return it as string.
+            return jsonldObj['@id'];
+        } else if (Object.keys(jsonldObj).length === 2 && jsonldObj['@value']) {
+            // encountered value with datatype. we're interested in the @value
+            return jsonldObj['@value'];
+        } else {
+            // full fledged jsonld-node. iterate over the keys and recurse into the values.
+
+            var newObj = {};
+            for (var k of Object.keys(jsonldObj)) {
+                var newKey;
+                switch (k) {
+                    case '@context':
+                        // drop it. we can't use the json-ld context in
+                        // the simplified object-format anyway, as there's no prefixes
+                        continue;
+
+                    case '@id':
+                        newKey = 'uri'
+                        //newObj['uri'] = jsonldObj['@id'];
+                        break;
+
+                    case '@type':
+                        newKey = 'type'
+                        // newObj['type'] = jsonldObj['@type'];
+                        break;
+
+                    default:
+                        var split = k.split(':')
+                        if (split.length !== 2) {
+                            throw new Exception(
+                                'encountered unexpected predicate when parsing json-ld. it doesn\'t follow the "<prefix>:<postfix> structure: "'
+                                + k
+                            );
+                        }
+                        newKey = split[1];
+                        break;
+                }
+                newObj[newKey] = jsonld2simpleFormat(jsonldObj[k]);
+            }
+            return newObj;
+        }
+    } else {
+        throw new Exception('Encountered unexpected value while parsing json-ld: ', jsonldObj);
+    }
+}
