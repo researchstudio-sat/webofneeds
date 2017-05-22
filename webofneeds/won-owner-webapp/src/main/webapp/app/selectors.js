@@ -272,14 +272,16 @@ export const selectEventsOfOpenConnection = createSelector(
 export const selectConnectMessageOfOpenConnection = createSelector(
     selectEventsOfOpenConnection,
     events => events && events
-        .filter(event =>
-            event && (
-                event.getIn(['hasCorrespondingRemoteMessage', 'hasMessageType']) === won.WONMSG.connectMessage ||
-                event.get('hasMessageType') === won.WONMSG.connectMessage
-            )
-        )
+        .filter(event => {
+            if(!event) return;
+            const messageType =
+                event.getIn(['hasCorrespondingRemoteMessage', 'hasMessageType']) ||
+                event.get('hasMessageType') === won.WONMSG.connectMessage;
+            return messageType === won.WONMSG.connectMessage ||
+                messageType === won.WONMSG.connectMessageCompacted;
+        })
         .first()
-)
+);
 
 export const selectRequestTimestampOfOpenConnection = createSelector(
     selectConnectMessageOfOpenConnection,
