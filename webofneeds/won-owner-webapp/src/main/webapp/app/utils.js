@@ -727,26 +727,43 @@ export function arrEq(xs, ys) {
  * @param jsonldObj
  * @returns {{}}
  */
-export function jsonld2simpleFormat(jsonldObj) {
+export function jsonld2simpleFormat(jsonldObj, context = undefined) {
     if (!jsonldObj) {
         return;
-    } else if (is('String', jsonldObj)) {
+    }
+    if(!context && jsonldObj['@context']) {
+        context = jsonldObj['@context']; // needed for expanding values
+    }
+    if (is('String', jsonldObj)) {
+
+        // try to expand any existing prefixes
+        if(context) {
+            for (let prefix of Object.keys(context)) {
+                if (jsonldObj.startsWith(prefix + ':')) {
+                    // found a compacted prefix that we can expand using the context
+                    return jsonldObj.replace(prefix + ':', context[prefix])
+                }
+            }
+        }
+
+        // no prefix found -- it's either a plain value or the prefix isn't in the context
         return jsonldObj;
+
     } else if (is('Array', jsonldObj)) {
-        return jsonldObj.map(x => jsonld2simpleFormat(x));
+        return jsonldObj.map(x => jsonld2simpleFormat(x, context));
     } else if (is('Object', jsonldObj)) {
 
         if (Object.keys(jsonldObj).length === 1 && jsonldObj['@id']) {
             // current node is an URL. return it as string.
-            return jsonldObj['@id'];
+            return jsonld2simpleFormat(jsonldObj['@id'], context);
         } else if (Object.keys(jsonldObj).length === 2 && jsonldObj['@value']) {
             // encountered value with datatype. we're interested in the @value
-            return jsonldObj['@value'];
+            return jsonld2simpleFormat(jsonldObj['@value'], context);
         } else {
             // full fledged jsonld-node. iterate over the keys and recurse into the values.
 
             var newObj = {};
-            for (var k of Object.keys(jsonldObj)) {
+            for (let k of Object.keys(jsonldObj)) {
                 var newKey;
                 switch (k) {
                     case '@context':
@@ -775,7 +792,7 @@ export function jsonld2simpleFormat(jsonldObj) {
                         newKey = split[1];
                         break;
                 }
-                newObj[newKey] = jsonld2simpleFormat(jsonldObj[k]);
+                newObj[newKey] = jsonld2simpleFormat(jsonldObj[k], context);
             }
             return newObj;
         }
