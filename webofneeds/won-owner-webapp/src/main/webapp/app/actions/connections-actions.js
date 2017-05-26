@@ -181,6 +181,10 @@ export function connectionsClose(connectionUri) {
         });
         deferred.promise.then((action)=> {
             dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
+            dispatch({
+                type: actionTypes.connections.close,
+                payload: { connectionUri }
+            });
         })
     }
 }

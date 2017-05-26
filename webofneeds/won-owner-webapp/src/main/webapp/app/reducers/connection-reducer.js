@@ -53,6 +53,10 @@ export default function(connections = initialState, action = {}) {
             return storeEventUris(connections, connectionUri, [action.payload.uri])
                 .setIn([connectionUri, 'hasConnectionState'], won.WON.Closed);
 
+        case actionTypes.connections.close:
+            return connections.setIn([action.payload.connectionUri, 'hasConnectionState'], won.WON.Closed);
+
+
         case actionTypes.connections.typedAtChatMessage:
             var connectionUri = action.payload.connectionUri;
             var chatMessage = action.payload.message;
