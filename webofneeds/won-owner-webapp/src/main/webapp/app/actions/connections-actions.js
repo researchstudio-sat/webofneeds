@@ -137,6 +137,15 @@ export function connectionsConnect(connectionUri,message) {
         });
         deferred.promise.then((action)=> {
             dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
+            dispatch({
+                type: actionTypes.connections.connect,
+                payload: {
+                    connectionUri,
+                    message,
+                    eventUri: action.eventUri,
+                    event: action.message,
+                }
+            });
         })
     }
 }
