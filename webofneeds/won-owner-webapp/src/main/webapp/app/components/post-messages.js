@@ -164,25 +164,33 @@ function genComponentConf() {
 
             this.snapToBottom();
 
+            this.$scope.$watchGroup(
+                ['self.connectionUri', 'self.connection'],
+                () => this.ensureMessagesAreLoaded()
+            );
+
             this.$scope.$watch(
                 () => this.chatMessages && this.chatMessages.length, // trigger if there's messages added (or removed)
-                () => delay(0).then(() => {
-
+                () => delay(0).then(() =>
                     // scroll to bottom directly after rendering, if snapped
-                    this.updateScrollposition();
-
-                    // make sure latest messages are loaded
-                    if (
-                        this.connectionUri &&
-                        this.connection &&
-                        !this.connection.get('loadingEvents') &&
-                        !this.eventsLoaded
-                    ) {
-                        this.connections__showLatestMessages(this.connectionUri, 4);
-                    }
-                })
+                    this.updateScrollposition()
+                )
             )
 
+        }
+
+        ensureMessagesAreLoaded() {
+            delay(0).then(() => {
+                // make sure latest messages are loaded
+                if (
+                    this.connectionUri &&
+                    this.connection &&
+                    !this.connection.get('loadingEvents') &&
+                    !this.eventsLoaded
+                ) {
+                    this.connections__showLatestMessages(this.connectionUri, 4);
+                }
+            })
         }
 
         encodeParam(param) {
