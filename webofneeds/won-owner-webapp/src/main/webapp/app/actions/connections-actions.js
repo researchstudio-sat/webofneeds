@@ -158,7 +158,7 @@ export function connectionsConnect(connectionUri,message) {
                         connectionUri,
                         message,
                         eventUri: action.eventUri,
-                        event: event,
+                        optimisticEvent: event,
                     }
                 });
             });
