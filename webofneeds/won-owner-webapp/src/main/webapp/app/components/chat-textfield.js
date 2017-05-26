@@ -89,13 +89,12 @@ function genComponentConf() {
             const value = this.value();
             const valid = this.valid();
             if(value && valid) {
+                this.medium.clear(); // clear text
+                this.mediumMount().focus(); //refocus so people can keep writing
+
                 const payload = { value, valid };
                 this.onSubmit(payload);
                 dispatchEvent(this.$element[0], 'submit', payload);
-
-                this.medium.clear(); // clear text
-
-                this.mediumMount().focus(); //refocus so people can keep writing
             }
         }
         charactersLeft() {
