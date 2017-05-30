@@ -126,10 +126,11 @@ export default function(state = initialState, action = {}) {
         case actionTypes.messages.connectMessageReceived:
         case actionTypes.messages.openMessageReceived:
         case actionTypes.messages.hintMessageReceived:
-            //TODO events should be an object too
-            var event = action.payload.events.filter(e => e.uri === action.payload.receivedEvent)[0];
-            event.unreadUri = action.payload.updatedConnection; //TODO never read afaict
 
+            //TODO flatten "hasCorrespondingRemoteMessage" to an uri. we want to store these in a
+            // normalized. ensure this in the event-reducer(!)
+
+            var event = action.payload.events.filter(e => e.uri === action.payload.receivedEvent)[0];
             var updatedState = state.update('unreadEventUris', unread => unread.add(event.uri));
             return storeConnectionRelatedData(updatedState, action.payload);
 
