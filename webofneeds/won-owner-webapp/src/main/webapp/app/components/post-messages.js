@@ -34,22 +34,14 @@ const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
 function genComponentConf() {
     let template = `
-        <div>
-            <div class="pm__header">
-                <a ui-sref="{connectionUri : null}">
-                    <img class="pm__header__icon clickable"
-                         src="generated/icon-sprite.svg#ico36_close"/>
-                </a>
-                <div class="pm__header__title">
-                    {{ self.theirNeedContent.get('dc:title') }}
-                </div>
-                <!--div class="pm__header__options">
-                    Options
-                </div>
-                <img
-                    class="pm__header__options__icon clickable"
-                    src="generated/icon-sprite.svg#ico_settings"
-                    ng-click="self.openConversationOption()"/-->
+        <div class="pm__header">
+            <a ui-sref="{connectionUri : null}">
+                <img class="pm__header__icon clickable"
+                     src="generated/icon-sprite.svg#ico36_close"/>
+            </a>
+            <div class="pm__header__title"
+              ui-sref="post({ postUri: self.theirNeed.get('@id'), connectionUri: null, connectionType: null})">
+                {{ self.theirNeedContent.get('dc:title') }}
             </div>
         </div>
         <div class="pm__content">
@@ -70,6 +62,7 @@ function genComponentConf() {
                         title="self.theirNeedContent.get('dc:title')"
                         src="self.theirNeedContent.get('TODOtitleImgSrc')"
                         uri="self.theirNeed.get('@id')"
+                        ui-sref="post({postUri: self.theirNeed.get('@id'), connectionUri: null, connectionType: null})"
                         ng-show="message.get('hasSenderNeed') != self.ownNeed.get('@id')">
                     </won-square-image>
                     <div class="pm__content__message__content">

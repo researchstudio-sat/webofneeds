@@ -78,7 +78,11 @@ function genComponentConf() {
                 <p ng-show="self.debugmode">
                     <a class="debuglink" target="_blank" href="{{self.post.get('@id')}}">[DATA]</a>
                 </p>
-                <div class="post-info__mapmount" id="post-info__mapmount" in-view="$inview && self.mapInView($inviewInfo)"></div>
+                <div class="post-info__mapmount"
+                     id="post-info__mapmount"
+                     in-view="$inview && self.mapInView($inviewInfo)"
+                     ng-show="self.location">
+                 </div>
             </div>
         </div>
     `;
@@ -105,7 +109,7 @@ function genComponentConf() {
                 (location, previousLocationValue) => {
                     console.log('in location watch: ', location, previousLocationValue);
                     if(location && !this._mapHasBeenAutoCentered) {
-                        this.updateMap(location)
+                        this.updateMap(location);
                         this._mapHasBeenAutoCentered = true;
                     }
                 }
