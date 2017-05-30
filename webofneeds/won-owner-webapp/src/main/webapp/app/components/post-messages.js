@@ -128,23 +128,9 @@ function genComponentConf() {
                 const connection = selectOpenConnection(state);
                 const eventUris = connection && connection.get('hasEvents');
                 const eventsLoaded = eventUris && eventUris.size > 0;
-
-                //TODO seems like rather bad practice to have sideffects here
-                delay(0).then(() => {
-                    // scroll to bottom directly after rendering, if snapped
-                    self.updateScrollposition();
-
-                    // amake sure latest messages are loaded
-                    if (connection && !connection.get('loadingEvents') && !eventsLoaded) {
-                        self.connections__showLatestMessages(connectionUri, 4);
-                    }
-                });
-
-
                 const connectionData = selectAllByConnections(state).get(connectionUri);
                 const ownNeed = connectionData && connectionData.get('ownNeed');
                 const theirNeed = connectionData && connectionData.get('remoteNeed');
-
                 const chatMessages = selectSortedChatMessages(state);
                 return {
                     connectionData,
@@ -170,6 +156,34 @@ function genComponentConf() {
             this.$scope.$on('$destroy', disconnect);
 
             this.snapToBottom();
+
+            this.$scope.$watchGroup(
+                ['self.connectionUri', 'self.connection'],
+                () => this.ensureMessagesAreLoaded()
+            );
+
+            this.$scope.$watch(
+                () => this.chatMessages && this.chatMessages.length, // trigger if there's messages added (or removed)
+                () => delay(0).then(() =>
+                    // scroll to bottom directly after rendering, if snapped
+                    this.updateScrollposition()
+                )
+            )
+
+        }
+
+        ensureMessagesAreLoaded() {
+            delay(0).then(() => {
+                // make sure latest messages are loaded
+                if (
+                    this.connectionUri &&
+                    this.connection &&
+                    !this.connection.get('loadingEvents') &&
+                    !this.eventsLoaded
+                ) {
+                    this.connections__showLatestMessages(this.connectionUri, 4);
+                }
+            })
         }
 
         encodeParam(param) {
