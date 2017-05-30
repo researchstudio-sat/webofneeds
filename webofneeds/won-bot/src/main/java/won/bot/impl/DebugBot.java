@@ -24,9 +24,11 @@ import won.bot.framework.eventbot.action.impl.debugbot.*;
 import won.bot.framework.eventbot.action.impl.matcher.RegisterMatcherAction;
 import won.bot.framework.eventbot.action.impl.wonmessage.*;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
+import won.bot.framework.eventbot.behaviour.CloseBevahiour;
 import won.bot.framework.eventbot.behaviour.ConnectionMessageBehaviour;
 import won.bot.framework.eventbot.behaviour.DeactivateNeedBehaviour;
 import won.bot.framework.eventbot.bus.EventBus;
+import won.bot.framework.eventbot.event.impl.command.close.CloseCommandSuccessEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.*;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
 import won.bot.framework.eventbot.event.impl.matcher.MatcherRegisterFailedEvent;
@@ -87,6 +89,10 @@ public class DebugBot extends EventBot {
         //react to the debug deactivate command (deactivate my need)
         BotBehaviour deactivateNeedBehaviour = new DeactivateNeedBehaviour(ctx);
         deactivateNeedBehaviour.activate();
+
+        //react to the close behaviour
+        BotBehaviour closeBehaviour = new CloseBevahiour(ctx);
+        closeBehaviour.activate();
 
         //register with WoN nodes, be notified when new needs are created
         RegisterMatcherAction registerMatcherAction = new RegisterMatcherAction(ctx);
@@ -164,15 +170,10 @@ public class DebugBot extends EventBot {
         bus.subscribe(UsageDebugCommandEvent.class, usageMessageSender);
 
 
-        //react to the debug close command (close the connection)
-        this.needCloser = new ActionOnEventListener(ctx,
-                new MultipleActions(ctx,
-                        new CloseConnectionAction(ctx, "As per your" +
-                                " request, this " +
-                                "connection is being closed."),
-                        new PublishSetChattinessEventAction(ctx, false)));
-
-        bus.subscribe(CloseDebugCommandEvent.class, this.needCloser);
+        bus.subscribe(CloseCommandSuccessEvent.class,
+                new ActionOnEventListener(ctx,
+                "chattiness off",
+                    new PublishSetChattinessEventAction(ctx, false)));
 
         //react to close event: set connection to not chatty
         bus.subscribe(CloseFromOtherNeedEvent.class,

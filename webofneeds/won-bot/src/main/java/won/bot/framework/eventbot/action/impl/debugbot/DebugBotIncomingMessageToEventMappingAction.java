@@ -25,6 +25,7 @@ import won.bot.framework.eventbot.event.BaseNeedAndConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.MessageEvent;
+import won.bot.framework.eventbot.event.impl.command.close.CloseCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.connectionmessage.ConnectionMessageCommandEvent;
 import won.bot.framework.eventbot.event.impl.command.deactivate.DeactivateNeedCommandEvent;
 import won.bot.framework.eventbot.event.impl.debugbot.*;
@@ -117,7 +118,7 @@ public class DebugBotIncomingMessageToEventMappingAction extends BaseEventBotAct
                     Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I'll close this connection");
 
                     bus.publish(new ConnectionMessageCommandEvent(con, messageModel));
-                    bus.publish(new CloseDebugCommandEvent(con));
+                    bus.publish(new CloseCommandEvent(con));
                 } else if (PATTERN_DEACTIVATE.matcher(message).matches()) {
                     Model messageModel = WonRdfUtils.MessageUtils.textMessage("Ok, I'll deactivate this need. This will close the connection we are currently talking on.");
 
