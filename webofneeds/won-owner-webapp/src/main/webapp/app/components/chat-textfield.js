@@ -22,7 +22,7 @@ function genComponentConf() {
         <div class="wdt__left">
             <div class="wdt__text"
                     ng-class="{ 'valid' : self.valid(), 'invalid' : !self.valid() }">
-                <div class="medium-mount"></div>
+                <div class="medium-mount" tabindex="0"></div>
             </div>
             <span class="wdt__charcount" ng-show="self.maxChars">
                 {{ self.charactersLeft() }} characters left
@@ -89,11 +89,12 @@ function genComponentConf() {
             const value = this.value();
             const valid = this.valid();
             if(value && valid) {
+                this.medium.clear(); // clear text
+                this.mediumMount().focus(); //refocus so people can keep writing
+
                 const payload = { value, valid };
                 this.onSubmit(payload);
                 dispatchEvent(this.$element[0], 'submit', payload);
-
-                this.medium.clear(); // clear text
             }
         }
         charactersLeft() {
