@@ -31,6 +31,7 @@ If you want to **set up your own deployment of Web of Needs** components, here y
 * [Linked Data interface](webofneeds/won-node-webapp/README.md)
 * [Matching Service Architecture](webofneeds/won-matcher-service/README.md)
 * [Bot Framework](webofneeds/won-bot/README.md) for interacting with WoN nodes programmatically
+* [Ontologies](/documentation/ontologies.md) defined for this project
 
 ### Papers and further Information
 
