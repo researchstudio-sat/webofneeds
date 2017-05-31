@@ -64,7 +64,7 @@ function genComponentConf() {
                 const connectionUris = !connections?
                     [] :
                     connections
-                        .filter(c => c.get('hasConnectionState') === this.connectionType)
+                        .filter(c => c && c.get('hasConnectionState') === this.connectionType)
                         .map(c => c.get('uri'))
                         .toJS();
 

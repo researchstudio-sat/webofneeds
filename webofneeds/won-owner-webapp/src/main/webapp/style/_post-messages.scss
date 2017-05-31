@@ -49,10 +49,13 @@
       font-size: $normalFontSize;
       text-align: left;
       width: 100%;
+      padding: 0.5rem 0;
 
       &__title{
         flex-grow:2;
         padding-top:0.5em;
+
+        cursor: pointer;
       }
       &__icon {
         flex-grow:1;
@@ -93,7 +96,7 @@
 
     .pm__content {
       padding: 1rem;
-      margin: 1rem 0;
+      margin-bottom: 1rem;
       background: white;
       border: $thinGrayBorder;
       overflow: auto;
@@ -103,6 +106,10 @@
         margin: 0.5rem 0;
         @include square-image($postIconSize, 0, 0.5rem, 0, 0);
         display: flex;
+
+        won-square-image {
+          cursor: pointer; /* the image links to their post info */
+        }
 
         &.left{
           justify-content: flex-start;
