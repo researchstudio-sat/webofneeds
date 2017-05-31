@@ -8,6 +8,7 @@
 @prefix local: <https://node.matchat.org/won/resource/> .
 @prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
 @prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix s:     <http://schema.org/> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix won:   <http://purl.org/webofneeds/model#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .
@@ -23,32 +24,32 @@
                             won:hasTag              "tennis" , "lesson", "offer" ;
                             dc:description  "tennis lessons for kids and adults of all levels";
                             won:hasLocation  [ a                   <s:Place> ;
-                                                won:hasBoundingBox  [ won:hasNorthWestCorner  [ a              <s:GeoCoordinates> ;
-                                                                                                <s:latitude>   "48.213814" ;
-                                                                                                <s:longitude>  "16.340870"
+                                                won:hasBoundingBox  [ won:hasNorthWestCorner  [ a              s:GeoCoordinates ;
+                                                                                                s:latitude   "48.213814" ;
+                                                                                                s:longitude  "16.340870"
                                                                                               ] ;
-                                                                      won:hasSouthEastCorner  [ a              <s:GeoCoordinates> ;
-                                                                                                <s:latitude>   "48.236309" ;
-                                                                                                <s:longitude>  "16.370149"
+                                                                      won:hasSouthEastCorner  [ a              s:GeoCoordinates ;
+                                                                                                s:latitude   "48.236309" ;
+                                                                                                s:longitude  "16.370149"
                                                                                               ]
                                                                     ] ;
-                                                <s:geo>             [ a              <s:GeoCoordinates> ;
-                                                                      <s:latitude>   "48.225073" ;
-                                                                      <s:longitude>  "16.358398"
+                                                s:geo               [ a              s:GeoCoordinates ;
+                                                                      s:latitude   "48.225073" ;
+                                                                      s:longitude  "16.358398"
                                                                     ] ;
-                                                <s:name>            "Alsergrund, Wien, 1090, Österreich"
+                                                s:name             "Alsergrund, Wien, 1090, Österreich"
                                               ]
                           ] ;
             won:seeks     [ a                       won:NeedContent ;
                             dc:title                "tennis students";
                             won:hasTag              "tennis" , "lesson" ;
                             dc:description  "people learning tennis";
-                            won:hasLocation  [ a                   <s:Place> ;
-                                                                    <s:geo>             [ a              <s:GeoCoordinates> ;
-                                                                                          <s:latitude>   "49.2" ;
-                                                                                          <s:longitude>  "17.3"
+                            won:hasLocation  [ a                   s:Place ;
+                                                                    s:geo             [ a              s:GeoCoordinates ;
+                                                                                          s:latitude   "49.2" ;
+                                                                                          s:longitude  "17.3"
                                                                                         ] ;
-                                                                    <s:name>            "Alsergrund, Wien, 1090, Österreich"
+                                                                    s:name            "Alsergrund, Wien, 1090, Österreich"
                                                                           ]
                           ] ;
             won:hasFacet          won:OwnerFacet ;
