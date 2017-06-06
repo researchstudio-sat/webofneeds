@@ -8,11 +8,11 @@
  * default export`ing the won-object)
  */
 
-import './service/won';
+import won from './service/won';
 import './service/need-builder';
 import './service/message-builder';
 import './service/linkeddata-service-won';
-export default window.won;
+export default won;
 
 
 

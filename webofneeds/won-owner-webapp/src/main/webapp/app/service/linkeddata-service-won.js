@@ -31,10 +31,8 @@ import * as q from 'q';
 import '../../scripts/rdfstore-js/rdf_store';
 const rdfstore = window.rdfstore;
 import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom jsonld
-
+import won from './won';
 (function(){
-    if(!won) won = {};
-
 
     /**
      * paging parameters as found
@@ -415,7 +413,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
      */
     won.getUnreleasedLocks = function(){
         var unreleasedLocks = [];
-        for (key in privateData.readUpdateLocksPerUri){
+        for (let key in privateData.readUpdateLocksPerUri){
             var lock = privateData.readUpdateLocksPerUri[key];
             if (lock.isLocked()){
                 unreleasedLocks.push(lock);
@@ -1484,7 +1482,7 @@ import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom 
                 return won.getAllConnectioneventUris(connectionUri, requesterWebId).then(
                     function(uris){
                         var eventPromises = [];
-                        for (key in uris){
+                        for (let key in uris){
                             eventPromises.push(won.ensureLoaded(uris[key]));
                         }
                         return q.all(eventPromises);

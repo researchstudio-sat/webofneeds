@@ -27,11 +27,6 @@ angular.module('won.owner').factory('utilService', function ($http, $q) {
     }
     utilService.getKeySize = function(obj) {
         return Object.keys(obj).length;
-        /*var size = 0, key;
-        for (key in obj) {
-            if (obj.hasOwnProperty(key)) size++;
-        }
-        return size;*/
     };
     utilService.getRandomPosInt = function() {
         return utilService.getRandomInt(1,9223372036854775807);
