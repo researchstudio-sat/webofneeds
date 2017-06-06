@@ -13,6 +13,8 @@ import {
     checkHttpStatus,
     contains,
     clone,
+    jsonld2simpleFormat,
+    getIn,
 } from '../utils';
 
 import {
@@ -199,8 +201,8 @@ export function successfulCreate(event) {
 
 export function openMessageReceived(events) {
     return dispatch => {
-        const eventOnRemote = events['msg:FromOwner'];
-        const eventOnOwn = events['msg:FromExternal'];
+        const eventOnRemote = events['msg:FromOwner']; // from the other person's owner application / node
+        const eventOnOwn = events['msg:FromExternal']; // generated on our node
         eventOnRemote.eventType = won.messageType2EventType[eventOnRemote.hasMessageType];
         won.invalidateCacheForNewMessage(eventOnOwn.hasReceiver || eventOnRemote.hasReceiver)
         .then(() =>
@@ -216,21 +218,55 @@ export function openMessageReceived(events) {
 }
 
 export function connectMessageReceived(events) {
-    //return reloadConnectionAndDispatch(events, actionTypes.messages.connectMessageReceived);
-    return dispatch => {
-        const eventOnRemote = events['msg:FromOwner'];
-        const eventOnOwn = events['msg:FromExternal'];
+    return (dispatch, getState) => {
+
+        // from the other person's owner application / node
+        const eventOnRemote = jsonld2simpleFormat(getIn(events, ['msg:FromOwner', 'framedMessage']));
+
+        // generated on our node
+        const eventOnOwn = jsonld2simpleFormat(getIn(events, ['msg:FromExternal', 'framedMessage']));
+
         eventOnRemote.eventType = won.messageType2EventType[eventOnRemote.hasMessageType];
-        won.invalidateCacheForNewConnection(eventOnOwn.hasReceiver, eventOnRemote.hasReceiverNeed)
-        .then(() => getConnectionData(eventOnRemote, eventOnOwn))
-        .then(data =>
+
+        const ownConnectionUri = eventOnOwn.hasReceiver || eventOnRemote.hasReceiver;
+        const ownNeedUri = eventOnOwn.hasReceiverNeed || eventOnRemote.hasReceiverNeed;
+        const theirNeedUri = eventOnOwn.hasSenderNeed || eventOnRemote.hasSenderNeed;
+
+        const state = getState();
+        let connectionP;
+        if(state.getIn(['connections', ownConnectionUri])) {
+            // already in state. invalidate the version in the rdf-store.
+            connectionP = Promise.resolve(state.getIn(['connections', ownConnectionUri]))
+            won.invalidateCacheForNewConnection(ownConnectionUri, ownNeedUri);
+        } else {
+            // need to fetch
+            connectionP = won
+                .getConnectionWithEventUris(ownConnectionUri, { requesterWebId: ownNeedUri })
+                .then(cnct => Immutable.fromJS(cnct));
+        }
+
+        Promise.all([
+            connectionP,
+            won.getTheirNeed(theirNeedUri)
+        ])
+        .then(([connection, theirNeed]) => {
             dispatch({
                 type: actionTypes.messages.connectMessageReceived,
-                payload: data
-            })
-        )
-    }
+                payload: {
+                    updatedConnection: ownConnectionUri,
+                    connection: connection.set('hasConnectionState', won.WON.RequestReceived),
+                    ownNeedUri: ownNeedUri,
+                    remoteNeed: theirNeed,
+                    receivedEvent: eventOnOwn.uri, // the more relevant event. used for unread-counter.
+                    events: [
+                        eventOnOwn,
+                        eventOnRemote,
+                    ],
+                }
+            });
+        });
 
+    }
 }
 
 /**
@@ -284,7 +320,6 @@ export function hintMessageReceived(event) {
                 let needUri = event.hasReceiverNeed;
                 let match = {}
 
-                event.unreadUri = event.hasReceiver;//TODO should be deprecated (as it's set in the event-reducer)
                 event.matchScore = event.framedMessage[won.WON.hasMatchScoreCompacted];
                 event.matchCounterpartURI = won.getSafeJsonLdValue(event.framedMessage[won.WON.hasMatchCounterpart]);
 

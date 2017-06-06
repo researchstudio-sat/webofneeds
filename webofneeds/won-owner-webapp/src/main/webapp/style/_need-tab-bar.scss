@@ -4,7 +4,7 @@
 @import 'sizing-utils';
 @import 'square-image';
 
-@mixin need-tab-bar($prefix, $tabBarWidth) {
+@mixin need-tab-bar($prefix) {
   @include title-bar($prefix);
 
   .#{$prefix}__titles__type {
@@ -31,6 +31,8 @@
       align-items: center;
       justify-content: flex-start;
 
+      margin: 1rem 0;
+
       @media (max-width: $responsivenessBreakPoint){
         @include square-image($postIconSize, 0, 0, 0, 0);
       }
@@ -42,8 +44,6 @@
     > .#{$prefix}__inner__right {
       //TODO dynamically adapt to number of children(?) or at least pull into a config-variable
       // or make won-tabs a parametrized mixin?
-      //flex-basis: $tabBarWidth;
-      //max-width: $tabBarWidth;
       flex-grow: 1;
       margin-top: 1rem;
 
@@ -92,5 +92,5 @@
 }
 
 .need-tab-bar {
-  @include need-tab-bar('ntb', 35rem);
+  @include need-tab-bar('ntb');
 }

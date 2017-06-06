@@ -1,6 +1,6 @@
 ## WoN Docker Deployment
 
-Docker images are provided in the [docker hub webofneeds repository] (https://hub.docker.com/r/webofneeds/) to run
+Docker images are provided in the [docker hub webofneeds repository](https://hub.docker.com/r/webofneeds/) to run
 the webofneeds applications as docker containers. There are images for the following components of webofneeds available:
 
 * wonnode: the won node application

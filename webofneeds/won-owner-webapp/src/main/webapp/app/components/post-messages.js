@@ -34,22 +34,14 @@ const serviceDependencies = ['$ngRedux', '$scope', '$element'];
 
 function genComponentConf() {
     let template = `
-        <div>
-            <div class="pm__header">
-                <a ui-sref="{connectionUri : null}">
-                    <img class="pm__header__icon clickable"
-                         src="generated/icon-sprite.svg#ico36_close"/>
-                </a>
-                <div class="pm__header__title">
-                    {{ self.theirNeedContent.get('dc:title') }}
-                </div>
-                <!--div class="pm__header__options">
-                    Options
-                </div>
-                <img
-                    class="pm__header__options__icon clickable"
-                    src="generated/icon-sprite.svg#ico_settings"
-                    ng-click="self.openConversationOption()"/-->
+        <div class="pm__header">
+            <a ui-sref="{connectionUri : null}">
+                <img class="pm__header__icon clickable"
+                     src="generated/icon-sprite.svg#ico36_close"/>
+            </a>
+            <div class="pm__header__title"
+              ui-sref="post({ postUri: self.theirNeed.get('@id'), connectionUri: null, connectionType: null})">
+                {{ self.theirNeedContent.get('dc:title') }}
             </div>
         </div>
         <div class="pm__content">
@@ -70,6 +62,7 @@ function genComponentConf() {
                         title="self.theirNeedContent.get('dc:title')"
                         src="self.theirNeedContent.get('TODOtitleImgSrc')"
                         uri="self.theirNeed.get('@id')"
+                        ui-sref="post({postUri: self.theirNeed.get('@id'), connectionUri: null, connectionType: null})"
                         ng-show="message.get('hasSenderNeed') != self.ownNeed.get('@id')">
                     </won-square-image>
                     <div class="pm__content__message__content">
@@ -135,23 +128,9 @@ function genComponentConf() {
                 const connection = selectOpenConnection(state);
                 const eventUris = connection && connection.get('hasEvents');
                 const eventsLoaded = eventUris && eventUris.size > 0;
-
-                //TODO seems like rather bad practice to have sideffects here
-                delay(0).then(() => {
-                    // scroll to bottom directly after rendering, if snapped
-                    self.updateScrollposition();
-
-                    // amake sure latest messages are loaded
-                    if (connection && !connection.get('loadingEvents') && !eventsLoaded) {
-                        self.connections__showLatestMessages(connectionUri, 4);
-                    }
-                });
-
-
                 const connectionData = selectAllByConnections(state).get(connectionUri);
                 const ownNeed = connectionData && connectionData.get('ownNeed');
                 const theirNeed = connectionData && connectionData.get('remoteNeed');
-
                 const chatMessages = selectSortedChatMessages(state);
                 return {
                     connectionData,
@@ -177,6 +156,34 @@ function genComponentConf() {
             this.$scope.$on('$destroy', disconnect);
 
             this.snapToBottom();
+
+            this.$scope.$watchGroup(
+                ['self.connectionUri', 'self.connection'],
+                () => this.ensureMessagesAreLoaded()
+            );
+
+            this.$scope.$watch(
+                () => this.chatMessages && this.chatMessages.length, // trigger if there's messages added (or removed)
+                () => delay(0).then(() =>
+                    // scroll to bottom directly after rendering, if snapped
+                    this.updateScrollposition()
+                )
+            )
+
+        }
+
+        ensureMessagesAreLoaded() {
+            delay(0).then(() => {
+                // make sure latest messages are loaded
+                if (
+                    this.connectionUri &&
+                    this.connection &&
+                    !this.connection.get('loadingEvents') &&
+                    !this.eventsLoaded
+                ) {
+                    this.connections__showLatestMessages(this.connectionUri, 4);
+                }
+            })
         }
 
         encodeParam(param) {

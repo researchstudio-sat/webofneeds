@@ -17,6 +17,9 @@ import java.util.Map;
  */
 public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
 
+    private static final String NEED_TYPE_DUMMY_FIELD = "_graph._type";
+    private static final String NEED_TYPE_DUMMY_FIELD_CONTENT = "http\\://purl.org/webofneeds/model#Need";
+
     public static final Map<NeedContentPropertyType, String> titleFieldMap;
     static
     {
@@ -152,6 +155,10 @@ public class BasicNeedQueryFactory extends NeedDatasetQueryFactory {
             boostQueryString = boostQueryFactory.makeQueryString();
         }
 
+        // create a dummy query, this is the minimal part of a query that has no search term content
+        // so that we at least create some valid query, in this case we just search for "all other needs"
+        MatchFieldQueryFactory dummyQuery = new MatchFieldQueryFactory(NEED_TYPE_DUMMY_FIELD, NEED_TYPE_DUMMY_FIELD_CONTENT);
+        contentFactories.add(dummyQuery);
 
         // combine all content term query parts with boolean OR operator
         SolrQueryFactory[] contentArray = new SolrQueryFactory[contentFactories.size()];

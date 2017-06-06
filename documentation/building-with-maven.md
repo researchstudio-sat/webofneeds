@@ -1,6 +1,6 @@
 # Requirements
 
-* Maven version > 3.2
+* Maven version > 3.2 (we use 3.3.3; setups with 3.5 seem to encounter problems)
 * JDK version > 1.8  
 
 # Building

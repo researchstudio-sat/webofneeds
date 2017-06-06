@@ -25,12 +25,12 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 /**
  * Behaviour that responds to a ConnectCommand by executing the ExecuteCommandAction
  */
-public class ConnectBevahiour extends BotBehaviour {
-    public ConnectBevahiour(EventListenerContext context) {
+public class ConnectBehaviour extends BotBehaviour {
+    public ConnectBehaviour(EventListenerContext context) {
         super(context);
     }
 
-    public ConnectBevahiour(EventListenerContext context, String name) {
+    public ConnectBehaviour(EventListenerContext context, String name) {
         super(context, name);
     }
 

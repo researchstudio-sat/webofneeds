@@ -42,7 +42,7 @@ NOTE: this openssl commands can be executed in windows using cygwin
 
 9. The other key stores, and the trust stores are created and filled in automatically when the application is run (in the locations defined in step 4 with the passwords defined in step 5).
 
-10. Depending on your java-setup it might not be able to generate keys of a relevant length. In that case, you need to download and install the [Java Cryptography Extension](e.g. http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html). There's a readme in the zip detailing its setup. At the time of this writing, this consists of copying the two jars into `$JAVA_HOME/(jre/)lib/security`. If you don't do this or the jars are in the wrong folder, you'll get an exception like `java.security.InvalidKeyException: Illegal key size` when trying to run the app.
+10. Depending on your java-setup it might not be able to generate keys of a relevant length. In that case, you need to download and install the [Java Cryptography Extension](http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html). There's a readme in the zip detailing its setup. At the time of this writing, this consists of copying the two jars into `$JAVA_HOME/(jre/)lib/security`. If you don't do this or the jars are in the wrong folder, you'll get an exception like `java.security.InvalidKeyException: Illegal key size` when trying to run the app.
 
 11. After building the project, copy the bouncycastle libraries (as of current state, `bcpkix-jdk15on-1.52.jar` and `bcprov-jdk15on-1.52.jar`) from the generated in your project `target/tomcat-libs/` folder into the the tomcat's `lib/` (if you miss this step, you'll see BC exceptions when running the owner/node)
 
