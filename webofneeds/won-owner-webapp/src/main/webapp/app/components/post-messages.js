@@ -49,7 +49,7 @@ function genComponentConf() {
                 alt="Loading&hellip;"
                 ng-show="self.connection.get('loadingEvents')"
                 class="hspinner"/>
-                <a ng-show="self.eventsLoaded && !self.connection.get('loadingEvents')"
+                <a ng-show="self.eventsLoaded && !self.connection.get('loadingEvents') && !self.allLoaded"
                     ng-click="self.connections__showMoreMessages(self.connectionUri, 5)"
                     href="">
                         show more
@@ -141,6 +141,10 @@ function genComponentConf() {
                     chatMessages: chatMessages && chatMessages.toArray(), //toArray needed as ng-repeat won't work otherwise :|
                     state4dbg: state,
                     debugmode: won.debugmode,
+
+                    // if the connect-message is here, everything else should be as well
+                    allLoaded: chatMessages
+                        .some(m => m.get('hasMessageType') === won.WONMSG.connectMessage),
 
                     ownNeed,
                     ownNeedType: ownNeed && inferLegacyNeedType(ownNeed),
