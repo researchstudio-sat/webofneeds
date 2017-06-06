@@ -25,6 +25,11 @@ export const selectLastUpdateTime = state => state.get('lastUpdateTime');
 export const selectRouterParams = state => state.getIn(['router', 'currentParams']);
 export const selectDrafts = state => state.get('drafts');
 
+export const selectOwnEventUris = createSelector(
+    selectEvents,
+    events => events.keySeq().toSet()
+)
+
 
 
 export const selectConnectionsByNeed = createSelector(
@@ -353,6 +358,138 @@ export const selectLastUpdatedPerConnection = createSelector(
         .max()
     )
 );
+
+/**
+ * Returns all events, but flattened, i.e.
+ * the events nested into others via
+ * `hasCorrespondingRemoteMessage` are listed
+ * directly via their uri.
+ */
+export const selectFlattenedEvents = createSelector(
+    selectEvents,
+        events => {
+        var flattenedEvents = events
+            .toList()
+            .flatMap(e => Immutable.List([e, e.get('hasCorrespondingRemoteMessage')]))
+
+            // the size-check is to avoid json-ld style uris, i.e. those that only
+            // contain of an uri field. These messages have not been properly loaded.
+            .filter(e => e && is('Object', e) && e.size > 1)
+
+            .map(e => [e.get('uri'), e]);
+
+        return Immutable.Map(flattenedEvents);
+    }
+);
+
+function ensureList(xs) {
+    if(!xs) return Immutable.List(); // undefined -> []
+    else if(is('String', xs)) return Immutable.List([xs]); // uri -> [uri]
+    else return Immutable.List(xs); // [uri] -> [uri]
+}
+
+/**
+ * @return a map of eventUri -> previousEventUri
+ */
+export const selectPreviousMessagesUris = createSelector(
+    selectEvents,
+    events => events
+     .map(e =>
+         Immutable.List([
+             ensureList(e.get('hasPreviousMessage')),
+             ensureList(e.getIn(['hasCorrespondingRemoteMessage','hasPreviousMessage'])),
+             ensureList(e.get('isResponseTo')),
+             ensureList(e.getIn(['hasCorrespondingRemoteMessage', 'isRemoteResponseTo']))
+         ]).flatten()
+     )
+
+        /*
+    selectFlattenedEvents,
+        flattenedEvents => flattenedEvents
+        .map(e =>
+            e.get('hasPreviousMessage')
+        )
+        .map(prevs => {
+            if(!prevs) return Immutable.List(); // undefined -> []
+            else if(is('String', prevs)) return Immutable.List([prevs]); // uri -> [uri]
+            else return Immutable.List(prevs); // [uri] -> [uri]
+        })
+        */
+
+);
+
+/**
+ * @return a map of eventUri -> previousEvent
+ */
+export const selectPrevMessages = createSelector(
+    selectFlattenedEvents, selectPreviousMessagesUris,
+    (flattenedEvents, prevMsgsUris) =>
+        prevMsgsUris.map(uris =>
+                uris.map(uri =>
+                        flattenedEvents.get(uri)
+                )
+        )
+);
+
+/**
+ * @return all uris that occur as `hasPreviousMessage`
+ */
+export const selectPreviousMessagesUrisFlattened = createSelector(
+    selectPreviousMessagesUris,
+        prevMsgsUris => prevMsgsUris.toList().flatten().toSet()
+);
+
+/**
+ * @return the uris of all events that don't ever occur as `hasPreviousMessage`
+ */
+export const selectUrisOfLatestLoadedMessages = createSelector(
+    selectOwnEventUris, selectPreviousMessagesUrisFlattened,
+    (ownEventUris, flattenedPrevUris) => ownEventUris.filter(uri => !flattenedPrevUris.has(uri))
+);
+
+/**
+ * @return all events, the uris of which don't ever occur as `hasPreviousMessage`
+ */
+export const selectLatestLoadedMessages = createSelector(
+    selectEvents, selectPreviousMessagesUrisFlattened,
+    (events, flattenedPrevUris) => events.filter((e, uri) => !flattenedPrevUris.has(uri))
+);
+
+///**
+// * TODO is instable. instead start with latest and go through chain?
+// * TODO other variant: also check for isResponseTo (~hasPreviousMessage)
+// * @return the uris of all messages that don't have predecessors --
+// * either the latter aren't loaded or there are none.
+// */
+//export const selectUrisOfFirstLoadedMessages = createSelector(
+//    selectPreviousMessagesUris, selectEvents, selectFlattenedEvents,
+//    (prevMsgsUris, events, flattenedEvents) =>
+//        prevMsgsUris
+//            .filter(prevs =>
+//                prevs.size === 0 || // truly first message. has no predecessors at all
+//                prevs.some(prev => !flattenedEvents.has(prev)) // msgs with at least some predecessors that haven't been loaded
+//            )
+//            .keySeq()
+//            .toSet()
+//            .filter(uri => events.has(uri)) // only msgs on our node
+//);
+//
+///**
+// * @return all messages that don't have predecessors --
+// * either the latter aren't loaded or there are none.
+// */
+//export const selectFirstLoadedMessages = createSelector(
+//    selectUrisOfFirstLoadedMessages, selectEvents,
+//    (firstMsgsUris, events) =>
+//        Immutable.Map(
+//            firstMsgsUris.map(uri =>
+//                    [uri, events.get(uri)]
+//            )
+//        )
+//);
+
+
+
 
 window.selectAllByConnections4dbg = selectAllByConnections;
 window.allByConnection4db = allByConnection;
