@@ -5,10 +5,9 @@
 
 //TODO switch to requirejs for dependency mngmt (so this lib isn't angular-bound)
 //TODO replace calls to `won` object to `require('util')`
-
+import won from './won';
 
 (function(){ // <need-builder-js> scope
-    if(!won) won = {};
 
     won.buildDraftRdf = function(args){
         let createDraftObject = {

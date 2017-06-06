@@ -451,7 +451,7 @@ function getOldestEventInChain(state, connectionUri) {
     let acc = Immutable.Map()
         .add('frontier', Immutable.Set())
         .add('earliestLoaded', Immutable.Set());
-    for([uri, e] of latestEvents.entries()) {
+    for(let [uri, e] of latestEvents.entries()) {
         const previous = prevMsgs(e);
         if(!previous) continue;
     }
