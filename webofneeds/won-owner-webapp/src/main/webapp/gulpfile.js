@@ -25,7 +25,11 @@ gulp.task('watch', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res'], functi
 gulp.task('bundlejs', function(){
     return gulp.src('app/app_jspm.js')
         .pipe(sourcemaps.init())
-        .pipe(gulp_jspm())
+        //.pipe(gulp_jspm())
+        .pipe(gulp_jspm({
+            selfExecutingBundle: true,
+            //minify: true,
+        }))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('./generated/'));
 });
