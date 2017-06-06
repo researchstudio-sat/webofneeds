@@ -492,7 +492,87 @@ export const selectLatestLoadedMessages = createSelector(
 //        )
 //);
 
+export const selectSortedChatMessagesArray = createSelector(
+    selectSortedChatMessages,
+    sortedMessages => sortedMessages.toArray()
+);
 
+//TODO refactor so that it always returns an array of immutable messages to
+// allow ng-repeat without giving up the cheaper digestion
+export const selectSortedChatMessages = createSelector(
+    selectOpenConnectionUri,
+    selectAllByConnections,
+    selectEvents,
+    selectLastUpdateTime,
+    (connectionUri, allByConnections, events, lastUpdateTime) => {
+        const connectionDate = allByConnections.get(connectionUri);
+        const ownNeedUri = connectionData && connectionData.getIn(['ownNeed', '@id']);
+
+        if (!connectionData || !connectionData.get('events')) {
+            return Immutable.List();
+
+        } else {
+            const timestamp = (event) =>
+                //msStringToDate(selectTimestamp(event, connectionUri))
+                msStringToDate(selectTimestamp(event))
+
+            const chatMessages = connectionData.get('events')
+
+                /* filter for valid chat messages */
+                .filter(event => {
+                    if (event.get('hasTextMessage')) return true;
+                    else {
+                        let remote = event.get('hasCorrespondingRemoteMessage');
+                        if(is('String', remote)) {
+                            remote = events.get(remote);
+                        }
+                        return remote && remote.get('hasTextMessage');
+                    }
+                }).map(event => {
+                    const remote = event.get('hasCorrespondingRemoteMessage');
+                    if (event.get('hasTextMessage'))
+                        return event;
+                    else
+                        return remote;
+                })
+
+                /* sort them so the latest get shown last */
+                .sort((event1, event2) =>
+                timestamp(event1) - timestamp(event2)
+            )
+                /*
+                 * sort so the latest, optimistic/unconfirmed
+                 * messages are always at the bottom.
+                 */
+                .sort((event1, event2) => {
+                    const u1 = event1.get('unconfirmed');
+                    const u2 = event2.get('unconfirmed');
+
+                    if(u1 && !u2) {
+                        return 1;
+                    }
+                    else if (!u1 && u2) {
+                        return -1;
+                    }
+                    else {
+                        return 0;
+                    }
+                })
+
+                /* add a nice relative timestamp */
+                .map(event => event.set(
+                    'humanReadableTimestamp',
+                    relativeTime(
+                        lastUpdateTime,
+                        timestamp(event)
+                    )
+                )
+            );
+
+            return chatMessages;
+        }
+    }
+);
 
 
 window.selectAllByConnections4dbg = selectAllByConnections;
