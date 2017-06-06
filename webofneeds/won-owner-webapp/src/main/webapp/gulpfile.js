@@ -25,7 +25,11 @@ gulp.task('watch', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res'], functi
 gulp.task('bundlejs', function(){
     return gulp.src('app/app_jspm.js')
         .pipe(sourcemaps.init())
-        .pipe(gulp_jspm())
+        //.pipe(gulp_jspm())
+        .pipe(gulp_jspm({
+            selfExecutingBundle: true,
+            //minify: true,
+        }))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('./generated/'));
 });
@@ -78,9 +82,6 @@ gulp.task('copy-static-scripts', function(done) {
         'node_modules/medium.js/medium.js',
         'scripts/jquery.10.2.js',
         'scripts/jquery.fs.scroller.min.js',
-        'jspm_packages/system.js',
-        'jspm_packages/system-polyfills.js',
-        'jspm_config.js',
     ])
         .pipe(gulp.dest('./generated/scripts/'))
 });

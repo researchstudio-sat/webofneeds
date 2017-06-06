@@ -43,10 +43,6 @@ https://github.com/researchstudio-sat/webofneeds/issues/664
 <script src="./generated/scripts/jquery.10.2.js"></script>
 <script src="./generated/scripts/jquery.fs.scroller.min.js"></script>
 
-<script src="./generated/scripts/system.js"></script>
-<script src="./generated/scripts/system-polyfills.js"></script>
-<script src="./generated/scripts/jspm_config.js"></script>
-
 <!--
 this line loads the bundled app. comment it out if you want
 jspm to dynamically load and compile the sources at runtime.
@@ -54,11 +50,6 @@ this makes for easier debugging, as you get seperate
 source files in the dev-tools' source explorer. -->
 
 <script src="./generated/app_jspm.bundle.js"></script>
-
-<script>
-    System.import('./app/app_jspm')
-            .catch(console.error.bind(console));
-</script>
 </body>
 </html>
 
