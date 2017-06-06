@@ -459,39 +459,6 @@ export const selectLatestLoadedMessages = createSelector(
     (events, flattenedPrevUris) => events.filter((e, uri) => !flattenedPrevUris.has(uri))
 );
 
-///**
-// * TODO is instable. instead start with latest and go through chain?
-// * TODO other variant: also check for isResponseTo (~hasPreviousMessage)
-// * @return the uris of all messages that don't have predecessors --
-// * either the latter aren't loaded or there are none.
-// */
-//export const selectUrisOfFirstLoadedMessages = createSelector(
-//    selectPreviousMessagesUris, selectEvents, selectFlattenedEvents,
-//    (prevMsgsUris, events, flattenedEvents) =>
-//        prevMsgsUris
-//            .filter(prevs =>
-//                prevs.size === 0 || // truly first message. has no predecessors at all
-//                prevs.some(prev => !flattenedEvents.has(prev)) // msgs with at least some predecessors that haven't been loaded
-//            )
-//            .keySeq()
-//            .toSet()
-//            .filter(uri => events.has(uri)) // only msgs on our node
-//);
-//
-///**
-// * @return all messages that don't have predecessors --
-// * either the latter aren't loaded or there are none.
-// */
-//export const selectFirstLoadedMessages = createSelector(
-//    selectUrisOfFirstLoadedMessages, selectEvents,
-//    (firstMsgsUris, events) =>
-//        Immutable.Map(
-//            firstMsgsUris.map(uri =>
-//                    [uri, events.get(uri)]
-//            )
-//        )
-//);
-
 export const selectSortedChatMessagesArray = createSelector(
     selectSortedChatMessages,
     sortedMessages => sortedMessages.toArray()
