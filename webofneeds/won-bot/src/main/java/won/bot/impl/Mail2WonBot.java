@@ -43,7 +43,7 @@ public class Mail2WonBot extends EventBot {
 
         bus = getEventBus();
 
-        BotBehaviour connectBehaviour = new ConnectBevahiour(ctx);
+        BotBehaviour connectBehaviour = new ConnectBehaviour(ctx);
         connectBehaviour.activate();
 
         BotBehaviour closeBehaviour = new CloseBevahiour(ctx);

@@ -13,7 +13,7 @@ import won.bot.framework.eventbot.action.impl.telegram.util.TelegramContentExtra
 import won.bot.framework.eventbot.action.impl.telegram.util.TelegramMessageGenerator;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
 import won.bot.framework.eventbot.behaviour.CloseBevahiour;
-import won.bot.framework.eventbot.behaviour.ConnectBevahiour;
+import won.bot.framework.eventbot.behaviour.ConnectBehaviour;
 import won.bot.framework.eventbot.behaviour.ConnectionMessageBehaviour;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.impl.telegram.SendHelpEvent;
@@ -57,7 +57,7 @@ public class Telegram2WonBot extends EventBot {
             logger.debug("botTokn: " + wonTelegramBotHandler.getBotToken());
             telegramBotsApi.registerBot(wonTelegramBotHandler);
 
-            BotBehaviour connectBehaviour = new ConnectBevahiour(ctx);
+            BotBehaviour connectBehaviour = new ConnectBehaviour(ctx);
             connectBehaviour.activate();
 
             BotBehaviour closeBehaviour = new CloseBevahiour(ctx);
