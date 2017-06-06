@@ -30,6 +30,29 @@ export const selectOwnEventUris = createSelector(
     events => events.keySeq().toSet()
 )
 
+/**
+ * Returns all events, but flattened, i.e.
+ * the events nested into others via
+ * `hasCorrespondingRemoteMessage` are listed
+ * directly via their uri.
+ */
+export const selectFlattenedEvents = createSelector(
+    selectEvents,
+        events => {
+        var flattenedEvents = events
+            .toList()
+            .flatMap(e => Immutable.List([e, e.get('hasCorrespondingRemoteMessage')]))
+
+            // the size-check is to avoid json-ld style uris, i.e. those that only
+            // contain of an uri field. These messages have not been properly loaded.
+            .filter(e => e && is('Object', e) && e.size > 1)
+
+            .map(e => [e.get('uri'), e]);
+
+        return Immutable.Map(flattenedEvents);
+    }
+);
+
 
 
 export const selectConnectionsByNeed = createSelector(
@@ -339,6 +362,9 @@ export const displayingOverview = createSelector(
     postUri => !postUri //if there's a postUri, this is almost certainly a detail view
 )
 
+/**
+ * @deprecated doesn't use daisy-chaining yet.
+ */
 export const selectLastUpdatedPerConnection = createSelector(
     selectAllByConnections,
     allByConnections => allByConnections.map(connectionAndRelated =>
@@ -359,28 +385,6 @@ export const selectLastUpdatedPerConnection = createSelector(
     )
 );
 
-/**
- * Returns all events, but flattened, i.e.
- * the events nested into others via
- * `hasCorrespondingRemoteMessage` are listed
- * directly via their uri.
- */
-export const selectFlattenedEvents = createSelector(
-    selectEvents,
-        events => {
-        var flattenedEvents = events
-            .toList()
-            .flatMap(e => Immutable.List([e, e.get('hasCorrespondingRemoteMessage')]))
-
-            // the size-check is to avoid json-ld style uris, i.e. those that only
-            // contain of an uri field. These messages have not been properly loaded.
-            .filter(e => e && is('Object', e) && e.size > 1)
-
-            .map(e => [e.get('uri'), e]);
-
-        return Immutable.Map(flattenedEvents);
-    }
-);
 
 function ensureList(xs) {
     if(!xs) return Immutable.List(); // undefined -> []
