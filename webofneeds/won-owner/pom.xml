@@ -31,6 +31,10 @@
             <artifactId>won-cryptography</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
         <!-- messaging stuff -->
         <dependency>
             <groupId>com.google.guava</groupId>
