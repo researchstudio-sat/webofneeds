@@ -85,6 +85,7 @@ public class WonMessageRoutes  extends RouteBuilder
       .setHeader(WonCamelConstants.DIRECTION_HEADER, new ConstantURIExpression(URI.create(WONMSG.TYPE_FROM_SYSTEM_STRING)))
         //TODO: as soon as messages are signed when they reach this route, perform signature/wellformedness checks here?
       .to("bean:receivedTimestampAdder")
+      .to("bean:referenceAdder")
       .to("bean:signatureAdder")
               //route to message processing logic
       .to("bean:persister")

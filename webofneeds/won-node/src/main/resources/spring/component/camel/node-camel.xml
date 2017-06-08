@@ -101,7 +101,7 @@
     <bean id="messagingContext" factory-bean="wonTransmissionService" factory-method="getClientMessagingContext">
     </bean>
 
-
+    <bean id="messageReferencer" class="won.node.camel.processor.general.MessageReferencer" />
 
     <bean id="needProtocolOutgoingMessagesProcessor"
           class="won.node.camel.processor.general.NeedProtocolOutgoingMessagesProcessor" />
