@@ -41,7 +41,8 @@ public class User implements UserDetails{
 
 
   @OneToMany(fetch = FetchType.EAGER)
-	@OrderBy("creationDate desc")
+  @OrderBy("creationDate desc")
+  @JoinTable(name = "wonuser_userneed", joinColumns = {@JoinColumn(name = "wonuser_id")})
   private List<UserNeed> userNeeds;
 
   @Column(name = "role")
