@@ -168,8 +168,8 @@ PREFIX won: <http://purl.org/webofneeds/model#>
 SELECT distinct ?first ?msg ?distance ?text ?msgType ?time ?rem WHERE {
  {
    SELECT distinct ?first ?msg (count (?mid) as ?distance) WHERE {
-       ?msg msg:hasPreviousMessage* ?mid.
-       ?mid msg:hasPreviousMessage ?first .
+     ?msg msg:hasPreviousMessage* ?mid .
+     ?mid msg:hasPreviousMessage+ ?first .
      FILTER NOT EXISTS {?first msg:hasPreviousMessage ?none}            
    }
    GROUP BY ?msg ?first 
