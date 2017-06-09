@@ -7,6 +7,7 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.shared.Lock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -111,6 +112,8 @@ public class WorkerCrawlerActor extends UntypedActor
         throw new CrawlWrapperException(e, uriMsg);
       }
     }
+    Lock lock = ds == null ? null : ds.getLock();
+    lock.enterCriticalSection(true);
 
     // Save dataset to triple store
     sparqlService.updateNamedGraphsOfDataset(ds);
@@ -164,18 +167,26 @@ public class WorkerCrawlerActor extends UntypedActor
 
       // only send active needs right now
       needModelWrapper = new NeedModelWrapper(ds);
-      NeedState state = needModelWrapper.getNeedState();
-      if (state.equals(NeedState.ACTIVE)) {
+      if (needModelWrapper.isANeed()) {
+        NeedState state = needModelWrapper.getNeedState();
+        if (state.equals(NeedState.ACTIVE)) {
 
-        log.debug("Created need event for need uri {}", uriMsg.getUri());
-        NeedEvent.TYPE type = NeedEvent.TYPE.CREATED;
-        NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
-        pubSubMediator
-          .tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent), getSelf());
+          log.debug("Created need event for need uri {}", uriMsg.getUri());
+          NeedEvent.TYPE type = NeedEvent.TYPE.CREATED;
+          NeedEvent needEvent = new NeedEvent(uriMsg.getUri(), wonNodeUri, type, crawlDate, ds);
+          pubSubMediator
+                  .tell(new DistributedPubSubMediator.Publish(needEvent.getClass().getName(), needEvent), getSelf());
+        }
       }
 
     } catch (DataIntegrityException e) {
       log.debug("no valid need model found in dataset for uri {}", uriMsg.getUri());
+    } catch (Exception e){
+      log.debug("caught exceptiontrying to interpret as a need dataset: {}", uriMsg.getUri());
+    } finally {
+      if (lock != null){
+        lock.leaveCriticalSection();
+      }
     }
   }
 
