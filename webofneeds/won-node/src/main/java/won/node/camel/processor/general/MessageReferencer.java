@@ -84,7 +84,7 @@ public class MessageReferencer {
             case SUCCESS_RESPONSE :
             case FAILURE_RESPONSE :
                 //we are replying to a message, so add that to the selected List
-                MessageEventPlaceholder messageEventPlaceholder = messageEventRepository.findOneByMessageURIforUpdate(message.getIsResponseToMessageURI());
+                MessageEventPlaceholder messageEventPlaceholder = messageEventRepository.findOneByMessageURIforUpdate(WonMessageUtils.getLocalIsResponseToURI(message));
                 if (messageEventPlaceholder != null) {
                     messageEventPlaceholders.add(messageEventPlaceholder);
                 }
@@ -120,7 +120,7 @@ public class MessageReferencer {
     private void selectUnreferenceMessages(Set<MessageAndPlaceholder> selected, final WonMessage message) throws WonMessageProcessingException {
         //find all unreferenced messages for the current message's parent
         List<MessageEventPlaceholder> messageEventPlaceholders = messageEventRepository
-                .findByParentURIAndNotReferencedByOtherMessageForUpdate(message.getSenderURI());
+                .findByParentURIAndNotReferencedByOtherMessageForUpdate(WonMessageUtils.getParentEntityUri(message));
         //load the WonMessages for the placeholders
         loadWonMessagesAndAddToSelected(selected, messageEventPlaceholders);
     }
