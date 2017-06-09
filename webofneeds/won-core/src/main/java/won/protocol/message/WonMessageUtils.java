@@ -34,6 +34,22 @@ public class WonMessageUtils
     return parentURI;
   }
 
+  /**
+   * Returns the need that this message belongs to.
+   * @param message
+   * @return
+     */
+  public static URI getParentNeedUri(final WonMessage message){
+    WonMessageDirection direction = message.getEnvelopeType();
+    if (direction == WonMessageDirection.FROM_EXTERNAL ){
+      return message.getReceiverNeedURI();
+    } else if (direction == WonMessageDirection.FROM_OWNER || direction == WonMessageDirection.FROM_SYSTEM){
+      return message.getSenderNeedURI();
+    } else {
+      throw new IllegalArgumentException("Unexpected message direction: " + direction);
+    }
+  }
+
   private static URI getParentUriFromSenderProperties(WonMessage message) {
     URI parentURI;
     parentURI = message.getSenderURI();
@@ -45,6 +61,8 @@ public class WonMessageUtils
     }
     return parentURI;
   }
+
+
 
   private static URI getParentUriFromReceiverProperties(WonMessage message) {
     URI parentURI;
