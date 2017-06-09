@@ -18,6 +18,9 @@ package won.protocol.message;
 
 import java.net.URI;
 
+import static won.protocol.message.WonMessageType.FAILURE_RESPONSE;
+import static won.protocol.message.WonMessageType.SUCCESS_RESPONSE;
+
 /**
  * Utilities for working with wonMessage objects.
  */
@@ -74,5 +77,26 @@ public class WonMessageUtils
       parentURI = message.getReceiverNodeURI();
     }
     return parentURI;
+  }
+
+  /**
+   * If the message is a ResponseMessage (SuccessResponse or FailureResponse)
+   * this method returns the message that was responded to and that belongs to the same parent as
+   * the specified message.
+   * @param message
+   * @return the URI of the message that was responded to, or null if the specified message is not a ResponseMessage.
+     */
+  public static URI getLocalIsResponseToURI(WonMessage message){
+    WonMessageType messageType = message.getMessageType();
+    if (messageType == SUCCESS_RESPONSE || messageType == FAILURE_RESPONSE) {
+      WonMessageDirection direction = message.getEnvelopeType();
+      if (direction == WonMessageDirection.FROM_EXTERNAL){
+        return message.getIsRemoteResponseToMessageURI();
+      } else {
+        return message.getIsResponseToMessageURI();
+      }
+    }else {
+        return null;
+    }
   }
 }
