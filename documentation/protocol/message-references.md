@@ -31,14 +31,14 @@ to be referenced:
 2. If the message is a ResponseMessage (`SuccessResponse` or `FailureResponse`), 
 the message that is being responded to is selected.
 3. If the message is specific to a connection (`ConnectionMessage` , 
-`Open`, `Close`, `Connect` (if it is used in an already existing connection)) 
-the newest message stored in the WoN node for the respective connection 
-is selected.
-4. If the message creates a connection (`Connect`, `Hint`), the `Create`
-message that created the Need is selected. *Note:* The messages that create 
+`Open`, `Close`, `Connect`, the newest message stored in the WoN node 
+for the respective connection is selected. If there is no message stored 
+for the respective connection, the `Create`
+message that created the Need is selected. 
+*Note:* The messages that create 
 the connection are assigned to the connection, so they will be selected
 by Rule 3 for the subsequent messages.
-5. Any message in the connection that is still unreferenced is selected.
+4. Any message in the connection that is still unreferenced is selected.
 
 *Note:* due to asynchronous message processing in a WoN node, message ordering 
 may not be total - messages may appear to happen at the same time. Therefore,
