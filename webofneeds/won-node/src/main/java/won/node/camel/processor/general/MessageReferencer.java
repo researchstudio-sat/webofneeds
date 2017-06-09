@@ -80,6 +80,7 @@ public class MessageReferencer {
                 //initialize a variable for the result
         WonMessageType messageType = message.getMessageType();
         switch (messageType){
+
             case SUCCESS_RESPONSE :
             case FAILURE_RESPONSE :
                 //we are replying to a message, so add that to the selected List
@@ -88,31 +89,24 @@ public class MessageReferencer {
                     messageEventPlaceholders.add(messageEventPlaceholder);
                 }
                 break;
-            case CONNECT :
-            case HINT_MESSAGE :
-                //it could be that this message is the one that creates the connection. if this is the case, we cannot
-                //find an earlier message for this connection in the database:
-                MessageEventPlaceholder canddate = messageEventRepository.findOldestByParentURIforUpdate(WonMessageUtils.getParentEntityUri(message));
-                if (canddate == null) {
-                    //we're starting a conversation, link to the create message of the need.
-                    messageEventPlaceholders.addAll(messageEventRepository
-                            .findByParentURIAndMessageTypeForUpdate(WonMessageUtils.getParentEntityUri(message), WonMessageType
-                                    .CREATE_NEED));
-                } else {
-                    //we aren't starting a connection - it's just another hint or connect. Chain it to earlier messages.
-                    messageEventPlaceholder = messageEventRepository.findNewestByParentURIforUpdate(WonMessageUtils.getParentEntityUri(message));
-                    if (messageEventPlaceholder != null) {
-                        messageEventPlaceholders.add(messageEventPlaceholder);
-                    }
-                }
-                break;
+
             case CREATE_NEED:
                 //a create message does not reference any other message. It is the root of the message structure
                 break;
+
             default:
+                //any other message: reference the latest message in the parent (i.e. the container of the message)
+                //if we don't find any: reference the create message of the need.
                 messageEventPlaceholder = messageEventRepository.findNewestByParentURIforUpdate(WonMessageUtils.getParentEntityUri(message));
                 if (messageEventPlaceholder != null) {
                     messageEventPlaceholders.add(messageEventPlaceholder);
+                } else {
+                    //we did not find any message to link to. Choose the create message of the need
+                    //we're starting a conversation, link to the create message of the need.
+                    List<MessageEventPlaceholder> eventsToSelect = messageEventRepository
+                            .findByParentURIAndMessageTypeForUpdate(WonMessageUtils.getParentNeedUri(message), WonMessageType
+                                    .CREATE_NEED);
+                    messageEventPlaceholders.addAll(eventsToSelect);
                 }
         }
         //load the WonMessages for the placeholders
