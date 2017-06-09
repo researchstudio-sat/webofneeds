@@ -55,5 +55,134 @@ confusion, both participants should be able to access each other's messages.
 *TODO* there may be a way to detect such a case solely based on message references. 
 
 
+This approach ensures the following invariants on the directed graph 
+obtained by all message references. 
+1. The `Create` message of a need must not contain a reference
+1. Any message other than a `Create` message must contain at least one reference
+1. Source and target of a Message reference must be in the same eventContainer
+  with the exception of references pointing to the `Create` message.
+1. There must be no directed circles in the graph
+1. From any message, other than a `Create` message, there must be 
+at least one path to the need's `Create` message
+1. A Response must always reference the message that it is a response to.
 
+*TODO explain NeedCreatedNotificationMessage*
 
+##  Invariants in SPARQL
+SPARQL queries to test message structure invariants
+ASK queries must yield false
+SELECT/CONSTRUCT queries must yield empty results
+
+```
+# The `Create` message of a need must not contain a reference
+prefix msg: <http://purl.org/webofneeds/message#>
+select ?msg where {
+  ?msg msg:hasMessageType msg:CreateMessage;
+	   msg:hasPreviousMessage ?msg.
+}
+```
+```
+# Any message other than a `Create` message must contain at least one reference
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX won: <http://purl.org/webofneeds/model#>
+SELECT * WHERE {
+  ?msg msg:hasMessageType ?msgType .
+  FILTER NOT EXISTS {?msg msg:hasPreviousMessage ?msg2}  
+  FILTER (?msgType != msg:CreateMessage && ?msgType != msg:NeedCreatedNotificationMessage)
+}
+```
+```
+# Source and target of a Message reference must be in the same 
+# eventContainerwith the exception of references pointing to 
+# the `Create` message.
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix msg: <http://purl.org/webofneeds/message#>
+prefix won: <http://purl.org/webofneeds/model#>
+select * where {
+  ?cnt rdfs:member ?msg .
+  ?cnt2 rdfs:member ?msg2 .
+  ?msg msg:hasPreviousMessage ?msg2 .
+  ?msg2 msg:hasMessageType ?targetType .
+  filter (?cnt != ?cnt2 && ?targetType != msg:CreateMessage)
+}
+```
+```
+# There must be no directed circles in the graph
+PREFIX msg: <http://purl.org/webofneeds/message#>
+SELECT ?msg WHERE {
+  {
+  	?msg msg:hasPreviousMessage ?msg .  
+  } UNION {
+  	?msg msg:hasPreviousMessage ?msg2 . 
+  	?msg2 msg:hasPreviousMessage* ?msg
+  } 
+}
+```
+```
+# From any message, other than a `Create` message, there must be 
+# at least one path to the need's `Create` message
+PREFIX msg: <http://purl.org/webofneeds/message#>
+SELECT ?msg WHERE {
+  ?msg msg:hasMessageType ?msgType.
+  FILTER NOT EXISTS {
+    ?msg msg:hasPreviousMessage* ?createMsg.
+    ?createMsg msg:hasMessageType msg:CreateMessage.
+  }
+  FILTER (?msgType != msg:NeedCreatedNotificationMessage)
+}
+```
+
+```
+# A Response must always reference the message that it is a response to.
+PREFIX msg: <http://purl.org/webofneeds/message#>
+SELECT * WHERE {
+  {
+  	?resp a msg:FromSystem .
+	?resp msg:isResponseTo ?msg .
+  } UNION {
+	?resp a msg:FromOwner .
+	?resp msg:isResponseTo ?msg .
+  } UNION {
+	?resp a msg:FromExternal .
+	?resp msg:isRemoteResponseTo ?msg .    
+  }
+  {
+  	?resp msg:hasMessageType msg:SuccessResponse.
+  } UNION {
+    ?resp msg:hasMessageType msg:FailureResponse.
+  } 
+  FILTER NOT EXISTS {
+  	?resp msg:hasPreviousMessage ?msg. 
+  }
+}
+```
+
+## Useful queries for messages
+
+Find all messages in temporal ordering
+```
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX won: <http://purl.org/webofneeds/model#>
+SELECT distinct ?first ?msg ?distance ?text ?msgType ?time ?rem WHERE {
+ {
+   SELECT distinct ?first ?msg (count (?mid) as ?distance) WHERE {
+       ?msg msg:hasPreviousMessage* ?mid.
+       ?mid msg:hasPreviousMessage ?first .
+     FILTER NOT EXISTS {?first msg:hasPreviousMessage ?none}            
+   }
+   GROUP BY ?msg ?first 
+ }
+ OPTIONAL {
+   ?msg won:hasTextMessage ?text.
+   ?msg msg:hasMessageType ?msgType.
+ }
+ OPTIONAL {
+    ?msg msg:hasCorrespondingRemoteMessage ?rem . 
+   ?rem won:hasTextMessage ?text.
+   ?rem msg:hasMessageType ?msgType.
+ }
+ ?msg msg:hasReceivedTimestamp ?time.  
+} ORDER BY ?first ?distance ?time
+```
