@@ -110,6 +110,14 @@ public class NeedModelWrapper {
         checkModels();
     }
 
+    /**
+     * Indicates if the wrapped data looks like need data.
+     * @return
+     */
+    public boolean isANeed(){
+        return getNeedNode(NeedGraphType.NEED) != null;
+    }
+
 
     private void checkModels() {
         try {
@@ -189,8 +197,9 @@ public class NeedModelWrapper {
     }
 
     public NeedState getNeedState() {
-
+        sysInfoModel.enterCriticalSection(true);
         RDFNode state = RdfUtils.findOnePropertyFromResource(sysInfoModel, getNeedNode(NeedGraphType.SYSINFO), WON.IS_IN_STATE);
+        sysInfoModel.leaveCriticalSection();
         if (state.equals(WON.NEED_STATE_ACTIVE)) {
             return NeedState.ACTIVE;
         } else {
