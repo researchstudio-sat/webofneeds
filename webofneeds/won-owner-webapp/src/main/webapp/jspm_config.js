@@ -1,10 +1,21 @@
 System.config({
   defaultJSExtensions: true,
-  transpiler: "babel",
-  babelOptions: {
-    "optional": [
-      "runtime"
-    ]
+  transpiler: "typescript",
+  typescriptOptions: {
+    "sourceMap": true,
+    "module": "system",
+    "target": "es5",
+  },
+  packages: {
+    "app": {
+      "defaultExtension": "ts",
+      "main": "app/app_jspm",
+      "meta": {
+        "*.ts": {
+          "loader": "ts"
+        }
+      }
+    }
   },
   paths: {
     "github:*": "jspm_packages/github/*",

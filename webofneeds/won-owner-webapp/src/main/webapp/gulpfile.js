@@ -10,8 +10,6 @@ var sassImportOnce = require('node-sass-import-once');
 var gulp_jspm = require('gulp-jspm');
 var sourcemaps = require('gulp-sourcemaps');
 
-
-
 gulp.task('default', ['build']);
 gulp.task('build', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res', 'copy-static-scripts']);
 gulp.task('watch', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res'], function() {
@@ -23,9 +21,8 @@ gulp.task('watch', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res'], functi
 });
 
 gulp.task('bundlejs', function(){
-    return gulp.src('app/app_jspm.js')
+    return gulp.src('app/app_jspm.ts')
         .pipe(sourcemaps.init())
-        //.pipe(gulp_jspm())
         .pipe(gulp_jspm({
             selfExecutingBundle: true,
             minify: true,
