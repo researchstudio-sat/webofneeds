@@ -505,8 +505,8 @@ export const selectSortedChatMessages = createSelector(
 
                 /* sort them so the latest get shown last */
                 .sort((event1, event2) =>
-                timestamp(event1) - timestamp(event2)
-            )
+                    timestamp(event1) - timestamp(event2)
+                )
                 /*
                  * sort so the latest, optimistic/unconfirmed
                  * messages are always at the bottom.
