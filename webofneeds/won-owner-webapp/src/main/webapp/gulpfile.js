@@ -26,6 +26,7 @@ gulp.task('bundlejs', function(){
         .pipe(gulp_jspm({
             selfExecutingBundle: true,
             minify: true,
+            fileName: 'app.bundle',
         }))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('./generated/'));
