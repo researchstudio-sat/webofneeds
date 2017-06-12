@@ -118,10 +118,6 @@
             <artifactId>hibernate-c3p0</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.mchange</groupId>
-            <artifactId>c3p0</artifactId>
-        </dependency>
-        <dependency>
             <!-- required for hibernate, which has it in test/provided scopes but needs it in our application -->
             <groupId>org.jboss</groupId>
             <artifactId>jandex</artifactId>

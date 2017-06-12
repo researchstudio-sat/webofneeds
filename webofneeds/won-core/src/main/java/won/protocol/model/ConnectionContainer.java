@@ -20,7 +20,6 @@ import won.protocol.model.parentaware.ParentAware;
 import won.protocol.model.parentaware.VersionedEntity;
 
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.Date;
 
 @Entity
@@ -31,9 +30,6 @@ public class ConnectionContainer implements ParentAware<Need>, VersionedEntity
   @Column( name = "id" )
   protected Long id;
 
-  @OneToMany (fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  private Collection<Connection> connections;
-
   @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
   private int version = 0;
 
@@ -42,12 +38,9 @@ public class ConnectionContainer implements ParentAware<Need>, VersionedEntity
   private Date lastUpdate = new Date();
 
   @OneToOne (fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "need_id")
   @MapsId
   private Need need;
-
-  public Collection<Connection> getConnections() {
-    return connections;
-  }
 
   @Override
   @PrePersist

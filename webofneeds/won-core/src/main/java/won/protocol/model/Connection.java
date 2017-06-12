@@ -80,7 +80,8 @@ public class Connection implements ParentAware<ConnectionContainer>, VersionedEn
   @Enumerated(EnumType.STRING)
   private ConnectionState state;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "parent_need_id")
   private ConnectionContainer parent;
 
   @OneToOne(fetch = FetchType.LAZY)

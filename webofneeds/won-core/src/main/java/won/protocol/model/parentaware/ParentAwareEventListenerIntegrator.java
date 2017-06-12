@@ -16,12 +16,11 @@
 
 package won.protocol.model.parentaware;
 
-import org.hibernate.cfg.Configuration;
+import org.hibernate.boot.Metadata;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
-import org.hibernate.metamodel.source.MetadataImplementor;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,38 +45,21 @@ public class ParentAwareEventListenerIntegrator implements Integrator
   }
 
   @Override
-  public void integrate(final Configuration configuration, final SessionFactoryImplementor sessionFactory, final SessionFactoryServiceRegistry serviceRegistry) {
+  public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactoryImplementor, SessionFactoryServiceRegistry sessionFactoryServiceRegistry) {
     logger.debug("integrating listeners for ParentAware entities");
     final EventListenerRegistry eventListenerRegistry =
-      serviceRegistry.getService(
-        EventListenerRegistry.class
-      );
+            sessionFactoryServiceRegistry.getService(
+                    EventListenerRegistry.class
+            );
 
     eventListenerRegistry.appendListeners(
-      EventType.PERSIST,
-      ParentAwarePersistEventListener.INSTANCE
+            EventType.PERSIST,
+            ParentAwarePersistEventListener.INSTANCE
     );
     eventListenerRegistry.appendListeners(
-      EventType.FLUSH_ENTITY,
-      ParentAwareFlushEventListener.INSTANCE
+            EventType.FLUSH_ENTITY,
+            ParentAwareFlushEventListener.INSTANCE
     );
   }
 
-  @Override
-  public void integrate(final MetadataImplementor metadata, final SessionFactoryImplementor sessionFactory, final SessionFactoryServiceRegistry serviceRegistry) {
-    logger.debug("integrating listeners for ParentAware entities");
-    final EventListenerRegistry eventListenerRegistry =
-      serviceRegistry.getService(
-        EventListenerRegistry.class
-      );
-
-    eventListenerRegistry.appendListeners(
-      EventType.PERSIST,
-      ParentAwarePersistEventListener.INSTANCE
-    );
-    eventListenerRegistry.appendListeners(
-      EventType.FLUSH_ENTITY,
-      ParentAwareFlushEventListener.INSTANCE
-    );
-  }
 }

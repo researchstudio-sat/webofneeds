@@ -39,7 +39,7 @@ public abstract class EventContainer implements VersionedEntity
   @Convert( converter = URIConverter.class)
   private URI parentUri;
 
-  @OneToMany(fetch = FetchType.LAZY)
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "eventContainer")
   private Collection<MessageEventPlaceholder> events = new ArrayList<>(1);
 
   @Column(name="version", columnDefinition = "integer DEFAULT 0", nullable = false)
