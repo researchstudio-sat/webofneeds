@@ -459,11 +459,6 @@ export const selectLatestLoadedMessages = createSelector(
     (events, flattenedPrevUris) => events.filter((e, uri) => !flattenedPrevUris.has(uri))
 );
 
-export const selectSortedChatMessagesArray = createSelector(
-    selectSortedChatMessages,
-    sortedMessages => sortedMessages.toArray()
-);
-
 //TODO refactor so that it always returns an array of immutable messages to
 // allow ng-repeat without giving up the cheaper digestion
 export const selectSortedChatMessages = createSelector(
@@ -540,6 +535,12 @@ export const selectSortedChatMessages = createSelector(
         }
     }
 );
+
+export const selectSortedChatMessagesArray = createSelector(
+    selectSortedChatMessages,
+        sortedMessages => sortedMessages.toArray()
+);
+
 
 
 window.selectAllByConnections4dbg = selectAllByConnections;
