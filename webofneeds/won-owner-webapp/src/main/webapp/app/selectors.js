@@ -467,7 +467,7 @@ export const selectSortedChatMessages = createSelector(
     selectEvents,
     selectLastUpdateTime,
     (connectionUri, allByConnections, events, lastUpdateTime) => {
-        const connectionDate = allByConnections.get(connectionUri);
+        const connectionData = allByConnections.get(connectionUri);
         const ownNeedUri = connectionData && connectionData.getIn(['ownNeed', '@id']);
 
         if (!connectionData || !connectionData.get('events')) {
