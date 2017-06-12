@@ -496,24 +496,6 @@ export const selectSortedChatMessages = createSelector(
                 .sort((event1, event2) =>
                     timestamp(event1) - timestamp(event2)
                 )
-                /*
-                 * sort so the latest, optimistic/unconfirmed
-                 * messages are always at the bottom.
-                 */
-                .sort((event1, event2) => {
-                    const u1 = event1.get('unconfirmed');
-                    const u2 = event2.get('unconfirmed');
-
-                    if(u1 && !u2) {
-                        return 1;
-                    }
-                    else if (!u1 && u2) {
-                        return -1;
-                    }
-                    else {
-                        return 0;
-                    }
-                })
 
                 .map(event => {
                     const remote = event.get('hasCorrespondingRemoteMessage');
