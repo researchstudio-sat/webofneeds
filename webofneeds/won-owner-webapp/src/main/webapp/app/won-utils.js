@@ -80,7 +80,7 @@ export function selectTimestamp(event, ownNeedUri) {
      * received timestamp, as these are optimistic
      * assumptions with only sent timestamps.
      */
-    return event.get('hasReceivedTimestamp');
+    return event.get('hasReceivedTimestamp') || event.get('hasSentTimestamp');
 };
 
 export function selectConnectionUris(need) {
