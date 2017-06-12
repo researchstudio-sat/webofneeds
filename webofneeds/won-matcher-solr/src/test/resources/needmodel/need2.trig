@@ -8,6 +8,7 @@
 @prefix local: <https://node.matchat.org/won/resource/> .
 @prefix sig:   <http://icp.it-risk.iwvi.uni-koblenz.de/ontologies/signature.owl#> .
 @prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix s:     <http://schema.org/> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix won:   <http://purl.org/webofneeds/model#> .
 @prefix ldp:   <http://www.w3.org/ns/ldp#> .

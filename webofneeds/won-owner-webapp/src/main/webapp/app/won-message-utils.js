@@ -366,7 +366,7 @@ export function getEventsFromMessage(msgJson) {
                 framedMessage['@graph'][0] //use first node - the graph should only consist of one node at this point
             );
             let eventData = {};
-            for (key in framedSimplifiedMessage){
+            for (var key in framedSimplifiedMessage){
                 const propName = won.getLocalName(key);
                 if (propName != null && ! won.isJsonLdKeyword(propName)) {
                     eventData[propName] = won.getSafeJsonLdValue(framedSimplifiedMessage[key]);

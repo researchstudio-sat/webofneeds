@@ -120,9 +120,9 @@ public class DefaultNeedModelWrapper extends NeedModelWrapper {
 
     public Coordinate getLocationCoordinate(Resource contentNode) {
 
-        Property geoProperty = needModel.createProperty("s:geo");
-        Property longitudeProperty = needModel.createProperty("s:longitude");
-        Property latitudeProperty = needModel.createProperty("s:latitude");
+        Property geoProperty = needModel.createProperty("http://schema.org/", "geo");
+        Property longitudeProperty = needModel.createProperty("http://schema.org/", "longitude");
+        Property latitudeProperty = needModel.createProperty("http://schema.org/", "latitude");
 
         RDFNode locationNode = RdfUtils.findOnePropertyFromResource(needModel, contentNode, WON.HAS_LOCATION);
         RDFNode geoNode = (locationNode != null && locationNode.isResource()) ? RdfUtils.findOnePropertyFromResource(needModel, locationNode.asResource(), geoProperty) : null;

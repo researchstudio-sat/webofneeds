@@ -201,8 +201,8 @@ export function successfulCreate(event) {
 
 export function openMessageReceived(events) {
     return dispatch => {
-        const eventOnRemote = events['msg:FromOwner'];
-        const eventOnOwn = events['msg:FromExternal'];
+        const eventOnRemote = events['msg:FromOwner']; // from the other person's owner application / node
+        const eventOnOwn = events['msg:FromExternal']; // generated on our node
         eventOnRemote.eventType = won.messageType2EventType[eventOnRemote.hasMessageType];
         won.invalidateCacheForNewMessage(eventOnOwn.hasReceiver || eventOnRemote.hasReceiver)
         .then(() =>

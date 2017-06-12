@@ -14,7 +14,7 @@ import locationPickerModule from '../location-picker';
 //import draftStoreModule from '../../stores/draft-store';
 import { attach } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
-
+import won from '../../won-es6';
 
 const postTypeTexts = [
     {

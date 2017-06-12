@@ -22,6 +22,11 @@ export default function(connections = initialState, action = {}) {
             var connectionUri = action.payload.events['msg:FromSystem'].hasReceiver;
             return connections.setIn([connectionUri, 'messageDraft'], ""); // successful open -- can reset draft
 
+        case actionTypes.connections.connect: // user has sent a request
+            var { connectionUri, eventUri } = action.payload
+            return storeEventUris(connections, connectionUri, [eventUri])
+                .setIn([connectionUri, 'hasConnectionState'], won.WON.RequestSent);
+
         case actionTypes.connections.open:
             var eventUri = action.payload.eventUri;
             var connectionUri = action.payload.optimisticEvent.hasSender;
@@ -47,6 +52,10 @@ export default function(connections = initialState, action = {}) {
             var connectionUri = action.payload.hasReceiver;
             return storeEventUris(connections, connectionUri, [action.payload.uri])
                 .setIn([connectionUri, 'hasConnectionState'], won.WON.Closed);
+
+        case actionTypes.connections.close:
+            return connections.setIn([action.payload.connectionUri, 'hasConnectionState'], won.WON.Closed);
+
 
         case actionTypes.connections.typedAtChatMessage:
             var connectionUri = action.payload.connectionUri;

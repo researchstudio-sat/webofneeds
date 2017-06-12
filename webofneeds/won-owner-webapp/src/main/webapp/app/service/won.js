@@ -17,10 +17,8 @@
 /**
  * Created by LEIH-NB on 19.08.2014.
  */
-
-(function(){
-
-    var won = {};
+"format es6"; /* required to force babel to transpile this so the minifier is happy */
+   var won = {};
 
     /**
      *  Constants
@@ -342,7 +340,7 @@
         propertyPath[propertyPath.length - 1] += 'Compacted';
         //console.log('toCompacted ', longValue, propertyPath, won.lookup(won, propertyPath));
         return won.lookup(won, propertyPath);
-    }
+    };
 
 
     won.clone = function(obj){
@@ -350,7 +348,7 @@
             return undefined;
         else
             return JSON.parse(JSON.stringify(obj));
-    }
+    };
 
 
     /**
@@ -364,7 +362,7 @@
             won.mergeIntoLast(arguments[i], o);
         }
         return o;
-    }
+    };
     /*
      * Recursively merge properties of several objects
      * Copies all properties from the passed objects into the last one starting
@@ -395,7 +393,7 @@
             }
         }
         return obj1;
-    }
+    };
 
     // as the constants above should be unique (thus their mapping bijective)
     // it is possible to do a reverse lookup. The table contains former values
@@ -403,7 +401,7 @@
     won.constantsReverseLookupTable = {};
     for(var root of ['WON', 'UNREAD', 'WONMSG', 'EVENT', 'COMMUNUCATION_STATE' ]) {
         won.mergeIntoLast(buildReverseLookup(won[root], [root]), won.constantsReverseLookupTable);
-    }
+    };
 
 
     won.buildReverseLookup = buildReverseLookup;
@@ -550,9 +548,9 @@
     }
 
     won.containsAll = function (array, subArray){
-        for (skey in subArray){
+        for (var skey in subArray){
             var found = false;
-            for (key in array){
+            for (var key in array){
                 if (subArray[skey] === array[key]){
                     found = true;
                     break;
@@ -579,13 +577,13 @@
     won.visitDepthFirst = function(data, callback, currentKey, currentContainer){
         if (data == null) return;
         if (won.isArray(data) && data.length > 0){
-            for (key in data) {
+            for (let key in data) {
                 won.visitDepthFirst(data[key], callback, key, data);
             }
             return;
         }
         if (typeof data === 'object'){
-            for (key in data) {
+            for (let key in data) {
                 won.visitDepthFirst(data[key], callback, key, data);
             }
             return;
@@ -610,7 +608,7 @@
         if (typeof array2 === 'undefined') return array1;
         if (typeof comparatorFun === 'undefined') comparatorFun = function(a,b){ return a === b};
         array2.filter(function (item) {
-            for (i = 0; i < array1.length; i++){
+            for (let i = 0; i < array1.length; i++){
                 if (comparatorFun(item, array1[i]) == 0) {
                     return false;
                 }
@@ -685,7 +683,7 @@
               // an '@id' keyword and return it (if we find it)
               //if the first node doesn't contain an @graph keyword, we assume that there
               //are no named graphs and all data is in the default graph.
-              outermostGraphContent = data['@graph'];
+              let outermostGraphContent = data['@graph'];
               for (var i = 0; i < outermostGraphContent.length; i++) {
                 var curNode = outermostGraphContent[i];
                 if (curNode['@graph'] == null){
@@ -712,7 +710,7 @@
                 } else {
                     //outermost node has '@graph' but no '@id'
                     //--> @graph array contains named graphs. search for name.
-                    outermostGraphContent = data['@graph'];
+                    let outermostGraphContent = data['@graph'];
                     for (var i = 0; i < outermostGraphContent.length; i++) {
                         var curNode = outermostGraphContent[i];
                         if (curNode['@id'] == null || curNode['@id'] === graphName) {
@@ -726,7 +724,7 @@
         },
         getNodeInGraph: function(data, graphName, nodeId){
             var graph = this.getNamedGraph(data, graphName);
-            for (key in graph['@graph']){
+            for (let key in graph['@graph']){
                 var curNode = graph['@graph'][key];
                 var curNodeId = node['@id'];
                 if (curNodeId === nodeId){
@@ -775,8 +773,8 @@
      * @returns {won.CreateMessageBuilder}
      */
     won.addMessageGraph = function (builder, graphURIs, messageType) {
-        graphs = builder.data['@graph'];
-        unsetMessageGraphUri = UNSET_URI+"#data";
+        let graphs = builder.data['@graph'];
+        let unsetMessageGraphUri = UNSET_URI+"#data";
         //create the message graph, containing the message type
         var messageGraph = {
             "@graph": [
@@ -867,7 +865,7 @@
         },
         forEnvelopeData: function (envelopeData){
             var node = this.getMessageEventNode();
-            for (key in envelopeData){
+            for (let key in envelopeData){
                 node[key] = {"@id":envelopeData[key]};
             }
             return this;
@@ -952,7 +950,7 @@
         getContentGraph: function(){
             var graphs = this.data["@graph"];
             var contentGraphUri = this.eventUriValue + "#content";
-            for (key in graphs){
+            for (let key in graphs){
                 var graph = graphs[key];
                 if (graph['@id'] === contentGraphUri){
                     return graph;
@@ -996,7 +994,4 @@
     };
 
     //TODO replace with `export default` after switching everything to ES6-module-syntax
-    window.won = won;
-})();
-
-
+export default won;

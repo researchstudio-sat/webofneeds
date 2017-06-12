@@ -55,6 +55,7 @@ public class MessageEventPlaceholder implements ParentAware<EventContainer>
   private int version = 0;
 
   @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "eventcontainer_id")
   private EventContainer eventContainer;
 
   @Column(name = "messageURI")

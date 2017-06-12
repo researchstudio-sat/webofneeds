@@ -4,10 +4,8 @@
 
 //TODO switch to requirejs for dependency mngmt (so this lib isn't angular-bound)
 //TODO replace calls to `won` object to `require('util')`
-
+import won from './won';
 (function(){ // <message-builder-js> scope
-    if(!won) won = {};
-
 
     /**
      * Builds the dataset that makes up the message. The set consists of several named

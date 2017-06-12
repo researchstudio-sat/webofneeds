@@ -6,6 +6,8 @@ import  won from '../won-es6';
 import Immutable from 'immutable';
 
 
+import jsonld from 'jsonld'; //import *after* the rdfstore to shadow its custom jsonld
+
 import { getRandomPosInt } from '../utils';
 
 import {
@@ -25,6 +27,8 @@ import {
     is,
     urisToLookupMap,
     msStringToDate,
+    getIn,
+    jsonld2simpleFormat,
 } from '../utils';
 
 import {
@@ -126,17 +130,38 @@ export function connectionsConnect(connectionUri,message) {
     return (dispatch, getState) => {
         const state = getState();
         const eventData = selectAllByConnections(state).get(connectionUri).toJS(); // TODO avoid toJS;
-        //let eventData = state.getIn(['connections', 'connectionsDeprecated', connectionData.connection.uri])
-        let messageData = null;
-        let deferred = Q.defer();
-        won.getConnectionWithEventUris(eventData.connection.uri).then(connection=> {
-            let msgToOpenFor = {event: eventData, connection: connection};
-            buildConnectMessage(msgToOpenFor, message).then(messageData=> {
-                deferred.resolve(messageData);
-            })
-        });
-        deferred.promise.then((action)=> {
+        const messageDataP = won
+            .getConnectionWithEventUris(eventData.connection.uri)
+            .then(connection=> {
+                let msgToOpenFor = {event: eventData, connection: connection};
+                return buildConnectMessage(msgToOpenFor, message)
+            });
+        messageDataP.then((action)=> {
             dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
+
+            jsonld.promises.frame(
+                action.message,
+                {
+                    '@id': action.eventUri,
+                    '@context': action.message['@context']
+                }
+            ).then(framed => {
+                let event = getIn(framed, ['@graph', 0]);
+                if(event) {
+                    event['@context'] = framed['@context']; // context is needed by jsonld2simpleFormat for expanding prefixes in values
+                    event = jsonld2simpleFormat(event);
+                }
+
+                dispatch({
+                    type: actionTypes.connections.connect,
+                    payload: {
+                        connectionUri,
+                        message,
+                        eventUri: action.eventUri,
+                        optimisticEvent: event,
+                    }
+                });
+            });
         })
     }
 }
@@ -156,6 +181,10 @@ export function connectionsClose(connectionUri) {
         });
         deferred.promise.then((action)=> {
             dispatch(actionCreators.messages__send({eventUri: action.eventUri, message: action.message}));
+            dispatch({
+                type: actionTypes.connections.close,
+                payload: { connectionUri }
+            });
         })
     }
 }
@@ -422,7 +451,7 @@ function getOldestEventInChain(state, connectionUri) {
     let acc = Immutable.Map()
         .add('frontier', Immutable.Set())
         .add('earliestLoaded', Immutable.Set());
-    for([uri, e] of latestEvents.entries()) {
+    for(let [uri, e] of latestEvents.entries()) {
         const previous = prevMsgs(e);
         if(!previous) continue;
     }

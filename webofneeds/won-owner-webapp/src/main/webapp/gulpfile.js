@@ -28,7 +28,7 @@ gulp.task('bundlejs', function(){
         //.pipe(gulp_jspm())
         .pipe(gulp_jspm({
             selfExecutingBundle: true,
-            //minify: true,
+            minify: true,
         }))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('./generated/'));
@@ -82,9 +82,6 @@ gulp.task('copy-static-scripts', function(done) {
         'node_modules/medium.js/medium.js',
         'scripts/jquery.10.2.js',
         'scripts/jquery.fs.scroller.min.js',
-        'jspm_packages/system.js',
-        'jspm_packages/system-polyfills.js',
-        'jspm_config.js',
     ])
         .pipe(gulp.dest('./generated/scripts/'))
 });

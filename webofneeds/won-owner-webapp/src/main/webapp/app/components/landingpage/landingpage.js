@@ -135,6 +135,7 @@ class LandingpageController {
     scrollToSignup(){
         const topPos = document.getElementById('signupSection').offsetTop;
         document.getElementById('allSections').scrollTop = topPos;
+        document.getElementById('registerEmail').focus();
     }
 }
 
