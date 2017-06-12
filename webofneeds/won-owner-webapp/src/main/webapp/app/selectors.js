@@ -490,12 +490,6 @@ export const selectSortedChatMessages = createSelector(
                         }
                         return remote && remote.get('hasTextMessage');
                     }
-                }).map(event => {
-                    const remote = event.get('hasCorrespondingRemoteMessage');
-                    if (event.get('hasTextMessage'))
-                        return event;
-                    else
-                        return remote;
                 })
 
                 /* sort them so the latest get shown last */
@@ -519,6 +513,14 @@ export const selectSortedChatMessages = createSelector(
                     else {
                         return 0;
                     }
+                })
+
+                .map(event => {
+                    const remote = event.get('hasCorrespondingRemoteMessage');
+                    if (event.get('hasTextMessage'))
+                        return event;
+                    else
+                        return remote;
                 })
 
                 /* add a nice relative timestamp */
