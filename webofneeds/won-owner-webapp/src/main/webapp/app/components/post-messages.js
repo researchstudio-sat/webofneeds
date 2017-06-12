@@ -71,12 +71,12 @@ function genComponentConf() {
                             {{ message.get('hasTextMessage') }}
                         </div>
                         <div
-                            ng-show="message.unconfirmed"
+                            ng-show="message.get('unconfirmed')"
                             class="pm__content__message__content__time">
                                 Pending&nbsp;&hellip;
                         </div>
                         <div
-                            ng-hide="message.unconfirmed"
+                            ng-hide="message.get('unconfirmed')"
                             class="pm__content__message__content__time">
                                 {{ message.get('humanReadableTimestamp') }}
                         </div>
