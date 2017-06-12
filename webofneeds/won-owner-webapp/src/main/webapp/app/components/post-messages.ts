@@ -10,7 +10,7 @@ import {
     delay,
     msStringToDate,
     urisToLookupMap,
-} from '../utils.js'
+} from '../utils'
 import {
     actionCreators
 }  from '../actions/actions';

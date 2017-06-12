@@ -10,7 +10,7 @@ import extendedGalleryModule from '../components/extended-gallery';
 import { actionCreators }  from '../actions/actions';
 import {
     attach,
-} from '../utils.js'
+} from '../utils'
 import {
     seeksOrIs,
     connect2Redux,
