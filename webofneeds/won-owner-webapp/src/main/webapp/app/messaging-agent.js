@@ -117,10 +117,18 @@ export function runMessagingAgent(redux) {
             const msgFromSystem = events['msg:FromSystem'];
 
             if(msgFromSystem && msgFromSystem.isResponseToMessageType === won.WONMSG.connectMessageCompacted){
-                if (msgFromSystem.hasMessageType === won.WONMSG.successResponseCompacted)
-                    redux.dispatch(actionCreators.messages__connect__success(events));
-                //else if(event.hasMessageType === won.WONMSG.failureResponseCompacted)
-                //  redux.dispatch(actionCreators.messages__open__failure(event));
+                if (msgFromSystem.hasMessageType === won.WONMSG.successResponseCompacted) {
+                    if (msgFromSystem.isRemoteResponseTo) {
+                        // got the second success-response (from the remote-node) - 2nd ACK
+                        redux.dispatch(actionCreators.messages__connect__successRemote({ events }));
+                    } else {
+                        // got the first success-response (from our own node) - 1st ACK
+                        redux.dispatch(actionCreators.messages__connect__successOwn({ events }));
+                    }
+
+                } else if(msgFromSystem.hasMessageType === won.WONMSG.failureResponseCompacted) {
+                    redux.dispatch(actionCreators.messages__connect__failure({ events }));
+                }
                 return true;
             }else{
                 return false;

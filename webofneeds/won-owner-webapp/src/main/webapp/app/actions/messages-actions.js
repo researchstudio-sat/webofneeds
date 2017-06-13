@@ -123,25 +123,6 @@ export function successfulCloseConnection(event) {
     }
 }
 
-export function successfulConnect(event) {
-    return (dispatch, getState) => {
-        const state = getState();
-        console.log("got response for CONNECT: " + event.hasMessageType);
-        let eventUri = null;
-        let receiverUri = null;
-        let isRemoteResponse = false;
-        //TODO maybe refactor these response message handling
-        if (state.getIn(['messages', 'waitingForAnswer', event.isRemoteResponseTo])) {
-            console.log("messages waitingForAnswer", event);
-            eventUri = event.isRemoteResponseTo;
-            dispatch({
-                type: actionTypes.messages.connect.success,
-                payload: event
-            });
-        }
-    }
-}
-
 //TODO move redirect elsewhere (e.g. to click-handler) then remove
 export function successfulOpen({ events }){
     return (dispatch, getState) => {

@@ -25,6 +25,34 @@ export const selectLastUpdateTime = state => state.get('lastUpdateTime');
 export const selectRouterParams = state => state.getIn(['router', 'currentParams']);
 export const selectDrafts = state => state.get('drafts');
 
+export const selectOwnEventUris = createSelector(
+    selectEvents,
+    events => events.keySeq().toSet()
+)
+
+/**
+ * Returns all events, but flattened, i.e.
+ * the events nested into others via
+ * `hasCorrespondingRemoteMessage` are listed
+ * directly via their uri.
+ */
+export const selectFlattenedEvents = createSelector(
+    selectEvents,
+        events => {
+        var flattenedEvents = events
+            .toList()
+            .flatMap(e => Immutable.List([e, e.get('hasCorrespondingRemoteMessage')]))
+
+            // the size-check is to avoid json-ld style uris, i.e. those that only
+            // contain of an uri field. These messages have not been properly loaded.
+            .filter(e => e && is('Object', e) && e.size > 1)
+
+            .map(e => [e.get('uri'), e]);
+
+        return Immutable.Map(flattenedEvents);
+    }
+);
+
 
 
 export const selectConnectionsByNeed = createSelector(
@@ -334,6 +362,9 @@ export const displayingOverview = createSelector(
     postUri => !postUri //if there's a postUri, this is almost certainly a detail view
 )
 
+/**
+ * @deprecated doesn't use daisy-chaining yet.
+ */
 export const selectLastUpdatedPerConnection = createSelector(
     selectAllByConnections,
     allByConnections => allByConnections.map(connectionAndRelated =>
@@ -353,6 +384,148 @@ export const selectLastUpdatedPerConnection = createSelector(
         .max()
     )
 );
+
+
+function ensureList(xs) {
+    if(!xs) return Immutable.List(); // undefined -> []
+    else if(is('String', xs)) return Immutable.List([xs]); // uri -> [uri]
+    else return Immutable.List(xs); // [uri] -> [uri]
+}
+
+/**
+ * @return a map of eventUri -> previousEventUri
+ */
+export const selectPreviousMessagesUris = createSelector(
+    selectEvents,
+    events => events
+     .map(e =>
+         Immutable.List([
+             ensureList(e.get('hasPreviousMessage')),
+             ensureList(e.getIn(['hasCorrespondingRemoteMessage','hasPreviousMessage'])),
+             ensureList(e.get('isResponseTo')),
+             ensureList(e.getIn(['hasCorrespondingRemoteMessage', 'isRemoteResponseTo']))
+         ]).flatten()
+     )
+
+        /*
+    selectFlattenedEvents,
+        flattenedEvents => flattenedEvents
+        .map(e =>
+            e.get('hasPreviousMessage')
+        )
+        .map(prevs => {
+            if(!prevs) return Immutable.List(); // undefined -> []
+            else if(is('String', prevs)) return Immutable.List([prevs]); // uri -> [uri]
+            else return Immutable.List(prevs); // [uri] -> [uri]
+        })
+        */
+
+);
+
+/**
+ * @return a map of eventUri -> previousEvent
+ */
+export const selectPrevMessages = createSelector(
+    selectFlattenedEvents, selectPreviousMessagesUris,
+    (flattenedEvents, prevMsgsUris) =>
+        prevMsgsUris.map(uris =>
+                uris.map(uri =>
+                        flattenedEvents.get(uri)
+                )
+        )
+);
+
+/**
+ * @return all uris that occur as `hasPreviousMessage`
+ */
+export const selectPreviousMessagesUrisFlattened = createSelector(
+    selectPreviousMessagesUris,
+        prevMsgsUris => prevMsgsUris.toList().flatten().toSet()
+);
+
+/**
+ * @return the uris of all events that don't ever occur as `hasPreviousMessage`
+ */
+export const selectUrisOfLatestLoadedMessages = createSelector(
+    selectOwnEventUris, selectPreviousMessagesUrisFlattened,
+    (ownEventUris, flattenedPrevUris) => ownEventUris.filter(uri => !flattenedPrevUris.has(uri))
+);
+
+/**
+ * @return all events, the uris of which don't ever occur as `hasPreviousMessage`
+ */
+export const selectLatestLoadedMessages = createSelector(
+    selectEvents, selectPreviousMessagesUrisFlattened,
+    (events, flattenedPrevUris) => events.filter((e, uri) => !flattenedPrevUris.has(uri))
+);
+
+//TODO refactor so that it always returns an array of immutable messages to
+// allow ng-repeat without giving up the cheaper digestion
+export const selectSortedChatMessages = createSelector(
+    selectOpenConnectionUri,
+    selectAllByConnections,
+    selectEvents,
+    selectLastUpdateTime,
+    (connectionUri, allByConnections, events, lastUpdateTime) => {
+        const connectionData = allByConnections.get(connectionUri);
+        const ownNeedUri = connectionData && connectionData.getIn(['ownNeed', '@id']);
+
+        if (!connectionData || !connectionData.get('events')) {
+            return Immutable.List();
+
+        } else {
+            const timestamp = (event) =>
+                //msStringToDate(selectTimestamp(event, connectionUri))
+                msStringToDate(selectTimestamp(event))
+
+            const chatMessages = connectionData.get('events')
+
+                /* filter for valid chat messages */
+                .filter(event => {
+                    if (event.get('hasTextMessage')) return true;
+                    else {
+                        let remote = event.get('hasCorrespondingRemoteMessage');
+                        if(is('String', remote)) {
+                            remote = events.get(remote);
+                        }
+                        return remote && remote.get('hasTextMessage');
+                    }
+                })
+
+                /* sort them so the latest get shown last */
+                .sort((event1, event2) =>
+                    timestamp(event1) - timestamp(event2)
+                )
+
+                .map(event => {
+                    const remote = event.get('hasCorrespondingRemoteMessage');
+                    if (event.get('hasTextMessage'))
+                        return event;
+                    else
+                        return remote;
+                })
+
+                /* add a nice relative timestamp */
+                .map(event => event.set(
+                    'humanReadableTimestamp',
+                    relativeTime(
+                        lastUpdateTime,
+                        timestamp(event)
+                    )
+                )
+            );
+
+            return chatMessages;
+        }
+    }
+);
+
+export const selectSortedChatMessagesArray = createSelector(
+    selectSortedChatMessages,
+        sortedMessages => sortedMessages.toArray()
+);
+
+
 
 window.selectAllByConnections4dbg = selectAllByConnections;
 window.allByConnection4db = allByConnection;

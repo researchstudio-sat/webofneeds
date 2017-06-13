@@ -177,8 +177,10 @@ const actionHierarchy = {
             //TODO failure: messages.failedClose
         },
         connect: {
-            success: messages.successfulConnect,
-            //TODO failure: messages.failedConnect //optimistic event is already stored
+            //success: messages.successfulConnect,
+            successRemote: INJ_DEFAULT, //2nd successResponse
+            successOwn: INJ_DEFAULT, //1st successResponse
+            failure: INJ_DEFAULT,
         },
         chatMessage: {
             //success: messages.successfulChatMessage,

@@ -69,6 +69,7 @@ export default function(state = initialState, action = {}) {
             var eventUri = action.payload.eventUri;
             return storeOptimisticEvent(state, action.payload.optimisticEvent);
 
+        case actionTypes.messages.connect.failure:
         case actionTypes.messages.open.failure:
         case actionTypes.messages.chatMessage.failure:
             //var eventOnRemoteNode = action.payload.events['msg:FromOwner'];
@@ -78,6 +79,7 @@ export default function(state = initialState, action = {}) {
             var eventUri = msgFromOwner.isRemoteResponseTo || msgFromOwner.isResponseTo;
             return state.removeIn(['events', eventUri]);
 
+        case actionTypes.messages.connect.successOwn:
         case actionTypes.messages.open.successOwn:
         case actionTypes.messages.chatMessage.successOwn:
             var msgFromOwner = Immutable.fromJS(action.payload.events['msg:FromSystem']);
@@ -93,6 +95,7 @@ export default function(state = initialState, action = {}) {
                      .set('hasReceivedTimestamp', msgFromOwner.get('hasReceivedTimestamp'))
                 )
 
+        case actionTypes.messages.connect.successRemote:
         case actionTypes.messages.open.successRemote:
         case actionTypes.messages.chatMessage.successRemote:
             //var eventOnRemoteNode = Immutable.fromJS(action.payload.events['msg:FromOwner']);

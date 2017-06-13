@@ -22,12 +22,13 @@ import {
     selectAllByConnections,
     selectOpenConnectionUri,
     selectOpenConnection,
+    selectSortedChatMessages,
+    selectSortedChatMessagesArray,
 } from '../selectors';
 import {
     seeksOrIs,
     inferLegacyNeedType,
     selectTimestamp,
-    selectSortedChatMessages,
 } from '../won-utils'
 
 const serviceDependencies = ['$ngRedux', '$scope', '$element'];
@@ -70,12 +71,12 @@ function genComponentConf() {
                             {{ message.get('hasTextMessage') }}
                         </div>
                         <div
-                            ng-show="message.unconfirmed"
+                            ng-show="message.get('unconfirmed')"
                             class="pm__content__message__content__time">
                                 Pending&nbsp;&hellip;
                         </div>
                         <div
-                            ng-hide="message.unconfirmed"
+                            ng-hide="message.get('unconfirmed')"
                             class="pm__content__message__content__time">
                                 {{ message.get('humanReadableTimestamp') }}
                         </div>
@@ -116,7 +117,6 @@ function genComponentConf() {
             attach(this, serviceDependencies, arguments);
             window.pm4dbg = this;
             window.selectOpenConnectionUri4dbg = selectOpenConnectionUri;
-            window.selectChatMessages4dbg = selectSortedChatMessages;
 
             const self = this;
 
@@ -132,13 +132,14 @@ function genComponentConf() {
                 const ownNeed = connectionData && connectionData.get('ownNeed');
                 const theirNeed = connectionData && connectionData.get('remoteNeed');
                 const chatMessages = selectSortedChatMessages(state);
+                const chatMessagesArray = selectSortedChatMessagesArray(state);
                 return {
                     connectionData,
                     connectionUri,
                     connection,
                     eventsLoaded,
                     lastUpdateTime: state.get('lastUpdateTime'),
-                    chatMessages: chatMessages && chatMessages.toArray(), //toArray needed as ng-repeat won't work otherwise :|
+                    chatMessages: chatMessagesArray, //toArray needed as ng-repeat won't work otherwise :|
                     state4dbg: state,
                     debugmode: won.debugmode,
 
