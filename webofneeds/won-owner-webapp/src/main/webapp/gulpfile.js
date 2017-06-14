@@ -13,7 +13,7 @@ var sourcemaps = require('gulp-sourcemaps');
 gulp.task('default', ['build']);
 gulp.task('build', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res', 'copy-static-scripts']);
 gulp.task('watch', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res'], function() {
-    gulp.watch('./*.js', ['bundlejs']);
+    gulp.watch('./*.ts', ['bundlejs']);
     gulp.watch('./app/**/*.js', ['bundlejs']);
     gulp.watch('./style/**/*.scss', ['sass']);
     gulp.watch('./style/**/_*.scss', ['sass']);
