@@ -25,7 +25,7 @@ System.config({
   },
 
   map: {
-    "angular": "npm:angular@1.4.8",
+    "angular": "npm:angular@1.6.4",
     "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.13.0",
     "angular-inview": "npm:angular-inview@2.1.0",
     "angular-mocks": "github:angular/bower-angular-mocks@1.4.2",
