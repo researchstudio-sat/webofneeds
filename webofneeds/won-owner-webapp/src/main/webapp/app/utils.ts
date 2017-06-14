@@ -18,11 +18,6 @@ export function firstToLowerCase(str) {
     return str.replace(/^([A-Z])/, args => args[0].toLowerCase()) //de-capitalize first letter
 }
 
-window.hyphen2Camel = hyphen2Camel;
-window.camel2Hyphen = camel2Hyphen;
-window.firstToLowerCase = firstToLowerCase;
-
-
 /**
  * Attaches the contents of `attachments` to `target` using the variable names from `names`
  * @param target the object
