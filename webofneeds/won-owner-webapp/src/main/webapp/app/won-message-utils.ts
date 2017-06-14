@@ -447,7 +447,7 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
         return Promise.resolve(emptyDataset);
     }
 
-    dispatchWellFormed = (payload) => curriedDispatch(wellFormedPayload(payload));
+    const dispatchWellFormed = (payload) => curriedDispatch(wellFormedPayload(payload));
 
     const allLoadedPromise = Promise.all(
         ownNeedUris.map(uri => won.ensureLoaded(uri, { requesterWebId: uri, deep: true }))
