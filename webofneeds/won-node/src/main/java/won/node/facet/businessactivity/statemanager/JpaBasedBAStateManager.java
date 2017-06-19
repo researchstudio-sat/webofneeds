@@ -23,7 +23,6 @@ public class JpaBasedBAStateManager implements BAStateManager
 
 
   @Override
-  @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
   public URI getStateForNeedUri(final URI coordinatorURI, final URI participantURI, final URI facetURI) {
     List<BAState> states = stateRepository.findByCoordinatorURIAndParticipantURIAndFacetTypeURI(coordinatorURI, participantURI, facetURI);
     Iterator<BAState> stateIterator = states.iterator();
@@ -63,7 +62,6 @@ public class JpaBasedBAStateManager implements BAStateManager
   }
 
   @Override
-  @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
   public URI getStatePhaseForNeedUri(final URI coordinatorURI, final URI participantURI, final URI facetURI) {
     List<BAState> states = stateRepository.findByCoordinatorURIAndParticipantURIAndFacetTypeURI(coordinatorURI, participantURI, facetURI);
     Iterator<BAState> stateIterator = states.iterator();
