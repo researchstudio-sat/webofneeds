@@ -21,7 +21,7 @@ import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageValidator;
+import won.protocol.validation.WonMessageValidator;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageNotWellFormedException;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
@@ -48,7 +48,13 @@ public class WellformednessCheckingWonMessageProcessor implements WonMessageProc
     Dataset dataset = message.getCompleteDataset();
 
     StringBuilder errorMessage = new StringBuilder("Message is not valid, failed at check ");
-    boolean valid = validator.validate(dataset, errorMessage);
+    boolean valid = false;
+    try {
+        dataset.getLock().enterCriticalSection(true);
+        valid = validator.validate(dataset, errorMessage);
+    } finally {
+        dataset.getLock().leaveCriticalSection();
+    }
     if (!valid) {
       logger.info(errorMessage.toString() + "\n Offending message:\n" + RdfUtils.writeDatasetToString(dataset, Lang
         .TRIG));
