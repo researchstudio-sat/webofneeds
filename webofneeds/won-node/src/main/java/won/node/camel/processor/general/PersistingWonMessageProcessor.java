@@ -19,9 +19,6 @@ package won.node.camel.processor.general;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import won.node.service.DataAccessService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
@@ -56,7 +53,6 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
 
   @Override
   //we use READ_COMMITTED because we want to wait for an exclusive lock will accept data written by a concurrent transaction that commits before we read
-  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
   public WonMessage process(WonMessage message) throws WonMessageProcessingException {
     URI parentURI = WonMessageUtils.getParentEntityUri(message);
     updateResponseInfo(message);
@@ -74,6 +70,8 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
     URI originalMessageURI = message.getIsResponseToMessageURI();
     if (originalMessageURI != null) {
       // update the message it responds to with the uri of the response
+      messageEventRepository.lockConnectionAndEventContainerByContainedMessageForUpdate(originalMessageURI);
+      messageEventRepository.lockNeedAndEventContainerByContainedMessageForUpdate(originalMessageURI);
       MessageEventPlaceholder event = messageEventRepository.findOneByMessageURIforUpdate(originalMessageURI);
       if (event != null){
         //we may not have saved the event yet if the current message is a FailureResponse
@@ -93,10 +91,6 @@ public class PersistingWonMessageProcessor implements WonMessageProcessor {
                                 wonMessage, container);
     event.setDatasetHolder(datasetHolder);
     messageEventRepository.save(event);
-    //FIXLOSTUPDATES:
-    //this could be part of the problem if the transaction stays open for a long time
-    //options:
-    // * commit immediately here (trying with REQURES_NEW)
   }
 
   private EventContainer loadOrCreateEventContainer(final WonMessage wonMessage, final URI parent) {
