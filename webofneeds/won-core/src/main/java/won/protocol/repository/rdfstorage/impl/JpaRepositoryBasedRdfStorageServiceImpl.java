@@ -20,9 +20,6 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import won.protocol.model.DataWithEtag;
 import won.protocol.model.DatasetHolder;
 import won.protocol.repository.DatasetHolderRepository;
@@ -40,7 +37,6 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
   private DatasetHolderRepository datasetHolderRepository;
 
 
-  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   @Override
   public void storeModel(final URI resourceURI, final Model model) {
     Dataset dataset = DatasetFactory.createGeneral();
@@ -49,7 +45,6 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
     storeDataset(resourceURI, dataset);
   }
 
-  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   @Override
   public void storeDataset(final URI resourceURI, final Dataset dataset) {
     DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
@@ -61,14 +56,12 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
     datasetHolderRepository.save(datasetHolder);
   }
 
-  @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, isolation = Isolation.READ_COMMITTED)
   @Override
   public Model loadModel(final URI resourceURI) {
     DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
     return datasetHolder == null ? null : datasetHolder.getDataset().getDefaultModel();
   }
 
-  @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, isolation = Isolation.READ_COMMITTED)
   @Override
   public DataWithEtag<Model> loadModel(final URI resourceURI, String etag) {
     Integer version = Integer.valueOf(etag);
@@ -81,14 +74,12 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
   }
 
 
-  @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, isolation = Isolation.READ_COMMITTED)
   @Override
   public Dataset loadDataset(final URI resourceURI) {
     DatasetHolder datasetHolder = datasetHolderRepository.findOneByUri(resourceURI);
     return datasetHolder == null ? null : datasetHolder.getDataset();
   }
 
-  @Transactional(propagation = Propagation.REQUIRED, readOnly = true, isolation = Isolation.READ_COMMITTED)
   @Override
   public DataWithEtag<Dataset> loadDataset(final URI resourceURI, String etag) {
     Integer version = etag == null ? -1 : Integer.valueOf(etag);
@@ -100,7 +91,6 @@ public class JpaRepositoryBasedRdfStorageServiceImpl implements RDFStorageServic
     return dataWithEtag;
   }
 
-  @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.REPEATABLE_READ)
   @Override
   public boolean removeContent(final URI resourceURI) {
     try{
