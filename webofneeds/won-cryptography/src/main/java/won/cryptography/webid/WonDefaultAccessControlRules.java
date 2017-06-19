@@ -4,8 +4,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.repository.MessageEventRepository;
 
@@ -30,7 +28,6 @@ public class WonDefaultAccessControlRules implements AccessControlRules
   public WonDefaultAccessControlRules() {
   }
 
-  @Transactional(isolation = Isolation.READ_COMMITTED)
   public boolean isAccessPermitted(String resourceURI, List<String> requesterWebIDs) {
     //TODO retrieve from an acl source for a resource instead of this temporary approach
     //specific for the message event resources

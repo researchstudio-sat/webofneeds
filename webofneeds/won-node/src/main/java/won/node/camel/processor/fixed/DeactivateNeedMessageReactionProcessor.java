@@ -20,9 +20,6 @@ import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.message.WonMessage;
@@ -48,7 +45,6 @@ public class DeactivateNeedMessageReactionProcessor extends AbstractCamelProcess
 {
   Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void process(final Exchange exchange) throws Exception {
     WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
     URI receiverNeedURI = wonMessage.getReceiverNeedURI();

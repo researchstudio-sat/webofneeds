@@ -22,9 +22,6 @@ import org.apache.jena.sparql.util.IsoMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
@@ -64,7 +61,6 @@ public class UriAlreadyUsedCheckingWonMessageProcessor implements WonMessageProc
   protected NeedRepository needRepository;
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
   public WonMessage process(final WonMessage message) throws UriAlreadyInUseException {
     checkEventURI(message);
     checkNeedURI(message);
