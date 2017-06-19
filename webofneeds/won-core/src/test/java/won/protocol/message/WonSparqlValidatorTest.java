@@ -5,6 +5,7 @@ import org.apache.jena.query.Query;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
+import won.protocol.validation.WonSparqlValidator;
 
 import java.io.IOException;
 

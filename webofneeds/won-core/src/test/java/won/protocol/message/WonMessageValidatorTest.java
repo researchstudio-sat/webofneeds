@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.validation.WonMessageValidator;
 import won.protocol.vocabulary.SFSIG;
 import won.protocol.vocabulary.WONMSG;
 

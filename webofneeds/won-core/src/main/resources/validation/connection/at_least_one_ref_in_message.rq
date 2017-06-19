@@ -1,0 +1,9 @@
+# Any message other than a `Create` message must contain at least one reference
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX msg: <http://purl.org/webofneeds/message#>
+PREFIX won: <http://purl.org/webofneeds/model#>
+SELECT * WHERE {
+  ?msg msg:hasMessageType ?msgType .
+  FILTER NOT EXISTS {?msg msg:hasPreviousMessage ?msg2}
+  FILTER (?msgType != msg:CreateMessage && ?msgType != msg:NeedCreatedNotificationMessage)
+}

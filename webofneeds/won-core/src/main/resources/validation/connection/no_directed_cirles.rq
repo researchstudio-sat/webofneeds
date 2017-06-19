@@ -1,0 +1,10 @@
+# There must be no directed circles in the graph
+PREFIX msg: <http://purl.org/webofneeds/message#>
+SELECT ?msg WHERE {
+  {
+  	?msg msg:hasPreviousMessage ?msg .
+  } UNION {
+  	?msg msg:hasPreviousMessage ?msg2 .
+  	?msg2 msg:hasPreviousMessage* ?msg
+  }
+}
