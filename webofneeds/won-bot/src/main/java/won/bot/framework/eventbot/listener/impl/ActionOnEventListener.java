@@ -105,4 +105,16 @@ public class ActionOnEventListener extends BaseEventListener
       }
     }
   }
+
+    @Override
+    public boolean equals(Object o) {
+        return this == o;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = task.hashCode();
+        result = 31 * result + timesToRun;
+        return result;
+    }
 }
