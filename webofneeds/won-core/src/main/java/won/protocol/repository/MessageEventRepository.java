@@ -18,6 +18,15 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
     MessageEventPlaceholder findOneByMessageURI(URI URI);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select n,c from NeedEventContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Need n on c.parentUri = n.needURI where msg.messageURI = :messageUri")
+    public void lockNeedAndEventContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select con,c from NeedEventContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Connection con on c.parentUri = con.needURI where msg.messageURI = :messageUri")
+    public void lockConnectionAndEventContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
+
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select msg from MessageEventPlaceholder msg where msg.messageURI = :uri")
     MessageEventPlaceholder findOneByMessageURIforUpdate(@Param("uri") URI uri);
 
@@ -29,9 +38,17 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
             @Param("parent") URI parentURI,
             @Param("messageType") WonMessageType messageType);
 
+    @Query("select msg from MessageEventPlaceholder msg where msg.parentURI = :parent and msg.messageType = :messageType")
+    List<MessageEventPlaceholder> findByParentURIAndMessageType(
+            @Param("parent") URI parentURI,
+            @Param("messageType") WonMessageType messageType);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select msg from MessageEventPlaceholder msg left outer join MessageEventPlaceholder msg2 on msg.parentURI = msg2.parentURI and msg.creationDate < msg2.creationDate where msg.parentURI = :parent and msg2.id is null")
     MessageEventPlaceholder findNewestByParentURIforUpdate(@Param("parent") URI parentUri);
+
+    @Query("select msg from MessageEventPlaceholder msg left outer join MessageEventPlaceholder msg2 on msg.parentURI = msg2.parentURI and msg.creationDate < msg2.creationDate where msg.parentURI = :parent and msg2.id is null")
+    MessageEventPlaceholder findNewestByParentURI(@Param("parent") URI parentUri);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select msg from MessageEventPlaceholder msg left outer join MessageEventPlaceholder msg2 on msg.parentURI = msg2.parentURI and msg.creationDate > msg2.creationDate where msg.parentURI = :parent and msg2.id is null")
@@ -42,6 +59,10 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
     @Query("select msg from MessageEventPlaceholder msg where msg.parentURI = :parent and " +
             "referencedByOtherMessage = false")
     List<MessageEventPlaceholder> findByParentURIAndNotReferencedByOtherMessageForUpdate(
+            @Param("parent") URI parentURI);
+    @Query("select msg from MessageEventPlaceholder msg where msg.parentURI = :parent and " +
+            "referencedByOtherMessage = false")
+    List<MessageEventPlaceholder> findByParentURIAndNotReferencedByOtherMessage(
             @Param("parent") URI parentURI);
 
     @Query("select msg from MessageEventPlaceholder msg where msg.parentURI = :parent")

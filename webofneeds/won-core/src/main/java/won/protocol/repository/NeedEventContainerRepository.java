@@ -27,12 +27,19 @@ import java.net.URI;
 /**
  * Created by fkleedorfer on 05.12.2016.
  */
-public interface NeedEventContainerRepository extends WonRepository<NeedEventContainer>
-{
-  public NeedEventContainer findOneByParentUri(URI parentUri);
+public interface NeedEventContainerRepository extends WonRepository<NeedEventContainer> {
+    public NeedEventContainer findOneByParentUri(URI parentUri);
 
-  @Lock(LockModeType.PESSIMISTIC_WRITE)
-  @Query("select c from NeedEventContainer c where c.parentUri = :parentUri")
-  public NeedEventContainer findOneByParentUriForUpdate(@Param("parentUri") URI parentUri);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select c from NeedEventContainer c where c.parentUri = :parentUri")
+    public NeedEventContainer findOneByParentUriForUpdate(@Param("parentUri") URI parentUri);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select need, c from Need need join NeedEventContainer c on need.needURI = c.parentUri where c.parentUri = :parentUri")
+    public void lockParentAndContainerByParentUriForUpdate(@Param("parentUri") URI parentUri);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select c from NeedEventContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri where msg.messageURI = :messageUri")
+    public NeedEventContainer findOneByContainedMessageUriForUpdate(@Param("messageUri") URI messageUri);
 
 }
