@@ -20,9 +20,6 @@ import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import won.protocol.matcher.MatcherProtocolNeedService;
 import won.protocol.message.WonMessage;
 import won.protocol.service.MatcherFacingNeedCommunicationService;
@@ -41,7 +38,6 @@ public class MatcherProtocolNeedServiceImpl implements MatcherProtocolNeedServic
   private MatcherFacingNeedCommunicationService matcherFacingNeedCommunicationService;
 
   @Override
-  @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.REPEATABLE_READ)
   public void hint(final URI needURI, final URI otherNeed,
                    final double score, final URI originator,
                    Model content, WonMessage wonMessage) throws Exception {
