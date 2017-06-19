@@ -3,9 +3,6 @@ package won.node.camel.processor.fixed;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -30,7 +27,6 @@ import java.util.Collection;
 public class HintMessageProcessor extends AbstractCamelProcessor {
 
 
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
     public void process(Exchange exchange) throws Exception {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -38,6 +34,7 @@ public class HintMessageProcessor extends AbstractCamelProcessor {
         logger.debug("STORING message with id {}", wonMessage.getMessageURI());
 
         URI needURIFromWonMessage = wonMessage.getReceiverNeedURI();
+        URI wonNodeFromWonMessage = wonMessage.getReceiverNodeURI();
         URI otherNeedURIFromWonMessage = URI.create(RdfUtils.findOnePropertyFromResource(
                 wonMessage.getMessageContent(), wonMessage.getMessageURI(),
                 WON.HAS_MATCH_COUNTERPART).asResource().getURI());
@@ -63,7 +60,7 @@ public class HintMessageProcessor extends AbstractCamelProcessor {
         Connection con = connectionRepository.findOneByNeedURIAndRemoteNeedURIAndTypeURIForUpdate(needURIFromWonMessage, otherNeedURIFromWonMessage, facet);
         if (con == null) {
             URI connectionUri = wonNodeInformationService.generateConnectionURI(
-                    wonNodeInformationService.getWonNodeUri(needURIFromWonMessage));
+                    wonNodeFromWonMessage);
             con = dataService.createConnection(
                     connectionUri, needURIFromWonMessage, otherNeedURIFromWonMessage,
                     null, facet, ConnectionState.SUGGESTED, ConnectionEventType.MATCHER_HINT);
