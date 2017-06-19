@@ -20,13 +20,26 @@ import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.filter.AbstractCompositeFilter;
 import won.bot.framework.eventbot.filter.EventFilter;
 
+import java.util.List;
+
 /**
  * Filter that accepts if all filters it has accept.
  */
 public class AndFilter extends AbstractCompositeFilter
 {
 
-  @Override
+    public AndFilter() {
+    }
+
+    public AndFilter(List<EventFilter> filters) {
+        super(filters);
+    }
+
+    public AndFilter(EventFilter... filters) {
+        super(filters);
+    }
+
+    @Override
   public synchronized boolean accept(final Event event)
   {
     for (EventFilter filter: getFilters()){
