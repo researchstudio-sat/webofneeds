@@ -100,7 +100,6 @@ public class RestNeedController {
     method = RequestMethod.GET
   )
   //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.SUPPORTS)
   public List<CreateDraftPojo> getAllDrafts() {
     User user = getCurrentUser();
 

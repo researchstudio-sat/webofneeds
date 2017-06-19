@@ -5,7 +5,6 @@
 
 package won.owner.web.rest;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
@@ -42,7 +40,6 @@ import won.owner.web.WonOwnerMailSender;
 import won.owner.web.validator.UserRegisterValidator;
 import won.protocol.util.CheapInsecureRandomString;
 
-import javax.print.DocFlavor;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -139,7 +136,6 @@ public class RestUserController
   )
 
   //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.SUPPORTS)
   public UserSettingsPojo getUserSettings(@RequestParam("uri") String uri) {
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -301,7 +297,6 @@ public class RestUserController
     method = RequestMethod.GET
   )
   //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.SUPPORTS)
   //public ResponseEntity isSignedIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
   public ResponseEntity isSignedIn() {
     // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
@@ -329,7 +324,6 @@ public class RestUserController
     method = RequestMethod.GET
   )
   //TODO: move transactionality annotation into the service layer
-  @Transactional(propagation = Propagation.SUPPORTS)
   //public ResponseEntity isSignedIn(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
   public ResponseEntity isSignedInRole() {
     // Execution will only get here, if the session is still valid, so sending OK here is enough. Spring sends an error
