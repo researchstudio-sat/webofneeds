@@ -41,7 +41,7 @@
             <bean class="org.springframework.scheduling.support.PeriodicTrigger">
                 <constructor-arg name="period" value="2000"/>
                 <constructor-arg name="timeUnit" value="MILLISECONDS"/>
-                <property name="initialDelay" value="10000"/> <!-- wait 10s at the beginning -->
+                <property name="initialDelay" value="2000"/> <!-- wait 10s at the beginning -->
                 <property name="fixedRate" value="false"/>  <!-- fixed delay after completion -->
             </bean>
         </property>
