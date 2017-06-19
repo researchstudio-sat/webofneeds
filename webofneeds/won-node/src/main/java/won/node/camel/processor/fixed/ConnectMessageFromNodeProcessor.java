@@ -3,9 +3,6 @@ package won.node.camel.processor.fixed;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.exception.NoSuchConnectionException;
@@ -29,13 +26,13 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor
 {
 
 
-  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
     // a need wants to connect.
     // get the required data from the message and create a connection
     URI needUri = wonMessage.getReceiverNeedURI();
+    URI wonNodeUriFromWonMessage = wonMessage.getReceiverNodeURI();
     URI remoteNeedUri = wonMessage.getSenderNeedURI();
     URI remoteConnectionUri = wonMessage.getSenderURI();
     URI facetURI = WonRdfUtils.FacetUtils.getRemoteFacet(wonMessage);
@@ -53,7 +50,7 @@ public class ConnectMessageFromNodeProcessor extends AbstractCamelProcessor
     if (con == null){
       //create Connection in Database
       URI connectionUri = wonNodeInformationService.generateConnectionURI(
-        wonNodeInformationService.getWonNodeUri(needUri));
+        wonNodeUriFromWonMessage);
       con = dataService.createConnection(connectionUri, needUri, remoteNeedUri, remoteConnectionUri, facetURI,
                                          ConnectionState.REQUEST_RECEIVED,
                                          ConnectionEventType.PARTNER_OPEN);
