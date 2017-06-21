@@ -16,14 +16,12 @@
 
 package won.node.camel.processor.fixed;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.protocol.exception.NoSuchNeedException;
@@ -32,6 +30,7 @@ import won.protocol.message.WonMessageBuilder;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Need;
+import won.protocol.repository.NeedRepository;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
@@ -44,10 +43,11 @@ import java.net.URI;
 @FixedMessageReactionProcessor(direction= WONMSG.TYPE_FROM_OWNER_STRING,messageType = WONMSG.TYPE_CREATE_STRING)
 public class CreateNeedMessageReactionProcessor extends AbstractCamelProcessor
 {
+    @Autowired
+    NeedRepository needRepository;
 
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -69,7 +69,7 @@ public class CreateNeedMessageReactionProcessor extends AbstractCamelProcessor
 
 
   private WonMessage makeNeedCreatedMessageForMatcher(final Need need) throws NoSuchNeedException {
-    Dataset needDataset = linkedDataService.getNeedDataset(need.getNeedURI());
+    Dataset needDataset = need.getDatatsetHolder().getDataset();
     return WonMessageBuilder
       .setMessagePropertiesForNeedCreatedNotification(wonNodeInformationService.generateEventURI(),
                                                       need.getNeedURI(), need.getWonNodeURI())
@@ -85,6 +85,5 @@ public class CreateNeedMessageReactionProcessor extends AbstractCamelProcessor
     }
     return needURI;
   }
-
 
 }

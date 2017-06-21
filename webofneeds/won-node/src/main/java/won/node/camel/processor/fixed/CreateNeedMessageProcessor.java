@@ -1,15 +1,12 @@
 package won.node.camel.processor.fixed;
 
-import org.apache.jena.query.Dataset;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.apache.jena.query.Dataset;
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.protocol.message.WonMessage;
@@ -37,7 +34,6 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
 
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void process(final Exchange exchange) throws Exception {
     Message message = exchange.getIn();
     WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
@@ -66,11 +62,8 @@ public class CreateNeedMessageProcessor extends AbstractCamelProcessor
     } else {
       throw new UriAlreadyInUseException("Found a NeedEventContainer for the need we're about to create (" + needURI + ") - aborting");
     }
-    needEventContainer.getEvents().add(messageEventRepository.findOneByMessageURI(wonMessage.getMessageURI()));
     need.setWonNodeURI(wonMessage.getReceiverNodeURI());
     ConnectionContainer connectionContainer = new ConnectionContainer(need);
-
-
     need.setConnectionContainer(connectionContainer);
     need.setEventContainer(needEventContainer);
 

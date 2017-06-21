@@ -29,7 +29,10 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Action to perform when the debug bot is set to be 'chatty' - that is,
@@ -100,8 +103,12 @@ public class SendChattyMessageAction extends BaseEventBotAction {
             //publish an event that causes the message to be sent
             Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(conURI);
             Connection con = RdfUtils.findFirst(connectionRDF, x -> new ConnectionModelMapper().fromModel(x));
-            Model messageModel = WonRdfUtils.MessageUtils.textMessage(message);
-            getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(con, messageModel));
+            if (con != null) {
+                Model messageModel = WonRdfUtils.MessageUtils.textMessage(message);
+                getEventListenerContext().getEventBus().publish(new ConnectionMessageCommandEvent(con, messageModel));
+            } else {
+                logger.warn("could not send chatty message on connection {} - failed to generate Connection object from RDF", conURI);
+            }
         }
         if (toRemove != null) {
             for (URI uri : toRemove) {

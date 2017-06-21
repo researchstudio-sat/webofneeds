@@ -16,13 +16,10 @@
 
 package won.node.camel.processor.general;
 
-import org.apache.jena.rdf.model.Model;
 import org.apache.camel.Exchange;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageBuilder;
@@ -42,7 +39,6 @@ import java.net.URI;
 public class FailResponder extends AbstractCamelProcessor
 {
   @Override
-  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void process(final Exchange exchange) throws Exception {
     Exception exception = null;
     WonMessage originalMessage = null;

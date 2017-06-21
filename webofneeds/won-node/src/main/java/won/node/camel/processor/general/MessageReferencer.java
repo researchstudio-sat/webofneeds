@@ -20,9 +20,6 @@ import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import won.cryptography.rdfsign.SigningStage;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
@@ -32,12 +29,10 @@ import won.protocol.message.processor.exception.WonMessageProcessingException;
 import won.protocol.message.processor.impl.WonMessageSignerVerifier;
 import won.protocol.model.DatasetHolder;
 import won.protocol.model.MessageEventPlaceholder;
-import won.protocol.repository.DatasetHolderRepository;
-import won.protocol.repository.MessageEventRepository;
+import won.protocol.repository.*;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,41 +47,86 @@ public class MessageReferencer {
     @Autowired
     private MessageEventRepository messageEventRepository;
     @Autowired
+    private ConnectionRepository connectionRepository;
+    @Autowired
+    private ConnectionEventContainerRepository connectionEventContainerRepository;
+    @Autowired
+    private NeedRepository needRepository;
+    @Autowired
+    private NeedEventContainerRepository needEventContainerRepository;
+    @Autowired
     private DatasetHolderRepository datasetHolderRepository;
 
     /**
      * Adds message references to <code>message</code>. If <code>messageBeingRepliedTo</code> is not null, a reference to that message will be added.
      * The referencedByOtherMessage flag will be set in all messages that are referenced.
      */
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public WonMessage addMessageReferences(final WonMessage message) throws WonMessageProcessingException {
-        Set<MessageAndPlaceholder> selected = new HashSet<>();
-        selectLatestMessage(selected, message);
-        selectUnreferenceMessages(selected, message);
-        selected = removeReferenceToSelf(selected, message);
+        // first, lock the parent. Tthis is required because modifying
+        // the past messages may cause conflicing concurrent modifications
+        Set<MessageUriAndParentUri> selectedMessageUris = new HashSet<>();
+        selectLatestMessage(selectedMessageUris, message);
+        selectUnreferenceMessages(selectedMessageUris, message);
+        deselectSelf(selectedMessageUris, message);
+        if (logger.isDebugEnabled()){
+            logger.debug("locking parents for message {}", message.getMessageURI());
+        }
+        lockParentByContainedMessage(message.getMessageURI());
+        if (logger.isDebugEnabled()) {
+            logger.debug("loading messages to reference for message {}: {}", message.getMessageURI(),
+                    selectedMessageUris);
+        }
+        List<MessageAndPlaceholder> selected = acquireLockedEntities(selectedMessageUris);
         WonMessage newMessage = processSelected(selected, message);
         updateReferenced(selected);
         return newMessage;
     }
 
+    private List<MessageAndPlaceholder> acquireLockedEntities(Set<MessageUriAndParentUri> selectedMessageUris) {
+        selectedMessageUris.stream()
+                .map(u -> u.getParentURI()) //get only the parents
+                .collect(Collectors.toSet())  //remove duplicates
+                .stream().sorted() //sort to ensure same processing ordering in all transactions (avoid deadlocks)
+                .forEach(parentUri -> lockParentByParentURI(parentUri));
+        return selectedMessageUris.stream()
+                .map(u -> u.getMessageURI())
+                .collect(Collectors.toSet()).stream() //avoid duplictes (just to make sure)
+                .sorted() //sort to ensure same processing ordering in all transactions (avoid deadlocks)
+                .map(messageUri -> {
+                        //lock the messages and load the WonMessages and MessageEventPlaceholders
+                        logger.debug("loading for update:{}", messageUri);
+                        return new MessageAndPlaceholder(
+                                messageEventRepository.findOneByMessageURIforUpdate(messageUri),
+                                loadWonMessageforURI(messageUri)
+                        );
+                })
+                .collect(Collectors.toList());
+    }
+
 
     /**
      * Selects the latest
-     * @param selected
+     *
+     * @param selectedUris
      * @param message
      */
-    private void selectLatestMessage(Set<MessageAndPlaceholder> selected, WonMessage message) {
-        List<MessageEventPlaceholder> messageEventPlaceholders = new ArrayList<>();
-                //initialize a variable for the result
+    private void selectLatestMessage(Set<MessageUriAndParentUri> selectedUris, WonMessage message) {
+        //initialize a variable for the result
         WonMessageType messageType = message.getMessageType();
-        switch (messageType){
+        switch (messageType) {
 
-            case SUCCESS_RESPONSE :
-            case FAILURE_RESPONSE :
+            case SUCCESS_RESPONSE:
+            case FAILURE_RESPONSE:
                 //we are replying to a message, so add that to the selected List
-                MessageEventPlaceholder messageEventPlaceholder = messageEventRepository.findOneByMessageURIforUpdate(WonMessageUtils.getLocalIsResponseToURI(message));
+                URI isResponseToURI = WonMessageUtils.getLocalIsResponseToURI(message);
+                MessageEventPlaceholder messageEventPlaceholder = messageEventRepository.findOneByMessageURI(isResponseToURI);
+                String methodName = "selectLatestMessage::response";
                 if (messageEventPlaceholder != null) {
-                    messageEventPlaceholders.add(messageEventPlaceholder);
+                    selectedUris.add(
+                            new MessageUriAndParentUri(
+                                    messageEventPlaceholder.getMessageURI(),
+                                    messageEventPlaceholder.getParentURI())
+                    );
                 }
                 break;
 
@@ -97,50 +137,61 @@ public class MessageReferencer {
             default:
                 //any other message: reference the latest message in the parent (i.e. the container of the message)
                 //if we don't find any: reference the create message of the need.
-                messageEventPlaceholder = messageEventRepository.findNewestByParentURIforUpdate(WonMessageUtils.getParentEntityUri(message));
+                URI parentUri = WonMessageUtils.getParentEntityUri(message);
+                messageEventPlaceholder = messageEventRepository.findNewestByParentURI(parentUri);
                 if (messageEventPlaceholder != null) {
-                    messageEventPlaceholders.add(messageEventPlaceholder);
+                    selectedUris.add(new MessageUriAndParentUri(messageEventPlaceholder.getMessageURI(), messageEventPlaceholder.getParentURI()));
                 } else {
                     //we did not find any message to link to. Choose the create message of the need
                     //we're starting a conversation, link to the create message of the need.
+                    URI parentNeedUri = WonMessageUtils.getParentNeedUri(message);
                     List<MessageEventPlaceholder> eventsToSelect = messageEventRepository
-                            .findByParentURIAndMessageTypeForUpdate(WonMessageUtils.getParentNeedUri(message), WonMessageType
+                            .findByParentURIAndMessageType(parentNeedUri, WonMessageType
                                     .CREATE_NEED);
-                    messageEventPlaceholders.addAll(eventsToSelect);
+                    selectedUris.addAll(
+                            eventsToSelect
+                                    .stream()
+                                    .map(p -> (new MessageUriAndParentUri(p.getMessageURI(), p.getParentURI())))
+                                    .collect(Collectors.toList()));
                 }
         }
-        //load the WonMessages for the placeholders
-        loadWonMessagesAndAddToSelected(selected, messageEventPlaceholders);
+    }
+
+
+    private void lockParentByParentURI(URI parentUri) {
+        needEventContainerRepository.lockParentAndContainerByParentUriForUpdate(parentUri);
+        connectionEventContainerRepository.lockParentAndContainerByParentUriForUpdate(parentUri);
+    }
+
+    private void lockParentByContainedMessage(URI isResponseToURI) {
+        messageEventRepository.lockNeedAndEventContainerByContainedMessageForUpdate(isResponseToURI);
+        messageEventRepository.lockConnectionAndEventContainerByContainedMessageForUpdate(isResponseToURI);
     }
 
 
     /**
      * Selects all unreferenced messages for referencing
      */
-    private void selectUnreferenceMessages(Set<MessageAndPlaceholder> selected, final WonMessage message) throws WonMessageProcessingException {
+    private void selectUnreferenceMessages(Set<MessageUriAndParentUri> selectedUris, final WonMessage message) throws WonMessageProcessingException {
+        if (message.getMessageType() == WonMessageType.CREATE_NEED) return;
+        URI parentUri = WonMessageUtils.getParentEntityUri(message);
         //find all unreferenced messages for the current message's parent
         List<MessageEventPlaceholder> messageEventPlaceholders = messageEventRepository
-                .findByParentURIAndNotReferencedByOtherMessageForUpdate(WonMessageUtils.getParentEntityUri(message));
+                .findByParentURIAndNotReferencedByOtherMessage(parentUri);
         //load the WonMessages for the placeholders
-        loadWonMessagesAndAddToSelected(selected, messageEventPlaceholders);
-    }
-
-    private void loadWonMessagesAndAddToSelected(Set<MessageAndPlaceholder> selected, List<MessageEventPlaceholder> messageEventPlaceholders) {
-        selected.addAll(messageEventPlaceholders.stream().map(messageEventPlaceholder -> {
-            WonMessage msg = loadWonMessageforURI(messageEventPlaceholder.getMessageURI());
-            return new MessageAndPlaceholder(messageEventPlaceholder, msg);
-        }).collect(Collectors.toSet()));
-    }
-
-    private Set<MessageAndPlaceholder> removeReferenceToSelf(Set<MessageAndPlaceholder> messageAndPlaceholders, WonMessage message) {
-        //the message should not sign itself, just in case:
-        return messageAndPlaceholders
+        selectedUris.addAll(messageEventPlaceholders
                 .stream()
-                .filter(mep -> !message.getMessageURI().equals(mep.getMessageEventPlaceholder().getMessageURI()) && !mep.getMessageEventPlaceholder().getMessageURI().equals(message.getCorrespondingRemoteMessageURI()))
-                .collect(Collectors.toSet());
+                .map(p -> new MessageUriAndParentUri(p.getMessageURI(), p.getParentURI()))
+                .collect(Collectors.toList()));
     }
 
-    private WonMessage processSelected(Set<MessageAndPlaceholder> selected, WonMessage message) {
+
+    private void deselectSelf(Set<MessageUriAndParentUri> selectedUris, WonMessage message) {
+        //the message should not sign itself, just in case:
+        selectedUris.remove(message.getMessageURI());
+    }
+
+    private WonMessage processSelected(List<MessageAndPlaceholder> selected, WonMessage message) {
         Dataset messageDataset = message.getCompleteDataset();
         URI outerEnvelopeGraphURI = message.getOuterEnvelopeGraphURI();
         URI messageUri = message.getMessageURI();
@@ -154,7 +205,7 @@ public class MessageReferencer {
         return newMessage;
     }
 
-    private void updateReferenced(Set<MessageAndPlaceholder> selected) {
+    private void updateReferenced(List<MessageAndPlaceholder> selected) {
         selected.stream().forEach((MessageAndPlaceholder m) -> {
             MessageEventPlaceholder messageEventPlaceholder = m.getMessageEventPlaceholder();
             messageEventPlaceholder.setReferencedByOtherMessage(true);
@@ -206,6 +257,32 @@ public class MessageReferencer {
 
         public WonMessage getWonMessage() {
             return wonMessage;
+        }
+    }
+
+    private static final class MessageUriAndParentUri {
+        private URI messageURI;
+        private URI parentURI;
+
+        public MessageUriAndParentUri(URI messageURI, URI parentURI) {
+            this.messageURI = messageURI;
+            this.parentURI = parentURI;
+        }
+
+        public URI getMessageURI() {
+            return messageURI;
+        }
+
+        public URI getParentURI() {
+            return parentURI;
+        }
+
+        @Override
+        public String toString() {
+            return "{" +
+                    "messageURI=" + messageURI +
+                    ", parentURI=" + parentURI +
+                    '}';
         }
     }
 }

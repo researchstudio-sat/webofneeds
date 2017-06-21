@@ -137,9 +137,14 @@ public class AsyncEventBusImpl implements EventBus {
         if (eventTypes == null) eventTypes = new HashSet<>();
         final Set<Class<? extends Event>> finalEventTypes = eventTypes;
         //add interfaces and recurse for interfaces
-        Arrays.stream(clazz.getInterfaces()).forEach(c -> { if (Event.class.isAssignableFrom(c)) { getEventTypes((Class<? extends Event>) c, finalEventTypes);}});
+        Arrays.stream(clazz.getInterfaces())
+                .forEach(c -> {
+                    if (Event.class.isAssignableFrom(c)) {
+                        getEventTypes((Class<? extends Event>) c, finalEventTypes);
+                    }
+                });
         Class superclass = clazz.getSuperclass();
-        if (superclass != null && !Event.class.isAssignableFrom(superclass)) {
+        if (superclass != null && Event.class.isAssignableFrom(superclass)) {
             getEventTypes(superclass, finalEventTypes);
         }
         finalEventTypes.add(clazz);

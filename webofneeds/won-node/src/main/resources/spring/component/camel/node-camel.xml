@@ -77,6 +77,25 @@
     </bean>
     <bean id="brokerComponentFactory" class="won.protocol.jms.BrokerComponentFactory"/>
 
+    <!-- transaction manager for '.transacted' routes -->
+    <bean id="PROPAGATION_REQUIRED" class="won.node.camel.tx.SpringTransactionPolicyWithCustomIsolation">
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="propagationBehaviorName" value="PROPAGATION_REQUIRED"/>
+        <property name="isolationLevelName" value="ISOLATION_READ_COMMITTED" />
+    </bean>
+
+    <bean id="PROPAGATION_REQUIRES_NEW" class="won.node.camel.tx.SpringTransactionPolicyWithCustomIsolation">
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="propagationBehaviorName" value="PROPAGATION_REQUIRES_NEW"/>
+        <property name="isolationLevelName" value="ISOLATION_READ_COMMITTED" />
+    </bean>
+
+    <bean id="PROPAGATION_NEVER" class="won.node.camel.tx.SpringTransactionPolicyWithCustomIsolation">
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="propagationBehaviorName" value="PROPAGATION_NEVER"/>
+    </bean>
+    
+
     <!--bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent"-->
         <!-- note: this URI does not need to be configurable via the
         config file, it will be the same on any system -->
@@ -219,6 +238,11 @@
   <bean name="fixedMessageReactionProcessorSlip" class="won.node.camel.processor.general.MessageTypeSlipComputer">
     <constructor-arg value="won.node.camel.processor.annotation.FixedMessageReactionProcessor" />
     <constructor-arg name="allowNoMatchingProcessor" value="true" />
+  </bean>
+  <bean name="parentLocker" class="won.protocol.message.processor.camel.WonMessageProcessorCamelAdapter">
+      <constructor-arg name="adaptee">
+          <bean class="won.node.camel.processor.general.LockMessageParentWonMessageProcessor" />
+      </constructor-arg>
   </bean>
   <!-- routing logic for wonMessages, computing which facet-specific processor to use -->
   <bean name="facetTypeSlip" class="won.node.camel.processor.general.FacetTypeSlipComputer"/>

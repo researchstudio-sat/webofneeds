@@ -19,9 +19,6 @@ package won.protocol.message.processor.camel;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.exception.MissingMessagePropertyException;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
@@ -40,7 +37,6 @@ public class FacetExtractingCamelProcessor implements Processor{
   ConnectionRepository connectionRepository;
 
   @Override
-  @Transactional(propagation = Propagation.SUPPORTS, isolation = Isolation.READ_COMMITTED)
   public void process(Exchange exchange) throws Exception {
     URI facetType = null;
     //first, try to extract the facet from the message

@@ -19,9 +19,6 @@ package won.node.camel.processor.general;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.processor.exception.WonMessageProcessingException;
@@ -38,7 +35,6 @@ public class ReferenceToUnreferencedMessageAddingProcessor implements WonMessage
 
   @Override
   //we use READ_COMMITTED because we want to wait for an exclusive lock will accept data written by a concurrent transaction that commits before we read
-  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
   public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
     return messageReferencer.addMessageReferences(message);
   }
