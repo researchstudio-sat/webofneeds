@@ -28,7 +28,8 @@ public class WonConnectionValidator extends BaseValidator {
     public WonConnectionValidator() {
         
         String[] dirs = {
-                resourceDir 
+                resourceDir + "/message-references",
+                resourceDir + "/message-structure"
         };
         this.loadSparqlValidatorsFromDirectories(dirs);
     }
