@@ -37,7 +37,8 @@ function genComponentConf() {
         <won-post-header
           need-uri="self.theirNeed.get('@id')"
           timestamp="self.lastUpdateTimestamp"
-          ng-click="self.setOpen()">
+          ng-click="self.setOpen()"
+          class="clickable">
         </won-post-header>
 
         <div class="conn__unreadCount">

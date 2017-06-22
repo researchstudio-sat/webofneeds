@@ -30,7 +30,7 @@ const serviceDependencies = ['$ngRedux', '$scope'];
 function genComponentConf() {
     let template = `
       <div ng-repeat="needUri in self.relevantOwnNeedUris">
-        <div class="covw__own-need"
+        <div class="covw__own-need clickable"
           ng-click="self.toggleConnections(needUri)">
           <won-post-header
             need-uri="needUri"
