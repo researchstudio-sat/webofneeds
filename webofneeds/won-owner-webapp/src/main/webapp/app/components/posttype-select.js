@@ -17,6 +17,7 @@ function genComponentConf() {
     let template = `
         <ul ng-class="self.expanded() ? 'typeselect--expanded' : 'typeselect--collapsed'">
             <li ng-repeat="o in self.options"
+                class="clickable"
                 ng-class="$index === self.selectedIdx? 'ts__option--selected' : 'ts__option'"
                 ng-click="self.unSelect($index)"
                 won-enter="self.unSelect($index)"
@@ -24,7 +25,7 @@ function genComponentConf() {
                     <span>{{o.text}}&nbsp;&hellip;</span>
                     <img src="generated/icon-sprite.svg#ico36_help"
                          ng-click="self.unSelectHelpFor($index); $event.stopPropagation();"
-                         class="ts__option__help-btn">
+                         class="ts__option__help-btn clickable">
                     <img src="generated/icon-sprite.svg#ico16_arrow_down_hi" class="ts__option__carret">
                     <div class="ts__option__help"
                          ng-show="self.isHelpVisible($index)"> {{o.helpText}} </div>

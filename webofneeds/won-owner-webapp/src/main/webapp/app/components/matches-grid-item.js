@@ -51,6 +51,7 @@ function genComponentConf() {
                 </won-square-image>
         </div>
         <won-feedback-grid
+            class="clickable"
             connection-uri="self.connectionUri"
             ng-click="self.hideFeedback()"
             ng-if="self.feedbackVisible"/>
