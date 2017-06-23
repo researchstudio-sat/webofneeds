@@ -86,7 +86,7 @@ function genComponentConf() {
         <div class="fi__footer" ng-show="self.unreadMatchesCount() || self.unreadRequestsCount()">
             <div class="fi__footer__indicators">
                 <a class="fi__footer__indicators__item clickable"
-                   ui-sref="postMatches({myUri: self.ownNeed.get('@id')})"
+                   ui-sref="post({connectionType: self.WON.Suggested, openConversation: null, connectionUri: null, postUri: self.needUri})"
                    ng-show="self.unreadMatchesCount()">
                     <img src="generated/icon-sprite.svg#ico36_match" class="fi__footer__indicators__item__icon"/>
                     <span class="fi__footer__indicators__item__caption">
@@ -95,7 +95,7 @@ function genComponentConf() {
                     </span>
                 </a>
                 <a class="fi__footer__indicators__item clickable"
-                   ui-sref="postRequests({myUri: self.ownNeed.get('@id')})"
+                   ui-sref="post({connectionType: self.WON.RequestReceived, openConversation: null, connectionUri: null, postUri: self.needUri})"
                    ng-show="self.unreadRequestsCount()">
                     <img src="generated/icon-sprite.svg#ico36_incoming" class="fi__footer__indicators__item__icon"/>
                     <span class="fi__footer__indicators__item__caption">
@@ -141,6 +141,7 @@ function genComponentConf() {
                     ownNeed,
                     ownNeedContent,
                     connections,
+                    WON: won.WON,
                     nrOfConnections: connections? connections.size : 0,
                     createdOn: ownNeed && relativeTime(lastUpdated, ownNeed.get('dct:created')),
                     unreadCounts: unreadCountsByNeedAndType && unreadCountsByNeedAndType.get(self.needUri),
