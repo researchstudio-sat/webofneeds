@@ -20,7 +20,7 @@ import postContentModule from './post-content';
 const serviceDependencies = ['$q', '$ngRedux', '$scope', '$interval'];
 function genComponentConf() {
     let template = `
-        <div class="mgi__description"
+        <div class="mgi__description clickable"
             ng-click="self.toggleFeedback()">
 
             <won-post-header
@@ -51,6 +51,7 @@ function genComponentConf() {
                 </won-square-image>
         </div>
         <won-feedback-grid
+            class="clickable"
             connection-uri="self.connectionUri"
             ng-click="self.hideFeedback()"
             ng-if="self.feedbackVisible"/>

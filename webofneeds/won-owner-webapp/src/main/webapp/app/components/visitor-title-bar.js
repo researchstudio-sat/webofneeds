@@ -36,14 +36,14 @@ function genComponentConf() {
                 <div class="vtb__inner__right" ng-show="self.hasConnectionWithOwnPost">
                     <button class="won-button--filled red">Quit Contact</button>
                     <ul class="vtb__tabs">
-                        <li
+                        <li class="clickable"
                             ng-class="self.selection == 0? 'vtb__tabs__selected' : ''"
                             ng-click="self.selection = 0">
                         <a ui-sref="post({ERROR: 'Messages tab not implemented yet'})">
                             Messages
                             <span class="vtb__tabs__unread">{{self.theirPost.get('messages').length}}</span>
                         </a></li>
-                        <li ng-class="self.selection == 1? 'vtb__tabs__selected' : ''" ng-click="self.selection = 1">
+                        <li class="clickable" ng-class="self.selection == 1? 'vtb__tabs__selected' : ''" ng-click="self.selection = 1">
                         <a ui-sref="postVisitor({myUri: 'http://example.org/121337345'})">
                             Post Info
                         </a></li>

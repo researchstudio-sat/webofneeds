@@ -67,7 +67,7 @@ function genTopnavConf() {
                                         ng-show="self.open" class="topnav__carret">
                             </a>
                         </li>
-                        <li ng-show="self.loggedIn" ng-click="self.showLogin()">
+                        <li ng-show="self.loggedIn" class="clickable" ng-click="self.showLogin()">
                             <a class="topnav__button">
                                 <span class="topnav__button__caption">{{self.email}}</span>
                                 <img src="generated/icon-sprite.svg#ico16_arrow_down"
