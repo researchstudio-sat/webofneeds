@@ -9,6 +9,7 @@ var svgSprite = require('gulp-svg-sprite');
 var sassImportOnce = require('node-sass-import-once');
 var gulp_jspm = require('gulp-jspm');
 var sourcemaps = require('gulp-sourcemaps');
+var ts = require("gulp-typescript");
 
 gulp.task('default', ['build']);
 gulp.task('build', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res', 'copy-static-scripts']);
@@ -31,6 +32,24 @@ gulp.task('bundlejs', function(){
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('./generated/'));
 });
+
+gulp.task("tstest", function () {
+    return gulp.src("app/app_jspm.ts")
+        .pipe(sourcemaps.init())
+        .pipe(ts({
+            //noImplicitAny: true,
+            allowJs: true,
+            sourceMap: true,
+            module: "system",
+            target: "es5",
+            out: "app.bundle.js"
+        }))
+        .pipe(gulp.dest("./generated/"));
+});
+
+
+
+
 
 gulp.task('sass', function(done) {
     var generatedStyleFolder =  './generated/';

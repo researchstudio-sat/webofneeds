@@ -168,3 +168,11 @@ angular.bootstrap(document, ['won.owner'], {
     // and https://docs.angularjs.org/guide/di#dependency-annotation
     strictDi: true
 });
+
+// angular.bootstrap(123); <-- why does this compile?
+
+function foo(bar: string) {
+    console.log(bar);
+}
+
+foo(123)
