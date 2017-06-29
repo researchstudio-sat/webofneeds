@@ -16,17 +16,20 @@
   "devDependencies": {
     "gulp": "3.9.0",
     "gulp-autoprefixer": "3.1.0",
+    "gulp-concat": "^2.6.1",
     "gulp-jspm": "0.5.13",
     "gulp-minify-css": "1.2.2",
     "gulp-rename": "1.2.2",
     "gulp-sass": "2.1.1",
     "gulp-sourcemaps": "1.6.0",
     "gulp-svg-sprite": "1.2.16",
+    "gulp-systemjs-builder": "^0.15.0",
     "gulp-typescript": "^3.1.7",
     "jspm": "0.16.19",
     "jspm-bower-endpoint": "0.3.2",
     "node-sass-import-once": "1.2.0",
     "rimraf": "2.4.4",
+    "systemjs-builder": "^0.16.9",
     "typescript": "^2.4.1"
   },
   "jspm": {

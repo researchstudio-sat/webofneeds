@@ -1,3 +1,10 @@
+//import angular from 'angular';
+//window.angular = angular; // for compatibility with pre-ES6/commonjs scripts
+
+//import 'fetch'; //polyfill for window.fetch (for backward-compatibility with older browsers)
+
+//console.log(angular);
+
 
 import {foobar} from "./testmodule2"
 import {

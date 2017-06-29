@@ -38,13 +38,67 @@ gulp.task("tstest", function () {
         .pipe(sourcemaps.init())
         .pipe(ts({
             //noImplicitAny: true,
+            //declaration: false,
             allowJs: true,
-            sourceMap: true,
+            //sourceMap: true,
             module: "system",
             target: "es5",
             out: "app.bundle.js"
         }))
         .pipe(gulp.dest("./generated/"));
+});
+
+var concat = require("gulp-concat");
+gulp.task("concatfoo", function() {
+    var files = [
+        "./jspm_packages/system.js",
+        "./jspm_config.test.js",
+        "./generated/app.bundle.js",
+        "./app-boot.js",
+    ]
+
+    return gulp.src(files)
+        .pipe(concat("app.sfxbundle.js"))
+        .pipe(gulp.dest("./generated"));
+
+
+
+});
+
+var systemjsBuilder = require('gulp-systemjs-builder');
+gulp.task("sysjsbuild", function () {
+    var builder = systemjsBuilder();
+    builder.loadConfigSync('./jspm_config.test.js');
+
+    return builder.buildStatic('generated/app.bundle.js', {
+        minify: false,
+        mangle: false
+    })
+    .pipe(gulp.dest('./generated/app.sfxbundle.js'));
+
+});
+
+
+var path = require("path");
+var Builder = require('systemjs-builder');
+gulp.task("raw-sysjs-build", function () {
+    // optional constructor options
+    // sets the baseURL and loads the configuration file
+    var builder = new Builder('./', './jspm_config.test.js');
+
+    builder.buildStatic('./generated/app.bundle.js', './generated/app.sfxbundle.js' )
+
+    /*
+    builder
+        .bundle('generated/app.bundle.js', 'generated/app.sfxbundle.js')
+        */
+        .then(function() {
+            console.log('Build complete');
+        })
+        .catch(function(err) {
+            console.log('Build error');
+            console.log(err);
+        });
 });
 
 
