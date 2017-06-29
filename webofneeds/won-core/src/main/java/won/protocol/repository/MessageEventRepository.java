@@ -17,6 +17,20 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
 
     MessageEventPlaceholder findOneByMessageURI(URI URI);
 
+    //read is permitted iff any of these conditions apply:
+    // * the WebId is the sender need
+    // * the WebId is the recipient need
+    // * the WebId is a need that has a connection to the sender need AND the message is in the need's event container
+    @Query("select case when (count(msg) > 0) then true else false end " +
+            "from MessageEventPlaceholder msg left outer join Connection con on (" +
+            " msg.parentURI = con.needURI or " +
+            " msg.parentURI = con.remoteNeedURI or " +
+            " msg.parentURI = con.connectionURI or " +
+            " msg.parentURI = con.remoteConnectionURI " +
+            " ) " +
+            " where (con.needURI = :webId or msg.parentURI = :webId or msg.senderNodeURI = :webId or msg.receiverNodeURI = :webId) and msg.messageURI = :messageUri")
+    public boolean isReadPermittedForWebID(@Param("messageUri") URI messageUri, @Param("webId") URI webId);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select n,c from NeedEventContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Need n on c.parentUri = n.needURI where msg.messageURI = :messageUri")
     public void lockNeedAndEventContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);
