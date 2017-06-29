@@ -116,7 +116,9 @@ public abstract class LinkedDataRestClient
       result = response.getBody();
     } catch (RestClientException e) {
       if(e instanceof HttpClientErrorException){
-        throw e;
+        throw new IllegalArgumentException(
+                MessageFormat.format(
+                        "caught a HttpClientErrorException exception, for {0}. Underlying error message is: {1}, response Body: {2}", resourceURI, e.getMessage(), ((HttpClientErrorException) e).getResponseBodyAsString()), e);
       }
       if (e instanceof HttpServerErrorException) {
         throw new IllegalArgumentException(

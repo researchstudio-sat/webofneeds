@@ -4,6 +4,7 @@ import org.apache.http.conn.ssl.PrivateKeyStrategy;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.ssl.*;
 import won.protocol.rest.LinkedDataRestBridge;
 import won.protocol.rest.LinkedDataRestClient;
@@ -38,6 +39,9 @@ public class DefaultSecurityWonTransmissionService implements WonTransmissionSer
   // updated in case of owner (we add needs' keys)
   private KeyStoreService clientKeyStoreService;
 
+  //strategy for deriving a key pair alias from a need uri
+  private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy;
+
   // TODO For the server we have a keystore that won't be changed or updated, so it can be used directly. In the
   // current implementation, the server's key store is different from the store that server uses when it itself
   // serves as client (see client key store).
@@ -61,6 +65,9 @@ public class DefaultSecurityWonTransmissionService implements WonTransmissionSer
     this.registrationQuery = registrationQuery;
   }
 
+  public void setKeyPairAliasDerivationStrategy(KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy) {
+    this.keyPairAliasDerivationStrategy = keyPairAliasDerivationStrategy;
+  }
 
   /**
    * Initializes necessary for WON transmission properties according to the default security settings that can be
@@ -91,13 +98,13 @@ public class DefaultSecurityWonTransmissionService implements WonTransmissionSer
     //this.linkedDataClientStrategy = new TrustSelfSignedStrategy();
     //this.linkedDataClientStrategy = new TrustNooneStrategy();
     this.linkedDataClient = new LinkedDataRestClientHttps(clientKeyStoreService,
-                                                          trustStoreService, linkedDataClientStrategy);
+                                                          trustStoreService, linkedDataClientStrategy, keyPairAliasDerivationStrategy);
 
 
     // temporary client to access response of linked data resources of node -
     // here uses the same key/trust setting as linkedDataClient
     this.linkedDataRestBridge = new LinkedDataRestBridge(clientKeyStoreService,
-                                                         trustStoreService, linkedDataClientStrategy);
+                                                         trustStoreService, linkedDataClientStrategy, keyPairAliasDerivationStrategy);
 
     // LINKED DATA server-side:
     // Server-side is configured via Filters that do access control and WebID verification in spring/node-context.xml

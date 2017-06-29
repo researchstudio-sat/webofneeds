@@ -40,11 +40,22 @@
     <bean id="cryptographyService" factory-bean="wonTransmissionService" factory-method="getClientCryptographyService">
     </bean>
 
+
+    <!--
+        if the fixedPrivateKeyAlias is empty or null, the alias used for a specified webid is the webid uri, otherwise
+        the predefined alias is used -->
+    <bean id="keyPairAliasDerivationStrategyFactory" class="won.cryptography.keymanagement.KeyPairAliasDerivationStrategyFactory">
+        <property name="predefinedAlias" value="${node.fixedPrivateKeyAlias}" />
+    </bean>
+
     <bean id="wonTransmissionService" class="won.cryptography.service.DefaultSecurityWonTransmissionService">
         <!--property name="serverKeyStoreService" ref="serverKeyStoreService" /-->
         <property name="trustStoreService" ref="trustStoreService" />
         <property name="clientKeyStoreService" ref="clientKeyStoreService" />
         <property name="registrationQuery" value="?register=node"></property>
+        <property name="keyPairAliasDerivationStrategy">
+            <bean factory-bean="keyPairAliasDerivationStrategyFactory" factory-method="create" />
+        </property>
     </bean>
 
     <!-- TODO can be moved to messaging config -->

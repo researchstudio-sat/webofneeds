@@ -62,12 +62,6 @@
         </constructor-arg>
     </bean>
 
-    <!-- if the fixedPrivateKeyAlias is empty or null, the processor generates a new Keypair for every need, if
-             it is a string, the processor uses the same key pair for all needs and storese it under the specified
-             alias -->
-    <bean id="keyPairAliasDerivationStrategyFactory" class="won.cryptography.keymanagement.KeyPairAliasDerivationStrategyFactory">
-        <property name="predefinedAlias" value="${owner.fixedPrivateKeyAlias}" />
-    </bean>
     <bean id="keyPairAliasDerivationStrategy" factory-bean="keyPairAliasDerivationStrategyFactory" factory-method="create" />
 
     <!-- processor for signing messages -->
