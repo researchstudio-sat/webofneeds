@@ -33,7 +33,7 @@
     "typescript": "^2.4.1"
   },
   "jspm": {
-    "configFile": "jspm_config.js",
+    "configFile": "jspm_config.test.js",
     "dependencies": {
       "angular": "npm:angular@1.6.4",
       "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.13.0",
