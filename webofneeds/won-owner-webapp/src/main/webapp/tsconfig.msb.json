@@ -1,16 +1,10 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "module": "commonjs",
+    "module": "system",
     "moduleResolution": "node",
     "noImplicitAny": false,
-    "noEmitOnError": true,
-    "removeComments": false,
     "sourceMap": true,
-    "declaration": false,
-    "noLib": false,
     "target": "es5",
     "outDir": "tmp/"
   },
