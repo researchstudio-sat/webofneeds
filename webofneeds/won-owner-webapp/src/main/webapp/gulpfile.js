@@ -33,6 +33,10 @@ gulp.task('bundlejs', function(){
         .pipe(gulp.dest('./generated/'));
 });
 
+
+
+
+
 gulp.task("tstest", function () {
     return gulp.src("app/app_jspm.ts")
         .pipe(sourcemaps.init())
@@ -60,10 +64,12 @@ gulp.task("concatfoo", function() {
     return gulp.src(files)
         .pipe(concat("app.sfxbundle.js"))
         .pipe(gulp.dest("./generated"));
-
-
-
 });
+
+
+
+
+
 
 var systemjsBuilder = require('gulp-systemjs-builder');
 gulp.task("sysjsbuild", function () {
@@ -77,6 +83,10 @@ gulp.task("sysjsbuild", function () {
     .pipe(gulp.dest('./generated/app.sfxbundle.js'));
 
 });
+
+
+
+
 
 
 var path = require("path");
