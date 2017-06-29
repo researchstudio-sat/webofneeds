@@ -66,6 +66,8 @@ gulp.task("concatfoo", function() {
         .pipe(gulp.dest("./generated"));
 });
 
+// use with jspm_config.test.js
+// fails to report if it e.g. doesn't find angular
 
 
 
