@@ -45,6 +45,7 @@ bin/setenv.*
 /webofneeds/won-matcher-webapp/overlays
 /webofneeds/won-owner-webapp/src/main/webapp/node
 /webofneeds/won-owner-webapp/src/main/webapp/node_modules
+/webofneeds/won-owner-webapp/src/main/webapp/build-tmp
 /webofneeds/won-docker/bots/bots.jar
 /webofneeds/won-docker/bots/conf/
 /webofneeds/won-docker/matcher-service/conf/

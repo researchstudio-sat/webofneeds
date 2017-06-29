@@ -105,6 +105,36 @@ gulp.task("raw-sysjs-build", function () {
 
 
 
+
+var tmpDirName = 'build-tmp';
+var tsProject = ts.createProject("./tsconfig.msb.json");
+gulp.task('msb:ts', function() { // msb = multi-step-build
+    var tsResult = gulp.src("app/**/*.ts") // or tsProject.src()
+        .pipe(tsProject());
+    return tsResult.js.pipe(gulp.dest(tmpDirName));
+});
+
+gulp.task('msb:cpyjs', function() {
+    return gulp.src(['app/**/*.js'])
+        .pipe(gulp.dest(tmpDirName));
+});
+
+gulp.task('msb:jspm', ['msb:ts', 'msb:cpyjs'], function(){
+    return gulp.src(tmpDirName + '/app_jspm.js')
+        .pipe(sourcemaps.init())
+        .pipe(gulp_jspm({
+            selfExecutingBundle: true,
+            minify: true,
+            fileName: 'app.bundle',
+        }))
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest('./generated/'));
+});
+
+
+
+
+
 gulp.task('sass', function(done) {
     var generatedStyleFolder =  './generated/';
     gulp.src('./style/won.scss')

@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "declaration": false,
+    "noLib": false,
+    "target": "es5",
+    "outDir": "tmp/"
+  },
+  "exclude": [
+    "node_modules",
+    "jspm_packages",
+    "generated",
+    "tmp"
+  ]
+}
