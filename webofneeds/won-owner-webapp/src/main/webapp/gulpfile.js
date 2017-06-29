@@ -49,7 +49,7 @@ gulp.task("tstest", function () {
             target: "es5",
             out: "app.bundle.js"
         }))
-        .pipe(gulp.dest("./generated/"));
+        .pipe(gulp.dest("./build-tmp/"));
 });
 
 var concat = require("gulp-concat");
@@ -57,12 +57,12 @@ gulp.task("concatfoo", function() {
     var files = [
         "./jspm_packages/system.js",
         "./jspm_config.test.js",
-        "./generated/app.bundle.js",
+        "./build-tmp/app.bundle.js",
         "./app-boot.js",
     ]
 
     return gulp.src(files)
-        .pipe(concat("app.sfxbundle.js"))
+        .pipe(concat("app.bundle.js"))
         .pipe(gulp.dest("./generated"));
 });
 
