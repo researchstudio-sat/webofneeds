@@ -7,6 +7,7 @@ https://piwik.org/docs/event-tracking/
 
 An example JavaScript Tracking Code:
 
+```HTML
 <!-- Piwik -->
 <script type="text/javascript">
   var _paq = _paq || [];
@@ -22,13 +23,15 @@ An example JavaScript Tracking Code:
   })();
 </script>
 <!-- End Piwik Code -->
-
+```
 
 Some examples:
+
+```HTML
 <a href="http://localhost/test1/" onclick="javascript:_paq.push(['trackEvent', 'Menu', 'Freedom']);">Freedom page</a>
 
 <input type="submit" onclick="_paq.push(['trackEvent', 'Category', 'Name', 'Description', 8.18]); " value="Click" name="commit">
-
+```
 
 
 
