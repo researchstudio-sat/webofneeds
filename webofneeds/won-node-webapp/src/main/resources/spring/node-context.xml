@@ -5,7 +5,7 @@
              xmlns:context="http://www.springframework.org/schema/context"
              xmlns="http://www.springframework.org/schema/beans" xmlns:beans="http://www.springframework.org/schema/beans"
              xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
-								 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+								 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
                                  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
 
     <!--context:property-placeholder location="file:${WON_CONFIG_DIR}/node.properties" ignore-unresolvable="true"/-->
@@ -63,7 +63,7 @@
               authentication-manager-ref="clientCertificateWebIdAuthenticationManager"
               use-expressions="true"
               access-decision-manager-ref="webIdBasedAccessDecisionManager">
-        <sec:headers>
+        <sec:headers defaults-disabled="true">
             <sec:content-type-options />
             <sec:hsts />
             <sec:frame-options />
@@ -79,6 +79,8 @@
         <sec:intercept-url pattern = "/(resource|data|page)/connection/[a-zA-z0-9]+/events/.+\?deep=true"
                            access="hasRole('ROLE_WEBID')" />
         <sec:intercept-url pattern=".*" access="denyAll" />
+        <!-- we do not need CSRF protection for these resources as accessing them is not state-changing -->
+        <sec:csrf disabled="true" />
     </sec:http>
 
     <!-- slightly different config for cases in which a client certificate is sufficient (but the webID will not be
@@ -89,7 +91,7 @@
               entry-point-ref="authorizationEntryPoint"
               authentication-manager-ref="clientCertificateNoWebIdAuthenticationManager"
               use-expressions="true">
-        <sec:headers>
+        <sec:headers defaults-disabled="true">
             <sec:cache-control/>
             <sec:content-type-options />
             <sec:hsts />
@@ -102,20 +104,27 @@
         <!-- we allow self-signed certificates that need not be webids -->
         <sec:intercept-url pattern = "/resource\?register=.+" access="hasRole('ROLE_CLIENT_CERTIFICATE_PRESENTED')" />
         <sec:intercept-url pattern=".*" access="denyAll" />
+        <!-- we do not need CSRF protection for 'register': the client does not necessarily make
+            a call to the server prior to registering, so there may be no way to pass a X-CSRF-Token to the client.
+            Also, we do not rely on sessions for registering -->
+        <sec:csrf disabled="true" />
     </sec:http>
 
     <!-- config for public acces -->
     <bean id="webAuthenticationDetailsSource" class="org.springframework.security.web.authentication.WebAuthenticationDetailsSource" />
      <sec:http entry-point-ref="authorizationEntryPoint"
-              authentication-manager-ref="clientCertificateWebIdAuthenticationManager">
-        <sec:headers>
+              authentication-manager-ref="clientCertificateWebIdAuthenticationManager"
+                use-expressions="false">
+        <sec:headers defaults-disabled="true">
             <!-- no cache-control for public resources to allow for storing-->
             <sec:content-type-options />
             <sec:hsts />
             <sec:frame-options />
             <sec:xss-protection />
         </sec:headers>
-    </sec:http>
+         <!-- we do not need CSRF protection for publicly accessible resources, as accessing them is not state-changing -->
+         <sec:csrf disabled="true" />
+     </sec:http>
 
 
 
