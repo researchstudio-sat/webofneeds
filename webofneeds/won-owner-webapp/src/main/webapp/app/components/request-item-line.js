@@ -3,7 +3,7 @@
 import angular from 'angular';
 import squareImageModule from '../components/square-image';
 import { labels } from '../won-label-utils';
-import {attach} from '../utils.js';
+import {attach} from '../utils';
 import { actionCreators }  from '../actions/actions';
 
 import { selectUnreadEvents } from '../selectors';

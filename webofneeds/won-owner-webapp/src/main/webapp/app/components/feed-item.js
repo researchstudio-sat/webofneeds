@@ -128,7 +128,7 @@ function genComponentConf() {
                 const ownNeed = ownNeeds && ownNeeds.get(self.needUri);
                 const ownNeedContent = ownNeed && seeksOrIs(ownNeed);
 
-                const cnctUriCollection = ownNeed.getIn(['won:hasConnections', 'rdfs:member']);
+                const cnctUriCollection = ownNeed && ownNeed.getIn(['won:hasConnections', 'rdfs:member']);
                 const connections = !cnctUriCollection?
                     [] : // if there's no cnctUriCollection, there's no connections
                     cnctUriCollection

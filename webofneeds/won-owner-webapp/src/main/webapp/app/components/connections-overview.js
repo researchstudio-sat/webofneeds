@@ -15,7 +15,7 @@ import {
     labels,
 } from '../won-label-utils';
 
-import { attach } from '../utils.js';
+import { attach } from '../utils';
 import { actionCreators }  from '../actions/actions';
 
 import {

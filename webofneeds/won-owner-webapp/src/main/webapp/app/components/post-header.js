@@ -13,7 +13,7 @@ import {
 import {
     attach,
     msStringToDate,
-} from '../utils.js'
+} from '../utils'
 import {
     selectTimestamp,
     seeksOrIs,

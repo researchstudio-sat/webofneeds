@@ -20,6 +20,8 @@ import {
     decodeUriComponentProperly,
     checkHttpStatus,
     getRandomPosInt,
+    hyphen2Camel,
+    firstToLowerCase,
 } from './utils';
 
 

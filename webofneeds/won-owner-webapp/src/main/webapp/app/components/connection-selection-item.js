@@ -9,7 +9,7 @@ import {
     labels,
     relativeTime,
 } from '../won-label-utils';
-import { attach, decodeUriComponentProperly } from '../utils.js';
+import { attach, decodeUriComponentProperly } from '../utils';
 import { actionCreators }  from '../actions/actions';
 import {
     selectOpenConnectionUri,

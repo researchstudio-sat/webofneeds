@@ -9,30 +9,143 @@ var svgSprite = require('gulp-svg-sprite');
 var sassImportOnce = require('node-sass-import-once');
 var gulp_jspm = require('gulp-jspm');
 var sourcemaps = require('gulp-sourcemaps');
-
-
+var ts = require("gulp-typescript");
 
 gulp.task('default', ['build']);
 gulp.task('build', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res', 'copy-static-scripts']);
 gulp.task('watch', ['sass', 'iconsprite', 'bundlejs', 'copy-static-res'], function() {
-    gulp.watch('./*.js', ['bundlejs']);
-    gulp.watch('./app/**/*.js', ['bundlejs']);
+    gulp.watch('./*.ts', ['bundlejs']);
+    gulp.watch('./app/**/*.ts', ['bundlejs']);
     gulp.watch('./style/**/*.scss', ['sass']);
     gulp.watch('./style/**/_*.scss', ['sass']);
     gulp.watch('./images/won-icons/**/*.svg', ['iconsprite']);
 });
 
 gulp.task('bundlejs', function(){
-    return gulp.src('app/app_jspm.js')
+    return gulp.src('app/app_jspm.ts')
         .pipe(sourcemaps.init())
-        //.pipe(gulp_jspm())
         .pipe(gulp_jspm({
             selfExecutingBundle: true,
             minify: true,
+            fileName: 'app.bundle',
         }))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('./generated/'));
 });
+
+
+
+
+
+gulp.task("tstest", function () {
+    return gulp.src("app/app_jspm.ts")
+        .pipe(sourcemaps.init())
+        .pipe(ts({
+            //noImplicitAny: true,
+            //declaration: false,
+            allowJs: true,
+            //sourceMap: true,
+            module: "system",
+            target: "es5",
+            out: "app.bundle.js"
+        }))
+        .pipe(gulp.dest("./build-tmp/"));
+});
+
+var concat = require("gulp-concat");
+gulp.task("concatfoo", function() {
+    var files = [
+        "./jspm_packages/system.js",
+        "./jspm_config.test.js",
+        "./build-tmp/app.bundle.js",
+        "./app-boot.js",
+    ]
+
+    return gulp.src(files)
+        .pipe(concat("app.bundle.js"))
+        .pipe(gulp.dest("./generated"));
+});
+
+// use with jspm_config.test.js
+// fails to report if it e.g. doesn't find angular
+
+
+
+
+
+var systemjsBuilder = require('gulp-systemjs-builder');
+gulp.task("sysjsbuild", function () {
+    var builder = systemjsBuilder();
+    builder.loadConfigSync('./jspm_config.test.js');
+
+    return builder.buildStatic('generated/app.bundle.js', {
+        minify: false,
+        mangle: false
+    })
+    .pipe(gulp.dest('./generated/app.sfxbundle.js'));
+
+});
+
+
+
+
+
+
+var path = require("path");
+var Builder = require('systemjs-builder');
+gulp.task("raw-sysjs-build", function () {
+    // optional constructor options
+    // sets the baseURL and loads the configuration file
+    var builder = new Builder('./', './jspm_config.test.js');
+
+    builder.buildStatic('./generated/app.bundle.js', './generated/app.sfxbundle.js' )
+
+    /*
+    builder
+        .bundle('generated/app.bundle.js', 'generated/app.sfxbundle.js')
+        */
+        .then(function() {
+            console.log('Build complete');
+        })
+        .catch(function(err) {
+            console.log('Build error');
+            console.log(err);
+        });
+});
+
+
+
+
+
+
+var tmpDirName = 'build-tmp';
+var tsProject = ts.createProject("./tsconfig.msb.json");
+gulp.task('msb:ts', function() { // msb = multi-step-build
+    var tsResult = gulp.src("app/**/*.ts") // or tsProject.src()
+        .pipe(tsProject());
+    return tsResult.js.pipe(gulp.dest(tmpDirName));
+});
+
+gulp.task('msb:cpyjs', function() {
+    return gulp.src(['app/**/*.js'])
+        .pipe(gulp.dest(tmpDirName));
+});
+
+gulp.task('msb:jspm', ['msb:ts', 'msb:cpyjs'], function(){
+    return gulp.src(tmpDirName + '/app_jspm.js')
+        .pipe(sourcemaps.init())
+        .pipe(gulp_jspm({
+            selfExecutingBundle: true,
+            minify: true,
+            fileName: 'app.bundle',
+        }))
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest('./generated/'));
+});
+
+
+
+
 
 gulp.task('sass', function(done) {
     var generatedStyleFolder =  './generated/';

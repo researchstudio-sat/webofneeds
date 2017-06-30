@@ -13,7 +13,7 @@ import {
     searchNominatim,
     reverseSearchNominatim,
     clone,
-} from '../utils.js';
+} from '../utils';
 import { actionCreators }  from '../actions/actions';
 import {
     selectOpenDraft,

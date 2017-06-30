@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "module": "system",
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "lib": [
+      "dom",
+      "es5",
+      "scripthost",
+      "es2015.iterable"
+    ],
+    "target": "es5",
+    "outDir": "tmp/"
+  },
+  "exclude": [
+    "node_modules",
+    "jspm_packages",
+    "generated",
+    "tmp"
+  ]
+}

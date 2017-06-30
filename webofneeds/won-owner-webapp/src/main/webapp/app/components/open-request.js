@@ -8,7 +8,7 @@ import {
 import {
     attach,
     msStringToDate,
-} from '../utils.js'
+} from '../utils'
 import { actionCreators }  from '../actions/actions';
 import {
     selectOpenConnectionUri,
