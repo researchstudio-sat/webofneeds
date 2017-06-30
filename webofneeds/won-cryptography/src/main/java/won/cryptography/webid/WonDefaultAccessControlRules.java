@@ -33,7 +33,10 @@ public class WonDefaultAccessControlRules implements AccessControlRules
     if (requesterWebIDs.size() > 1){
       logger.warn("received more than 1 requester webids, only using first one: ", firstWebId);
     }
-    return messageEventRepository.isReadPermittedForWebID(URI.create(resourceURI), URI.create(firstWebId));
+    URI resourceUri = URI.create(resourceURI);
+    URI webId = URI.create(firstWebId);
+    boolean accessGranted = messageEventRepository.isReadPermittedForWebID( resourceUri, webId);
+    return accessGranted;
   }
 
 }
