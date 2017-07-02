@@ -4,13 +4,13 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xmlns:beans="http://www.springframework.org/schema/beans" xmlns:benas="http://www.springframework.org/schema/beans"
              xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
-								 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+								 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd">
 
 
 	<!-- special config for linked data brige: we want no caching headers added  -->
 	<http use-expressions="true" pattern="/rest/linked-data/**"
 		  entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint" security-context-repository-ref="securityContextRepository">
-		<headers>
+		<headers defaults-disabled="true">
 			<content-type-options />
 			<hsts />
 			<frame-options />
@@ -19,6 +19,8 @@
 		<intercept-url pattern="/rest/linked-data/**" access="permitAll()"/>
 		<intercept-url pattern="/**" access="denyAll" />
 		<custom-filter ref="sessionRepositoryFilter" before="FIRST" />
+		<!-- we do not need CSRF protection for these resources as accessing them is not state-changing - however, it would be better to have it.. -->
+		<csrf disabled="true" />
 	</http>
 
 	<http use-expressions="true"
@@ -31,10 +33,12 @@
 			If it changes, we want clients to notice the change via If-None-Match Etag validation.
 			We accept that users only check these resources once a day
 		-->
-		<headers >
+		<headers defaults-disabled="true">
 			<header name="Cache-Control" value="max-age=86400" />
 		</headers>
 		<intercept-url pattern=".*" access="permitAll()" />
+		<!-- we do not need CSRF protection for these resources as accessing them is not state-changing -->
+		<csrf disabled="true" />
 	</http>
 
 	<http use-expressions="true" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint"
@@ -64,7 +68,8 @@
 		<!-- see http://docs.spring.io/spring-security/site/docs/3.2.9.RELEASE/reference/htmlsingle/#headers for
 		configuration in spring-security-3.2.9 -->
 		<headers />
-
+		<!-- TODO: we actually do need CSRF protection here (see https://github.com/researchstudio-sat/webofneeds/issues/1141) -->
+		<csrf disabled="true" />
 	</http>
 
 

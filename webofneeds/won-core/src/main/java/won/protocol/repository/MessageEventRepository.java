@@ -17,6 +17,42 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
 
     MessageEventPlaceholder findOneByMessageURI(URI URI);
 
+    //read is permitted iff any of these conditions apply:
+    // * the WebId is the sender need
+    // * the WebId is the recipient need
+    // * the WebId is a need that has a connection to the sender need AND the message is in the need's event container
+    /*
+    sql:
+     select msg.*, con.*
+            from message_event msg left outer join connection con on (
+             msg.parentURI = con.connectionURI  -- msg is in connection. need and remote need have access
+             or msg.parentURI = con.needURI -- msg not in connection but belongs to need. We allow all remote needs access
+             -- if con is null, there are no connections for the msg's need, and therefore no remote needs. only allow the local need access
+            )
+             where (
+		msg.messageURI = 'https://satvm05.researchstudio.at/won/resource/event/2x27qe2l4jt6obgxiqij' -- ok now we have the event and maybe a connection
+		and (
+                 (con is null and msg.parentURI = 'https://satvm05.researchstudio.at/won/resource/need/6825071433651196000') -- the event belongs to the need: fine
+                 or con.needURI = 'https://satvm05.researchstudio.at/won/resource/need/6825071433651196000' -- grant access to the local need
+                 or con.remoteNeedURI = 'https://satvm05.researchstudio.at/won/resource/need/6825071433651196000' -- grant access to the remote need
+		 or msg.senderNodeURI = 'https://satvm05.researchstudio.at/won/resource/need/6825071433651196000' -- grant access to the sender node
+		 or msg.receiverNodeURI = 'https://satvm05.researchstudio.at/won/resource/need/6825071433651196000' -- grant access to the receiver node
+		) )
+     */
+    @Query("select case when (count(msg) > 0) then true else false end " +
+            "from MessageEventPlaceholder msg left outer join Connection con on (" +
+            " msg.parentURI = con.connectionURI or " +
+            " msg.parentURI = con.needURI " +
+            " ) " +
+            " where msg.messageURI = :messageUri and (" +
+            "   ( con is null and msg.parentURI = :webId )" +
+            "   or con.needURI = :webId " +
+            "   or con.remoteNeedURI = :webId " +
+            "   or msg.receiverNodeURI = :webId " +
+            "   or msg.senderNodeURI = :webId " +
+            ")")
+    public boolean isReadPermittedForWebID(@Param("messageUri") URI messageUri, @Param("webId") URI webId);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select n,c from NeedEventContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Need n on c.parentUri = n.needURI where msg.messageURI = :messageUri")
     public void lockNeedAndEventContainerByContainedMessageForUpdate(@Param("messageUri") URI messageUri);

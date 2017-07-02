@@ -63,6 +63,7 @@ public class CrawlAction extends BaseEventBotAction {
                             "Could not crawl " + crawlCommandEvent.getStartURI() +
                                     " with WebID " + crawlCommandEvent.getNeedURI() +
                                     ": caught " + e));
+            return;
         }
         stopWatch.stop();
         logger.debug("finished crawl for {} in {} millis", crawlCommandEvent.getStartURI(), stopWatch.getTotalTimeMillis());
