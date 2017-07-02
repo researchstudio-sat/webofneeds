@@ -39,7 +39,7 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
 		 or msg.receiverNodeURI = 'https://satvm05.researchstudio.at/won/resource/need/6825071433651196000' -- grant access to the receiver node
 		) )
      */
-    @Query("select distinct msg " +
+    @Query("select case when (count(msg) > 0) then true else false end " +
             "from MessageEventPlaceholder msg left outer join Connection con on (" +
             " msg.parentURI = con.connectionURI or " +
             " msg.parentURI = con.needURI " +
@@ -51,7 +51,7 @@ public interface MessageEventRepository extends WonRepository<MessageEventPlaceh
             "   or msg.receiverNodeURI = :webId " +
             "   or msg.senderNodeURI = :webId " +
             ")")
-    public MessageEventPlaceholder isReadPermittedForWebID(@Param("messageUri") URI messageUri, @Param("webId") URI webId);
+    public boolean isReadPermittedForWebID(@Param("messageUri") URI messageUri, @Param("webId") URI webId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select n,c from NeedEventContainer c join MessageEventPlaceholder msg on msg.parentURI = c.parentUri join Need n on c.parentUri = n.needURI where msg.messageURI = :messageUri")
