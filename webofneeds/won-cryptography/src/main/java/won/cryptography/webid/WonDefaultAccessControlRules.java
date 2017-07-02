@@ -3,7 +3,6 @@ package won.cryptography.webid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.protocol.model.MessageEventPlaceholder;
 import won.protocol.repository.MessageEventRepository;
 
 import java.net.URI;
@@ -36,8 +35,8 @@ public class WonDefaultAccessControlRules implements AccessControlRules
     }
     URI resourceUri = URI.create(resourceURI);
     URI webId = URI.create(firstWebId);
-    MessageEventPlaceholder messageEventPlaceholder = messageEventRepository.isReadPermittedForWebID( resourceUri, webId);
-    return messageEventPlaceholder != null;
+    boolean accessGranted = messageEventRepository.isReadPermittedForWebID( resourceUri, webId);
+    return accessGranted;
   }
 
 }
