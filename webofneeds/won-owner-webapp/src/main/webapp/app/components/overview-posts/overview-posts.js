@@ -25,6 +25,8 @@ class OverviewPostsController {
         attach(this, serviceDependencies, arguments);
         this.selection = 1;
         window.ovp4dbg = this;
+        this.activePostsOpen = true;
+        this.closedPostsOpen = false;
 
         const selectFromState = (state) => {
             const unreadEvents = selectUnreadEvents(state);
@@ -69,11 +71,9 @@ class OverviewPostsController {
                 //unreadMatchEventsOfNeed: unseenMatchesCounts,
                 //nrOfPostsWithNotifications: unseenMatchesCounts.length
                 drafts: null,
-                activePostsOpen: state.getIn(["postOverview", "activePostsView"]),
                 draftsOpen: false,
-                closedPostsOpen: state.getIn(["postOverview", "closedPostsView"])
             }
-        }
+        };
 
         const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
         this.$scope.$on('$destroy', disconnect);

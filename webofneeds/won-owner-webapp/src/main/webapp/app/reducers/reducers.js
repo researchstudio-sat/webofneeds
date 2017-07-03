@@ -10,7 +10,6 @@ import { combineReducersStable } from '../redux-utils';
 import draftsReducer from './drafts-reducer';
 import { messagesReducer } from './message-reducers';
 import reduceReducers from 'reduce-reducers';
-import postsReducer from './posts-reducer';
 import needReducer from './need-reducer';
 import eventReducer from './event-reducer';
 import userReducer from './user-reducer';
@@ -44,7 +43,6 @@ const reducers = {
     user: userReducer,
     needs:needReducer,
     matches: matchReducer,
-    postOverview:postsReducer,
     messages: messagesReducer,
     toasts: toastReducer,
 
