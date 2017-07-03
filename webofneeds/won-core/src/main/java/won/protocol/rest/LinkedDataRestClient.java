@@ -19,8 +19,12 @@ package won.protocol.rest;
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -112,13 +116,20 @@ public abstract class LinkedDataRestClient
       result = response.getBody();
     } catch (RestClientException e) {
       if(e instanceof HttpClientErrorException){
-        throw e;
+        throw new IllegalArgumentException(
+                MessageFormat.format(
+                        "caught a HttpClientErrorException exception, for {0}. Underlying error message is: {1}, response Body: {2}", resourceURI, e.getMessage(), ((HttpClientErrorException) e).getResponseBodyAsString()), e);
+      }
+      if (e instanceof HttpServerErrorException) {
+        throw new IllegalArgumentException(
+                MessageFormat.format(
+                        "caught a HttpServerErrorException exception, for {0}. Underlying error message is: {1}, response Body: {2}", resourceURI, e.getMessage(), ((HttpServerErrorException) e).getResponseBodyAsString()), e);
       }
       throw new IllegalArgumentException(
-        MessageFormat.format(
-          "caught a clientHandler exception, " +
-            "which may indicate that the URI that was accessed isn''t a" +
-            " linked data URI, please check {0}. Underlying error message is: {1}", resourceURI, e.getMessage()), e);
+              MessageFormat.format(
+                      "caught a clientHandler exception, " +
+                              "which may indicate that the URI that was accessed isn''t a" +
+                              " linked data URI, please check {0}. Underlying error message is: {1}", resourceURI, e.getMessage()), e);
     }
     if (logger.isDebugEnabled()) {
       logger.debug("fetched model with {} statements in default model for resource {}",result.getDefaultModel().size(),

@@ -943,7 +943,7 @@
         <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
         <org.springframework.boot.version>1.0.2.RELEASE</org.springframework.boot.version>
         <org.springframework.version>4.3.8.RELEASE</org.springframework.version>
-        <org.springframework.security.version>3.2.9.RELEASE</org.springframework.security.version>
+        <org.springframework.security.version>4.2.3.RELEASE</org.springframework.security.version>
         <org.slf4j.version>1.6.6</org.slf4j.version>
         <org.hsqldb.version>2.3.2</org.hsqldb.version>
         <postgresql.version>42.1.1</postgresql.version>

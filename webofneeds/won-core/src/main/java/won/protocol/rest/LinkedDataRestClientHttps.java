@@ -23,6 +23,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
+import won.cryptography.keymanagement.NeedUriAsAliasStrategy;
 import won.cryptography.service.CryptographyUtils;
 import won.cryptography.service.KeyStoreService;
 import won.cryptography.service.TrustStoreService;
@@ -52,15 +54,17 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient
   private KeyStoreService keyStoreService;
   private TrustStoreService trustStoreService;
   private TrustStrategy trustStrategy;
+  private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy = new NeedUriAsAliasStrategy();
 
 
 
-  public LinkedDataRestClientHttps(KeyStoreService keyStoreService, TrustStoreService trustStoreService, TrustStrategy trustStrategy) {
+  public LinkedDataRestClientHttps(KeyStoreService keyStoreService, TrustStoreService trustStoreService, TrustStrategy trustStrategy, KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy) {
     this.readTimeout = 20000;
     this.connectionTimeout = 20000; //DEF. TIMEOUT IS 20 sec
     this.keyStoreService = keyStoreService;
     this.trustStoreService = trustStoreService;
     this.trustStrategy = trustStrategy;
+    this.keyPairAliasDerivationStrategy = keyPairAliasDerivationStrategy;
   }
 
   @PostConstruct
@@ -83,7 +87,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient
       template = CryptographyUtils.createSslRestTemplate(
         this.keyStoreService.getUnderlyingKeyStore(),
         this.keyStoreService.getPassword(),
-        new PredefinedAliasPrivateKeyStrategy(webID),
+        new PredefinedAliasPrivateKeyStrategy(keyPairAliasDerivationStrategy.getAliasForNeedUri(webID)),
         this.trustStoreService.getUnderlyingKeyStore(),
         this.trustStrategy,
         readTimeout, connectionTimeout, true);
@@ -100,7 +104,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient
     HttpMessageConverter datasetConverter = new RdfDatasetConverter();
     RestTemplate restTemplate;
     try {
-      restTemplate = getRestTemplateForReadingLinkedData(requesterWebID.toString());
+      restTemplate = getRestTemplateForReadingLinkedData(keyPairAliasDerivationStrategy.getAliasForNeedUri(requesterWebID.toString()));
     } catch (Exception e) {
       logger.error("Failed to create ssl tofu rest template", e);
       throw new RuntimeException(e);
