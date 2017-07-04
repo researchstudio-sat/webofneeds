@@ -145,9 +145,6 @@ const actionHierarchy = {
         load:INJ_DEFAULT,
         clean:INJ_DEFAULT
     },
-    posts_overview:{
-        openPostsView:INJ_DEFAULT
-    },
 
     /**
      * Server triggered interactions (aka received messages)
@@ -237,7 +234,7 @@ const actionHierarchy = {
      send = dispatch("pending")
      */
 
-}
+};
 
 //as string constans, e.g. actionTypes.drafts.change.type === "drafts.change.type"
 export const actionTypes = tree2constants(actionHierarchy);
