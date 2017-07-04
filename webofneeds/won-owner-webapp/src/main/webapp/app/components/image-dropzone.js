@@ -53,7 +53,7 @@ function genComponentConf() {
                     return imageData;
                 }).then(imageData => {
                     //TODO implement multi-image mode
-                    this.onImagePicked({image: imageData});
+                    this.onImagePicked(imageData);
                     dispatchEvent(this.$element[0], 'image-picked', imageData);
                 });
             }

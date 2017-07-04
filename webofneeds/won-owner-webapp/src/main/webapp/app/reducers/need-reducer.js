@@ -70,7 +70,7 @@ export default function(allNeeds = initialState, action = {}) {
                 "ownNeeds", action.payload.ownNeedUri, 'won:isInState'
             ], won.WON.InactiveCompacted);
 
-        case actionTypes.drafts.publishSuccessful:
+        case actionTypes.needs.createSuccessful:
             return addOwnNeed(allNeeds, action.payload.need);
 
         case actionTypes.connections.load:

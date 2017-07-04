@@ -115,24 +115,11 @@ const actionHierarchy = {
         received: INJ_DEFAULT,
         connectionsReceived:INJ_DEFAULT,
         clean:INJ_DEFAULT,
+        create: needCreate,
+        createSuccessful: INJ_DEFAULT,
         reopen: needsOpen,
         close: needsClose,
         failed: INJ_DEFAULT
-    },
-    drafts: {
-        new: INJ_DEFAULT, // A new draft was created (either through the view in this client or on another browser)
-        change: { // A draft has changed. Pass along the draftURI and the respective data.
-            type: INJ_DEFAULT,
-            title: INJ_DEFAULT,
-            description: INJ_DEFAULT,
-            tags: INJ_DEFAULT,
-            thumbnail: INJ_DEFAULT,
-            location: INJ_DEFAULT,
-        },
-
-        delete: INJ_DEFAULT,
-        publish: draftsPublish,
-        publishSuccessful: INJ_DEFAULT
     },
     router: {
         stateGo,
@@ -236,7 +223,7 @@ const actionHierarchy = {
 
 };
 
-//as string constans, e.g. actionTypes.drafts.change.type === "drafts.change.type"
+//as string constans, e.g. actionTypes.needs.close === "needs.close"
 export const actionTypes = tree2constants(actionHierarchy);
 
 /**
@@ -277,11 +264,11 @@ export function startTicking() {
 }
 
 
-export function draftsPublish(draft, nodeUri) {
+export function needCreate(draft, nodeUri) {
     const { message, eventUri, needUri } = buildCreateMessage(draft, nodeUri);
     return {
-        type: actionTypes.drafts.publish,
-        payload: { eventUri, message, needUri, draftId: draft.draftId }
+        type: actionTypes.needs.create,
+        payload: { eventUri, message, needUri }
     };
 }
 

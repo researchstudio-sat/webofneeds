@@ -2,24 +2,15 @@
  * Created by ksinger on 15.07.2016.
  */
 
-import won from '../won-es6';
 import angular from 'angular';
 import Immutable from 'immutable'; // also exports itself as (window).L
 import L from '../leaflet-bundleable';
-import 'ng-redux';
-//import { labels } from '../won-label-utils';
 import {
     attach,
     searchNominatim,
     reverseSearchNominatim,
-    clone,
 } from '../utils.js';
 import { actionCreators }  from '../actions/actions';
-import {
-    selectOpenDraft,
-    selectRouterParams,
-    selectOwnNeeds,
-} from '../selectors';
 import {
     doneTypingBufferNg,
     DomCache,
@@ -27,10 +18,9 @@ import {
 
 import {
     initLeaflet,
-    seeksOrIs,
 } from '../won-utils';
 
-const serviceDependencies = ['$scope', '$ngRedux', '$element', '$sce'];
+const serviceDependencies = ['$scope', '$element', '$sce'];
 function genComponentConf() {
     let template = `
         <input type="text" class="lp__searchbox" placeholder="Search for location"/>
@@ -49,14 +39,14 @@ function genComponentConf() {
                 </a>
                 (current)
             </li>
-            <li ng-show="!self.locationIsSaved()"
+            <!--li ng-show="!self.locationIsSaved()"
                 ng-repeat="previousLocation in self.previousLocations | filter:self.lastSearchedFor">
                     <a href=""
                         ng-click="self.selectedLocation(previousLocation)"
                         ng-bind-html="self.highlight(previousLocation.name, self.lastSearchedFor)">
                     </a>
                     (previous)
-            </li>
+            </li-->
             <li ng-repeat="result in self.searchResults">
                 <a href=""
                     ng-click="self.selectedLocation(result)"
@@ -77,41 +67,11 @@ function genComponentConf() {
             this.determineCurrentLocation();
 
             window.lp4dbg = this;
-            const selectFromState = state => {
-                const openDraft = selectOpenDraft(state);
-                const routerParams = selectRouterParams(state);
-                const ownNeeds = selectOwnNeeds(state);
-                const previousLocations = ownNeeds && ownNeeds.map(need => {
-                        const content = seeksOrIs(need);
-                        return content.getIn('won:hasLocation');
-                    })
-                    .filter(location => location) //remove entries from needs without locations
-
-                    //eliminate duplicates in name
-                    .groupBy(location => location.get('s:name'))
-                    .map(group => group.first())
-
-                    .map(location => jsonLd2draftLocation(location))
-                    .toArray();
-
-                return {
-                    savedName: openDraft && openDraft.getIn(['location', 'name']),
-                    draftId: routerParams.get('draftId'),
-                    previousLocations: previousLocations,
-
-                    openDraft4dbg: openDraft,
-                }
-            };
-
 
             doneTypingBufferNg(
                 e => this.doneTyping(e),
                 this.textfieldNg(), 1000
             );
-
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
-
         }
 
         /**
@@ -135,8 +95,7 @@ function genComponentConf() {
             );
         }
         locationIsSaved() {
-            return this.savedName &&
-                this.textfield().value === this.savedName;
+            return this.draft.location && this.draft.location.name;
         }
         placeMarkers(locations) {
             if(this.markers) {
@@ -161,12 +120,10 @@ function genComponentConf() {
             this.placeMarkers([]);
         }
         selectedLocation(location) {
+            console.log("selectedLocation: ", location);
             this.resetSearchResults(); // picked one, can hide the rest if they were there
 
-            this.drafts__change__location({
-                draftId: this.draftId,
-                location
-            });
+            this.draft.location = location;
 
             this.textfield().value = location.name; // use textfield to display result
 
@@ -197,7 +154,7 @@ function genComponentConf() {
                 navigator.geolocation.getCurrentPosition(
                     currentLocation => {
 
-                        console.log(currentLocation)
+                        console.log(currentLocation);
                         const lat = currentLocation.coords.latitude;
                         const lon = currentLocation.coords.longitude;
                         const zoom = 13; // TODO use `currentLocation.coords.accuracy` to control coarseness of query / zoom-level
@@ -245,6 +202,7 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
+            draft: "="
         },
         template: template
     }
