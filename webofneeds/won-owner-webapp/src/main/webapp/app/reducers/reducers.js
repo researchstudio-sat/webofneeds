@@ -10,7 +10,6 @@ import reduceReducers from 'reduce-reducers';
 import needReducer from './need-reducer';
 import eventReducer from './event-reducer';
 import userReducer from './user-reducer';
-import matchReducer from './match-reducer';
 import toastReducer from './toast-reducer';
 import connectionReducer from './connection-reducer';
 
@@ -37,8 +36,7 @@ const reducers = {
     connections:connectionReducer,
     events: eventReducer,
     user: userReducer,
-    needs:needReducer,
-    matches: matchReducer,
+    needs: needReducer,
     messages: messagesReducer,
     toasts: toastReducer,
 
