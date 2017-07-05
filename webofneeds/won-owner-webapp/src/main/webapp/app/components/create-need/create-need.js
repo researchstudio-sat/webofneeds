@@ -37,7 +37,7 @@ const postTypeTexts = [
 ]
 
 //TODO can't inject $scope with the angular2-router, preventing redux-cleanup
-const serviceDependencies = ['$q', '$ngRedux', '$scope'/*'$routeParams' /*injections as strings here*/];
+const serviceDependencies = ['$ngRedux', '$scope'/*'$routeParams' /*injections as strings here*/];
 
 class CreateNeedController {
     constructor(/* arguments <- serviceDependencies */) {
@@ -103,13 +103,13 @@ class CreateNeedController {
         this.drafts__change__type({draftId: this.draftId, type: undefined}); //TODO proper draft idx in URL
     }
     titlePicZoneNg() {
-        if(!this._titlePicZone) {
-            this._titlePicZone = this.$element.find('#titlePic');
-        }
-        return this._titlePicZone;
+        return angular.element(this.titlePicZone())
     }
     titlePicZone() {
-        return titlePicZoneNg[0];
+        if(!this._titlePicZone) {
+            this._titlePicZone = this.$element[0].querySelector('#titlePic');
+        }
+        return this._titlePicZone;
     }
     publish() {
         if (!this.pendingPublishing) {

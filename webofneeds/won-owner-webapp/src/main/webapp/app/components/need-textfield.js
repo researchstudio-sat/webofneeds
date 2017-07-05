@@ -50,7 +50,9 @@ function genComponentConf() {
         }*/
         input(e) {
 
-            const paragraphsDom = this.$element.find('p').toArray();
+            const paragraphsDom = Array.prototype.slice.call( // to normal Array
+                this.$element[0].querySelectorAll('p') // NodeList of paragraphs
+            );
             const paragraphsNg = paragraphsDom.map(p => angular.element(p)); // how performant is `.element`?
             paragraphsNg.map(p => p.removeClass("medium_title"));
 
@@ -59,7 +61,6 @@ function genComponentConf() {
             titleParagraphNg.addClass("medium_title");
 
             var description;
-            var tags;
             if(paragraphsDom && paragraphsDom.length > 1){
                 const descriptionParagraphs = paragraphsNg.slice(1);
                 description = descriptionParagraphs.map(p =>
@@ -93,19 +94,24 @@ function genComponentConf() {
                 .trim();
 
             //ADD TAGS
-            const titleTags = title? title.match(/#(\S+)/gi) : [];
-            const descriptionTags = description? description.match(/#(\S+)/gi) : [];
+            const titleTags = Immutable.Set(title? title.match(/#(\S+)/gi) : []);
+            const descriptionTags = Immutable.Set(description? description.match(/#(\S+)/gi) : []);
+            const tags = titleTags.merge(descriptionTags).map(tag => tag.substr(1));
 
-            tags = angular.element.unique(
-                angular.element.merge(
-                    titleTags ? titleTags : [],
-                    descriptionTags ? descriptionTags : []
-                )
-            );
 
-            for(var i=0; i<tags.length; i++){
-                tags[i] = tags[i].substr(1);
-            }
+
+            //const titleTags = title? title.match(/#(\S+)/gi) : [];
+            //const descriptionTags = description? description.match(/#(\S+)/gi) : [];
+            //tags = angular.element.unique(
+            //    angular.element.merge(
+            //        titleTags ? titleTags : [],
+            //        descriptionTags ? descriptionTags : []
+            //    )
+            //);
+            //
+            //for(var i=0; i<tags.length; i++){
+            //    tags[i] = tags[i].substr(1);
+            //}
 
             //SAVE TO STATE //TODO: MOVE THIS HACK TO VIEW LEVEL (to make component reusable)
             this.drafts__change__description({
@@ -120,7 +126,7 @@ function genComponentConf() {
 
             this.drafts__change__tags({
                 draftId: this.draftId,
-                tags: tags && tags.length > 0? tags : undefined
+                tags: tags.toJS(),
             });
         }
         valid() {
@@ -236,24 +242,24 @@ function genComponentConf() {
         }
 
         mediumMountNg() {
+            return angular.element(this.mediumMount());
+        }
+
+        mediumMount() {
             if(!this._mediumMount) {
-                this._mediumMount = this.textFieldNg().find('.medium-mount')
+                this._mediumMount = this.textField().querySelector('.medium-mount')
             }
             return this._mediumMount;
         }
 
-        mediumMount() {
-            return this.mediumMountNg()[0];
-        }
-
         textFieldNg() {
-            if(!this._textField) {
-                this._textField = this.$element.find('.wdt__text');
-            }
-            return this._textField;
+            return angular.element(this.textField());
         }
         textField() {
-            return this.textFieldNg()[0];
+            if(!this._textField) {
+                this._textField = this.$element[0].querySelector('.wdt__text');
+            }
+            return this._textField;
         }
     }
     Controller.$inject = serviceDependencies;

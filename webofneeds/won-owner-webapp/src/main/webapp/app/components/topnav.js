@@ -116,7 +116,7 @@ function genTopnavConf() {
         </div>
     `;
 
-    const serviceDependencies = ['$q', '$ngRedux', '$scope', /*injections as strings here*/];
+    const serviceDependencies = ['$ngRedux', '$scope', /*injections as strings here*/];
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */){

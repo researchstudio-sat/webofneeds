@@ -82,17 +82,6 @@ let app = angular.module('won.owner', [
 
 ]);
 
-/*
- * silences bogus errors from combining angular 1.6 and ui-router. see:
- * - http://stackoverflow.com/questions/39931983/angularjs-possible-unhandled-rejection-when-using-ui-router
- * - https://github.com/angular-ui/ui-router/issues/2889
- */
-/*
-app.config(['$qProvider', function ($qProvider) {
-    $qProvider.errorOnUnhandledRejections(false);
-}]);
-*/
-
 app.config([ '$ngReduxProvider', configRedux ]);
 app.filter('filterByNeedState', function(){
     return function(needs,state){
@@ -101,7 +90,7 @@ app.filter('filterByNeedState', function(){
             if(need['won:isInState']['@id'] == state){
                 filtered.push(need);
             }
-        })
+        });
 
         return filtered;
     }
@@ -113,7 +102,7 @@ app.filter('filterByNeedState', function(){
                 if(event.hasReceiverNeed == uri && event.eventType == type){
                     filtered.push(event);
                 }
-            })
+            });
 
             return filtered;
         }

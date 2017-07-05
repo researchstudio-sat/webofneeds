@@ -12,7 +12,7 @@ import {
     inferLegacyNeedType,
 } from '../won-utils';
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope'];
+const serviceDependencies = ['$ngRedux', '$scope'];
 
 function genComponentConf() {
     let template = `

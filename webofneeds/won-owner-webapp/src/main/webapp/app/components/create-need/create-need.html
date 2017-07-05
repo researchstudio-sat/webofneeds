@@ -19,8 +19,8 @@
             <need-textfield></need-textfield>
         </div>
 
-        <hr ng-show="self.tags"/>
-        <div class="cp__tags" ng-show="self.tags">
+        <hr ng-show="self.tags && self.tags.size > 0"/>
+        <div class="cp__tags" ng-show="self.tags && self.tags.size > 0">
             <div class="cp__header tags">Tags</div>
             <span class="cp__tags__tag" ng-repeat="tag in self.tags.toJS()">{{tag}}</span>
         </div>

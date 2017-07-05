@@ -14,7 +14,7 @@ function genLogoutConf() {
                     </a>
                     <button class="won-button--filled lighterblue" ng-click="::self.logout()">Sign out</button>`;
 
-    const serviceDependencies = ['$q', '$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
+    const serviceDependencies = ['$ngRedux', '$scope', /*'$routeParams' /*injections as strings here*/];
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */){

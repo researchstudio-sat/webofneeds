@@ -24,7 +24,7 @@ import {
     selectLastUpdateTime,
 } from '../selectors';
 
-const serviceDependencies = ['$q', '$ngRedux', '$scope', '$interval'];
+const serviceDependencies = ['$ngRedux', '$scope', '$interval'];
 function genComponentConf() {
     let template = `
         <div ng-show="self.images" class="mfi__gallery">

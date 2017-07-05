@@ -59,7 +59,7 @@ function genLoginConf() {
                         </a>
                     </div>`;
 
-    const serviceDependencies = ['$q', '$ngRedux', '$scope', '$element' /*'$routeParams' /*injections as strings here*/];
+    const serviceDependencies = ['$ngRedux', '$scope', '$element' /*'$routeParams' /*injections as strings here*/];
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */){

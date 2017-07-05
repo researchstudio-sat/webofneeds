@@ -1883,47 +1883,45 @@ import won from './won';
     //TODO refactor this method.
     won.getConnectionInStateForNeedWithRemoteNeed = function(needUri,connectionState) {
 
-        return won.getconnectionUrisOfNeed(needUri).then(function(connectionUris){
-            let promises=[];
-            connectionUris.forEach(function(connection){
-                let resultObject = {}
-                let data = Q.defer()
-                promises.push(data.promise)
-                won.getConnectionWithEventUris(connection).then(function(connectionData){
-                    resultObject.connection = connectionData;
-                    let query="prefix msg: <http://purl.org/webofneeds/message#> \n"+
-                        "prefix won: <http://purl.org/webofneeds/model#> \n" +
-                        "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
-                        "select ?remoteNeed \n" +
-                        " where { \n" +
-                        "<"+connectionData.uri+"> a won:Connection; \n" +
-                        "              won:belongsToNeed <" +needUri +"> ; \n" +
-                        "              won:hasRemoteNeed ?remoteNeed; \n"+
-                        "              won:hasConnectionState "+ connectionState +". \n"+
-                        "} \n"
+        return won.getconnectionUrisOfNeed(needUri).then(connectionUris => {
 
-                    privateData.store.execute(query,[],[],function(success,results){
-                        if (rejectIfFailed(success, results, {message: "Error loading connection for need " + needUri + "in state"+connectionState+".", allowNone: true, allowMultiple: true})) {
-                            return;
-                        }
-                        let needs = []
-                        let ownNeedPromise = won.getNeedWithConnectionUris(needUri);
-                        needs.push(ownNeedPromise);
-                        let remoteNeedPromise = won.getTheirNeed(results[0].remoteNeed.value)
-                         needs.push(remoteNeedPromise)
-                        Q.all(needs).then(function(needData){
-                            resultObject.ownNeed = needData[0]
-                            resultObject.remoteNeed=needData[1]
-                            return data.resolve(resultObject );
+
+
+            const promises = connectionUris.map(connectionUri =>
+                new Promise((resolve, reject) => {
+                    let resultObject = {};
+                    won.getConnectionWithEventUris(connectionUri).then(connectionData => {
+                        resultObject.connection = connectionData;
+                        let query="prefix msg: <http://purl.org/webofneeds/message#> \n"+
+                            "prefix won: <http://purl.org/webofneeds/model#> \n" +
+                            "prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"+
+                            "select ?remoteNeed \n" +
+                            " where { \n" +
+                            "<"+connectionData.uri+"> a won:Connection; \n" +
+                            "              won:belongsToNeed <" +needUri +"> ; \n" +
+                            "              won:hasRemoteNeed ?remoteNeed; \n"+
+                            "              won:hasConnectionState "+ connectionState +". \n"+
+                            "} \n"
+
+                        privateData.store.execute(query,[],[],function(success,results){
+                            if (rejectIfFailed(success, results, {message: "Error loading connection for need " + needUri + "in state"+connectionState+".", allowNone: true, allowMultiple: true})) {
+                                return;
+                            }
+                            Promise.all([
+                                won.getNeedWithConnectionUris(needUri),
+                                won.getTheirNeed(results[0].remoteNeed.value)
+                            ]).then(needData => {
+                                resultObject.ownNeed = needData[0];
+                                resultObject.remoteNeed = needData[1];
+                                return resolve(resultObject );
+                            })
                         })
-
-
-
                     })
                 })
-            })
-            return Q.all(promises)
+            );
+            return Promise.all(promises)
         })
+
 
     }
 

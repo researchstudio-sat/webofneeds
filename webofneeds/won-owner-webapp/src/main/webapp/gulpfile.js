@@ -28,7 +28,8 @@ gulp.task('bundlejs', function(){
         //.pipe(gulp_jspm())
         .pipe(gulp_jspm({
             selfExecutingBundle: true,
-            minify: true,
+            minify: false,
+            //minify: true,
         }))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('./generated/'));

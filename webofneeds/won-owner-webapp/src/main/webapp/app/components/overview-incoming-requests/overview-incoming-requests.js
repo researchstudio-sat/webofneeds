@@ -7,7 +7,7 @@ import connectionsOverviewModule from '../connections-overview';
 import { attach,mapToMatches } from '../../utils';
 import { actionCreators }  from '../../actions/actions';
 import { selectAllByConnections } from '../../selectors';
-const serviceDependencies = ['$q', '$ngRedux', '$scope'];
+const serviceDependencies = ['$ngRedux', '$scope'];
 
 class IncomingRequestsController {
     constructor() {
