@@ -94,9 +94,7 @@ function genComponentConf() {
                 )
             );
         }
-        locationIsSaved() {
-            return this.draft.location && this.draft.location.name;
-        }
+
         placeMarkers(locations) {
             if(this.markers) {
                 //remove previously placed markers
@@ -123,7 +121,8 @@ function genComponentConf() {
             console.log("selectedLocation: ", location);
             this.resetSearchResults(); // picked one, can hide the rest if they were there
 
-            this.draft.location = location;
+            let draft = {location};
+            this.onDraftChange({draft});
 
             this.textfield().value = location.name; // use textfield to display result
 
@@ -202,7 +201,8 @@ function genComponentConf() {
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
         scope: {
-            draft: "="
+            onDraftChange: "&",
+            locationIsSaved: "&",
         },
         template: template
     }

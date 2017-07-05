@@ -16,7 +16,7 @@
                     on-image-picked="::self.pickImage(image)">
             </won-image-dropzone>
 
-            <need-textfield draft="self.draft"></need-textfield>
+            <need-textfield on-draft-change="::self.setDraft(draft)"></need-textfield>
         </div>
 
         <hr ng-show="self.draft.tags"/>
@@ -29,7 +29,7 @@
         <hr ng-show="self.isValid()"/>
         <div class="cp__location" ng-show="self.isValid()">
             <div class="cp__header location">Location</div>
-            <won-location-picker draft="self.draft"></won-location-picker>
+            <won-location-picker on-draft-change="::self.setDraft(draft)" location-is-saved="::self.locationIsSaved()"></won-location-picker>
         </div>
 
         <!--

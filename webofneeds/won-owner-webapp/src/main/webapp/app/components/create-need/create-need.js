@@ -88,6 +88,15 @@ class CreateNeedController {
         }
     }
 
+    setDraft(draft) {
+        Object.assign(this.draft, draft);
+        this.$scope.$digest();
+    }
+
+    locationIsSaved() {
+        return this.draft.location && this.draft.location.name;
+    }
+
     pickImage(image) {
         this.draft.thumbnail = image;
     }

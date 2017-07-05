@@ -6,7 +6,11 @@
 
 import angular from 'angular';
 import 'angular-sanitize';
-import { attach, delay } from '../utils';
+import {
+    attach,
+    delay,
+    dispatchEvent,
+} from '../utils';
 
 function genComponentConf() {
     let template = `
@@ -30,17 +34,17 @@ function genComponentConf() {
             this.mediumMountNg().bind('paste', e => this.input(e));
         }
         input(e) {
-            console.log("input!");
             const paragraphsDom = this.$element.find('p').toArray();
             const paragraphsNg = paragraphsDom.map(p => angular.element(p)); // how performant is `.element`?
             paragraphsNg.map(p => p.removeClass("medium_title"));
+
 
             const titleParagraphDom = paragraphsDom[0];
             const titleParagraphNg = paragraphsNg[0];
             titleParagraphNg.addClass("medium_title");
 
-            var description;
-            var tags;
+            let description;
+            let tags;
             if(paragraphsDom && paragraphsDom.length > 1){
                 const descriptionParagraphs = paragraphsNg.slice(1);
                 description = descriptionParagraphs.map(p =>
@@ -59,8 +63,6 @@ function genComponentConf() {
             } else {
                 description = undefined;
             }
-            this.draft.description = description;
-            console.log("draft-description: ",this.draft.description);
 
             /*
              * Remove placeholder-white-space if medium.js fails to remove it,
@@ -74,8 +76,6 @@ function genComponentConf() {
                 // sometimes mediumjs doesn't remove the placeholder nbsp properly.
                 .replace(/^&nbsp;/, '')
                 .trim();
-            this.draft.title = title;
-            console.log("draft-title: ",this.draft.title);
 
             //ADD TAGS
             const titleTags = title? title.match(/#(\S+)/gi) : [];
@@ -88,12 +88,15 @@ function genComponentConf() {
                 )
             );
 
-            for(var i=0; i<tags.length; i++){
+            for(let i=0; i<tags.length; i++){
                 tags[i] = tags[i].substr(1);
             }
 
-            this.draft.tags = tags && tags.length > 0? tags : undefined;
-            console.log("draft-tags: ",this.draft.tags);
+            tags = tags && tags.length > 0? tags : undefined;
+
+            const draft = {title, description, tags};
+            this.onDraftChange({draft});
+            dispatchEvent(this.$element[0], 'draftChange', draft);
         }
 
         value() {
@@ -178,7 +181,7 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: { draft: "="},
+        scope: { onDraftChange: "&"},
         template: template
     }
 }
