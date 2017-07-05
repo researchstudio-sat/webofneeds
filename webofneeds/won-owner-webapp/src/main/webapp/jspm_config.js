@@ -14,28 +14,18 @@ System.config({
 
   map: {
     "angular": "npm:angular@1.4.8",
-    "angular-bootstrap": "github:angular-ui/bootstrap-bower@0.13.0",
     "angular-inview": "npm:angular-inview@2.1.0",
-    "angular-mocks": "github:angular/bower-angular-mocks@1.4.2",
     "angular-route": "github:angular/bower-angular-route@1.4.2",
     "angular-sanitize": "github:angular/bower-angular-sanitize@1.4.8",
     "angular-ui-router": "npm:angular-ui-router@0.2.15",
-    "angular-ui-utils": "github:angular-ui/ui-utils@2.0.0",
     "babel": "npm:babel-core@5.8.35",
     "babel-runtime": "npm:babel-runtime@5.8.35",
-    "bootstrap": "github:twbs/bootstrap@3.3.5",
     "core-js": "npm:core-js@1.2.6",
     "fetch": "github:github/fetch@0.10.1",
-    "font-awesome": "bower:font-awesome@4.3.0",
     "immutable": "npm:immutable@3.7.5",
-    "jquery": "github:components/jquery@2.1.4",
-    "js-md5": "bower:js-md5@1.1.0",
     "jsonld": "npm:jsonld@0.4.2",
     "leaflet": "npm:leaflet@0.7.7",
-    "ng-clip": "bower:ng-clip@0.2.6",
     "ng-redux": "npm:ng-redux@3.4.0-beta.1",
-    "ng-scrollbar": "bower:ng-scrollbar@0.0.6",
-    "ng-tags-input": "bower:ng-tags-input@2.3.0",
     "q": "bower:q@1.0.1",
     "reduce-reducers": "npm:reduce-reducers@0.1.1",
     "redux": "npm:redux@3.6.0",
@@ -44,23 +34,6 @@ System.config({
     "redux-ui-router": "npm:redux-ui-router@0.3.3",
     "reselect": "npm:reselect@2.0.2",
     "sockjs": "bower:sockjs@0.3.4",
-    "bower:font-awesome@4.3.0": {
-      "css": "github:systemjs/plugin-css@0.1.20"
-    },
-    "bower:ng-clip@0.2.6": {
-      "angular": "bower:angular@1.5.0-beta.2",
-      "zeroclipboard": "bower:zeroclipboard@2.2.0"
-    },
-    "bower:ng-scrollbar@0.0.6": {
-      "css": "github:systemjs/plugin-css@0.1.20"
-    },
-    "bower:ng-tags-input@2.3.0": {
-      "angular": "bower:angular@1.5.0-beta.2",
-      "css": "github:systemjs/plugin-css@0.1.20"
-    },
-    "github:angular/bower-angular-mocks@1.4.2": {
-      "angular": "github:angular/bower-angular@1.4.8"
-    },
     "github:angular/bower-angular-route@1.4.2": {
       "angular": "github:angular/bower-angular@1.4.8"
     },
@@ -141,9 +114,6 @@ System.config({
     },
     "github:jspm/nodelibs-zlib@0.1.0": {
       "browserify-zlib": "npm:browserify-zlib@0.1.4"
-    },
-    "github:twbs/bootstrap@3.3.5": {
-      "jquery": "github:components/jquery@2.1.4"
     },
     "npm:abbrev@1.0.7": {
       "assert": "github:jspm/nodelibs-assert@0.1.0",
