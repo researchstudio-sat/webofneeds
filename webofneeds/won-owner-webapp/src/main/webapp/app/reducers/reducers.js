@@ -154,7 +154,7 @@ export default reduceReducers( //passes on the state from one reducer to another
     //-------------------- </cross-cutting-reducer> -------------------
 )
 
-window.ImmutableFoo = Immutable;
+window.Immutable4dbg = Immutable;
 
 function deleteCnctBetweenOwned(state) {
     var cnctBetweenOwned = selectCnctUrisBetweenOwnedNeeds(state);
