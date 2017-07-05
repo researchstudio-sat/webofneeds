@@ -97,14 +97,38 @@ function logUrlChange() {
 
 
 export const piwikMiddleware = store => next => action => {
-    //if(action && action.type === '@@reduxUiRouter/$stateChangeSuccess') {
-    //    const urlWithParams = getIn(action, ['payload', 'currentState', 'url']);
-    //    const viewName = getIn(action, ['payload', 'currentState', 'name']);
-    //    console.log('piwik.js -- sending action to server: ', viewName, ' --- ', urlWithParams);
-    //    piwikCall(['trackEvent', 'UiRouter', 'StateChangeSuccess', viewName, urlWithParams]);
-    //    piwikCall(['trackEvent', 'StateChangeSuccess', urlWithParams, viewName]); // TODO something's not working out here. maybe it doesn't push specialchars? the values of the params get lost sometimes. sometimes there's no request.
-    //    piwikCall(['trackEvent', 'Category2', 'Name2', 'Description2', 0.1]);
-    //}
+
+    if(! (action && action.type))
+        return next(action);
+
+    const loggingWhiteList = {
+        Connections: [ // log as category "Connections"
+            'connections.sendChatMessage', // log this and following actions
+            'messages.connectionMessageReceived',
+            'connections.open',
+            'messages.openMessageReceived',
+            'connections.connect',
+            'messages.connectMessageReceived',
+            'messages.hintMessageReceived',
+            'connections.close',
+        ],
+        Needs: [
+            'drafts.publish',
+            'needs.close',
+            'needs.reopen',
+        ]
+
+    };
+
+    // check if action.type is in the whitelist
+    for(let category of Object.keys(loggingWhiteList)) {
+        loggingWhiteList[category].forEach(actionType => {
+            if(action.type === actionType) {
+                //send HTTP-GET to piwik-server
+                piwikCall(['trackEvent', category, actionType, '', 1])
+            }
+        })
+    }
 
     return next(action);
 };
