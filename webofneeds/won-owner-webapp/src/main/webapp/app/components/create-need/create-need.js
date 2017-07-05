@@ -93,7 +93,6 @@ class CreateNeedController {
 
     setDraft(updatedDraft) {
         Object.assign(this.draft, updatedDraft);
-        this.$scope.$digest();
     }
 
     locationIsSaved() {
