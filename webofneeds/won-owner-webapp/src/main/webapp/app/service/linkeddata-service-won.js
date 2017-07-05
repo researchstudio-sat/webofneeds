@@ -26,7 +26,6 @@ import {
     contains,
     camel2Hyphen,
 } from '../utils';
-import * as q from 'q';
 
 import '../../scripts/rdfstore-js/rdf_store';
 const rdfstore = window.rdfstore;
