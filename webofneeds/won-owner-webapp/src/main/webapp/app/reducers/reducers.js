@@ -33,7 +33,7 @@ const reducers = {
     */
 
 
-    connections:connectionReducer,
+    connections: connectionReducer,
     events: eventReducer,
     user: userReducer,
     needs: needReducer,

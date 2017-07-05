@@ -26,9 +26,6 @@ export default function(allToasts = initialState, action = {}) {
 
         //WARN TOASTS: won.WON.warnToast
         //ERROR TOASTS: won.WON.errorToast
-        case actionTypes.needs.failed:
-            return pushNewToast(allToasts, "Needlist Retrieval Failed", won.WON.errorToast);
-
         case actionTypes.messages.closeNeed.failed:
             return pushNewToast(allToasts, "Closing Need failed", won.WON.errorToast);
 
