@@ -11,7 +11,10 @@ import labelledHrModule from '../labelled-hr';
 import needTextfieldModule from '../need-textfield';
 import imageDropzoneModule from '../image-dropzone';
 import locationPickerModule from '../location-picker';
-import { attach } from '../../utils';
+import {
+    attach,
+    clone,
+} from '../../utils';
 import { actionCreators }  from '../../actions/actions';
 import won from '../../won-es6';
 
@@ -88,8 +91,8 @@ class CreateNeedController {
         }
     }
 
-    setDraft(draft) {
-        Object.assign(this.draft, draft);
+    setDraft(updatedDraft) {
+        Object.assign(this.draft, updatedDraft);
         this.$scope.$digest();
     }
 
