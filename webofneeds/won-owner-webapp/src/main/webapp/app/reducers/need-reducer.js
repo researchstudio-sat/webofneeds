@@ -127,7 +127,7 @@ function parseNeed(jsonldNeed, ownNeed) {
         const is = jsonldNeedImm.get("won:is");
         const seeks = jsonldNeedImm.get("won:seeks");
 
-        const title = is ? is.get("dc:title") : (seeks ? seeks.get("dc:title") : undefined);
+        const title = (is && is.get("dc:title")) ? is.get("dc:title") : ((seeks && seeks.get("dc:title")) ? seeks.get("dc:title") : undefined);
 
         if(!!id && !!title){
             parsedNeed.id = id;
@@ -168,7 +168,7 @@ function parseNeed(jsonldNeed, ownNeed) {
 
         //TODO: LOCATION IS STILL MISSING
     }else{
-        console.error('Cant parse need data is an invalid need-object: ', jsonldNeedImm);
+        console.error('Cant parse need data is an invalid need-object: ', jsonldNeedImm.toJS());
         return undefined;
     }
 
@@ -188,24 +188,38 @@ function parseNeed(jsonldNeed, ownNeed) {
  */
 function addConnection(state, needUri, connectionUri) {
     const pathToConnections = ['ownNeeds', needUri, 'won:hasConnections', 'rdfs:member'];
+    const pathToNewConnections = ['allNeeds', needUri, 'connections'];
+
     if(!state.getIn(pathToConnections)) {
-        //make sure the rdfs:member array exists
         state = state.setIn(pathToConnections, Immutable.List());
     }
+
     const connections = state.getIn(pathToConnections);
-    if( connections.filter(c => c && c.get('@id') === connectionUri).size > 0) {
-        // connection's already been added to the need before
-        return state;
-    } else {
+    if( connections.filter(c => c && c.get('@id') === connectionUri).size == 0) {
         // new connection, add it to the need
-        return state.updateIn(
+        state = state.updateIn(
             pathToConnections,
             connections => connections.push(
                 Immutable.fromJS({ '@id': connectionUri })
             )
         );
-
     }
+
+    if(!state.getIn(pathToNewConnections)){
+        state = state.setIn(pathToNewConnections, Immutable.List());
+    }
+
+    const newConnections = state.getIn(pathToNewConnections);
+    if(connections.filter(c => c && c.get("id") === connectionUri).size == 0) {
+        state = state.updateIn(
+            pathToNewConnections,
+            newConnections => newConnections.push(
+                Immutable.fromJS({ "id": connectionUri })
+            )
+        )
+    }
+
+    return state;
 }
 
 function setIfNew(state, path, obj){
