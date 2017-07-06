@@ -23,7 +23,6 @@ export const selectOwnNeeds = state => state.getIn(['needs', 'ownNeeds']);
 export const selectTheirNeeds = state => state.getIn(['needs', 'theirNeeds']);
 export const selectLastUpdateTime = state => state.get('lastUpdateTime');
 export const selectRouterParams = state => state.getIn(['router', 'currentParams']);
-export const selectDrafts = state => state.get('drafts');
 
 export const selectOwnEventUris = createSelector(
     selectEvents,
@@ -245,12 +244,6 @@ export const selectAllByConnectionsByNeed = createSelector(
         .groupBy(cnct => cnct.getIn(['ownNeed', '@id']))
 );
 
-
-export const selectOpenDraft = createSelector(
-    selectRouterParams, selectDrafts,
-    (routerParams, drafts) =>
-        drafts.get(routerParams.get('draftId'))
-);
 
 export const selectOpenConnectionUri = createSelector(
     selectRouterParams,

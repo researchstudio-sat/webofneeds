@@ -4,62 +4,47 @@
 
 ;
 
-// import Medium from '../mediumjs-es6';
 import angular from 'angular';
-import 'ng-redux';
-import Immutable from 'immutable';
 import 'angular-sanitize';
-import { dispatchEvent, attach, delay } from '../utils';
-import { actionCreators }  from '../actions/actions';
+import {
+    attach,
+    delay,
+    dispatchEvent,
+} from '../utils';
 
 function genComponentConf() {
     let template = `
         <div class="wdt__left">
-            <div class="wdt__text"
-                    ng-class="{ 'valid' : self.valid(), 'invalid' : !self.valid() }">
+            <div class="wdt__text valid">
                 <div class="medium-mount"></div>
             </div>
-            <!--span class="wdt__charcount">
-                {{ self.charactersLeft() }} characters left
-            </span-->
         </div>
     `;
 
-    const serviceDependencies = ['$scope', '$element', '$ngRedux', /*injections as strings here*/];
+    const serviceDependencies = ['$scope', '$element', /*injections as strings here*/];
 
     class Controller {
         constructor(/* arguments <- serviceDependencies */) {
             attach(this, serviceDependencies, arguments);
             window.ntf4dbg = this;
 
-            //this.characterLimit = 140; //COMMENT BECAUSE WE DO NOT NEED IT FOR NOW TODO move to conf
-
-            const selectFromState = (state) => ({
-                draftId: state.getIn(['router', 'currentParams', 'draftId'])
-            })
-            const disconnect = this.$ngRedux.connect(selectFromState, actionCreators)(this);
-            this.$scope.$on('$destroy', disconnect);
-
             this.initMedium();
 
             this.mediumMountNg().bind('input', e => this.input(e));
             this.mediumMountNg().bind('paste', e => this.input(e));
         }
-        /*charactersLeft() {
-            return this.characterLimit - this.medium.value().length;
-        }*/
         input(e) {
-
             const paragraphsDom = this.$element.find('p').toArray();
             const paragraphsNg = paragraphsDom.map(p => angular.element(p)); // how performant is `.element`?
             paragraphsNg.map(p => p.removeClass("medium_title"));
+
 
             const titleParagraphDom = paragraphsDom[0];
             const titleParagraphNg = paragraphsNg[0];
             titleParagraphNg.addClass("medium_title");
 
-            var description;
-            var tags;
+            let description;
+            let tags;
             if(paragraphsDom && paragraphsDom.length > 1){
                 const descriptionParagraphs = paragraphsNg.slice(1);
                 description = descriptionParagraphs.map(p =>
@@ -103,28 +88,15 @@ function genComponentConf() {
                 )
             );
 
-            for(var i=0; i<tags.length; i++){
+            for(let i=0; i<tags.length; i++){
                 tags[i] = tags[i].substr(1);
             }
 
-            //SAVE TO STATE //TODO: MOVE THIS HACK TO VIEW LEVEL (to make component reusable)
-            this.drafts__change__description({
-                draftId: this.draftId,
-                description : description,
-            });
+            tags = tags && tags.length > 0? tags : undefined;
 
-            this.drafts__change__title({
-                draftId: this.draftId,
-                title: title,
-            });
-
-            this.drafts__change__tags({
-                draftId: this.draftId,
-                tags: tags && tags.length > 0? tags : undefined
-            });
-        }
-        valid() {
-            return true; //return this.charactersLeft() >= 0;
+            const draft = {title, description, tags};
+            this.$scope.$apply(() => this.onDraftChange({draft}));
+            dispatchEvent(this.$element[0], 'draftChange', draft);
         }
 
         value() {
@@ -147,28 +119,11 @@ function genComponentConf() {
                 modifier: 'auto',
                 placeholder: 'What',
                 autoHR: false, //if true, inserts <hr> after two empty lines
-                //mode: Medium.inlineMode, // no newlines, no styling
                 mode: Medium.partialMode, // allows newlines, no styling
-                //maxLength: this.maxChars, // -1 would disable it
-
-                //tags: null,
-                /*
-                tags: {
-                    'break': 'br',
-                    // 'horizontalRule': 'hr',
-                    'paragraph': 'p',
-                    // 'outerLevel': ['pre', 'blockquote', 'figure'],
-                    // 'innerLevel': ['a', 'b', 'u', 'i', 'img', 'strong']
-                    //'outerLevel': [], //should disable all tags
-                    //'innerLevel': [], //should disable all tags
-                },
-                */
                 attributes: {
                     //remove: ['style', 'class'] //TODO does this remove the ng-class?
                     remove: ['style'] //TODO does this remove the ng-class?
                 },
-                //pasteAsText: false,
-                //pasteAsText: true,
                 beforeInsertHtml: function () {
                     //this = Medium.Html (!)
 
@@ -182,45 +137,7 @@ function genComponentConf() {
                     this.html = sanitizedHtml;
 
                     console.log('medium.js - beforeInsertHtml: ', this, originalHtml, sanitizedHtml);
-
-                    //this.html = 'trololololo';
-                    // TODO: parse
-                    // <br> -> </div> (also add opening tag!)
-                    // <br><br> -> <div> + <div><br></div>
                 },
-                /*
-                */
-                /*
-                pasteEventHandler: function(e) {
-                    //default paste event handler
-                    //enables paste (dunno why) but also breaks the inlineMode (suddenly there's <p> elements)
-                    console.log('medium.js - pasteEventHandler: ', this, arguments)
-                }
-                */
-
-                /*
-                TODO stopped here
-
-
-                 pasteAsText?
-                 intercept paste and replace <br>s with <p>s
-                 beforeInserHtml
-                 beforeAddTag - intercept any <br>
-
-                 intercept all paste events and call insertHtml manually?
-
-                */
-                /*
-                beforeInvokeElement: function () {
-                 //this = Medium.Element
-                     console.log('beforeInvokeElement: ', this)
-                 },
-                 beforeAddTag: function (tag, shouldFocus, isEditable, afterElement) {
-                     console.log('beforeAddTag: ', this, arguments)
-                 },
-                 keyContext: null, //what does this do?
-                */
-
             });
 
             //remove the inline-styles placed by medium.js
@@ -264,7 +181,7 @@ function genComponentConf() {
         controller: Controller,
         controllerAs: 'self',
         bindToController: true, //scope-bindings -> ctrl
-        scope: { },
+        scope: { onDraftChange: "&"},
         template: template
     }
 }
