@@ -12,7 +12,7 @@ const initialState = Immutable.fromJS({
     allNeeds: {},
 });
 
-export default function(needs = initialState, action = {}) {
+export default function(state = initialState, action = {}) {
     switch(action.type) {
         case actionTypes.logout:
         case actionTypes.needs.clean:
@@ -26,7 +26,7 @@ export default function(needs = initialState, action = {}) {
             theirNeeds = theirNeeds? theirNeeds : Immutable.Set();
             const stateWithOwnNeeds = ownNeeds.reduce(
                 (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
-                needs
+                state
             );
             const stateWithOwnAndTheirNeeds = theirNeeds.reduce(
                 (updatedState, theirNeed) => addNeed(updatedState, theirNeed, false),
@@ -37,45 +37,46 @@ export default function(needs = initialState, action = {}) {
 
         case actionTypes.router.accessedNonLoadedPost:
             const theirNeed = action.payload.get('theirNeed');
-            return addNeed(needs, theirNeed, false);
+            return addNeed(state, theirNeed, false);
 
         case actionTypes.needs.fetch:
             //TODO needs supplied by this action don't have a list of already associated connections
             return action.payload.reduce(
                 (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
-                needs
+                state
             );
 
         case actionTypes.needs.reopen:
-            return needs.setIn([
-                "ownNeeds", action.payload.ownNeedUri, 'won:isInState'
-            ], won.WON.ActiveCompacted);
+            return state
+                .setIn(["ownNeeds", action.payload.ownNeedUri, 'won:isInState'], won.WON.ActiveCompacted)
+                .setIn(["allNeeds", action.payload.ownNeedUri, "state"], won.WON.ActiveCompacted);
 
         case actionTypes.needs.close:
-            return needs.setIn([
-                "ownNeeds", action.payload.ownNeedUri, 'won:isInState'
-            ], won.WON.InactiveCompacted);
+
+            return state
+                .setIn(["ownNeeds", action.payload.ownNeedUri, 'won:isInState'], won.WON.InactiveCompacted)
+                .setIn(["allNeeds", action.payload.ownNeedUri, "state", won.WON.InactiveCompacted]);
 
         case actionTypes.needs.createSuccessful:
-            return addNeed(needs, action.payload.need, true);
+            return addNeed(state, action.payload.need, true);
 
         case actionTypes.connections.load:
             var updatedNeeds =  action.payload.reduce(
                 (updatedState, connectionWithRelatedData) =>
                     storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
-                needs);
+                state);
             return updatedNeeds;
 
         case actionTypes.messages.connectMessageReceived:
             const {ownNeedUri, remoteNeed, updatedConnection } = action.payload;
-            const stateWithBothNeeds = addNeed(needs, remoteNeed, false); // guarantee that remoteNeed is in state
+            const stateWithBothNeeds = addNeed(state, remoteNeed, false); // guarantee that remoteNeed is in state
             return addConnection(stateWithBothNeeds, ownNeedUri, updatedConnection);
 
         case actionTypes.messages.hintMessageReceived:
-            return storeConnectionAndRelatedData(needs, action.payload);
+            return storeConnectionAndRelatedData(state, action.payload);
 
         default:
-            return needs;
+            return state;
     }
 }
 
@@ -142,10 +143,10 @@ function parseNeed(jsonldNeed, ownNeed) {
         }
 
         const state = jsonldNeedImm.getIn([won.WON.isInStateCompacted, "@id"]);
-        if(state === won.WON.Active){ //we use to check for active state and everything else will be inactive
+        if(state === won.WON.ActiveCompacted){ //we use to check for active state and everything else will be inactive
             parsedNeed.state = state;
         } else {
-            parsedNeed.state = won.WON.Inactive;
+            parsedNeed.state = won.WON.InactiveCompacted;
         }
 
         let type = undefined;
