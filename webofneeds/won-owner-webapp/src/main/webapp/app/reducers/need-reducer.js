@@ -12,7 +12,7 @@ const initialState = Immutable.fromJS({
     allNeeds: {},
 });
 
-export default function(allNeeds = initialState, action = {}) {
+export default function(needs = initialState, action = {}) {
     switch(action.type) {
         case actionTypes.logout:
         case actionTypes.needs.clean:
@@ -25,90 +25,154 @@ export default function(allNeeds = initialState, action = {}) {
             let theirNeeds = action.payload.get('theirNeeds');
             theirNeeds = theirNeeds? theirNeeds : Immutable.Set();
             const stateWithOwnNeeds = ownNeeds.reduce(
-                (updatedState, ownNeed) => addOwnNeed(updatedState, ownNeed),
-                allNeeds
+                (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
+                needs
             );
             const stateWithOwnAndTheirNeeds = theirNeeds.reduce(
-                (updatedState, theirNeed) => addTheirNeed(updatedState, theirNeed),
+                (updatedState, theirNeed) => addNeed(updatedState, theirNeed, false),
                 stateWithOwnNeeds
 
             );
             return stateWithOwnAndTheirNeeds;
-            /*
-            return allNeeds
-                .mergeIn(['ownNeeds'], ownNeeds)
-                .mergeIn(['theirNeeds'], theirNeeds);
-                */
 
         case actionTypes.router.accessedNonLoadedPost:
             const theirNeed = action.payload.get('theirNeed');
-            return addTheirNeed(allNeeds, theirNeed);
+            return addNeed(needs, theirNeed, false);
 
         case actionTypes.needs.fetch:
             //TODO needs supplied by this action don't have a list of already associated connections
             return action.payload.reduce(
-                (updatedState, ownNeed) => addOwnNeed(updatedState, ownNeed),
-                allNeeds
+                (updatedState, ownNeed) => addNeed(updatedState, ownNeed, true),
+                needs
             );
 
         case actionTypes.needs.reopen:
-            return allNeeds.setIn([
+            return needs.setIn([
                 "ownNeeds", action.payload.ownNeedUri, 'won:isInState'
             ], won.WON.ActiveCompacted);
 
         case actionTypes.needs.close:
-            return allNeeds.setIn([
+            return needs.setIn([
                 "ownNeeds", action.payload.ownNeedUri, 'won:isInState'
             ], won.WON.InactiveCompacted);
 
         case actionTypes.needs.createSuccessful:
-            return addOwnNeed(allNeeds, action.payload.need);
+            return addNeed(needs, action.payload.need, true);
 
         case actionTypes.connections.load:
-            return action.payload.reduce(
+            var updatedNeeds =  action.payload.reduce(
                 (updatedState, connectionWithRelatedData) =>
                     storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
-                allNeeds);
+                needs);
+            return updatedNeeds;
 
         case actionTypes.messages.connectMessageReceived:
             const {ownNeedUri, remoteNeed, updatedConnection } = action.payload;
-            const stateWithBothNeeds = addTheirNeed(allNeeds, remoteNeed); // guarantee that remoteNeed is in state
+            const stateWithBothNeeds = addNeed(needs, remoteNeed, false); // guarantee that remoteNeed is in state
             return addConnection(stateWithBothNeeds, ownNeedUri, updatedConnection);
 
         case actionTypes.messages.hintMessageReceived:
-            return storeConnectionAndRelatedData(allNeeds, action.payload);
+            return storeConnectionAndRelatedData(needs, action.payload);
 
         default:
-            return allNeeds;
+            return needs;
     }
 }
 
 function storeConnectionAndRelatedData(state, connectionWithRelatedData) {
     const {ownNeed, remoteNeed, connection} = connectionWithRelatedData;
-    const stateWithOwnNeed = addOwnNeed(state, ownNeed); // guarantee that ownNeed is in state
-    const stateWithBothNeeds = addTheirNeed(stateWithOwnNeed, remoteNeed); // guarantee that remoteNeed is in state
+    const stateWithOwnNeed = addNeed(state, ownNeed, true); // guarantee that ownNeed is in state
+    const stateWithBothNeeds = addNeed(stateWithOwnNeed, remoteNeed, false); // guarantee that remoteNeed is in state
     return addConnection(stateWithBothNeeds, ownNeed['@id'], connection.uri);
 }
 
-function addOwnNeed(allNeeds, ownNeed) {
-    const ownNeed_ = Immutable.fromJS(ownNeed);
-    if(ownNeed_ && ownNeed_.get('@id')) {
-        return setIfNew(allNeeds, ['ownNeeds', ownNeed_.get('@id')], ownNeed_);
+function addNeed(needs, jsonldNeed, ownNeed) {
+    const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
+    const mapName = ownNeed? "ownNeeds" : "theirNeeds";
+
+    let newState;
+    let parsedNeed = parseNeed(jsonldNeed, ownNeed);
+
+    if(parsedNeed && parsedNeed.get("id")) {
+        newState = setIfNew(needs, [mapName, parsedNeed.get("id")], jsonldNeedImm);
+        newState = setIfNew(newState, ["allNeeds", parsedNeed.get("id")], parsedNeed);
     } else {
-        console.error('Tried to add invalid need-object: ', ownNeed_);
-        return allNeeds;
+        console.error('Tried to add invalid need-object: ', jsonldNeedImm);
+        newState = needs;
     }
-    //return setIfNew(allNeeds, ['ownNeeds', ownNeed_.get('@id')], ownNeed_);
+
+    return newState;
 }
 
-function addTheirNeed(allNeeds, theirNeed) {
-    const theirNeedImm = Immutable.fromJS(theirNeed);
-    if(theirNeedImm && theirNeedImm.get('@id')) {
-        return setIfNew(allNeeds, ['theirNeeds', theirNeedImm.get('@id')], theirNeedImm);
-    } else {
-        console.error('Tried to add invalid need-object: ', theirNeedImm);
-        return allNeeds;
+
+
+function parseNeed(jsonldNeed, ownNeed) {
+    const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
+    console.log("jsonldNeed: ", jsonldNeedImm);
+
+    let parsedNeed = {id: undefined,
+                title: undefined,
+                description: undefined,
+                type: undefined,
+                state: undefined,
+                tags: undefined,
+                location: undefined,
+                connections: undefined,
+                creationDate: undefined,
+                ownNeed};
+
+    if(jsonldNeedImm){
+        const id = jsonldNeedImm.get("@id");
+
+        const is = jsonldNeedImm.get("won:is");
+        const seeks = jsonldNeedImm.get("won:seeks");
+
+        const title = is ? is.get("dc:title") : (seeks ? seeks.get("dc:title") : undefined);
+
+        if(!!id && !!title){
+            parsedNeed.id = id;
+            parsedNeed.title = title;
+        }else{
+            return undefined;
+        }
+
+        const creationDate = jsonldNeedImm.getIn(["dct:created"]);
+        if(creationDate){
+            parsedNeed.creationDate = creationDate;
+        }
+
+        const state = jsonldNeedImm.getIn([won.WON.isInStateCompacted, "@id"]);
+        if(state === won.WON.Active){ //we use to check for active state and everything else will be inactive
+            parsedNeed.state = state;
+        } else {
+            parsedNeed.state = won.WON.Inactive;
+        }
+
+        let type = undefined;
+        let description = undefined;
+        let tags = undefined;
+
+        if(is){
+            type = seeks ? won.WON.BasicNeedTypeDotogetherCompacted : won.WON.BasicNeedTypeSupplyCompacted;
+            description = is.get("dc:description");
+            tags = is.get("won:hasTag");
+        }else if(seeks){
+            type = won.WON.BasicNeedTypeDemandCompacted;
+            description = seeks.get("dc:description");
+            tags = seeks.get("won:hasTag");
+        }
+
+        parsedNeed.tags = tags ? tags : undefined;
+        parsedNeed.description = description ? description : undefined;
+        parsedNeed.type = type;
+
+        //TODO: LOCATION IS STILL MISSING
+    }else{
+        console.error('Cant parse need data is an invalid need-object: ', jsonldNeedImm);
+        return undefined;
     }
+
+    return Immutable.fromJS(parsedNeed);
 }
 
 /**
@@ -145,7 +209,8 @@ function addConnection(state, needUri, connectionUri) {
 }
 
 function setIfNew(state, path, obj){
-    return state.updateIn(path, val => val?
+    console.log("Set If New: ", state, "path", path, obj);
+    return state.updateIn(path, val => val ?
         //we've seen this need before, no need to overwrite it
         val :
         //it's the first time we see this need -> add it
