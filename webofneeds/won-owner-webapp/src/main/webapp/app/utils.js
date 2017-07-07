@@ -800,3 +800,51 @@ export function jsonld2simpleFormat(jsonldObj, context = undefined) {
         throw new Exception('Encountered unexpected value while parsing json-ld: ', jsonldObj);
     }
 }
+
+/**
+ * Similar to Promise.all, takes an array of promises and returns a promise.
+ * That promise will resolve if at least one of the promises succeeds.
+ * The value with which it resolves it is an array of equal length as the input
+ * containing either the resolve value of the promise or null if rejected.
+ * If an errorHandler is specified, it is called with ([array key], [reject value]) of
+ * each rejected promise.
+ * @param promises
+ */
+export function somePromises(promises, errorHandler) {
+    if(!promises || promises.length === 0) {
+        Promise.resolve();
+    }
+
+    let numPromises = promises.length,
+        successes = 0,
+        failures = 0,
+        results = Array.isArray(promises) ? [] : {},
+        handler = typeof errorHandler === 'function' ? errorHandler : function(x,y){};
+
+    const resultPromise = new Promise((resolve, reject) =>
+        promises.forEach((promise, key) => {
+            promise.then(
+                value => {
+                    successes++;
+                    if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
+                    results[key] = value;
+                    if (failures + successes >= numPromises) resolve(results);
+                },
+                reason => {
+                    failures ++;
+                    //console.log("linkeddata-service-won.js: warning: promise failed. Reason " + JSON.stringify(reason));
+                    if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
+                    results[key] = null;
+                    handler(key, reason);
+                    if (failures >= numPromises) {
+                        reject(results);
+                    } else if (failures + successes >= numPromises) {
+                        resolve(results);
+                    }
+                }
+            )
+
+
+        })
+    )
+}

@@ -126,50 +126,6 @@ import won from './won';
     }
 
     /**
-     * Similar to q.all, takes an array of promises and returns a promise.
-     * That promise will resolve if at least one of the promises succeeds.
-     * The value with which it resolves it is an array of equal length as the input
-     * containing either the resolve value of the promise or null if rejected.
-     * If an errorHandler is specified, it is called with ([array key], [reject value]) of
-     * each rejected promise.
-     * @param promises
-     */
-    var somePromises = function(promises, errorHandler){
-        var deferred = q.defer(),
-            numPromises = promises.length,
-            successes = 0,
-            failures = 0,
-            results = Array.isArray(promises) ? [] : {},
-            handler = typeof errorHandler === 'function' ? errorHandler : function(x,y){};
-
-        if (promises.length == 0) {
-            deferred.reject(results);
-        }
-
-        promises.forEach(function(promise, key) {
-            promise.then(function(value) {
-                successes++;
-                if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
-                results[key] = value;
-                if (failures + successes >= numPromises) deferred.resolve(results);
-            }, function(reason) {
-                failures ++;
-                //console.log("linkeddata-service-won.js: warning: promise failed. Reason " + JSON.stringify(reason));
-                if (results.hasOwnProperty(key)) return; //TODO: not sure if we need this
-                results[key] = null;
-                handler(key, reason);
-                if (failures >= numPromises) {
-                    deferred.reject(results);
-                } else if (failures + successes >= numPromises) {
-                    deferred.resolve(results);
-                }
-            });
-        });
-
-        return deferred.promise;
-    }
-
-    /**
      * An emulation of a lock that can be acquired by any number of readers
      * as long as there is no updater trying to acquire it. An updater that tries
      * to acquire the lock is blocked until all readers have released their lock.
