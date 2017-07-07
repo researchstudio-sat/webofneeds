@@ -2,11 +2,8 @@
  * Created by syim on 20.01.2016.
  */
 import { actionTypes } from '../actions/actions';
-import { repeatVar } from '../utils';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
-import { combineReducersStable } from '../redux-utils';
-import { buildCreateMessage } from '../won-message-utils';
 import won from '../won-es6';
 
 const initialState = Immutable.fromJS({});
