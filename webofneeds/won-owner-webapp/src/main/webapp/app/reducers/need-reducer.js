@@ -5,6 +5,7 @@ import { actionTypes } from '../actions/actions';
 import Immutable from 'immutable';
 import { createReducer } from 'redux-immutablejs'
 import won from '../won-es6';
+import { msStringToDate } from '../utils';
 
 const initialState = Immutable.fromJS({
     ownNeeds: {},
@@ -97,6 +98,33 @@ export default function(state = initialState, action = {}) {
         case actionTypes.messages.close.success:
             return changeConnectionState(state,  action.payload.hasReceiver, won.WON.Closed);
 
+        //NEW MESSAGE STATE UPDATES
+        case actionTypes.messages.connectionMessageReceived:
+            //ADD RECEIVED CHAT MESSAGES
+            //payload; { events }
+            console.log("connectionMessageReceived: ", action.payload.events);
+            return addMessage(state, action.payload.events, false, true);
+
+        case actionTypes.connections.sendChatMessage:
+            //ADD SENT TEXT MESSAGE
+            /*payload: {
+                eventUri: optimisticEvent.uri,
+                message,
+                optimisticEvent,
+             }*/
+            console.log("sendChatMessage: ", action.payload.optimisticEvent);
+            return addMessage(state, action.payload.optimisticEvent, true, true);
+
+        case actionTypes.connections.showLatestMessages:
+        case actionTypes.connections.showMoreMessages:
+            /*var updatedNeeds =  action.payload.reduce(
+                (updatedState, connectionWithRelatedData) =>
+                    addMessage(updatedState, )storeConnectionAndRelatedData(updatedState, connectionWithRelatedData),
+                state);*/
+            var loadedEvents = action.payload.get('events');
+            //TODO: IMPLEMENT MESSAGE STORING OF MESSAGES
+            return state;
+
         default:
             return state;
     }
@@ -128,8 +156,6 @@ function addNeed(needs, jsonldNeed, ownNeed) {
 
     return newState;
 }
-
-
 
 function parseNeed(jsonldNeed, ownNeed) {
     const jsonldNeedImm = Immutable.fromJS(jsonldNeed);
@@ -260,6 +286,47 @@ function parseConnection(jsonldConnection, newConnection) {
     }
 }
 
+function parseMessage(jsonldMessage, outgoingMessage, newMessage) {
+    const jsonldMessageImm = Immutable.fromJS(jsonldMessage);
+
+    let parsedMessage = {
+        belongsToId: undefined,
+        data: {
+            id: undefined,
+            text: undefined,
+            date: undefined,
+            outgoingMessage,
+            newMessage
+        }
+    };
+
+
+
+    if(outgoingMessage){
+        parsedMessage.belongsToId = jsonldMessageImm.get("hasSender");
+        parsedMessage.data.id = jsonldMessageImm.get("uri");
+        parsedMessage.data.text = jsonldMessageImm.get("hasTextMessage");
+        parsedMessage.data.date = jsonldMessageImm.get("hasSentTimestamp");
+    }else{
+        parsedMessage.belongsToId = jsonldMessageImm.getIn(["msg:FromOwner", "hasReceiver"]);
+        parsedMessage.data.id = jsonldMessageImm.getIn(["msg:FromOwner", "uri"]);
+        parsedMessage.data.text = jsonldMessageImm.getIn(["msg:FromOwner", "hasTextMessage"]);
+        parsedMessage.data.date = msStringToDate(jsonldMessageImm.getIn(["msg:FromExternal", "hasReceivedTimestamp"]));
+    }
+
+    if(
+        !parsedMessage.data.id ||
+        !parsedMessage.belongsToId ||
+        !parsedMessage.data.text ||
+        !parsedMessage.data.date
+    ) {
+        console.error('Cant parse chat-message, data is an invalid message-object: ', jsonldMessageImm.toJS());
+        return undefined;
+    } else {
+        return Immutable.fromJS(parsedMessage);
+    }
+}
+
 /**
  * Add's the connectionUri to the needs connections. Makes
  * sure the same uri doesn't get added twice.
@@ -303,17 +370,38 @@ function addConnectionFull(state, connection, newConnection) {
     let parsedConnection = parseConnection(connection, newConnection);
 
     if(parsedConnection){
-        let connections = state.getIn(['allNeeds', parsedConnection.get("belongsToId"), 'connections']);
-        connections = connections.set(parsedConnection.getIn(["data", "id"]), parsedConnection.get("data"));
+        const needId = parsedConnection.get("belongsToId");
+        let connections = state.getIn(['allNeeds', needId, 'connections']);
 
-        return state.setIn(["allNeeds", parsedConnection.get("belongsToId"), "connections"], connections);
-    }else{
-        return state;
+        if(connections){
+            connections = connections.set(parsedConnection.getIn(["data", "id"]), parsedConnection.get("data"));
+
+            return state.setIn(["allNeeds", needId, "connections"], connections);
+        }else{
+            console.error("Couldnt add valid connection - missing need data in state", needId);
+        }
     }
+    return state;
 }
 
+function addMessage(state, message, ownMessage, newMessage) {
+    let parsedMessage = parseMessage(message, ownMessage, newMessage);
+
+    if(parsedMessage){
+        const connectionId = parsedMessage.get("belongsToId");
+        let need = getNeedForConnectionUri(state, connectionId);
+        if(need){
+            let messages = state.getIn(['allNeeds', need.get("id"), "connections", connectionId, "messages"]);
+            messages = messages.set(parsedMessage.getIn(["data", "id"]), parsedMessage.get("data"));
+
+            return state.setIn(["allNeeds", need.get("id"), "connections", connectionId, "messages"], messages);
+        }
+    }
+    return state;
+}
+
+
 function setIfNew(state, path, obj){
-    console.log("Set If New: ", state, "path", path, obj);
     return state.updateIn(path, val => val ?
         //we've seen this need before, no need to overwrite it
         val :
@@ -322,7 +410,7 @@ function setIfNew(state, path, obj){
 }
 
 function changeConnectionState(state, connectionUri, newState) {
-    const need = getNeedForConnectionUri(connectionUri);
+    const need = getNeedForConnectionUri(state, connectionUri);
 
     if(!need) {
         console.error("no need found for connectionUri", connectionUri);
