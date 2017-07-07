@@ -494,8 +494,14 @@ function fetchAllAccessibleAndRelevantData(ownNeedUris, curriedDispatch = () => 
                     urisToLookupMap(theirNeedUris, won.getTheirNeed));
 
         //dispatch to the curried-in action as soon as any part of the data arrives
-        allOwnNeedsPromise.then(ownNeeds => dispatchWellFormed({ownNeeds}));
-        allConnectionsPromise.then(connections => dispatchWellFormed({connections}));
+        const ownNeedsDispatchedP = allOwnNeedsPromise.then(ownNeeds => dispatchWellFormed({ownNeeds}));
+
+        //Is needed for the reducer to make sure that all needs have already been put in the state
+        Promise.all([
+            ownNeedsDispatchedP,
+            allConnectionsPromise,
+        ]).then(([x, connections]) => dispatchWellFormed({connections}));
+
         //allEventsPromise.then(events => dispatchWellFormed({events})); // STARTING with selective loading
         allTheirNeedsPromise.then(theirNeeds => dispatchWellFormed({theirNeeds}));
 
