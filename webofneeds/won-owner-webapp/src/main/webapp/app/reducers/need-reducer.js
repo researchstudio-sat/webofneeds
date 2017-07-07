@@ -123,6 +123,9 @@ export default function(state = initialState, action = {}) {
                 state);*/
             var loadedEvents = action.payload.get('events');
             //TODO: IMPLEMENT MESSAGE STORING OF MESSAGES
+            if(loadedEvents){
+                console.log("showXMessages: ", loadedEvents.toJS());
+            }
             return state;
 
         default:
