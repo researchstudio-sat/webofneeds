@@ -1443,7 +1443,7 @@ import won from './won';
                         for (let key in uris){
                             eventPromises.push(won.ensureLoaded(uris[key]));
                         }
-                        return q.all(eventPromises);
+                        return Promise.all(eventPromises);
                     }
                 );
             }
@@ -1526,7 +1526,7 @@ import won from './won';
                                         conData.connection.value,
                                         requesterWebId
                                 ).then(function(eventUriResult){
-                                            return q.all(
+                                            return Promise.all(
                                                 [won.getNodeWithAttributes(eventUriResult[0].eventUri.value, requesterWebId),
                                                  won.getNodeWithAttributes(conData.connection.value),
                                                  won.getTheirNeed(conData.remoteNeed.value)
@@ -1897,7 +1897,7 @@ import won from './won';
             //console.log("linkeddata-service-won.js: executing query: \n"+query);
             var locks = getReadUpdateLocksPerUris(relevantResources);
             var promises = acquireReadLocks(locks);
-            return q.all(promises).then(
+            return Promise.all(promises).then(
                 function () {
                     var resultObject = {};
                     try {
@@ -1927,7 +1927,7 @@ import won from './won';
             //console.log("linkeddata-service-won.js: resolving " + propertyPaths.length + " property paths on baseUri " + baseUri);
             var locks = getReadUpdateLocksPerUris(relevantResources);
             var promises = acquireReadLocks(locks);
-            return q.all(promises).then(
+            return Promise.all(promises).then(
                 function () {
                     try {
                         var resolvedUris = [];
@@ -1970,7 +1970,7 @@ import won from './won';
                 //console.log("linkeddata-service-won.js: crawlableQuery:resolveOrExecute resolving property paths ...");
                 Array.prototype.push.apply(relevantResources, resolvedUris);
                 var loadedPromises = relevantResources.map(x => won.ensureLoaded(x, { requesterWebId }) );
-                return q.all(loadedPromises)
+                return Promise.all(loadedPromises)
                     .then(
                         function (x) {
                             return resolvePropertyPathsFromBaseUri(crawlableQuery.propertyPaths, baseUri, relevantResources);
