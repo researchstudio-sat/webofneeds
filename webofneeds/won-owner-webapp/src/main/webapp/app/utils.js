@@ -808,6 +808,11 @@ export function jsonld2simpleFormat(jsonldObj, context = undefined) {
  * containing either the resolve value of the promise or null if rejected.
  * If an errorHandler is specified, it is called with ([array key], [reject value]) of
  * each rejected promise.
+ *
+ * Consider using `Promise.race` if you just need once Promise to resolve/reject.
+ * `somePromises` waits for all promises to either resolve or reject, then resolves
+ * if at least one of them was successful.
+ *
  * @param promises
  */
 export function somePromises(promises, errorHandler) {
