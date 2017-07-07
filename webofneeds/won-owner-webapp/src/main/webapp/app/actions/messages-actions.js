@@ -161,7 +161,7 @@ export function successfulCreate(event) {
                 eventData.needURI = needURI;
                 won.getNeedWithConnectionUris(needURI).then((need) => {
                     console.log("Dispatching action " + won.EVENT.NEED_CREATED);
-                    dispatch(actionCreators.drafts__publishSuccessful({
+                    dispatch(actionCreators.needs__createSuccessful({
                         publishEventUri: event.isResponseTo,
                         needUri: event.hasSenderNeed,
                         eventData: eventData,
