@@ -13,7 +13,6 @@ const initialState = Immutable.fromJS({
 });
 
 export default function(state = initialState, action = {}) {
-    let connections;
     switch(action.type) {
         case actionTypes.logout:
         case actionTypes.needs.clean:
@@ -35,20 +34,12 @@ export default function(state = initialState, action = {}) {
 
             );
 
-            connections = action.payload.get('connections');
-            connections = connections ? connections : Immutable.Set();
-            const stateWithOwnAndTheirNeedsAndConnections = storeConnectionsData(stateWithOwnAndTheirNeeds, connections, false);
-
-            return stateWithOwnAndTheirNeedsAndConnections;
+            return storeConnectionsData(stateWithOwnAndTheirNeeds, action.payload.get('connections'), false);
         case actionTypes.messages.closeNeed.failed:
-            connections = action.payload.get('connections');
-            connections = connections ? connections : Immutable.Set();
-
-            return stateWithConnections = storeConnectionsData(state, connections, false);
+            return storeConnectionsData(state, action.payload.get('connections'), false);
 
         case actionTypes.router.accessedNonLoadedPost:
-            const theirNeed = action.payload.get('theirNeed');
-            return addNeed(state, theirNeed, false);
+            return addNeed(state, action.payload.get('theirNeed'), false);
 
         case actionTypes.needs.fetch:
             //TODO needs supplied by this action don't have a list of already associated connections
@@ -58,15 +49,10 @@ export default function(state = initialState, action = {}) {
             );
 
         case actionTypes.needs.reopen:
-            return state
-                .setIn(["ownNeeds", action.payload.ownNeedUri, 'won:isInState'], won.WON.ActiveCompacted)
-                .setIn(["allNeeds", action.payload.ownNeedUri, "state"], won.WON.ActiveCompacted);
+            return changeNeedState(state, action.payload.ownNeedUri, won.WON.ActiveCompacted);
 
         case actionTypes.needs.close:
-
-            return state
-                .setIn(["ownNeeds", action.payload.ownNeedUri, 'won:isInState'], won.WON.InactiveCompacted)
-                .setIn(["allNeeds", action.payload.ownNeedUri, "state", won.WON.InactiveCompacted]);
+            return changeNeedState(state, action.payload.ownNeedUri, won.WON.InactiveCompacted);
 
         case actionTypes.needs.createSuccessful:
             return addNeed(state, action.payload.need, true);
@@ -214,6 +200,8 @@ function parseNeed(jsonldNeed, ownNeed) {
 }
 
 function storeConnectionsData(state, connectionsToStore, newConnections) {
+    newConnections = newConnections ? newConnections : Immutable.Set();
+
     if(connectionsToStore && connectionsToStore.size > 0) {
         connectionsToStore.map(function(connection){
             state = addConnectionFull(state, connection, newConnections);
@@ -334,8 +322,7 @@ function setIfNew(state, path, obj){
 }
 
 function changeConnectionState(state, connectionUri, newState) {
-    let needs = state.get("allNeeds");
-    const need = needs.filter(need => need.get("ownNeed") && need.get("connections").has(connectionUri)).first();
+    const need = getNeedForConnectionUri(connectionUri);
 
     if(!need) {
         console.error("no need found for connectionUri", connectionUri);
@@ -349,3 +336,13 @@ function changeConnectionState(state, connectionUri, newState) {
             .setIn(["allNeeds", needUri, "connections", connectionUri, "newConnection"], true);
 }
 
+function changeNeedState(state, needUri, newState) {
+    return state
+        .setIn(["ownNeeds", action.payload.ownNeedUri, 'won:isInState'], newState)
+        .setIn(["allNeeds", action.payload.ownNeedUri, "state", newState]);
+}
+
+function getNeedForConnectionUri(state, connectionUri){
+    let needs = state.get("allNeeds");
+    return needs.filter(need => need.get("connections").has(connectionUri)).first();
+}
