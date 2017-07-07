@@ -25,6 +25,7 @@ import {
     clone,
     contains,
     camel2Hyphen,
+    somePromises,
 } from '../utils';
 
 import '../../scripts/rdfstore-js/rdf_store';
@@ -163,7 +164,8 @@ import won from './won';
                 + "]";
         },
         acquireReadLock: function(){
-            var deferred = q.defer();
+            let deferred = {};
+            let promise = new Promise((resolve, reject) => { deferred = {resolve, reject} });
             if (this.updateInProgress || this.blockedUpdaters.length > 0){
                 //updates are already in progress or are waiting. block.
                 //console.log("linkeddata-service-won.js: rul:read:block:  " + this.uri + " " + this.getLockStatusString());
@@ -177,10 +179,11 @@ import won from './won';
                 this.blockedReaders.push(deferred);
                 this.grantLockToReaders();
             }
-            return deferred.promise;
+            return promise;
         },
         acquireUpdateLock: function(){
-            var deferred = q.defer();
+            let deferred = {};
+            let promise = new Promise((resolve, reject) => {deferred = {resolve, reject}});
 
             if (this.activeReaderCount > 0 ) {
                 //readers are present, we have to wait till they are done
@@ -194,7 +197,7 @@ import won from './won';
                 this.grantLockToUpdaters();
             }
 
-            return deferred.promise;
+            return promise;
         },
         releaseReadLock: function(){
             //console.log("linkeddata-service-won.js: rul:read:release:" + this.uri + " " + this.getLockStatusString());
